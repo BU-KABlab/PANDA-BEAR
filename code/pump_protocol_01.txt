@@ -1,0 +1,61 @@
+For our first protocol we will:
+withdraw from dish 1 a volume of 300 uL
+wait for movement to complete
+infuse into dish 2 a volume of 200 uL
+withdraw 0.25 ul to stop any drips
+
+Based on what I know so far we will send 
+small programs to the pump in sequence to avoid 
+programming long loops
+
+
+DIA     ;diameter
+VOL ML  ;Volume units ml
+TRGFT   ;
+AL 0    ;Alarm 0 -off 1 -on
+PF 0    ;PowerFail 0 -off 1 -on
+BP 1    ;Keyboard Beep 0 -off 1 -on
+;""""""""""""""""""""""""""""""""""""
+PHN 1   ;pump phase
+FUN RAT ;Function fill rate
+RAT 750 MH  ;rate of 750 ml per hour
+VOL 2.0 ;function Volume 2 ml
+DIR INF ;direction infuse/withdraw
+;""""""""""""""""""""""""""""""""""""
+PHN 1   ;pump phase
+FUN RAT ;Function fill rate
+RAT 750 MH  ;rate of 750 ml per hour
+VOL 2.0 ;function Volume 2 ml
+DIR INF ;direction infuse/withdraw
+;""""""""""""""""""""""""""""""""""""
+PHN 1   ;pump phase
+FUN RAT ;Function fill rate
+RAT 750 MH  ;rate of 750 ml per hour
+VOL 2.0 ;function Volume 2 ml
+DIR INF ;direction infuse/withdraw
+;""""""""""""""""""""""""""""""""""""
+PHN 1   ;pump phase
+FUN RAT ;Function fill rate
+RAT 750 MH  ;rate of 750 ml per hour
+VOL 2.0 ;function Volume 2 ml
+DIR INF ;direction infuse/withdraw
+
+HOW TO LOOP
+
+PHN 3   ;phase number
+FUN LPS ;loop start
+
+PHN 4   ;
+FUN LPS ;nested loop start
+
+PHN 5
+FUN PAS 90  ;pause for 90s
+
+PHN 6
+FUN LOP 3   ;Loop back to phase 4 3 times
+
+PHN 7
+FUN BP
+
+PHN 8 PAS 30
+
