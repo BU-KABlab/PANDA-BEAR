@@ -10,6 +10,10 @@
 ## Designs
 * [3D Printed Instrument Holder](https://cad.onshape.com/documents/1eb6654eae271aa8916cdb7a/w/86f439f42eab6f737d696fb6/e/022d282226daba6b9e3abdd7?renderMode=0&uiState=6407ea2431dacb56d468d665)
 
+# Other Tools
+* Python 11
+* [Slack SDK](https://slack.dev/python-slack-sdk/)
+
 ## Inspiration Board
 ### Opentrons
 https://opentrons.com/
