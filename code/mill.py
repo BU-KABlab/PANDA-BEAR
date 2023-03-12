@@ -11,8 +11,9 @@ ser = serial.Serial(
 
 
 time.sleep(2)
-command = 'G0x20 0\n'# G00X80Y20\n'
+command = 'G0x-20 0\n'# G00X80Y20\n'
 #command = '(ctrl-x)\n'
+print(f'Sending: {command}')
 ser.write(command.replace(" ","").encode())
 
 time.sleep(1)
