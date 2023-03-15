@@ -25,7 +25,7 @@ mill_move = "G1 X{} Y{} Z{}\n"  # move to specified coordinates
 # define some constants
 steps_per_rev = 200  # steps per motor revolution
 microsteps_per_step = 8  # microsteps per motor step
-lead_screw_pitch = 2  # millimeters of travel per motor revolution
+lead_screw_pitch = 1.5875  # millimeters of travel per motor revolution
 syringe_diameter = 4.57  # syringe diameter in millimeters
 
 # define reusable functions for the mill
@@ -91,3 +91,6 @@ response = withdraw(volume)
 print(response)
 
 # wait for the machine to finish moving
+time.sleep(30)
+ser_mill.close()
+ser_pump.close()
