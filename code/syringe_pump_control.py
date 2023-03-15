@@ -1,38 +1,30 @@
-import time
 import serial
+import time
 
-# configure the serial connections (the parameters differs on the device you are connecting to)
-ser = serial.Serial(
-    port='/dev/ttyUSB1',
-    baudrate=9600,
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS
-)
+# configure the serial port
+ser = serial.Serial()
+ser.baudrate = 9600
+ser.port = '/dev/ttyUSB0'  # set your port name here
+ser.timeout = 1
+ser.open()
 
-ser.isOpen()
+# define some commands
+pump_rate = "IRATE,1,0.5\r\n"  # set pump rate to 0.5 ml/min
+syringe_diameter = "IDIAM,1,4.0\r\n"  # set syringe diameter to 4.0 mm
+infuse = "INFU,1,10\r\n"  # infuse 10 ml
 
-print('Enter your commands below.\r\nInsert "exit" to leave the application.')
+# send the commands to the pump
+ser.write(pump_rate.encode())
+ser.write(syringe_diameter.encode())
+ser.write(infuse.encode())
 
-input=1
-while 1 :
-    # get keyboard input
-    input = input(">> ")
+# wait for the pump to finish infusing
+time.sleep(60)  # wait for 1 minute
 
-    if input == 'exit':
-        ser.close()
-        exit()
-    else:
-        # send the character to the device
-        # (note that I append a \r\n carriage return and line feed to the characters - this is requested by my device)
-        ser.write(input)
-        out = ''
-        # let's wait one second before reading output (let's give device time to answer)
-        time.sleep(1)
-        while ser.inWaiting() > 0:
-            out += ser.read(1)
-            
-        if out != '':
-            print(f">>{out}")
+# stop the pump
+stop = "STOP\r\n"
+ser.write(stop.encode())
 
-# return pump to Basic mode: (0x2) ( 0x8) SAF0 (0x55) (0x43) (0x3)
+# close the serial port
+ser.close()
+
