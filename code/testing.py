@@ -10,17 +10,21 @@ ser_pump.port = '/dev/ttyUSB0'  # set your pump port name here
 ser_pump.timeout = 1
 ser_pump.open()
 
-ser_mill = serial.Serial()
-ser_mill.baudrate = 9600
-ser_mill.port = '/dev/ttyUSB1'  # set your mill port name here
-ser_mill.timeout = 1
-ser_mill.open()
+ser_mill = serial.Serial(
+    port='/dev/ttyUSB1',
+    baudrate=115200,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS,
+)
+#ser_mill.open()
+
 
 # define some commands
 pump_infuse = "IA{}\n"  # infuse command for the pump
 pump_withdraw = "IW{}\n"  # withdraw command for the pump
-mill_home = "G28\n"  # home all axes
-mill_move = "G1 X{} Y{} Z{}\n"  # move to specified coordinates
+mill_home = "$H\n"  # home all axes
+mill_move = "G0 X{} Y{} Z{}\n"  # move to specified coordinates
 
 # define some constants
 steps_per_rev = 200  # steps per motor revolution
@@ -30,13 +34,14 @@ syringe_diameter = 4.57  # syringe diameter in millimeters
 
 # define reusable functions for the mill
 def send_mill_command(command):
-    ser_mill.write(command.encode())
+    print(f'Sending {command} to mill')
+    ser_mill.write(command)
     response = ser_mill.readline().decode().strip()
     return response
 
 def move_to_position(x, y, z):
     command = mill_move.format(x, y, z)
-    response = send_mill_command(command)
+    response = send_mill_command(command.encode())
     return response
 
 def calculate_steps(distance):
@@ -46,7 +51,8 @@ def calculate_steps(distance):
 
 # define reusable functions for the syringe pump
 def send_pump_command(command):
-    ser_pump.write(command.encode())
+    print(f'Sending {command} to pump')
+    ser_pump.write(command)
     response = ser_pump.readline().decode().strip()
     return response
 
@@ -61,29 +67,32 @@ def infuse(volume):
     distance = volume / calculate_volume(1)  # calculate the distance to move
     steps = calculate_steps(distance)  # calculate the number of steps to move
     command = pump_infuse.format(steps)
-    response = send_pump_command(command)
+    response = send_pump_command(command.encode())
     return response
 
 def withdraw(volume):
     distance = volume / calculate_volume(1)  # calculate the distance to move
     steps = calculate_steps(distance)  # calculate the number of steps to move
     command = pump_withdraw.format(steps)
-    response = send_pump_command(command)
+    response = send_pump_command(command.encode())
     return response
 
 # move to the starting position
-send_mill_command(mill_home)
-time.sleep(5)  # wait for 5 seconds for the machine to home
+send_mill_command(mill_home.encode())
+time.sleep(30)  # wait for 5 seconds for the machine to home
 
 # move to the target position
 x, y, z = 40, 30, -20  # set target coordinates
 response = move_to_position(x, y, z)
 print(response)
+time.sleep(10)
 
 # infuse 0.5 ml of fluid
 volume = 0.5  # set the infusion volume
 response = infuse(volume)
 print(response)
+
+time.sleep(10)
 
 # withdraw 0.2 ml of fluid
 volume = 0.2  # set the withdrawal volume
