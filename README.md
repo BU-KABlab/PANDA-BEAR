@@ -1,4 +1,5 @@
-# KABLAB
+# ORCA
+Opto-elecRo-Chemical Autonomous researcher
 ## Purpose
 
 ## Instruments
