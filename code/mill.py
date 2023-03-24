@@ -27,7 +27,8 @@ def move_to_position(x, y, z):
     return response
 
 # move to the starting position
-#send_command(home.encode())
+response = send_command(b'$H\n')
+print(response)
 time.sleep(5)  # wait for 5 seconds for the machine to home
 
 # move to the target position

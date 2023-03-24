@@ -10,18 +10,18 @@ ser_pump.port = '/dev/ttyUSB0'  # set your pump port name here
 ser_pump.timeout = 1
 ser_pump.open()
 
-ser_mill = serial.Serial(
-    port='/dev/ttyUSB1',
-    baudrate=115200,
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS,
-)
+#ser_mill = serial.Serial(
+#    port='/dev/ttyUSB1',
+#    baudrate=115200,
+#    parity=serial.PARITY_NONE,
+#    stopbits=serial.STOPBITS_ONE,
+#    bytesize=serial.EIGHTBITS,
+#)
 #ser_mill.open()
 
 
 # define some commands
-pump_infuse = "IA{}\n"  # infuse command for the pump
+pump_infuse = "INF{}\n"  # infuse command for the pump
 pump_withdraw = "IW{}\n"  # withdraw command for the pump
 mill_home = "$H\n"  # home all axes
 mill_move = "G0 X{} Y{} Z{}\n"  # move to specified coordinates
@@ -54,6 +54,7 @@ def send_pump_command(command):
     print(f'Sending {command} to pump')
     ser_pump.write(command)
     response = ser_pump.readline().decode().strip()
+    print(response)
     return response
 
 def calculate_volume(distance):
@@ -78,28 +79,30 @@ def withdraw(volume):
     return response
 
 # move to the starting position
-send_mill_command(mill_home.encode())
-time.sleep(30)  # wait for 5 seconds for the machine to home
+#response = send_mill_command(mill_home.encode())
+#print(response)
+#time.sleep(30)  # wait for 5 seconds for the machine to home
 
 # move to the target position
-x, y, z = 40, 30, -20  # set target coordinates
-response = move_to_position(x, y, z)
-print(response)
-time.sleep(10)
+#x, y, z = 40, 30, -20  # set target coordinates
+#response = move_to_position(x, y, z)
+#print(response)
+#time.sleep(10)
 
 # infuse 0.5 ml of fluid
-volume = 0.5  # set the infusion volume
-response = infuse(volume)
+#volume = 10  # set the infusion volume
+#response = infuse(volume)
+response = send_pump_command(b'INF')
 print(response)
 
 time.sleep(10)
 
 # withdraw 0.2 ml of fluid
-volume = 0.2  # set the withdrawal volume
-response = withdraw(volume)
-print(response)
+#volume = 0.2  # set the withdrawal volume
+#response = withdraw(volume)
+#print(response)
 
 # wait for the machine to finish moving
-time.sleep(30)
-ser_mill.close()
+time.sleep(10)
+#ser_mill.close()
 ser_pump.close()
