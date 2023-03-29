@@ -54,7 +54,7 @@ def send_pump_command(command):
     print(f'Sending {command} to pump')
     ser_pump.write(command)
     response = ser_pump.readline().decode().strip()
-    print(response)
+    print(f'pump returned: {response}')
     return response
 
 def calculate_volume(distance):
@@ -92,8 +92,7 @@ def withdraw(volume):
 # infuse 0.5 ml of fluid
 #volume = 10  # set the infusion volume
 #response = infuse(volume)
-response = send_pump_command(b'INF')
-print(response)
+response = send_pump_command(b'ADRS\r')
 
 time.sleep(10)
 
@@ -103,6 +102,6 @@ time.sleep(10)
 #print(response)
 
 # wait for the machine to finish moving
-time.sleep(10)
+#time.sleep(10)
 #ser_mill.close()
 ser_pump.close()
