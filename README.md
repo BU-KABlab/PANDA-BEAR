@@ -10,7 +10,7 @@ Opto-elecRo-Chemical Autonomous researcher
 * [Gamry Potentiostat]()
 
 ## Designs
-* [3D Printed Instrument Holder]([https://cad.onshape.com/documents/1eb6654eae271aa8916cdb7a/w/86f439f42eab6f737d696fb6/e/022d282226daba6b9e3abdd7?renderMode=0&uiState=6407ea2431dacb56d468d665](https://cad.onshape.com/documents/c75fe6bc68ee2746309c067f/w/80942d9f5953df01d216df22/e/fce6103128a9bdf7b907dcd4))
+* [3D Printed Instrument Holder](https://cad.onshape.com/documents/c75fe6bc68ee2746309c067f/w/80942d9f5953df01d216df22/e/fce6103128a9bdf7b907dcd4)
 
 # Other Tools
 * Python 3.10
