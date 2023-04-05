@@ -3,51 +3,64 @@ import time
 
 # configure the serial port
 ser = serial.Serial(
-    port='/dev/ttyUSB1',
+    port='COM6',
     baudrate=115200,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,
     bytesize=serial.EIGHTBITS,
 )
+if not ser.is_open:
+    ser.open()
+else:
+    print('Serial port is still open')
+
+time.sleep(2) #REQUIRED after opening the serial port to allow back and forth!!!
 
 # define some commands
-home = "$H\n"  # home all axes
+home_cmd = '$H\n' # home all axes
 move = "G0 X{} Y{} Z{}\n"  # move to specified coordinates
 
 # define reusable functions
-def send_command(command):
-    print(f'Sending: {command}')
-    ser.write(command)
-    response = ser.readline().decode().strip()
-    return response
+def send_command_to_mill(command):
+    if command != 'close':
+        print(f'Sending: {command.strip()}')
+        ser.write(command)
+        time.sleep(1)
+        out=''
+        while ser.inWaiting() > 0:
+            out = ser.readline()
+                    
+            if out != '':
+                print(out.strip().decode())
+    else:
+        ser.close()
 
 def move_to_position(x, y, z):
     command = move.format(x, y, z).encode()
-    response = send_command(command)
+    response = send_command_to_mill(command)
     return response
 
 # move to the starting position
-response = send_command(b'$H\n')
-print(response)
-time.sleep(5)  # wait for 5 seconds for the machine to home
+send_command_to_mill(home_cmd.encode())
+#print(response)
+time.sleep(10)  # wait for 10 seconds for the machine to home
 
 # move to the target position
 x, y, z = 40, 30, -20  # set target coordinates
-response = move_to_position(x, y, z)
-print(response)
-
+move_to_position(x, y, z)
 # wait for the machine to finish moving
 time.sleep(10)  # wait for 10 seconds
-move_to_position(20,20,0)
 
-time.sleep(10)  # wait for 10 seconds
 move_to_position(20,20,0)
 time.sleep(10)  # wait for 10 seconds
 
+move_to_position(20,20,0)
+time.sleep(10)  # wait for 10 seconds
 
+move_to_position(0,0,0)
+time.sleep(10)
 # stop the machine
-send_command(b'\x18')
-response = ser.readline().decode().strip()  # read the response
+response = send_command_to_mill(b'\x18')# read the response
 print(response)
 
 # close the serial port

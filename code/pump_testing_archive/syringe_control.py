@@ -9,7 +9,8 @@ syringes = {'1 ml BD':'4.699',
 
 #set up the serial port
 serial_connection = serial.Serial(
-    port='/dev/ttyUSB0',
+    #port='/dev/ttyUSB0',
+    port='COM4',
     baudrate= 19200,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,
@@ -20,9 +21,9 @@ def find_pumps(ser,tot_range=1):
     pumps = []
     for i in range(tot_range):
         #pump_adr = str(i)
-        cmd = 'ADR\r\n'
+        cmd = 'ADR\r'
         print(f'Sending: ADR')
-        ser.write(b"RUN\r")
+        ser.write(cmd.encode())
         time.sleep(1)
         output = ser.readlines()
         print(f'Output: {output}')
@@ -134,7 +135,7 @@ def prime(ser,pump):
     output = ser.readline()
     if '?' in output: print (cmd.strip()+' from prime not understood')
 
-
+serial_connection.close()
 serial_connection.open()
 print (serial_connection.name)       # check which port was really used
 print (f'Serial port is open: {serial_connection.isOpen()}')
