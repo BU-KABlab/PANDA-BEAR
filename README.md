@@ -13,9 +13,10 @@ Opto-elecRo-Chemical Autonomous researcher
 * [3D Printed Instrument Holder](https://cad.onshape.com/documents/c75fe6bc68ee2746309c067f/w/80942d9f5953df01d216df22/e/fce6103128a9bdf7b907dcd4)
 
 # Other Tools
-* Python 3.10
-* nesp-lib (syringe pump control package)
+* Python 3
+* [nesp-lib](https://github.com/AbeKh/nesp-lib-py)
 * [Slack SDK](https://slack.dev/python-slack-sdk/)
+* [Windows driver for serial cable communication](https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip)
 
 ## Inspiration Board
 ### Opentrons
