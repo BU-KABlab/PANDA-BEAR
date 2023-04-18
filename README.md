@@ -1,5 +1,4 @@
 # ~~ORCA~~ PANDA
-Opto-elecRo-Chemical Autonomous researcher
 ![PANDA-logo](https://github.com/erasmus95/PANDA/blob/main/images/PANDA_logo.png)
 ## Purpose
 
