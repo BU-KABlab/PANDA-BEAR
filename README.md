@@ -1,10 +1,9 @@
-# ORCA
-Opto-elecRo-Chemical Autonomous researcher
-![ORCA-Logo](https://user-images.githubusercontent.com/83718021/229601631-5157f3f3-942a-40aa-87a5-3f3fa7ce6dd2.png)
+# ~~ORCA~~ PANDA
+![PANDA-logo](https://github.com/erasmus95/PANDA/blob/main/images/PANDA_logo.png)
 ## Purpose
 
 ## Instruments
-* [Genmitsu 3018 Prover V1](https://www.sainsmart.com/products/sainsmart-genmitsu-cnc-router-3018-prover-kit)
+* [Genmitsu PROVerXL 4030 CNC Router](https://www.sainsmart.com/products/genmitsu-proverxl-4030-cnc-router-with-carveco-maker-subscription)
 * [WPI Aladin Syringe Pump - Model A-1000](https://www.wpiinc.com/var-al1000hp-aladdin-single-syringe-pump-high-pressure)
 * [5mL Pasture Pipette]()
 * [Gamry Potentiostat Interface 1010E](https://www.gamry.com/potentiostats/interface-1010e-potentiostat/)
@@ -14,6 +13,8 @@ Opto-elecRo-Chemical Autonomous researcher
 
 # Other Tools
 * Python 3
+* Anaconda
+* Spyder
 * [nesp-lib](https://github.com/AbeKh/nesp-lib-py)
 * [Slack SDK](https://slack.dev/python-slack-sdk/)
 * [Windows driver for serial cable communication](https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip)
