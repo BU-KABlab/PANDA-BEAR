@@ -31,7 +31,7 @@ class Vial():
     def get_volume(self):
         return self.volume
     
-class MillControl():
+class Mill_Control():
     '''Set up the mill connection and pass commands, including special commands'''
     def __init__(self) -> None:
        
