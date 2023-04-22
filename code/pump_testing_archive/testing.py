@@ -2,7 +2,7 @@
 import serial
 import time
 import math
-import nesp_lib
+#import nesp_lib
 
 # find serial port devices
 def find_serial_device(baudrate:int,OS:str):
@@ -45,8 +45,8 @@ def find_serial_device(baudrate:int,OS:str):
         return 'error'
 
 # Check that the search for devices was fruitful
-#pump_port= find_serial_device(19200,'windows')
-#if pump_port == 'error': exit()
+pump_port= find_serial_device(19200,'windows')
+if pump_port == 'error': exit()
 #mill_port = find_serial_device(115200,'windows')
 #if mill_port == 'error': exit()
 
