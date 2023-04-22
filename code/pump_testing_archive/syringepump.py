@@ -2,7 +2,7 @@ import nesp_lib
 from nesp_lib import Port, Pump, PumpingDirection
 
 # Constructs the port to which the pump is connected.
-port = Port('/dev/ttyUSB0',19200)
+port = Port('COM3',19200)
 # Constructs the pump connected to the port.
 pump = Pump(port)
 

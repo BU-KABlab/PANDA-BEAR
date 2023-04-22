@@ -10,7 +10,7 @@ syringes = {'1 ml BD':'4.699',
 #set up the serial port
 serial_connection = serial.Serial(
     #port='/dev/ttyUSB0',
-    port='COM4',
+    port='COM5',
     baudrate= 19200,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,
