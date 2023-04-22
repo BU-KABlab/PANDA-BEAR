@@ -1,7 +1,7 @@
 import serial
 import time
 import nesp_lib
-from classes import Vial, Wells
+#from classes import Vial, Wells
 
 # define reusable functions for the mill
 def SEND_COMMAND_TO_MILL(command:str,ser):
@@ -18,12 +18,18 @@ def SEND_COMMAND_TO_MILL(command:str,ser):
             out = ser.readline()
                     
         if out != '':
-            response = (out.strip().decode())
+            out = (out.strip().decode())
+            print(out)
     else:
         ser.close()
-    time.sleep(15)    
-    return response
-def MOVE_TO_POSITION(x, y, z):
+        
+    if command == '$H':
+        time.sleep(20)
+    else:
+        time.sleep(10)
+        
+    return out
+def MOVE_TO_POSITION(x, y, z,ser_mill):
     '''
     INPUT: x,y,z coordinates as int or float to where you want the mill to move absolutely
 
@@ -53,23 +59,26 @@ def MOVE_ELECTRODE_TO_POSITION(x, y, z):
     response = SEND_COMMAND_TO_MILL(command,ser_mill)
     return response
 
-def PUMP_WITHDRAW(volume:float,rate:float,pump):
+def PUMP_WITHDRAW(volume:float,rate:float,ser_pump):
     '''Set the pump direction to withdraw the given volume at the given rate
         volume <float> (ml) | rate <float> (ml/m)
     
     Return the cummulative volue withdrawn when complete'''
-    if pump.volume_withdrawn + volume >= 0.1:
+    if ser_pump.volume_withdrawn + volume >= 0.1:
         Exception("The command will overfill the pipette. Not running")
     else:
-        pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+        ser_pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         # Sets the pumping volume of the pump in units of milliliters.
-        pump.pumping_volume = 0.02
+        ser_pump.pumping_volume = volume
         # Sets the pumping rate of the pump in units of milliliters per minute.
-        pump.pumping_rate = 0.1
-        pump.run()
-    return pump.volume_withdrawn
+        ser_pump.pumping_rate = rate
+        ser_pump.run()
+        while pump.running:
+            pass
+        time.sleep(2)
+    return ser_pump.volume_withdrawn
 
-def PUMP_INFUSE(volue:float,rate:float,pump):
+def PUMP_INFUSE(volume:float,rate:float,pump):
     '''Set the pump direction to infuse the given volume at the given rate
     
     volume <float> (ml) | rate <float> (ml/m)
@@ -77,21 +86,14 @@ def PUMP_INFUSE(volue:float,rate:float,pump):
     Returns the cummulative volume infused when complete'''
     pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
     # Sets the pumping volume of the pump in units of milliliters.
-    pump.pumping_volume = 0.25
+    pump.pumping_volume = volume
     # Sets the pumping rate of the pump in units of milliliters per minute.
-    pump.pumping_rate = 0.5
+    pump.pumping_rate = rate
     pump.run()
+    while pump.running:
+        pass
+    time.sleep(2)
     return pump.volume_infused
-
-def SET_UP_PUMP():
-    # set up WPI syringe pump
-    pump_port = nesp_lib.Port('COM5',19200)
-    pump = nesp_lib.Pump(pump_port)
-    pump.syringe_diameter = 4.699 #milimeters
-    pump.volume_infused_clear()
-    pump.volume_withdrawn_clear()
-    print(f'Pump at address: {pump.address}')
-    return pump
 
 def SET_UP_MILL():
     ser_mill = serial.Serial(
@@ -104,11 +106,21 @@ def SET_UP_MILL():
         )
     return ser_mill
 
+def SET_UP_PUMP():
+    # set up WPI syringe pump
+    pump_port = nesp_lib.Port('COM5',19200)
+    pump = nesp_lib.Pump(pump_port)
+    pump.syringe_diameter = 4.699 #milimeters
+    pump.volume_infused_clear()
+    pump.volume_withdrawn_clear()
+    print(f'Pump at address: {pump.address}')
+    return pump
+
 try:
     # set up connection for SainSmart Prover/GRBL
-    ser_mill = SET_UP_MILL()
-    if not ser_mill.isOpen():
-        ser_mill.open()
+    mill = SET_UP_MILL()
+    if not mill.isOpen():
+        mill.open()
     time.sleep(2)
 
     # Mill commands
@@ -121,28 +133,26 @@ try:
     mill_gcode_parser_state = '$G'
 
     #set up the WPI syringe pump
-    ser_pump = SET_UP_PUMP()
-    if not ser_pump.isOpen():
-        ser_pump.open()
-    time.sleep(2)
+    pump = SET_UP_PUMP()
     
     # begin by homing the mill
-    SEND_COMMAND_TO_MILL(mill_home_cmd)
+    SEND_COMMAND_TO_MILL(mill_home_cmd,mill)
     # tell the mill to use absolute positioning
-    SEND_COMMAND_TO_MILL('G90')
+    SEND_COMMAND_TO_MILL('G90',mill)
     # begin procedure
     #first operation
-    MOVE_TO_POSITION(30,20,-10)
-    response = PUMP_WITHDRAW(0.25,0.5,ser_pump)
+    MOVE_TO_POSITION(-30,-20,-10,mill)
+    response = PUMP_WITHDRAW(0.02,0.2,pump)
     print(f'Pump has withdrawn: {response}ml')
 
     #second operation
-    MOVE_TO_POSITION(30,25,-10)
-    response = PUMP_INFUSE(0.25,0.5,ser_pump)
+    MOVE_TO_POSITION(-150,-25,-10,mill)
+    response = PUMP_INFUSE(0.02,0.2,pump)
 
     print(f'Pump has infused: {response}ml')
-    print(f'remaining volume in pipette: {ser_pump.volume_withdrawn}')
-    SEND_COMMAND_TO_MILL(mill_home_cmd)
+    print(f'remaining volume in pipette: {pump.volume_withdrawn}')
+    SEND_COMMAND_TO_MILL(mill_home_cmd,mill)
+    mill.close()
 finally:
-    ser_mill.close()
-    ser_pump.close()
+    pass
+   
