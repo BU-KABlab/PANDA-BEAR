@@ -16,13 +16,14 @@
 * [Vial tube rack](https://github.com/erasmus95/PANDA-BEAR/blob/main/3d-prints/TubeRack_2mLx10_v1_scaled.stl)
 
 
-# Other Tools
+# Other Tools and Materials
 * Python 3
 * Anaconda
 * Spyder
 * [nesp-lib](https://github.com/AbeKh/nesp-lib-py)
 * [Slack SDK](https://slack.dev/python-slack-sdk/)
 * [Windows driver for serial cable communication](https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip)
+* [Septum Vials] (https://www.fishersci.com/shop/products/clear-voa-glass-vials-0-125in-septa/12-100-112?searchHijack=true&searchTerm=clear-voa-glass-vials-0-125in-septa&searchType=Rapid&matchedCatNo=12-100-112)
 
 ## Inspiration Board
 ### Opentrons
