@@ -23,7 +23,7 @@
 * [nesp-lib](https://github.com/AbeKh/nesp-lib-py)
 * [Slack SDK](https://slack.dev/python-slack-sdk/)
 * [Windows driver for serial cable communication](https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip)
-* [Septum Vials] (https://www.fishersci.com/shop/products/clear-voa-glass-vials-0-125in-septa/12-100-112?searchHijack=true&searchTerm=clear-voa-glass-vials-0-125in-septa&searchType=Rapid&matchedCatNo=12-100-112)
+* [Septum Vials](https://www.fishersci.com/shop/products/clear-voa-glass-vials-0-125in-septa/12-100-112?searchHijack=true&searchTerm=clear-voa-glass-vials-0-125in-septa&searchType=Rapid&matchedCatNo=12-100-112)
 
 ## Inspiration Board
 ### Opentrons
