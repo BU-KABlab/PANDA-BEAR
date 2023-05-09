@@ -65,19 +65,19 @@ def stopacq():
     
     #savedata
 
-    column_names = ["Time", "Vf","Vu","Im","Q","Vsig","Ach","IERange","Overload","StopTest"]
+    column_names = ["Time", "Vf","Vm","Vsig","Ach","Overload","StopTest"]
     output = pd.DataFrame(dtaqsink.acquired_points, columns = column_names)
-    np.savetxt('CA-Dep1.txt', output)
+    np.savetxt('OCP-Dep1.txt', output)
     
     #plotdata
-    df = pd.read_csv('CA-Dep1.txt', sep=" ", header=None, names=["runtime", "Vf", "Vu","Im","Q","Vsig","Ach","IERange","Over","StopTest"])
+    df = pd.read_csv('OCP-Dep1.txt', sep=" ", header=None, names=["Time", "Vf","Vm","Vsig","Ach","Overload","StopTest"])
     plt.rcParams["figure.dpi"]=150
     plt.rcParams["figure.facecolor"]="white"
-    plt.plot(df['runtime'], df['Im'])
+    plt.plot(df['Time'], df['Vf'])
     plt.xlabel('Time (s)')
-    plt.ylabel('Current (A)')
+    plt.ylabel('Voltage (V)')
     plt.tight_layout()
-    plt.savefig('CA-Dep1')
+    plt.savefig('OCP-Dep1')
 
 
               
@@ -113,44 +113,34 @@ def run(vinit, tinit, vstep1, tstep1, vstep2, tstep2, sample):
 
     pstat.Open()
     
-    signal.Init(pstat, vinit, tinit, vstep1, tstep1, vstep2, tstep2, sample, GamryCOM.PstatMode)
+    signal.Init(pstat, vinit, tinit, sample, GamryCOM.PstatMode)
     initializepstat(pstat)
 
-    dtaq.Init(pstat, GamryCOM.ChronoAmp)
+    dtaq.Init(pstat)
     pstat.SetSignal(signal)
-    pstat.SetCell(GamryCOM.CellOn)
+    # unlike most other experiemnts, we keep CellOff. This prevents current flow. We are making the OCP measurement with no applied signal
+    pstat.SetCell(GamryCOM.CellOff)
 
     dtaq.Run(True)
-    # Code for timing started
-    start_time = time.time()
     print("made it to run end")
 
 active = True
 
-# CA/CP Setup Parameters
+# OCP Setup Parameters
 vinit = 0.0
-tinit = 0.0
-vstep1 = -2.7
-tstep1 = 300
-vstep2 = 0
-tstep2 = 0
-sample = 0.1
+tinit = 150
+sample = 0.5
 
 #########################################
 #########################################
 if __name__ == "__main__":
     try:
-        run(vinit, tinit, vstep1, tstep1, vstep2, tstep2, sample)
-        start_time = time.time()
+        run(vinit, tinit, sample)
         print("made it to try")
         while active == True:
             client.PumpEvents(1)
             time.sleep(0.1)
-        # code for end time
-        end_time = time.time()
-        total_time = end_time - start_time
-        print("Time to run is ", total_time, " seconds")
-
+        
     except Exception as e:
         raise gamry_error_decoder(e)
 
