@@ -1,86 +1,97 @@
 import time
 import serial
 
+WELL_ROWS = "ABCDEFGH"
+WELL_COLUMNS = range(1, 13)
+
 class Wells:
     '''Position of well plate and each well in it'''
     def __init__(self):
         self.wells = {}
-        for row in "ABCDEFGH":
-            for col in range(1, 13):
-                well_id = row + str(col)
+        for row in WELL_ROWS:
+            for col in WELL_COLUMNS:
+                well_id = f"{row}{col}"
                 if well_id == "A1":
                     coordinates = {"x": 10, "y": 10, "z": -30}
                     contents = None
                     volume = 0
                 else:
-                    coordinates = {"x": None, "y": None, "z": None}
+                    a1_coordinates = self.wells["A1"]["coordinates"]
+                    x_offset = (col - 1) * 9  # Adjust the x-coordinate based on the column
+                    y_offset = (ord(row) - ord("A")) * 9  # Adjust the y-coordinate based on the row
+                    coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": -30}
                     contents = None
                     volume = 0
                 self.wells[well_id] = {"coordinates": coordinates, "contents": contents, "volume": volume}
+    
     def get_coordinates(self, well_id):
         coordinates_dict = self.wells[well_id]["coordinates"]
         coordinates_list = [coordinates_dict["x"], coordinates_dict["y"], coordinates_dict["z"]]
         return coordinates_list
 
-class Vial():
+class Vial:
     '''Class for creating vial objects with their position and contents'''
-    def __init__(self, x, y, z, contents, volume):
-        self.coordinates = {"x": x, "y": y, "z": z}
+    def __init__(self, x, y, z_top, z_bottom, contents, volume):
+        self.coordinates = {"x": x, "y": y, "z": z_top}
+        self.depth = z_bottom
         self.contents = contents
         self.volume = volume
-    def get_volume(self):
-        return self.volume
     
-class Mill_Control():
+    @property
+    def position(self):
+        return self.coordinates
+    
+    
+    
+class MillControl:
     '''Set up the mill connection and pass commands, including special commands'''
-    def __init__(self) -> None:
-       
-        self.ser_mill = serial.Serial(
-            port= 'COM6',
-            baudrate=115200,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS,
-            timeout=1
-            )
+    def __init__(self, ser_mill):
+        self.ser_mill = ser_mill
+
+    def __enter__(self):
         if not self.ser_mill.isOpen():
             self.ser_mill.open()
         time.sleep(2)
-    def send_to_mill(self,command:str):
-        '''INPUT:
-        command: "command to send"
-        ser: serial variable for the mill
-        OUTPUT: Returns the response from the mill'''
-        ser = self.ser_mill
-        if command != 'close':
-            print(f'Sending: {command.strip()}')
-            ser.write(str(command+'\n').encode())
-            time.sleep(1)
-            out=''
-            while ser.inWaiting() > 0:
-                out = ser.readline()
-                        
-            if out != '':
-                response = (out.strip().decode())
-        else:
-            ser.close()
-            time.sleep(15)    
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.ser_mill.close()
+        time.sleep(15)
+
+    def execute_command(self, command):
+        '''Execute a command and return the response from the mill'''
+        command_bytes = command.encode()
+        self.ser_mill.write(command_bytes + b'\n')
+        time.sleep(1)
+        response = self.ser_mill.readline().strip().decode()
         return response
-    
+
     def stop(self):
         '''Stop the mill'''
-        Mill_Control.send_to_mill('$X')
+        self.execute_command('$X')
+
     def reset(self):
-        Mill_Control.send_to_mill('(ctrl-x)')
+        '''Reset the mill'''
+        self.execute_command('(ctrl-x)')
+
     def home(self):
-        Mill_Control.send_to_mill('$H')
+        '''Home the mill'''
+        self.execute_command('$H')
+
     def current_status(self):
-        Mill_Control.send_to_mill('?')
+        '''Get the current status of the mill'''
+        return self.execute_command('?')
+
     def gcode_mode(self):
-        Mill_Control.send_to_mill('$C')
-    def gcode_paramaters(self):
-        Mill_Control.send_to_mill('$#')
+        '''Switch to G-code mode'''
+        self.execute_command('$C')
+
+    def gcode_parameters(self):
+        '''Get G-code parameters'''
+        return self.execute_command('$#')
+
     def gcode_parser_state(self):
-        Mill_Control.send_to_mill('$G')
-    
+        '''Get the G-code parser state'''
+        return self.execute_command('$G')
+
     
