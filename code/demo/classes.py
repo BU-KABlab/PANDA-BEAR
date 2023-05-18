@@ -1,34 +1,89 @@
 import time
 import serial
+import matplotlib.pyplot as plt
 
-WELL_ROWS = "ABCDEFGH"
-WELL_COLUMNS = range(1, 13)
+WELL_ROWS = "ABCDEF"
+WELL_COLUMNS = range(1, 8)
 
 class Wells:
-    '''Position of well plate and each well in it'''
-    def __init__(self):
+    '''Position of well plate and each well in it. 
+    Orientation is defined by:
+        0 - Vertical....and wells become more negative from A1 
+        1 - Vertical....and wells become less negative from A1
+        2 - Horizontal..and wells become more negative from A1
+        3 - Horizontal..and wells become less negative from A1
+    '''
+    def __init__(self, a1_X=0, a1_Y=0, orientation=0):
         self.wells = {}
-        for row in WELL_ROWS:
-            for col in WELL_COLUMNS:
-                well_id = f"{row}{col}"
+        self.orientation = orientation
+        a1_coordinates = {"x": a1_X, "y": a1_Y, "z": -30}
+        for col_idx, col in enumerate("ABCDEFG"):  # Use "ABCDEFG" for columns
+            for row in range(1, 14):  # Update the range for rows
+                well_id = col + str(row)
                 if well_id == "A1":
-                    coordinates = {"x": 10, "y": 10, "z": -30}
+                    coordinates = a1_coordinates
                     contents = None
                     volume = 0
                 else:
-                    a1_coordinates = self.wells["A1"]["coordinates"]
-                    x_offset = (col - 1) * 9  # Adjust the x-coordinate based on the column
-                    y_offset = (ord(row) - ord("A")) * 9  # Adjust the y-coordinate based on the row
-                    coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": -30}
+                    well_offset = 9  # Adjust according to the distance between the center of each well
+                    z_base = -30
+                    if orientation == 0:
+                        x_offset = col_idx * well_offset  # Adjust the x-coordinate based on the column index
+                        y_offset = (row - 1) * well_offset  # Adjust the y-coordinate based on the row
+                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_base}
+                    elif orientation == 1:
+                        x_offset = col_idx * well_offset  # Adjust the x-coordinate based on the column index
+                        y_offset = (row - 1) * well_offset  # Adjust the y-coordinate based on the row
+                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_base}
+                    elif orientation == 2:  # Horizontal placement and becoming more negative
+                        x_offset = col_idx * well_offset  # Adjust the x-coordinate based on the column index
+                        y_offset = (row - 1) * well_offset  # Adjust the y-coordinate based on the row
+                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_base}
+                    elif orientation == 3:  # Horizontal placement and becoming less negative
+                        x_offset = col_idx * well_offset  # Adjust the x-coordinate based on the column index
+                        y_offset = (row - 1) * well_offset  # Adjust the y-coordinate based on the row
+                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_base}
                     contents = None
                     volume = 0
                 self.wells[well_id] = {"coordinates": coordinates, "contents": contents, "volume": volume}
-    
+
+    def print_well_coordinates_table(self):
+        print("Well Coordinates:")
+        header_row_start = "   |"
+        header_row = "     " + "      |     ".join([f"{row:2}" for row in range(1, 14)])
+        header_underline = "     " + "      |     ".join([f"--" for row in range(1, 14)])
+        print(header_row_start+header_row)
+        print(header_row_start+header_underline)
+        for col in "ABCDEFG":
+            col_str = f" {col} |"
+            for row in range(1, 14):
+                well_id = col + str(row)
+                coordinates = self.wells[well_id]["coordinates"]
+                x, y, z = coordinates["x"], coordinates["y"], coordinates["z"]
+                col_str += f" {x:3} {y:3} {z or '':3} |"
+            print(col_str)
+    def visualize_well_coordinates(self):
+        # Extract x and y coordinates of the wells
+        x_coordinates = []
+        y_coordinates = []
+        for well_id, well_data in self.wells.items():
+            x_coordinates.append(well_data["coordinates"]["x"])
+            y_coordinates.append(well_data["coordinates"]["y"])
+
+        # Plot the well coordinates
+        plt.scatter(x_coordinates, y_coordinates)
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        plt.title("Well Coordinates")
+        plt.grid(True)
+        plt.xlim(-400, 0)  # Set x-axis limits
+        plt.ylim(-300, 0)  # Set y-axis limits
+        plt.show()
     def get_coordinates(self, well_id):
         coordinates_dict = self.wells[well_id]["coordinates"]
         coordinates_list = [coordinates_dict["x"], coordinates_dict["y"], coordinates_dict["z"]]
         return coordinates_list
-
+    
 class Vial:
     '''Class for creating vial objects with their position and contents'''
     def __init__(self, x, y, z_top, z_bottom, contents, volume):
