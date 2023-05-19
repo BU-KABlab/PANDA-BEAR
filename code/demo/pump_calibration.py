@@ -50,7 +50,7 @@ def SET_UP_PUMP():
 
 try:
     # Define your calibration protocol as a list of volumes in micoliters
-    protocol_ul = [100,100,100,60,60,60,50,50,50,40,40,40]
+    protocol_ul = [100]#,100,100,60,60,60,50,50,50,40,40,40]
     # Define your purge volume for before and after each infusion
     purge_vol_ul = 20
 
@@ -89,7 +89,7 @@ try:
         time.sleep(2)
         response = INFUSE(volume_ml,0.2,pump)
         winsound.Beep(1000,250)
-        print(f'Pump has infused: {response}ml...')
+        print(f'Pump has infused: {response} ml')
         time.sleep(5)
 
         # After infusion purge
