@@ -77,15 +77,15 @@ def pump_infuse(volume:float,rate:float):
     return pump.volume_infused
 
 # define location of items on the deck
-v1 = Vial(10,10,0,'water',3)
-v2 = Vial(10,15,0,'water',3)
-v3 = Vial(10,20,0,'water',3)
+v1 = Vial(10,10,20,1,'water',3)
+v2 = Vial(10,15,20,1,'chlorine',3)
+v3 = Vial(10,20,20,1,'PEG',3)
 
 well_plate = Wells()
 print(f'Well A1 coordinates {well_plate.get_coordinates("A1")}')
-
+print(f'Well B6 coordinates {well_plate.get_coordinates("B6")}')
 # begin by homing the mill
-MillControl.home()
+Mill_Control.home()
 
 # begin procedure
 move_center_to_position(30,20,-10)
