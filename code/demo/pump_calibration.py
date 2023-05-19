@@ -1,11 +1,8 @@
-import serial
 import time
 import nesp_lib
 import winsound #for making beeping sounds
-#from classes import Vial, Wells
 
-
-def PUMP_WITHDRAW(volume:float,rate:float,ser_pump):
+def WITHDRAW(volume:float,rate:float,ser_pump):
     '''Set the pump direction to withdraw the given volume at the given rate
         volume <float> (ml) | rate <float> (ml/m)
     
@@ -24,7 +21,7 @@ def PUMP_WITHDRAW(volume:float,rate:float,ser_pump):
         time.sleep(2)
     return ser_pump.volume_withdrawn
 
-def PUMP_INFUSE(volume:float,rate:float,pump):
+def INFUSE(volume:float,rate:float,pump):
     '''Set the pump direction to infuse the given volume at the given rate
     
     volume <float> (ml) | rate <float> (ml/m)
@@ -52,36 +49,55 @@ def SET_UP_PUMP():
     return pump
 
 try:
-    
+    # Define your calibration protocol as a list of volumes in micoliters
     protocol_ul = [100,100,100,60,60,60,50,50,50,40,40,40]
+    # Define your purge volume for before and after each infusion
     purge_vol_ul = 20
-    #set up the WPI syringe pump
+
+    # Set up the WPI syringe pump
     pump = SET_UP_PUMP()
+
     for i in protocol_ul:
         volume_ml = i/1000
         purge_ml = purge_vol_ul/1000
         initial_withdraw = volume_ml + 2*purge_ml
-        print(f'Withdrawing {volume_ml}ml with additional {purge_ml*2}ml')    
-        response = PUMP_WITHDRAW(initial_withdraw,0.4,pump)
-        time.sleep(10)
-        print(f'Pump has withdrawn: {response}ml')
-        print('Purging')
-        response = PUMP_INFUSE(purge_ml,0.2,pump)
-        time.sleep(10)
-        print(f'Pump has infused: {response}ml')
-        print(f'Infusing {volume_ml}ml')
-        response = PUMP_INFUSE(volume_ml,0.2,pump)
-        time.sleep(10)
-        print(f'Pump has infused: {response}ml')
-        print('Purging')
-        response = PUMP_INFUSE(purge_ml,0.2,pump)
-        time.sleep(10)
-        print(f'Pump has infused: {response}ml')
-        time.sleep(10)
 
-    print(f'Pump has infused: {response}ml')
-    print(f'remaining volume in pipette: {pump.volume_withdrawn}')
+        # Withdraw the desired volume plus the purge volume
+        for i in range(1,4): winsound.Beep(2000,500)
+        time.sleep(1)
+        print(f'Withdrawing {volume_ml}ml with additional {purge_ml*2}ml...')    
+        response = WITHDRAW(initial_withdraw,0.4,pump)
+        #time.sleep(10)
+        print(f'Pump has withdrawn: {response}ml')
+
+        # First purge before main infusion
+        winsound.Beep(3000,250)
+        print('Purging...')
+        time.sleep(1)
+        response = INFUSE(purge_ml,0.2,pump)
+        winsound.Beep(1000,250)
+        print(f'Pump has infused: {response}ml')
+        #time.sleep(5)
+
+        # Main infusion
+        for i in range(1,4): winsound.Beep(3000,500)
+        time.sleep(1)
+        print(f'Main infusion of {volume_ml}ml...')
+        response = INFUSE(volume_ml,0.2,pump)
+        winsound.Beep(1000,250)
+        print(f'Pump has infused: {response}ml...')
+        time.sleep(5)
+
+        # After infusion purge
+        winsound.Beep(3000,250)
+        print('Purging...')
+        time.sleep(1)
+        response = INFUSE(purge_ml,0.2,pump)
+        winsound.Beep(1000,250)
+        print(f'remaining volume in pipette: {pump.volume_withdrawn}')
+        time.sleep(5)
     
 finally:
+    for i in range(1,4): winsound.Beep(1000*i,250)
     pass
    
