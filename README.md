@@ -1,11 +1,12 @@
-# ~~ORCA~~ PANDA BEAR
+# PANDA BEAR
 ![PANDA-logo](https://github.com/erasmus95/PANDA/blob/main/images/PANDA_logo.png)
 ## Purpose
+To synthesize polymer thin films, evaluate and compare their electrical properties using optical assays correlated to said properties, and use this information to autonomously select the parameters used to create new polymer thin films to be used as the separator layer in Li+ batteries.
 
 ## Instruments
 * [Genmitsu PROVerXL 4030 CNC Router](https://www.sainsmart.com/products/genmitsu-proverxl-4030-cnc-router-with-carveco-maker-subscription)
 * [WPI Aladin Syringe Pump - Model A-1000](https://www.wpiinc.com/var-al1000hp-aladdin-single-syringe-pump-high-pressure)
-* [200ul Pipette]()
+* [200 µl Pipette tips]()
 * [Gamry Potentiostat Interface 1010E](https://www.gamry.com/potentiostats/interface-1010e-potentiostat/)
 
 ## Designs
