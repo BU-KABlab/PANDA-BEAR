@@ -113,11 +113,15 @@ pump = set_up_pump()
 purge_vial = Vial(-20,-100,-10,-26,'purge',0)
 purge = infuse(20, purge_vial.coordinates, -30, 0.4, pump)
 
+# Common values
+withdrawl_height = -30
+infuse_height = withdrawl_height
+
 # Set up wells
 Wells(-150, -10, 0)
 
 # Define locations of vials and their contents
-Water = Vial(0, 0, 0, -36, "water", 400)
+Solution1 = Vial(0, 0, 0, -36, "water", 400)
 DMF = Vial(0, -10, 0 , -36, "DMF", 400)
 
 """ 
@@ -127,11 +131,10 @@ Experiment A1
 """
 # Begin by homing the mill
 mill.home()
-withdrawl_height = -30
-infuse_height = withdrawl_height
+
 
 # Pipette solution #N1
-Target_vial = V1.coordinates
+Target_vial = Solution1.coordinates
 Target_well = Wells.get_coordinates("A1")
 move_pipette_to_position(Target_vial)
 withdraw(140, Target_vial, withdrawl_height, (0.4).pump)
@@ -142,40 +145,33 @@ purge
 print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 mill.home()
 
-# Electrode deposition
+# Electrode - chronoamperometry
 move_electrode_to_position(Target_well)
 # TODO Gamry(chronoamperometry)
 mill.home()
 
-# Remove desposition
+# Remove Solution 1 deposition
 move_pipette_to_position(Target_well)
-withdraw(100,Target_well,-36,0.4,pump)
-infuse(120,purge_vial,withdrawl_height,0.4,pump)
+withdraw(100, Target_well, -36, 0.4, pump)
+infuse(120, purge_vial, withdrawl_height, 0.4, pump)
 mill.home()
 
 #Pipette - Dimethylferrocene solution
 move_pipette_to_position(DMF.coordinates)
-withdraw(140, DMF.coordinates, withdrawl_height,0.4,pump)
+withdraw(140, DMF.coordinates, withdrawl_height, 0.4, pump)
 purge
 move_pipette_to_position(Wells.get_coordinates("A1"))
 infuse(100,Target_well, infuse_height, 0.4, pump)
 purge
 mill.home()
-'''
 
-Electrode - Cyclic voltammetry
+# Electrode - Cyclic voltammetry
+move_electrode_to_position(Wells.get_coordinates("A1"))
+#TODO Gamry(cyclic_voltammetry)
+mill.home()
 
-    Moves electrode to well A1
-    Perform Gamry script for experiment - cyclic voltammetry
-    PAW to home position
-
-Pipette - Remove DMF solution
-
-    Moves pipette to well A1
-    Withdraws total volume from well
-    Moves to purge vial
-    Dispenses total volume
-    PAW to home position
-
-
-'''
+# Remove Remove DMF solution
+move_pipette_to_position(Target_well)
+withdraw(120, Target_well, -36, 0.4, pump)
+infuse(140, purge_vial, withdrawl_height, 0.4, pump)
+mill.home()
