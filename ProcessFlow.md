@@ -1,14 +1,14 @@
-#Input parameters
-* Size of well plate
-* Stock solutions
-  - Number of solutions
-  - Ranges of concentrations to explore
-* Deposition parameters
-  - Deposition potential
-  - Deposition time
+# Input parameters
+## Size of well plate
+## Stock solutions
+* Number of solutions
+* Ranges of concentrations to explore
+## Deposition parameters
+* Deposition potential
+* Deposition time
 
-#PANDA Operation
-##Experiment A1
+# PANDA Operation
+## Experiment A1
 * Pipette - Solution #N
   - Moves pipette to #N stock solution vial
   - Withdraws programmed volume
@@ -49,8 +49,8 @@
   - Moves to purge vial
   - Dispenses total volume
   - PAW to home position
-##Experiment A2
+## Experiment A2
 * Repeat of previous
 ...
-##Experiment N#
+## Experiment N#
 * Repeat of previous
