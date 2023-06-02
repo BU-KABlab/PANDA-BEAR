@@ -117,19 +117,19 @@ class savedataOCP(object):
         print(len(dtaqsink.acquired_points))
 
         #savedata
-        column_names = ["Time", "Vf","Vu","Im","Q","Vsig","Ach","IERange","Overload","StopTest"]
-        output = pd.DataFrame(dtaqsink.acquired_points, columns = column_names)
-        np.savetxt('2023-05-17_CA-Test3.txt', output)
+        #column_names = ["Time", "Vf","Vu","Im","Q","Vsig","Ach","IERange","Overload","StopTest"]
+        output = pd.DataFrame(dtaqsink.acquired_points)
+        np.savetxt('2023-06-02_OCP-Test1', output)
 
         #plotdata
-        df = pd.read_csv('2023-05-17_CA-Test3.txt', sep=" ", header=None, names=["runtime", "Vf", "Vu","Im","Q","Vsig","Ach","IERange","Over","StopTest"])
-        plt.rcParams["figure.dpi"]=150
-        plt.rcParams["figure.facecolor"]="white"
-        plt.plot(df['runtime'], df['Im'])
-        plt.xlabel('Time (s)')
-        plt.ylabel('Current (A)')
-        plt.tight_layout()
-        plt.savefig('2023-05-17_CA-Test3')
+        #df = pd.read_csv('2023-05-17_CA-Test3.txt', sep=" ", header=None, names=["runtime", "Vf", "Vu","Im","Q","Vsig","Ach","IERange","Over","StopTest"])
+        #plt.rcParams["figure.dpi"]=150
+        #plt.rcParams["figure.facecolor"]="white"
+        #plt.plot(df['runtime'], df['Im'])
+        #plt.xlabel('Time (s)')
+        #plt.ylabel('Current (A)')
+        #plt.tight_layout()
+        #plt.savefig('2023-05-17_CA-Test3')
         
         
 def CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
@@ -272,6 +272,7 @@ if __name__ == "__main__":
         #pick one of the following to test
         #CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
         #CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
+        OCP(OCPvi, OCPti, OCPrate)
         print("made it to try")
         while active == True:
             client.PumpEvents(1)
