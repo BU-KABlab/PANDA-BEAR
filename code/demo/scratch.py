@@ -14,7 +14,7 @@ wells.visualize_well_coordinates()
 #mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
 #command = mill_move.format(v1.position['x'],v1.position['y'],v1.position['z'])
 #print(command)
-def SET_UP_MILL():
+def set_up_mill():
     ser_mill = serial.Serial(
         port= 'COM4',
         baudrate=115200,
@@ -24,7 +24,6 @@ def SET_UP_MILL():
         timeout=1
         )
     return ser_mill
-serial_mill = SET_UP_MILL()
-mill = MillControl(serial_mill)
+mill = MillControl(set_up_mill())
 mill.__enter__
 mill.home

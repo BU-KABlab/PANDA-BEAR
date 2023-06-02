@@ -1,6 +1,7 @@
 import time
 import nesp_lib
-from demo.classes import Vial, Wells, MillControl as mill
+import serial
+from demo.classes import Vial, Wells, MillControl
 #HQ potentiostat#
 #import demo.pstatcontrol
 
@@ -13,6 +14,16 @@ def set_up_pump():
     pump.volume_withdrawn_clear()
     print(f"Pump at address: {pump.address}")
     return pump
+def set_up_mill():
+    ser_mill = serial.Serial(
+        port= 'COM4',
+        baudrate=115200,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=1
+        )
+    return ser_mill
 
 
 def withdraw(volume: float, position: list, height: float, rate: float, ser_pump):
@@ -108,10 +119,13 @@ def move_electrode_to_position(coordinates: list):
 Program Set Up
 -------------------------------------------------------------------------
 """
+mill = MillControl(set_up_mill())
+
+
 # Set up the pump
 pump = set_up_pump()
 # Define the amount to purge, vial location, height,and rate to purge
-purge_vial = Vial(-20,-100,-10,-26,'purge',0)
+purge_vial = Vial(0,-200,-10,-26,'waste',0)
 purge = infuse(20, purge_vial.coordinates, -30, 0.4, pump)
 
 # Common values
@@ -119,11 +133,11 @@ withdrawl_height = -30
 infuse_height = withdrawl_height
 
 # Set up wells
-Wells(-150, -10, 0)
+Wells(-200, -100, 0)
 
 # Define locations of vials and their contents
-Solution1 = Vial(0, 0, 0, -36, "water", 400)
-DMF = Vial(0, -10, 0 , -36, "DMF", 400)
+Solution1 = Vial(0, -100, 0, -36, "water", 400)
+DMF = Vial(0, -150, 0 , -36, "DMF", 400)
 
 """ 
 -------------------------------------------------------------------------
