@@ -76,7 +76,7 @@ class Wells:
     def get_coordinates(self, well_id):
         coordinates_dict = self.wells[well_id]["coordinates"]
         coordinates_list = [coordinates_dict["x"], coordinates_dict["y"], coordinates_dict["z"]]
-        return coordinates_list
+        return coordinates_dict
     
     def contents(self,well_id):
         return self.wells[well_id]["contents"]
@@ -121,8 +121,16 @@ class MillControl:
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b'\n')
         time.sleep(1)
-        response = self.ser_mill.readline().strip().decode()
-        return response
+        out=''
+        while self.ser_mill.inWaiting() > 0:
+            out = self.ser_mill.readline()
+                    
+        if out != '':
+            out = (out.strip().decode())
+            print(out)
+        #out = self.ser_mill.readline().strip().decode()
+        time.sleep(5)
+        return out
 
     def stop(self):
         self.execute_command('$X')
