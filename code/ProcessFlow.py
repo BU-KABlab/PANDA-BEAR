@@ -1,7 +1,8 @@
 import time
 import nesp_lib
 from demo.classes import Vial, Wells, MillControl as mill
-
+#HQ potentiostat#
+#import demo.pstatcontrol
 
 def set_up_pump():
     # Set up WPI syringe pump
@@ -147,7 +148,8 @@ mill.home()
 
 # Electrode - chronoamperometry
 move_electrode_to_position(Target_well)
-# TODO Gamry(chronoamperometry)
+# Initiate pstat experiment
+#pstatcontrol.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
 mill.home()
 
 # Remove Solution 1 deposition
@@ -167,7 +169,8 @@ mill.home()
 
 # Electrode - Cyclic voltammetry
 move_electrode_to_position(Wells.get_coordinates("A1"))
-#TODO Gamry(cyclic_voltammetry)
+# Initiate pstat experiment
+#pstatcontrol.CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
 mill.home()
 
 # Remove Remove DMF solution
