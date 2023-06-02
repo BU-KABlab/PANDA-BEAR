@@ -15,6 +15,7 @@ def set_up_pump():
     print(f"Pump at address: {pump.address}")
     time.sleep(2)
     return pump
+
 def set_up_mill():
     ser_mill = serial.Serial(
         port= 'COM4',
@@ -53,7 +54,7 @@ def withdraw(volume: float, position: list, height: float, rate: float, ser_pump
         print(f"Pump has withdrawn: {ser_pump.volume_withdrawn} ml")
 
     # Return to safe height
-    move_pipette_to_position(position["x"], position["y"], position["z"])
+    move_pipette_to_position(position["x"], position["y"], 0)
     mill.current_status()
     return 0
 
@@ -83,7 +84,7 @@ def infuse(volume: float, position: list, height: float, rate: float, pump):
     print(f"Pump has infused: {pump.volume_infused} ml")
 
     # Move the pipette back up
-    move_pipette_to_position(position["x"], position["y"], position["z"])
+    move_pipette_to_position(position["x"], position["y"], 0)
     mill.current_status()
     return 0
 
@@ -113,9 +114,7 @@ def move_electrode_to_position(x,y,z):
     INPUT: x, y, z coordinates as int or float to where you want the mill to move absolutely.
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
-    command = mill_move.format(
-        x + 84.5, y, z
-    )  # electrode has 45 mm offset
+    command = mill_move.format(x + 84.5, y, z)  # electrode has 45 mm offset
     response = mill.execute_command(str(command))
     return response
 
@@ -143,7 +142,9 @@ plate = Wells(-200, -100, 0)
 
 # Define locations of vials and their contents
 Solution1 = Vial(0, -100, 0, -36, "water", 400)
-DMF = Vial(0, -150, 0 , -36, "DMF", 400)
+# Define the amount to purge, vial location, height,and rate to purge
+purge_vial = Vial(0,-200,0,-36,'waste',0)
+#DMF = Vial(0, -150, 0 , -36, "DMF", 400)
 
 """ 
 -------------------------------------------------------------------------
@@ -156,7 +157,6 @@ time.sleep(20)
 
 # Pipette solution #N1
 Target_vial = Solution1.coordinates
-purge_coord = purge_vial.coordinates
 Target_well = plate.get_coordinates("A1")
 
 move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])

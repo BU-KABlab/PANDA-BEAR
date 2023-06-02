@@ -9,15 +9,18 @@ class Wells:
     '''
     Position of well plate and each well in it. 
     Orientation is defined by:
-        0 - Vertical, wells become more negative from A1 
+        0 - Vertical, wells become more negative from A1
+
         1 - Vertical, wells become less negative from A1
+
         2 - Horizontal, wells become more negative from A1
-        3 - Horizontal, wells become less negative from A1
+
+        3 - Horizontal, wells become less negative from A1  
     '''
     def __init__(self, a1_X=0, a1_Y=0, orientation=0):
         self.wells = {}
         self.orientation = orientation
-        a1_coordinates = {"x": a1_X, "y": a1_Y, "z": -30}
+        a1_coordinates = {"x": a1_X, "y": a1_Y, "z": 0}
         for col_idx, col in enumerate("ABCDEFG"):
             for row in range(1, 14):
                 well_id = col + str(row)
