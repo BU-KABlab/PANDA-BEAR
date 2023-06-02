@@ -85,8 +85,8 @@ def move_pipette_to_position(coordinates: list):
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(
-        coordinates(0) - 45, coordinates(1), coordinates(2)
-    )  # x-coordinate has 45 mm offset for pipette location
+        coordinates(0) + 84, coordinates(1), coordinates(2)
+    )  # x-coordinate has 84 mm offset for pipette location
     response = mill.send_to_mill(command)
     return response
 
@@ -97,7 +97,7 @@ def move_electrode_to_position(coordinates: list):
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(
-        coordinates(0) + 45, coordinates(1), coordinates(2)
+        coordinates(0) - 84.5, coordinates(1), coordinates(2)
     )  # electrode has 45 mm offset
     response = mill.send_to_mill(command)
     return response
