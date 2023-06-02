@@ -6,6 +6,8 @@ import gc
 import comtypes
 import comtypes.client as client
 
+#fileName = 'TestRun'
+
 #Bring in gamrycom and pstat
 #GamryCOM=client.GetModule(r'C:\Program Files (x86)\Gamry Instruments\Framework\GamryCOM.exe')
 GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
@@ -52,6 +54,7 @@ class GamryDtaqEvents(object):
         self.cook() # a final cook
         time.sleep(2.0)              
         stopacq()
+        savedata()
         
 def stopacq():
     global active
@@ -65,73 +68,52 @@ def stopacq():
     gc.collect()
     return    
 
-class savedataCV(object):
-    def __init__(self, saveCV):
-        self.saveCV = saveCV
+
+def savedata():
+    global fileName
+    print(dtaqsink.acquired_points)
+    print(len(dtaqsink.acquired_points))
+
+    #savedata
+    #column_names = ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
+    output = pd.DataFrame(dtaqsink.acquired_points)
+    np.savetxt(fileName+'.txt', output)
+
+    #plotdata
+    ###### OCP ######
+    #'''
+    df = pd.read_csv(fileName+'.txt', sep=" ", header=None, names=["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"])
+    plt.rcParams["figure.dpi"]=150
+    plt.rcParams["figure.facecolor"]="white"
+    plt.plot(df['Time'], df['Vf'])
+    plt.xlabel('Time (s)')
+    plt.ylabel('Voltage (V)')
+    #'''
+    
+    ###### CA ######
+    '''
+    df = pd.read_csv(fileName+'CA.txt', sep=" ", header=None, names=["runtime", "Vf", "Vu","Im","Q","Vsig","Ach","IERange","Over","StopTest"])
+    plt.rcParams["figure.dpi"]=150
+    plt.rcParams["figure.facecolor"]="white"
+    plt.plot(df['runtime'], df['Im'])
+    plt.xlabel('Time (s)')
+    plt.ylabel('Current (A)')
+    '''
+    
+    ###### CV ######
+    '''    
+    df = pd.read_csv(fileName+'CV.txt', sep=" ", header=None, names=["Time", "Vf","Vu","Im","Vsig","Ach","IERange","Overload","StopTest","Cycle","Ach2"])
+    plt.rcParams["figure.dpi"]=150
+    plt.rcParams["figure.facecolor"]="white"
+    plt.plot(df['Time'], df['Im'])
+    plt.xlabel('Time (s)')
+    plt.ylabel('Current (A)')
+    '''
+    
+    plt.tight_layout()
+    plt.savefig(fileName+'.png')
         
-        print(dtaqsink.acquired_points)
-        print(len(dtaqsink.acquired_points))
 
-        #savedata
-        column_names = ["Time", "Vf","Vu","Im","Vsig","Ach","IERange","Overload","StopTest","Cycle","Ach2"]
-        output = pd.DataFrame(dtaqsink.acquired_points, columns = column_names)
-        np.savetxt('2023-05-18_CV-Test1.txt', output)
-
-        #plotdata
-        df = pd.read_csv('2023-05-18_CV-Test1.txt', sep=" ", header=None, names=["Time", "Vf","Vu","Im","Vsig","Ach","IERange","Overload","StopTest","Cycle","Ach2"])
-        plt.rcParams["figure.dpi"]=150
-        plt.rcParams["figure.facecolor"]="white"
-        plt.plot(df['Time'], df['Im'])
-        plt.xlabel('Time (s)')
-        plt.ylabel('Current (A)')
-        plt.tight_layout()
-        plt.savefig('2023-05-18_CV-Test1')
-
-class savedataCA(object):
-    def __init__(self, saveCA):
-        self.saveCA = saveCA
-
-        print(dtaqsink.acquired_points)
-        print(len(dtaqsink.acquired_points))
-
-        #savedata
-        column_names = ["Time", "Vf","Vu","Im","Q","Vsig","Ach","IERange","Overload","StopTest"]
-        output = pd.DataFrame(dtaqsink.acquired_points, columns = column_names)
-        np.savetxt('2023-05-17_CA-Test3.txt', output)
-
-        #plotdata
-        df = pd.read_csv('2023-05-17_CA-Test3.txt', sep=" ", header=None, names=["runtime", "Vf", "Vu","Im","Q","Vsig","Ach","IERange","Over","StopTest"])
-        plt.rcParams["figure.dpi"]=150
-        plt.rcParams["figure.facecolor"]="white"
-        plt.plot(df['runtime'], df['Im'])
-        plt.xlabel('Time (s)')
-        plt.ylabel('Current (A)')
-        plt.tight_layout()
-        plt.savefig('2023-05-17_CA-Test3')
-
-class savedataOCP(object):
-    def __init__(self, saveOCP):
-        self.saveOCP = saveOCP
-
-        print(dtaqsink.acquired_points)
-        print(len(dtaqsink.acquired_points))
-
-        #savedata
-        #column_names = ["Time", "Vf","Vu","Im","Q","Vsig","Ach","IERange","Overload","StopTest"]
-        output = pd.DataFrame(dtaqsink.acquired_points)
-        np.savetxt('2023-06-02_OCP-Test1', output)
-
-        #plotdata
-        #df = pd.read_csv('2023-05-17_CA-Test3.txt', sep=" ", header=None, names=["runtime", "Vf", "Vu","Im","Q","Vsig","Ach","IERange","Over","StopTest"])
-        #plt.rcParams["figure.dpi"]=150
-        #plt.rcParams["figure.facecolor"]="white"
-        #plt.plot(df['runtime'], df['Im'])
-        #plt.xlabel('Time (s)')
-        #plt.ylabel('Current (A)')
-        #plt.tight_layout()
-        #plt.savefig('2023-05-17_CA-Test3')
-        
-        
 def CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
     global dtaq
     global signal
@@ -164,7 +146,6 @@ def CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
     pstat.SetCell(GamryCOM.CellOn)
 
     dtaq.Run(True)
-    saveCV.Run(True)
     # Code for timing started
     start_time = time.time()
     print("made it to run end")
@@ -201,11 +182,11 @@ def CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     pstat.SetCell(GamryCOM.CellOn)
 
     dtaq.Run(True)
-    saveCA.Run(True)
+    
     # Code for timing started
     start_time = time.time()
     print("made it to run end")
-    
+
 def OCP(OCPvi, OCPti, OCPrate):
     global dtaq
     global signal
@@ -213,6 +194,9 @@ def OCP(OCPvi, OCPti, OCPrate):
     global pstat
     global connection
     global dtaqsink
+    global start_time
+    global end_time
+    global total_time
     print("made it to run")
 
     # signal and dtaq object creation
@@ -235,6 +219,7 @@ def OCP(OCPvi, OCPti, OCPrate):
     pstat.SetCell(GamryCOM.CellOff)
 
     dtaq.Run(True)
+    start_time = time.time()
     print("made it to run end")    
     
 active = True
@@ -244,7 +229,8 @@ CVvi = 0.0
 CVap1 = -0.8
 CVap2 = -0.1
 CVfin = -0.1
-CVstep = 0.002
+#CVstep = 0.002
+CVstep = 0.1
 CVsr1 = 0.05
 CVcycle = 3
 
@@ -256,27 +242,30 @@ CVsamplerate = CVstep / CVsr1
 CAvi = 0.0
 CAti = 0.0
 CAv1 = -2.7
-CAt1 = 300
+CAt1 = 30
+#CAt1 = 300
 CAv2 = 0
 CAt2 = 0
 CAsamplerate = 0.1
 
 #OCP Setup Parameters
 OCPvi = 0.0
-OCPti = 150
+#OCPti = 150
+OCPti = 15
 OCPrate = 0.5
 
+fileName = "testrun1"
 
 if __name__ == "__main__":
     try:
         #pick one of the following to test
-        #CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
-        #CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
         OCP(OCPvi, OCPti, OCPrate)
+        #CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
+        #CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)     
         print("made it to try")
         while active == True:
             client.PumpEvents(1)
-            time.sleep(0.1)
+            time.sleep(0.5)
         # code for end time
         end_time = time.time()
         total_time = end_time - start_time
