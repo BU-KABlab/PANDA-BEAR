@@ -138,6 +138,10 @@ class MillControl:
             print(f'{command} executed and returned: {out}')
         #out = self.ser_mill.readline().strip().decode()
         time.sleep(5)
+        # TODO check if the below code works for waiting for a command to finish
+        #while self.current_status == 'Run':
+        #    pass
+        time.sleep(5)
         return out
 
     def stop(self):

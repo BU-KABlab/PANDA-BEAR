@@ -31,23 +31,30 @@ def set_up_mill():
 
 def withdraw(volume: float, position: list, depth: float, rate: float, ser_pump):
     """Set the pump direction to withdraw the given volume at the given rate and height.
-    volume <float> (ml) | rate <float> (ml/m) | height <float> <mm>
+    volume <float> (ml)
+    
+    position <list> coordinates x,y,z
+
+    depth <float> <mm>
+    
+    rate <float> (ml/m)
+    
+    ser_pump <serial object to a pump>
+    
     """
     # Move the pipette down to the given height at the current position
-    move_pipette_to_position(position["x"], position["y"], 0)
-    mill.current_status()
-    move_pipette_to_position(position["x"], position["y"], position["z"])
-    mill.current_status()
-    move_pipette_to_position(position["x"], position["y"], position["z"] + depth)
-    mill.current_status()
+    move_pipette_to_position(position["x"], position["y"], 0) #start above the location
+    
+    move_pipette_to_position(position["x"], position["y"], position["z"]) # go to the top
+    
+    move_pipette_to_position(position["x"], position["y"], position["z"] + depth) # plunge a calculated depth
+    
     # Perform the withdrawl
     if ser_pump.volume_withdrawn + volume >= 0.2:
         raise Exception("The command will overfill the pipette. Not running")
     else:
         ser_pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
-        ser_pump.pumping_volume = (
-            volume  # Sets the pumping volume of the pump in units of milliliters.
-        )
+        ser_pump.pumping_volume = (volume)  # Sets the pumping volume of the pump in units of milliliters.
         ser_pump.pumping_rate = rate  # Sets the pumping rate of the pump in units of milliliters per minute.
         ser_pump.run()
         while ser_pump.running:
