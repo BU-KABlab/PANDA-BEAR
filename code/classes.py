@@ -20,7 +20,7 @@ class Wells:
     def __init__(self, a1_X=0, a1_Y=0, orientation=0):
         self.wells = {}
         self.orientation = orientation
-        a1_coordinates = {"x": a1_X, "y": a1_Y, "z": 0}
+        a1_coordinates = {"x": a1_X, "y": a1_Y, "z": 0} #TODO set to zero for now, should be real value in future
         for col_idx, col in enumerate("ABCDEFG"):
             for row in range(1, 14):
                 well_id = col + str(row)
@@ -130,7 +130,7 @@ class MillControl:
                     
         if out != '':
             out = (out.strip().decode())
-            print(out)
+            print(f'{command} executed and returned: {out}')
         #out = self.ser_mill.readline().strip().decode()
         time.sleep(5)
         return out
@@ -143,6 +143,7 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
+        time.sleep(20)
 
     def current_status(self):
         return self.execute_command('?')

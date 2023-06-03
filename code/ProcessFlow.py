@@ -29,14 +29,16 @@ def set_up_mill():
     return ser_mill
 
 
-def withdraw(volume: float, position: list, height: float, rate: float, ser_pump):
+def withdraw(volume: float, position: list, depth: float, rate: float, ser_pump):
     """Set the pump direction to withdraw the given volume at the given rate and height.
     volume <float> (ml) | rate <float> (ml/m) | height <float> <mm>
     """
     # Move the pipette down to the given height at the current position
+    move_pipette_to_position(position["x"], position["y"], 0)
+    mill.current_status()
     move_pipette_to_position(position["x"], position["y"], position["z"])
     mill.current_status()
-    move_pipette_to_position(position["x"], position["y"], position["z"] + height)
+    move_pipette_to_position(position["x"], position["y"], position["z"] + depth)
     mill.current_status()
     # Perform the withdrawl
     if ser_pump.volume_withdrawn + volume >= 0.2:
@@ -59,15 +61,18 @@ def withdraw(volume: float, position: list, height: float, rate: float, ser_pump
     return 0
 
 
-def infuse(volume: float, position: list, height: float, rate: float, pump):
+def infuse(volume: float, position: list, depth: float, rate: float, pump):
     """Set the pump direction to infuse the given volume at the given rate.
     volume <float> (ml) | rate <float> (ml/m)
     """
-    move_pipette_to_position(position["x"], position["y"], position["z"])
+    move_pipette_to_position(position["x"], position["y"],0) #first move to the x,y coord
     mill.current_status()
-                             
+
+    move_pipette_to_position(position["x"], position["y"], position["z"]) # then lower to the top
+    mill.current_status()
+
     # Move the pipette down to the given height at the current position
-    move_pipette_to_position(position["x"], position["y"], position["z"] + height)
+    move_pipette_to_position(position["x"], position["y"], position["z"] + depth) #then lower to the pipetting depth
     mill.current_status()
     # Perform infusion
     pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
@@ -109,12 +114,12 @@ def move_pipette_to_position(x,y,z):
     return response
 
 
-def move_electrode_to_position(x,y,z):
+def move_electrode_to_position(coordinates : list):
     """
     INPUT: x, y, z coordinates as int or float to where you want the mill to move absolutely.
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
-    command = mill_move.format(x + 84.5, y, z)  # electrode has 45 mm offset
+    command = mill_move.format(coordinates['x'] + 84.5, coordinates['y'], coordinates['z'])  # electrode has 84.5 mm offset
     response = mill.execute_command(str(command))
     return response
 
@@ -139,12 +144,13 @@ infuse_height = withdrawl_height
 
 # Set up wells
 plate = Wells(-200, -100, 0)
+#floor-of-well = -##
 
 # Define locations of vials and their contents
 Solution1 = Vial(0, -100, 0, -36, "water", 400)
 # Define the amount to purge, vial location, height,and rate to purge
 purge_vial = Vial(0,-200,0,-36,'waste',0)
-#DMF = Vial(0, -150, 0 , -36, "DMF", 400)
+DMF = Vial(0, -150, 0 , 0, "DMF", 400)
 
 """ 
 -------------------------------------------------------------------------
@@ -153,14 +159,14 @@ Experiment A1
 """
 # Begin by homing the mill
 mill.home()
-time.sleep(20)
 
-# Pipette solution #N1
+""" Pipette solution #N1"""
 Target_vial = Solution1.coordinates
 Target_well = plate.get_coordinates("A1")
 
-move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
-withdraw(0.140, Target_vial, withdrawl_height, 0.4,pump)
+#move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
+#withdraw(0.140, Target_vial, withdrawl_height, 0.4,pump)
+withdraw(0.140, Solution1.coordinates, Solution1.depth, 0.4,pump)
 purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
 #move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
 infuse(0.10, Target_well, withdrawl_height, 0.4, pump)
@@ -168,35 +174,50 @@ purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
 print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 mill.home()
 
-# Electrode - chronoamperometry
+""" 
+Electrode - chronoamperometry
+-------------------------------------------------------------------------
+"""
 move_electrode_to_position(Target_well)
 # Initiate pstat experiment
 #pstatcontrol.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
 mill.home()
 
-# Remove Solution 1 deposition
-move_pipette_to_position(Target_well)
+
+""" 
+Remove Solution 1 deposition
+-------------------------------------------------------------------------
+"""
+#move_pipette_to_position(Target_well)
 withdraw(0.100, Target_well, -36, 0.4, pump)
 infuse(0.120, purge_vial, withdrawl_height, 0.4, pump)
 mill.home()
 
-#Pipette - Dimethylferrocene solution
-move_pipette_to_position(DMF.coordinates)
+""" 
+Pipette - Dimethylferrocene solution
+-------------------------------------------------------------------------
+"""
+#move_pipette_to_position(DMF.coordinates)
 withdraw(0.140, DMF.coordinates, withdrawl_height, 0.4, pump)
-purge
-move_pipette_to_position(plate.get_coordinates("A1"))
+purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
+#move_pipette_to_position(plate.get_coordinates("A1"))
 infuse(0.100,Target_well, infuse_height, 0.4, pump)
-purge
+purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
 mill.home()
 
-# Electrode - Cyclic voltammetry
+"""
+Electrode - Cyclic voltammetry
+-------------------------------------------------------------------------
+"""
 move_electrode_to_position(plate.get_coordinates("A1"))
 # Initiate pstat experiment
 #pstatcontrol.CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
 mill.home()
 
-# Remove Remove DMF solution
-move_pipette_to_position(Target_well)
-withdraw(0.120, Target_well, -36, 0.4, pump)
+"""
+Remove Remove DMF solution
+-------------------------------------------------------------------------
+"""
+withdraw(0.120, Target_well, plate.get_coordinates("A1"), 0.4, pump)
 infuse(0.140, purge_vial, withdrawl_height, 0.4, pump)
 mill.home()
