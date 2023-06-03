@@ -167,29 +167,26 @@ purge_volume = 0.02
 
 # Set up wells
 plate = Wells(-200, -100, 0)
-# floor-of-well = -##
+# TODO floor-of-well = -##
 
-# Define locations of vials and their contents
-Solution1 = Vial(0, -100, 0, -36, "water", 400)
-# Define the amount to purge, vial location, height,and rate to purge
-purge_vial = Vial(0, -200, 0, -36, "waste", 0)
-DMF = Vial(0, -150, 0, 0, "DMF", 400)
+solution1_vial = Vial(0, -100, 0, -36, "water", 400) # Define locations of vials and their contents
+purge_vial = Vial(0, -200, 0, -36, "waste", 0) # Define the amount to purge, vial location, height,and rate to purge
+DMF_vial = Vial(0, -150, 0, 0, "DMF_vial", 400)
 
 """ 
 -------------------------------------------------------------------------
 Experiment A1
 -------------------------------------------------------------------------
 """
-# Begin by homing the mill
-mill.home()
+mill.home() # Begin by homing the mill
 
 """ Pipette solution #N1"""
-Target_vial = Solution1.coordinates
+Target_vial = solution1_vial.coordinates
 Target_well = plate.get_coordinates("A1")
 
 # move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
 # withdraw(0.140, Target_vial, withdrawl_height, 0.4,pump)
-withdraw(0.140, Solution1.coordinates, Solution1.depth, 0.4, pump)
+withdraw(0.140, solution1_vial.coordinates, solution1_vial.depth, 0.4, pump)
 purge(purge_volume,purge_vial.position,purge_vial.depth)
 # move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
 infuse(0.10, Target_well, withdrawl_height, 0.4, pump)
@@ -220,8 +217,8 @@ mill.home()
 Pipette - Dimethylferrocene solution
 -------------------------------------------------------------------------
 """
-# move_pipette_to_position(DMF.coordinates)
-withdraw(0.140, DMF.coordinates, withdrawl_height, 0.4, pump)
+# move_pipette_to_position(DMF_vial.coordinates)
+withdraw(0.140, DMF_vial.coordinates, withdrawl_height, 0.4, pump)
 purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
 # move_pipette_to_position(plate.get_coordinates("A1"))
 infuse(0.100, Target_well, infuse_height, 0.4, pump)
@@ -238,7 +235,7 @@ move_electrode_to_position(plate.get_coordinates("A1"))
 mill.home()
 
 """
-Remove Remove DMF solution
+Remove Remove DMF_vial solution
 -------------------------------------------------------------------------
 """
 withdraw(0.120, Target_well, plate.depth("A1"), 0.4, pump)
