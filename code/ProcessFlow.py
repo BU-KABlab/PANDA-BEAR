@@ -139,6 +139,7 @@ purge_vial = Vial(0,-200,0,-36,'waste',0)
 #purge = infuse(20, purge_vial.coordinates, -30, 0.4, pump)
 purge = infuse
 # Common values
+# TODO eliminate these values by calculating the volume/depth for each vessel based on their z-top and bottom
 withdrawl_height = -30
 infuse_height = withdrawl_height
 
@@ -218,6 +219,7 @@ mill.home()
 Remove Remove DMF solution
 -------------------------------------------------------------------------
 """
-withdraw(0.120, Target_well, plate.get_coordinates("A1"), 0.4, pump)
+withdraw(0.120, Target_well, plate.depth("A1"), 0.4, pump)
 infuse(0.140, purge_vial, withdrawl_height, 0.4, pump)
+#infuse(0.140, purge_vial, purge_vial.depth, 0.4, pump)
 mill.home()
