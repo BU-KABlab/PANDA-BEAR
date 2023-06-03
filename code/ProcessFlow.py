@@ -194,10 +194,10 @@ purge_vial = Vial(0, -200, 0, 0, "waste", 0) # TODO replace heigh with real heig
 
 # Common values
 # TODO eliminate these height values by calculating the volume/depth for each vessel based on their z-top and bottom
-withdrawl_height = -30
+withdrawl_height = -30 # depth to lower to for withdrawl
 infuse_height = withdrawl_height
-purge_volume = 0.02
-pumping_rate = 0.4 # max of 0.6
+purge_volume = 0.02 #ml
+pumping_rate = 0.4 # max of 0.6 ml/min
 
 # Set up wells
 wells_plate = Wells(-200, -100, 0)
@@ -206,7 +206,7 @@ wells_plate = Wells(-200, -100, 0)
 # Set up vials
 solution_1_vial = Vial(0, -100, 0, -36, "water", 400) # Define locations of vials and their contents
 purge_vial = Vial(0, -200, 0, -36, "waste", 0) # Define the amount to purge, vial location, height,and rate to purge
-DMF_vial = Vial(0, -150, 0, 0, "DMF_vial", 400)
+DMF_vial = Vial(0, -150, 0, -36, "DMF", 400)
 
 """ 
 -------------------------------------------------------------------------
@@ -221,9 +221,9 @@ Pipette solution 1 into A1
 """
 Target_well = wells_plate.get_coordinates("A1")
 
-withdraw(0.140, solution_1_vial.coordinates, solution_1_vial.depth, 0.4, pump)
+withdraw(0.140, solution_1_vial.coordinates, solution_1_vial.depth, pumping_rate, pump)
 purge(purge_volume,purge_vial.position,purge_vial.depth)
-infuse(0.100, Target_well, withdrawl_height, 0.4, pump)
+infuse(0.100, Target_well, infuse_height, pumping_rate, pump)
 purge(purge_volume,purge_vial.position,purge_vial.depth)
 print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 mill.home()
@@ -243,8 +243,8 @@ Remove Solution 1 deposition
 -------------------------------------------------------------------------
 """
 # move_pipette_to_position(Target_well)
-withdraw(0.100, Target_well, -36, pumping_rate, pump)
-infuse(0.120, purge_vial, withdrawl_height, pumping_rate, pump)
+withdraw(0.120, Target_well, withdraw_height, pumping_rate, pump)
+infuse(0.120, purge_vial, infuse_height, pumping_rate, pump)
 mill.home()
 
 """ 
@@ -253,10 +253,10 @@ Pipette - Dimethylferrocene solution
 """
 # move_pipette_to_position(DMF_vial.coordinates)
 withdraw(0.140, DMF_vial.coordinates, withdrawl_height, pumping_rate, pump)
-purge(0.020, purge_vial.coordinates, -30, pumping_rate, pump)
+purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
 # move_pipette_to_position(wells_plate.get_coordinates("A1"))
 infuse(0.100, Target_well, infuse_height, pumping_rate, pump)
-purge(0.020, purge_vial.coordinates, -30, pumping_rate, pump)
+purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
 mill.home()
 
 """
@@ -273,6 +273,6 @@ Remove Remove DMF_vial solution
 -------------------------------------------------------------------------
 """
 withdraw(0.120, Target_well, wells_plate.depth("A1"), pumping_rate, pump)
-infuse(0.140, purge_vial, withdrawl_height, pumping_rate, pump)
+infuse(0.120, purge_vial, withdrawl_height, pumping_rate, pump)
 # infuse(0.140, purge_vial, purge_vial.depth, 0.4, pump)
 mill.home()
