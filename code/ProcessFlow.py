@@ -139,25 +139,31 @@ def move_electrode_to_position(coordinates: list):
     response = mill.execute_command(str(command))
     return response
 
+def purge(volume = 0.02, purge_vial_location = {'x':0,'y':0,'z':0}, purge_vial_depth = 0.00):
+    """
+    purge function to avoid repeating the same code
+    """
+    infuse(volume, purge_vial_location, purge_vial_depth, 0.4, pump)
 
 """ 
 -------------------------------------------------------------------------
 Program Set Up
 -------------------------------------------------------------------------
 """
+# Set up the CNC mill
 mill = MillControl(set_up_mill())
-
 
 # Set up the pump
 pump = set_up_pump()
-# Define the amount to purge, vial location, height,and rate to purge
-purge_vial = Vial(0, -200, 0, -36, "waste", 0)
-# purge = infuse(20, purge_vial.coordinates, -30, 0.4, pump)
-purge = infuse
+
+# Define the purge vial location, height,and rate to purge
+purge_vial = Vial(0, -200, 0, 0, "waste", 0) # TODO replace heigh with real height
+
 # Common values
-# TODO eliminate these values by calculating the volume/depth for each vessel based on their z-top and bottom
+# TODO eliminate these height values by calculating the volume/depth for each vessel based on their z-top and bottom
 withdrawl_height = -30
 infuse_height = withdrawl_height
+purge_volume = 0.02
 
 # Set up wells
 plate = Wells(-200, -100, 0)
@@ -184,10 +190,10 @@ Target_well = plate.get_coordinates("A1")
 # move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
 # withdraw(0.140, Target_vial, withdrawl_height, 0.4,pump)
 withdraw(0.140, Solution1.coordinates, Solution1.depth, 0.4, pump)
-purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
+purge(purge_volume,purge_vial.position,purge_vial.depth)
 # move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
 infuse(0.10, Target_well, withdrawl_height, 0.4, pump)
-purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
+purge(purge_volume,purge_vial.position,purge_vial.depth)
 print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 mill.home()
 
