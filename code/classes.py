@@ -20,7 +20,9 @@ class Wells:
     def __init__(self, a1_X=0, a1_Y=0, orientation=0):
         self.wells = {}
         self.orientation = orientation
-        a1_coordinates = {"x": a1_X, "y": a1_Y, "z": 0} #TODO set to zero for now, should be real value in future
+        z_bottom = 0
+        z_top = 0
+        a1_coordinates = {"x": a1_X, "y": a1_Y,"z": z_top} #TODO set to zero for now, should be real value in future
         for col_idx, col in enumerate("ABCDEFG"):
             for row in range(1, 14):
                 well_id = col + str(row)
@@ -28,22 +30,23 @@ class Wells:
                     coordinates = a1_coordinates
                     contents = None
                     volume = 0
+                    depth = z_bottom
                 else:
                     well_offset = 9
-                    z_base = -30
                     x_offset = col_idx * well_offset
                     y_offset = (row - 1) * well_offset
                     if orientation == 0:
-                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_base}
+                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_top}
                     elif orientation == 1:
-                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_base}
+                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_top}
                     elif orientation == 2:
-                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_base}
+                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_top}
                     elif orientation == 3:
-                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_base}
+                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_top}
                     contents = None
                     volume = 0
-                self.wells[well_id] = {"coordinates": coordinates, "contents": contents, "volume": volume}
+                    depth = z_bottom
+                self.wells[well_id] = {"coordinates": coordinates, "contents": contents, "volume": volume,"depth":depth}
 
     def print_well_coordinates_table(self):
         print("Well Coordinates:")
@@ -86,6 +89,8 @@ class Wells:
     
     def volume(self,well_id):
         return self.wells[well_id]['volume']
+    def depth(self,well_id):
+        return self.wells[well_id]['depth']
 
 
 class Vial:
