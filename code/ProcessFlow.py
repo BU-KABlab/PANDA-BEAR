@@ -8,7 +8,11 @@ from classes import Vial, Wells, MillControl
 
 
 def set_up_pump():
-    # Set up WPI syringe pump
+    """
+    Set up the WPI syringe pump.
+    Returns:
+        Pump: Initialized pump object.
+    """
     pump_port = nesp_lib.Port("COM5", 19200)
     pump = nesp_lib.Pump(pump_port)
     pump.syringe_diameter = 4.699  # millimeters
@@ -18,9 +22,13 @@ def set_up_pump():
     time.sleep(2)
     return pump
 
-
 def set_up_mill():
-    ser_mill = serial.Serial(
+    """
+    Set up the CNC mill.
+    Returns:
+        serial.Serial: Initialized serial object for mill communication.
+    """
+    mill_serial = serial.Serial(
         port="COM4",
         baudrate=115200,
         parity=serial.PARITY_NONE,
@@ -29,12 +37,17 @@ def set_up_mill():
         timeout=1,
     )
     time.sleep(2)
-    return ser_mill
+    return mill_serial
 
 
 def withdraw(volume: float, position: list, depth: float, rate: float, ser_pump: object):
-    """Set the pump direction to withdraw the given volume at the given rate and height.
-
+    """
+    Withdraw the given volume at the given rate and depth from the specified position.
+    Args:
+        volume (float): Volume to be withdrawn in milliliters.
+        position (dict): Dictionary containing x, y, and z coordinates of the position.
+        depth (float): Depth to plunge from the specified position in millimeters.
+        rate (float): Pumping rate in milliliters per minute.
     """
     # Move the pipette down to the given height at the current position
     move_pipette_to_position(
@@ -70,9 +83,15 @@ def withdraw(volume: float, position: list, depth: float, rate: float, ser_pump:
     return 0
 
 
-def infuse(volume: float, position: list, depth: float, rate: float, pump: object):
-    """Set the pump direction to infuse the given volume at the given rate.
-        """
+def infuse(volume: float, position: list, depth: float, rate: float, ser_pump: object):
+    """
+    Infuse the given volume at the given rate and depth from the specified position.
+    Args:
+        volume (float): Volume to be infused in milliliters.
+        position (dict): Dictionary containing x, y, and z coordinates of the position.
+        depth (float): Depth to lower from the specified position in millimeters.
+        rate (float): Pumping rate in milliliters per minute.
+    """
     move_pipette_to_position(
         position["x"], position["y"], 0
     )  # first move to the x,y coord
@@ -86,18 +105,18 @@ def infuse(volume: float, position: list, depth: float, rate: float, pump: objec
     )  # then lower to the pipetting depth
 
     # Perform infusion
-    pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
-    pump.pumping_volume = (
+    ser_pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+    ser_pump.pumping_volume = (
         volume  # Sets the pumping volume of the pump in units of milliliters.
     )
-    pump.pumping_rate = (
+    ser_pump.pumping_rate = (
         rate  # Sets the pumping rate of the pump in units of milliliters per minute.
     )
-    pump.run()
-    while pump.running:
+    ser_pump.run()
+    while ser_pump.running:
         pass
     time.sleep(2)
-    print(f"Pump has infused: {pump.volume_infused} ml")
+    print(f"Pump has infused: {ser_pump.volume_infused} ml")
 
     move_pipette_to_position(
         position["x"], position["y"], 0
@@ -108,7 +127,11 @@ def infuse(volume: float, position: list, depth: float, rate: float, pump: objec
 
 def move_center_to_position(coordinates: list):
     """
-    INPUT: x, y, z coordinates as int or float to where you want the mill to move absolutely.
+    Move the mill to the specified coordinates.
+    Args:
+        coordinates (dict): Dictionary containing x, y, and z coordinates.
+    Returns:
+        str: Response from the mill after executing the command.
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(coordinates["x"], coordinates["y"], coordinates["z"])
@@ -118,7 +141,13 @@ def move_center_to_position(coordinates: list):
 
 def move_pipette_to_position(x, y, z):
     """
-    INPUT: x, y, z coordinates as int or float to where you want the mill to move absolutely.
+    Move the pipette to the specified coordinates.
+    Args:
+        x (float): X coordinate.
+        y (float): Y coordinate.
+        z (float): Z coordinate.
+    Returns:
+        str: Response from the mill after executing the command.
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(
@@ -130,7 +159,11 @@ def move_pipette_to_position(x, y, z):
 
 def move_electrode_to_position(coordinates: list):
     """
-    INPUT: x, y, z coordinates as int or float to where you want the mill to move absolutely.
+    Move the electrode to the specified coordinates.
+    Args:
+        coordinates (dict): Dictionary containing x, y, and z coordinates.
+    Returns:
+        str: Response from the mill after executing the command.
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(
@@ -141,7 +174,11 @@ def move_electrode_to_position(coordinates: list):
 
 def purge(volume = 0.02, purge_vial_location = {'x':0,'y':0,'z':0}, purge_vial_depth = 0.00):
     """
-    purge function to avoid repeating the same code
+    Perform purging from the pipette.
+    Args:
+        volume (float): Volume to be purged in milliliters. Default is 0.02 ml.
+        purge_vial_location (dict): Dictionary containing x, y, and z coordinates of the purge vial.
+        purge_vial_depth (float): Depth to lower from the purge vial position in millimeters. Default is 0.00 mm.
     """
     infuse(volume, purge_vial_location, purge_vial_depth, 0.4, pump)
 
@@ -150,13 +187,9 @@ def purge(volume = 0.02, purge_vial_location = {'x':0,'y':0,'z':0}, purge_vial_d
 Program Set Up
 -------------------------------------------------------------------------
 """
-# Set up the CNC mill
+
 mill = MillControl(set_up_mill())
-
-# Set up the pump
 pump = set_up_pump()
-
-# Define the purge vial location, height,and rate to purge
 purge_vial = Vial(0, -200, 0, 0, "waste", 0) # TODO replace heigh with real height
 
 # Common values
@@ -164,12 +197,14 @@ purge_vial = Vial(0, -200, 0, 0, "waste", 0) # TODO replace heigh with real heig
 withdrawl_height = -30
 infuse_height = withdrawl_height
 purge_volume = 0.02
+pumping_rate = 0.4 # max of 0.6
 
 # Set up wells
-plate = Wells(-200, -100, 0)
+wells_plate = Wells(-200, -100, 0)
 # TODO floor-of-well = -##
 
-solution1_vial = Vial(0, -100, 0, -36, "water", 400) # Define locations of vials and their contents
+# Set up vials
+solution_1_vial = Vial(0, -100, 0, -36, "water", 400) # Define locations of vials and their contents
 purge_vial = Vial(0, -200, 0, -36, "waste", 0) # Define the amount to purge, vial location, height,and rate to purge
 DMF_vial = Vial(0, -150, 0, 0, "DMF_vial", 400)
 
@@ -178,18 +213,17 @@ DMF_vial = Vial(0, -150, 0, 0, "DMF_vial", 400)
 Experiment A1
 -------------------------------------------------------------------------
 """
-mill.home() # Begin by homing the mill
+mill.home() 
 
-""" Pipette solution #N1"""
-Target_vial = solution1_vial.coordinates
-Target_well = plate.get_coordinates("A1")
+""" 
+Pipette solution 1 into A1
+-------------------------------------------------------------------------
+"""
+Target_well = wells_plate.get_coordinates("A1")
 
-# move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
-# withdraw(0.140, Target_vial, withdrawl_height, 0.4,pump)
-withdraw(0.140, solution1_vial.coordinates, solution1_vial.depth, 0.4, pump)
+withdraw(0.140, solution_1_vial.coordinates, solution_1_vial.depth, 0.4, pump)
 purge(purge_volume,purge_vial.position,purge_vial.depth)
-# move_pipette_to_position(Target_vial['x'],Target_vial['y'],Target_vial['z'])
-infuse(0.10, Target_well, withdrawl_height, 0.4, pump)
+infuse(0.100, Target_well, withdrawl_height, 0.4, pump)
 purge(purge_volume,purge_vial.position,purge_vial.depth)
 print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 mill.home()
@@ -209,8 +243,8 @@ Remove Solution 1 deposition
 -------------------------------------------------------------------------
 """
 # move_pipette_to_position(Target_well)
-withdraw(0.100, Target_well, -36, 0.4, pump)
-infuse(0.120, purge_vial, withdrawl_height, 0.4, pump)
+withdraw(0.100, Target_well, -36, pumping_rate, pump)
+infuse(0.120, purge_vial, withdrawl_height, pumping_rate, pump)
 mill.home()
 
 """ 
@@ -218,18 +252,18 @@ Pipette - Dimethylferrocene solution
 -------------------------------------------------------------------------
 """
 # move_pipette_to_position(DMF_vial.coordinates)
-withdraw(0.140, DMF_vial.coordinates, withdrawl_height, 0.4, pump)
-purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
-# move_pipette_to_position(plate.get_coordinates("A1"))
-infuse(0.100, Target_well, infuse_height, 0.4, pump)
-purge(0.020, purge_vial.coordinates, -30, 0.4, pump)
+withdraw(0.140, DMF_vial.coordinates, withdrawl_height, pumping_rate, pump)
+purge(0.020, purge_vial.coordinates, -30, pumping_rate, pump)
+# move_pipette_to_position(wells_plate.get_coordinates("A1"))
+infuse(0.100, Target_well, infuse_height, pumping_rate, pump)
+purge(0.020, purge_vial.coordinates, -30, pumping_rate, pump)
 mill.home()
 
 """
 Electrode - Cyclic voltammetry
 -------------------------------------------------------------------------
 """
-move_electrode_to_position(plate.get_coordinates("A1"))
+move_electrode_to_position(wells_plate.get_coordinates("A1"))
 # Initiate pstat experiment
 # pstatcontrol.CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
 mill.home()
@@ -238,7 +272,7 @@ mill.home()
 Remove Remove DMF_vial solution
 -------------------------------------------------------------------------
 """
-withdraw(0.120, Target_well, plate.depth("A1"), 0.4, pump)
-infuse(0.140, purge_vial, withdrawl_height, 0.4, pump)
+withdraw(0.120, Target_well, wells_plate.depth("A1"), pumping_rate, pump)
+infuse(0.140, purge_vial, withdrawl_height, pumping_rate, pump)
 # infuse(0.140, purge_vial, purge_vial.depth, 0.4, pump)
 mill.home()
