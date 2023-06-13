@@ -164,6 +164,31 @@ class MillControl:
         # if command != '$H':
         #     while self.current_status()[:4] == '<Run':
         #         time.sleep(0.01)
+        
+        # while True:
+        #     first = ''
+        #     second = ''
+        #     command = '?'
+        #     command_bytes = command.encode()
+        #     self.ser_mill.write(command_bytes + b'\n')
+        #     reply = self.ser_mill.readlines()
+        #     if type(reply) == list:
+        #         first = reply[0].decode()
+        #         second = reply[1].decode()
+                
+        #         if first == 'ok':
+        #            out = second
+        #         else:
+        #             out = first
+        #     if type(reply) == str:
+        #         out = reply[0].decode()
+                
+        #     print(f'{out}')
+        #     if out[:4] == '<Run':
+        #         break
+        #     else:
+        #         continue
+        
         time.sleep(5)
         return out
 
