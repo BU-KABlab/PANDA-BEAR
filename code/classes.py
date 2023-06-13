@@ -1,5 +1,5 @@
 import time
-import serial
+#import serial
 import matplotlib.pyplot as plt
 
 WELL_ROWS = "ABCDEF"
@@ -20,7 +20,7 @@ class Wells:
     def __init__(self, a1_X=0, a1_Y=0, orientation=0):
         self.wells = {}
         self.orientation = orientation
-        z_bottom = 0
+        z_bottom = -100
         z_top = 0
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": z_top} #TODO set to zero for now, should be real value in future
         for col_idx, col in enumerate("ABCDEFG"):
@@ -36,17 +36,39 @@ class Wells:
                     x_offset = col_idx * well_offset
                     y_offset = (row - 1) * well_offset
                     if orientation == 0:
-                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_top}
+                        coordinates = {
+                            "x": a1_coordinates["x"] - x_offset, 
+                            "y": a1_coordinates["y"] - y_offset, 
+                            "z": z_top
+                        }
                     elif orientation == 1:
-                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_top}
+                        coordinates = {
+                            "x": a1_coordinates["x"] + x_offset, 
+                            "y": a1_coordinates["y"] + y_offset, 
+                            "z": z_top
+                            }
                     elif orientation == 2:
-                        coordinates = {"x": a1_coordinates["x"] - x_offset, "y": a1_coordinates["y"] - y_offset, "z": z_top}
+                        coordinates = {
+                            "x": a1_coordinates["x"] - x_offset, 
+                            "y": a1_coordinates["y"] - y_offset, 
+                            "z": z_top
+                            }
                     elif orientation == 3:
-                        coordinates = {"x": a1_coordinates["x"] + x_offset, "y": a1_coordinates["y"] + y_offset, "z": z_top}
+                        coordinates = {
+                            "x": a1_coordinates["x"] + x_offset, 
+                            "y": a1_coordinates["y"] + y_offset, 
+                            "z": z_top
+                        }
                     contents = None
                     volume = 0
                     depth = z_bottom
-                self.wells[well_id] = {"coordinates": coordinates, "contents": contents, "volume": volume,"depth":depth}
+                    
+                self.wells[well_id] = {
+                    "coordinates": coordinates, 
+                    "contents": contents, 
+                    "volume": volume,
+                    "depth":depth
+                }
 
     def print_well_coordinates_table(self):
         print("Well Coordinates:")
@@ -81,7 +103,7 @@ class Wells:
 
     def get_coordinates(self, well_id):
         coordinates_dict = self.wells[well_id]["coordinates"]
-        coordinates_list = [coordinates_dict["x"], coordinates_dict["y"], coordinates_dict["z"]]
+        #coordinates_list = [coordinates_dict["x"], coordinates_dict["y"], coordinates_dict["z"]]
         return coordinates_dict
     
     def contents(self,well_id):
@@ -121,7 +143,7 @@ class MillControl:
         time.sleep(2)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self):
         self.ser_mill.close()
         time.sleep(15)
 
@@ -139,8 +161,9 @@ class MillControl:
         #out = self.ser_mill.readline().strip().decode()
         time.sleep(5)
         # TODO check if the below code works for waiting for a command to finish
-        #while self.current_status == 'Run':
-        #    pass
+        # if command != '$H':
+        #     while self.current_status()[:4] == '<Run':
+        #         time.sleep(0.01)
         time.sleep(5)
         return out
 
@@ -152,10 +175,19 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
-        time.sleep(20)
+        time.sleep(30)
 
     def current_status(self):
-        return self.execute_command('?')
+        first = ''
+        second = ''
+        command = '?'
+        command_bytes = command.encode()
+        self.ser_mill.write(command_bytes + b'\n')
+        reply = self.ser_mill.readline()
+        first = reply.decode()
+        #out = (out.strip().decode())
+        print(f'{first}')
+        return first
 
     def gcode_mode(self):
         self.execute_command('$C')
