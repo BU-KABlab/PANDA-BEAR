@@ -178,16 +178,7 @@ class MillControl:
         time.sleep(30)
 
     def current_status(self):
-        first = ''
-        second = ''
-        command = '?'
-        command_bytes = command.encode()
-        self.ser_mill.write(command_bytes + b'\n')
-        reply = self.ser_mill.readline()
-        first = reply.decode()
-        #out = (out.strip().decode())
-        print(f'{first}')
-        return first
+        self.execute_command('?')
 
     def gcode_mode(self):
         self.execute_command('$C')
