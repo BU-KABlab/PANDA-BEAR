@@ -1,5 +1,5 @@
 import time
-#import serial
+import serial
 import matplotlib.pyplot as plt
 
 WELL_ROWS = "ABCDEF"
@@ -135,7 +135,15 @@ class MillControl:
     Set up the mill connection and pass commands, including special commands
     '''
     def __init__(self, ser_mill):
-        self.ser_mill = ser_mill
+        self.ser_mill = serial.Serial(
+                            port="COM4",
+                            baudrate=115200,
+                            parity=serial.PARITY_NONE,
+                            stopbits=serial.STOPBITS_ONE,
+                            bytesize=serial.EIGHTBITS,
+                            timeout=1,
+                        )
+        time.sleep(2)
 
     def __enter__(self):
         if not self.ser_mill.isOpen():
