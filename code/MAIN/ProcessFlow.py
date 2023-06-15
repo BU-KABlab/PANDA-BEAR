@@ -200,8 +200,8 @@ Program Set Up
 -------------------------------------------------------------------------
 """
 
-#mill = MillControl()
-#pump = set_up_pump()
+mill = MillControl()
+pump = set_up_pump()
 purge_vial = Vial(0,-50,'waste') # TODO replace height with real height
 
 # Set up wells

@@ -104,7 +104,7 @@ class Wells:
     
     def update_volume(self,well_id,volume:float):
         self.wells[well_id]["volume"] += volume
-        self.wells[well_id]["depth"] = self.volume/(math.pi*self.radius**2.0) + self.bottom
+        self.wells[well_id]["depth"] = self.wells[well_id]["volume"]/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
 
 """class Well:
     def __init__(self, x, y, contents = None, volume=0.00, capacity=0.02, radius = 0.028, height = 0.061, z_bottom = -100):
