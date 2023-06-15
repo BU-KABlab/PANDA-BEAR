@@ -134,7 +134,7 @@ class MillControl:
     '''
     Set up the mill connection and pass commands, including special commands
     '''
-    def __init__(self, ser_mill):
+    def __init__(self):
         self.ser_mill = serial.Serial(
                             port="COM4",
                             baudrate=115200,

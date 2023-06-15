@@ -22,23 +22,6 @@ def set_up_pump():
     time.sleep(2)
     return pump
 
-def set_up_mill():
-    """
-    Set up the CNC mill.
-    Returns:
-        serial.Serial: Initialized serial object for mill communication.
-    """
-    mill_serial = serial.Serial(
-        port="COM4",
-        baudrate=115200,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS,
-        timeout=1,
-    )
-    time.sleep(2)
-    return mill_serial
-
 
 def withdraw(volume: float, position: list, depth: float, rate: float, ser_pump: object):
     """
@@ -199,7 +182,7 @@ Program Set Up
 -------------------------------------------------------------------------
 """
 
-mill = MillControl(set_up_mill())
+mill = MillControl()
 pump = set_up_pump()
 purge_vial = Vial(0,-50,0,-80,'waste',0) # TODO replace heigh with real height
 
