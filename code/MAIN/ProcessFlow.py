@@ -1,10 +1,18 @@
 import time
 import nesp_lib
 import serial
-from classes import Vial, Wells, MillControl
+from classes import Vial, MillControl, Wells
 
 # HQ potentiostat#
 # import demo.pstatcontrol
+
+# Constants
+vial_withdraw_height = -80
+vial_infuse_height = vial_withdraw_height
+
+well_withdraw_height = -101
+well_infuse_height = -98
+pumping_rate = 0.4
 
 
 def set_up_pump():
@@ -175,6 +183,16 @@ def purge(volume = 0.02, purge_vial_location = {'x':0,'y':0,'z':0}, purge_vial_d
         purge_vial_depth (float): Depth to lower from the purge vial position in millimeters. Default is 0.00 mm.
     """
     infuse(volume, purge_vial_location, purge_vial_depth, 0.4, pump)
+    purge_vial.update_volume(0.02)
+
+def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.020):
+    withdraw(volume + 2 * purge_volume, solution.coordinates, solution.depth, pumping_rate, pump)
+    purge(purge_vial_location = purge_vial.position, purge_vial_depth = purge_vial.depth)
+    infuse(volume, target_well, plate.depth(target_well), pumping_rate, pump)
+    purge(purge_vial_location = purge_vial.position, purge_vial_depth = purge_vial.depth)
+    solution.update_volume(-volume)
+    target_well.update_volume(volume)
+    print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
 """ 
 -------------------------------------------------------------------------
@@ -182,52 +200,36 @@ Program Set Up
 -------------------------------------------------------------------------
 """
 
-mill = MillControl()
-pump = set_up_pump()
-purge_vial = Vial(0,-50,0,-80,'waste',0) # TODO replace heigh with real height
-
-# Common values
-vial_withdraw_height = -80
-vial_infuse_height = vial_withdraw_height
-
-well_withdraw_height = -101
-well_infuse_height = -98
-
-pumping_rate = 0.4
+#mill = MillControl()
+#pump = set_up_pump()
+purge_vial = Vial(0,-50,'waste') # TODO replace height with real height
 
 # Set up wells
 plate = Wells(-219, -76, 0)
 
 # Define locations of vials and their contents
 #Sol1 = Vial(-10, -50, 0, -80, "water", 400)
-Sol2 = Vial( 0,  -84, 0, -80, "water", 400)
-Sol3 = Vial( 0, -115, 0, -80, "water", 400)
-Sol4 = Vial( 0, -150, 0, -80, "water", 400)
-Sol5 = Vial( 0, -182, 0, -80, "water", 400)
+Sol2 = Vial( 0,  -84, "water")
+Sol3 = Vial( 0, -115, "water")
+Sol4 = Vial( 0, -150, "water")
+Sol5 = Vial( 0, -182, "water")
 
 """ 
 -------------------------------------------------------------------------
 Experiment A1
 -------------------------------------------------------------------------
 """
-mill.home() 
+#mill.home() 
 
-""" 
-Pipette solution 1 into C1
--------------------------------------------------------------------------
-"""
-# Pipette solution #N1
-#Target_vial = Sol2.coordinates
-#Target_vial2 = Sol5.coordinates
-purge_coord = purge_vial.coordinates
-Target_well = plate.get_coordinates("D1")
+## Pipette solution 1 into C1
+Target_well = plate.get_coordinates("A1")
 
 withdraw(0.140, Sol2.coordinates, vial_withdraw_height, pumping_rate, pump)
 purge(0.020, purge_vial.position, vial_infuse_height)
 infuse(0.100, Target_well, well_infuse_height, pumping_rate, pump)
 purge(0.020, purge_vial.position, vial_infuse_height)
 print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
-#mill.home()
+
 
 """ 
 Electrode - chronoamperometry
