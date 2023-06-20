@@ -167,18 +167,18 @@ def move_electrode_to_position(coordinates: dict):
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(
-        coordinates["x"] + 82, coordinates["y"], 0
+        coordinates["x"] + 82, coordinates["y"] + 1, 0
     )  # electrode has 84.5 mm offset
     response = mill.execute_command(str(command))
     # TODO: create seperate raise and lower electrode functions 
    
     command = mill_move.format(
-        coordinates["x"] + 82, coordinates["y"], coordinates["z"]
+        coordinates["x"] + 82, coordinates["y"] + 1, coordinates["z"]
     )  # electrode has 84.5 mm offset
     response = mill.execute_command(str(command))
     time.sleep(15)
     command = mill_move.format(
-        coordinates["x"] + 82, coordinates["y"], 0
+        coordinates["x"] + 82, coordinates["y"] + 1, 0
     )  # electrode has 84.5 mm offset
     response = mill.execute_command(str(command))
     return response
@@ -237,7 +237,7 @@ Pipette solution 1 into C1
 #Target_vial = Sol2.coordinates
 #Target_vial2 = Sol5.coordinates
 purge_coord = purge_vial.coordinates
-Target_well = plate.get_coordinates("D1")
+Target_well = plate.get_coordinates("D5")
 
 withdraw(0.140, Sol2.coordinates, vial_withdraw_height, pumping_rate, pump)
 purge(0.020, purge_vial.position, vial_infuse_height)
