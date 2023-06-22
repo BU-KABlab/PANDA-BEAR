@@ -158,7 +158,7 @@ class Vial:
     '''
     Class for creating vial objects with their position and contents
     '''
-    def __init__(self, x, y, contents, volume=0.00, capacity=0.02, radius = 0.028, height=0.061, z_bottom = -98):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity=0.02, radius = 0.028, height=0.061, z_bottom = -98):
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
         self.contents = contents
@@ -173,9 +173,14 @@ class Vial:
     def position(self):
         return self.coordinates
     
-    def update_volume(self,volume:float):
-        self.volume += volume
-        self.depth = (self.volume/self.base) + self.bottom
+    def update_volume(self,added_volume:float):
+        if self.volume + added_volume > self.capacity:
+            raise Exception("Vial overfill")
+        elif self.volume + added_volume < 0:
+            raise Exception("Vial over draw")
+        else:
+            self.volume += added_volume
+            self.depth = (self.volume/self.base) + self.bottom
 
 
 class MillControl:
