@@ -258,7 +258,7 @@ PurgeVial = Vial(0,-50,'waste') # TODO replace height with real height
 wellplate = Wells(-219, -76, 0)
 
 # Define locations of vials and their contents
-#Sol1 = Vial(-10, -50, 0, -80, "water", 400)
+#Sol1 = PurgeVial
 Sol2 = Vial( 0,  -84, "water")
 Sol3 = Vial( 0, -115, "water")
 Sol4 = Vial( 0, -150, "water")
@@ -266,10 +266,10 @@ Sol5 = Vial( 0, -182, "water")
 
 ## Set up experiments
 experiements= [
-    {'Target Well': 'A4','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
-    {'Target Well': 'B6','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
-    {'Target Well': 'D7','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
-    {'Target Well': 'D9','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'A4','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'B6','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'D7','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'D9','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
     {'Target Well': 'H12','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
     ]
 
