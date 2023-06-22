@@ -30,6 +30,8 @@ if test_y_coord == coords['y']:
 else:
     print('Y-coordinates do not match')
     passing = False
+    
+print(coords)
 
 
 # test updating the voluem

@@ -97,8 +97,8 @@ def move_center_to_position(x,y,z):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': 82,
-        'y': 1,
+        'x': 0,
+        'y': 0,
         'z': 0
     }
 
@@ -119,7 +119,7 @@ def move_pipette_to_position(x, y, z = 0.00):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': 88,
+        'x': -88,
         'y': 1,
         'z': 0
     }
@@ -161,7 +161,7 @@ def purge(purge_vial: Vial,purge_volume = 0.02):
         purge_vial_location (dict): Dictionary containing x, y, and z coordinates of the purge vial.
         purge_vial_depth (float): Depth to lower from the purge vial position in millimeters. Default is 0.00 mm.
     """
-    infuse(purge_volume,purge_vial.coordinates, purge_vial.depth, purge_volume, pump)
+    infuse(purge_volume, purge_volume, pump)
     purge_vial.update_volume(purge_volume)
     print(f'Purge vial new volume: {purge_vial.volume}')
 
@@ -192,10 +192,10 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
         purge_volume (float): Desired about to purge before and after pipetting
     """
     ## First half: pick up solution
-    move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],0) # start at safe height
-    move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],solution.coordinates['z']) # go to object top
-    move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],solution.depth) # go to soltuion depth
-    withdraw(volume + 2 * purge_volume, solution.coordinates, solution.depth, pumping_rate, pump)
+    move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], 0) # start at safe height
+    move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], solution.coordinates['z']) # go to object top
+    move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], solution.depth) # go to soltuion depth
+    withdraw(volume + 2 * purge_volume, pumping_rate, pump)
     solution.update_volume(-volume)
     print(f'{solution} new volume: {solution.volume}')
     move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],0) # return to safe height
@@ -204,14 +204,14 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-    purge(PurgeVial,purge_volume)
+    purge(PurgeVial, purge_volume)
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     
     ## Second Half: Deposit to well
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),0) # start at safe height
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # start at safe height
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),wellplate.depth) # go to solution depth
-    infuse(volume, target_well, wellplate.depth(target_well), pumping_rate, pump)
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.depth) # go to solution depth
+    infuse(volume, pumping_rate, pump)
     wellplate.update_volume(target_well,volume)
     print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # return to safe height
@@ -238,7 +238,7 @@ def clear_well(volume: float, target_well: str):
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),wellplate.depth) # go to solution depth
     
-    withdraw(volume, target_well, wellplate.z_bottom+1, pumping_rate, pump)
+    withdraw(volume, pumping_rate, pump)
     wellplate.update_volume(target_well,-volume)
     
     print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
@@ -250,7 +250,7 @@ def clear_well(volume: float, target_well: str):
     
 ## Program Set Up
 mill = MillControl()
-mill.home() 
+#mill.home() 
 pump = set_up_pump()
 PurgeVial = Vial(0,-50,'waste') # TODO replace height with real height
 
@@ -259,10 +259,10 @@ wellplate = Wells(-219, -76, 0)
 
 # Define locations of vials and their contents
 #Sol1 = PurgeVial
-Sol2 = Vial( 0,  -84, "water")
-Sol3 = Vial( 0, -115, "water")
-Sol4 = Vial( 0, -150, "water")
-Sol5 = Vial( 0, -182, "water")
+Sol2 = Vial( 0,  -84, "water", 20)
+Sol3 = Vial( 0, -115, "water", 20)
+Sol4 = Vial( 0, -150, "water", 20)
+Sol5 = Vial( 0, -182, "water", 20)
 
 ## Set up experiments
 experiements= [
@@ -278,7 +278,7 @@ for run in experiements:
 
     try:
         ## Pipette solution 1 into target well
-        pipette(run['Pipette Volume'],run['Solution'],wellplate.get_coordinates(run['Target Well']))
+        pipette(run['Pipette Volume'],run['Solution'],run['Target Well'])
         print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
         ## Electrode - chronoamperometry
@@ -292,10 +292,11 @@ for run in experiements:
 
     except Exception as e:
         print(e)
-        mill.__exit__()
+        
+        
     finally:
-        pass
-
+        break
+        
 # """ 
 # Pipette - Dimethylferrocene solution
 # -------------------------------------------------------------------------

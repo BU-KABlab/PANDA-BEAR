@@ -24,16 +24,17 @@ class Wells:
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
-        self.well_volume = 0
+        
         self.well_capacity = 0.2
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} #TODO set to zero for now, should be real value in future
+        volume = 0
         for col_idx, col in enumerate("ABCDEFG"):
             for row in range(1, 14):
                 well_id = col + str(row)
                 if well_id == "A1":
                     coordinates = a1_coordinates
                     contents = None
-                    depth = self.well_volume/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
+                    depth = volume/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
 
                 else:
                     
@@ -64,13 +65,13 @@ class Wells:
                             "z": self.z_top
                         }
                     contents = None
-                    volume = 0
+                    
                     depth = self.z_bottom
                     
                 self.wells[well_id] = {
                     "coordinates": coordinates, 
                     "contents": contents, 
-                    "volume": self.well_volume,
+                    "volume": volume,
                     "depth":depth
                 }
 
@@ -166,8 +167,16 @@ class Wells:
 class Vial:
     '''
     Class for creating vial objects with their position and contents
+    
+    Args:
+        x
+        y
+        contents
+        volume in ml
+        capacity in ml
+        
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity=0.2, radius = 0.028, height=0.061, z_bottom = -98):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20, radius = 0.018, height = -30, z_bottom = -98):
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
         self.contents = contents
@@ -176,7 +185,7 @@ class Vial:
         self.height = height + z_bottom
         self.volume = volume
         self.base = math.pi*math.pow(self.radius,2.0)
-        self.depth = (self.volume/self.base) + z_bottom
+        self.depth = ((self.volume/1000)/self.base) + z_bottom #Note volume must be converted to liters
 
     @property
     def position(self):
@@ -283,9 +292,9 @@ class MillControl:
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
-    print("Exception: Vial over fill")
+    pass
     
 class OverDraftException(Exception):
     """Raised when a vessel if over drawn"""
-    print("Exception: Vial over draw")
+    pass
     
