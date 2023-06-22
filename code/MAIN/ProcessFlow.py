@@ -161,7 +161,7 @@ def purge(purge_vial: Vial,purge_volume = 0.02):
         purge_vial_location (dict): Dictionary containing x, y, and z coordinates of the purge vial.
         purge_vial_depth (float): Depth to lower from the purge vial position in millimeters. Default is 0.00 mm.
     """
-    infuse(purge_volume, purge_volume, pump)
+    infuse(purge_volume,0.04, pump)
     purge_vial.update_volume(purge_volume)
     print(f'Purge vial new volume: {purge_vial.volume}')
 
