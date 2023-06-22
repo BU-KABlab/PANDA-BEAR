@@ -249,18 +249,18 @@ try:
     move_electrode_to_position(electrode_move_to)
     # Initiate pstat experiment
     # pstatcontrol.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
-    #mill.home()
 
 
     """ 
     Remove Solution 1 deposition
     -------------------------------------------------------------------------
     """
-    # move_pipette_to_position(Target_well)
     withdraw(0.140, Target_well, well_withdraw_height, pumping_rate, pump)
     purge(0.140, purge_vial.position, vial_infuse_height)
-    #mill.home()
-except:
+
+
+except Exception as e:
+    print(e)
     mill.__exit__()
 finally:
    pass
