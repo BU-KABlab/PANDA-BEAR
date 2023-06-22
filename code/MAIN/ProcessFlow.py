@@ -118,17 +118,17 @@ def move_pipette_to_position(x, y, z = 0.00):
     Returns:
         str: Response from the mill after executing the command.
     """
-    coordinate_offsets = {
-        'x': 82,
+    offsets = {
+        'x': 88,
         'y': 1,
         'z': 0
     }
 
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(
-        x - 88, 
-        y, 
-        z
+        x + offsets['x'], 
+        y + offsets['y'], 
+        z + offsets['z']
     )  # x-coordinate has 84 mm offset for pipette location
     mill.execute_command(str(command))
     return 0
@@ -147,9 +147,9 @@ def move_electrode_to_position(x,y,z):
         'y': 1,
         'z': 0
     }
-
-    mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
-    command = mill_move.format(x+offsets['x'], y + offsets['x'], z + offsets['x']) 
+    # move to specified coordinates
+    mill_move = "G0 X{} Y{} Z{}"  
+    command = mill_move.format(x + offsets['x'], y + offsets['x'], z + offsets['x']) 
     mill.execute_command(str(command))
     return 0
 
@@ -191,7 +191,7 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
         target_well (str): The alphanumeric name of the well you would like to pipette into
         purge_volume (float): Desired about to purge before and after pipetting
     """
-   
+    ## First half: pick up solution
     move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],0) # start at safe height
     move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],solution.coordinates['z']) # go to object top
     move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],solution.depth) # go to soltuion depth
@@ -200,8 +200,14 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     print(f'{solution} new volume: {solution.volume}')
     move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],0) # return to safe height
 
+    ## Intermediate: Purge
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
     purge(PurgeVial,purge_volume)
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     
+    ## Second Half: Deposit to well
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),0) # start at safe height
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),wellplate.depth) # go to solution depth
@@ -210,19 +216,39 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # return to safe height
     
+    ## Intermediate: Purge
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
     purge(PurgeVial,purge_volume)
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     
     print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
-def clear_well(volume: float, target_well: str, purge_volume = 0.020):
-    pass
-
-""" 
--------------------------------------------------------------------------
-Program Set Up
--------------------------------------------------------------------------
-"""
-
+def clear_well(volume: float, target_well: str):
+    """
+    Perform the full pipetting sequence
+    Args:
+        volume (float): Volume to be pipetted into desired well
+        solution (Vial object): the vial source or solution to be pipetted
+        target_well (str): The alphanumeric name of the well you would like to pipette into
+        purge_volume (float): Desired about to purge before and after pipetting
+    """
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),0) # start at safe height
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),wellplate.depth) # go to solution depth
+    
+    withdraw(volume, target_well, wellplate.z_bottom+1, pumping_rate, pump)
+    wellplate.update_volume(target_well,-volume)
+    
+    print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # return to safe height
+    
+    purge(PurgeVial,volume)
+    
+    print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
+    
+## Program Set Up
 mill = MillControl()
 mill.home() 
 pump = set_up_pump()
@@ -238,11 +264,7 @@ Sol3 = Vial( 0, -115, "water")
 Sol4 = Vial( 0, -150, "water")
 Sol5 = Vial( 0, -182, "water")
 
-""" 
--------------------------------------------------------------------------
-Experiment A1
--------------------------------------------------------------------------
-"""
+## Set up experiments
 experiements= [
     {'Target Well': 'A4','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
     {'Target Well': 'B6','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
@@ -251,24 +273,21 @@ experiements= [
     {'Target Well': 'H12','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
     ]
 
+## Run the experiments
 for run in experiements:
 
     try:
         ## Pipette solution 1 into target well
-        
         pipette(run['Pipette Volume'],run['Solution'],wellplate.get_coordinates(run['Target Well']))
         print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
         ## Electrode - chronoamperometry
-
         electrode(wellplate.get_coordinates(run['Target Well']),'test',run['Test duration'])
         # Initiate pstat experiment
         # pstatcontrol.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
 
         ## Remove Solution 1 deposition
-
-        withdraw(0.140, wellplate.get_coordinates(run['Target Well']), well_withdraw_height, pumping_rate, pump)
-        purge(PurgeVial,0.140)
+        clear_well(0.14,run['Target Well'])
 
 
     except Exception as e:
