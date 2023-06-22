@@ -219,37 +219,43 @@ Sol5 = Vial( 0, -182, "water")
 Experiment A1
 -------------------------------------------------------------------------
 """
-#mill.home() 
+try:
+    mill.home() 
 
-## Pipette solution 1 into C1
-Target_well = plate.get_coordinates("A1")
+    ## Pipette solution 1 into C1
+    Target_well = plate.get_coordinates("A1")
 
-withdraw(0.140, Sol2.coordinates, vial_withdraw_height, pumping_rate, pump)
-purge(0.020, purge_vial.position, vial_infuse_height)
-infuse(0.100, Target_well, well_infuse_height, pumping_rate, pump)
-purge(0.020, purge_vial.position, vial_infuse_height)
-print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
-
-
-""" 
-Electrode - chronoamperometry
--------------------------------------------------------------------------
-"""
-electrode_move_to = {'x':Target_well['x'],'y':Target_well['y'],'z':plate.depth('A1')}
-move_electrode_to_position(electrode_move_to)
-# Initiate pstat experiment
-# pstatcontrol.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
-#mill.home()
+    
+    withdraw(0.140, Sol2.coordinates, vial_withdraw_height, pumping_rate, pump)
+    purge(0.020, purge_vial.position, vial_infuse_height)
+    infuse(0.100, Target_well, well_infuse_height, pumping_rate, pump)
+    purge(0.020, purge_vial.position, vial_infuse_height)
+    print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
 
-""" 
-Remove Solution 1 deposition
--------------------------------------------------------------------------
-"""
-# move_pipette_to_position(Target_well)
-withdraw(0.140, Target_well, well_withdraw_height, pumping_rate, pump)
-purge(0.140, purge_vial.position, vial_infuse_height)
-#mill.home()
+    """ 
+    Electrode - chronoamperometry
+    -------------------------------------------------------------------------
+    """
+    electrode_move_to = {'x':Target_well['x'],'y':Target_well['y'],'z':plate.depth('A1')}
+    move_electrode_to_position(electrode_move_to)
+    # Initiate pstat experiment
+    # pstatcontrol.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
+    #mill.home()
+
+
+    """ 
+    Remove Solution 1 deposition
+    -------------------------------------------------------------------------
+    """
+    # move_pipette_to_position(Target_well)
+    withdraw(0.140, Target_well, well_withdraw_height, pumping_rate, pump)
+    purge(0.140, purge_vial.position, vial_infuse_height)
+    #mill.home()
+except:
+    mill.__exit__()
+finally:
+   pass
 
 # """ 
 # Pipette - Dimethylferrocene solution
