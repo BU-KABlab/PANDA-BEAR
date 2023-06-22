@@ -210,7 +210,7 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     ## Second Half: Deposit to well
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # start at safe height
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.depth) # go to solution depth
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.depth(target_well)) # go to solution depth
     infuse(volume, pumping_rate, pump)
     wellplate.update_volume(target_well,volume)
     print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
@@ -236,7 +236,7 @@ def clear_well(volume: float, target_well: str):
     """
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),0) # start at safe height
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),wellplate.depth) # go to solution depth
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),wellplate.depth(target_well)) # go to solution depth
     
     withdraw(volume, pumping_rate, pump)
     wellplate.update_volume(target_well,-volume)
@@ -328,3 +328,4 @@ for run in experiements:
 # mill.home()
 
 mill.__exit__()
+pump.stop()
