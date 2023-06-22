@@ -186,6 +186,14 @@ def purge(volume = 0.02, purge_vial_location = {'x':0,'y':0,'z':0}, purge_vial_d
     purge_vial.update_volume(0.02)
 
 def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.020):
+    """
+    Perform the full pipetting sequence
+    Args:
+        volume (float): Volume to be pipetted into desired well
+        solution (Vial object): the vial source or solution to be pipetted
+        target_well (str): The alphanumeric name of the well you would like to pipette into
+        purge_volume (float): Desired about to purge before and after pipetting
+    """
     withdraw(volume + 2 * purge_volume, solution.coordinates, solution.depth, pumping_rate, pump)
     purge(purge_vial_location = purge_vial.position, purge_vial_depth = purge_vial.depth)
     infuse(volume, target_well, plate.depth(target_well), pumping_rate, pump)
