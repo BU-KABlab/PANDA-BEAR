@@ -158,7 +158,7 @@ class Vial:
     '''
     Class for creating vial objects with their position and contents
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity=0.02, radius = 0.028, height=0.061, z_bottom = -98):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity=0.2, radius = 0.028, height=0.061, z_bottom = -98):
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
         self.contents = contents

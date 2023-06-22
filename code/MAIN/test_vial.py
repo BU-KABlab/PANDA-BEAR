@@ -3,7 +3,7 @@ from classes import Vial
 # Create an instance of a vial
 test_x_coord = 0
 test_y_coord = -100
-Sol1 = Vial(0,-100,'water',0.01)
+Sol1 = Vial(0,-100,'water',0.1)
 
 # Test fetching all attributes
 coords = Sol1.coordinates
@@ -21,13 +21,45 @@ passing = True
 if test_x_coord == coords['x']:
     print('X-coordinates match')
 else:
+    print('X-coordinates do not match')
     passing = False
     
 
 if test_y_coord == coords['y']:
     print('Y-coordinates match')
 else:
+    print('Y-coordinates do not match')
     passing = False
 
 
+# test updating the voluem
+try:
+    print('\n\nCurrent volume: ',Sol1.volume)
+    # No exception should raise
+    volume_to_add = 0.05
+    print('Adding ',volume_to_add)
+    Sol1.update_volume(volume_to_add)
+    print('Current volume: ',Sol1.volume)
+except Exception as e:
+    print(e)
+
+try:
+    print('\nAttempt to overfill:')
+    volume_to_add = 0.1
+    print('Adding ',volume_to_add)
+    Sol1.update_volume(volume_to_add)
+    print('Current volume: ',Sol1.volume)
+
+except Exception as e:
+    print(e)
+
+try:
+    print('\nAttempt to over draft:')
+    volume_to_add = -0.2
+    print('Adding ',volume_to_add)
+    Sol1.update_volume(volume_to_add)
+    print('Current volume: ',Sol1.volume)
+
+except Exception as e:
+    print(e)
 

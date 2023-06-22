@@ -148,7 +148,7 @@ def move_pipette_to_position(x, y, z):
     return response
 
 
-def move_electrode_to_position(coordinates: dict):
+def move_electrode_to_position(x,y,z):
     """
     Move the electrode to the specified coordinates.
     Args:
@@ -157,22 +157,28 @@ def move_electrode_to_position(coordinates: dict):
         str: Response from the mill after executing the command.
     """
     mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
-    command = mill_move.format(
-        coordinates["x"] + 82, coordinates["y"], 0
-    )  # electrode has 84.5 mm offset
-    response = mill.execute_command(str(command))
-    # TODO: create seperate raise and lower electrode functions 
-   
-    command = mill_move.format(
-        coordinates["x"] + 82, coordinates["y"], coordinates["z"]
-    )  # electrode has 84.5 mm offset
-    response = mill.execute_command(str(command))
-    time.sleep(15)
-    command = mill_move.format(
-        coordinates["x"] + 82, coordinates["y"], 0
-    )  # electrode has 84.5 mm offset
+    command = mill_move.format(x,y,z) 
     response = mill.execute_command(str(command))
     return response
+
+
+def electrode(location: dict,test,test_duration = 10):
+    coordinate_offsets = {
+        'x': 82,
+        'y': 1,
+        'z': 0
+    }
+
+    x= location['x'] + coordinate_offsets['x'],
+    y= location['y'] + coordinate_offsets['y'],
+    z= location['z'] + coordinate_offsets['z']
+    
+
+    move_electrode_to_position(x,y) # Move to z=0 above the location
+    move_electrode_to_position(x,y,z) # move in the z-direction
+    time.sleep(test_duration) # stay there for the duration of the test
+    move_electrode_to_position(x,y) # Move back to z=0 above the location
+
 
 def purge(volume = 0.02, purge_vial_location = {'x':0,'y':0,'z':0}, purge_vial_depth = 0.00):
     """
