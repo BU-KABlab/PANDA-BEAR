@@ -37,9 +37,11 @@ try:
     print('\n\nCurrent volume: ',Sol1.volume)
     # No exception should raise
     volume_to_add = 0.05
+    print(f'Current depth: {Sol1.depth}')
     print('Adding ',volume_to_add)
     Sol1.update_volume(volume_to_add)
-    print('Current volume: ',Sol1.volume)
+    print('new volume: ',Sol1.volume)
+    print(f'new depth: {Sol1.depth}')
 except Exception as e:
     print(e)
 

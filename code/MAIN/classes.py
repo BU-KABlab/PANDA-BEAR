@@ -25,6 +25,7 @@ class Wells:
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
         self.well_volume = 0
+        self.well_capacity = 0.2
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} #TODO set to zero for now, should be real value in future
         for col_idx, col in enumerate("ABCDEFG"):
             for row in range(1, 14):
@@ -102,9 +103,17 @@ class Wells:
     def depth(self,well_id):
         return self.wells[well_id]['depth']
     
-    def update_volume(self,well_id,volume:float):
-        self.wells[well_id]["volume"] += volume
-        self.wells[well_id]["depth"] = self.wells[well_id]["volume"]/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
+    def update_volume(self,well_id,added_volume:float):
+        
+
+        if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
+            raise OverFillException
+        
+        elif self.wells[well_id]["volume"] + added_volume < 0:
+            raise OverDraftException
+        else:
+            self.wells[well_id]["volume"] += added_volume
+            self.wells[well_id]["depth"] = self.wells[well_id]["volume"]/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
 
 """class Well:
     def __init__(self, x, y, contents = None, volume=0.00, capacity=0.02, radius = 0.028, height = 0.061, z_bottom = -100):
@@ -175,9 +184,9 @@ class Vial:
     
     def update_volume(self,added_volume:float):
         if self.volume + added_volume > self.capacity:
-            raise Exception("Vial overfill")
+            raise OverFillException
         elif self.volume + added_volume < 0:
-            raise Exception("Vial over draw")
+            raise OverDraftException
         else:
             self.volume += added_volume
             self.depth = (self.volume/self.base) + self.bottom
@@ -270,3 +279,13 @@ class MillControl:
 
     def gcode_parser_state(self):
         return self.execute_command('$G')
+
+
+class OverFillException(Exception):
+    """Raised when a vessel if over filled"""
+    print("Exception: Vial over fill")
+    
+class OverDraftException(Exception):
+    """Raised when a vessel if over drawn"""
+    print("Exception: Vial over draw")
+    
