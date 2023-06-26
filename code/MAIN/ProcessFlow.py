@@ -198,6 +198,7 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
         purge_volume (float): Desired about to purge before and after pipetting
     """
     ## First half: pick up solution
+    print('Withdrawing solution...')
     move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], 0) # start at safe height
     move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], solution.coordinates['z']) # go to object top
     move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], solution.depth) # go to soltuion depth
@@ -207,6 +208,7 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],0) # return to safe height
 
     ## Intermediate: Purge
+    print('Purging...')
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
@@ -214,6 +216,7 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     
     ## Second Half: Deposit to well
+    print('Depositing into well...')
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # start at safe height
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.depth(target_well)) # go to solution depth
@@ -223,11 +226,12 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # return to safe height
     
     ## Intermediate: Purge
-    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
-    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-    purge(PurgeVial,purge_volume)
-    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+    print('Purging...')
+    move_pipette_to_position(PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
+    move_pipette_to_position(PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], PurgeVial.coordinates['z'])
+    move_pipette_to_position(PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], PurgeVial.depth)
+    purge(PurgeVial, purge_volume)
+    move_pipette_to_position(PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
     
     print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
@@ -240,15 +244,16 @@ def clear_well(volume: float, target_well: str):
         target_well (str): The alphanumeric name of the well you would like to pipette into
         purge_volume (float): Desired about to purge before and after pipetting
     """
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),0) # start at safe height
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.get_coordinates(target_well)['z']) # go to object top
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well),wellplate.depth(target_well)) # go to solution depth
+    print('Clearing well ',target_well)
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],       0) # start at safe height
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],  wellplate.get_coordinates(target_well)['z']) # go to object top
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],       wellplate.depth(target_well)) # go to solution depth
     
     withdraw(volume, pumping_rate, pump)
     wellplate.update_volume(target_well,-volume)
     
     print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # return to safe height
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],       0) # return to safe height
     
     purge(PurgeVial,volume)
     
