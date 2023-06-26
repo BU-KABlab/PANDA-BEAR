@@ -176,7 +176,7 @@ class Vial:
         capacity in ml
         
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20, radius = 0.018, height = -30, z_bottom = -98):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20, radius = 0.018, height = -40, z_bottom = -98):
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
         self.contents = contents
@@ -192,13 +192,16 @@ class Vial:
         return self.coordinates
     
     def update_volume(self,added_volume:float):
+        print(f'Adding {added_volume} to {self.volume}...')
         if self.volume + added_volume > self.capacity:
             raise OverFillException
         elif self.volume + added_volume < 0:
             raise OverDraftException
         else:
             self.volume += added_volume
-            self.depth = (self.volume/self.base) + self.bottom
+            self.depth = ((self.volume/1000)/self.base) + self.bottom
+        print(f'Solution volume now: {self.volume}')
+        print(f'Solution depth now: {self.depth}')
 
 
 class MillControl:
@@ -216,6 +219,9 @@ class MillControl:
                         )
         time.sleep(2)
         self.home()
+        self.ser_mill.flushInput()
+        self.ser_mill.flushOutput()
+        
     def __enter__(self):
         if not self.ser_mill.isOpen():
             self.ser_mill.open()
@@ -232,15 +238,20 @@ class MillControl:
         time.sleep(1)
         
         if command != '$H':
+            time.sleep(0.5)
             status = self.current_status()
-            while status[:3] == '<Run':
-                time.sleep(1)
+            
+            while status[:6] == "b'<Run":
+                
                 status = self.current_status()
-            out = status
+                
+                time.sleep(0.5)
+            out = self.ser_mill.readline()
+            print(f'{command} executed and returned: {out}')
         else:
             out = self.ser_mill.readline()
-            print(f'{command} executed and returned: {out.strip()}')
-        time.sleep(5)
+            print(f'{command} executed and returned: {out}')
+        time.sleep(3)
         return out
     
     def stop(self):
@@ -251,6 +262,7 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
+        self.stop()
         time.sleep(30)
 
     def current_status(self):
@@ -258,27 +270,31 @@ class MillControl:
         Instantly queries the mill for its current status.
         DOES NOT RUN during homing sequence.
         """
-        #first = ''
-        #second = ''
+        self.ser_mill.flushInput()
+        self.ser_mill.flushOutput()
+        
+        out = ''
+        first = ''
+        second = ''
         command = '?'
         command_bytes = command.encode()
         #self.ser_mill.write(command_bytes + b'\n') 
         self.ser_mill.write(command_bytes) # version without carriage return because grbl documentation says its not needed
         status = self.ser_mill.readline()
-        
-        '''if type(reply) == list:
-            first = reply[0].decode()
-            second = reply[1].decode()
+        print(status.decode())
+        if type(status) == list:
+            first = status[0].decode()
+            second = status[1].decode()
             
             if first == 'ok':
                out = second
             else:
                 out = first
-        if type(reply) == str:
-            out = reply[0].decode()'''
+        if type(status) == str:
+            out = status.decode()
             
-        print(f'{status}')
-        return status
+        print(f'{out}')
+        return out
 
     def gcode_mode(self):
         self.execute_command('$C')

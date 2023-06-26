@@ -2,6 +2,7 @@ import time
 import nesp_lib
 from classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
+import sys
 
 # HQ potentiostat#
 # import demo.pstatcontrol
@@ -150,7 +151,7 @@ def move_electrode_to_position(x,y,z):
     }
     # move to specified coordinates
     mill_move = "G0 X{} Y{} Z{}"  
-    command = mill_move.format(x + offsets['x'], y + offsets['x'], z + offsets['x']) 
+    command = mill_move.format(x + offsets['x'], y + offsets['y'], z + offsets['z']) 
     mill.execute_command(str(command))
     return 0
 
@@ -162,7 +163,7 @@ def purge(purge_vial: Vial,purge_volume = 0.02):
         purge_vial_location (dict): Dictionary containing x, y, and z coordinates of the purge vial.
         purge_vial_depth (float): Depth to lower from the purge vial position in millimeters. Default is 0.00 mm.
     """
-    infuse(purge_volume,0.04, pump)
+    infuse(purge_volume,pumping_rate, pump)
     purge_vial.update_volume(purge_volume)
     print(f'Purge vial new volume: {purge_vial.volume}')
 
@@ -173,15 +174,15 @@ def electrode(location: dict,test,test_duration = 10):
         'z': 0
     }
 
-    x= location['x'] + coordinate_offsets['x'],
-    y= location['y'] + coordinate_offsets['y'],
-    z= location['z'] + coordinate_offsets['z']
+    x = location['x'] + coordinate_offsets['x']
+    y = location['y'] + coordinate_offsets['y']
+    z = location['z'] + coordinate_offsets['z']
     
 
-    move_electrode_to_position(x,y) # Move to z=0 above the location
+    move_electrode_to_position(x, y, 0) # Move to z=0 above the location
     move_electrode_to_position(x,y,z) # move in the z-direction
     time.sleep(test_duration) # stay there for the duration of the test
-    move_electrode_to_position(x,y) # Move back to z=0 above the location
+    move_electrode_to_position(x,y,0) # Move back to z=0 above the location
 
 def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.020):
     """
@@ -197,7 +198,7 @@ def pipette(volume: float, solution: Vial, target_well: str, purge_volume = 0.02
     move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], solution.coordinates['z']) # go to object top
     move_pipette_to_position(solution.coordinates['x'], solution.coordinates['y'], solution.depth) # go to soltuion depth
     withdraw(volume + 2 * purge_volume, pumping_rate, pump)
-    solution.update_volume(-volume)
+    solution.update_volume(-volume + 2 * purge_volume)
     print(f'{solution} new volume: {solution.volume}')
     move_pipette_to_position(solution.coordinates['x'],solution.coordinates['y'],0) # return to safe height
 
@@ -253,13 +254,13 @@ def clear_well(volume: float, target_well: str):
 mill = MillControl()
 #mill.home() 
 pump = set_up_pump()
-PurgeVial = Vial(0,-50,'waste') # TODO replace height with real height
+PurgeVial = Vial(0,-50,'waste',1)
 
 # Set up wells
 wellplate = Wells(-219, -76, 0)
 
 # Define locations of vials and their contents
-#Sol1 = PurgeVial
+#Sol0 = PurgeVial
 Sol1 = Vial( 0,  -84, "water", 20)
 Sol2 = Vial( 0, -115, "water", 20)
 Sol3 = Vial( 0, -150, "water", 20)
@@ -280,7 +281,7 @@ for run in experiements:
     try:
         ## Pipette solution 1 into target well
         pipette(run['Pipette Volume'],run['Solution'],run['Target Well'])
-        print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
+        #print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
         ## Electrode - chronoamperometry
         electrode(wellplate.get_coordinates(run['Target Well']),'test',run['Test duration'])
@@ -292,7 +293,13 @@ for run in experiements:
 
 
     except Exception as e:
-        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+    
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
         
         
     finally:
