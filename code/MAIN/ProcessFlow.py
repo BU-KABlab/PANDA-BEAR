@@ -1,6 +1,7 @@
 import time
 import nesp_lib
 from classes import Vial, MillControl, Wells
+from generate_instructions import instruction_reader
 
 # HQ potentiostat#
 # import demo.pstatcontrol
@@ -259,18 +260,18 @@ wellplate = Wells(-219, -76, 0)
 
 # Define locations of vials and their contents
 #Sol1 = PurgeVial
-Sol2 = Vial( 0,  -84, "water", 20)
-Sol3 = Vial( 0, -115, "water", 20)
-Sol4 = Vial( 0, -150, "water", 20)
-Sol5 = Vial( 0, -182, "water", 20)
+Sol1 = Vial( 0,  -84, "water", 20)
+Sol2 = Vial( 0, -115, "water", 20)
+Sol3 = Vial( 0, -150, "water", 20)
+Sol4 = Vial( 0, -182, "water", 20)
 
 ## Set up experiments
 experiements= [
-    {'Target Well':  'A4','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
-    {'Target Well':  'B6','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
-    {'Target Well':  'D7','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
-    {'Target Well':  'D9','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
-    {'Target Well': 'H12','Solution': Sol2,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'A4','Solution': Sol1,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'B6','Solution': Sol1,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'D7','Solution': Sol1,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well':  'D9','Solution': Sol1,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
+    {'Target Well': 'H12','Solution': Sol1,'Pipette Volume': 0.1,'Test Type': 'Test','Test duration': 10},
     ]
 
 ## Run the experiments
