@@ -233,6 +233,7 @@ class MillControl:
         time.sleep(15)
 
     def execute_command(self, command):
+        print(f'Executing command: {command}...')
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b'\n')
         time.sleep(1)
@@ -262,7 +263,6 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
-        self.stop()
         time.sleep(30)
 
     def current_status(self):
@@ -280,11 +280,13 @@ class MillControl:
         command_bytes = command.encode()
         #self.ser_mill.write(command_bytes + b'\n') 
         self.ser_mill.write(command_bytes) # version without carriage return because grbl documentation says its not needed
-        status = self.ser_mill.readline()
-        print(status.decode())
+        status = self.ser_mill.readlines()
         if type(status) == list:
+            list_length = len(status)
             first = status[0].decode()
-            second = status[1].decode()
+            
+            if list_length > 1:
+                second = status[1].decode()
             
             if first == 'ok':
                out = second

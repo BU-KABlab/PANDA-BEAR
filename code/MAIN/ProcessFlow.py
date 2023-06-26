@@ -151,7 +151,11 @@ def move_electrode_to_position(x,y,z):
     }
     # move to specified coordinates
     mill_move = "G0 X{} Y{} Z{}"  
-    command = mill_move.format(x + offsets['x'], y + offsets['y'], z + offsets['z']) 
+    command = mill_move.format(
+        x + offsets['x'], 
+        y + offsets['y'], 
+        z + offsets['z']
+        ) 
     mill.execute_command(str(command))
     return 0
 
