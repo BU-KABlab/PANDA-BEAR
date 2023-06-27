@@ -2,6 +2,7 @@ import time
 import serial
 import matplotlib.pyplot as plt
 import math
+import sys
 
 
 
@@ -28,7 +29,7 @@ class Wells:
         self.well_capacity = 0.2
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} #TODO set to zero for now, should be real value in future
         volume = 0
-        for col_idx, col in enumerate("ABCDEFG"):
+        for col_idx, col in enumerate("ABCDEFGH"):
             for row in range(1, 14):
                 well_id = col + str(row)
                 if well_id == "A1":
@@ -237,22 +238,30 @@ class MillControl:
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b'\n')
         time.sleep(1)
-        
-        if command != '$H':
-            time.sleep(0.5)
-            status = self.current_status()
-            
-            while status[:6] == "b'<Run":
-                
+        try:
+            if command != '$H':
+                time.sleep(0.5)
                 status = self.current_status()
                 
-                time.sleep(0.5)
-            out = self.ser_mill.readline()
-            print(f'{command} executed and returned: {out}')
-        else:
-            out = self.ser_mill.readline()
-            print(f'{command} executed and returned: {out}')
-        time.sleep(3)
+                while status.find('Run') > 0:
+                    
+                    status = self.current_status()
+                    
+                    time.sleep(0.5)
+                out = status
+                print(f'{command} executed')
+            else:
+                out = self.ser_mill.readline()
+                print(f'{command} executed')
+            time.sleep(5)
+        except Exception as e:
+            exception_type, exception_object, exception_traceback = sys.exc_info()
+            filename = exception_traceback.tb_frame.f_code.co_filename
+            line_number = exception_traceback.tb_lineno
+            print('Exception: ',e)
+            print("Exception type: ", exception_type)
+            print("File name: ", filename)
+            print("Line number: ", line_number)
         return out
     
     def stop(self):
@@ -278,24 +287,33 @@ class MillControl:
         second = ''
         command = '?'
         command_bytes = command.encode()
-        #self.ser_mill.write(command_bytes + b'\n') 
-        self.ser_mill.write(command_bytes) # version without carriage return because grbl documentation says its not needed
+        self.ser_mill.write(command_bytes) # without carriage return because grbl documentation says its not needed
         status = self.ser_mill.readlines()
-        if type(status) == list:
-            list_length = len(status)
-            first = status[0].decode()
-            
-            if list_length > 1:
-                second = status[1].decode()
-            
-            if first == 'ok':
-               out = second
-            else:
-                out = first
-        if type(status) == str:
-            out = status.decode()
-            
-        print(f'{out}')
+        
+        try:
+            if type(status) == list:
+                list_length = len(status)
+                first = status[0].decode("utf-8")
+                
+                if list_length > 1:
+                    second = status[1].decode("utf-8")
+                
+                if first.find('ok') >=0:
+                   out = second
+                else:
+                    out = first
+            if type(status) == str:
+                out = status.decode("utf-8")
+                
+            print(f'{out}')
+        except Exception as e:
+            exception_type, exception_object, exception_traceback = sys.exc_info()
+            filename = exception_traceback.tb_frame.f_code.co_filename
+            line_number = exception_traceback.tb_lineno
+            print('Exception: ',e)
+            print("Exception type: ", exception_type)
+            print("File name: ", filename)
+            print("Line number: ", line_number)
         return out
 
     def gcode_mode(self):

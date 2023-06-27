@@ -51,8 +51,10 @@ def withdraw(volume: float, rate: float, ser_pump: object):
         )
         ser_pump.pumping_rate = rate  # Sets the pumping rate of the pump in units of milliliters per minute.
         ser_pump.run()
+        print('Withdrawing...')
         while ser_pump.running:
             pass
+        print('Done withdrawing')
         time.sleep(2)
 
         print(f"Pump has withdrawn: {ser_pump.volume_withdrawn} ml")
@@ -81,8 +83,10 @@ def infuse(volume: float, rate: float, ser_pump: object):
         rate  # Sets the pumping rate of the pump in units of milliliters per minute.
     )
     ser_pump.run()
+    print('Infusing...')
     while ser_pump.running:
         pass
+    print('Done infusing')
     time.sleep(2)
     # TODO update the volume with the infusion step vessel.update_volume(volume)
     print(f"Pump has infused: {ser_pump.volume_infused} ml")
@@ -171,20 +175,16 @@ def purge(purge_vial: Vial,purge_volume = 0.02):
     purge_vial.update_volume(purge_volume)
     print(f'Purge vial new volume: {purge_vial.volume}')
 
-def electrode(location: dict,test,test_duration = 10):
-    coordinate_offsets = {
-        'x': 82,
-        'y': 1,
-        'z': 0
-    }
-
-    x = location['x'] + coordinate_offsets['x']
-    y = location['y'] + coordinate_offsets['y']
-    z = location['z'] + coordinate_offsets['z']
+def electrode(location: dict, depth, test,test_duration = 10):
+  
+    x = location['x'] 
+    y = location['y'] 
+    z = location['z']
     
-
+    print('Moving electrode to test well...')
+    print(f'{x, y, z}')
     move_electrode_to_position(x, y, 0) # Move to z=0 above the location
-    move_electrode_to_position(x,y,z) # move in the z-direction
+    move_electrode_to_position(x,y,depth) # move in the z-direction
     time.sleep(test_duration) # stay there for the duration of the test
     move_electrode_to_position(x,y,0) # Move back to z=0 above the location
 
@@ -249,13 +249,19 @@ def clear_well(volume: float, target_well: str):
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],  wellplate.get_coordinates(target_well)['z']) # go to object top
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],       wellplate.depth(target_well)) # go to solution depth
     
-    withdraw(volume, pumping_rate, pump)
+    withdraw(volume + 0.02, pumping_rate, pump) # TODO break into 4 parts where we withdraw from each corner
     wellplate.update_volume(target_well,-volume)
     
     print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],       0) # return to safe height
     
-    purge(PurgeVial,volume)
+    print('Moving to purge vial...')
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
+    print('Purging...')
+    purge(PurgeVial, volume + 0.02)
+    move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     
     print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
     
@@ -293,26 +299,23 @@ for run in experiements:
         #print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
         ## Electrode - chronoamperometry
-        electrode(wellplate.get_coordinates(run['Target Well']),'test',run['Test duration'])
+        electrode(wellplate.get_coordinates(run['Target Well']),wellplate.depth(run['Target Well']), 'test',run['Test duration'])
         # Initiate pstat experiment
         # pstatcontrol.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
 
         ## Remove Solution 1 deposition
-        clear_well(0.14,run['Target Well'])
+        clear_well(0.1,run['Target Well'])
 
 
     except Exception as e:
         exception_type, exception_object, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
         line_number = exception_traceback.tb_lineno
-    
+        print('Exception: ',e)
         print("Exception type: ", exception_type)
         print("File name: ", filename)
         print("Line number: ", line_number)
         
-        
-    finally:
-        break
         
 # """ 
 # Pipette - Dimethylferrocene solution
@@ -345,4 +348,3 @@ for run in experiements:
 # mill.home()
 
 mill.__exit__()
-pump.stop()
