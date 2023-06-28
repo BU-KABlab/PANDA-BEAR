@@ -1,5 +1,6 @@
 import csv
 from classes import Vial
+from pathlib import Path
 
 
 def instruction_reader(filename: str, solution: object,rows:str,cols:int):
@@ -7,8 +8,13 @@ def instruction_reader(filename: str, solution: object,rows:str,cols:int):
     COLS = cols
     
     instructions=[]
-    file_path = 'code/instructions/'+filename
-    with open(file_path, newline='') as file:
+    
+    cwd = Path().absolute()
+    #print(cwd)
+    #print(cwd.parents[0])
+    file_path = Path(cwd.parents[0].__str__() + "/instructions")
+    file_to_open = file_path / filename
+    with open(file_to_open, newline='') as file:
         reader = csv.reader(file,delimiter = ',')
 
         for letter,row in zip(ROWS,reader):
@@ -16,7 +22,7 @@ def instruction_reader(filename: str, solution: object,rows:str,cols:int):
                 #print(f'{letter}{i}: {amount}, ',end = '')
                 well = letter + str(i)
                 instructions.append(
-                    {'Target Well': well, 'Solution': solution,'Pipette Volume': amount, 'Test Type': 'Test','Test duration': 10}
+                    {'Target Well': well, 'Solution': solution,'Pipette Volume': float(amount), 'Test Type': 'Test','Test duration': 10}
                 )
             #print()  
 

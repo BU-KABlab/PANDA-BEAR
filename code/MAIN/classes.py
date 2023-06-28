@@ -177,7 +177,8 @@ class Vial:
         capacity in ml
         
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20, radius = 0.018, height = -40, z_bottom = -98):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20, radius = 0.018, height = -40, z_bottom = -99, name = 'vial'):
+        self.name = name
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
         self.contents = contents
@@ -190,6 +191,15 @@ class Vial:
 
     @property
     def position(self):
+        '''
+        
+
+        Returns
+        -------
+        DICT
+            x, y, z-height
+
+        '''
         return self.coordinates
     
     def update_volume(self,added_volume:float):
@@ -220,6 +230,7 @@ class MillControl:
                         )
         time.sleep(2)
         self.home()
+        self.execute_command('F2000')
         self.ser_mill.flushInput()
         self.ser_mill.flushOutput()
         
@@ -234,7 +245,7 @@ class MillControl:
         time.sleep(15)
 
     def execute_command(self, command):
-        print(f'Executing command: {command}...')
+        print(f'\tExecuting command: {command}...')
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b'\n')
         time.sleep(1)
@@ -247,13 +258,13 @@ class MillControl:
                     
                     status = self.current_status()
                     
-                    time.sleep(0.5)
+                    time.sleep(0.3)
                 out = status
-                print(f'{command} executed')
+                print(f'\t{command} executed')
             else:
                 out = self.ser_mill.readline()
-                print(f'{command} executed')
-            time.sleep(5)
+                print(f'\t{command} executed')
+            time.sleep(1)
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
@@ -293,19 +304,19 @@ class MillControl:
         try:
             if type(status) == list:
                 list_length = len(status)
-                first = status[0].decode("utf-8")
+                first = status[0].decode("utf-8").strip()
                 
                 if list_length > 1:
-                    second = status[1].decode("utf-8")
+                    second = status[1].decode("utf-8").strip()
                 
                 if first.find('ok') >=0:
                    out = second
                 else:
                     out = first
             if type(status) == str:
-                out = status.decode("utf-8")
+                out = status.decode("utf-8").strip()
                 
-            print(f'{out}')
+            print(f'\t\t{out}')
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
