@@ -18,7 +18,7 @@ class Wells:
 
         3 - Horizontal, wells become less negative from A1  
     '''
-    def __init__(self, a1_X=0, a1_Y=0, orientation=0):
+    def __init__(self, a1_X=0, a1_Y=0, orientation=0, starting_volume = 0.00):
         self.wells = {}
         self.orientation = orientation
         self.z_bottom = -100
@@ -28,7 +28,7 @@ class Wells:
         
         self.well_capacity = 0.2
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} #TODO set to zero for now, should be real value in future
-        volume = 0
+        volume = starting_volume
         for col_idx, col in enumerate("ABCDEFGH"):
             for row in range(1, 14):
                 well_id = col + str(row)
@@ -264,7 +264,7 @@ class MillControl:
             else:
                 out = self.ser_mill.readline()
                 print(f'\t{command} executed')
-            time.sleep(1)
+            #time.sleep(1)
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
@@ -316,7 +316,7 @@ class MillControl:
             if type(status) == str:
                 out = status.decode("utf-8").strip()
                 
-            print(f'\t\t{out}')
+            #print(f'\t\t{out}')
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename

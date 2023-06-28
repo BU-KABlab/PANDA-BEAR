@@ -1,13 +1,12 @@
-import time
-import nesp_lib
+import time, nesp_lib, serial, sys
 from classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
-import sys
 
 # HQ potentiostat#
 # import demo.pstatcontrol
 
-
+def verbose_output(*args):
+    pass
 
 
 def set_up_pump():
@@ -21,7 +20,7 @@ def set_up_pump():
     pump.syringe_diameter = 4.699  # millimeters
     pump.volume_infused_clear()
     pump.volume_withdrawn_clear()
-    print(f"Pump at address: {pump.address}")
+    print(f"\tPump at address: {pump.address}")
     time.sleep(2)
     return pump
 
@@ -267,121 +266,128 @@ def clear_well(volume: float, target_well: str):
     
     print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
-# Constants
-#vial_withdraw_height = -80
-#vial_infuse_height = vial_withdraw_height
 
-#well_withdraw_height = -101
-#well_infuse_height = -98
-pumping_rate = 0.4
-Well_Rows = 'ABCDEFGH'
-Well_Columns = 13
-
+def main(verbose = False)
+    # Constants
+    #vial_withdraw_height = -80
+    #vial_infuse_height = vial_withdraw_height
     
-## Program Set Up
-mill = MillControl()
-#mill.home() 
-pump = set_up_pump()
-PurgeVial = Vial(-2,-50,'waste',1)
-
-# Set up wells
-wellplate = Wells(-219, -76, 0)
-
-# Define locations of vials and their contents
-#Sol0 = PurgeVial
-Sol1 = Vial( -2,  -85, "red", 20, name = 'Sol1')
-Sol2 = Vial( -2, -120, "blue", 20, name = 'Sol2')
-Sol3 = Vial( -2, -150, "water", 20, name = 'Sol3')
-
-## Set up experiments
-
-color1 = instruction_reader('sol1.csv', Sol1, Well_Rows, Well_Columns)
-color2 = instruction_reader('sol2.csv', Sol2, Well_Rows, Well_Columns)
-dilution = instruction_reader('sol3.csv', Sol3, Well_Rows, Well_Columns)
-experiments = [color1, color2, dilution]
-## Run the experiments
-try:
-    for solution in experiments:
-        for run in solution:
-                
-                print(f"pipetting {run['Pipette Volume']} ul from {run['Solution'].name}: {run['Solution'].contents} into well {run['Target Well']}")
-                pipette(float(run['Pipette Volume'])/1000,run['Solution'],run['Target Well'])
-                
-        # Flushing procedure
-        print('\n\nMoving to flush with Sol3...')
-        move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
-        move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], Sol3.depth)
-        print('Withdrawing Sol3...')
-        withdraw(0.12,0.5,pump)
-        move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
+    #well_withdraw_height = -101
+    #well_infuse_height = -98
+    pumping_rate = 0.5
+    Well_Rows = 'ABCDEFGH'
+    Well_Columns = 13
+    
         
-        print('Moving to purge...')
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-        print('Purging...')
-        purge(PurgeVial, 0.14)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth+5)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth+2)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        
-        # Flushing procedure
-        print('\nMoving to second flush with Sol3...')
-        move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
-        move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], Sol3.depth)
-        print('Withdrawing Sol3...')
-        withdraw(0.12,0.5,pump)
-        move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
-        
-        print('Moving to purge a second time...')
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-        print('Purging again...')
-        purge(PurgeVial, 0.14)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth+5)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth+2)
-        move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        print('Solution run completed\n\n....................................................................\n')
+    ## Program Set Up
+    print('Beginning protocol:\nConnecting to Mill and Pump:')
+    mill = MillControl()
+    #mill.home() 
+    pump = set_up_pump()
+    PurgeVial = Vial(-2,-50,'waste',1.00)
+    
+    # Set up wells
+    wellplate = Wells(-219, -76, 0.00)
+    
+    # Define locations of vials and their contents
+    #Sol0 = PurgeVial
+    Sol1 = Vial( -2,  -85, "red", 20.0, name = 'Sol1')
+    Sol2 = Vial( -2, -120, "blue", 20.0, name = 'Sol2')
+    Sol3 = Vial( -2, -150, "water", 20.0, name = 'Sol3')
+    
+    ## Set up experiments
+    
+    #color1 = instruction_reader('sol1.csv', Sol1, Well_Rows, Well_Columns)
+    #color2 = instruction_reader('sol2.csv', Sol2, Well_Rows, Well_Columns)
+    #dilution = instruction_reader('sol3.csv', Sol3, Well_Rows, Well_Columns)
+    water_layer = instruction_reader('water.csv', Sol3, Well_Rows, Well_Columns)
+    #experiments = [color1, color2, dilution]
+    experiments = [water_layer]
+    ## Run the experiments
+    try:
+        for solution in experiments:
+            for run in solution:
+                    
+                    print(f"pipetting {run['Pipette Volume']} ul from {run['Solution'].name}: {run['Solution'].contents} into well {run['Target Well']}")
+                    pipette(float(run['Pipette Volume'])/1000,run['Solution'],run['Target Well'])
+                    
+            # Flushing procedure
+            print('\n\nMoving to flush with Sol3...')
+            move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
+            move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], Sol3.depth)
+            print('Withdrawing Sol3...')
+            withdraw(0.12,0.5,pump)
+            move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
+            
+            print('Moving to purge...')
+            move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+            #move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
+            move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
+            print('Purging...')
+            purge(PurgeVial, 0.14)
+            move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+            
+            # Flushing procedure
+            print('\nMoving to second flush with Sol3...')
+            move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
+            move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], Sol3.depth)
+            print('Withdrawing Sol3...')
+            withdraw(0.12,0.5,pump)
+            move_pipette_to_position(Sol3.coordinates['x'], Sol3.coordinates['y'], 0)
+            
+            print('Moving to purge a second time...')
+            move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+            #move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
+            move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
+            print('Purging again...')
+            purge(PurgeVial, 0.14)
+            move_pipette_to_position(PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+            print('Solution run completed\n\n....................................................................\n')
+        print('\n\n\t\t\tEXPERIMENT COMPLETED\n\n')
+    except Exception as e:
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print('Exception: ',e)
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+            
+            
+    # """ 
+    # Pipette - Dimethylferrocene solution
+    # -------------------------------------------------------------------------
+    # """
+    # # move_pipette_to_position(DMF_vial.coordinates)
+    # withdraw(0.140, DMF_vial.coordinates, withdrawl_height, pumping_rate, pump)
+    # purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
+    # # move_pipette_to_position(wells_plate.get_coordinates("A1"))
+    # infuse(0.100, Target_well, infuse_height, pumping_rate, pump)
+    # purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
+    # mill.home()
+    
+    # """
+    # Electrode - Cyclic voltammetry
+    # -------------------------------------------------------------------------
+    # """
+    # move_electrode_to_position(wells_plate.get_coordinates("A1"))
+    # # Initiate pstat experiment
+    # # pstatcontrol.CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
+    # mill.home()
+    
+    # """
+    # Remove Remove DMF_vial solution
+    # -------------------------------------------------------------------------
+    # """
+    # withdraw(0.120, Target_well, wells_plate.depth("A1"), pumping_rate, pump)
+    # infuse(0.120, purge_vial, withdrawl_height, pumping_rate, pump)
+    # # infuse(0.140, purge_vial, purge_vial.depth, 0.4, pump)
+    # mill.home()
+    
+    mill.__exit__()    
+    serial.Serial("COM5", 19200).close()
 
-except Exception as e:
-    exception_type, exception_object, exception_traceback = sys.exc_info()
-    filename = exception_traceback.tb_frame.f_code.co_filename
-    line_number = exception_traceback.tb_lineno
-    print('Exception: ',e)
-    print("Exception type: ", exception_type)
-    print("File name: ", filename)
-    print("Line number: ", line_number)
-        
-        
-# """ 
-# Pipette - Dimethylferrocene solution
-# -------------------------------------------------------------------------
-# """
-# # move_pipette_to_position(DMF_vial.coordinates)
-# withdraw(0.140, DMF_vial.coordinates, withdrawl_height, pumping_rate, pump)
-# purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
-# # move_pipette_to_position(wells_plate.get_coordinates("A1"))
-# infuse(0.100, Target_well, infuse_height, pumping_rate, pump)
-# purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
-# mill.home()
-
-# """
-# Electrode - Cyclic voltammetry
-# -------------------------------------------------------------------------
-# """
-# move_electrode_to_position(wells_plate.get_coordinates("A1"))
-# # Initiate pstat experiment
-# # pstatcontrol.CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
-# mill.home()
-
-# """
-# Remove Remove DMF_vial solution
-# -------------------------------------------------------------------------
-# """
-# withdraw(0.120, Target_well, wells_plate.depth("A1"), pumping_rate, pump)
-# infuse(0.120, purge_vial, withdrawl_height, pumping_rate, pump)
-# # infuse(0.140, purge_vial, purge_vial.depth, 0.4, pump)
-# mill.home()
-
-mill.__exit__()
+if __name__ == '__main__':
+    main()
+else:
+    pass
