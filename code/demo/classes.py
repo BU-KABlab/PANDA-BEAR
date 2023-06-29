@@ -46,7 +46,7 @@ class Wells:
         print("Well Coordinates:")
         header_row_start = "   |"
         header_row = "     " + "      |     ".join([f"{row:2}" for row in range(1, 14)])
-        header_underline = "     " + "      |     ".join([f"--" for row in range(1, 14)])
+        header_underline = "     " + "      |     ".join(["--" for row in range(1, 14)])
         print(header_row_start + header_row)
         print(header_row_start + header_underline)
         for col in "ABCDEFG":
