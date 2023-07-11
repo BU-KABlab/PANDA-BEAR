@@ -3,9 +3,6 @@ from classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
 From gamrycontrol import pstatcontrol, exp
 
-# HQ potentiostat#
-# import demo.pstatcontrol
-
 def verbose_output(*args):
     pass
 
@@ -399,7 +396,8 @@ def main(verbose = False)
     # """
     # move_electrode_to_position(wells_plate.get_coordinates("A1"))
     # # Initiate pstat experiment
-    # # pstatcontrol.CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
+    # exp.CV(0.0, -0.8, -0.1, -0.1, 0.1, 0.05, 0.05, 0.05, 2, 3)
+    # pstatcontrol.plotdata(CV)
     # mill.home()
     
     # """
