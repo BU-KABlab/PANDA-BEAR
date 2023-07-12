@@ -246,9 +246,9 @@ def clear_well(volume: float, target_well: str):
         purge_volume (float): Desired about to purge before and after pipetting
     """
     print('Clearing well ',target_well)
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],       0) # start at safe height
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],  0) # start at safe height
     move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],  wellplate.get_coordinates(target_well)['z']) # go to object top
-    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],       wellplate.depth(target_well)) # go to solution depth
+    move_pipette_to_position(wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'],  wellplate.depth(target_well)) # go to solution depth
     
     withdraw(volume + 0.02, pumping_rate, pump) # TODO break into 4 parts where we withdraw from each corner
     wellplate.update_volume(target_well,-volume)
@@ -267,7 +267,7 @@ def clear_well(volume: float, target_well: str):
     print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
 
 
-def main(verbose = False)
+def main(verbose = False):
     # Constants
     #vial_withdraw_height = -80
     #vial_infuse_height = vial_withdraw_height
@@ -297,12 +297,11 @@ def main(verbose = False)
     
     ## Set up experiments
     
-    #color1 = instruction_reader('sol1.csv', Sol1, Well_Rows, Well_Columns)
-    #color2 = instruction_reader('sol2.csv', Sol2, Well_Rows, Well_Columns)
-    #dilution = instruction_reader('sol3.csv', Sol3, Well_Rows, Well_Columns)
+    color1 = instruction_reader('sol1.csv', Sol1, Well_Rows, Well_Columns)
+    color2 = instruction_reader('sol2.csv', Sol2, Well_Rows, Well_Columns)
+    dilution = instruction_reader('sol3.csv', Sol3, Well_Rows, Well_Columns)
     water_layer = instruction_reader('water.csv', Sol3, Well_Rows, Well_Columns)
-    #experiments = [color1, color2, dilution]
-    experiments = [water_layer]
+    experiments = [color1, color2, dilution, water_layer]
     ## Run the experiments
     try:
         for solution in experiments:
