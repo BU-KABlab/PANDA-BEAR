@@ -139,8 +139,6 @@ class exp:
         global total_time
         global active
 
-        active = True
-
         print("made it to run")
 
         # signal and dtaq object creation
@@ -164,8 +162,13 @@ class exp:
 
         dtaq.Run(True)
         # Code for timing started
+        while active == True:
+            client.PumpEvents(1)
+            time.sleep(0.5)
+
         start_time = time.time()
         print("made it to run end")
+        
 
     @staticmethod
     def CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
@@ -179,7 +182,10 @@ class exp:
         global total_time
         global active
 
-        active = True
+        
+        while active == True:
+            client.PumpEvents(1)
+            time.sleep(0.5)
         
 
         print("made it to run")
@@ -278,8 +284,6 @@ OCPvi = 0.0
 # OCPti = 150
 OCPti = 15
 OCPrate = 0.5
-
-fileName = "testrun1"
 
 
 if __name__ == "__main__":
