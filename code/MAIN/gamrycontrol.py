@@ -1,3 +1,5 @@
+import datetime
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -129,6 +131,18 @@ class pstatcontrol:
     
     def setfilename():
         current_time = datetime.datetime.now()
+        global fileName
+        global filePath
+        global complete_file_name
+        fileDate = current_time.strftime("%Y-%m-%d")
+        ## not sure how to write this so we can add on the target well to it... will revisit
+        # fileName = fileDate + EdepDemo.target_well
+        filePath = os.path.join(os.path.expanduser("~"), "Documents", "Github","PANDA","data")
+        complete_file_name = os.path.join(filePath, fileName)
+        print(complete_file_name)
+        if not os.path.exists(filePath):
+            os.makedirs(filePath)
+        return
         
         
 class exp:
@@ -150,15 +164,14 @@ class exp:
         signal = client.CreateObject('GamryCOM.GamrySignalRupdn')
         dtaq = client.CreateObject('GamryCOM.GamryDtaqRcv')
 
-        dtaqsink = GamryDtaqEvents(dtaq)
+        dtaqsink = pstatcontrol.GamryDtaqEvents(dtaq)
         connection = client.GetEvents(dtaq, dtaqsink)
         pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
         devices = client.CreateObject('GamryCOM.GamryDeviceList')
         pstat.Init(devices.EnumSections()[0])  # grab first pstat
         pstat.Open()
 
-        signal.Init(pstat, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, 0.0, 0.0, 0.0, CVsamplerate, CVcycle,
-                    GamryCOM.PstatMode)
+        signal.Init(pstat, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, 0.0, 0.0, 0.0, CVsamplerate, CVcycle, GamryCOM.PstatMode)
         pstatcontrol.initializepstat(pstat)
 
         dtaq.Init(pstat)
@@ -199,7 +212,7 @@ class exp:
         signal = client.CreateObject('GamryCOM.GamrySignalDstep')
         dtaq = client.CreateObject('GamryCOM.GamryDtaqChrono')
 
-        dtaqsink = GamryDtaqEvents(dtaq)
+        dtaqsink = pstatcontrol.GamryDtaqEvents(dtaq)
         connection = client.GetEvents(dtaq, dtaqsink)
         pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
         devices = client.CreateObject('GamryCOM.GamryDeviceList')

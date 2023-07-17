@@ -257,9 +257,6 @@ def clear_well(volume: float, target_well: str, wellplate: object, pumping_rate,
 
 
 def main():
-    filePath = 'C:/Users/Kab Lab/Documents/GitHub/PANDA/data/2023-07/'
-    current_time = datetime.datetime.now()
-    
     # Constants
     #vial_withdraw_height = -80
     #vial_infuse_height = vial_withdraw_height
@@ -324,7 +321,7 @@ def main():
                     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
             
             ## set the name of the files for the echem experiments
-            complete_file_name = echem.pstatcontrol.setfilename(filePath + current_time.year + current_time.month + current_time.day + target_well)
+            completefilename = echem.pstatcontrol.setfilename(echem.pstatcontrol.complete_file_name, target_well)
             ## echem CA - deposition
             echem.exp.CA(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
             
