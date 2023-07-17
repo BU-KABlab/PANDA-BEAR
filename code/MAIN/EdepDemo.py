@@ -2,6 +2,8 @@ import time, nesp_lib, serial, sys
 from classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
 import gamrycontrol as echem
+import os.path
+import datetime
 
 def verbose_output(*args):
     pass
@@ -255,6 +257,9 @@ def clear_well(volume: float, target_well: str, wellplate: object, pumping_rate,
 
 
 def main():
+    filePath = 'C:/Users/Kab Lab/Documents/GitHub/PANDA/data/2023-07/'
+    current_time = datetime.datetime.now()
+    
     # Constants
     #vial_withdraw_height = -80
     #vial_infuse_height = vial_withdraw_height
@@ -273,10 +278,10 @@ def main():
     pump = set_up_pump()
     PurgeVial = Vial(-2,-50,'waste',1.00)
     
-    # Set up wells
+    ## Set up wells
     wellplate = Wells(-219, -76, 0.00)
     
-    # Define locations of vials and their contents
+    ## Define locations of vials and their contents
     #Sol0 = PurgeVial
     Sol1 = Vial( -2,  -90, "Acetonitrile", 20.0, name = 'ACN')
     Sol2 = Vial( -2, -120, "PEG", 20.0, name = 'PEG')
@@ -318,6 +323,8 @@ def main():
                     purge(PurgeVial, solution_volume + 0.02)
                     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
             
+            ## set the name of the files for the echem experiments
+            complete_file_name = echem.pstatcontrol.setfilename(filePath + current_time.year + current_time.month + current_time.day + target_well)
             ## echem CA - deposition
             echem.exp.CA(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
             

@@ -85,19 +85,20 @@ class pstatcontrol:
     @staticmethod
     def savedata():
         global fileName
+        global filePath
         #print(dtaqsink.acquired_points)
         print("number of data points acquired")
         print(len(dtaqsink.acquired_points))
         # savedata
         # column_names = ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
         output = pd.DataFrame(dtaqsink.acquired_points)
-        np.savetxt(fileName + '.txt', output)
+        np.savetxt(complete_file_name + '.txt', output)
         print("data saved")
 
     def plotdata(exp_name):
         match exp_name:
             case 'OCP':
-                df = pd.read_csv(fileName + '.txt', sep=" ", header=None,
+                df = pd.read_csv(complete_file_name + '.txt', sep=" ", header=None,
                                 names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
                 plt.rcParams["figure.dpi"] = 150
                 plt.rcParams["figure.facecolor"] = "white"
@@ -105,7 +106,7 @@ class pstatcontrol:
                 plt.xlabel('Time (s)')
                 plt.ylabel('Voltage (V)')
             case 'CA':
-                df = pd.read_csv(fileName + 'CA.txt', sep=" ", header=None,
+                df = pd.read_csv(complete_file_name + 'CA.txt', sep=" ", header=None,
                                 names=["runtime", "Vf", "Vu", "Im", "Q", "Vsig", "Ach", "IERange", "Over", "StopTest"])
                 plt.rcParams["figure.dpi"] = 150
                 plt.rcParams["figure.facecolor"] = "white"
@@ -113,7 +114,7 @@ class pstatcontrol:
                 plt.xlabel('Time (s)')
                 plt.ylabel('Current (A)')
             case 'CV':
-                df = pd.read_csv(fileName + 'CV.txt', sep=" ", header=None,
+                df = pd.read_csv(complete_file_name + 'CV.txt', sep=" ", header=None,
                                 names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest",
                                         "Cycle", "Ach2"])
                 plt.rcParams["figure.dpi"] = 150
@@ -123,9 +124,13 @@ class pstatcontrol:
                 plt.ylabel('Current (A)')
 
         plt.tight_layout()
-        plt.savefig(fileName + '.png')
+        plt.savefig(complete_file_name + '.png')
         print("plot saved")
-
+    
+    def setfilename():
+        current_time = datetime.datetime.now()
+        
+        
 class exp:
     @staticmethod
     def CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
