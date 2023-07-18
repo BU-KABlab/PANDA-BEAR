@@ -85,9 +85,8 @@ class pstatcontrol:
             self.call_savedata()
 
     @staticmethod
-    def savedata():
-        global fileName
-        global filePath
+    def savedata(complete_file_name):
+        
         #print(dtaqsink.acquired_points)
         print("number of data points acquired")
         print(len(dtaqsink.acquired_points))
@@ -97,9 +96,8 @@ class pstatcontrol:
         np.savetxt(complete_file_name + '.txt', output)
         print("data saved")
 
-    def plotdata(exp_name):
-        match exp_name:
-            case 'OCP':
+    def plotdata(exp_name, complete_file_name):
+        if exp_name == 'OCP':
                 df = pd.read_csv(complete_file_name + '.txt', sep=" ", header=None,
                                 names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
                 plt.rcParams["figure.dpi"] = 150
@@ -107,7 +105,7 @@ class pstatcontrol:
                 plt.plot(df['Time'], df['Vf'])
                 plt.xlabel('Time (s)')
                 plt.ylabel('Voltage (V)')
-            case 'CA':
+        elif exp_name == 'CA':
                 df = pd.read_csv(complete_file_name + 'CA.txt', sep=" ", header=None,
                                 names=["runtime", "Vf", "Vu", "Im", "Q", "Vsig", "Ach", "IERange", "Over", "StopTest"])
                 plt.rcParams["figure.dpi"] = 150
@@ -115,7 +113,7 @@ class pstatcontrol:
                 plt.plot(df['runtime'], df['Im'])
                 plt.xlabel('Time (s)')
                 plt.ylabel('Current (A)')
-            case 'CV':
+        elif exp_name == 'CV':
                 df = pd.read_csv(complete_file_name + 'CV.txt', sep=" ", header=None,
                                 names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest",
                                         "Cycle", "Ach2"])
@@ -129,19 +127,14 @@ class pstatcontrol:
         plt.savefig(complete_file_name + '.png')
         print("plot saved")
     
-    def setfilename():
+    def setfilename(target_well, experiment):
         current_time = datetime.datetime.now()
-        global fileName
-        global filePath
-        global complete_file_name
         fileDate = current_time.strftime("%Y-%m-%d")
-        ## not sure how to write this so we can add on the target well to it... will revisit
-        # fileName = fileDate + EdepDemo.target_well
         filePath = os.path.join(os.path.expanduser("~"), "Documents", "Github","PANDA","data")
-        complete_file_name = os.path.join(filePath, fileName)
+        complete_file_name = os.path.join(filePath, fileDate, target_well + '_' + experiment)
         print(complete_file_name)
         if not os.path.exists(filePath):
-            os.makedirs(filePath)
+            os.makedirs(filePath, exist_ok = True)
         return
         
         

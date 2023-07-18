@@ -231,10 +231,10 @@ def pipette(volume: float, solution: Vial, target_well: str, pumping_rate, Purge
 
 def clear_well(volume: float, target_well: str, wellplate: object, pumping_rate, pump: object, PurgeVial: Vial, mill: object):
     import math
-    repititions = math.ciel(volume/0.200)
+    repititions = math.ceil(volume/0.200)
     repition_vol = volume/repititions
     
-    for i in range(repititions):
+    for j in range(repititions):
         print('Clearing well ',target_well)
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # start at safe height
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z']) # go to object top
@@ -294,7 +294,8 @@ def main():
     experiments = [color1, color2, dilution, water_layer]
     ## Run the experiments
     try:
-        for i in len(color1): #loop per well
+        #for i in len(color1): #loop per well
+        for i in range(len(color1)): #loop per well
             total_well_volume = 0
             
             ## Deposit all experiment solutions into well
@@ -320,16 +321,15 @@ def main():
                     purge(PurgeVial, solution_volume + 0.02)
                     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
             
+            target_well = solution[i]['Target Well']
             ## set the name of the files for the echem experiments
-            completefilename = echem.pstatcontrol.setfilename(echem.pstatcontrol.complete_file_name, target_well)
+            echem.pstatcontrol.setfilename(target_well, 'dep')
             ## echem CA - deposition
             echem.exp.CA(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
-            
             ## echem plot the data
             echem.pstatcontrol.plotdata(echem.CA)
             
-            ## Withdraw all well volume
-            target_well = solution[i]['Target Well']
+            ## Withdraw all well volume            
             if wellplate.volume(target_well) != total_well_volume:
                 print(f'Well volume: {wellplate.volume(target_well)} != Running total: {total_well_volume}')
             clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
@@ -347,6 +347,7 @@ def main():
             pipette(total_well_volume, Sol4, solution[i]['Target Well'], pumping_rate, PurgeVial, wellplate, pump, mill)        
             
             ## Echem CV - characterization
+            echem.pstatcontrol.setfilename(target_well, 'CV')
             echem.exp.CV(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
             
             ## echem plot the data
