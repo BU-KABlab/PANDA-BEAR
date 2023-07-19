@@ -4,6 +4,8 @@ from generate_instructions import instruction_reader
 import gamrycontrol as echem
 import os.path
 import datetime
+import comtypes
+import comtypes.client as client
 
 def verbose_output(*args):
     pass
@@ -119,8 +121,8 @@ def move_pipette_to_position(mill:object, x, y, z = 0.00, ):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': -87,
-        'y': 1,
+        'x': -86,
+        'y': 0,
         'z': 0
     }
 
@@ -276,14 +278,14 @@ def main():
     PurgeVial = Vial(-2,-50,'waste',1.00)
     
     ## Set up wells
-    wellplate = Wells(-219, -76, 0.00)
+    wellplate = Wells(-218, -74, 0.00)
     
     ## Define locations of vials and their contents
     #Sol0 = PurgeVial
-    Sol1 = Vial( -2,  -90, "Acetonitrile", 20.0, name = 'ACN')
-    Sol2 = Vial( -2, -120, "PEG", 20.0, name = 'PEG')
-    Sol3 = Vial( -2, -150, "Acrylate", 20.0, name = 'Acrylate')
-    Sol4 = Vial( -2, -180, "DMF", 20.0, name = 'DMF')
+    Sol1 = Vial( -2,  -80, "Acetonitrile", 20.0, name = 'ACN')
+    Sol2 = Vial( -2, -110, "PEG", 20.0, name = 'PEG')
+    Sol3 = Vial( -2, -140, "Acrylate", 20.0, name = 'Acrylate')
+    Sol4 = Vial( -2, -170, "DMF", 20.0, name = 'DMF')
     
     ## Set up experiments
     
@@ -292,6 +294,7 @@ def main():
     dilution = instruction_reader('sol3.csv', Sol3, Well_Rows, Well_Columns)
     water_layer = instruction_reader('water.csv', Sol3, Well_Rows, Well_Columns)
     experiments = [color1, color2, dilution, water_layer]
+    experiments = [color1]
     ## Run the experiments
     try:
         #for i in len(color1): #loop per well
@@ -306,32 +309,37 @@ def main():
                     
                     solution_volume = (solution[i]['Pipette Volume'])/1000 #1000 because the demo is in ml
                     
-                    # Flushing procedure
+                    ## Beginning of pipette flushing procedure
                     print('\n\nMoving to flush with Sol3...')
                     move_pipette_to_position(mill, Sol1.coordinates['x'], Sol1.coordinates['y'], 0)
                     move_pipette_to_position(mill, Sol1.coordinates['x'], Sol1.coordinates['y'], Sol3.depth)
-                    print('Withdrawing Sol3...')
+                    print('\tWithdrawing Sol3...')
                     withdraw(solution_volume + 0.02, 0.5, pump)
                     move_pipette_to_position(mill, Sol1.coordinates['x'], Sol1.coordinates['y'], 0)
                     
-                    print('Moving to purge...')
+                    print('\tMoving to purge...')
                     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
                     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-                    print('Purging...')
-                    purge(PurgeVial, solution_volume + 0.02)
+                    print('\tPurging...')
+                    purge(PurgeVial, pump, solution_volume + 0.02)
                     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-            
+                    ## End of pipette flushing procedure
             target_well = solution[i]['Target Well']
             ## set the name of the files for the echem experiments
             echem.pstatcontrol.setfilename(target_well, 'dep')
             ## echem CA - deposition
+            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z'])
             echem.exp.CA(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
+            while active == True:
+                client.PumpEvents(1)
+                time.sleep(0.1)
             ## echem plot the data
             echem.pstatcontrol.plotdata(echem.CA)
             
             ## Withdraw all well volume            
             if wellplate.volume(target_well) != total_well_volume:
                 print(f'Well volume: {wellplate.volume(target_well)} != Running total: {total_well_volume}')
+                wait = input("Press Enter to continue.")
             clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
             #clear_well(total_well_volume, target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
             
@@ -349,7 +357,9 @@ def main():
             ## Echem CV - characterization
             echem.pstatcontrol.setfilename(target_well, 'CV')
             echem.exp.CV(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
-            
+            while active == True:
+                client.PumpEvents(1)
+                time.sleep(0.1)
             ## echem plot the data
             echem.pstatcontrol.plotdata(echem.CV)
             
@@ -378,41 +388,10 @@ def main():
         print("Exception type: ", exception_type)
         print("File name: ", filename)
         print("Line number: ", line_number)
-            
-            
-    # """ 
-    # Pipette - Dimethylferrocene solution
-    # -------------------------------------------------------------------------
-    # """
-    # # move_pipette_to_position(DMF_vial.coordinates)
-    # withdraw(0.140, DMF_vial.coordinates, withdrawl_height, pumping_rate, pump)
-    # purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
-    # # move_pipette_to_position(wells_plate.get_coordinates("A1"))
-    # infuse(0.100, Target_well, infuse_height, pumping_rate, pump)
-    # purge(0.020, purge_vial.coordinates, purge_vial.depth, pumping_rate, pump)
-    # mill.home()
-    
-    # """
-    # Electrode - Cyclic voltammetry
-    # -------------------------------------------------------------------------
-    # """
-    # move_electrode_to_position(wells_plate.get_coordinates("A1"))
-    # # Initiate pstat experiment
-    # exp.CV(0.0, -0.8, -0.1, -0.1, 0.1, 0.05, 0.05, 0.05, 2, 3)
-    # pstatcontrol.plotdata(CV)
-    # mill.home()
-    
-    # """
-    # Remove Remove DMF_vial solution
-    # -------------------------------------------------------------------------
-    # """
-    # withdraw(0.120, Target_well, wells_plate.depth("A1"), pumping_rate, pump)
-    # infuse(0.120, purge_vial, withdrawl_height, pumping_rate, pump)
-    # # infuse(0.140, purge_vial, purge_vial.depth, 0.4, pump)
-    # mill.home()
-    
+      
+    ## close out of serial connections
     mill.__exit__()    
-    serial.Serial("COM5", 19200).close()
+    #serial.Serial("COM5", 19200).close()
 
 if __name__ == '__main__':
     main()
