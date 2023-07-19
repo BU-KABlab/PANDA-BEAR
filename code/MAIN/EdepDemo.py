@@ -2,9 +2,6 @@ import time, nesp_lib, serial, sys
 from classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
 import gamrycontrol as echem
-import os.path
-import datetime
-import comtypes
 import comtypes.client as client
 
 def verbose_output(*args):
@@ -298,8 +295,6 @@ def main():
     ## Run the experiments
     try:
         #initializing and connecting to pstat
-        GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
-        pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
         devices = client.CreateObject('GamryCOM.GamryDeviceList')
         echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
         echem.pstat.Open() #open connection to pstat
@@ -336,7 +331,7 @@ def main():
             ## echem CA - deposition
             move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z'])
             echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
-            while active == True:
+            while echem.active == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)
             ## echem plot the data
@@ -363,7 +358,7 @@ def main():
             ## Echem CV - characterization
             echem.setfilename(target_well, 'CV')
             echem.cyclic(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
-            while active == True:
+            while echem.active == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)
             ## echem plot the data
@@ -390,7 +385,7 @@ def main():
         exception_type, exception_object, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
         line_number = exception_traceback.tb_lineno
-        raise echem.gamry_error_decoder(e)
+        #raise echem.gamry_error_decoder(e)
         print('Exception: ',e)
         print("Exception type: ", exception_type)
         print("File name: ", filename)

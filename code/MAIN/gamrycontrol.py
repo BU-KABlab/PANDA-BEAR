@@ -16,7 +16,9 @@ pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
 devices = client.CreateObject('GamryCOM.GamryDeviceList')
 active = True
 
-@staticmethod
+class GamryCOMError(Exception):
+    pass
+
 def gamry_error_decoder(e):
     if isinstance(e, comtypes.COMError):
         hresult = 2**32 + e.args[0]
@@ -24,7 +26,6 @@ def gamry_error_decoder(e):
             return GamryCOMError('0x{0:08x}: {1}'.format(2**32 + e.args[0], e.args[1]))
     return e
 
-@staticmethod
 def initializepstat(pstat):
     pstat.SetCtrlMode(GamryCOM.PstatMode)
     pstat.SetCell(GamryCOM.CellOff)
@@ -35,7 +36,6 @@ def initializepstat(pstat):
     # the following command allows us to set our range manually
     # pstat.SetIERange (x)
 
-@staticmethod
 def stopacq():
     global active
     global connection
@@ -48,18 +48,17 @@ def stopacq():
     gc.collect()
     return
 
-class GamryCOMError(Exception):
-    pass
 
 class GamryDtaqEvents(object):
-    def __init__(self, dtaq):
+    def __init__(self, dtaq, complete_file_name):
         self.dtaq = dtaq
         self.acquired_points = []
+        self.complete_file_name = complete_file_name
 
     def call_stopacq(self):
         stopacq()
     
-    def call_savedata(self,complete_file_name):
+    def call_savedata(self, complete_file_name):
         savedata(complete_file_name)
 
     def cook(self):
@@ -79,7 +78,7 @@ class GamryDtaqEvents(object):
         self.cook()  # a final cook
         time.sleep(2.0)
         self.call_stopacq()
-        self.call_savedata(complete_file_name)
+        self.call_savedata(self.complete_file_name)
 
 def disconnectpstat():
     global pstat
@@ -89,7 +88,6 @@ def disconnectpstat():
     del connection
     time.sleep(15)
 
-@staticmethod
 def savedata(complete_file_name):
     
     #print(dtaqsink.acquired_points)
@@ -143,7 +141,7 @@ def setfilename(target_well, experiment):
     return
         
         
-@staticmethod
+
 def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
     global dtaq
     global signal
@@ -175,7 +173,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     start_time = time.time()
     print("made it to run end")
     
-@staticmethod
+
 def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global dtaq
     global signal
@@ -211,7 +209,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     start_time = time.time()
     print("made it to run end")
 
-@staticmethod
+
 def OCP(OCPvi, OCPti, OCPrate):
     global dtaq
     global signal
@@ -280,18 +278,18 @@ OCPrate = 0.5
 
 if __name__ == "__main__":
     try:
-        #pick one of the following to test
-        exp.OCP(OCPvi, OCPti, OCPrate)
-        #exp.CA(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
-        #exp.CV(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)     
+        pstat.Init(devices.EnumSections()[0])  # grab first pstat
+        pstat.Open() #open connection to pstat
+        complete_file_name = setfilename('A1', 'dep')
+        dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
+        ## echem CA - deposition
+        chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate) #CA
         print("made it to try")
         while active == True:
             client.PumpEvents(1)
             time.sleep(0.5)
-        # code for end time
-        end_time = time.time()
-        total_time = end_time - start_time
-        print("Time to run is ", total_time, " seconds")
+        ## echem plot the data
+        plotdata('CA', complete_file_name)
 
     except Exception as e:
         raise gamry_error_decoder(e)
