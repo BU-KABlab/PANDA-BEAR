@@ -7,6 +7,8 @@ import time
 import gc
 import comtypes
 import comtypes.client as client
+import pathlib
+import random
 
 #Bring in gamrycom and pstat
 #GamryCOM=client.GetModule(r'C:\Program Files (x86)\Gamry Instruments\Framework\GamryCOM.exe')
@@ -15,6 +17,7 @@ GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
 pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
 devices = client.CreateObject('GamryCOM.GamryDeviceList')
 active = True
+#complete_file_name = 'test'
 
 class GamryCOMError(Exception):
     pass
@@ -71,10 +74,13 @@ class GamryDtaqEvents(object):
 
     def _IGamryDtaqEvents_OnDataAvailable(self, this):
         self.cook()
-        print("made it to data available")
+        if random.randint(0,10) % 2 == 0:
+            print("\rmade it to data available/", end = "")
+        else:
+            print("\rmade it to data available\\", end = "")
 
     def _IGamryDtaqEvents_OnDataDone(self, this):
-        print("made it to data done")
+        print("\nmade it to data done")
         self.cook()  # a final cook
         time.sleep(2.0)
         self.call_stopacq()
@@ -96,12 +102,14 @@ def savedata(complete_file_name):
     # savedata
     # column_names = ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
     output = pd.DataFrame(dtaqsink.acquired_points)
-    np.savetxt(complete_file_name + '.txt', output)
+    #complete_file_name = os.path(complete_file_name)
+    np.savetxt(complete_file_name.with_suffix('.txt'), output)
     print("data saved")
 
 def plotdata(exp_name, complete_file_name):
+    #complete_file_name = os.path(complete_file_name)
     if exp_name == 'OCP':
-            df = pd.read_csv(complete_file_name + '.txt', sep=" ", header=None,
+            df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None,
                             names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
             plt.rcParams["figure.dpi"] = 150
             plt.rcParams["figure.facecolor"] = "white"
@@ -109,7 +117,7 @@ def plotdata(exp_name, complete_file_name):
             plt.xlabel('Time (s)')
             plt.ylabel('Voltage (V)')
     elif exp_name == 'CA':
-            df = pd.read_csv(complete_file_name + 'CA.txt', sep=" ", header=None,
+            df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None,
                             names=["runtime", "Vf", "Vu", "Im", "Q", "Vsig", "Ach", "IERange", "Over", "StopTest"])
             plt.rcParams["figure.dpi"] = 150
             plt.rcParams["figure.facecolor"] = "white"
@@ -117,9 +125,7 @@ def plotdata(exp_name, complete_file_name):
             plt.xlabel('Time (s)')
             plt.ylabel('Current (A)')
     elif exp_name == 'CV':
-            df = pd.read_csv(complete_file_name + 'CV.txt', sep=" ", header=None,
-                            names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest",
-                                    "Cycle", "Ach2"])
+            df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
             plt.rcParams["figure.dpi"] = 150
             plt.rcParams["figure.facecolor"] = "white"
             plt.plot(df['Time'], df['Im'])
@@ -127,18 +133,29 @@ def plotdata(exp_name, complete_file_name):
             plt.ylabel('Current (A)')
 
     plt.tight_layout()
-    plt.savefig(complete_file_name + '.png')
+    plt.savefig(complete_file_name.with_suffix('.png'))
     print("plot saved")
 
 def setfilename(target_well, experiment):
+    global complete_file_name
     current_time = datetime.datetime.now()
     fileDate = current_time.strftime("%Y-%m-%d")
-    filePath = os.path.join(os.path.expanduser("~"), "Documents", "Github","PANDA","data")
-    complete_file_name = os.path.join(filePath, fileDate, target_well + '_' + experiment)
-    print(complete_file_name)
-    if not os.path.exists(filePath):
-        os.makedirs(filePath, exist_ok = True)
-    return
+    cwd = pathlib.Path().absolute()
+    filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
+    #filePathPar = os.path.join(os.path.expanduser("~"), "Documents", "Github","PANDA","data")
+    #filePath = os.path.join(filePathPar, fileDate)
+    filePath = filePathPar / fileDate
+    #complete_file_name = os.path.join(filePath, target_well + '_' + experiment)
+    complete_file_name = filePath / (target_well + '_' + experiment)
+    print(f'eChem: complete file name is: {complete_file_name}')
+    #if not os.path.exists(filePath):
+    if not pathlib.Path.exists(filePath):
+        print(f"folder does not exist. Making folder: {filePath}")
+        pathlib.Path.mkdir(filePath, parents=True, exist_ok=True)
+        #os.makedirs(filePath, exist_ok = True)
+    else:
+        print(f"folder {filePath} exists")
+    return complete_file_name
         
         
 
@@ -153,6 +170,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     global total_time
     global active
     global GamryCOM
+    #global complete_file_name
     
     print("made it to run")
     active = True
@@ -160,7 +178,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     # signal and dtaq object creation
     signal = client.CreateObject('GamryCOM.GamrySignalRupdn')
     dtaq = client.CreateObject('GamryCOM.GamryDtaqRcv')
-    dtaqsink = GamryDtaqEvents(dtaq)
+    dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
     
     signal.Init(pstat, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, 0.0, 0.0, 0.0, CVsamplerate, CVcycle, GamryCOM.PstatMode)
@@ -185,6 +203,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global total_time
     global active
     global GamryCom
+    #global complete_file_name
 
     active = True
     print("made it to run")
@@ -193,7 +212,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     signal = client.CreateObject('GamryCOM.GamrySignalDstep')
     dtaq = client.CreateObject('GamryCOM.GamryDtaqChrono')
 
-    dtaqsink = GamryDtaqEvents(dtaq)
+    dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
     
     signal.Init(pstat, CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate, GamryCOM.PstatMode)
@@ -229,7 +248,7 @@ def OCP(OCPvi, OCPti, OCPrate):
     signal = client.CreateObject('GamryCOM.GamrySignalConst')
     dtaq = client.CreateObject('GamryCOM.GamryDtaqOcv')
 
-    dtaqsink = GamryDtaqEvents(dtaq)
+    dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
     
     signal.Init(pstat, OCPvi, OCPti, OCPrate, GamryCOM.PstatMode)
@@ -244,6 +263,12 @@ def OCP(OCPvi, OCPti, OCPrate):
     print("made it to run end")
 
 active = True
+
+def errortest():
+    testerror = comtypes.COMError(0x20000000, None, (None, None, None, None))
+    raise gamry_error_decoder(testerror)
+
+
 
 # CV Setup Parameters
 CVvi = 0.0
@@ -262,7 +287,7 @@ CVsamplerate = CVstep / CVsr1
 # CA/CP Setup Parameters
 CAvi = 0.0
 CAti = 0.0
-CAv1 = -2.7
+CAv1 = -2.0
 CAt1 = 30
 # CAt1 = 300
 CAv2 = 0
@@ -281,7 +306,6 @@ if __name__ == "__main__":
         pstat.Init(devices.EnumSections()[0])  # grab first pstat
         pstat.Open() #open connection to pstat
         complete_file_name = setfilename('A1', 'dep')
-        dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
         ## echem CA - deposition
         chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate) #CA
         print("made it to try")
@@ -290,6 +314,8 @@ if __name__ == "__main__":
             time.sleep(0.5)
         ## echem plot the data
         plotdata('CA', complete_file_name)
+        pstat.Close()
+        del connection
 
     except Exception as e:
         raise gamry_error_decoder(e)

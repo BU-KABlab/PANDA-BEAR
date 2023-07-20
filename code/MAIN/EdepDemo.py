@@ -295,10 +295,12 @@ def main():
     ## Run the experiments
     try:
         #initializing and connecting to pstat
+        GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
+        pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
         devices = client.CreateObject('GamryCOM.GamryDeviceList')
         echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
         echem.pstat.Open() #open connection to pstat
-        
+        complete_file_name = echem.setfilename(target_well, 'dep')
         for i in range(len(color1)): #loop per well
             total_well_volume = 0
             
@@ -327,15 +329,15 @@ def main():
                     ## End of pipette flushing procedure
             target_well = solution[i]['Target Well']
             ## set the name of the files for the echem experiments
-            echem.setfilename(target_well, 'dep')
+            complete_file_name = echem.setfilename(target_well, 'dep')
             ## echem CA - deposition
             move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z'])
             echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
             while echem.active == True:
                 client.PumpEvents(1)
-                time.sleep(0.1)
+                time.sleep(0.5)
             ## echem plot the data
-            echem.plotdata(echem.CA)
+            echem.plotdata(echem.CA, complete_file_name)
             
             ## Withdraw all well volume            
             if wellplate.volume(target_well) != total_well_volume:
@@ -356,13 +358,13 @@ def main():
             pipette(total_well_volume, Sol4, solution[i]['Target Well'], pumping_rate, PurgeVial, wellplate, pump, mill)        
             
             ## Echem CV - characterization
-            echem.setfilename(target_well, 'CV')
+            complete_file_name = echem.setfilename(target_well, 'CV')
             echem.cyclic(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
             while echem.active == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)
             ## echem plot the data
-            echem.plotdata(echem.CV)
+            echem.plotdata(echem.CV, complete_file_name)
             
             # Flushing procedure
             print('\nMoving to second flush with Sol3...')
@@ -380,7 +382,8 @@ def main():
             move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
             print('Solution run completed\n\n....................................................................\n')
         print('\n\n\t\t\tDEMO COMPLETED\n\n')
-        
+    
+    
     except Exception as e:
         exception_type, exception_object, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
@@ -393,7 +396,7 @@ def main():
       
     ## close out of serial connections
     mill.__exit__()
-    echem.pstat.Close()
+    echem.disconnectpstat()
     #serial.Serial("COM5", 19200).close()
 
 if __name__ == '__main__':
