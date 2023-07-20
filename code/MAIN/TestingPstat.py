@@ -18,7 +18,7 @@ if __name__ == "__main__":
     try:
         echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
         echem.pstat.Open() #open connection to pstat
-        complete_file_name = echem.setfilename('A2', 'dep')
+        complete_file_name = echem.setfilename('A4', 'dep')
         ## echem CA - deposition
         echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
         print("made it to try")
@@ -27,7 +27,7 @@ if __name__ == "__main__":
             time.sleep(0.5)
         ## echem plot the data
         echem.plotdata('CA', complete_file_name)
-        echem.pstat.Close()
+        #echem.pstat.Close()
 
     except Exception as e:
         raise gamry_error_decoder(e)
