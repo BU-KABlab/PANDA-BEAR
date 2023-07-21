@@ -91,7 +91,7 @@ def disconnectpstat():
     global connection
     
     pstat.Close()
-    del connection
+    #del connection
     time.sleep(15)
 
 def savedata(complete_file_name):
