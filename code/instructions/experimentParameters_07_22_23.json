@@ -1,0 +1,23 @@
+{"Experiments":[
+{"Target_Well": "A1", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A2", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A3", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A4", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A5", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A6", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A7", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A8", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A9", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A10", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A11", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "A12", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B1", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B2", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B3", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B4", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B5", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B6", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B7", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}, 
+{"Target_Well": "B8", "sol1": 0, "sol2": 125, "sol3": 125, "sol4": 0, "test-type": "CV", "dep-duration": 300, "DepPot": -2.7, "status": 0}
+]
+}
