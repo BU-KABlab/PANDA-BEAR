@@ -74,10 +74,9 @@ class GamryDtaqEvents(object):
 
     def _IGamryDtaqEvents_OnDataAvailable(self, this):
         self.cook()
-        if random.randint(0,10) % 2 == 0:
-            print("\rmade it to data available/", end = "")
-        else:
-            print("\rmade it to data available\\", end = "")
+        loading = ['|','/','-','\']
+        print(f"\rmade it to data available{random.choice(loading)}", end = "")
+        
 
     def _IGamryDtaqEvents_OnDataDone(self, this):
         print("\nmade it to data done")
