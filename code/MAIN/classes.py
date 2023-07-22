@@ -26,7 +26,7 @@ class Wells:
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
         
-        self.well_capacity = 0.2
+        self.well_capacity = 2.0 # ml
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
         for col_idx, col in enumerate("ABCDEFGH"):
@@ -108,6 +108,18 @@ class Wells:
     def depth(self,well_id):
         return self.wells[well_id]['depth']
     
+    def check_volume(self,well_id,added_volume:float):
+        print(f'Check if {added_volume} can fit in {well_id} ...',end='')
+        if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
+            raise OverFillException(well_id, self.volume, added_volume, self.well_capacity)
+        
+        elif self.wells[well_id]["volume"] + added_volume < 0:
+            raise OverDraftException(well_id, self.volume, added_volume, self.well_capacity)
+        else:
+            print(f'{added_volume} can fit in {well_id}')
+            return True
+
+
     def update_volume(self,well_id,added_volume:float):
         
 
@@ -119,7 +131,7 @@ class Wells:
         else:
             self.wells[well_id]["volume"] += added_volume
             self.wells[well_id]["depth"] = self.wells[well_id]["volume"]/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
-
+            print(f'\tNew Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
 
 class Vial:
     '''
@@ -156,13 +168,27 @@ class Vial:
         '''
         return self.coordinates
     
+    def check_volume(self,added_volume:float):
+        '''
+        Updates the volume of the vial
+        '''
+        print(f'Check if {added_volume} can fit in {self.name} ...',end='')
+        if self.volume + added_volume > self.capacity:
+            raise OverFillException(self.name, self.volume, added_volume, self.capacity)
+        elif self.volume + added_volume < 0:
+            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
+        else:
+            print(f'{added_volume} can fit in {self.name}')
+            return True
+
+
     def update_volume(self,added_volume:float):
         '''
         Updates the volume of the vial
         '''
         print(f'Updating {self.name} volume...')
-        print(f'\tCurrent volume: {self.volume}\n\tCurrent depth: {self.depth}')
-        print(f'\tAdding {added_volume} to {self.volume}...')
+        print(f'\tCurrent volume: {self.volume} | Current depth: {self.depth}')
+        #print(f'\tAdding {added_volume} to {self.volume}...')
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
@@ -170,8 +196,8 @@ class Vial:
         else:
             self.volume += added_volume
             self.depth = ((self.volume/1000)/self.base) + self.bottom
-        print(f'\tSolution volume now: {self.volume}')
-        print(f'\tSolution depth now: {self.depth}')
+        print(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
+        
 
 
 class MillControl:
@@ -209,7 +235,12 @@ class MillControl:
         self.ser_mill.write(command_bytes + b'\n')
         time.sleep(1)
         try:
-            if command != '$H':
+            if command == 'F2000':
+                time.sleep(1)
+                out = self.ser_mill.readline()
+                print(f' executed')
+
+            elif command != '$H':
                 time.sleep(0.5)
                 status = self.current_status()
                 
@@ -219,10 +250,11 @@ class MillControl:
                     
                     time.sleep(0.3)
                 out = status
-                print(f'\t executed')
+                print(f' executed')
+            
             else:
                 out = self.ser_mill.readline()
-                print(f'\t executed')
+                print(f' executed')
             #time.sleep(1)
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
@@ -260,7 +292,7 @@ class MillControl:
         self.ser_mill.write(command_bytes) # without carriage return because grbl documentation says its not needed
         time.sleep(2)
         status = self.ser_mill.readlines()
-        time.sleep(1)
+        time.sleep(2)
         try:
             if type(status) == list:
                 list_length = len(status)
