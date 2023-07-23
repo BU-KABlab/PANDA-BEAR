@@ -3,7 +3,6 @@ from classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
 import gamrycontrol as echem
 import comtypes.client as client
-import pathlib
 import read_json as rj
 
 def set_up_pump():
@@ -337,6 +336,17 @@ def flush_pipette_tip(pump: object,
     print('\tPurging...')
     purge(PurgeVial, pump, flush_volume + 0.02)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+
+def solution_selector(solutions: list, solution_name: str):
+    '''
+    Select the solution from the list of solutions
+    '''
+    for solution in solutions:
+        if solution.name == solution_name and solution.volume > 0.00:
+            return solution
+        else:
+            pass
+    raise Exception(f'{solution_name} not found in list of solutions')
 
 def main():
     # Constants
