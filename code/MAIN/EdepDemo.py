@@ -3,6 +3,8 @@ from classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
 import gamrycontrol as echem
 import comtypes.client as client
+import pathlib
+import read_json as rj
 
 def set_up_pump():
     """
@@ -177,7 +179,16 @@ def electrode(mill: object, location: dict, depth, test,test_duration = 10):
     time.sleep(test_duration) # stay there for the duration of the test
     move_electrode_to_position(mill, x,y,0) # Move back to z=0 above the location
 
-def pipette(volume: float, solution: Vial, target_well: str, pumping_rate, PurgeVial: object, wellplate: Wells, pump: object, mill: object, purge_volume = 0.020):
+def pipette(volume: float,
+            solution: Vial,
+            target_well: str,
+            pumping_rate: float,
+            PurgeVial: object,
+            wellplate: Wells,
+            pump: object,
+            mill: object,
+            purge_volume = 0.020
+            ):
     """
     Perform the full pipetting sequence
     Args:
@@ -236,7 +247,16 @@ def pipette(volume: float, solution: Vial, target_well: str, pumping_rate, Purge
     else:
         pass
 
-def clear_well(volume: float, target_well: str, wellplate: object, pumping_rate, pump: object, PurgeVial: Vial, mill: object):
+def clear_well(volume: float,
+               target_well: str,
+               wellplate: object,
+               pumping_rate: float,
+               pump: object,
+               PurgeVial: Vial,
+               mill: object):
+    '''
+    
+    '''
     import math
     repititions = math.ceil(volume/0.200)
     repition_vol = volume/repititions
@@ -273,17 +293,57 @@ def print_runtime_data(runtime_data: dict):
             print(f"{section}: {runtime} seconds")
         print()
 
+def rinse(wellplate : object,
+          target_well: str,
+          pumping_rate: float,
+          pump: object,
+          PurgeVial: Vial,
+          mill: object,
+          rinse_sol: Vial,
+          rinse_repititions = 3,
+          rinse_vol = 0.150):
+    '''
+    Rinse the well with 0.150 ml of ACN
+    '''
+    print(f'Rinsing well {target_well} 3x...')
+    for i in range(rinse_repititions):
+        print(f'Rinse {i+1} of {rinse_repititions}')
+        pipette(rinse_vol, rinse_sol, target_well, pumping_rate, PurgeVial, wellplate, pump, mill)
+        clear_well(rinse_vol, target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
+
+def flush_pipette_tip(pump: object,
+                      PurgeVial: Vial,
+                      flush_solution: Vial,
+                      mill: object,
+                      pumping_rate = 0.4,
+                      flush_volume = 0.12
+                      ):
+    '''
+    Flush the pipette tip with 0.12 ml of DMF
+    '''
+    print(f'\n\nFlushing with {flush_solution.name}...')
+    move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], 0)
+    move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], flush_solution.depth)
+    print(f'\tWithdrawing {flush_solution.name}...')
+    withdraw(flush_volume, pumping_rate, pump)
+    move_pipette_to_position(mill, flush_solution.coordinates['x'], flush_solution.coordinates['y'], 0)
+    
+    print('\tMoving to purge...')
+    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
+    if not PurgeVial.check_volume(0.12):
+                print(f'{PurgeVial.name} is too full to add {0.12} ml')
+                raise Exception(f'{PurgeVial.name} is too full to add {0.12} ml')
+    print('\tPurging...')
+    purge(PurgeVial, pump, flush_volume + 0.02)
+    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+
 def main():
     # Constants
-    #vial_withdraw_height = -80
-    #vial_infuse_height = vial_withdraw_height
-    
-    #well_withdraw_height = -101
-    #well_infuse_height = -98
     pumping_rate = 0.5
     Well_Rows = 'ABCDEFGH'
     Well_Columns = 13
-    RunTimes = {} 
+    RunTimes = {}
 
     try:
         ## Program Set Up
@@ -302,6 +362,8 @@ def main():
         print('\tWells defined')
         
         ## Define locations of vials and their contents
+        solutions = rj.read_json('vialParameters_07_22_23.json')
+
         PurgeVial = Vial(-2,-50,'waste',1.00, name='Purge Vial')
         Sol1 = Vial( -2,  -80, "Acetonitrile", 20.0, name = 'ACN')
         Sol2 = Vial( -2, -110, "PEG", 20.0, name = 'PEG')
@@ -330,44 +392,27 @@ def main():
         print('\tPstat connected: ',devices.EnumSections()[0])
         
         for i in range(23): #loop per well
-            total_well_volume = 0
+            
             startTime = time.time()
             wellRun = experiments[0][i]['Target Well']
             RunTimes[wellRun] = {}
             RunTimes[wellRun]['Start Time'] = startTime
+            
             ## Deposit all experiment solutions into well
             for solution in experiments:
-                    print(f"\npipetting {solution[i]['Pipette Volume']} ul from {solution[i]['Solution'].name}: {solution[i]['Solution'].contents} into well {solution[i]['Target Well']}")
-                    pipette(float(solution[i]['Pipette Volume'])/1000,solution[i]['Solution'],solution[i]['Target Well'],pumping_rate, PurgeVial, wellplate, pump, mill)
-                    total_well_volume += (solution[i]['Pipette Volume'])/1000
-                    
-                    solution_volume = (solution[i]['Pipette Volume'])/1000 #1000 because the demo is in ml
-                    
-                    ## Beginning of pipette flushing procedure
-                    print(f'\n\nMoving to flush with {Sol3.name}...')
-                    move_pipette_to_position(mill, Sol1.coordinates['x'], Sol1.coordinates['y'], 0)
-                    move_pipette_to_position(mill, Sol1.coordinates['x'], Sol1.coordinates['y'], Sol3.depth)
-                    print(f'\tWithdrawing {Sol3.name}...')
-                    withdraw(solution_volume + 0.02, 0.5, pump)
-                    move_pipette_to_position(mill, Sol1.coordinates['x'], Sol1.coordinates['y'], 0)
-                    
-                    print('\tMoving to purge...')
-                    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-                    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-                    print('\tPurging...')
-                    purge(PurgeVial, pump, solution_volume + 0.02)
-                    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-                    ## End of pipette flushing procedure
+                print(f"\npipetting {solution[i]['Pipette Volume']} ul from {solution[i]['Solution'].name}: {solution[i]['Solution'].contents} into well {solution[i]['Target Well']}")
+                solution_volume = float((solution[i]['Pipette Volume'])/1000) #because the pump works in ml
+                current_well = solution[i]['Target Well']
+                pipette(solution_volume, solution[i]['Solution'], current_well, pumping_rate, PurgeVial, wellplate, pump, mill)
+                flush_pipette_tip(pump, PurgeVial, Sol3, mill)
 
             solutionsTime = time.time()
             RunTimes[wellRun]['Solutions Time'] = solutionsTime - startTime
             print(f'\nSolutions time: {RunTimes[wellRun]["Solutions Time"]}')
 
-
-            target_well = solution[i]['Target Well']
-            ## set the name of the files for the echem experiments
-            
             print('\n\nSetting up eChem experiments...')
+            ## echem setup
+            target_well = solution[i]['Target Well']            
             complete_file_name = echem.setfilename(target_well, 'dep')
             print("\n\nBeginning eChem deposition of well: ",target_well)
             ## echem CA - deposition
@@ -383,24 +428,13 @@ def main():
             depositionTime = time.time()
             RunTimes[wellRun]['Deposition Time'] = depositionTime - solutionsTime
             print(f'Deposition time: {RunTimes[wellRun]["Deposition Time"]}')
-            
-            
+
             ## Withdraw all well volume            
-            if wellplate.volume(target_well) != total_well_volume:
-                print(f'Well volume: {wellplate.volume(target_well)} != Running total: {total_well_volume}')
-                wait = input("Press Enter to continue.")
-            clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
-            #clear_well(total_well_volume, target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
-            
-                     
+            clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, PurgeVial, mill)        
+    
             ## Rinse the well 3x
-            print(f'Rinsing well {target_well} 3x...')
-            for k in range(2):
-                print(f'Rinse {k+1} of 3')
-                rinse_vol = 0.150 #ml
-                pipette(rinse_vol, Sol1, target_well, pumping_rate, PurgeVial, wellplate, pump, mill)
-                clear_well(rinse_vol, target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
-            
+            rinse(wellplate, target_well, pumping_rate, pump, PurgeVial, mill, Sol1)
+
             rinseTime = time.time()
             RunTimes[wellRun]['Rinse Time'] = rinseTime - depositionTime
             print(f'\nRinse time: {RunTimes[wellRun]["Rinse Time"]}')
@@ -428,23 +462,12 @@ def main():
 
             clear_well(0.25, target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
 
+            clearTime = time.time()
+            RunTimes[wellRun]['Clear Well Time'] = clearTime- characterizationTime
+            print(f'\Time to Clear Well: {RunTimes[wellRun]["Clear Well Time"]}')
+
             # Flushing procedure
-            print(f'\n\nFlushing with {Sol3.name}...')
-            move_pipette_to_position(mill,Sol1.coordinates['x'], Sol1.coordinates['y'], 0)
-            move_pipette_to_position(mill,Sol1.coordinates['x'], Sol1.coordinates['y'], Sol3.depth)
-            print(f'\tWithdrawing {Sol3.name}...')
-            withdraw(0.12,0.5,pump)
-            move_pipette_to_position(mill, Sol1.coordinates['x'], Sol1.coordinates['y'], 0)
-            
-            print('\tMoving to purge')
-            move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-            move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-            print('\tPurging again...')
-            if not PurgeVial.check_volume(0.12):
-                print(f'{PurgeVial.name} is too full to add {0.12} ml')
-                raise Exception(f'{PurgeVial.name} is too full to add {0.12} ml')
-            purge(PurgeVial, pump,0.14)
-            move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+            flush_pipette_tip(pump, PurgeVial, Sol3, mill)
             
             flushTime = time.time()
             RunTimes[wellRun]['Flush Time'] = flushTime - characterizationTime
@@ -456,7 +479,7 @@ def main():
             RunTimes[wellRun]['Well Time'] = wellTime - startTime
             print(f'Well time: {RunTimes[wellRun]["Well Time"]/60} minutes')
 
-            ## Table of all Vials and their volumes
+            ## Table of all Vials and their volumes at this stage in the run
             print('\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
             print('\n\nVial Volumes:') 
             print(f'{PurgeVial.name}: {PurgeVial.volume}')
@@ -464,36 +487,33 @@ def main():
                 print(f'{solution.name}: {solution.volume}')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')    
     	
-        print('\n\n\t\t\tDEMO COMPLETED\n\n')
+        print('\n\nEXPERIMENTS COMPLETED\n\n')
         endTime = time.time()
         print(f'End Time: {endTime}')
         print(f'Total Time: {endTime - startTime}')
 
-
     except KeyboardInterrupt:
         print('Keyboard Interrupt')
-    
+
     except Exception as e:
         exception_type, exception_object, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
         line_number = exception_traceback.tb_lineno
-        #raise echem.gamry_error_decoder(e)
         print('Exception: ', e)
         print("Exception type: ", exception_type)
         print("File name: ", filename)
         print("Line number: ", line_number)
-    
+
     finally:
-        print('Disconnecting from Mill, Pump, Pstat:')
         ## close out of serial connections
+        print('Disconnecting from Mill, Pump, Pstat:')
         mill.__exit__()
         print('Mill closed')
-        
+
         print('Pump closed')
         echem.disconnectpstat()
         print('Pstat closed')
-        #serial.Serial("COM5", 19200).close()
-        ## stop the script
+
         totalEndTime = time.time()
         print(f'\n\nTotal Time: {totalEndTime - totalStartTime}')
         print_runtime_data(RunTimes)
