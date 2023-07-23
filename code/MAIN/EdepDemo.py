@@ -373,6 +373,8 @@ def main():
         
         ## Define locations of vials and their contents
         solutions = rj.read_json('vialParameters_07_22_23.json')
+        
+
 
         PurgeVial = Vial(-2,-50,'waste',1.00, name='Purge Vial')
         Sol1 = Vial( -2,  -80, "Acetonitrile", 20.0, name = 'ACN')
