@@ -1,0 +1,7 @@
+{"Solutions":[
+{"solution": "S0", "contents": "PurgeVial", "x": -2, "y": -50, "name": "PurgeVial", "StartingVolume": 0}, {"solution": "S1", "contents": "DMF", "x": -2, "y": -90, "name": "DMF", "StartingVolume": 20000}
+, {"solution": "S2", "contents": "PEG", "x": -2, "y": -120, "name": "PEG", "StartingVolume": 20000}
+, {"solution": "S3", "contents": "Acrylate", "x": -2, "y": -150, "name": "Acrylate", "StartingVolume": 20000}
+, {"solution": "S4", "contents": "Ferrocene", "x": -2, "y": -180, "name": "Ferrocene", "StartingVolume": 20000}
+]
+}

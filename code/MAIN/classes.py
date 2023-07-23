@@ -26,8 +26,8 @@ class Wells:
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
         
-        self.well_capacity = 0.2
-        a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} #TODO set to zero for now, should be real value in future
+        self.well_capacity = 2.0 # ml
+        a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
         for col_idx, col in enumerate("ABCDEFGH"):
             for row in range(1, 14):
@@ -65,7 +65,7 @@ class Wells:
                             "y": a1_coordinates["y"] + y_offset, 
                             "z": self.z_top
                         }
-                    contents = None
+                    contents = []
                     
                     depth = self.z_bottom
                     
@@ -73,7 +73,10 @@ class Wells:
                     "coordinates": coordinates, 
                     "contents": contents, 
                     "volume": volume,
-                    "depth":depth
+                    "depth":depth,
+                    "status": "empty",
+                    "CV-results": None
+
                 }
 
     def visualize_well_coordinates(self):
@@ -105,66 +108,31 @@ class Wells:
     def depth(self,well_id):
         return self.wells[well_id]['depth']
     
+    def check_volume(self,well_id,added_volume:float):
+        print(f'Check if {added_volume} can fit in {well_id} ...',end='')
+        if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
+            raise OverFillException(well_id, self.volume, added_volume, self.well_capacity)
+        
+        elif self.wells[well_id]["volume"] + added_volume < 0:
+            raise OverDraftException(well_id, self.volume, added_volume, self.well_capacity)
+        else:
+            print(f'{added_volume} can fit in {well_id}')
+            return True
+
+
     def update_volume(self,well_id,added_volume:float):
         
 
         if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
-            raise OverFillException
+            raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         
         elif self.wells[well_id]["volume"] + added_volume < 0:
-            raise OverDraftException
+            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.wells[well_id]["volume"] += added_volume
             self.wells[well_id]["depth"] = self.wells[well_id]["volume"]/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
+            print(f'\tNew Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
 
-"""class Well:
-    def __init__(self, x, y, contents = None, volume=0.00, capacity=0.02, radius = 0.028, height = 0.061, z_bottom = -100):
-        self.bottom = z_bottom
-        self.capacity = capacity
-        self.coordinates = {'x':x,'y':y}
-        self.contents = contents
-        self.height = height
-        self.radius = radius
-        self.volume = volume
-        self.base = self.volume/(math.pi*math.pow(self.radius,2.0))
-        self.depth = (self.volume/self.base) + self.bottom
-    
-    def update_volume(self,volume:float):
-        self.volume += volume
-        self.depth = (self.volume/self.base) + self.bottom"""
-
-"""def create_wellplate(a1_X=0, a1_Y=0, orientation=0, WELL_ROWS = "ABCDEF", WELL_COLUMNS = range(1, 14), well_offset = 9):
-    for col_idx, col in enumerate(WELL_ROWS):
-            for row in WELL_COLUMNS:
-                well_id = col + str(row)
-                if well_id == "A1":
-                    current_well = 'well_'+well_id
-
-                    setattr('well_'+well_id, x = a1_X, y = a1_Y)
-                else:
-                    x_offset = col_idx * well_offset
-                    y_offset = (row - 1) * well_offset
-                    if orientation == 0:
-                        x = getattr('well_A1', 'x') - x_offset
-                        y = getattr('well_A1', 'y') - y_offset
-                        setattr('well_'+ well_id,x = x, y = y)
-                        
-                    elif orientation == 1:
-                        x = getattr('well_A1', 'x') + x_offset
-                        y = getattr('well_A1', 'y') + y_offset
-                        setattr('well_'+ well_id,x = x, y = y)
-
-                    elif orientation == 2:
-                        x = getattr('well_A1', 'x') - x_offset
-                        y = getattr('well_A1', 'y') - y_offset
-                        setattr('well_'+ well_id,x = x, y = y)
-                        
-                    elif orientation == 3:
-                        x = getattr('well_A1', 'x') + x_offset
-                        y = getattr('well_A1', 'y') + y_offset
-                        setattr('well_'+ well_id,x = x, y = y)
-
-"""
 class Vial:
     '''
     Class for creating vial objects with their position and contents
@@ -192,8 +160,6 @@ class Vial:
     @property
     def position(self):
         '''
-        
-
         Returns
         -------
         DICT
@@ -202,17 +168,36 @@ class Vial:
         '''
         return self.coordinates
     
-    def update_volume(self,added_volume:float):
-        print(f'Adding {added_volume} to {self.volume}...')
+    def check_volume(self,added_volume:float):
+        '''
+        Updates the volume of the vial
+        '''
+        print(f'Check if {added_volume} can fit in {self.name} ...',end='')
         if self.volume + added_volume > self.capacity:
-            raise OverFillException
+            raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
-            raise OverDraftException
+            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
+        else:
+            print(f'{added_volume} can fit in {self.name}')
+            return True
+
+
+    def update_volume(self,added_volume:float):
+        '''
+        Updates the volume of the vial
+        '''
+        print(f'Updating {self.name} volume...')
+        print(f'\tCurrent volume: {self.volume} | Current depth: {self.depth}')
+        #print(f'\tAdding {added_volume} to {self.volume}...')
+        if self.volume + added_volume > self.capacity:
+            raise OverFillException(self.name, self.volume, added_volume, self.capacity)
+        elif self.volume + added_volume < 0:
+            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
             self.depth = ((self.volume/1000)/self.base) + self.bottom
-        print(f'Solution volume now: {self.volume}')
-        print(f'Solution depth now: {self.depth}')
+        print(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
+        
 
 
 class MillControl:
@@ -245,12 +230,17 @@ class MillControl:
         time.sleep(15)
 
     def execute_command(self, command):
-        print(f'\tExecuting command: {command}...')
+        print(f'\tExecuting command: {command}...', end='')
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b'\n')
         time.sleep(1)
         try:
-            if command != '$H':
+            if command == 'F2000':
+                time.sleep(1)
+                out = self.ser_mill.readline()
+                print(f' executed')
+
+            elif command != '$H':
                 time.sleep(0.5)
                 status = self.current_status()
                 
@@ -260,10 +250,11 @@ class MillControl:
                     
                     time.sleep(0.3)
                 out = status
-                print(f'\t{command} executed')
+                print(f' executed')
+            
             else:
                 out = self.ser_mill.readline()
-                print(f'\t{command} executed')
+                print(f' executed')
             #time.sleep(1)
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
@@ -299,8 +290,9 @@ class MillControl:
         command = '?'
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes) # without carriage return because grbl documentation says its not needed
+        time.sleep(2)
         status = self.ser_mill.readlines()
-        
+        time.sleep(2)
         try:
             if type(status) == list:
                 list_length = len(status)
@@ -339,9 +331,27 @@ class MillControl:
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
-    pass
+    def __init__(self, name, volume, added_volume, capacity) -> None:
+        super().__init__(self)
+        self.name = name
+        self.volume = volume
+        self.added_volume = added_volume
+        self.capacity = capacity
+
+    def __str__(self) -> str:
+        return f'OverFillException: {self.name} has {self.volume} + {self.added_volume} > {self.capacity}'
+    
     
 class OverDraftException(Exception):
     """Raised when a vessel if over drawn"""
-    pass
+    def __init__(self, name, volume, added_volume, capacity) -> None:
+        super().__init__(self)
+        self.name = name
+        self.volume = volume
+        self.added_volume = added_volume
+        self.capacity = capacity
+
+    def __str__(self) -> str:
+        return f'OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0'
+    
     
