@@ -4,6 +4,7 @@ from generate_instructions import instruction_reader
 import gamrycontrol as echem
 import comtypes.client as client
 import read_json as rj
+from parameters_to_objects import read_vials, read_instructions
 
 def set_up_pump():
     """
@@ -394,34 +395,6 @@ def main():
        
         pump = set_up_pump()
         
-        ## Set up wells
-        wellplate = Wells(-218, -74, 0, 0)
-        print('\tWells defined')
-        
-        ## Define locations of vials and their contents
-        solutions = rj.read_json('vialParameters_07_22_23.json')
-        
-
-#TODO - remake into reading in jsons of vials and waste vials and then creating the objects
-        PurgeVial = Vial(-2,-50,'waste',1.00, name='Purge Vial')
-        Sol1 = Vial( -2,  -80, "Acetonitrile", 20.0, name = 'ACN')
-        Sol2 = Vial( -2, -110, "PEG", 20.0, name = 'PEG')
-        Sol3 = Vial( -2, -140, "Acrylate", 20.0, name = 'Acrylate')
-        Sol4 = Vial( -2, -170, "DMF", 20.0, name = 'DMF')
-        solutions = [Sol1, Sol2, Sol3, Sol4]
-        print('\tVials defined')
-        
-        ## Set up experiments
-        
-        color1 = instruction_reader('sol1.csv', Sol1, Well_Rows, Well_Columns)
-        color2 = instruction_reader('sol2.csv', Sol2, Well_Rows, Well_Columns)
-        dilution = instruction_reader('sol3.csv', Sol3, Well_Rows, Well_Columns)
-        water_layer = instruction_reader('water.csv', Sol3, Well_Rows, Well_Columns)
-        experiments = [color1, color2, dilution, water_layer]
-        experiments = [color1]
-        print('\tExperiments defined')
-        ## Run the experiments
-    
         #initializing and connecting to pstat
         GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
         pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
@@ -430,20 +403,35 @@ def main():
         echem.pstat.Open() #open connection to pstat
         print('\tPstat connected: ',devices.EnumSections()[0])
         
-        for i in range(23): #loop per well
+        ## Set up wells
+        wellplate = Wells(-218, -74, 0, 0)
+        print('\tWells defined')
+        
+        ## Set up solutions
+        waste_vials = read_vials('wasteParameters_07_22_23.json')
+        solutions = read_vials('vialParameters_07_22_23.json')
+        print('\tVials defined')
+
+        ## Read instructions
+        instructions = read_instructions('experimentParameters_07_22_23.json')
+        print('\tExperiments defined')
+        ## Run the experiments
+    
+        for i in range(len(instructions)): #loop per well
             
             startTime = time.time()
-            wellRun = experiments[0][i]['Target Well']
+            wellRun = instructions[0][i]['Target Well']
             RunTimes[wellRun] = {}
             RunTimes[wellRun]['Start Time'] = startTime
             
             ## Deposit all experiment solutions into well
-            for solution in experiments:
+            
+            for solution in instructions:
                 print(f"\npipetting {solution[i]['Pipette Volume']} ul from {solution[i]['Solution'].name}: {solution[i]['Solution'].contents} into well {solution[i]['Target Well']}")
                 solution_volume = float((solution[i]['Pipette Volume'])/1000) #because the pump works in ml
                 current_well = solution[i]['Target Well']
-                pipette(solution_volume, solution[i]['Solution'], current_well, pumping_rate, PurgeVial, wellplate, pump, mill)
-                flush_pipette_tip(pump, PurgeVial, Sol3, mill)
+                pipette(solution_volume, solution[i]['Solution'], current_well, pumping_rate, waste_vials, wellplate, pump, mill)
+                flush_pipette_tip(pump, waste_vials, solutions, mill)
 
             solutionsTime = time.time()
             RunTimes[wellRun]['Solutions Time'] = solutionsTime - startTime

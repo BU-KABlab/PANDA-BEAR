@@ -14,15 +14,15 @@ def read_instructions(filename):
 def read_vials(filename):    
     vial_parameters = read_json.read_json(filename)
     
-    sol_objects = {}
+    sol_objects = []
     for key, values in vial_parameters.items():
         for items in values: 
-            sol_objects[items['solution']] = classes.Vial(x=items['x'], 
+            sol_objects.append(classes.Vial(x=items['x'], 
                                                           y=items['y'],
                                                           volume=items['StartingVolume'],
                                                           name=items['name'],
                                                           contents=items['contents']
-                                                          )
+                                                          ))
     return sol_objects
 
 
@@ -35,14 +35,10 @@ def main():
 
 if __name__ == '__main__':
     instructions, sol_objects, waste_vials = main()
-
-    for instruction in instructions:
-        print(instruction['Target_Well'])
-    print()
-    for sol in sol_objects:
-        print(sol + ':', sol_objects[sol].contents)
-        print()
-    
-    for waste in waste_vials:
-        print(waste + ':', waste_vials[waste].contents)
+    for value in instructions:
+        print(value)
+    for value in sol_objects:
+        print(value)
+    for value in waste_vials:
+        print(value)
 print()
