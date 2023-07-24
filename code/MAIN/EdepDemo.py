@@ -337,12 +337,12 @@ def flush_pipette_tip(pump: object,
     purge(PurgeVial, pump, flush_volume + 0.02)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
 
-def solution_selector(solutions: list, solution_name: str):
+def solution_selector(solutions: list, solution_name: str, volume: float):
     '''
     Select the solution from the list of solutions
     '''
     for solution in solutions:
-        if solution.name == solution_name and solution.volume > 0.00:
+        if solution.name == solution_name and solution.volume > (volume+1):
             return solution
         else:
             pass
@@ -375,7 +375,7 @@ def main():
         solutions = rj.read_json('vialParameters_07_22_23.json')
         
 
-
+#TODO - remake into reading in jsons of vials and waste vials and then creating the objects
         PurgeVial = Vial(-2,-50,'waste',1.00, name='Purge Vial')
         Sol1 = Vial( -2,  -80, "Acetonitrile", 20.0, name = 'ACN')
         Sol2 = Vial( -2, -110, "PEG", 20.0, name = 'PEG')
