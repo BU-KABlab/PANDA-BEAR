@@ -377,8 +377,6 @@ def main():
     Well_Rows = 'ABCDEFGH'
     Well_Columns = 13
     RunTimes = {}
-    char_sol_name = 'Ferrrocene'
-    flush_sol_name = 'DMF'
 
     try:
         ## Program Set Up
@@ -422,27 +420,21 @@ def main():
             RunTimes[wellRun]['Start Time'] = startTime
             
             ## Deposit all experiment solutions into well
-            experiment_solutions = ['Acrylate', 'PEG']
-            for solution_name in experiment_solutions:
-                print(f'Pipetting {instructions[i][solution_name]} ul of {solution_name} into {wellRun}...')
-                soltuion_ml = float((instructions[i][solution_name])/1000) #because the pump works in ml
-                pipette(volume = soltuion_ml,
-                        solutions = stock_vials,
-                        solution_name= solution_name,
-                        target_well=wellRun,
-                        pumping_rate=pumping_rate,
-                        waste_vials=waste_vials,
-                        wellplate=wellplate,
-                        pump=pump,
-                        mill=mill)
-                flush_pipette_tip(pump, waste_vials, stock_vials, flush_sol_name, mill)
+            experiment_solutions = [instructions[i]['DMF'], instructions[i]['Acrylate'], instructions[i]['PEG'], instructions[i]['Ferrocene']]
+            for solution in experiment_solutions:
+                print(f"\npipetting {solution[i]['Pipette Volume']} ul from {solution[i]['Solution'].name}: {solution[i]['Solution'].contents} into well {solution[i]['Target Well']}")
+                solution_volume = float((solution[i]['Pipette Volume'])/1000) #because the pump works in ml
+                current_well = solution[i]['Target Well']
+                pipette(solution_volume, solution[i]['Solution'], current_well, pumping_rate, waste_vials, wellplate, pump, mill)
+                flush_pipette_tip(pump, waste_vials, stock_vials, mill)
+
             solutionsTime = time.time()
             RunTimes[wellRun]['Solutions Time'] = solutionsTime - startTime
             print(f'\nSolutions time: {RunTimes[wellRun]["Solutions Time"]}')
 
-            ## echem setup
             print('\n\nSetting up eChem experiments...')
-            target_well = wellRun           
+            ## echem setup
+            target_well = solution[i]['Target Well']            
             complete_file_name = echem.setfilename(target_well, 'dep')
             print("\n\nBeginning eChem deposition of well: ",target_well)
             ## echem CA - deposition
@@ -470,11 +462,10 @@ def main():
             print(f'\nRinse time: {RunTimes[wellRun]["Rinse Time"]}')
 
             print("\n\nBeginning eChem characterization of well: ",target_well)
-            
             ## Deposit DMF into well
-            char_sol = solution_selector(stock_vials, char_sol_name, 0.25)
-            print(f"Infuse {char_sol.name} into well {target_well}...")
-            pipette(0.25, char_sol, solution[i]['Target Well'], pumping_rate, waste_vials, wellplate, pump, mill)        
+            dmf_vial = solution_selector(stock_vials, 'DMF', 0.25)
+            print(f"Infuse {dmf_vial.name} into well {target_well}...")
+            pipette(0.25, dmf_vial, solution[i]['Target Well'], pumping_rate, waste_vials, wellplate, pump, mill)        
             
             ## Echem CV - characterization
             print(f'Characterizing well: {target_well}')
@@ -498,7 +489,7 @@ def main():
             print(f'\Time to Clear Well: {RunTimes[wellRun]["Clear Well Time"]}')
 
             # Flushing procedure
-            flush_solution = solution_selector(stock_vials, flush_sol_name, 0.12)
+            flush_solution = solution_selector(stock_vials, 'Acrylate', 0.12)
             flush_pipette_tip(pump, waste_vials, flush_solution, mill)
             
             flushTime = time.time()

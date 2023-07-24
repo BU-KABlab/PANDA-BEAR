@@ -156,6 +156,7 @@ class Vial:
         self.volume = volume
         self.base = math.pi*math.pow(self.radius,2.0)
         self.depth = ((self.volume/1000)/self.base) + z_bottom #Note volume must be converted to liters
+        self.contamination = 0
 
     @property
     def position(self):
@@ -197,7 +198,7 @@ class Vial:
             self.volume += added_volume
             self.depth = ((self.volume/1000)/self.base) + self.bottom
         print(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
-        
+        self.contamination += 1
 
 
 class MillControl:
