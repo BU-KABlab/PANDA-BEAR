@@ -14,7 +14,7 @@ def read_json(filename: str):
     :param filename: The name of the JSON file to read.
     :return: The data from the JSON file as a dictionary.
     '''
-    cwd = pathlib.Path().absolute().parents[0]
+    cwd = pathlib.Path(__file__).parents[1]
     file_path = cwd / "instructions"
     file_to_open = file_path / filename
     with open(file_to_open, 'r',encoding = 'ascii') as file:

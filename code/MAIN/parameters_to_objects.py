@@ -35,10 +35,10 @@ def main():
 
 if __name__ == '__main__':
     instructions, sol_objects, waste_vials = main()
-    for value in instructions:
-        print(value)
-    for value in sol_objects:
-        print(value)
-    for value in waste_vials:
-        print(value)
-print()
+
+    for i in range(len(instructions)): #loop per well
+        wellRun = instructions[i]['Target_Well']
+        ## Deposit all experiment solutions into well
+        experiment_solutions = ['Acrylate', 'PEG']
+        for solution in experiment_solutions:
+            print(f'Pipette {instructions[i][solution]} ml of {solution} into {wellRun}')
