@@ -25,34 +25,24 @@ def read_vials(filename):
                                                           )
     return sol_objects
 
-def read_waste_vials(filename):    
-    sol_objects = {}
-    waste_vials = read_json.read_json(filename)
-    for key, values in waste_vials.items():
-        for items in values: 
-            sol_objects[items['solution']] = classes.Vial(x=items['x'], 
-                                                          y=items['y'],
-                                                          volume=items['StartingVolume'],
-                                                          name=items['name'],
-                                                          contents=items['contents']
-                                                          )
-            
-
-    return waste_vials
-
 
 def main():
 
     instructions = read_instructions('experimentParameters_07_24_23.json')
     sol_objects = read_vials('vialParameters_07_24_23.json')
-    waste_vials = read_waste_vials('wasteVials_07_24_23.json')
+    waste_vials = read_vials('wasteParameters_07_24_23.json')
     return instructions, sol_objects, waste_vials
 
 if __name__ == '__main__':
     instructions, sol_objects, waste_vials = main()
 
-    print(instructions)
+    for instruction in instructions:
+        print(instruction['Target_Well'])
     print()
-    print(sol_objects)
-    print()
-    print(waste_vials)
+    for sol in sol_objects:
+        print(sol + ':', sol_objects[sol].contents)
+        print()
+    
+    for waste in waste_vials:
+        print(waste + ':', waste_vials[waste].contents)
+print()

@@ -179,10 +179,11 @@ def electrode(mill: object, location: dict, depth, test,test_duration = 10):
     move_electrode_to_position(mill, x,y,0) # Move back to z=0 above the location
 
 def pipette(volume: float,
-            solution: Vial,
+            solutions: list,
+            solution_name: str,
             target_well: str,
             pumping_rate: float,
-            PurgeVial: object,
+            waste_vials: list,
             wellplate: Wells,
             pump: object,
             mill: object,
@@ -196,6 +197,9 @@ def pipette(volume: float,
         target_well (str): The alphanumeric name of the well you would like to pipette into
         purge_volume (float): Desired about to purge before and after pipetting
     """
+    solution = solution_selector(solutions, solution_name, volume)
+    PurgeVial = waste_selector(waste_vials, 'waste', volume)
+
     if volume > 0.00:
         ## First half: pick up solution
         print(f'Withdrawing {solution.name}...')
@@ -251,7 +255,7 @@ def clear_well(volume: float,
                wellplate: object,
                pumping_rate: float,
                pump: object,
-               PurgeVial: Vial,
+               waste_vials: list,
                mill: object):
     '''
     
@@ -262,6 +266,9 @@ def clear_well(volume: float,
     
     print(f'\n\nClearing well {target_well} with {repititions}x repitions of {repition_vol} ...')
     for j in range(repititions):
+        
+        PurgeVial = waste_selector(waste_vials, 'waste', repition_vol)
+        
         print(f'Repition {j+1} of {repititions}')
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # start at safe height
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z']) # go to object top
@@ -296,23 +303,28 @@ def rinse(wellplate : object,
           target_well: str,
           pumping_rate: float,
           pump: object,
-          PurgeVial: Vial,
+          waste_vials: list,
           mill: object,
-          rinse_sol: Vial,
+          solutions: list,
           rinse_repititions = 3,
           rinse_vol = 0.150):
     '''
     Rinse the well with 0.150 ml of ACN
     '''
+
     print(f'Rinsing well {target_well} 3x...')
-    for i in range(rinse_repititions):
-        print(f'Rinse {i+1} of {rinse_repititions}')
-        pipette(rinse_vol, rinse_sol, target_well, pumping_rate, PurgeVial, wellplate, pump, mill)
+    for r in range(rinse_repititions):
+        rinse_solution_name = 'Rinse'+r
+        PurgeVial = waste_selector(waste_vials, rinse_solution_name, rinse_vol)
+        rinse_solution = solution_selector(solutions, rinse_solution_name, rinse_vol)
+        print(f'Rinse {r+1} of {rinse_repititions}')
+        pipette(rinse_vol, rinse_solution, target_well, pumping_rate, PurgeVial, wellplate, pump, mill)
         clear_well(rinse_vol, target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
 
 def flush_pipette_tip(pump: object,
-                      PurgeVial: Vial,
-                      flush_solution: Vial,
+                      WasteVials: list,
+                      Solutions: list,
+                      flush_solution_name: str,
                       mill: object,
                       pumping_rate = 0.4,
                       flush_volume = 0.12
@@ -320,6 +332,10 @@ def flush_pipette_tip(pump: object,
     '''
     Flush the pipette tip with 0.12 ml of DMF
     '''
+
+    flush_solution = solution_selector(Solutions, flush_solution_name, flush_volume)
+    PurgeVial = waste_selector(WasteVials, 'waste', flush_volume)
+
     print(f'\n\nFlushing with {flush_solution.name}...')
     move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], 0)
     move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], flush_solution.depth)
@@ -343,6 +359,17 @@ def solution_selector(solutions: list, solution_name: str, volume: float):
     '''
     for solution in solutions:
         if solution.name == solution_name and solution.volume > (volume+1):
+            return solution
+        else:
+            pass
+    raise Exception(f'{solution_name} not found in list of solutions')
+
+def waste_selector(solutions: list, solution_name: str, volume: float):
+    '''
+    Select the solution from the list of solutions
+    '''
+    for solution in solutions:
+        if solution.name == solution_name and (solution.volume + volume) < solution.capacity:
             return solution
         else:
             pass

@@ -1,0 +1,11 @@
+{"Waste":[
+{"solution": "W0", "contents": "waste", "x": -2, "y": -50, "name": "waste", "StartingVolume": 1}, {"solution": "W1", "contents": "waste", "x": -2, "y": -90, "name": "waste", "StartingVolume": 1}
+, {"solution": "W2", "contents": "waste", "x": -2, "y": -120, "name": "waste", "StartingVolume": 1}
+, {"solution": "W3", "contents": "waste", "x": -2, "y": -150, "name": "waste", "StartingVolume": 1}
+, {"solution": "W4", "contents": "waste", "x": -2, "y": -180, "name": "waste", "StartingVolume": 1}
+, {"solution": "W5", "contents": "waste", "x": -2, "y": -210, "name": "waste", "StartingVolume": 1}
+, {"solution": "RW0", "contents": "Rinse0", "x": 0, "y": 0, "name": "First Rinse Purge", "StartingVolume": 1}
+, {"solution": "RW1", "contents": "Rinse1", "x": 0, "y": 0, "name": "Second Rinse Purge", "StartingVolume": 1}
+, {"solution": "RW2", "contents": "Rinse2", "x": 0, "y": 0, "name": "Third Rinse Purge", "StartingVolume": 1}
+]
+}

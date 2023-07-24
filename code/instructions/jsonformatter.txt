@@ -1,4 +1,0 @@
-Parse error on line 25:
-...tus": 0    }  ],}
--------------------^
-Expecting 'STRING', got '}'
