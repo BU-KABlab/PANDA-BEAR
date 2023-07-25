@@ -2,13 +2,18 @@
 To test the reading in of parameters and turning them into obejcts and instructions
 '''
 import read_json
+import json
 import classes
+import pathlib
+import time
 
 def read_instructions(filename):
     instructions = []
     parameters = read_json.read_json(filename)
     for experiment in range(len(parameters['Experiments'])):
         instructions.append(parameters['Experiments'][experiment])
+        instructions[experiment]['status'] = 'qued'
+        
     return instructions
     
 def read_vials(filename):    
@@ -42,3 +47,16 @@ if __name__ == '__main__':
         experiment_solutions = ['Acrylate', 'PEG']
         for solution in experiment_solutions:
             print(f'Pipette {instructions[i][solution]} ml of {solution} into {wellRun}')
+
+
+    month = time.strftime("%m")
+    day = time.strftime("%d")
+    year = time.strftime("%y")
+    filename = 'experiments_' + year + "_" + month + "_" + day + '.json'
+    cwd = pathlib.Path(__file__).parents[1]
+    file_path = cwd / "instructions"
+    file_folder = file_path / (year + "_" + month + "_" + day)
+    pathlib.Path(file_folder).mkdir(parents=True, exist_ok=True)
+    file_to_save = file_folder / filename
+    with open(file_to_save, 'w') as file:
+        json.dump(instructions, file, indent=4)
