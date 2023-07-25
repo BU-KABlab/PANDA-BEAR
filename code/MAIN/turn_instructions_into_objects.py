@@ -4,8 +4,6 @@ To test the reading in of parameters and turning them into obejcts and instructi
 import read_json
 import json
 import classes
-import datetime
-from datetime import date
 import pathlib
 import time
 

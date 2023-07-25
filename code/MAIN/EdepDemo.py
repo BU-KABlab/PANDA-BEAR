@@ -2,7 +2,7 @@ import time, nesp_lib, sys
 from classes import Vial, MillControl, Wells
 import gamrycontrol as echem
 import comtypes.client as client
-from parameters_to_objects import read_vials, read_instructions
+from turn_instructions_into_objects import read_vials, read_instructions
 import PrintPanda
 import json
 import pathlib
@@ -372,12 +372,24 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
             pass
     raise Exception(f'{solution_name} not found in list of solutions')
 
+def record_time_step(well: str, step: str, run_times: dict):
+    currentTime = time.time()
+    sub_key = step + ' Time'
+    if well not in run_times:
+        run_times[well] = {}
+        run_times[well][sub_key] = currentTime
+    else:
+        run_times[well][sub_key] = currentTime - run_times[well][list(run_times[well])[-1]]
+    print(f'{step} time: {run_times[well][sub_key]}')
+
 def main():
     ## Constants
     pumping_rate = 0.5
     RunTimes = {}
     char_sol_name = 'Ferrrocene'
+    char_vol = 0.25
     flush_sol_name = 'DMF'
+    flush_vol = 0.12
 
     try:
         ## Program Set Up
@@ -421,7 +433,7 @@ def main():
             wellRun = instructions[0][i]['Target Well']
             wellStatus = instructions[0][i]['Status']
             RunTimes[wellRun] = {}
-            RunTimes[wellRun]['Start Time'] = startTime
+            record_time_step(wellRun, 'Start', RunTimes)
             
             ## Deposit all experiment solutions into well
             experiment_solutions = ['Acrylate', 'PEG']
@@ -437,7 +449,7 @@ def main():
                         wellplate=wellplate,
                         pump=pump,
                         mill=mill)
-                flush_pipette_tip(pump, waste_vials, stock_vials, flush_sol_name, mill)
+                flush_pipette_tip(pump, waste_vials, stock_vials, flush_sol_name, mill, pumping_rate, flush_vol)
             solutionsTime = time.time()
             RunTimes[wellRun]['Solutions Time'] = solutionsTime - startTime
             print(f'\nSolutions time: {RunTimes[wellRun]["Solutions Time"]}')
@@ -456,10 +468,7 @@ def main():
             ## echem plot the data
             echem.plotdata('CA', complete_file_name)
             
-            
-            depositionTime = time.time()
-            RunTimes[wellRun]['Deposition Time'] = depositionTime - solutionsTime
-            print(f'Deposition time: {RunTimes[wellRun]["Deposition Time"]}')
+            record_time_step(wellRun, 'Deposition', RunTimes)
 
             ## Withdraw all well volume            
             clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, waste_vials, mill)        
@@ -474,9 +483,9 @@ def main():
             print("\n\nBeginning eChem characterization of well: ",target_well)
             
             ## Deposit DMF into well
-            char_sol = solution_selector(stock_vials, char_sol_name, 0.25)
+            char_sol = solution_selector(stock_vials, char_sol_name, char_vol)
             print(f"Infuse {char_sol.name} into well {target_well}...")
-            pipette(0.25, char_sol, solution[i]['Target Well'], pumping_rate, waste_vials, wellplate, pump, mill)        
+            pipette(char_vol, char_sol, wellRun, pumping_rate, waste_vials, wellplate, pump, mill)        
             
             ## Echem CV - characterization
             print(f'Characterizing well: {target_well}')
@@ -489,27 +498,24 @@ def main():
             ## echem plot the data
             echem.plotdata('CV', complete_file_name)
             
-            characterizationTime = time.time()
-            RunTimes[wellRun]['Characterization Time'] = characterizationTime - rinseTime
-            print(f'\nCharacterization time: {RunTimes[wellRun]["Characterization Time"]}')
+            record_time_step(wellRun, 'Characterization', RunTimes)
 
             clear_well(0.25, target_well, wellplate, pumping_rate, pump, waste_vials, mill)
 
-            clearTime = time.time()
-            RunTimes[wellRun]['Clear Well Time'] = clearTime- characterizationTime
-            print(f'\Time to Clear Well: {RunTimes[wellRun]["Clear Well Time"]}')
+            record_time_step(wellRun, 'Clear Well', RunTimes)
 
             # Flushing procedure
             flush_solution = solution_selector(stock_vials, flush_sol_name, 0.12)
-            flush_pipette_tip(pump, waste_vials, flush_solution, mill)
+            flush_pipette_tip(pump, waste_vials, flush_solution, mill, pumping_rate, flush_vol)
             
-            flushTime = time.time()
-            RunTimes[wellRun]['Flush Time'] = flushTime - characterizationTime
-            print(f'\nFlush time: {RunTimes[wellRun]["Flush Time"]}')
+            record_time_step(wellRun, 'Flush', RunTimes)
 
             print(f'well {target_well} completed\n\n....................................................................\n')
             wellStatus = 'Completed'
             instructions[i]['Status'] = wellStatus
+
+            record_time_step(wellRun, 'End', RunTimes)
+            
             wellTime = time.time()
             RunTimes[wellRun]['Well Time'] = wellTime - startTime
             print(f'Well time: {RunTimes[wellRun]["Well Time"]/60} minutes')
