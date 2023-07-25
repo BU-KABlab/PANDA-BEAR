@@ -1,0 +1,10 @@
+{"Solutions":[
+{"solution": "S0", "contents": "DMF", "x": -2, "y": -43, "name": "DMF", "StartingVolume": 20000}, 
+{"solution": "S1", "contents": "DMF", "x": -2, "y": -76, "name": "DMF", "StartingVolume": 20000}, 
+{"solution": "S2", "contents": "PEG", "x": -2, "y": -109, "name": "PEG", "StartingVolume": 20000}, 
+{"solution": "S3", "contents": "Acrylate", "x": -2, "y": -142, "name": "Acrylate", "StartingVolume": 20000}, 
+{"solution": "S4", "contents": "Ferrocene", "x": -2, "y": -175, "name": "Ferrocene", "StartingVolume": 20000}, 
+{"solution": "R0", "contents": "Rinse0", "x": -2, "y": -208, "name": "First Rinse", "StartingVolume": 20000}, 
+{"solution": "R1", "contents": "Rinse1", "x": -2, "y": -241, "name": "Second Rinse", "StartingVolume": 20000}, 
+{"solution": "R2", "contents": "Rinse2", "x": -2, "y": -274, "name": "Third Rinse", "StartingVolume": 20000}]
+}

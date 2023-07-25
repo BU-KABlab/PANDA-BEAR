@@ -26,12 +26,16 @@ def withdraw(volume: float, rate: float, ser_pump: object):
     """
     Withdraw the given volume at the given rate and depth from the specified position.
     Args:
-        volume (float): Volume to be withdrawn in milliliters.
+        volume (float): Volume to be withdrawn in milliliters but given as microliters.
         position (dict): Dictionary containing x, y, and z coordinates of the position.
         depth (float): Depth to plunge from the specified position in millimeters.
         rate (float): Pumping rate in milliliters per minute.
     """
     # Perform the withdrawl
+
+    ## convert the volume argument from ul to ml
+    volume = volume/1000
+
     if ser_pump.volume_withdrawn + volume >= 0.2:
         raise Exception("The command will overfill the pipette. Stopping run")
     else:
@@ -56,7 +60,7 @@ def infuse(volume: float, rate: float, ser_pump: object):
     """
     Infuse the given volume at the given rate and depth from the specified position.
     Args:
-        volume (float): Volume to be infused in milliliters.
+        volume (float): Volume to be infused in milliliters but given as microliters.
         position (dict): Dictionary containing x, y, and z coordinates of the position.
         depth (float): Depth to lower from the specified position in millimeters.
         rate (float): Pumping rate in milliliters per minute.
@@ -64,6 +68,10 @@ def infuse(volume: float, rate: float, ser_pump: object):
     # then lower to the pipetting depth
     #move_pipette_to_position(position["x"], position["y"], depth)
     # Perform infusion
+
+    ## convert the volume argument from ul to ml
+    volume = volume/1000
+
     if volume > 0.0:
         ser_pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
         ser_pump.pumping_volume = (
@@ -150,7 +158,7 @@ def move_electrode_to_position(mill: object, x,y,z):
     mill.execute_command(str(command))
     return 0
 
-def purge(purge_vial: Vial,pump: object, purge_volume = 0.02, pumping_rate = 0.4):
+def purge(purge_vial: Vial,pump: object, purge_volume = 20.00, pumping_rate = 0.4):
     """
     Perform purging from the pipette.
     Args:
@@ -162,20 +170,7 @@ def purge(purge_vial: Vial,pump: object, purge_volume = 0.02, pumping_rate = 0.4
     purge_vial.update_volume(purge_volume)
     print(f'Purge vial new volume: {purge_vial.volume}')
 
-def electrode(mill: object, location: dict, depth, test,test_duration = 10):
-  
-    x = location['x'] 
-    y = location['y'] 
-    z = location['z']
-    
-    print('Moving electrode to test well...')
-    print(f'{x, y, z}')
-    move_electrode_to_position(mill, x, y, 0) # Move to z=0 above the location
-    move_electrode_to_position(mill, x,y,depth) # move in the z-direction
-    time.sleep(test_duration) # stay there for the duration of the test
-    move_electrode_to_position(mill, x,y,0) # Move back to z=0 above the location
-
-def pipette(volume: float,
+def pipette(volume: float, #volume in ul
             solutions: list,
             solution_name: str,
             target_well: str,
@@ -184,7 +179,7 @@ def pipette(volume: float,
             wellplate: Wells,
             pump: object,
             mill: object,
-            purge_volume = 0.020
+            purge_volume = 20.00
             ):
     """
     Perform the full pipetting sequence
@@ -204,8 +199,8 @@ def pipette(volume: float,
         move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], solution.depth) # go to soltuion depth
         
         if not solution.check_volume(-volume):
-            print(f'Not enough {solution.name} to withdraw {volume} ml')
-            raise Exception(f'Not enough {solution.name} to withdraw {volume} ml')
+            print(f'Not enough {solution.name} to withdraw {volume} ul')
+            raise Exception(f'Not enough {solution.name} to withdraw {volume} ul')
         withdraw(volume + 2 * purge_volume, pumping_rate, pump)
         solution.update_volume(-(volume + 2 * purge_volume))
         print(f'{solution.name} new volume: {solution.volume}')
@@ -216,8 +211,8 @@ def pipette(volume: float,
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
         if not PurgeVial.check_volume(+volume):
-            print(f'{PurgeVial.name} is too full to add {volume} ml')
-            raise Exception(f'{PurgeVial.name} is too full to add {volume} ml')
+            print(f'{PurgeVial.name} is too full to add {volume} ul')
+            raise Exception(f'{PurgeVial.name} is too full to add {volume} ul')
         purge(PurgeVial, pump, purge_volume)
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
         
@@ -226,8 +221,8 @@ def pipette(volume: float,
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # start at safe height
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.depth(target_well)) # go to solution depth
         if not wellplate.check_volume(well_id= target_well,added_volume=+volume):
-            print(f'Well {target_well} is too full to add {volume} ml')
-            raise Exception(f'Well {target_well} is too full to add {volume} ml')
+            print(f'Well {target_well} is too full to add {volume} ul')
+            raise Exception(f'Well {target_well} is too full to add {volume} ul')
         infuse(volume, pumping_rate, pump)
         wellplate.update_volume(target_well,volume)
         print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
@@ -238,8 +233,8 @@ def pipette(volume: float,
         move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
         move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], PurgeVial.depth)
         if not PurgeVial.check_volume(+volume):
-            print(f'{PurgeVial.name} is too full to add {volume} ml')
-            raise Exception(f'{PurgeVial.name} is too full to add {volume} ml')
+            print(f'{PurgeVial.name} is too full to add {volume} ul')
+            raise Exception(f'{PurgeVial.name} is too full to add {volume} ul')
         purge(PurgeVial, pump, purge_volume)
         move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
         
@@ -258,7 +253,7 @@ def clear_well(volume: float,
     
     '''
     import math
-    repititions = math.ceil(volume/0.200)
+    repititions = math.ceil(volume/200) #divide by 200ul which is the pipette capacity
     repition_vol = volume/repititions
     
     print(f'\n\nClearing well {target_well} with {repititions}x repitions of {repition_vol} ...')
@@ -284,7 +279,7 @@ def clear_well(volume: float,
         if not PurgeVial.check_volume(+volume):
             print(f'{PurgeVial.name} is too full to add {volume} ml')
             raise Exception(f'{PurgeVial.name} is too full to add {volume} ml')
-        purge(PurgeVial, pump, repition_vol + 0.02)
+        purge(PurgeVial, pump, repition_vol + 20) #repitition volume + 20 ul purge
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
         
         print(f"Remaining volume in well: {wellplate.volume(target_well)}")
@@ -304,9 +299,9 @@ def rinse(wellplate : object,
           mill: object,
           solutions: list,
           rinse_repititions = 3,
-          rinse_vol = 0.150):
+          rinse_vol = 150):
     '''
-    Rinse the well with 0.150 ml of ACN
+    Rinse the well with 150 ul of ACN
     '''
 
     print(f'Rinsing well {target_well} 3x...')
@@ -324,10 +319,10 @@ def flush_pipette_tip(pump: object,
                       flush_solution_name: str,
                       mill: object,
                       pumping_rate = 0.4,
-                      flush_volume = 0.12
+                      flush_volume = 120
                       ):
     '''
-    Flush the pipette tip with 0.12 ml of DMF
+    Flush the pipette tip with 120 ul of DMF
     '''
 
     flush_solution = solution_selector(Solutions, flush_solution_name, flush_volume)
@@ -343,11 +338,11 @@ def flush_pipette_tip(pump: object,
     print('\tMoving to purge...')
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-    if not PurgeVial.check_volume(0.12):
-                print(f'{PurgeVial.name} is too full to add {0.12} ml')
-                raise Exception(f'{PurgeVial.name} is too full to add {0.12} ml')
+    if not PurgeVial.check_volume(120):
+                print(f'{PurgeVial.name} is too full to add {120} ul')
+                raise Exception(f'{PurgeVial.name} is too full to add {120} ul')
     print('\tPurging...')
-    purge(PurgeVial, pump, flush_volume + 0.02)
+    purge(PurgeVial, pump, flush_volume + 20)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
 
 def solution_selector(solutions: list, solution_name: str, volume: float):
@@ -365,18 +360,23 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
     '''
     Select the solution from the list of solutions
     '''
+    solution_found = False
     for solution in solutions:
         if solution.name == solution_name and (solution.volume + volume) < solution.capacity:
+            solution_found = True
             return solution
         else:
             pass
-    raise Exception(f'{solution_name} not found in list of solutions')
+    if solution_found == False:
+        raise Exception(f'{solution_name} not found in list of solutions')
 
 def record_time_step(well: str, step: str, run_times: dict):
     currentTime = time.time()
     sub_key = step + ' Time'
     if well not in run_times:
         run_times[well] = {}
+        run_times[well][sub_key] = currentTime
+    if step == 'Start':
         run_times[well][sub_key] = currentTime
     else:
         run_times[well][sub_key] = currentTime - run_times[well][list(run_times[well])[-1]]
@@ -387,9 +387,9 @@ def main():
     pumping_rate = 0.5
     RunTimes = {}
     char_sol_name = 'Ferrrocene'
-    char_vol = 0.25
+    char_vol = 250
     flush_sol_name = 'DMF'
-    flush_vol = 0.12
+    flush_vol = 120
 
     try:
         ## Program Set Up
@@ -417,12 +417,12 @@ def main():
         print('\tWells defined')
         
         ## Set up solutions
-        waste_vials = read_vials('wasteParameters_07_22_23.json')
-        stock_vials = read_vials('vialParameters_07_22_23.json')
+        waste_vials = read_vials('wasteParameters_07_25_23.json')
+        stock_vials = read_vials('vialParameters_07_25_23.json')
         print('\tVials defined')
 
         ## Read instructions
-        instructions = read_instructions('experimentParameters_07_22_23.json')
+        instructions = read_instructions('experimentParameters_07_25_23.json')
         
         print('\tExperiments defined')
         
@@ -430,8 +430,8 @@ def main():
         for i in range(len(instructions)): #loop per well
             
             startTime = time.time()
-            wellRun = instructions[0][i]['Target Well']
-            wellStatus = instructions[0][i]['Status']
+            wellRun = instructions[i]['Target_Well']
+            wellStatus = instructions[i]['status']
             RunTimes[wellRun] = {}
             record_time_step(wellRun, 'Start', RunTimes)
             
@@ -439,16 +439,16 @@ def main():
             experiment_solutions = ['Acrylate', 'PEG']
             for solution_name in experiment_solutions:
                 print(f'Pipetting {instructions[i][solution_name]} ul of {solution_name} into {wellRun}...')
-                soltuion_ml = float((instructions[i][solution_name])/1000) #because the pump works in ml
-                pipette(volume = soltuion_ml,
+                #soltuion_ml = float((instructions[i][solution_name])/1000000) #because the pump works in ml
+                pipette(volume = instructions[i][solution_name], #volume in ul
                         solutions = stock_vials,
-                        solution_name= solution_name,
-                        target_well=wellRun,
-                        pumping_rate=pumping_rate,
-                        waste_vials=waste_vials,
-                        wellplate=wellplate,
-                        pump=pump,
-                        mill=mill)
+                        solution_name = solution_name,
+                        target_well = wellRun,
+                        pumping_rate = pumping_rate,
+                        waste_vials = waste_vials,
+                        wellplate = wellplate,
+                        pump = pump,
+                        mill = mill)
                 flush_pipette_tip(pump, waste_vials, stock_vials, flush_sol_name, mill, pumping_rate, flush_vol)
             solutionsTime = time.time()
             RunTimes[wellRun]['Solutions Time'] = solutionsTime - startTime
@@ -547,8 +547,8 @@ def main():
     finally:
         ## Move electrode to frit bath
         print('Moving electrode to frit bath...')
-        electrode(mill, {'x': -255, 'y': -17, 'z': 0}, -93, 0)
-        
+        #move_electrode_to_position(mill, -337, -18,0)
+        #move_electrode_to_position(mill, -337, -18,-85)
         ## Save experiment instructions and status
         month = time.strftime("%m")
         day = time.strftime("%d")

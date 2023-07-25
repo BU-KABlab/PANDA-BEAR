@@ -75,7 +75,7 @@ class GamryDtaqEvents(object):
 
     def _IGamryDtaqEvents_OnDataAvailable(self, this):
         self.cook()
-        loading = ['|','/','-','\']
+        loading = ['|','/','-','\\']
         print(f"\rmade it to data available{random.choice(loading)}", end = "")
         
 
