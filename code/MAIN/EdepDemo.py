@@ -5,6 +5,7 @@ import gamrycontrol as echem
 import comtypes.client as client
 import read_json as rj
 from parameters_to_objects import read_vials, read_instructions
+import PrintPanda
 
 def set_up_pump():
     """
@@ -382,6 +383,7 @@ def main():
 
     try:
         ## Program Set Up
+        PrintPanda.printpanda()
         totalStartTime = time.time()
 
         print(f'Start Time: {totalStartTime}')
