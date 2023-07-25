@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import time
 import gc
 import comtypes
@@ -127,10 +128,32 @@ def plotdata(exp_name, complete_file_name):
             df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
             plt.rcParams["figure.dpi"] = 150
             plt.rcParams["figure.facecolor"] = "white"
-            plt.plot(df['Time'], df['Im'])
-            plt.xlabel('Time (s)')
-            plt.ylabel('Current (A)')
+            # Check for NaN values in the 'Cycle' column and drop them
+            df = df.dropna(subset=['Cycle'])
 
+            # Convert the 'Cycle' column to integers
+            df['Cycle'] = df['Cycle'].astype(int)
+
+            # Find the maximum cycle number
+            max_cycle = df['Cycle'].max()
+
+            # Create a list of custom dash patterns for each cycle
+            dash_patterns = [
+                (5 * (i + 1), 4 * (i + 1), 3 * (i + 1), 2 * (i + 1))
+                for i in range(max_cycle)]
+
+            # Create a 'viridis' colormap with the number of colors equal to the number of cycles
+            colors = cm.cool(np.linspace(0, 1, max_cycle))
+
+            # Plot values for vsig vs Im for each cycle with different dash patterns
+            for i in range(1, max_cycle + 1):
+                df2 = df[df['Cycle'] == i]
+                dashes = dash_patterns[i - 1]  # Use the corresponding dash pattern from the list
+                plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[i - 1], label=f'Cycle {i}')
+
+            plt.xlabel('V vs Ag/AgCl (V)')
+            plt.ylabel('Current (A)')
+          
     plt.tight_layout()
     plt.savefig(complete_file_name.with_suffix('.png'))
     print("plot saved")
