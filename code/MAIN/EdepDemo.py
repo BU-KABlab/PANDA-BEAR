@@ -476,9 +476,7 @@ def main():
             ## Rinse the well 3x
             rinse(wellplate, target_well, pumping_rate, pump, waste_vials, mill, stock_vials)
 
-            rinseTime = time.time()
-            RunTimes[wellRun]['Rinse Time'] = rinseTime - depositionTime
-            print(f'\nRinse time: {RunTimes[wellRun]["Rinse Time"]}')
+            record_time_step(wellRun, 'Rinse', RunTimes)
 
             print("\n\nBeginning eChem characterization of well: ",target_well)
             
@@ -505,7 +503,7 @@ def main():
             record_time_step(wellRun, 'Clear Well', RunTimes)
 
             # Flushing procedure
-            flush_solution = solution_selector(stock_vials, flush_sol_name, 0.12)
+            flush_solution = solution_selector(stock_vials, flush_sol_name, flush_vol)
             flush_pipette_tip(pump, waste_vials, flush_solution, mill, pumping_rate, flush_vol)
             
             record_time_step(wellRun, 'Flush', RunTimes)
@@ -515,7 +513,7 @@ def main():
             instructions[i]['Status'] = wellStatus
 
             record_time_step(wellRun, 'End', RunTimes)
-            
+
             wellTime = time.time()
             RunTimes[wellRun]['Well Time'] = wellTime - startTime
             print(f'Well time: {RunTimes[wellRun]["Well Time"]/60} minutes')
@@ -577,6 +575,7 @@ def main():
         totalEndTime = time.time()
         print(f'\n\nTotal Time: {totalEndTime - totalStartTime}')
         print_runtime_data(RunTimes)
+
 if __name__ == '__main__':
     main()
 else:
