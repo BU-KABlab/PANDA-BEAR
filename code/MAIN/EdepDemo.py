@@ -1,11 +1,11 @@
 import time, nesp_lib, sys
 from classes import Vial, MillControl, Wells
-from generate_instructions import instruction_reader
 import gamrycontrol as echem
 import comtypes.client as client
-import read_json as rj
 from parameters_to_objects import read_vials, read_instructions
 import PrintPanda
+import json
+import pathlib
 
 def set_up_pump():
     """
@@ -375,8 +375,6 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
 def main():
     ## Constants
     pumping_rate = 0.5
-    Well_Rows = 'ABCDEFGH'
-    Well_Columns = 13
     RunTimes = {}
     char_sol_name = 'Ferrrocene'
     flush_sol_name = 'DMF'
@@ -413,6 +411,7 @@ def main():
 
         ## Read instructions
         instructions = read_instructions('experimentParameters_07_22_23.json')
+        
         print('\tExperiments defined')
         
         ## Run the experiments
@@ -420,6 +419,7 @@ def main():
             
             startTime = time.time()
             wellRun = instructions[0][i]['Target Well']
+            wellStatus = instructions[0][i]['Status']
             RunTimes[wellRun] = {}
             RunTimes[wellRun]['Start Time'] = startTime
             
@@ -508,10 +508,19 @@ def main():
             print(f'\nFlush time: {RunTimes[wellRun]["Flush Time"]}')
 
             print(f'well {target_well} completed\n\n....................................................................\n')
-
+            wellStatus = 'Completed'
+            instructions[i]['Status'] = wellStatus
             wellTime = time.time()
             RunTimes[wellRun]['Well Time'] = wellTime - startTime
             print(f'Well time: {RunTimes[wellRun]["Well Time"]/60} minutes')
+
+            ## Print the current vial volumes in a table format
+            print('\n\nCurrent Vial Volumes:')
+            for vial in stock_vials:
+                print(f'{vial.name}: {vial.volume} ml')
+            print('\n\n')
+            
+
     	
         print('\n\nEXPERIMENTS COMPLETED\n\n')
         endTime = time.time()
@@ -529,8 +538,27 @@ def main():
         print("Exception type: ", exception_type)
         print("File name: ", filename)
         print("Line number: ", line_number)
+        instructions[i]['Status'] = 'error'
 
     finally:
+        ## Move electrode to frit bath
+        print('Moving electrode to frit bath...')
+        electrode(mill, {'x': -255, 'y': -17, 'z': 0}, -93, 0)
+        
+        ## Save experiment instructions and status
+        month = time.strftime("%m")
+        day = time.strftime("%d")
+        year = time.strftime("%y")
+        filename = 'experiments_' + year + "_" + month + "_" + day + '.json'
+        cwd = pathlib.Path(__file__).parents[1]
+        file_path = cwd / "instructions"
+        file_folder = file_path / (year + "_" + month + "_" + day)
+        pathlib.Path(file_folder).mkdir(parents=True, exist_ok=True)
+        file_to_save = file_folder / filename
+        with open(file_to_save, 'w') as file:
+            json.dump(instructions, file, indent=4)
+        
+
         ## close out of serial connections
         print('Disconnecting from Mill, Pump, Pstat:')
         mill.__exit__()
