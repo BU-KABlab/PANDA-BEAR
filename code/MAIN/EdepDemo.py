@@ -557,7 +557,7 @@ def main():
             ## Deposit DMF into well
             
             print(f"Infuse {char_sol_name} into well {wellRun}...")
-            pipette(volume = char_vol,
+            pipette(volume = char_vol/2,
                     solutions = stock_vials, 
                     solution_name = char_sol_name, 
                     target_well=wellRun, 
@@ -568,7 +568,17 @@ def main():
                     pump=pump, 
                     mill=mill
                     )        
-            
+            pipette(volume = char_vol/2,
+                    solutions = stock_vials, 
+                    solution_name = char_sol_name, 
+                    target_well=wellRun, 
+                    pumping_rate=pumping_rate, 
+                    waste_vials=waste_vials, 
+                    waste_solution_name="waste", 
+                    wellplate=wellplate, 
+                    pump=pump, 
+                    mill=mill
+                    )  
             ## Echem CV - characterization
             print(f'Characterizing well: {wellRun}')
             move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], 0) # move to safe height above target well
