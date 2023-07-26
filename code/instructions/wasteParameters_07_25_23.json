@@ -4,7 +4,7 @@
 {"solution": "W2", "contents": "waste", "x": -47, "y": -79, "name": "waste", "StartingVolume": 1000}, 
 {"solution": "W3", "contents": "waste", "x": -47, "y": -112, "name": "waste", "StartingVolume": 1000}, 
 {"solution": "W4", "contents": "waste", "x": -47, "y": -145, "name": "waste", "StartingVolume": 1000}, 
-{"solution": "RW0", "contents": "Rinse0", "x": -47, "y": -178, "name": "First Rinse Purge", "StartingVolume": 1000}, 
-{"solution": "RW1", "contents": "Rinse1", "x": -47, "y": -211, "name": "Second Rinse Purge", "StartingVolume": 1000}, 
-{"solution": "RW2", "contents": "Rinse2", "x": -47, "y": -244, "name": "Third Rinse Purge", "StartingVolume": 1000}]
+{"solution": "RW0", "contents": "Rinse0", "x": -47, "y": -178, "name": "Rinse0", "StartingVolume": 1000}, 
+{"solution": "RW1", "contents": "Rinse1", "x": -47, "y": -211, "name": "Rinse1", "StartingVolume": 1000}, 
+{"solution": "RW2", "contents": "Rinse2", "x": -47, "y": -244, "name": "Rinse2", "StartingVolume": 1000}]
 }

@@ -25,18 +25,19 @@ class Wells:
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
-        
-        self.well_capacity = 2.0 # ml
+        self.well_capacity = 300 # ul
+
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
         for col_idx, col in enumerate("ABCDEFGH"):
-            for row in range(1, 14):
+            for row in range(1, 13):
                 well_id = col + str(row)
                 if well_id == "A1":
                     coordinates = a1_coordinates
                     contents = None
-                    depth = volume/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
-
+                    depth = (volume/1000000)/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom #Note volume must be converted to liters
+                    if depth < -100:
+                        depth = -100
                 else:
                     
                     x_offset = col_idx * self.well_offset
@@ -110,11 +111,11 @@ class Wells:
     
     def check_volume(self,well_id,added_volume:float):
         print(f'Check if {added_volume} can fit in {well_id} ...',end='')
-        if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
+        if self.wells[well_id]["volume"] + added_volume >= self.well_capacity:
             raise OverFillException(well_id, self.volume, added_volume, self.well_capacity)
         
-        elif self.wells[well_id]["volume"] + added_volume < 0:
-            raise OverDraftException(well_id, self.volume, added_volume, self.well_capacity)
+        #elif self.wells[well_id]["volume"] + added_volume < 0:
+        #    raise OverDraftException(well_id, self.volume, added_volume, self.well_capacity)
         else:
             print(f'{added_volume} can fit in {well_id}')
             return True
@@ -126,11 +127,13 @@ class Wells:
         if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         
-        elif self.wells[well_id]["volume"] + added_volume < 0:
-            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
+        #elif self.wells[well_id]["volume"] + added_volume < 0:
+        #    raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.wells[well_id]["volume"] += added_volume
-            self.wells[well_id]["depth"] = self.wells[well_id]["volume"]/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
+            self.wells[well_id]["depth"] = (self.wells[well_id]["volume"]/1000000)/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
+            if self.wells[well_id]["depth"] < -100:
+                self.wells[well_id]["depth"] = -100
             print(f'\tNew Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
 
 class Vial:
@@ -275,7 +278,7 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
-        time.sleep(60)
+        time.sleep(90)
 
     def current_status(self):
         """

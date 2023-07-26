@@ -36,8 +36,8 @@ def withdraw(volume: float, rate: float, ser_pump: object):
     ## convert the volume argument from ul to ml
     volume = volume/1000
 
-    if ser_pump.volume_withdrawn + volume >= 0.2:
-        raise Exception("The command will overfill the pipette. Stopping run")
+    if ser_pump.volume_withdrawn + volume > 0.2: # 0.2 is the maximum volume for the pipette tip
+        raise Exception(f"The command to withdraw {volume} ml will overfill the 0.2 ml pipette with {ser_pump.volume_withdrawn} ml inside. Stopping run")
     else:
         ser_pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         ser_pump.pumping_volume = (
@@ -110,6 +110,8 @@ def move_center_to_position(mill:object, x,y,z):
     mill.execute_command(command)
     return 0
 
+## TODO Add a diagnoal move check to move pipette to position and move electrode to position functions
+
 def move_pipette_to_position(mill:object, x, y, z = 0.00, ):
     """
     Move the pipette to the specified coordinates.
@@ -176,6 +178,7 @@ def pipette(volume: float, #volume in ul
             target_well: str,
             pumping_rate: float,
             waste_vials: list,
+            waste_solution_name: str,
             wellplate: Wells,
             pump: object,
             mill: object,
@@ -190,7 +193,7 @@ def pipette(volume: float, #volume in ul
         purge_volume (float): Desired about to purge before and after pipetting
     """
     solution = solution_selector(solutions, solution_name, volume)
-    PurgeVial = waste_selector(waste_vials, 'waste', volume)
+    PurgeVial = waste_selector(waste_vials, waste_solution_name, volume)
 
     if volume > 0.00:
         ## First half: pick up solution
@@ -201,18 +204,24 @@ def pipette(volume: float, #volume in ul
         if not solution.check_volume(-volume):
             print(f'Not enough {solution.name} to withdraw {volume} ul')
             raise Exception(f'Not enough {solution.name} to withdraw {volume} ul')
-        withdraw(volume + 2 * purge_volume, pumping_rate, pump)
+        withdraw(volume + (2 * purge_volume), pumping_rate, pump)
         solution.update_volume(-(volume + 2 * purge_volume))
         print(f'{solution.name} new volume: {solution.volume}')
         move_pipette_to_position(mill, solution.coordinates['x'],solution.coordinates['y'],0) # return to safe height
     
         ## Intermediate: Purge
         print('Purging...')
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-        if not PurgeVial.check_volume(+volume):
-            print(f'{PurgeVial.name} is too full to add {volume} ul')
-            raise Exception(f'{PurgeVial.name} is too full to add {volume} ul')
+        move_pipette_to_position(mill, 
+                                 PurgeVial.coordinates['x'],
+                                 PurgeVial.coordinates['y'],
+                                 0)
+        move_pipette_to_position(mill,
+                                 PurgeVial.coordinates['x'],
+                                 PurgeVial.coordinates['y'],
+                                 PurgeVial.depth)
+        if not PurgeVial.check_volume(+purge_volume):
+            print(f'{PurgeVial.name} is too full to add {purge_volume} ul')
+            raise Exception(f'{PurgeVial.name} is too full to add {purge_volume} ul')
         purge(PurgeVial, pump, purge_volume)
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
         
@@ -248,47 +257,63 @@ def clear_well(volume: float,
                pumping_rate: float,
                pump: object,
                waste_vials: list,
-               mill: object):
+               mill: object,
+               solution_name = 'waste'):
     '''
-    
+    Clear the well of the specified volume with the specified solution
+
+    Args:
+        volume (float): Volume to be cleared in microliters
+        target_well (str): The alphanumeric name of the well you would like to clear
+        wellplate (Wells object): The wellplate object
+        pumping_rate (float): The pumping rate in ml/min
+        pump (object): The pump object
+        waste_vials (list): The list of waste vials
+        mill (object): The mill object
+
+    Returns:
+        None
     '''
     import math
-    repititions = math.ceil(volume/200) #divide by 200ul which is the pipette capacity
+    repititions = math.ceil(volume/200) #divide by 200 ul which is the pipette capacity to determin the number of repitions
     repition_vol = volume/repititions
     
     print(f'\n\nClearing well {target_well} with {repititions}x repitions of {repition_vol} ...')
     for j in range(repititions):
         
-        PurgeVial = waste_selector(waste_vials, 'waste', repition_vol)
+        PurgeVial = waste_selector(waste_vials, solution_name, repition_vol)
         
         print(f'Repition {j+1} of {repititions}')
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # start at safe height
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z']) # go to object top
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.depth(target_well)) # go to solution depth
-        withdraw(repition_vol + 0.02, pumping_rate, pump)
-        wellplate.update_volume(target_well,-volume)
+        withdraw(repition_vol+20, pumping_rate, pump)
+        wellplate.update_volume(target_well,-repition_vol)
         
         print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # return to safe height
         
         print('Moving to purge vial...')
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
+        #move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
         print('Purging...')
-        if not PurgeVial.check_volume(+volume):
-            print(f'{PurgeVial.name} is too full to add {volume} ml')
-            raise Exception(f'{PurgeVial.name} is too full to add {volume} ml')
+        if not PurgeVial.check_volume(+repition_vol):
+            print(f'{PurgeVial.name} is too full to add {repition_vol} ml')
+            raise Exception(f'{PurgeVial.name} is too full to add {repition_vol} ml')
         purge(PurgeVial, pump, repition_vol + 20) #repitition volume + 20 ul purge
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        
+        #withdraw(20, pumping_rate, pump)
+        #infuse(20, pumping_rate, pump)
+
         print(f"Remaining volume in well: {wellplate.volume(target_well)}")
 
 def print_runtime_data(runtime_data: dict):
     for well, data in runtime_data.items():
         print(f"Well {well} Runtimes:")
         for section, runtime in data.items():
-            print(f"{section}: {runtime} seconds")
+            minutes = runtime/60
+            print(f"{section}: {minutes} seconds")
         print()
 
 def rinse(wellplate : object,
@@ -299,19 +324,30 @@ def rinse(wellplate : object,
           mill: object,
           solutions: list,
           rinse_repititions = 3,
-          rinse_vol = 150):
+          rinse_vol = 150
+          ):
     '''
     Rinse the well with 150 ul of ACN
     '''
 
-    print(f'Rinsing well {target_well} 3x...')
-    for r in range(rinse_repititions):
-        rinse_solution_name = 'Rinse'+r
+    print(f'Rinsing well {target_well} {rinse_repititions}x...')
+    for r in range(rinse_repititions): # 0, 1, 2...
+        rinse_solution_name = 'Rinse' + str(r)
         PurgeVial = waste_selector(waste_vials, rinse_solution_name, rinse_vol)
-        rinse_solution = solution_selector(solutions, rinse_solution_name, rinse_vol)
+        #rinse_solution = solution_selector(solutions, rinse_solution_name, rinse_vol)
         print(f'Rinse {r+1} of {rinse_repititions}')
-        pipette(rinse_vol, rinse_solution, target_well, pumping_rate, PurgeVial, wellplate, pump, mill)
-        clear_well(rinse_vol, target_well, wellplate, pumping_rate, pump, PurgeVial, mill)
+        pipette(rinse_vol,
+                solutions,
+                rinse_solution_name,
+                target_well,
+                pumping_rate,
+                waste_vials,
+                rinse_solution_name,
+                wellplate,
+                pump,
+                mill
+                )
+        clear_well(rinse_vol, target_well, wellplate, pumping_rate, pump, waste_vials, mill,solution_name=rinse_solution_name)
 
 def flush_pipette_tip(pump: object,
                       WasteVials: list,
@@ -330,6 +366,7 @@ def flush_pipette_tip(pump: object,
 
     print(f'\n\nFlushing with {flush_solution.name}...')
     move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], 0)
+    withdraw(20, pumping_rate, pump)
     move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], flush_solution.depth)
     print(f'\tWithdrawing {flush_solution.name}...')
     withdraw(flush_volume, pumping_rate, pump)
@@ -338,12 +375,13 @@ def flush_pipette_tip(pump: object,
     print('\tMoving to purge...')
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
-    if not PurgeVial.check_volume(120):
-                print(f'{PurgeVial.name} is too full to add {120} ul')
-                raise Exception(f'{PurgeVial.name} is too full to add {120} ul')
+    if not PurgeVial.check_volume(flush_volume):
+                print(f'{PurgeVial.name} is too full to add {flush_volume} ul')
+                raise Exception(f'{PurgeVial.name} is too full to add {flush_volume} ul')
     print('\tPurging...')
     purge(PurgeVial, pump, flush_volume + 20)
-    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0) # move back to safe height (top)
+    
 
 def solution_selector(solutions: list, solution_name: str, volume: float):
     '''
@@ -382,10 +420,14 @@ def record_time_step(well: str, step: str, run_times: dict):
         run_times[well][sub_key] = currentTime - run_times[well][list(run_times[well])[-1]]
     print(f'{step} time: {run_times[well][sub_key]}')
 
+def record_stock_solution_hx(stock_sols: dict, waste_sol: dict, stock_solution_hx: dict):
+    pass
+
 def main():
     ## Constants
     pumping_rate = 0.5
     RunTimes = {}
+    StockSolutionsHx = {}
     char_sol_name = 'Ferrrocene'
     char_vol = 250
     flush_sol_name = 'DMF'
@@ -400,7 +442,7 @@ def main():
         print('Beginning protocol:\nConnecting to Mill, Pump, Pstat:')
         print('\tConnecting to Mill...')
         mill = MillControl()
-        print('\tMill connected')
+        print('\tMill connected') #Made an actual ccheck
        
         pump = set_up_pump()
         
@@ -412,6 +454,8 @@ def main():
         echem.pstat.Open() # open connection to pstat
         print('\tPstat connected: ',devices.EnumSections()[0])
         
+        #TODO Create proper exceptions for when things fail to connect,dont try and disconnect if they arent connected
+
         ## Set up wells
         wellplate = Wells(-218, -74, 0, 0)
         print('\tWells defined')
@@ -429,7 +473,7 @@ def main():
         ## Run the experiments
         for i in range(len(instructions)): #loop per well
             
-            startTime = time.time()
+            startTime = time.time() #experiment start time
             wellRun = instructions[i]['Target_Well']
             wellStatus = instructions[i]['status']
             RunTimes[wellRun] = {}
@@ -446,21 +490,23 @@ def main():
                         target_well = wellRun,
                         pumping_rate = pumping_rate,
                         waste_vials = waste_vials,
+                        waste_solution_name= "waste",
                         wellplate = wellplate,
                         pump = pump,
                         mill = mill)
                 flush_pipette_tip(pump, waste_vials, stock_vials, flush_sol_name, mill, pumping_rate, flush_vol)
-            solutionsTime = time.time()
-            RunTimes[wellRun]['Solutions Time'] = solutionsTime - startTime
-            print(f'\nSolutions time: {RunTimes[wellRun]["Solutions Time"]}')
+            
+            record_time_step(wellRun, 'Solutions', RunTimes)
 
             ## echem setup
             print('\n\nSetting up eChem experiments...')
             target_well = wellRun           
             complete_file_name = echem.setfilename(target_well, 'dep')
-            print("\n\nBeginning eChem deposition of well: ",target_well)
+            
             ## echem CA - deposition
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z'])
+            print("\n\nBeginning eChem deposition of well: ",target_well)
+            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # move to safe height above target well
+            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.depth(target_well)) # move to well depth
             echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
             while echem.active == True:
                 client.PumpEvents(1)
@@ -468,10 +514,12 @@ def main():
             ## echem plot the data
             echem.plotdata('CA', complete_file_name)
             
-            record_time_step(wellRun, 'Deposition', RunTimes)
+            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # move to safe height above target well
 
-            ## Withdraw all well volume            
-            clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, waste_vials, mill)        
+            record_time_step(wellRun, 'Deposition', RunTimes)
+            
+            ## Withdraw all well volume into waste          
+            clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, waste_vials, mill, 'waste')        
     
             ## Rinse the well 3x
             rinse(wellplate, target_well, pumping_rate, pump, waste_vials, mill, stock_vials)
@@ -483,11 +531,12 @@ def main():
             ## Deposit DMF into well
             char_sol = solution_selector(stock_vials, char_sol_name, char_vol)
             print(f"Infuse {char_sol.name} into well {target_well}...")
-            pipette(char_vol, char_sol, wellRun, pumping_rate, waste_vials, wellplate, pump, mill)        
+            pipette(char_vol, char_sol, wellRun, pumping_rate, waste_vials, "waste", wellplate, pump, mill)        
             
             ## Echem CV - characterization
             print(f'Characterizing well: {target_well}')
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z'])
+            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0)
+            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.depth(target_well))
             complete_file_name = echem.setfilename(target_well, 'CV')
             echem.cyclic(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
             while echem.active == True:
@@ -495,10 +544,11 @@ def main():
                 time.sleep(0.1)
             ## echem plot the data
             echem.plotdata('CV', complete_file_name)
+            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0)
             
             record_time_step(wellRun, 'Characterization', RunTimes)
 
-            clear_well(0.25, target_well, wellplate, pumping_rate, pump, waste_vials, mill)
+            clear_well(char_vol, target_well, wellplate, pumping_rate, pump, waste_vials, mill, 'waste')
 
             record_time_step(wellRun, 'Clear Well', RunTimes)
 
@@ -507,6 +557,10 @@ def main():
             flush_pipette_tip(pump, waste_vials, flush_solution, mill, pumping_rate, flush_vol)
             
             record_time_step(wellRun, 'Flush', RunTimes)
+
+            ## Final rinse
+            rinse(wellplate, target_well, pumping_rate, pump, waste_vials, mill, stock_vials)
+            record_time_step(wellRun, 'Final Rinse', RunTimes)
 
             print(f'well {target_well} completed\n\n....................................................................\n')
             wellStatus = 'Completed'
@@ -523,7 +577,7 @@ def main():
             for vial in stock_vials:
                 print(f'{vial.name}: {vial.volume} ml')
             print('\n\n')
-            
+            # TODO save the status of stock vials to a dataframe, saving the dataframe at the end of the campaign
 
     	
         print('\n\nEXPERIMENTS COMPLETED\n\n')
