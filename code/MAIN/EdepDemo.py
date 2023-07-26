@@ -428,7 +428,7 @@ def main():
     pumping_rate = 0.5
     RunTimes = {}
     StockSolutionsHx = {}
-    char_sol_name = 'Ferrrocene'
+    char_sol_name = 'Ferrocene'
     char_vol = 250
     flush_sol_name = 'DMF'
     flush_vol = 120
