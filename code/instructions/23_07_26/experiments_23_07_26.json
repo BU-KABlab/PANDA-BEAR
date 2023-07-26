@@ -8,7 +8,8 @@
         "test-type": "new",
         "dep-duration": 300,
         "DepPot": -2.7,
-        "status": "qued"
+        "status": "qued",
+        "Status": "Completed"
     },
     {
         "Target_Well": "A2",

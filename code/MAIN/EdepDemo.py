@@ -654,6 +654,7 @@ def main():
         endTime = time.time()
         print(f'End Time: {endTime}')
         print(f'Total Time: {endTime - startTime}')
+        print_runtime_data(RunTimes[wellRun])
 
     except KeyboardInterrupt:
         print('Keyboard Interrupt')
