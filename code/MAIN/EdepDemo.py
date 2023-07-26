@@ -149,8 +149,8 @@ def move_electrode_to_position(mill: object, x,y,z):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': 82,
-        'y': 1,
+        'x': 35,
+        'y': 30,
         'z': 0
     }
     # move to specified coordinates
@@ -521,7 +521,7 @@ def main():
             move_electrode_to_position(mill, 
                                        wellplate.get_coordinates(wellRun)['x'],
                                        wellplate.get_coordinates(wellRun)['y'],
-                                       wellplate.depth(wellRun)
+                                       wellplate.echem_height
                                        ) # move to well depth
             echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
             while echem.active == True:
@@ -580,7 +580,7 @@ def main():
             ## Echem CV - characterization
             print(f'Characterizing well: {wellRun}')
             move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], 0) # move to safe height above target well
-            move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], wellplate.depth(wellRun))
+            move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], wellplate.echem_height)
             complete_file_name = echem.setfilename(wellRun, 'CV')
             echem.cyclic(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
             while echem.active == True:
