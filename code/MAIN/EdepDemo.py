@@ -286,7 +286,7 @@ def clear_well(volume: float,
         print(f'Repition {j+1} of {repititions}')
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # start at safe height
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z']) # go to object top
-        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.depth(target_well)) # go to solution depth
+        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.z_bottom) # go to bottom of well
         withdraw(repition_vol+20, pumping_rate, pump)
         wellplate.update_volume(target_well,-repition_vol)
         
@@ -388,7 +388,7 @@ def solution_selector(solutions: list, solution_name: str, volume: float):
     Select the solution from the list of solutions
     '''
     for solution in solutions:
-        if solution.name == solution_name and solution.volume > (volume+1):
+        if solution.name == solution_name and solution.volume > (volume+100):
             return solution
         else:
             pass
@@ -500,13 +500,21 @@ def main():
 
             ## echem setup
             print('\n\nSetting up eChem experiments...')
-            target_well = wellRun           
-            complete_file_name = echem.setfilename(target_well, 'dep')
+                   
+            complete_file_name = echem.setfilename(wellRun, 'dep')
             
             ## echem CA - deposition
-            print("\n\nBeginning eChem deposition of well: ",target_well)
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # move to safe height above target well
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.depth(target_well)) # move to well depth
+            print("\n\nBeginning eChem deposition of well: ",wellRun)
+            move_electrode_to_position(mill, 
+                                       wellplate.get_coordinates(wellRun)['x'], 
+                                       wellplate.get_coordinates(wellRun)['y'], 
+                                       0
+                                       ) # move to safe height above target well
+            move_electrode_to_position(mill, 
+                                       wellplate.get_coordinates(wellRun)['x'],
+                                       wellplate.get_coordinates(wellRun)['y'],
+                                       wellplate.depth(wellRun)
+                                       ) # move to well depth
             echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
             while echem.active == True:
                 client.PumpEvents(1)
@@ -514,55 +522,109 @@ def main():
             ## echem plot the data
             echem.plotdata('CA', complete_file_name)
             
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # move to safe height above target well
+            move_electrode_to_position(mill,
+                                       wellplate.get_coordinates(wellRun)['x'],
+                                       wellplate.get_coordinates(wellRun)['y'],
+                                       0
+                                       ) # move to safe height above target well
 
             record_time_step(wellRun, 'Deposition', RunTimes)
             
             ## Withdraw all well volume into waste          
-            clear_well(wellplate.volume(target_well), target_well, wellplate, pumping_rate, pump, waste_vials, mill, 'waste')        
+            clear_well(volume = wellplate.volume(wellRun), 
+                       target_well=wellRun, 
+                       wellplate=wellplate, 
+                       pumping_rate=pumping_rate, 
+                       pump=pump, 
+                       waste_vials=waste_vials, 
+                       mill=mill, 
+                       solution_name='waste'
+                       )        
     
             ## Rinse the well 3x
-            rinse(wellplate, target_well, pumping_rate, pump, waste_vials, mill, stock_vials)
+            rinse(wellplate,
+                  wellRun,
+                  pumping_rate,
+                  pump,
+                  waste_vials,
+                  mill,
+                  stock_vials)
 
             record_time_step(wellRun, 'Rinse', RunTimes)
 
-            print("\n\nBeginning eChem characterization of well: ",target_well)
+            print("\n\nBeginning eChem characterization of well: ",wellRun)
             
             ## Deposit DMF into well
-            char_sol = solution_selector(stock_vials, char_sol_name, char_vol)
-            print(f"Infuse {char_sol.name} into well {target_well}...")
-            pipette(char_vol, char_sol, wellRun, pumping_rate, waste_vials, "waste", wellplate, pump, mill)        
+            
+            print(f"Infuse {char_sol_name} into well {wellRun}...")
+            pipette(volume = char_vol,
+                    solutions = stock_vials, 
+                    solution_name = char_sol_name, 
+                    target_well=wellRun, 
+                    pumping_rate=pumping_rate, 
+                    waste_vials=waste_vials, 
+                    waste_solution_name="waste", 
+                    wellplate=wellplate, 
+                    pump=pump, 
+                    mill=mill
+                    )        
             
             ## Echem CV - characterization
-            print(f'Characterizing well: {target_well}')
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0)
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.depth(target_well))
-            complete_file_name = echem.setfilename(target_well, 'CV')
+            print(f'Characterizing well: {wellRun}')
+            move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], 0) # move to safe height above target well
+            move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], wellplate.depth(wellRun))
+            complete_file_name = echem.setfilename(wellRun, 'CV')
             echem.cyclic(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
             while echem.active == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)
             ## echem plot the data
             echem.plotdata('CV', complete_file_name)
-            move_electrode_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0)
+            move_electrode_to_position(mill,
+                                       wellplate.get_coordinates(wellRun)['x'],
+                                       wellplate.get_coordinates(wellRun)['y'],
+                                       0
+                                       ) # move to safe height above target well
             
             record_time_step(wellRun, 'Characterization', RunTimes)
 
-            clear_well(char_vol, target_well, wellplate, pumping_rate, pump, waste_vials, mill, 'waste')
+            clear_well(char_vol,
+                       wellRun,
+                       wellplate,
+                       pumping_rate,
+                       pump,
+                       waste_vials,
+                       mill,
+                       'waste'
+                       )
 
             record_time_step(wellRun, 'Clear Well', RunTimes)
 
             # Flushing procedure
             flush_solution = solution_selector(stock_vials, flush_sol_name, flush_vol)
-            flush_pipette_tip(pump, waste_vials, flush_solution, mill, pumping_rate, flush_vol)
+            flush_pipette_tip(pump,
+                              waste_vials,
+                              stock_vials,
+                              flush_solution,
+                              mill,
+                              pumping_rate,
+                              flush_vol
+                              )
             
             record_time_step(wellRun, 'Flush', RunTimes)
 
             ## Final rinse
-            rinse(wellplate, target_well, pumping_rate, pump, waste_vials, mill, stock_vials)
+            rinse(wellplate,
+                  wellRun,
+                  pumping_rate,
+                  pump,
+                  waste_vials,
+                  mill,
+                  stock_vials
+                  )
             record_time_step(wellRun, 'Final Rinse', RunTimes)
 
-            print(f'well {target_well} completed\n\n....................................................................\n')
+            print(f'well {wellRun} completed\n\n....................................................................\n')
             wellStatus = 'Completed'
             instructions[i]['Status'] = wellStatus
 
@@ -589,7 +651,7 @@ def main():
         print('Keyboard Interrupt')
 
     except Exception as e:
-        exception_type, exception_object, exception_traceback = sys.exc_info()
+        exception_type, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
         line_number = exception_traceback.tb_lineno
         print('Exception: ', e)
@@ -600,7 +662,7 @@ def main():
 
     finally:
         ## Move electrode to frit bath
-        print('Moving electrode to frit bath...')
+        #print('Moving electrode to frit bath...')
         #move_electrode_to_position(mill, -337, -18,0)
         #move_electrode_to_position(mill, -337, -18,-85)
         ## Save experiment instructions and status
