@@ -145,7 +145,7 @@ class Vial:
         capacity in ml
         
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20, radius = 0.018, height = -40, z_bottom = -99, name = 'vial'):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 0.018, height = -40, z_bottom = -99, name = 'vial'):
         self.name = name
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
@@ -155,7 +155,7 @@ class Vial:
         self.height = height + z_bottom
         self.volume = volume
         self.base = math.pi*math.pow(self.radius,2.0)
-        self.depth = ((self.volume/1000)/self.base) + z_bottom #Note volume must be converted to liters
+        self.depth = ((self.volume/1000000)/self.base) + z_bottom #Note volume must be converted to liters
         self.contamination = 0
 
     @property
@@ -196,7 +196,7 @@ class Vial:
             raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
-            self.depth = ((self.volume/1000)/self.base) + self.bottom
+            self.depth = ((self.volume/1000000)/self.base) + self.bottom #Note volume must be converted to liters
         print(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
         self.contamination += 1
 
@@ -275,7 +275,7 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
-        time.sleep(30)
+        time.sleep(60)
 
     def current_status(self):
         """
