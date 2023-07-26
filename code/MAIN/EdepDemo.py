@@ -47,6 +47,7 @@ def withdraw(volume: float, rate: float, ser_pump: object):
         ser_pump.pumping_rate = rate  # Sets the pumping rate of the pump in units of milliliters per minute.
         ser_pump.run()
         print('\tWithdrawing...')
+        time.sleep(0.5)
         while ser_pump.running:
             pass
         print('\tDone withdrawing')
@@ -83,10 +84,11 @@ def infuse(volume: float, rate: float, ser_pump: object):
         )
         ser_pump.run()
         print('\tInfusing...')
+        time.sleep(0.5)
         while ser_pump.running:
             pass
         print('\tDone infusing')
-        time.sleep(1)
+        time.sleep(2)
         print(f"\tPump has infused: {ser_pump.volume_infused} ml")
     else:
         pass
