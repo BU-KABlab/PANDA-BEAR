@@ -6,6 +6,7 @@ from turn_instructions_into_objects import read_vials, read_instructions
 import PrintPanda
 import json
 import pathlib
+import math
 
 def set_up_pump():
     """
@@ -192,62 +193,68 @@ def pipette(volume: float, #volume in ul
         target_well (str): The alphanumeric name of the well you would like to pipette into
         purge_volume (float): Desired about to purge before and after pipetting
     """
-    solution = solution_selector(solutions, solution_name, volume)
-    PurgeVial = waste_selector(waste_vials, waste_solution_name, volume)
+    
 
     if volume > 0.00:
-        ## First half: pick up solution
-        print(f'Withdrawing {solution.name}...')
-        move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], 0) # start at safe height
-        move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], solution.depth) # go to soltuion depth
+        repititions = math.ceil(volume/200) #divide by 200 ul which is the pipette capacity to determin the number of repitions
+        repition_vol = volume/repititions
+        for j in range(repititions):
+            print(f'\n\nRepition {j+1} of {repititions}')
+            solution = solution_selector(solutions, solution_name, repition_vol)
+            PurgeVial = waste_selector(waste_vials, waste_solution_name, repition_vol)
+            ## First half: pick up solution
+            print(f'Withdrawing {solution.name}...')
+            move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], 0) # start at safe height
+            move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], solution.depth) # go to soltuion depth
+            
+            if not solution.check_volume(-repition_vol):
+                print(f'Not enough {solution.name} to withdraw {repition_vol} ul')
+                raise Exception(f'Not enough {solution.name} to withdraw {repition_vol} ul')
+            
+            withdraw(repition_vol + (2 * purge_volume), pumping_rate, pump)
+            solution.update_volume(-(repition_vol + 2 * purge_volume))
+            print(f'{solution.name} new volume: {solution.volume}')
+            move_pipette_to_position(mill, solution.coordinates['x'],solution.coordinates['y'],0) # return to safe height
         
-        if not solution.check_volume(-volume):
-            print(f'Not enough {solution.name} to withdraw {volume} ul')
-            raise Exception(f'Not enough {solution.name} to withdraw {volume} ul')
-        withdraw(volume + (2 * purge_volume), pumping_rate, pump)
-        solution.update_volume(-(volume + 2 * purge_volume))
-        print(f'{solution.name} new volume: {solution.volume}')
-        move_pipette_to_position(mill, solution.coordinates['x'],solution.coordinates['y'],0) # return to safe height
-    
-        ## Intermediate: Purge
-        print('Purging...')
-        move_pipette_to_position(mill, 
-                                 PurgeVial.coordinates['x'],
-                                 PurgeVial.coordinates['y'],
-                                 0)
-        move_pipette_to_position(mill,
-                                 PurgeVial.coordinates['x'],
-                                 PurgeVial.coordinates['y'],
-                                 PurgeVial.depth)
-        if not PurgeVial.check_volume(+purge_volume):
-            print(f'{PurgeVial.name} is too full to add {purge_volume} ul')
-            raise Exception(f'{PurgeVial.name} is too full to add {purge_volume} ul')
-        purge(PurgeVial, pump, purge_volume)
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-        
-        ## Second Half: Deposit to well
-        print(f'Infusing {solution.name} into well {target_well}...')
-        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # start at safe height
-        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.depth(target_well)) # go to solution depth
-        if not wellplate.check_volume(well_id= target_well,added_volume=+volume):
-            print(f'Well {target_well} is too full to add {volume} ul')
-            raise Exception(f'Well {target_well} is too full to add {volume} ul')
-        infuse(volume, pumping_rate, pump)
-        wellplate.update_volume(target_well,volume)
-        print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
-        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # return to safe height
-        
-        ## Intermediate: Purge
-        print('Purging...')
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], PurgeVial.depth)
-        if not PurgeVial.check_volume(+volume):
-            print(f'{PurgeVial.name} is too full to add {volume} ul')
-            raise Exception(f'{PurgeVial.name} is too full to add {volume} ul')
-        purge(PurgeVial, pump, purge_volume)
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
-        
-        print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
+            ## Intermediate: Purge
+            print('Purging...')
+            move_pipette_to_position(mill, 
+                                    PurgeVial.coordinates['x'],
+                                    PurgeVial.coordinates['y'],
+                                    0)
+            move_pipette_to_position(mill,
+                                    PurgeVial.coordinates['x'],
+                                    PurgeVial.coordinates['y'],
+                                    PurgeVial.depth)
+            if not PurgeVial.check_volume(purge_volume):
+                print(f'{PurgeVial.name} is too full to add {purge_volume} ul')
+                raise Exception(f'{PurgeVial.name} is too full to add {purge_volume} ul')
+            purge(PurgeVial, pump, purge_volume)
+            move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
+            
+            ## Second Half: Deposit to well
+            print(f'Infusing {solution.name} into well {target_well}...')
+            move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # start at safe height
+            move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],wellplate.depth(target_well)) # go to solution depth
+            if not wellplate.check_volume(well_id = target_well,added_volume = repition_vol):
+                print(f'Well {target_well} is too full to add {repition_vol} ul')
+                raise Exception(f'Well {target_well} is too full to add {repition_vol} ul')
+            infuse(repition_vol, pumping_rate, pump)
+            wellplate.update_volume(target_well,repition_vol)
+            print(f'Well {target_well} volume: {wellplate.volume(target_well)}')
+            move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'],wellplate.get_coordinates(target_well)['y'],0) # return to safe height
+            
+            ## Intermediate: Purge
+            print('Purging...')
+            move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
+            move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], PurgeVial.depth)
+            if not PurgeVial.check_volume(purge_volume):
+                print(f'{PurgeVial.name} is too full to add {purge_volume} ul')
+                raise Exception(f'{PurgeVial.name} is too full to add {purge_volume} ul')
+            purge(PurgeVial, pump, purge_volume)
+            move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
+            
+            print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
     else:
         pass
 
@@ -274,7 +281,6 @@ def clear_well(volume: float,
     Returns:
         None
     '''
-    import math
     repititions = math.ceil(volume/200) #divide by 200 ul which is the pipette capacity to determin the number of repitions
     repition_vol = volume/repititions
     
