@@ -149,8 +149,8 @@ def move_electrode_to_position(mill: object, x,y,z):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': 35,
-        'y': 30,
+        'x': 34,
+        'y': 29,
         'z': 0
     }
     # move to specified coordinates
