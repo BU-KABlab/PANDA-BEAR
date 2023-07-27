@@ -634,9 +634,9 @@ def main():
 
     	
         print('\n\nEXPERIMENTS COMPLETED\n\n')
-        endTime = time.time()
-        print(f'End Time: {endTime}')
-        print(f'Total Time: {endTime - startTime}')
+        end_time = time.time()
+        print(f'End Time: {end_time}')
+        print(f'Total Time: {end_time - startTime}')
         print_runtime_data(RunTimes[wellRun])
 
     except KeyboardInterrupt:
@@ -680,8 +680,8 @@ def main():
         echem.disconnectpstat()
         print('Pstat closed')
 
-        totalEndTime = time.time()
-        print(f'\n\nTotal Time: {totalEndTime - totalStartTime}')
+        total_end_time = time.time()
+        print(f'\n\nTotal Time: {total_end_time - totalStartTime}')
         print_runtime_data(RunTimes)
 
 if __name__ == '__main__':
