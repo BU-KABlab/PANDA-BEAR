@@ -293,7 +293,7 @@ def clear_well(volume: float,
         
         print(f'Repitition {j+1} of {repititions}')
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # start at safe height
-        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z']) # go to object top
+        #move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z']) # go to object top
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.z_bottom) # go to bottom of well
         withdraw(repetition_vol+20, pumping_rate, pump)
         wellplate.update_volume(target_well,-repetition_vol)
@@ -384,8 +384,8 @@ def flush_pipette_tip(pump: object,
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
     if not PurgeVial.check_volume(flush_volume):
-                print(f'{PurgeVial.name} is too full to add {flush_volume} ul')
-                raise Exception(f'{PurgeVial.name} is too full to add {flush_volume} ul')
+        print(f'{PurgeVial.name} is too full to add {flush_volume} ul')
+        raise Exception(f'{PurgeVial.name} is too full to add {flush_volume} ul')
     print('\tPurging...')
     purge(PurgeVial, pump, flush_volume + 20)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0) # move back to safe height (top)
