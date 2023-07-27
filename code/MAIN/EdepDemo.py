@@ -272,10 +272,10 @@ def clear_well(volume: float,
     Returns:
         None
     '''
-    repititions = math.ceil(volume/200) #divide by 200 ul which is the pipette capacity to determin the number of repitions
+    repititions = math.ceil(volume/200) #divide by 200 ul which is the pipette capacity to determin the number of repetitions
     repetition_vol = volume/repititions
     
-    print(f'\n\nClearing well {target_well} with {repititions}x repitions of {repetition_vol} ...')
+    print(f'\n\nClearing well {target_well} with {repititions}x repetitions of {repetition_vol} ...')
     for j in range(repititions):
         
         PurgeVial = waste_selector(waste_vials, solution_name, repetition_vol)
@@ -400,7 +400,7 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
         raise Exception(f'{solution_name} not found in list of solutions')
 
 def record_time_step(well: str, step: str, run_times: dict):
-    currentTime = time.time()
+    currentTime = int(time.time())
     sub_key = step + ' Time'
     if well not in run_times:
         run_times[well] = {}
@@ -428,7 +428,7 @@ def main():
     try:
         ## Program Set Up
         PrintPanda.printpanda()
-        totalStartTime = time.time()
+        totalStartTime = int(time.time())
 
         print(f'Start Time: {totalStartTime}')
         print('Beginning protocol:\nConnecting to Mill, Pump, Pstat:')
@@ -606,15 +606,15 @@ def main():
             record_time_step(wellRun, 'Flush', RunTimes)
 
             ## Final rinse
-            rinse(wellplate,
-                  wellRun,
-                  pumping_rate,
-                  pump,
-                  waste_vials,
-                  mill,
-                  stock_vials
-                  )
-            record_time_step(wellRun, 'Final Rinse', RunTimes)
+            # rinse(wellplate,
+            #       wellRun,
+            #       pumping_rate,
+            #       pump,
+            #       waste_vials,
+            #       mill,
+            #       stock_vials
+            #       )
+            # record_time_step(wellRun, 'Final Rinse', RunTimes)
 
             print(f'well {wellRun} completed\n\n....................................................................\n')
             wellStatus = 'Completed'
@@ -622,9 +622,11 @@ def main():
 
             record_time_step(wellRun, 'End', RunTimes)
 
-            wellTime = time.time()
+            wellTime = int(time.time())
             RunTimes[wellRun]['Well Time'] = wellTime - startTime
             print(f'Well time: {RunTimes[wellRun]["Well Time"]/60} minutes')
+            run_time_file_name = 'RunTimes' + '-' + wellRun +'.json'
+            json.dump(RunTimes, open(run_time_file_name, 'w'), indent=4)
 
             ## Print the current vial volumes in a table format
             print('\n\nCurrent Vial Volumes:')
@@ -635,7 +637,7 @@ def main():
 
     	
         print('\n\nEXPERIMENTS COMPLETED\n\n')
-        end_time = time.time()
+        end_time = int(time.time())
         print(f'End Time: {end_time}')
         print(f'Total Time: {end_time - startTime}')
         print_runtime_data(RunTimes[wellRun])
