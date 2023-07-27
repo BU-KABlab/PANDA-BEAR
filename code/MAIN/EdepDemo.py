@@ -126,7 +126,7 @@ def move_pipette_to_position(mill:object, x, y, z = 0.00, ):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': -89,
+        'x': -88,
         'y': 0,
         'z': 0
     }
@@ -149,7 +149,7 @@ def move_electrode_to_position(mill: object, x,y,z):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': 34,
+        'x': 35,
         'y': 29,
         'z': 0
     }
@@ -421,7 +421,7 @@ def main():
     RunTimes = {}
     StockSolutionsHx = {}
     char_sol_name = 'Ferrocene'
-    char_vol = 250
+    char_vol = 290
     flush_sol_name = 'DMF'
     flush_vol = 120
 
@@ -657,9 +657,9 @@ def main():
 
     finally:
         ## Move electrode to frit bath
-        #print('Moving electrode to frit bath...')
-        #move_electrode_to_position(mill, -337, -18,0)
-        #move_electrode_to_position(mill, -337, -18,-85)
+        print('Moving electrode to frit bath...')
+        move_electrode_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
+        move_electrode_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],wellplate.echem_height)
         ## Save experiment instructions and status
         month = time.strftime("%m")
         day = time.strftime("%d")

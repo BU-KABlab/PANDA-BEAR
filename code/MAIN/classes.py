@@ -21,12 +21,12 @@ class Wells:
     def __init__(self, a1_X=0, a1_Y=0, orientation=0, starting_volume = 0.00):
         self.wells = {}
         self.orientation = orientation
-        self.z_bottom = -100
+        self.z_bottom = -104
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
         self.well_capacity = 300 # ul
-        self.echem_height = -106
+        self.echem_height = -107
 
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
