@@ -149,7 +149,7 @@ def move_electrode_to_position(mill: object, x,y,z):
         str: Response from the mill after executing the command.
     """
     offsets = {
-        'x': 35,
+        'x': 36,
         'y': 29,
         'z': 0
     }
@@ -207,7 +207,7 @@ def pipette(volume: float, #volume in ul
             ## First half: pick up solution
             print(f'Withdrawing {solution.name}...')
             move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], 0) # start at safe height
-            move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], solution.depth) # go to soltuion depth
+            move_pipette_to_position(mill, solution.coordinates['x'], solution.coordinates['y'], solution.bottom) # go to solution depth (depth replaced with height)
             
             withdraw(repetition_vol + (2 * purge_volume), pumping_rate, pump)
             solution.update_volume(-(repetition_vol + 2 * purge_volume))
@@ -223,7 +223,7 @@ def pipette(volume: float, #volume in ul
             move_pipette_to_position(mill,
                                     PurgeVial.coordinates['x'],
                                     PurgeVial.coordinates['y'],
-                                    PurgeVial.depth)
+                                    PurgeVial.height) #PurgeVial.depth replaced with height
             purge(PurgeVial, pump, purge_volume)
             move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
             
@@ -240,7 +240,7 @@ def pipette(volume: float, #volume in ul
             ## Intermediate: Purge
             print('Purging...')
             move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
-            move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], PurgeVial.depth)
+            move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], PurgeVial.height) #PurgeVial.depth replaced with height
             
             purge(PurgeVial, pump, purge_volume)
             move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
@@ -283,7 +283,7 @@ def clear_well(volume: float,
         print(f'Repitition {j+1} of {repititions}')
         move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], 0) # start at safe height
         #move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.get_coordinates(target_well)['z']) # go to object top
-        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.z_bottom) # go to bottom of well
+        move_pipette_to_position(mill, wellplate.get_coordinates(target_well)['x'], wellplate.get_coordinates(target_well)['y'], wellplate.depth(target_well)) # go to bottom of well
         withdraw(repetition_vol+20, pumping_rate, pump)
         wellplate.update_volume(target_well,-repetition_vol)
         
@@ -293,7 +293,7 @@ def clear_well(volume: float,
         print('Moving to purge vial...')
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
         #move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.coordinates['z'])
-        move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
+        move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.height) #PurgeVial.depth replaced with height
         print('Purging...')
         purge(PurgeVial, pump, repetition_vol + 20) #repitition volume + 20 ul purge
         move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
@@ -361,14 +361,14 @@ def flush_pipette_tip(pump: object,
     print(f'\n\nFlushing with {flush_solution.name}...')
     move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], 0)
     withdraw(20, pumping_rate, pump)
-    move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], flush_solution.depth)
+    move_pipette_to_position(mill,flush_solution.coordinates['x'], flush_solution.coordinates['y'], flush_solution.bottom) #depth replaced with height
     print(f'\tWithdrawing {flush_solution.name}...')
     withdraw(flush_volume, pumping_rate, pump)
     move_pipette_to_position(mill, flush_solution.coordinates['x'], flush_solution.coordinates['y'], 0)
     
     print('\tMoving to purge...')
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0)
-    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.depth)
+    move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],PurgeVial.height) #PurgeVial.depth replaced with height
     print('\tPurging...')
     purge(PurgeVial, pump, flush_volume + 20)
     move_pipette_to_position(mill, PurgeVial.coordinates['x'],PurgeVial.coordinates['y'],0) # move back to safe height (top)
@@ -458,7 +458,7 @@ def main():
         print('\tVials defined')
 
         ## Read instructions
-        instructions = read_instructions('experimentParameters_07_25_23.json')
+        instructions = read_instructions('experimentParameters_07_27_23.json')
         
         print('\tExperiments defined')
         
