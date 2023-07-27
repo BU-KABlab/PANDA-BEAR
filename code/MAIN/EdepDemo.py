@@ -405,10 +405,11 @@ def record_time_step(well: str, step: str, run_times: dict):
     if well not in run_times:
         run_times[well] = {}
         run_times[well][sub_key] = currentTime
-    if step == 'Start':
+    elif step == 'Start':
         run_times[well][sub_key] = currentTime
     else:
-        run_times[well][sub_key] = currentTime - run_times[well][list(run_times[well])[-1]]
+        #run_times[well][sub_key] = currentTime - run_times[well][list(run_times[well])[-1]]
+        run_times[well][sub_key] = currentTime
     print(f'{step} time: {run_times[well][sub_key]}')
 
 def record_stock_solution_hx(stock_sols: dict, waste_sol: dict, stock_solution_hx: dict):
