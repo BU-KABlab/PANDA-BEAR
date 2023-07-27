@@ -466,20 +466,20 @@ def main():
         for i in range(len(instructions)): #loop per well
             
             startTime = time.time() #experiment start time
-            wellRun = instructions[i]['Target_Well']
+            well_run = instructions[i]['Target_Well']
             wellStatus = instructions[i]['status']
-            RunTimes[wellRun] = {}
-            record_time_step(wellRun, 'Start', RunTimes)
+            RunTimes[well_run] = {}
+            record_time_step(well_run, 'Start', RunTimes)
             
             ## Deposit all experiment solutions into well
             experiment_solutions = ['Acrylate', 'PEG']
             for solution_name in experiment_solutions:
-                print(f'Pipetting {instructions[i][solution_name]} ul of {solution_name} into {wellRun}...')
+                print(f'Pipetting {instructions[i][solution_name]} ul of {solution_name} into {well_run}...')
                 #soltuion_ml = float((instructions[i][solution_name])/1000000) #because the pump works in ml
                 pipette(volume = instructions[i][solution_name], #volume in ul
                         solutions = stock_vials,
                         solution_name = solution_name,
-                        target_well = wellRun,
+                        target_well = well_run,
                         pumping_rate = pumping_rate,
                         waste_vials = waste_vials,
                         waste_solution_name= "waste",
@@ -488,23 +488,23 @@ def main():
                         mill = mill)
                 flush_pipette_tip(pump, waste_vials, stock_vials, flush_sol_name, mill, pumping_rate, flush_vol)
             
-            record_time_step(wellRun, 'Solutions', RunTimes)
+            record_time_step(well_run, 'Solutions', RunTimes)
 
             ## echem setup
             print('\n\nSetting up eChem experiments...')
                    
-            complete_file_name = echem.setfilename(wellRun, 'dep')
+            complete_file_name = echem.setfilename(well_run, 'dep')
             
             ## echem CA - deposition
-            print("\n\nBeginning eChem deposition of well: ",wellRun)
+            print("\n\nBeginning eChem deposition of well: ",well_run)
             move_electrode_to_position(mill,
-                                       wellplate.get_coordinates(wellRun)['x'], 
-                                       wellplate.get_coordinates(wellRun)['y'], 
+                                       wellplate.get_coordinates(well_run)['x'], 
+                                       wellplate.get_coordinates(well_run)['y'], 
                                        0
                                        ) # move to safe height above target well
             move_electrode_to_position(mill,
-                                       wellplate.get_coordinates(wellRun)['x'],
-                                       wellplate.get_coordinates(wellRun)['y'],
+                                       wellplate.get_coordinates(well_run)['x'],
+                                       wellplate.get_coordinates(well_run)['y'],
                                        wellplate.echem_height
                                        ) # move to well depth
             echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
@@ -515,16 +515,16 @@ def main():
             echem.plotdata('CA', complete_file_name)
             
             move_electrode_to_position(mill,
-                                       wellplate.get_coordinates(wellRun)['x'],
-                                       wellplate.get_coordinates(wellRun)['y'],
+                                       wellplate.get_coordinates(well_run)['x'],
+                                       wellplate.get_coordinates(well_run)['y'],
                                        0
                                        ) # move to safe height above target well
 
-            record_time_step(wellRun, 'Deposition', RunTimes)
+            record_time_step(well_run, 'Deposition', RunTimes)
             
             ## Withdraw all well volume into waste          
-            clear_well(volume = wellplate.volume(wellRun), 
-                       target_well=wellRun, 
+            clear_well(volume = wellplate.volume(well_run), 
+                       target_well=well_run, 
                        wellplate=wellplate, 
                        pumping_rate=pumping_rate, 
                        pump=pump, 
@@ -535,24 +535,24 @@ def main():
     
             ## Rinse the well 3x
             rinse(wellplate,
-                  wellRun,
+                  well_run,
                   pumping_rate,
                   pump,
                   waste_vials,
                   mill,
                   stock_vials)
 
-            record_time_step(wellRun, 'Rinse', RunTimes)
+            record_time_step(well_run, 'Rinse', RunTimes)
 
-            print("\n\nBeginning eChem characterization of well: ",wellRun)
+            print("\n\nBeginning eChem characterization of well: ",well_run)
             
             ## Deposit DMF into well
             
-            print(f"Infuse {char_sol_name} into well {wellRun}...")
+            print(f"Infuse {char_sol_name} into well {well_run}...")
             pipette(volume = char_vol,
                     solutions = stock_vials, 
                     solution_name = char_sol_name, 
-                    target_well=wellRun, 
+                    target_well=well_run, 
                     pumping_rate=pumping_rate, 
                     waste_vials=waste_vials, 
                     waste_solution_name="waste", 
@@ -562,10 +562,10 @@ def main():
                     )        
             
             ## Echem CV - characterization
-            print(f'Characterizing well: {wellRun}')
-            move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], 0) # move to safe height above target well
-            move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], wellplate.echem_height)
-            complete_file_name = echem.setfilename(wellRun, 'CV')
+            print(f'Characterizing well: {well_run}')
+            move_electrode_to_position(mill, wellplate.get_coordinates(well_run)['x'], wellplate.get_coordinates(well_run)['y'], 0) # move to safe height above target well
+            move_electrode_to_position(mill, wellplate.get_coordinates(well_run)['x'], wellplate.get_coordinates(well_run)['y'], wellplate.echem_height)
+            complete_file_name = echem.setfilename(well_run, 'CV')
             echem.cyclic(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
             while echem.active == True:
                 client.PumpEvents(1)
@@ -573,15 +573,15 @@ def main():
             ## echem plot the data
             echem.plotdata('CV', complete_file_name)
             move_electrode_to_position(mill,
-                                       wellplate.get_coordinates(wellRun)['x'],
-                                       wellplate.get_coordinates(wellRun)['y'],
+                                       wellplate.get_coordinates(well_run)['x'],
+                                       wellplate.get_coordinates(well_run)['y'],
                                        0
                                        ) # move to safe height above target well
             
-            record_time_step(wellRun, 'Characterization', RunTimes)
+            record_time_step(well_run, 'Characterization', RunTimes)
 
             clear_well(char_vol,
-                       wellRun,
+                       well_run,
                        wellplate,
                        pumping_rate,
                        pump,
@@ -590,7 +590,7 @@ def main():
                        'waste'
                        )
 
-            record_time_step(wellRun, 'Clear Well', RunTimes)
+            record_time_step(well_run, 'Clear Well', RunTimes)
 
             # Flushing procedure
             #flush_solution = solution_selector(stock_vials, flush_sol_name, flush_vol)
@@ -603,29 +603,29 @@ def main():
                               flush_vol
                               )
             
-            record_time_step(wellRun, 'Flush', RunTimes)
+            record_time_step(well_run, 'Flush', RunTimes)
 
             ## Final rinse
             # rinse(wellplate,
-            #       wellRun,
+            #       well_run,
             #       pumping_rate,
             #       pump,
             #       waste_vials,
             #       mill,
             #       stock_vials
             #       )
-            # record_time_step(wellRun, 'Final Rinse', RunTimes)
+            # record_time_step(well_run, 'Final Rinse', RunTimes)
 
-            print(f'well {wellRun} completed\n\n....................................................................\n')
+            print(f'well {well_run} completed\n\n....................................................................\n')
             wellStatus = 'Completed'
             instructions[i]['Status'] = wellStatus
 
-            record_time_step(wellRun, 'End', RunTimes)
+            record_time_step(well_run, 'End', RunTimes)
 
             wellTime = int(time.time())
-            RunTimes[wellRun]['Well Time'] = wellTime - startTime
-            print(f'Well time: {RunTimes[wellRun]["Well Time"]/60} minutes')
-            run_time_file_name = 'RunTimes' + '-' + wellRun +'.json'
+            RunTimes[well_run]['Well Time'] = wellTime - startTime
+            print(f'Well time: {RunTimes[well_run]["Well Time"]/60} minutes')
+            run_time_file_name = 'RunTimes' + '-' + well_run +'.json'
             json.dump(RunTimes, open(run_time_file_name, 'w'), indent=4)
 
             ## Print the current vial volumes in a table format
@@ -640,7 +640,7 @@ def main():
         end_time = int(time.time())
         print(f'End Time: {end_time}')
         print(f'Total Time: {end_time - startTime}')
-        print_runtime_data(RunTimes[wellRun])
+        print_runtime_data(RunTimes[well_run])
 
     except KeyboardInterrupt:
         print('Keyboard Interrupt')
