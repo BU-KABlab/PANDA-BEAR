@@ -21,12 +21,12 @@ class Wells:
     def __init__(self, a1_X=0, a1_Y=0, orientation=0, starting_volume = 0.00):
         self.wells = {}
         self.orientation = orientation
-        self.z_bottom = -100
+        self.z_bottom = -64 #64
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
         self.well_capacity = 300 # ul
-        self.echem_height = -106
+        self.echem_height = -69
 
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
@@ -36,9 +36,10 @@ class Wells:
                 if well_id == "A1":
                     coordinates = a1_coordinates
                     contents = None
-                    depth = (volume/1000000)/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom #Note volume must be converted to liters
-                    if depth < -100:
-                        depth = -100
+                    #depth = (volume/1000000)/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom #Note volume must be converted to liters
+                    depth = self.z_bottom
+                    if depth < self.z_bottom:
+                        depth = self.z_bottom
                 else:
                     
                     x_offset = col_idx * self.well_offset
@@ -133,8 +134,8 @@ class Wells:
         else:
             self.wells[well_id]["volume"] += added_volume
             self.wells[well_id]["depth"] = (self.wells[well_id]["volume"]/1000000)/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
-            if self.wells[well_id]["depth"] < -100:
-                self.wells[well_id]["depth"] = -100
+            if self.wells[well_id]["depth"] < self.z_bottom:
+                self.wells[well_id]["depth"] = self.z_bottom
             print(f'\tNew Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
 
 class Vial:
@@ -149,14 +150,14 @@ class Vial:
         capacity in ml
         
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 0.018, height = -40, z_bottom = -99, name = 'vial'):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 0.01175, height = -14, z_bottom = -64, name = 'vial'):
         self.name = name
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
         self.contents = contents
         self.capacity = capacity
         self.radius = radius
-        self.height = height + z_bottom
+        self.height = height
         self.volume = volume
         self.base = math.pi*math.pow(self.radius,2.0)
         self.depth = ((self.volume/1000000)/self.base) + z_bottom #Note volume must be converted to liters
