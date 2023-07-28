@@ -379,7 +379,7 @@ def solution_selector(solutions: list, solution_name: str, volume: float):
     Select the solution from the list of solutions
     '''
     for solution in solutions:
-        if solution.name == solution_name and solution.volume > (volume+100):
+        if solution.name == solution_name and solution.volume > (volume+1000):
             return solution
         else:
             pass
