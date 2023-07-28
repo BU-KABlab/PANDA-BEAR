@@ -187,6 +187,7 @@ def pipette(volume: float, #volume in ul
             mill: object,
             purge_volume = 20.00
             ):
+    
     """
     Perform the full pipetting sequence
     Args:
@@ -198,7 +199,7 @@ def pipette(volume: float, #volume in ul
     
 
     if volume > 0.00:
-        repetitions = math.ceil(volume/200) #divide by pipette capacity
+        repetitions = math.ceil(volume/200) #divide by pipette capacity (200 ul)
         repetition_vol = volume/repetitions
         for j in range(repetitions):
             print(f'\n\nRepetition {j+1} of {repetitions}')
@@ -245,7 +246,7 @@ def pipette(volume: float, #volume in ul
             purge(PurgeVial, pump, purge_volume)
             move_pipette_to_position(mill, PurgeVial.coordinates['x'], PurgeVial.coordinates['y'], 0)
             
-            print(f"Remaining volume in pipette: {pump.volume_withdrawn}")
+            print(f"Remaining volume in pipette: {pump.volume_withdrawn}") # should always be zero, pause if not
     else:
         pass
 
@@ -400,15 +401,17 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
         raise Exception(f'{solution_name} not found in list of solutions')
 
 def record_time_step(well: str, step: str, run_times: dict):
-    currentTime = time.time()
+    currentTime = int(time.time())
     sub_key = step + ' Time'
     if well not in run_times:
         run_times[well] = {}
         run_times[well][sub_key] = currentTime
     if step == 'Start':
+        run_times[well] = {}
         run_times[well][sub_key] = currentTime
     else:
         run_times[well][sub_key] = currentTime - run_times[well][list(run_times[well])[-1]]
+    
     print(f'{step} time: {run_times[well][sub_key]}')
 
 def record_stock_solution_hx(stock_sols: dict, waste_sol: dict, stock_solution_hx: dict):
@@ -427,7 +430,7 @@ def main():
     try:
         ## Program Set Up
         PrintPanda.printpanda()
-        totalStartTime = time.time()
+        totalStartTime = int(time.time())
 
         print(f'Start Time: {totalStartTime}')
         print('Beginning protocol:\nConnecting to Mill, Pump, Pstat:')
@@ -531,7 +534,9 @@ def main():
                        mill=mill, 
                        solution_name='waste'
                        )        
-    
+
+            record_time_step(wellRun, 'Clear dep_sol', RunTimes)
+
             ## Rinse the well 3x
             rinse(wellplate,
                   wellRun,
@@ -560,6 +565,8 @@ def main():
                     mill=mill
                     )        
             
+            record_time_step(wellRun, 'Deposit char_sol', RunTimes)
+
             ## Echem CV - characterization
             print(f'Characterizing well: {wellRun}')
             move_electrode_to_position(mill, wellplate.get_coordinates(wellRun)['x'], wellplate.get_coordinates(wellRun)['y'], 0) # move to safe height above target well
@@ -589,7 +596,7 @@ def main():
                        'waste'
                        )
 
-            record_time_step(wellRun, 'Clear Well', RunTimes)
+            record_time_step(wellRun, 'Clear char_sol', RunTimes)
 
             # Flushing procedure
             #flush_solution = solution_selector(stock_vials, flush_sol_name, flush_vol)
@@ -617,7 +624,7 @@ def main():
 
             print(f'well {wellRun} completed\n\n....................................................................\n')
             wellStatus = 'Completed'
-            instructions[i]['Status'] = wellStatus
+            instructions[i]['status'] = wellStatus
 
             record_time_step(wellRun, 'End', RunTimes)
 
@@ -634,7 +641,7 @@ def main():
 
     	
         print('\n\nEXPERIMENTS COMPLETED\n\n')
-        end_time = time.time()
+        end_time = int(time.time())
         print(f'End Time: {end_time}')
         print(f'Total Time: {end_time - startTime}')
         print_runtime_data(RunTimes[wellRun])

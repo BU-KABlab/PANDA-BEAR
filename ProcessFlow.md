@@ -9,6 +9,8 @@
 
 # PANDA Operation
 ## Experiment A1
+Home the mill
+
 * Pipette - Solution #N
   - Moves pipette to #N stock solution vial
   - Withdraws programmed volume
@@ -18,17 +20,20 @@
   - Dispenses programmed amount
   - Moves to purge vial
   - Dispenses purge amount
-  - PAW to home position
+  
 * Electrode - Deposition
   - Moves electrode to well A1
   - Perform Gamry script for experiment - chronoamperometry
-  - PAW to home position
+  
 * Pipette - Remove deposition solution
   - Moves pipette to well A1
   - Withdraws total volume from well
   - Moves to purge vial
   - Dispenses total volume
-  - PAW to home position
+  
+* Rinse the well x3
+  - 
+
 * Pipette - Dimethylferrocene solution
   - Moves pipette to DMF stock solution vial
   - Withdraws programmed volume
@@ -38,17 +43,20 @@
   - Dispenses programmed amount
   - Moves to purge vial
   - Dispenses purge amount
-  - PAW to home position
-* Electrode - Cyclic voltammetry
+
+* Electrode - Cyclic voltammetry "characterization"
   - Moves electrode to well A1
   - Perform Gamry script for experiment - cyclic voltammetry
-  - PAW to home position
+
 * Pipette - Remove DMF solution
   - Moves pipette to well A1
   - Withdraws total volume from well
   - Moves to purge vial
   - Dispenses total volume
-  - PAW to home position
+
+* Rinse the well x3
+  - 
+
 ## Experiment A2
 * Repeat of previous
 ...
