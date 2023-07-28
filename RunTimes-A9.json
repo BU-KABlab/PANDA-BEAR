@@ -1,0 +1,90 @@
+{
+    "A2": {
+        "Start Time": 1690497089,
+        "Solutions Time": 1690497656,
+        "Deposition Time": 1690497996,
+        "Rinse Time": 1690499112,
+        "Characterization Time": 1690499549,
+        "Clear Well Time": 1690499769,
+        "Flush Time": 1690499875,
+        "End Time": 1690499875,
+        "Well Time": 2785.073005914688
+    },
+    "A3": {
+        "Start Time": 1690499875,
+        "Solutions Time": 1690500442,
+        "Deposition Time": 1690500781,
+        "Rinse Time": 1690501893,
+        "Characterization Time": 1690502329,
+        "Clear Well Time": 1690502549,
+        "Flush Time": 1690502656,
+        "End Time": 1690502656,
+        "Well Time": 2780.0395851135254
+    },
+    "A4": {
+        "Start Time": 1690502656,
+        "Solutions Time": 1690503222,
+        "Deposition Time": 1690503562,
+        "Rinse Time": 1690504673,
+        "Characterization Time": 1690505109,
+        "Clear Well Time": 1690505330,
+        "Flush Time": 1690505436,
+        "End Time": 1690505436,
+        "Well Time": 2779.8282995224
+    },
+    "A5": {
+        "Start Time": 1690505436,
+        "Solutions Time": 1690506003,
+        "Deposition Time": 1690506342,
+        "Rinse Time": 1690507454,
+        "Characterization Time": 1690507890,
+        "Clear Well Time": 1690508110,
+        "Flush Time": 1690508217,
+        "End Time": 1690508217,
+        "Well Time": 2780.3485889434814
+    },
+    "A6": {
+        "Start Time": 1690508217,
+        "Solutions Time": 1690508783,
+        "Deposition Time": 1690509123,
+        "Rinse Time": 1690510213,
+        "Characterization Time": 1690510649,
+        "Clear Well Time": 1690510870,
+        "Flush Time": 1690510976,
+        "End Time": 1690510976,
+        "Well Time": 2758.9007058143616
+    },
+    "A7": {
+        "Start Time": 1690510976,
+        "Solutions Time": 1690511542,
+        "Deposition Time": 1690511882,
+        "Rinse Time": 1690512972,
+        "Characterization Time": 1690513408,
+        "Clear Well Time": 1690513629,
+        "Flush Time": 1690513735,
+        "End Time": 1690513735,
+        "Well Time": 2758.667010307312
+    },
+    "A8": {
+        "Start Time": 1690513735,
+        "Solutions Time": 1690514301,
+        "Deposition Time": 1690514641,
+        "Rinse Time": 1690515731,
+        "Characterization Time": 1690516167,
+        "Clear Well Time": 1690516388,
+        "Flush Time": 1690516494,
+        "End Time": 1690516494,
+        "Well Time": 2758.493020057678
+    },
+    "A9": {
+        "Start Time": 1690516494,
+        "Solutions Time": 1690517082,
+        "Deposition Time": 1690517422,
+        "Rinse Time": 1690518528,
+        "Characterization Time": 1690518985,
+        "Clear Well Time": 1690519221,
+        "Flush Time": 1690519328,
+        "End Time": 1690519328,
+        "Well Time": 2833.3051404953003
+    }
+}
