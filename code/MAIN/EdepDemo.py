@@ -7,6 +7,7 @@ import PrintPanda
 import json
 import pathlib
 import math
+import csv
 
 def set_up_pump():
     """
@@ -406,15 +407,20 @@ def record_time_step(well: str, step: str, run_times: dict):
     if well not in run_times:
         run_times[well] = {}
         run_times[well][sub_key] = currentTime
-    elif step == 'Start':
-        run_times[well][sub_key] = currentTime
     else:
-        #run_times[well][sub_key] = currentTime - run_times[well][list(run_times[well])[-1]]
         run_times[well][sub_key] = currentTime
-    print(f'{step} time: {run_times[well][sub_key]}')
+    #print(f'{step} time: {run_times[well][sub_key]}')
 
 def record_stock_solution_hx(stock_sols: dict, waste_sol: dict, stock_solution_hx: dict):
     pass
+
+def save_runtime_data(run_times: dict, filename: str):
+    '''Save the run times to a json file in code/run_times'''
+    cwd = pathlib.Path(__file__).parents[1]
+    file_path = cwd / "run_times"
+    file_to_save = file_path / (filename + '.json')
+    with open(file_to_save, 'w') as f:
+        json.dump(run_times, f)
 
 def main():
     ## Constants
@@ -425,6 +431,11 @@ def main():
     char_vol = 290
     flush_sol_name = 'DMF'
     flush_vol = 120
+
+    ## Common Variables
+    month = time.strftime("%m")
+    day = time.strftime("%d")
+    year = time.strftime("%y")
 
     try:
         ## Program Set Up
@@ -630,8 +641,8 @@ def main():
             wellTime = int(time.time())
             RunTimes[well_run]['Well Time'] = wellTime - startTime
             print(f'Well time: {RunTimes[well_run]["Well Time"]/60} minutes')
-            run_time_file_name = 'RunTimes' + '-' + well_run +'.json'
-            json.dump(RunTimes, open(run_time_file_name, 'w'), indent=4)
+
+            save_runtime_data(RunTimes[well_run], year + '_' + month + '_' + day + '_' + 'Experiment Timestamps')
 
             ## Print the current vial volumes in a table format
             print('\n\nCurrent Vial Volumes:')
@@ -665,6 +676,8 @@ def main():
         print('Moving electrode to frit bath...')
         move_electrode_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
         move_electrode_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],wellplate.echem_height)
+        
+        
         ## Save experiment instructions and status
         month = time.strftime("%m")
         day = time.strftime("%d")
