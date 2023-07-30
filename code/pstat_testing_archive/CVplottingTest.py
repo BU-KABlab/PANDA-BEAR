@@ -12,7 +12,7 @@ import comtypes.client as client
 import pathlib
 import random
 
-file_path ="https://raw.githubusercontent.com/erasmus95/PANDA-BEAR/main/data/2023-07-21/A1_CV.txt?token=GHSAT0AAAAAACEGYHBHT3LT2FXKAJRCTSQWZF75L7A"
+file_path ="https://raw.githubusercontent.com/erasmus95/PANDA-BEAR/main/data/2023-07-27/A2_CV.txt?token=GHSAT0AAAAAACEGYHBG7A67JS26L5LE77T4ZGDBDWQ"
 df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
 plt.rcParams["figure.dpi"] = 150
 plt.rcParams["figure.facecolor"] = "white"
@@ -51,5 +51,5 @@ plt.ylabel('Current (A)')
 plt.legend()      
 
 plt.tight_layout()
-plt.savefig('Test2.png')
+plt.savefig('Test3.png')
 print("plot saved")
