@@ -101,7 +101,7 @@ def plot(folder_path, rows, columns,echem_funcion):
                 df['Im'] = df['Im'].apply(modify_function)
 
                 # Plot values for vsig vs Im for each cycle with different dash patterns
-                for i in range(1, max_cycle + 1):
+                for i in range(max_cycle):
                     df2 = df[df['Cycle'] == i]
                     dashes = dash_patterns[i - 1]  # Use the corresponding dash pattern from the list
                     plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[i - 1], label=f'Cycle {i}')
@@ -116,6 +116,7 @@ def plot(folder_path, rows, columns,echem_funcion):
                 plt.legend()      
 
                 plt.tight_layout()
+                #plt.show()
                 plt.savefig(folder_path / f"{row}{column}_{echem_funcion}.png")
                 print(f"{row}{column}_{echem_funcion} plot saved")
                 plt.close()
@@ -125,5 +126,5 @@ rows = 'ABC'
 columns = range(1, 13)
 folder_path = pathlib.Path(__file__).parents[2] /  "data" / "Wet_Dress_Rehersal"
 
-#plot(folder_path, rows, columns,"CV")
-plot(folder_path, rows, columns,"dep")
+plot(folder_path, rows, columns,"CV")
+#plot(folder_path, rows, columns,"dep")

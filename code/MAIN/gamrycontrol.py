@@ -182,6 +182,7 @@ def setfilename(target_well, experiment):
         
 
 def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
+    ''' cyclic chronoamperometry'''
     global dtaq
     global signal
     global dtaqsink
@@ -293,10 +294,11 @@ def errortest():
 
 
 # CV Setup Parameters
-CVvi = 0.0
-CVap1 = -0.8
+CVvi = 0.0 #initial voltage
+CVap1 = -0.8 
 CVap2 = -0.1
 CVvf = -0.1
+
 CVstep = 0.01 #testing step, 100 mv/s
 CVsr1 = 0.1
 CVcycle = 3
