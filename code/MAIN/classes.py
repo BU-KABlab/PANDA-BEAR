@@ -360,4 +360,14 @@ class OverDraftException(Exception):
     def __str__(self) -> str:
         return f'OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0'
     
-    
+def main():
+     wellplate = Wells(-218, -74, 0, 0)
+     offsets = {"x": 36, "y": 30, "z": 0}
+     coord = wellplate.wells['H2']['coordinates']
+     print(f"x: {coord['x'] + offsets['x']} y: {coord['y'] + offsets['y']} z: {coord['z'] + offsets['z']}"
+           
+            )
+     #wellplate.visualize_well_coordinates()
+
+if __name__ == '__main__':
+    main()

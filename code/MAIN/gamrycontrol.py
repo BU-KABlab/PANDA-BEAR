@@ -106,7 +106,7 @@ def savedata(complete_file_name):
     np.savetxt(complete_file_name.with_suffix('.txt'), output)
     print("data saved")
 
-def plotdata(exp_name, complete_file_name):
+def plotdata(exp_name, complete_file_name, showplot = False):
     #complete_file_name = os.path(complete_file_name)
     if exp_name == 'OCP':
             df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None,
@@ -146,13 +146,15 @@ def plotdata(exp_name, complete_file_name):
             colors = cm.cool(np.linspace(0, 1, max_cycle))
 
             # Plot values for vsig vs Im for each cycle with different dash patterns
-            for i in range(1, max_cycle + 1):
+            for i in range(max_cycle):
                 df2 = df[df['Cycle'] == i]
                 dashes = dash_patterns[i - 1]  # Use the corresponding dash pattern from the list
                 plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[i - 1], label=f'Cycle {i}')
 
             plt.xlabel('V vs Ag/AgCl (V)')
             plt.ylabel('Current (A)')
+            if showplot == True:
+                plt.show()
           
     plt.tight_layout()
     plt.savefig(complete_file_name.with_suffix('.png'))
