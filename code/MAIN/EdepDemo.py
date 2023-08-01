@@ -25,7 +25,7 @@ def read_json(filename: str):
 
 def read_instructions(filename):
     instructions = []
-    parameters = read_json.read_json(filename)
+    parameters = read_json(filename)
     for experiment in range(len(parameters["Experiments"])):
         instructions.append(parameters["Experiments"][experiment])
         instructions[experiment]["status"] = "qued"
@@ -34,7 +34,7 @@ def read_instructions(filename):
 
 
 def read_vials(filename):
-    vial_parameters = read_json.read_json(filename)
+    vial_parameters = read_json(filename)
 
     sol_objects = []
     for key, values in vial_parameters.items():
@@ -194,7 +194,7 @@ def move_electrode_to_position(mill: object, x, y, z):
     Returns:
         str: Response from the mill after executing the command.
     """
-    offsets = {"x": 36, "y": 29, "z": 0}
+    offsets = {"x": 36, "y": 30, "z": 0}
     # move to specified coordinates
     mill_move = "G1 X{} Y{} Z{}"
     command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
@@ -763,11 +763,11 @@ def main():
                 echem.CVap1,
                 echem.CVap2,
                 echem.CVvf,
-                echem.CVsr1,
-                echem.CVsr2,
-                echem.CVsr3,
-                echem.CVsamplerate,
-                echem.CVcycle,
+                CVsr1=0.05,
+                CVsr2=0.05,
+                CVsr3=0.05,
+                CVsamplerate=echem.CVsamplerate,
+                CVcycle=echem.CVcycle,
             )
             while echem.active == True:
                 client.PumpEvents(1)
@@ -849,7 +849,7 @@ def main():
         end_time = int(time.time())
         print(f"End Time: {end_time}")
         print(f"Total Time: {end_time - startTime}")
-        print_runtime_data(RunTimes[well_run])
+        print_runtime_data(RunTimes)
 
     except KeyboardInterrupt:
         print("Keyboard Interrupt")
@@ -869,14 +869,14 @@ def main():
         print("Moving electrode to frit bath...")
         move_electrode_to_position(
             mill,
-            wellplate.get_coordinates("H1")["x"],
-            wellplate.get_coordinates("H1")["y"],
+            wellplate.get_coordinates("H2")["x"],
+            wellplate.get_coordinates("H2")["y"],
             0,
         )
         move_electrode_to_position(
             mill,
-            wellplate.get_coordinates("H1")["x"],
-            wellplate.get_coordinates("H1")["y"],
+            wellplate.get_coordinates("H2")["x"],
+            wellplate.get_coordinates("H2")["y"],
             wellplate.echem_height,
         )
 
