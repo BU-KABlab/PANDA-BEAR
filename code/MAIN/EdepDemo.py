@@ -2,7 +2,7 @@ import time, nesp_lib, sys
 from classes import Vial, MillControl, Wells
 import gamrycontrol as echem
 import comtypes.client as client
-import PrintPanda
+import print_panda
 import json
 import pathlib
 import math
@@ -585,7 +585,7 @@ def main():
 
     try:
         ## Program Set Up
-        PrintPanda.printpanda()
+        print_panda.printpanda()
         totalStartTime = int(time.time())
 
         print(f"Start Time: {totalStartTime}")
@@ -797,7 +797,6 @@ def main():
             record_time_step(well_run, "Clear Well", RunTimes)
 
             # Flushing procedure
-            # flush_solution = solution_selector(stock_vials, flush_sol_name, flush_vol)
             flush_pipette_tip(
                 pump,
                 waste_vials,
