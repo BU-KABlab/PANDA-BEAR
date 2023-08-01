@@ -1,1 +1,8 @@
-{"Start Time": 1690838044, "Deposit char_sol Time": 1690838420, "Characterization Time": 1690838545, "Clear Well Time": 1690838781, "End Time": 1690838781, "Well Time": 736.1855845451355}
+{
+    "Start Time": 1690838044,
+    "Deposit char_sol Time": 1690838420,
+    "Characterization Time": 1690838545,
+    "Clear Well Time": 1690838781,
+    "End Time": 1690838781,
+    "Well Time": 736
+  }
