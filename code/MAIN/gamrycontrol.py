@@ -18,7 +18,6 @@ GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
 pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
 devices = client.CreateObject('GamryCOM.GamryDeviceList')
 active = True
-#complete_file_name = 'test'
 
 class GamryCOMError(Exception):
     pass
