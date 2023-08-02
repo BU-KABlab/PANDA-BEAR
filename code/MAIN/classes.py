@@ -242,15 +242,15 @@ class MillControl:
         self.ser_mill.close()
         time.sleep(15)
 
-    def read_json_config():
+    def read_json_config(self):
         '''
         Reads a JSON config file and returns a dictionary of the contents.
         '''
         config_file_name = 'mill_config.json'
         config_file_path = pathlib.Path.cwd() / config_file_name
         with open(config_file_path, 'r') as f:
-            config = json.load(f)
-        return config
+            configuaration = json.load(f)
+        return configuaration
 
     def execute_command(self, command):
         logging.debug(f'Executing command: {command}...')
@@ -319,7 +319,11 @@ class MillControl:
         try:
             if type(status) == list:
                 list_length = len(status)
-                first = status[0].decode("utf-8").strip()
+                if list_length == 0:
+                    out = 'No response'
+
+                if list_length > 0:
+                    first = status[0].decode("utf-8").strip()
                 
                 if list_length > 1:
                     second = status[1].decode("utf-8").strip()
@@ -363,7 +367,7 @@ class MillControl:
 
         #offsets = self.config['instrument_offsets']['center']
 
-        mill_move = "G1 X{} Y{} Z{}"  # move to specified coordinates
+        mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
         command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
         self.execute_command(command)
         return 0
@@ -389,7 +393,7 @@ class MillControl:
         """
         offsets = {"x": -88, "y": 0, "z": 0}
         offsets = self.config['instrument_offsets']['pipette']
-        mill_move = "G1 X{} Y{} Z{}"  # move to specified coordinates
+        mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
         command = mill_move.format(
             x + offsets["x"], y + offsets["y"], z + offsets["z"]
         )  # x-coordinate has 84 mm offset for pipette location
@@ -408,7 +412,7 @@ class MillControl:
         offsets = {"x": 36, "y": 30, "z": 0}
         offsets = self.config['instrument_offsets']['electrode']
         # move to specified coordinates
-        mill_move = "G1 X{} Y{} Z{}"
+        mill_move = "G00 X{} Y{} Z{}"
         command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
         self.execute_command(str(command))
         return 0
