@@ -611,12 +611,12 @@ def main():
         print("\tWells defined")
 
         ## Set up solutions
-        waste_vials = read_vials("wasteParameters_07_25_23.json")
-        stock_vials = read_vials("vialParameters_07_25_23.json")
+        waste_vials = read_vials("wasteParameters_08_02_23.json")
+        stock_vials = read_vials("vialParameters_08_02_23.json")
         print("\tVials defined")
 
         ## Read instructions
-        instructions = read_instructions("experimentParameters_07_27_23.json")
+        instructions = read_instructions("experimentParameters_08_02_23_v2.json")
 
         print("\tExperiments defined")
 
@@ -647,15 +647,16 @@ def main():
                     pump=pump,
                     mill=mill,
                 )
-                flush_pipette_tip(
-                    pump,
-                    waste_vials,
-                    stock_vials,
-                    flush_sol_name,
-                    mill,
-                    pumping_rate,
-                    flush_vol,
-                )
+                if instructions[i][solution_name] > 0:
+                    flush_pipette_tip(
+                        pump,
+                        waste_vials,
+                        stock_vials,
+                        flush_sol_name,
+                        mill,
+                        pumping_rate,
+                        flush_vol,
+                    )
 
             record_time_step(well_run, "Solutions", RunTimes)
 
@@ -725,7 +726,7 @@ def main():
 
             print("\n\nBeginning eChem characterization of well: ", well_run)
 
-            ## Deposit DMF into well
+            ## Deposit Ferrocene into well
 
             print(f"Infuse {char_sol_name} into well {well_run}...")
             pipette(
@@ -810,15 +811,15 @@ def main():
             record_time_step(well_run, "Flush", RunTimes)
 
             ## Final rinse
-            # rinse(wellplate,
-            #       well_run,
-            #       pumping_rate,
-            #       pump,
-            #       waste_vials,
-            #       mill,
-            #       stock_vials
-            #       )
-            # record_time_step(well_run, 'Final Rinse', RunTimes)
+            rinse(wellplate,
+                  well_run,
+                  pumping_rate,
+                  pump,
+                  waste_vials,
+                  mill,
+                  stock_vials
+                  )
+            record_time_step(well_run, 'Final Rinse', RunTimes)
 
             print(
                 f"well {well_run} completed\n\n....................................................................\n"

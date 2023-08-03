@@ -72,6 +72,7 @@ def plot(folder_path, rows, columns,echem_funcion):
             elif (row == 'C' and column == 8):
                 break
             else:
+                print('plotting', row, column)
                 file_path = folder_path / f"{row}{column}_{echem_funcion}.txt"
                 df = pd.read_csv(file_path, 
                                 sep=" ", 
@@ -122,9 +123,9 @@ def plot(folder_path, rows, columns,echem_funcion):
                 plt.close()
 
 
-rows = 'ABC'
-columns = range(1, 13)
-folder_path = pathlib.Path(__file__).parents[2] /  "data" / "Wet_Dress_Rehersal"
+rows = 'D'
+columns = range(2, 3)
+folder_path = pathlib.Path(__file__).parents[2] /  "data" / "2023-08-02"
 
 plot(folder_path, rows, columns,"CV")
 #plot(folder_path, rows, columns,"dep")

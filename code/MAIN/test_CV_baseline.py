@@ -2,7 +2,7 @@ import time, nesp_lib, sys
 from classes import Vial, MillControl, Wells
 import gamrycontrol as echem
 import comtypes.client as client
-import PrintPanda
+import print_panda as PrintPanda
 import json
 import pathlib
 import math
@@ -616,7 +616,7 @@ def main():
         print("\tVials defined")
 
         ## Read instructions
-        instructions = read_instructions("characterizationBaselineParameters_07_31_23.json")
+        instructions = read_instructions("characterizationBaselineParameters_08_02_23.json")
 
         print("\tExperiments defined")
 
