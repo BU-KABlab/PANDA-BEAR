@@ -124,8 +124,8 @@ def plot(folder_path, rows, columns,echem_funcion):
 
 
 rows = 'D'
-columns = range(2, 3)
-folder_path = pathlib.Path(__file__).parents[2] /  "data" / "2023-08-02"
-
+columns = [9]
+folder_path = pathlib.Path(__file__).parents[2] /  "data" / "2023-08-03"
+#folder_path = pathlib.Path("C:\\Users\\Kab Lab\\Documents\\data\\2023-08-03")
 plot(folder_path, rows, columns,"CV")
 #plot(folder_path, rows, columns,"dep")

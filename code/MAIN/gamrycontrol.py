@@ -158,6 +158,7 @@ def plotdata(exp_name, complete_file_name, showplot = False):
           
     plt.tight_layout()
     plt.savefig(complete_file_name.with_suffix('.png'))
+    plt.close()
     print("plot saved")
 
 def setfilename(target_well, experiment):
@@ -312,7 +313,7 @@ CVsamplerate = CVstep / CVsr1
 # CA/CP Setup Parameters
 CAvi = 0.0 #Pre-step voltage (V)
 CAti = 0.0 #Pre-step delay time (s)
-CAv1 = -2.0 #Step 1 voltage (V)
+CAv1 = -2.4 #Step 1 voltage (V)
 CAt1 = 300 #run time 300 seconds
 CAv2 = 0 #Step 2 voltage (V)
 CAt2 = 0 #Step 2 time (s)

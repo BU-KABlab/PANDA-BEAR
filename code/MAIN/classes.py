@@ -26,7 +26,7 @@ class Wells:
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
         self.well_capacity = 300 # ul
-        self.echem_height = -69
+        self.echem_height = -68
 
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
