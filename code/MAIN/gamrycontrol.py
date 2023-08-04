@@ -158,6 +158,7 @@ def plotdata(exp_name, complete_file_name, showplot = False):
           
     plt.tight_layout()
     plt.savefig(complete_file_name.with_suffix('.png'))
+    plt.close()
     print("plot saved")
 
 def setfilename(target_well, experiment):
@@ -310,14 +311,20 @@ CVsr3 = CVsr1
 CVsamplerate = CVstep / CVsr1
 
 # CA/CP Setup Parameters
-CAvi = 0.0
-CAti = 0.0
-CAv1 = -2.0
-#CAt1 = 30 #testing time 30 seconds
+CAvi = 0.0 #Pre-step voltage (V)
+CAti = 0.0 #Pre-step delay time (s)
+CAv1 = -2.4 #Step 1 voltage (V)
 CAt1 = 300 #run time 300 seconds
-CAv2 = 0
-CAt2 = 0
-CAsamplerate = 0.1
+CAv2 = 0 #Step 2 voltage (V)
+CAt2 = 0 #Step 2 time (s)
+CAsamplerate = 0.05 #sample period (s)
+# Max current (mA)
+# Limit I (mA/cm^2)
+# PF Corr. (ohm)
+# Equil. time (s)
+# Expected Max V (V)
+# Initial Delay on
+# Initial Delay (s)
 
 # OCP Setup Parameters
 OCPvi = 0.0

@@ -152,7 +152,7 @@ def move_center_to_position(mill: object, x, y, z):
     """
     offsets = {"x": 0, "y": 0, "z": 0}
 
-    mill_move = "G1 X{} Y{} Z{}"  # move to specified coordinates
+    mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
     mill.execute_command(command)
     return 0
@@ -178,7 +178,7 @@ def move_pipette_to_position(
     """
     offsets = {"x": -88, "y": 0, "z": 0}
 
-    mill_move = "G1 X{} Y{} Z{}"  # move to specified coordinates
+    mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
     command = mill_move.format(
         x + offsets["x"], y + offsets["y"], z + offsets["z"]
     )  # x-coordinate has 84 mm offset for pipette location
@@ -196,7 +196,7 @@ def move_electrode_to_position(mill: object, x, y, z):
     """
     offsets = {"x": 36, "y": 30, "z": 0}
     # move to specified coordinates
-    mill_move = "G1 X{} Y{} Z{}"
+    mill_move = "G0 X{} Y{} Z{}"
     command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
     mill.execute_command(str(command))
     return 0
@@ -611,12 +611,12 @@ def main():
         print("\tWells defined")
 
         ## Set up solutions
-        waste_vials = read_vials("wasteParameters_07_25_23.json")
-        stock_vials = read_vials("vialParameters_07_25_23.json")
+        waste_vials = read_vials("wasteParameters_08_02_23.json")
+        stock_vials = read_vials("vialParameters_08_02_23.json")
         print("\tVials defined")
 
         ## Read instructions
-        instructions = read_instructions("experimentParameters_07_27_23.json")
+        instructions = read_instructions("testing_08_03_23.json")
 
         print("\tExperiments defined")
 
@@ -629,7 +629,7 @@ def main():
             record_time_step(well_run, "Start", RunTimes)
 
             ## Deposit all experiment solutions into well
-            experiment_solutions = ["Acrylate", "PEG"]
+            experiment_solutions = ["DMF", "PEG", "Acrylate", "Ferrocene"]
             for solution_name in experiment_solutions:
                 print(
                     f"Pipetting {instructions[i][solution_name]} ul of {solution_name} into {well_run}..."
@@ -647,15 +647,16 @@ def main():
                     pump=pump,
                     mill=mill,
                 )
-                flush_pipette_tip(
-                    pump,
-                    waste_vials,
-                    stock_vials,
-                    flush_sol_name,
-                    mill,
-                    pumping_rate,
-                    flush_vol,
-                )
+                if instructions[i][solution_name] > 0:
+                    flush_pipette_tip(
+                        pump,
+                        waste_vials,
+                        stock_vials,
+                        flush_sol_name,
+                        mill,
+                        pumping_rate,
+                        flush_vol,
+                    )
 
             record_time_step(well_run, "Solutions", RunTimes)
 
@@ -725,7 +726,7 @@ def main():
 
             print("\n\nBeginning eChem characterization of well: ", well_run)
 
-            ## Deposit DMF into well
+            ## Deposit Ferrocene into well
 
             print(f"Infuse {char_sol_name} into well {well_run}...")
             pipette(
@@ -810,15 +811,15 @@ def main():
             record_time_step(well_run, "Flush", RunTimes)
 
             ## Final rinse
-            # rinse(wellplate,
-            #       well_run,
-            #       pumping_rate,
-            #       pump,
-            #       waste_vials,
-            #       mill,
-            #       stock_vials
-            #       )
-            # record_time_step(well_run, 'Final Rinse', RunTimes)
+            rinse(wellplate,
+                  well_run,
+                  pumping_rate,
+                  pump,
+                  waste_vials,
+                  mill,
+                  stock_vials
+                  )
+            record_time_step(well_run, 'Final Rinse', RunTimes)
 
             print(
                 f"well {well_run} completed\n\n....................................................................\n"
