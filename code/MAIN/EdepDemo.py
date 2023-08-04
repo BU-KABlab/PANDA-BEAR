@@ -20,7 +20,7 @@ def read_json(filename: str):
     file_path = cwd / "instructions"
     file_to_open = file_path / filename
     with open(file_to_open, "r", encoding="ascii") as file:
-        data = json.load(file)
+        data = json.load(file).dumps(data, indent=4)
     return data
 
 
@@ -103,7 +103,6 @@ def withdraw(volume: float, rate: float, ser_pump: object):
         time.sleep(2)
 
         logging.debug(f"\tPump has withdrawn: {ser_pump.volume_withdrawn} ml")
-    # vessel.update_volume(-volume)
 
     return 0
 
@@ -588,8 +587,6 @@ def main(logging_level=logging.INFO):
     char_vol = 290
     flush_sol_name = "DMF"
     flush_vol = 120
-
-    
 
     try:
         ## Program Set Up
