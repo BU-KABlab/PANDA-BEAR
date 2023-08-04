@@ -1,4 +1,4 @@
-from classes import MillControl
+from classes import MillControl, Wells
 '''
 For calibrating the location of instruments on the mill head.
 '''
@@ -9,7 +9,7 @@ def mill_calibration():
     '''
     For calibrating the location of instruments on the mill head.
     '''
-    
+    wellplate = Wells(-218, -74, 0, 0)
     mill = MillControl()
     mill.move_center_to_position(-200,-240,0)
     mill.move_center_to_position(-200,-240,-10)
