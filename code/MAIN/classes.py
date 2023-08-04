@@ -208,6 +208,7 @@ class Vial:
             self.depth = ((self.volume/1000000)/self.base) + self.bottom #Note volume must be converted to liters
         logging.debug(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
         self.contamination += 1
+        
 
 
 class MillControl:
