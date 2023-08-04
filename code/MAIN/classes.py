@@ -331,7 +331,7 @@ class MillControl:
                 if first.find('ok') >=0:
                    out = second
                 else:
-                    out = first
+                    out = 'could not parse response'
             if type(status) == str:
                 out = status.decode("utf-8").strip()
                 
