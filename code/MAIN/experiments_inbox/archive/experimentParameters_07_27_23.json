@@ -16,7 +16,12 @@
             "deposition_data_file": "",
             "deposition_plot_file": "",
             "characterization_data_file": "",
-            "characterization_plot_file": ""
+            "characterization_plot_file": "",
+            "pumping_rate" : 0.5,
+            "char_sol_name" : "Ferrocene",
+            "char_vol" : 290,
+            "flush_sol_name" : "DMF",
+            "flush_vol" : 120
         },
         {
             "Target_Well": "D6",

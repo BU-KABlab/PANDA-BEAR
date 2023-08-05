@@ -802,8 +802,8 @@
         },
         {
             "Target_Well": "G9",
-            "status": "new",
-            "status_date": "2023-08-04_14-27",
+            "status": "queued",
+            "status_date": "2023-08-04_20_44_17",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,

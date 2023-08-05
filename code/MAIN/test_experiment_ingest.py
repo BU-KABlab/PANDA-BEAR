@@ -182,21 +182,21 @@ def save_completed_instructions(instructions: list, filename: str):
 if __name__ == "__main__":
     print(f"{check_inbox()} new experiments read.")
 
-    exp, filename = read_next_experiment_from_queue()
-    runtimes = {
-        "Start Time": 1690497089,
-        "Solutions Time": 1690497656,
-        "Deposition Time": 1690497996,
-        "Rinse Time": 1690499112,
-        "Characterization Time": 1690499549,
-        "Clear Well Time": 1690499769,
-        "Flush Time": 1690499875,
-        "End Time": 1690499875,
-        "Well Time": 167104.380354881
-    }
-    exp["time_stamps"] = runtimes
-    exp['status'] = "error"
-    exp['status_date'] = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
-    print(json.dumps(exp, indent=4))
+    # exp, filename = read_next_experiment_from_queue()
+    # runtimes = {
+    #     "Start Time": 1690497089,
+    #     "Solutions Time": 1690497656,
+    #     "Deposition Time": 1690497996,
+    #     "Rinse Time": 1690499112,
+    #     "Characterization Time": 1690499549,
+    #     "Clear Well Time": 1690499769,
+    #     "Flush Time": 1690499875,
+    #     "End Time": 1690499875,
+    #     "Well Time": 167104.380354881
+    # }
+    # exp["time_stamps"] = runtimes
+    # exp['status'] = "error"
+    # exp['status_date'] = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+    # print(json.dumps(exp, indent=4))
 
-    save_completed_instructions(exp, filename)
+    # save_completed_instructions(exp, filename)

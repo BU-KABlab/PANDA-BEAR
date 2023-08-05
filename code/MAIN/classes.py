@@ -9,7 +9,6 @@ import json
 
 
 
-
 class Wells:
     '''
     Position of well plate and each well in it. 
@@ -154,7 +153,7 @@ class Vial:
         capacity in ml
         
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 0.01175, height = -14, z_bottom = -64, name = 'vial'):
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 0.01175, height = -14, z_bottom = -64, name = 'vial',filepath = None):
         self.name = name
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
@@ -166,6 +165,7 @@ class Vial:
         self.base = math.pi*math.pow(self.radius,2.0)
         self.depth = ((self.volume/1000000)/self.base) + z_bottom #Note volume must be converted to liters
         self.contamination = 0
+        self.filepath = filepath
 
     @property
     def position(self):

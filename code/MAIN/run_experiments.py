@@ -144,6 +144,7 @@ def purge(purge_vial: Vial, pump: object, purge_volume=20.00, pumping_rate=0.4):
     """
     infuse(purge_volume, pumping_rate, pump)
     purge_vial.update_volume(purge_volume)
+
     logging.debug(f"Purge vial new volume: {purge_vial.volume}")
 
 
@@ -414,7 +415,7 @@ def flush_pipette_tip(
 
     logging.info(f"\n\nFlushing with {flush_solution.name}...")
     mill.move_pipette_to_position(
-        mill, flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
+        flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
     withdraw(20, pumping_rate, pump)
     mill.move_pipette_to_position(
@@ -426,20 +427,20 @@ def flush_pipette_tip(
     logging.debug(f"\tWithdrawing {flush_solution.name}...")
     withdraw(flush_volume, pumping_rate, pump)
     mill.move_pipette_to_position(
-        mill, flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
+        flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
 
     logging.debug("\tMoving to purge...")
     mill.move_pipette_to_position(
-        mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
+        PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
     )
     mill.move_pipette_to_position(
-        mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], PurgeVial.height
+        PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], PurgeVial.height
     )  # PurgeVial.depth replaced with height
     logging.debug("\tPurging...")
     purge(PurgeVial, pump, flush_volume + 20)
     mill.move_pipette_to_position(
-        mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
+        PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
     )  # move back to safe height (top)
 
 
@@ -473,21 +474,11 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
         raise Exception(f"{solution_name} not found in list of solutions")
 
 
-def record_time_step(well: str, step: str, run_times: dict):
+def record_time_step(step: str, run_times: dict):
     currentTime = int(time.time())
     sub_key = step + " Time"
-    if well not in run_times:
-        run_times[well] = {}
-        run_times[well][sub_key] = currentTime
-    else:
-        run_times[well][sub_key] = currentTime
+    run_times[sub_key] = currentTime
     # print(f'{step} time: {run_times[well][sub_key]}')
-
-
-def record_stock_solution_hx(
-    stock_sols: dict, waste_sol: dict, stock_solution_hx: dict
-):
-    pass
 
 
 def save_runtime_data(run_times: dict, filename: str):
@@ -690,6 +681,17 @@ def save_completed_instructions(instructions: list, filename: str):
     os.remove(queue_file_path / (filename))
     print(f"Experiment {filename} removed from queue.")
 
+def write_json(data: dict, filename: str):
+    """
+    Writes a dictionary to a JSON file.
+    :param data: The data to write to the JSON file.
+    :param filename: The name of the JSON file to write to.
+    """
+    cwd = pathlib.Path(__file__).parents[0]
+    file_to_save = cwd / filename
+    with open(file_to_save, "w") as file:
+        json.dump(data, file, indent=4)
+
 def run_experiment(instructions, instructions_filename, logging_level=logging.INFO):
     ## Common Variables
     month = time.strftime("%m")
@@ -705,13 +707,6 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     ## Constants
-    pumping_rate = 0.5
-    RunTimes = {}
-    StockSolutionsHx = {}
-    char_sol_name = "Ferrocene"
-    char_vol = 290
-    flush_sol_name = "DMF"
-    flush_vol = 120
 
     try:
         ## Program Set Up
@@ -736,22 +731,37 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         logging.info("\tVials defined")
 
         logging.info(f"""Experiment outline:
-                     Target Well: {instructions["Target_Well"]}
-                        Acrylate: {instructions["Acrylate"]}
-                        PEG: {instructions["PEG"]}   
-                        DMF: {instructions["DMF"]}
-                        Ferrocene: {instructions["Ferrocene"]}
-                        Deposition Time: {instructions["dep-duration"]}
-                        Deposition Voltage: {instructions["DepPot"]}
+                            Target Well: {instructions["Target_Well"]}
+                            Acrylate: {instructions["Acrylate"]}
+                            PEG: {instructions["PEG"]}   
+                            DMF: {instructions["DMF"]}
+                            Ferrocene: {instructions["Ferrocene"]}
+                            Deposition Time: {instructions["dep-duration"]}
+                            Deposition Voltage: {instructions["DepPot"]}
+                        Experiment Parameters:
+                            Pumping Rate: {instructions['pump_rate']}
+                            Charaterization Sol: {instructions["char_sol"]}
+                            Characterization Vol: {instructions["char_vol"]}
+                            Flush Sol: {instructions["flush_sol"]}
+                            Flush Vol: {instructions["flush_vol"]}
                      """)
 
         ## Run the experiment
         
-        
         well_run = instructions["Target_Well"]
         wellStatus = instructions["status"]
-        RunTimes[well_run] = {}
-        record_time_step(well_run, "Start", RunTimes)
+        RunTimes = {}
+        record_time_step("Start", RunTimes)
+
+        ## Fetch parameters from isntructions
+        pumping_rate = instructions["pump_rate"]
+        char_sol = instructions["char_sol"]
+        char_vol = instructions["char_vol"]
+        flush_sol = instructions["flush_sol"]
+        flush_vol = instructions["flush_vol"]
+        dep_duration = instructions["dep-duration"]
+        dep_pot = instructions["DepPot"]
+
 
         ## Deposit all experiment solutions into well
         experiment_solutions = ["Acrylate", "PEG", "DMF", "Ferrocene"]
@@ -778,13 +788,16 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
                     pump,
                     waste_vials,
                     stock_vials,
-                    flush_sol_name,
+                    flush_sol,
                     mill,
                     pumping_rate,
                     flush_vol,
                 )
 
-        record_time_step(well_run, "Pipetted solutions", RunTimes)
+        record_time_step("Pipetted solutions", RunTimes)
+
+        write_json(stock_vials, "vial_status.json")
+        write_json(waste_vials, "waste_status.json")
 
         ## echem setup
         logging.info("\n\nSetting up eChem experiments...")
@@ -824,7 +837,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             0,
         )  # move to safe height above target well
 
-        record_time_step(well_run, "Deposition completed", RunTimes)
+        record_time_step("Deposition completed", RunTimes)
 
         ## Withdraw all well volume into waste
         clear_well(
@@ -838,24 +851,30 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             solution_name="waste",
         )
 
-        record_time_step(well_run, "Cleared dep_sol", RunTimes)
+        write_json(stock_vials, "vial_status.json")
+        write_json(waste_vials, "waste_status.json")
+
+        record_time_step("Cleared dep_sol", RunTimes)
 
         ## Rinse the well 3x
         rinse(
             wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials
         )
 
-        record_time_step(well_run, "Rinsed well", RunTimes)
+        write_json(stock_vials, "vial_status.json")
+        write_json(waste_vials, "waste_status.json")
+
+        record_time_step("Rinsed well", RunTimes)
 
         logging.info("\n\nBeginning eChem characterization of well: ", well_run)
 
         ## Deposit characterization solution into well
 
-        logging.info(f"Infuse {char_sol_name} into well {well_run}...")
+        logging.info(f"Infuse {char_sol} into well {well_run}...")
         pipette(
             volume=char_vol,
             solutions=stock_vials,
-            solution_name=char_sol_name,
+            solution_name=char_sol,
             target_well=well_run,
             pumping_rate=pumping_rate,
             waste_vials=waste_vials,
@@ -865,7 +884,10 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             mill=mill,
         )
 
-        record_time_step(well_run, "Deposited char_sol", RunTimes)
+        record_time_step("Deposited char_sol", RunTimes)
+
+        write_json(stock_vials, "vial_status.json")
+        write_json(waste_vials, "waste_status.json")
 
         ## Echem CV - characterization
         logging.info(f"Characterizing well: {well_run}")
@@ -903,7 +925,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             0,
         )  # move to safe height above target well
 
-        record_time_step(well_run, "Characterization complete", RunTimes)
+        record_time_step("Characterization complete", RunTimes)
 
         clear_well(
             char_vol,
@@ -916,20 +938,26 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             "waste",
         )
 
-        record_time_step(well_run, "Well cleared", RunTimes)
+        write_json(stock_vials, "vial_status.json")
+        write_json(waste_vials, "waste_status.json")
+
+        record_time_step("Well cleared", RunTimes)
 
         # Flushing procedure
         flush_pipette_tip(
             pump,
             waste_vials,
             stock_vials,
-            flush_sol_name,
+            flush_sol,
             mill,
             pumping_rate,
             flush_vol,
         )
 
-        record_time_step(well_run, "Pipette Flushed", RunTimes)
+        record_time_step("Pipette Flushed", RunTimes)
+
+        write_json(stock_vials, "vial_status.json")
+        write_json(waste_vials, "waste_status.json")
 
         # Final rinse
         rinse(wellplate,
@@ -940,11 +968,14 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
               mill,
               stock_vials
               )
-        record_time_step(well_run, 'Final Rinse', RunTimes)
+        record_time_step('Final Rinse', RunTimes)
+
+        write_json(stock_vials, "vial_status.json")
+        write_json(waste_vials, "waste_status.json")    
 
         instructions["status"] = "Completed"
 
-        record_time_step(well_run, "End", RunTimes)
+        record_time_step("End", RunTimes)
 
         instructions["time_stamps"] = RunTimes
 
