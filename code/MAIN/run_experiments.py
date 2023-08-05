@@ -10,6 +10,7 @@ import logging
 import os
 import datetime
 
+
 def read_vials(filename):
     cwd = pathlib.Path(__file__).parents[0]
     filename = cwd / filename
@@ -28,20 +29,6 @@ def read_vials(filename):
                 )
             )
     return sol_objects
-
-# def update_vials(filename, vial_objects):
-#     cwd = pathlib.Path(__file__).parents[0]
-#     filename = cwd / filename
-#     vial_parameters = json.load(open(filename))
-
-#     for key, values in vial_parameters.items():
-#         for items in values:
-#             for vial in vial_objects:
-#                 if vial.name == items["name"]:
-#                     items["volume"] = vial.volume
-
-#     with open(filename, "w") as outfile:
-#         json.dump(vial_parameters, outfile, indent=4)
 
 
 def set_up_pump():
@@ -489,6 +476,7 @@ def save_runtime_data(run_times: dict, filename: str):
     with open(file_to_save, "w") as f:
         json.dump(run_times, f)
 
+
 def connect_to_pstat():
     ## Initializing and connecting to pstat
     GamryCOM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
@@ -497,10 +485,11 @@ def connect_to_pstat():
     echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
     echem.pstat.Open()  # open connection to pstat
     logging.info("\tPstat connected: ", devices.EnumSections()[0])
-    
+
+
 def check_well_status(well: str):
     """
-    Checks the status of a well.
+    Checks the status of a well in well_status.json.
     :param well: The well to check.
     :return: The status of the well.
     """
@@ -508,9 +497,10 @@ def check_well_status(well: str):
     file_to_open = cwd / "well_status.json"
     with open(file_to_open, "r", encoding="ascii") as file:
         data = json.load(file)
-        for well in data['Wells']:
-            if well['Target_Well'] == well:
-                return well['status']
+        for well in data["Wells"]:
+            if well["Target_Well"] == well:
+                return well["status"]
+
 
 def choose_alternative_well(well: str):
     """
@@ -522,14 +512,15 @@ def choose_alternative_well(well: str):
     file_to_open = cwd / "well_status.json"
     with open(file_to_open, "r", encoding="ascii") as file:
         data = json.load(file)
-        for well in data['Wells']:
-            if well['status'] == "new":
-                return well['Target_Well']
-        return "none"    
+        for well in data["Wells"]:
+            if well["status"] == "new":
+                return well["Target_Well"]
+        return "none"
+
 
 def change_well_status(well: str, status: str):
     """
-    Changes the status of a well.
+    Changes the status of a well in well_status.json.
     :param well: The well to change.
     :param status: The new status of the well.
     """
@@ -537,19 +528,22 @@ def change_well_status(well: str, status: str):
     file_to_open = cwd / "well_status.json"
     with open(file_to_open, "r", encoding="ascii") as file:
         data = json.load(file)
-        for wells in data['Wells']:
-            if wells['Target_Well'] == well:
-                wells['status'] = status
-                wells['status_date'] = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+        for wells in data["Wells"]:
+            if wells["Target_Well"] == well:
+                wells["status"] = status
+                wells["status_date"] = datetime.datetime.now().strftime(
+                    "%Y-%m-%d_%H_%M_%S"
+                )
                 break
     with open(file_to_open, "w") as file:
         json.dump(data, file, indent=4)
 
+
 def read_new_experiments(filename: str):
     """
-    Reads a JSON file and returns the data as a dictionary.
+    Reads a JSON file and returns the experiment instructions/recipie as a dictionary.
     :param filename: The name of the JSON file to read.
-    :return: The data from the JSON file as a dictionary.
+    :return: The instructions/recipie from the JSON file as a dictionary.
     """
     experiments_read = 0
     complete = True
@@ -558,39 +552,43 @@ def read_new_experiments(filename: str):
     file_to_open = file_path / filename
     with open(file_to_open, "r", encoding="ascii") as file:
         data = json.load(file)
-        for experiment in data['Experiments']:
-            existing_status = experiment['status']
+        for experiment in data["Experiments"]:
+            existing_status = experiment["status"]
             if existing_status != "new":
                 continue
             # Get the target well and create a filename
-            desired_well = experiment['Target_Well']
+            desired_well = experiment["Target_Well"]
 
             # Check if the well is available
             if check_well_status(desired_well) != "new":
                 # Find the next available well
                 target_well = choose_alternative_well(desired_well)
                 if target_well == "none":
-                    print(f"No wells available for experiment originally for well {desired_well}.")
+                    print(
+                        f"No wells available for experiment originally for well {desired_well}."
+                    )
                     complete = False
                     continue
                 else:
-                    print(f"Experiment originally for well {desired_well} is now for well {target_well}.")
-                    experiment['Target_Well'] = target_well                
+                    print(
+                        f"Experiment originally for well {desired_well} is now for well {target_well}."
+                    )
+                    experiment["Target_Well"] = target_well
             else:
                 target_well = desired_well
 
-            filename = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H')}_{target_well}.json"
+            filename = (
+                f"{datetime.datetime.now().strftime('%Y-%m-%d_%H')}_{target_well}.json"
+            )
 
             # add additional information to the experiment
-            
             experiment["time_stamps"] = []
             experiment["OCP_file"] = ""
-            experiment["OCP_pass"]= None
+            experiment["OCP_pass"] = None
             experiment["deposition_data_file"] = ""
             experiment["deposition_plot_file"] = ""
             experiment["characterization_data_file"] = ""
             experiment["characterization_plot_file"] = ""
-
 
             # Save the experiment as a separate file in the experiment_que subfolder
             subfolder_path = cwd / "experiment_queue"
@@ -601,19 +599,20 @@ def read_new_experiments(filename: str):
 
             # Change the status of the well
             change_well_status(target_well, "queued")
-            experiment['status'] = "queued"
-            experiment['status_date'] = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
+            experiment["status"] = "queued"
+            experiment["status_date"] = datetime.datetime.now().strftime(
+                "%Y-%m-%d_%H_%M_%S"
+            )
 
             # Add the experiment to the list of experiments read
             experiments_read += 1
-        
+
     # Save the updated file
     with open(file_to_open, "w") as file:
         json.dump(data, file, indent=4)
 
-
-
     return experiments_read, complete
+
 
 def check_inbox():
     """
@@ -625,7 +624,7 @@ def check_inbox():
     count = 0
     for file in file_path.iterdir():
         if file.is_file():
-            [count,complete] = read_new_experiments(file.name)
+            [count, complete] = read_new_experiments(file.name)
 
             # Move to archive the file if it has been read
             if complete:
@@ -634,10 +633,13 @@ def check_inbox():
                 file.replace(archive_path / file.name)
                 print(f"File {file.name} moved to archive.")
             else:
-                print(f"File {file.name} not moved to archive. Not all experiments read.")
+                print(
+                    f"File {file.name} not moved to archive. Not all experiments read."
+                )
 
     return count
-        
+
+
 def read_next_experiment_from_queue():
     """
     Reads the next experiment from the queue.
@@ -645,7 +647,7 @@ def read_next_experiment_from_queue():
     """
     cwd = pathlib.Path(__file__).parents[0]
     file_path = cwd / "experiment_queue"
-    
+
     ## if folder is not empty pick the first file in the queue
     if os.listdir(file_path):
         file_to_open = file_path / os.listdir(file_path)[0]
@@ -655,22 +657,23 @@ def read_next_experiment_from_queue():
     else:
         return None, None
 
+
 def save_completed_instructions(instructions: list, filename: str):
-    '''Save the experiment instructions to either the completed or failed instructions folder.
-        Delete the experiment from the instructions queue'''
+    """Save the experiment instructions to either the completed or failed instructions folder.
+    Delete the experiment from the instructions queue"""
     filename = filename.name
     cwd = pathlib.Path(__file__).parents[0]
     queue_file_path = cwd / "experiment_queue"
     completed_file_path = cwd / "experiments_completed"
     failed_file_path = cwd / "experiments_error"
 
-    if instructions['status'] == "completed":
+    if instructions["status"] == "completed":
         file_to_save = completed_file_path / (filename)
-    elif instructions['status'] == "error":
+    elif instructions["status"] == "error":
         file_to_save = failed_file_path / (filename)
     else:
         return False
-        
+
     with open(file_to_save, "w") as f:
         json.dump(instructions, f, indent=4)
         print(f"Experiment {filename} saved to {file_to_save}.")
@@ -680,6 +683,7 @@ def save_completed_instructions(instructions: list, filename: str):
 
     os.remove(queue_file_path / (filename))
     print(f"Experiment {filename} removed from queue.")
+
 
 def write_json(data: dict, filename: str):
     """
@@ -691,6 +695,7 @@ def write_json(data: dict, filename: str):
     file_to_save = cwd / filename
     with open(file_to_save, "w") as file:
         json.dump(data, file, indent=4)
+
 
 def run_experiment(instructions, instructions_filename, logging_level=logging.INFO):
     ## Common Variables
@@ -730,7 +735,8 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         stock_vials = read_vials("vial_status.json")
         logging.info("\tVials defined")
 
-        logging.info(f"""Experiment outline:
+        logging.info(
+            f"""Experiment outline:
                             Target Well: {instructions["Target_Well"]}
                             Acrylate: {instructions["Acrylate"]}
                             PEG: {instructions["PEG"]}   
@@ -744,10 +750,11 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
                             Characterization Vol: {instructions["char_vol"]}
                             Flush Sol: {instructions["flush_sol"]}
                             Flush Vol: {instructions["flush_vol"]}
-                     """)
+                     """
+        )
 
         ## Run the experiment
-        
+
         well_run = instructions["Target_Well"]
         wellStatus = instructions["status"]
         RunTimes = {}
@@ -762,11 +769,10 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         dep_duration = instructions["dep-duration"]
         dep_pot = instructions["DepPot"]
 
-
         ## Deposit all experiment solutions into well
         experiment_solutions = ["Acrylate", "PEG", "DMF", "Ferrocene"]
         for solution_name in experiment_solutions:
-            if instructions[solution_name] > 0: # if there is a solution to deposit
+            if instructions[solution_name] > 0:  # if there is a solution to deposit
                 logging.info(
                     f"Pipetting {instructions[solution_name]} ul of {solution_name} into {well_run}..."
                 )
@@ -783,7 +789,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
                     pump=pump,
                     mill=mill,
                 )
-                
+
                 flush_pipette_tip(
                     pump,
                     waste_vials,
@@ -819,11 +825,11 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         echem.chrono(
             echem.CAvi,
             echem.CAti,
-            echem.CAv1,
-            echem.CAt1,
-            echem.CAv2,
-            echem.CAt2,
-            echem.CAsamplerate,
+            CAv1=dep_pot,
+            deposition_time=dep_duration,
+            CAv2=echem.CAv2,
+            CAt2=echem.CAt2,
+            CAsamplerate=echem.CAsamplerate
         )  # CA
         while echem.active == True:
             client.PumpEvents(1)
@@ -857,9 +863,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         record_time_step("Cleared dep_sol", RunTimes)
 
         ## Rinse the well 3x
-        rinse(
-            wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials
-        )
+        rinse(wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials)
 
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
@@ -960,18 +964,11 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         write_json(waste_vials, "waste_status.json")
 
         # Final rinse
-        rinse(wellplate,
-              well_run,
-              pumping_rate,
-              pump,
-              waste_vials,
-              mill,
-              stock_vials
-              )
-        record_time_step('Final Rinse', RunTimes)
+        rinse(wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials)
+        record_time_step("Final Rinse", RunTimes)
 
         write_json(stock_vials, "vial_status.json")
-        write_json(waste_vials, "waste_status.json")    
+        write_json(waste_vials, "waste_status.json")
 
         instructions["status"] = "Completed"
 
@@ -982,7 +979,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         # save the updated instructions with run times, and data file names
         save_completed_instructions(instructions, instructions_filename)
         logging.info(f"Saved completed instructions for well {well_run}")
-        
+
         # TODO save the status of stock vials to a dataframe, saving the dataframe at the end of the campaign
 
         logging.info(f"\n\nEXPERIMENT {well_run} COMPLETED\n\n")
@@ -1025,6 +1022,8 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         logging.info("Pump closed")
         echem.disconnectpstat()
         logging.info("Pstat closed")
+
+
 def main():
     ## Read instructions
     while True:
@@ -1035,9 +1034,10 @@ def main():
         else:
             logging.info("Instructions read from queue")
             logging.info(instructions)
-            run_experiment(instructions, instructions_filename)
+            run_experiment(
+                instructions, instructions_filename, logging_level=logging.DEBUG
+            )
             logging.info("Experiment completed")
-
 
 
 if __name__ == "__main__":
