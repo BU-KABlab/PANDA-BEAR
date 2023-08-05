@@ -901,7 +901,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             0,
         )  # move to safe height above target well
         mill.move_electrode_to_position(
-            mill,
+                    
             wellplate.get_coordinates(well_run)["x"],
             wellplate.get_coordinates(well_run)["y"],
             wellplate.echem_height,
@@ -1001,14 +1001,12 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
     finally:
         ## Move electrode to frit bath
         logging.info("Moving electrode to frit bath...")
-        mill.move_electrode_to_position(
-            mill,
+        mill.move_electrode_to_position(      
             wellplate.get_coordinates("H2")["x"],
             wellplate.get_coordinates("H2")["y"],
             0,
         )
-        mill.move_electrode_to_position(
-            mill,
+        mill.move_electrode_to_position(   
             wellplate.get_coordinates("H2")["x"],
             wellplate.get_coordinates("H2")["y"],
             wellplate.echem_height,
@@ -1017,7 +1015,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         ## close out of serial connections
         logging.info("Disconnecting from Mill, Pump, Pstat:")
         mill.__exit__()
-        logging.info("Mill closed: ", not mill.is_open)
+        logging.info("Mill closed")
 
         logging.info("Pump closed")
         echem.disconnectpstat()
