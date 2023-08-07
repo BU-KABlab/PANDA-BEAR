@@ -190,19 +190,33 @@ def plotdata(exp_name, complete_file_name, showplot=False):
         colors = cm.cool(np.linspace(0, 1, max_cycle))
 
         # Plot values for vsig vs Im for each cycle with different dash patterns
-        for i in range(max_cycle):
-            df2 = df[df["Cycle"] == i]
-            dashes = dash_patterns[
-                i - 1
+        # for i in range(max_cycle):
+        #     df2 = df[df["Cycle"] == i]
+        #     dashes = dash_patterns[
+        #         i - 1
+        #     ]  # Use the corresponding dash pattern from the list
+        #     plt.plot(
+        #         df2["Vsig"],
+        #         df2["Im"],
+        #         linestyle="--",
+        #         dashes=dashes,
+        #         color=colors[i - 1],
+        #         label=f"Cycle {i}",
+        #     )
+
+        # plot only the 2nd cycle
+        df2 = df[df["Cycle"] == 1]
+        dashes = dash_patterns[
+                1 - 1
             ]  # Use the corresponding dash pattern from the list
-            plt.plot(
-                df2["Vsig"],
-                df2["Im"],
-                linestyle="--",
-                dashes=dashes,
-                color=colors[i - 1],
-                label=f"Cycle {i}",
-            )
+        plt.plot(
+            df2["Vsig"],
+            df2["Im"],
+            linestyle="--",
+            dashes=dashes,
+            color=colors[1 - 1],
+            label=f"Cycle {1}"
+        )
 
         plt.xlabel("V vs Ag/AgCl (V)")
         plt.ylabel("Current (A)")
