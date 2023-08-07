@@ -318,7 +318,9 @@ def pipette(
 
             purge(PurgeVial, pump, purge_volume)
             move_pipette_to_position(
-                mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
+                mill, 
+                PurgeVial.coordinates["x"], 
+                PurgeVial.coordinates["y"], 0
             )
 
             print(
