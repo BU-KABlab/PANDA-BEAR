@@ -611,12 +611,12 @@ def main():
         print("\tWells defined")
 
         ## Set up solutions
-        waste_vials = read_vials("wasteParameters_07_31_23.json")
-        stock_vials = read_vials("vialParameters_07_25_23.json")
+        waste_vials = read_vials("wasteParameters_08_07_23.json")
+        stock_vials = read_vials("vialParameters_08_07_23.json")
         print("\tVials defined")
 
         ## Read instructions
-        instructions = read_instructions("characterizationBaselineParameters_08_02_23.json")
+        instructions = read_instructions("cv_baseline_23_08_07.json")
 
         print("\tExperiments defined")
 
@@ -766,14 +766,14 @@ def main():
         print("Moving electrode to frit bath...")
         move_electrode_to_position(
             mill,
-            wellplate.get_coordinates("H2")["x"],
-            wellplate.get_coordinates("H2")["y"],
+            wellplate.get_coordinates("H3")["x"],
+            wellplate.get_coordinates("H3")["y"],
             0,
         )
         move_electrode_to_position(
             mill,
-            wellplate.get_coordinates("H2")["x"],
-            wellplate.get_coordinates("H2")["y"],
+            wellplate.get_coordinates("H3")["x"],
+            wellplate.get_coordinates("H3")["y"],
             wellplate.echem_height,
         )
 
@@ -781,7 +781,7 @@ def main():
         month = time.strftime("%m")
         day = time.strftime("%d")
         year = time.strftime("%y")
-        filename = "experiments_" + year + "_" + month + "_" + day + ".json"
+        filename = "cv_baseline_" + year + "_" + month + "_" + day + ".json"
         cwd = pathlib.Path(__file__).parents[1]
         file_path = cwd / "instructions"
         file_folder = file_path / (year + "_" + month + "_" + day)
