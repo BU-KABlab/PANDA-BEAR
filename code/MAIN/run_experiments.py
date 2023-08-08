@@ -582,6 +582,9 @@ def read_new_experiments(filename: str):
             )
 
             # add additional information to the experiment
+            
+            experiment["deposition:"] = ""
+            experiment["characterization"] = ""
             experiment["time_stamps"] = []
             experiment["OCP_file"] = ""
             experiment["OCP_pass"] = None

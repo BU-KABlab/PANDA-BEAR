@@ -40,8 +40,8 @@ def initializepstat(pstat):
     pstat.SetCell(GamryCOM.CellOff)
     pstat.SetIEStability(GamryCOM.StabilityNorm)
     pstat.SetVchRangeMode(True)
-    pstat.SetVchRange(10.0)
-    pstat.SetIERangeMode(True)
+    pstat.SetVchRange(10.0) #Expected Max Voltage
+    pstat.SetIERangeMode(True) #True = Auto, False = Manual
     # the following command allows us to set our range manually
     # pstat.SetIERange (x)
 
@@ -113,7 +113,7 @@ def savedata(complete_file_name):
     print("data saved")
 
 
-def plotdata(exp_name, complete_file_name, showplot=False):
+def plotdata(exp_name, complete_file_name, showplot=False, is_replicate=False):
     # complete_file_name = os.path(complete_file_name)
     if exp_name == "OCP":
         df = pd.read_csv(
@@ -127,6 +127,7 @@ def plotdata(exp_name, complete_file_name, showplot=False):
         plt.plot(df["Time"], df["Vf"])
         plt.xlabel("Time (s)")
         plt.ylabel("Voltage (V)")
+    
     elif exp_name == "CA":
         df = pd.read_csv(
             complete_file_name.with_suffix(".txt"),
@@ -150,6 +151,7 @@ def plotdata(exp_name, complete_file_name, showplot=False):
         plt.plot(df["runtime"], df["Im"])
         plt.xlabel("Time (s)")
         plt.ylabel("Current (A)")
+    
     elif exp_name == "CV":
         df = pd.read_csv(
             complete_file_name.with_suffix(".txt"),
@@ -189,32 +191,16 @@ def plotdata(exp_name, complete_file_name, showplot=False):
         # Create a 'viridis' colormap with the number of colors equal to the number of cycles
         colors = cm.cool(np.linspace(0, 1, max_cycle))
 
-        # Plot values for vsig vs Im for each cycle with different dash patterns
-        # for i in range(max_cycle):
-        #     df2 = df[df["Cycle"] == i]
-        #     dashes = dash_patterns[
-        #         i - 1
-        #     ]  # Use the corresponding dash pattern from the list
-        #     plt.plot(
-        #         df2["Vsig"],
-        #         df2["Im"],
-        #         linestyle="--",
-        #         dashes=dashes,
-        #         color=colors[i - 1],
-        #         label=f"Cycle {i}",
-        #     )
-
+        # Plot values for vsig vs Im
         # plot only the 2nd cycle
         df2 = df[df["Cycle"] == 1]
-        dashes = dash_patterns[
-                1 - 1
-            ]  # Use the corresponding dash pattern from the list
+        dashes = dash_patterns[1]
         plt.plot(
             df2["Vsig"],
             df2["Im"],
             linestyle="--",
             dashes=dashes,
-            color=colors[1 - 1],
+            color=colors[1],
             label=f"Cycle {1}"
         )
 
@@ -225,7 +211,11 @@ def plotdata(exp_name, complete_file_name, showplot=False):
 
     plt.tight_layout()
     plt.savefig(complete_file_name.with_suffix(".png"))
-    plt.close()
+    # are we doing replicates? If so don't close the plot yet
+    if is_replicate:
+        pass
+    else:
+        plt.close()
     print("plot saved")
 
 
@@ -235,17 +225,12 @@ def setfilename(target_well, experiment):
     fileDate = current_time.strftime("%Y-%m-%d")
     cwd = pathlib.Path().absolute()
     filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
-    # filePathPar = os.path.join(os.path.expanduser("~"), "Documents", "Github","PANDA","data")
-    # filePath = os.path.join(filePathPar, fileDate)
     filePath = filePathPar / fileDate
-    # complete_file_name = os.path.join(filePath, target_well + '_' + experiment)
     complete_file_name = filePath / (target_well + "_" + experiment)
     print(f"eChem: complete file name is: {complete_file_name}")
-    # if not os.path.exists(filePath):
     if not pathlib.Path.exists(filePath):
         print(f"folder does not exist. Making folder: {filePath}")
         pathlib.Path.mkdir(filePath, parents=True, exist_ok=True)
-        # os.makedirs(filePath, exist_ok = True)
     else:
         print(f"folder {filePath} exists")
     return complete_file_name
@@ -258,7 +243,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     global dtaqsink
     global pstat
     global connection
-    global start_time
+    #global start_time
     global end_time
     global total_time
     global active
@@ -296,7 +281,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     pstat.SetCell(GamryCOM.CellOn)
     dtaq.Run(True)
     # Code for timing started
-    start_time = time.time()
+    #start_time = time.time()
     print("made it to run end")
 
 
@@ -306,7 +291,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global dtaqsink
     global pstat
     global connection
-    global start_time
+    #global start_time
     global end_time
     global total_time
     global active
@@ -335,7 +320,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     dtaq.Run(True)
 
     # Code for timing started
-    start_time = time.time()
+    #start_time = time.time()
     print("made it to run end")
 
 
@@ -345,7 +330,7 @@ def OCP(OCPvi, OCPti, OCPrate):
     global dtaqsink
     global pstat
     global connection
-    global start_time
+    #global start_time
     global end_time
     global total_time
     global active
@@ -369,7 +354,7 @@ def OCP(OCPvi, OCPti, OCPrate):
     pstat.SetCell(GamryCOM.CellOff)
 
     dtaq.Run(True)
-    start_time = time.time()
+    #start_time = time.time()
     print("made it to run end")
 
 
@@ -403,11 +388,11 @@ CAt1 = 300  # run time 300 seconds
 CAv2 = 0  # Step 2 voltage (V)
 CAt2 = 0  # Step 2 time (s)
 CAsamplerate = 0.05  # sample period (s)
-# Max current (mA)
+# Max current (mA) - see init statement
 # Limit I (mA/cm^2)
 # PF Corr. (ohm)
 # Equil. time (s)
-# Expected Max V (V)
+# Expected Max V (V) - see init statement
 # Initial Delay on
 # Initial Delay (s)
 

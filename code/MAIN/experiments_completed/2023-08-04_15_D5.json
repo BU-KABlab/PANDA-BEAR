@@ -7,7 +7,9 @@
     "test-type": "CV",
     "dep-duration": 300,
     "DepPot": -2.7,
-    "status": "completed",
+    "status": "complete",
+    "deposition:": "complete",
+    "characterization": "complete",
     "time_stamps": {
         "Start Time": 1690497089,
         "Solutions Time": 1690497656,
