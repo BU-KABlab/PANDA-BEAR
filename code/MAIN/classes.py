@@ -301,20 +301,23 @@ class MillControl:
         time.sleep(2)
         try:
             if type(status) == list:
-                list_length = len(status)
-                first = status[0].decode("utf-8").strip()
                 
-                if list_length > 1:
+                list_length = len(status)
+                if list_length == 0:
+                    out = 'No response'
+                elif list_length == 1:    
+                    first = status[0].decode("utf-8").strip()
+                
+                elif list_length > 1:
                     second = status[1].decode("utf-8").strip()
                 
-                if first.find('ok') >=0:
+                elif first.find('ok') >=0:
                    out = second
                 else:
-                    out = first
+                    out = 'No response'
             if type(status) == str:
                 out = status.decode("utf-8").strip()
                 
-            #print(f'\t\t{out}')
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename

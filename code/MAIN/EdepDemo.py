@@ -6,7 +6,345 @@ import print_panda
 import json
 import pathlib
 import math
-import csv
+
+def main():
+    ## Constants
+    pumping_rate = 0.5
+    RunTimes = {}
+    char_sol_name = "Ferrocene"
+    char_vol = 290
+    flush_sol_name = "DMF"
+    flush_vol = 120
+
+    ## Common Variables
+    month = time.strftime("%m")
+    day = time.strftime("%d")
+    year = time.strftime("%y")
+
+    try:
+        ## Program Set Up
+        print_panda.printpanda()
+        totalStartTime = int(time.time())
+
+        print(f"Start Time: {totalStartTime}")
+        print("Beginning protocol:\nConnecting to Mill, Pump, Pstat:")
+        print("\tConnecting to Mill...")
+        mill = MillControl()
+        print("\tMill connected")  # Made an actual ccheck
+
+        pump = set_up_pump()
+
+        ## Initializing and connecting to pstat
+        GamryCOM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
+        pstat = client.CreateObject("GamryCOM.GamryPC6Pstat")
+        devices = client.CreateObject("GamryCOM.GamryDeviceList")
+        echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
+        echem.pstat.Open()  # open connection to pstat
+        print("\tPstat connected: ", devices.EnumSections()[0])
+
+        # TODO Create proper exceptions for when things fail to connect,dont try and disconnect if they arent connected
+
+        ## Set up wells
+        wellplate = Wells(-218, -74, 0, 0)
+        print("\tWells defined")
+
+        ## Set up solutions
+        waste_vials = read_vials("wasteParameters_08_07_23.json")
+        stock_vials = read_vials("vialParameters_08_07_23.json")
+        print("\tVials defined")
+
+        ## Read instructions
+        instruction_file = "campaign_3_23_08_07"
+        instructions = read_instructions(instruction_file + ".json")
+
+        print("\tExperiments defined")
+
+        ## Run the experiments
+        for i in range(len(instructions)):  # loop per well
+            startTime = time.time()  # experiment start time
+            well_run = instructions[i]["Target_Well"]
+            wellStatus = instructions[i]["status"]
+            RunTimes[well_run] = {}
+            record_time_step(well_run, "Start", RunTimes)
+
+            ## Deposit all experiment solutions into well
+            experiment_solutions = ["Campaign3Mix"]
+            for solution_name in experiment_solutions:
+                print(
+                    f"Pipetting {instructions[i][solution_name]} ul of {solution_name} into {well_run}..."
+                )
+                # soltuion_ml = float((instructions[i][solution_name])/1000000) #because the pump works in ml
+                pipette(
+                    volume=instructions[i][solution_name],  # volume in ul
+                    solutions=stock_vials,
+                    solution_name=solution_name,
+                    target_well=well_run,
+                    pumping_rate=pumping_rate,
+                    waste_vials=waste_vials,
+                    waste_solution_name="waste",
+                    wellplate=wellplate,
+                    pump=pump,
+                    mill=mill,
+                )
+                if instructions[i][solution_name] > 0:
+                    flush_pipette_tip(
+                        pump,
+                        waste_vials,
+                        stock_vials,
+                        flush_sol_name,
+                        mill,
+                        pumping_rate,
+                        flush_vol,
+                    )
+
+            record_time_step(well_run, "Solutions", RunTimes)
+
+            ## echem setup
+            print("\n\nSetting up eChem experiments...")
+
+            complete_file_name = echem.setfilename(well_run, "dep")
+
+            ## echem CA - deposition
+            print("\n\nBeginning eChem deposition of well: ", well_run)
+            move_electrode_to_position(
+                mill,
+                wellplate.get_coordinates(well_run)["x"],
+                wellplate.get_coordinates(well_run)["y"],
+                0,
+            )  # move to safe height above target well
+            move_electrode_to_position(
+                mill,
+                wellplate.get_coordinates(well_run)["x"],
+                wellplate.get_coordinates(well_run)["y"],
+                wellplate.echem_height,
+            )  # move to well depth
+            echem.chrono(
+                CAvi=echem.CAvi,
+                CAti=echem.CAti,
+                CAv1=instructions[i]["CAv1"],
+                CAt1=echem.CAt1,
+                CAv2=echem.CAv2,
+                CAt2=echem.CAt2,
+                CAsamplerate=echem.CAsamplerate,
+            )  # CA
+            while echem.active == True:
+                client.PumpEvents(1)
+                time.sleep(0.5)
+            ## echem plot the data
+            echem.plotdata("CA", complete_file_name)
+
+            move_electrode_to_position(
+                mill,
+                wellplate.get_coordinates(well_run)["x"],
+                wellplate.get_coordinates(well_run)["y"],
+                0,
+            )  # move to safe height above target well
+
+            record_time_step(well_run, "Deposition", RunTimes)
+
+            ## Withdraw all well volume into waste
+            clear_well(
+                volume=wellplate.volume(well_run),
+                target_well=well_run,
+                wellplate=wellplate,
+                pumping_rate=pumping_rate,
+                pump=pump,
+                waste_vials=waste_vials,
+                mill=mill,
+                solution_name="waste",
+            )
+
+            record_time_step(well_run, "Clear dep_sol", RunTimes)
+
+            ## Rinse the well 3x
+            rinse(
+                wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials
+            )
+
+            record_time_step(well_run, "Rinse", RunTimes)
+
+            print("\n\nBeginning eChem characterization of well: ", well_run)
+
+            ## Deposit Ferrocene into well
+
+            print(f"Infuse {char_sol_name} into well {well_run}...")
+            pipette(
+                volume=char_vol,
+                solutions=stock_vials,
+                solution_name=char_sol_name,
+                target_well=well_run,
+                pumping_rate=pumping_rate,
+                waste_vials=waste_vials,
+                waste_solution_name="waste",
+                wellplate=wellplate,
+                pump=pump,
+                mill=mill,
+            )
+
+            record_time_step(well_run, "Deposit char_sol", RunTimes)
+
+            ## Echem CV - characterization
+            print(f"Characterizing well: {well_run}")
+            move_electrode_to_position(
+                mill,
+                wellplate.get_coordinates(well_run)["x"],
+                wellplate.get_coordinates(well_run)["y"],
+                0,
+            )  # move to safe height above target well
+            move_electrode_to_position(
+                mill,
+                wellplate.get_coordinates(well_run)["x"],
+                wellplate.get_coordinates(well_run)["y"],
+                wellplate.echem_height,
+            )
+            complete_file_name = echem.setfilename(well_run, "CV")
+            echem.cyclic(
+                echem.CVvi,
+                echem.CVap1,
+                echem.CVap2,
+                echem.CVvf,
+                CVsr1=0.05,
+                CVsr2=0.05,
+                CVsr3=0.05,
+                CVsamplerate=echem.CVsamplerate,
+                CVcycle=echem.CVcycle,
+            )
+            while echem.active == True:
+                client.PumpEvents(1)
+                time.sleep(0.1)
+            ## echem plot the data
+            echem.plotdata("CV", complete_file_name)
+            move_electrode_to_position(
+                mill,
+                wellplate.get_coordinates(well_run)["x"],
+                wellplate.get_coordinates(well_run)["y"],
+                0,
+            )  # move to safe height above target well
+
+            record_time_step(well_run, "Characterization", RunTimes)
+
+            clear_well(
+                char_vol,
+                well_run,
+                wellplate,
+                pumping_rate,
+                pump,
+                waste_vials,
+                mill,
+                "waste",
+            )
+
+            record_time_step(well_run, "Clear Well", RunTimes)
+
+            # Flushing procedure
+            flush_pipette_tip(
+                pump,
+                waste_vials,
+                stock_vials,
+                flush_sol_name,
+                mill,
+                pumping_rate,
+                flush_vol,
+            )
+
+            record_time_step(well_run, "Flush", RunTimes)
+
+            ## Final rinse
+            rinse(wellplate,
+                  well_run,
+                  pumping_rate,
+                  pump,
+                  waste_vials,
+                  mill,
+                  stock_vials
+                  )
+            record_time_step(well_run, 'Final Rinse', RunTimes)
+
+            print(
+                f"well {well_run} completed\n\n....................................................................\n"
+            )
+            wellStatus = "Completed"
+            instructions[i]["status"] = wellStatus
+
+            record_time_step(well_run, "End", RunTimes)
+
+            wellTime = int(time.time())
+            RunTimes[well_run]["Well Time"] = wellTime - startTime
+            print(f'Well time: {RunTimes[well_run]["Well Time"]/60} minutes')
+
+            save_runtime_data(
+                RunTimes[well_run],
+                f"{year}_{month}_{day}_{instruction_file}_Timestamps",
+            )
+
+            ## Print the current vial volumes in a table format
+            print("\n\nCurrent Vial Volumes:")
+            for vial in stock_vials:
+                print(f"{vial.name}: {vial.volume} ml")
+            print("\n\n")
+            # TODO save the status of stock vials to a dataframe, saving the dataframe at the end of the campaign
+
+        print("\n\nEXPERIMENTS COMPLETED\n\n")
+        end_time = int(time.time())
+        print(f"End Time: {end_time}")
+        print(f"Total Time: {end_time - startTime}")
+        print_runtime_data(RunTimes)
+
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt")
+
+    except Exception as e:
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception: ", e)
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        instructions[i]["Status"] = "error"
+
+    finally:
+        ## Move electrode to frit bath
+        print("Moving electrode to frit bath...")
+        move_electrode_to_position(
+            mill,
+            wellplate.get_coordinates("H4")["x"],
+            wellplate.get_coordinates("H4")["y"],
+            0,
+        )
+        move_electrode_to_position(
+            mill,
+            wellplate.get_coordinates("H4")["x"],
+            wellplate.get_coordinates("H4")["y"],
+            wellplate.echem_height,
+        )
+
+        ## Save experiment instructions and status
+        month = time.strftime("%m")
+        day = time.strftime("%d")
+        year = time.strftime("%y")
+        filename = instruction_file
+        cwd = pathlib.Path(__file__).parents[1]
+        file_path = cwd / "instructions"
+        file_folder = file_path / (year + "_" + month + "_" + day)
+        pathlib.Path(file_folder).mkdir(parents=True, exist_ok=True)
+        file_to_save = file_folder / filename
+        with open(file_to_save, "w") as file:
+            json.dump(instructions, file, indent=4)
+
+        ## close out of serial connections
+        print("Disconnecting from Mill, Pump, Pstat:")
+        mill.__exit__()
+        print("Mill closed")
+
+        print("Pump closed")
+        echem.disconnectpstat()
+        print("Pstat closed")
+
+        total_end_time = time.time()
+        print(f"\n\nTotal Time: {total_end_time - totalStartTime}")
+        print_runtime_data(RunTimes)
+
 
 
 def read_json(filename: str):
@@ -318,7 +656,9 @@ def pipette(
 
             purge(PurgeVial, pump, purge_volume)
             move_pipette_to_position(
-                mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
+                mill, 
+                PurgeVial.coordinates["x"], 
+                PurgeVial.coordinates["y"], 0
             )
 
             print(
@@ -567,344 +907,6 @@ def save_runtime_data(run_times: dict, filename: str):
     with open(file_to_save, "w") as f:
         json.dump(run_times, f)
 
-
-def main():
-    ## Constants
-    pumping_rate = 0.5
-    RunTimes = {}
-    StockSolutionsHx = {}
-    char_sol_name = "Ferrocene"
-    char_vol = 290
-    flush_sol_name = "DMF"
-    flush_vol = 120
-
-    ## Common Variables
-    month = time.strftime("%m")
-    day = time.strftime("%d")
-    year = time.strftime("%y")
-
-    try:
-        ## Program Set Up
-        print_panda.printpanda()
-        totalStartTime = int(time.time())
-
-        print(f"Start Time: {totalStartTime}")
-        print("Beginning protocol:\nConnecting to Mill, Pump, Pstat:")
-        print("\tConnecting to Mill...")
-        mill = MillControl()
-        print("\tMill connected")  # Made an actual ccheck
-
-        pump = set_up_pump()
-
-        ## Initializing and connecting to pstat
-        GamryCOM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
-        pstat = client.CreateObject("GamryCOM.GamryPC6Pstat")
-        devices = client.CreateObject("GamryCOM.GamryDeviceList")
-        echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
-        echem.pstat.Open()  # open connection to pstat
-        print("\tPstat connected: ", devices.EnumSections()[0])
-
-        # TODO Create proper exceptions for when things fail to connect,dont try and disconnect if they arent connected
-
-        ## Set up wells
-        wellplate = Wells(-218, -74, 0, 0)
-        print("\tWells defined")
-
-        ## Set up solutions
-        waste_vials = read_vials("wasteParameters_08_02_23.json")
-        stock_vials = read_vials("vialParameters_08_02_23.json")
-        print("\tVials defined")
-
-        ## Read instructions
-        instructions = read_instructions("testing_08_03_23.json")
-
-        print("\tExperiments defined")
-
-        ## Run the experiments
-        for i in range(len(instructions)):  # loop per well
-            startTime = time.time()  # experiment start time
-            well_run = instructions[i]["Target_Well"]
-            wellStatus = instructions[i]["status"]
-            RunTimes[well_run] = {}
-            record_time_step(well_run, "Start", RunTimes)
-
-            ## Deposit all experiment solutions into well
-            experiment_solutions = ["DMF", "PEG", "Acrylate", "Ferrocene"]
-            for solution_name in experiment_solutions:
-                print(
-                    f"Pipetting {instructions[i][solution_name]} ul of {solution_name} into {well_run}..."
-                )
-                # soltuion_ml = float((instructions[i][solution_name])/1000000) #because the pump works in ml
-                pipette(
-                    volume=instructions[i][solution_name],  # volume in ul
-                    solutions=stock_vials,
-                    solution_name=solution_name,
-                    target_well=well_run,
-                    pumping_rate=pumping_rate,
-                    waste_vials=waste_vials,
-                    waste_solution_name="waste",
-                    wellplate=wellplate,
-                    pump=pump,
-                    mill=mill,
-                )
-                if instructions[i][solution_name] > 0:
-                    flush_pipette_tip(
-                        pump,
-                        waste_vials,
-                        stock_vials,
-                        flush_sol_name,
-                        mill,
-                        pumping_rate,
-                        flush_vol,
-                    )
-
-            record_time_step(well_run, "Solutions", RunTimes)
-
-            ## echem setup
-            print("\n\nSetting up eChem experiments...")
-
-            complete_file_name = echem.setfilename(well_run, "dep")
-
-            ## echem CA - deposition
-            print("\n\nBeginning eChem deposition of well: ", well_run)
-            move_electrode_to_position(
-                mill,
-                wellplate.get_coordinates(well_run)["x"],
-                wellplate.get_coordinates(well_run)["y"],
-                0,
-            )  # move to safe height above target well
-            move_electrode_to_position(
-                mill,
-                wellplate.get_coordinates(well_run)["x"],
-                wellplate.get_coordinates(well_run)["y"],
-                wellplate.echem_height,
-            )  # move to well depth
-            echem.chrono(
-                echem.CAvi,
-                echem.CAti,
-                echem.CAv1,
-                echem.CAt1,
-                echem.CAv2,
-                echem.CAt2,
-                echem.CAsamplerate,
-            )  # CA
-            while echem.active == True:
-                client.PumpEvents(1)
-                time.sleep(0.5)
-            ## echem plot the data
-            echem.plotdata("CA", complete_file_name)
-
-            move_electrode_to_position(
-                mill,
-                wellplate.get_coordinates(well_run)["x"],
-                wellplate.get_coordinates(well_run)["y"],
-                0,
-            )  # move to safe height above target well
-
-            record_time_step(well_run, "Deposition", RunTimes)
-
-            ## Withdraw all well volume into waste
-            clear_well(
-                volume=wellplate.volume(well_run),
-                target_well=well_run,
-                wellplate=wellplate,
-                pumping_rate=pumping_rate,
-                pump=pump,
-                waste_vials=waste_vials,
-                mill=mill,
-                solution_name="waste",
-            )
-
-            record_time_step(well_run, "Clear dep_sol", RunTimes)
-
-            ## Rinse the well 3x
-            rinse(
-                wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials
-            )
-
-            record_time_step(well_run, "Rinse", RunTimes)
-
-            print("\n\nBeginning eChem characterization of well: ", well_run)
-
-            ## Deposit Ferrocene into well
-
-            print(f"Infuse {char_sol_name} into well {well_run}...")
-            pipette(
-                volume=char_vol,
-                solutions=stock_vials,
-                solution_name=char_sol_name,
-                target_well=well_run,
-                pumping_rate=pumping_rate,
-                waste_vials=waste_vials,
-                waste_solution_name="waste",
-                wellplate=wellplate,
-                pump=pump,
-                mill=mill,
-            )
-
-            record_time_step(well_run, "Deposit char_sol", RunTimes)
-
-            ## Echem CV - characterization
-            print(f"Characterizing well: {well_run}")
-            move_electrode_to_position(
-                mill,
-                wellplate.get_coordinates(well_run)["x"],
-                wellplate.get_coordinates(well_run)["y"],
-                0,
-            )  # move to safe height above target well
-            move_electrode_to_position(
-                mill,
-                wellplate.get_coordinates(well_run)["x"],
-                wellplate.get_coordinates(well_run)["y"],
-                wellplate.echem_height,
-            )
-            complete_file_name = echem.setfilename(well_run, "CV")
-            echem.cyclic(
-                echem.CVvi,
-                echem.CVap1,
-                echem.CVap2,
-                echem.CVvf,
-                CVsr1=0.05,
-                CVsr2=0.05,
-                CVsr3=0.05,
-                CVsamplerate=echem.CVsamplerate,
-                CVcycle=echem.CVcycle,
-            )
-            while echem.active == True:
-                client.PumpEvents(1)
-                time.sleep(0.1)
-            ## echem plot the data
-            echem.plotdata("CV", complete_file_name)
-            move_electrode_to_position(
-                mill,
-                wellplate.get_coordinates(well_run)["x"],
-                wellplate.get_coordinates(well_run)["y"],
-                0,
-            )  # move to safe height above target well
-
-            record_time_step(well_run, "Characterization", RunTimes)
-
-            clear_well(
-                char_vol,
-                well_run,
-                wellplate,
-                pumping_rate,
-                pump,
-                waste_vials,
-                mill,
-                "waste",
-            )
-
-            record_time_step(well_run, "Clear Well", RunTimes)
-
-            # Flushing procedure
-            flush_pipette_tip(
-                pump,
-                waste_vials,
-                stock_vials,
-                flush_sol_name,
-                mill,
-                pumping_rate,
-                flush_vol,
-            )
-
-            record_time_step(well_run, "Flush", RunTimes)
-
-            ## Final rinse
-            rinse(wellplate,
-                  well_run,
-                  pumping_rate,
-                  pump,
-                  waste_vials,
-                  mill,
-                  stock_vials
-                  )
-            record_time_step(well_run, 'Final Rinse', RunTimes)
-
-            print(
-                f"well {well_run} completed\n\n....................................................................\n"
-            )
-            wellStatus = "Completed"
-            instructions[i]["status"] = wellStatus
-
-            record_time_step(well_run, "End", RunTimes)
-
-            wellTime = int(time.time())
-            RunTimes[well_run]["Well Time"] = wellTime - startTime
-            print(f'Well time: {RunTimes[well_run]["Well Time"]/60} minutes')
-
-            save_runtime_data(
-                RunTimes[well_run],
-                year + "_" + month + "_" + day + "_" + "Experiment Timestamps",
-            )
-
-            ## Print the current vial volumes in a table format
-            print("\n\nCurrent Vial Volumes:")
-            for vial in stock_vials:
-                print(f"{vial.name}: {vial.volume} ml")
-            print("\n\n")
-            # TODO save the status of stock vials to a dataframe, saving the dataframe at the end of the campaign
-
-        print("\n\nEXPERIMENTS COMPLETED\n\n")
-        end_time = int(time.time())
-        print(f"End Time: {end_time}")
-        print(f"Total Time: {end_time - startTime}")
-        print_runtime_data(RunTimes)
-
-    except KeyboardInterrupt:
-        print("Keyboard Interrupt")
-
-    except Exception as e:
-        exception_type, exception_object, exception_traceback = sys.exc_info()
-        filename = exception_traceback.tb_frame.f_code.co_filename
-        line_number = exception_traceback.tb_lineno
-        print("Exception: ", e)
-        print("Exception type: ", exception_type)
-        print("File name: ", filename)
-        print("Line number: ", line_number)
-        instructions[i]["Status"] = "error"
-
-    finally:
-        ## Move electrode to frit bath
-        print("Moving electrode to frit bath...")
-        move_electrode_to_position(
-            mill,
-            wellplate.get_coordinates("H2")["x"],
-            wellplate.get_coordinates("H2")["y"],
-            0,
-        )
-        move_electrode_to_position(
-            mill,
-            wellplate.get_coordinates("H2")["x"],
-            wellplate.get_coordinates("H2")["y"],
-            wellplate.echem_height,
-        )
-
-        ## Save experiment instructions and status
-        month = time.strftime("%m")
-        day = time.strftime("%d")
-        year = time.strftime("%y")
-        filename = "experiments_" + year + "_" + month + "_" + day + ".json"
-        cwd = pathlib.Path(__file__).parents[1]
-        file_path = cwd / "instructions"
-        file_folder = file_path / (year + "_" + month + "_" + day)
-        pathlib.Path(file_folder).mkdir(parents=True, exist_ok=True)
-        file_to_save = file_folder / filename
-        with open(file_to_save, "w") as file:
-            json.dump(instructions, file, indent=4)
-
-        ## close out of serial connections
-        print("Disconnecting from Mill, Pump, Pstat:")
-        mill.__exit__()
-        print("Mill closed")
-
-        print("Pump closed")
-        echem.disconnectpstat()
-        print("Pstat closed")
-
-        total_end_time = time.time()
-        print(f"\n\nTotal Time: {total_end_time - totalStartTime}")
-        print_runtime_data(RunTimes)
 
 
 if __name__ == "__main__":
