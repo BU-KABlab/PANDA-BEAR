@@ -153,7 +153,9 @@ class Vial:
         capacity in ml
         
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 0.01175, height = -14, z_bottom = -64, name = 'vial',filepath = None):
+    # TODO how to rewrite this to use disk stored information isntead of all in memory
+
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 13.5, height = -14, z_bottom = -64, name = 'vial',filepath = None):
         self.name = name
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
@@ -205,10 +207,19 @@ class Vial:
             raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
-            self.depth = ((self.volume/1000000)/self.base) + self.bottom #Note volume must be converted to liters
+            self.depth = self.vial_height_calculator(self.radius*2, self.volume) + self.bottom #Note volume must be converted to liters
         logging.debug(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
         self.contamination += 1
         
+    def vial_height_calculator(diameter_mm, volume_ul):
+        """
+        Calculates the height of a liquid in a vial given its diameter (in mm), height (in mm), and volume (in ul).
+        """
+        radius_mm = diameter_mm / 2
+        area_mm2 = 3.141592653589793 * radius_mm ** 2
+        volume_mm3 = volume_ul # 1 ul = 1 mm3
+        liquid_height_mm = volume_mm3 / area_mm2
+        return liquid_height_mm
 
 
 class MillControl:

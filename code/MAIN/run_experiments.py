@@ -431,34 +431,55 @@ def flush_pipette_tip(
     )  # move back to safe height (top)
 
 
-def solution_selector(solutions: list, solution_name: str, volume: float):
-    """
-    Select the solution from the list of solutions
-    """
-    for solution in solutions:
-        if solution.name == solution_name and solution.volume > (volume + 1000):
+# def solution_selector(solutions: list, solution_name: str, volume: float):
+#     """
+#     Select the solution from the list of solutions
+#     """
+#     for solution in solutions:
+#         if solution.name == solution_name and solution.volume > (volume + 1000):
+#             return solution
+#         else:
+#             pass
+#     raise Exception(f"{solution_name} not found in list of solutions")
+
+def solution_selector(solution_name: str, volume: float):
+    '''Selects the appropriate vial from the list of solutions in vial_status.json for the given solution name and volume'''
+    with open('vial_status.json', 'r') as f:
+        vial_status = json.load(f)
+    for solution in vial_status['solutions']:
+        if solution['name'] == solution_name and solution['volume'] > (volume + 1000):
             return solution
         else:
             pass
-    raise Exception(f"{solution_name} not found in list of solutions")
+    raise Exception(f"{solution_name} not found in list of solutions or not enough volume in vial(s)")
 
+# def waste_selector(solutions: list, solution_name: str, volume: float):
+#     """
+#     Select the solution from the list of solutions
+#     """
+#     solution_found = False
+#     for solution in solutions:
+#         if (
+#             solution.name == solution_name
+#             and (solution.volume + volume) < solution.capacity
+#         ):
+#             solution_found = True
+#             return solution
+#         else:
+#             pass
+#     if solution_found == False:
+#         raise Exception(f"{solution_name} not found in list of solutions")
 
-def waste_selector(solutions: list, solution_name: str, volume: float):
-    """
-    Select the solution from the list of solutions
-    """
-    solution_found = False
-    for solution in solutions:
-        if (
-            solution.name == solution_name
-            and (solution.volume + volume) < solution.capacity
-        ):
-            solution_found = True
+def waste_selector(solution_name:str, volume):
+    '''Selects the appropriate vial from the list of waste vials in waste_status.json for the given solution name and volume'''
+    with open('waste_status.json', 'r') as f:
+        waste_status = json.load(f)
+    for solution in waste_status['waste']:
+        if solution['name'] == solution_name and (solution['volume'] + volume) < solution['capacity']:
             return solution
         else:
             pass
-    if solution_found == False:
-        raise Exception(f"{solution_name} not found in list of solutions")
+    raise Exception(f"{solution_name} not found in list of waste vials or not capacity vials")
 
 
 def record_time_step(step: str, run_times: dict):
@@ -582,7 +603,7 @@ def read_new_experiments(filename: str):
             )
 
             # add additional information to the experiment
-            
+            experiment["filename"] = filename
             experiment["deposition:"] = ""
             experiment["characterization"] = ""
             experiment["time_stamps"] = []
@@ -602,6 +623,7 @@ def read_new_experiments(filename: str):
 
             # Change the status of the well
             change_well_status(target_well, "queued")
+            experiment["filename"] = filename
             experiment["status"] = "queued"
             experiment["status_date"] = datetime.datetime.now().strftime(
                 "%Y-%m-%d_%H_%M_%S"
@@ -699,6 +721,22 @@ def write_json(data: dict, filename: str):
     with open(file_to_save, "w") as file:
         json.dump(data, file, indent=4)
 
+def update_experiment_recipt(experiment: dict, item_to_update:str, value, filename: str):
+    """
+    Updates the experiment receipt with the new value.
+    :param experiment: The experiment receipt to update.
+    :param item_to_update: The item to update.
+    :param value: The new value.
+    :return: The updated experiment receipt.
+    """
+    experiment[item_to_update] = value
+
+    # Save the updated file 
+    with open(filename, "w") as file:
+        json.dump(experiment, file, indent=4)
+        
+
+    return experiment
 
 def run_experiment(instructions, instructions_filename, logging_level=logging.INFO):
     ## Common Variables
@@ -770,10 +808,11 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         flush_sol = instructions["flush_sol"]
         flush_vol = instructions["flush_vol"]
         dep_duration = instructions["dep-duration"]
-        dep_pot = instructions["DepPot"]
+        deposition_potential = instructions["DepPot"]
 
         ## Deposit all experiment solutions into well
         experiment_solutions = ["Acrylate", "PEG", "DMF", "Ferrocene"]
+
         for solution_name in experiment_solutions:
             if instructions[solution_name] > 0:  # if there is a solution to deposit
                 logging.info(
@@ -812,9 +851,11 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         logging.info("\n\nSetting up eChem experiments...")
 
         complete_file_name = echem.setfilename(well_run, "dep")
-
+        
         ## echem CA - deposition
         logging.info("\n\nBeginning eChem deposition of well: ", well_run)
+        instructions["status"] = "deposition"
+
         mill.move_electrode_to_position(
             wellplate.get_coordinates(well_run)["x"],
             wellplate.get_coordinates(well_run)["y"],
@@ -828,7 +869,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         echem.chrono(
             echem.CAvi,
             echem.CAti,
-            CAv1=dep_pot,
+            CAv1=deposition_potential,
             deposition_time=dep_duration,
             CAv2=echem.CAv2,
             CAt2=echem.CAt2,
@@ -847,6 +888,9 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         )  # move to safe height above target well
 
         record_time_step("Deposition completed", RunTimes)
+        
+        instructions["deposition"] = "completed" # TODO turn into function to update instructions
+        update_experiment_recipt(instructions,"deposition","completed",instructions_filename)
 
         ## Withdraw all well volume into waste
         clear_well(
