@@ -1,0 +1,5 @@
+obsws_python
+nesp_lib
+comtypes
+numpy
+matplotlib
