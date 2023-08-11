@@ -9,6 +9,7 @@ import math
 import logging
 import os
 import datetime
+import obsws_python as obs
 
 
 def read_vials(filename):
@@ -743,6 +744,11 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
     month = time.strftime("%m")
     day = time.strftime("%d")
     year = time.strftime("%Y")
+    # osbclient = obs.ReqClient(host='localhost', port=4455, password='mystrongpass', timeout=3)
+    # label = osbclient.get_input_settings("text")
+    # label.input_settings["text"]="ePANDA"
+    # label.input_settings["font"]["size"]=60
+    
 
     ## Logging
     log_file = f"{year}-{month}-{day}.log"
@@ -797,6 +803,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         ## Run the experiment
 
         well_run = instructions["Target_Well"]
+        replicates = instructions["replicates"]
         wellStatus = instructions["status"]
         RunTimes = {}
         record_time_step("Start", RunTimes)
@@ -810,10 +817,27 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         dep_duration = instructions["dep-duration"]
         deposition_potential = instructions["DepPot"]
 
+        # video_information = f'''
+        # Experiment Parameters:
+        #     Well: {well_run}
+        #     Replicates: {replicates}
+        #     Pumping Rate: {pumping_rate}
+        #     Charaterization Sol: {char_sol} Vol: {char_vol}
+        #     Flush Sol: {flush_sol} Vol: {flush_vol}
+        #     Deposition Voltage: {deposition_potential}
+        #     OCP Compelte: No
+        #     Deposition Complete: No
+        #     Characterization Complete: No
+        # '''
+        # osbclient.set_input_settings(video_information,label.input_settings,True)
+        # osbclient.start_record()
+
         ## Deposit all experiment solutions into well
         experiment_solutions = ["Acrylate", "PEG", "DMF", "Ferrocene"]
 
         for solution_name in experiment_solutions:
+            
+
             if instructions[solution_name] > 0:  # if there is a solution to deposit
                 logging.info(
                     f"Pipetting {instructions[solution_name]} ul of {solution_name} into {well_run}..."
