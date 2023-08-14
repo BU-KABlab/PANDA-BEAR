@@ -375,9 +375,9 @@ class MillControl:
         Returns:
             str: Response from the mill after executing the command.
         """
-        offsets = {"x": 0, "y": 0, "z": 0}
+        #offsets = {"x": 0, "y": 0, "z": 0}
 
-        #offsets = self.config['instrument_offsets']['center']
+        offsets = self.config['instrument_offsets']['center']
 
         mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
         command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
@@ -403,7 +403,7 @@ class MillControl:
         Returns:
             str: Response from the mill after executing the command.
         """
-        offsets = {"x": -88, "y": 0, "z": 0}
+        #offsets = {"x": -88, "y": 0, "z": 0}
         offsets = self.config['instrument_offsets']['pipette']
         mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
         command = mill_move.format(
@@ -421,7 +421,7 @@ class MillControl:
         Returns:
             str: Response from the mill after executing the command.
         """
-        offsets = {"x": 36, "y": 30, "z": 0}
+        #offsets = {"x": 36, "y": 30, "z": 0}
         offsets = self.config['instrument_offsets']['electrode']
         # move to specified coordinates
         mill_move = "G00 X{} Y{} Z{}"
