@@ -1,0 +1,3 @@
+import PrintPanda
+
+PrintPanda.printpanda()

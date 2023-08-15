@@ -188,34 +188,28 @@ def plotdata(exp_name, complete_file_name, showplot=False, is_replicate=False):
             for i in range(max_cycle)
         ]
 
-        # Create a 'viridis' colormap with the number of colors equal to the number of cycles
+            # Create a 'viridis' colormap with the number of colors equal to the number of cycles
         colors = cm.cool(np.linspace(0, 1, max_cycle))
 
-        # Plot values for vsig vs Im
-        # plot only the 2nd cycle
-        df2 = df[df["Cycle"] == 1]
-        dashes = dash_patterns[1]
-        plt.plot(
-            df2["Vsig"],
-            df2["Im"],
-            linestyle="--",
-            dashes=dashes,
-            color=colors[1],
-            label=f"Cycle {1}"
-        )
+            # Plot values for vsig vs Im for each cycle with different dash patterns
+            # for i in range(max_cycle):
+            #     df2 = df[df['Cycle'] == i]
+            #     dashes = dash_patterns[i - 1]  # Use the corresponding dash pattern from the list
+            #     plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[i - 1], label=f'Cycle {i}')
 
-        plt.xlabel("V vs Ag/AgCl (V)")
-        plt.ylabel("Current (A)")
+            
+        df2 = df[df['Cycle'] == 1]
+        dashes = dash_patterns[0]  # Use the corresponding dash pattern from the list
+        plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[0], label=f'Cycle 1 - index 0')
+        plt.legend(loc='upper left')
+        plt.xlabel('V vs Ag/AgCl (V)')
+        plt.ylabel('Current (A)')
         if showplot == True:
             plt.show()
-
+          
     plt.tight_layout()
-    plt.savefig(complete_file_name.with_suffix(".png"))
-    # are we doing replicates? If so don't close the plot yet
-    if is_replicate:
-        pass
-    else:
-        plt.close()
+    plt.savefig(complete_file_name.with_suffix('.png'))
+    plt.close()
     print("plot saved")
 
 
@@ -234,7 +228,8 @@ def setfilename(target_well, experiment):
     else:
         print(f"folder {filePath} exists")
     return complete_file_name
-
+        
+        
 
 def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
     """cyclic chronoamperometry"""
@@ -381,18 +376,18 @@ CVsr3 = CVsr1
 CVsamplerate = CVstep / CVsr1
 
 # CA/CP Setup Parameters
-CAvi = 0.0  # Pre-step voltage (V)
-CAti = 0.0  # Pre-step delay time (s)
-CAv1 = -2.4  # Step 1 voltage (V)
-CAt1 = 300  # run time 300 seconds
-CAv2 = 0  # Step 2 voltage (V)
-CAt2 = 0  # Step 2 time (s)
-CAsamplerate = 0.05  # sample period (s)
-# Max current (mA) - see init statement
+CAvi = 0.0 #Pre-step voltage (V)
+CAti = 0.0 #Pre-step delay time (s)
+CAv1 = -2.4 #Step 1 voltage (V)
+CAt1 = 300 #run time 300 seconds
+CAv2 = 0 #Step 2 voltage (V)
+CAt2 = 0 #Step 2 time (s)
+CAsamplerate = 0.05 #sample period (s)
+# Max current (mA)
 # Limit I (mA/cm^2)
 # PF Corr. (ohm)
 # Equil. time (s)
-# Expected Max V (V) - see init statement
+# Expected Max V (V)
 # Initial Delay on
 # Initial Delay (s)
 

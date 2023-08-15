@@ -2,7 +2,7 @@ import time, nesp_lib, sys
 from classes import Vial, MillControl, Wells
 import gamrycontrol as echem
 import comtypes.client as client
-import PrintPanda
+import print_panda as PrintPanda
 import json
 import pathlib
 import math
@@ -25,7 +25,7 @@ def read_json(filename: str):
 
 def read_instructions(filename):
     instructions = []
-    parameters = read_json.read_json(filename)
+    parameters = read_json(filename)
     for experiment in range(len(parameters["Experiments"])):
         instructions.append(parameters["Experiments"][experiment])
         instructions[experiment]["status"] = "qued"
@@ -34,7 +34,7 @@ def read_instructions(filename):
 
 
 def read_vials(filename):
-    vial_parameters = read_json.read_json(filename)
+    vial_parameters = read_json(filename)
 
     sol_objects = []
     for key, values in vial_parameters.items():
@@ -194,7 +194,7 @@ def move_electrode_to_position(mill: object, x, y, z):
     Returns:
         str: Response from the mill after executing the command.
     """
-    offsets = {"x": 36, "y": 29, "z": 0}
+    offsets = {"x": 36, "y": 30, "z": 0}
     # move to specified coordinates
     mill_move = "G1 X{} Y{} Z{}"
     command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
@@ -611,12 +611,12 @@ def main():
         print("\tWells defined")
 
         ## Set up solutions
-        waste_vials = read_vials("wasteParameters_07_25_23.json")
-        stock_vials = read_vials("vialParameters_07_25_23.json")
+        waste_vials = read_vials("wasteParameters_08_07_23.json")
+        stock_vials = read_vials("vialParameters_08_07_23.json")
         print("\tVials defined")
 
         ## Read instructions
-        instructions = read_instructions("characterizationBaselineParameters_07_31_23.json")
+        instructions = read_instructions("cv_baseline_23_08_07.json")
 
         print("\tExperiments defined")
 
@@ -625,6 +625,9 @@ def main():
             startTime = time.time()  # experiment start time
             well_run = instructions[i]["Target_Well"]
             wellStatus = instructions[i]["status"]
+            if wellStatus != "new" and wellStatus != "qued":
+                print(f"Skipping well {well_run}")
+                continue
             RunTimes[well_run] = {}
             record_time_step(well_run, "Start", RunTimes)
 
@@ -670,11 +673,11 @@ def main():
                 echem.CVap1,
                 echem.CVap2,
                 echem.CVvf,
-                echem.CVsr1,
-                echem.CVsr2,
-                echem.CVsr3,
-                echem.CVsamplerate,
-                echem.CVcycle,
+                CVsr1=0.05,
+                CVsr2=0.05,
+                CVsr3=0.05,
+                CVsamplerate=echem.CVsamplerate,
+                CVcycle=echem.CVcycle,
             )
             while echem.active == True:
                 client.PumpEvents(1)
@@ -687,7 +690,7 @@ def main():
                 wellplate.get_coordinates(well_run)["y"],
                 0,
             )  # move to safe height above target well
-
+            
             record_time_step(well_run, "Characterization", RunTimes)
 
             clear_well(
@@ -718,7 +721,7 @@ def main():
             print(
                 f"well {well_run} baseline characterization completed\n\n....................................................................\n"
             )
-            wellStatus = "Completed"
+            wellStatus = "complete"
             instructions[i]["status"] = wellStatus
 
             record_time_step(well_run, "End", RunTimes)
@@ -743,7 +746,7 @@ def main():
         end_time = int(time.time())
         print(f"End Time: {end_time}")
         print(f"Total Time: {end_time - startTime}")
-        print_runtime_data(RunTimes[well_run])
+        print_runtime_data(RunTimes)
 
     except KeyboardInterrupt:
         print("Keyboard Interrupt")
@@ -763,14 +766,14 @@ def main():
         print("Moving electrode to frit bath...")
         move_electrode_to_position(
             mill,
-            wellplate.get_coordinates("H1")["x"],
-            wellplate.get_coordinates("H1")["y"],
+            wellplate.get_coordinates("H3")["x"],
+            wellplate.get_coordinates("H3")["y"],
             0,
         )
         move_electrode_to_position(
             mill,
-            wellplate.get_coordinates("H1")["x"],
-            wellplate.get_coordinates("H1")["y"],
+            wellplate.get_coordinates("H3")["x"],
+            wellplate.get_coordinates("H3")["y"],
             wellplate.echem_height,
         )
 
@@ -778,7 +781,7 @@ def main():
         month = time.strftime("%m")
         day = time.strftime("%d")
         year = time.strftime("%y")
-        filename = "experiments_" + year + "_" + month + "_" + day + ".json"
+        filename = "cv_baseline_" + year + "_" + month + "_" + day + ".json"
         cwd = pathlib.Path(__file__).parents[1]
         file_path = cwd / "instructions"
         file_folder = file_path / (year + "_" + month + "_" + day)

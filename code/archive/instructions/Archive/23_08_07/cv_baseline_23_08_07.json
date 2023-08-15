@@ -1,0 +1,13 @@
+[
+    {
+        "Target_Well": "D10",
+        "DMF": 0,
+        "PEG": 0,
+        "Acrylate": 0,
+        "Ferrocene": 290,
+        "test-type": "CV",
+        "dep-duration": 300,
+        "DepPot": -2.4,
+        "status": "complete"
+    }
+]

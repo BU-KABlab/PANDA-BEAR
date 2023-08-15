@@ -30,6 +30,7 @@ class Wells:
         self.well_offset = 9 # mm from center to center
         self.well_capacity = 300 # ul
         self.echem_height = -68
+        self.echem_height = -68
 
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
@@ -330,6 +331,7 @@ class MillControl:
         time.sleep(2)
         try:
             if type(status) == list:
+                
                 list_length = len(status)
                 if list_length == 0:
                     out = 'No response'
@@ -337,10 +339,10 @@ class MillControl:
                 if list_length > 0:
                     first = status[0].decode("utf-8").strip()
                 
-                if list_length > 1:
+                elif list_length > 1:
                     second = status[1].decode("utf-8").strip()
                 
-                if first.find('ok') >=0:
+                elif first.find('ok') >=0:
                    out = second
                 else:
                     out = 'could not parse response'
