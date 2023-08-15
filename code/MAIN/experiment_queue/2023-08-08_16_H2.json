@@ -1,0 +1,19 @@
+{
+    "Target_Well": "H2",
+    "DMF": 0,
+    "PEG": 0,
+    "Acrylate": 0,
+    "Ferrocene": 0,
+    "test-type": "CA",
+    "dep-duration": 0,
+    "DepPot": 0,
+    "status": "new",
+    "status_date": "2023-08-08_16_46_34",
+    "time_stamps": [],
+    "OCP_file": "",
+    "OCP_pass": null,
+    "deposition_data_file": "",
+    "deposition_plot_file": "",
+    "characterization_data_file": "",
+    "characterization_plot_file": ""
+}

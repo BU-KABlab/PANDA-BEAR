@@ -345,6 +345,7 @@ def main():
         print(f"\n\nTotal Time: {total_end_time - totalStartTime}")
         print_runtime_data(RunTimes)
 
+import logging
 
 
 def read_json(filename: str):
@@ -357,7 +358,7 @@ def read_json(filename: str):
     file_path = cwd / "instructions"
     file_to_open = file_path / filename
     with open(file_to_open, "r", encoding="ascii") as file:
-        data = json.load(file)
+        data = json.load(file).dumps(data, indent=4)
     return data
 
 
@@ -400,7 +401,7 @@ def set_up_pump():
     pump.syringe_diameter = 4.699  # millimeters
     pump.volume_infused_clear()
     pump.volume_withdrawn_clear()
-    print(f"\tPump at address: {pump.address}")
+    logging.info(f"\tPump found at address: {pump.address}")
     time.sleep(2)
     return pump
 
@@ -432,15 +433,14 @@ def withdraw(volume: float, rate: float, ser_pump: object):
         )
         ser_pump.pumping_rate = rate  # in units of milliliters per minute.
         ser_pump.run()
-        print("\tWithdrawing...")
+        logging.debug("\tWithdrawing...")
         time.sleep(0.5)
         while ser_pump.running:
             pass
-        print("\tDone withdrawing")
+        logging.debug("\tDone withdrawing")
         time.sleep(2)
 
-        print(f"\tPump has withdrawn: {ser_pump.volume_withdrawn} ml")
-    # vessel.update_volume(-volume)
+        logging.debug(f"\tPump has withdrawn: {ser_pump.volume_withdrawn} ml")
 
     return 0
 
@@ -468,13 +468,13 @@ def infuse(volume: float, rate: float, ser_pump: object):
         )
         ser_pump.pumping_rate = rate  # Sets the pumping rate of the pump in units of milliliters per minute.
         ser_pump.run()
-        print("\tInfusing...")
+        logging.debug("\tInfusing...")
         time.sleep(0.5)
         while ser_pump.running:
             pass
-        print("\tDone infusing")
+        logging.debug("\tDone infusing")
         time.sleep(2)
-        print(f"\tPump has infused: {ser_pump.volume_infused} ml")
+        logging.debug(f"\tPump has infused: {ser_pump.volume_infused} ml")
     else:
         pass
     return 0
@@ -550,7 +550,7 @@ def purge(purge_vial: Vial, pump: object, purge_volume=20.00, pumping_rate=0.4):
     """
     infuse(purge_volume, pumping_rate, pump)
     purge_vial.update_volume(purge_volume)
-    print(f"Purge vial new volume: {purge_vial.volume}")
+    logging.debug(f"Purge vial new volume: {purge_vial.volume}")
 
 
 def pipette(
@@ -579,11 +579,11 @@ def pipette(
         repetitions = math.ceil(volume / 200)  # divide by pipette capacity (200 ul)
         repetition_vol = volume / repetitions
         for j in range(repetitions):
-            print(f"\n\nRepetition {j+1} of {repetitions}")
+            logging.info(f"\n\nRepetition {j+1} of {repetitions}")
             solution = solution_selector(solutions, solution_name, repetition_vol)
             PurgeVial = waste_selector(waste_vials, waste_solution_name, repetition_vol)
             ## First half: pick up solution
-            print(f"Withdrawing {solution.name}...")
+            logging.info(f"Withdrawing {solution.name}...")
             move_pipette_to_position(
                 mill, solution.coordinates["x"], solution.coordinates["y"], 0
             )  # start at safe height
@@ -596,13 +596,13 @@ def pipette(
 
             withdraw(repetition_vol + (2 * purge_volume), pumping_rate, pump)
             solution.update_volume(-(repetition_vol + 2 * purge_volume))
-            print(f"{solution.name} new volume: {solution.volume}")
+            logging.debug(f"{solution.name} new volume: {solution.volume}")
             move_pipette_to_position(
                 mill, solution.coordinates["x"], solution.coordinates["y"], 0
             )  # return to safe height
 
             ## Intermediate: Purge
-            print("Purging...")
+            logging.info("Purging...")
             move_pipette_to_position(
                 mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
             )
@@ -618,7 +618,7 @@ def pipette(
             )
 
             ## Second Half: Deposit to well
-            print(f"Infusing {solution.name} into well {target_well}...")
+            logging.info(f"Infusing {solution.name} into well {target_well}...")
             move_pipette_to_position(
                 mill,
                 wellplate.get_coordinates(target_well)["x"],
@@ -634,7 +634,7 @@ def pipette(
 
             infuse(repetition_vol, pumping_rate, pump)
             wellplate.update_volume(target_well, repetition_vol)
-            print(f"Well {target_well} volume: {wellplate.volume(target_well)}")
+            logging.info(f"Well {target_well} volume: {wellplate.volume(target_well)}")
             move_pipette_to_position(
                 mill,
                 wellplate.get_coordinates(target_well)["x"],
@@ -643,7 +643,7 @@ def pipette(
             )  # return to safe height
 
             ## Intermediate: Purge
-            print("Purging...")
+            logging.info("Purging...")
             move_pipette_to_position(
                 mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
             )
@@ -661,7 +661,7 @@ def pipette(
                 PurgeVial.coordinates["y"], 0
             )
 
-            print(
+            logging.debug(
                 f"Remaining volume in pipette: {pump.volume_withdrawn}"
             )  # should always be zero, pause if not
     else:
@@ -698,13 +698,13 @@ def clear_well(
     )  # divide by 200 ul which is the pipette capacity to determin the number of repetitions
     repetition_vol = volume / repititions
 
-    print(
+    logging.info(
         f"\n\nClearing well {target_well} with {repititions}x repetitions of {repetition_vol} ..."
     )
     for j in range(repititions):
         PurgeVial = waste_selector(waste_vials, solution_name, repetition_vol)
 
-        print(f"Repitition {j+1} of {repititions}")
+        logging.info(f"Repitition {j+1} of {repititions}")
         move_pipette_to_position(
             mill,
             wellplate.get_coordinates(target_well)["x"],
@@ -721,7 +721,7 @@ def clear_well(
         withdraw(repetition_vol + 20, pumping_rate, pump)
         wellplate.update_volume(target_well, -repetition_vol)
 
-        print(f"Well {target_well} volume: {wellplate.volume(target_well)}")
+        logging.debug(f"Well {target_well} volume: {wellplate.volume(target_well)}")
         move_pipette_to_position(
             mill,
             wellplate.get_coordinates(target_well)["x"],
@@ -729,7 +729,7 @@ def clear_well(
             0,
         )  # return to safe height
 
-        print("Moving to purge vial...")
+        logging.info("Moving to purge vial...")
         move_pipette_to_position(
             mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
         )
@@ -740,7 +740,7 @@ def clear_well(
             PurgeVial.coordinates["y"],
             PurgeVial.height,
         )  # PurgeVial.depth replaced with height
-        print("Purging...")
+        logging.info("Purging...")
         purge(PurgeVial, pump, repetition_vol + 20)  # repitition volume + 20 ul purge
         move_pipette_to_position(
             mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
@@ -748,16 +748,15 @@ def clear_well(
         # withdraw(20, pumping_rate, pump)
         # infuse(20, pumping_rate, pump)
 
-        print(f"Remaining volume in well: {wellplate.volume(target_well)}")
+        logging.info(f"Remaining volume in well: {wellplate.volume(target_well)}")
 
 
 def print_runtime_data(runtime_data: dict):
     for well, data in runtime_data.items():
-        print(f"Well {well} Runtimes:")
+        logging.info(f"Well {well} Runtimes:")
         for section, runtime in data.items():
             minutes = runtime / 60
-            print(f"{section}: {minutes} seconds")
-        print()
+            logging.info(f"{section}: {minutes} seconds")
 
 
 def rinse(
@@ -775,12 +774,12 @@ def rinse(
     Rinse the well with 150 ul of ACN
     """
 
-    print(f"Rinsing well {target_well} {rinse_repititions}x...")
+    logging.info(f"Rinsing well {target_well} {rinse_repititions}x...")
     for r in range(rinse_repititions):  # 0, 1, 2...
         rinse_solution_name = "Rinse" + str(r)
         PurgeVial = waste_selector(waste_vials, rinse_solution_name, rinse_vol)
         # rinse_solution = solution_selector(solutions, rinse_solution_name, rinse_vol)
-        print(f"Rinse {r+1} of {rinse_repititions}")
+        logging.info(f"Rinse {r+1} of {rinse_repititions}")
         pipette(
             rinse_vol,
             solutions,
@@ -821,7 +820,7 @@ def flush_pipette_tip(
     flush_solution = solution_selector(Solutions, flush_solution_name, flush_volume)
     PurgeVial = waste_selector(WasteVials, "waste", flush_volume)
 
-    print(f"\n\nFlushing with {flush_solution.name}...")
+    logging.info(f"\n\nFlushing with {flush_solution.name}...")
     move_pipette_to_position(
         mill, flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
@@ -832,20 +831,20 @@ def flush_pipette_tip(
         flush_solution.coordinates["y"],
         flush_solution.bottom,
     )  # depth replaced with height
-    print(f"\tWithdrawing {flush_solution.name}...")
+    logging.debug(f"\tWithdrawing {flush_solution.name}...")
     withdraw(flush_volume, pumping_rate, pump)
     move_pipette_to_position(
         mill, flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
 
-    print("\tMoving to purge...")
+    logging.debug("\tMoving to purge...")
     move_pipette_to_position(
         mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
     )
     move_pipette_to_position(
         mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], PurgeVial.height
     )  # PurgeVial.depth replaced with height
-    print("\tPurging...")
+    logging.debug("\tPurging...")
     purge(PurgeVial, pump, flush_volume + 20)
     move_pipette_to_position(
         mill, PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
@@ -910,6 +909,8 @@ def save_runtime_data(run_times: dict, filename: str):
 
 
 if __name__ == "__main__":
+    
+    #logging.basicConfig(level=20)
     main()
 else:
     pass

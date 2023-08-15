@@ -1,0 +1,31 @@
+{
+    "Experiments": [
+        {
+            "Target_Well": "G9",
+            "status": "queued",
+            "DMF": 10,
+            "PEG": 10,
+            "Acrylate": 10,
+            "Ferrocene": 10,
+            "pump_rate": 40,
+            "dep-duration": 300,
+            "DepPot": -2.4,
+            "rise_sol": "Rinse",
+            "rinse_vol": 120,
+            "rinse_count": 3,
+            "char_sol": "Ferrocene",
+            "char_vol": 40,
+            "purge_vol": 20,
+            "flush_sol": "DMF",
+            "flush_vol": 120,
+            "status_date": "2023-08-04_20_44_17",
+            "time_stamps": [],
+            "OCP_file": "",
+            "OCP_pass": null,
+            "deposition_data_file": "",
+            "deposition_plot_file": "",
+            "characterization_data_file": "",
+            "characterization_plot_file": ""
+        }
+    ]
+}
