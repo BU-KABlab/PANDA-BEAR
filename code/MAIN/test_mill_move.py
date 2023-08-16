@@ -18,25 +18,47 @@ move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.g
 def main():
     mill = MillControl()
     wellplate = Wells(-218, -74, 0, 0)
-    ## Set up solutions
+    
     waste_vials = read_vials('vial_status.json')
     stock_vials = read_vials('waste_status.json')
     
-    input("Press Enter to progress...")
-    ## Move center to position
-    mill.move_center_to_position(-200, -240,0)
-
-    ## Move pipette to position
-    input("Press Enter to progress...")
-    mill.move_pipette_to_position(-200, -240,0)
-
-    ## Move electrode to position
-    input("Press Enter to progress...")
-    mill.move_electrode_to_position(-200, -240,0)
-
-    ## pause for user input
-    input("Press Enter to end...")
+    while True:
+        print("Select an operation:")
+        print("1. Move center to position")
+        print("2. Move pipette to position")
+        print("3. Move electrode to position")
+        print("4. Exit")
+        
+        choice = input("Enter your choice (1/2/3/4): ")
+        
+        if choice == '1':
+            x = float(input("Enter X coordinate: "))
+            y = float(input("Enter Y coordinate: "))
+            z = float(input("Enter Z coordinate: "))
+            mill.move_center_to_position(x, y, z)
+        elif choice == '2':
+            x = float(input("Enter X coordinate: "))
+            y = float(input("Enter Y coordinate: "))
+            z = float(input("Enter Z coordinate: "))
+            mill.move_pipette_to_position(x, y, z)
+        elif choice == '3':
+            x = float(input("Enter X coordinate: "))
+            y = float(input("Enter Y coordinate: "))
+            z = float(input("Enter Z coordinate: "))
+            mill.move_electrode_to_position(x, y, z)
+        
+        elif choice == '4':
+            print("Exiting program.")
+            break
+        else:
+            print("Invalid choice. Please enter a valid option.")
+    
     return 0
+
+if __name__ == "__main__":
+    main()
+
+
 
 #start echem experiment
 '''
