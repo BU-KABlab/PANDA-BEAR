@@ -2,6 +2,7 @@
 from classes import Wells, MillControl
 import gamrycontrol as echem
 import Analyzer as analyzer
+from run_experiments import read_vials
 """
 Run this file using the debug python file option to establish a connection to the mill and be able to send commands via the debug console.
 
@@ -17,84 +18,47 @@ move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.g
 def main():
     mill = MillControl()
     wellplate = Wells(-218, -74, 0, 0)
-    ## Set up solutions
-#    waste_vials = read_vials('wasteParameters_08_07_23.json')
-#    stock_vials = read_vials('vialParameters_08_07_23.json')
-
-    ## pause for user input
-    input("Press Enter to end...")
+    
+    waste_vials = read_vials('vial_status.json')
+    stock_vials = read_vials('waste_status.json')
+    
+    while True:
+        print("Select an operation:")
+        print("1. Move center to position")
+        print("2. Move pipette to position")
+        print("3. Move electrode to position")
+        print("4. Exit")
+        
+        choice = input("Enter your choice (1/2/3/4): ")
+        
+        if choice == '1':
+            x = float(input("Enter X coordinate: "))
+            y = float(input("Enter Y coordinate: "))
+            z = float(input("Enter Z coordinate: "))
+            mill.move_center_to_position(x, y, z)
+        elif choice == '2':
+            x = float(input("Enter X coordinate: "))
+            y = float(input("Enter Y coordinate: "))
+            z = float(input("Enter Z coordinate: "))
+            mill.move_pipette_to_position(x, y, z)
+        elif choice == '3':
+            x = float(input("Enter X coordinate: "))
+            y = float(input("Enter Y coordinate: "))
+            z = float(input("Enter Z coordinate: "))
+            mill.move_electrode_to_position(x, y, z)
+        
+        elif choice == '4':
+            print("Exiting program.")
+            break
+        else:
+            print("Invalid choice. Please enter a valid option.")
+    
     return 0
 
-
-def move_center_to_position(mill: object, x, y, z):
-    """
-    Move the mill to the specified coordinates.
-    Args:
-        coordinates (dict): Dictionary containing x, y, and z coordinates.
-    Returns:
-        str: Response from the mill after executing the command.
-    """
-    offsets = {"x": 0, "y": 0, "z": 0}
-
-    mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
-    command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
-    mill.execute_command(command)
-    return 0
+if __name__ == "__main__":
+    main()
 
 
-## TODO Add a diagnoal move check to move pipette to position and move electrode to position functions
-
-
-def move_pipette_to_position(
-    mill: object,
-    x,
-    y,
-    z=0.00,
-):
-    """
-    Move the pipette to the specified coordinates.
-    Args:
-        x (float): X coordinate.
-        y (float): Y coordinate.
-        z (float): Z coordinate.
-    Returns:
-        str: Response from the mill after executing the command.
-    """
-    offsets = {"x": -92, "y": -4, "z": 0}
-
-    mill_move = "G0 X{} Y{} Z{}"  # move to specified coordinates
-    command = mill_move.format(
-        x + offsets["x"], y + offsets["y"], z + offsets["z"]
-    )  # x-coordinate has 92 mm offset for pipette location
-    mill.execute_command(str(command))
-    return 0
-
-
-def move_electrode_to_position(mill: object, x, y, z):
-    """
-    Move the electrode to the specified coordinates.
-    Args:
-        coordinates (dict): Dictionary containing x, y, and z coordinates.
-    Returns:
-        str: Response from the mill after executing the command.
-    """
-    offsets = {"x": 33, "y": 30, "z": 0}
-    # move to specified coordinates
-    mill_move = "G0 X{} Y{} Z{}"
-    command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
-    mill.execute_command(str(command))
-    return 0
-
-
-# Move pipette to position
-#move_pipette_to_position(mill, waste_vials[0].coordinates['x'], waste_vials[0].coordinates['y'], 0)
-
-#move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
-#move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],-100)
-
-# Move electrode to position
-#move_electrode_to_position(mill, wellplate.get_coordinates('F2')['x'], wellplate.get_coordinates('F2')['y'],0)
-#move_electrode_to_position(mill, wellplate.get_coordinates('F2')['x'], wellplate.get_coordinates('F2')['y'],wellplate.echem_height)
 
 #start echem experiment
 '''
