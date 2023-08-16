@@ -6,7 +6,7 @@ import sys
 import logging
 import pathlib
 import json
-
+import regex as re
 
 
 class Wells:
@@ -209,8 +209,16 @@ class Vial:
         else:
             self.volume += added_volume
             self.depth = self.vial_height_calculator(self.radius*2, self.volume) + self.bottom #Note volume must be converted to liters
-        logging.debug(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
+            if self.depth < self.bottom:
+                self.depth = self.bottom
+
+            ##TODO write new volume to file
+            
+
+            logging.debug(f'\tNew volume: {self.volume} | New depth: {self.depth}')
         self.contamination += 1
+
+
         
     def vial_height_calculator(diameter_mm, volume_ul):
         """
@@ -237,6 +245,7 @@ class MillControl:
                             timeout=10,
                         )
         time.sleep(2)
+        logging.basicConfig(filename='mill.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.DEBUG)
         logging.info(f'Mill connected: {self.ser_mill.isOpen()}')
         self.home()
         self.execute_command('F2000')
@@ -275,6 +284,11 @@ class MillControl:
                 time.sleep(1)
                 out = self.ser_mill.readline()
                 logging.debug(f'{command} executed')
+
+            elif command == '?':
+                time.sleep(1)
+                out = self.ser_mill.readlines()[0]
+                logging.debug(f'{command} executed. Returned {out.decode()}')
 
             elif command != '$H':
                 time.sleep(0.5)
@@ -349,7 +363,7 @@ class MillControl:
             if type(status) == str:
                 out = status.decode("utf-8").strip()
                 
-            #logging.info(f'\t\t{out}')
+            logging.info(f'{out}')
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
@@ -386,6 +400,45 @@ class MillControl:
         self.execute_command(command)
         return 0
 
+    def current_coordinates(self):
+        """
+        Get the current coordinates of the mill.
+        Args:
+            None
+        Returns:
+            list: [x,y,z]
+        """
+        command = "?"
+        status = self.execute_command(command)
+        # Regular expression to extract MPos coordinates
+        pattern = re.compile(r'MPos:([\d.-]+),([\d.-]+),([\d.-]+)')
+
+        match = pattern.search(status.decode())  # Decoding the bytes to string
+        if match:
+            x_coord = float(match.group(1))+3
+            y_coord = float(match.group(2))+3
+            z_coord = float(match.group(3))+3
+            log_message = f"MPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
+            logging.info(log_message)
+        else:
+            logging.info("MPos coordinates not found in the line.")
+        return [x_coord, y_coord, z_coord]
+
+    def rinse_electrode(self):
+        """
+        Rinse the electrode by moving it to the rinse position and back to the
+        center position.
+        Args:
+            None
+        Returns:
+            None
+        """
+        [initial_x,initial_y,initial_z] = self.current_coordinates()
+        self.move_center_to_position(initial_x, initial_y, 0)
+        self.move_electrode_to_position(-405, -30, 0)
+        self.move_electrode_to_position(-405, -30, -60)
+        self.move_electrode_to_position(-405, -30, 0)
+        return 0
 
     ## TODO Add a diagnoal move check to move pipette to position and move electrode to position functions
 
@@ -429,6 +482,19 @@ class MillControl:
         mill_move = "G00 X{} Y{} Z{}"
         command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
         self.execute_command(str(command))
+        return 0
+    
+    def update_offset(self,offset_type,offset_X,offset_Y,offset_Z):
+        '''
+        Update the offset in the config file
+        '''
+        current_offset = self.config[offset_type]
+        offset = {"x": current_offset['x']+offset_X, "y": current_offset['y']+offset_Y, "z": current_offset['z']+offset_Z}
+
+        self.config['instrument_offsets'][offset_type] = offset
+        with open('mill_config.json', 'w') as f:
+            json.dump(self.config, f, indent=4)
+        logging.info(f'Updated {offset_type} to {offset}')
         return 0
 
 

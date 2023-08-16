@@ -22,6 +22,10 @@ def main():
     waste_vials = read_vials('vial_status.json')
     stock_vials = read_vials('waste_status.json')
     
+    mill.move_electrode_to_position(-200,-240,0)
+    mill.move_electrode_to_position(-200,-240,-20)
+    mill.rinse_electrode()
+
     while True:
         print("Select an operation:")
         print("1. Move center to position")
@@ -55,33 +59,5 @@ def main():
     
     return 0
 
-if __name__ == "__main__":
-    main()
-
-
-
-#start echem experiment
-'''
-echem.pstatconnect()
-#complete_file_name = echem.setfilename(well_run,"OCP")
-complete_file_name = "C:\\Users\\gamry\\Documents\\Python Scripts\\EdepDemo\\EdepDemo\\data\\2023-08-16\\F2_OCP.txt"
-echem.OCP(echem.pstat, echem.OCPvi, echem.OCPti, echem.OCPsamplerate)
-    if echem.check_vsig_range(complete_file_name('CV.txt')):
-    echem.chrono(
-    CAvi=echem.CAvi,
-    CAti=echem.CAti,
-    CAv1=echem.CAv1,
-    CAt1=echem.CAt1,
-    CAv2=echem.CAv2,
-    CAt2=echem.CAt2,
-    CAsamplerate=echem.CAsamplerate,
-)  # CA
-    while echem.active == True:
-        client.PumpEvents(1)
-        time.sleep(0.5)
-    ## echem plot the data
-    analyzer.plotdata("CA", complete_file_name)
-    
-'''
 if __name__ == "__main__":
     main()
