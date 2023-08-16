@@ -3,6 +3,9 @@ import serial
 import matplotlib.pyplot as plt
 import math
 import sys
+import logging
+import pathlib
+import json
 
 
 
@@ -21,12 +24,13 @@ class Wells:
     def __init__(self, a1_X=0, a1_Y=0, orientation=0, starting_volume = 0.00):
         self.wells = {}
         self.orientation = orientation
-        self.z_bottom = -75 #updated from 64 after installing new clear paw and shorter luerlock adapter
+        self.z_bottom = -64 #64
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9 # mm from center to center
         self.well_capacity = 300 # ul
-        self.echem_height = -75 #updated for new clear paw and electrode holder with no solution
+        self.echem_height = -68
+        self.echem_height = -68
 
         a1_coordinates = {"x": a1_X, "y": a1_Y,"z": self.z_top} # coordinates of A1
         volume = starting_volume
@@ -112,14 +116,14 @@ class Wells:
         return self.wells[well_id]['depth']
     
     def check_volume(self,well_id,added_volume:float):
-        print(f'Check if {added_volume} can fit in {well_id} ...',end='')
+        logging.info(f'Checking if {added_volume} can fit in {well_id} ...',end='')
         if self.wells[well_id]["volume"] + added_volume >= self.well_capacity:
             raise OverFillException(well_id, self.volume, added_volume, self.well_capacity)
         
         #elif self.wells[well_id]["volume"] + added_volume < 0:
         #    raise OverDraftException(well_id, self.volume, added_volume, self.well_capacity)
         else:
-            print(f'{added_volume} can fit in {well_id}')
+            logging.info(f'{added_volume} can fit in {well_id}')
             return True
 
 
@@ -136,7 +140,7 @@ class Wells:
             self.wells[well_id]["depth"] = (self.wells[well_id]["volume"]/1000000)/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
             if self.wells[well_id]["depth"] < self.z_bottom:
                 self.wells[well_id]["depth"] = self.z_bottom
-            print(f'\tNew Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
+            logging.debug(f'\tNew Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
 
 class Vial:
     '''
@@ -150,7 +154,9 @@ class Vial:
         capacity in ml
         
     '''
-    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 0.01175, height = -14, z_bottom = -64, name = 'vial'):
+    # TODO how to rewrite this to use disk stored information isntead of all in memory
+
+    def __init__(self, x: float, y: float, contents: str, volume=0.00, capacity = 20000, radius = 13.5, height = -14, z_bottom = -64, name = 'vial',filepath = None):
         self.name = name
         self.coordinates = {"x": x, "y": y, "z": height}
         self.bottom = z_bottom
@@ -162,6 +168,7 @@ class Vial:
         self.base = math.pi*math.pow(self.radius,2.0)
         self.depth = ((self.volume/1000000)/self.base) + z_bottom #Note volume must be converted to liters
         self.contamination = 0
+        self.filepath = filepath
 
     @property
     def position(self):
@@ -178,13 +185,13 @@ class Vial:
         '''
         Updates the volume of the vial
         '''
-        print(f'Check if {added_volume} can fit in {self.name} ...',end='')
+        logging.info(f'Check if {added_volume} can fit in {self.name} ...',end='')
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
             raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
-            print(f'{added_volume} can fit in {self.name}')
+            logging.info(f'{added_volume} can fit in {self.name}')
             return True
 
 
@@ -192,19 +199,18 @@ class Vial:
         '''
         Updates the volume of the vial
         '''
-        print(f'Updating {self.name} volume...')
-        print(f'\tCurrent volume: {self.volume} | Current depth: {self.depth}')
-        #print(f'\tAdding {added_volume} to {self.volume}...')
+        logging.info(f'Updating {self.name} volume...')
+        logging.debug(f'\tCurrent volume: {self.volume} | Current depth: {self.depth}')
+        #logging.info(f'\tAdding {added_volume} to {self.volume}...')
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
             raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
-            self.depth = ((self.volume/1000000)/self.base) + self.bottom #Note volume must be converted to liters
-        print(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
+            self.depth = self.vial_height_calculator(self.radius*2, self.volume) + self.bottom #Note volume must be converted to liters
+        logging.debug(f'\tNew Solution volume: {self.volume} | Solution depth: {self.depth}')
         self.contamination += 1
-        
         
     def vial_height_calculator(diameter_mm, volume_ul):
         """
@@ -212,9 +218,10 @@ class Vial:
         """
         radius_mm = diameter_mm / 2
         area_mm2 = 3.141592653589793 * radius_mm ** 2
-        volume_mm3 = volume_ul # 1 µl = 1 mm3
+        volume_mm3 = volume_ul # 1 ul = 1 mm3
         liquid_height_mm = volume_mm3 / area_mm2
         return liquid_height_mm
+
 
 class MillControl:
     '''
@@ -227,13 +234,16 @@ class MillControl:
                             parity=serial.PARITY_NONE,
                             stopbits=serial.STOPBITS_ONE,
                             bytesize=serial.EIGHTBITS,
-                            timeout=1,
+                            timeout=10,
                         )
         time.sleep(2)
+        logging.info(f'Mill connected: {self.ser_mill.isOpen()}')
         self.home()
         self.execute_command('F2000')
         self.ser_mill.flushInput()
         self.ser_mill.flushOutput()
+        self.config = self.read_json_config()
+        logging.info(f'Mill config loaded: {self.config}')
         
     def __enter__(self):
         if not self.ser_mill.isOpen():
@@ -245,8 +255,18 @@ class MillControl:
         self.ser_mill.close()
         time.sleep(15)
 
+    def read_json_config(self):
+        '''
+        Reads a JSON config file and returns a dictionary of the contents.
+        '''
+        config_file_name = 'mill_config.json'
+        config_file_path = pathlib.Path.cwd() / config_file_name
+        with open(config_file_path, 'r') as f:
+            configuaration = json.load(f)
+        return configuaration
+
     def execute_command(self, command):
-        print(f'\tExecuting command: {command}...', end='')
+        logging.debug(f'Executing command: {command}...')
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b'\n')
         time.sleep(1)
@@ -254,7 +274,7 @@ class MillControl:
             if command == 'F2000':
                 time.sleep(1)
                 out = self.ser_mill.readline()
-                print(f' executed')
+                logging.debug(f'{command} executed')
 
             elif command != '$H':
                 time.sleep(0.5)
@@ -266,20 +286,20 @@ class MillControl:
                     
                     time.sleep(0.3)
                 out = status
-                print(f' executed')
+                logging.debug(f'{command} executed')
             
             else:
                 out = self.ser_mill.readline()
-                print(f' executed')
+                logging.debug(f'{command} executed')
             #time.sleep(1)
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
-            print('Exception: ',e)
-            print("Exception type: ", exception_type)
-            print("File name: ", filename)
-            print("Line number: ", line_number)
+            logging.error('Exception: ',e)
+            logging.error("Exception type: ", exception_type)
+            logging.error("File name: ", filename)
+            logging.error("Line number: ", line_number)
         return out
     
     def stop(self):
@@ -315,7 +335,8 @@ class MillControl:
                 list_length = len(status)
                 if list_length == 0:
                     out = 'No response'
-                elif list_length == 1:    
+
+                if list_length > 0:
                     first = status[0].decode("utf-8").strip()
                 
                 elif list_length > 1:
@@ -324,18 +345,19 @@ class MillControl:
                 elif first.find('ok') >=0:
                    out = second
                 else:
-                    out = 'No response'
+                    out = 'could not parse response'
             if type(status) == str:
                 out = status.decode("utf-8").strip()
                 
+            #logging.info(f'\t\t{out}')
         except Exception as e:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
-            print('Exception: ',e)
-            print("Exception type: ", exception_type)
-            print("File name: ", filename)
-            print("Line number: ", line_number)
+            logging.error('Exception: ',e)
+            logging.error("Exception type: ", exception_type)
+            logging.error("File name: ", filename)
+            logging.error("Line number: ", line_number)
         return out
 
     def gcode_mode(self):
