@@ -30,11 +30,14 @@ def pstatconnect():
 class GamryCOMError(Exception):
     pass
 
+
 def gamry_error_decoder(e):
     if isinstance(e, comtypes.COMError):
         hresult = 2**32 + e.args[0]
         if hresult & 0x20000000:
-            return GamryCOMError('0x{0:08x}: {1}'.format(2**32 + e.args[0], e.args[1]))
+            return GamryCOMError(
+                "0x{0:08x}: {1}".format(2**32 + e.args[0], e.args[1])
+            )
     return e
 
 def initializepstat():
@@ -42,10 +45,11 @@ def initializepstat():
     pstat.SetCell(GamryCOM.CellOff)
     pstat.SetIEStability(GamryCOM.StabilityNorm)
     pstat.SetVchRangeMode(True)
-    pstat.SetVchRange(10.0)
-    pstat.SetIERangeMode(True)
+    pstat.SetVchRange(10.0) #Expected Max Voltage
+    pstat.SetIERangeMode(True) #True = Auto, False = Manual
     # the following command allows us to set our range manually
     # pstat.SetIERange (x)
+
 
 def stopacq():
     global active
@@ -65,7 +69,7 @@ class GamryDtaqEvents(object):
 
     def call_stopacq(self):
         stopacq()
-    
+
     def call_savedata(self, complete_file_name):
         savedata(complete_file_name)
 
@@ -79,9 +83,8 @@ class GamryDtaqEvents(object):
 
     def _IGamryDtaqEvents_OnDataAvailable(self, this):
         self.cook()
-        loading = ['|','/','-','\\']
-        print(f"\rmade it to data available{random.choice(loading)}", end = "")
-        
+        loading = ["|", "/", "-", "\\"]
+        print(f"\rmade it to data available{random.choice(loading)}", end="")
 
     def _IGamryDtaqEvents_OnDataDone(self, this):
         print("\nmade it to data done")
@@ -90,10 +93,12 @@ class GamryDtaqEvents(object):
         self.call_stopacq()
         self.call_savedata(self.complete_file_name)
 
+
 def disconnectpstat():
     pstat.Close()
-    #del connection
+    # del connection
     time.sleep(15)
+
 
 def savedata(complete_file_name):
     #print(dtaqsink.acquired_points)
@@ -102,8 +107,8 @@ def savedata(complete_file_name):
     # savedata
     # column_names = ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
     output = pd.DataFrame(dtaqsink.acquired_points)
-    #complete_file_name = os.path(complete_file_name)
-    np.savetxt(complete_file_name.with_suffix('.txt'), output)
+    # complete_file_name = os.path(complete_file_name)
+    np.savetxt(complete_file_name.with_suffix(".txt"), output)
     print("data saved")
 
 def setfilename(target_well, experiment):
@@ -112,17 +117,12 @@ def setfilename(target_well, experiment):
     fileDate = current_time.strftime("%Y-%m-%d")
     cwd = pathlib.Path().absolute()
     filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
-    #filePathPar = os.path.join(os.path.expanduser("~"), "Documents", "Github","PANDA","data")
-    #filePath = os.path.join(filePathPar, fileDate)
     filePath = filePathPar / fileDate
-    #complete_file_name = os.path.join(filePath, target_well + '_' + experiment)
-    complete_file_name = filePath / (target_well + '_' + experiment)
-    print(f'eChem: complete file name is: {complete_file_name}')
-    #if not os.path.exists(filePath):
+    complete_file_name = filePath / (target_well + "_" + experiment)
+    print(f"eChem: complete file name is: {complete_file_name}")
     if not pathlib.Path.exists(filePath):
         print(f"folder does not exist. Making folder: {filePath}")
         pathlib.Path.mkdir(filePath, parents=True, exist_ok=True)
-        #os.makedirs(filePath, exist_ok = True)
     else:
         print(f"folder {filePath} exists")
     return complete_file_name
@@ -141,23 +141,38 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     
     print("made it to run")
     active = True
-    
+
     # signal and dtaq object creation
-    signal = client.CreateObject('GamryCOM.GamrySignalRupdn')
-    dtaq = client.CreateObject('GamryCOM.GamryDtaqRcv')
+    signal = client.CreateObject("GamryCOM.GamrySignalRupdn")
+    dtaq = client.CreateObject("GamryCOM.GamryDtaqRcv")
     dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
-    
-    signal.Init(pstat, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, 0.0, 0.0, 0.0, CVsamplerate, CVcycle, GamryCOM.PstatMode)
+
+    signal.Init(
+        pstat,
+        CVvi,
+        CVap1,
+        CVap2,
+        CVvf,
+        CVsr1,
+        CVsr2,
+        CVsr3,
+        0.0,
+        0.0,
+        0.0,
+        CVsamplerate,
+        CVcycle,
+        GamryCOM.PstatMode,
+    )
     initializepstat(pstat)
     dtaq.Init(pstat)
     pstat.SetSignal(signal)
     pstat.SetCell(GamryCOM.CellOn)
     dtaq.Run(True)
     # Code for timing started
-    start_time = time.time()
+    #start_time = time.time()
     print("made it to run end")
-    
+
 
 def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global dtaq
@@ -172,13 +187,15 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     print("made it to run")
 
     # signal and dtaq object creation
-    signal = client.CreateObject('GamryCOM.GamrySignalDstep')
-    dtaq = client.CreateObject('GamryCOM.GamryDtaqChrono')
+    signal = client.CreateObject("GamryCOM.GamrySignalDstep")
+    dtaq = client.CreateObject("GamryCOM.GamryDtaqChrono")
 
     dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
-    
-    signal.Init(pstat, CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate, GamryCOM.PstatMode)
+
+    signal.Init(
+        pstat, CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate, GamryCOM.PstatMode
+    )
     initializepstat(pstat)
 
     dtaq.Init(pstat, GamryCOM.ChronoAmp)
@@ -188,7 +205,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     dtaq.Run(True)
 
     # Code for timing started
-    start_time = time.time()
+    #start_time = time.time()
     print("made it to run end")
 
 
@@ -201,12 +218,12 @@ def OCP(instructions):
     global active
 
     active = True
-    
+
     print("made it to run")
 
     # signal and dtaq object creation
-    signal = client.CreateObject('GamryCOM.GamrySignalConst')
-    dtaq = client.CreateObject('GamryCOM.GamryDtaqOcv')
+    signal = client.CreateObject("GamryCOM.GamrySignalConst")
+    dtaq = client.CreateObject("GamryCOM.GamryDtaqOcv")
 
     dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
@@ -219,7 +236,7 @@ def OCP(instructions):
     pstat.SetCell(GamryCOM.CellOff)
 
     dtaq.Run(True)
-    start_time = time.time()
+    #start_time = time.time()
     print("made it to run end")
 
 def activecheck():
@@ -243,12 +260,12 @@ def check_vsig_range(filename):
         return False
 
 # CV Setup Parameters
-CVvi = 0.0 #initial voltage
-CVap1 = -0.8 
+CVvi = 0.0  # initial voltage
+CVap1 = -0.8
 CVap2 = -0.1
 CVvf = -0.1
 
-CVstep = 0.01 #testing step, 100 mv/s
+CVstep = 0.01  # testing step, 100 mv/s
 CVsr1 = 0.1
 CVcycle = 3
 

@@ -1,0 +1,28 @@
+{
+    "Target_Well": "D11",
+    "DMF": 0,
+    "PEG": 145,
+    "Acrylate": 145,
+    "Ferrocene": 0,
+    "test-type": "CV",
+    "dep-duration": 300,
+    "DepPot": -2.7,
+    "status": "completed",
+    "time_stamps": {
+        "Start Time": 1690497089,
+        "Solutions Time": 1690497656,
+        "Deposition Time": 1690497996,
+        "Rinse Time": 1690499112,
+        "Characterization Time": 1690499549,
+        "Clear Well Time": 1690499769,
+        "Flush Time": 1690499875,
+        "End Time": 1690499875,
+        "Well Time": 2785.073005914688
+    },
+    "OCP_file": "",
+    "OCP_pass": null,
+    "deposition_data_file": "",
+    "deposition_plot_file": "",
+    "characterization_data_file": "",
+    "characterization_plot_file": ""
+}
