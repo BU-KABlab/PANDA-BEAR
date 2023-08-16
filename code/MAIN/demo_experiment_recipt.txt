@@ -5,6 +5,7 @@
 "PEG": 145,
 "Acrylate": 145,
 "Ferrocene": 0,
+"Custom": 0,
 "OCP",1,
 "CA": 1,
 "CV": 1,

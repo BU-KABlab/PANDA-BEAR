@@ -1,5 +1,5 @@
 from run_experiments import read_vials
-from classes import Wells, MillControl, Vial
+from classes import Wells, MillControl
 '''
 For calibrating the location of instruments on the mill head.
 '''
