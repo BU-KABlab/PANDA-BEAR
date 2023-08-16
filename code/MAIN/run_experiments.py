@@ -10,6 +10,7 @@ import logging
 import os
 import datetime
 import obsws_python as obs
+import Analyzer as analyzer
 
 
 def read_vials(filename):
@@ -347,7 +348,7 @@ def rinse(
     pump: object,
     waste_vials: list,
     mill: object,
-    solutions: list,
+    stock_vials: list,
     rinse_repititions=3,
     rinse_vol=150,
 ):
@@ -359,11 +360,11 @@ def rinse(
     for r in range(rinse_repititions):  # 0, 1, 2...
         rinse_solution_name = "Rinse" + str(r)
         PurgeVial = waste_selector(waste_vials, rinse_solution_name, rinse_vol)
-        # rinse_solution = solution_selector(solutions, rinse_solution_name, rinse_vol)
+        # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
         logging.info(f"Rinse {r+1} of {rinse_repititions}")
         pipette(
             rinse_vol,
-            solutions,
+            stock_vials,
             rinse_solution_name,
             target_well,
             pumping_rate,
@@ -383,12 +384,13 @@ def rinse(
             mill,
             solution_name=rinse_solution_name,
         )
-
+    write_json(stock_vials, "vial_status.json")
+    write_json(waste_vials, "waste_status.json")
 
 def flush_pipette_tip(
     pump: object,
-    WasteVials: list,
-    Solutions: list,
+    waste_vials: list,
+    stock_vials: list,
     flush_solution_name: str,
     mill: object,
     pumping_rate=0.4,
@@ -398,8 +400,8 @@ def flush_pipette_tip(
     Flush the pipette tip with 120 ul of DMF
     """
 
-    flush_solution = solution_selector(Solutions, flush_solution_name, flush_volume)
-    PurgeVial = waste_selector(WasteVials, "waste", flush_volume)
+    flush_solution = solution_selector(stock_vials, flush_solution_name, flush_volume)
+    PurgeVial = waste_selector(waste_vials, "waste", flush_volume)
 
     logging.info(f"\n\nFlushing with {flush_solution.name}...")
     mill.move_pipette_to_position(
@@ -430,7 +432,8 @@ def flush_pipette_tip(
     mill.move_pipette_to_position(
         PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0
     )  # move back to safe height (top)
-
+    write_json(stock_vials, "vial_status.json")
+    write_json(waste_vials, "waste_status.json")
 
 # def solution_selector(solutions: list, solution_name: str, volume: float):
 #     """
@@ -645,6 +648,7 @@ def check_inbox():
     Checks the experiments inbox folder for new experiments.
     :return: the filename(s) of new experiments.
     """
+    
     cwd = pathlib.Path(__file__).parents[0]
     file_path = cwd / "experiments_inbox"
     count = 0
@@ -739,15 +743,119 @@ def update_experiment_recipt(experiment: dict, item_to_update:str, value, filena
 
     return experiment
 
-def run_experiment(instructions, instructions_filename, logging_level=logging.INFO):
+def deposition(current_well, instructions, mill, pump, wellplate, echem, analyzer, deposition_potential, dep_duration, sample_period, experiment_id):
+    ## echem setup
+        logging.info("\n\nSetting up eChem experiments...")
+
+        ## echem OCP
+        logging.info("\n\nBeginning eChem OCP of well: ", current_well)
+        instructions["status"] = "ocp"
+        mill.move_electrode_to_position(
+            wellplate.get_coordinates(current_well)["x"],
+            wellplate.get_coordinates(current_well)["y"],
+            0,
+        )  # move to safe height above target well
+        mill.move_electrode_to_position(
+            wellplate.get_coordinates(current_well)["x"],
+            wellplate.get_coordinates(current_well)["y"],
+            wellplate.echem_height,
+        )  # move to well depth
+        complete_file_name = echem.setfilename(current_well, "OCP")
+        echem.ocp(
+            echem.OCPvi,
+            echem.OCPti,
+            echem.OCPrate,
+        )  # OCP
+        echem.activecheck()
+        instructions["OCP_file"] = complete_file_name
+        instructions["OCP_pass"] = echem.check_vsig_range(complete_file_name.with_suffix('.txt'))
+
+        ## echem CA - deposition
+        if instructions["OCP_pass"]:
+            logging.info("\n\nBeginning eChem deposition of well: ", current_well)
+            instructions["status"] = "deposition"
+            complete_file_name = echem.setfilename(experiment_id, 'CA')
+            #cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
+            echem.chrono(
+                echem.CAvi,
+                echem.CAti,
+                CAv1=deposition_potential,
+                deposition_time=dep_duration,
+                CAv2=echem.CAv2,
+                CAt2=echem.CAt2,
+                CAsamplerate=sample_period #TODO confirm
+            )  # CA
+            print("made it to try")
+            echem.activecheck()
+            ## echem plot the data
+            analyzer.plotdata('CV', complete_file_name)
+        else:
+            raise Exception("OCP failed")
+
+        mill.move_electrode_to_position(
+            wellplate.get_coordinates(current_well)["x"],
+            wellplate.get_coordinates(current_well)["y"],
+            0,
+        )  # move to safe height above target well
+        return 0
+
+def characterization(current_well, instructions, mill, pump, wellplate, echem, analyzer, pumping_rate, char_sol, char_vol, experiment_id):
+    logging.info(f"Characterizing well: {current_well}")
+    ## echem OCP
+    logging.info("\n\nBeginning eChem OCP of well: ", current_well)
+    instructions["status"] = "ocp-char"
+    mill.move_electrode_to_position(
+        wellplate.get_coordinates(current_well)["x"],
+        wellplate.get_coordinates(current_well)["y"],
+        0,
+    )  # move to safe height above target well
+    mill.move_electrode_to_position(
+        wellplate.get_coordinates(current_well)["x"],
+        wellplate.get_coordinates(current_well)["y"],
+        wellplate.echem_height,
+    )  # move to well depth
+    complete_file_name = echem.setfilename(current_well, "OCP_char")
+    echem.ocp(
+        echem.OCPvi,
+        echem.OCPti,
+        echem.OCPrate,
+    )  # OCP
+    echem.activecheck()
+    instructions["OCP_char_file"] = complete_file_name
+    instructions["OCP_char_pass"] = echem.check_vsig_range(complete_file_name.with_suffix('.txt'))
+
+    ## echem CV - characterization
+    if instructions["OCP_char_pass"]:
+        complete_file_name = echem.setfilename(current_well, "CV")
+        echem.cyclic(
+            echem.CVvi,
+            echem.CVap1,
+            echem.CVap2,
+            echem.CVvf,
+            CVsr1=instructions["scan-rate"],
+            CVsr2=instructions["scan-rate"],
+            CVsr3=instructions["scan-rate"],
+            CVsamplerate=echem.CVstep / instructions["scan-rate"],
+            CVcycle=echem.CVcycle,
+        )
+        echem.activecheck()
+        ## echem plot the data
+        echem.plotdata("CV", complete_file_name)
+        mill.move_electrode_to_position(
+            wellplate.get_coordinates(current_well)["x"],
+            wellplate.get_coordinates(current_well)["y"],
+            0,
+        )  # move to safe height above target well
+
+def run_experiment(instructions, instructions_filename,mill, pump, logging_level=logging.INFO):
     ## Common Variables
     month = time.strftime("%m")
     day = time.strftime("%d")
     year = time.strftime("%Y")
-    # osbclient = obs.ReqClient(host='localhost', port=4455, password='mystrongpass', timeout=3)
-    # label = osbclient.get_input_settings("text")
-    # label.input_settings["text"]="ePANDA"
-    # label.input_settings["font"]["size"]=60
+    osbclient = obs.ReqClient(host='localhost', port=4455, password='PandaBear!', timeout=3)
+    label = osbclient.get_input_settings("text")
+    label.input_settings["text"]="ePANDA"
+    label.input_settings["font"]["size"]=60
     
 
     ## Logging
@@ -763,15 +871,8 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
     try:
         ## Program Set Up
         print_panda.printpanda()
-
         logging.info("Beginning protocol:\nConnecting to Mill, Pump, Pstat:")
         logging.info("\tConnecting to Mill...")
-        mill = MillControl()
-        pump = set_up_pump()
-
-        connect_to_pstat()
-
-        # TODO Create proper exceptions for when things fail to connect,dont try and disconnect if they arent connected
 
         ## Set up wells
         wellplate = Wells(-218, -74, 0, 0)
@@ -783,30 +884,37 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         logging.info("\tVials defined")
 
         logging.info(
-            f"""Experiment outline:
-                            Target Well: {instructions["Target_Well"]}
-                            Acrylate: {instructions["Acrylate"]}
-                            PEG: {instructions["PEG"]}   
-                            DMF: {instructions["DMF"]}
-                            Ferrocene: {instructions["Ferrocene"]}
-                            Deposition Time: {instructions["dep-duration"]}
-                            Deposition Voltage: {instructions["DepPot"]}
-                        Experiment Parameters:
-                            Pumping Rate: {instructions['pump_rate']}
-                            Charaterization Sol: {instructions["char_sol"]}
-                            Characterization Vol: {instructions["char_vol"]}
-                            Flush Sol: {instructions["flush_sol"]}
-                            Flush Vol: {instructions["flush_vol"]}
+            f"""Experiment Outline:
+                    Experiment ID: {instructions["id"]}
+                    Replicates: {instructions["replicates"]}
+                    Target Well: {instructions["target_well"]}
+                    Acrylate: {instructions["acrylate"]}
+                    PEG: {instructions["peg"]}   
+                    DMF: {instructions["dmf"]}
+                    Ferrocene: {instructions["ferrocene"]}
+                    Custom: {instructions["custom"]}
+                    Deposition Time: {instructions["dep-duration"]}
+                    Deposition Voltage: {instructions["dep-pot"]}
+                    OCP: {instructions["ocp"]}
+                    CA: {instructions["ca"]}
+                    CV: {instructions["cv"]}
+                    Baseline: {instructions["baseline"]}
+                General Parameters:
+                    Pumping Rate: {instructions['pump_rate']}
+                    Charaterization Sol: {instructions["char_sol"]}
+                    Characterization Vol: {instructions["char_vol"]}
+                    Flush Sol: {instructions["flush_sol"]}
+                    Flush Vol: {instructions["flush_vol"]}
                      """
         )
 
         ## Run the experiment
-
-        well_run = instructions["Target_Well"]
+        experiment_id = instructions["id"]
+        current_well = instructions["target_well"]
         replicates = instructions["replicates"]
         wellStatus = instructions["status"]
-        RunTimes = {}
-        record_time_step("Start", RunTimes)
+        run_times = {}
+        record_time_step("Start", run_times)
 
         ## Fetch parameters from isntructions
         pumping_rate = instructions["pump_rate"]
@@ -815,39 +923,41 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         flush_sol = instructions["flush_sol"]
         flush_vol = instructions["flush_vol"]
         dep_duration = instructions["dep-duration"]
-        deposition_potential = instructions["DepPot"]
+        deposition_potential = instructions["dep-pot"]
+        scan_rate = instructions["scan-rate"]
+        sample_period = instructions["sample-period"]
 
-        # video_information = f'''
-        # Experiment Parameters:
-        #     Well: {well_run}
-        #     Replicates: {replicates}
-        #     Pumping Rate: {pumping_rate}
-        #     Charaterization Sol: {char_sol} Vol: {char_vol}
-        #     Flush Sol: {flush_sol} Vol: {flush_vol}
-        #     Deposition Voltage: {deposition_potential}
-        #     OCP Compelte: No
-        #     Deposition Complete: No
-        #     Characterization Complete: No
-        # '''
-        # osbclient.set_input_settings(video_information,label.input_settings,True)
-        # osbclient.start_record()
+        video_information = f'''
+        Experiment Parameters:
+            Experiment ID: {experiment_id}
+            Well: {current_well}
+            Replicates: {replicates}
+            Pumping Rate: {pumping_rate}
+            Charaterization Sol: {char_sol} Vol: {char_vol}
+            Flush Sol: {flush_sol} Vol: {flush_vol}
+            Deposition Voltage: {deposition_potential}
+            OCP Compelte: No
+            Deposition Complete: No
+            Characterization Complete: No
+        '''
+        osbclient.set_input_settings(video_information,label.input_settings,True)
+        osbclient.start_record()
 
         ## Deposit all experiment solutions into well
-        experiment_solutions = ["Acrylate", "PEG", "DMF", "Ferrocene"]
+        experiment_solutions = ["acrylate", "peg", "dmf", "ferrocene", "custom"]
 
         for solution_name in experiment_solutions:
-            
 
             if instructions[solution_name] > 0:  # if there is a solution to deposit
                 logging.info(
-                    f"Pipetting {instructions[solution_name]} ul of {solution_name} into {well_run}..."
+                    f"Pipetting {instructions[solution_name]} ul of {solution_name} into {current_well}..."
                 )
                 # soltuion_ml = float((instructions[solution_name])/1000000) #because the pump works in ml
                 pipette(
                     volume=instructions[solution_name],  # volume in ul
                     solutions=stock_vials,
                     solution_name=solution_name,
-                    target_well=well_run,
+                    target_well=current_well,
                     pumping_rate=pumping_rate,
                     waste_vials=waste_vials,
                     waste_solution_name="waste",
@@ -866,60 +976,21 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
                     flush_vol,
                 )
 
-        record_time_step("Pipetted solutions", RunTimes)
-
+        record_time_step("Pipetted solutions", run_times)
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
-        ## echem setup
-        logging.info("\n\nSetting up eChem experiments...")
+        deposition(current_well, instructions, mill, pump, wellplate, echem, analyzer, deposition_potential, dep_duration, sample_period, experiment_id)
 
-        complete_file_name = echem.setfilename(well_run, "dep")
-        
-        ## echem CA - deposition
-        logging.info("\n\nBeginning eChem deposition of well: ", well_run)
-        instructions["status"] = "deposition"
-
-        mill.move_electrode_to_position(
-            wellplate.get_coordinates(well_run)["x"],
-            wellplate.get_coordinates(well_run)["y"],
-            0,
-        )  # move to safe height above target well
-        mill.move_electrode_to_position(
-            wellplate.get_coordinates(well_run)["x"],
-            wellplate.get_coordinates(well_run)["y"],
-            wellplate.echem_height,
-        )  # move to well depth
-        echem.chrono(
-            echem.CAvi,
-            echem.CAti,
-            CAv1=deposition_potential,
-            deposition_time=dep_duration,
-            CAv2=echem.CAv2,
-            CAt2=echem.CAt2,
-            CAsamplerate=echem.CAsamplerate
-        )  # CA
-        while echem.active == True:
-            client.PumpEvents(1)
-            time.sleep(0.5)
-        ## echem plot the data
-        echem.plotdata("CA", complete_file_name)
-
-        mill.move_electrode_to_position(
-            wellplate.get_coordinates(well_run)["x"],
-            wellplate.get_coordinates(well_run)["y"],
-            0,
-        )  # move to safe height above target well
-
-        record_time_step("Deposition completed", RunTimes)
+        record_time_step("Deposition completed", run_times)
         
         instructions["deposition"] = "completed" # TODO turn into function to update instructions
         update_experiment_recipt(instructions,"deposition","completed",instructions_filename)
 
         ## Withdraw all well volume into waste
         clear_well(
-            volume=wellplate.volume(well_run),
-            target_well=well_run,
+            volume=wellplate.volume(current_well),
+            target_well=current_well,
             wellplate=wellplate,
             pumping_rate=pumping_rate,
             pump=pump,
@@ -931,26 +1002,23 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
-        record_time_step("Cleared dep_sol", RunTimes)
+        record_time_step("Cleared dep_sol", run_times)
 
         ## Rinse the well 3x
-        rinse(wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials)
+        rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials)
 
-        write_json(stock_vials, "vial_status.json")
-        write_json(waste_vials, "waste_status.json")
+        record_time_step("Rinsed well", run_times)
 
-        record_time_step("Rinsed well", RunTimes)
-
-        logging.info("\n\nBeginning eChem characterization of well: ", well_run)
+        logging.info("\n\nBeginning eChem characterization of well: ", current_well)
 
         ## Deposit characterization solution into well
 
-        logging.info(f"Infuse {char_sol} into well {well_run}...")
+        logging.info(f"Infuse {char_sol} into well {current_well}...")
         pipette(
             volume=char_vol,
             solutions=stock_vials,
             solution_name=char_sol,
-            target_well=well_run,
+            target_well=current_well,
             pumping_rate=pumping_rate,
             waste_vials=waste_vials,
             waste_solution_name="waste",
@@ -959,52 +1027,20 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             mill=mill,
         )
 
-        record_time_step("Deposited char_sol", RunTimes)
+        record_time_step("Deposited char_sol", run_times)
 
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
         ## Echem CV - characterization
-        logging.info(f"Characterizing well: {well_run}")
-        mill.move_electrode_to_position(
-            wellplate.get_coordinates(well_run)["x"],
-            wellplate.get_coordinates(well_run)["y"],
-            0,
-        )  # move to safe height above target well
-        mill.move_electrode_to_position(
-                    
-            wellplate.get_coordinates(well_run)["x"],
-            wellplate.get_coordinates(well_run)["y"],
-            wellplate.echem_height,
-        )
-        complete_file_name = echem.setfilename(well_run, "CV")
-        echem.cyclic(
-            echem.CVvi,
-            echem.CVap1,
-            echem.CVap2,
-            echem.CVvf,
-            CVsr1=0.05,
-            CVsr2=0.05,
-            CVsr3=0.05,
-            CVsamplerate=echem.CVsamplerate,
-            CVcycle=echem.CVcycle,
-        )
-        while echem.active == True:
-            client.PumpEvents(1)
-            time.sleep(0.1)
-        ## echem plot the data
-        echem.plotdata("CV", complete_file_name)
-        mill.move_electrode_to_position(
-            wellplate.get_coordinates(well_run)["x"],
-            wellplate.get_coordinates(well_run)["y"],
-            0,
-        )  # move to safe height above target well
 
-        record_time_step("Characterization complete", RunTimes)
+        characterization(current_well, instructions, mill, pump, wellplate, echem, analyzer, scan_rate, experiment_id)
+        
+        record_time_step("Characterization complete", run_times)
 
         clear_well(
             char_vol,
-            well_run,
+            current_well,
             wellplate,
             pumping_rate,
             pump,
@@ -1016,7 +1052,7 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
-        record_time_step("Well cleared", RunTimes)
+        record_time_step("Well cleared", run_times)
 
         # Flushing procedure
         flush_pipette_tip(
@@ -1029,35 +1065,40 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
             flush_vol,
         )
 
-        record_time_step("Pipette Flushed", RunTimes)
+        record_time_step("Pipette Flushed", run_times)
 
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
         # Final rinse
-        rinse(wellplate, well_run, pumping_rate, pump, waste_vials, mill, stock_vials)
-        record_time_step("Final Rinse", RunTimes)
+        rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials)
+        record_time_step("Final Rinse", run_times)
 
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
         instructions["status"] = "Completed"
 
-        record_time_step("End", RunTimes)
+        record_time_step("End", run_times)
 
-        instructions["time_stamps"] = RunTimes
+        instructions["time_stamps"] = run_times
 
         # save the updated instructions with run times, and data file names
         save_completed_instructions(instructions, instructions_filename)
-        logging.info(f"Saved completed instructions for well {well_run}")
+        logging.info(f"Saved completed instructions for well {experiment_id}")
 
         # TODO save the status of stock vials to a dataframe, saving the dataframe at the end of the campaign
 
-        logging.info(f"\n\nEXPERIMENT {well_run} COMPLETED\n\n")
-        print_runtime_data(RunTimes)
-
+        logging.info(f"\n\nEXPERIMENT {experiment_id} COMPLETED\n\n")
+        print_runtime_data(run_times)
+    
     except KeyboardInterrupt:
         logging.warning("Keyboard Interrupt")
+        instructions["Status"] = "error"
+        save_completed_instructions(instructions, instructions_filename)
+        logging.info(f"Saved completed instructions for well {experiment_id}")
+        return 2
+
 
     except Exception as e:
         exception_type, exception_object, exception_traceback = sys.exc_info()
@@ -1068,32 +1109,24 @@ def run_experiment(instructions, instructions_filename, logging_level=logging.IN
         logging.error("File name: ", filename)
         logging.error("Line number: ", line_number)
         instructions["Status"] = "error"
+        return 1
 
-    finally:
-        ## Move electrode to frit bath
-        logging.info("Moving electrode to frit bath...")
-        mill.move_electrode_to_position(      
-            wellplate.get_coordinates("H2")["x"],
-            wellplate.get_coordinates("H2")["y"],
-            0,
-        )
-        mill.move_electrode_to_position(   
-            wellplate.get_coordinates("H2")["x"],
-            wellplate.get_coordinates("H2")["y"],
-            wellplate.echem_height,
-        )
-
-        ## close out of serial connections
-        logging.info("Disconnecting from Mill, Pump, Pstat:")
-        mill.__exit__()
-        logging.info("Mill closed")
-
-        logging.info("Pump closed")
-        echem.disconnectpstat()
-        logging.info("Pstat closed")
+    return 0
+        
 
 
 def main():
+
+    ## Check inbox
+    logging.info("Checking inbox for new experiments...")
+    new_experiments = check_inbox()
+    logging.info(f"{new_experiments} new experiments found")
+
+    ## Connect to equipment
+    mill = MillControl()
+    pump = set_up_pump()
+    connect_to_pstat()
+
     ## Read instructions
     while True:
         instructions, instructions_filename = read_next_experiment_from_queue()
@@ -1103,14 +1136,33 @@ def main():
         else:
             logging.info("Instructions read from queue")
             logging.info(instructions)
-            run_experiment(
+            status = run_experiment(
                 instructions, instructions_filename, logging_level=logging.DEBUG
-            )
-            logging.info("Experiment completed")
+                )
+            logging.info("Experiment completed with code ", status)
+            if status == 0:
+                pass
+            elif status == 1:
+                logging.error("Experiment failed")
+            elif status == 2:
+                logging.warning("Experiment stopped by user")
+                break
+            else:
+                pass
 
+    
+    ## Disconnect from equipment
+    mill.home()
+
+    ## close out of serial connections
+    logging.info("Disconnecting from Mill, Pump, Pstat:")
+    mill.__exit__()
+    logging.info("Mill closed")
+
+    logging.info("Pump closed")
+    echem.disconnectpstat()
+    logging.info("Pstat closed")
 
 if __name__ == "__main__":
     # logging.basicConfig(level=20)
     main()
-else:
-    pass
