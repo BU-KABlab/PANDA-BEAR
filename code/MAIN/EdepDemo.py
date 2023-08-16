@@ -35,13 +35,17 @@ def main():
         pump = set_up_pump()
 
         ## Initializing and connecting to pstat
+        ''' old code for connecting to pstat
         GamryCOM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
         pstat = client.CreateObject("GamryCOM.GamryPC6Pstat")
         devices = client.CreateObject("GamryCOM.GamryDeviceList")
         echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
         echem.pstat.Open()  # open connection to pstat
         print("\tPstat connected: ", devices.EnumSections()[0])
-
+        '''
+        #New code to connect to pstat
+        echem.pstatconnect()
+        
         # TODO Create proper exceptions for when things fail to connect,dont try and disconnect if they arent connected
 
         ## Set up wells
@@ -118,6 +122,14 @@ def main():
                 wellplate.get_coordinates(well_run)["y"],
                 wellplate.echem_height,
             )  # move to well depth
+            #code to check OCP before proceeding
+            '''
+            complete_file_name = echem.setfilename(well_run,"OCP")
+            echem.OCP(instructions[i])
+                if echem.check_vsig_range(complete_file_name.with_suffix('.txt')):
+                echem.chrono(instructions[i])
+            '''
+            '''
             echem.chrono(
                 CAvi=echem.CAvi,
                 CAti=echem.CAti,
@@ -127,6 +139,7 @@ def main():
                 CAt2=echem.CAt2,
                 CAsamplerate=echem.CAsamplerate,
             )  # CA
+            '''
             while echem.active == True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
@@ -197,7 +210,17 @@ def main():
                 wellplate.get_coordinates(well_run)["y"],
                 wellplate.echem_height,
             )
+            '''
+            #code to check OCP before proceeding
+            complete_file_name = echem.setfilename(well_run,"OCP")
+            echem.OCP(instructions[i])
+            if echem.check_vsig_range(complete_file_name.with_suffix('.txt')):
+                complete_file_name = echem.setfilename(well_run, "CV")
+                echem.cyclic(instructions[i])
+            '''
             complete_file_name = echem.setfilename(well_run, "CV")
+            echem.cyclic(instructions[i])
+            '''
             echem.cyclic(
                 echem.CVvi,
                 echem.CVap1,
@@ -209,6 +232,7 @@ def main():
                 CVsamplerate=echem.CVsamplerate,
                 CVcycle=echem.CVcycle,
             )
+            '''
             while echem.active == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)

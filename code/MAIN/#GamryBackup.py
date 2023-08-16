@@ -1,3 +1,4 @@
+#GamryBackup
 import datetime
 import os
 import numpy as np
@@ -10,22 +11,15 @@ import comtypes
 import comtypes.client as client
 import pathlib
 import random
-import Analyzer
 
-def pstatconnect():    
-    global pstat
-    global devices
-    global GamryCOM
+#Bring in gamrycom and pstat
+#GamryCOM=client.GetModule(r'C:\Program Files (x86)\Gamry Instruments\Framework\GamryCOM.exe')
 
-    GamryCOM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
-    pstat = client.CreateObject("GamryCOM.GamryPC6Pstat")
-    devices = client.CreateObject("GamryCOM.GamryDeviceList")
-    pstat.Init(devices.EnumSections()[0])  # grab first pstat
-    pstat.Open()  # open connection to pstat
-    if devices.EnumSections():
-        print("\tPstat connected: ", devices.EnumSections()[0])
-    else:
-        print("\tPstat not connected")
+GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
+pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
+devices = client.CreateObject('GamryCOM.GamryDeviceList')
+active = True
+#complete_file_name = 'test'
 
 class GamryCOMError(Exception):
     pass
@@ -37,7 +31,7 @@ def gamry_error_decoder(e):
             return GamryCOMError('0x{0:08x}: {1}'.format(2**32 + e.args[0], e.args[1]))
     return e
 
-def initializepstat():
+def initializepstat(pstat):
     pstat.SetCtrlMode(GamryCOM.PstatMode)
     pstat.SetCell(GamryCOM.CellOff)
     pstat.SetIEStability(GamryCOM.StabilityNorm)
@@ -45,14 +39,17 @@ def initializepstat():
     pstat.SetVchRange(10.0)
     pstat.SetIERangeMode(True)
     # the following command allows us to set our range manually
-    # pstat.SetIERange (x)
+    pstat.SetIERange (0.1)
 
 def stopacq():
     global active
-    
+    global connection
+
     active = False
     pstat.SetCell(GamryCOM.CellOff)
     time.sleep(1)
+#    pstat.Close()
+#    del connection
     gc.collect()
     return
 
@@ -91,11 +88,15 @@ class GamryDtaqEvents(object):
         self.call_savedata(self.complete_file_name)
 
 def disconnectpstat():
+    global pstat
+    global connection
+    
     pstat.Close()
     #del connection
     time.sleep(15)
 
 def savedata(complete_file_name):
+    
     #print(dtaqsink.acquired_points)
     print("number of data points acquired")
     print(len(dtaqsink.acquired_points))
@@ -105,6 +106,66 @@ def savedata(complete_file_name):
     #complete_file_name = os.path(complete_file_name)
     np.savetxt(complete_file_name.with_suffix('.txt'), output)
     print("data saved")
+
+def plotdata(exp_name, complete_file_name, showplot = False):
+    #complete_file_name = os.path(complete_file_name)
+    if exp_name == 'OCP':
+            df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None,
+                            names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
+            plt.rcParams["figure.dpi"] = 150
+            plt.rcParams["figure.facecolor"] = "white"
+            plt.plot(df['Time'], df['Vf'])
+            plt.xlabel('Time (s)')
+            plt.ylabel('Voltage (V)')
+    elif exp_name == 'CA':
+            df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None,
+                            names=["runtime", "Vf", "Vu", "Im", "Q", "Vsig", "Ach", "IERange", "Over", "StopTest"])
+            plt.rcParams["figure.dpi"] = 150
+            plt.rcParams["figure.facecolor"] = "white"
+            plt.plot(df['runtime'], df['Im'])
+            plt.xlabel('Time (s)')
+            plt.ylabel('Current (A)')
+    elif exp_name == 'CV':
+            df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None, names=["Time", "Vf", "Vu", "Im", "Vsig", "Ach", "IERange", "Overload", "StopTest", "Cycle", "Ach2"])
+            plt.rcParams["figure.dpi"] = 150
+            plt.rcParams["figure.facecolor"] = "white"
+            # Check for NaN values in the 'Cycle' column and drop them
+            df = df.dropna(subset=['Cycle'])
+
+            # Convert the 'Cycle' column to integers
+            df['Cycle'] = df['Cycle'].astype(int)
+
+            # Find the maximum cycle number
+            max_cycle = df['Cycle'].max()
+
+            # Create a list of custom dash patterns for each cycle
+            dash_patterns = [
+                (5 * (i + 1), 4 * (i + 1), 3 * (i + 1), 2 * (i + 1))
+                for i in range(max_cycle)]
+
+            # Create a 'viridis' colormap with the number of colors equal to the number of cycles
+            colors = cm.cool(np.linspace(0, 1, max_cycle))
+
+            # Plot values for vsig vs Im for each cycle with different dash patterns
+            # for i in range(max_cycle):
+            #     df2 = df[df['Cycle'] == i]
+            #     dashes = dash_patterns[i - 1]  # Use the corresponding dash pattern from the list
+            #     plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[i - 1], label=f'Cycle {i}')
+
+            
+            df2 = df[df['Cycle'] == 1]
+            dashes = dash_patterns[0]  # Use the corresponding dash pattern from the list
+            plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[0], label=f'Cycle 1 - index 0')
+            plt.legend(loc='upper left')
+            plt.xlabel('V vs Ag/AgCl (V)')
+            plt.ylabel('Current (A)')
+            if showplot == True:
+                plt.show()
+          
+    plt.tight_layout()
+    plt.savefig(complete_file_name.with_suffix('.png'))
+    plt.close()
+    print("plot saved")
 
 def setfilename(target_well, experiment):
     global complete_file_name
@@ -134,9 +195,13 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     global dtaq
     global signal
     global dtaqsink
+    global pstat
     global connection
     global start_time
+    global end_time
+    global total_time
     global active
+    global GamryCOM
     #global complete_file_name
     
     print("made it to run")
@@ -163,9 +228,13 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global dtaq
     global signal
     global dtaqsink
+    global pstat
     global connection
     global start_time
+    global end_time
+    global total_time
     global active
+    global GamryCom
     #global complete_file_name
 
     active = True
@@ -192,12 +261,15 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     print("made it to run end")
 
 
-def OCP(instructions):
+def OCP(OCPvi, OCPti, OCPrate):
     global dtaq
     global signal
     global dtaqsink
+    global pstat
     global connection
     global start_time
+    global end_time
+    global total_time
     global active
 
     active = True
@@ -211,7 +283,7 @@ def OCP(instructions):
     dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
     
-    signal.Init(pstat, instructions["OCPvi"], instructions["OCPti"], instructions["OCPrate"], GamryCOM.PstatMode)
+    signal.Init(pstat, OCPvi, OCPti, OCPrate, GamryCOM.PstatMode)
     initializepstat(pstat)
 
     dtaq.Init(pstat)
@@ -222,25 +294,13 @@ def OCP(instructions):
     start_time = time.time()
     print("made it to run end")
 
-def activecheck():
-    while active == True:
-        client.PumpEvents(1)
-        time.sleep(0.5)
+active = True
 
-def check_vsig_range(filename):
-    try:
-        ocp_data = pd.read_csv(filename, sep="\t", header=None)
-        vsig_last_row = ocp_data.iloc[-1, ocp_data.columns.get_loc("Vsig")]
+def errortest():
+    testerror = comtypes.COMError(0x20000000, None, (None, None, None, None))
+    raise gamry_error_decoder(testerror)
 
-        if -1 <= vsig_last_row <= 1:
-            print("Vsig in valid range (-1 to 1). Proceeding to chrono()")
-            return True
-        else:
-            print("Vsig not in valid range. Aborting chrono()")
-            return False
-    except Exception as e:
-        print("Error occurred while checking Vsig:", e)
-        return False
+
 
 # CV Setup Parameters
 CVvi = 0.0 #initial voltage
@@ -248,9 +308,9 @@ CVap1 = -0.8
 CVap2 = -0.1
 CVvf = -0.1
 
-CVstep = 0.01 #testing step, 100 mv/s
-CVsr1 = 0.1
-CVcycle = 3
+CVstep = 0.01 #testing step, 10 mV #sample period
+CVsr1 = 0.05 #scan rate (50 mV/s)
+CVcycle = 3 #number of cycles
 
 CVsr2 = CVsr1
 CVsr3 = CVsr1
@@ -281,21 +341,17 @@ OCPrate = 0.5
 
 if __name__ == "__main__":
     try:
-        pstatconnect()  # grab first pstat
-        complete_file_name = setfilename('A1','OCP')
-        OCP(instructions)
-
-
+        pstat.Init(devices.EnumSections()[0])  # grab first pstat
+        pstat.Open() #open connection to pstat
+        complete_file_name = setfilename('A1', 'dep')
         ## echem CA - deposition
-        if check_vsig_range(complete_file_name.with_suffix('.txt')):
-            complete_file_name = setfilename('A1', 'dep')
-            chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
-            print("made it to try")
-            while active == True:
-                client.PumpEvents(1)
-                time.sleep(0.5)
-            ## echem plot the data
-            Analyzer.plotdata('CA', complete_file_name)
+        chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate) #CA
+        print("made it to try")
+        while active == True:
+            client.PumpEvents(1)
+            time.sleep(0.5)
+        ## echem plot the data
+        plotdata('CA', complete_file_name)
         pstat.Close()
         del connection
 
