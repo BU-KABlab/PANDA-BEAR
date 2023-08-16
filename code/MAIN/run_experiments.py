@@ -1087,9 +1087,7 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
         save_completed_instructions(instructions, instructions_filename)
         logging.info(f"Saved completed instructions for well {experiment_id}")
 
-        # TODO save the status of stock vials to a dataframe, saving the dataframe at the end of the campaign
-
-        logging.info(f"\n\nEXPERIMENT {experiment_id} COMPLETED\n\n")
+        logging.info(f"EXPERIMENT {experiment_id} COMPLETED\n\n")
         print_runtime_data(run_times)
     
     except KeyboardInterrupt:
@@ -1098,6 +1096,7 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
         save_completed_instructions(instructions, instructions_filename)
         logging.info(f"Saved completed instructions for well {experiment_id}")
         return 2
+    
 
 
     except Exception as e:
@@ -1110,7 +1109,9 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
         logging.error("Line number: ", line_number)
         instructions["Status"] = "error"
         return 1
-
+    
+    finally:
+        instructions["status_date"] = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     return 0
         
 

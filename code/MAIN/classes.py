@@ -140,7 +140,7 @@ class Wells:
             self.wells[well_id]["depth"] = (self.wells[well_id]["volume"]/1000000)/(math.pi*math.pow(self.radius,2.0)) + self.z_bottom
             if self.wells[well_id]["depth"] < self.z_bottom:
                 self.wells[well_id]["depth"] = self.z_bottom
-            logging.debug(f'\tNew Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
+            logging.debug(f'New Well volume: {self.wells[well_id]["volume"]} | Solution depth: {self.wells[well_id]["depth"]}')
 
 class Vial:
     '''
@@ -200,7 +200,7 @@ class Vial:
         Updates the volume of the vial
         '''
         logging.info(f'Updating {self.name} volume...')
-        logging.debug(f'\tCurrent volume: {self.volume} | Current depth: {self.depth}')
+        logging.debug(f'Current volume: {self.volume} | Current depth: {self.depth}')
         #logging.info(f'\tAdding {added_volume} to {self.volume}...')
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
@@ -215,7 +215,7 @@ class Vial:
             ##TODO write new volume to file
             
 
-            logging.debug(f'\tNew volume: {self.volume} | New depth: {self.depth}')
+            logging.debug(f'New volume: {self.volume} | New depth: {self.depth}')
         self.contamination += 1
 
 
