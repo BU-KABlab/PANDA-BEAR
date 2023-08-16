@@ -118,6 +118,7 @@ def setfilename(target_well, experiment):
     cwd = pathlib.Path().absolute()
     filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
     filePath = filePathPar / fileDate
+    #complete_file_name = filePath / (target_well + "_" + experiment)
     complete_file_name = filePath / (target_well + "_" + experiment)
     print(f"eChem: complete file name is: {complete_file_name}")
     if not pathlib.Path.exists(filePath):
@@ -164,7 +165,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
         CVcycle,
         GamryCOM.PstatMode,
     )
-    initializepstat(pstat)
+    initializepstat()
     dtaq.Init(pstat)
     pstat.SetSignal(signal)
     pstat.SetCell(GamryCOM.CellOn)
@@ -196,7 +197,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     signal.Init(
         pstat, CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate, GamryCOM.PstatMode
     )
-    initializepstat(pstat)
+    initializepstat()
 
     dtaq.Init(pstat, GamryCOM.ChronoAmp)
     pstat.SetSignal(signal)
@@ -209,7 +210,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     print("made it to run end")
 
 
-def OCP(instructions):
+def OCP(OCPvi, OCPti, OCPrate):
     global dtaq
     global signal
     global dtaqsink
@@ -228,8 +229,8 @@ def OCP(instructions):
     dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
     connection = client.GetEvents(dtaq, dtaqsink)
     
-    signal.Init(pstat, instructions["OCPvi"], instructions["OCPti"], instructions["OCPrate"], GamryCOM.PstatMode)
-    initializepstat(pstat)
+    signal.Init(pstat, OCPvi, OCPti, OCPrate, GamryCOM.PstatMode)
+    initializepstat()
 
     dtaq.Init(pstat)
     pstat.SetSignal(signal)
@@ -237,7 +238,7 @@ def OCP(instructions):
 
     dtaq.Run(True)
     #start_time = time.time()
-    print("made it to run end")
+    #print("made it to run end")
 
 def activecheck():
     while active == True:
@@ -246,14 +247,17 @@ def activecheck():
 
 def check_vsig_range(filename):
     try:
-        ocp_data = pd.read_csv(filename, sep="\t", header=None)
-        vsig_last_row = ocp_data.iloc[-1, ocp_data.columns.get_loc("Vsig")]
+        ocp_data = pd.read_csv(filename, sep=" ", header=None, names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
+        vsig_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vsig")]
+        print("Vsig last row:", vsig_last_row_scientific)
+        vsig_last_row_decimal = float(vsig_last_row_scientific)
+        print("Vsig last row:", vsig_last_row_decimal)
 
-        if -1 <= vsig_last_row <= 1:
-            print("Vsig in valid range (-1 to 1). Proceeding to chrono()")
+        if -1 < vsig_last_row_decimal and vsig_last_row_decimal < 1:
+            print("Vsig in valid range (-1 to 1). Proceeding to echem experiment")
             return True
         else:
-            print("Vsig not in valid range. Aborting chrono()")
+            print("Vsig not in valid range. Aborting echem experiment")
             return False
     except Exception as e:
         print("Error occurred while checking Vsig:", e)
@@ -261,9 +265,9 @@ def check_vsig_range(filename):
 
 # CV Setup Parameters
 CVvi = 0.0  # initial voltage
-CVap1 = -0.8
-CVap2 = -0.1
-CVvf = -0.1
+CVap1 = 0.3
+CVap2 = -0.2
+CVvf = -0.2
 
 CVstep = 0.01  # testing step, 100 mv/s
 CVsr1 = 0.1
@@ -299,21 +303,24 @@ OCPrate = 0.5
 if __name__ == "__main__":
     try:
         pstatconnect()  # grab first pstat
-        complete_file_name = setfilename('A1','OCP')
-        OCP(instructions)
-
-
+        complete_file_name = setfilename('F1','OCP')
+        OCP(OCPvi, OCPti,OCPrate)
+        activecheck()
+#        while active == True:
+                #client.PumpEvents(1)
+                #time.sleep(0.5)
         ## echem CA - deposition
         if check_vsig_range(complete_file_name.with_suffix('.txt')):
-            complete_file_name = setfilename('A1', 'dep')
-            chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
+            complete_file_name = setfilename('F1', 'CV')
+            cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
+            #chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
             print("made it to try")
             while active == True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data
-            Analyzer.plotdata('CA', complete_file_name)
-        pstat.Close()
+            Analyzer.plotdata('CV', complete_file_name)
+        disconnectpstat()
         del connection
 
     except Exception as e:

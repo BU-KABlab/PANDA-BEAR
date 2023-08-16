@@ -62,7 +62,6 @@ def plotdata(exp_name, complete_file_name, showplot = False):
             df2 = df[df['Cycle'] == 1]
             dashes = dash_patterns[0]  # Use the corresponding dash pattern from the list
             plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[0], label=f'Cycle 1 - index 0')
-            plt.legend(loc='upper left')
             plt.xlabel('V vs Ag/AgCl (V)')
             plt.ylabel('Current (A)')
             if showplot == True:
