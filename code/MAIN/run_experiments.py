@@ -12,7 +12,6 @@ import datetime
 import obsws_python as obs
 import Analyzer as analyzer
 
-
 def read_vials(filename):
     cwd = pathlib.Path(__file__).parents[0]
     filename = cwd / filename
@@ -32,7 +31,6 @@ def read_vials(filename):
             )
     return sol_objects
 
-
 def set_up_pump():
     """
     Set up the WPI syringe pump.
@@ -47,7 +45,6 @@ def set_up_pump():
     logging.info(f"\tPump found at address: {pump.address}")
     time.sleep(2)
     return pump
-
 
 def withdraw(volume: float, rate: float, ser_pump: object):
     """
@@ -87,7 +84,6 @@ def withdraw(volume: float, rate: float, ser_pump: object):
 
     return 0
 
-
 def infuse(volume: float, rate: float, ser_pump: object):
     """
     Infuse the given volume at the given rate and depth from the specified position.
@@ -122,7 +118,6 @@ def infuse(volume: float, rate: float, ser_pump: object):
         pass
     return 0
 
-
 def purge(purge_vial: Vial, pump: object, purge_volume=20.00, pumping_rate=0.4):
     """
     Perform purging from the pipette.
@@ -135,7 +130,6 @@ def purge(purge_vial: Vial, pump: object, purge_volume=20.00, pumping_rate=0.4):
     purge_vial.update_volume(purge_volume)
 
     logging.debug(f"Purge vial new volume: {purge_vial.volume}")
-
 
 def pipette(
     volume: float,  # volume in ul
@@ -249,7 +243,6 @@ def pipette(
     else:
         pass
 
-
 def clear_well(
     volume: float,
     target_well: str,
@@ -332,14 +325,12 @@ def clear_well(
 
         logging.info(f"Remaining volume in well: {wellplate.volume(target_well)}")
 
-
 def print_runtime_data(runtime_data: dict):
     for well, data in runtime_data.items():
         logging.info(f"Well {well} Runtimes:")
         for section, runtime in data.items():
             minutes = runtime / 60
             logging.info(f"{section}: {minutes} seconds")
-
 
 def rinse(
     wellplate: object,
@@ -485,13 +476,11 @@ def waste_selector(solution_name:str, volume):
             pass
     raise Exception(f"{solution_name} not found in list of waste vials or not capacity vials")
 
-
 def record_time_step(step: str, run_times: dict):
     currentTime = int(time.time())
     sub_key = step + " Time"
     run_times[sub_key] = currentTime
     # print(f'{step} time: {run_times[well][sub_key]}')
-
 
 def save_runtime_data(run_times: dict, filename: str):
     """Save the run times to a json file in code/run_times"""
@@ -501,7 +490,6 @@ def save_runtime_data(run_times: dict, filename: str):
     with open(file_to_save, "w") as f:
         json.dump(run_times, f)
 
-
 def connect_to_pstat():
     ## Initializing and connecting to pstat
     GamryCOM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
@@ -510,7 +498,6 @@ def connect_to_pstat():
     echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
     echem.pstat.Open()  # open connection to pstat
     logging.info("\tPstat connected: ", devices.EnumSections()[0])
-
 
 def check_well_status(well: str):
     """
@@ -526,7 +513,6 @@ def check_well_status(well: str):
             if well["Target_Well"] == well:
                 return well["status"]
 
-
 def choose_alternative_well(well: str):
     """
     Chooses an alternative well if the target well is not available.
@@ -541,7 +527,6 @@ def choose_alternative_well(well: str):
             if well["status"] == "new":
                 return well["Target_Well"]
         return "none"
-
 
 def change_well_status(well: str, status: str):
     """
@@ -562,7 +547,6 @@ def change_well_status(well: str, status: str):
                 break
     with open(file_to_open, "w") as file:
         json.dump(data, file, indent=4)
-
 
 def read_new_experiments(filename: str):
     """
@@ -642,7 +626,6 @@ def read_new_experiments(filename: str):
 
     return experiments_read, complete
 
-
 def check_inbox():
     """
     Checks the experiments inbox folder for new experiments.
@@ -669,7 +652,6 @@ def check_inbox():
 
     return count
 
-
 def read_next_experiment_from_queue():
     """
     Reads the next experiment from the queue.
@@ -686,7 +668,6 @@ def read_next_experiment_from_queue():
         return data, file_to_open
     else:
         return None, None
-
 
 def save_completed_instructions(instructions: list, filename: str):
     """Save the experiment instructions to either the completed or failed instructions folder.
@@ -713,7 +694,6 @@ def save_completed_instructions(instructions: list, filename: str):
 
     os.remove(queue_file_path / (filename))
     print(f"Experiment {filename} removed from queue.")
-
 
 def write_json(data: dict, filename: str):
     """
@@ -1097,8 +1077,6 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
         logging.info(f"Saved completed instructions for well {experiment_id}")
         return 2
     
-
-
     except Exception as e:
         exception_type, exception_object, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
@@ -1113,8 +1091,6 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
     finally:
         instructions["status_date"] = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     return 0
-        
-
 
 def main():
 
