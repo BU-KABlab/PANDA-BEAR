@@ -1,7 +1,7 @@
 {
     "Wells": [
         {
-            "Target_Well": "A1",
+            "well_id": "A1",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -11,7 +11,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A2",
+            "well_id": "A2",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -21,7 +21,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A3",
+            "well_id": "A3",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -31,7 +31,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A4",
+            "well_id": "A4",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -41,7 +41,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A5",
+            "well_id": "A5",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -51,7 +51,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A6",
+            "well_id": "A6",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -61,7 +61,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A7",
+            "well_id": "A7",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -71,7 +71,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A8",
+            "well_id": "A8",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -81,7 +81,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A9",
+            "well_id": "A9",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -91,7 +91,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A10",
+            "well_id": "A10",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -101,7 +101,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A11",
+            "well_id": "A11",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -111,7 +111,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "A12",
+            "well_id": "A12",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -121,7 +121,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B1",
+            "well_id": "B1",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -131,7 +131,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B2",
+            "well_id": "B2",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -141,7 +141,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B3",
+            "well_id": "B3",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -151,7 +151,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B4",
+            "well_id": "B4",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -161,7 +161,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B5",
+            "well_id": "B5",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -171,7 +171,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B6",
+            "well_id": "B6",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -181,7 +181,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B7",
+            "well_id": "B7",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -191,7 +191,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B8",
+            "well_id": "B8",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -201,7 +201,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B9",
+            "well_id": "B9",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -211,7 +211,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B10",
+            "well_id": "B10",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -221,7 +221,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B11",
+            "well_id": "B11",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -231,7 +231,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "B12",
+            "well_id": "B12",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -241,7 +241,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C1",
+            "well_id": "C1",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -251,7 +251,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C2",
+            "well_id": "C2",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -261,7 +261,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C3",
+            "well_id": "C3",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -271,7 +271,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C4",
+            "well_id": "C4",
             "status": "complete",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
@@ -281,7 +281,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C5",
+            "well_id": "C5",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -291,7 +291,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C6",
+            "well_id": "C6",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -301,7 +301,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C7",
+            "well_id": "C7",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -311,7 +311,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C8",
+            "well_id": "C8",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -321,7 +321,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C9",
+            "well_id": "C9",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -331,7 +331,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C10",
+            "well_id": "C10",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -341,7 +341,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C11",
+            "well_id": "C11",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -351,7 +351,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "C12",
+            "well_id": "C12",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -361,7 +361,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D1",
+            "well_id": "D1",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -371,7 +371,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D2",
+            "well_id": "D2",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -381,7 +381,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D3",
+            "well_id": "D3",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -391,7 +391,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D4",
+            "well_id": "D4",
             "status": "complete",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
@@ -401,7 +401,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D5",
+            "well_id": "D5",
             "status": "complete",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
@@ -411,7 +411,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D6",
+            "well_id": "D6",
             "status": "complete",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
@@ -421,7 +421,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D7",
+            "well_id": "D7",
             "status": "complete",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
@@ -431,7 +431,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D8",
+            "well_id": "D8",
             "status": "complete",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
@@ -441,7 +441,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D9",
+            "well_id": "D9",
             "status": "complete",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
@@ -451,7 +451,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D10",
+            "well_id": "D10",
             "status": "complete",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
@@ -461,7 +461,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D11",
+            "well_id": "D11",
             "status": "complete",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
@@ -471,7 +471,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "D12",
+            "well_id": "D12",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -481,7 +481,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E1",
+            "well_id": "E1",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -491,7 +491,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E2",
+            "well_id": "E2",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -501,7 +501,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E3",
+            "well_id": "E3",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -511,7 +511,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E4",
+            "well_id": "E4",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -521,7 +521,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E5",
+            "well_id": "E5",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -531,7 +531,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E6",
+            "well_id": "E6",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -541,7 +541,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E7",
+            "well_id": "E7",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -551,7 +551,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E8",
+            "well_id": "E8",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -561,7 +561,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E9",
+            "well_id": "E9",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -571,7 +571,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E10",
+            "well_id": "E10",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -581,7 +581,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E11",
+            "well_id": "E11",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -591,7 +591,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "E12",
+            "well_id": "E12",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -601,7 +601,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F1",
+            "well_id": "F1",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -611,7 +611,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F2",
+            "well_id": "F2",
             "status": "error",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -621,7 +621,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F3",
+            "well_id": "F3",
             "status": "error",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -631,7 +631,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F4",
+            "well_id": "F4",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -641,7 +641,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F5",
+            "well_id": "F5",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -651,9 +651,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F6",
-            "status": "new",
-            "status_date": "2023-08-04_15_49_12",
+            "well_id": "F6",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_14",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -661,9 +661,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F7",
-            "status": "new",
-            "status_date": "2023-08-04_15_49_12",
+            "well_id": "F7",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_13",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -671,9 +671,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F8",
-            "status": "new",
-            "status_date": "2023-08-04_15_49_12",
+            "well_id": "F8",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_13",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -681,9 +681,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F9",
-            "status": "new",
-            "status_date": "2023-08-04_15_49_12",
+            "well_id": "F9",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_12",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -691,9 +691,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F10",
-            "status": "new",
-            "status_date": "2023-08-04_15_49_12",
+            "well_id": "F10",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_11",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -701,9 +701,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F11",
-            "status": "new",
-            "status_date": "2023-08-04_15_49_12",
+            "well_id": "F11",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_10",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -711,9 +711,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "F12",
-            "status": "new",
-            "status_date": "2023-08-04_15_49_12",
+            "well_id": "F12",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_05",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -721,7 +721,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G1",
+            "well_id": "G1",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -731,7 +731,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G2",
+            "well_id": "G2",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -741,7 +741,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G3",
+            "well_id": "G3",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -751,7 +751,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G4",
+            "well_id": "G4",
             "status": "complete",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
@@ -761,17 +761,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G5",
-            "status": "complete",
-            "status_date": "2023-08-04_15_49_13",
-            "contents": [],
-            "OCP_file": null,
-            "OCP_pass": null,
-            "deposition_file": null,
-            "characterization_file": null
-        },
-        {
-            "Target_Well": "G6",
+            "well_id": "G5",
             "status": "complete",
             "status_date": "2023-08-04_15_49_13",
             "contents": [],
@@ -781,7 +771,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G7",
+            "well_id": "G6",
             "status": "complete",
             "status_date": "2023-08-04_15_49_13",
             "contents": [],
@@ -791,7 +781,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G8",
+            "well_id": "G7",
             "status": "complete",
             "status_date": "2023-08-04_15_49_13",
             "contents": [],
@@ -801,7 +791,17 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G9",
+            "well_id": "G8",
+            "status": "complete",
+            "status_date": "2023-08-04_15_49_13",
+            "contents": [],
+            "OCP_file": null,
+            "OCP_pass": null,
+            "deposition_file": null,
+            "characterization_file": null
+        },
+        {
+            "well_id": "G9",
             "status": "complete",
             "status_date": "2023-08-04_20_44_17",
             "contents": [],
@@ -811,7 +811,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G10",
+            "well_id": "G10",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -821,7 +821,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G11",
+            "well_id": "G11",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -831,7 +831,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "G12",
+            "well_id": "G12",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -841,7 +841,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H1",
+            "well_id": "H1",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -851,7 +851,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H2",
+            "well_id": "H2",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -861,7 +861,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H3",
+            "well_id": "H3",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -871,7 +871,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H4",
+            "well_id": "H4",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -881,7 +881,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H5",
+            "well_id": "H5",
             "status": "unavailable",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -891,7 +891,7 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H6",
+            "well_id": "H6",
             "status": "complete",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
@@ -901,9 +901,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H7",
-            "status": "new",
-            "status_date": "2023-08-08_16_46_34",
+            "well_id": "H7",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_04",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -911,9 +911,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H8",
-            "status": "new",
-            "status_date": "2023-08-08_16_46_34",
+            "well_id": "H8",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_03",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -921,9 +921,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H9",
-            "status": "new",
-            "status_date": "2023-08-04_14-27",
+            "well_id": "H9",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_02",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -931,9 +931,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H10",
-            "status": "new",
-            "status_date": "2023-08-04_14-27",
+            "well_id": "H10",
+            "status": "queued",
+            "status_date": "2023-08-16_21_00_00",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -941,9 +941,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H11",
-            "status": "new",
-            "status_date": "2023-08-04_14-27",
+            "well_id": "H11",
+            "status": "queued",
+            "status_date": "2023-08-16_20_59_57",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -951,9 +951,9 @@
             "characterization_file": null
         },
         {
-            "Target_Well": "H12",
-            "status": "new",
-            "status_date": "2023-08-04_14-27",
+            "well_id": "H12",
+            "status": "queued",
+            "status_date": "2023-08-16_20_59_49",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
