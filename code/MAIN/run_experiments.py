@@ -806,7 +806,11 @@ def characterization(current_well, instructions, mill, pump, wellplate, echem, a
 
     ## echem CV - characterization
     if instructions["OCP_char_pass"]:
-        complete_file_name = echem.setfilename(current_well, "CV")
+        if instructions["baseline"] == 1:
+            test_type = "CV_baseline"
+        else:
+            test_type = "CV"
+        complete_file_name = echem.setfilename(current_well, test_type)
         echem.cyclic(
             echem.CVvi,
             echem.CVap1,
@@ -850,18 +854,18 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
 
     try:
         ## Program Set Up
-        print_panda.printpanda()
+        logging.info(print_panda.printpanda())
         logging.info("Beginning protocol:\nConnecting to Mill, Pump, Pstat:")
-        logging.info("\tConnecting to Mill...")
+        logging.info("Connecting to Mill...")
 
         ## Set up wells
         wellplate = Wells(-218, -74, 0, 0)
-        logging.info("\tWells defined")
+        logging.info("Wells defined")
 
         ## Set up solutions
         waste_vials = read_vials("waste_status.json")
         stock_vials = read_vials("vial_status.json")
-        logging.info("\tVials defined")
+        logging.info("Vials defined")
 
         logging.info(
             f"""Experiment Outline:
@@ -960,95 +964,96 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
-        deposition(current_well, instructions, mill, pump, wellplate, echem, analyzer, deposition_potential, dep_duration, sample_period, experiment_id)
+        if instructions["CA"] == 1:
+            deposition(current_well, instructions, mill, pump, wellplate, echem, analyzer, deposition_potential, dep_duration, sample_period, experiment_id)
 
-        record_time_step("Deposition completed", run_times)
+            record_time_step("Deposition completed", run_times)
         
-        instructions["deposition"] = "completed" # TODO turn into function to update instructions
-        update_experiment_recipt(instructions,"deposition","completed",instructions_filename)
+            instructions["deposition"] = "completed" # TODO turn into function to update instructions
+            update_experiment_recipt(instructions,"deposition","completed",instructions_filename)
 
-        ## Withdraw all well volume into waste
-        clear_well(
-            volume=wellplate.volume(current_well),
-            target_well=current_well,
-            wellplate=wellplate,
-            pumping_rate=pumping_rate,
-            pump=pump,
-            waste_vials=waste_vials,
-            mill=mill,
-            solution_name="waste",
-        )
+            ## Withdraw all well volume into waste
+            clear_well(
+                volume=wellplate.volume(current_well),
+                target_well=current_well,
+                wellplate=wellplate,
+                pumping_rate=pumping_rate,
+                pump=pump,
+                waste_vials=waste_vials,
+                mill=mill,
+                solution_name="waste",
+            )
 
-        write_json(stock_vials, "vial_status.json")
-        write_json(waste_vials, "waste_status.json")
+            write_json(stock_vials, "vial_status.json")
+            write_json(waste_vials, "waste_status.json")
 
-        record_time_step("Cleared dep_sol", run_times)
+            record_time_step("Cleared dep_sol", run_times)
 
-        ## Rinse the well 3x
-        rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials)
+            ## Rinse the well 3x
+            rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials)
 
-        record_time_step("Rinsed well", run_times)
+            record_time_step("Rinsed well", run_times)
 
-        logging.info("\n\nBeginning eChem characterization of well: ", current_well)
+            logging.info("\n\nBeginning eChem characterization of well: ", current_well)
 
-        ## Deposit characterization solution into well
+            ## Deposit characterization solution into well
 
-        logging.info(f"Infuse {char_sol} into well {current_well}...")
-        pipette(
-            volume=char_vol,
-            solutions=stock_vials,
-            solution_name=char_sol,
-            target_well=current_well,
-            pumping_rate=pumping_rate,
-            waste_vials=waste_vials,
-            waste_solution_name="waste",
-            wellplate=wellplate,
-            pump=pump,
-            mill=mill,
-        )
+            logging.info(f"Infuse {char_sol} into well {current_well}...")
+            pipette(
+                volume=char_vol,
+                solutions=stock_vials,
+                solution_name=char_sol,
+                target_well=current_well,
+                pumping_rate=pumping_rate,
+                waste_vials=waste_vials,
+                waste_solution_name="waste",
+                wellplate=wellplate,
+                pump=pump,
+                mill=mill,
+            )
 
-        record_time_step("Deposited char_sol", run_times)
+            record_time_step("Deposited char_sol", run_times)
 
-        write_json(stock_vials, "vial_status.json")
-        write_json(waste_vials, "waste_status.json")
+            write_json(stock_vials, "vial_status.json")
+            write_json(waste_vials, "waste_status.json")
 
         ## Echem CV - characterization
-
-        characterization(current_well, instructions, mill, pump, wellplate, echem, analyzer, scan_rate, experiment_id)
+        if instructions["CV"] == 1:
+            characterization(current_well, instructions, mill, pump, wellplate, echem, analyzer, scan_rate, experiment_id)
         
-        record_time_step("Characterization complete", run_times)
+            record_time_step("Characterization complete", run_times)
 
-        clear_well(
-            char_vol,
-            current_well,
-            wellplate,
-            pumping_rate,
-            pump,
-            waste_vials,
-            mill,
-            "waste",
-        )
+            clear_well(
+                char_vol,
+                current_well,
+                wellplate,
+                pumping_rate,
+                pump,
+                waste_vials,
+                mill,
+                "waste",
+            )
 
-        write_json(stock_vials, "vial_status.json")
-        write_json(waste_vials, "waste_status.json")
+            write_json(stock_vials, "vial_status.json")
+            write_json(waste_vials, "waste_status.json")
 
-        record_time_step("Well cleared", run_times)
+            record_time_step("Well cleared", run_times)
 
-        # Flushing procedure
-        flush_pipette_tip(
-            pump,
-            waste_vials,
-            stock_vials,
-            flush_sol,
-            mill,
-            pumping_rate,
-            flush_vol,
-        )
+            # Flushing procedure
+            flush_pipette_tip(
+                pump,
+                waste_vials,
+                stock_vials,
+                flush_sol,
+                mill,
+                pumping_rate,
+                flush_vol,
+            )
 
-        record_time_step("Pipette Flushed", run_times)
+            record_time_step("Pipette Flushed", run_times)
 
-        write_json(stock_vials, "vial_status.json")
-        write_json(waste_vials, "waste_status.json")
+            write_json(stock_vials, "vial_status.json")
+            write_json(waste_vials, "waste_status.json")
 
         # Final rinse
         rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials)
@@ -1057,7 +1062,7 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
         write_json(stock_vials, "vial_status.json")
         write_json(waste_vials, "waste_status.json")
 
-        instructions["status"] = "Completed"
+        instructions["status"] = "complete"
 
         record_time_step("End", run_times)
 
@@ -1127,7 +1132,6 @@ def main():
             else:
                 pass
 
-    
     ## Disconnect from equipment
     mill.home()
 
