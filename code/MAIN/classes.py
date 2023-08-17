@@ -194,6 +194,26 @@ class Vial:
             logging.info(f'{added_volume} can fit in {self.name}')
             return True
 
+    def write_volume_to_disk(self):
+        '''
+        Writes the current volume to a json file
+        '''
+        # logging.info(f'Writing {self.name} volume to {self.filepath}...')
+        # with open(self.filepath, 'w') as f:
+        #     json.dump(self.volume, f, indent=4)
+        # return 0
+        logging.info(f'Writing {self.name} volume to vial file...')
+        
+        ## Open the file and read the contents
+        with open('vial.json', 'r') as f:
+            solutions = json.load(f)
+
+        ## Find matching solution name and update the volume
+        for solution in solutions:
+            if solution['name'] == self.name:
+                solution['volume'] = self.volume
+
+
 
     def update_volume(self,added_volume:float):
         '''
@@ -208,6 +228,7 @@ class Vial:
             raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
+            self.write_volume_to_disk()
             self.depth = self.vial_height_calculator(self.radius*2, self.volume) + self.bottom #Note volume must be converted to liters
             if self.depth < self.bottom:
                 self.depth = self.bottom
@@ -324,7 +345,7 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
-        time.sleep(90)
+        time.sleep(30)
 
     def current_status(self):
         """
