@@ -202,16 +202,24 @@ class Vial:
         # with open(self.filepath, 'w') as f:
         #     json.dump(self.volume, f, indent=4)
         # return 0
-        logging.info(f'Writing {self.name} volume to vial file...')
+        logging.info('Writing %s volume to vial file...',self.name)
         
         ## Open the file and read the contents
-        with open('vial.json', 'r') as f:
+        with open('.\\code\\MAIN\\'+self.filepath, 'r', encoding='UTF-8') as f:
             solutions = json.load(f)
 
         ## Find matching solution name and update the volume
+        #solutions = solutions['solutions']
         for solution in solutions:
             if solution['name'] == self.name:
                 solution['volume'] = self.volume
+                solution['contamination'] = self.contamination
+                break
+
+        ## Write the updated contents back to the file
+        with open('.\\code\\MAIN\\'+self.filepath, 'w', encoding='UTF-8') as f:
+            json.dump(solutions, f)
+        return 0
 
 
 
@@ -229,19 +237,15 @@ class Vial:
         else:
             self.volume += added_volume
             self.write_volume_to_disk()
-            self.depth = self.vial_height_calculator(self.radius*2, self.volume) + self.bottom #Note volume must be converted to liters
+            self.depth = self.vial_height_calculator((self.radius*2), self.volume) + self.bottom #Note volume must be converted to liters
             if self.depth < self.bottom:
                 self.depth = self.bottom
-
-            ##TODO write new volume to file
-            
-
-            logging.debug(f'New volume: {self.volume} | New depth: {self.depth}')
+            logging.debug('New volume: %s | New depth: %s',self.volume, self.depth)
         self.contamination += 1
 
 
         
-    def vial_height_calculator(diameter_mm, volume_ul):
+    def vial_height_calculator(self, diameter_mm, volume_ul):
         """
         Calculates the height of a liquid in a vial given its diameter (in mm), height (in mm), and volume (in ul).
         """
@@ -345,7 +349,7 @@ class MillControl:
 
     def home(self):
         self.execute_command('$H')
-        time.sleep(30)
+        time.sleep(60)
 
     def current_status(self):
         """
@@ -466,8 +470,8 @@ class MillControl:
 
     def move_pipette_to_position(
         self,
-        x,
-        y,
+        x: float = 0,
+        y: float = 0,
         z=0.00,
     ):
         """
@@ -489,7 +493,7 @@ class MillControl:
         return 0
 
 
-    def move_electrode_to_position(self, x, y, z):
+    def move_electrode_to_position(self, x: float, y: float, z: float):
         """
         Move the electrode to the specified coordinates.
         Args:
@@ -514,7 +518,7 @@ class MillControl:
 
         self.config['instrument_offsets'][offset_type] = offset
         with open('mill_config.json', 'w') as f:
-            json.dump(self.config, f, indent=4)
+            json.dump(self.config, f)
         logging.info(f'Updated {offset_type} to {offset}')
         return 0
 

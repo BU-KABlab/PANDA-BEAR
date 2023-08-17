@@ -1,10 +1,10 @@
 import obsws_python as obsws
 
 class OBS_controller():
-      def __init__(self):
-         self.client = obsws.ReqClient(host='localhost', port=4455, password='PandaBear!', timeout=3)
+    def __init__(self):
+        self.client = obsws.ReqClient(host='localhost', port=4455, password='PandaBear!', timeout=3)
 
-      def place_text_on_screen(self, instructions):
+    def place_text_on_screen(self, instructions):
         video_information = f'''
             Experiment Parameters:
                 Experiment ID: {instructions["id"]}
