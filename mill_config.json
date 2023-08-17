@@ -1,12 +1,12 @@
 {
     "instrument_offsets": {
       "electrode": {
-        "x": 33,
-        "y": 30,
+        "x": 39,
+        "y": 31,
         "z": 0
       },
       "pipette": {
-        "x": -88,
+        "x": -84,
         "y": 4,
         "z": 0
       },

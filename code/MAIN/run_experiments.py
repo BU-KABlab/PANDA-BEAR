@@ -170,7 +170,7 @@ def pipette(
         repetitions = math.ceil(volume / 200)  # divide by pipette capacity (200 ul)
         repetition_vol = volume / repetitions
         for j in range(repetitions):
-            logging.info(f"\n\nRepetition {j+1} of {repetitions}")
+            logging.info(f"Repetition {j+1} of {repetitions}")
             #solution = solution_selector(solution_name, repetition_vol)
             solution = solution_selector(solutions, solution_name, repetition_vol)
             #PurgeVial = waste_selector(waste_solution_name, repetition_vol)
@@ -392,18 +392,17 @@ def flush_pipette_tip(
     flush_solution = solution_selector(stock_vials, flush_solution_name,flush_volume)
     PurgeVial = waste_selector(waste_vials, 'waste',flush_volume)
 
-    logging.info(f"\nFlushing with {flush_solution.name}...")
+    logging.info(f"Flushing with {flush_solution.name}...")
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
     withdraw(20, pumping_rate, pump)
     mill.move_pipette_to_position(
-        mill,
         flush_solution.coordinates["x"],
         flush_solution.coordinates["y"],
         flush_solution.bottom,
     )  # depth replaced with height
-    logging.debug(f"Withdrawing {flush_solution.name}...")
+    logging.debug("Withdrawing %s...", flush_solution.name)
     withdraw(flush_volume, pumping_rate, pump)
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
@@ -742,12 +741,17 @@ def update_experiment_recipt(
     :param value: The new value.
     :return: The updated experiment receipt.
     """
+    if isinstance(value, pathlib.WindowsPath):
+        value = value.__str__()
     experiment[item_to_update] = value
     experiment["status_date"] = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     #obs.OBS_controller.place_text_on_screen(experiment)
 
     # Save the updated file
-    with open(filename, "w", encoding='UTF-8') as file:
+    cwd = pathlib.Path(__file__).parents[0]
+    file_path = cwd / "experiment_queue"
+    file_to_open = file_path / filename
+    with open(file_to_open, "w", encoding='UTF-8') as file:
         json.dump(experiment, file, indent=4)
 
     return experiment
@@ -1179,6 +1183,7 @@ def main():
                     pass
     finally:
         ## Disconnect from equipment
+        logging.info("Homing the mill...")
         mill.home()
 
         ## close out of serial connections
