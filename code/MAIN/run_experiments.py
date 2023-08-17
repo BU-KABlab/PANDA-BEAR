@@ -990,7 +990,7 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
             record_time_step("Cleared dep_sol", run_times)
 
             ## Rinse the well 3x
-            rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials)
+            rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials, rinse_repititions=instructions["rinse_count"], rinse_vol=instructions["rinse_vol"])
 
             record_time_step("Rinsed well", run_times)
 
@@ -1056,7 +1056,7 @@ def run_experiment(instructions, instructions_filename,mill, pump, logging_level
             write_json(waste_vials, "waste_status.json")
 
         # Final rinse
-        rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials)
+        rinse(wellplate, current_well, pumping_rate, pump, waste_vials, mill, stock_vials, rinse_repititions=instructions["rinse_count"], rinse_vol=instructions["rinse_vol"])
         record_time_step("Final Rinse", run_times)
 
         write_json(stock_vials, "vial_status.json")
