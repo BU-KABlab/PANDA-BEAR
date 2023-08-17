@@ -16,6 +16,8 @@
 "time_stamps": [],
 "OCP_file": "",
 "OCP_pass": null,
+"OCP_char_file": "",
+"OCP_char_pass": null,
 "deposition_data_file": "",
 "deposition_plot_file": "",
 "deposition_max_value":
