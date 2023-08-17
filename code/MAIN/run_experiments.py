@@ -723,7 +723,7 @@ def update_experiment_recipt(experiment: dict, item_to_update:str, value, filena
 
     return experiment
 
-def deposition(current_well, instructions, mill, pump, wellplate, echem, analyzer, deposition_potential, dep_duration, sample_period, experiment_id):
+def deposition(current_well, instructions, mill, wellplate, echem, analyzer, deposition_potential, dep_duration, sample_period, experiment_id):
     ## echem setup
         logging.info("\n\nSetting up eChem experiments...")
 
@@ -752,7 +752,7 @@ def deposition(current_well, instructions, mill, pump, wellplate, echem, analyze
 
         ## echem CA - deposition
         if instructions["OCP_pass"]:
-            logging.info("\n\nBeginning eChem deposition of well: ", current_well)
+            logging.info("Beginning eChem deposition of well: ", current_well)
             instructions["status"] = "deposition"
             complete_file_name = echem.setfilename(experiment_id, 'CA')
             #cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
@@ -765,7 +765,7 @@ def deposition(current_well, instructions, mill, pump, wellplate, echem, analyze
                 CAt2=echem.CAt2,
                 CAsamplerate=sample_period #TODO confirm
             )  # CA
-            print("made it to try")
+            
             echem.activecheck()
             ## echem plot the data
             analyzer.plotdata('CV', complete_file_name)
@@ -779,7 +779,7 @@ def deposition(current_well, instructions, mill, pump, wellplate, echem, analyze
         )  # move to safe height above target well
         return 0
 
-def characterization(current_well, instructions, mill, pump, wellplate, echem, analyzer, pumping_rate, char_sol, char_vol, experiment_id):
+def characterization(current_well, instructions, mill, wellplate, echem, analyzer, experiment_id):
     logging.info(f"Characterizing well: {current_well}")
     ## echem OCP
     logging.info("\n\nBeginning eChem OCP of well: ", current_well)
@@ -794,7 +794,7 @@ def characterization(current_well, instructions, mill, pump, wellplate, echem, a
         wellplate.get_coordinates(current_well)["y"],
         wellplate.echem_height,
     )  # move to well depth
-    complete_file_name = echem.setfilename(current_well, "OCP_char")
+    complete_file_name = echem.setfilename(experiment_id, "OCP_char")
     echem.ocp(
         echem.OCPvi,
         echem.OCPti,
@@ -810,7 +810,7 @@ def characterization(current_well, instructions, mill, pump, wellplate, echem, a
             test_type = "CV_baseline"
         else:
             test_type = "CV"
-        complete_file_name = echem.setfilename(current_well, test_type)
+        complete_file_name = echem.setfilename(experiment_id, test_type)
         echem.cyclic(
             echem.CVvi,
             echem.CVap1,
@@ -824,7 +824,7 @@ def characterization(current_well, instructions, mill, pump, wellplate, echem, a
         )
         echem.activecheck()
         ## echem plot the data
-        echem.plotdata("CV", complete_file_name)
+        analyzer.plotdata("CV", complete_file_name)
         mill.move_electrode_to_position(
             wellplate.get_coordinates(current_well)["x"],
             wellplate.get_coordinates(current_well)["y"],
