@@ -1,5 +1,5 @@
 def printpanda():
-    print(r"""
+    image = r"""
     
                                                                                         
      _       _ _   _       _ _     _             
@@ -26,4 +26,6 @@ def printpanda():
       @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
          @@@                                   @@            @@      @@@@@@@@@                   
                 
-    """)
+    """
+
+    return image
