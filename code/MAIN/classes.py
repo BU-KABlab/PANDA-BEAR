@@ -218,7 +218,7 @@ class Vial:
 
         ## Write the updated contents back to the file
         with open('.\\code\\MAIN\\'+self.filepath, 'w', encoding='UTF-8') as f:
-            json.dump(solutions, f)
+            json.dump(solutions, f, indent=4)
         return 0
 
 
@@ -227,9 +227,7 @@ class Vial:
         '''
         Updates the volume of the vial
         '''
-        logging.info(f'Updating {self.name} volume...')
-        logging.debug(f'Current volume: {self.volume} | Current depth: {self.depth}')
-        #logging.info(f'\tAdding {added_volume} to {self.volume}...')
+        logging.info('Updating %s volume...',self.name)
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
@@ -237,14 +235,13 @@ class Vial:
         else:
             self.volume += added_volume
             self.write_volume_to_disk()
-            self.depth = self.vial_height_calculator((self.radius*2), self.volume) + self.bottom #Note volume must be converted to liters
+            self.depth = self.vial_height_calculator((self.radius*2), self.volume) + self.bottom
             if self.depth < self.bottom:
                 self.depth = self.bottom
             logging.debug('New volume: %s | New depth: %s',self.volume, self.depth)
         self.contamination += 1
+        return 0
 
-
-        
     def vial_height_calculator(self, diameter_mm, volume_ul):
         """
         Calculates the height of a liquid in a vial given its diameter (in mm), height (in mm), and volume (in ul).
@@ -518,7 +515,7 @@ class MillControl:
 
         self.config['instrument_offsets'][offset_type] = offset
         with open('mill_config.json', 'w') as f:
-            json.dump(self.config, f)
+            json.dump(self.config, f, indent=4)
         logging.info(f'Updated {offset_type} to {offset}')
         return 0
 
