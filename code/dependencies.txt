@@ -3,3 +3,4 @@ nesp_lib
 comtypes
 numpy
 matplotlib
+pydantic
