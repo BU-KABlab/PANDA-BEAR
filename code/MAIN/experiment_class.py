@@ -2,7 +2,7 @@
 from typing import List, Optional
 from enum import Enum
 from datetime import datetime
-from pydantic import ConfigDict, FilePath, RootModel
+from pydantic import ConfigDict, FilePath, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
 from dataclasses import field
 
@@ -95,14 +95,26 @@ def make_test_value():
 
 
 def test_parse():
-    pass
+    value = make_test_value()
+    print(f"Original---> {value}")
+    sample_json = RootModel[Experiment](value).model_dump_json(indent=4)
+    parsed_value = RootModel[Experiment].model_validate_json(sample_json).root
+    print(f"Parsed--->{parsed_value}")
+    assert(value == parsed_value)
 
 def test_serialize():
    value = make_test_value()
-   print(RootModel[Experiment](value).model_dump_json(indent=4))
-   #with open('temp_test_file.json', 'w') as f:
-   #    f.write(RootModel[Experiment](value).model_dump_json(indent=4))
+   sample_json = RootModel[Experiment](value).model_dump_json(indent=4)
+   print(sample_json)
+   with open('temp_test_file.json', 'w') as f:
+       f.write(sample_json)
+
+def test_schema():
+    # Useful if you have tools that validate your json externally
+    import json
+    print(json.dumps(TypeAdapter(Experiment).json_schema(), indent=4))
 
 if __name__ == "__main__":
     test_serialize()
     test_parse()
+    test_schema()
