@@ -101,6 +101,7 @@ def disconnectpstat():
 
 
 def savedata(complete_file_name):
+    ''' save the data to a file'''
     #print(dtaqsink.acquired_points)
     print("number of data points acquired")
     print(len(dtaqsink.acquired_points))
@@ -112,6 +113,7 @@ def savedata(complete_file_name):
     print("data saved")
 
 def setfilename(id, experiment):
+    ''' set the file name for the experiment'''
     global complete_file_name
     current_time = datetime.datetime.now()
     fileDate = current_time.strftime("%Y-%m-%d")

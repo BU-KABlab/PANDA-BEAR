@@ -24,6 +24,8 @@ def main():
     stock_vials = read_vials('waste_status.json')
     
     mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],0)
+    mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],-67)
+    mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'], wellplate.depth('F6'))
 
     mill.move_electrode_to_position(-200,-240,0)
     mill.move_electrode_to_position(-200,-240,-20)

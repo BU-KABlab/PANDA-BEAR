@@ -890,7 +890,6 @@ def run_experiment(instructions, instructions_filename, mill, pump):
     """
     try:
         ## Program Set Up
-        # logging.info(print_panda.printpanda())
         logging.info("Beginning protocol:\nConnecting to Mill, Pump, Pstat:")
         logging.info("Connecting to Mill...")
 
@@ -1100,7 +1099,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
 
         # save the updated instructions with run times, and data file names
         save_completed_instructions(instructions, instructions_filename)
-        logging.info("Saved completed instructions for well %s", experiment_id)
+        logging.info("Saved completed instructions for experiment %s", experiment_id)
 
         logging.info("EXPERIMENT %s COMPLETED\n\n",experiment_id)
         print_runtime_data(run_times)

@@ -26,13 +26,12 @@ class Wells:
     def __init__(self, a1_x=0, a1_y=0, orientation=0, starting_volume=0.00):
         self.wells = {}
         self.orientation = orientation
-        self.z_bottom = -68  # 64
+        self.z_bottom = -74  # -64
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9  # mm from center to center
         self.well_capacity = 300  # ul
-        self.echem_height = -68
-        self.echem_height = -68
+        self.echem_height = -69 #-68
 
         a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
         volume = starting_volume
@@ -546,7 +545,7 @@ class MillControl:
         return 0
 
     def move_electrode_to_position(
-        self, x_coord: float, y_coord: float, z_coord: float
+        self, x_coord: float, y_coord: float, z_coord: float = 0.00
     ):
         """
         Move the electrode to the specified coordinates.
@@ -560,7 +559,7 @@ class MillControl:
         # move to specified coordinates
         mill_move = "G00 X{} Y{} Z{}"
         command = mill_move.format(
-            x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]
+            (x_coord + offsets["x"]), (y_coord + offsets["y"]), (z_coord + offsets["z"])
         )
         self.execute_command(str(command))
         return 0
