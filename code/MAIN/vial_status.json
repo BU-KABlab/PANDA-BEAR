@@ -41,9 +41,9 @@
         "x": -2,
         "y": -175,
         "name": "ferrocene",
-        "volume": 19630.0,
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 1
+        "contamination": 0
     },
     {
         "solution": "R0",
@@ -51,7 +51,7 @@
         "x": -2,
         "y": -208,
         "name": "rinse0",
-        "volume": 19840.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -71,7 +71,7 @@
         "x": -2,
         "y": -274,
         "name": "rinse2",
-        "volume": 20000.0,
+        "volume": 2000.0,
         "capacity": 20000,
         "contamination": 0
     }

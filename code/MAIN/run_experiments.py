@@ -1,4 +1,4 @@
-'''Run experiments is the 1ary and 2ary loops of the ePANDA. Checking for new experiments, queuing and running them until none are left'''
+"""Run experiments is the 1ary and 2ary loops of the ePANDA. Checking for new experiments, queuing and running them until none are left"""
 import json
 import pathlib
 import math
@@ -9,10 +9,10 @@ import time
 import sys
 import nesp_lib
 import print_panda
-from classes import Vial, MillControl, Wells
+from classes import Vial, MillControl, Wells #TODO import MillControl as mill and adjust functions accordingly
 import gamrycontrol as echem
 
-#import obs_controls as obs
+# import obs_controls as obs
 import Analyzer as analyzer
 
 
@@ -76,7 +76,11 @@ def withdraw(volume: float, rate: float, ser_pump: object):
     if (
         ser_pump.volume_withdrawn + volume > 0.2
     ):  # 0.2 is the maximum volume for the pipette tip
-        raise Exception("The command to withdraw %f ml will overfill the 0.2 ml pipette with %f ml inside. Stopping run",volume, ser_pump.volume_withdrawn)
+        raise Exception(
+            "The command to withdraw %f ml will overfill the 0.2 ml pipette with %f ml inside. Stopping run",
+            volume,
+            ser_pump.volume_withdrawn,
+        )
     else:
         ser_pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         ser_pump.pumping_volume = (
@@ -91,7 +95,7 @@ def withdraw(volume: float, rate: float, ser_pump: object):
         logging.debug("Done withdrawing")
         time.sleep(2)
 
-        logging.debug("Pump has withdrawn: %f ml",ser_pump.volume_withdrawn)
+        logging.debug("Pump has withdrawn: %f ml", ser_pump.volume_withdrawn)
 
     return 0
 
@@ -171,20 +175,20 @@ def pipette(
         repetitions = math.ceil(volume / 200)  # divide by pipette capacity (200 ul)
         repetition_vol = volume / repetitions
         for j in range(repetitions):
-            logging.info("Repetition %d of %d", j+1, repetitions)
-            #solution = solution_selector(solution_name, repetition_vol)
+            logging.info("Repetition %d of %d", j + 1, repetitions)
+            # solution = solution_selector(solution_name, repetition_vol)
             solution = solution_selector(solutions, solution_name, repetition_vol)
-            #purge_vial = waste_selector(waste_solution_name, repetition_vol)
-            purge_vial = waste_selector(waste_vials, waste_solution_name, repetition_vol)
+            # purge_vial = waste_selector(waste_solution_name, repetition_vol)
+            purge_vial = waste_selector(
+                waste_vials, waste_solution_name, repetition_vol
+            )
             ## First half: pick up solution
             logging.info("Withdrawing %s...", solution.name)
             mill.move_pipette_to_position(
                 solution.coordinates["x"], solution.coordinates["y"], 0
             )  # start at safe height
             mill.move_pipette_to_position(
-                solution.coordinates["x"],
-                solution.coordinates["y"],
-                solution.bottom
+                solution.coordinates["x"], solution.coordinates["y"], solution.bottom
             )  # go to solution depth (depth replaced with height)
 
             withdraw(repetition_vol + (2 * purge_volume), pumping_rate, pump)
@@ -196,7 +200,8 @@ def pipette(
 
             ## Intermediate: Purge
             logging.info("Purging...")
-            mill.move_pipette_to_position( purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+            mill.move_pipette_to_position(
+                purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"],
@@ -204,11 +209,12 @@ def pipette(
                 purge_vial.height,
             )  # purge_vial.depth replaced with height
             purge(purge_vial, pump, purge_volume)
-            mill.move_pipette_to_position( purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+            mill.move_pipette_to_position(
+                purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
 
             ## Second Half: Deposit to well
-            logging.info("Infusing %s into well %s...",solution.name, target_well)
+            logging.info("Infusing %s into well %s...", solution.name, target_well)
             mill.move_pipette_to_position(
                 wellplate.get_coordinates(target_well)["x"],
                 wellplate.get_coordinates(target_well)["y"],
@@ -222,7 +228,9 @@ def pipette(
 
             infuse(repetition_vol, pumping_rate, pump)
             wellplate.update_volume(target_well, repetition_vol)
-            logging.info("Well %s volume: %f", target_well, wellplate.volume(target_well))
+            logging.info(
+                "Well %s volume: %f", target_well, wellplate.volume(target_well)
+            )
             mill.move_pipette_to_position(
                 wellplate.get_coordinates(target_well)["x"],
                 wellplate.get_coordinates(target_well)["y"],
@@ -232,9 +240,7 @@ def pipette(
             ## Intermediate: Purge
             logging.info("Purging...")
             mill.move_pipette_to_position(
-                purge_vial.coordinates["x"], 
-                purge_vial.coordinates["y"], 
-                0
+                purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"],
@@ -243,9 +249,13 @@ def pipette(
             )  # purge_vial.depth replaced with height
 
             purge(purge_vial, pump, purge_volume)
-            mill.move_pipette_to_position(purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0)
+            mill.move_pipette_to_position(
+                purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+            )
 
-            logging.debug("Remaining volume in pipette: %f ",pump.volume_withdrawn)  # should always be zero, pause if not
+            logging.debug(
+                "Remaining volume in pipette: %f ", pump.volume_withdrawn
+            )  # should always be zero, pause if not
 
 
 def clear_well(
@@ -278,11 +288,16 @@ def clear_well(
     )  # divide by 200 ul which is the pipette capacity to determin the number of repetitions
     repetition_vol = volume / repititions
 
-    logging.info("Clearing well %s with %dx repetitions of %f", target_well, repititions, repetition_vol)
+    logging.info(
+        "Clearing well %s with %dx repetitions of %f",
+        target_well,
+        repititions,
+        repetition_vol,
+    )
     for j in range(repititions):
         purge_vial = waste_selector(waste_vials, solution_name, repetition_vol)
 
-        logging.info("Repitition %d of %d",j+1, repititions)
+        logging.info("Repitition %d of %d", j + 1, repititions)
         mill.move_pipette_to_position(
             wellplate.get_coordinates(target_well)["x"],
             wellplate.get_coordinates(target_well)["y"],
@@ -304,7 +319,8 @@ def clear_well(
         )  # return to safe height
 
         logging.info("Moving to purge vial...")
-        mill.move_pipette_to_position(purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+        mill.move_pipette_to_position(
+            purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
         mill.move_pipette_to_position(
             purge_vial.coordinates["x"],
@@ -313,7 +329,8 @@ def clear_well(
         )  # purge_vial.depth replaced with height
         logging.info("Purging...")
         purge(purge_vial, pump, repetition_vol + 20)  # repitition volume + 20 ul purge
-        mill.move_pipette_to_position(purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+        mill.move_pipette_to_position(
+            purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
         # withdraw(20, pumping_rate, pump)
         # infuse(20, pumping_rate, pump)
@@ -324,10 +341,10 @@ def clear_well(
 def print_runtime_data(runtime_data: dict):
     """Print the runtimes to the console"""
     for well, data in runtime_data.items():
-        logging.info("Well %s Runtimes:",well)
+        logging.info("Well %s Runtimes:", well)
         for section, runtime in data.items():
             minutes = runtime / 60
-            logging.info("%s: %f minutes",section, minutes)
+            logging.info("%s: %f minutes", section, minutes)
 
 
 def rinse(
@@ -346,11 +363,11 @@ def rinse(
     """
 
     logging.info("Rinsing well %s %dx...", target_well, rinse_repititions)
-    for r in range(rinse_repititions):  # 0, 1, 2...
-        rinse_solution_name = "Rinse" + str(r)
+    for rep in range(rinse_repititions):  # 0, 1, 2...
+        rinse_solution_name = "Rinse" + str(rep)
         # purge_vial = waste_selector(rinse_solution_name, rinse_vol)
         # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
-        logging.info(f"Rinse {r+1} of {rinse_repititions}")
+        logging.info("Rinse %d of %d",rep+1, rinse_repititions)
         pipette(
             rinse_vol,
             stock_vials,
@@ -390,8 +407,8 @@ def flush_pipette_tip(
 
     # flush_solution = solution_selector(flush_solution_name, flush_volume)
     # purge_vial = waste_selector("waste", flush_volume)
-    flush_solution = solution_selector(stock_vials, flush_solution_name,flush_volume)
-    purge_vial = waste_selector(waste_vials, 'waste',flush_volume)
+    flush_solution = solution_selector(stock_vials, flush_solution_name, flush_volume)
+    purge_vial = waste_selector(waste_vials, "waste", flush_volume)
 
     logging.info("Flushing with %s...", flush_solution.name)
     mill.move_pipette_to_position(
@@ -428,7 +445,9 @@ def solution_selector(solutions: list, solution_name: str, volume: float):
     Select the solution from the list of solutions
     """
     for solution in solutions:
-        if solution.name.lower() == solution_name.lower() and solution.volume > (volume + 1000):
+        if solution.name.lower() == solution_name.lower() and solution.volume > (
+            volume + 1000
+        ):
             return solution
     raise Exception("%s not found in list of solutions", solution_name)
 
@@ -479,6 +498,7 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
 
 
 def record_time_step(step: str, run_times: dict):
+    '''Record the time of a step in the run_times dictionary'''
     current_time = int(time.time())
     sub_key = step + " Time"
     run_times[sub_key] = current_time
@@ -555,7 +575,7 @@ def change_well_status(well: str, status: str):
                     "%Y-%m-%d_%H_%M_%S"
                 )
                 break
-    with open(file_to_open, "w") as file:
+    with open(file_to_open, "w", encoding="ascii") as file:
         json.dump(data, file, indent=4)
 
 
@@ -589,7 +609,9 @@ def read_new_experiments(filename: str):
                     )
                     complete = False
                     continue
-                print(f"Experiment originally for well {desired_well} is now for well {target_well}.")
+                print(
+                    f"Experiment originally for well {desired_well} is now for well {target_well}."
+                )
                 experiment["target_well"] = target_well
             else:
                 target_well = desired_well
@@ -618,7 +640,7 @@ def read_new_experiments(filename: str):
             subfolder_path = cwd / "experiment_queue"
             subfolder_path.mkdir(parents=True, exist_ok=True)
             file_to_save = subfolder_path / filename
-            with open(file_to_save, "w", encoding='UTF-8') as outfile:
+            with open(file_to_save, "w", encoding="UTF-8") as outfile:
                 json.dump(experiment, outfile, indent=4)
 
             # Change the status of the well
@@ -633,7 +655,7 @@ def read_new_experiments(filename: str):
             experiments_read += 1
 
     # Save the updated file
-    with open(file_to_open, "w", encoding='UTF-8') as file:
+    with open(file_to_open, "w", encoding="UTF-8") as file:
         json.dump(data, file, indent=4)
 
     return experiments_read, complete
@@ -707,9 +729,6 @@ def save_completed_instructions(instructions: list, filename: str):
     os.remove(queue_file_path / (filename))
     print(f"Experiment {filename} removed from queue.")
 
-    os.remove(queue_file_path / (filename))
-    print(f"Experiment {filename} removed from queue.")
-
 
 def write_json(data: dict, filename: str):
     """
@@ -723,7 +742,7 @@ def write_json(data: dict, filename: str):
     ## take the Vial data dictionary of objects and turn into json matching
 
     # data = {"solutions": [ob.__dict__ for ob in data]}
-    with open(file_to_save, "w", encoding='UTF-8') as f:
+    with open(file_to_save, "w", encoding="UTF-8") as f:
         json.dump(data, f, indent=4)
 
 
@@ -741,25 +760,25 @@ def update_experiment_recipt(
         value = value.__str__()
     experiment[item_to_update] = value
     experiment["status_date"] = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
-    #obs.OBS_controller.place_text_on_screen(experiment)
+    # obs.OBS_controller.place_text_on_screen(experiment)
 
     # Save the updated file
     cwd = pathlib.Path(__file__).parents[0]
     file_path = cwd / "experiment_queue"
     file_to_open = file_path / filename
-    with open(file_to_open, "w", encoding='UTF-8') as file:
+    with open(file_to_open, "w", encoding="UTF-8") as file:
         json.dump(experiment, file, indent=4)
 
     return experiment
 
 
 def deposition(current_well, instructions, mill, wellplate, experiment_id):
-    '''Deposition of the solutions onto the substrate'''
+    """Deposition of the solutions onto the substrate"""
     ## echem setup
     logging.info("\n\nSetting up eChem experiments...")
 
     ## echem OCP
-    logging.info("Beginning eChem OCP of well: %s" ,current_well)
+    logging.info("Beginning eChem OCP of well: %s", current_well)
     instructions = update_experiment_recipt(
         instructions, "status", "ocp", instructions["filename"]
     )
@@ -814,11 +833,13 @@ def deposition(current_well, instructions, mill, wellplate, experiment_id):
         wellplate.get_coordinates(current_well)["y"],
         0,
     )  # move to safe height above target well
+
+    mill.rinse_electrode()
     return instructions
 
 
 def characterization(current_well, instructions, mill, wellplate, experiment_id):
-    '''Characterization of the solutions on the substrate'''
+    """Characterization of the solutions on the substrate"""
     logging.info("Characterizing well: %s", current_well)
     ## echem OCP
     logging.info("Beginning eChem OCP of well: %s", current_well)
@@ -880,7 +901,7 @@ def characterization(current_well, instructions, mill, wellplate, experiment_id)
             wellplate.get_coordinates(current_well)["y"],
             0,
         )  # move to safe height above target well
-
+    mill.rinse_electrode()
     return instructions
 
 
@@ -908,7 +929,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
         #             Replicates: {instructions["replicates"]}
         #             Target Well: {instructions["target_well"]}
         #             Acrylate: {instructions["acrylate"]}
-        #             PEG: {instructions["peg"]}   
+        #             PEG: {instructions["peg"]}
         #             DMF: {instructions["dmf"]}
         #             Ferrocene: {instructions["ferrocene"]}
         #             Custom: {instructions["custom"]}
@@ -930,28 +951,30 @@ def run_experiment(instructions, instructions_filename, mill, pump):
         ## Run the experiment
         experiment_id = instructions["id"]
         current_well = instructions["target_well"]
-        #replicates = instructions["replicates"]
-        #wellStatus = instructions["status"]
+        # replicates = instructions["replicates"]
+        # wellstatus = instructions["status"]
         run_times = {}
         record_time_step("Start", run_times)
 
         ## Fetch parameters from isntructions
         pumping_rate = instructions["pump_rate"]
-        char_sol = instructions["char_sol"]
+        char_sol = instructions["char_sol"].lower()
         char_vol = instructions["char_vol"]
-        flush_sol = instructions["flush_sol"]
+        flush_sol = instructions["flush_sol"].lower()
         flush_vol = instructions["flush_vol"]
-        #dep_duration = instructions["dep-duration"]
-        #deposition_potential = instructions["dep-pot"]
-        #scan_rate = instructions["scan-rate"]
-        #sample_period = instructions["sample-period"]
+        # dep_duration = instructions["dep-duration"]
+        # deposition_potential = instructions["dep-pot"]
+        # scan_rate = instructions["scan-rate"]
+        # sample_period = instructions["sample-period"]
 
         ## Deposit all experiment solutions into well
         experiment_solutions = ["acrylate", "peg", "dmf", "ferrocene", "custom"]
 
         for solution_name in experiment_solutions:
             if instructions[solution_name] > 0:  # if there is a solution to deposit
-                logging.info(f"Pipetting {instructions[solution_name]} ul of {solution_name} into {current_well}...")
+                logging.info(
+                    "Pipetting %s ul of %s into %s...",instructions[solution_name],solution_name,current_well
+                )
                 # soltuion_ml = float((instructions[solution_name])/1000000) #because the pump works in ml
                 pipette(
                     volume=instructions[solution_name],  # volume in ul
@@ -1098,20 +1121,19 @@ def run_experiment(instructions, instructions_filename, mill, pump):
         instructions["time_stamps"] = run_times
 
         # save the updated instructions with run times, and data file names
-        save_completed_instructions(instructions, instructions_filename)
-        logging.info("Saved completed instructions for experiment %s", experiment_id)
 
-        logging.info("EXPERIMENT %s COMPLETED\n\n",experiment_id)
+        mill.move_to_safe_position()
+        logging.info("EXPERIMENT %s COMPLETED\n\n", experiment_id)
         print_runtime_data(run_times)
 
     except KeyboardInterrupt:
         logging.warning("Keyboard Interrupt")
-        instructions["Status"] = "error"
+        instructions["status"] = "error"
         instructions["status_date"] = datetime.datetime.now().strftime(
             "%Y-%m-%d_%H_%M_%S"
         )
         save_completed_instructions(instructions, instructions_filename)
-        logging.info("Saved completed instructions for well %s",experiment_id)
+        logging.info("Saved completed instructions for well %s", experiment_id)
         return 2
 
     except Exception as general_exception:
@@ -1122,7 +1144,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
         logging.error("Exception type: %s", exception_type)
         logging.error("File name: %s", filename)
         logging.error("Line number: %d", line_number)
-        instructions["Status"] = "error"
+        instructions["status"] = "error"
         instructions["status_date"] = datetime.datetime.now().strftime(
             "%Y-%m-%d_%H_%M_%S"
         )
@@ -1132,11 +1154,14 @@ def run_experiment(instructions, instructions_filename, mill, pump):
         instructions["status_date"] = datetime.datetime.now().strftime(
             "%Y-%m-%d_%H_%M_%S"
         )
+        save_completed_instructions(instructions, instructions_filename)
+        logging.info("Saved completed instructions for experiment %s", experiment_id)
+        change_well_status(current_well, instructions["status"])
     return 0
 
 
 def main():
-    '''Main function'''
+    """Main function"""
     logging.basicConfig(
         filename="ePANDA.log",
         level=logging.INFO,
@@ -1154,7 +1179,7 @@ def main():
     mill = MillControl()
     pump = set_up_pump()
     echem.pstatconnect()
-    #obs.OBS_controller()
+    # obs.OBS_controller()
 
     ## Read instructions
     try:
@@ -1166,8 +1191,11 @@ def main():
 
             logging.info("Instructions read from queue")
             logging.info(instructions)
+            mill.move_to_safe_position()
             status = run_experiment(instructions, instructions_filename, mill, pump)
-            logging.info("Experiment %s completed with code %d", instructions["id"], status)
+            logging.info(
+                "Experiment %s completed with code %d", instructions["id"], status
+            )
             if status == 0:
                 pass
             elif status == 1:
@@ -1175,6 +1203,18 @@ def main():
             elif status == 2:
                 logging.warning("Experiment %s stopped by user", instructions["id"])
                 break
+    except Exception as general_exception:
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        logging.error("Exception: %s", general_exception)
+        logging.error("Exception type: %s", exception_type)
+        logging.error("File name: %s", filename)
+        logging.error("Line number: %d", line_number)
+        instructions["status"] = "error"
+        instructions["status_date"] = datetime.datetime.now().strftime(
+            "%Y-%m-%d_%H_%M_%S"
+        )
     finally:
         ## Disconnect from equipment
         logging.info("Homing the mill...")

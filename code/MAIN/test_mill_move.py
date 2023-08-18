@@ -20,9 +20,13 @@ def main():
     mill = MillControl()
     wellplate = Wells(-218, -74, 0, 0)
     
-    waste_vials = read_vials('vial_status.json')
-    stock_vials = read_vials('waste_status.json')
-    
+    stock_vials = read_vials('vial_status.json')
+    waste_vials = read_vials('waste_status.json')
+    ferrocene_vial = stock_vials['ferrocene']
+    ferrocene_coordinates = ferrocene_vial.coordinates
+    mill.move_pipette_to_position(ferrocene_coordinates['x'],ferrocene_coordinates['y'],0)
+    mill.move_pipette_to_position(ferrocene_coordinates['x'],ferrocene_coordinates['y'],ferrocene_vial.bottom)
+
     mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],0)
     mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],-67)
     mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'], wellplate.depth('F6'))

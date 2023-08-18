@@ -26,12 +26,12 @@ class Wells:
     def __init__(self, a1_x=0, a1_y=0, orientation=0, starting_volume=0.00):
         self.wells = {}
         self.orientation = orientation
-        self.z_bottom = -74  # -64
+        self.z_bottom = -73  # -64
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9  # mm from center to center
         self.well_capacity = 300  # ul
-        self.echem_height = -69 #-68
+        self.echem_height = -71 #-68
 
         a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
         volume = starting_volume
@@ -176,9 +176,9 @@ class Vial:
         contents: str,
         volume=0.00,
         capacity=20000,
-        radius=13.5,
-        height=-14,
-        z_bottom=-64,
+        radius=14,
+        height=-20,
+        z_bottom=-75,
         name="vial",
         filepath=None,
     ):
@@ -191,9 +191,7 @@ class Vial:
         self.height = height
         self.volume = volume
         self.base = math.pi * math.pow(self.radius, 2.0)
-        self.depth = (
-            (self.volume / 1000000) / self.base
-        ) + z_bottom  # Note volume must be converted to liters
+        self.depth = self.vial_height_calculator(self.radius*2,self.volume) + self.bottom
         self.contamination = 0
         self.filepath = filepath
 
@@ -259,26 +257,25 @@ class Vial:
         logging.info("Updating %s volume...", self.name)
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
-        elif self.volume + added_volume < 0:
+        if self.volume + added_volume < 0:
             raise OverDraftException(
                 self.name, self.volume, added_volume, self.capacity
             )
-        else:
-            self.volume += added_volume
-            self.write_volume_to_disk()
-            self.depth = (
-                self.vial_height_calculator((self.radius * 2), self.volume)
-                + self.bottom
-            )
-            if self.depth < self.bottom:
-                self.depth = self.bottom
-            logging.debug("New volume: %s | New depth: %s", self.volume, self.depth)
+        self.volume += added_volume
+        self.write_volume_to_disk()
+        self.depth = (
+            self.vial_height_calculator((self.radius * 2), self.volume)
+            + self.bottom
+        )
+        if self.depth < self.bottom:
+            self.depth = self.bottom
+        logging.debug("New volume: %s | New depth: %s", self.volume, self.depth)
         self.contamination += 1
         return 0
 
     def vial_height_calculator(self, diameter_mm, volume_ul):
         """
-        Calculates the height of a liquid in a vial given its diameter (in mm), height (in mm), and volume (in ul).
+        Calculates the height of a volume of liquid in a vial given its diameter (in mm).
         """
         radius_mm = diameter_mm / 2
         area_mm2 = 3.141592653589793 * radius_mm**2
@@ -515,10 +512,15 @@ class MillControl:
         """
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-        self.move_electrode_to_position(-405, -30, 0)
-        self.move_electrode_to_position(-405, -30, -60)
-        self.move_electrode_to_position(-405, -30, 0)
+        self.move_electrode_to_position(-411, -30, 0)
+        self.move_electrode_to_position(-411, -30, -45)
+        self.move_electrode_to_position(-411, -30, 0)
         return 0
+
+    def move_to_safe_position(self):
+        '''Move the mill to its current x,y location and z = 0'''
+        [initial_x, initial_y, initial_z] = self.current_coordinates()
+        self.move_center_to_position(initial_x, initial_y, initial_z * 0)
 
     def move_pipette_to_position(
         self,
