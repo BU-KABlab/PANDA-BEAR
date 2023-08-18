@@ -1,3 +1,4 @@
+{
 "ID": 1,
 "Replicates": [],
 "Target_Well": "D5",
@@ -6,7 +7,7 @@
 "Acrylate": 145,
 "Ferrocene": 0,
 "Custom": 0,
-"OCP",1,
+"OCP":1,
 "CA": 1,
 "CV": 1,
 "dep-duration": 300,
@@ -14,20 +15,21 @@
 "status": "queued",
 "status_date": "YYYY-MM-DD:HH:MM:SS",
 "time_stamps": [],
-"OCP_file": "",
+"OCP_file": null,
 "OCP_pass": null,
-"OCP_char_file": "",
+"OCP_char_file": null,
 "OCP_char_pass": null,
-"deposition_data_file": "",
-"deposition_plot_file": "",
-"deposition_max_value":
-"deposition_min_value":
-"characterization_data_file": "",
-"characterization_plot_file": "",
-"characterization_max_value":
-"characterization_min_value":
+"deposition_data_file": null,
+"deposition_plot_file": null,
+"deposition_max_value": null,
+"deposition_min_value": null,
+"characterization_data_file": null,
+"characterization_plot_file": null,
+"characterization_max_value":null,
+"characterization_min_value": null,
 "pumping_rate" : 0.5,
 "char_sol_name" : "Ferrocene",
 "char_vol" : 290,
 "flush_sol_name" : "DMF",
 "flush_vol" : 120
+}
