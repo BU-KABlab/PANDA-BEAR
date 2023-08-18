@@ -73,9 +73,7 @@ def withdraw(volume: float, rate: float, ser_pump: object):
     if (
         ser_pump.volume_withdrawn + volume > 0.2
     ):  # 0.2 is the maximum volume for the pipette tip
-        raise Exception(
-            f"The command to withdraw {volume} ml will overfill the 0.2 ml pipette with {ser_pump.volume_withdrawn} ml inside. Stopping run"
-        )
+        raise Exception(f"The command to withdraw {volume} ml will overfill the 0.2 ml pipette with {ser_pump.volume_withdrawn} ml inside. Stopping run")
     else:
         ser_pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         ser_pump.pumping_volume = (
@@ -176,7 +174,7 @@ def pipette(
             #PurgeVial = waste_selector(waste_solution_name, repetition_vol)
             PurgeVial = waste_selector(waste_vials, waste_solution_name, repetition_vol)
             ## First half: pick up solution
-            logging.info(f"Withdrawing {solution.name}...")
+            logging.info("Withdrawing %s...", solution.name)
             mill.move_pipette_to_position(
                 solution.coordinates["x"], solution.coordinates["y"], 0
             )  # start at safe height
@@ -241,11 +239,7 @@ def pipette(
             purge(PurgeVial, pump, purge_volume)
             mill.move_pipette_to_position(PurgeVial.coordinates["x"], PurgeVial.coordinates["y"], 0)
 
-            logging.debug(
-                f"Remaining volume in pipette: {pump.volume_withdrawn}"
-            )  # should always be zero, pause if not
-    else:
-        pass
+            logging.debug(f"Remaining volume in pipette: {pump.volume_withdrawn}")  # should always be zero, pause if not
 
 
 def clear_well(
@@ -322,6 +316,7 @@ def clear_well(
 
 
 def print_runtime_data(runtime_data: dict):
+    """Print the runtimes to the console"""
     for well, data in runtime_data.items():
         logging.info(f"Well {well} Runtimes:")
         for section, runtime in data.items():
@@ -392,7 +387,7 @@ def flush_pipette_tip(
     flush_solution = solution_selector(stock_vials, flush_solution_name,flush_volume)
     PurgeVial = waste_selector(waste_vials, 'waste',flush_volume)
 
-    logging.info(f"Flushing with {flush_solution.name}...")
+    logging.info("Flushing with %s...", flush_solution.name)
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
@@ -431,7 +426,7 @@ def solution_selector(solutions: list, solution_name: str, volume: float):
             return solution
         else:
             pass
-    raise Exception(f"{solution_name} not found in list of solutions")
+    raise Exception("%s not found in list of solutions", solution_name)
 
 
 # def solution_selector(solution_name: str, volume: float):
@@ -1141,6 +1136,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
 
 
 def main():
+    '''Main function'''
     logging.basicConfig(
         filename="ePANDA.log",
         level=logging.INFO,
@@ -1167,19 +1163,19 @@ def main():
             if instructions is None:
                 logging.info("No instructions in queue")
                 break
+            
+            logging.info("Instructions read from queue")
+            logging.info(instructions)
+            status = run_experiment(instructions, instructions_filename, mill, pump)
+            logging.info("Experiment completed with code %d", status)
+            if status == 0:
+                pass
+            elif status == 1:
+                logging.error("Experiment failed")
+            elif status == 2:
+                logging.warning("Experiment stopped by user")
+                break
             else:
-                logging.info("Instructions read from queue")
-                logging.info(instructions)
-                status = run_experiment(instructions, instructions_filename, mill, pump)
-                logging.info("Experiment completed with code ", status)
-                if status == 0:
-                    pass
-                elif status == 1:
-                    logging.error("Experiment failed")
-                elif status == 2:
-                    logging.warning("Experiment stopped by user")
-                    break
-                else:
                     pass
     finally:
         ## Disconnect from equipment
