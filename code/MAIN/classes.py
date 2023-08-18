@@ -23,10 +23,10 @@ class Wells:
         3 - Horizontal, wells become less negative from A1
     """
 
-    def __init__(self, a1_X=0, a1_Y=0, orientation=0, starting_volume=0.00):
+    def __init__(self, a1_x=0, a1_y=0, orientation=0, starting_volume=0.00):
         self.wells = {}
         self.orientation = orientation
-        self.z_bottom = -64  # 64
+        self.z_bottom = -68  # 64
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9  # mm from center to center
@@ -34,7 +34,7 @@ class Wells:
         self.echem_height = -68
         self.echem_height = -68
 
-        a1_coordinates = {"x": a1_X, "y": a1_Y, "z": self.z_top}  # coordinates of A1
+        a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
         volume = starting_volume
         for col_idx, col in enumerate("ABCDEFGH"):
             for row in range(1, 13):
@@ -326,7 +326,7 @@ class MillControl:
         time.sleep(2)
         return self
 
-    def __exit__(self):
+    def exit(self):
         '''Close the serial connection to the mill'''
         self.ser_mill.close()
         time.sleep(15)
@@ -374,14 +374,14 @@ class MillControl:
                 out = self.ser_mill.readline()
                 logging.debug("%s executed", command)
             # time.sleep(1)
-        except Exception as e:
+        except Exception as mill_exception:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
-            logging.error("Exception: ", e)
-            logging.error("Exception type: ", exception_type)
-            logging.error("File name: ", filename)
-            logging.error("Line number: ", line_number)
+            logging.error("Exception: %s", mill_exception)
+            logging.error("Exception type: %s", exception_type)
+            logging.error("File name: %s", filename)
+            logging.error("Line number: %d", line_number)
         return out
 
     def stop(self):
@@ -415,7 +415,7 @@ class MillControl:
         )  # without carriage return because grbl documentation says its not needed
         time.sleep(2)
         status = self.ser_mill.readlines()
-        time.sleep(2)
+        time.sleep(0.5)
         try:
             if isinstance(status, list):
                 list_length = len(status)
@@ -436,14 +436,14 @@ class MillControl:
                 out = status.decode("utf-8").strip()
 
             logging.info(out)
-        except Exception as e:
+        except Exception as current_status_ecxeption:
             exception_type, exception_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
-            logging.error("Exception: ", e)
-            logging.error("Exception type: ", exception_type)
-            logging.error("File name: ", filename)
-            logging.error("Line number: ", line_number)
+            logging.error("Exception: %s", current_status_ecxeption)
+            logging.error("Exception type: %s", exception_type)
+            logging.error("File name: %s", filename)
+            logging.error("Line number: %d", line_number)
         return out
 
     def gcode_mode(self):
@@ -458,7 +458,7 @@ class MillControl:
         """Ask the mill for its gcode parser state"""
         return self.execute_command("$G")
 
-    def move_center_to_position(self, x, y, z):
+    def move_center_to_position(self, x_coord, y_coord, z_coord):
         """
         Move the mill to the specified coordinates.
         Args:
@@ -471,7 +471,11 @@ class MillControl:
         offsets = self.config["instrument_offsets"]["center"]
 
         mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
-        command = mill_move.format(x + offsets["x"], y + offsets["y"], z + offsets["z"])
+        command = mill_move.format(
+            x_coord + offsets["x"],
+            y_coord + offsets["y"],
+            z_coord + offsets["z"]
+            )
         self.execute_command(command)
         return 0
 
