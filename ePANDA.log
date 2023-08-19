@@ -1,0 +1,1107 @@
+2023-08-18 15:02:13 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 15:02:13 INFO Checking inbox for new experiments...
+2023-08-18 15:02:13 INFO 0 new experiments found
+2023-08-18 15:02:15 INFO Mill connected: True
+2023-08-18 15:04:34 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 15:04:34 INFO Checking inbox for new experiments...
+2023-08-18 15:04:34 INFO 13 new experiments found
+2023-08-18 15:04:36 INFO Mill connected: True
+2023-08-18 15:05:39 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 39, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 4, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 15:05:39 INFO Pump found at address: 0
+2023-08-18 15:05:45 INFO Instructions read from queue
+2023-08-18 15:05:45 INFO {'id': '79', 'priority': '2', 'replicates': [], 'target_well': 'F6', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 0, 'pump_rate': 0.5, 'ocp': 1, 'ca': 0, 'cv': 1, 'baseline': 1, 'dep-duration': 300, 'dep-pot': -2.4, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-79_F6.json', 'status_date': 'YYYY-MM-DD:HH:MM:SS', 'time_stamps': [], 'OCP_file': None, 'OCP_pass': None, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 15:05:57 INFO MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-08-18 15:06:11 INFO 
+2023-08-18 15:06:11 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 15:06:11 INFO Connecting to Mill...
+2023-08-18 15:06:11 INFO Wells defined
+2023-08-18 15:06:11 INFO Vials defined
+2023-08-18 15:06:11 INFO Beginning eChem characterization of well: F6
+2023-08-18 15:06:11 INFO Infuse ferrocene into well F6...
+2023-08-18 15:06:11 INFO Repetition 1 of 2
+2023-08-18 15:06:11 INFO Withdrawing ferrocene...
+2023-08-18 15:06:25 INFO 
+2023-08-18 15:06:39 INFO 
+2023-08-18 15:07:04 INFO Updating ferrocene volume...
+2023-08-18 15:07:04 INFO Writing ferrocene volume to vial file...
+2023-08-18 17:40:13 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 17:40:13 INFO Checking inbox for new experiments...
+2023-08-18 17:40:13 INFO 0 new experiments found
+2023-08-18 17:40:15 INFO Mill connected: True
+2023-08-18 17:41:18 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 17:41:19 INFO Pump found at address: 0
+2023-08-18 17:41:24 INFO Instructions read from queue
+2023-08-18 17:41:24 INFO {'id': '79', 'priority': '2', 'replicates': [], 'target_well': 'F6', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 0, 'pump_rate': 0.5, 'ocp': 1, 'ca': 0, 'cv': 1, 'baseline': 1, 'dep-duration': 300, 'dep-pot': -2.4, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-79_F6.json', 'status_date': 'YYYY-MM-DD:HH:MM:SS', 'time_stamps': [], 'OCP_file': None, 'OCP_pass': None, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 17:41:36 INFO MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-08-18 17:41:50 INFO 
+2023-08-18 17:41:50 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 17:41:50 INFO Connecting to Mill...
+2023-08-18 17:41:50 INFO Wells defined
+2023-08-18 17:41:50 INFO Vials defined
+2023-08-18 17:41:50 INFO Beginning eChem characterization of well: F6
+2023-08-18 17:41:50 INFO Infuse ferrocene into well F6...
+2023-08-18 17:41:50 INFO Repetition 1 of 2
+2023-08-18 17:41:50 INFO Withdrawing ferrocene...
+2023-08-18 17:42:04 INFO 
+2023-08-18 17:42:18 INFO 
+2023-08-18 17:42:43 INFO Updating ferrocene volume...
+2023-08-18 17:42:43 INFO Writing ferrocene volume to vial file...
+2023-08-18 17:42:57 INFO 
+2023-08-18 17:42:57 INFO Purging...
+2023-08-18 17:43:11 INFO 
+2023-08-18 17:43:25 INFO 
+2023-08-18 17:43:31 INFO Updating waste volume...
+2023-08-18 17:43:31 INFO Writing waste volume to vial file...
+2023-08-18 17:43:45 INFO 
+2023-08-18 17:43:45 INFO Infusing ferrocene into well F6...
+2023-08-18 17:43:59 INFO 
+2023-08-18 17:44:13 INFO 
+2023-08-18 17:44:33 INFO Well F6 volume: 145.000000
+2023-08-18 17:44:47 INFO 
+2023-08-18 17:44:47 INFO Purging...
+2023-08-18 17:45:01 INFO 
+2023-08-18 17:45:15 INFO 
+2023-08-18 17:45:20 INFO Updating waste volume...
+2023-08-18 17:45:20 INFO Writing waste volume to vial file...
+2023-08-18 17:45:34 INFO 
+2023-08-18 17:45:34 INFO Repetition 2 of 2
+2023-08-18 17:45:34 INFO Withdrawing ferrocene...
+2023-08-18 17:45:49 INFO 
+2023-08-18 17:46:03 INFO 
+2023-08-18 17:46:27 INFO Updating ferrocene volume...
+2023-08-18 17:46:27 INFO Writing ferrocene volume to vial file...
+2023-08-18 17:46:41 INFO 
+2023-08-18 17:46:41 INFO Purging...
+2023-08-18 17:46:55 INFO 
+2023-08-18 17:47:09 INFO 
+2023-08-18 17:47:15 INFO Updating waste volume...
+2023-08-18 17:47:15 INFO Writing waste volume to vial file...
+2023-08-18 17:47:29 INFO 
+2023-08-18 17:47:29 INFO Infusing ferrocene into well F6...
+2023-08-18 17:47:43 INFO 
+2023-08-18 17:47:57 INFO 
+2023-08-18 17:48:17 INFO Well F6 volume: 290.000000
+2023-08-18 17:48:31 INFO 
+2023-08-18 17:48:31 INFO Purging...
+2023-08-18 17:48:45 INFO 
+2023-08-18 17:48:59 INFO 
+2023-08-18 17:49:05 INFO Updating waste volume...
+2023-08-18 17:49:05 INFO Writing waste volume to vial file...
+2023-08-18 17:49:19 INFO 
+2023-08-18 17:49:19 INFO Characterizing well: F6
+2023-08-18 17:49:19 INFO Beginning eChem OCP of well: F6
+2023-08-18 17:49:33 INFO 
+2023-08-18 17:49:47 INFO 
+2023-08-18 17:52:07 INFO 
+2023-08-18 17:55:35 INFO MPos coordinates: X = -225.0, Y = -89.0, Z = 0.0
+2023-08-18 17:55:49 INFO 
+2023-08-18 17:56:03 INFO 
+2023-08-18 17:56:17 INFO 
+2023-08-18 17:56:31 INFO 
+2023-08-18 17:56:31 INFO Clearing well F6 with 2x repetitions of 145.000000
+2023-08-18 17:56:31 INFO Repitition 1 of 2
+2023-08-18 17:56:45 INFO 
+2023-08-18 17:56:59 INFO 
+2023-08-18 17:57:36 INFO 
+2023-08-18 17:57:36 INFO Moving to purge vial...
+2023-08-18 17:57:50 INFO 
+2023-08-18 17:58:04 INFO 
+2023-08-18 17:58:04 INFO Purging...
+2023-08-18 17:58:31 INFO Updating waste volume...
+2023-08-18 17:58:31 INFO Writing waste volume to vial file...
+2023-08-18 17:58:45 INFO 
+2023-08-18 17:58:45 INFO Remaining volume in well: 145
+2023-08-18 17:58:45 INFO Repitition 2 of 2
+2023-08-18 17:58:59 INFO 
+2023-08-18 17:59:13 INFO 
+2023-08-18 17:59:50 INFO 
+2023-08-18 17:59:50 INFO Moving to purge vial...
+2023-08-18 18:00:04 INFO 
+2023-08-18 18:00:18 INFO 
+2023-08-18 18:00:18 INFO Purging...
+2023-08-18 18:00:45 INFO Updating waste volume...
+2023-08-18 18:00:45 INFO Writing waste volume to vial file...
+2023-08-18 18:00:59 INFO 
+2023-08-18 18:00:59 INFO Remaining volume in well: 0
+2023-08-18 18:00:59 INFO Flushing with dmf...
+2023-08-18 18:01:13 INFO 
+2023-08-18 18:01:32 INFO 
+2023-08-18 18:02:03 INFO 
+2023-08-18 18:02:17 INFO 
+2023-08-18 18:02:31 INFO 
+2023-08-18 18:02:55 INFO Updating waste volume...
+2023-08-18 18:02:55 INFO Writing waste volume to vial file...
+2023-08-18 18:03:36 INFO 
+2023-08-18 18:04:39 INFO Rinsing well F6 3x...
+2023-08-18 18:04:39 INFO Rinse 1 of 3
+2023-08-18 18:04:39 INFO Repetition 1 of 1
+2023-08-18 18:08:06 ERROR Exception: Rinse0 not found in list of solutions
+2023-08-18 18:08:07 ERROR Exception type: <class 'Exception'>
+2023-08-18 18:08:07 ERROR File name: c:\Users\Kab Lab\Documents\GitHub\PANDA\code\MAIN\run_experiments.py
+2023-08-18 18:08:08 ERROR Line number: 1102
+2023-08-18 18:08:19 INFO Saved completed instructions for experiment 79
+2023-08-18 18:08:22 INFO Experiment 79 completed with code 1
+2023-08-18 18:08:25 ERROR Experiment 79 failed
+2023-08-18 18:08:31 INFO Instructions read from queue
+2023-08-18 18:08:32 INFO {'id': '80', 'priority': '2', 'replicates': [], 'target_well': 'F7', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 0, 'pump_rate': 0.5, 'ocp': 1, 'ca': 0, 'cv': 1, 'baseline': 1, 'dep-duration': 300, 'dep-pot': -2.4, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-80_F7.json', 'status_date': 'YYYY-MM-DD:HH:MM:SS', 'time_stamps': [], 'OCP_file': None, 'OCP_pass': None, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 18:08:46 INFO MPos coordinates: X = -131.0, Y = -10.0, Z = 0.0
+2023-08-18 18:09:00 INFO 
+2023-08-18 18:10:01 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 18:10:01 INFO Connecting to Mill...
+2023-08-18 18:10:01 INFO Wells defined
+2023-08-18 18:10:01 INFO Vials defined
+2023-08-18 18:10:01 INFO Beginning eChem characterization of well: F7
+2023-08-18 18:10:01 INFO Infuse ferrocene into well F7...
+2023-08-18 18:10:01 INFO Repetition 1 of 2
+2023-08-18 18:10:01 INFO Withdrawing ferrocene...
+2023-08-18 18:10:15 INFO 
+2023-08-18 18:10:29 INFO 
+2023-08-18 18:10:54 INFO Updating ferrocene volume...
+2023-08-18 18:10:54 INFO Writing ferrocene volume to vial file...
+2023-08-18 18:11:08 INFO 
+2023-08-18 18:11:08 INFO Purging...
+2023-08-18 18:11:22 INFO 
+2023-08-18 18:11:36 INFO 
+2023-08-18 18:11:42 INFO Updating waste volume...
+2023-08-18 18:11:42 INFO Writing waste volume to vial file...
+2023-08-18 18:11:56 INFO 
+2023-08-18 18:11:56 INFO Infusing ferrocene into well F7...
+2023-08-18 18:12:10 INFO 
+2023-08-18 18:12:24 INFO 
+2023-08-18 18:12:44 INFO Well F7 volume: 145.000000
+2023-08-18 18:12:58 INFO 
+2023-08-18 18:12:58 INFO Purging...
+2023-08-18 18:13:12 INFO 
+2023-08-18 18:13:26 INFO 
+2023-08-18 18:13:31 INFO Updating waste volume...
+2023-08-18 18:13:31 INFO Writing waste volume to vial file...
+2023-08-18 18:13:45 INFO 
+2023-08-18 18:13:45 INFO Repetition 2 of 2
+2023-08-18 18:13:45 INFO Withdrawing ferrocene...
+2023-08-18 18:13:59 INFO 
+2023-08-18 18:14:13 INFO 
+2023-08-18 18:14:38 INFO Updating ferrocene volume...
+2023-08-18 18:14:38 INFO Writing ferrocene volume to vial file...
+2023-08-18 18:14:52 INFO 
+2023-08-18 18:14:52 INFO Purging...
+2023-08-18 18:15:06 INFO 
+2023-08-18 18:15:20 INFO 
+2023-08-18 18:15:26 INFO Updating waste volume...
+2023-08-18 18:15:26 INFO Writing waste volume to vial file...
+2023-08-18 18:15:40 INFO 
+2023-08-18 18:15:40 INFO Infusing ferrocene into well F7...
+2023-08-18 18:15:54 INFO 
+2023-08-18 18:16:08 INFO 
+2023-08-18 18:16:28 INFO Well F7 volume: 290.000000
+2023-08-18 18:16:42 INFO 
+2023-08-18 18:16:42 INFO Purging...
+2023-08-18 18:16:56 INFO 
+2023-08-18 18:17:10 INFO 
+2023-08-18 18:17:16 INFO Updating waste volume...
+2023-08-18 18:17:16 INFO Writing waste volume to vial file...
+2023-08-18 18:17:30 INFO 
+2023-08-18 18:17:30 INFO Characterizing well: F7
+2023-08-18 18:17:30 INFO Beginning eChem OCP of well: F7
+2023-08-18 18:17:44 INFO 
+2023-08-18 18:17:58 INFO 
+2023-08-18 18:19:31 INFO 
+2023-08-18 18:19:43 INFO MPos coordinates: X = -225.0, Y = -98.0, Z = 0.0
+2023-08-18 18:19:57 INFO 
+2023-08-18 18:20:11 INFO 
+2023-08-18 18:20:25 INFO 
+2023-08-18 18:20:39 INFO 
+2023-08-18 18:20:39 INFO Clearing well F7 with 2x repetitions of 145.000000
+2023-08-18 18:20:39 INFO Repitition 1 of 2
+2023-08-18 18:20:53 INFO 
+2023-08-18 18:21:07 INFO 
+2023-08-18 18:21:44 INFO 
+2023-08-18 18:21:44 INFO Moving to purge vial...
+2023-08-18 18:21:58 INFO 
+2023-08-18 18:22:12 INFO 
+2023-08-18 18:22:12 INFO Purging...
+2023-08-18 18:22:39 INFO Updating waste volume...
+2023-08-18 18:22:39 INFO Writing waste volume to vial file...
+2023-08-18 18:22:53 INFO 
+2023-08-18 18:22:53 INFO Remaining volume in well: 145
+2023-08-18 18:22:53 INFO Repitition 2 of 2
+2023-08-18 18:23:07 INFO 
+2023-08-18 18:23:21 INFO 
+2023-08-18 18:23:58 INFO 
+2023-08-18 18:23:58 INFO Moving to purge vial...
+2023-08-18 18:24:12 INFO 
+2023-08-18 18:24:26 INFO 
+2023-08-18 18:24:26 INFO Purging...
+2023-08-18 18:24:53 INFO Updating waste volume...
+2023-08-18 18:24:53 INFO Writing waste volume to vial file...
+2023-08-18 18:25:07 INFO 
+2023-08-18 18:25:07 INFO Remaining volume in well: 0
+2023-08-18 18:25:07 INFO Flushing with dmf...
+2023-08-18 18:25:21 INFO 
+2023-08-18 18:25:40 INFO 
+2023-08-18 18:26:11 INFO 
+2023-08-18 18:26:26 INFO 
+2023-08-18 18:26:40 INFO 
+2023-08-18 18:27:03 INFO Updating waste volume...
+2023-08-18 18:27:03 INFO Writing waste volume to vial file...
+2023-08-18 18:27:17 INFO 
+2023-08-18 18:27:17 INFO Rinsing well F7 3x...
+2023-08-18 18:27:17 INFO Rinse 1 of 3
+2023-08-18 18:27:17 INFO Repetition 1 of 1
+2023-08-18 18:30:03 ERROR Exception: Rinse0 not found in list of solutions
+2023-08-18 18:30:03 ERROR Exception type: <class 'Exception'>
+2023-08-18 18:30:03 ERROR File name: c:\Users\Kab Lab\Documents\GitHub\PANDA\code\MAIN\run_experiments.py
+2023-08-18 18:30:03 ERROR Line number: 1102
+2023-08-18 18:30:09 INFO Saved completed instructions for experiment 80
+2023-08-18 18:30:36 INFO Experiment 80 completed with code 1
+2023-08-18 18:30:38 ERROR Experiment 80 failed
+2023-08-18 18:32:49 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 18:32:49 INFO Checking inbox for new experiments...
+2023-08-18 18:32:49 INFO 0 new experiments found
+2023-08-18 18:32:51 INFO Mill connected: True
+2023-08-18 18:33:54 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 18:33:54 INFO Pump found at address: 0
+2023-08-18 18:37:03 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 18:37:03 INFO Checking inbox for new experiments...
+2023-08-18 18:37:03 INFO 0 new experiments found
+2023-08-18 18:37:05 INFO Mill connected: True
+2023-08-18 18:38:08 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 18:38:08 INFO Pump found at address: 0
+2023-08-18 18:38:10 INFO Instructions read from queue
+2023-08-18 18:38:10 INFO {'id': '81', 'priority': '2', 'replicates': [], 'target_well': 'F8', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 290, 'pump_rate': 0.5, 'ocp': 1, 'ca': 1, 'cv': 1, 'baseline': 0, 'dep-duration': 300, 'dep-pot': -1.5, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-81_F8.json', 'status_date': 'YYYY-MM-DD:HH:MM:SS', 'time_stamps': [], 'OCP_file': None, 'OCP_pass': None, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 18:38:22 INFO MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-08-18 18:38:36 INFO 
+2023-08-18 18:38:36 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 18:38:36 INFO Connecting to Mill...
+2023-08-18 18:38:36 INFO Wells defined
+2023-08-18 18:38:36 INFO Vials defined
+2023-08-18 18:38:36 INFO Pipetting 290 ul of custom into F8...
+2023-08-18 18:38:36 INFO Repetition 1 of 2
+2023-08-18 18:41:25 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 18:41:25 INFO Checking inbox for new experiments...
+2023-08-18 18:41:25 INFO 0 new experiments found
+2023-08-18 18:41:27 INFO Mill connected: True
+2023-08-18 18:42:30 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 18:42:30 INFO Pump found at address: 0
+2023-08-18 18:42:32 INFO Instructions read from queue
+2023-08-18 18:42:32 INFO {'id': '81', 'priority': '2', 'replicates': [], 'target_well': 'F8', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 290, 'pump_rate': 0.5, 'ocp': 1, 'ca': 1, 'cv': 1, 'baseline': 0, 'dep-duration': 300, 'dep-pot': -1.5, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-81_F8.json', 'status_date': 'YYYY-MM-DD:HH:MM:SS', 'time_stamps': [], 'OCP_file': None, 'OCP_pass': None, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 18:42:44 INFO MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-08-18 18:42:58 INFO 
+2023-08-18 18:42:58 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 18:42:58 INFO Connecting to Mill...
+2023-08-18 18:42:58 INFO Wells defined
+2023-08-18 18:42:58 INFO Vials defined
+2023-08-18 18:42:58 INFO Pipetting 290 ul of custom into F8...
+2023-08-18 18:42:58 INFO Repetition 1 of 2
+2023-08-18 18:42:58 INFO Withdrawing custom...
+2023-08-18 18:43:12 INFO 
+2023-08-18 18:43:26 INFO 
+2023-08-18 18:43:51 INFO Updating custom volume...
+2023-08-18 18:43:51 INFO Writing custom volume to vial file...
+2023-08-18 18:44:05 INFO 
+2023-08-18 18:44:05 INFO Purging...
+2023-08-18 18:44:19 INFO 
+2023-08-18 18:44:33 INFO 
+2023-08-18 18:44:39 INFO Updating waste volume...
+2023-08-18 18:44:39 INFO Writing waste volume to vial file...
+2023-08-18 18:44:53 INFO 
+2023-08-18 18:44:53 INFO Infusing custom into well F8...
+2023-08-18 18:45:07 INFO 
+2023-08-18 18:45:21 INFO 
+2023-08-18 18:45:41 INFO Well F8 volume: 145.000000
+2023-08-18 18:45:55 INFO 
+2023-08-18 18:45:55 INFO Purging...
+2023-08-18 18:46:09 INFO 
+2023-08-18 18:46:23 INFO 
+2023-08-18 18:46:29 INFO Updating waste volume...
+2023-08-18 18:46:29 INFO Writing waste volume to vial file...
+2023-08-18 18:46:43 INFO 
+2023-08-18 18:46:43 INFO Repetition 2 of 2
+2023-08-18 18:46:43 INFO Withdrawing custom...
+2023-08-18 18:46:57 INFO 
+2023-08-18 18:47:11 INFO 
+2023-08-18 18:47:36 INFO Updating custom volume...
+2023-08-18 18:47:36 INFO Writing custom volume to vial file...
+2023-08-18 18:47:50 INFO 
+2023-08-18 18:47:50 INFO Purging...
+2023-08-18 18:48:04 INFO 
+2023-08-18 18:48:18 INFO 
+2023-08-18 18:48:23 INFO Updating waste volume...
+2023-08-18 18:48:23 INFO Writing waste volume to vial file...
+2023-08-18 18:48:37 INFO 
+2023-08-18 18:48:37 INFO Infusing custom into well F8...
+2023-08-18 18:48:51 INFO 
+2023-08-18 18:49:05 INFO 
+2023-08-18 18:49:26 INFO Well F8 volume: 290.000000
+2023-08-18 18:49:40 INFO 
+2023-08-18 18:49:40 INFO Purging...
+2023-08-18 18:49:54 INFO 
+2023-08-18 18:50:08 INFO 
+2023-08-18 18:50:13 INFO Updating waste volume...
+2023-08-18 18:50:13 INFO Writing waste volume to vial file...
+2023-08-18 18:50:27 INFO 
+2023-08-18 18:50:27 INFO Flushing with dmf...
+2023-08-18 18:50:41 INFO 
+2023-08-18 18:51:00 INFO 
+2023-08-18 18:51:32 INFO 
+2023-08-18 18:51:46 INFO 
+2023-08-18 18:52:00 INFO 
+2023-08-18 18:52:23 INFO Updating waste volume...
+2023-08-18 18:52:23 INFO Writing waste volume to vial file...
+2023-08-18 18:52:37 INFO 
+2023-08-18 18:52:37 INFO 
+
+Setting up eChem experiments...
+2023-08-18 18:52:37 INFO Beginning eChem OCP of well: F8
+2023-08-18 18:52:51 INFO 
+2023-08-18 18:53:05 INFO 
+2023-08-18 18:53:24 INFO Beginning eChem deposition of well: F8
+2023-08-18 18:58:42 INFO 
+2023-08-18 18:58:54 INFO MPos coordinates: X = -225.0, Y = -107.0, Z = 0.0
+2023-08-18 18:59:08 INFO 
+2023-08-18 18:59:22 INFO 
+2023-08-18 18:59:36 INFO 
+2023-08-18 18:59:50 INFO 
+2023-08-18 18:59:50 INFO Clearing well F8 with 2x repetitions of 145.000000
+2023-08-18 18:59:50 INFO Repitition 1 of 2
+2023-08-18 19:00:04 INFO 
+2023-08-18 19:00:18 INFO 
+2023-08-18 19:00:55 INFO 
+2023-08-18 19:00:55 INFO Moving to purge vial...
+2023-08-18 19:01:09 INFO 
+2023-08-18 19:01:23 INFO 
+2023-08-18 19:01:23 INFO Purging...
+2023-08-18 19:01:50 INFO Updating waste volume...
+2023-08-18 19:01:50 INFO Writing waste volume to vial file...
+2023-08-18 19:02:04 INFO 
+2023-08-18 19:02:04 INFO Remaining volume in well: 145
+2023-08-18 19:02:04 INFO Repitition 2 of 2
+2023-08-18 19:02:18 INFO 
+2023-08-18 19:02:32 INFO 
+2023-08-18 19:03:09 INFO 
+2023-08-18 19:03:09 INFO Moving to purge vial...
+2023-08-18 19:03:23 INFO 
+2023-08-18 19:03:37 INFO 
+2023-08-18 19:03:37 INFO Purging...
+2023-08-18 19:04:05 INFO Updating waste volume...
+2023-08-18 19:04:05 INFO Writing waste volume to vial file...
+2023-08-18 19:04:19 INFO 
+2023-08-18 19:04:19 INFO Remaining volume in well: 0
+2023-08-18 19:04:19 INFO Rinsing well F8 3x...
+2023-08-18 19:04:19 INFO Rinse 1 of 3
+2023-08-18 19:04:19 INFO Repetition 1 of 1
+2023-08-18 19:36:19 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 19:36:19 INFO Checking inbox for new experiments...
+2023-08-18 19:36:19 INFO 0 new experiments found
+2023-08-18 19:36:21 INFO Mill connected: True
+2023-08-18 19:37:24 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 19:37:25 INFO Pump found at address: 0
+2023-08-18 19:37:27 INFO Instructions read from queue
+2023-08-18 19:37:27 INFO {'id': '81', 'priority': '2', 'replicates': [], 'target_well': 'F8', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 290, 'pump_rate': 0.5, 'ocp': 1, 'ca': 1, 'cv': 1, 'baseline': 0, 'dep-duration': 300, 'dep-pot': -1.5, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-81_F8.json', 'status_date': '2023-08-18_18_59_50', 'time_stamps': [], 'OCP_file': 'C:\\Users\\Kab Lab\\Documents\\data\\2023-08-18\\experiment-F8_OCP', 'OCP_pass': True, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 19:37:39 INFO MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-08-18 19:37:53 INFO 
+2023-08-18 19:37:53 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 19:37:53 INFO Connecting to Mill...
+2023-08-18 19:37:53 INFO Wells defined
+2023-08-18 19:37:53 INFO Vials defined
+2023-08-18 19:37:53 INFO Pipetting 290 ul of custom into F8...
+2023-08-18 19:37:53 INFO Repetition 1 of 2
+2023-08-18 19:41:12 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 19:41:12 INFO Checking inbox for new experiments...
+2023-08-18 19:41:12 INFO 0 new experiments found
+2023-08-18 19:41:14 INFO Mill connected: True
+2023-08-18 19:42:17 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 19:42:17 INFO Pump found at address: 0
+2023-08-18 19:42:19 INFO Instructions read from queue
+2023-08-18 19:42:19 INFO {'id': '81', 'priority': '2', 'replicates': [], 'target_well': 'F8', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 290, 'pump_rate': 0.5, 'ocp': 1, 'ca': 1, 'cv': 1, 'baseline': 0, 'dep-duration': 300, 'dep-pot': -1.5, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-81_F8.json', 'status_date': '2023-08-18_18_59_50', 'time_stamps': [], 'OCP_file': 'C:\\Users\\Kab Lab\\Documents\\data\\2023-08-18\\experiment-F8_OCP', 'OCP_pass': True, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 19:42:31 INFO MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-08-18 19:42:45 INFO 
+2023-08-18 19:42:45 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 19:42:45 INFO Connecting to Mill...
+2023-08-18 19:42:45 INFO Wells defined
+2023-08-18 19:42:45 INFO Vials defined
+2023-08-18 19:42:45 INFO Pipetting 290 ul of custom into F8...
+2023-08-18 19:42:45 INFO Repetition 1 of 2
+2023-08-18 19:42:45 INFO Withdrawing custom...
+2023-08-18 19:42:59 INFO 
+2023-08-18 19:43:13 INFO 
+2023-08-18 19:43:38 INFO Updating custom volume...
+2023-08-18 19:43:38 INFO Writing custom volume to vial file...
+2023-08-18 19:43:52 INFO 
+2023-08-18 19:43:52 INFO Purging...
+2023-08-18 19:53:55 INFO 
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-08-18 19:53:55 INFO Checking inbox for new experiments...
+2023-08-18 19:53:55 INFO 0 new experiments found
+2023-08-18 19:53:57 INFO Mill connected: True
+2023-08-18 19:55:00 INFO Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-08-18 19:55:00 INFO Pump found at address: 0
+2023-08-18 19:55:02 INFO Instructions read from queue
+2023-08-18 19:55:02 INFO {'id': '81', 'priority': '2', 'replicates': [], 'target_well': 'F8', 'status': 'queued', 'dmf': 0, 'peg': 0, 'acrylate': 0, 'ferrocene': 0, 'custom': 290, 'pump_rate': 0.5, 'ocp': 1, 'ca': 1, 'cv': 1, 'baseline': 0, 'dep-duration': 300, 'dep-pot': -1.5, 'scan-rate': 0.05, 'sample-period': 0.01, 'rise_sol': 'Rinse', 'rinse_vol': 120, 'rinse_count': 3, 'char_sol': 'Ferrocene', 'char_vol': 290, 'purge_vol': 20, 'flush_sol': 'DMF', 'flush_vol': 120, 'filename': '2023-08-18_experiment-81_F8.json', 'status_date': '2023-08-18_18_59_50', 'time_stamps': [], 'OCP_file': 'C:\\Users\\Kab Lab\\Documents\\data\\2023-08-18\\experiment-F8_OCP', 'OCP_pass': True, 'OCP_char_file': None, 'OCP_char_pass': None, 'deposition_data_file': None, 'deposition_plot_file': None, 'deposition_max_value': None, 'deposition_min_value': None, 'characterization_data_file': None, 'characterization_plot_file': None, 'characterization_max_value': None, 'characterization_min_value': None}
+2023-08-18 19:55:14 INFO MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-08-18 19:55:28 INFO 
+2023-08-18 19:55:28 INFO Beginning protocol:
+Connecting to Mill, Pump, Pstat:
+2023-08-18 19:55:28 INFO Connecting to Mill...
+2023-08-18 19:55:28 INFO Wells defined
+2023-08-18 19:55:28 INFO Vials defined
+2023-08-18 19:55:28 INFO Pipetting 290 ul of custom into F8...
+2023-08-18 19:55:28 INFO Repetition 1 of 2
+2023-08-18 19:55:28 INFO Withdrawing custom...
+2023-08-18 19:55:42 INFO 
+2023-08-18 19:55:56 INFO 
+2023-08-18 19:56:21 INFO Updating custom volume...
+2023-08-18 19:56:21 INFO Writing custom volume to vial file...
+2023-08-18 19:56:35 INFO 
+2023-08-18 19:56:35 INFO Purging...
+2023-08-18 19:56:49 INFO 
+2023-08-18 19:57:03 INFO 
+2023-08-18 19:57:09 INFO Updating waste volume...
+2023-08-18 19:57:09 INFO Writing waste volume to vial file...
+2023-08-18 19:57:23 INFO 
+2023-08-18 19:57:23 INFO Infusing custom into well F8...
+2023-08-18 19:57:37 INFO 
+2023-08-18 19:57:51 INFO 
+2023-08-18 19:58:11 INFO Well F8 volume: 145.000000
+2023-08-18 19:58:25 INFO 
+2023-08-18 19:58:25 INFO Purging...
+2023-08-18 19:58:39 INFO 
+2023-08-18 19:58:53 INFO 
+2023-08-18 19:58:59 INFO Updating waste volume...
+2023-08-18 19:58:59 INFO Writing waste volume to vial file...
+2023-08-18 19:59:13 INFO 
+2023-08-18 19:59:13 INFO Repetition 2 of 2
+2023-08-18 19:59:13 INFO Withdrawing custom...
+2023-08-18 19:59:27 INFO 
+2023-08-18 19:59:41 INFO 
+2023-08-18 20:00:06 INFO Updating custom volume...
+2023-08-18 20:00:06 INFO Writing custom volume to vial file...
+2023-08-18 20:00:20 INFO 
+2023-08-18 20:00:20 INFO Purging...
+2023-08-18 20:00:34 INFO 
+2023-08-18 20:00:48 INFO 
+2023-08-18 20:00:53 INFO Updating waste volume...
+2023-08-18 20:00:53 INFO Writing waste volume to vial file...
+2023-08-18 20:01:07 INFO 
+2023-08-18 20:01:07 INFO Infusing custom into well F8...
+2023-08-18 20:01:21 INFO 
+2023-08-18 20:01:36 INFO 
+2023-08-18 20:01:56 INFO Well F8 volume: 290.000000
+2023-08-18 20:02:10 INFO 
+2023-08-18 20:02:10 INFO Purging...
+2023-08-18 20:02:24 INFO 
+2023-08-18 20:02:38 INFO 
+2023-08-18 20:02:43 INFO Updating waste volume...
+2023-08-18 20:02:43 INFO Writing waste volume to vial file...
+2023-08-18 20:02:57 INFO 
+2023-08-18 20:02:57 INFO Flushing with dmf...
+2023-08-18 20:03:11 INFO 
+2023-08-18 20:03:31 INFO 
+2023-08-18 20:04:02 INFO 
+2023-08-18 20:04:16 INFO 
+2023-08-18 20:04:30 INFO 
+2023-08-18 20:04:53 INFO Updating waste volume...
+2023-08-18 20:04:53 INFO Writing waste volume to vial file...
+2023-08-18 20:05:07 INFO 
+2023-08-18 20:05:07 INFO 
+
+Setting up eChem experiments...
+2023-08-18 20:05:07 INFO Beginning eChem OCP of well: F8
+2023-08-18 20:05:21 INFO 
+2023-08-18 20:05:35 INFO 
+2023-08-18 20:05:54 INFO Beginning eChem deposition of well: F8
+2023-08-18 20:11:13 INFO 
+2023-08-18 20:11:25 INFO MPos coordinates: X = -225.0, Y = -107.0, Z = 0.0
+2023-08-18 20:11:39 INFO 
+2023-08-18 20:11:53 INFO 
+2023-08-18 20:12:07 INFO 
+2023-08-18 20:12:21 INFO 
+2023-08-18 20:12:21 INFO Clearing well F8 with 2x repetitions of 145.000000
+2023-08-18 20:12:21 INFO Repitition 1 of 2
+2023-08-18 20:12:35 INFO 
+2023-08-18 20:12:49 INFO 
+2023-08-18 20:13:25 INFO 
+2023-08-18 20:13:25 INFO Moving to purge vial...
+2023-08-18 20:13:39 INFO 
+2023-08-18 20:13:53 INFO 
+2023-08-18 20:13:53 INFO Purging...
+2023-08-18 20:14:21 INFO Updating waste volume...
+2023-08-18 20:14:21 INFO Writing waste volume to vial file...
+2023-08-18 20:14:35 INFO 
+2023-08-18 20:14:35 INFO Remaining volume in well: 145
+2023-08-18 20:14:35 INFO Repitition 2 of 2
+2023-08-18 20:14:49 INFO 
+2023-08-18 20:15:03 INFO 
+2023-08-18 20:15:39 INFO 
+2023-08-18 20:15:39 INFO Moving to purge vial...
+2023-08-18 20:15:53 INFO 
+2023-08-18 20:16:07 INFO 
+2023-08-18 20:16:07 INFO Purging...
+2023-08-18 20:16:35 INFO Updating waste volume...
+2023-08-18 20:16:35 INFO Writing waste volume to vial file...
+2023-08-18 20:16:49 INFO 
+2023-08-18 20:16:49 INFO Remaining volume in well: 0
+2023-08-18 20:16:49 INFO Rinsing well F8 3x...
+2023-08-18 20:16:49 INFO Rinse 1 of 3
+2023-08-18 20:16:49 INFO Repetition 1 of 1
+2023-08-18 20:16:49 INFO Withdrawing rinse0...
+2023-08-18 20:17:03 INFO 
+2023-08-18 20:17:17 INFO 
+2023-08-18 20:17:39 INFO Updating rinse0 volume...
+2023-08-18 20:17:39 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:17:53 INFO 
+2023-08-18 20:17:53 INFO Purging...
+2023-08-18 20:18:07 INFO 
+2023-08-18 20:18:21 INFO 
+2023-08-18 20:18:26 INFO Updating rinse0 volume...
+2023-08-18 20:18:26 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:18:40 INFO 
+2023-08-18 20:18:40 INFO Infusing rinse0 into well F8...
+2023-08-18 20:18:54 INFO 
+2023-08-18 20:19:08 INFO 
+2023-08-18 20:19:26 INFO Well F8 volume: 120.000000
+2023-08-18 20:19:40 INFO 
+2023-08-18 20:19:40 INFO Purging...
+2023-08-18 20:19:54 INFO 
+2023-08-18 20:20:08 INFO 
+2023-08-18 20:20:13 INFO Updating rinse0 volume...
+2023-08-18 20:20:13 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:20:27 INFO 
+2023-08-18 20:20:27 INFO Clearing well F8 with 1x repetitions of 120.000000
+2023-08-18 20:20:27 INFO Repitition 1 of 1
+2023-08-18 20:20:41 INFO 
+2023-08-18 20:20:55 INFO 
+2023-08-18 20:21:29 INFO 
+2023-08-18 20:21:29 INFO Moving to purge vial...
+2023-08-18 20:21:43 INFO 
+2023-08-18 20:21:57 INFO 
+2023-08-18 20:21:57 INFO Purging...
+2023-08-18 20:22:21 INFO Updating rinse0 volume...
+2023-08-18 20:22:21 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:22:35 INFO 
+2023-08-18 20:22:35 INFO Remaining volume in well: 0
+2023-08-18 20:22:35 INFO Rinse 2 of 3
+2023-08-18 20:22:35 INFO Repetition 1 of 1
+2023-08-18 20:22:35 INFO Withdrawing rinse1...
+2023-08-18 20:22:49 INFO 
+2023-08-18 20:23:03 INFO 
+2023-08-18 20:23:24 INFO Updating rinse1 volume...
+2023-08-18 20:23:24 INFO Writing rinse1 volume to vial file...
+2023-08-18 20:23:38 INFO 
+2023-08-18 20:23:38 INFO Purging...
+2023-08-18 20:23:52 INFO 
+2023-08-18 20:24:06 INFO 
+2023-08-18 20:24:12 INFO Updating rinse1 volume...
+2023-08-18 20:24:12 INFO Writing rinse1 volume to vial file...
+2023-08-18 20:24:26 INFO 
+2023-08-18 20:24:26 INFO Infusing rinse1 into well F8...
+2023-08-18 20:24:40 INFO 
+2023-08-18 20:24:54 INFO 
+2023-08-18 20:25:11 INFO Well F8 volume: 120.000000
+2023-08-18 20:25:25 INFO 
+2023-08-18 20:25:25 INFO Purging...
+2023-08-18 20:25:39 INFO 
+2023-08-18 20:25:53 INFO 
+2023-08-18 20:25:59 INFO Updating rinse1 volume...
+2023-08-18 20:25:59 INFO Writing rinse1 volume to vial file...
+2023-08-18 20:26:13 INFO 
+2023-08-18 20:26:13 INFO Clearing well F8 with 1x repetitions of 120.000000
+2023-08-18 20:26:13 INFO Repitition 1 of 1
+2023-08-18 20:26:27 INFO 
+2023-08-18 20:26:41 INFO 
+2023-08-18 20:27:15 INFO 
+2023-08-18 20:27:15 INFO Moving to purge vial...
+2023-08-18 20:27:29 INFO 
+2023-08-18 20:27:43 INFO 
+2023-08-18 20:27:43 INFO Purging...
+2023-08-18 20:28:06 INFO Updating rinse1 volume...
+2023-08-18 20:28:06 INFO Writing rinse1 volume to vial file...
+2023-08-18 20:28:20 INFO 
+2023-08-18 20:28:20 INFO Remaining volume in well: 0
+2023-08-18 20:28:20 INFO Rinse 3 of 3
+2023-08-18 20:28:20 INFO Repetition 1 of 1
+2023-08-18 20:28:20 INFO Withdrawing rinse2...
+2023-08-18 20:28:34 INFO 
+2023-08-18 20:28:48 INFO 
+2023-08-18 20:29:10 INFO Updating rinse2 volume...
+2023-08-18 20:29:10 INFO Writing rinse2 volume to vial file...
+2023-08-18 20:29:24 INFO 
+2023-08-18 20:29:24 INFO Purging...
+2023-08-18 20:29:38 INFO 
+2023-08-18 20:29:52 INFO 
+2023-08-18 20:29:58 INFO Updating rinse2 volume...
+2023-08-18 20:29:58 INFO Writing rinse2 volume to vial file...
+2023-08-18 20:30:12 INFO 
+2023-08-18 20:30:12 INFO Infusing rinse2 into well F8...
+2023-08-18 20:30:26 INFO 
+2023-08-18 20:30:40 INFO 
+2023-08-18 20:30:57 INFO Well F8 volume: 120.000000
+2023-08-18 20:31:11 INFO 
+2023-08-18 20:31:11 INFO Purging...
+2023-08-18 20:31:25 INFO 
+2023-08-18 20:31:39 INFO 
+2023-08-18 20:31:45 INFO Updating rinse2 volume...
+2023-08-18 20:31:45 INFO Writing rinse2 volume to vial file...
+2023-08-18 20:31:59 INFO 
+2023-08-18 20:31:59 INFO Clearing well F8 with 1x repetitions of 120.000000
+2023-08-18 20:31:59 INFO Repitition 1 of 1
+2023-08-18 20:32:13 INFO 
+2023-08-18 20:32:27 INFO 
+2023-08-18 20:33:00 INFO 
+2023-08-18 20:33:00 INFO Moving to purge vial...
+2023-08-18 20:33:14 INFO 
+2023-08-18 20:33:28 INFO 
+2023-08-18 20:33:28 INFO Purging...
+2023-08-18 20:33:52 INFO Updating rinse2 volume...
+2023-08-18 20:33:52 INFO Writing rinse2 volume to vial file...
+2023-08-18 20:34:06 INFO 
+2023-08-18 20:34:06 INFO Remaining volume in well: 0
+2023-08-18 20:34:06 INFO Well rinsed
+2023-08-18 20:34:06 INFO Beginning eChem characterization of well: F8
+2023-08-18 20:34:06 INFO Infuse ferrocene into well F8...
+2023-08-18 20:34:06 INFO Repetition 1 of 2
+2023-08-18 20:34:06 INFO Withdrawing ferrocene...
+2023-08-18 20:34:20 INFO 
+2023-08-18 20:34:34 INFO 
+2023-08-18 20:34:59 INFO Updating ferrocene volume...
+2023-08-18 20:34:59 INFO Writing ferrocene volume to vial file...
+2023-08-18 20:35:13 INFO 
+2023-08-18 20:35:13 INFO Purging...
+2023-08-18 20:35:27 INFO 
+2023-08-18 20:35:41 INFO 
+2023-08-18 20:35:47 INFO Updating waste volume...
+2023-08-18 20:35:47 INFO Writing waste volume to vial file...
+2023-08-18 20:36:01 INFO 
+2023-08-18 20:36:01 INFO Infusing ferrocene into well F8...
+2023-08-18 20:36:15 INFO 
+2023-08-18 20:36:29 INFO 
+2023-08-18 20:36:49 INFO Well F8 volume: 145.000000
+2023-08-18 20:37:03 INFO 
+2023-08-18 20:37:03 INFO Purging...
+2023-08-18 20:37:17 INFO 
+2023-08-18 20:37:31 INFO 
+2023-08-18 20:37:37 INFO Updating waste volume...
+2023-08-18 20:37:37 INFO Writing waste volume to vial file...
+2023-08-18 20:37:51 INFO 
+2023-08-18 20:37:51 INFO Repetition 2 of 2
+2023-08-18 20:37:51 INFO Withdrawing ferrocene...
+2023-08-18 20:38:05 INFO 
+2023-08-18 20:38:19 INFO 
+2023-08-18 20:38:44 INFO Updating ferrocene volume...
+2023-08-18 20:38:44 INFO Writing ferrocene volume to vial file...
+2023-08-18 20:38:58 INFO 
+2023-08-18 20:38:58 INFO Purging...
+2023-08-18 20:39:12 INFO 
+2023-08-18 20:39:26 INFO 
+2023-08-18 20:39:31 INFO Updating waste volume...
+2023-08-18 20:39:31 INFO Writing waste volume to vial file...
+2023-08-18 20:39:45 INFO 
+2023-08-18 20:39:45 INFO Infusing ferrocene into well F8...
+2023-08-18 20:39:59 INFO 
+2023-08-18 20:40:13 INFO 
+2023-08-18 20:40:33 INFO Well F8 volume: 290.000000
+2023-08-18 20:40:47 INFO 
+2023-08-18 20:40:47 INFO Purging...
+2023-08-18 20:41:01 INFO 
+2023-08-18 20:41:15 INFO 
+2023-08-18 20:41:21 INFO Updating waste volume...
+2023-08-18 20:41:21 INFO Writing waste volume to vial file...
+2023-08-18 20:41:35 INFO 
+2023-08-18 20:41:35 INFO Characterizing well: F8
+2023-08-18 20:41:35 INFO Beginning eChem OCP of well: F8
+2023-08-18 20:41:49 INFO 
+2023-08-18 20:42:03 INFO 
+2023-08-18 20:43:36 INFO 
+2023-08-18 20:43:48 INFO MPos coordinates: X = -225.0, Y = -107.0, Z = 0.0
+2023-08-18 20:44:02 INFO 
+2023-08-18 20:44:16 INFO 
+2023-08-18 20:44:30 INFO 
+2023-08-18 20:44:44 INFO 
+2023-08-18 20:44:44 INFO Clearing well F8 with 2x repetitions of 145.000000
+2023-08-18 20:44:44 INFO Repitition 1 of 2
+2023-08-18 20:44:58 INFO 
+2023-08-18 20:45:13 INFO 
+2023-08-18 20:45:49 INFO 
+2023-08-18 20:45:49 INFO Moving to purge vial...
+2023-08-18 20:46:03 INFO 
+2023-08-18 20:46:17 INFO 
+2023-08-18 20:46:17 INFO Purging...
+2023-08-18 20:46:45 INFO Updating waste volume...
+2023-08-18 20:46:45 INFO Writing waste volume to vial file...
+2023-08-18 20:46:59 INFO 
+2023-08-18 20:46:59 INFO Remaining volume in well: 145
+2023-08-18 20:46:59 INFO Repitition 2 of 2
+2023-08-18 20:47:13 INFO 
+2023-08-18 20:47:27 INFO 
+2023-08-18 20:48:03 INFO 
+2023-08-18 20:48:03 INFO Moving to purge vial...
+2023-08-18 20:48:17 INFO 
+2023-08-18 20:48:31 INFO 
+2023-08-18 20:48:31 INFO Purging...
+2023-08-18 20:48:59 INFO Updating waste volume...
+2023-08-18 20:48:59 INFO Writing waste volume to vial file...
+2023-08-18 20:49:13 INFO 
+2023-08-18 20:49:13 INFO Remaining volume in well: 0
+2023-08-18 20:49:13 INFO Flushing with dmf...
+2023-08-18 20:49:27 INFO 
+2023-08-18 20:49:46 INFO 
+2023-08-18 20:50:17 INFO 
+2023-08-18 20:50:31 INFO 
+2023-08-18 20:50:45 INFO 
+2023-08-18 20:51:09 INFO Updating waste volume...
+2023-08-18 20:51:09 INFO Writing waste volume to vial file...
+2023-08-18 20:51:23 INFO 
+2023-08-18 20:51:23 INFO Rinsing well F8 3x...
+2023-08-18 20:51:23 INFO Rinse 1 of 3
+2023-08-18 20:51:23 INFO Repetition 1 of 1
+2023-08-18 20:51:23 INFO Withdrawing rinse0...
+2023-08-18 20:51:37 INFO 
+2023-08-18 20:51:51 INFO 
+2023-08-18 20:52:12 INFO Updating rinse0 volume...
+2023-08-18 20:52:12 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:52:27 INFO 
+2023-08-18 20:52:27 INFO Purging...
+2023-08-18 20:52:41 INFO 
+2023-08-18 20:52:55 INFO 
+2023-08-18 20:53:00 INFO Updating rinse0 volume...
+2023-08-18 20:53:00 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:53:14 INFO 
+2023-08-18 20:53:14 INFO Infusing rinse0 into well F8...
+2023-08-18 20:53:28 INFO 
+2023-08-18 20:53:42 INFO 
+2023-08-18 20:53:59 INFO Well F8 volume: 120.000000
+2023-08-18 20:54:13 INFO 
+2023-08-18 20:54:13 INFO Purging...
+2023-08-18 20:54:27 INFO 
+2023-08-18 20:54:41 INFO 
+2023-08-18 20:54:47 INFO Updating rinse0 volume...
+2023-08-18 20:54:47 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:55:01 INFO 
+2023-08-18 20:55:01 INFO Clearing well F8 with 1x repetitions of 120.000000
+2023-08-18 20:55:01 INFO Repitition 1 of 1
+2023-08-18 20:55:15 INFO 
+2023-08-18 20:55:29 INFO 
+2023-08-18 20:56:03 INFO 
+2023-08-18 20:56:03 INFO Moving to purge vial...
+2023-08-18 20:56:17 INFO 
+2023-08-18 20:56:31 INFO 
+2023-08-18 20:56:31 INFO Purging...
+2023-08-18 20:56:54 INFO Updating rinse0 volume...
+2023-08-18 20:56:54 INFO Writing rinse0 volume to vial file...
+2023-08-18 20:57:08 INFO 
+2023-08-18 20:57:08 INFO Remaining volume in well: 0
+2023-08-18 20:57:08 INFO Rinse 2 of 3
+2023-08-18 20:57:08 INFO Repetition 1 of 1
+2023-08-18 20:57:08 INFO Withdrawing rinse1...
+2023-08-18 20:57:22 INFO 
+2023-08-18 20:57:36 INFO 
+2023-08-18 20:57:58 INFO Updating rinse1 volume...
+2023-08-18 20:57:58 INFO Writing rinse1 volume to vial file...
+2023-08-18 20:58:12 INFO 
+2023-08-18 20:58:12 INFO Purging...
+2023-08-18 20:58:26 INFO 
+2023-08-18 20:58:40 INFO 
+2023-08-18 20:58:46 INFO Updating rinse1 volume...
+2023-08-18 20:58:46 INFO Writing rinse1 volume to vial file...
+2023-08-18 20:59:00 INFO 
+2023-08-18 20:59:00 INFO Infusing rinse1 into well F8...
+2023-08-18 20:59:14 INFO 
+2023-08-18 20:59:28 INFO 
+2023-08-18 20:59:45 INFO Well F8 volume: 120.000000
+2023-08-18 20:59:59 INFO 
+2023-08-18 20:59:59 INFO Purging...
+2023-08-18 21:00:13 INFO 
+2023-08-18 21:00:27 INFO 
+2023-08-18 21:00:33 INFO Updating rinse1 volume...
+2023-08-18 21:00:33 INFO Writing rinse1 volume to vial file...
+2023-08-18 21:00:47 INFO 
+2023-08-18 21:00:47 INFO Clearing well F8 with 1x repetitions of 120.000000
+2023-08-18 21:00:47 INFO Repitition 1 of 1
+2023-08-18 21:01:01 INFO 
+2023-08-18 21:01:15 INFO 
+2023-08-18 21:01:48 INFO 
+2023-08-18 21:01:48 INFO Moving to purge vial...
+2023-08-18 21:02:02 INFO 
+2023-08-18 21:02:17 INFO 
+2023-08-18 21:02:17 INFO Purging...
+2023-08-18 21:02:40 INFO Updating rinse1 volume...
+2023-08-18 21:02:40 INFO Writing rinse1 volume to vial file...
+2023-08-18 21:02:54 INFO 
+2023-08-18 21:02:54 INFO Remaining volume in well: 0
+2023-08-18 21:02:54 INFO Rinse 3 of 3
+2023-08-18 21:02:54 INFO Repetition 1 of 1
+2023-08-18 21:02:54 INFO Withdrawing rinse2...
+2023-08-18 21:03:08 INFO 
+2023-08-18 21:03:22 INFO 
+2023-08-18 21:03:44 INFO Updating rinse2 volume...
+2023-08-18 21:03:44 INFO Writing rinse2 volume to vial file...
+2023-08-18 21:03:58 INFO 
+2023-08-18 21:03:58 INFO Purging...
+2023-08-18 21:04:12 INFO 
+2023-08-18 21:04:26 INFO 
+2023-08-18 21:04:32 INFO Updating rinse2 volume...
+2023-08-18 21:04:32 INFO Writing rinse2 volume to vial file...
+2023-08-18 21:04:46 INFO 
+2023-08-18 21:04:46 INFO Infusing rinse2 into well F8...
+2023-08-18 21:05:00 INFO 
+2023-08-18 21:05:14 INFO 
+2023-08-18 21:05:31 INFO Well F8 volume: 120.000000
+2023-08-18 21:05:45 INFO 
+2023-08-18 21:05:45 INFO Purging...
+2023-08-18 21:05:59 INFO 
+2023-08-18 21:06:13 INFO 
+2023-08-18 21:06:19 INFO Updating rinse2 volume...
+2023-08-18 21:06:19 INFO Writing rinse2 volume to vial file...
+2023-08-18 21:06:33 INFO 
+2023-08-18 21:06:33 INFO Clearing well F8 with 1x repetitions of 120.000000
+2023-08-18 21:06:33 INFO Repitition 1 of 1
+2023-08-18 21:06:47 INFO 
+2023-08-18 21:07:01 INFO 

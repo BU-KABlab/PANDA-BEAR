@@ -5,8 +5,9 @@
         "x": -2,
         "y": -43,
         "name": "custom",
-        "volume": 20000,
-        "capacity": 20000
+        "volume": 5260.0,
+        "capacity": 20000,
+        "contamination": 1
     },
     {
         "solution": "S1",
@@ -41,9 +42,9 @@
         "x": -2,
         "y": -175,
         "name": "ferrocene",
-        "volume": 20000.0,
+        "volume": 13890.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 1
     },
     {
         "solution": "R0",
@@ -51,9 +52,9 @@
         "x": -2,
         "y": -208,
         "name": "rinse0",
-        "volume": 20000.0,
+        "volume": 9680.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 1
     },
     {
         "solution": "R1",
@@ -61,9 +62,9 @@
         "x": -2,
         "y": -241,
         "name": "rinse1",
-        "volume": 20000.0,
+        "volume": 9680.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 1
     },
     {
         "solution": "R2",
@@ -71,8 +72,8 @@
         "x": -2,
         "y": -274,
         "name": "rinse2",
-        "volume": 2000.0,
+        "volume": 9680.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 1
     }
 ]

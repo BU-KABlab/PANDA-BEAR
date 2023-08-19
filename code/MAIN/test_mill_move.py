@@ -14,26 +14,29 @@
 from classes import Wells, MillControl
 import gamrycontrol as echem
 import Analyzer as analyzer
-from run_experiments import read_vials
+from run_experiments import read_vials, set_up_pump, withdraw, infuse
+mill = MillControl()
+wellplate = Wells(-218, -74, 0, 0)
+pump = set_up_pump()
+stock_vials = read_vials('vial_status.json')
+waste_vials = read_vials('waste_status.json')
 
 def main():
-    mill = MillControl()
-    wellplate = Wells(-218, -74, 0, 0)
-    
-    stock_vials = read_vials('vial_status.json')
-    waste_vials = read_vials('waste_status.json')
-    ferrocene_vial = stock_vials['ferrocene']
-    ferrocene_coordinates = ferrocene_vial.coordinates
-    mill.move_pipette_to_position(ferrocene_coordinates['x'],ferrocene_coordinates['y'],0)
-    mill.move_pipette_to_position(ferrocene_coordinates['x'],ferrocene_coordinates['y'],ferrocene_vial.bottom)
+    input("Press enter to finish.")
 
-    mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],0)
-    mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],-67)
-    mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'], wellplate.depth('F6'))
+def interactive():
+    # ferrocene_vial = stock_vials[4]
+    # ferrocene_coordinates = ferrocene_vial.coordinates
+    # mill.move_pipette_to_position(ferrocene_coordinates['x'],ferrocene_coordinates['y'],0)
+    # mill.move_pipette_to_position(ferrocene_coordinates['x'],ferrocene_coordinates['y'],ferrocene_vial.bottom)
 
-    mill.move_electrode_to_position(-200,-240,0)
-    mill.move_electrode_to_position(-200,-240,-20)
-    mill.rinse_electrode()
+    # mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],0)
+    # mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'],-67)
+    # mill.move_electrode_to_position(wellplate.get_coordinates('F6')['x'], wellplate.get_coordinates('F6')['y'], wellplate.depth('F6'))
+
+    # mill.move_electrode_to_position(-200,-240,0)
+    # mill.move_electrode_to_position(-200,-240,-20)
+    # mill.rinse_electrode()
 
     while True:
         print("Select an operation:")
