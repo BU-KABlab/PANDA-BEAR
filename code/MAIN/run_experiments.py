@@ -18,10 +18,13 @@ def read_vials(filename):
     """
     Read in the virtual vials from the json file
     """
-    cwd = pathlib.Path(__file__).parents[0]
-    filename_ob = cwd / filename
-    vial_parameters = json.load(open(filename_ob))
+    # pathlib Paths override the '/' operator so you can use them like in strings to join
+    # Always use "with" to make sure your file is properly closed
+    # I would also turn vial_params into a dataclass
+    with open(pathlib.Path(__file__).parent / filename) as f: 
+        vial_parameters = json.load(f)
 
+    # This whole section would disappear by using Pydantic
     sol_objects = []
     for items in vial_parameters:
         sol_objects.append(
@@ -40,6 +43,9 @@ def read_vials(filename):
     return sol_objects
 
 
+# I would move pump related things to pump.py
+# Separation of concerns helps make it easier to reason about code, 
+# and remove uneccessary dependencies in this file like nesp_lib
 def set_up_pump():
     """
     Set up the WPI syringe pump.
@@ -65,6 +71,7 @@ def withdraw(volume: float, rate: float, ser_pump: object):
         depth (float): Depth to plunge from the specified position in millimeters.
         rate (float): Pumping rate in milliliters per minute.
     """
+    # Great documentation!
     # Perform the withdrawl
 
     ## convert the volume argument from ul to ml
@@ -94,7 +101,9 @@ def withdraw(volume: float, rate: float, ser_pump: object):
 
     return 0
 
-
+# Given the use of different units in here, you might consider enumerating the ones
+# and let the type checking ensure the right units are being passed around. 
+# Something like https://github.com/hgrecco/pint
 def infuse(volume: float, rate: float, ser_pump: object):
     """
     Infuse the given volume at the given rate and depth from the specified position.
@@ -143,7 +152,11 @@ def purge(purge_vial: Vial, pump: object, purge_volume=20.00, pumping_rate=0.4):
 
     logging.debug(f"Purge vial new volume: {purge_vial.volume}")
 
-
+# Unless your building a library, if your functions start to have more than 5 parameters you likely should create some 
+# dataclasses to contain the values or a class that can hold state to perform this on.
+# For example you could make an object called "apparatus" to store the things that don't change during a campaign such as
+# wellplate, pump, mill, solutions, pumping_rate, and the waste vial information
+# then calls would look more like pipette(apparatus, solution_name, target_well) or even apparatus.pipette(solution_name, target_well)
 def pipette(
     volume: float,  # volume in ul
     solutions: list,
@@ -504,7 +517,10 @@ def save_runtime_data(run_times: dict, filename: str):
 #     echem.pstat.Open()  # open connection to pstat
 #     logging.info("Pstat connected: ", devices.EnumSections()[0])
 
-
+# There's nothing wrong with reading from the disk every time since performance really isn't an issue.
+# However, unless you have multiple processes running at once this adds an uneccessary point of fragility
+# This whole function could be replaced by a field lookup, and you could write the information to disk when you change it.
+# e.g. wells.get_status(well_id) and occassionally wells.set_status(well_id, status) which could write changes to disk.
 def check_well_status(well_to_check: str):
     """
     Checks the status of a well in well_status.json.
@@ -522,7 +538,7 @@ def check_well_status(well_to_check: str):
                 continue
         return "none"
 
-
+# Similarly this would be a quick function on a Wells class, instead of having to read from disk
 def choose_alternative_well(well: str):
     """
     Chooses an alternative well if the target well is not available.
