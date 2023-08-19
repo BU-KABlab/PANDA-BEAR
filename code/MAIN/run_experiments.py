@@ -338,11 +338,8 @@ def clear_well(
 
 def print_runtime_data(runtime_data: dict):
     """Print the runtimes to the console"""
-    for well, data in runtime_data.items():
-        logging.info("Well %s Runtimes:", well)
-        for section, runtime in data.items():
-            minutes = runtime / 60
-            logging.info("%s: %f minutes", section, minutes)
+    for key in runtime_data:
+        logging.info("%s: %f minutes", key, runtime_data[key] / 60)
 
 
 def rinse(
