@@ -2,3 +2,6 @@
     code\MAIN\experiments_completed\**
     code\MAIN\experiments_error\**
     code\MAIN\experiment_queue\**
+
+#Untracked files
+*.pyc
