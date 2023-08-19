@@ -54,7 +54,7 @@ def set_up_pump():
     pump.syringe_diameter = 4.699  # millimeters
     pump.volume_infused_clear()
     pump.volume_withdrawn_clear()
-    logging.info(f"Pump found at address: {pump.address}")
+    logging.info("Pump found at address: %s", pump.address)
     time.sleep(2)
     return pump
 
@@ -129,7 +129,7 @@ def infuse(volume: float, rate: float, ser_pump: object):
             pass
         # logging.debug("Done infusing")
         time.sleep(2)
-        logging.debug(f"Pump has infused: {ser_pump.volume_infused} ml")
+        logging.debug("Pump has infused: %f ml", ser_pump.volume_infused)
     else:
         pass
     return 0
@@ -179,9 +179,7 @@ def pipette(
             # solution = solution_selector(solution_name, repetition_vol)
             solution = solution_selector(solutions, solution_name, repetition_vol)
             # purge_vial = waste_selector(waste_solution_name, repetition_vol)
-            purge_vial = waste_selector(
-                waste_vials, waste_solution_name, repetition_vol
-            )
+            purge_vial = waste_selector(waste_vials, waste_solution_name, repetition_vol)
             ## First half: pick up solution
             logging.info("Withdrawing %s...", solution.name)
             mill.move_pipette_to_position(
@@ -449,7 +447,7 @@ def solution_selector(solutions: list, solution_name: str, volume: float):
             volume + 1000
         ):
             return solution
-    raise Exception("%s not found in list of solutions", solution_name)
+    raise Exception(f"{solution_name} not found in list of solutions")
 
 
 # def solution_selector(solution_name: str, volume: float):
@@ -471,13 +469,12 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
     Select the solution from the list of solutions
     """
     solution_found = False
-    for solution in solutions:
-        if (
-            solution.name.lower() == solution_name.lower()
-            and (solution.volume + volume) < solution.capacity
+    solution_name = solution_name.lower()
+    for waste_solution in solutions:
+        if (waste_solution.name.lower() == solution_name and (waste_solution.volume + volume) < waste_solution.capacity
         ):
             solution_found = True
-            return solution
+            return waste_solution
     if solution_found is False:
         raise Exception(f"{solution_name} not found in list of solutions")
 
@@ -510,7 +507,7 @@ def save_runtime_data(run_times: dict, filename: str):
     cwd = pathlib.Path(__file__).parents[1]
     file_path = cwd / "run_times"
     file_to_save = file_path / (filename + ".json")
-    with open(file_to_save, "w") as f:
+    with open(file_to_save, "w", encoding='UTF-8') as f:
         json.dump(run_times, f)
 
 
@@ -722,12 +719,12 @@ def save_completed_instructions(instructions: list, filename: str):
     else:
         return False
 
-    with open(file_to_save, "w") as f:
+    with open(file_to_save, "w", encoding = 'UTF-8') as f:
         json.dump(instructions, f, indent=4)
-        print(f"Experiment {filename} saved to {file_to_save}.")
+        logging.info("Experiment %s saved to %s",filename, file_to_save)
 
     os.remove(queue_file_path / (filename))
-    print(f"Experiment {filename} removed from queue.")
+    logging.info("Experiment %s removed from queue",filename)
 
 
 def write_json(data: dict, filename: str):
@@ -792,7 +789,7 @@ def deposition(current_well, instructions, mill, wellplate, experiment_id):
         wellplate.get_coordinates(current_well)["y"],
         wellplate.echem_height,
     )  # move to well depth
-    complete_file_name = echem.setfilename(current_well, "OCP")
+    complete_file_name = echem.setfilename(experiment_id, "OCP")
     echem.OCP(
         echem.OCPvi,
         echem.OCPti,
