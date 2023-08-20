@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import regex as re
 import serial
 
-
 class Wells:
     """
     Position of well plate and each well in it.

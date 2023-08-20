@@ -8,11 +8,9 @@ import datetime
 import time
 import sys
 import nesp_lib
-import pump
 import print_panda
-from classes import Vial, MillControl as mill, Wells
+from classes import Vial, MillControl, Wells #TODO import MillControl as mill and adjust functions accordingly
 import gamrycontrol as echem
-from slack_functions import send_slack_message
 
 # import obs_controls as obs
 import Analyzer as analyzer
@@ -44,7 +42,24 @@ def read_vials(filename):
         )
     return sol_objects
 
-def withdraw(volume: float, rate: float):
+
+def set_up_pump():
+    """
+    Set up the WPI syringe pump.
+    Returns:
+        Pump: Initialized pump object.
+    """
+    pump_port = nesp_lib.Port("COM5", 19200)
+    pump = nesp_lib.Pump(pump_port)
+    pump.syringe_diameter = 4.699  # millimeters
+    pump.volume_infused_clear()
+    pump.volume_withdrawn_clear()
+    logging.info("Pump found at address: %s", pump.address)
+    time.sleep(2)
+    return pump
+
+
+def withdraw(volume: float, rate: float, ser_pump: object):
     """
     Withdraw the given volume at the given rate and depth from the specified position.
     Args:
@@ -59,33 +74,33 @@ def withdraw(volume: float, rate: float):
     volume = volume / 1000
 
     if (
-        pump.volume_withdrawn + volume > 0.2
+        ser_pump.volume_withdrawn + volume > 0.2
     ):  # 0.2 is the maximum volume for the pipette tip
         raise Exception(
             "The command to withdraw %f ml will overfill the 0.2 ml pipette with %f ml inside. Stopping run",
             volume,
-            pump.volume_withdrawn,
+            ser_pump.volume_withdrawn,
         )
     else:
-        pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
-        pump.pumping_volume = (
+        ser_pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+        ser_pump.pumping_volume = (
             volume  # Sets the pumping volume of the pump in units of milliliters.
         )
-        pump.pumping_rate = rate  # in units of milliliters per minute.
-        pump.run()
+        ser_pump.pumping_rate = rate  # in units of milliliters per minute.
+        ser_pump.run()
         logging.debug("Withdrawing...")
         time.sleep(0.5)
-        while pump.running:
+        while ser_pump.running:
             pass
         logging.debug("Done withdrawing")
         time.sleep(2)
 
-        logging.debug("Pump has withdrawn: %f ml", pump.volume_withdrawn)
+        logging.debug("Pump has withdrawn: %f ml", ser_pump.volume_withdrawn)
 
     return 0
 
 
-def infuse(volume: float, rate: float):
+def infuse(volume: float, rate: float, ser_pump: object):
     """
     Infuse the given volume at the given rate and depth from the specified position.
     Args:
@@ -102,25 +117,25 @@ def infuse(volume: float, rate: float):
     volume = volume / 1000
 
     if volume > 0.0:
-        pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
-        pump.pumping_volume = (
+        ser_pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+        ser_pump.pumping_volume = (
             volume  # Sets the pumping volume of the pump in units of milliliters.
         )
-        pump.pumping_rate = rate  # Sets the pumping rate of the pump in units of milliliters per minute.
-        pump.run()
+        ser_pump.pumping_rate = rate  # Sets the pumping rate of the pump in units of milliliters per minute.
+        ser_pump.run()
         logging.debug("Infusing...")
         time.sleep(0.5)
-        while pump.running:
+        while ser_pump.running:
             pass
         # logging.debug("Done infusing")
         time.sleep(2)
-        logging.debug("Pump has infused: %f ml", pump.volume_infused)
+        logging.debug("Pump has infused: %f ml", ser_pump.volume_infused)
     else:
         pass
     return 0
 
 
-def purge(purge_vial: Vial, purge_volume=20.00, pumping_rate=0.4):
+def purge(purge_vial: Vial, pump: object, purge_volume=20.00, pumping_rate=0.4):
     """
     Perform purging from the pipette.
     Args:
@@ -143,6 +158,8 @@ def pipette(
     waste_vials: list,
     waste_solution_name: str,
     wellplate: Wells,
+    pump: object,
+    mill: object,
     purge_volume=20.00,
 ):
     """
@@ -244,7 +261,9 @@ def clear_well(
     target_well: str,
     wellplate: object,
     pumping_rate: float,
+    pump: object,
     waste_vials: list,
+    mill: object,
     solution_name="waste",
 ):
     """
@@ -320,14 +339,16 @@ def clear_well(
 def print_runtime_data(runtime_data: dict):
     """Print the runtimes to the console"""
     for key in runtime_data:
-        logging.info("%s: %f minutes", key, runtime_data[key] / 60)
+        logging.info("%s: %f", key, runtime_data[key])
 
 
 def rinse(
     wellplate: object,
     target_well: str,
     pumping_rate: float,
+    pump: object,
     waste_vials: list,
+    mill: object,
     stock_vials: list,
     rinse_repititions=3,
     rinse_vol=150,
@@ -351,21 +372,27 @@ def rinse(
             waste_vials,
             rinse_solution_name,
             wellplate,
+            pump,
+            mill,
         )
         clear_well(
             rinse_vol,
             target_well,
             wellplate,
             pumping_rate,
+            pump,
             waste_vials,
+            mill,
             solution_name=rinse_solution_name,
         )
 
 
 def flush_pipette_tip(
+    pump: object,
     waste_vials: list,
     stock_vials: list,
     flush_solution_name: str,
+    mill: object,
     pumping_rate=0.4,
     flush_volume=120,
 ):
@@ -382,14 +409,14 @@ def flush_pipette_tip(
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
-    withdraw(20, pumping_rate)
+    withdraw(20, pumping_rate, pump)
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"],
         flush_solution.coordinates["y"],
         flush_solution.bottom,
     )  # depth replaced with height
     logging.debug("Withdrawing %s...", flush_solution.name)
-    withdraw(flush_volume, pumping_rate)
+    withdraw(flush_volume, pumping_rate, pump)
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
@@ -402,7 +429,7 @@ def flush_pipette_tip(
         purge_vial.coordinates["x"], purge_vial.coordinates["y"], purge_vial.height
     )  # purge_vial.depth replaced with height
     logging.debug("Purging...")
-    purge(purge_vial, flush_volume + 20)
+    purge(purge_vial, pump, flush_volume + 20)
     mill.move_pipette_to_position(
         purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
     )  # move back to safe height (top)
@@ -417,7 +444,7 @@ def solution_selector(solutions: list, solution_name: str, volume: float):
             volume + 1000
         ):
             return solution
-    raise MissingSolution(f"{solution_name} not found in list of solutions")
+    raise Exception(f"{solution_name} not found in list of solutions")
 
 
 # def solution_selector(solution_name: str, volume: float):
@@ -739,7 +766,7 @@ def update_experiment_recipt(
     return experiment
 
 
-def deposition(current_well, instructions, wellplate, experiment_id):
+def deposition(current_well, instructions, mill, wellplate, experiment_id):
     """Deposition of the solutions onto the substrate"""
     ## echem setup
     logging.info("\n\nSetting up eChem experiments...")
@@ -805,7 +832,7 @@ def deposition(current_well, instructions, wellplate, experiment_id):
     return instructions
 
 
-def characterization(current_well, instructions, wellplate, experiment_id):
+def characterization(current_well, instructions, mill, wellplate, experiment_id):
     """Characterization of the solutions on the substrate"""
     logging.info("Characterizing well: %s", current_well)
     ## echem OCP
@@ -872,7 +899,7 @@ def characterization(current_well, instructions, wellplate, experiment_id):
     return instructions
 
 
-def run_experiment(instructions, instructions_filename):
+def run_experiment(instructions, instructions_filename, mill, pump):
     """
     Run the experiment
     """
@@ -951,13 +978,17 @@ def run_experiment(instructions, instructions_filename):
                     pumping_rate=pumping_rate,
                     waste_vials=waste_vials,
                     waste_solution_name="waste",
-                    wellplate=wellplate
+                    wellplate=wellplate,
+                    pump=pump,
+                    mill=mill,
                 )
 
                 flush_pipette_tip(
+                    pump,
                     waste_vials,
                     stock_vials,
                     flush_sol,
+                    mill,
                     pumping_rate,
                     flush_vol,
                 )
@@ -966,7 +997,7 @@ def run_experiment(instructions, instructions_filename):
 
         if instructions["ca"] == 1:
             instructions = deposition(
-                current_well, instructions, wellplate, experiment_id
+                current_well, instructions, mill, wellplate, experiment_id
             )
 
             record_time_step("Deposition completed", run_times)
@@ -981,7 +1012,9 @@ def run_experiment(instructions, instructions_filename):
                 target_well=current_well,
                 wellplate=wellplate,
                 pumping_rate=pumping_rate,
+                pump=pump,
                 waste_vials=waste_vials,
+                mill=mill,
                 solution_name="waste",
             )
 
@@ -992,7 +1025,9 @@ def run_experiment(instructions, instructions_filename):
                 wellplate,
                 current_well,
                 pumping_rate,
+                pump,
                 waste_vials,
+                mill,
                 stock_vials,
                 rinse_repititions=instructions["rinse_count"],
                 rinse_vol=instructions["rinse_vol"],
@@ -1015,13 +1050,15 @@ def run_experiment(instructions, instructions_filename):
                 pumping_rate=pumping_rate,
                 waste_vials=waste_vials,
                 waste_solution_name="waste",
-                wellplate=wellplate
+                wellplate=wellplate,
+                pump=pump,
+                mill=mill,
             )
 
             record_time_step("Deposited char_sol", run_times)
 
             instructions = characterization(
-                current_well, instructions, wellplate, experiment_id
+                current_well, instructions, mill, wellplate, experiment_id
             )
 
             record_time_step("Characterization complete", run_times)
@@ -1031,7 +1068,9 @@ def run_experiment(instructions, instructions_filename):
                 current_well,
                 wellplate,
                 pumping_rate,
+                pump,
                 waste_vials,
+                mill,
                 "waste",
             )
 
@@ -1039,9 +1078,11 @@ def run_experiment(instructions, instructions_filename):
 
             # Flushing procedure
             flush_pipette_tip(
+                pump,
                 waste_vials,
                 stock_vials,
                 flush_sol,
+                mill,
                 pumping_rate,
                 flush_vol,
             )
@@ -1056,7 +1097,9 @@ def run_experiment(instructions, instructions_filename):
             wellplate,
             current_well,
             pumping_rate,
+            pump,
             waste_vials,
+            mill,
             stock_vials,
             rinse_repititions=instructions["rinse_count"],
             rinse_vol=instructions["rinse_vol"],
@@ -1127,8 +1170,8 @@ def main():
     logging.info("%s new experiments found", new_experiments)
 
     ## Connect to equipment
-    mill.__init__()
-    pump.__init__()
+    mill = MillControl()
+    pump = set_up_pump()
     echem.pstatconnect()
     # obs.OBS_controller()
 
@@ -1138,29 +1181,22 @@ def main():
             instructions, instructions_filename = read_next_experiment_from_queue()
             if instructions is None:
                 logging.info("No instructions in queue")
-                send_slack_message("No instructions in queue...stopping loop")
-
                 break
 
             logging.info("Instructions read from queue")
             logging.info(instructions)
             mill.move_to_safe_position()
-            status = run_experiment(instructions, instructions_filename)
-            log_msg = f"Experiment {instructions['id']} completed with code {status}"
-            logging.info(log_msg)
-            send_slack_message(log_msg)
+            status = run_experiment(instructions, instructions_filename, mill, pump)
+            logging.info(
+                "Experiment %s completed with code %d", instructions["id"], status
+            )
             if status == 0:
                 pass
             elif status == 1:
-                log_msg = f"Experiment {instructions['id']} failed...going to the next experiment"
-                logging.error(log_msg)
-                send_slack_message(log_msg)
+                logging.error("Experiment %s failed", instructions["id"])
             elif status == 2:
-                log_msg = f"Experiment {instructions['id']} stopped by user, stopping loop"
-                logging.warning(log_msg)
-                send_slack_message(log_msg)
+                logging.warning("Experiment %s stopped by user", instructions["id"])
                 break
-
     except Exception as general_exception:
         exception_type, exception_object, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
@@ -1187,9 +1223,6 @@ def main():
         echem.disconnectpstat()
         logging.info("Pstat closed")
 
-class MissingSolution(Exception):
-    """Raised when a solution is missing from the list of solutions"""
-    logging.error("Solution missing from list of solutions")
 
 if __name__ == "__main__":
     # logging.basicConfig(level=20)
