@@ -11,7 +11,7 @@ import nesp_lib
 import print_panda
 from classes import Vial, MillControl, Wells #TODO import MillControl as mill and adjust functions accordingly
 import gamrycontrol as echem
-
+import slack_functions as slack
 # import obs_controls as obs
 import Analyzer as analyzer
 
@@ -1163,7 +1163,7 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     logging.info(print_panda.printpanda())
-
+    slack.send_slack_message('alert', 'ePANDA is starting up')
     ## Check inbox
     logging.info("Checking inbox for new experiments...")
     new_experiments = check_inbox()
@@ -1187,15 +1187,19 @@ def main():
             logging.info(instructions)
             mill.move_to_safe_position()
             status = run_experiment(instructions, instructions_filename, mill, pump)
-            logging.info(
-                "Experiment %s completed with code %d", instructions["id"], status
-            )
+            log_msg = f"Experiment {instructions['id']} completed with code {status}"
+            logging.info(log_msg)
+            slack.send_slack_message('alert', log_msg)
             if status == 0:
                 pass
             elif status == 1:
-                logging.error("Experiment %s failed", instructions["id"])
+                log_msg = f"Experiment {instructions['id']} failed...moving to next experiment"
+                logging.error(log_msg)
+                slack.send_slack_message('alert', log_msg)
             elif status == 2:
-                logging.warning("Experiment %s stopped by user", instructions["id"])
+                log_msg = f"Experiment {instructions['id']} stopped by user...stopping experiments"
+                logging.warning(log_msg)
+                slack.send_slack_message('alert', log_msg)
                 break
     except Exception as general_exception:
         exception_type, exception_object, exception_traceback = sys.exc_info()
@@ -1222,6 +1226,7 @@ def main():
         logging.info("Pump closed")
         echem.disconnectpstat()
         logging.info("Pstat closed")
+        slack.send_slack_message('alert', 'ePANDA is shutting down')
 
 
 if __name__ == "__main__":

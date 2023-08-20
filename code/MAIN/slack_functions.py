@@ -5,7 +5,7 @@ import slack_credentials as slack_cred
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-def send_slack_message(message):
+def send_slack_message(channel: str, message):
     """
     Sends a message to a Slack channel using the Slack API.
 
@@ -17,10 +17,14 @@ def send_slack_message(message):
     """
     # WebClient insantiates a client that can call API methods
     # When using Bolt, you can use either `app.client` or the `client` passed to listeners.
-    client = WebClient(slack_cred.o_auth_token)
+    client = WebClient(slack_cred.token)
     # ID of the channel you want to send the message to
-    #channel_id = slack_cred.epabda_conversation #epanda-alerts channel
-    channel_id = slack_cred.epabda_alerts_channel_id #epanda-alerts channel
+    if channel == 'conversation':
+        channel_id = slack_cred.conversation_channel_id #epanda-alerts channel
+    elif channel == 'alert':
+        channel_id = slack_cred.alert_channel_id #epanda-alerts channel
+    else:
+        return 'No applicable channel'
 
     try:
         # Call the chat.postMessage method using the WebClient
@@ -35,4 +39,4 @@ def send_slack_message(message):
 
 if __name__ == "__main__":
     MESSAGE = "This is a test message."
-    send_slack_message(MESSAGE)
+    send_slack_message('alert', MESSAGE)
