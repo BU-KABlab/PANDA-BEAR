@@ -4,7 +4,7 @@ import pathlib
 import math
 import logging
 import os
-import datetime
+from datetime import datetime
 import time
 import sys
 import nesp_lib
@@ -14,6 +14,7 @@ import gamrycontrol as echem
 import slack_functions as slack
 # import obs_controls as obs
 import Analyzer as analyzer
+from pump import Pump
 
 
 def read_vials(filename):
@@ -336,12 +337,6 @@ def clear_well(
         logging.info("Remaining volume in well: %d", wellplate.volume(target_well))
 
 
-def print_runtime_data(runtime_data: dict):
-    """Print the runtimes to the console"""
-    for key in runtime_data:
-        logging.info("%s: %f", key, runtime_data[key])
-
-
 def rinse(
     wellplate: object,
     target_well: str,
@@ -489,23 +484,6 @@ def waste_selector(solutions: list, solution_name: str, volume: float):
 #         else:
 #             pass
 #     raise Exception("%s not found in list of waste vials or not capacity vials", solution_name)
-
-
-def record_time_step(step: str, run_times: dict):
-    '''Record the time of a step in the run_times dictionary'''
-    current_time = int(time.time())
-    sub_key = step + " Time"
-    run_times[sub_key] = current_time
-    # print(f'{step} time: {run_times[well][sub_key]}')
-
-
-def save_runtime_data(run_times: dict, filename: str):
-    """Save the run times to a json file in code/run_times"""
-    cwd = pathlib.Path(__file__).parents[1]
-    file_path = cwd / "run_times"
-    file_to_save = file_path / (filename + ".json")
-    with open(file_to_save, "w", encoding='UTF-8') as f:
-        json.dump(run_times, f)
 
 
 # def connect_to_pstat():
@@ -947,8 +925,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
         current_well = instructions["target_well"]
         # replicates = instructions["replicates"]
         # wellstatus = instructions["status"]
-        run_times = {}
-        record_time_step("Start", run_times)
+        logging.info("Start: %f", datetime.now)
 
         ## Fetch parameters from isntructions
         pumping_rate = instructions["pump_rate"]
@@ -993,14 +970,14 @@ def run_experiment(instructions, instructions_filename, mill, pump):
                     flush_vol,
                 )
 
-        record_time_step("Pipetted solutions", run_times)
+        logging.info("Pipetted solutions: %f", datetime.now())
 
         if instructions["ca"] == 1:
             instructions = deposition(
                 current_well, instructions, mill, wellplate, experiment_id
             )
 
-            record_time_step("Deposition completed", run_times)
+            logging.info("Deposition completed: %f", datetime.now())
 
             instructions = update_experiment_recipt(
                 instructions, "status", "deposition", instructions_filename
@@ -1018,7 +995,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
                 solution_name="waste",
             )
 
-            record_time_step("Cleared dep_sol", run_times)
+            logging.info("Cleared dep_sol: %f", datetime.now())
 
             ## Rinse the well 3x
             rinse(
@@ -1033,7 +1010,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
                 rinse_vol=instructions["rinse_vol"],
             )
 
-            record_time_step("Rinsed well", run_times)
+            logging.info("Rinsed well: %f", datetime.now())
             logging.info("Well rinsed")
 
         ## Echem CV - characterization
@@ -1055,13 +1032,13 @@ def run_experiment(instructions, instructions_filename, mill, pump):
                 mill=mill,
             )
 
-            record_time_step("Deposited char_sol", run_times)
+            logging.info("Deposited char_sol: %f", datetime.now())
 
             instructions = characterization(
                 current_well, instructions, mill, wellplate, experiment_id
             )
 
-            record_time_step("Characterization complete", run_times)
+            logging.info("Characterization complete: %f", datetime.now())
 
             clear_well(
                 char_vol,
@@ -1074,7 +1051,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
                 "waste",
             )
 
-            record_time_step("Well cleared", run_times)
+            logging.info("Well cleared: %f", datetime.now())
 
             # Flushing procedure
             flush_pipette_tip(
@@ -1087,7 +1064,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
                 flush_vol,
             )
 
-            record_time_step("Pipette Flushed", run_times)
+            logging.info("Pipette Flushed: %f", datetime.now())
 
         # Final rinse
         instructions = update_experiment_recipt(
@@ -1104,21 +1081,19 @@ def run_experiment(instructions, instructions_filename, mill, pump):
             rinse_repititions=instructions["rinse_count"],
             rinse_vol=instructions["rinse_vol"],
         )
-        record_time_step("Final Rinse", run_times)
+        logging.info("Final Rinse: %f", datetime.now())
 
         instructions = update_experiment_recipt(
             instructions, "status", "completed", instructions_filename
         )
 
-        record_time_step("End", run_times)
+        logging.info("End: %f", datetime.now())
 
-        instructions["time_stamps"] = run_times
 
         # save the updated instructions with run times, and data file names
 
         mill.move_to_safe_position()
         logging.info("EXPERIMENT %s COMPLETED\n\n", experiment_id)
-        print_runtime_data(run_times)
 
     except KeyboardInterrupt:
         logging.warning("Keyboard Interrupt")
