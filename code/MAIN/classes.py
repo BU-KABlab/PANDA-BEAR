@@ -9,6 +9,14 @@ import matplotlib.pyplot as plt
 import regex as re
 import serial
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    filename="classes.log",
+    filemode="a",
+    format="%(asctime)s - %(name)% - %(levelname)% - %(message)%",
+    level=logging.INFO,
+    )
+
 class Wells:
     """
     Position of well plate and each well in it.
