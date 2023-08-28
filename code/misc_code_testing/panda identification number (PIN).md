@@ -14,27 +14,27 @@ Considerations:
 Categories:
 Mill | Pump | Potentiostat | Reference Electrode | Working Electrode | Wells | Pipette Adapter | Camera | Scale
 
-mill 1 = Prover 3018
+mill 1 = Prover 3018 \
 mill 2 = Prover 4030 Pro
 
 pump 001 = New Era A-1000 syringe pump with 1ml, 4.699 diameter syringe
 
 potentiostat 001 = 
 
-reference electrode 001 = silver chloride solution inside of glass tube
-reference electrode 002 = glass tube with reference elctrode fixed with PDMS
-reference electrode 003 = glass tube with reference elctrode fixed with epoxy
+reference electrode 001 = silver chloride solution inside of glass tube\
+reference electrode 002 = glass tube with reference elctrode fixed with PDMS\
+reference electrode 003 = glass tube with reference elctrode fixed with epoxy\
 reference electrode 004 = carbon-glass and silver
 
-working electrode 001 = gold
+working electrode 001 = gold\
 working electrode 002 = ITO
 
 wells 001 = 96 silicon 9mm x 9mm square wells 
 
-pipette adapter 001 = barbed fitting
-pipette adapter 002 = male leur-lock part of adapter
-pipette adapter 003 = female leur-lock part of adapter
-pipette adapter 004 = cut off end
+pipette adapter 001 = barbed fitting\
+pipette adapter 002 = male leur-lock part of adapter\
+pipette adapter 003 = female leur-lock part of adapter\
+pipette adapter 004 = cut off end\
 pipette adapter 005 = remodeled short adapter with female leur-lock
 
 
