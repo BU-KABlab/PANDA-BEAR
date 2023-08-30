@@ -6,3 +6,5 @@
 #Untracked files
 *.pyc
 code/MAIN/slack_credentials.py
+code/MAIN/slack_config.py
+code/misc_code_testing/ePANDA_pro_pic.jpeg

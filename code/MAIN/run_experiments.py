@@ -943,9 +943,7 @@ def run_experiment(instructions, instructions_filename, mill, pump):
 
         for solution_name in experiment_solutions:
             if instructions[solution_name] > 0:  # if there is a solution to deposit
-                logging.info(
-                    "Pipetting %s ul of %s into %s...",instructions[solution_name],solution_name,current_well
-                )
+                logging.info("Pipetting %s ul of %s into %s...",instructions[solution_name],solution_name,current_well)
                 # soltuion_ml = float((instructions[solution_name])/1000000) #because the pump works in ml
                 pipette(
                     volume=instructions[solution_name],  # volume in ul
@@ -1131,10 +1129,11 @@ def run_experiment(instructions, instructions_filename, mill, pump):
 
 def main():
     """Main function"""
+    logger = logging.getLogger(__name__)
     logging.basicConfig(
         filename="ePANDA.log",
         level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
+        format="%(asctime)s - %(name)% - %(levelname)% - %(message)%",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     logging.info(print_panda.printpanda())

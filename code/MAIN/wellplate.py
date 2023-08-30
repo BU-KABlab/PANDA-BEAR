@@ -18,7 +18,7 @@ class Wells:
         3 - Horizontal, wells become less negative from A1
     """
 
-    def __init__(self, a1_x=0, a1_y=0, orientation=0, columns = 'ABCDEFGH', rows = 13):
+    def __init__(self, a1_x:float=0, a1_y:float=0, orientation:int=0, columns:str = 'ABCDEFGH', rows:int = 13):
         self.wells = {}
         self.orientation = orientation
         self.z_bottom = -77  # -64

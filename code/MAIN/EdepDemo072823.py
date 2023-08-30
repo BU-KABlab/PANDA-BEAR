@@ -441,8 +441,8 @@ def main():
         GamryCOM = client.GetModule(['{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}', 1, 0])
         pstat = client.CreateObject('GamryCOM.GamryPC6Pstat')
         devices = client.CreateObject('GamryCOM.GamryDeviceList')
-        echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
-        echem.pstat.Open() # open connection to pstat
+        echem.PSTAT.Init(devices.EnumSections()[0])  # grab first pstat
+        echem.PSTAT.Open() # open connection to pstat
         print('\tPstat connected: ',devices.EnumSections()[0])
         
         #TODO Create proper exceptions for when things fail to connect,dont try and disconnect if they arent connected
@@ -507,7 +507,7 @@ def main():
                                        wellplate.echem_height
                                        ) # move to well depth
             echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
-            while echem.active == True:
+            while echem.ACTIVE == True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data
@@ -566,7 +566,7 @@ def main():
             move_electrode_to_position(mill, wellplate.get_coordinates(well_run)['x'], wellplate.get_coordinates(well_run)['y'], wellplate.echem_height)
             complete_file_name = echem.setfilename(well_run, 'CV')
             echem.cyclic(echem.CVvi, echem.CVap1, echem.CVap2, echem.CVvf, echem.CVsr1, echem.CVsr2, echem.CVsr3, echem.CVsamplerate, echem.CVcycle)
-            while echem.active == True:
+            while echem.ACTIVE == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)
             ## echem plot the data

@@ -9,8 +9,19 @@ import time
 import sys
 import serial
 
+## set up logging to log to both the mill_control.log file and the ePANDA.log file
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+file_handler = logging.FileHandler("mill_control.log")
+system_handler = logging.FileHandler("ePANDA.log")
+file_handler.setFormatter(formatter)
+system_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.addHandler(system_handler)
 
-class MillControl:
+
+class Mill:
     """
     Set up the mill connection and pass commands, including special commands
     """
@@ -97,7 +108,7 @@ class MillControl:
                 logging.debug("%s executed", command)
             # time.sleep(1)
         except Exception as mill_exception:
-            exception_type, exception_object, exception_traceback = sys.exc_info()
+            exception_type, experiment_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
             logging.error("Exception: %s", mill_exception)
@@ -158,11 +169,11 @@ class MillControl:
                 out = status.decode("utf-8").strip()
 
             logging.info(out)
-        except Exception as current_status_ecxeption:
-            exception_type, exception_object, exception_traceback = sys.exc_info()
+        except Exception as current_status_exception:
+            exception_type, experiment_object ,exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
-            logging.error("Exception: %s", current_status_ecxeption)
+            logging.error("Exception: %s", current_status_exception)
             logging.error("Exception type: %s", exception_type)
             logging.error("File name: %s", filename)
             logging.error("Line number: %d", line_number)
@@ -225,6 +236,7 @@ class MillControl:
             logging.info(log_message)
         else:
             logging.info("MPos coordinates not found in the line.")
+            raise LocationNotFound
         return [x_coord, y_coord, z_coord]
 
     def rinse_electrode(self):
@@ -304,8 +316,28 @@ class MillControl:
         }
 
         self.config["instrument_offsets"][offset_type] = offset
-        with open("mill_config.json", "w", encoding="UTF-8") as f:
-            json.dump(self.config, f, indent=4)
-        logging_message = f"Updated {offset_type} to {offset}"
-        logging.info(logging_message)
-        return 0
+        try:
+            with open("mill_config.json", "w", encoding="UTF-8") as f:
+                json.dump(self.config, f, indent=4)
+            logging_message = f"Updated {offset_type} to {offset}"
+            logging.info(logging_message)
+            return 0
+        except MillConfigNotFound as update_offset_exception:
+            logging.error(update_offset_exception)
+            return 3
+        
+class StatusReturnError(Exception):
+    """Raised when the mill returns an error in the status"""
+    pass
+
+class MillConfigNotFound(Exception):
+    """Raised when the mill config file is not found"""
+    pass
+    
+
+class CommandExecutionError(Exception):
+    pass
+
+class LocationNotFound(Exception):
+    """Raised when the mill cannot find its location"""
+    pass

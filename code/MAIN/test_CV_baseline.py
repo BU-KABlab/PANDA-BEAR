@@ -600,8 +600,8 @@ def main():
         GamryCOM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
         pstat = client.CreateObject("GamryCOM.GamryPC6Pstat")
         devices = client.CreateObject("GamryCOM.GamryDeviceList")
-        echem.pstat.Init(devices.EnumSections()[0])  # grab first pstat
-        echem.pstat.Open()  # open connection to pstat
+        echem.PSTAT.Init(devices.EnumSections()[0])  # grab first pstat
+        echem.PSTAT.Open()  # open connection to pstat
         print("\tPstat connected: ", devices.EnumSections()[0])
 
         # TODO Create proper exceptions for when things fail to connect,dont try and disconnect if they arent connected
@@ -679,7 +679,7 @@ def main():
                 CVsamplerate=echem.CVsamplerate,
                 CVcycle=echem.CVcycle,
             )
-            while echem.active == True:
+            while echem.ACTIVE == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)
             ## echem plot the data

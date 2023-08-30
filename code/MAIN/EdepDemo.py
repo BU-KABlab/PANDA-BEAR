@@ -140,7 +140,7 @@ def main():
                 CAsamplerate=echem.CAsamplerate,
             )  # CA
             '''
-            while echem.active == True:
+            while echem.ACTIVE == True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data
@@ -233,7 +233,7 @@ def main():
                 CVcycle=echem.CVcycle,
             )
             '''
-            while echem.active == True:
+            while echem.ACTIVE == True:
                 client.PumpEvents(1)
                 time.sleep(0.1)
             ## echem plot the data

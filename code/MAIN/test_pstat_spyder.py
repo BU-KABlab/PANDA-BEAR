@@ -13,13 +13,13 @@ import comtypes.client as client
  
 if __name__ == "__main__":
     try:
-        echem.pstat.Init(echem.devices.EnumSections()[0])  # grab first pstat
-        echem.pstat.Open() #open connection to pstat
+        echem.PSTAT.Init(echem.DEVICES.EnumSections()[0])  # grab first pstat
+        echem.PSTAT.Open() #open connection to pstat
         echem.setfilename('A1', 'dep')
         ## echem CA - deposition
         echem.chrono(echem.CAvi, echem.CAti, echem.CAv1, echem.CAt1, echem.CAv2, echem.CAt2, echem.CAsamplerate) #CA
         print("made it to try")
-        while echem.active == True:
+        while echem.ACTIVE == True:
             client.PumpEvents(1)
             time.sleep(0.5)
         ## echem plot the data
