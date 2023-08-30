@@ -17,6 +17,8 @@ Returns:
     Wellplate: The updated wellplate object.
     Vials: The updated vials object.
 """
+# pylint: disable=line-too-long
+
 import logging
 import math
 from datetime import datetime
@@ -84,8 +86,9 @@ def pipette(
                 solution.coordinates["x"], solution.coordinates["y"], solution.bottom
             )  # go to solution depth (depth replaced with height)
 
-            pump.withdraw(repetition_vol + (2 * purge_volume), pumping_rate, pump)
             solution.update_volume(-(repetition_vol + 2 * purge_volume))
+            pump.withdraw(repetition_vol + (2 * purge_volume), pumping_rate, pump)
+            
             logger.debug("%s new volume: %f", solution.name, solution.volume)
             mill.move_pipette_to_position(
                 solution.coordinates["x"], solution.coordinates["y"], 0
@@ -118,9 +121,8 @@ def pipette(
                 wellplate.get_coordinates(target_well)["y"],
                 wellplate.depth(target_well),
             )  # go to solution depth
-
-            pump.infuse(repetition_vol, pumping_rate, pump)
             wellplate.update_volume(target_well, repetition_vol)
+            pump.infuse(repetition_vol, pumping_rate, pump)
             logger.info(
                 "Well %s volume: %f", target_well, wellplate.volume(target_well)
             )
@@ -179,7 +181,7 @@ def clear_well(
     clear_well_buffer = 20  # an extra 20 ul to ensure the well is cleared
     repititions = math.ceil(
         volume / 200
-    )  # divide by 200 ul which is the pipette capacity to determin the number of repetitions
+    )  # divide by 200 ul (pipette capacity) for the number of repetitions. No purge needed here.
     repetition_vol = volume / repititions
 
     logger.info(
@@ -189,6 +191,7 @@ def clear_well(
         repetition_vol,
     )
     for j in range(repititions):
+        # TODO revisit bundling vial selection within purge, infuse, and withdraw along with updating volumes
         purge_vial = waste_selector(waste_vials, solution_name, repetition_vol + clear_well_buffer)
 
         logger.info("Repitition %d of %d", j + 1, repititions)
@@ -202,10 +205,10 @@ def clear_well(
             wellplate.get_coordinates(target_well)["y"],
             wellplate.depth(target_well),
         )  # go to bottom of well
+        wellplate.update_volume(target_well, -repetition_vol) # no buffer to avoid an overdraft error
         pump.withdraw(repetition_vol + clear_well_buffer, pumping_rate, pump)
-        wellplate.update_volume(target_well, -repetition_vol) # we do not include the buffer here to avoid an overdraft error
-
         logger.debug("Well %s volume: %f", target_well, wellplate.volume(target_well))
+
         mill.move_pipette_to_position(
             wellplate.get_coordinates(target_well)["x"],
             wellplate.get_coordinates(target_well)["y"],
@@ -355,8 +358,8 @@ def purge(purge_vial: vial_class, pump: pump_class, purge_volume=20.00, pumping_
     Returns:
         None
     """
-    pump.infuse(purge_volume, pumping_rate, pump)
     purge_vial.update_volume(purge_volume)
+    pump.infuse(purge_volume, pumping_rate, pump)
     log_msg = f"Purged {purge_volume} ml"
     logger.debug(log_msg)
 
