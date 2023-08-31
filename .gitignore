@@ -1,7 +1,7 @@
 #Untracked directories
-    code\experiments_completed\**
-    code\experiments_error\**
-    code\experiment_queue\**
+code\experiments_completed\**
+code\experiments_error\**
+code\experiment_queue\**
 
 #Untracked files
 *.pyc
