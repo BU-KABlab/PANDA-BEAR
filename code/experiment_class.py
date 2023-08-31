@@ -5,6 +5,7 @@ from dataclasses import field
 from typing import Optional
 from pydantic import ConfigDict, FilePath, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
+from configs.pin import CURRENT_PIN
 
 
 class ExperimentStatus(str, Enum):
@@ -49,6 +50,7 @@ class Experiment:
     ocp: int #Open Circuit Potential
     ca: int #Cyclic Amperometry
     cv: int #Cyclic Voltammetry
+    baseline: int #Baseline
     dep_duration: int #Deposition duration
     dep_pot: float #Deposition potential
     char_sol_name: str #Characterization solution name
@@ -61,14 +63,15 @@ class Experiment:
     # To restrict this to one of a few values you can use an enum
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
+    filename: FilePath = None
     # The optional fields seemed to be that way because they were experiment results
     results: Optional[ExperimentResult] = None
 
     def is_replicate(self, other):
         '''Check if two experiments have the same parameters but different ids'''
         if isinstance(other, Experiment):
-            return (self.dmf == other.dmf 
-                    and self.peg == other.peg 
+            return (self.dmf == other.dmf
+                    and self.peg == other.peg
                     and self.acrylate == other.acrylate 
                     and self.ferrocene == other.ferrocene
             )
@@ -81,7 +84,7 @@ class Experiment:
         return False
 
 
-def make_test_value():
+def make_test_value() -> Experiment:
     '''Create a test experiment value for the class'''
     return Experiment(
         id=1,
@@ -95,18 +98,49 @@ def make_test_value():
         ocp=1,
         ca=1,
         cv=1,
+        baseline = 0,
         dep_duration=300,
         dep_pot=-2.7,
         status=ExperimentStatus.QUEUED,
         status_date=datetime.now(),
         pumping_rate=0.5,
-        char_sol_name="Ferrocene",
+        char_sol_name="ferrocene",
         char_vol=290,
-        flush_sol_name="DMF",
+        flush_sol_name="dmf",
         flush_vol=120,
+        rinse_count=3,
+        rinse_vol=150,
+        filename=None,
         results=None)
 
-
+def make_baseline_value() -> Experiment:
+    '''Create a test experiment value for the class'''
+    return Experiment(
+        id=1,
+        pin=CURRENT_PIN,
+        target_well="D5",
+        dmf=0,
+        peg=0,
+        acrylate=0,
+        ferrocene=0,
+        custom=0,
+        ocp=1,
+        ca=0,
+        cv=1,
+        baseline = 1,
+        dep_duration=300,
+        dep_pot=-2.7,
+        status=ExperimentStatus.QUEUED,
+        status_date=datetime.now(),
+        pumping_rate=0.5,
+        char_sol_name="ferrocene",
+        char_vol=290,
+        flush_sol_name="dmf",
+        flush_vol=120,
+        rinse_count=3,
+        rinse_vol=150,
+        filename=None,
+        results=None)
 
 def test_parse():
     '''Test that the class can be parsed from json and back'''

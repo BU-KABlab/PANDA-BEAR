@@ -34,8 +34,8 @@ import wellplate as wellplate_class
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-file_handler = logging.FileHandler("ePANDA_module.log")
-system_handler = logging.FileHandler("ePANDA.log")
+file_handler = logging.FileHandler("code/logs/ePANDA_module.log")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
 file_handler.setFormatter(formatter)
 system_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -259,7 +259,7 @@ def rinse(
 
     logger.info("Rinsing well %s %dx...", instructions.target_well, instructions.rinse_count)
     for rep in range(instructions.rinse_count):  # 0, 1, 2...
-        rinse_solution_name = "Rinse" + str(rep)
+        rinse_solution_name = "rinse" + str(rep)
         # purge_vial = waste_selector(rinse_solution_name, rinse_vol)
         # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
         logger.info("Rinse %d of %d", rep + 1, instructions.rinse_count)
@@ -753,12 +753,14 @@ def run_experiment(instructions: Experiment,
 
 
 if __name__ == "__main__":
+    import pathlib
     from experiment_class import make_test_value
     pump_driver = pump_class()
     mill_driver = mill_control.Mill()
     echem.initialize()
-    stock_vials_list = vial_class.read_vials("vial_status.json")
-    waste_vials_list = vial_class.read_vials("waste_status.json")
+    path_to_state = pathlib.Path.cwd() / "code/state"
+    stock_vials_list = vial_class.read_vials(path_to_state / "vial_status.json")
+    waste_vials_list = vial_class.read_vials(path_to_state / "waste_status.json")
     wells_object = wellplate_class.Wellplate(-218, -74, 0, 0)
     test_instructions = make_test_value()
     test_results = ExperimentResult()

@@ -2,12 +2,13 @@
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 import csv
 from datetime import datetime
-import json
+#import json
 import logging
+from pathlib import Path
+#import re
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(

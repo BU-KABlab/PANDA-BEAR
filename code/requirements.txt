@@ -3,3 +3,10 @@ nesp_lib
 comtypes
 numpy
 matplotlib
+pandas
+pydantic
+pyserial
+py-opencv
+
+
+

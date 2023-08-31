@@ -1,10 +1,9 @@
 #Untracked directories
-    code\MAIN\experiments_completed\**
-    code\MAIN\experiments_error\**
-    code\MAIN\experiment_queue\**
+    code\experiments_completed\**
+    code\experiments_error\**
+    code\experiment_queue\**
 
 #Untracked files
 *.pyc
-code/MAIN/slack_credentials.py
-code/MAIN/slack_config.py
 code/misc_code_testing/ePANDA_pro_pic.jpeg
+code/slack_credentials.py

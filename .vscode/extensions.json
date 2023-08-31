@@ -1,5 +1,8 @@
 {
     "recommendations": [
-        "ms-vscode-remote.remote-wsl"
+        "ms-vscode-remote.remote-wsl",
+        "ms-python.vscode-pylance",
+        "ms-python.pylint",
+        "ms-python.python"
     ]
 }

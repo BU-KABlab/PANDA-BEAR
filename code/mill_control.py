@@ -9,6 +9,9 @@ import time
 import sys
 import serial
 
+# Config file path
+
+
 ## set up logging to log to both the mill_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
@@ -35,6 +38,7 @@ class Mill:
             bytesize=serial.EIGHTBITS,
             timeout=10,
         )
+        self.config_file = 'mill_config.json'
         time.sleep(2)
         logging.basicConfig(
             filename="mill.log",
@@ -68,8 +72,11 @@ class Mill:
         """
         Reads a JSON config file and returns a dictionary of the contents.
         """
-        config_file_name = "mill_config.json"
-        config_file_path = pathlib.Path.cwd() / config_file_name
+        config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
+        if not config_file_path.exists():
+            logger.error("Config file not found")
+            raise MillConfigNotFound
+
         with open(config_file_path, "r", encoding="UTF-8") as f:
             configuaration = json.load(f)
         return configuaration
@@ -316,9 +323,14 @@ class Mill:
         }
 
         self.config["instrument_offsets"][offset_type] = offset
+        config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
+        if not config_file_path.exists():
+            logger.error("Config file not found")
+            raise MillConfigNotFound
+
         try:
-            with open("mill_config.json", "w", encoding="UTF-8") as f:
-                json.dump(self.config, f, indent=4)
+            with open(config_file_path, "w", encoding="UTF-8") as file:
+                json.dump(self.config, file, indent=4)
             logging_message = f"Updated {offset_type} to {offset}"
             logging.info(logging_message)
             return 0
