@@ -10,13 +10,16 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
 
+## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    filename="slack_bot.log",
-    filemode="a",
-    format="%(asctime)s - %(name)% - %(levelname)s - %(message)s",
-    level=logging.INFO,
-)
+logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+file_handler = logging.FileHandler("slack_bot.log")
+system_handler = logging.FileHandler("ePANDA.log")
+file_handler.setFormatter(formatter)
+system_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.addHandler(system_handler)
 
 def send_slack_message(channel_id: str, message) -> None:
     """
@@ -41,10 +44,14 @@ def send_slack_message(channel_id: str, message) -> None:
         # Call the chat.postMessage method using the WebClient
         result = client.chat_postMessage(channel=channel_id, text=message)
         # print(result)
-        logging.info("Message sent: %s", message)
-
+        # Log the result
+        if result["ok"]:
+            logger.info("Message sent: %s", message)
+        else:
+            logger.error("Error sending message: %s", message)
+            
     except SlackApiError as error:
-        logging.error("Error posting message: %s", error)
+        logger.error("Error posting message: %s", error)
 
 
 def send_slack_file(channel: str, file, message=None) -> None:
@@ -75,11 +82,14 @@ def send_slack_file(channel: str, file, message=None) -> None:
         )
         # Log the result
         # print(result)
-        logging.info("File sent: %s", file)
+        if result["ok"]:
+            logger.info("File sent: %s", file)
+        else:
+            logger.error("Error sending file: %s", file)
 
     except SlackApiError as exception:
         log_msg = f"Error uploading file: {format(exception)}"
-        logging.error(log_msg)
+        logger.error(log_msg)
 
     def upload_requested_experiment_info(experimentID, test_type, result_type, channel):
         """Uploads requested experiment information to Slack channel.
@@ -135,7 +145,7 @@ def check_slack_messages(channel: str):
     # latestTS = datetime.now().timestamp()
 
     try:
-        logging.info("Checking for new messages.")
+        logger.info("Checking for new messages.")
         # Call the conversations.history method using the WebClient
         # conversations.history returns the first 100 messages by default
         # These results are paginated, see: https://api.slack.com/methods/conversations.history$pagination
@@ -197,7 +207,7 @@ def check_slack_messages(channel: str):
 
     except SlackApiError as error:
         error_msg = f"Error creating conversation: {format(error)}"
-        logging.error(error_msg)
+        logger.error(error_msg)
 
 
 def find_id(id):

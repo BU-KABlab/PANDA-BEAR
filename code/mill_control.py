@@ -40,25 +40,21 @@ class Mill:
         )
         self.config_file = 'mill_config.json'
         time.sleep(2)
-        logging.basicConfig(
-            filename="mill.log",
-            filemode="w",
-            format="%(asctime)s - %(message)s",
-            level=logging.DEBUG,
-        )
-        logging_message = f"Mill connected: {self.ser_mill.isOpen()}"
-        logging.info(logging_message)
+        
+        logger_message = f"Mill connected: {self.ser_mill.isOpen()}"
+        logger.info(logger_message)
         self.home()
         self.execute_command("F2000")
         self.ser_mill.flushInput()
         self.ser_mill.flushOutput()
         self.config = self.read_json_config()
         log_message = f"Mill config loaded: {self.config}"
-        logging.info(log_message)
+        logger.info(log_message)
 
     def __enter__(self):
         '''Open the serial connection to the mill'''
         if not self.ser_mill.isOpen():
+            logger.info("Opening serial connection to mill...")
             self.ser_mill.open()
         time.sleep(2)
         return self
@@ -72,6 +68,7 @@ class Mill:
         """
         Reads a JSON config file and returns a dictionary of the contents.
         """
+        logger.debug("Reading mill config file...")
         config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
         if not config_file_path.exists():
             logger.error("Config file not found")
@@ -83,8 +80,8 @@ class Mill:
 
     def execute_command(self, command):
         """encodes and send commands to the mill and returns the response"""
-        logging_message = f"Executing command: {command}..."
-        logging.debug(logging_message)
+        logger_message = f"Executing command: {command}..."
+        logger.debug(logger_message)
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b"\n")
         time.sleep(1)
@@ -92,12 +89,12 @@ class Mill:
             if command == "F2000":
                 time.sleep(1)
                 out = self.ser_mill.readline()
-                logging.debug("%s executed", command)
+                logger.debug("%s executed", command)
 
             elif command == "?":
                 time.sleep(1)
                 out = self.ser_mill.readlines()[0]
-                logging.debug("%s executed. Returned %s )", command, out.decode())
+                logger.debug("%s executed. Returned %s )", command, out.decode())
 
             elif command != "$H":
                 time.sleep(0.5)
@@ -108,20 +105,20 @@ class Mill:
 
                     time.sleep(0.3)
                 out = status
-                logging.debug("%s executed", command)
+                logger.debug("%s executed", command)
 
             else:
                 out = self.ser_mill.readline()
-                logging.debug("%s executed", command)
+                logger.debug("%s executed", command)
             # time.sleep(1)
         except Exception as mill_exception:
             exception_type, experiment_object, exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
-            logging.error("Exception: %s", mill_exception)
-            logging.error("Exception type: %s", exception_type)
-            logging.error("File name: %s", filename)
-            logging.error("Line number: %d", line_number)
+            logger.error("Exception: %s", mill_exception)
+            logger.error("Exception type: %s", exception_type)
+            logger.error("File name: %s", filename)
+            logger.error("Line number: %d", line_number)
         return out
 
     def stop(self):
@@ -175,15 +172,15 @@ class Mill:
             if isinstance(status, str):
                 out = status.decode("utf-8").strip()
 
-            logging.info(out)
+            logger.info(out)
         except Exception as current_status_exception:
             exception_type, experiment_object ,exception_traceback = sys.exc_info()
             filename = exception_traceback.tb_frame.f_code.co_filename
             line_number = exception_traceback.tb_lineno
-            logging.error("Exception: %s", current_status_exception)
-            logging.error("Exception type: %s", exception_type)
-            logging.error("File name: %s", filename)
-            logging.error("Line number: %d", line_number)
+            logger.error("Exception: %s", current_status_exception)
+            logger.error("Exception type: %s", exception_type)
+            logger.error("File name: %s", filename)
+            logger.error("Line number: %d", line_number)
         return out
 
     def gcode_mode(self):
@@ -240,9 +237,9 @@ class Mill:
             log_message = (
                 f"MPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
             )
-            logging.info(log_message)
+            logger.info(log_message)
         else:
-            logging.info("MPos coordinates not found in the line.")
+            logger.info("MPos coordinates not found in the line.")
             raise LocationNotFound
         return [x_coord, y_coord, z_coord]
 
@@ -331,11 +328,11 @@ class Mill:
         try:
             with open(config_file_path, "w", encoding="UTF-8") as file:
                 json.dump(self.config, file, indent=4)
-            logging_message = f"Updated {offset_type} to {offset}"
-            logging.info(logging_message)
+            logger_message = f"Updated {offset_type} to {offset}"
+            logger.info(logger_message)
             return 0
         except MillConfigNotFound as update_offset_exception:
-            logging.error(update_offset_exception)
+            logger.error(update_offset_exception)
             return 3
         
 class StatusReturnError(Exception):

@@ -16,7 +16,7 @@ system_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(system_handler)
 
-class Pump:
+class Pump():
     '''
     Class for controlling a new era A-1000 syringe pump using the nesp-lib library
     
