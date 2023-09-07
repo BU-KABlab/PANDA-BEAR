@@ -63,10 +63,12 @@ def main():
         wellplate = wellplate_module.Wells(-218, -74, 0, 0)
 
         ## On start up we want to run a baseline test
-        scheduler.insert_control_tests()
-        baseline = scheduler.read_next_experiment_from_queue()
-        baseline_results = ExperimentResult()
-        e_panda.run_experiment(baseline, baseline_results, mill, pump, stock_vials, waste_vials, wellplate)
+        # we are having the science team insert the control tests at the moment
+        # uncomment the following lines to run the baseline test at startup
+        # scheduler.insert_control_tests()  
+        # baseline = scheduler.read_next_experiment_from_queue()
+        # baseline_results = ExperimentResult()
+        # e_panda.run_experiment(baseline, baseline_results, mill, pump, stock_vials, waste_vials, wellplate)
 
         ## Begin outer loop
         while True:

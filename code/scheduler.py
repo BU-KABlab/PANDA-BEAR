@@ -203,8 +203,8 @@ class Scheduler:
         for file in file_path.iterdir():
             # If there are files but 0 added then begin by inserting a baseline test
             # or every tenth experiment
-            if (count == 0) or (count % 9 == 0):
-                self.insert_control_tests()
+            # if (count == 0) or (count % 9 == 0): # We are currently having the science team insert the baseline tests
+            #     self.insert_control_tests()   # so we are not doing this here.
 
             if file.is_file():
                 [count, complete] = self.read_new_experiments(file.name)
