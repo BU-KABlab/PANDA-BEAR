@@ -1,6 +1,6 @@
 [
     {
-        "solution": "S0",
+        "position": "S0",
         "contents": "DMF",
         "x": -2,
         "y": -43,
@@ -10,7 +10,7 @@
         "contamination": 1
     },
     {
-        "solution": "S1",
+        "position": "S1",
         "contents": "DMF",
         "x": -2,
         "y": -76,
@@ -19,7 +19,7 @@
         "capacity": 20000
     },
     {
-        "solution": "S2",
+        "position": "S2",
         "contents": "PEG",
         "x": -2,
         "y": -109,
@@ -28,7 +28,7 @@
         "capacity": 20000
     },
     {
-        "solution": "S3",
+        "position": "S3",
         "contents": "Acrylate",
         "x": -2,
         "y": -142,
@@ -37,7 +37,7 @@
         "capacity": 20000
     },
     {
-        "solution": "S4",
+        "position": "S4",
         "contents": "Ferrocene",
         "x": -2,
         "y": -175,
@@ -47,7 +47,7 @@
         "contamination": 1
     },
     {
-        "solution": "R0",
+        "position": "R0",
         "contents": "Rinse0",
         "x": -2,
         "y": -208,
@@ -57,7 +57,7 @@
         "contamination": 0
     },
     {
-        "solution": "R1",
+        "position": "R1",
         "contents": "Rinse1",
         "x": -2,
         "y": -241,
@@ -67,7 +67,7 @@
         "contamination": 0
     },
     {
-        "solution": "R2",
+        "position": "R2",
         "contents": "Rinse2",
         "x": -2,
         "y": -274,

@@ -40,7 +40,6 @@ class Scheduler:
         self.experiment_queue = []
         self.control_tests = []
 
-
     def check_well_status(self, well_to_check: str) -> str:
         """
         Checks the status of a well in the well config file: well_status.json.
@@ -60,7 +59,6 @@ class Scheduler:
                 else:
                     continue
             return None
-
 
     def choose_alternative_well(self, well: str, baseline: bool = False) -> str:
         """
@@ -83,7 +81,6 @@ class Scheduler:
                             return well["well_id"]
                     return well["well_id"]
             return None
-
 
     def change_well_status(self, well: str, status: str) -> None:
         """
@@ -154,25 +151,25 @@ class Scheduler:
                     pin=CURRENT_PIN,
                     target_well=target_well,
                     dmf=experiment["dmf"],
-                    peg = experiment["peg"],
-                    acrylate = experiment["acrylate"],
-                    ferrocene  = experiment["ferrocene"],
-                    custom = experiment["custom"],
-                    ocp = experiment["ocp"],
-                    ca = experiment["ca"],
-                    cv = experiment["cv"],
-                    baseline = experiment["baseline"],
-                    dep_duration = experiment["dep_duration"],
-                    dep_pot = experiment["dep_pot"],
-                    char_sol_name = experiment["char_sol_name"],
-                    char_vol = experiment["char_vol"],
-                    flush_sol_name = experiment["flush_sol_name"],
-                    flush_vol = experiment["flush_vol"],
-                    pumping_rate = experiment["pumping_rate"],
-                    rinse_count = experiment["rinse_count"],
-                    rinse_vol = experiment["rinse_vol"],
-                    status = ExperimentStatus.QUEUED,
-                    filename = filename,
+                    peg=experiment["peg"],
+                    acrylate=experiment["acrylate"],
+                    ferrocene=experiment["ferrocene"],
+                    custom=experiment["custom"],
+                    ocp=experiment["ocp"],
+                    ca=experiment["ca"],
+                    cv=experiment["cv"],
+                    baseline=experiment["baseline"],
+                    dep_duration=experiment["dep_duration"],
+                    dep_pot=experiment["dep_pot"],
+                    char_sol_name=experiment["char_sol_name"],
+                    char_vol=experiment["char_vol"],
+                    flush_sol_name=experiment["flush_sol_name"],
+                    flush_vol=experiment["flush_vol"],
+                    pumping_rate=experiment["pumping_rate"],
+                    rinse_count=experiment["rinse_count"],
+                    rinse_vol=experiment["rinse_vol"],
+                    status=ExperimentStatus.QUEUED,
+                    filename=filename,
                 )
 
                 # Save the experiment as a separate file in the experiment_que subfolder
@@ -206,7 +203,7 @@ class Scheduler:
         for file in file_path.iterdir():
             # If there are files but 0 added then begin by inserting a baseline test
             # or every tenth experiment
-            if count == 0 or count == 9:
+            if (count == 0) or (count % 9 == 0):
                 self.insert_control_tests()
 
             if file.is_file():
@@ -226,14 +223,14 @@ class Scheduler:
         return count, complete
 
     def insert_control_tests(self):
-        '''
+        """
         Creates a baseline test experiment and saves it to the queue.
         Args:
             None
         Returns:
             None
-                '''
-        
+        """
+
         ## Insert the baseline tests to the queue directory
         target_well = self.choose_alternative_well("A1", baseline=True)
         filename = f"{datetime.datetime.now().strftime('%Y-%m-%d')}_baseline_{target_well}.json"
@@ -249,8 +246,7 @@ class Scheduler:
         ## change the status of the well
         self.change_well_status(target_well, "queued")
 
-
-    def read_next_experiment_from_queue(self) -> Experiment and pathlib.Path:
+    def read_next_experiment_from_queue(self) -> tuple(Experiment, pathlib.Path):
         """
         Reads the next experiment from the queue.
         :return: The next experiment.
@@ -262,13 +258,15 @@ class Scheduler:
 
         ## check if folder is not empty
         if os.listdir(file_path):
+            ## if there is a baseline test in the queue run that first
+
             ## if there are any experiments are in queue pick one at random
             file_list = os.listdir(file_path)
             random_file = random.choice(file_list)
             with open(file_path / random_file, "r", encoding="ascii") as file:
                 data = json.load(file)
                 if data["baseline"] == 0 and data["status"] == "queued":
-                    return data, file_path / random_file
+                    return data, (file_path / random_file)
 
         else:
             return None, None

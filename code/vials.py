@@ -1,9 +1,38 @@
 '''
 Vial class for creating vial objects with their position and contents
 '''
+# pylint: disable=line-too-long
 import json
 import logging
 import math
+import pathlib
+
+def read_vials(filename):
+    """
+    Read in the virtual vials from the json file
+    """
+    cwd = pathlib.Path(__file__).parents[0]
+    filename_ob = cwd / filename
+    with open(filename_ob, "r", encoding="ascii") as file:
+        vial_parameters = json.load(file)
+
+    sol_objects = []
+    for items in vial_parameters:
+        sol_objects.append(
+            Vial(
+                position=items["position"],
+                x_coord=items["x"],
+                y_coord=items["y"],
+                volume=items["volume"],
+                name=items["name"],
+                contents=items["contents"],
+                # capacity=items["capacity"],
+                # bottom=items["bottom"],
+                # height=items["height"],
+                filepath=filename,
+            )
+        )
+    return sol_objects
 
 class Vial:
     """
@@ -19,6 +48,7 @@ class Vial:
     """
     def __init__(
         self,
+        position: str,
         x_coord: float,
         y_coord: float,
         contents: str,
@@ -31,6 +61,7 @@ class Vial:
         filepath=None,
     ):
         self.name = name
+        self.position = position
         self.coordinates = {"x": x_coord, "y": y_coord, "z": height}
         self.bottom = z_bottom
         self.contents = contents
@@ -82,8 +113,8 @@ class Vial:
         logging.info("Writing %s volume to vial file...", self.name)
 
         ## Open the file and read the contents
-        with open(".\\code\\MAIN\\" + self.filepath, "r", encoding="UTF-8") as f:
-            solutions = json.load(f)
+        with open(".\\code\\MAIN\\" + self.filepath, "r", encoding="UTF-8") as file:
+            solutions = json.load(file)
 
         ## Find matching solution name and update the volume
         # solutions = solutions['solutions']
@@ -94,8 +125,8 @@ class Vial:
                 break
 
         ## Write the updated contents back to the file
-        with open(".\\code\\MAIN\\" + self.filepath, "w", encoding="UTF-8") as f:
-            json.dump(solutions, f, indent=4)
+        with open(".\\code\\MAIN\\" + self.filepath, "w", encoding="UTF-8") as file:
+            json.dump(solutions, file, indent=4)
         return 0
 
     def update_volume(self, added_volume: float):
