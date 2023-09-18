@@ -9,11 +9,8 @@ import nesp_lib
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-file_handler = logging.FileHandler("pump_control.log")
 system_handler = logging.FileHandler("ePANDA.log")
-file_handler.setFormatter(formatter)
 system_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 logger.addHandler(system_handler)
 
 class Pump():
@@ -39,6 +36,7 @@ class Pump():
         """
         self.pump = self.set_up_pump()
         self.capacity = 1.0 #mL
+        self.pipette_capacity = 0.2 #mL
 
     def set_up_pump(self):
         """
@@ -68,28 +66,12 @@ class Pump():
         # Perform the withdrawl
 
         ## convert the volume argument from ul to ml
-        volume = volume / 1000
+        volume_ml = volume / 1000  # Convert ul to ml
 
-        if (
-            self.pump.volume_withdrawn + volume > 0.2
-        ):  # 0.2 is the maximum volume for the pipette tip
-            raise OverFillException(volume, self.pump.volume_withdrawn, self.capacity)
+        if self.pump.volume_withdrawn + volume_ml > self.pipette_capacity:
+            raise OverFillException(volume_ml, self.pump.volume_withdrawn, self.pipette_capacity)
 
-        self.pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
-        self.pump.pumping_volume = (
-            volume  # Sets the pumping volume of the pump in units of milliliters.
-        )
-        self.pump.pumping_rate = rate  # in units of milliliters per minute.
-        self.pump.run()
-        logger.debug("Withdrawing...")
-        time.sleep(0.5)
-        while self.pump.running:
-            pass
-        logger.debug("Done withdrawing")
-        time.sleep(2)
-        log_msg = f"Pump has withdrawn: {self.pump.volume_withdrawn} ml"
-        logger.debug(log_msg)
-
+        self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate)
         return 0
 
     def infuse(self, volume: float, rate: float):
@@ -106,30 +88,32 @@ class Pump():
         # Perform infusion
 
         ## convert the volume argument from ul to ml
-        volume = volume / 1000
+        volume_ml = volume / 1000  # Convert ul to ml
 
-        if volume > 0.0:
+        if volume_ml > 0.0:
+            if self.pump.volume_withdrawn - volume_ml < 0:
+                raise OverDraftException(volume_ml, self.pump.volume_withdrawn, self.capacity)
 
-            if self.pump.volume_withdrawn - volume < 0:
-                raise OverDraftException(volume, self.pump.volume_withdrawn, self.capacity)
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate)
 
-            self.pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
-            self.pump.pumping_volume = (
-                volume  # Sets the pumping volume of the pump in units of mLs.
-            )
-            self.pump.pumping_rate = rate  # rate of the pump in units of mL/min.
-            self.pump.run()
-            logger.debug("Infusing...")
-            time.sleep(0.5)
-            while self.pump.running:
-                pass
-            time.sleep(2)
-            log_msg = f"Pump has infused: {self.pump.volume_infused} ml"
-            logger.debug(log_msg)
-        else:
-            pass
         return 0
 
+    def run_pump(self, direction, volume_ml, rate):
+        """Combine all the common commands to run the pump into one function"""
+        self.pump.pumping_direction = direction
+        self.pump.pumping_volume = volume_ml
+        self.pump.pumping_rate = rate
+        self.pump.run()
+        action = "Withdrawing" if direction == nesp_lib.PumpingDirection.WITHDRAW else "Infusing"
+        logger.debug("%s...", action)
+        time.sleep(0.5)
+        while self.pump.running:
+            pass
+        logger.debug("Done %s", action)
+        time.sleep(2)
+        action_type = "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
+        log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
+        logger.debug(log_msg)
 
 class OverFillException(Exception):
     """Raised when a vessel is over filled"""
@@ -140,7 +124,7 @@ class OverFillException(Exception):
         self.added_volume = added_volume
         self.capacity = capacity
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"OverFillException: {self.volume} + {self.added_volume} > {self.capacity}"
 
 
@@ -153,5 +137,6 @@ class OverDraftException(Exception):
         self.added_volume = added_volume
         self.capacity = capacity
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"OverDraftException: {self.volume} - {self.added_volume} < 0"
+    
