@@ -23,6 +23,14 @@ def plotdata(exp_name, complete_file_name, showplot = False):
             plt.plot(df['Time'], df['Vf'])
             plt.xlabel('Time (s)')
             plt.ylabel('Voltage (V)')
+    elif exp_name == 'mock_CA':
+            df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None,
+                            names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
+            plt.rcParams["figure.dpi"] = 150
+            plt.rcParams["figure.facecolor"] = "white"
+            plt.plot(df['Time'], df['Vf'])
+            plt.xlabel('Time (s)')
+            plt.ylabel('Voltage (V)')
     elif exp_name == 'CA':
             df = pd.read_csv(complete_file_name.with_suffix('.txt'), sep=" ", header=None,
                             names=["runtime", "Vf", "Vu", "Im", "Q", "Vsig", "Ach", "IERange", "Over", "StopTest"])
@@ -64,7 +72,7 @@ def plotdata(exp_name, complete_file_name, showplot = False):
             dashes = dash_patterns[0]  # Use the corresponding dash pattern from the list
             #plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[0], label=f'Cycle 1 - index 0')
             plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color='#5b5b5b', label=f'Cycle 1 - index 0')
-            plt.xlabel('V vs Ag/AgCl (V)')
+            plt.xlabel('V vs Ag (V)')
             plt.ylabel('Current (A)')
             if showplot == True:
                 plt.show()

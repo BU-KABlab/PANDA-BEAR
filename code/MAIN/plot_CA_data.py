@@ -69,7 +69,7 @@ def plot_all_filesCA(folder_path, echem_function):
         plt.xlabel('Time (s)')
         plt.ylabel('Reduction Current Density (mA/cm²)')
 
-        # Uncomment the following line if you want to plot all cycles in the same color
+        
         plt.plot(df['Time'], df['Im'])
         plt.savefig(folder_path / f"all_files_{echem_function}.png")
         print(f"All files plot saved")
@@ -77,8 +77,9 @@ def plot_all_filesCA(folder_path, echem_function):
 
 #rows = 'A'
 #columns = [4]
-folder_path = pathlib.Path(__file__).parents[2] /  "data" / "Wet_Dress_Rehersal"
-#folder_path = pathlib.Path("C:\\Users\\Kab Lab\\Documents\\data\\2023-07-31")
+#folder_path = pathlib.Path(__file__).parents[2] /  "data" / "Wet_Dress_Rehersal"
+folder_path = pathlib.Path("C:\\Users\\Kab Lab\\Documents\\data\\2023-07-31")
 echem_function = "dep"
 #plotCA(folder_path, rows, columns, echem_function)
 #plot_all_filesCA(folder_path, echem_function)
+

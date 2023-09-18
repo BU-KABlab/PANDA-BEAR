@@ -242,6 +242,37 @@ def OCP(OCPvi, OCPti, OCPrate):
     #start_time = time.time()
     #print("made it to run end")
 
+
+def mock_CA(MCAvi, MCAti, MCArate):
+    global dtaq
+    global signal
+    global dtaqsink
+    global connection
+    global start_time
+    global active
+
+    active = True
+
+    print("made it to run")
+
+    # signal and dtaq object creation
+    signal = client.CreateObject("GamryCOM.GamrySignalConst")
+    dtaq = client.CreateObject("GamryCOM.GamryDtaqOcv")
+
+    dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
+    connection = client.GetEvents(dtaq, dtaqsink)
+    
+    signal.Init(pstat, MCAvi, MCAti, MCArate, GamryCOM.PstatMode)
+    initializepstat()
+
+    dtaq.Init(pstat)
+    pstat.SetSignal(signal)
+    pstat.SetCell(GamryCOM.CellOff)
+
+    dtaq.Run(True)
+    #start_time = time.time()
+    #print("made it to run end")
+
 def activecheck():
     while active == True:
         client.PumpEvents(1)
@@ -301,6 +332,10 @@ OCPvi = 0.0
 OCPti = 15
 OCPrate = 0.5
 
+#Mock_CA Setup parameters
+MCAvi = 0.0
+MCAti = 300
+MCArate = 0.5
 
 if __name__ == "__main__":
     try:
