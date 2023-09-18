@@ -1,62 +1,70 @@
 '''
 This module contains the MillControl class, which is used to control the a GRBL CNC machine.
 '''
+# standard libraries
+import dataclasses
 import json
 import logging
 import pathlib
 import re
 import time
-import sys
+# non-standard libraries
 import serial
 
-# Config file path
-
-
-## set up logging to log to both the mill_control.log file and the ePANDA.log file
+# Configure the logger
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
+logger.setLevel(logging.INFO)  # Change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-file_handler = logging.FileHandler("mill_control.log")
 system_handler = logging.FileHandler("ePANDA.log")
-file_handler.setFormatter(formatter)
 system_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 logger.addHandler(system_handler)
 
+@dataclasses.dataclass
+class Instruments:
+    """Class for naming of the mill instruments"""
+    CENTER = "center"
+    PIPETTE = "pipette"
+    ELECTRODE = "electrode"
 
 class Mill:
     """
     Set up the mill connection and pass commands, including special commands
     """
-
-    def __init__(self):
-        self.ser_mill = serial.Serial(
-            port="COM4",
-            baudrate=115200,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS,
-            timeout=10,
-        )
-        self.config_file = 'mill_config.json'
-        time.sleep(2)
-        
-        logger_message = f"Mill connected: {self.ser_mill.isOpen()}"
-        logger.info(logger_message)
-        self.home()
-        self.execute_command("F2000")
-        self.ser_mill.flushInput()
-        self.ser_mill.flushOutput()
+    def __init__(self, config_file='mill_config.json'):
+        self.config_file = config_file
         self.config = self.read_json_config()
-        log_message = f"Mill config loaded: {self.config}"
-        logger.info(log_message)
+        self.ser_mill = self.connect_to_mill()
+        self.home()
+        self.execute_command("F2000") #set feed rate to max but consistent
+        self.ser_mill.flushInput() #clear input buffer
+        self.ser_mill.flushOutput() #clear output buffer
+
+    def connect_to_mill(self):
+        """Connect to the mill"""
+        try:
+            ser_mill = serial.Serial(
+                port="COM4",
+                baudrate=115200,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout=10,
+            )
+            time.sleep(2)
+
+            if not ser_mill.isOpen():
+                logger.info("Opening serial connection to mill...")
+                ser_mill.open()
+                time.sleep(2)
+
+            logger.info("Mill connected: %s", ser_mill.isOpen())
+            return ser_mill
+        except Exception as exep:
+            logger.error("Error connecting to the mill: %s", str(exep))
+            raise MillConnectionError("Error connecting to the mill")
 
     def __enter__(self):
         '''Open the serial connection to the mill'''
-        if not self.ser_mill.isOpen():
-            logger.info("Opening serial connection to mill...")
-            self.ser_mill.open()
-        time.sleep(2)
         return self
 
     def exit(self):
@@ -65,27 +73,28 @@ class Mill:
         time.sleep(15)
 
     def read_json_config(self):
-        """
-        Reads a JSON config file and returns a dictionary of the contents.
-        """
-        logger.debug("Reading mill config file...")
-        config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
-        if not config_file_path.exists():
+        try:
+            config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
+            with open(config_file_path, "r", encoding="UTF-8") as f:
+                configuration = json.load(f)
+            logger.debug("Mill config loaded: %s", configuration)
+            return configuration
+        except FileNotFoundError:
             logger.error("Config file not found")
-            raise MillConfigNotFound
-
-        with open(config_file_path, "r", encoding="UTF-8") as f:
-            configuaration = json.load(f)
-        return configuaration
+            raise MillConfigNotFound("Config file not found")
+        except Exception as e:
+            logger.error("Error reading config file: %s", str(e))
+            raise MillConfigError("Error reading config file")
 
     def execute_command(self, command):
         """encodes and send commands to the mill and returns the response"""
-        logger_message = f"Executing command: {command}..."
-        logger.debug(logger_message)
-        command_bytes = command.encode()
-        self.ser_mill.write(command_bytes + b"\n")
-        time.sleep(1)
         try:
+            logger_message = f"Executing command: {command}..."
+            logger.debug(logger_message)
+
+            command_bytes = command.encode()
+            self.ser_mill.write(command_bytes + b"\n")
+
             if command == "F2000":
                 time.sleep(1)
                 out = self.ser_mill.readline()
@@ -97,12 +106,9 @@ class Mill:
                 logger.debug("%s executed. Returned %s )", command, out.decode())
 
             elif command != "$H":
-                time.sleep(0.5)
                 status = self.current_status()
-
                 while status.find("Run") > 0:
                     status = self.current_status()
-
                     time.sleep(0.3)
                 out = status
                 logger.debug("%s executed", command)
@@ -110,16 +116,11 @@ class Mill:
             else:
                 out = self.ser_mill.readline()
                 logger.debug("%s executed", command)
-            # time.sleep(1)
-        except Exception as mill_exception:
-            exception_type, experiment_object, exception_traceback = sys.exc_info()
-            filename = exception_traceback.tb_frame.f_code.co_filename
-            line_number = exception_traceback.tb_lineno
-            logger.error("Exception: %s", mill_exception)
-            logger.error("Exception type: %s", exception_type)
-            logger.error("File name: %s", filename)
-            logger.error("Line number: %d", line_number)
-        return out
+
+            return out
+        except Exception as exep:
+            logger.error("Error executing command %s: %s", command, str(exep))
+            raise CommandExecutionError(f"Error executing command {command}")
 
     def stop(self):
         """Stop the mill"""
@@ -139,49 +140,38 @@ class Mill:
         Instantly queries the mill for its current status.
         DOES NOT RUN during homing sequence.
         """
-        self.ser_mill.flushInput()
-        self.ser_mill.flushOutput()
-
-        out = ""
-        first = ""
-        second = ""
-        command = "?"
-        command_bytes = command.encode()
-        self.ser_mill.write(
-            command_bytes
-        )  # without carriage return because grbl documentation says its not needed
-        time.sleep(2)
-        status = self.ser_mill.readlines()
-        time.sleep(0.5)
         try:
+            out = ""
+            first = ""
+            second = ""
+            command = "?"
+            command_bytes = command.encode()
+            self.ser_mill.write(command_bytes)
+
+            time.sleep(2)
+            status = self.ser_mill.readlines()
+            time.sleep(0.5)
+
             if isinstance(status, list):
                 list_length = len(status)
                 if list_length == 0:
                     out = "No response"
-
-                if list_length > 0:
+                elif list_length > 0:
                     first = status[0].decode("utf-8").strip()
-
                 elif list_length > 1:
                     second = status[1].decode("utf-8").strip()
-
                 elif first.find("ok") >= 0:
                     out = second
                 else:
-                    out = "could not parse response"
-            if isinstance(status, str):
+                    raise StatusReturnError("Could not parse status message: %s", status)
+            elif isinstance(status, str):
                 out = status.decode("utf-8").strip()
 
             logger.info(out)
-        except Exception as current_status_exception:
-            exception_type, experiment_object ,exception_traceback = sys.exc_info()
-            filename = exception_traceback.tb_frame.f_code.co_filename
-            line_number = exception_traceback.tb_lineno
-            logger.error("Exception: %s", current_status_exception)
-            logger.error("Exception type: %s", exception_type)
-            logger.error("File name: %s", filename)
-            logger.error("Line number: %d", line_number)
-        return out
+            return out
+        except Exception as exep:
+            logger.error("Error getting current status: %s", str(exep))
+            raise StatusReturnError("Error getting current status")
 
     def gcode_mode(self):
         """Ask the mill for its gcode mode"""
@@ -334,7 +324,7 @@ class Mill:
         except MillConfigNotFound as update_offset_exception:
             logger.error(update_offset_exception)
             return 3
-        
+
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""
     pass
@@ -342,11 +332,25 @@ class StatusReturnError(Exception):
 class MillConfigNotFound(Exception):
     """Raised when the mill config file is not found"""
     pass
-    
+
+class MillConfigError(Exception):
+    """Raised when there is an error reading the mill config file"""
+    pass
+
+class MillConnectionError(Exception):
+    """Raised when there is an error connecting to the mill"""
+    pass
 
 class CommandExecutionError(Exception):
+    """Raised when there is an error executing a command"""
     pass
 
 class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
     pass
+
+
+
+
+
+
