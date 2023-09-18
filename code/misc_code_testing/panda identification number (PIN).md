@@ -9,7 +9,7 @@ Example PIN:
 ## Considerations
 
 - The first category will not have leading 0s
-- If any category grows beyond the initial 3-digits, all previous entries must be expanded with a leading 0. 
+- If any category grows beyond the initial 3-digits, all previous entries must be expanded with a leading 0.
 - When adding a new category all previous entries must be backfilled with 0s
 - All codes are numberic inorder to result in an integer value
 
