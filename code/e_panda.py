@@ -65,7 +65,7 @@ def pipette(
     if volume > 0.00:
         repetitions = math.ceil(
             volume / (pump.pipette_capacity_ul - 2 * purge_volume)
-        )  # divide by pipette capacity (200 ul)
+        )  # divide by pipette capacity
         repetition_vol = volume / repetitions
         for j in range(repetitions):
             logger.info("Repetition %d of %d", j + 1, repetitions)
