@@ -66,7 +66,7 @@ def pipette(
 
     if volume > 0.00:
         repetitions = math.ceil(
-            volume / (200 - 2 * purge_volume)
+            volume / (pump.pipette_capacity_ul - 2 * purge_volume)
         )  # divide by pipette capacity (200 ul)
         repetition_vol = volume / repetitions
         for j in range(repetitions):
@@ -238,7 +238,7 @@ def clear_well(
         mill.move_pipette_to_position(
             purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
-        
+
         logger.info("Remaining volume in well: %d", wellplate.volume(target_well))
 
 
