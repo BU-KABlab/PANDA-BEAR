@@ -29,16 +29,14 @@ import mill_control
 from pump_control import Pump as pump_class
 import vials as vial_class
 import wellplate as wellplate_class
+import nesp_lib
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s: %(levelname)s: %(wellID)s:%(experimentID)s:%(message)s")
-file_handler = logging.FileHandler("code/logs/ePANDA_module.log")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
-file_handler.setFormatter(formatter)
 system_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 logger.addHandler(system_handler)
 
 
@@ -104,7 +102,7 @@ def pipette(
                 purge_vial.coordinates["y"],
                 purge_vial.height,
             )  # purge_vial.depth replaced with height
-            purge(purge_vial, pump, purge_volume)
+            purge(purge_vial, pump, purge_volume) # remaining vol in pipette is now repition vol + 1 purge
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
@@ -122,7 +120,7 @@ def pipette(
                 wellplate.depth(target_well),
             )  # go to solution depth
             wellplate.update_volume(target_well, repetition_vol)
-            pump.infuse(repetition_vol, pumping_rate, pump)
+            pump.infuse(repetition_vol, pumping_rate, pump) # remaining vol in pipette is now 1 purge
             logger.info(
                 "Well %s volume: %f", target_well, wellplate.volume(target_well)
             )
@@ -143,7 +141,7 @@ def pipette(
                 purge_vial.height,
             )  # purge_vial.depth replaced with height
 
-            purge(purge_vial, pump, purge_volume)
+            purge(purge_vial, pump, purge_volume) # remaining vol in pipette is now 0
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
@@ -151,6 +149,22 @@ def pipette(
             logger.debug(
                 "Remaining volume in pipette: %f ", pump.volume_withdrawn
             )  # should always be zero, pause if not
+            while pump.volume_withdrawn != 0:
+                logger.warning(
+                    "Pipette not fully purged. Remaining volume: %f. Attempting to purge...",
+                    pump.volume_withdrawn,
+                )
+                try:
+                    purge(purge_vial, pump, pump.volume_withdrawn)
+                except nesp_lib.StatusAlarmException:
+                    logger.error(
+                        "Pipette not fully purged. Remaining volume: %f. Purge failed.",
+                        pump.volume_withdrawn,
+                    )
+                    sys.exit(1)
+                logger.debug(
+                    "Remaining volume in pipette: %f ", pump.volume_withdrawn
+                )
 
 
 def clear_well(
@@ -183,7 +197,7 @@ def clear_well(
     )  # divide by 200 ul (pipette capacity) for the number of repetitions. No purge needed here.
     repetition_vol = volume / repititions
 
-    if repetition_vol > 200:
+    if repetition_vol > pump.pipette_capacity_ul:
         repititions = repititions+1
         repetition_vol = volume / repititions
 
@@ -645,13 +659,12 @@ def run_experiment(
                 solution_name="waste",
             )
 
-            logger.info("Cleared dep_sol: %f", datetime.now())
+            logger.info("Cleared dep_sol from well: %s", instructions.target_well)
 
             ## Rinse the well 3x
             rinse(wellplate, instructions, pump, waste_vials, mill, stock_vials)
 
-            logger.info("Rinsed well: %f", datetime.now())
-            logger.info("Well rinsed")
+            logger.info("Rinsed well: %s", instructions.target_well)
 
         ## Echem CV - characterization
         if instructions["cv"] == 1:
@@ -678,13 +691,13 @@ def run_experiment(
                 mill=mill,
             )
 
-            logger.info("Deposited char_sol: %f", datetime.now())
+            logger.info("Deposited char_sol in well: %s", instructions.target_well)
 
             instructions, results = characterization(
                 instructions, results, mill, wellplate
             )
 
-            logger.info("Characterization complete: %f", datetime.now())
+            logger.info("Characterization of %s complete", instructions.target_well)
 
             clear_well(
                 instructions.char_vol,
@@ -697,7 +710,7 @@ def run_experiment(
                 "waste",
             )
 
-            logger.info("Well cleared: %f", datetime.now())
+            logger.info("Well %s cleared", instructions.target_well)
 
             # Flushing procedure
             flush_pipette_tip(
@@ -710,14 +723,14 @@ def run_experiment(
                 instructions.flush_vol,
             )
 
-            logger.info("Pipette Flushed: %f", datetime.now())
+            logger.info("Pipette Flushed")
 
         instructions.status = ExperimentStatus.FINAL_RINSE
         rinse(wellplate, instructions, pump, waste_vials, mill, stock_vials)
-        logger.info("Final Rinse: %f", datetime.now())
+        logger.info("Final Rinse")
 
         instructions.status = ExperimentStatus.COMPLETE
-        logger.info("End: %f", datetime.now())
+        logger.info("End of Experiment: %s", instructions.id)
 
         mill.move_to_safe_position()
         logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
