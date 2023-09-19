@@ -13,7 +13,7 @@ import os
 import pathlib
 import random
 from datetime import datetime
-from experiment_class import Experiment, ExperimentStatus, make_baseline_value
+from experiment_class import Experiment, ExperimentStatus #, make_baseline_value
 from configs.pin import CURRENT_PIN
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -57,10 +57,11 @@ class Scheduler:
                     continue
             return None
 
-    def choose_alternative_well(self, well: str, baseline: bool = False) -> str:
+    def choose_alternative_well(self, baseline: bool = False) -> str:
         """
         Chooses an alternative well if the target well is not available.
         :param well: The well to check.
+        :param baseline: Whether or not the experiment is a baseline test.
         :return: The alternative well. Or None if no wells are available.
         """
         file_to_open = pathlib.Path.cwd() / "code" / "system state" / "well_status.json"
@@ -219,29 +220,29 @@ class Scheduler:
 
         return count, complete
 
-    def insert_control_tests(self):
-        """
-        Creates a baseline test experiment and saves it to the queue.
-        Args:
-            None
-        Returns:
-            None
-        """
+    # def insert_control_tests(self):
+    #     """
+    #     Creates a baseline test experiment and saves it to the queue.
+    #     Args:
+    #         None
+    #     Returns:
+    #         None
+    #     """
 
-        ## Insert the baseline tests to the queue directory
-        target_well = self.choose_alternative_well("A1", baseline=True)
-        filename = f"{datetime.datetime.now().strftime('%Y-%m-%d')}_baseline_{target_well}.json"
-        baseline = make_baseline_value()
-        baseline.target_well = target_well
-        baseline.filename = filename
-        ## save the experiment as a separate file in the experiment_queue subfolder
-        subfolder_path = pathlib.Path.cwd() / "code" / "experiment_queue"
-        subfolder_path.mkdir(parents=True, exist_ok=True)
-        file_to_save = subfolder_path / filename
-        with open(file_to_save, "w", encoding="UTF-8") as outfile:
-            json.dump(baseline, outfile, indent=4)
-        ## change the status of the well
-        self.change_well_status(target_well, "queued")
+    #     ## Insert the baseline tests to the queue directory
+    #     target_well = self.choose_alternative_well(baseline=True)
+    #     filename = f"{datetime.datetime.now().strftime('%Y-%m-%d')}_baseline_{target_well}.json"
+    #     baseline = make_baseline_value()
+    #     baseline.target_well = target_well
+    #     baseline.filename = filename
+    #     ## save the experiment as a separate file in the experiment_queue subfolder
+    #     subfolder_path = pathlib.Path.cwd() / "code" / "experiment_queue"
+    #     subfolder_path.mkdir(parents=True, exist_ok=True)
+    #     file_to_save = subfolder_path / filename
+    #     with open(file_to_save, "w", encoding="UTF-8") as outfile:
+    #         json.dump(baseline, outfile, indent=4)
+    #     ## change the status of the well
+    #     self.change_well_status(target_well, "queued")
 
     def read_next_experiment_from_queue(self) -> tuple(Experiment, pathlib.Path):
         """
