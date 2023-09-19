@@ -90,14 +90,19 @@ class Pump():
 
         ## convert the volume argument from ul to ml
         volume_ml = volume / 1000  # Convert ul to ml
+        try:
+            if volume_ml > 0.0:
+                if self.pump.volume_withdrawn - volume_ml < 0:
+                    raise OverDraftException(volume_ml,
+                                             self.pump.volume_withdrawn,
+                                             self.pipette_capacity_ml
+                                             )
+                self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate)
 
-        if volume_ml > 0.0:
-            if self.pump.volume_withdrawn - volume_ml < 0:
-                raise OverDraftException(volume_ml, self.pump.volume_withdrawn, self.capacity)
-
-            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate)
-
-        return 0
+            return 0
+        except OverDraftException as err:
+            logger.error(err)
+            raise err
 
     def run_pump(self, direction, volume_ml, rate):
         """Combine all the common commands to run the pump into one function"""
