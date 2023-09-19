@@ -68,12 +68,15 @@ class Pump():
 
         ## convert the volume argument from ul to ml
         volume_ml = volume / 1000  # Convert ul to ml
+        try:
+            if self.pump.volume_withdrawn + volume_ml > self.pipette_capacity_ml:
+                raise OverFillException(volume_ml, self.pump.volume_withdrawn, self.pipette_capacity_ml)
 
-        if self.pump.volume_withdrawn + volume_ml > self.pipette_capacity_ml:
-            raise OverFillException(volume_ml, self.pump.volume_withdrawn, self.pipette_capacity_ml)
-
-        self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate)
-        return 0
+            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate)
+            return 0
+        except OverFillException as err:
+            logger.error(err)
+            raise err
 
     def infuse(self, volume: float, rate: float):
         """
