@@ -4,7 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pathlib
-
+from matplotlib.colors import Normalize
+from matplotlib.lines import Line2D
 
 #################
 # Book keeeping #
@@ -291,12 +292,6 @@ def plot_list_deposition_backup(folder_path, echem_function, experiment_numbers)
     print(f"All depositions plot saved")
     plt.close()
 
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from matplotlib.colors import Normalize
-
 def plot_list_deposition(folder_path, echem_function, experiment_numbers):
     plt.rcParams["figure.dpi"] = 150
     plt.rcParams["figure.facecolor"] = "white"
@@ -361,8 +356,35 @@ def plot_list_deposition(folder_path, echem_function, experiment_numbers):
     print(f"All depositions plot saved")
     plt.close()
 
+def plot_list_OCP(folder_path, echem_function, experiment_numbers):
+    plt.rcParams["figure.dpi"] = 150
+    plt.rcParams["figure.facecolor"] = "white"
+    
+    cycle_count = 0
+    colors = cm.viridis(np.linspace(0,1,len(experiment_numbers)))
+    legend_handles = []  # List to store legend handles
+    legend_labels = []   # List to store legend labels
 
+    for experiment_number in experiment_numbers:
+        file_name = f"experiment-{experiment_number}_{echem_function}_char.txt"
+        file_path = os.path.join(folder_path, file_name)
+                
+        df = pd.read_csv(file_path, sep=" ", header=None, names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
+                    
+        color = colors[cycle_count % len(colors)]
+        plt.plot(df['Time'], df['Vf'], color=color)
+        # Create a custom legend handle for this experiment
+        legend_handles.append(Line2D([0], [0], color=color, lw=2))
+        legend_labels.append(f'Experiment {experiment_number}')
+        cycle_count += 1
 
+    plt.xlabel('Time (s)')
+    plt.ylabel('Voltage (V)')
+    plt.tight_layout()
+    plt.legend(legend_handles, legend_labels)
+    plt.savefig(folder_path / f"{echem_function}_ALL.png")
+    print(f"All OCP plots saved")
+    plt.close()
 
 
 ####################
@@ -541,25 +563,8 @@ def plot_all_cycles_baseline(folder_path, echem_function):
 # Summary Plots #
 #################
 experiment_numbers = [
-106,107,116,117,129,130,141,142,118,119,108,109,131,132,
-143,144,110,111,133,134,145,146,120,121,122,123,135,136,
-147,148,112,113,149,150,124,125,114,115,137,138, 97, 98
+170,171,172,173,174,175,176,177,178
 ]
-
-'''
-experiment_numbers = [
-149,
-150,
-124,
-125,
-114,
-115,
-137,
-138,
-97,
-98
-]
-'''
 
 
 ##########
@@ -569,15 +574,16 @@ experiment_numbers = [
 #date = '2023-09-09'
 #folder_path = prefolder_path / f"{date}"
 #folder_path = pathlib.Path(__file__).parents[2] /  "data" / "2023-09-06"
-#prefolder_path = pathlib.Path("G:\\.shortcut-targets-by-id\\1-5Q8N9FCPTbzY_DvdwwKXIjGIYwbSlFQ\\data\\")
-
+prefolder_path = pathlib.Path("G:\\.shortcut-targets-by-id\\1-5Q8N9FCPTbzY_DvdwwKXIjGIYwbSlFQ\\data\\")
 folder_path = pathlib.Path("G:\\.shortcut-targets-by-id\\1-5Q8N9FCPTbzY_DvdwwKXIjGIYwbSlFQ\\data\\panda-app-dev\\")
-echem_function = "CA"
+
 master_file_path = folder_path / f"master_file.csv"
-master_df = pd.read_csv(master_file_path, sep=",", header='infer')
+#master_df = pd.read_csv(master_file_path, sep=",", header='infer')
 experiment_number_column = "ExpID"
 legend_value_column = "Ratio calc PEG rich"
-
+echem_function = "OCP"
+#exp = 174
+#expnum = f"experiment-{exp}"
 
 #############
 # Functions #
@@ -587,7 +593,8 @@ legend_value_column = "Ratio calc PEG rich"
 #plot_all_second_cycles_baseline(folder_path, echem_function)
 #plot_list_second_cycles(folder_path, echem_function, experiment_numbers)
 #plot_list_second_cycles_baseline(folder_path, echem_function, experiment_numbers)
-plot_list_deposition(folder_path, echem_function, experiment_numbers)
+#plot_list_deposition(folder_path, echem_function, experiment_numbers)
+plot_list_OCP(folder_path, echem_function, experiment_numbers)
 
 #plot_ind(folder_path, expnum, echem_function)
 #plot_second_cycle(folder_path, echem_function)
