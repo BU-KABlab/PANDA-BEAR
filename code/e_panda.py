@@ -131,7 +131,7 @@ def pipette(
             )  # return to safe height
 
             ## Intermediate: Purge
-            logger.info("Purging...")
+            logger.debug("Purging...")
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
@@ -194,7 +194,7 @@ def clear_well(
     """
     repititions = math.ceil(
         volume / pump.pipette_capacity_ul
-    )  # divide by 200 ul (pipette capacity) for the number of repetitions. No purge needed here.
+    )  # divide by pipette capacity for the number of repetitions. No purge needed here.
     repetition_vol = volume / repititions
 
     if repetition_vol > pump.pipette_capacity_ul:
@@ -224,6 +224,7 @@ def clear_well(
             wellplate.get_coordinates(target_well)["y"],
             wellplate.depth(target_well),
         )  # go to bottom of well
+        logger.debug("Withdrawing %s from well %s...", solution_name, target_well)
         wellplate.update_volume(
             target_well, -repetition_vol
         ) # update the volume of the well
@@ -245,7 +246,7 @@ def clear_well(
             purge_vial.coordinates["y"],
             purge_vial.height,
         )  # purge_vial.depth replaced with height
-        logger.info("Purging...")
+        logger.debug("Purging...")
         purge(
             purge_vial, pump, repetition_vol
         )  # repitition volume
@@ -639,13 +640,13 @@ def run_experiment(
                     instructions.flush_vol,
                 )
 
-        logger.info("Pipetted solutions: %f", datetime.now())
+        logger.info("Pipetted solutions into well: %s", instructions.target_well)
 
         if instructions["ca"] == 1:
             instructions.status = ExperimentStatus.DEPOSITING
             instructions, results = deposition(instructions, results, mill, wellplate)
 
-            logger.info("Deposition completed: %f", datetime.now())
+            logger.info("Deposition completed for well: %s", instructions.target_well)
 
             ## Withdraw all well volume into waste
             clear_well(
