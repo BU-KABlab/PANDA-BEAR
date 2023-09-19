@@ -150,7 +150,10 @@ class Wells:
                 self.wells[well_id]["depth"] = self.z_bottom
             debug_message = f"New volume: {self.wells[well_id]['volume']} | New depth: {self.wells[well_id]['depth']}"
             logging.debug(debug_message)
-
+    
+    def check_status(self, well_id):
+        """Check the status of a specific well"""
+        return self.wells[well_id]["status"]
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
