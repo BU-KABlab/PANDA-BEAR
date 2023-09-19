@@ -23,7 +23,7 @@ import logging
 import math
 from datetime import datetime
 import sys
-import gamrycontrol as echem
+import gamry_control as echem
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
 import mill_control
 from pump_control import Pump as pump_class
@@ -33,7 +33,7 @@ import wellplate as wellplate_class
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s: %(levelname)s: %(wellID)s:%(experimentID)s:%(message)s")
 file_handler = logging.FileHandler("code/logs/ePANDA_module.log")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 file_handler.setFormatter(formatter)
@@ -178,11 +178,14 @@ def clear_well(
     Returns:
         None
     """
-    clear_well_buffer = 20  # an extra 20 ul to ensure the well is cleared
     repititions = math.ceil(
-        volume / 200
+        volume / pump.pipette_capacity_ul
     )  # divide by 200 ul (pipette capacity) for the number of repetitions. No purge needed here.
     repetition_vol = volume / repititions
+
+    if repetition_vol > 200:
+        repititions = repititions+1
+        repetition_vol = volume / repititions
 
     logger.info(
         "Clearing well %s with %dx repetitions of %f",
@@ -193,7 +196,7 @@ def clear_well(
     for j in range(repititions):
         # TODO revisit bundling vial selection within purge, infuse, and withdraw along with updating volumes
         purge_vial = waste_selector(
-            waste_vials, solution_name, repetition_vol + clear_well_buffer
+            waste_vials, solution_name, repetition_vol
         )
 
         logger.info("Repitition %d of %d", j + 1, repititions)
@@ -209,8 +212,8 @@ def clear_well(
         )  # go to bottom of well
         wellplate.update_volume(
             target_well, -repetition_vol
-        )  # no buffer to avoid an overdraft error
-        pump.withdraw(repetition_vol + clear_well_buffer, pumping_rate, pump)
+        ) # update the volume of the well
+        pump.withdraw(repetition_vol, pumping_rate, pump)
         logger.debug("Well %s volume: %f", target_well, wellplate.volume(target_well))
 
         mill.move_pipette_to_position(
@@ -230,14 +233,12 @@ def clear_well(
         )  # purge_vial.depth replaced with height
         logger.info("Purging...")
         purge(
-            purge_vial, pump, repetition_vol + clear_well_buffer
-        )  # repitition volume + 20 ul purge
+            purge_vial, pump, repetition_vol
+        )  # repitition volume
         mill.move_pipette_to_position(
             purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
-        # pump.withdraw(20, pumping_rate, pump)
-        # pump.infuse(20, pumping_rate, pump)
-
+        
         logger.info("Remaining volume in well: %d", wellplate.volume(target_well))
 
 
