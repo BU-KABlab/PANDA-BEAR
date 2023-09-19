@@ -20,11 +20,8 @@ from configs.pin import CURRENT_PIN
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-file_handler = logging.FileHandler("logs/scheduler.log")
 system_handler = logging.FileHandler("logs/ePANDA.log")
-file_handler.setFormatter(formatter)
 system_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 logger.addHandler(system_handler)
 
 
