@@ -35,8 +35,9 @@ class Pump():
         Initialize the pump and set the capacity.
         """
         self.pump = self.set_up_pump()
-        self.capacity = 1.0 #mL
-        self.pipette_capacity = 0.2 #mL
+        self.syringe_capacity = 1.0 #mL
+        self.pipette_capacity_ml = 0.2 #mL
+        self.pipette_capacity_ul = self.pipette_capacity_ml * 1000 #uL
 
     def set_up_pump(self):
         """
@@ -68,8 +69,8 @@ class Pump():
         ## convert the volume argument from ul to ml
         volume_ml = volume / 1000  # Convert ul to ml
 
-        if self.pump.volume_withdrawn + volume_ml > self.pipette_capacity:
-            raise OverFillException(volume_ml, self.pump.volume_withdrawn, self.pipette_capacity)
+        if self.pump.volume_withdrawn + volume_ml > self.pipette_capacity_ml:
+            raise OverFillException(volume_ml, self.pump.volume_withdrawn, self.pipette_capacity_ml)
 
         self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate)
         return 0
