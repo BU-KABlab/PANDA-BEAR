@@ -14,7 +14,7 @@ import time
 from print_panda import printpanda
 from mill_control import Mill
 from pump_control import Pump
-import gamrycontrol as echem
+import gamry_control as echem
 import obs_controls as obs
 import slack_functions as slack
 from scheduler import Scheduler
