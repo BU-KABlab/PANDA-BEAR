@@ -30,16 +30,13 @@ import wellplate as wellplate_module
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-file_handler = logging.FileHandler("code/logs/controller.log")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
-file_handler.setFormatter(formatter)
 system_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 logger.addHandler(system_handler)
 
-path_to_config = "code/config/mill_config.json"
-path_to_status = "code/status"
-path_to_experiment = "code/config/experiment.json"
+PATH_TO_CONFIG = "code/config/mill_config.json"
+PATH_TO_STATUS = "code/status"
+PATH_TO_EXPERIMENT = "code/config/experiment.json"
 
 def main():
     """Main function"""
@@ -58,9 +55,19 @@ def main():
         scheduler = Scheduler()
 
         ## Establish state of system
-        stock_vials = vial_module.read_vials(Path.cwd() / path_to_status / "stock_status.json")
-        waste_vials = vial_module.read_vials(Path.cwd() / path_to_status / "waste_status.json")
+        stock_vials = vial_module.read_vials(Path.cwd() / PATH_TO_STATUS / "stock_status.json")
+        waste_vials = vial_module.read_vials(Path.cwd() / PATH_TO_STATUS / "waste_status.json")
         wellplate = wellplate_module.Wells(-218, -74, 0, 0)
+
+        logger.info("System state established")
+        # read through the stock vials and log their name, contents, and volume
+        for vial in stock_vials:
+            logging.info("Stock vial %s contains %s with volume %d", vial.name, vial.contents, vial.volume)
+        # read through the waste vials and log their name, contents, and volume
+        for vial in waste_vials:
+            logging.info("Waste vial %s contains %s with volume %d", vial.name, vial.contents, vial.volume)
+        # read through the wellplate and log the status of each well
+        
 
         ## On start up we want to run a baseline test
         # we are having the science team insert the control tests at the moment
