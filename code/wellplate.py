@@ -5,6 +5,16 @@ import logging
 import math
 import matplotlib.pyplot as plt
 
+
+
+## set up logging to log to both the pump_control.log file and the ePANDA.log file
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
+system_handler.setFormatter(formatter)
+logger.addHandler(system_handler)
+
 class Wells:
     """
     Position of well plate and each well in it.
@@ -150,11 +160,20 @@ class Wells:
                 self.wells[well_id]["depth"] = self.z_bottom
             debug_message = f"New volume: {self.wells[well_id]['volume']} | New depth: {self.wells[well_id]['depth']}"
             logging.debug(debug_message)
-    
-    def check_status(self, well_id):
+
+    def check_well_status(self, well_id):
         """Check the status of a specific well"""
         return self.wells[well_id]["status"]
 
+    def update_well_status(self, well_id, status):
+        """Update the status of a specific well"""
+        self.wells[well_id]["status"] = status
+
+    def check_all_wells_status(self):
+        """Check the status of all wells"""
+        for well_id, well_data in self.wells.items():
+            logger.info("Well %s status: %s",well_id,well_data["status"])
+           
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
 
