@@ -26,7 +26,8 @@ def send_slack_message(channel_id: str, message) -> None:
     Sends a message to a Slack channel using the Slack API.
 
     Args:
-    message (str): The message to send.
+        channel_id (str): The ID of the channel to send the message to. Can be 'conversation' or 'alert'.
+        message (str): The message to send.
 
     Returns:
     None
