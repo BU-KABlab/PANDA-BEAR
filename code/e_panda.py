@@ -120,7 +120,7 @@ def pipette(
                 wellplate.depth(target_well),
             )  # go to solution depth
             wellplate.update_volume(target_well, repetition_vol)
-            pump.infuse(repetition_vol, pumping_rate, pump) # remaining vol in pipette is now 1 purge
+            pump.infuse(repetition_vol, pumping_rate, pump) # remaining vol in pipette is now 1 purge vol
             logger.info(
                 "Well %s volume: %f", target_well, wellplate.volume(target_well)
             )
@@ -142,6 +142,7 @@ def pipette(
             )  # purge_vial.depth replaced with height
 
             purge(purge_vial, pump, purge_volume) # remaining vol in pipette is now 0
+            pump.infuse(20,0.5) # remaining vol in pipette is now -purge volume
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
@@ -149,6 +150,8 @@ def pipette(
             logger.debug(
                 "Remaining volume in pipette: %f ", pump.volume_withdrawn
             )  # should always be zero, pause if not
+            pump.withdraw(20, pumping_rate, pump) # remaining vol in pipette is now 0
+            
             while pump.volume_withdrawn != 0:
                 logger.warning(
                     "Pipette not fully purged. Remaining volume: %f. Attempting to purge...",
@@ -250,10 +253,11 @@ def clear_well(
         purge(
             purge_vial, pump, repetition_vol
         )  # repitition volume
+        pump.infuse(20,0.5) # purge the pipette tip
         mill.move_pipette_to_position(
             purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
-
+        pump.withdraw(20, pumping_rate) # remaining vol in pipette is now 0
         logger.info("Remaining volume in well: %d", wellplate.volume(target_well))
 
 
@@ -365,10 +369,11 @@ def flush_pipette_tip(
     )  # purge_vial.depth replaced with height
     logger.debug("Purging...")
     purge(purge_vial, pump, flush_volume + 20)
+    pump.infuse(20,0.5) # purge the pipette tip
     mill.move_pipette_to_position(
         purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
     )  # move back to safe height (top)
-
+    pump.withdraw(20, pumping_rate) # remaining vol in pipette is now 0
 
 def purge(
     purge_vial: vial_class, pump: pump_class, purge_volume=20.00, pumping_rate=0.5
