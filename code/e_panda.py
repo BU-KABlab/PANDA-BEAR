@@ -151,23 +151,23 @@ def pipette(
                 "Remaining volume in pipette: %f ", pump.volume_withdrawn
             )  # should always be zero, pause if not
             pump.withdraw(20, pumping_rate, pump) # remaining vol in pipette is now 0
-            
-            while pump.volume_withdrawn != 0:
-                logger.warning(
-                    "Pipette not fully purged. Remaining volume: %f. Attempting to purge...",
-                    pump.volume_withdrawn,
-                )
-                try:
-                    purge(purge_vial, pump, pump.volume_withdrawn)
-                except nesp_lib.StatusAlarmException:
-                    logger.error(
-                        "Pipette not fully purged. Remaining volume: %f. Purge failed.",
-                        pump.volume_withdrawn,
-                    )
-                    sys.exit(1)
-                logger.debug(
-                    "Remaining volume in pipette: %f ", pump.volume_withdrawn
-                )
+
+            # while pump.volume_withdrawn != 0:
+            #     logger.warning(
+            #         "Pipette not fully purged. Remaining volume: %f. Attempting to purge...",
+            #         pump.volume_withdrawn,
+            #     )
+            #     try:
+            #         purge(purge_vial, pump, pump.volume_withdrawn)
+            #     except nesp_lib.StatusAlarmException:
+            #         logger.error(
+            #             "Pipette not fully purged. Remaining volume: %f. Purge failed.",
+            #             pump.volume_withdrawn,
+            #         )
+            #         sys.exit(1)
+            #     logger.debug(
+            #         "Remaining volume in pipette: %f ", pump.volume_withdrawn
+            #     )
 
 
 def clear_well(
