@@ -19,10 +19,11 @@ import obs_controls as obs
 import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
-from experiment_class import Experiment, ExperimentStatus, ExperimentResult
+from experiment_class import Experiment, ExperimentResult
 import vials as vial_module
 from pathlib import Path
 import wellplate as wellplate_module
+from scale import Sartorius as Scale
 
 
 
@@ -50,6 +51,8 @@ def main():
         pump = Pump()
         echem.pstatconnect()
         # obs.OBS_controller()
+        scale = Scale()
+        slack.send_slack_message('alert', 'ePANDA is connected to equipment')
 
         ## Initialize scheduler
         scheduler = Scheduler()
@@ -67,7 +70,7 @@ def main():
         for vial in waste_vials:
             logging.info("Waste vial %s contains %s with volume %d", vial.name, vial.contents, vial.volume)
         # read through the wellplate and log the status of each well
-        
+
 
         ## On start up we want to run a baseline test
         # we are having the science team insert the control tests at the moment
@@ -87,12 +90,24 @@ def main():
                 ## Replace with slack alert and wait for response from user
                 scheduler.check_inbox()
 
+            # confirm that the new experiment is a valid experiment object
+            if not isinstance(new_experiment, Experiment):
+                logging.error("The experiment object is not valid")
+                slack.send_slack_message('alert', 'An invalid experiment object was passed to the controller')
+                continue
+
             ## Initialize a results object
             experiment_results = ExperimentResult()
             ## Run experiments
-            logging.info("Running experiment %s", new_experiment)
+            pre_experiment_status_msg = f"Running experiment {new_experiment} from {new_experiment_path}"
+            logging.info(pre_experiment_status_msg)
+            slack.send_slack_message('alert', pre_experiment_status_msg)
+
             experiment_results = e_panda.run_experiment(new_experiment, experiment_results, mill, pump, stock_vials, waste_vials, wellplate)
-            logging.info("Experiment %d ended with status %s", new_experiment.id, new_experiment.status)
+
+            post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status}"
+            logging.info(post_experiment_status_msg)
+            slack.send_slack_message('alert', post_experiment_status_msg)
 
 
     finally:
@@ -108,4 +123,4 @@ def main():
         logging.info("Pump closed")
         echem.disconnectpstat()
         logging.info("Pstat closed")
-        slack.send_slack_message('alert', 'ePANDA is shutting down')
+        slack.send_slack_message('alert', 'ePANDA is shutting down...goodbye')
