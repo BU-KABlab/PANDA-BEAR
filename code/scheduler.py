@@ -146,6 +146,7 @@ class Scheduler:
                 # TODO make the planner json output conform to schema so it can just be read in
                 instructions = Experiment(
                     id=experiment["id"],
+                    priority=experiment["priority"],
                     pin=CURRENT_PIN,
                     target_well=target_well,
                     dmf=experiment["dmf"],
@@ -176,6 +177,12 @@ class Scheduler:
                 file_to_save = subfolder_path / filename
                 with open(file_to_save, "w", encoding="UTF-8") as outfile:
                     json.dump(instructions, outfile, indent=4)
+
+                # Add the experiment to the queue
+                queue_file_path = "code" / "system state" / "queue.csv"
+                with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
+                    line = f"{instructions.id},{instructions.priority},{instructions.filename}"
+                    queue_file.write(line)
 
                 # Change the status of the well
                 self.change_well_status(target_well, "queued")
@@ -249,10 +256,15 @@ class Scheduler:
         Reads the next experiment from the queue.
         :return: The next experiment.
         """
+        file_path = pathlib.Path.cwd() / "code" / "system state" / "queue.csv"
+        if not pathlib.Path.exists(file_path):
+            logger.error("queue file not found")
+            raise FileNotFoundError("experiment queue file")
+
         file_path = pathlib.Path.cwd() / "code" / "experiment_queue"
         if not pathlib.Path.exists(file_path):
             logger.error("experiment_queue folder not found")
-            raise FileNotFoundError("experiment_queue folder")
+            raise FileNotFoundError("experiment queue folder")
 
         ## check if folder is not empty
         if os.listdir(file_path):
