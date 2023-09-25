@@ -37,7 +37,9 @@ class Pump():
         self.pump = self.set_up_pump()
         self.syringe_capacity = 1.0 #mL
         self.pipette_capacity_ml = 0.2 #mL
-        self.pipette_capacity_ul = self.pipette_capacity_ml * 1000 #uL
+        self.pipette_capacity_ul = 200 #uL
+        self.pipette_volume_ul = 0.0 #uL
+        self.pipette_volume_ml = 0.0 #mL
 
     def set_up_pump(self):
         """
@@ -55,7 +57,7 @@ class Pump():
         time.sleep(2)
         return pump
 
-    def withdraw(self, volume: float, rate: float):
+    def withdraw(self, volume: float, rate: float = 0.5):
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
@@ -67,45 +69,42 @@ class Pump():
         # Perform the withdrawl
 
         ## convert the volume argument from ul to ml
-        volume_ml = volume / 1000  # Convert ul to ml
-        try:
-            if self.pump.volume_withdrawn + volume_ml > self.pipette_capacity_ml:
-                raise OverFillException(volume_ml, self.pump.volume_withdrawn, self.pipette_capacity_ml)
+        volume = volume / 1000
 
-            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate)
-            return 0
-        except OverFillException as err:
-            logger.error(err)
-            raise err
+        self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
+        self.update_pipette_volume(self.pump.volume_withdrawn)
+        logging.debug(
+            "Pump has withdrawn: %f ml    Pipette vol: %f",
+            self.pump.volume_withdrawn,
+            self.pipette_volume_ul,
+        )
+        self.pump.volume_infused_clear()
+        self.pump.volume_withdrawn_clear()
+        return 0
 
-    def infuse(self, volume: float, rate: float):
+    def infuse(self, volume: float, rate: float = 0.5):
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
             volume (float): Volume to be infused in milliliters but given as microliters.
-            position (dict): Dictionary containing x, y, and z coordinates of the position.
-            depth (float): Depth to lower from the specified position in millimeters.
             rate (float): Pumping rate in milliliters per minute.
         """
-        # then lower to the pipetting depth
-        # mill.move_pipette_to_position(position["x"], position["y"], depth)
-        # Perform infusion
-
         ## convert the volume argument from ul to ml
-        volume_ml = volume / 1000  # Convert ul to ml
-        try:
-            if volume_ml > 0.0:
-                if self.pump.volume_withdrawn - volume_ml < 0:
-                    raise OverDraftException(volume_ml,
-                                             self.pump.volume_withdrawn,
-                                             self.pipette_capacity_ml
-                                             )
-                self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate)
+        volume = volume / 1000
 
-            return 0
-        except OverDraftException as err:
-            logger.error(err)
-            raise err
+        if volume > 0.0:
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
+            self.update_pipette_volume(self.pump.volume_infused)
+            logging.debug(
+                "Pump has infused: %f ml  Pipette volume: %f",
+                self.pump.volume_infused,
+                self.pipette_volume_ul,
+            )
+            self.pump.volume_infused_clear()
+            self.pump.volume_withdrawn_clear()
+        else:
+            pass
+        return 0
 
     def run_pump(self, direction, volume_ml, rate):
         """Combine all the common commands to run the pump into one function"""
@@ -114,7 +113,7 @@ class Pump():
         self.pump.pumping_rate = rate
         self.pump.run()
         action = "Withdrawing" if direction == nesp_lib.PumpingDirection.WITHDRAW else "Infusing"
-        logger.debug("%s...", action)
+        logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
         while self.pump.running:
             pass
@@ -123,6 +122,20 @@ class Pump():
         action_type = "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
         log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
         logger.debug(log_msg)
+
+    def update_pipette_volume(self, volume_ul):
+        """Set the volume of the pipette in ul"""
+        if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
+            self.pipette_volume_ul -= volume_ul
+            self.pipette_volume_ml -= volume_ul / 1000
+        else:
+            self.pipette_volume_ul += volume_ul
+            self.pipette_volume_ml += volume_ul / 1000
+
+    def set_pipette_capacity(self, capacity_ul):
+        """Set the capacity of the pipette in ul"""
+        self.pipette_capacity_ml = capacity_ul
+        self.pipette_capacity_ul = capacity_ul / 1000
 
 class OverFillException(Exception):
     """Raised when a vessel is over filled"""
