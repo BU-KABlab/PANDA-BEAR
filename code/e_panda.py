@@ -288,15 +288,17 @@ def rinse(
     stock_vials: list,
 ):
     """
-    Rinse the well with given ul of specified rinse solution in the experiment instructions
+    Rinse the well with rinse_vol ul of ACN.
+    Involves pipetteing and then clearing the well with no purging steps
     Args:
         wellplate (Wells object): The wellplate object
-        instructions (Experiment object): The experiment instructions
+        target_well (str): The alphanumeric name of the well you would like to rinse
+        pumping_rate (float): The pumping rate in ml/min
         pump (object): The pump object
         waste_vials (list): The list of waste vials
         mill (object): The mill object
-        stock_vials (list): The list of stock vials
-
+        rinse_repititions (int): The number of times to rinse
+        rinse_vol (float): The volume to rinse with in microliters
     Returns:
         None
     """
@@ -343,15 +345,15 @@ def flush_pipette_tip(
     flush_volume=120,
 ):
     """
-    Flush the pipette tip with given ul of flush solution
+    Flush the pipette tip with flush_volume ul of DMF to remove any residue
     Args:
         pump (object): The pump object
-        waste_vials (list): The list of waste vial objects
-        stock_vials (list): The list of stock vial objects
+        waste_vials (list): The list of waste vials
+        stock_vials (list): The list of stock vials
         flush_solution_name (str): The name of the flush solution
         mill (object): The mill object
-        pumping_rate (float): The pumping rate in ml/min (default 0.5)
-        flush_volume (float): The volume to flush in ml (default 120)
+        pumping_rate (float): The pumping rate in ml/min
+        flush_volume (float): The volume to flush with in microliters
 
     Returns:
         None
@@ -361,17 +363,21 @@ def flush_pipette_tip(
     # purge_vial = waste_selector("waste", flush_volume)
     flush_solution = solution_selector(stock_vials, flush_solution_name, flush_volume)
     purge_vial = waste_selector(waste_vials, "waste", flush_volume)
+    air_gap = 40  # ul
 
-    logger.info("Flushing with %s...", flush_solution.name)
+    logger.info("Moving to flush solution %s...", flush_solution.name)
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
-    pump.withdraw(20, pumping_rate, pump)
+    logger.debug("Withdrawing %f of air gap...", air_gap)
+    pump.withdraw(air_gap, pumping_rate)
+    
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"],
         flush_solution.coordinates["y"],
         flush_solution.bottom,
     )  # depth replaced with height
+
     logger.debug("Withdrawing %s...", flush_solution.name)
     pump.withdraw(flush_volume, pumping_rate, pump)
     mill.move_pipette_to_position(
@@ -386,12 +392,12 @@ def flush_pipette_tip(
         purge_vial.coordinates["x"], purge_vial.coordinates["y"], purge_vial.height
     )  # purge_vial.depth replaced with height
     logger.debug("Purging...")
-    purge(purge_vial, pump, flush_volume + 20)
-    pump.infuse(20,0.5) # purge the pipette tip
+    purge(purge_vial, pump, flush_volume)
+    logger.debug("Purging the air gap...")
+    pump.infuse(air_gap,0.5) # purge the pipette tip
     mill.move_pipette_to_position(
         purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
     )  # move back to safe height (top)
-    pump.withdraw(20, pumping_rate) # remaining vol in pipette is now 0
 
 def purge(
     purge_vial: vial_class, pump: pump_class, purge_volume=20.00, pumping_rate=0.5
@@ -416,17 +422,13 @@ def purge(
 
 def solution_selector(solutions: list, solution_name: str, volume: float) -> vial_class:
     """
-    Select the first solution from the list of solutions that:
-        1. matches the name
-        2. has enough volume
-
+    Select the solution from which to writhdraw from from the list of solution objects
     Args:
-        solutions (list): The list of solutions
-        solution_name (str): The name of the desired solution
-        volume (float): The volume to be added to the solution
-
+        solutions (list): The list of solution objects
+        solution_name (str): The name of the solution to select
+        volume (float): The volume to be pipetted
     Returns:
-        vial_class: The solution vial object
+        solution (object): The solution object
     """
     for solution in solutions:
         if solution.name.lower() == solution_name.lower() and solution.volume > (
@@ -439,17 +441,13 @@ def solution_selector(solutions: list, solution_name: str, volume: float) -> via
 
 def waste_selector(solutions: list, solution_name: str, volume: float) -> vial_class:
     """
-    Select the waste vial from the list of waste vials that:
-        1. matches the name
-        2. has enough volume
-
+    Select the solution in which to deposit into from the list of solution objects
     Args:
-        solutions (list): The list of waste vials
-        solution_name (str): The name of the desired waste vial
-        volume (float): The volume to be added to the waste vial
-
+        solutions (list): The list of solution objects
+        solution_name (str): The name of the solution to select
+        volume (float): The volume to be pipetted
     Returns:
-        vial_class: The waste vial object
+        solution (object): The solution object
     """
     solution_name = solution_name.lower()
     for waste_solution in solutions:
