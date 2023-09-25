@@ -40,6 +40,7 @@ class ExperimentResult:
 class Experiment:
     '''Define the data that is used to run an experiment'''
     id: int
+    priority: int = 2 # 0 is baseline 1 is high priority 2 is normal priority 3 is end baseline
     pin: int
     target_well: str
     dmf: float
