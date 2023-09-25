@@ -108,6 +108,7 @@ class Pump():
 
     def run_pump(self, direction, volume_ml, rate):
         """Combine all the common commands to run the pump into one function"""
+
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml
         self.pump.pumping_rate = rate
