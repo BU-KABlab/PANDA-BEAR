@@ -31,6 +31,7 @@ import gamry_control as echem
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
 import mill_control
 from pump_control import Pump as pump_class
+from scale import Sartorius as scale_class
 import vials as vial_class
 import wellplate as wellplate_class
 
@@ -55,6 +56,7 @@ def pipette(
     wellplate: object,
     pump: pump_class,
     mill: object,
+    scale: scale_class,
     purge_volume=20.00,
 ):
     """
@@ -77,7 +79,7 @@ def pipette(
 
 
         for j in range(repetitions):
-            logger.info("\n\nRepetition %d of %d", j + 1, repetitions)
+            logger.info("\n\n:(%s): Repetition %d of %d", j + 1,target_well, repetitions)
             repetition_and_purge_vol = repetition_vol + (2 * purge_volume)
             # solution = solution_selector(solution_name, repetition_vol)
             solution = solution_selector(solutions, solution_name, repetition_and_purge_vol)
@@ -86,10 +88,10 @@ def pipette(
                 waste_vials, waste_solution_name, repetition_and_purge_vol
             )
             ## First half: pick up solution
-            logger.debug("Withdrawing %f of air gap...", air_gap)
+            logger.debug(":(%s): Withdrawing %f of air gap...", target_well, air_gap)
             pump.withdraw(air_gap, pumping_rate, pump) # withdraw air gap to engage screw
 
-            logger.info("Moving to %s...", solution.name)
+            logger.info(":(%s): Moving to %s...", target_well, solution.name)
             mill.move_pipette_to_position(
                 solution.coordinates["x"], solution.coordinates["y"], 0
             )  # start at safe height
@@ -97,18 +99,27 @@ def pipette(
                 solution.coordinates["x"], solution.coordinates["y"], solution.bottom
             )  # go to solution depth (depth replaced with height)
 
-            solution.update_volume(-(repetition_vol + 2 * purge_volume))
-            logger.info("Withdrawing %s...", solution.name)
-            pump.withdraw(repetition_and_purge_vol, pumping_rate, pump)
-
-            logger.debug("%s new volume: %f", solution.name, solution.volume)
+            ## Estimate the weight to be withdrawn
+            ## based on the density of the solution
+            ## and the volume to be withdrawn
+            estimated_weight = solution.density * repetition_and_purge_vol
+            weight_before = scale.value()
+            logger.debug(":(%s): Weight before: %f",target_well, weight_before)
+            solution.update_volume(-(repetition_and_purge_vol))
+            logger.info(":(%s): Withdrawing %s...", target_well, solution.name)
+            pump.withdraw(repetition_and_purge_vol, target_well, pumping_rate, pump)
+            logger.debug(":(%s): %s new volume: %f", target_well, solution.name, solution.volume)
+            weight_after = scale.value()
+            logger.debug(":(%s): Weight after: %f", target_well, weight_after)
+            logger.debug(":(%s): Weight difference: %f", target_well, weight_before - weight_after)
+            logger.debug(":(%s): Weight deviation: %f", target_well, weight_before - weight_after - estimated_weight)
 
             mill.move_pipette_to_position(
                 solution.coordinates["x"], solution.coordinates["y"], 0
             )  # return to safe height
 
             ## Intermediate: Purge
-            logger.info("Moving to purge vial: %s...", purge_vial.name)
+            logger.info(":(%s): Moving to purge vial: %s...", target_well, purge_vial.name)
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
@@ -124,7 +135,7 @@ def pipette(
             )
 
             ## Second Half: Deposit to well
-            logger.info("Moving to target well: %s...", target_well)
+            logger.info(":(%s): Moving to target well: %s...", target_well, target_well)
             mill.move_pipette_to_position(
                 wellplate.get_coordinates(target_well)["x"],
                 wellplate.get_coordinates(target_well)["y"],
@@ -137,10 +148,10 @@ def pipette(
             )  # go to solution depth
 
             wellplate.update_volume(target_well, repetition_vol)
-            logger.info("Infusing %s into well %s...", solution.name, target_well)
+            logger.info(":(%s): Infusing %s into well %s...", target_well, solution.name, target_well)
             pump.infuse(repetition_vol, pumping_rate, pump) # remaining vol in pipette is now 1 purge vol
             logger.info(
-                "Well %s volume: %f", target_well, wellplate.volume(target_well)
+                ":(%s): Well %s volume: %f", target_well, target_well, wellplate.volume(target_well)
             )
 
             mill.move_pipette_to_position(
@@ -150,7 +161,7 @@ def pipette(
             )  # return to safe height
 
             ## End Purge
-            logger.debug("Moving to purge vial: %s...", purge_vial.name)
+            logger.debug(":(%s): Moving to purge vial: %s...", target_well, purge_vial.name)
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
@@ -168,18 +179,18 @@ def pipette(
             )
 
             logger.debug(
-                "Remaining volume in pipette: %f ", pump.volume_withdrawn
+                ":(%s): Remaining volume in pipette: %f ", target_well, pump.volume_withdrawn
             )  # should always be zero, pause if not
 
             if pump.pipette_volume_ul != 0:
                 while pump.pipette_volume_ul != 0:
                     logger.warning(
-                        "Pipette not empty. Volume: %f. Attempting to purge", pump.pipette_volume_ul
+                        ":(%s): Pipette not empty. Volume: %f. Attempting to purge", target_well, pump.pipette_volume_ul
                     )
                     pump.infuse(pump.pipette_volume_ul, pumping_rate)
                     time.sleep(1)
 
-                logger.debug("Pipette empty. Continuing...")
+                logger.debug(":(%s): Pipette empty. Continuing...", target_well)
 
 
 def clear_well(
@@ -371,7 +382,7 @@ def flush_pipette_tip(
     )
     logger.debug("Withdrawing %f of air gap...", air_gap)
     pump.withdraw(air_gap, pumping_rate)
-    
+
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"],
         flush_solution.coordinates["y"],
@@ -615,6 +626,7 @@ def run_experiment(
     results: ExperimentResult,
     mill: mill_control,
     pump: pump_class,
+    scale: scale_class,
     stock_vials: list,
     waste_vials: list,
     wellplate: wellplate_class,
@@ -650,6 +662,7 @@ def run_experiment(
                     wellplate=wellplate,
                     pump=pump,
                     mill=mill,
+                    scale=scale,
                 )
 
                 flush_pipette_tip(
@@ -801,6 +814,7 @@ if __name__ == "__main__":
 
     pump_driver = pump_class()
     mill_driver = mill_control.Mill()
+    Sartorius = scale_class()
     echem.pstatconnect()
     path_to_state = pathlib.Path.cwd() / "code/state"
     stock_vials_list = vial_class.read_vials(path_to_state / "vial_status.json")
@@ -813,6 +827,7 @@ if __name__ == "__main__":
         results=test_results,
         mill=mill_driver,
         pump=pump_driver,
+        scale=Sartorius,
         stock_vials=stock_vials_list,
         waste_vials=waste_vials_list,
         wellplate=wells_object,
