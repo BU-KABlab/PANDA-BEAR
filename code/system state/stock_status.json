@@ -2,6 +2,7 @@
     {
         "position": "S0",
         "contents": "DMF",
+        "density": 0.95,
         "x": -2,
         "y": -43,
         "name": "custom",
@@ -12,6 +13,7 @@
     {
         "position": "S1",
         "contents": "DMF",
+        "density": 0.95,
         "x": -2,
         "y": -76,
         "name": "dmf",
@@ -21,6 +23,7 @@
     {
         "position": "S2",
         "contents": "PEG",
+        "density": 1,
         "x": -2,
         "y": -109,
         "name": "peg",
@@ -30,6 +33,7 @@
     {
         "position": "S3",
         "contents": "Acrylate",
+        "density": 1,
         "x": -2,
         "y": -142,
         "name": "acrylate",
@@ -39,6 +43,7 @@
     {
         "position": "S4",
         "contents": "Ferrocene",
+        "density": 1.5,
         "x": -2,
         "y": -175,
         "name": "ferrocene",
@@ -49,6 +54,7 @@
     {
         "position": "R0",
         "contents": "Rinse0",
+        "density": 1,
         "x": -2,
         "y": -208,
         "name": "rinse0",
@@ -59,6 +65,7 @@
     {
         "position": "R1",
         "contents": "Rinse1",
+        "density": 1,
         "x": -2,
         "y": -241,
         "name": "rinse1",
@@ -69,6 +76,7 @@
     {
         "position": "R2",
         "contents": "Rinse2",
+        "density": 1,
         "x": -2,
         "y": -274,
         "name": "rinse2",
