@@ -1,18 +1,22 @@
 """sendSlackMessages.py"""
+# pylint: disable=line-too-long
+
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 import csv
 from datetime import datetime
-#import json
+
+# import json
 import logging
 from pathlib import Path
-#import re
+
+# import re
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
+logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
 file_handler = logging.FileHandler("slack_bot.log")
 system_handler = logging.FileHandler("ePANDA.log")
@@ -21,12 +25,13 @@ system_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(system_handler)
 
+
 def send_slack_message(channel_id: str, message) -> None:
     """
     Sends a message to a Slack channel using the Slack API.
 
     Args:
-        channel_id (str): The ID of the channel to send the message to. Can be 'conversation' or 'alert'.
+        channel_id (str): Can be 'conversation' or 'alert'.
         message (str): The message to send.
 
     Returns:
@@ -50,7 +55,6 @@ def send_slack_message(channel_id: str, message) -> None:
             logger.info("Message sent: %s", message)
         else:
             logger.error("Error sending message: %s", message)
-            
     except SlackApiError as error:
         logger.error("Error posting message: %s", error)
 
@@ -92,39 +96,40 @@ def send_slack_file(channel: str, file, message=None) -> None:
         log_msg = f"Error uploading file: {format(exception)}"
         logger.error(log_msg)
 
-    def upload_requested_experiment_info(experimentID, test_type, result_type, channel):
-        """Uploads requested experiment information to Slack channel.
 
-        Args:
-            experimentID (int): The ID of the experiment to get information from.
-            test_type (str): CV, CA, or OCP
-            result_type (str): plot/graph, data, .
-            channel (str): The Slack channel to upload the information to.
+def upload_requested_experiment_info(experiment_id, test_type, result_type, channel):
+    """Uploads requested experiment information to Slack channel.
 
-        """
-        # clean inputs
-        experimentID = int(experimentID)
-        test_type = test_type.lower()
-        result_type = result_type.lower()
-        channel = channel.lower()
+    Args:
+        experimentID (int): The ID of the experiment to get information from.
+        test_type (str): CV, CA, or OCP
+        result_type (str): plot/graph, data, .
+        channel (str): The Slack channel to upload the information to.
 
-        # Get experiment information
-        match result_type:
-            case "plot":
-                # Get plot
-                pass
-            case "graph":
-                # Get plot
-                pass
+    """
+    # clean inputs
+    experiment_id = int(experiment_id)
+    test_type = test_type.lower()
+    result_type = result_type.lower()
+    channel = channel.lower()
 
-            case "data":
-                # Get data
-                pass
-            case "parameters":
-                # Get parameters
-                pass
-            case _:
-                return "No applicable result type"
+    # Get experiment information
+    match result_type:
+        case "plot":
+            # Get plot
+            pass
+        case "graph":
+            # Get plot
+            pass
+
+        case "data":
+            # Get data
+            pass
+        case "parameters":
+            # Get parameters
+            pass
+        case _:
+            return "No applicable result type"
 
 
 def check_slack_messages(channel: str):
@@ -149,12 +154,12 @@ def check_slack_messages(channel: str):
         logger.info("Checking for new messages.")
         # Call the conversations.history method using the WebClient
         # conversations.history returns the first 100 messages by default
-        # These results are paginated, see: https://api.slack.com/methods/conversations.history$pagination
+        # These results are paginated, see:
+        # https://api.slack.com/methods/conversations.history$pagination
         result = client.conversations_history(channel=channel_id)
 
         conversation_history = result["messages"]
 
-        # Eliminate messages with not text value, as this throws error with scipy.io.savemat function
         conversation_history2 = [
             x
             for x in conversation_history
@@ -165,7 +170,7 @@ def check_slack_messages(channel: str):
             or (x["text"][0:7] == "!ePanda")
         ]
 
-        for message, payload in enumerate(conversation_history2):
+        for _, payload in enumerate(conversation_history2):
             msg_id = payload["client_msg_id"]
             msg_text = payload["text"]
             msg_ts = payload["ts"]
@@ -211,7 +216,7 @@ def check_slack_messages(channel: str):
         logger.error(error_msg)
 
 
-def find_id(id):
+def find_id(experiment_id):
     """Find the message ID in the slack ticket tracker csv file."""
     with open(
         Path(__file__).parents[0] / "slack_ticket_tracker.csv",
@@ -230,7 +235,7 @@ def find_id(id):
             ],
         )
         for row in reader:
-            if row["msg_id"] == id:
+            if row["msg_id"] == experiment_id:
                 return row
     return False
 
@@ -272,12 +277,15 @@ def parse_slack_message(text: str, channel_id) -> int:
         # Get experiment number
         experiment_number = text[5:]
         # Get plot
-        pass
 
     elif text[0:15] == "data experiment":
         # Get experiment number
         experiment_number = text[6:]
         # Share experiment
+        data = upload_requested_experiment_info(
+            experiment_number, "CV", "data", channel_id
+        )
+        send_slack_message(channel_id, data)
         return 1
 
     elif text[0:17] == "status experiment":
@@ -307,14 +315,14 @@ def parse_slack_message(text: str, channel_id) -> int:
         return 1
 
     else:
-        message = "Sorry, I don't understand that command. Type !epanda help for a list of commands."
+        message = "Sorry, I don't understand that command. Type !epanda help for commands I understand."
         send_slack_message(channel_id, message)
         return 0
 
 
 if __name__ == "__main__":
     TEST_MESSAGE = "This is a test message."
-    ePANDA_hello = "Hello ePANDA team! I am ePANDA. I am here to help you with your experiments. I can run experiments, analyze data, and send you alerts. I am still learning, so please be patient with me. I am excited to work with you!"
+    EPANDA_HELLO = """Hello ePANDA team! I am ePANDA. I am here to help you with your experiments. I can run experiments, analyze data, and send you alerts. I am still learning, so please be patient with me. I am excited to work with you!"""
     # send_slack_message('alert', MESSAGE)
     # send_slack_file('alert', r'code\misc_code_testing\ePANDA_pro_pic.jpeg', ePANDA_hello)
     check_slack_messages("alert")
