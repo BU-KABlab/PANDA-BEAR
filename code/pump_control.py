@@ -4,6 +4,8 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 import logging
 import time
 import nesp_lib
+from scale import Sartorius as Scale
+from vials import Vial
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -57,7 +59,7 @@ class Pump():
         time.sleep(2)
         return pump
 
-    def withdraw(self, volume: float, rate: float = 0.5):
+    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5):
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
@@ -82,7 +84,7 @@ class Pump():
         self.pump.volume_withdrawn_clear()
         return 0
 
-    def infuse(self, volume: float, rate: float = 0.5):
+    def infuse(self, volume: float,  solution: Vial = None, rate: float = 0.5):
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -105,6 +107,26 @@ class Pump():
         else:
             pass
         return 0
+
+    def purge(
+        self, purge_vial: Vial, solution: Vial = None, purge_volume=20.00, pumping_rate=0.5
+    ) -> None:
+        """
+        Perform purging from the pipette.
+        Args:
+            purge_vial (Vial object): The vial to purge into
+            pump (object): The pump object to use
+            purge_volume (float): The volume to purge in ml (default 20)
+            pumping_rate (float): The pumping rate in ml/min (default 0.5)
+
+        Returns:
+            None
+        """
+        purge_vial.update_volume(purge_volume)
+        logger.debug("Purging %f ul...", purge_volume)
+        self.infuse(volume=purge_volume, rate= pumping_rate, solution= solution)
+        log_msg = f"Purged {purge_volume} ul"
+        logger.debug(log_msg)
 
     def run_pump(self, direction, volume_ml, rate):
         """Combine all the common commands to run the pump into one function"""
