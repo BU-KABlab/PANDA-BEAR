@@ -1,7 +1,7 @@
 [
     {
         "position": "S0",
-        "contents": "DMF",
+        "contents": "custom",
         "density": 0.95,
         "x": -2,
         "y": -43,
@@ -12,7 +12,7 @@
     },
     {
         "position": "S1",
-        "contents": "DMF",
+        "contents": "dmf",
         "density": 0.95,
         "x": -2,
         "y": -76,
@@ -22,7 +22,7 @@
     },
     {
         "position": "S2",
-        "contents": "PEG",
+        "contents": "peg",
         "density": 1,
         "x": -2,
         "y": -109,
@@ -32,7 +32,7 @@
     },
     {
         "position": "S3",
-        "contents": "Acrylate",
+        "contents": "acrylate",
         "density": 1,
         "x": -2,
         "y": -142,
@@ -42,7 +42,7 @@
     },
     {
         "position": "S4",
-        "contents": "Ferrocene",
+        "contents": "ferrocene",
         "density": 1.5,
         "x": -2,
         "y": -175,
@@ -53,7 +53,7 @@
     },
     {
         "position": "R0",
-        "contents": "Rinse0",
+        "contents": "rinse0",
         "density": 1,
         "x": -2,
         "y": -208,
@@ -64,7 +64,7 @@
     },
     {
         "position": "R1",
-        "contents": "Rinse1",
+        "contents": "rinse1",
         "density": 1,
         "x": -2,
         "y": -241,
@@ -75,7 +75,7 @@
     },
     {
         "position": "R2",
-        "contents": "Rinse2",
+        "contents": "rinse2",
         "density": 1,
         "x": -2,
         "y": -274,
