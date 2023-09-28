@@ -252,7 +252,7 @@ def clear_well(
         wellplate.update_volume(target_well, -repetition_vol)
         logger.debug("Withdrawing %f from %s...", repetition_vol, target_well)
         pump.withdraw(
-            volume = repetition_vol, 
+            volume = repetition_vol,
             solution= wellplate.density(target_well),
             rate= pumping_rate
         )  # withdraw the volume from the well
@@ -644,7 +644,6 @@ def run_experiment(
                     wellplate=wellplate,
                     pump=pump,
                     mill=mill,
-                    scale=scale,
                 )
 
                 flush_pipette_tip(
@@ -715,7 +714,6 @@ def run_experiment(
                 wellplate=wellplate,
                 pump=pump,
                 mill=mill,
-                scale=scale,
             )
 
             logger.info("Deposited char_sol in well: %s", instructions.target_well)

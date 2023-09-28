@@ -45,6 +45,9 @@ class Mill:
         self.config_file = config_file
         self.config = self.read_json_config()
         self.ser_mill = self.connect_to_mill()
+
+    def homing_sequence(self):
+        """Home the mill, set the feed rate, and clear the buffers"""
         self.home()
         self.execute_command("F2000") #set feed rate to max but consistent
         self.ser_mill.flushInput() #clear input buffer

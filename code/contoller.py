@@ -49,6 +49,7 @@ def main():
     try:
         ## Connect to equipment
         mill = Mill()
+        mill.homing_sequence()
         pump = Pump()
         echem.pstatconnect()
         # obs.OBS_controller()
