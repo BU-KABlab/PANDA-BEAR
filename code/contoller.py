@@ -9,23 +9,24 @@ The controller is responsible for the following:
 '''
 # pylint: disable=line-too-long
 
+## import standard libraries
 import logging
 import time
+
+## import third-party libraries
+from pathlib import Path
 from print_panda import printpanda
 from mill_control import Mill
 from pump_control import Pump
 import gamry_control as echem
-import obs_controls as obs
+#import obs_controls as obs
 import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
 from experiment_class import Experiment, ExperimentResult
 import vials as vial_module
-from pathlib import Path
 import wellplate as wellplate_module
 from scale import Sartorius as Scale
-
-
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ def main():
         ## On start up we want to run a baseline test
         # we are having the science team insert the control tests at the moment
         # uncomment the following lines to run the baseline test at startup
-        # scheduler.insert_control_tests()  
+        # scheduler.insert_control_tests()
         # baseline = scheduler.read_next_experiment_from_queue()
         # baseline_results = ExperimentResult()
         # e_panda.run_experiment(baseline, baseline_results, mill, pump, stock_vials, waste_vials, wellplate)
