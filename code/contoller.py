@@ -103,7 +103,16 @@ def main():
             logging.info(pre_experiment_status_msg)
             slack.send_slack_message('alert', pre_experiment_status_msg)
 
-            experiment_results = e_panda.run_experiment(new_experiment, experiment_results, mill, pump, stock_vials, waste_vials, wellplate)
+            experiment_results = e_panda.run_experiment(
+                instructions= new_experiment,
+                results = experiment_results,
+                mill= mill,
+                pump= pump,
+                scale = scale,
+                stock_vials= stock_vials,
+                waste_vials= waste_vials,
+                wellplate= wellplate
+                )
 
             post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status}"
             logging.info(post_experiment_status_msg)
@@ -123,4 +132,8 @@ def main():
         logging.info("Pump closed")
         echem.disconnectpstat()
         logging.info("Pstat closed")
+
+        scale.close()
+        logging.info("Scale closed")
+
         slack.send_slack_message('alert', 'ePANDA is shutting down...goodbye')
