@@ -1,8 +1,8 @@
 {
     "[python]": {
-        "editor.defaultFormatter": "ms-python.python"
+        "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "python.formatting.provider": "black",
+    "python.formatting.provider": "none",
     "python.analysis.typeCheckingMode": "off",
     "githubPullRequests.ignoredPullRequestBranches": [
         "main"
