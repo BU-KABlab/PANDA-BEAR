@@ -6,6 +6,7 @@ import time
 import nesp_lib
 from scale import Sartorius as Scale
 from vials import Vial
+from mill_control import Mill
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ class Pump():
         OverDraftException: Raised when a syringe is over drawn.
     '''
 
-    def __init__(self):
+    def __init__(self, mill: Mill, scale: Scale):
         """
         Initialize the pump and set the capacity.
         """
@@ -42,6 +43,8 @@ class Pump():
         self.pipette_capacity_ul = 200 #uL
         self.pipette_volume_ul = 0.0 #uL
         self.pipette_volume_ml = 0.0 #mL
+        self.mill = mill
+        self.scale = scale
 
     def set_up_pump(self):
         """
@@ -145,6 +148,21 @@ class Pump():
         action_type = "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
         log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
         logger.debug(log_msg)
+
+    def mix(self, repetitions, volume = 200, rate = 0.62):
+        """Mix the solution in the pipette by withdrawing and infusing the solution"""
+        logger.info("Mixing %d times", repetitions)
+        for i in range(repetitions):
+            logger.debug("Mixing %d of %d times", i, repetitions)
+            self.withdraw(volume, rate)
+            current_coords = self.mill.current_coordinates()
+            self.mill.move_pipette_to_position(current_coords["x"],
+                                          current_coords["y"],
+                                          current_coords["z"] + 1.5)
+            self.infuse(volume, rate)
+            self.mill.move_pipette_to_position(current_coords["x"],
+                                          current_coords["y"],
+                                          current_coords["z"])
 
     def update_pipette_volume(self, volume_ul):
         """Set the volume of the pipette in ul"""
