@@ -11,6 +11,7 @@ Args:
     OBS: OBS object
     Wellplate: Wellplate object
     Vials: Vials object
+    Scale: Scale object
 
 Returns:
     ExperimentResult: The results of the experiment.
@@ -29,7 +30,7 @@ import time
 ## Third party or custom imports
 import gamry_control as echem
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
-import mill_control
+from mill_control import Mill as mill_control, Instruments as mill_instruments
 from pump_control import Pump as pump_class
 from scale import Sartorius as scale_class
 import vials as vial_class
@@ -173,7 +174,7 @@ def pipette(
 
             purge(purge_vial, pump, purge_volume)
             ## Pump out the air gap
-            pump.infuse(air_gap,0.5) 
+            pump.infuse(air_gap,0.5)
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
@@ -294,9 +295,10 @@ def rinse(
     wellplate: object,
     instructions: Experiment,
     pump: pump_class,
-    waste_vials: list,
+    scale: scale_class,
     mill: object,
     stock_vials: list,
+    waste_vials: list,
 ):
     """
     Rinse the well with rinse_vol ul of ACN.
@@ -333,6 +335,7 @@ def rinse(
             wellplate,
             pump,
             mill,
+            scale
         )
         clear_well(
             instructions.rinse_vol,
@@ -481,7 +484,10 @@ class NoAvailableSolution(Exception):
 
 
 def deposition(
-    dep_instructions: Experiment, dep_results: ExperimentResult, mill, wellplate
+    dep_instructions: Experiment, 
+    dep_results: ExperimentResult, 
+    mill: mill_control, 
+    wellplate: wellplate_class
 ):
     """Deposition of the solutions onto the substrate"""
     ## echem setup
@@ -489,10 +495,7 @@ def deposition(
 
     ## echem OCP
     logger.info("Beginning eChem OCP of well: %s", dep_instructions.target_well)
-    # TODO replace update_experiment_recipt with populating experiment result data class
-    # dep_instructions = update_experiment_recipt(
-    #    dep_instructions, "status", "ocp", dep_instructions["filename"]
-    # )
+    dep_instructions.status = ExperimentStatus.OCPCHECK
     mill.move_electrode_to_position(
         wellplate.get_coordinates(dep_instructions.target_well)["x"],
         wellplate.get_coordinates(dep_instructions.target_well)["y"],
@@ -516,6 +519,7 @@ def deposition(
 
     ## echem CA - deposition
     if dep_instructions["OCP_pass"]:
+        dep_instructions.status = ExperimentStatus.DEPOSITING
         logger.info(
             "Beginning eChem deposition of well: %s", dep_instructions.target_well
         )
@@ -531,11 +535,7 @@ def deposition(
         )  # CA
 
         echem.activecheck()
-        mill.move_electrode_to_position(
-            wellplate.get_coordinates(dep_instructions.target_well)["x"],
-            wellplate.get_coordinates(dep_instructions.target_well)["y"],
-            0,
-        )  # move to safe height above target well
+        mill.move_to_safe_position()  # move to safe height above target well
 
         mill.rinse_electrode()
         return dep_instructions, dep_results
@@ -562,9 +562,7 @@ def characterization(
     ## echem OCP
     logger.info("Beginning eChem OCP of well: %s", char_instructions.target_well)
 
-    # char_instructions = update_experiment_recipt(
-    #     char_instructions, "status", "ocp-char", char_instructions["filename"]
-    # )
+    char_instructions.status = ExperimentStatus.OCPCHECK
     mill.move_electrode_to_position(
         wellplate.get_coordinates(char_instructions.target_well)["x"],
         wellplate.get_coordinates(char_instructions.target_well)["y"],
@@ -589,8 +587,15 @@ def characterization(
     if char_instructions.ocp_char_pass:
         if char_instructions["baseline"] == 1:
             test_type = "CV_baseline"
+            char_instructions.status = ExperimentStatus.BASELINE
         else:
             test_type = "CV"
+            char_instructions.status = ExperimentStatus.CHARACTERIZING
+
+        logger.info(
+            "Beginning eChem %s of well: %s", test_type, char_instructions.target_well
+        )
+
         char_results.characterization_data_file = echem.setfilename(
             char_instructions.id, test_type
         )
@@ -608,13 +613,7 @@ def characterization(
             CVcycle=echem.potentiostat_cv_parameters.CVcycle,
         )
         echem.activecheck()
-        ## echem plot the data
-        # analyzer.plotdata("CV", complete_file_name)
-        mill.move_electrode_to_position(
-            wellplate.get_coordinates(char_instructions.target_well)["x"],
-            wellplate.get_coordinates(char_instructions.target_well)["y"],
-            0,
-        )  # move to safe height above target well
+        mill.move_to_safe_position() # move to safe height above target well
         mill.rinse_electrode()
         return char_instructions
     else:
@@ -636,14 +635,14 @@ def run_experiment(
     """
     try:
         logger.info("Beginning experiment %d", instructions.id)
+        ## Fetch list of solution names from stock_vials
+        experiment_solutions = [vial.name for vial in stock_vials]
+        #experiment_solutions = ["acrylate", "peg", "dmf", "ferrocene", "custom"]
 
         ## Deposit all experiment solutions into well
-        # TODO reconfigure the Experiment to have this list included
-        experiment_solutions = ["acrylate", "peg", "dmf", "ferrocene", "custom"]
-
         for solution_name in experiment_solutions:
             if (
-                getattr(instructions, solution_name) > 0
+                getattr(instructions, solution_name) > 0 and solution_name[0:4] != "rinse"
             ):  # if there is a solution to deposit
                 logger.info(
                     "Pipetting %s ul of %s into %s...",
@@ -698,7 +697,15 @@ def run_experiment(
             logger.info("Cleared dep_sol from well: %s", instructions.target_well)
 
             ## Rinse the well 3x
-            rinse(wellplate, instructions, pump, waste_vials, mill, stock_vials)
+            rinse(
+                wellplate=wellplate,
+                instructions= instructions,
+                pump= pump,
+                scale= scale,
+                mill= mill,
+                waste_vials= waste_vials,
+                stock_vials= stock_vials
+                )
 
             logger.info("Rinsed well: %s", instructions.target_well)
 
@@ -725,6 +732,7 @@ def run_experiment(
                 wellplate=wellplate,
                 pump=pump,
                 mill=mill,
+                scale=scale,
             )
 
             logger.info("Deposited char_sol in well: %s", instructions.target_well)
@@ -762,7 +770,15 @@ def run_experiment(
             logger.info("Pipette Flushed")
 
         instructions.status = ExperimentStatus.FINAL_RINSE
-        rinse(wellplate, instructions, pump, waste_vials, mill, stock_vials)
+        rinse(
+                wellplate=wellplate,
+                instructions= instructions,
+                pump= pump,
+                scale= scale,
+                mill= mill,
+                waste_vials= waste_vials,
+                stock_vials= stock_vials
+                )
         logger.info("Final Rinse")
 
         instructions.status = ExperimentStatus.COMPLETE
@@ -786,7 +802,7 @@ def run_experiment(
         return 2
 
     except Exception as general_exception:
-        exception_type, experiment_object, exception_traceback = sys.exc_info()
+        exception_type, _, exception_traceback = sys.exc_info()
         filename = exception_traceback.tb_frame.f_code.co_filename
         line_number = exception_traceback.tb_lineno
         logger.error("Exception: %s", general_exception)
