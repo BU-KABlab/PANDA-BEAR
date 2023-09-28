@@ -87,6 +87,7 @@ class Wells:
                     "depth": depth,
                     "status": "empty",
                     "CV-results": None,
+                    "density": 1.0
                 }
 
     def visualize_well_coordinates(self):
@@ -122,6 +123,10 @@ class Wells:
     def depth(self, well_id):
         """Return the depth of a specific well"""
         return self.wells[well_id]["depth"]
+    
+    def density(self, well_id):
+        """Return the density of a specific well"""
+        return self.wells[well_id]["density"]
 
     def check_volume(self, well_id, added_volume: float):
         """Check if a volume can fit in a specific well"""
