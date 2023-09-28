@@ -1,5 +1,16 @@
 '''
 This module contains the MillControl class, which is used to control the a GRBL CNC machine.
+The MillControl class is used by the EPanda class to move the pipette and electrode to the
+specified coordinates. 
+
+The MillControl class contains methods to move the pipette and
+electrode to a safe position, rinse the electrode, and update the offsets in the mill config
+file. 
+
+The MillControl class contains methods to connect to the mill, execute commands,
+stop the mill, reset the mill, home the mill, get the current status of the mill, get the
+gcode mode of the mill, get the gcode parameters of the mill, and get the gcode parser state
+of the mill.
 '''
 # standard libraries
 import dataclasses
@@ -61,7 +72,7 @@ class Mill:
             return ser_mill
         except Exception as exep:
             logger.error("Error connecting to the mill: %s", str(exep))
-            raise MillConnectionError("Error connecting to the mill")
+            raise MillConnectionError("Error connecting to the mill") from exep
 
     def __enter__(self):
         '''Open the serial connection to the mill'''
@@ -73,18 +84,19 @@ class Mill:
         time.sleep(15)
 
     def read_json_config(self):
+        """Read the config file"""
         try:
             config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
-            with open(config_file_path, "r", encoding="UTF-8") as f:
-                configuration = json.load(f)
+            with open(config_file_path, "r", encoding="UTF-8") as file:
+                configuration = json.load(file)
             logger.debug("Mill config loaded: %s", configuration)
             return configuration
-        except FileNotFoundError:
+        except FileNotFoundError as err:
             logger.error("Config file not found")
-            raise MillConfigNotFound("Config file not found")
-        except Exception as e:
-            logger.error("Error reading config file: %s", str(e))
-            raise MillConfigError("Error reading config file")
+            raise MillConfigNotFound("Config file not found") from err
+        except Exception as err:
+            logger.error("Error reading config file: %s", str(err))
+            raise MillConfigError("Error reading config file") from err
 
     def execute_command(self, command):
         """encodes and send commands to the mill and returns the response"""
@@ -120,7 +132,7 @@ class Mill:
             return out
         except Exception as exep:
             logger.error("Error executing command %s: %s", command, str(exep))
-            raise CommandExecutionError(f"Error executing command {command}")
+            raise CommandExecutionError(f"Error executing command {command}") from exep
 
     def stop(self):
         """Stop the mill"""
@@ -163,7 +175,7 @@ class Mill:
                 elif first.find("ok") >= 0:
                     out = second
                 else:
-                    raise StatusReturnError("Could not parse status message: %s", status)
+                    raise StatusReturnError(f"Could not parse status message: {status}")
             elif isinstance(status, str):
                 out = status.decode("utf-8").strip()
 
@@ -171,7 +183,7 @@ class Mill:
             return out
         except Exception as exep:
             logger.error("Error getting current status: %s", str(exep))
-            raise StatusReturnError("Error getting current status")
+            raise StatusReturnError("Error getting current status") from exep
 
     def gcode_mode(self):
         """Ask the mill for its gcode mode"""
@@ -327,30 +339,18 @@ class Mill:
 
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""
-    pass
 
 class MillConfigNotFound(Exception):
     """Raised when the mill config file is not found"""
-    pass
 
 class MillConfigError(Exception):
     """Raised when there is an error reading the mill config file"""
-    pass
 
 class MillConnectionError(Exception):
     """Raised when there is an error connecting to the mill"""
-    pass
 
 class CommandExecutionError(Exception):
     """Raised when there is an error executing a command"""
-    pass
 
 class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
-    pass
-
-
-
-
-
-
