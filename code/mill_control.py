@@ -36,6 +36,7 @@ class Instruments:
     CENTER = "center"
     PIPETTE = "pipette"
     ELECTRODE = "electrode"
+    LENSE = "lense"
 
 class Mill:
     """
@@ -221,7 +222,7 @@ class Mill:
         self.execute_command(command)
         return 0
 
-    def current_coordinates(self):
+    def current_coordinates(self, instrument = Instruments.CENTER):
         """
         Get the current coordinates of the mill.
         Args:
@@ -246,7 +247,17 @@ class Mill:
         else:
             logger.info("MPos coordinates not found in the line.")
             raise LocationNotFound
-        return [x_coord, y_coord, z_coord]
+        
+        if instrument == Instruments.CENTER or instrument == Instruments.LENSE:
+            return [x_coord, y_coord, z_coord]
+        elif instrument == Instruments.PIPETTE:
+            offsets = self.config["instrument_offsets"]["pipette"]
+            return [x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]]
+        elif instrument == Instruments.ELECTRODE:
+            offsets = self.config["instrument_offsets"]["electrode"]
+            return [x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]]
+        else:
+            raise ValueError("Invalid instrument")
 
     def rinse_electrode(self):
         """
