@@ -80,7 +80,7 @@ class Mill:
         '''Open the serial connection to the mill'''
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def close(self):
         '''Close the serial connection to the mill'''
         self.ser_mill.close()
         time.sleep(15)

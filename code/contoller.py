@@ -50,10 +50,10 @@ def main():
         ## Connect to equipment
         mill = Mill()
         mill.homing_sequence()
-        pump = Pump()
         echem.pstatconnect()
         # obs.OBS_controller()
         scale = Scale()
+        pump = Pump(mill=mill, scale=scale)
         slack.send_slack_message('alert', 'ePANDA is connected to equipment')
 
         ## Initialize scheduler
@@ -120,15 +120,23 @@ def main():
             logging.info(post_experiment_status_msg)
             slack.send_slack_message('alert', post_experiment_status_msg)
 
+    except Exception as error:
+        logging.error(error)
+        slack.send_slack_message('alert', f"ePANDA encountered an error: {error}")
+        raise error
+
+    except KeyboardInterrupt:
+        logging.info("Keyboard interrupt detected")
+        slack.send_slack_message('alert', 'ePANDA was interrupted by the user')
+        raise KeyboardInterrupt
 
     finally:
         ## Disconnect from equipment
         logging.info("Homing the mill...")
         mill.home()
-
         ## close out of serial connections
         logging.info("Disconnecting from Mill, Pump, Pstat:")
-        mill.exit()
+        mill.close()
         logging.info("Mill closed")
         # pump.close()
         logging.info("Pump closed")
