@@ -19,7 +19,6 @@ import logging
 import pathlib
 import re
 import time
-# non-standard libraries
 import serial
 
 # Configure the logger
@@ -36,7 +35,7 @@ class Instruments:
     CENTER = "center"
     PIPETTE = "pipette"
     ELECTRODE = "electrode"
-    LENSE = "lense"
+    LENS = "lens"  # Fixed the typo here
 
 class Mill:
     """
@@ -50,15 +49,14 @@ class Mill:
     def homing_sequence(self):
         """Home the mill, set the feed rate, and clear the buffers"""
         self.home()
-        self.execute_command("F2000") #set feed rate to max but consistent
-        self.ser_mill.flushInput() #clear input buffer
-        self.ser_mill.flushOutput() #clear output buffer
+        self.set_feed_rate(2000)  # Set feed rate to 2000
+        self.clear_buffers()
 
     def connect_to_mill(self):
         """Connect to the mill"""
         try:
             ser_mill = serial.Serial(
-                port="COM4",
+                port="COM4",  # Hardcoded serial port (consider making this configurable)
                 baudrate=115200,
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
@@ -82,7 +80,7 @@ class Mill:
         '''Open the serial connection to the mill'''
         return self
 
-    def exit(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         '''Close the serial connection to the mill'''
         self.ser_mill.close()
         time.sleep(15)
@@ -103,7 +101,7 @@ class Mill:
             raise MillConfigError("Error reading config file") from err
 
     def execute_command(self, command):
-        """encodes and send commands to the mill and returns the response"""
+        """Encodes and sends commands to the mill and returns the response"""
         try:
             logger_message = f"Executing command: {command}..."
             logger.debug(logger_message)
@@ -136,7 +134,7 @@ class Mill:
             return out
         except Exception as exep:
             logger.error("Error executing command %s: %s", command, str(exep))
-            raise CommandExecutionError(f"Error executing command {command}") from exep
+            raise CommandExecutionError(f"Error executing command {command}: {str(exep)}") from exep
 
     def stop(self):
         """Stop the mill"""
@@ -146,10 +144,22 @@ class Mill:
         """Reset the mill"""
         self.execute_command("(ctrl-x)")
 
-    def home(self):
-        """Home the mill"""
+    def home(self, timeout=90):
+        """Home the mill with a timeout"""
         self.execute_command("$H")
-        time.sleep(60)
+        start_time = time.time()
+
+        while True:
+            if time.time() - start_time > timeout:
+                logger.warning("Homing timed out")
+                break
+
+            status = self.current_status()
+            if "Idle" in status:
+                logger.info("Homing completed")
+                break
+
+            time.sleep(1)  # Adjust the sleep interval as needed
 
     def current_status(self):
         """
@@ -189,6 +199,15 @@ class Mill:
             logger.error("Error getting current status: %s", str(exep))
             raise StatusReturnError("Error getting current status") from exep
 
+    def set_feed_rate(self, rate):
+        """Set the feed rate"""
+        self.execute_command(f"F{rate}")
+
+    def clear_buffers(self):
+        """Clear input and output buffers"""
+        self.ser_mill.flushInput()  # Clear input buffer
+        self.ser_mill.flushOutput()  # Clear output buffer
+
     def gcode_mode(self):
         """Ask the mill for its gcode mode"""
         self.execute_command("$C")
@@ -205,20 +224,20 @@ class Mill:
         """
         Move the mill to the specified coordinates.
         Args:
-            coordinates (dict): Dictionary containing x, y, and z coordinates.
+            x_coord (float): X coordinate.
+            y_coord (float): Y coordinate.
+            z_coord (float): Z coordinate.
         Returns:
             str: Response from the mill after executing the command.
         """
-        # offsets = {"x": 0, "y": 0, "z": 0}
-
         offsets = self.config["instrument_offsets"]["center"]
 
-        mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
+        mill_move = "G00 X{} Y{} Z{}"  # Move to specified coordinates
         command = mill_move.format(
             x_coord + offsets["x"],
             y_coord + offsets["y"],
             z_coord + offsets["z"]
-            )
+        )
         self.execute_command(command)
         return 0
 
@@ -248,7 +267,7 @@ class Mill:
             logger.info("MPos coordinates not found in the line.")
             raise LocationNotFound
         
-        if instrument == Instruments.CENTER or instrument == Instruments.LENSE:
+        if instrument == Instruments.CENTER or instrument == Instruments.LENS:
             return [x_coord, y_coord, z_coord]
         elif instrument == Instruments.PIPETTE:
             offsets = self.config["instrument_offsets"]["pipette"]
@@ -368,3 +387,18 @@ class CommandExecutionError(Exception):
 
 class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
+
+def main():
+    try:
+        with Mill() as mill:
+            mill.homing_sequence()
+            # Perform other operations here
+    except (MillConnectionError, MillConfigNotFound, 
+            MillConfigError, CommandExecutionError, 
+            StatusReturnError, LocationNotFound
+            ) as error:
+        logger.error("Error occurred: %s",error)
+        # Handle the error gracefully, e.g., print a message or perform cleanup
+
+if __name__ == "__main__":
+    main()
