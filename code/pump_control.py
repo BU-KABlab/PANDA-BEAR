@@ -6,7 +6,7 @@ import time
 import nesp_lib
 from scale import Sartorius as Scale
 from vials import Vial
-from mill_control import Mill
+from mill_control import Mill, Instruments
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -23,10 +23,18 @@ class Pump():
     Attributes:
         pump (Pump): Initialized pump object.
         capacity (float): Maximum volume of the syringe in milliliters.
+        pipette_capacity_ml (float): Maximum volume of the pipette in milliliters.
+        pipette_capacity_ul (float): Maximum volume of the pipette in microliters.
+        pipette_volume_ul (float): Current volume of the pipette in microliters.
+        pipette_volume_ml (float): Current volume of the pipette in milliliters.
     
     Methods:
         withdraw(volume, rate): Withdraw the given volume at the given rate.
         infuse(volume, rate): Infuse the given volume at the given rate.
+        purge(purge_vial, pump, purge_volume, pumping_rate): Perform purging from the pipette.
+        mix(repetitions, volume, rate): Mix the solution in the pipette by withdrawing and infusing the solution.
+        update_pipette_volume(volume_ul): Set the volume of the pipette in ul.
+        set_pipette_capacity(capacity_ul): Set the capacity of the pipette in ul.
     
     Exceptions:
         OverFillException: Raised when a syringe is over filled.
@@ -155,7 +163,8 @@ class Pump():
         for i in range(repetitions):
             logger.debug("Mixing %d of %d times", i, repetitions)
             self.withdraw(volume, rate)
-            current_coords = self.mill.current_coordinates()
+            current_coords = self.mill.current_coordinates(Instruments.PIPETTE)
+
             self.mill.move_pipette_to_position(current_coords["x"],
                                           current_coords["y"],
                                           current_coords["z"] + 1.5)
