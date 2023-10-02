@@ -113,20 +113,14 @@ class Mill:
                 time.sleep(1)
                 out = self.ser_mill.readline()
                 logger.debug("%s executed", command)
-
             elif command == "?":
                 time.sleep(1)
                 out = self.ser_mill.readlines()[0]
                 logger.debug("%s executed. Returned %s )", command, out.decode())
-
             elif command != "$H":
-                status = self.current_status()
-                while status.find("Run") > 0:
-                    status = self.current_status()
-                    time.sleep(0.3)
-                out = status
+                self.wait_for_completion()
+                out = self.current_status()
                 logger.debug("%s executed", command)
-
             else:
                 out = self.ser_mill.readline()
                 logger.debug("%s executed", command)
@@ -160,45 +154,27 @@ class Mill:
                 break
 
             time.sleep(1)  # Adjust the sleep interval as needed
-
-    def current_status(self):
-        """
-        Instantly queries the mill for its current status.
-        DOES NOT RUN during homing sequence.
-        """
-        try:
-            out = ""
-            first = ""
-            second = ""
-            command = "?"
-            command_bytes = command.encode()
-            self.ser_mill.write(command_bytes)
-
-            time.sleep(2)
-            status = self.ser_mill.readlines()
+    def wait_for_completion(self, timeout=90):
+        """Wait for the mill to complete the previous command"""
+        start_time = time.time()
+        while True:
+            if time.time() - start_time > timeout:
+                logger.warning("Command execution timed out")
+                break
+            status = self.current_status()
+            if "Idle" in status:
+                break
             time.sleep(0.5)
 
-            if isinstance(status, list):
-                list_length = len(status)
-                if list_length == 0:
-                    out = "No response"
-                elif list_length > 0:
-                    first = status[0].decode("utf-8").strip()
-                elif list_length > 1:
-                    second = status[1].decode("utf-8").strip()
-                elif first.find("ok") >= 0:
-                    out = second
-                else:
-                    raise StatusReturnError(f"Could not parse status message: {status}")
-            elif isinstance(status, str):
-                out = status.decode("utf-8").strip()
-
-            logger.info(out)
-            return out
-        except Exception as exep:
-            logger.error("Error getting current status: %s", str(exep))
-            raise StatusReturnError("Error getting current status") from exep
-
+    def current_status(self):
+        """Get the current status of the mill"""
+        status = self.execute_command("?")
+        status = status.decode()
+        if "error" in status:
+            logger.error("Error in status: %s", status)
+            raise StatusReturnError("Error in status")
+        return status
+    
     def set_feed_rate(self, rate):
         """Set the feed rate"""
         self.execute_command(f"F{rate}")
