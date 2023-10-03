@@ -12,7 +12,7 @@ To synthesize polymer thin films, evaluate and compare their electrical properti
 * [200 µl Pipette tips]()
 * [Grace Bio-Labs FlexWell Incubation Chambers](https://gracebio.com/product/flexwell-incubation-chambers-204997/)
 * [PDMS gasket](https://cad.onshape.com/documents/8f40aa9641f7f1039e816474/w/adf97a8228dac96fc46992ed/e/9cba4213e4509f8c1b8e8175)
-* [Gold-coated Glass Substrate]
+* [Gold-coated Glass Substrate]()
 * [Septum Vials](https://www.fishersci.com/shop/products/clear-voa-glass-vials-0-125in-septa/12-100-112?searchHijack=true&searchTerm=clear-voa-glass-vials-0-125in-septa&searchType=Rapid&matchedCatNo=12-100-112)
 
 ## Designs
@@ -25,13 +25,13 @@ To synthesize polymer thin films, evaluate and compare their electrical properti
 
 # Other Tools and Dependencies
 * Python 3
+  * [nesp-lib](https://github.com/AbeKh/nesp-lib-py)
+  * comtypes
+  * numpy
+  * matplotlib
+  * pandas
 * Anaconda
-* Spyder
-* [nesp-lib](https://github.com/AbeKh/nesp-lib-py)
-* comtypes
-* numpy
-* matplotlib + dependancies
-* pandas
+  * Spyder
 * [Slack SDK](https://slack.dev/python-slack-sdk/)
 * [Windows driver for serial cable communication](https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip)
 
