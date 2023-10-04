@@ -1,4 +1,4 @@
-'''
+"""
 This module contains the MillControl class, which is used to control the a GRBL CNC machine.
 The MillControl class is used by the EPanda class to move the pipette and electrode to the
 specified coordinates. 
@@ -11,7 +11,7 @@ The MillControl class contains methods to connect to the mill, execute commands,
 stop the mill, reset the mill, home the mill, get the current status of the mill, get the
 gcode mode of the mill, get the gcode parameters of the mill, and get the gcode parser state
 of the mill.
-'''
+"""
 # standard libraries
 import dataclasses
 import json
@@ -29,19 +29,23 @@ system_handler = logging.FileHandler("ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
+
 @dataclasses.dataclass
 class Instruments:
     """Class for naming of the mill instruments"""
+
     CENTER = "center"
     PIPETTE = "pipette"
     ELECTRODE = "electrode"
     LENS = "lens"  # Fixed the typo here
 
+
 class Mill:
     """
     Set up the mill connection and pass commands, including special commands
     """
-    def __init__(self, config_file='mill_config.json'):
+
+    def __init__(self, config_file="mill_config.json"):
         self.config_file = config_file
         self.config = self.read_json_config()
         self.ser_mill = self.connect_to_mill()
@@ -77,18 +81,22 @@ class Mill:
             raise MillConnectionError("Error connecting to the mill") from exep
 
     def __enter__(self):
-        '''Open the serial connection to the mill'''
+        """Enter the context manager"""
         return self
+    
+    def __exit__(self):
+        """Exit the context manager"""
+        self.disconnect()
 
-    def close(self):
-        '''Close the serial connection to the mill'''
+    def disconnect(self):
+        """Close the serial connection to the mill"""
         self.ser_mill.close()
         time.sleep(15)
 
     def read_json_config(self):
         """Read the config file"""
         try:
-            config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
+            config_file_path = pathlib.Path.cwd() / "code/config" / self.config_file
             with open(config_file_path, "r", encoding="UTF-8") as file:
                 configuration = json.load(file)
             logger.debug("Mill config loaded: %s", configuration)
@@ -128,7 +136,9 @@ class Mill:
             return out
         except Exception as exep:
             logger.error("Error executing command %s: %s", command, str(exep))
-            raise CommandExecutionError(f"Error executing command {command}: {str(exep)}") from exep
+            raise CommandExecutionError(
+                f"Error executing command {command}: {str(exep)}"
+            ) from exep
 
     def stop(self):
         """Stop the mill"""
@@ -154,6 +164,7 @@ class Mill:
                 break
 
             time.sleep(1)  # Adjust the sleep interval as needed
+
     def wait_for_completion(self, timeout=90):
         """Wait for the mill to complete the previous command"""
         start_time = time.time()
@@ -174,7 +185,7 @@ class Mill:
             logger.error("Error in status: %s", status)
             raise StatusReturnError("Error in status")
         return status
-    
+
     def set_feed_rate(self, rate):
         """Set the feed rate"""
         self.execute_command(f"F{rate}")
@@ -210,14 +221,12 @@ class Mill:
 
         mill_move = "G00 X{} Y{} Z{}"  # Move to specified coordinates
         command = mill_move.format(
-            x_coord + offsets["x"],
-            y_coord + offsets["y"],
-            z_coord + offsets["z"]
+            x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]
         )
         self.execute_command(command)
         return 0
 
-    def current_coordinates(self, instrument = Instruments.CENTER):
+    def current_coordinates(self, instrument=Instruments.CENTER):
         """
         Get the current coordinates of the mill.
         Args:
@@ -242,15 +251,23 @@ class Mill:
         else:
             logger.info("MPos coordinates not found in the line.")
             raise LocationNotFound
-        
+
         if instrument == Instruments.CENTER or instrument == Instruments.LENS:
             return [x_coord, y_coord, z_coord]
         elif instrument == Instruments.PIPETTE:
             offsets = self.config["instrument_offsets"]["pipette"]
-            return [x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]]
+            return [
+                x_coord + offsets["x"],
+                y_coord + offsets["y"],
+                z_coord + offsets["z"],
+            ]
         elif instrument == Instruments.ELECTRODE:
             offsets = self.config["instrument_offsets"]["electrode"]
-            return [x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]]
+            return [
+                x_coord + offsets["x"],
+                y_coord + offsets["y"],
+                z_coord + offsets["z"],
+            ]
         else:
             raise ValueError("Invalid instrument")
 
@@ -271,7 +288,7 @@ class Mill:
         return 0
 
     def move_to_safe_position(self):
-        '''Move the mill to its current x,y location and z = 0'''
+        """Move the mill to its current x,y location and z = 0"""
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
 
@@ -331,7 +348,7 @@ class Mill:
         }
 
         self.config["instrument_offsets"][offset_type] = offset
-        config_file_path = pathlib.Path.cwd() / 'code/config' / self.config_file
+        config_file_path = pathlib.Path.cwd() / "code/config" / self.config_file
         if not config_file_path.exists():
             logger.error("Config file not found")
             raise MillConfigNotFound
@@ -346,35 +363,47 @@ class Mill:
             logger.error(update_offset_exception)
             return 3
 
+
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""
+
 
 class MillConfigNotFound(Exception):
     """Raised when the mill config file is not found"""
 
+
 class MillConfigError(Exception):
     """Raised when there is an error reading the mill config file"""
+
 
 class MillConnectionError(Exception):
     """Raised when there is an error connecting to the mill"""
 
+
 class CommandExecutionError(Exception):
     """Raised when there is an error executing a command"""
 
+
 class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
+
 
 def main():
     try:
         with Mill() as mill:
             mill.homing_sequence()
             # Perform other operations here
-    except (MillConnectionError, MillConfigNotFound, 
-            MillConfigError, CommandExecutionError, 
-            StatusReturnError, LocationNotFound
-            ) as error:
-        logger.error("Error occurred: %s",error)
+    except (
+        MillConnectionError,
+        MillConfigNotFound,
+        MillConfigError,
+        CommandExecutionError,
+        StatusReturnError,
+        LocationNotFound,
+    ) as error:
+        logger.error("Error occurred: %s", error)
         # Handle the error gracefully, e.g., print a message or perform cleanup
+
 
 if __name__ == "__main__":
     main()
