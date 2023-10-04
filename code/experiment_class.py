@@ -20,6 +20,7 @@ class ExperimentStatus(str, Enum):
     FINAL_RINSE = 'final_rinse'
     COMPLETE = 'complete'
     ERROR = 'error'
+    MIXING = 'mixing'
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class ExperimentResult:
@@ -63,6 +64,10 @@ class Experiment:
     pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
     rinse_count: int = 3 #Default rinse count
     rinse_vol: int = 150 #Default rinse volume
+    mix: int = 0 #Binary mix or dont mix
+    mix_count: int = 0 #Number of times to mix
+    mix_vol: int = 0 #Volume to mix
+    mix_rate: float = 0 #Rate for pump to mix at
     # To restrict this to one of a few values you can use an enum
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
@@ -113,6 +118,10 @@ def make_test_value() -> Experiment:
         flush_vol=120,
         rinse_count=3,
         rinse_vol=150,
+        mix = 0,
+        mix_count = 0,
+        mix_vol = 0,
+        mix_rate = 0,
         filename=None,
         results=None)
 
