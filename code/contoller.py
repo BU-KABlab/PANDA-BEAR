@@ -125,10 +125,11 @@ def main():
         slack.send_slack_message('alert', f"ePANDA encountered an error: {error}")
         raise error
 
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as exc:
         logging.info("Keyboard interrupt detected")
         slack.send_slack_message('alert', 'ePANDA was interrupted by the user')
-        raise KeyboardInterrupt
+        raise KeyboardInterrupt from exc
+
 
     finally:
         ## Disconnect from equipment
@@ -136,7 +137,7 @@ def main():
         mill.home()
         ## close out of serial connections
         logging.info("Disconnecting from Mill, Pump, Pstat:")
-        mill.close()
+        mill.disconnect()
         logging.info("Mill closed")
         # pump.close()
         logging.info("Pump closed")
