@@ -28,9 +28,9 @@ import sys
 import time
 
 ## Third party or custom imports
-import gamry_control as echem
+import gamry_control_WIP as echem
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus, make_test_value
-from mill_control import Mill as mill_control, Instruments as mill_instruments
+from mill_control import Mill as mill_control
 from pump_control import Pump as pump_class
 from scale import Sartorius as scale_class
 import vials as vial_class
@@ -690,8 +690,29 @@ def run_experiment(
                     instructions.pumping_rate,
                     instructions.flush_vol,
                 )
-
         logger.info("Pipetted solutions into well: %s", instructions.target_well)
+
+        ## Mix solutions in well
+        if instructions["mix"] == 1:
+            logger.info("Mixing well: %s", instructions.target_well)
+            instructions.status = ExperimentStatus.MIXING
+            pump.mix(
+                instructions.target_well,
+                instructions.mix_vol,
+                instructions.mix_rate,
+                wellplate,
+            )
+            logger.info("Mixed well: %s", instructions.target_well)
+
+        flush_pipette_tip(
+            pump,
+            waste_vials,
+            stock_vials,
+            instructions.flush_sol_name,
+            mill,
+            instructions.pumping_rate,
+            instructions.flush_vol,
+        )
 
         if instructions["ca"] == 1:
             instructions.status = ExperimentStatus.DEPOSITING
@@ -863,3 +884,8 @@ if __name__ == "__main__":
         waste_vials=waste_vials_list,
         wellplate=wells_object,
     )
+    print(test_results)
+
+    # close connections
+    echem.pstatdisconnect()
+    mill_driver.disconnect()
