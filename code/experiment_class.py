@@ -43,7 +43,7 @@ class ExperimentResult:
 class Experiment:
     '''Define the data that is used to run an experiment'''
     id: int
-    priority: int = 2 # 0 is baseline 1 is high priority 2 is normal priority 3 is end baseline
+    priority: int # 0 is baseline 1 is high priority 2 is normal priority 3 is end baseline
     pin: int
     target_well: str
     dmf: float
@@ -64,14 +64,14 @@ class Experiment:
     pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
     rinse_count: int = 3 #Default rinse count
     rinse_vol: int = 150 #Default rinse volume
-    mix: int = 0 #Binary mix or dont mix
-    mix_count: int = 0 #Number of times to mix
-    mix_vol: int = 0 #Volume to mix
-    mix_rate: float = 0 #Rate for pump to mix at
+    mix: int = 1 #Binary mix or dont mix
+    mix_count: int = 3 #Number of times to mix
+    mix_vol: int = 200 #Volume to mix
+    mix_rate: float = 0.62 #Rate for pump to mix at
     # To restrict this to one of a few values you can use an enum
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
-    filename: FilePath = None
+    filename: Optional[FilePath] = None
     # The optional fields seemed to be that way because they were experiment results
     results: Optional[ExperimentResult] = None
 
@@ -96,6 +96,7 @@ def make_test_value() -> Experiment:
     '''Create a test experiment value for the class'''
     return Experiment(
         id=1,
+        priority=2,
         pin=1001001001001001,
         target_well="D5",
         dmf=0,
@@ -118,17 +119,18 @@ def make_test_value() -> Experiment:
         flush_vol=120,
         rinse_count=3,
         rinse_vol=150,
-        mix = 0,
-        mix_count = 0,
-        mix_vol = 0,
-        mix_rate = 0,
-        filename=None,
+        mix = 1,
+        mix_count = 3,
+        mix_vol = 200,
+        mix_rate = 0.62,
+        filename= None, #f"test_{datetime.now}.json",
         results=None)
 
 def make_baseline_value() -> Experiment:
     '''Create a test experiment value for the class'''
     return Experiment(
-        id=1,
+        id=0,
+        priority=0,
         pin=CURRENT_PIN,
         target_well="D5",
         dmf=0,
@@ -151,7 +153,7 @@ def make_baseline_value() -> Experiment:
         flush_vol=120,
         rinse_count=3,
         rinse_vol=150,
-        filename=None,
+        filename= None, #f"test_{datetime.now}.json",
         results=None)
 
 def test_parse():
