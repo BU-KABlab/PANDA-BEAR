@@ -1,0 +1,35 @@
+2023-10-06 13:45:38,048:__main__:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-10-06 13:45:40,051:__main__:Mill connected: True
+2023-10-06 13:45:40,051:__main__:execute_command: $H
+2023-10-06 13:45:42,053:__main__:execute_command: $H executed. Returned 
+2023-10-06 13:46:46,464:__main__:Homing completed
+2023-10-06 13:46:46,465:__main__:execute_command: F2000
+2023-10-06 13:46:48,465:__main__:execute_command: F2000 executed
+2023-10-06 13:46:48,466:__main__:execute_command: G00 X-302 Y-71 Z0
+2023-10-06 13:46:50,466:__main__:execute_command: G00 X-302 Y-71 Z0 executed. Initially ok
+2023-10-06 13:47:04,475:__main__:execute_command: G00 X-302 Y-71 Z0 executed. Returned <Idle|MPos:-305.000,-74.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 13:47:04,475:__main__:execute_command: G00 X-302 Y-71 Z-77
+2023-10-06 13:47:06,476:__main__:execute_command: G00 X-302 Y-71 Z-77 executed. Initially ok
+2023-10-06 13:47:14,480:__main__:execute_command: G00 X-302 Y-71 Z-77 executed. Returned <Idle|MPos:-305.000,-74.000,-80.000|Bf:15,127|FS:0,0>
+2023-10-06 13:47:14,480:__main__:execute_command: G00 X-302 Y-71 Z0
+2023-10-06 13:47:16,480:__main__:execute_command: G00 X-302 Y-71 Z0 executed. Initially ok
+2023-10-06 13:47:24,485:__main__:execute_command: G00 X-302 Y-71 Z0 executed. Returned <Idle|MPos:-305.000,-74.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 13:47:24,485:__main__:execute_command: G00 X-329 Y-107 Z0
+2023-10-06 13:47:26,486:__main__:execute_command: G00 X-329 Y-107 Z0 executed. Initially ok
+2023-10-06 13:47:31,491:__main__:execute_command: G00 X-329 Y-107 Z0 executed. Returned <Idle|MPos:-332.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 13:47:31,491:__main__:execute_command: G00 X-329 Y-107 Z-77
+2023-10-06 13:47:33,492:__main__:execute_command: G00 X-329 Y-107 Z-77 executed. Initially ok
+2023-10-06 13:47:41,497:__main__:execute_command: G00 X-329 Y-107 Z-77 executed. Returned <Idle|MPos:-332.000,-110.000,-80.000|Bf:15,127|FS:0,0>
+2023-10-06 13:47:41,498:__main__:execute_command: G00 X-329 Y-107 Z0
+2023-10-06 13:47:43,499:__main__:execute_command: G00 X-329 Y-107 Z0 executed. Initially ok
+2023-10-06 13:47:51,505:__main__:execute_command: G00 X-329 Y-107 Z0 executed. Returned <Idle|MPos:-332.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 13:47:51,505:__main__:execute_command: G00 X-365 Y-89 Z0
+2023-10-06 13:47:53,505:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Initially ok
+2023-10-06 13:47:58,509:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Returned <Idle|MPos:-368.000,-92.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 13:47:58,509:__main__:execute_command: G00 X-365 Y-89 Z-77
+2023-10-06 13:48:00,510:__main__:execute_command: G00 X-365 Y-89 Z-77 executed. Initially ok
+2023-10-06 13:48:08,513:__main__:execute_command: G00 X-365 Y-89 Z-77 executed. Returned <Idle|MPos:-368.000,-92.000,-80.000|Bf:15,127|FS:0,0>
+2023-10-06 13:48:08,513:__main__:execute_command: G00 X-365 Y-89 Z0
+2023-10-06 13:48:10,514:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Initially ok
+2023-10-06 13:48:18,518:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Returned <Idle|MPos:-368.000,-92.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 13:48:33,520:__main__:Exiting program.

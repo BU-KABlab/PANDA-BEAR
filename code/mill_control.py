@@ -21,6 +21,8 @@ import re
 import time
 import serial
 
+import wellplate as Wells
+
 # Configure the logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
@@ -188,7 +190,7 @@ class Mill:
         if "error" in status.lower() or "alarm" in status.lower():
             logger.error("current_status: Error in status: %s", status)
             raise StatusReturnError("Error in status")
-        
+        ## Check for busy
         while status == "ok":
             status = self.ser_mill.readline().decode().rstrip()
         return status
@@ -241,7 +243,7 @@ class Mill:
         Returns:
             list: [x,y,z]
         """
-        
+
         status = self.current_status()
         # Regular expression to extract MPos coordinates
         pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
@@ -395,13 +397,14 @@ class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
 
 
-def main():
-    import wellplate as Wells
+def movement_test():
+    """Test the mill movement with a wellplate"""
     wellplate = Wells.Wells(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
 
-    system_handler = logging.FileHandler("code/logs/mill_control_testing.log")
-    system_handler.setFormatter(formatter)
-    logger.addHandler(system_handler)
+    # Configure the logger for testing
+    testing_handler = logging.FileHandler("code/logs/mill_control_testing.log")
+    logger.addHandler(testing_handler)
+    logger.removeHandler(system_handler)
 
     try:
         with Mill() as mill:
@@ -439,4 +442,4 @@ def main():
         mill.disconnect()
 
 if __name__ == "__main__":
-    main()
+    movement_test()
