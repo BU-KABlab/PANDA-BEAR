@@ -12,7 +12,6 @@ The controller is responsible for the following:
 ## import standard libraries
 import logging
 import time
-from typing import List, Dict, Tuple
 
 ## import third-party libraries
 from pathlib import Path
@@ -39,32 +38,31 @@ logger.addHandler(system_handler)
 
 PATH_TO_CONFIG = "code/config/mill_config.json"
 PATH_TO_STATUS = "code/system state"
-#PATH_TO_EXPERIMENT = "code/config/experiment.json"
-MILL_CONNECTED = False
-PSTAT_CONNECTED = False
-PUMP_CONNECTED = False
-SCALE_CONNECTED = False
+
 
 def main():
     """Main function"""
     logger.info(printpanda())
     slack.send_slack_message('alert', 'ePANDA is starting up')
-
+    mill_connected = False
+    pstat_connected = False
+    pump_connected = False
+    scale_connected = False
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
         ## Connect to equipment
         mill = Mill()
-        MILL_CONNECTED = True
+        mill_connected = True
         mill.homing_sequence()
         echem.pstatconnect()
-        PSTAT_CONNECTED = True
+        pstat_connected = True
         # obs.OBS_controller()
         scale = Scale()
-        SCALE_CONNECTED = True
+        scale_connected = True
         initial_weight = scale.value()
         logger.info("Connected to scale: %s", initial_weight)
         pump = Pump(mill=mill, scale=scale)
-        PUMP_CONNECTED = True
+        pump_connected = True
         slack.send_slack_message('alert', 'ePANDA is connected to equipment')
 
         ## Initialize scheduler
@@ -145,23 +143,23 @@ def main():
     finally:
         ## close out of serial connections
         logger.info("Disconnecting from Mill, Pump, Pstat:")
-        if SCALE_CONNECTED:
+        if scale_connected:
             scale.close()
             logger.info("Scale closed")
-            SCALE_CONNECTED = False
-        if PUMP_CONNECTED:
+            scale_connected = False
+        if pump_connected:
             #pump.close()
             logger.info("Pump closed")
-            PUMP_CONNECTED = False
-        if PSTAT_CONNECTED:
+            pump_connected = False
+        if pstat_connected:
             echem.disconnectpstat()
             logger.info("Pstat closed")
-            PSTAT_CONNECTED = False
-        if MILL_CONNECTED:
+            pstat_connected = False
+        if mill_connected:
             mill.home()
             mill.disconnect()
             logger.info("Mill closed")
-            MILL_CONNECTED = False
+            mill_connected = False
         slack.send_slack_message('alert', 'ePANDA is shutting down...goodbye')
 
 if __name__ == "__main__":
