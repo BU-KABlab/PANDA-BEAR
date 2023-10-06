@@ -5,7 +5,7 @@ from dataclasses import field
 from typing import Optional
 from pydantic import ConfigDict, FilePath, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
-from configs.pin import CURRENT_PIN
+from config.pin import CURRENT_PIN
 
 
 class ExperimentStatus(str, Enum):

@@ -1,0 +1,67 @@
+2023-10-05 17:17:55,439:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 17:18:44,397:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 17:21:47,715:slack_functions:Message sent: ePANDA encountered an error: experiment queue folder
+2023-10-05 17:23:00,970:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-05 17:23:49,187:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 17:24:38,272:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 17:31:20,921:slack_functions:Message sent: An invalid experiment object was passed to the controller
+2023-10-05 17:31:25,765:slack_functions:Message sent: An invalid experiment object was passed to the controller
+2023-10-05 17:31:35,136:slack_functions:Message sent: An invalid experiment object was passed to the controller
+2023-10-05 17:32:06,214:slack_functions:Message sent: An invalid experiment object was passed to the controller
+2023-10-05 17:32:34,677:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 17:34:59,422:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 17:35:45,309:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 17:43:16,553:slack_functions:Message sent: ePANDA encountered an error: 1 validation error for RootModel[Experiment]
+  JSON input should be string, bytes or bytearray [type=json_type, input_value={'id': 1, 'priority': 2, ...: None, 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/json_type
+2023-10-05 17:44:29,056:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-05 17:47:07,374:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 17:47:56,994:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 17:51:19,096:slack_functions:Message sent: Running experiment Experiment(id=1, priority=2, pin=1001001001001001, target_well='D5', dmf=0.0, peg=145.0, acrylate=145.0, ferrocene=0.0, custom=0.0, ocp=1, ca=1, cv=1, baseline=0, dep_duration=300, dep_pot=-2.7, char_sol_name='ferrocene', char_vol=290, flush_sol_name='dmf', flush_vol=120, pumping_rate=0.5, rinse_count=3, rinse_vol=150, mix=1, mix_count=3, mix_vol=200, mix_rate=0.62, status=<ExperimentStatus.QUEUED: 'queued'>, status_date=datetime.datetime(2023, 10, 5, 17, 23, 17, 905826), filename=None, results=None) from C:\Users\Kab Lab\Documents\GitHub\PANDA\code\experiment_queue\test1.json
+2023-10-05 18:03:40,174:slack_functions:Message sent: ePANDA encountered an error: type object 'datetime.datetime' has no attribute 'datetime'
+2023-10-05 18:08:56,664:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 18:09:45,736:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 18:10:59,844:slack_functions:Message sent: Running experiment Experiment(id=1, priority=2, pin=1001001001001001, target_well='D5', dmf=0.0, peg=145.0, acrylate=145.0, ferrocene=0.0, custom=0.0, ocp=1, ca=1, cv=1, baseline=0, dep_duration=300, dep_pot=-2.7, char_sol_name='ferrocene', char_vol=290, flush_sol_name='dmf', flush_vol=120, pumping_rate=0.5, rinse_count=3, rinse_vol=150, mix=1, mix_count=3, mix_vol=200, mix_rate=0.62, status=<ExperimentStatus.QUEUED: 'queued'>, status_date=datetime.datetime(2023, 10, 5, 17, 23, 17, 905826), filename=None, results=None) from C:\Users\Kab Lab\Documents\GitHub\PANDA\code\experiment_queue\test1.json
+2023-10-05 20:15:58,804:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 20:21:45,505:slack_functions:Message sent: ePANDA encountered an error: Error executing command ?: list index out of range
+2023-10-05 20:25:06,371:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 20:25:45,590:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 20:26:09,212:slack_functions:Message sent: Running experiment Experiment(id=1, priority=2, pin=1001001001001001, target_well='D5', dmf=0.0, peg=145.0, acrylate=145.0, ferrocene=0.0, custom=0.0, ocp=1, ca=1, cv=1, baseline=0, dep_duration=300, dep_pot=-2.7, char_sol_name='ferrocene', char_vol=290, flush_sol_name='dmf', flush_vol=120, pumping_rate=0.5, rinse_count=3, rinse_vol=150, mix=1, mix_count=3, mix_vol=200, mix_rate=0.62, status=<ExperimentStatus.QUEUED: 'queued'>, status_date=datetime.datetime(2023, 10, 5, 17, 23, 17, 905826), filename=None, results=None) from C:\Users\Kab Lab\Documents\GitHub\PANDA\code\experiment_queue\test1.json
+2023-10-05 20:43:45,992:slack_functions:Message sent: ePANDA encountered an error: type object 'datetime.datetime' has no attribute 'datetime'
+2023-10-05 20:44:18,365:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-05 20:53:18,710:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 20:53:57,772:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 20:53:57,950:slack_functions:Message sent: Running experiment Experiment(id=1, priority=2, pin=1001001001001001, target_well='D5', dmf=0.0, peg=145.0, acrylate=145.0, ferrocene=0.0, custom=0.0, ocp=1, ca=1, cv=1, baseline=0, dep_duration=300, dep_pot=-2.7, char_sol_name='ferrocene', char_vol=290, flush_sol_name='dmf', flush_vol=120, pumping_rate=0.5, rinse_count=3, rinse_vol=150, mix=1, mix_count=3, mix_vol=200, mix_rate=0.62, status=<ExperimentStatus.QUEUED: 'queued'>, status_date=datetime.datetime(2023, 10, 5, 17, 23, 17, 922766), filename=None, results=None) from C:\Users\Kab Lab\Documents\GitHub\PANDA\code\experiment_queue\test2.json
+2023-10-05 21:08:45,087:slack_functions:Message sent: ePANDA encountered an error: 'Experiment' object does not support item assignment
+2023-10-05 21:09:18,095:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-05 21:14:46,124:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 21:15:25,055:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 21:15:25,213:slack_functions:Message sent: Running experiment Experiment(id=1, priority=2, pin=1001001001001001, target_well='D5', dmf=0.0, peg=145.0, acrylate=145.0, ferrocene=0.0, custom=0.0, ocp=1, ca=1, cv=1, baseline=0, dep_duration=300, dep_pot=-2.7, char_sol_name='ferrocene', char_vol=290, flush_sol_name='dmf', flush_vol=120, pumping_rate=0.5, rinse_count=3, rinse_vol=150, mix=1, mix_count=3, mix_vol=200, mix_rate=0.62, status=<ExperimentStatus.QUEUED: 'queued'>, status_date=datetime.datetime(2023, 10, 5, 17, 23, 17, 922766), filename=None, results=None) from C:\Users\Kab Lab\Documents\GitHub\PANDA\code\experiment_queue\test2.json
+2023-10-05 21:25:48,281:slack_functions:Message sent: ePANDA encountered an error: 1 validation error for Experiment
+status_date
+  Input should be a valid datetime, invalid time separator, expected `:` [type=datetime_parsing, input_value='2023-10-05_21_25_16', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.4/v/datetime_parsing
+2023-10-05 21:26:36,608:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-05 21:31:18,596:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 21:32:03,160:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 21:32:03,330:slack_functions:Message sent: Running experiment Experiment(id=1, priority=2, pin=1001001001001001, target_well='D5', dmf=0.0, peg=145.0, acrylate=145.0, ferrocene=0.0, custom=0.0, ocp=1, ca=1, cv=1, baseline=0, dep_duration=300, dep_pot=-2.7, char_sol_name='ferrocene', char_vol=290, flush_sol_name='dmf', flush_vol=120, pumping_rate=0.5, rinse_count=3, rinse_vol=150, mix=1, mix_count=3, mix_vol=200, mix_rate=0.62, status=<ExperimentStatus.QUEUED: 'queued'>, status_date=datetime.datetime(2023, 10, 5, 17, 23, 17, 922766), filename=None, results=None) from C:\Users\Kab Lab\Documents\GitHub\PANDA\code\experiment_queue\test2.json
+2023-10-05 22:14:14,919:slack_functions:Message sent: ePANDA encountered an error: name 'test_results' is not defined
+2023-10-05 22:17:15,580:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-05 22:18:35,249:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 22:20:24,692:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 22:20:24,876:slack_functions:Message sent: Running experiment 1
+2023-10-05 22:25:05,503:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 22:27:59,696:slack_functions:Message sent: ePANDA encountered an error: (-536870873, None, ('CGamryPstat - In use by another script', 'GamryCOM.GamryPC6Pstat.1', None, 0, None))
+2023-10-05 23:09:39,161:slack_functions:Message sent: ePANDA is starting up
+2023-10-05 23:11:28,763:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-05 23:11:28,929:slack_functions:Message sent: Running experiment 1
+2023-10-05 23:25:34,279:slack_functions:Message sent: ePANDA encountered an error: 1 validation error for Experiment
+status_date
+  Input should be a valid datetime, invalid time separator, expected `:` [type=datetime_parsing, input_value='2023-10-05_23_25_07', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.4/v/datetime_parsing
+2023-10-05 23:29:18,173:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-06 00:05:29,446:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 00:07:20,918:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 00:07:21,073:slack_functions:Message sent: Running experiment 1
+2023-10-06 12:36:19,822:slack_functions:Message sent: Experiment 1 ended with status ExperimentStatus.ERROR
+2023-10-06 12:38:31,073:slack_functions:Message sent: ePANDA is starting up

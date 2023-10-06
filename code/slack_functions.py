@@ -18,8 +18,8 @@ import slack_credentials as slack_cred
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-file_handler = logging.FileHandler("slack_bot.log")
-system_handler = logging.FileHandler("ePANDA.log")
+file_handler = logging.FileHandler("code/logs/slack_bot.log")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
 file_handler.setFormatter(formatter)
 system_handler.setFormatter(formatter)
 logger.addHandler(file_handler)

@@ -12,6 +12,7 @@ The controller is responsible for the following:
 ## import standard libraries
 import logging
 import time
+from typing import List, Dict, Tuple
 
 ## import third-party libraries
 from pathlib import Path
@@ -37,8 +38,12 @@ system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
 PATH_TO_CONFIG = "code/config/mill_config.json"
-PATH_TO_STATUS = "code/status"
-PATH_TO_EXPERIMENT = "code/config/experiment.json"
+PATH_TO_STATUS = "code/system state"
+#PATH_TO_EXPERIMENT = "code/config/experiment.json"
+MILL_CONNECTED = False
+PSTAT_CONNECTED = False
+PUMP_CONNECTED = False
+SCALE_CONNECTED = False
 
 def main():
     """Main function"""
@@ -49,11 +54,17 @@ def main():
     try:
         ## Connect to equipment
         mill = Mill()
+        MILL_CONNECTED = True
         mill.homing_sequence()
         echem.pstatconnect()
+        PSTAT_CONNECTED = True
         # obs.OBS_controller()
         scale = Scale()
+        SCALE_CONNECTED = True
+        initial_weight = scale.value()
+        logger.info("Connected to scale: %s", initial_weight)
         pump = Pump(mill=mill, scale=scale)
+        PUMP_CONNECTED = True
         slack.send_slack_message('alert', 'ePANDA is connected to equipment')
 
         ## Initialize scheduler
@@ -62,15 +73,15 @@ def main():
         ## Establish state of system
         stock_vials = vial_module.read_vials(Path.cwd() / PATH_TO_STATUS / "stock_status.json")
         waste_vials = vial_module.read_vials(Path.cwd() / PATH_TO_STATUS / "waste_status.json")
-        wellplate = wellplate_module.Wells(-218, -74, 0, 0)
+        wellplate = wellplate_module.Wells(a1_x=-218,a1_y= -74,orientation= 0,columns= "ABCDEFGH",rows= 13)
 
         logger.info("System state established")
         # read through the stock vials and log their name, contents, and volume
         for vial in stock_vials:
-            logging.info("Stock vial %s contains %s with volume %d", vial.name, vial.contents, vial.volume)
+            logger.info("Stock vial %s contains %s with volume %d", vial.name, vial.contents, vial.volume)
         # read through the waste vials and log their name, contents, and volume
         for vial in waste_vials:
-            logging.info("Waste vial %s contains %s with volume %d", vial.name, vial.contents, vial.volume)
+            logger.info("Waste vial %s contains %s with volume %d", vial.name, vial.contents, vial.volume)
         # read through the wellplate and log the status of each well
 
 
@@ -87,25 +98,25 @@ def main():
             ## Ask the scheduler for the next experiment
             new_experiment, new_experiment_path = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
-                logging.info("No new experiments to run...waiting 1 minute for new experiments")
+                logger.info("No new experiments to run...waiting 1 minute for new experiments")
                 time.sleep(60)
                 ## Replace with slack alert and wait for response from user
                 scheduler.check_inbox()
 
             # confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, Experiment):
-                logging.error("The experiment object is not valid")
+                logger.error("The experiment object is not valid")
                 slack.send_slack_message('alert', 'An invalid experiment object was passed to the controller')
-                continue
+                break
 
             ## Initialize a results object
             experiment_results = ExperimentResult()
             ## Run experiments
-            pre_experiment_status_msg = f"Running experiment {new_experiment} from {new_experiment_path}"
-            logging.info(pre_experiment_status_msg)
+            pre_experiment_status_msg = f"Running experiment {new_experiment.id}"
+            logger.info(pre_experiment_status_msg)
             slack.send_slack_message('alert', pre_experiment_status_msg)
 
-            experiment_results = e_panda.run_experiment(
+            updated_experiment, experiment_results = e_panda.run_experiment(
                 instructions= new_experiment,
                 results = experiment_results,
                 mill= mill,
@@ -116,35 +127,42 @@ def main():
                 wellplate= wellplate
                 )
 
-            post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status}"
-            logging.info(post_experiment_status_msg)
+            post_experiment_status_msg = f"Experiment {updated_experiment.id} ended with status {updated_experiment.status}"
+            logger.info(post_experiment_status_msg)
             slack.send_slack_message('alert', post_experiment_status_msg)
 
     except Exception as error:
-        logging.error(error)
+        logger.error(error)
         slack.send_slack_message('alert', f"ePANDA encountered an error: {error}")
         raise error
 
     except KeyboardInterrupt as exc:
-        logging.info("Keyboard interrupt detected")
+        logger.info("Keyboard interrupt detected")
         slack.send_slack_message('alert', 'ePANDA was interrupted by the user')
         raise KeyboardInterrupt from exc
 
 
     finally:
-        ## Disconnect from equipment
-        logging.info("Homing the mill...")
-        mill.home()
         ## close out of serial connections
-        logging.info("Disconnecting from Mill, Pump, Pstat:")
-        mill.disconnect()
-        logging.info("Mill closed")
-        # pump.close()
-        logging.info("Pump closed")
-        echem.disconnectpstat()
-        logging.info("Pstat closed")
-
-        scale.close()
-        logging.info("Scale closed")
-
+        logger.info("Disconnecting from Mill, Pump, Pstat:")
+        if SCALE_CONNECTED:
+            scale.close()
+            logger.info("Scale closed")
+            SCALE_CONNECTED = False
+        if PUMP_CONNECTED:
+            #pump.close()
+            logger.info("Pump closed")
+            PUMP_CONNECTED = False
+        if PSTAT_CONNECTED:
+            echem.disconnectpstat()
+            logger.info("Pstat closed")
+            PSTAT_CONNECTED = False
+        if MILL_CONNECTED:
+            mill.home()
+            mill.disconnect()
+            logger.info("Mill closed")
+            MILL_CONNECTED = False
         slack.send_slack_message('alert', 'ePANDA is shutting down...goodbye')
+
+if __name__ == "__main__":
+    main()

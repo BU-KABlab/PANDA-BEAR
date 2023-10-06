@@ -23,9 +23,9 @@ import serial
 
 # Configure the logger
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)  # Change to INFO to reduce verbosity
+logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-system_handler = logging.FileHandler("ePANDA.log")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -83,8 +83,8 @@ class Mill:
     def __enter__(self):
         """Enter the context manager"""
         return self
-    
-    def __exit__(self):
+
+    def __exit__(self, exc_type, exc_value, traceback):
         """Exit the context manager"""
         self.disconnect()
 
@@ -111,29 +111,29 @@ class Mill:
     def execute_command(self, command):
         """Encodes and sends commands to the mill and returns the response"""
         try:
-            logger_message = f"Executing command: {command}..."
-            logger.debug(logger_message)
+            logger.debug("execute_command: %s", command)
 
             command_bytes = command.encode()
             self.ser_mill.write(command_bytes + b"\n")
+            time.sleep(2)
+            out = self.ser_mill.readline().decode().rstrip()
 
             if command == "F2000":
-                time.sleep(1)
-                out = self.ser_mill.readline()
-                logger.debug("%s executed", command)
+                logger.debug("execute_command: %s executed", command)
+
             elif command == "?":
-                time.sleep(1)
-                out = self.ser_mill.readlines()[0]
-                logger.debug("%s executed. Returned %s )", command, out.decode())
+                logger.debug("execute_command: %s executed. Returned %s", command, out)
+
             elif command != "$H":
-                self.wait_for_completion()
+                logger.debug("execute_command: %s executed. Initially %s", command, out)
+                self.wait_for_completion(out)
                 out = self.current_status()
-                logger.debug("%s executed", command)
+                logger.debug("execute_command: %s executed. Returned %s", command, out)
             else:
-                out = self.ser_mill.readline()
-                logger.debug("%s executed", command)
+                logger.debug("execute_command: %s executed. Returned %s", command, out)
 
             return out
+
         except Exception as exep:
             logger.error("Error executing command %s: %s", command, str(exep))
             raise CommandExecutionError(
@@ -151,6 +151,7 @@ class Mill:
     def home(self, timeout=90):
         """Home the mill with a timeout"""
         self.execute_command("$H")
+        time.sleep(90)
         start_time = time.time()
 
         while True:
@@ -163,27 +164,33 @@ class Mill:
                 logger.info("Homing completed")
                 break
 
-            time.sleep(1)  # Adjust the sleep interval as needed
+            time.sleep(2)  # Adjust the sleep interval as needed
 
-    def wait_for_completion(self, timeout=90):
+    def wait_for_completion(self, incoming_status, timeout=90):
         """Wait for the mill to complete the previous command"""
+        status = incoming_status
         start_time = time.time()
-        while True:
+        while "Idle" not in status:
             if time.time() - start_time > timeout:
-                logger.warning("Command execution timed out")
+                logger.warning("wait_for_completion: Command execution timed out")
                 break
             status = self.current_status()
-            if "Idle" in status:
-                break
-            time.sleep(0.5)
+            time.sleep(1)
 
-    def current_status(self):
+    def current_status(self) -> str:
         """Get the current status of the mill"""
-        status = self.execute_command("?")
-        status = status.decode()
-        if "error" in status:
-            logger.error("Error in status: %s", status)
+        command = "?"
+        command_bytes = command.encode()
+        self.ser_mill.write(command_bytes + b"\n")
+        time.sleep(2)
+        status = self.ser_mill.readline().decode().rstrip()
+        ## Check for errors
+        if "error" in status.lower() or "alarm" in status.lower():
+            logger.error("current_status: Error in status: %s", status)
             raise StatusReturnError("Error in status")
+        
+        while status == "ok":
+            status = self.ser_mill.readline().decode().rstrip()
         return status
 
     def set_feed_rate(self, rate):
@@ -207,7 +214,7 @@ class Mill:
         """Ask the mill for its gcode parser state"""
         return self.execute_command("$G")
 
-    def move_center_to_position(self, x_coord, y_coord, z_coord):
+    def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
         """
         Move the mill to the specified coordinates.
         Args:
@@ -226,7 +233,7 @@ class Mill:
         self.execute_command(command)
         return 0
 
-    def current_coordinates(self, instrument=Instruments.CENTER):
+    def current_coordinates(self, instrument=Instruments.CENTER) -> list:
         """
         Get the current coordinates of the mill.
         Args:
@@ -234,12 +241,12 @@ class Mill:
         Returns:
             list: [x,y,z]
         """
-        command = "?"
-        status = self.execute_command(command)
+        
+        status = self.current_status()
         # Regular expression to extract MPos coordinates
         pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 
-        match = pattern.search(status.decode())  # Decoding the bytes to string
+        match = pattern.search(status)  # Decoding the bytes to string
         if match:
             x_coord = float(match.group(1)) + 3
             y_coord = float(match.group(2)) + 3
@@ -389,9 +396,20 @@ class LocationNotFound(Exception):
 
 
 def main():
+    import wellplate as Wells
+    wellplate = Wells.Wells(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
     try:
         with Mill() as mill:
             mill.homing_sequence()
+            mill.move_pipette_to_position(wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
+            mill.move_pipette_to_position(wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],-20)
+            mill.move_to_safe_position()
+
+            mill.move_pipette_to_position(wellplate.get_coordinates('A5')['x'], wellplate.get_coordinates('A5')['y'],0)
+            mill.move_pipette_to_position(wellplate.get_coordinates('A5')['x'], wellplate.get_coordinates('A5')['y'],-20)
+            mill.move_to_safe_position()
+
+
             # Perform other operations here
     except (
         MillConnectionError,
@@ -404,6 +422,10 @@ def main():
         logger.error("Error occurred: %s", error)
         # Handle the error gracefully, e.g., print a message or perform cleanup
 
+    finally:
+        logger.info("Exiting program.")
+        # Perform cleanup here
+        mill.disconnect()
 
 if __name__ == "__main__":
     main()

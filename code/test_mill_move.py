@@ -11,10 +11,7 @@
 # move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
 
 #
-from classes import Wells, MillControl
-import gamrycontrol as echem
-import Analyzer as analyzer
-from run_experiments import read_vials, set_up_pump, withdraw, infuse
+import mill_control as MillControl
 mill = MillControl()
 wellplate = Wells(-218, -74, 0, 0)
 pump = set_up_pump()

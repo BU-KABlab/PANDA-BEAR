@@ -106,11 +106,19 @@ class Wells:
         plt.ylim(-300, 0)
         plt.show()
 
-    def get_coordinates(self, well_id):
-        """Return the coordinate of a specific well"""
+    def get_coordinates(self, well_id) -> dict:
+        """
+        Return the coordinate of a specific well
+        Args:
+            well_id (str): The well ID
+        Returns:
+            dict: The coordinates of the well in the form {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
+        """
         coordinates_dict = self.wells[well_id]["coordinates"]
-        # coordinates_list = [coordinates_dict["x"], coordinates_dict["y"], coordinates_dict["z"]]
+        coordinates_dict["depth"] = self.wells[well_id]["depth"]
+        coordinates_dict["echem_height"] = self.echem_height
         return coordinates_dict
+        
 
     def contents(self, well_id):
         """Return the contents of a specific well"""

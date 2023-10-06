@@ -18,7 +18,7 @@ import Analyzer
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-system_handler = logging.FileHandler("ePANDA.log")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 

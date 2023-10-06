@@ -61,7 +61,7 @@ class Vial:
         filepath=None,
     ):
         self.name = name
-        self.position = position
+        self.position_name = position
         self.coordinates = {"x": x_coord, "y": y_coord, "z": height}
         self.bottom = z_bottom
         self.contents = contents
@@ -113,7 +113,7 @@ class Vial:
         logging.info("Writing %s volume to vial file...", self.name)
 
         ## Open the file and read the contents
-        with open(".\\code\\MAIN\\" + self.filepath, "r", encoding="UTF-8") as file:
+        with open(self.filepath, "r", encoding="UTF-8") as file:
             solutions = json.load(file)
 
         ## Find matching solution name and update the volume
@@ -125,7 +125,7 @@ class Vial:
                 break
 
         ## Write the updated contents back to the file
-        with open(".\\code\\MAIN\\" + self.filepath, "w", encoding="UTF-8") as file:
+        with open(self.filepath, "w", encoding="UTF-8") as file:
             json.dump(solutions, file, indent=4)
         return 0
 

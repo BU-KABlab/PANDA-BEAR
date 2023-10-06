@@ -13,14 +13,16 @@ import os
 import pathlib
 import random
 from datetime import datetime
+from typing import List, Dict, Tuple
+import experiment_class
 from experiment_class import Experiment, ExperimentStatus #, make_baseline_value
-from configs.pin import CURRENT_PIN
+from config.pin import CURRENT_PIN
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-system_handler = logging.FileHandler("logs/ePANDA.log")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -103,7 +105,7 @@ class Scheduler:
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
 
-    def read_new_experiments(self, filename: str) -> int and bool:
+    def read_new_experiments(self, filename: str) -> Tuple[int, bool]:
         """
         Reads a JSON file and returns the experiment instructions/recipie as a dictionary.
         :param filename: The name of the JSON file to read.
@@ -196,7 +198,7 @@ class Scheduler:
 
         return experiments_read, complete
 
-    def check_inbox(self) -> int and bool:
+    def check_inbox(self) -> Tuple[int, bool]:
         """
         Checks the experiments inbox folder for new experiments.
         :return: the count of new experiments.
@@ -251,7 +253,7 @@ class Scheduler:
     #     ## change the status of the well
     #     self.change_well_status(target_well, "queued")
 
-    def read_next_experiment_from_queue(self) -> tuple(Experiment, pathlib.Path):
+    def read_next_experiment_from_queue(self) -> Tuple[Experiment, pathlib.Path]:
         """
         Reads the next experiment from the queue.
         :return: The next experiment.
@@ -276,6 +278,7 @@ class Scheduler:
             with open(file_path / random_file, "r", encoding="ascii") as file:
                 data = json.load(file)
                 if data["baseline"] == 0 and data["status"] == "queued":
+                    data = experiment_class.RootModel[Experiment].model_validate_json(json.dumps(data)).root
                     return data, (file_path / random_file)
 
         else:

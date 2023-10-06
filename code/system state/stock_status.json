@@ -27,8 +27,9 @@
         "x": -2,
         "y": -109,
         "name": "peg",
-        "volume": 20000,
-        "capacity": 20000
+        "volume": 18890.0,
+        "capacity": 20000,
+        "contamination": 0
     },
     {
         "position": "S3",
@@ -37,8 +38,9 @@
         "x": -2,
         "y": -142,
         "name": "acrylate",
-        "volume": 20000,
-        "capacity": 20000
+        "volume": 19260.0,
+        "capacity": 20000,
+        "contamination": 0
     },
     {
         "position": "S4",

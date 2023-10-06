@@ -7,12 +7,13 @@ import nesp_lib
 from scale import Sartorius as Scale
 from vials import Vial
 from mill_control import Mill, Instruments
+from wellplate import Wells as Wellplate
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-system_handler = logging.FileHandler("ePANDA.log")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -70,7 +71,7 @@ class Pump():
         time.sleep(2)
         return pump
 
-    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5):
+    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
@@ -95,7 +96,7 @@ class Pump():
         self.pump.volume_withdrawn_clear()
         return 0
 
-    def infuse(self, volume: float,  solution: Vial = None, rate: float = 0.5):
+    def infuse(self, volume: float,  solution: Vial = None, rate: float = 0.5) -> int:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -145,10 +146,10 @@ class Pump():
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml
         self.pump.pumping_rate = rate
-        self.pump.run()
         action = "Withdrawing" if direction == nesp_lib.PumpingDirection.WITHDRAW else "Infusing"
         logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
+        self.pump.run()
         while self.pump.running:
             pass
         logger.debug("Done %s", action)
@@ -157,21 +158,44 @@ class Pump():
         log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
         logger.debug(log_msg)
 
-    def mix(self, repetitions, volume = 200, rate = 0.62):
-        """Mix the solution in the pipette by withdrawing and infusing the solution"""
+    def mix(self, mix_location:dict = None, repetitions = 3, volume = 200.0, rate = 0.62):
+        """Mix the solution in the pipette by withdrawing and infusing the solution
+        Args:
+            mix_location (dict): Dictionary containing x, y, and z coordinates of the position.
+            repetitions (int): Number of times to mix the solution.
+            volume (float): Volume to be infused in milliliters but given as microliters.
+            rate (float): Pumping rate in milliliters per minute.
+            
+        Returns:
+            None
+        """
         logger.info("Mixing %d times", repetitions)
-        for i in range(repetitions):
-            logger.debug("Mixing %d of %d times", i, repetitions)
-            self.withdraw(volume, rate)
-            current_coords = self.mill.current_coordinates(Instruments.PIPETTE)
 
-            self.mill.move_pipette_to_position(current_coords["x"],
-                                          current_coords["y"],
-                                          current_coords["z"] + 1.5)
-            self.infuse(volume, rate)
-            self.mill.move_pipette_to_position(current_coords["x"],
+        if mix_location is not None:
+            for i in range(repetitions):
+                logger.debug("Mixing %d of %d times", i, repetitions)
+                self.withdraw(volume, rate)
+                current_coords = self.mill.current_coordinates(Instruments.PIPETTE)
+
+                self.mill.move_pipette_to_position(current_coords["x"],
+                                            current_coords["y"],
+                                            current_coords["z"] + 1.5)
+                self.infuse(volume, rate)
+                self.mill.move_pipette_to_position(current_coords["x"],
                                           current_coords["y"],
                                           current_coords["z"])
+        else:
+            #move to mix location
+            self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], 0)
+            self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], mix_location['depth'])
+            for i in range(repetitions):
+                logger.debug("Mixing %d of %d times", i, repetitions)
+                self.withdraw(volume, rate)
+                self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], mix_location['depth'] + 1.5)
+                self.infuse(volume, rate)
+                self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], mix_location['depth'])
+            #move back to original position
+            self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], 0)
 
     def update_pipette_volume(self, volume_ul):
         """Set the volume of the pipette in ul"""
