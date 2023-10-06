@@ -4281,3 +4281,510 @@ status_date
 2023-10-06 13:48:10,514:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Initially ok
 2023-10-06 13:48:18,518:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Returned <Idle|MPos:-368.000,-92.000,-3.000|Bf:15,127|FS:0,0>
 2023-10-06 13:48:33,520:__main__:Exiting program.
+2023-10-06 16:17:00,958:__main__:
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-10-06 16:17:01,143:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 16:17:01,144:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-10-06 16:17:03,146:mill_control:Mill connected: True
+2023-10-06 16:17:03,147:mill_control:execute_command: $H
+2023-10-06 16:17:05,148:mill_control:execute_command: $H executed. Returned 
+2023-10-06 16:18:09,535:mill_control:Homing completed
+2023-10-06 16:18:09,536:mill_control:execute_command: F2000
+2023-10-06 16:18:11,536:mill_control:execute_command: F2000 executed
+2023-10-06 16:18:14,854:__main__:Connected to scale: 0.0
+2023-10-06 16:18:14,927:pump_control:Pump found at address 0
+2023-10-06 16:18:17,098:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 16:18:17,101:__main__:System state established
+2023-10-06 16:18:17,101:__main__:Stock vial custom contains custom with volume 1930
+2023-10-06 16:18:17,101:__main__:Stock vial dmf contains dmf with volume 20000
+2023-10-06 16:18:17,101:__main__:Stock vial peg contains peg with volume 18890
+2023-10-06 16:18:17,101:__main__:Stock vial acrylate contains acrylate with volume 19260
+2023-10-06 16:18:17,101:__main__:Stock vial ferrocene contains ferrocene with volume 10190
+2023-10-06 16:18:17,102:__main__:Stock vial rinse0 contains rinse0 with volume 6640
+2023-10-06 16:18:17,102:__main__:Stock vial rinse1 contains rinse1 with volume 6640
+2023-10-06 16:18:17,102:__main__:Stock vial rinse2 contains rinse2 with volume 6640
+2023-10-06 16:18:17,102:__main__:Waste vial waste contains waste with volume 15560
+2023-10-06 16:18:17,102:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:18:17,102:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:18:17,102:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:18:17,102:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:18:17,102:__main__:Waste vial rinse0 contains Rinse0 with volume 4780
+2023-10-06 16:18:17,102:__main__:Waste vial rinse1 contains Rinse1 with volume 4780
+2023-10-06 16:18:17,102:__main__:Waste vial rinse2 contains Rinse2 with volume 4780
+2023-10-06 16:18:17,121:__main__:Running experiment 1
+2023-10-06 16:18:17,283:slack_functions:Message sent: Running experiment 1
+2023-10-06 16:20:20,859:__main__:1 validation error for Experiment
+status
+  Input should be 'new', 'queued', 'ocpcheck', 'depositing', 'rinsing', 'baselining', 'characterizing', 'final_rinse', 'complete', 'error' or 'mixing' [type=enum, input_value='running', input_type=str]
+2023-10-06 16:20:22,655:slack_functions:Message sent: ePANDA encountered an error: 1 validation error for Experiment
+status
+  Input should be 'new', 'queued', 'ocpcheck', 'depositing', 'rinsing', 'baselining', 'characterizing', 'final_rinse', 'complete', 'error' or 'mixing' [type=enum, input_value='running', input_type=str]
+2023-10-06 16:20:31,427:__main__:Disconnecting from Mill, Pump, Pstat:
+2023-10-06 16:21:59,792:__main__:Scale closed
+2023-10-06 16:22:01,394:__main__:Pump closed
+2023-10-06 16:22:17,600:__main__:Pstat closed
+2023-10-06 16:22:20,158:mill_control:execute_command: $H
+2023-10-06 16:22:32,168:mill_control:execute_command: $H executed. Returned 
+2023-10-06 16:23:04,170:mill_control:Homing completed
+2023-10-06 16:23:25,272:__main__:Mill closed
+2023-10-06 16:23:26,920:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-06 16:23:52,309:__main__:
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-10-06 16:23:52,479:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 16:23:52,481:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-10-06 16:23:54,483:mill_control:Mill connected: True
+2023-10-06 16:23:54,483:mill_control:execute_command: $H
+2023-10-06 16:23:56,485:mill_control:execute_command: $H executed. Returned 
+2023-10-06 16:24:36,490:mill_control:Homing completed
+2023-10-06 16:24:36,491:mill_control:execute_command: F2000
+2023-10-06 16:24:38,492:mill_control:execute_command: F2000 executed
+2023-10-06 16:24:41,698:__main__:Connected to scale: 0.0
+2023-10-06 16:24:41,768:pump_control:Pump found at address 0
+2023-10-06 16:24:43,944:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 16:24:43,946:__main__:System state established
+2023-10-06 16:24:43,946:__main__:Stock vial custom contains custom with volume 1930
+2023-10-06 16:24:43,946:__main__:Stock vial dmf contains dmf with volume 20000
+2023-10-06 16:24:43,946:__main__:Stock vial peg contains peg with volume 18890
+2023-10-06 16:24:43,946:__main__:Stock vial acrylate contains acrylate with volume 19260
+2023-10-06 16:24:43,946:__main__:Stock vial ferrocene contains ferrocene with volume 10190
+2023-10-06 16:24:43,946:__main__:Stock vial rinse0 contains rinse0 with volume 6640
+2023-10-06 16:24:43,947:__main__:Stock vial rinse1 contains rinse1 with volume 6640
+2023-10-06 16:24:43,947:__main__:Stock vial rinse2 contains rinse2 with volume 6640
+2023-10-06 16:24:43,947:__main__:Waste vial waste contains waste with volume 15560
+2023-10-06 16:24:43,947:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:24:43,947:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:24:43,947:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:24:43,948:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:24:43,948:__main__:Waste vial rinse0 contains Rinse0 with volume 4780
+2023-10-06 16:24:43,948:__main__:Waste vial rinse1 contains Rinse1 with volume 4780
+2023-10-06 16:24:43,948:__main__:Waste vial rinse2 contains Rinse2 with volume 4780
+2023-10-06 16:24:43,966:__main__:Running experiment 1
+2023-10-06 16:24:44,128:slack_functions:Message sent: Running experiment 1
+2023-10-06 16:26:02,188:__main__:type object 'datetime.datetime' has no attribute 'datetime'
+2023-10-06 16:26:02,848:slack_functions:Message sent: ePANDA encountered an error: type object 'datetime.datetime' has no attribute 'datetime'
+2023-10-06 16:26:04,648:__main__:Disconnecting from Mill, Pump, Pstat:
+2023-10-06 16:26:04,649:__main__:Scale closed
+2023-10-06 16:26:04,649:__main__:Pump closed
+2023-10-06 16:26:19,651:__main__:Pstat closed
+2023-10-06 16:26:19,652:mill_control:execute_command: $H
+2023-10-06 16:26:31,666:mill_control:execute_command: $H executed. Returned 
+2023-10-06 16:27:03,668:mill_control:Homing completed
+2023-10-06 16:27:18,670:__main__:Mill closed
+2023-10-06 16:27:18,859:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-06 16:29:05,286:__main__:
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-10-06 16:29:05,478:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 16:29:05,478:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-10-06 16:29:07,481:mill_control:Mill connected: True
+2023-10-06 16:29:07,481:mill_control:execute_command: $H
+2023-10-06 16:29:09,481:mill_control:execute_command: $H executed. Returned 
+2023-10-06 16:29:49,487:mill_control:Homing completed
+2023-10-06 16:29:49,487:mill_control:execute_command: F2000
+2023-10-06 16:29:51,488:mill_control:execute_command: F2000 executed
+2023-10-06 16:29:54,679:__main__:Connected to scale: 0.0
+2023-10-06 16:29:54,749:pump_control:Pump found at address 0
+2023-10-06 16:29:56,895:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 16:29:56,896:__main__:System state established
+2023-10-06 16:29:56,896:__main__:Stock vial custom contains custom with volume 1930
+2023-10-06 16:29:56,897:__main__:Stock vial dmf contains dmf with volume 20000
+2023-10-06 16:29:56,897:__main__:Stock vial peg contains peg with volume 18890
+2023-10-06 16:29:56,897:__main__:Stock vial acrylate contains acrylate with volume 19260
+2023-10-06 16:29:56,897:__main__:Stock vial ferrocene contains ferrocene with volume 10190
+2023-10-06 16:29:56,897:__main__:Stock vial rinse0 contains rinse0 with volume 6640
+2023-10-06 16:29:56,897:__main__:Stock vial rinse1 contains rinse1 with volume 6640
+2023-10-06 16:29:56,897:__main__:Stock vial rinse2 contains rinse2 with volume 6640
+2023-10-06 16:29:56,897:__main__:Waste vial waste contains waste with volume 15560
+2023-10-06 16:29:56,897:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:29:56,897:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:29:56,897:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:29:56,897:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 16:29:56,897:__main__:Waste vial rinse0 contains Rinse0 with volume 4780
+2023-10-06 16:29:56,897:__main__:Waste vial rinse1 contains Rinse1 with volume 4780
+2023-10-06 16:29:56,897:__main__:Waste vial rinse2 contains Rinse2 with volume 4780
+2023-10-06 16:29:56,914:__main__:Running experiment 1
+2023-10-06 16:29:57,066:slack_functions:Message sent: Running experiment 1
+2023-10-06 17:09:12,514:__main__:Object of type datetime is not JSON serializable
+2023-10-06 17:09:13,027:slack_functions:Message sent: ePANDA encountered an error: Object of type datetime is not JSON serializable
+2023-10-06 17:09:15,437:__main__:Disconnecting from Mill, Pump, Pstat:
+2023-10-06 17:09:17,008:__main__:Scale closed
+2023-10-06 17:09:17,009:__main__:Pump closed
+2023-10-06 17:09:32,012:__main__:Pstat closed
+2023-10-06 17:09:32,012:mill_control:execute_command: $H
+2023-10-06 17:09:44,015:mill_control:execute_command: $H executed. Returned 
+2023-10-06 17:10:16,017:mill_control:Homing completed
+2023-10-06 17:10:31,018:__main__:Mill closed
+2023-10-06 17:10:31,184:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-06 17:21:26,562:__main__:
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-10-06 17:21:26,737:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 17:21:26,738:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+2023-10-06 17:21:28,740:mill_control:Mill connected: True
+2023-10-06 17:21:28,740:mill_control:execute_command: $H
+2023-10-06 17:21:30,741:mill_control:execute_command: $H executed. Returned 
+2023-10-06 17:22:10,746:mill_control:Homing completed
+2023-10-06 17:22:10,746:mill_control:execute_command: F2000
+2023-10-06 17:22:12,747:mill_control:execute_command: F2000 executed
+2023-10-06 17:22:16,059:__main__:Connected to scale: 0.0
+2023-10-06 17:22:16,128:pump_control:Pump found at address 0
+2023-10-06 17:22:18,289:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 17:22:18,292:__main__:System state established
+2023-10-06 17:22:18,292:__main__:Stock vial custom contains custom with volume 1930
+2023-10-06 17:22:18,292:__main__:Stock vial dmf contains dmf with volume 20000
+2023-10-06 17:22:18,292:__main__:Stock vial peg contains peg with volume 18890
+2023-10-06 17:22:18,292:__main__:Stock vial acrylate contains acrylate with volume 19260
+2023-10-06 17:22:18,292:__main__:Stock vial ferrocene contains ferrocene with volume 10190
+2023-10-06 17:22:18,292:__main__:Stock vial rinse0 contains rinse0 with volume 6640
+2023-10-06 17:22:18,292:__main__:Stock vial rinse1 contains rinse1 with volume 6640
+2023-10-06 17:22:18,292:__main__:Stock vial rinse2 contains rinse2 with volume 6640
+2023-10-06 17:22:18,292:__main__:Waste vial waste contains waste with volume 15560
+2023-10-06 17:22:18,292:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 17:22:18,292:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 17:22:18,292:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 17:22:18,292:__main__:Waste vial waste contains waste with volume 1000
+2023-10-06 17:22:18,292:__main__:Waste vial rinse0 contains Rinse0 with volume 4780
+2023-10-06 17:22:18,292:__main__:Waste vial rinse1 contains Rinse1 with volume 4780
+2023-10-06 17:22:18,292:__main__:Waste vial rinse2 contains Rinse2 with volume 4780
+2023-10-06 17:22:18,310:__main__:Running experiment 1
+2023-10-06 17:22:18,477:slack_functions:Message sent: Running experiment 1
+2023-10-06 17:22:18,488:scheduler:Well D5 status changed to running
+2023-10-06 17:26:04,886:e_panda:INFO:Beginning experiment 1
+2023-10-06 17:26:04,887:e_panda:INFO:Pipetting 145.0 ul of peg into D5...
+2023-10-06 17:26:04,887:e_panda:INFO:D5: Repetition 1 of 1
+2023-10-06 17:26:04,887:e_panda:DEBUG:Selected stock vial: peg in position {'x': -2, 'y': -109, 'z': -20}
+2023-10-06 17:26:04,887:e_panda:DEBUG:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-06 17:26:04,887:e_panda:DEBUG:D5: Withdrawing 40.000000 of air gap...
+2023-10-06 17:26:04,943:pump_control:Withdrawing 0.040000 ml...
+2023-10-06 17:26:10,392:pump_control:Done Withdrawing
+2023-10-06 17:26:12,410:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:26:12,476:e_panda:INFO:D5: Moving to peg...
+2023-10-06 17:26:12,477:mill_control:execute_command: G00 X-86 Y-106 Z0
+2023-10-06 17:26:14,478:mill_control:execute_command: G00 X-86 Y-106 Z0 executed. Initially ok
+2023-10-06 17:26:22,485:mill_control:execute_command: G00 X-86 Y-106 Z0 executed. Returned <Idle|MPos:-89.000,-109.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:26:22,486:mill_control:execute_command: G00 X-86 Y-106 Z-75
+2023-10-06 17:26:24,487:mill_control:execute_command: G00 X-86 Y-106 Z-75 executed. Initially ok
+2023-10-06 17:26:32,492:mill_control:execute_command: G00 X-86 Y-106 Z-75 executed. Returned <Idle|MPos:-89.000,-109.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-06 17:26:32,547:pump_control:Withdrawing 0.185000 ml...
+2023-10-06 17:26:55,374:pump_control:Done Withdrawing
+2023-10-06 17:26:57,391:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:26:57,459:mill_control:execute_command: G00 X-86 Y-106 Z0
+2023-10-06 17:26:59,460:mill_control:execute_command: G00 X-86 Y-106 Z0 executed. Initially ok
+2023-10-06 17:27:07,466:mill_control:execute_command: G00 X-86 Y-106 Z0 executed. Returned <Idle|MPos:-89.000,-109.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-06 17:27:07,467:e_panda:INFO:D5: Moving to purge vial: waste...
+2023-10-06 17:27:07,467:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:27:09,468:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:27:17,473:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:27:17,474:mill_control:execute_command: G00 X-131 Y-10 Z-20
+2023-10-06 17:27:19,475:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Initially ok
+2023-10-06 17:27:24,480:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Returned <Idle|MPos:-134.000,-13.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-06 17:27:24,482:pump_control:Purging 20.000000 ul...
+2023-10-06 17:27:24,537:pump_control:Infusing 0.020000 ml...
+2023-10-06 17:27:27,558:pump_control:Done Infusing
+2023-10-06 17:27:29,575:pump_control:Pump has infused: 0.02 ml
+2023-10-06 17:27:29,641:pump_control:Purged 20.0 ul
+2023-10-06 17:27:29,642:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:27:31,644:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:27:36,647:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:27:36,648:e_panda:INFO:D5: Moving to target well: D5...
+2023-10-06 17:27:36,649:mill_control:execute_command: G00 X-329 Y-107 Z0
+2023-10-06 17:27:38,651:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Initially ok
+2023-10-06 17:27:49,660:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Returned <Idle|MPos:-332.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:27:49,661:mill_control:execute_command: G00 X-329 Y-107 Z-77
+2023-10-06 17:27:51,662:mill_control:execute_command: G00 X-329 Y-107 Z-77 executed. Initially ok
+2023-10-06 17:27:59,667:mill_control:execute_command: G00 X-329 Y-107 Z-77 executed. Returned <Idle|MPos:-332.000,-110.000,-80.000|Bf:15,127|FS:0,0>
+2023-10-06 17:27:59,668:e_panda:INFO:D5: Infusing peg into well D5...
+2023-10-06 17:27:59,722:pump_control:Infusing 0.145000 ml...
+2023-10-06 17:28:17,759:pump_control:Done Infusing
+2023-10-06 17:28:19,777:pump_control:Pump has infused: 0.145 ml
+2023-10-06 17:28:19,844:e_panda:INFO:D5: Well D5 volume: 145.000000
+2023-10-06 17:28:19,844:mill_control:execute_command: G00 X-329 Y-107 Z0
+2023-10-06 17:28:21,845:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Initially ok
+2023-10-06 17:28:29,848:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Returned <Idle|MPos:-332.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:28:29,849:e_panda:DEBUG:D5: Moving to purge vial: waste...
+2023-10-06 17:28:29,850:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:28:31,852:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:28:42,858:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:28:42,859:mill_control:execute_command: G00 X-131 Y-10 Z-20
+2023-10-06 17:28:44,860:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Initially ok
+2023-10-06 17:28:49,863:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Returned <Idle|MPos:-134.000,-13.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-06 17:28:49,865:pump_control:Purging 20.000000 ul...
+2023-10-06 17:28:49,920:pump_control:Infusing 0.020000 ml...
+2023-10-06 17:28:52,938:pump_control:Done Infusing
+2023-10-06 17:28:54,956:pump_control:Pump has infused: 0.02 ml
+2023-10-06 17:28:55,023:pump_control:Purged 20.0 ul
+2023-10-06 17:28:55,077:pump_control:Infusing 0.040000 ml...
+2023-10-06 17:29:00,513:pump_control:Done Infusing
+2023-10-06 17:29:02,530:pump_control:Pump has infused: 0.04 ml
+2023-10-06 17:29:02,597:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:29:04,598:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:29:09,600:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:29:09,618:e_panda:DEBUG:D5: Remaining volume in pipette: 0.000000 
+2023-10-06 17:29:09,618:e_panda:DEBUG:Selected stock vial: dmf in position {'x': -2, 'y': -76, 'z': -20}
+2023-10-06 17:29:09,619:e_panda:DEBUG:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-06 17:29:09,620:e_panda:INFO:Moving to flush solution dmf...
+2023-10-06 17:29:09,620:mill_control:execute_command: G00 X-86 Y-73 Z0
+2023-10-06 17:29:11,621:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Initially ok
+2023-10-06 17:29:19,626:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Returned <Idle|MPos:-89.000,-76.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:29:19,626:e_panda:DEBUG:Withdrawing 40.000000 of air gap...
+2023-10-06 17:29:19,683:pump_control:Withdrawing 0.040000 ml...
+2023-10-06 17:29:25,123:pump_control:Done Withdrawing
+2023-10-06 17:29:27,140:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:29:27,207:mill_control:execute_command: G00 X-86 Y-73 Z-75
+2023-10-06 17:29:29,208:mill_control:execute_command: G00 X-86 Y-73 Z-75 executed. Initially ok
+2023-10-06 17:29:37,213:mill_control:execute_command: G00 X-86 Y-73 Z-75 executed. Returned <Idle|MPos:-89.000,-76.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-06 17:29:37,214:e_panda:DEBUG:Withdrawing dmf...
+2023-10-06 17:29:37,267:pump_control:Withdrawing 0.120000 ml...
+2023-10-06 17:29:52,299:pump_control:Done Withdrawing
+2023-10-06 17:29:54,317:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:29:54,383:mill_control:execute_command: G00 X-86 Y-73 Z0
+2023-10-06 17:29:56,386:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Initially ok
+2023-10-06 17:30:04,392:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Returned <Idle|MPos:-89.000,-76.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:30:04,393:e_panda:DEBUG:Moving to purge...
+2023-10-06 17:30:04,393:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:30:06,395:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:30:14,400:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:30:14,400:mill_control:execute_command: G00 X-131 Y-10 Z-20
+2023-10-06 17:30:16,401:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Initially ok
+2023-10-06 17:30:21,404:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Returned <Idle|MPos:-134.000,-13.000,-23.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-06 17:30:21,406:e_panda:DEBUG:Purging...
+2023-10-06 17:30:21,407:pump_control:Purging 120.000000 ul...
+2023-10-06 17:30:21,463:pump_control:Infusing 0.120000 ml...
+2023-10-06 17:30:36,483:pump_control:Done Infusing
+2023-10-06 17:30:38,501:pump_control:Pump has infused: 0.12 ml
+2023-10-06 17:30:38,568:pump_control:Purged 120 ul
+2023-10-06 17:30:38,568:e_panda:DEBUG:Purging the air gap...
+2023-10-06 17:30:38,621:pump_control:Infusing 0.040000 ml...
+2023-10-06 17:30:44,065:pump_control:Done Infusing
+2023-10-06 17:30:46,083:pump_control:Pump has infused: 0.04 ml
+2023-10-06 17:30:46,150:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:30:48,151:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:30:53,154:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:30:53,155:e_panda:INFO:Pipetting 145.0 ul of acrylate into D5...
+2023-10-06 17:30:53,155:e_panda:INFO:D5: Repetition 1 of 1
+2023-10-06 17:30:53,156:e_panda:DEBUG:Selected stock vial: acrylate in position {'x': -2, 'y': -142, 'z': -20}
+2023-10-06 17:30:53,156:e_panda:DEBUG:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-06 17:30:53,156:e_panda:DEBUG:D5: Withdrawing 40.000000 of air gap...
+2023-10-06 17:30:53,212:pump_control:Withdrawing 0.040000 ml...
+2023-10-06 17:30:58,660:pump_control:Done Withdrawing
+2023-10-06 17:31:00,677:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:31:00,744:e_panda:INFO:D5: Moving to acrylate...
+2023-10-06 17:31:00,744:mill_control:execute_command: G00 X-86 Y-139 Z0
+2023-10-06 17:31:02,745:mill_control:execute_command: G00 X-86 Y-139 Z0 executed. Initially ok
+2023-10-06 17:31:10,749:mill_control:execute_command: G00 X-86 Y-139 Z0 executed. Returned <Idle|MPos:-89.000,-142.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:31:10,750:mill_control:execute_command: G00 X-86 Y-139 Z-75
+2023-10-06 17:31:12,751:mill_control:execute_command: G00 X-86 Y-139 Z-75 executed. Initially ok
+2023-10-06 17:31:20,756:mill_control:execute_command: G00 X-86 Y-139 Z-75 executed. Returned <Idle|MPos:-89.000,-142.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-06 17:31:20,812:pump_control:Withdrawing 0.185000 ml...
+2023-10-06 17:31:43,618:pump_control:Done Withdrawing
+2023-10-06 17:31:45,636:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:31:45,703:mill_control:execute_command: G00 X-86 Y-139 Z0
+2023-10-06 17:31:47,705:mill_control:execute_command: G00 X-86 Y-139 Z0 executed. Initially ok
+2023-10-06 17:31:55,710:mill_control:execute_command: G00 X-86 Y-139 Z0 executed. Returned <Idle|MPos:-89.000,-142.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-06 17:31:55,710:e_panda:INFO:D5: Moving to purge vial: waste...
+2023-10-06 17:31:55,711:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:31:57,712:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:32:05,717:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:32:05,718:mill_control:execute_command: G00 X-131 Y-10 Z-20
+2023-10-06 17:32:07,719:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Initially ok
+2023-10-06 17:32:12,722:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Returned <Idle|MPos:-134.000,-13.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-06 17:32:12,724:pump_control:Purging 20.000000 ul...
+2023-10-06 17:32:12,780:pump_control:Infusing 0.020000 ml...
+2023-10-06 17:32:15,798:pump_control:Done Infusing
+2023-10-06 17:32:17,816:pump_control:Pump has infused: 0.02 ml
+2023-10-06 17:32:17,883:pump_control:Purged 20.0 ul
+2023-10-06 17:32:17,884:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:32:19,886:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:32:24,888:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:32:24,889:e_panda:INFO:D5: Moving to target well: D5...
+2023-10-06 17:32:24,889:mill_control:execute_command: G00 X-329 Y-107 Z0
+2023-10-06 17:32:26,890:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Initially ok
+2023-10-06 17:32:37,897:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Returned <Idle|MPos:-332.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:32:37,898:mill_control:execute_command: G00 X-329 Y-107 Z-76.99999711531666
+2023-10-06 17:32:39,899:mill_control:execute_command: G00 X-329 Y-107 Z-76.99999711531666 executed. Initially ok
+2023-10-06 17:32:47,904:mill_control:execute_command: G00 X-329 Y-107 Z-76.99999711531666 executed. Returned <Idle|MPos:-332.000,-110.000,-80.000|Bf:15,127|FS:0,0>
+2023-10-06 17:32:47,904:e_panda:INFO:D5: Infusing acrylate into well D5...
+2023-10-06 17:32:47,960:pump_control:Infusing 0.145000 ml...
+2023-10-06 17:33:05,993:pump_control:Done Infusing
+2023-10-06 17:33:08,011:pump_control:Pump has infused: 0.145 ml
+2023-10-06 17:33:08,078:e_panda:INFO:D5: Well D5 volume: 290.000000
+2023-10-06 17:33:08,078:mill_control:execute_command: G00 X-329 Y-107 Z0
+2023-10-06 17:33:10,080:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Initially ok
+2023-10-06 17:33:18,084:mill_control:execute_command: G00 X-329 Y-107 Z0 executed. Returned <Idle|MPos:-332.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:33:18,085:e_panda:DEBUG:D5: Moving to purge vial: waste...
+2023-10-06 17:33:18,085:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:33:20,086:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:33:31,093:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:33:31,093:mill_control:execute_command: G00 X-131 Y-10 Z-20
+2023-10-06 17:33:33,094:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Initially ok
+2023-10-06 17:33:38,096:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Returned <Idle|MPos:-134.000,-13.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-06 17:33:38,098:pump_control:Purging 20.000000 ul...
+2023-10-06 17:33:38,152:pump_control:Infusing 0.020000 ml...
+2023-10-06 17:33:41,169:pump_control:Done Infusing
+2023-10-06 17:33:43,188:pump_control:Pump has infused: 0.02 ml
+2023-10-06 17:33:43,254:pump_control:Purged 20.0 ul
+2023-10-06 17:33:43,309:pump_control:Infusing 0.040000 ml...
+2023-10-06 17:33:48,752:pump_control:Done Infusing
+2023-10-06 17:33:50,769:pump_control:Pump has infused: 0.04 ml
+2023-10-06 17:33:50,835:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:33:52,837:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:33:57,840:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:33:57,858:e_panda:DEBUG:D5: Remaining volume in pipette: 0.000000 
+2023-10-06 17:33:57,858:e_panda:DEBUG:Selected stock vial: dmf in position {'x': -2, 'y': -76, 'z': -20}
+2023-10-06 17:33:57,858:e_panda:DEBUG:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-06 17:33:57,859:e_panda:INFO:Moving to flush solution dmf...
+2023-10-06 17:33:57,859:mill_control:execute_command: G00 X-86 Y-73 Z0
+2023-10-06 17:33:59,860:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Initially ok
+2023-10-06 17:34:07,864:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Returned <Idle|MPos:-89.000,-76.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:34:07,865:e_panda:DEBUG:Withdrawing 40.000000 of air gap...
+2023-10-06 17:34:07,919:pump_control:Withdrawing 0.040000 ml...
+2023-10-06 17:34:13,359:pump_control:Done Withdrawing
+2023-10-06 17:34:15,377:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:34:15,443:mill_control:execute_command: G00 X-86 Y-73 Z-75
+2023-10-06 17:34:17,445:mill_control:execute_command: G00 X-86 Y-73 Z-75 executed. Initially ok
+2023-10-06 17:34:25,450:mill_control:execute_command: G00 X-86 Y-73 Z-75 executed. Returned <Idle|MPos:-89.000,-76.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-06 17:34:25,451:e_panda:DEBUG:Withdrawing dmf...
+2023-10-06 17:34:25,505:pump_control:Withdrawing 0.120000 ml...
+2023-10-06 17:34:40,539:pump_control:Done Withdrawing
+2023-10-06 17:34:42,557:pump_control:Pump has withdrawn: 0.0 ml
+2023-10-06 17:34:42,624:mill_control:execute_command: G00 X-86 Y-73 Z0
+2023-10-06 17:34:44,626:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Initially ok
+2023-10-06 17:34:52,630:mill_control:execute_command: G00 X-86 Y-73 Z0 executed. Returned <Idle|MPos:-89.000,-76.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:34:52,631:e_panda:DEBUG:Moving to purge...
+2023-10-06 17:34:52,631:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:34:54,632:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:35:02,638:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:35:02,639:mill_control:execute_command: G00 X-131 Y-10 Z-20
+2023-10-06 17:35:04,640:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Initially ok
+2023-10-06 17:35:09,644:mill_control:execute_command: G00 X-131 Y-10 Z-20 executed. Returned <Idle|MPos:-134.000,-13.000,-23.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-06 17:35:09,645:e_panda:DEBUG:Purging...
+2023-10-06 17:35:09,647:pump_control:Purging 120.000000 ul...
+2023-10-06 17:35:09,703:pump_control:Infusing 0.120000 ml...
+2023-10-06 17:35:24,726:pump_control:Done Infusing
+2023-10-06 17:35:26,743:pump_control:Pump has infused: 0.12 ml
+2023-10-06 17:35:26,810:pump_control:Purged 120 ul
+2023-10-06 17:35:26,811:e_panda:DEBUG:Purging the air gap...
+2023-10-06 17:35:26,863:pump_control:Infusing 0.040000 ml...
+2023-10-06 17:35:32,311:pump_control:Done Infusing
+2023-10-06 17:35:34,328:pump_control:Pump has infused: 0.04 ml
+2023-10-06 17:35:34,395:mill_control:execute_command: G00 X-131 Y-10 Z0
+2023-10-06 17:35:36,397:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Initially ok
+2023-10-06 17:35:41,401:mill_control:execute_command: G00 X-131 Y-10 Z0 executed. Returned <Idle|MPos:-134.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-06 17:35:41,401:e_panda:INFO:Pipetted solutions into well: D5
+2023-10-06 17:35:41,402:e_panda:INFO:Mixing well: D5
+2023-10-06 17:39:15,547:e_panda:ERROR:Exception: Pump.mix() got an unexpected keyword argument 'mix_repititions'
+2023-10-06 17:39:15,797:e_panda:ERROR:Exception type: <class 'TypeError'>
+2023-10-06 17:39:16,364:e_panda:ERROR:File name: c:\Users\Kab Lab\Documents\GitHub\PANDA\code\e_panda.py
+2023-10-06 17:39:16,940:e_panda:ERROR:Line number: 702
+2023-10-06 17:39:20,158:e_panda:INFO:Returning completed instructions for experiment 1
+2023-10-06 17:39:22,093:__main__:Experiment 1 ended with status ExperimentStatus.ERROR
+2023-10-06 17:39:22,832:slack_functions:Message sent: Experiment 1 ended with status ExperimentStatus.ERROR
+2023-10-06 17:41:25,818:__main__:Scale closed
+2023-10-06 17:41:25,818:__main__:Pump closed
+2023-10-06 17:41:40,820:__main__:Pstat closed
+2023-10-06 17:41:40,820:mill_control:execute_command: $H
+2023-10-06 17:41:42,822:mill_control:execute_command: $H executed. Returned ok
+2023-10-06 17:42:19,126:mill_control:Homing completed
+2023-10-06 17:42:34,127:__main__:Mill closed

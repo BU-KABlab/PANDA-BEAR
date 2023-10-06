@@ -8,6 +8,8 @@ import time
 from comtypes import client
 import numpy as np
 import pandas as pd
+from pydantic import ConfigDict
+from pydantic.dataclasses import dataclass
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -103,7 +105,7 @@ class GamryPotentiostat:
             """Call the save_data method"""
             self.potentiostat.save_data(complete_file_name, self.acquired_points)
 
-    # Other methods remain the same
+    # methods for controlling the potentiostat
 
     def disconnect_pstat(self):
         """Disconnect the potentiostat"""
@@ -140,6 +142,112 @@ class GamryPotentiostat:
         else:
             logger.debug("Folder %s exists", file_path)
         return self.complete_file_name
+
+    def activecheck(self):
+        """Check if the potentiostat is active"""
+        while self.active is True:
+            client.PumpEvents(1)
+            time.sleep(0.5)
+
+
+    def check_vsig_range(self, filename):
+        """Check if the Vsig is in the valid range"""
+        try:
+            ocp_data = pd.read_csv(
+                filename,
+                sep=" ",
+                header=None,
+                names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"],
+            )
+            vsig_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vsig")]
+            logger.debug("Vsig last row: %s", vsig_last_row_scientific)
+            vsig_last_row_decimal = float(vsig_last_row_scientific)
+            logger.debug("Vsig last row: %f", vsig_last_row_decimal)
+
+            if -1 < vsig_last_row_decimal and vsig_last_row_decimal < 1:
+                logger.debug("Vsig in valid range (-1 to 1). Proceeding to echem experiment")
+                return True
+            else:
+                logger.debug("Vsig not in valid range. Aborting echem experiment")
+                return False
+        
+        except Exception as exception:
+            logger.debug("Error occurred while checking Vsig: %s", exception)
+            return False
+
+    def cyclic(self, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
+        logger.debug("cyclic: made it to run")
+        self.signal = client.CreateObject("GamryCOM.GamrySignalRupdn")
+        self.dtaq = client.CreateObject("GamryCOM.GamryDtaqRcv")
+        self.dtaq_sink = self.GamryDtaqEvents(self.dtaq, self.complete_file_name)
+        self.connection = client.GetEvents(self.dtaq, self.dtaq_sink)
+
+        self.signal.Init(
+            self.pstat,
+            CVvi,
+            CVap1,
+            CVap2,
+            CVvf,
+            CVsr1,
+            CVsr2,
+            CVsr3,
+            0.0,
+            0.0,
+            0.0,
+            CVsamplerate,
+            CVcycle,
+            self.gamry_com.PstatMode,
+        )
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class potentiostat_cv_parameters:
+    """CV Setup Parameters"""
+
+    # CV Setup Parameters
+    CVvi: float = 0.0  # initial voltage
+    CVap1: float = 0.3
+    CVap2: float = -0.2
+    CVvf: float = -0.2
+    CVstep: float = 0.01  # testing step, 100 mv/s
+    CVsr1: float = 0.1
+    CVcycle: int = 3
+    CVsr2: float = CVsr1
+    CVsr3: float = CVsr1
+    CVsamplerate: float = CVstep / CVsr1
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class potentiostat_ca_parameters:
+    """CA Setup Parameters"""
+
+    # CA/CP Setup Parameters
+    CAvi: float = 0.0  # Pre-step voltage (V)
+    CAti: float = 0.0  # Pre-step delay time (s)
+    CAv1: float = -2.4  # Step 1 voltage (V)
+    CAt1: float = 300.0  # run time 300 seconds
+    CAv2: float = 0.0  # Step 2 voltage (V)
+    CAt2: float = 0.0  # Step 2 time (s)
+    CAsamplerate: float = 0.05  # sample period (s)
+    # Max current (mA)
+    # Limit I (mA/cm^2)
+    # PF Corr. (ohm)
+    # Equil. time (s)
+    # Expected Max V (V)
+    # Initial Delay on
+    # Initial Delay (s)
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class potentiostat_ocp_parameters:
+    """OCP Setup Parameters"""
+
+    # OCP Setup Parameters
+    OCPvi: float = 0.0
+    OCPti: float = 15.0
+    OCPrate: float = 0.5
+
+
 if __name__ == "__main__":
     with GamryPotentiostat() as gamry:
         try:

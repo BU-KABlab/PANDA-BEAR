@@ -9,18 +9,19 @@ from vials import Vial
 from mill_control import Mill, Instruments
 from wellplate import Wells as Wellplate
 
-## set up logging to log to both the pump_control.log file and the ePANDA.log file
+# set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
+logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
+
 class Pump():
     '''
     Class for controlling a new era A-1000 syringe pump using the nesp-lib library
-    
+
     Attributes:
         pump (Pump): Initialized pump object.
         capacity (float): Maximum volume of the syringe in milliliters.
@@ -28,7 +29,7 @@ class Pump():
         pipette_capacity_ul (float): Maximum volume of the pipette in microliters.
         pipette_volume_ul (float): Current volume of the pipette in microliters.
         pipette_volume_ml (float): Current volume of the pipette in milliliters.
-    
+
     Methods:
         withdraw(volume, rate): Withdraw the given volume at the given rate.
         infuse(volume, rate): Infuse the given volume at the given rate.
@@ -36,7 +37,7 @@ class Pump():
         mix(repetitions, volume, rate): Mix the solution in the pipette by withdrawing and infusing the solution.
         update_pipette_volume(volume_ul): Set the volume of the pipette in ul.
         set_pipette_capacity(capacity_ul): Set the capacity of the pipette in ul.
-    
+
     Exceptions:
         OverFillException: Raised when a syringe is over filled.
         OverDraftException: Raised when a syringe is over drawn.
@@ -47,11 +48,11 @@ class Pump():
         Initialize the pump and set the capacity.
         """
         self.pump = self.set_up_pump()
-        self.syringe_capacity = 1.0 #mL
-        self.pipette_capacity_ml = 0.2 #mL
-        self.pipette_capacity_ul = 200 #uL
-        self.pipette_volume_ul = 0.0 #uL
-        self.pipette_volume_ml = 0.0 #mL
+        self.syringe_capacity = 1.0  # mL
+        self.pipette_capacity_ml = 0.2  # mL
+        self.pipette_capacity_ul = 200  # uL
+        self.pipette_volume_ul = 0.0  # uL
+        self.pipette_volume_ml = 0.0  # mL
         self.mill = mill
         self.scale = scale
 
@@ -82,7 +83,7 @@ class Pump():
         """
         # Perform the withdrawl
 
-        ## convert the volume argument from ul to ml
+        # convert the volume argument from ul to ml
         volume = volume / 1000
 
         self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
@@ -103,7 +104,7 @@ class Pump():
             volume (float): Volume to be infused in milliliters but given as microliters.
             rate (float): Pumping rate in milliliters per minute.
         """
-        ## convert the volume argument from ul to ml
+        # convert the volume argument from ul to ml
         volume = volume / 1000
 
         if volume > 0.0:
@@ -136,7 +137,7 @@ class Pump():
         """
         purge_vial.update_volume(purge_volume)
         logger.debug("Purging %f ul...", purge_volume)
-        self.infuse(volume=purge_volume, rate= pumping_rate, solution= solution)
+        self.infuse(volume=purge_volume, rate=pumping_rate, solution=solution)
         log_msg = f"Purged {purge_volume} ul"
         logger.debug(log_msg)
 
@@ -158,44 +159,50 @@ class Pump():
         log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
         logger.debug(log_msg)
 
-    def mix(self, mix_location:dict = None, repetitions = 3, volume = 200.0, rate = 0.62):
+    def mix(self, mix_location: dict = None, mix_repetitions=3, mix_volume=200.0, rate=0.62):
         """Mix the solution in the pipette by withdrawing and infusing the solution
         Args:
             mix_location (dict): Dictionary containing x, y, and z coordinates of the position.
             repetitions (int): Number of times to mix the solution.
             volume (float): Volume to be infused in milliliters but given as microliters.
             rate (float): Pumping rate in milliliters per minute.
-            
+
         Returns:
             None
         """
-        logger.info("Mixing %d times", repetitions)
+        logger.info("Mixing %d times", mix_repetitions)
 
         if mix_location is not None:
-            for i in range(repetitions):
-                logger.debug("Mixing %d of %d times", i, repetitions)
-                self.withdraw(volume, rate)
-                current_coords = self.mill.current_coordinates(Instruments.PIPETTE)
+            for i in range(mix_repetitions):
+                logger.debug("Mixing %d of %d times", i, mix_repetitions)
+                self.withdraw(mix_volume, rate)
+                current_coords = self.mill.current_coordinates(
+                    Instruments.PIPETTE)
 
                 self.mill.move_pipette_to_position(current_coords["x"],
-                                            current_coords["y"],
-                                            current_coords["z"] + 1.5)
-                self.infuse(volume, rate)
+                                                   current_coords["y"],
+                                                   current_coords["z"] + 1.5)
+                self.infuse(mix_volume, rate)
                 self.mill.move_pipette_to_position(current_coords["x"],
-                                          current_coords["y"],
-                                          current_coords["z"])
+                                                   current_coords["y"],
+                                                   current_coords["z"])
         else:
-            #move to mix location
-            self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], 0)
-            self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], mix_location['depth'])
-            for i in range(repetitions):
-                logger.debug("Mixing %d of %d times", i, repetitions)
-                self.withdraw(volume, rate)
-                self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], mix_location['depth'] + 1.5)
-                self.infuse(volume, rate)
-                self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], mix_location['depth'])
-            #move back to original position
-            self.mill.move_pipette_to_position(mix_location['x'], mix_location['y'], 0)
+            # move to mix location
+            self.mill.move_pipette_to_position(
+                mix_location['x'], mix_location['y'], 0)
+            self.mill.move_pipette_to_position(
+                mix_location['x'], mix_location['y'], mix_location['depth'])
+            for i in range(mix_repetitions):
+                logger.debug("Mixing %d of %d times", i, mix_repetitions)
+                self.withdraw(mix_volume, rate)
+                self.mill.move_pipette_to_position(
+                    mix_location['x'], mix_location['y'], mix_location['depth'] + 1.5)
+                self.infuse(mix_volume, rate)
+                self.mill.move_pipette_to_position(
+                    mix_location['x'], mix_location['y'], mix_location['depth'])
+            # move back to original position
+            self.mill.move_pipette_to_position(
+                mix_location['x'], mix_location['y'], 0)
 
     def update_pipette_volume(self, volume_ul):
         """Set the volume of the pipette in ul"""
@@ -210,6 +217,7 @@ class Pump():
         """Set the capacity of the pipette in ul"""
         self.pipette_capacity_ml = capacity_ul
         self.pipette_capacity_ul = capacity_ul / 1000
+
 
 class OverFillException(Exception):
     """Raised when a vessel is over filled"""
@@ -235,4 +243,3 @@ class OverDraftException(Exception):
 
     def __str__(self):
         return f"OverDraftException: {self.volume} - {self.added_volume} < 0"
-    

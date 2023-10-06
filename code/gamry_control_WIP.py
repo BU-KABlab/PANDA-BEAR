@@ -167,7 +167,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     global ACTIVE
     # global complete_file_name
 
-    logger.debug("made it to run")
+    logger.debug("cyclic: made it to run")
     ACTIVE = True
 
     # signal and dtaq object creation

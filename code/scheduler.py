@@ -15,10 +15,10 @@ import random
 from datetime import datetime
 from typing import List, Dict, Tuple
 import experiment_class
-from experiment_class import Experiment, ExperimentStatus #, make_baseline_value
+from experiment_class import Experiment, ExperimentStatus  # , make_baseline_value
 from config.pin import CURRENT_PIN
 
-## set up logging to log to both the pump_control.log file and the ePANDA.log file
+# set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
@@ -98,12 +98,14 @@ class Scheduler:
             for wells in data["Wells"]:
                 if wells["well_id"] == well:
                     wells["status"] = status
-                    wells["status_date"] = datetime.datetime.now().strftime(
+                    wells["status_date"] = datetime.now().strftime(
                         "%Y-%m-%d_%H_%M_%S"
                     )
                     break
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
+
+        logger.info("Well %s status changed to %s", well, status)
 
     def read_new_experiments(self, filename: str) -> Tuple[int, bool]:
         """
@@ -142,7 +144,7 @@ class Scheduler:
                 else:
                     target_well = desired_well
 
-                filename = f"{datetime.datetime.now().strftime('%Y-%m-%d')}_experiment-{experiment['id']}_{target_well}.json"
+                filename = f"{datetime.now().strftime('%Y-%m-%d')}_experiment-{experiment['id']}_{target_well}.json"
 
                 # populate an experiment instance
                 # TODO make the planner json output conform to schema so it can just be read in
@@ -240,7 +242,7 @@ class Scheduler:
 
     #     ## Insert the baseline tests to the queue directory
     #     target_well = self.choose_alternative_well(baseline=True)
-    #     filename = f"{datetime.datetime.now().strftime('%Y-%m-%d')}_baseline_{target_well}.json"
+    #     filename = f"{datetime.now().strftime('%Y-%m-%d')}_baseline_{target_well}.json"
     #     baseline = make_baseline_value()
     #     baseline.target_well = target_well
     #     baseline.filename = filename
@@ -268,18 +270,36 @@ class Scheduler:
             logger.error("experiment_queue folder not found")
             raise FileNotFoundError("experiment queue folder")
 
-        ## check if folder is not empty
+        # check if folder is not empty
         if os.listdir(file_path):
-            ## if there is a baseline test in the queue run that first
+            # if there is a baseline test in the queue run that first
 
-            ## if there are any experiments are in queue pick one at random
+            # if there are any experiments are in queue pick one at random
             file_list = os.listdir(file_path)
             random_file = random.choice(file_list)
             with open(file_path / random_file, "r", encoding="ascii") as file:
                 data = json.load(file)
                 if data["baseline"] == 0 and data["status"] == "queued":
-                    data = experiment_class.RootModel[Experiment].model_validate_json(json.dumps(data)).root
+                    data = experiment_class.RootModel[Experiment].model_validate_json(
+                        json.dumps(data)).root
                     return data, (file_path / random_file)
 
         else:
             return None, None
+
+
+def test_well_status_update():
+    """
+    Tests the change_well_status function.
+    """
+    scheduler = Scheduler()
+    scheduler.change_well_status("A1", "running")
+    assert scheduler.check_well_status("A1") == "running"
+    scheduler.change_well_status("A1", "complete")
+    assert scheduler.check_well_status("A1") == "complete"
+    scheduler.change_well_status("A1", "new")
+    assert scheduler.check_well_status("A1") == "new"
+
+
+if __name__ == "__main__":
+    test_well_status_update()

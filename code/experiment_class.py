@@ -12,6 +12,7 @@ class ExperimentStatus(str, Enum):
     '''Define the possible statuses of an experiment'''
     NEW = 'new'
     QUEUED = 'queued'
+    RUNNING = 'running'
     OCPCHECK = 'ocpcheck'
     DEPOSITING = 'depositing'
     RINSING = 'rinsing'

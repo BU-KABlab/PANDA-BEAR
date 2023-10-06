@@ -65,3 +65,24 @@ status_date
 2023-10-06 00:07:21,073:slack_functions:Message sent: Running experiment 1
 2023-10-06 12:36:19,822:slack_functions:Message sent: Experiment 1 ended with status ExperimentStatus.ERROR
 2023-10-06 12:38:31,073:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 16:17:01,143:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 16:18:17,098:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 16:18:17,283:slack_functions:Message sent: Running experiment 1
+2023-10-06 16:20:22,655:slack_functions:Message sent: ePANDA encountered an error: 1 validation error for Experiment
+status
+  Input should be 'new', 'queued', 'ocpcheck', 'depositing', 'rinsing', 'baselining', 'characterizing', 'final_rinse', 'complete', 'error' or 'mixing' [type=enum, input_value='running', input_type=str]
+2023-10-06 16:23:26,920:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-06 16:23:52,479:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 16:24:43,944:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 16:24:44,128:slack_functions:Message sent: Running experiment 1
+2023-10-06 16:26:02,848:slack_functions:Message sent: ePANDA encountered an error: type object 'datetime.datetime' has no attribute 'datetime'
+2023-10-06 16:27:18,859:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-06 16:29:05,478:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 16:29:56,895:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 16:29:57,066:slack_functions:Message sent: Running experiment 1
+2023-10-06 17:09:13,027:slack_functions:Message sent: ePANDA encountered an error: Object of type datetime is not JSON serializable
+2023-10-06 17:10:31,184:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-06 17:21:26,737:slack_functions:Message sent: ePANDA is starting up
+2023-10-06 17:22:18,289:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-06 17:22:18,477:slack_functions:Message sent: Running experiment 1
+2023-10-06 17:39:22,832:slack_functions:Message sent: Experiment 1 ended with status ExperimentStatus.ERROR

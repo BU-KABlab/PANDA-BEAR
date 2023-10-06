@@ -34,6 +34,27 @@ def read_vials(filename):
         )
     return sol_objects
 
+def update_vials(vial_objects: list, filename):
+    """
+    Update the vials in the json file
+    """
+    cwd = pathlib.Path(__file__).parents[0]
+    filename_ob = cwd / filename
+    with open(filename_ob, "r", encoding="ascii") as file:
+        vial_parameters = json.load(file)
+
+    for vial in vial_objects:
+        for items in vial_parameters:
+            if items["name"] == vial.name:
+                items["volume"] = vial.volume
+                items["contamination"] = vial.contamination
+                break
+
+    with open(filename_ob, "w", encoding="ascii") as file:
+        json.dump(vial_parameters, file, indent=4)
+
+    return 0
+
 class Vial:
     """
     Class for creating vial objects with their position and contents

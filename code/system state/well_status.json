@@ -2,8 +2,8 @@
     "Wells": [
         {
             "well_id": "A1",
-            "status": "complete",
-            "status_date": "2023-08-04_15_08_10",
+            "status": "new",
+            "status_date": "2023-10-06_17_19_44",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -402,8 +402,8 @@
         },
         {
             "well_id": "D5",
-            "status": "complete",
-            "status_date": "2023-08-04_15_49_11",
+            "status": "running",
+            "status_date": "2023-10-06_17_22_18",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,

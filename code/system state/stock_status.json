@@ -2,6 +2,7 @@
     {
         "position": "S0",
         "contents": "custom",
+        "viscocity_rank": 1,
         "density": 0.95,
         "x": -2,
         "y": -43,
@@ -13,6 +14,7 @@
     {
         "position": "S1",
         "contents": "dmf",
+        "viscocity_rank": 1,
         "density": 0.95,
         "x": -2,
         "y": -76,
@@ -23,28 +25,31 @@
     {
         "position": "S2",
         "contents": "peg",
+        "viscocity_rank": 1,
         "density": 1,
         "x": -2,
         "y": -109,
         "name": "peg",
-        "volume": 18890.0,
+        "volume": 18705.0,
         "capacity": 20000,
         "contamination": 0
     },
     {
         "position": "S3",
         "contents": "acrylate",
+        "viscocity_rank": 1,
         "density": 1,
         "x": -2,
         "y": -142,
         "name": "acrylate",
-        "volume": 19260.0,
+        "volume": 19075.0,
         "capacity": 20000,
         "contamination": 0
     },
     {
         "position": "S4",
         "contents": "ferrocene",
+        "viscocity_rank": 1,
         "density": 1.5,
         "x": -2,
         "y": -175,
@@ -56,6 +61,7 @@
     {
         "position": "R0",
         "contents": "rinse0",
+        "viscocity_rank": 1,
         "density": 1,
         "x": -2,
         "y": -208,
@@ -67,6 +73,7 @@
     {
         "position": "R1",
         "contents": "rinse1",
+        "viscocity_rank": 1,
         "density": 1,
         "x": -2,
         "y": -241,
@@ -78,6 +85,7 @@
     {
         "position": "R2",
         "contents": "rinse2",
+        "viscocity_rank": 1,
         "density": 1,
         "x": -2,
         "y": -274,
