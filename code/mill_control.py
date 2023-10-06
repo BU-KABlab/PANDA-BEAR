@@ -124,7 +124,7 @@ class Mill:
             elif command == "?":
                 logger.debug("execute_command: %s executed. Returned %s", command, out)
 
-            elif command != "$H":
+            elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
                 logger.debug("execute_command: %s executed. Initially %s", command, out)
                 self.wait_for_completion(out)
                 out = self.current_status()
@@ -151,7 +151,7 @@ class Mill:
     def home(self, timeout=90):
         """Home the mill with a timeout"""
         self.execute_command("$H")
-        time.sleep(90)
+        time.sleep(30)
         start_time = time.time()
 
         while True:
@@ -398,18 +398,28 @@ class LocationNotFound(Exception):
 def main():
     import wellplate as Wells
     wellplate = Wells.Wells(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
+
+    system_handler = logging.FileHandler("code/logs/mill_control_testing.log")
+    system_handler.setFormatter(formatter)
+    logger.addHandler(system_handler)
+
     try:
         with Mill() as mill:
             mill.homing_sequence()
-            mill.move_pipette_to_position(wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
-            mill.move_pipette_to_position(wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],-20)
-            mill.move_to_safe_position()
+            a1 = wellplate.get_coordinates('A1')
+            d5 = wellplate.get_coordinates('D5')
+            h3 = wellplate.get_coordinates('H3')
+            mill.move_pipette_to_position(a1['x'], a1['y'],0)
+            mill.move_pipette_to_position(a1['x'], a1['y'],a1['depth'])
+            mill.move_pipette_to_position(a1['x'], a1['y'],0)
 
-            mill.move_pipette_to_position(wellplate.get_coordinates('A5')['x'], wellplate.get_coordinates('A5')['y'],0)
-            mill.move_pipette_to_position(wellplate.get_coordinates('A5')['x'], wellplate.get_coordinates('A5')['y'],-20)
-            mill.move_to_safe_position()
+            mill.move_pipette_to_position(d5['x'], d5['y'],0)
+            mill.move_pipette_to_position(d5['x'], d5['y'],d5['depth'])
+            mill.move_pipette_to_position(d5['x'], d5['y'],0)
 
-
+            mill.move_pipette_to_position(h3['x'], h3['y'],0)
+            mill.move_pipette_to_position(h3['x'], h3['y'],h3['depth'])
+            mill.move_pipette_to_position(h3['x'], h3['y'],0)
             # Perform other operations here
     except (
         MillConnectionError,
@@ -425,6 +435,7 @@ def main():
     finally:
         logger.info("Exiting program.")
         # Perform cleanup here
+        mill.home()
         mill.disconnect()
 
 if __name__ == "__main__":
