@@ -23,6 +23,7 @@ import gamry_control as echem
 import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
+import experiment_class
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
 import vials as vial_module
 import wellplate as wellplate_module
@@ -67,10 +68,10 @@ def main():
         pump_connected = True
         slack.send_slack_message('alert', 'ePANDA is connected to equipment')
 
-        # Initialize scheduler
+        ## Initialize scheduler
         scheduler = Scheduler()
 
-        # Establish state of system
+        ## Establish state of system
         stock_vials = vial_module.read_vials(
             Path.cwd() / PATH_TO_STATUS / "stock_status.json")
         waste_vials = vial_module.read_vials(
@@ -79,11 +80,11 @@ def main():
             a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
 
         logger.info("System state established")
-        # read through the stock vials and log their name, contents, and volume
+        ## read through the stock vials and log their name, contents, and volume
         for vial in stock_vials:
             logger.info("Stock vial %s contains %s with volume %d",
                         vial.name, vial.contents, vial.volume)
-        # read through the waste vials and log their name, contents, and volume
+        ## read through the waste vials and log their name, contents, and volume
         for vial in waste_vials:
             logger.info("Waste vial %s contains %s with volume %d",
                         vial.name, vial.contents, vial.volume)
@@ -97,9 +98,9 @@ def main():
         # baseline_results = ExperimentResult()
         # e_panda.run_experiment(baseline, baseline_results, mill, pump, stock_vials, waste_vials, wellplate)
 
-        # Begin outer loop
+        ## Begin outer loop
         while True:
-            # Ask the scheduler for the next experiment
+            ## Ask the scheduler for the next experiment
             new_experiment, new_experiment_path = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
                 logger.info(
@@ -108,25 +109,25 @@ def main():
                 # Replace with slack alert and wait for response from user
                 scheduler.check_inbox()
 
-            # confirm that the new experiment is a valid experiment object
+            ## confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, Experiment):
                 logger.error("The experiment object is not valid")
                 slack.send_slack_message(
                     'alert', 'An invalid experiment object was passed to the controller')
                 break
 
-            # Initialize a results object
+            ## Initialize a results object
             experiment_results = ExperimentResult()
             # Announce the experiment
             pre_experiment_status_msg = f"Running experiment {new_experiment.id}"
             logger.info(pre_experiment_status_msg)
             slack.send_slack_message('alert', pre_experiment_status_msg)
 
-            # Update the experiment status to running
+            ## Update the experiment status to running
             new_experiment.status = "running"
             scheduler.change_well_status(new_experiment.target_well, "running")
 
-            # Run the experiment
+            ## Run the experiment
             updated_experiment, experiment_results, stock_vials, waste_vials, wellplate = e_panda.run_experiment(
                 instructions=new_experiment,
                 results=experiment_results,
@@ -142,7 +143,7 @@ def main():
             logger.info(post_experiment_status_msg)
             slack.send_slack_message('alert', post_experiment_status_msg)
 
-            # Update the system state
+            ## Update the system state
             scheduler.change_well_status(
                 updated_experiment.target_well, updated_experiment.status)
             vial_module.update_vials(
@@ -150,13 +151,20 @@ def main():
             vial_module.update_vials(
                 waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
 
-            # Update location of experiment instructions
+            ## Update location of experiment instructions and save results
             if updated_experiment.status == ExperimentStatus.COMPLETE:
                 # move the experiment instructions to the completed folder
                 logger.info(
                     "Moving experiment %s instructions to completed folder", updated_experiment.id)
                 new_experiment_path.rename(
                     Path.cwd() / "code" / PATH_TO_COMPLETED_EXPERIMENTS / new_experiment_path.name)
+
+                # save the results
+                logger.info(
+                    "Saving experiment %s results to database", updated_experiment.id)
+                results_json = experiment_class.serialize_results(experiment_results)
+                with open(Path.cwd() / "data" / f"{updated_experiment.id}.json", "w", encoding= 'UTF-8') as results_file:
+                    results_file.write(results_json)
 
             elif updated_experiment.status == ExperimentStatus.ERROR:
                 # move the experiment instructions to the errored folder
@@ -165,8 +173,15 @@ def main():
                 new_experiment_path.rename(
                     Path.cwd() / "code" / PATH_TO_ERRORED_EXPERIMENTS / new_experiment_path.name)
 
+                # save the results
+                logger.info(
+                    "Saving experiment %s results to database", updated_experiment.id)
+                results_json = experiment_class.serialize_results(experiment_results)
+                with open(Path.cwd() / "data" / f"{updated_experiment.id}.json", "w", encoding= 'UTF-8') as results_file:
+                    results_file.write(results_json)
+
             else:
-                # If the experiment is not complete or errored, then we need to keep it in the queue
+                # If the experiment is neither complete nor errored, then we need to keep it in the queue
                 logger.info(
                     "Experiment %s is not complete or errored, keeping in queue", updated_experiment.id)
 
@@ -202,7 +217,6 @@ def main():
             logger.info("Mill closed")
             mill_connected = False
         slack.send_slack_message('alert', 'ePANDA is shutting down...goodbye')
-
 
 if __name__ == "__main__":
     main()

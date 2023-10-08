@@ -556,6 +556,9 @@ def deposition(
         )
         dep_results.deposition_data_file = echem.setfilename(
             dep_instructions.id, "CA")
+
+        # TODO have chrono return the max and min values for the deposition
+        # and save them to the results
         echem.chrono(
             echem.potentiostat_ca_parameters.CAvi,
             echem.potentiostat_ca_parameters.CAti,
@@ -633,6 +636,9 @@ def characterization(
         char_results.characterization_data_file = echem.setfilename(
             char_instructions.id, test_type
         )
+
+        # TODO have cyclic return the max and min values for the characterization
+        # and save them to the results
         echem.cyclic(
             echem.potentiostat_cv_parameters.CVvi,
             echem.potentiostat_cv_parameters.CVap1,
@@ -670,6 +676,7 @@ def run_experiment(
     """
     try:
         logger.info("Beginning experiment %d", instructions.id)
+        results.id = instructions.id
         # Fetch list of solution names from stock_vials
         # list of vial names to exclude
         exclude_list = ["rinse0", "rinse1", "rinse2"]

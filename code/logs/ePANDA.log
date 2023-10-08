@@ -5097,3 +5097,4 @@ status
 2023-10-07 20:02:27,407:mill_control:execute_command: G00 X-302.0 Y-71.0 Z-77.0 executed. Returned <Idle|MPos:-305.000,-74.000,-80.000|Bf:15,127|FS:0,0>
 2023-10-07 20:02:27,407:mill_control:execute_command: $H
 2023-10-07 20:02:29,409:mill_control:execute_command: $H executed. Returned ok
+2023-10-07 20:04:01,410:mill_control:current_status: Error in status: ALARM:9
