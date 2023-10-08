@@ -33,3 +33,85 @@
 2023-10-06 13:48:10,514:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Initially ok
 2023-10-06 13:48:18,518:__main__:execute_command: G00 X-365 Y-89 Z0 executed. Returned <Idle|MPos:-368.000,-92.000,-3.000|Bf:15,127|FS:0,0>
 2023-10-06 13:48:33,520:__main__:Exiting program.
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill connected: True
+execute_command: $H
+execute_command: $H executed. Returned 
+current_status: Error in status: ALARM:8
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill connected: True
+execute_command: $H
+execute_command: $H executed. Returned 
+Homing completed
+execute_command: F2000
+execute_command: F2000 executed
+execute_command: G00 X-302 Y-71 Z0
+execute_command: G00 X-302 Y-71 Z0 executed. Initially ok
+execute_command: G00 X-302 Y-71 Z0 executed. Returned <Idle|MPos:-305.000,-74.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: G00 X-302 Y-71 Z-77
+execute_command: G00 X-302 Y-71 Z-77 executed. Initially ok
+execute_command: G00 X-302 Y-71 Z-77 executed. Returned <Idle|MPos:-305.000,-74.000,-80.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+execute_command: G00 X-302 Y-71 Z0
+execute_command: G00 X-302 Y-71 Z0 executed. Initially ok
+execute_command: G00 X-302 Y-71 Z0 executed. Returned <Idle|MPos:-305.000,-74.000,-3.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-302.0, -71.0, 0.0]
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-386.0, -68.0, 0.0]
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-302.0, -71.0, 0.0]
+execute_command: G00 X-302 Y-71 Z0
+execute_command: G00 X-302 Y-71 Z0 executed. Initially ok
+execute_command: G00 X-302 Y-71 Z0 executed. Returned <Idle|MPos:-305.000,-74.000,-3.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-302.0, -71.0, 0.0]
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-386.0, -68.0, 0.0]
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill connected: True
+MPos coordinates not found in the line.
+MPos coordinates not found in the line.
+MPos coordinates not found in the line.
+current_status: Error in status: <Alarm|MPos:0.000,0.000,0.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+execute_command: (ctrl-x)
+execute_command: (ctrl-x) executed. Returned ok
+current_status: Error in status: <Alarm|MPos:0.000,0.000,0.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill connected: True
+MPos coordinates not found in the line.
+execute_command: $H
+execute_command: $H executed. Returned <Alarm|MPos:0.000,0.000,0.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+Homing completed
+execute_command: F2000
+execute_command: F2000 executed
+MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+current_coordinates: [0.0, 0.0, 0.0]
+execute_command: G00 X-302 Y-71 Z0
+execute_command: G00 X-302 Y-71 Z0 executed. Initially ok
+execute_command: G00 X-302 Y-71 Z0 executed. Returned <Idle|MPos:-305.000,-74.000,-3.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-302.0, -71.0, 0.0]
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-302.0, -71.0, 0.0]
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-386.0, -68.0, 0.0]
+execute_command: G00 X-302 Y-71 Z-77
+execute_command: G00 X-302 Y-71 Z-77 executed. Initially ok
+execute_command: G00 X-302 Y-71 Z-77 executed. Returned <Idle|MPos:-305.000,-74.000,-80.000|Bf:15,127|FS:0,0>
+execute_command: G00 X-302 Y-71 Z0
+execute_command: G00 X-302 Y-71 Z0 executed. Initially ok
+execute_command: G00 X-302 Y-71 Z0 executed. Returned <Idle|MPos:-305.000,-74.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+MPos coordinates: X = -302.0, Y = -71.0, Z = 0.0
+current_coordinates: [-386.0, -68.0, 0.0]
+Exiting program.
+execute_command: $H
+Error executing command $H: Attempting to use a port that is not open
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill connected: True
+execute_command: $H
+execute_command: $H executed. Returned 
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}}
+Mill connected: True

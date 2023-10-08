@@ -88,6 +88,7 @@ class Mill:
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit the context manager"""
+        self.home()
         self.disconnect()
 
     def disconnect(self):
@@ -153,7 +154,7 @@ class Mill:
     def home(self, timeout=90):
         """Home the mill with a timeout"""
         self.execute_command("$H")
-        time.sleep(30)
+        time.sleep(90)
         start_time = time.time()
 
         while True:
@@ -189,7 +190,7 @@ class Mill:
         ## Check for errors
         if "error" in status.lower() or "alarm" in status.lower():
             logger.error("current_status: Error in status: %s", status)
-            raise StatusReturnError("Error in status")
+            raise StatusReturnError(f"Error in status: {status}")
         ## Check for busy
         while status == "ok":
             status = self.ser_mill.readline().decode().rstrip()
@@ -261,24 +262,28 @@ class Mill:
             logger.info("MPos coordinates not found in the line.")
             raise LocationNotFound
 
-        if instrument == Instruments.CENTER or instrument == Instruments.LENS:
-            return [x_coord, y_coord, z_coord]
+        if instrument in [Instruments.CENTER, Instruments.LENS]:
+            current_coordinates = [x_coord, y_coord, z_coord]
         elif instrument == Instruments.PIPETTE:
             offsets = self.config["instrument_offsets"]["pipette"]
-            return [
+            current_coordinates = [
                 x_coord + offsets["x"],
                 y_coord + offsets["y"],
-                z_coord + offsets["z"],
-            ]
+                z_coord + offsets["z"]
+                ]
         elif instrument == Instruments.ELECTRODE:
             offsets = self.config["instrument_offsets"]["electrode"]
-            return [
+            current_coordinates = [
                 x_coord + offsets["x"],
                 y_coord + offsets["y"],
-                z_coord + offsets["z"],
-            ]
+                z_coord + offsets["z"]
+                ]
+
         else:
             raise ValueError("Invalid instrument")
+
+        logger.debug("current_coordinates: %s", current_coordinates)
+        return current_coordinates
 
     def rinse_electrode(self):
         """
@@ -321,7 +326,7 @@ class Mill:
         mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
         command = mill_move.format(
             x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]
-        )  # x-coordinate has 84 mm offset for pipette location
+        )
         self.execute_command(str(command))
         return 0
 
@@ -416,13 +421,16 @@ def movement_test():
             mill.move_pipette_to_position(a1['x'], a1['y'],a1['depth'])
             mill.move_pipette_to_position(a1['x'], a1['y'],0)
 
-            mill.move_pipette_to_position(d5['x'], d5['y'],0)
-            mill.move_pipette_to_position(d5['x'], d5['y'],d5['depth'])
-            mill.move_pipette_to_position(d5['x'], d5['y'],0)
+            mill_coordinates = mill.current_coordinates(instrument=Instruments.LENS)
+            assert mill_coordinates == [a1['x'], a1['y'], 0]
 
-            mill.move_pipette_to_position(h3['x'], h3['y'],0)
-            mill.move_pipette_to_position(h3['x'], h3['y'],h3['depth'])
-            mill.move_pipette_to_position(h3['x'], h3['y'],0)
+            # mill.move_pipette_to_position(d5['x'], d5['y'],0)
+            # mill.move_pipette_to_position(d5['x'], d5['y'],d5['depth'])
+            # mill.move_pipette_to_position(d5['x'], d5['y'],0)
+
+            # mill.move_pipette_to_position(h3['x'], h3['y'],0)
+            # mill.move_pipette_to_position(h3['x'], h3['y'],h3['depth'])
+            # mill.move_pipette_to_position(h3['x'], h3['y'],0)
             # Perform other operations here
     except (
         MillConnectionError,
@@ -437,9 +445,6 @@ def movement_test():
 
     finally:
         logger.info("Exiting program.")
-        # Perform cleanup here
-        mill.home()
-        mill.disconnect()
 
 if __name__ == "__main__":
     movement_test()

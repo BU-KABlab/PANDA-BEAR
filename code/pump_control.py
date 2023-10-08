@@ -172,18 +172,22 @@ class Pump():
         """
         logger.info("Mixing %d times", mix_repetitions)
 
-        if mix_location is not None:
+        if mix_location is None:
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
                 self.withdraw(mix_volume, rate)
-                current_coords = self.mill.current_coordinates(
-                    Instruments.PIPETTE)
+                current_coords = self.mill.current_coordinates()
+                current_coords = {
+                    "x": current_coords[0],
+                    "y": current_coords[1],
+                    "z": current_coords[2]
+                }
 
-                self.mill.move_pipette_to_position(current_coords["x"],
+                self.mill.move_center_to_position(current_coords["x"],
                                                    current_coords["y"],
-                                                   current_coords["z"] + 1.5)
+                                                   current_coords["z"] + 2)
                 self.infuse(mix_volume, rate)
-                self.mill.move_pipette_to_position(current_coords["x"],
+                self.mill.move_center_to_position(current_coords["x"],
                                                    current_coords["y"],
                                                    current_coords["z"])
         else:
@@ -243,3 +247,17 @@ class OverDraftException(Exception):
 
     def __str__(self):
         return f"OverDraftException: {self.volume} - {self.added_volume} < 0"
+
+def test_mixing():
+    """Test the mixing function"""
+    wellplate = Wellplate(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
+    a1 = wellplate.get_coordinates('A1')
+    with Mill() as mill:
+        mill.homing_sequence()
+        pump = Pump(mill=mill, scale=Scale())
+        mill.move_pipette_to_position(a1['x'],a1['y'], 0)
+        mill.move_pipette_to_position(a1['x'],a1['y'], a1['depth'])
+        pump.mix()
+
+if __name__ == "__main__":
+    test_mixing()
