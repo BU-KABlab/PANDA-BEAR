@@ -47,6 +47,8 @@ system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
+AIR_GAP = 40  # ul
+
 class CustomLoggingFilter(logging.Filter):
     """ This is a filter which injects custom values into the log record.
     From: https://stackoverflow.com/questions/56776576/how-to-add-custom-values-to-python-logging
@@ -253,12 +255,13 @@ def clear_well(
     wellplate: Wells,
     pumping_rate: float,
     pump: pump_class,
-    waste_vials: list,
-    mill: object,
+    waste_vials: list[vial_class],
+    mill: mill_control,
     solution_name="waste",
 ):
     """
-    Clear the well of the specified volume with the specified solution
+    Clear the well of the specified volume with the specified solution.
+    Involves withdrawing the solution from the well and purging it into the waste vial
 
     Args:
         volume (float): Volume to be cleared in microliters
@@ -276,7 +279,6 @@ def clear_well(
         volume / 200
     )  # divide by 200 ul which is the pipette capacity to determin the number of repetitions
     repetition_vol = volume / repetition
-    air_gap = 20  # ul
     logger.info(
         "Clearing well %s with %dx repetitions of %f",
         target_well,
@@ -287,9 +289,9 @@ def clear_well(
         purge_vial = waste_selector(waste_vials, solution_name, repetition_vol)
 
         logger.info("Repitition %d of %d", j + 1, repetition)
-        logger.debug("Withdrawing %f of air gap...", air_gap)
+        logger.debug("Withdrawing %f of air gap...", AIR_GAP)
         # withdraw a little to engange screw
-        pump.withdraw(air_gap, pumping_rate)
+        pump.withdraw(AIR_GAP, pumping_rate)
         logger.debug("Moving to %s...", target_well)
         mill.move_pipette_to_position(
             wellplate.get_coordinates(target_well)["x"],
@@ -333,7 +335,7 @@ def clear_well(
             purge_vial, wellplate.density(target_well), repetition_vol
         )  # repitition volume
         logger.info("Purging the air gap...")
-        pump.infuse(volume=air_gap, rate=0.5)  # extra purge to clear pipette
+        pump.infuse(volume=AIR_GAP, rate=0.5)  # extra purge to clear pipette
 
         mill.move_pipette_to_position(
             purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
@@ -358,13 +360,14 @@ def rinse(
     instructions: Experiment,
     pump: pump_class,
     scale: scale_class,
-    mill: object,
+    mill: mill_control,
     stock_vials: list,
     waste_vials: list,
 ):
     """
     Rinse the well with rinse_vol ul of ACN.
     Involves pipetteing and then clearing the well with no purging steps
+
     Args:
         wellplate (Wells object): The wellplate object
         target_well (str): The alphanumeric name of the well you would like to rinse
@@ -413,15 +416,15 @@ def rinse(
 
 def flush_pipette_tip(
     pump: pump_class,
-    waste_vials: list,
-    stock_vials: list,
+    waste_vials: list[vial_class],
+    stock_vials: list[vial_class],
     flush_solution_name: str,
-    mill: object,
+    mill: mill_control,
     pumping_rate=0.5,
     flush_volume=120,
 ):
     """
-    Flush the pipette tip with flush_volume ul of DMF to remove any residue
+    Flush the pipette tip with the designated flush_volume ul of DMF to remove any residue
     Args:
         pump (object): The pump object
         waste_vials (list): The list of waste vials
@@ -434,20 +437,18 @@ def flush_pipette_tip(
     Returns:
         None
     """
-
-    # flush_solution = solution_selector(flush_solution_name, flush_volume)
-    # purge_vial = waste_selector("waste", flush_volume)
+    logger.info("Flushing pipette tip with %f ul of %s...",
+                flush_volume, flush_solution_name)
     flush_solution = solution_selector(
         stock_vials, flush_solution_name, flush_volume)
     purge_vial = waste_selector(waste_vials, "waste", flush_volume)
-    air_gap = 40  # ul
 
     logger.info("Moving to flush solution %s...", flush_solution.name)
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
-    logger.debug("Withdrawing %f of air gap...", air_gap)
-    pump.withdraw(air_gap, pumping_rate)
+    logger.debug("Withdrawing %f of air gap...", AIR_GAP)
+    pump.withdraw(AIR_GAP, pumping_rate)
 
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"],
@@ -472,7 +473,7 @@ def flush_pipette_tip(
     logger.debug("Purging...")
     pump.purge(purge_vial, flush_solution, flush_volume)
     logger.debug("Purging the air gap...")
-    pump.infuse(volume=air_gap, rate=0.5)  # purge the pipette tip
+    pump.infuse(volume=AIR_GAP, rate=0.5)  # purge the pipette tip
     mill.move_pipette_to_position(
         purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
     )  # move back to safe height (top)
@@ -501,7 +502,7 @@ def solution_selector(solutions: list[vial_class], solution_name: str, volume: f
     raise NoAvailableSolution(solution_name)
 
 
-def waste_selector(solutions: list, solution_name: str, volume: float) -> vial_class:
+def waste_selector(solutions: list[vial_class], solution_name: str, volume: float) -> vial_class:
     """
     Select the solution in which to deposit into from the list of solution objects
     Args:
@@ -689,8 +690,8 @@ def run_experiment(
     mill: mill_control,
     pump: pump_class,
     scale: scale_class,
-    stock_vials: list,
-    waste_vials: list,
+    stock_vials: list[vial_class],
+    waste_vials: list[vial_class],
     wellplate: Wells,
 ) -> Tuple[Experiment, ExperimentResult, List, List, Wells]:
     """
@@ -952,7 +953,7 @@ def run_experiment(
 if __name__ == "__main__":
     import pathlib
 
-    mill_driver = mill_control.Mill()
+    mill_driver = mill_control()
     Sartorius = scale_class()
     pump_driver = pump_class(mill=mill_driver, scale=Sartorius)
     echem.pstatconnect()
@@ -961,7 +962,7 @@ if __name__ == "__main__":
         path_to_state / "vial_status.json")
     waste_vials_list = read_vials(
         path_to_state / "waste_status.json")
-    wells_object = wellplate_module.Wellplate(-218, -74, 0, 0)
+    wells_object = wellplate_module.Wells(-218, -74, 0, 0)
     test_instructions = make_test_value()
     test_results = ExperimentResult()
     run_experiment(
@@ -977,5 +978,5 @@ if __name__ == "__main__":
     print(test_results)
 
     # close connections
-    echem.pstatdisconnect()
+    echem.disconnectpstat()
     mill_driver.disconnect()
