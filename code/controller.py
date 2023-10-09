@@ -189,7 +189,7 @@ def main():
                 wellplate=wellplate
             )
 
-            ## With returned experiment and results objects, update the experiment status and post the final status
+            ## With returned experiment and results, update the experiment status and post the final status
             post_experiment_status_msg = f"Experiment {updated_experiment.id} ended with status {updated_experiment.status.value}"
             logger.info(post_experiment_status_msg)
             slack.send_slack_message('alert', post_experiment_status_msg)
