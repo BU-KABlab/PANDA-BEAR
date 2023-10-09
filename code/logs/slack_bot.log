@@ -119,3 +119,21 @@ status
 2023-10-09 15:49:05,488:slack_functions:Message sent: Please replace the wellplate and confirm in the terminal that the program should continue
 2023-10-09 15:49:37,434:slack_functions:Message sent: ePANDA was interrupted by the user
 2023-10-09 15:53:00,348:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 16:12:07,456:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 16:12:12,920:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 16:12:13,068:slack_functions:Message sent: There are no clear wells on the wellplate
+2023-10-09 16:12:13,229:slack_functions:Message sent: Please replace the wellplate and confirm in the terminal that the program should continue
+2023-10-09 16:12:43,238:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 16:12:59,556:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 16:16:41,719:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 16:16:47,154:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 16:17:36,766:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 16:17:51,915:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 16:18:06,413:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 16:18:11,826:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 16:19:36,148:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 16:19:51,301:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 16:20:06,630:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 16:20:12,056:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 16:22:11,184:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 16:22:26,321:slack_functions:Message sent: ePANDA is shutting down...goodbye

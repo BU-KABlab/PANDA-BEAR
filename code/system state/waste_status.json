@@ -5,9 +5,9 @@
         "x": -47,
         "y": -13,
         "name": "waste",
-        "volume": 1060.0,
+        "volume": 1500.0,
         "capacity": 20000,
-        "contamination": 1
+        "contamination": 6
     },
     {
         "position": "W1",

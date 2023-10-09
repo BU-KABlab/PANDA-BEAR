@@ -440,8 +440,6 @@ class Mill:
         # Calculate the differences between the current and target coordinates
         dx = x_coord - current_x
         dy = y_coord - current_y
-        dz = z_coord - current_z
-
         # Initialize a list to store the movement commands
         commands = []
 
@@ -485,6 +483,166 @@ class CommandExecutionError(Exception):
 class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
 
+
+class MockMill:
+    """A class that simulates a mill for testing purposes.
+
+    Attributes:
+    config_file (str): The path to the configuration file.
+    config (dict): The configuration dictionary.
+    ser_mill (None): The serial connection to the mill.
+    current_x (float): The current x-coordinate.
+    current_y (float): The current y-coordinate.
+    current_z (float): The current z-coordinate.
+
+    Methods:
+    homing_sequence(): Simulate homing, setting feed rate, and clearing buffers.
+    disconnect(): Simulate disconnecting from the mill.
+    execute_command(command): Simulate executing a command.
+    stop(): Simulate stopping the mill.
+    reset(): Simulate resetting the mill.
+    home(timeout): Simulate homing the mill.
+    wait_for_completion(incoming_status, timeout): Simulate waiting for completion.
+    current_status(): Simulate getting the current status.
+    set_feed_rate(rate): Simulate setting the feed rate.
+    clear_buffers(): Simulate clearing buffers.
+    gcode_mode(): Simulate getting the G-code mode.
+    gcode_parameters(): Simulate getting G-code parameters.
+    gcode_parser_state(): Simulate getting G-code parser state.
+    rinse_electrode(): Simulate rinsing the electrode.
+    move_to_safe_position(): Simulate moving to a safe position.
+    move_center_to_position(x_coord, y_coord, z_coord): Simulate moving to a specified position.
+    current_coordinates(instrument): Return the tracked current coordinates.
+    move_pipette_to_position(x_coord, y_coord, z_coord): Simulate moving the pipette to a specified position.
+    move_electrode_to_position(x_coord, y_coord, z_coord): Simulate moving the electrode to a specified position.
+    update_offset(offset_type, offset_x, offset_y, offset_z): Simulate updating offsets in the config.
+    safe_move(x_coord, y_coord, z_coord, instrument): Simulate a safe move with horizontal and vertical movements.
+    """
+
+    def __init__(self, config_file="mill_config.json"):
+        self.config_file = config_file
+        self.config = {}  # Initialize an empty config for testing
+        self.ser_mill = None  # No serial connection in mock
+        self.current_x = 0.0
+        self.current_y = 0.0
+        self.current_z = 0.0
+        self.logger = logging.getLogger(__name__)
+
+    def homing_sequence(self):
+        """Simulate homing, setting feed rate, and clearing buffers"""
+        self.home()
+        self.set_feed_rate(2000)  # Set feed rate to 2000
+        self.clear_buffers()
+
+    def disconnect(self):
+        """Simulate disconnecting from the mill"""
+        self.logger.info("Disconnecting from the mill")
+
+    def execute_command(self, command):
+        """Simulate executing a command"""
+        self.logger.info("Executing command: %s", command)
+
+    def stop(self):
+        """Simulate stopping the mill"""
+        self.logger.info("Stopping the mill")
+
+    def reset(self):
+        """Simulate resetting the mill"""
+        self.logger.info("Resetting the mill")
+
+
+    def home(self, timeout=90):
+        """Simulate homing the mill"""
+        self.current_x = 0.0
+        self.current_y = 0.0
+        self.current_z = 0.0
+        self.logger.info("Homing the mill")
+
+    def wait_for_completion(self, incoming_status, timeout=90):
+        """Simulate waiting for completion"""
+        self.logger.info("Waiting for completion with status: %s", incoming_status)
+
+    def current_status(self) -> str:
+        """Simulate getting the current status"""
+        self.logger.info("Getting current status")
+        return "Idle"  # Mock status for testing
+
+    def set_feed_rate(self, rate):
+        """Simulate setting the feed rate"""
+        self.logger.info("Setting feed rate to %s", rate)
+
+    def clear_buffers(self):
+        """Simulate clearing buffers"""
+        self.logger.info("Clearing buffers")
+
+    def gcode_mode(self):
+        """Simulate getting the G-code mode"""
+        self.logger.info("Getting G-code mode")
+
+    def gcode_parameters(self):
+        """Simulate getting G-code parameters"""
+        self.logger.info("Getting G-code parameters")
+
+    def gcode_parser_state(self):
+        """Simulate getting G-code parser state"""
+        self.logger.info("Getting G-code parser state")
+
+    def rinse_electrode(self):
+        """Simulate rinsing the electrode"""
+        self.logger.info("Rinsing the electrode")
+        time.sleep(10)
+
+    def move_to_safe_position(self):
+        """Simulate moving to a safe position"""
+        self.logger.info("Moving to a safe position")
+
+    def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
+        """Simulate moving to a specified position"""
+        self.current_x = x_coord
+        self.current_y = y_coord
+        self.current_z = z_coord
+        self.logger.info("Moving to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
+        return 0
+
+    def current_coordinates(self, instrument=Instruments.CENTER) -> list:
+        """Return the tracked current coordinates"""
+        self.logger.info("Getting current coordinates")
+        return [self.current_x, self.current_y, self.current_z]
+
+    def move_pipette_to_position(
+        self,
+        x_coord: float = 0,
+        y_coord: float = 0,
+        z_coord=0.00,
+    ):
+        """Simulate moving the pipette to a specified position"""
+        self.current_x = x_coord
+        self.current_y = y_coord
+        self.current_z = z_coord
+        self.logger.info("Moving pipette to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
+
+    def move_electrode_to_position(
+        self, x_coord: float, y_coord: float, z_coord: float = 0.00
+    ):
+        """Simulate moving the electrode to a specified position"""
+        self.current_x = x_coord
+        self.current_y = y_coord
+        self.current_z = z_coord
+        self.logger.info("Moving electrode to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
+
+    def update_offset(self, offset_type, offset_x, offset_y, offset_z):
+        """Simulate updating offsets in the config"""
+        self.logger.info("Updating offset: %s (%s, %s, %s)", offset_type, offset_x, offset_y, offset_z)
+
+    def safe_move(
+        self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER
+    ) -> int:
+        """Simulate a safe move with horizontal and vertical movements"""
+        self.current_x = x_coord
+        self.current_y = y_coord
+        self.current_z = z_coord
+        self.logger.info("Safe move to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
+        return 0
 
 def movement_test():
     """Test the mill movement with a wellplate"""

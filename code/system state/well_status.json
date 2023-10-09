@@ -412,8 +412,8 @@
         },
         {
             "well_id": "D6",
-            "status": "new",
-            "status_date": "2023-10-09T11:16:17",
+            "status": "running",
+            "status_date": "2023-10-09T16:22:46",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,

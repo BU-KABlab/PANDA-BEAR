@@ -10,13 +10,14 @@ The controller is responsible for the following:
 # pylint: disable=line-too-long
 
 # import standard libraries
+import json
 import logging
 import time
 
 # import third-party libraries
 from pathlib import Path
 from print_panda import printpanda
-from mill_control import Mill
+from mill_control import MockMill as Mill
 from pump_control import Pump
 import gamry_control as echem
 
@@ -284,25 +285,29 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
         )
         slack.send_slack_message("alert", "The program is continuing")
 
-    # read through the wellplate and log the status of each well in a grid
-    number_of_clear_wells = 0
-    for row in range(1, 13):
-        for column in "ABCDEFGH":
-            # logger.debug("Well %s%s is %s", column, row,
-            #             wellplate.check_well_status(column+str(row)))
-            if wellplate.check_well_status(column + str(row)) in ["clear", "new"]:
-                number_of_clear_wells += 1
-    logger.info("There are %d clear wells", number_of_clear_wells)
-    if number_of_clear_wells == 0:
-        slack.send_slack_message("alert", "There are no clear wells on the wellplate")
-        slack.send_slack_message(
-            "alert",
-            "Please replace the wellplate and confirm in the terminal that the program should continue",
-        )
-        input(
-            "Confirm that the program should continue by pressing enter or ctrl+c to exit"
-        )
-        slack.send_slack_message("alert", "The program is continuing")
+    # read the wellplate json and log the status of each well in a grid
+    # number_of_clear_wells = 0
+    # with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
+    #     wellplate_status = json.load(file)
+    # for row in wellplate_status:
+    #     for well in row:
+    #         if well["status"] == "clear":
+    #             number_of_clear_wells += 1
+    #         logger.debug(
+    #             "Well %s has status %s", well["name"], well["status"].value
+    #         )
+
+    # logger.info("There are %d clear wells", number_of_clear_wells)
+    # if number_of_clear_wells == 0:
+    #     slack.send_slack_message("alert", "There are no clear wells on the wellplate")
+    #     slack.send_slack_message(
+    #         "alert",
+    #         "Please replace the wellplate and confirm in the terminal that the program should continue",
+    #     )
+    #     input(
+    #         "Confirm that the program should continue by pressing enter or ctrl+c to exit"
+    #     )
+    #     slack.send_slack_message("alert", "The program is continuing")
 
     return stock_vials, waste_vials, wellplate
 
