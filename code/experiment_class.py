@@ -73,7 +73,7 @@ class Experiment:
     # To restrict this to one of a few values you can use an enum
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
-    filename: Optional[FilePath] = None
+    filename: str = None #Optional[FilePath] = None
     # The optional fields seemed to be that way because they were experiment results
     results: Optional[ExperimentResult] = None
 
@@ -97,7 +97,7 @@ class Experiment:
 def make_test_value() -> Experiment:
     '''Create a test experiment value for the class'''
     return Experiment(
-        id=1,
+        id=0,
         priority=2,
         pin=1001001001001001,
         target_well="D5",
@@ -125,7 +125,7 @@ def make_test_value() -> Experiment:
         mix_count = 3,
         mix_vol = 200,
         mix_rate = 0.62,
-        filename= None, #f"test_{datetime.now}.json",
+        filename= f"test_{datetime.now}.json",
         results=None)
 
 def make_baseline_value() -> Experiment:

@@ -42,7 +42,7 @@ from wellplate import Wells
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(custom-values)%:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -748,7 +748,7 @@ def run_experiment(
             pump.mix(
                 mix_location=wellplate.get_coordinates(
                     instructions.target_well),
-                mix_repititions=3,
+                mix_repetitions=3,
                 mix_volume=instructions.mix_vol,
                 mix_rate=instructions.mix_rate,
             )

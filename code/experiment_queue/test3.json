@@ -1,8 +1,8 @@
 {
-    "id": 1,
+    "id": 0,
     "priority": 2,
     "pin": 1001001001001001,
-    "target_well": "D6",
+    "target_well": "C5",
     "dmf": 0.0,
     "peg": 145.0,
     "acrylate": 145.0,
@@ -25,8 +25,8 @@
     "mix_count": 3,
     "mix_vol": 200,
     "mix_rate": 0.62,
-    "status": "queued",
-    "status_date": "2023-10-05T17:23:17.922766",
-    "filename": "test2.json",
+    "status": "new",
+    "status_date": "2023-10-09T10:58:24",
+    "filename": "test3.json",
     "results": null
 }

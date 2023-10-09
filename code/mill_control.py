@@ -115,7 +115,7 @@ class Mill:
     def execute_command(self, command):
         """Encodes and sends commands to the mill and returns the response"""
         try:
-            logger.debug("execute_command: %s", command)
+            logger.debug("execute_command: Command sent: %s", command)
 
             command_bytes = command.encode()
             self.ser_mill.write(command_bytes + b"\n")
@@ -123,22 +123,23 @@ class Mill:
             out = self.ser_mill.readline().decode().rstrip()
 
             if command == "F2000":
-                logger.debug("execute_command: %s executed", command)
+                logger.debug(
+                    "execute_command: Returned %s", out)
 
             elif command == "?":
                 logger.debug(
-                    "execute_command: %s executed. Returned %s", command, out)
+                    "execute_command: Returned %s", out)
 
             elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
                 logger.debug(
-                    "execute_command: %s executed. Initially %s", command, out)
+                    "execute_command: Initially %s", out)
                 self.wait_for_completion(out)
                 out = self.current_status()
                 logger.debug(
-                    "execute_command: %s executed. Returned %s", command, out)
+                    "execute_command: Returned %s", out)
             else:
                 logger.debug(
-                    "execute_command: %s executed. Returned %s", command, out)
+                    "execute_command: Returned %s", out)
 
             return out
 

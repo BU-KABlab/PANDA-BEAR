@@ -139,7 +139,7 @@ def main():
             )
 
             ## With returned experiment and results objects, update the experiment status and post the final status
-            post_experiment_status_msg = f"Experiment {updated_experiment.id} ended with status {updated_experiment.status}"
+            post_experiment_status_msg = f"Experiment {updated_experiment.id} ended with status {updated_experiment.status.value}"
             logger.info(post_experiment_status_msg)
             slack.send_slack_message('alert', post_experiment_status_msg)
 
@@ -152,6 +152,7 @@ def main():
                 waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
 
             ## Update location of experiment instructions and save results
+            scheduler.update_experiment_status(updated_experiment)
             scheduler.update_experiment_location(updated_experiment)
             scheduler.save_results(updated_experiment, experiment_results)
 

@@ -147,7 +147,7 @@ def setfilename(experiment_id, experiment_type):
     filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
     filePath = filePathPar / fileDate
     # complete_file_name = filePath / (target_well + "_" + experiment)
-    COMPLETE_FILE_NAME = filePath / ("experiment-" + experiment_id + "_" + experiment_type)
+    COMPLETE_FILE_NAME = filePath / ("experiment-" + str(experiment_id) + "_" + experiment_type)
     logger.debug(f"eChem: complete file name is: {COMPLETE_FILE_NAME}")
     if not pathlib.Path.exists(filePath):
         logger.debug(f"folder does not exist. Making folder: {filePath}")

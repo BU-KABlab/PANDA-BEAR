@@ -86,3 +86,30 @@ status
 2023-10-06 17:22:18,289:slack_functions:Message sent: ePANDA is connected to equipment
 2023-10-06 17:22:18,477:slack_functions:Message sent: Running experiment 1
 2023-10-06 17:39:22,832:slack_functions:Message sent: Experiment 1 ended with status ExperimentStatus.ERROR
+2023-10-08 23:19:30,525:slack_functions:Message sent: ePANDA is starting up
+2023-10-08 23:20:46,154:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-08 23:20:46,416:slack_functions:Message sent: Running experiment 1
+2023-10-08 23:46:01,529:slack_functions:Message sent: Experiment 1 ended with status ExperimentStatus.ERROR
+2023-10-09 09:52:38,749:slack_functions:Message sent: ePANDA encountered an error: unsupported operand type(s) for /: 'WindowsPath' and 'NoneType'
+2023-10-09 09:54:34,051:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 10:25:21,207:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 10:28:10,072:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 10:29:25,674:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-09 10:29:25,884:slack_functions:Message sent: Running experiment 1
+2023-10-09 10:37:41,335:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 10:39:29,785:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 10:40:42,143:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-09 10:40:42,306:slack_functions:Message sent: Running experiment 0
+2023-10-09 10:57:10,199:slack_functions:Message sent: Experiment 0 ended with status ExperimentStatus.ERROR
+2023-10-09 10:58:29,598:slack_functions:Message sent: Running experiment 1
+2023-10-09 10:59:30,306:slack_functions:Message sent: Experiment 1 ended with status ExperimentStatus.ERROR
+2023-10-09 10:59:57,154:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 11:01:29,317:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 11:02:56,993:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 11:06:25,926:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 11:07:41,384:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-09 11:07:41,623:slack_functions:Message sent: Running experiment 0
+2023-10-09 11:14:53,170:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 11:15:04,509:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 11:16:16,853:slack_functions:Message sent: ePANDA is connected to equipment
+2023-10-09 11:16:17,101:slack_functions:Message sent: Running experiment 1

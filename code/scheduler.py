@@ -107,7 +107,7 @@ class Scheduler:
                 if wells["well_id"] == well:
                     wells["status"] = status
                     wells["status_date"] = datetime.now().strftime(
-                        "%Y-%m-%d_%H_%M_%S"
+                        "%Y-%m-%dT%H:%M:%S"
                     )
                     break
         with open(file_to_open, "w", encoding="ascii") as file:
@@ -315,6 +315,26 @@ class Scheduler:
                 if line.split(",")[0] != experiment.id:
                     file.write(line)
 
+    def update_experiment_status(self, experiment: Experiment) -> None:
+        """
+        Updates the status of the experiment in the experiment instructions file.
+        :param experiment: The experiment that was just run.
+        """
+        file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
+        if not pathlib.Path.exists(file_path):
+            logger.error("experiment file not found")
+            raise FileNotFoundError("experiment file")
+
+        # Update the status of the experiment
+        with open(file_path, "r", encoding="UTF-8") as file:
+            data = json.load(file)
+            data["status"] = experiment.status.value
+            data["status_date"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+        # Save the updated file
+        with open(file_path, "w", encoding="UTF-8") as file:
+            json.dump(data, file, indent=4)
+
     def update_experiment_location(self, experiment: Experiment) -> None:
         """
         Updates the location of the experiment instructions file.
@@ -339,7 +359,7 @@ class Scheduler:
             # If the experiment is neither complete nor errored, then we need to keep it in the queue
             logger.info(
                 "Experiment %s is not complete or errored, keeping in queue", experiment.id)
-    
+
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
         Args:

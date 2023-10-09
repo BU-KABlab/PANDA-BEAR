@@ -159,13 +159,13 @@ class Pump():
         log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
         logger.debug(log_msg)
 
-    def mix(self, mix_location: dict = None, mix_repetitions=3, mix_volume=200.0, rate=0.62):
+    def mix(self, mix_location: dict = None, mix_repetitions=3, mix_volume=200.0, mix_rate=0.62):
         """Mix the solution in the pipette by withdrawing and infusing the solution
         Args:
             mix_location (dict): Dictionary containing x, y, and z coordinates of the position.
-            repetitions (int): Number of times to mix the solution.
-            volume (float): Volume to be infused in milliliters but given as microliters.
-            rate (float): Pumping rate in milliliters per minute.
+            mix_repetitions (int): Number of times to mix the solution.
+            mix_volume (float): Volume to be infused in milliliters but given as microliters.
+            mix_rate (float): Pumping rate in milliliters per minute.
 
         Returns:
             None
@@ -175,21 +175,22 @@ class Pump():
         if mix_location is None:
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(mix_volume, rate)
+                self.withdraw(mix_volume, mix_rate)
                 current_coords = self.mill.current_coordinates()
                 current_coords = {
                     "x": current_coords[0],
                     "y": current_coords[1],
                     "z": current_coords[2]
                 }
-
+                self.mill.set_feed_rate(500)
                 self.mill.move_center_to_position(current_coords["x"],
                                                    current_coords["y"],
-                                                   current_coords["z"] + 2)
-                self.infuse(mix_volume, rate)
+                                                   current_coords["z"] + 3)
+                self.infuse(mix_volume, mix_rate)
                 self.mill.move_center_to_position(current_coords["x"],
                                                    current_coords["y"],
                                                    current_coords["z"])
+                self.mill.set_feed_rate(2000)
         else:
             # move to mix location
             self.mill.move_pipette_to_position(
@@ -198,10 +199,10 @@ class Pump():
                 mix_location['x'], mix_location['y'], mix_location['depth'])
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(mix_volume, rate)
+                self.withdraw(mix_volume, mix_rate)
                 self.mill.move_pipette_to_position(
                     mix_location['x'], mix_location['y'], mix_location['depth'] + 1.5)
-                self.infuse(mix_volume, rate)
+                self.infuse(mix_volume, mix_rate)
                 self.mill.move_pipette_to_position(
                     mix_location['x'], mix_location['y'], mix_location['depth'])
             # move back to original position
