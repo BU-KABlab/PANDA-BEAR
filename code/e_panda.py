@@ -143,22 +143,10 @@ def pipette(
                 solution.coordinates["x"], solution.coordinates["y"], solution.bottom
             )  # go to solution depth (depth replaced with height)
 
-            # Estimate the weight to be withdrawn
-            # based on the density of the solution
-            # and the volume to be withdrawn
-            # estimated_weight = solution.density * repetition_and_purge_vol
-            # weight_before = scale.value()
-            # logger.debug(":%s:Scale: Weight before: %f",target_well, weight_before)
             solution.update_volume(-(repetition_and_purge_vol))
-            # logger.info(":%s:Scale: Withdrawing %s...", target_well, solution.name)
             pump.withdraw(
                 volume=repetition_and_purge_vol, solution=solution, rate=pumping_rate
             )  # pipette now has air gap + repitition + 2 purge vol
-            # logger.debug(":%s: %s new volume: %f", target_well, solution.name, solution.volume)
-            # weight_after = scale.value()
-            # logger.debug(":%s:Scale: Weight after: %f", target_well, weight_after)
-            # logger.debug(":%s:Scale: Weight difference: %f", target_well, weight_before - weight_after)
-            # logger.debug(":%s:Scale: Weight deviation: %f", target_well, weight_before - weight_after - estimated_weight)
 
             mill.move_pipette_to_position(
                 solution.coordinates["x"], solution.coordinates["y"], 0
@@ -166,7 +154,7 @@ def pipette(
 
             # Intermediate: Purge
             logger.info(
-                "%s: Moving to purge vial: %s...", target_well, purge_vial.name
+                "Moving to purge vial: %s...", purge_vial.name
             )
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
@@ -200,8 +188,7 @@ def pipette(
 
             wellplate.update_volume(target_well, repetition_vol)
             logger.info(
-                "%s: Infusing %s into well %s...",
-                target_well,
+                "Infusing %s into well %s...",
                 solution.name,
                 target_well,
             )
@@ -209,8 +196,7 @@ def pipette(
                 volume=repetition_vol, solution=solution, rate=pumping_rate
             )  # remaining vol in pipette is now air gap + 1 purge vol
             logger.info(
-                "%s: Well %s volume: %f",
-                target_well,
+                "Well %s volume: %f",
                 target_well,
                 wellplate.volume(target_well),
             )
@@ -223,7 +209,7 @@ def pipette(
 
             # End Purge
             logger.debug(
-                "%s: Moving to purge vial: %s...", target_well, purge_vial.name
+                "Moving to purge vial: %s...", purge_vial.name
             )
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
@@ -244,16 +230,14 @@ def pipette(
             )
 
             logger.debug(
-                "%s: Remaining volume in pipette: %f ",
-                target_well,
+                "Remaining volume in pipette: %f ",
                 pump.pump.volume_withdrawn,
             )  # should always be zero, pause if not
 
             if round(pump.pipette_volume_ul, 2) != 0.00:
                 while pump.pipette_volume_ul > 0.00:
                     logger.warning(
-                        "%s: Pipette not empty. Volume: %f. Attempting to purge",
-                        target_well,
+                        "Pipette not empty. Volume: %f. Attempting to purge",
                         pump.pipette_volume_ul,
                     )
                     pump.infuse(volume=pump.pipette_volume_ul,
