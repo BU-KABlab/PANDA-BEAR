@@ -24,7 +24,7 @@ import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
 from experiment_class import Experiment, ExperimentResult
-import vials as vial_module
+from vials import read_vials, update_vials
 import wellplate as wellplate_module
 from scale import Sartorius as Scale
 
@@ -71,9 +71,9 @@ def main():
         scheduler = Scheduler()
 
         ## Establish state of system
-        stock_vials = vial_module.read_vials(
+        stock_vials = read_vials(
             Path.cwd() / PATH_TO_STATUS / "stock_status.json")
-        waste_vials = vial_module.read_vials(
+        waste_vials = read_vials(
             Path.cwd() / PATH_TO_STATUS / "waste_status.json")
         wellplate = wellplate_module.Wells(
             a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
@@ -146,9 +146,9 @@ def main():
             ## Update the system state with new vial and wellplate information
             scheduler.change_well_status(
                 updated_experiment.target_well, updated_experiment.status) # this function should probably be in the wellplate module
-            vial_module.update_vials(
+            update_vials(
                 stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
-            vial_module.update_vials(
+            update_vials(
                 waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
 
             ## Update location of experiment instructions and save results

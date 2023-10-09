@@ -35,7 +35,7 @@ from experiment_class import Experiment, ExperimentResult, ExperimentStatus, mak
 from mill_control import Mill as mill_control
 from pump_control import Pump as pump_class
 from scale import Sartorius as scale_class
-import vials as vial_class
+from vials import Vial as vial_class, read_vials
 import wellplate as wellplate_module
 from wellplate import Wells
 
@@ -76,7 +76,31 @@ def pipette(
     purge_volume=20.00,
 ):
     """
-    Perform the full pipetting sequence
+    Perform the full pipetting sequence:
+    1. Determine the number of repetitions
+    2. Withdraw the solution from the source
+        a. Withdraw an air gap to engage the screw
+        b. Move to the source
+        c. Withdraw the solution
+        d. Move back to safe height
+    3. Purge the solution into the waste vial
+        a. Move to the waste vial
+        b. Purge the solution
+        c. Purge the air gap
+        d. Move back to safe height
+    4. Deposit the solution into the target well
+        a. Move to the target well
+        b. Deposit the solution
+        c. Move back to safe height
+    5. Purge the solution into the waste vial
+        a. Move to the waste vial
+        b. Purge the solution
+        c. Purge the air gap
+        d. Move back to safe height
+    6. Repeat 2-5 until all repetitions are complete
+    7. Purge the air gap
+    8. Move back to safe height
+    
     Args:
         volume (float): Volume to be pipetted into desired well
         solution (Vial object): the vial source or solution to be pipetted
@@ -470,9 +494,9 @@ def flush_pipette_tip(
     )  # move back to safe height (top)
 
 
-def solution_selector(solutions: list, solution_name: str, volume: float) -> vial_class:
+def solution_selector(solutions: list[vial_class], solution_name: str, volume: float) -> vial_class:
     """
-    Select the solution from which to writhdraw from from the list of solution objects
+    Select the solution from which to withdraw from, from the list of solution objects
     Args:
         solutions (list): The list of solution objects
         solution_name (str): The name of the solution to select
@@ -686,7 +710,33 @@ def run_experiment(
     wellplate: Wells,
 ) -> Tuple[Experiment, ExperimentResult, List, List, Wells]:
     """
-    Run the experiment
+    Run the standard experiment:
+    1. Deposit solutions into well
+        for each solution:
+            a. Withdraw air gap
+            b. Withdraw solution
+            c. Purge
+            d. Deposit into well
+            e. Purge
+            f. Blow out
+            g. Flush pipette tip
+    2. Mix solutions in well
+    3. Flush pipette tip
+    4. Deposit film onto substrate
+    5. Withdraw all well volume into waste
+    6. Rinse the well 3x
+    7. Characterize the film on the substrate
+    8. Rinse the well 3x
+
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        mill (object): The mill object
+        pump (object): The pump object
+        scale (object): The scale object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
     """
     # Add custom value to log format
     custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
@@ -923,9 +973,9 @@ if __name__ == "__main__":
     pump_driver = pump_class(mill=mill_driver, scale=Sartorius)
     echem.pstatconnect()
     path_to_state = pathlib.Path.cwd() / "code/state"
-    stock_vials_list = vial_class.read_vials(
+    stock_vials_list = read_vials(
         path_to_state / "vial_status.json")
-    waste_vials_list = vial_class.read_vials(
+    waste_vials_list = read_vials(
         path_to_state / "waste_status.json")
     wells_object = wellplate_module.Wellplate(-218, -74, 0, 0)
     test_instructions = make_test_value()
