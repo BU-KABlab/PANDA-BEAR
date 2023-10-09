@@ -12,7 +12,7 @@
         },
         {
             "well_id": "A2",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -22,7 +22,7 @@
         },
         {
             "well_id": "A3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -32,7 +32,7 @@
         },
         {
             "well_id": "A4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -42,7 +42,7 @@
         },
         {
             "well_id": "A5",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -52,7 +52,7 @@
         },
         {
             "well_id": "A6",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -62,7 +62,7 @@
         },
         {
             "well_id": "A7",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -72,7 +72,7 @@
         },
         {
             "well_id": "A8",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -82,7 +82,7 @@
         },
         {
             "well_id": "A9",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -92,7 +92,7 @@
         },
         {
             "well_id": "A10",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -102,7 +102,7 @@
         },
         {
             "well_id": "A11",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -112,7 +112,7 @@
         },
         {
             "well_id": "A12",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -122,7 +122,7 @@
         },
         {
             "well_id": "B1",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -132,7 +132,7 @@
         },
         {
             "well_id": "B2",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -142,7 +142,7 @@
         },
         {
             "well_id": "B3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -152,7 +152,7 @@
         },
         {
             "well_id": "B4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -162,7 +162,7 @@
         },
         {
             "well_id": "B5",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -172,7 +172,7 @@
         },
         {
             "well_id": "B6",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -182,7 +182,7 @@
         },
         {
             "well_id": "B7",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -192,7 +192,7 @@
         },
         {
             "well_id": "B8",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -202,7 +202,7 @@
         },
         {
             "well_id": "B9",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -212,7 +212,7 @@
         },
         {
             "well_id": "B10",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -222,7 +222,7 @@
         },
         {
             "well_id": "B11",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -232,7 +232,7 @@
         },
         {
             "well_id": "B12",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -242,7 +242,7 @@
         },
         {
             "well_id": "C1",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -252,7 +252,7 @@
         },
         {
             "well_id": "C2",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -262,7 +262,7 @@
         },
         {
             "well_id": "C3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -272,7 +272,7 @@
         },
         {
             "well_id": "C4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_10",
             "contents": [],
             "OCP_file": null,
@@ -282,7 +282,7 @@
         },
         {
             "well_id": "C5",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-10-09T10:58:19",
             "contents": [],
             "OCP_file": null,
@@ -292,7 +292,7 @@
         },
         {
             "well_id": "C6",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -302,7 +302,7 @@
         },
         {
             "well_id": "C7",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -312,7 +312,7 @@
         },
         {
             "well_id": "C8",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -322,7 +322,7 @@
         },
         {
             "well_id": "C9",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -332,7 +332,7 @@
         },
         {
             "well_id": "C10",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -342,7 +342,7 @@
         },
         {
             "well_id": "C11",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -352,7 +352,7 @@
         },
         {
             "well_id": "C12",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -362,7 +362,7 @@
         },
         {
             "well_id": "D1",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -372,7 +372,7 @@
         },
         {
             "well_id": "D2",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -382,7 +382,7 @@
         },
         {
             "well_id": "D3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -392,7 +392,7 @@
         },
         {
             "well_id": "D4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_08_11",
             "contents": [],
             "OCP_file": null,
@@ -402,7 +402,7 @@
         },
         {
             "well_id": "D5",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-10-09T10:59:31",
             "contents": [],
             "OCP_file": null,
@@ -412,7 +412,7 @@
         },
         {
             "well_id": "D6",
-            "status": "running",
+            "status": "new",
             "status_date": "2023-10-09T11:16:17",
             "contents": [],
             "OCP_file": null,
@@ -422,7 +422,7 @@
         },
         {
             "well_id": "D7",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
             "OCP_file": null,
@@ -432,7 +432,7 @@
         },
         {
             "well_id": "D8",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
             "OCP_file": null,
@@ -442,7 +442,7 @@
         },
         {
             "well_id": "D9",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
             "OCP_file": null,
@@ -452,7 +452,7 @@
         },
         {
             "well_id": "D10",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
             "OCP_file": null,
@@ -462,7 +462,7 @@
         },
         {
             "well_id": "D11",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_11",
             "contents": [],
             "OCP_file": null,
@@ -472,7 +472,7 @@
         },
         {
             "well_id": "D12",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -482,7 +482,7 @@
         },
         {
             "well_id": "E1",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -492,7 +492,7 @@
         },
         {
             "well_id": "E2",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -502,7 +502,7 @@
         },
         {
             "well_id": "E3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -512,7 +512,7 @@
         },
         {
             "well_id": "E4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -522,7 +522,7 @@
         },
         {
             "well_id": "E5",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -532,7 +532,7 @@
         },
         {
             "well_id": "E6",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -542,7 +542,7 @@
         },
         {
             "well_id": "E7",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -552,7 +552,7 @@
         },
         {
             "well_id": "E8",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -562,7 +562,7 @@
         },
         {
             "well_id": "E9",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -572,7 +572,7 @@
         },
         {
             "well_id": "E10",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -582,7 +582,7 @@
         },
         {
             "well_id": "E11",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -592,7 +592,7 @@
         },
         {
             "well_id": "E12",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -602,7 +602,7 @@
         },
         {
             "well_id": "F1",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -612,7 +612,7 @@
         },
         {
             "well_id": "F2",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -622,7 +622,7 @@
         },
         {
             "well_id": "F3",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -632,7 +632,7 @@
         },
         {
             "well_id": "F4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -642,7 +642,7 @@
         },
         {
             "well_id": "F5",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -652,7 +652,7 @@
         },
         {
             "well_id": "F6",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-08-18_18_08_19",
             "contents": [],
             "OCP_file": null,
@@ -662,7 +662,7 @@
         },
         {
             "well_id": "F7",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-08-18_18_30_10",
             "contents": [],
             "OCP_file": null,
@@ -672,7 +672,7 @@
         },
         {
             "well_id": "F8",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-18_21_14_59",
             "contents": [],
             "OCP_file": null,
@@ -682,7 +682,7 @@
         },
         {
             "well_id": "F9",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-08-18_22_40_34",
             "contents": [],
             "OCP_file": null,
@@ -692,7 +692,7 @@
         },
         {
             "well_id": "F10",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_00_04_18",
             "contents": [],
             "OCP_file": null,
@@ -702,7 +702,7 @@
         },
         {
             "well_id": "F11",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_01_18_21",
             "contents": [],
             "OCP_file": null,
@@ -712,7 +712,7 @@
         },
         {
             "well_id": "F12",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_02_32_24",
             "contents": [],
             "OCP_file": null,
@@ -722,7 +722,7 @@
         },
         {
             "well_id": "G1",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -732,7 +732,7 @@
         },
         {
             "well_id": "G2",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -742,7 +742,7 @@
         },
         {
             "well_id": "G3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -752,7 +752,7 @@
         },
         {
             "well_id": "G4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_12",
             "contents": [],
             "OCP_file": null,
@@ -762,7 +762,7 @@
         },
         {
             "well_id": "G5",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_13",
             "contents": [],
             "OCP_file": null,
@@ -772,7 +772,7 @@
         },
         {
             "well_id": "G6",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_13",
             "contents": [],
             "OCP_file": null,
@@ -782,7 +782,7 @@
         },
         {
             "well_id": "G7",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_13",
             "contents": [],
             "OCP_file": null,
@@ -792,7 +792,7 @@
         },
         {
             "well_id": "G8",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_15_49_13",
             "contents": [],
             "OCP_file": null,
@@ -802,7 +802,7 @@
         },
         {
             "well_id": "G9",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-04_20_44_17",
             "contents": [],
             "OCP_file": null,
@@ -812,7 +812,7 @@
         },
         {
             "well_id": "G10",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -822,7 +822,7 @@
         },
         {
             "well_id": "G11",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -832,7 +832,7 @@
         },
         {
             "well_id": "G12",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -842,7 +842,7 @@
         },
         {
             "well_id": "H1",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -852,7 +852,7 @@
         },
         {
             "well_id": "H2",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -862,7 +862,7 @@
         },
         {
             "well_id": "H3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -872,7 +872,7 @@
         },
         {
             "well_id": "H4",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -882,7 +882,7 @@
         },
         {
             "well_id": "H5",
-            "status": "running",
+            "status": "new",
             "status_date": "2023-10-09T11:07:41",
             "contents": [],
             "OCP_file": null,
@@ -892,7 +892,7 @@
         },
         {
             "well_id": "H6",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-08-08_16_46_34",
             "contents": [],
             "OCP_file": null,
@@ -902,7 +902,7 @@
         },
         {
             "well_id": "H7",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_03_46_27",
             "contents": [],
             "OCP_file": null,
@@ -912,7 +912,7 @@
         },
         {
             "well_id": "H8",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_05_00_30",
             "contents": [],
             "OCP_file": null,
@@ -922,7 +922,7 @@
         },
         {
             "well_id": "H9",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_06_14_34",
             "contents": [],
             "OCP_file": null,
@@ -932,7 +932,7 @@
         },
         {
             "well_id": "H10",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_07_28_37",
             "contents": [],
             "OCP_file": null,
@@ -942,7 +942,7 @@
         },
         {
             "well_id": "H11",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_08_42_40",
             "contents": [],
             "OCP_file": null,
@@ -952,7 +952,7 @@
         },
         {
             "well_id": "H12",
-            "status": "completed",
+            "status": "new",
             "status_date": "2023-08-19_09_18_05",
             "contents": [],
             "OCP_file": null,

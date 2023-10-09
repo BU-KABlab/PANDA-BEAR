@@ -6329,3 +6329,69 @@ status
 2023-10-09 11:18:32,593:pump_control:Pump has withdrawn: 0.0 ml
 2023-10-09 11:18:32,660:mill_control:execute_command: Command sent: G00 X-86 Y-73 Z-75
 2023-10-09 11:18:34,661:mill_control:execute_command: Initially ok
+2023-10-09 15:48:57,468:controller:
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-10-09 15:48:57,648:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 15:48:57,649:controller:Checking for required files and directories
+2023-10-09 15:48:57,651:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-09 15:48:59,653:mill_control:Mill connected: True
+2023-10-09 15:48:59,733:pump_control:Pump found at address 0
+2023-10-09 15:49:05,038:controller:Connected to instruments
+2023-10-09 15:49:05,178:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 15:49:05,179:controller:System state established
+2023-10-09 15:49:05,180:controller:Stock vial custom contains custom with volume 1930
+2023-10-09 15:49:05,180:controller:Stock vial dmf contains dmf with volume 20000
+2023-10-09 15:49:05,180:controller:Stock vial peg contains peg with volume 17595
+2023-10-09 15:49:05,180:controller:Stock vial acrylate contains acrylate with volume 18520
+2023-10-09 15:49:05,180:controller:Stock vial ferrocene contains ferrocene with volume 10190
+2023-10-09 15:49:05,180:controller:Stock vial rinse0 contains rinse0 with volume 6640
+2023-10-09 15:49:05,180:controller:Stock vial rinse1 contains rinse1 with volume 6640
+2023-10-09 15:49:05,180:controller:Stock vial rinse2 contains rinse2 with volume 6640
+2023-10-09 15:49:05,180:controller:Waste vial waste contains waste with volume 1060
+2023-10-09 15:49:05,180:controller:Waste vial waste contains waste with volume 1000
+2023-10-09 15:49:05,180:controller:Waste vial waste contains waste with volume 1000
+2023-10-09 15:49:05,180:controller:Waste vial waste contains waste with volume 1000
+2023-10-09 15:49:05,180:controller:Waste vial waste contains waste with volume 1000
+2023-10-09 15:49:05,180:controller:Waste vial rinse0 contains Rinse0 with volume 4780
+2023-10-09 15:49:05,180:controller:Waste vial rinse1 contains Rinse1 with volume 4780
+2023-10-09 15:49:05,180:controller:Waste vial rinse2 contains Rinse2 with volume 4780
+2023-10-09 15:49:05,181:controller:There are 0 clear wells
+2023-10-09 15:49:05,351:slack_functions:Message sent: There are no clear wells on the wellplate
+2023-10-09 15:49:05,488:slack_functions:Message sent: Please replace the wellplate and confirm in the terminal that the program should continue
+2023-10-09 15:49:36,758:controller:Keyboard interrupt detected
+2023-10-09 15:49:37,434:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 15:49:42,093:controller:Disconnecting from instruments:
+2023-10-09 15:49:42,093:controller:Scale closed
+2023-10-09 15:49:42,093:controller:Pump closed
+2023-10-09 15:49:57,094:controller:Pstat closed
+2023-10-09 15:49:57,094:mill_control:execute_command: Command sent: $H
+2023-10-09 15:50:09,104:mill_control:execute_command: Returned 
+2023-10-09 15:52:45,185:mill_control:Homing timed out
+2023-10-09 15:53:00,186:controller:Mill closed
+2023-10-09 15:53:00,348:slack_functions:Message sent: ePANDA is shutting down...goodbye

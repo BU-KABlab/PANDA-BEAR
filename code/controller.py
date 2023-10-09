@@ -182,7 +182,7 @@ def main():
 class Toolkit:
     """A class to hold all of the instruments"""
 
-    def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat: echem.pstat):
+    def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat):
         self.mill = mill
         self.scale = scale
         self.pump = pump

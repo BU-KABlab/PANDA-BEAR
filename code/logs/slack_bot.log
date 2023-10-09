@@ -113,3 +113,9 @@ status
 2023-10-09 11:15:04,509:slack_functions:Message sent: ePANDA is starting up
 2023-10-09 11:16:16,853:slack_functions:Message sent: ePANDA is connected to equipment
 2023-10-09 11:16:17,101:slack_functions:Message sent: Running experiment 1
+2023-10-09 15:48:57,648:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 15:49:05,178:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 15:49:05,351:slack_functions:Message sent: There are no clear wells on the wellplate
+2023-10-09 15:49:05,488:slack_functions:Message sent: Please replace the wellplate and confirm in the terminal that the program should continue
+2023-10-09 15:49:37,434:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 15:53:00,348:slack_functions:Message sent: ePANDA is shutting down...goodbye
