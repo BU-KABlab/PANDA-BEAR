@@ -6,9 +6,9 @@ import json
 import logging
 import math
 import pathlib
-from vials import Vial
+from vials import Vial as Vials
 
-def read_vials(filename) -> list[Vial]:
+def read_vials(filename) -> list[Vials]:
     """
     Read in the virtual vials from the json file
     """
@@ -35,7 +35,7 @@ def read_vials(filename) -> list[Vial]:
         )
     return sol_objects
 
-def update_vials(vial_objects: list[Vial], filename):
+def update_vials(vial_objects: list[Vials], filename):
     """
     Update the vials in the json file
     """
