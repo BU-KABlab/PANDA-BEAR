@@ -12,7 +12,7 @@ import pandas as pd
 from datetime import datetime
 
 
-def pstatconnect():
+def pstatconnect() -> bool:
     global pstat
     global devices
     global GamryCOM
@@ -23,9 +23,11 @@ def pstatconnect():
     pstat.Init(devices.EnumSections()[0])  # grab first pstat
     pstat.Open()  # open connection to pstat
     if devices.EnumSections():
-        print("\tPstat connected: ", devices.EnumSections()[0])
+        #print("\tPstat connected: ", devices.EnumSections()[0])
+        return True
     else:
-        print("\tPstat not connected")
+        #print("\tPstat not connected")
+        return False
 
 
 class GamryCOMError(Exception):

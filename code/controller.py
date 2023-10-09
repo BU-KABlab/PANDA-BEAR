@@ -57,18 +57,16 @@ def main():
         check_required_files()
 
         # Connect to equipment
-        mill = Mill()
+        # TODO clean this up and make it more robust
+        toolkit = connect_to_instruments()
+        mill = toolkit.mill
+        scale = toolkit.scale
+        pump = toolkit.pump
         mill_connected = True
-        mill.homing_sequence()
-        echem.pstatconnect()
         pstat_connected = True
-        # obs.OBS_controller()
-        scale = Scale()
+        pump_connected = echem.pstatconnect()
         scale_connected = True
-        initial_weight = scale.value()
-        logger.info("Connected to scale. Initial reading: %sg", initial_weight)
-        pump = Pump(mill=mill, scale=scale)
-        pump_connected = True
+        logger.info("Connected to instruments")
         slack.send_slack_message('alert', 'ePANDA has connected to equipment')
 
         ## Initialize scheduler
@@ -169,21 +167,22 @@ def main():
             mill_connected = False
         slack.send_slack_message('alert', 'ePANDA is shutting down...goodbye')
 
-# class Toolkit:
-#     """A class to hold all of the instruments"""
-#     def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat, obs = None):
-#         self.mill = mill
-#         self.scale = scale
-#         self.pump = pump
+class Toolkit:
+    """A class to hold all of the instruments"""
+    def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat: echem.pstat):
+        self.mill = mill
+        self.scale = scale
+        self.pump = pump
+        self.pstat = pstat
 
 
-# def test_build_toolkit():
-#     """ Test the building of the toolkit and checking that they are connected or not"""
-#     mill = Mill()
-#     scale = Scale()
-#     pump = Pump(mill=mill, scale=scale)
-#     instruments = Toolkit(mill=mill, scale=scale, pump=pump)
-#     return instruments
+def test_build_toolkit():
+    """ Test the building of the toolkit and checking that they are connected or not"""
+    mill = Mill()
+    scale = Scale()
+    pump = Pump(mill=mill, scale=scale)
+    instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
+    return instruments
 
 def check_required_files():
     """Confirm all required directories and files exist"""
@@ -256,6 +255,14 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
 
     return stock_vials, waste_vials, wellplate
 
+def connect_to_instruments():
+    """Connect to the instruments"""
+    mill = Mill()
+    scale = Scale()
+    pump = Pump(mill=mill, scale=scale)
+    #pstat_connected = echem.pstatconnect()
+    instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
+    return instruments
 
 if __name__ == "__main__":
     main()
