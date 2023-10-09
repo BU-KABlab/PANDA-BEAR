@@ -137,3 +137,6 @@ status
 2023-10-09 16:20:12,056:slack_functions:Message sent: ePANDA has connected to equipment
 2023-10-09 16:22:11,184:slack_functions:Message sent: ePANDA was interrupted by the user
 2023-10-09 16:22:26,321:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 16:22:40,925:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 16:22:46,308:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 16:22:46,478:slack_functions:Message sent: Running experiment 1
