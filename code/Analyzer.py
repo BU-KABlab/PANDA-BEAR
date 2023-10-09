@@ -1,11 +1,9 @@
-# Analyzer
+""""Analyzer module to plot and analyze data from the Gamry potentiostat"""
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import numpy as np
+
 
 def plotdata(exp_name, complete_file_name, showplot=False):
-    """Plot data from a Gamry experiment"""
     if exp_name == "OCP":
         df = pd.read_csv(
             complete_file_name.with_suffix(".txt"),
@@ -91,7 +89,7 @@ def plotdata(exp_name, complete_file_name, showplot=False):
 
         # Create a 'viridis' colormap with the number of colors equal to the number of cycles
         # unused at the moment
-        colors = cm.cool(np.linspace(0, 1, max_cycle))
+        #colors = cm.cool(np.linspace(0, 1, max_cycle))
 
         # Plot values for vsig vs Im for each cycle with different dash patterns
         # for i in range(max_cycle):
@@ -115,7 +113,7 @@ def plotdata(exp_name, complete_file_name, showplot=False):
         if showplot is True:
             plt.show()
 
-        plt.tight_layout()
-        plt.savefig(complete_file_name.with_suffix(".png"))
-        plt.close()
-        print("plot saved")
+    plt.tight_layout()
+    plt.savefig(complete_file_name.with_suffix(".png"))
+    plt.close()
+    print("plot saved")
