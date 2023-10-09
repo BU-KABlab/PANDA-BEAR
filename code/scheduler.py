@@ -15,8 +15,16 @@ import random
 from datetime import datetime
 from typing import List, Dict, Tuple
 import experiment_class
-from experiment_class import Experiment, ExperimentStatus  # , make_baseline_value
+from experiment_class import Experiment, ExperimentStatus, ExperimentResult  # , make_baseline_value
 from config.pin import CURRENT_PIN
+
+# define constants or globals
+PATH_TO_CONFIG = "code/config/mill_config.json"
+PATH_TO_STATUS = "code/system state"
+PATH_TO_QUEUE = "code/system state/queue.csv"
+PATH_TO_EXPERIMENT_QUEUE = "code/experiment_queue"
+PATH_TO_COMPLETED_EXPERIMENTS = "code/experiments_completed"
+PATH_TO_ERRORED_EXPERIMENTS = "code/experiments_error"
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -287,7 +295,68 @@ class Scheduler:
         else:
             return None, None
 
+    def update_queue(self, experiment: Experiment) -> None:
+        """
+        Updates the queue file to remove the experiment that was just run.
+        :param experiment: The experiment that was just run.
+        """
+        file_path = pathlib.Path.cwd() / "code" / "system state" / "queue.csv"
+        if not pathlib.Path.exists(file_path):
+            logger.error("queue file not found")
+            raise FileNotFoundError("experiment queue file")
 
+        # Read the queue file
+        with open(file_path, "r", encoding="ascii") as file:
+            data = file.readlines()
+
+        # Remove the experiment from the queue file
+        with open(file_path, "w", encoding="ascii") as file:
+            for line in data:
+                if line.split(",")[0] != experiment.id:
+                    file.write(line)
+
+    def update_experiment_location(self, experiment: Experiment) -> None:
+        """
+        Updates the location of the experiment instructions file.
+        :param experiment: The experiment that was just run.
+        """
+        file_path = pathlib.Path(pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename)
+        if not pathlib.Path.exists(file_path):
+            logger.error("experiment file not found")
+            raise FileNotFoundError("experiment file")
+
+        if experiment.status == ExperimentStatus.COMPLETE:
+            # Move the file to the completed folder
+            completed_path = pathlib.Path.cwd() / PATH_TO_COMPLETED_EXPERIMENTS
+            file_path.replace(completed_path / experiment.filename)
+
+        elif experiment.status == ExperimentStatus.ERROR:
+            # Move the file to the errored folder
+            errored_path = pathlib.Path.cwd() / PATH_TO_ERRORED_EXPERIMENTS
+            file_path.replace(errored_path / experiment.filename)
+
+        else:
+            # If the experiment is neither complete nor errored, then we need to keep it in the queue
+            logger.info(
+                "Experiment %s is not complete or errored, keeping in queue", experiment.id)
+    
+    def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
+        """Save the results of the experiment as a json file in the data folder
+        Args:
+            experiment (Experiment): The experiment that was just run
+            results (ExperimentResult): The results of the experiment
+            
+        Returns:
+            None
+        """
+        # Save the results
+        logger.info(
+            "Saving experiment %s results to database", experiment.id)
+        results_json = experiment_class.serialize_results(results)
+        with open(pathlib.Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding= 'UTF-8') as results_file:
+            results_file.write(results_json)
+
+####################################################################################################
 def test_well_status_update():
     """
     Tests the change_well_status function.
