@@ -23,8 +23,7 @@ import gamry_control as echem
 import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
-import experiment_class
-from experiment_class import Experiment, ExperimentResult, ExperimentStatus
+from experiment_class import Experiment, ExperimentResult
 import vials as vial_module
 import wellplate as wellplate_module
 from scale import Sartorius as Scale
@@ -139,51 +138,22 @@ def main():
                 wellplate=wellplate
             )
 
+            ## With returned experiment and results objects, update the experiment status and post the final status
             post_experiment_status_msg = f"Experiment {updated_experiment.id} ended with status {updated_experiment.status}"
             logger.info(post_experiment_status_msg)
             slack.send_slack_message('alert', post_experiment_status_msg)
 
-            ## Update the system state
+            ## Update the system state with new vial and wellplate information
             scheduler.change_well_status(
-                updated_experiment.target_well, updated_experiment.status)
+                updated_experiment.target_well, updated_experiment.status) # this function should probably be in the wellplate module
             vial_module.update_vials(
                 stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
             vial_module.update_vials(
                 waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
 
             ## Update location of experiment instructions and save results
-            if updated_experiment.status == ExperimentStatus.COMPLETE:
-                # move the experiment instructions to the completed folder
-                logger.info(
-                    "Moving experiment %s instructions to completed folder", updated_experiment.id)
-                new_experiment_path.rename(
-                    Path.cwd() / "code" / PATH_TO_COMPLETED_EXPERIMENTS / new_experiment_path.name)
-
-                # save the results
-                logger.info(
-                    "Saving experiment %s results to database", updated_experiment.id)
-                results_json = experiment_class.serialize_results(experiment_results)
-                with open(Path.cwd() / "data" / f"{updated_experiment.id}.json", "w", encoding= 'UTF-8') as results_file:
-                    results_file.write(results_json)
-
-            elif updated_experiment.status == ExperimentStatus.ERROR:
-                # move the experiment instructions to the errored folder
-                logger.info(
-                    "Moving experiment %s instructions to errored folder", updated_experiment.id)
-                new_experiment_path.rename(
-                    Path.cwd() / "code" / PATH_TO_ERRORED_EXPERIMENTS / new_experiment_path.name)
-
-                # save the results
-                logger.info(
-                    "Saving experiment %s results to database", updated_experiment.id)
-                results_json = experiment_class.serialize_results(experiment_results)
-                with open(Path.cwd() / "data" / f"{updated_experiment.id}.json", "w", encoding= 'UTF-8') as results_file:
-                    results_file.write(results_json)
-
-            else:
-                # If the experiment is neither complete nor errored, then we need to keep it in the queue
-                logger.info(
-                    "Experiment %s is not complete or errored, keeping in queue", updated_experiment.id)
+            scheduler.update_experiment_location(updated_experiment)
+            scheduler.save_results(updated_experiment, experiment_results)
 
     except Exception as error:
         logger.error(error)
@@ -198,7 +168,7 @@ def main():
 
     finally:
         # close out of serial connections
-        logger.info("Disconnecting from Mill, Pump, Pstat:")
+        logger.info("Disconnecting from instruments:")
         if scale_connected:
             scale.close()
             logger.info("Scale closed")
@@ -217,6 +187,22 @@ def main():
             logger.info("Mill closed")
             mill_connected = False
         slack.send_slack_message('alert', 'ePANDA is shutting down...goodbye')
+
+# class Toolkit:
+#     """A class to hold all of the instruments"""
+#     def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat, obs = None):
+#         self.mill = mill
+#         self.scale = scale
+#         self.pump = pump
+
+
+# def test_build_toolkit():
+#     """ Test the building of the toolkit and checking that they are connected or not"""
+#     mill = Mill()
+#     scale = Scale()
+#     pump = Pump(mill=mill, scale=scale)
+#     instruments = Toolkit(mill=mill, scale=scale, pump=pump)
+#     return instruments
 
 if __name__ == "__main__":
     main()
