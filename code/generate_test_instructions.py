@@ -4,7 +4,7 @@ import experiment_class as Experiment
 
 for i in range(3,5):
     filename = f'test{i}.json'
-    filepath = os.path.join(os.getcwd(),"code", "experiment_queue", filename)
+    filepath = os.path.join(os.getcwd(),"code", "experiment_inbox", filename)
     test = Experiment.make_test_value()
     test.filename = filename
     serialized_test = Experiment.RootModel[Experiment.Experiment](test).model_dump_json(indent=4)
