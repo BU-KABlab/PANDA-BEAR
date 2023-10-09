@@ -30,6 +30,8 @@ class Wells:
 
     def __init__(self, a1_x:float=0, a1_y:float=0, orientation:int=0, columns:str = 'ABCDEFGH', rows:int = 13):
         self.wells = {}
+        self.rows = rows
+        self.columns = columns
         self.orientation = orientation
         self.z_bottom = -77  # -64
         self.z_top = 0
