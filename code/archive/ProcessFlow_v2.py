@@ -1,7 +1,7 @@
 import time
 import nesp_lib
 import serial
-from classes import Vial, Wells, MillControl
+from code.archive.classes import Vial, Wells, MillControl
 #HQ potentiostat#
 #import demo.pstatcontrol
 

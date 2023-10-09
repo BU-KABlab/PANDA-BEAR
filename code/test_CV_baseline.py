@@ -1,5 +1,5 @@
 import time, nesp_lib, sys
-from classes import Vial, MillControl, Wells
+from code.archive.classes import Vial, MillControl, Wells
 import gamrycontrol as echem
 import comtypes.client as client
 import print_panda as PrintPanda

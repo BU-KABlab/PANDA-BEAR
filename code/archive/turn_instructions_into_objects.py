@@ -3,7 +3,7 @@ To test the reading in of parameters and turning them into obejcts and instructi
 '''
 import read_json
 import json
-import classes
+import code.archive.classes as classes
 import pathlib
 import time
 

@@ -2,7 +2,7 @@
 For calibrating the location of instruments on the mill head.
 '''
 from run_experiments import read_vials
-from classes import Wells, MillControl
+from code.archive.classes import Wells, MillControl
 
 # Path: code\MAIN\mill_calibration.py
 

@@ -9,7 +9,7 @@ import time
 import sys
 import nesp_lib
 import print_panda
-from classes import Vial, MillControl, Wells #TODO import MillControl as mill and adjust functions accordingly
+from code.archive.classes import Vial, MillControl, Wells #TODO import MillControl as mill and adjust functions accordingly
 import gamrycontrol as echem
 import slack_functions as slack
 # import obs_controls as obs

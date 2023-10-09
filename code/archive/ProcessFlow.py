@@ -1,6 +1,6 @@
 import time
 import nesp_lib
-from classes import Vial, MillControl, Wells
+from code.archive.classes import Vial, MillControl, Wells
 from generate_instructions import instruction_reader
 import sys
 
