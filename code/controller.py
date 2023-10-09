@@ -43,77 +43,6 @@ PATH_TO_ERRORED_EXPERIMENTS = "code/experiments_error"
 PATH_TO_DATA = "data"
 PATH_TO_LOGS = "code/logs"
 
-def check_required_files():
-    """Confirm all required directories and files exist"""
-    logger.info("Checking for required files and directories")
-    required_files = [PATH_TO_CONFIG, PATH_TO_STATUS, PATH_TO_COMPLETED_EXPERIMENTS, PATH_TO_ERRORED_EXPERIMENTS,
-                        PATH_TO_DATA, PATH_TO_LOGS]
-
-    for file in required_files:
-        if not Path(file).exists():
-            logger.error("The %s is missing", file)
-            slack.send_slack_message('alert', f"The {file} is missing")
-            raise FileNotFoundError
-
-def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.Wells]:
-    """
-    Establish state of system
-    Returns:
-        stock_vials (list[Vial]): list of stock vials
-        waste_vials (list[Vial]): list of waste vials
-        wellplate (wellplate_module.Wells): wellplate object
-    """
-    stock_vials = read_vials(
-        Path.cwd() / PATH_TO_STATUS / "stock_status.json")
-    waste_vials = read_vials(
-        Path.cwd() / PATH_TO_STATUS / "waste_status.json")
-    wellplate = wellplate_module.Wells(
-        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
-    logger.info("System state established")
-
-    ## read through the stock vials and log their name, contents, and volume
-    for vial in stock_vials:
-        logger.debug("Stock vial %s contains %s with volume %d",
-                    vial.name, vial.contents, vial.volume)
-
-    ## if any stock vials are empty, send a slack message prompting the user to refill them and confirm if program should continue
-    empty_stock_vials = [vial for vial in stock_vials if vial.volume < 1000]
-    if len(empty_stock_vials) > 0:
-        slack.send_slack_message('alert', 'The following stock vials are low or empty: ' + ', '.join([vial.name for vial in empty_stock_vials]))
-        slack.send_slack_message('alert', 'Please refill the stock vials and confirm in the terminal that the program should continue')
-        input('Confirm that the program should continue by pressing enter or ctrl+c to exit')
-        slack.send_slack_message('alert', 'The program is continuing')
-
-    ## read through the waste vials and log their name, contents, and volume
-    for vial in waste_vials:
-        logger.debug("Waste vial %s contains %s with volume %d",
-                    vial.name, vial.contents, vial.volume)
-
-    ## if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
-    full_waste_vials = [vial for vial in waste_vials if vial.volume > 19000]
-    if len(full_waste_vials) > 0:
-        slack.send_slack_message('alert', 'The following waste vials are full: ' + ', '.join([vial.name for vial in full_waste_vials]))
-        slack.send_slack_message('alert', 'Please empty the waste vials and confirm in the terminal that the program should continue')
-        input('Confirm that the program should continue by pressing enter or ctrl+c to exit')
-        slack.send_slack_message('alert', 'The program is continuing')
-
-    # read through the wellplate and log the status of each well in a grid
-    number_of_clear_wells = 0
-    for row in range(1,13):
-        for column in 'ABCDEFGH':
-            # logger.debug("Well %s%s is %s", column, row,
-            #             wellplate.check_well_status(column+str(row)))
-            if wellplate.check_well_status(column+str(row)) in ['clear', 'new']:
-                number_of_clear_wells += 1
-    logger.info("There are %d clear wells", number_of_clear_wells)
-    if number_of_clear_wells == 0:
-        slack.send_slack_message('alert', 'There are no clear wells on the wellplate')
-        slack.send_slack_message('alert', 'Please replace the wellplate and confirm in the terminal that the program should continue')
-        input('Confirm that the program should continue by pressing enter or ctrl+c to exit')
-        slack.send_slack_message('alert', 'The program is continuing')
-
-    return stock_vials, waste_vials, wellplate
-
 def main():
     """Main function"""
     logger.info(printpanda())
@@ -137,7 +66,7 @@ def main():
         scale = Scale()
         scale_connected = True
         initial_weight = scale.value()
-        logger.info("Connected to scale: %sg", initial_weight)
+        logger.info("Connected to scale. Initial reading: %sg", initial_weight)
         pump = Pump(mill=mill, scale=scale)
         pump_connected = True
         slack.send_slack_message('alert', 'ePANDA has connected to equipment')
@@ -255,6 +184,78 @@ def main():
 #     pump = Pump(mill=mill, scale=scale)
 #     instruments = Toolkit(mill=mill, scale=scale, pump=pump)
 #     return instruments
+
+def check_required_files():
+    """Confirm all required directories and files exist"""
+    logger.info("Checking for required files and directories")
+    required_files = [PATH_TO_CONFIG, PATH_TO_STATUS, PATH_TO_COMPLETED_EXPERIMENTS, PATH_TO_ERRORED_EXPERIMENTS,
+                        PATH_TO_DATA, PATH_TO_LOGS]
+
+    for file in required_files:
+        if not Path(file).exists():
+            logger.error("The %s is missing", file)
+            slack.send_slack_message('alert', f"The {file} is missing")
+            raise FileNotFoundError
+
+def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.Wells]:
+    """
+    Establish state of system
+    Returns:
+        stock_vials (list[Vial]): list of stock vials
+        waste_vials (list[Vial]): list of waste vials
+        wellplate (wellplate_module.Wells): wellplate object
+    """
+    stock_vials = read_vials(
+        Path.cwd() / PATH_TO_STATUS / "stock_status.json")
+    waste_vials = read_vials(
+        Path.cwd() / PATH_TO_STATUS / "waste_status.json")
+    wellplate = wellplate_module.Wells(
+        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
+    logger.info("System state established")
+
+    ## read through the stock vials and log their name, contents, and volume
+    for vial in stock_vials:
+        logger.debug("Stock vial %s contains %s with volume %d",
+                    vial.name, vial.contents, vial.volume)
+
+    ## if any stock vials are empty, send a slack message prompting the user to refill them and confirm if program should continue
+    empty_stock_vials = [vial for vial in stock_vials if vial.volume < 1000]
+    if len(empty_stock_vials) > 0:
+        slack.send_slack_message('alert', 'The following stock vials are low or empty: ' + ', '.join([vial.name for vial in empty_stock_vials]))
+        slack.send_slack_message('alert', 'Please refill the stock vials and confirm in the terminal that the program should continue')
+        input('Confirm that the program should continue by pressing enter or ctrl+c to exit')
+        slack.send_slack_message('alert', 'The program is continuing')
+
+    ## read through the waste vials and log their name, contents, and volume
+    for vial in waste_vials:
+        logger.debug("Waste vial %s contains %s with volume %d",
+                    vial.name, vial.contents, vial.volume)
+
+    ## if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
+    full_waste_vials = [vial for vial in waste_vials if vial.volume > 19000]
+    if len(full_waste_vials) > 0:
+        slack.send_slack_message('alert', 'The following waste vials are full: ' + ', '.join([vial.name for vial in full_waste_vials]))
+        slack.send_slack_message('alert', 'Please empty the waste vials and confirm in the terminal that the program should continue')
+        input('Confirm that the program should continue by pressing enter or ctrl+c to exit')
+        slack.send_slack_message('alert', 'The program is continuing')
+
+    # read through the wellplate and log the status of each well in a grid
+    number_of_clear_wells = 0
+    for row in range(1,13):
+        for column in 'ABCDEFGH':
+            # logger.debug("Well %s%s is %s", column, row,
+            #             wellplate.check_well_status(column+str(row)))
+            if wellplate.check_well_status(column+str(row)) in ['clear', 'new']:
+                number_of_clear_wells += 1
+    logger.info("There are %d clear wells", number_of_clear_wells)
+    if number_of_clear_wells == 0:
+        slack.send_slack_message('alert', 'There are no clear wells on the wellplate')
+        slack.send_slack_message('alert', 'Please replace the wellplate and confirm in the terminal that the program should continue')
+        input('Confirm that the program should continue by pressing enter or ctrl+c to exit')
+        slack.send_slack_message('alert', 'The program is continuing')
+
+    return stock_vials, waste_vials, wellplate
+
 
 if __name__ == "__main__":
     main()
