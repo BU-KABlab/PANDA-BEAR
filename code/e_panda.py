@@ -42,11 +42,25 @@ from wellplate import Wells
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(custom-values)%:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
+class CustomLoggingFilter(logging.Filter):
+    """ This is a filter which injects custom values into the log record.
+    From: https://stackoverflow.com/questions/56776576/how-to-add-custom-values-to-python-logging
+    The values will be the experiment id and the well id
+    """
+    def __init__(self, custom1, custom2):
+        super().__init__()
+        self.custom1 = custom1
+        self.custom2 = custom2
+
+    def filter(self, record):
+        record.custom1 = self.custom1
+        record.custom2 = self.custom2
+        return True
 
 def pipette(
     volume: float,  # volume in ul
@@ -79,8 +93,8 @@ def pipette(
         repetition_vol = volume / repetitions
 
         for j in range(repetitions):
-            logger.info("%s: Repetition %d of %d",
-                        target_well, j + 1,  repetitions)
+            logger.info("Repetition %d of %d",
+                        j + 1,  repetitions)
             repetition_and_purge_vol = repetition_vol + (2 * purge_volume)
             # solution = solution_selector(solution_name, repetition_vol)
             solution = solution_selector(
@@ -91,13 +105,13 @@ def pipette(
                 waste_vials, waste_solution_name, repetition_and_purge_vol
             )
             # First half: pick up solution
-            logger.debug("%s: Withdrawing %f of air gap...",
-                         target_well, air_gap)
+            logger.debug("Withdrawing %f of air gap...",
+                         air_gap)
             pump.withdraw(
                 air_gap, solution, pumping_rate
             )  # withdraw air gap to engage screw
 
-            logger.info("%s: Moving to %s...", target_well, solution.name)
+            logger.info("Moving to %s...", solution.name)
             mill.move_pipette_to_position(
                 solution.coordinates["x"], solution.coordinates["y"], 0
             )  # start at safe height
@@ -147,8 +161,8 @@ def pipette(
             )
 
             # Second Half: Deposit to well
-            logger.info("%s: Moving to target well: %s...",
-                        target_well, target_well)
+            logger.info("Moving to target well: %s...",
+                        target_well)
             mill.move_pipette_to_position(
                 wellplate.get_coordinates(target_well)["x"],
                 wellplate.get_coordinates(target_well)["y"],
@@ -222,7 +236,7 @@ def pipette(
                                 rate=pumping_rate)
                     time.sleep(1)
 
-                logger.debug("%s: Pipette empty. Continuing...", target_well)
+                logger.debug("Pipette empty. Continuing...")
 
 
 def clear_well(
@@ -264,11 +278,11 @@ def clear_well(
     for j in range(repetition):
         purge_vial = waste_selector(waste_vials, solution_name, repetition_vol)
 
-        logger.info("%s: Repitition %d of %d", target_well, j + 1, repetition)
-        logger.debug("%s:Withdrawing %f of air gap...", target_well, air_gap)
+        logger.info("Repitition %d of %d", j + 1, repetition)
+        logger.debug("Withdrawing %f of air gap...", air_gap)
         # withdraw a little to engange screw
         pump.withdraw(air_gap, pumping_rate)
-        logger.debug("%s:Moving to %s...", target_well, target_well)
+        logger.debug("Moving to %s...", target_well)
         mill.move_pipette_to_position(
             wellplate.get_coordinates(target_well)["x"],
             wellplate.get_coordinates(target_well)["y"],
@@ -281,24 +295,23 @@ def clear_well(
         )  # go to bottom of well
 
         wellplate.update_volume(target_well, -repetition_vol)
-        logger.debug("%s: Withdrawing %f from %s...",
-                     target_well, repetition_vol, target_well)
+        logger.debug("Withdrawing %f from %s...",
+                     repetition_vol, target_well)
         pump.withdraw(
             volume=repetition_vol,
             solution=wellplate.density(target_well),
             rate=pumping_rate,
         )  # withdraw the volume from the well
 
-        logger.debug("%s: Well %s volume: %f", target_well,
-                     target_well, wellplate.volume(target_well))
+        logger.debug("Well %s volume: %f", target_well,
+                     wellplate.volume(target_well))
         mill.move_pipette_to_position(
             wellplate.get_coordinates(target_well)["x"],
             wellplate.get_coordinates(target_well)["y"],
             0,
         )  # return to safe height
 
-        logger.info("%s: Moving to purge vial %s...",
-                    target_well, purge_vial.name)
+        logger.info("Moving to purge vial %s...", purge_vial.name)
         mill.move_pipette_to_position(
             purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
@@ -311,14 +324,14 @@ def clear_well(
         pump.purge(
             purge_vial, wellplate.density(target_well), repetition_vol
         )  # repitition volume
-        logger.info("%s: Purging the air gap...", target_well)
+        logger.info("Purging the air gap...")
         pump.infuse(volume=air_gap, rate=0.5)  # extra purge to clear pipette
 
         mill.move_pipette_to_position(
             purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
-        logger.info("%s: Remaining volume in well: %d",
-                    target_well, wellplate.volume(target_well))
+        logger.info("Remaining volume in well: %f",
+                    wellplate.volume(target_well))
         if round(pump.pipette_volume_ul, 2) != 0.00:
             while pump.pipette_volume_ul != 0:
                 logger.warning(
@@ -329,6 +342,7 @@ def clear_well(
                 time.sleep(1)
 
             logger.debug("Pipette empty. Continuing...")
+
 
 
 def rinse(
@@ -674,6 +688,10 @@ def run_experiment(
     """
     Run the experiment
     """
+    # Add custom value to log format
+    custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
+    logger.addFilter(custom_filter)
+
     try:
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
