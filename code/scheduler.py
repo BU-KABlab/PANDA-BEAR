@@ -15,7 +15,11 @@ import random
 from datetime import datetime
 from typing import List, Dict, Tuple
 import experiment_class
-from experiment_class import Experiment, ExperimentStatus, ExperimentResult  # , make_baseline_value
+from experiment_class import (
+    Experiment,
+    ExperimentStatus,
+    ExperimentResult,
+)  # , make_baseline_value
 from config.pin import CURRENT_PIN
 
 # define constants or globals
@@ -106,9 +110,7 @@ class Scheduler:
             for wells in data["Wells"]:
                 if wells["well_id"] == well:
                     wells["status"] = status
-                    wells["status_date"] = datetime.now().strftime(
-                        "%Y-%m-%dT%H:%M:%S"
-                    )
+                    wells["status_date"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
                     break
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
@@ -288,8 +290,11 @@ class Scheduler:
             with open(file_path / random_file, "r", encoding="ascii") as file:
                 data = json.load(file)
                 if data["baseline"] == 0 and data["status"] == "queued":
-                    data = experiment_class.RootModel[Experiment].model_validate_json(
-                        json.dumps(data)).root
+                    data = (
+                        experiment_class.RootModel[Experiment]
+                        .model_validate_json(json.dumps(data))
+                        .root
+                    )
                     return data, (file_path / random_file)
 
         else:
@@ -340,7 +345,9 @@ class Scheduler:
         Updates the location of the experiment instructions file.
         :param experiment: The experiment that was just run.
         """
-        file_path = pathlib.Path(pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename)
+        file_path = pathlib.Path(
+            pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
+        )
         if not pathlib.Path.exists(file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
@@ -358,24 +365,26 @@ class Scheduler:
         else:
             # If the experiment is neither complete nor errored, then we need to keep it in the queue
             logger.info(
-                "Experiment %s is not complete or errored, keeping in queue", experiment.id)
+                "Experiment %s is not complete or errored, keeping in queue",
+                experiment.id,
+            )
 
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
         Args:
             experiment (Experiment): The experiment that was just run
             results (ExperimentResult): The results of the experiment
-            
+
         Returns:
             None
         """
         # Save the results
-        logger.info(
-            "Saving experiment %s results to database", experiment.id)
+        logger.info("Saving experiment %s results to database", experiment.id)
         results_json = experiment_class.serialize_results(results)
-        with open(pathlib.Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding= 'UTF-8') as results_file:
+        with open(
+            pathlib.Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
+        ) as results_file:
             results_file.write(results_json)
-
 
     def reset_well_statuses(self):
         """Loop through the well statuses and set them all to new"""
@@ -384,7 +393,7 @@ class Scheduler:
 
         # Confirm that the user wants this
         choice = input(
-        "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
+            "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
         )
         if choice == "n":
             print("Exiting program.")
@@ -399,6 +408,7 @@ class Scheduler:
 
         print("Well statuses reset to new.")
         return 0
+
 
 ####################################################################################################
 def test_well_status_update():

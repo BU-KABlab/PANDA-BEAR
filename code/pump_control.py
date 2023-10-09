@@ -1,6 +1,6 @@
-'''
+"""
 A "driver" class for controlling a new era A-1000 syringe pump using the nesp-lib library
-'''
+"""
 import logging
 import time
 import nesp_lib
@@ -18,8 +18,8 @@ system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
 
-class Pump():
-    '''
+class Pump:
+    """
     Class for controlling a new era A-1000 syringe pump using the nesp-lib library
 
     Attributes:
@@ -41,7 +41,7 @@ class Pump():
     Exceptions:
         OverFillException: Raised when a syringe is over filled.
         OverDraftException: Raised when a syringe is over drawn.
-    '''
+    """
 
     def __init__(self, mill: Mill, scale: Scale):
         """
@@ -97,7 +97,7 @@ class Pump():
         self.pump.volume_withdrawn_clear()
         return 0
 
-    def infuse(self, volume: float,  solution: Vial = None, rate: float = 0.5) -> int:
+    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -122,7 +122,11 @@ class Pump():
         return 0
 
     def purge(
-        self, purge_vial: Vial, solution: Vial = None, purge_volume=20.00, pumping_rate=0.5
+        self,
+        purge_vial: Vial,
+        solution: Vial = None,
+        purge_volume=20.00,
+        pumping_rate=0.5,
     ) -> None:
         """
         Perform purging from the pipette.
@@ -147,7 +151,11 @@ class Pump():
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml
         self.pump.pumping_rate = rate
-        action = "Withdrawing" if direction == nesp_lib.PumpingDirection.WITHDRAW else "Infusing"
+        action = (
+            "Withdrawing"
+            if direction == nesp_lib.PumpingDirection.WITHDRAW
+            else "Infusing"
+        )
         logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
         self.pump.run()
@@ -155,11 +163,19 @@ class Pump():
             pass
         logger.debug("Done %s", action)
         time.sleep(2)
-        action_type = "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
+        action_type = (
+            "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
+        )
         log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
         logger.debug(log_msg)
 
-    def mix(self, mix_location: dict = None, mix_repetitions=3, mix_volume=200.0, mix_rate=0.62):
+    def mix(
+        self,
+        mix_location: dict = None,
+        mix_repetitions=3,
+        mix_volume=200.0,
+        mix_rate=0.62,
+    ):
         """Mix the solution in the pipette by withdrawing and infusing the solution
         Args:
             mix_location (dict): Dictionary containing x, y, and z coordinates of the position.
@@ -180,34 +196,35 @@ class Pump():
                 current_coords = {
                     "x": current_coords[0],
                     "y": current_coords[1],
-                    "z": current_coords[2]
+                    "z": current_coords[2],
                 }
                 self.mill.set_feed_rate(500)
-                self.mill.move_center_to_position(current_coords["x"],
-                                                   current_coords["y"],
-                                                   current_coords["z"] + 3)
+                self.mill.move_center_to_position(
+                    current_coords["x"], current_coords["y"], current_coords["z"] + 3
+                )
                 self.infuse(mix_volume, mix_rate)
-                self.mill.move_center_to_position(current_coords["x"],
-                                                   current_coords["y"],
-                                                   current_coords["z"])
+                self.mill.move_center_to_position(
+                    current_coords["x"], current_coords["y"], current_coords["z"]
+                )
                 self.mill.set_feed_rate(2000)
         else:
             # move to mix location
+            self.mill.move_pipette_to_position(mix_location["x"], mix_location["y"], 0)
             self.mill.move_pipette_to_position(
-                mix_location['x'], mix_location['y'], 0)
-            self.mill.move_pipette_to_position(
-                mix_location['x'], mix_location['y'], mix_location['depth'])
+                mix_location["x"], mix_location["y"], mix_location["depth"]
+            )
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
                 self.withdraw(mix_volume, mix_rate)
                 self.mill.move_pipette_to_position(
-                    mix_location['x'], mix_location['y'], mix_location['depth'] + 1.5)
+                    mix_location["x"], mix_location["y"], mix_location["depth"] + 1.5
+                )
                 self.infuse(mix_volume, mix_rate)
                 self.mill.move_pipette_to_position(
-                    mix_location['x'], mix_location['y'], mix_location['depth'])
+                    mix_location["x"], mix_location["y"], mix_location["depth"]
+                )
             # move back to original position
-            self.mill.move_pipette_to_position(
-                mix_location['x'], mix_location['y'], 0)
+            self.mill.move_pipette_to_position(mix_location["x"], mix_location["y"], 0)
 
     def update_pipette_volume(self, volume_ul):
         """Set the volume of the pipette in ul"""
@@ -234,7 +251,9 @@ class OverFillException(Exception):
         self.capacity = capacity
 
     def __str__(self):
-        return f"OverFillException: {self.volume} + {self.added_volume} > {self.capacity}"
+        return (
+            f"OverFillException: {self.volume} + {self.added_volume} > {self.capacity}"
+        )
 
 
 class OverDraftException(Exception):
@@ -249,16 +268,20 @@ class OverDraftException(Exception):
     def __str__(self):
         return f"OverDraftException: {self.volume} - {self.added_volume} < 0"
 
+
 def test_mixing():
     """Test the mixing function"""
-    wellplate = Wellplate(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
-    a1 = wellplate.get_coordinates('A1')
+    wellplate = Wellplate(
+        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
+    )
+    a1 = wellplate.get_coordinates("A1")
     with Mill() as mill:
         mill.homing_sequence()
         pump = Pump(mill=mill, scale=Scale())
-        mill.move_pipette_to_position(a1['x'],a1['y'], 0)
-        mill.move_pipette_to_position(a1['x'],a1['y'], a1['depth'])
+        mill.move_pipette_to_position(a1["x"], a1["y"], 0)
+        mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
         pump.mix()
+
 
 if __name__ == "__main__":
     test_mixing()

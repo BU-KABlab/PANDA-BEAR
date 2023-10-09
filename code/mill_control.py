@@ -123,23 +123,18 @@ class Mill:
             out = self.ser_mill.readline().decode().rstrip()
 
             if command == "F2000":
-                logger.debug(
-                    "execute_command: Returned %s", out)
+                logger.debug("execute_command: Returned %s", out)
 
             elif command == "?":
-                logger.debug(
-                    "execute_command: Returned %s", out)
+                logger.debug("execute_command: Returned %s", out)
 
             elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
-                logger.debug(
-                    "execute_command: Initially %s", out)
+                logger.debug("execute_command: Initially %s", out)
                 self.wait_for_completion(out)
                 out = self.current_status()
-                logger.debug(
-                    "execute_command: Returned %s", out)
+                logger.debug("execute_command: Returned %s", out)
             else:
-                logger.debug(
-                    "execute_command: Returned %s", out)
+                logger.debug("execute_command: Returned %s", out)
 
             return out
 
@@ -181,8 +176,7 @@ class Mill:
         start_time = time.time()
         while "Idle" not in status:
             if time.time() - start_time > timeout:
-                logger.warning(
-                    "wait_for_completion: Command execution timed out")
+                logger.warning("wait_for_completion: Command execution timed out")
                 break
             status = self.current_status()
             time.sleep(1)
@@ -192,7 +186,7 @@ class Mill:
         command = "?"
         command_bytes = command.encode()
         self.ser_mill.write(command_bytes + b"\n")
-        #time.sleep(2)
+        # time.sleep(2)
         status = self.ser_mill.readline().decode().rstrip()
         # Check for errors
         if "error" in status.lower() or "alarm" in status.lower():
@@ -242,7 +236,7 @@ class Mill:
         command_coordinates = [
             x_coord + offsets["x"],
             y_coord + offsets["y"],
-            z_coord + offsets["z"]
+            z_coord + offsets["z"],
         ]
 
         # check that command coordinates are within working volume
@@ -293,14 +287,14 @@ class Mill:
             current_coordinates = [
                 x_coord - offsets["x"],
                 y_coord - offsets["y"],
-                z_coord - offsets["z"]
+                z_coord - offsets["z"],
             ]
         elif instrument == Instruments.ELECTRODE:
             offsets = self.config["instrument_offsets"]["electrode"]
             current_coordinates = [
                 x_coord - offsets["x"],
                 y_coord - offsets["y"],
-                z_coord - offsets["z"]
+                z_coord - offsets["z"],
             ]
 
         else:
@@ -356,7 +350,7 @@ class Mill:
         command_coordinates = [
             x_coord + offsets["x"],
             y_coord + offsets["y"],
-            z_coord + offsets["z"]
+            z_coord + offsets["z"],
         ]
         self.move_center_to_position(*command_coordinates)
         return 0
@@ -384,7 +378,7 @@ class Mill:
         command_coordinates = [
             x_coord + offsets["x"],
             y_coord + offsets["y"],
-            z_coord + offsets["z"]
+            z_coord + offsets["z"],
         ]
         self.move_center_to_position(*command_coordinates)
         return 0
@@ -417,7 +411,9 @@ class Mill:
             return 3
 
     ## Special versions of the movement commands that avoid diagonal movements
-    def safe_move(self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER) -> int:
+    def safe_move(
+        self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER
+    ) -> int:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
         Args:
@@ -465,6 +461,7 @@ class Mill:
 
         return 0
 
+
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""
 
@@ -491,8 +488,9 @@ class LocationNotFound(Exception):
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wells(a1_x=-218, a1_y=-74,
-                            orientation=0, columns="ABCDEFGH", rows=13)
+    wellplate = Wells.Wells(
+        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
+    )
 
     # Configure the logger for testing
     testing_handler = logging.FileHandler("code/logs/mill_control_testing.log")
@@ -502,20 +500,19 @@ def movement_test():
     try:
         with Mill() as mill:
             mill.homing_sequence()
-            a1 = wellplate.get_coordinates('A1')
-            d5 = wellplate.get_coordinates('D5')
-            h3 = wellplate.get_coordinates('H3')
-            mill.move_pipette_to_position(a1['x'], a1['y'], 0)
-            mill.move_pipette_to_position(a1['x'], a1['y'], a1['depth'])
-            #mill.move_pipette_to_position(a1['x'], a1['y'], 0)
+            a1 = wellplate.get_coordinates("A1")
+            d5 = wellplate.get_coordinates("D5")
+            h3 = wellplate.get_coordinates("H3")
+            mill.move_pipette_to_position(a1["x"], a1["y"], 0)
+            mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
+            # mill.move_pipette_to_position(a1['x'], a1['y'], 0)
 
             # test that the mill current corrinates work
-            mill_coordinates = mill.current_coordinates(
-                instrument=Instruments.PIPETTE)
-            assert mill_coordinates == [a1['x'], a1['y'], a1['depth']]
+            mill_coordinates = mill.current_coordinates(instrument=Instruments.PIPETTE)
+            assert mill_coordinates == [a1["x"], a1["y"], a1["depth"]]
 
             # test that the mill safe move works
-            mill.safe_move(d5['x'], d5['y'], d5['depth'])
+            mill.safe_move(d5["x"], d5["y"], d5["depth"])
 
             # mill.move_pipette_to_position(d5['x'], d5['y'],0)
             # mill.move_pipette_to_position(d5['x'], d5['y'],d5['depth'])
