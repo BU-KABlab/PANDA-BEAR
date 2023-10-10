@@ -45,14 +45,17 @@ import wellplate as wellplate_module
 from wellplate import Wells
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter(
-    "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
-)
-system_handler = logging.FileHandler("code/logs/ePANDA.log")
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+# formatter = logging.Formatter(
+#     "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
+# )
+# system_handler = logging.FileHandler("code/logs/ePANDA.log")
+# system_handler.setFormatter(formatter)
+# logger.addHandler(system_handler)
+
+from logger import CustomLogger
+logger = CustomLogger.get_logger()
 
 AIR_GAP = 40  # ul
 
@@ -718,6 +721,7 @@ def run_experiment(
         wellplate (Wells object): The wellplate object
     """
     # Add custom value to log format
+    # Create the logger and add the custom filter
     custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
     logger.addFilter(custom_filter)
 
