@@ -12,11 +12,12 @@ from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 import time
 import Analyzer
+
 # pylint: disable=global-statement
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # change to INFO to reduce verbosity
+logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
@@ -24,14 +25,14 @@ logger.addHandler(system_handler)
 
 # global variables
 global PSTAT
-global DEVICES 
-global GAMRY_COM 
-global DTAQ 
-global SIGNAL 
-global DTAQ_SINK 
-global CONNECTION 
-global ACTIVE 
-global COMPLETE_FILE_NAME 
+global DEVICES
+global GAMRY_COM
+global DTAQ
+global SIGNAL
+global DTAQ_SINK
+global CONNECTION
+global ACTIVE
+global COMPLETE_FILE_NAME
 
 
 def pstatconnect():
@@ -53,6 +54,7 @@ def pstatconnect():
 
 class GamryCOMError(Exception):
     """Exception raised when a COM error occurs."""
+
     pass
 
 
@@ -61,9 +63,7 @@ def gamry_error_decoder(err):
     if isinstance(err, comtypes.COMError):
         hresult = 2**32 + err.args[0]
         if hresult & 0x20000000:
-            return GamryCOMError(
-                f"0x{hresult:08x}: {err.args[1]}"
-            )
+            return GamryCOMError(f"0x{hresult:08x}: {err.args[1]}")
     return err
 
 
@@ -113,8 +113,8 @@ class GamryDtaqEvents(object):
 
     def _IGamryDtaqEvents_OnDataAvailable(self):
         self.cook()
-        #loading = ["|", "/", "-", "\\"]
-        #logger.debug("\rmade it to data available %s{random.choice(loading)}", end="")
+        # loading = ["|", "/", "-", "\\"]
+        # logger.debug("\rmade it to data available %s{random.choice(loading)}", end="")
 
     def _IGamryDtaqEvents_OnDataDone(self):
         logger.debug("made it to data done")
@@ -146,8 +146,12 @@ def savedata(complete_file_name):
 def setfilename(experiment_id, experiment_type) -> pathlib.Path:
     """set the file name for the experiment"""
     global COMPLETE_FILE_NAME
-    COMPLETE_FILE_NAME = pathlib.Path.cwd() / "data" / ("experiment-" + str(experiment_id) + "_" + experiment_type)
-    logger.debug("eChem: complete file name is: %s",COMPLETE_FILE_NAME)
+    COMPLETE_FILE_NAME = (
+        pathlib.Path.cwd()
+        / "data"
+        / ("experiment-" + str(experiment_id) + "_" + experiment_type)
+    )
+    logger.debug("eChem: complete file name is: %s", COMPLETE_FILE_NAME)
     return COMPLETE_FILE_NAME
 
 
@@ -243,7 +247,6 @@ def OCP(OCPvi, OCPti, OCPrate):
     global PSTAT
     global COMPLETE_FILE_NAME
 
-
     ACTIVE = True
 
     logger.debug("ocp: made it to run")
@@ -287,7 +290,9 @@ def check_vsig_range(filename):
         logger.debug("Vsig last row (float): %f", vsig_last_row_decimal)
 
         if -1 < vsig_last_row_decimal and vsig_last_row_decimal < 1:
-            logger.debug("Vsig in valid range (-1 to 1). Proceeding to echem experiment")
+            logger.debug(
+                "Vsig in valid range (-1 to 1). Proceeding to echem experiment"
+            )
             return True
         else:
             logger.debug("Vsig not in valid range. Aborting echem experiment")
@@ -295,7 +300,6 @@ def check_vsig_range(filename):
     except Exception as exception:
         logger.debug("Error occurred while checking Vsig: %s", exception)
         return False
-
 
 
 def mock_CA(MCAvi, MCAti, MCArate):

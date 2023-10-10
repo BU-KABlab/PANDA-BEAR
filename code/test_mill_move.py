@@ -34,9 +34,7 @@ def cv_cleaning_test():
         a4_coord = wellplate.get_coordinates("A4")
 
         ## Well 1: Characterization of bare gold with DmFC sol (CV, 3 cycles, -0.2, 0.3V)
-        mill.safe_move(
-            a1_coord["x"], a1_coord["y"], a1_coord["echem_height"]
-        )
+        mill.safe_move(a1_coord["x"], a1_coord["y"], a1_coord["echem_height"])
         input("Press enter to start CV.")
         echem.setfilename("cleaning_test_W1", "CV")
         echem.cyclic(
@@ -55,7 +53,10 @@ def cv_cleaning_test():
 
         ## Well 2: Deposition using polymers (CA V=-1.7V, 300s)
         mill.safe_move(
-            a2_coord["x"], a2_coord["y"], a2_coord["echem_height"], Instruments.ELECTRODE
+            a2_coord["x"],
+            a2_coord["y"],
+            a2_coord["echem_height"],
+            Instruments.ELECTRODE,
         )
         input("Press enter to start CV.")
         echem.setfilename("cleaning_test_W2", "CA")
@@ -75,7 +76,10 @@ def cv_cleaning_test():
 
         ## Well 3: Cleaning in pure electrolyte (CV, 10 cycles, -1.5V to 1.5V)
         mill.safe_move(
-            a3_coord["x"], a3_coord["y"], a3_coord["echem_height"], Instruments.ELECTRODE
+            a3_coord["x"],
+            a3_coord["y"],
+            a3_coord["echem_height"],
+            Instruments.ELECTRODE,
         )
         input("Press enter to start CV cleaning")
         echem.setfilename("cleaning_test_W3", "CV")
@@ -96,7 +100,10 @@ def cv_cleaning_test():
 
         ## Well 4: Characterization of bare gold with DmFC sol (CV, 3 cycles, -0.2, 0.3V)
         mill.safe_move(
-            a4_coord["x"], a4_coord["y"], a4_coord["echem_height"], Instruments.ELECTRODE
+            a4_coord["x"],
+            a4_coord["y"],
+            a4_coord["echem_height"],
+            Instruments.ELECTRODE,
         )
         input("Press enter to continue.")
         echem.setfilename("cleaning_test_W4", "CV")
@@ -167,5 +174,5 @@ def interactive():
 
 if __name__ == "__main__":
     cv_cleaning_test()
-    #main()
+    # main()
     # interactive()

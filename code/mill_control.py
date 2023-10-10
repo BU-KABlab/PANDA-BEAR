@@ -537,12 +537,12 @@ class MockMill:
     def __enter__(self):
         """Enter the context manager"""
         return self
-    
+
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit the context manager"""
         self.home()
         self.disconnect()
-        
+
     def disconnect(self):
         """Simulate disconnecting from the mill"""
         self.logger.info("Disconnecting from the mill")
@@ -558,7 +558,6 @@ class MockMill:
     def reset(self):
         """Simulate resetting the mill"""
         self.logger.info("Resetting the mill")
-
 
     def home(self, timeout=90):
         """Simulate homing the mill"""
@@ -628,7 +627,9 @@ class MockMill:
         self.current_x = x_coord
         self.current_y = y_coord
         self.current_z = z_coord
-        self.logger.info("Moving pipette to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
+        self.logger.info(
+            "Moving pipette to position: (%s, %s, %s)", x_coord, y_coord, z_coord
+        )
 
     def move_electrode_to_position(
         self, x_coord: float, y_coord: float, z_coord: float = 0.00
@@ -637,11 +638,19 @@ class MockMill:
         self.current_x = x_coord
         self.current_y = y_coord
         self.current_z = z_coord
-        self.logger.info("Moving electrode to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
+        self.logger.info(
+            "Moving electrode to position: (%s, %s, %s)", x_coord, y_coord, z_coord
+        )
 
     def update_offset(self, offset_type, offset_x, offset_y, offset_z):
         """Simulate updating offsets in the config"""
-        self.logger.info("Updating offset: %s (%s, %s, %s)", offset_type, offset_x, offset_y, offset_z)
+        self.logger.info(
+            "Updating offset: %s (%s, %s, %s)",
+            offset_type,
+            offset_x,
+            offset_y,
+            offset_z,
+        )
 
     def safe_move(
         self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER
@@ -650,8 +659,11 @@ class MockMill:
         self.current_x = x_coord
         self.current_y = y_coord
         self.current_z = z_coord
-        self.logger.info("Safe move to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
+        self.logger.info(
+            "Safe move to position: (%s, %s, %s)", x_coord, y_coord, z_coord
+        )
         return 0
+
 
 def movement_test():
     """Test the mill movement with a wellplate"""
