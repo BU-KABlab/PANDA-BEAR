@@ -245,6 +245,7 @@ class Pump:
         self.pipette_capacity_ml = capacity_ul
         self.pipette_capacity_ul = capacity_ul / 1000
 
+
 class MockPump(Pump):
     """
     Subclass of Pump that mocks the behavior of the external pump.
@@ -260,7 +261,7 @@ class MockPump(Pump):
         # Check if the requested volume is greater than the pipette's capacity
         volume_ml = volume / 1000
 
-        #self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
+        # self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
         self.pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         self.update_pipette_volume(volume)
         logging.debug(
@@ -268,7 +269,6 @@ class MockPump(Pump):
             volume_ml,
             self.pipette_volume_ul,
         )
-
 
         return 0
 
@@ -280,7 +280,7 @@ class MockPump(Pump):
         volume_ml = volume / 1000
 
         if volume > 0.0:
-            #self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
+            # self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
             self.pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume)
             logging.debug(
@@ -291,7 +291,7 @@ class MockPump(Pump):
         else:
             pass
         return 0
-    
+
     def update_pipette_volume(self, volume_ul):
         """Set the volume of the pipette in ul"""
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
@@ -300,6 +300,8 @@ class MockPump(Pump):
         else:
             self.pipette_volume_ul += volume_ul
             self.pipette_volume_ml += volume_ul / 1000
+
+
 class OverFillException(Exception):
     """Raised when a vessel is over filled"""
 
@@ -341,6 +343,7 @@ def test_mixing():
         mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
         pump.mix()
 
+
 def mock_pump_testing_routine():
     """Test the pump"""
     with MockMill() as mill:
@@ -354,6 +357,7 @@ def mock_pump_testing_routine():
 
             mock_pump.mix()
 
+
 if __name__ == "__main__":
-    #test_mixing()
+    # test_mixing()
     mock_pump_testing_routine()
