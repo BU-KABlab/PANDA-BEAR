@@ -66,8 +66,8 @@ def main():
         scale = toolkit.scale
         pump = toolkit.pump
         mill_connected = True
-        pstat_connected = True
-        pump_connected = echem.pstatconnect()
+        pstat_connected = False #echem.pstatconnect()
+        pump_connected = True
         scale_connected = True
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
@@ -81,10 +81,7 @@ def main():
         ## Begin outer loop
         while True:
             ## Ask the scheduler for the next experiment
-            (
-                new_experiment,
-                new_experiment_path,
-            ) = scheduler.read_next_experiment_from_queue()
+            new_experiment, new_experiment_path = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
                 logger.info(
                     "No new experiments to run...waiting 1 minute for new experiments"

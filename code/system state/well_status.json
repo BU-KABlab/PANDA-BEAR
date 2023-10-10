@@ -282,8 +282,8 @@
         },
         {
             "well_id": "C5",
-            "status": "new",
-            "status_date": "2023-10-09T10:58:19",
+            "status": "complete",
+            "status_date": "2023-10-10T14:14:13",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -402,8 +402,8 @@
         },
         {
             "well_id": "D5",
-            "status": "new",
-            "status_date": "2023-10-09T10:59:31",
+            "status": "complete",
+            "status_date": "2023-10-10T14:48:58",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -412,8 +412,8 @@
         },
         {
             "well_id": "D6",
-            "status": "running",
-            "status_date": "2023-10-09T16:22:46",
+            "status": "complete",
+            "status_date": "2023-10-10T13:39:28",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
@@ -882,8 +882,8 @@
         },
         {
             "well_id": "H5",
-            "status": "new",
-            "status_date": "2023-10-09T11:07:41",
+            "status": "error",
+            "status_date": "2023-10-10T18:35:35",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,

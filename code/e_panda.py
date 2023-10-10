@@ -85,7 +85,8 @@ def pipette(
     wellplate: Wells,
     pump: pump_class,
     mill: mill_control,
-    purge_volume=20.00,
+    scale: scale_class = None,
+    purge_volume: float = 20.00,
 ):
     """
     Perform the full pipetting sequence:
@@ -398,7 +399,7 @@ def rinse(
             wellplate,
             pump,
             mill,
-            scale,
+            scale=scale,
         )
         clear_well(
             instructions.rinse_vol,
@@ -546,7 +547,7 @@ def deposition(
     """Deposition of the solutions onto the substrate"""
     # echem setup
     logger.info("\n\nSetting up eChem experiments...")
-
+    echem.pstatconnect()
     # echem OCP
     logger.info("Beginning eChem OCP of well: %s", dep_instructions.target_well)
     dep_instructions.status = ExperimentStatus.OCPCHECK
@@ -560,7 +561,8 @@ def deposition(
         wellplate.get_coordinates(dep_instructions.target_well)["y"],
         wellplate.echem_height,
     )  # move to well depth
-    dep_results.ocp_dep_file = echem.setfilename(dep_instructions.id, "OCP")
+    base_filename = echem.setfilename(dep_instructions.id, "OCP")
+    dep_results.ocp_dep_file = base_filename
     echem.OCP(
         echem.potentiostat_ocp_parameters.OCPvi,
         echem.potentiostat_ocp_parameters.OCPti,
@@ -572,7 +574,7 @@ def deposition(
     )
 
     # echem CA - deposition
-    if dep_instructions["OCP_pass"]:
+    if dep_results.ocp_dep_pass:
         dep_instructions.status = ExperimentStatus.DEPOSITING
         logger.info(
             "Beginning eChem deposition of well: %s", dep_instructions.target_well
@@ -584,28 +586,22 @@ def deposition(
         echem.chrono(
             echem.potentiostat_ca_parameters.CAvi,
             echem.potentiostat_ca_parameters.CAti,
-            CAv1=dep_instructions["dep-pot"],
-            CAt1=dep_instructions["dep-duration"],
+            CAv1=dep_instructions.dep_pot,
+            CAt1=dep_instructions.dep_duration,
             CAv2=echem.potentiostat_ca_parameters.CAv2,
             CAt2=echem.potentiostat_ca_parameters.CAt2,
-            CAsamplerate=dep_instructions["sample-period"],
+            CAsamplerate=dep_instructions.ca_sample_period,
         )  # CA
 
         echem.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well
 
         mill.rinse_electrode()
+        echem.disconnectpstat()
         return dep_instructions, dep_results
-    raise OCPFailure("CA")
-
-
-class OCPFailure(Exception):
-    """Raised when OCP fails"""
-
-    def __init__(self, stage):
-        self.stage = stage
-        self.message = f"OCP failed before {stage}"
-        super().__init__(self.message)
+    else:
+        echem.disconnectpstat()
+        raise OCPFailure("CA")
 
 
 def characterization(
@@ -618,7 +614,7 @@ def characterization(
     logger.info("Characterizing well: %s", char_instructions.target_well)
     # echem OCP
     logger.info("Beginning eChem OCP of well: %s", char_instructions.target_well)
-
+    echem.pstatconnect()
     char_instructions.status = ExperimentStatus.OCPCHECK
     mill.move_electrode_to_position(
         wellplate.get_coordinates(char_instructions.target_well)["x"],
@@ -641,8 +637,8 @@ def characterization(
         char_results.ocp_char_file.with_suffix(".txt")
     )
     # echem CV - characterization
-    if char_instructions.ocp_char_pass:
-        if char_instructions["baseline"] == 1:
+    if char_results.ocp_char_pass:
+        if char_instructions.baseline == 1:
             test_type = "CV_baseline"
             char_instructions.status = ExperimentStatus.BASELINE
         else:
@@ -664,19 +660,21 @@ def characterization(
             echem.potentiostat_cv_parameters.CVap1,
             echem.potentiostat_cv_parameters.CVap2,
             echem.potentiostat_cv_parameters.CVvf,
-            CVsr1=char_instructions["scan-rate"],
-            CVsr2=char_instructions["scan-rate"],
-            CVsr3=char_instructions["scan-rate"],
+            CVsr1=char_instructions.cv_scan_rate,
+            CVsr2=char_instructions.cv_scan_rate,
+            CVsr3=char_instructions.cv_scan_rate,
             CVsamplerate=(
-                echem.potentiostat_cv_parameters.CVstep / char_instructions["scan-rate"]
+                echem.potentiostat_cv_parameters.CVstep / char_instructions.cv_scan_rate
             ),
             CVcycle=echem.potentiostat_cv_parameters.CVcycle,
         )
         echem.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well
         mill.rinse_electrode()
-        return char_instructions
+        echem.disconnectpstat()
+        return char_instructions, char_results
     else:
+        echem.disconnectpstat()
         raise OCPFailure("CV")
 
 
@@ -759,6 +757,7 @@ def run_experiment(
                     wellplate=wellplate,
                     pump=pump,
                     mill=mill,
+                    scale=scale,
                 )
 
                 flush_pipette_tip(
@@ -850,6 +849,7 @@ def run_experiment(
                 wellplate=wellplate,
                 pump=pump,
                 mill=mill,
+                scale=scale,
             )
 
             logger.info("Deposited char_sol in well: %s", instructions.target_well)
@@ -937,6 +937,15 @@ def run_experiment(
         )
 
     return instructions, results, stock_vials, waste_vials, wellplate
+
+
+class OCPFailure(Exception):
+    """Raised when OCP fails"""
+
+    def __init__(self, stage):
+        self.stage = stage
+        self.message = f"OCP failed before {stage}"
+        super().__init__(self.message)
 
 
 if __name__ == "__main__":

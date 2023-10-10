@@ -6,7 +6,7 @@ import time
 import nesp_lib
 from scale import Sartorius as Scale
 from vials import Vial
-from mill_control import Mill, Instruments
+from mill_control import Mill, MockMill, Instruments
 from wellplate import Wells as Wellplate
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -166,7 +166,12 @@ class Pump:
         action_type = (
             "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
         )
-        log_msg = f"Pump has {action_type}: {self.pump.volume_infused} ml"
+        action_volume = (
+            self.pump.volume_infused
+            if direction == nesp_lib.PumpingDirection.INFUSE
+            else self.pump.volume_withdrawn
+        )
+        log_msg = f"Pump has {action_type}: {action_volume} ml"
         logger.debug(log_msg)
 
     def mix(
@@ -240,7 +245,61 @@ class Pump:
         self.pipette_capacity_ml = capacity_ul
         self.pipette_capacity_ul = capacity_ul / 1000
 
+class MockPump(Pump):
+    """
+    Subclass of Pump that mocks the behavior of the external pump.
+    """
 
+    def __init__(self, mill: Mill, scale: Scale):
+        super().__init__(mill, scale)  # Call the constructor of the base class
+
+    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
+        # Simulate withdraw behavior without sending commands to the pump
+        # Update pipette volume, log, and handle exceptions as needed
+
+        # Check if the requested volume is greater than the pipette's capacity
+        volume_ml = volume / 1000
+
+        #self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
+        self.pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+        self.update_pipette_volume(volume)
+        logging.debug(
+            "Mock Pump has withdrawn: %f ml    Pipette vol: %f",
+            volume_ml,
+            self.pipette_volume_ul,
+        )
+
+
+        return 0
+
+    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
+        # Simulate infuse behavior without sending commands to the pump
+        # Update pipette volume, log, and handle exceptions as needed
+
+        # convert the volume argument from ul to ml
+        volume_ml = volume / 1000
+
+        if volume > 0.0:
+            #self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
+            self.pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+            self.update_pipette_volume(volume)
+            logging.debug(
+                "Mock Pump has infused: %f ml  Pipette volume: %f",
+                volume_ml,
+                self.pipette_volume_ul,
+            )
+        else:
+            pass
+        return 0
+    
+    def update_pipette_volume(self, volume_ul):
+        """Set the volume of the pipette in ul"""
+        if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
+            self.pipette_volume_ul -= volume_ul
+            self.pipette_volume_ml -= volume_ul / 1000
+        else:
+            self.pipette_volume_ul += volume_ul
+            self.pipette_volume_ml += volume_ul / 1000
 class OverFillException(Exception):
     """Raised when a vessel is over filled"""
 
@@ -282,6 +341,19 @@ def test_mixing():
         mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
         pump.mix()
 
+def mock_pump_testing_routine():
+    """Test the pump"""
+    with MockMill() as mill:
+        with Scale() as scale:
+            mill.homing_sequence()
+            mock_pump = MockPump(mill=mill, scale=scale)
+            mock_pump.withdraw(100)
+            assert mock_pump.pipette_volume_ul == 100
+            mock_pump.infuse(100)
+            assert mock_pump.pipette_volume_ul == 0
+
+            mock_pump.mix()
 
 if __name__ == "__main__":
-    test_mixing()
+    #test_mixing()
+    mock_pump_testing_routine()

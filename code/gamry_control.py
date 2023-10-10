@@ -120,11 +120,7 @@ def savedata(complete_file_name):
 def setfilename(id, experiment):
     """set the file name for the experiment"""
     global complete_file_name
-    current_time = datetime.datetime.now()
-    fileDate = current_time.strftime("%Y-%m-%d")
-    cwd = pathlib.Path().absolute()
-    filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
-    filePath = filePathPar / fileDate
+    filePath = pathlib.Path.cwd() + "/data"
     # complete_file_name = filePath / (target_well + "_" + experiment)
     complete_file_name = filePath / ("experiment-" + id + "_" + experiment)
     print(f"eChem: complete file name is: {complete_file_name}")

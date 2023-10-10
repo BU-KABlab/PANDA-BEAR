@@ -286,16 +286,19 @@ class Scheduler:
 
             # if there are any experiments are in queue pick one at random
             file_list = os.listdir(file_path)
-            random_file = random.choice(file_list)
-            with open(file_path / random_file, "r", encoding="ascii") as file:
-                data = json.load(file)
-                if data["baseline"] == 0 and data["status"] == "queued":
-                    data = (
-                        experiment_class.RootModel[Experiment]
-                        .model_validate_json(json.dumps(data))
-                        .root
-                    )
-                    return data, (file_path / random_file)
+            count = 0
+            while count < len(file_list):
+                random_file = random.choice(file_list)
+                count += 1
+                with open(file_path / random_file, "r", encoding="ascii") as file:
+                    data = json.load(file)
+                    if data["baseline"] == 0 and data["status"] in ["queued","new"]:
+                        data = (
+                            experiment_class.RootModel[Experiment]
+                            .model_validate_json(json.dumps(data))
+                            .root
+                        )
+                        return data, (file_path / random_file)
 
         else:
             return None, None

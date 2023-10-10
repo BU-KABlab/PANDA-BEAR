@@ -11,11 +11,9 @@
 # move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
 
 #
-from mill_control import Mill
+from mill_control import Mill, Instruments
 from wellplate import Wells
-from pump_control import Pump
 from vials import read_vials
-from scale import Sartorius as Scale
 import gamry_control_WIP as echem
 
 wellplate = Wells(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
@@ -30,14 +28,14 @@ def cv_cleaning_test():
         echem.pstatconnect()
 
         # define coordinates for easy reference
-        a1_coordinates = wellplate.get_coordinates("A1")
-        a2_coordinates = wellplate.get_coordinates("A2")
-        a3_coordinates = wellplate.get_coordinates("A3")
-        a4_coordinates = wellplate.get_coordinates("A4")
+        a1_coord = wellplate.get_coordinates("A1")
+        a2_coord = wellplate.get_coordinates("A2")
+        a3_coord = wellplate.get_coordinates("A3")
+        a4_coord = wellplate.get_coordinates("A4")
 
-        ## Well 1: Characterization of baregold with DmFC sol (CV, 3 cycles, -0.2, 0.3V)
+        ## Well 1: Characterization of bare gold with DmFC sol (CV, 3 cycles, -0.2, 0.3V)
         mill.safe_move(
-            a1_coordinates["x"], a1_coordinates["y"], a1_coordinates["echem_height"]
+            a1_coord["x"], a1_coord["y"], a1_coord["echem_height"]
         )
         input("Press enter to start CV.")
         echem.setfilename("cleaning_test_W1", "CV")
@@ -53,18 +51,18 @@ def cv_cleaning_test():
             CVcycle=3,
         )
         echem.activecheck()
-        input("Press enter to start continue.")
+        input("Press enter to start continue to well 2.")
 
         ## Well 2: Deposition using polymers (CA V=-1.7V, 300s)
         mill.safe_move(
-            a2_coordinates["x"], a2_coordinates["y"], a2_coordinates["echem_height"]
+            a2_coord["x"], a2_coord["y"], a2_coord["echem_height"], Instruments.ELECTRODE
         )
         input("Press enter to start CV.")
         echem.setfilename("cleaning_test_W2", "CA")
         echem.chrono(
             echem.potentiostat_ca_parameters.CAvi,
             echem.potentiostat_ca_parameters.CAti,
-            CAv1=-1.5,
+            CAv1=-1.7,
             CAt1=300,
             CAv2=echem.potentiostat_ca_parameters.CAv2,
             CAt2=echem.potentiostat_ca_parameters.CAt2,
@@ -72,11 +70,12 @@ def cv_cleaning_test():
         )  # CA
 
         echem.activecheck()
-        input("Press enter to continue.")
+        mill.rinse_electrode()
+        input("Press enter to continue to well 3.")
 
         ## Well 3: Cleaning in pure electrolyte (CV, 10 cycles, -1.5V to 1.5V)
         mill.safe_move(
-            a3_coordinates["x"], a3_coordinates["y"], a3_coordinates["echem_height"]
+            a3_coord["x"], a3_coord["y"], a3_coord["echem_height"], Instruments.ELECTRODE
         )
         input("Press enter to start CV cleaning")
         echem.setfilename("cleaning_test_W3", "CV")
@@ -92,11 +91,12 @@ def cv_cleaning_test():
             CVcycle=10,
         )
         echem.activecheck()
-        input("Press enter to start continue.")
+        mill.rinse_electrode()
+        input("Press enter to start continue to well 4.")
 
-        ## Well 4: Characterization of baregold with DmFC sol (CV, 3 cycles, -0.2, 0.3V)
+        ## Well 4: Characterization of bare gold with DmFC sol (CV, 3 cycles, -0.2, 0.3V)
         mill.safe_move(
-            a4_coordinates["x"], a4_coordinates["y"], a4_coordinates["echem_height"]
+            a4_coord["x"], a4_coord["y"], a4_coord["echem_height"], Instruments.ELECTRODE
         )
         input("Press enter to continue.")
         echem.setfilename("cleaning_test_W4", "CV")
@@ -112,7 +112,8 @@ def cv_cleaning_test():
             CVcycle=3,
         )
         echem.activecheck()
-        input("Press enter to start end")
+        mill.rinse_electrode()
+        input("Press enter to end")
         echem.disconnectpstat()
 
 

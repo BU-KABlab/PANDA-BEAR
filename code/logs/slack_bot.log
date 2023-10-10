@@ -140,3 +140,114 @@ status
 2023-10-09 16:22:40,925:slack_functions:Message sent: ePANDA is starting up
 2023-10-09 16:22:46,308:slack_functions:Message sent: ePANDA has connected to equipment
 2023-10-09 16:22:46,478:slack_functions:Message sent: Running experiment 1
+2023-10-09 16:42:59,496:slack_functions:Message sent: Experiment 1 ended with status error
+2023-10-09 16:43:04,514:slack_functions:Message sent: ePANDA encountered an error: cannot unpack non-iterable NoneType object
+2023-10-09 16:43:24,520:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 16:54:26,937:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 16:54:32,467:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 16:56:51,346:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 16:57:01,105:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 16:57:06,512:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 16:57:06,699:slack_functions:Message sent: Running experiment 0
+2023-10-09 17:14:08,155:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 17:14:23,301:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 17:15:31,460:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 17:15:36,860:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 17:16:22,560:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 17:17:01,198:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 17:17:06,612:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 17:18:35,378:slack_functions:Message sent: Running experiment 0
+2023-10-09 18:03:36,994:slack_functions:Message sent: Experiment 0 ended with status error
+2023-10-09 18:03:37,162:slack_functions:Message sent: Running experiment 0
+2023-10-09 18:04:14,198:slack_functions:Message sent: Experiment 0 ended with status error
+2023-10-09 18:04:14,348:slack_functions:Message sent: Running experiment 1
+2023-10-09 18:04:25,406:slack_functions:Message sent: Experiment 1 ended with status error
+2023-10-09 18:04:25,578:slack_functions:Message sent: Running experiment 1
+2023-10-09 18:04:25,778:slack_functions:Message sent: Experiment 1 ended with status error
+2023-10-09 18:04:26,561:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 18:04:41,741:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 18:15:43,490:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 18:15:49,075:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 18:15:57,578:slack_functions:Message sent: Running experiment 0
+2023-10-09 18:34:18,798:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 18:34:33,952:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 18:34:52,552:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 18:34:57,988:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 18:34:58,150:slack_functions:Message sent: Running experiment 0
+2023-10-09 18:44:59,810:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 18:45:14,962:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 21:03:53,562:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 21:03:59,141:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 21:11:24,402:slack_functions:Message sent: ePANDA encountered an error: cannot unpack non-iterable NoneType object
+2023-10-09 21:11:47,287:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 21:13:17,618:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 21:13:23,023:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 21:13:23,199:slack_functions:Message sent: Running experiment 1
+2023-10-09 21:33:12,674:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 21:33:27,822:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 21:38:46,729:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 21:38:52,140:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 21:38:52,328:slack_functions:Message sent: Running experiment 1
+2023-10-09 21:55:27,786:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-09 21:55:42,939:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-09 22:00:10,761:slack_functions:Message sent: ePANDA is starting up
+2023-10-09 22:00:16,212:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-09 22:00:16,394:slack_functions:Message sent: Running experiment 1
+2023-10-10 10:07:32,187:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 10:07:47,386:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 10:41:18,392:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 10:41:20,654:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 10:41:20,846:slack_functions:Message sent: Running experiment 0
+2023-10-10 10:52:30,061:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 11:01:18,241:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 11:01:43,315:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 11:01:43,818:slack_functions:Message sent: Running experiment 1
+2023-10-10 11:22:40,801:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 11:22:40,952:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 11:23:30,946:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 11:23:33,197:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 11:24:42,099:slack_functions:Message sent: ePANDA encountered an error: 3 validation errors for RootModel[Experiment]
+ca_sample_period
+  Field required [type=missing, input_value={'id': 0, 'priority': 2, ....json', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+cv_sample_period
+  Field required [type=missing, input_value={'id': 0, 'priority': 2, ....json', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+cv_scan_rate
+  Field required [type=missing, input_value={'id': 0, 'priority': 2, ....json', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+2023-10-10 11:24:46,918:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 11:25:42,248:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 11:25:44,519:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 11:25:44,731:slack_functions:Message sent: Running experiment 0
+2023-10-10 11:45:38,951:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 11:45:39,156:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 11:51:07,677:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 11:51:09,911:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 11:51:10,092:slack_functions:Message sent: Running experiment 1
+2023-10-10 13:04:22,205:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 13:04:22,351:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 13:04:37,110:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 13:04:39,358:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 13:04:39,540:slack_functions:Message sent: Running experiment 1
+2023-10-10 13:39:28,438:slack_functions:Message sent: Experiment 1 ended with status complete
+2023-10-10 13:39:28,633:slack_functions:Message sent: Running experiment 0
+2023-10-10 14:14:13,373:slack_functions:Message sent: Experiment 0 ended with status complete
+2023-10-10 14:14:13,562:slack_functions:Message sent: Running experiment 1
+2023-10-10 14:48:58,917:slack_functions:Message sent: Experiment 1 ended with status complete
+2023-10-10 14:48:59,105:slack_functions:Message sent: Running experiment 0
+2023-10-10 14:52:56,730:slack_functions:Message sent: Experiment 0 ended with status error
+2023-10-10 14:53:00,123:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 14:53:00,298:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 18:26:48,985:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 18:26:51,228:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 18:26:51,383:slack_functions:Message sent: Running experiment 0
+2023-10-10 18:33:15,941:slack_functions:Message sent: Experiment 0 ended with status error
+2023-10-10 18:33:24,054:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 18:33:24,200:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 18:33:51,394:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 18:33:53,654:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 18:33:53,816:slack_functions:Message sent: Running experiment 0
+2023-10-10 18:35:35,676:slack_functions:Message sent: Experiment 0 ended with status error
+2023-10-10 18:35:36,991:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 18:35:37,169:slack_functions:Message sent: ePANDA is shutting down...goodbye

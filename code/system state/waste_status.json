@@ -5,9 +5,9 @@
         "x": -47,
         "y": -13,
         "name": "waste",
-        "volume": 1500.0,
+        "volume": 1000,
         "capacity": 20000,
-        "contamination": 6
+        "contamination": 0
     },
     {
         "position": "W1",
@@ -51,7 +51,7 @@
         "x": -47,
         "y": -178,
         "name": "rinse0",
-        "volume": 4780.0,
+        "volume": 6110.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -61,7 +61,7 @@
         "x": -47,
         "y": -211,
         "name": "rinse1",
-        "volume": 4780.0,
+        "volume": 6110.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -71,7 +71,7 @@
         "x": -47,
         "y": -244,
         "name": "rinse2",
-        "volume": 4780.0,
+        "volume": 6110.0,
         "capacity": 20000,
         "contamination": 0
     }

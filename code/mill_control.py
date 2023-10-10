@@ -534,6 +534,15 @@ class MockMill:
         self.set_feed_rate(2000)  # Set feed rate to 2000
         self.clear_buffers()
 
+    def __enter__(self):
+        """Enter the context manager"""
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Exit the context manager"""
+        self.home()
+        self.disconnect()
+        
     def disconnect(self):
         """Simulate disconnecting from the mill"""
         self.logger.info("Disconnecting from the mill")

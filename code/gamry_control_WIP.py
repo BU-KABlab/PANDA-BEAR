@@ -23,19 +23,19 @@ system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
 # global variables
-PSTAT = None
-DEVICES = None
-GAMRY_COM = None
-DTAQ = None
-SIGNAL = None
-DTAQ_SINK = None
-CONNECTION = None
-START_TIME = None
-ACTIVE = None
-COMPLETE_FILE_NAME = None
+global PSTAT
+global DEVICES 
+global GAMRY_COM 
+global DTAQ 
+global SIGNAL 
+global DTAQ_SINK 
+global CONNECTION 
+global ACTIVE 
+global COMPLETE_FILE_NAME 
 
 
 def pstatconnect():
+    """connect to the pstat"""
     global PSTAT
     global DEVICES
     global GAMRY_COM
@@ -52,20 +52,23 @@ def pstatconnect():
 
 
 class GamryCOMError(Exception):
+    """Exception raised when a COM error occurs."""
     pass
 
 
 def gamry_error_decoder(err):
+    """Decode a COM error from GamryCOM into a more useful exception."""
     if isinstance(err, comtypes.COMError):
         hresult = 2**32 + err.args[0]
         if hresult & 0x20000000:
             return GamryCOMError(
-                "0x{0:08x}: {1}".format(2**32 + err.args[0], err.args[1])
+                f"0x{hresult:08x}: {err.args[1]}"
             )
     return err
 
 
 def initializepstat():
+    """initialize the pstat"""
     PSTAT.SetCtrlMode(GAMRY_COM.PstatMode)
     PSTAT.SetCell(GAMRY_COM.CellOff)
     PSTAT.SetIEStability(GAMRY_COM.StabilityNorm)
@@ -77,8 +80,10 @@ def initializepstat():
 
 
 def stopacq():
+    """stop the acquisition"""
     global ACTIVE
-
+    global PSTAT
+    global GAMRY_COM
     ACTIVE = False
     PSTAT.SetCell(GAMRY_COM.CellOff)
     time.sleep(1)
@@ -112,7 +117,7 @@ class GamryDtaqEvents(object):
         #logger.debug("\rmade it to data available %s{random.choice(loading)}", end="")
 
     def _IGamryDtaqEvents_OnDataDone(self):
-        logger.debug("\nmade it to data done")
+        logger.debug("made it to data done")
         self.cook()  # a final cook
         time.sleep(2.0)
         self.call_stopacq()
@@ -120,6 +125,7 @@ class GamryDtaqEvents(object):
 
 
 def disconnectpstat():
+    """disconnect the pstat"""
     PSTAT.Close()
     # del connection
     time.sleep(15)
@@ -128,8 +134,7 @@ def disconnectpstat():
 def savedata(complete_file_name):
     """save the data to a file"""
     # logger.debug(dtaqsink.acquired_points)
-    logger.debug("number of data points acquired")
-    logger.debug(len(DTAQ_SINK.acquired_points))
+    logger.debug("number of data points acquired: %d", len(DTAQ_SINK.acquired_points))
     # savedata
     # column_names = ["Time", "Vf","Vu","Vsig","Ach","Overload","StopTest","Temp"]
     output = pd.DataFrame(DTAQ_SINK.acquired_points)
@@ -138,20 +143,11 @@ def savedata(complete_file_name):
     logger.debug("data saved")
 
 
-def setfilename(experiment_id, experiment_type):
+def setfilename(experiment_id, experiment_type) -> pathlib.Path:
     """set the file name for the experiment"""
     global COMPLETE_FILE_NAME
-    current_time = datetime.datetime.now()
-    fileDate = current_time.strftime("%Y-%m-%d")
-    filePathPar = pathlib.Path.cwd() / "data"
-    filePath = filePathPar / fileDate
-    COMPLETE_FILE_NAME = filePath / ("experiment-" + str(experiment_id) + "_" + experiment_type)
-    logger.debug(f"eChem: complete file name is: {COMPLETE_FILE_NAME}")
-    if not pathlib.Path.exists(filePath):
-        logger.debug(f"folder does not exist. Making folder: {filePath}")
-        pathlib.Path.mkdir(filePath, parents=True, exist_ok=True)
-    else:
-        logger.debug(f"folder {filePath} exists")
+    COMPLETE_FILE_NAME = pathlib.Path.cwd() / "data" / ("experiment-" + str(experiment_id) + "_" + experiment_type)
+    logger.debug("eChem: complete file name is: %s",COMPLETE_FILE_NAME)
     return COMPLETE_FILE_NAME
 
 
@@ -161,6 +157,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     global SIGNAL
     global DTAQ_SINK
     global CONNECTION
+    global GAMRY_COM
     global START_TIME
     global ACTIVE
     # global complete_file_name
@@ -197,7 +194,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     DTAQ.Run(True)
     # Code for timing started
     # start_time = time.time()
-    logger.debug("made it to run end")
+    logger.debug("cyclic: made it to run end")
 
 
 def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
@@ -205,12 +202,13 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global SIGNAL
     global DTAQ_SINK
     global CONNECTION
+    global GAMRY_COM
     global START_TIME
     global ACTIVE
     # global complete_file_name
 
     ACTIVE = True
-    logger.debug("made it to run")
+    logger.debug("chrono: made it to run")
 
     # signal and dtaq object creation
     SIGNAL = client.CreateObject("GamryCOM.GamrySignalDstep")
@@ -232,7 +230,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
 
     # Code for timing started
     # start_time = time.time()
-    logger.debug("made it to run end")
+    logger.debug("chrono: made it to run end")
 
 
 def OCP(OCPvi, OCPti, OCPrate):
@@ -241,10 +239,14 @@ def OCP(OCPvi, OCPti, OCPrate):
     global DTAQ_SINK
     global CONNECTION
     global ACTIVE
+    global GAMRY_COM
+    global PSTAT
+    global COMPLETE_FILE_NAME
+
 
     ACTIVE = True
 
-    logger.debug("made it to run")
+    logger.debug("ocp: made it to run")
 
     # signal and dtaq object creation
     SIGNAL = client.CreateObject("GamryCOM.GamrySignalConst")
@@ -262,11 +264,11 @@ def OCP(OCPvi, OCPti, OCPrate):
 
     DTAQ.Run(True)
     # start_time = time.time()
-    # logger.debug("made it to run end")
+    logger.debug("ocp: made it to run end")
 
 
 def activecheck():
-    while ACTIVE == True:
+    while ACTIVE is True:
         client.PumpEvents(1)
         time.sleep(0.5)
 
@@ -280,9 +282,9 @@ def check_vsig_range(filename):
             names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"],
         )
         vsig_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vsig")]
-        logger.debug("Vsig last row: %s", vsig_last_row_scientific)
+        logger.debug("Vsig last row (sci): %s", vsig_last_row_scientific)
         vsig_last_row_decimal = float(vsig_last_row_scientific)
-        logger.debug("Vsig last row: %f", vsig_last_row_decimal)
+        logger.debug("Vsig last row (float): %f", vsig_last_row_decimal)
 
         if -1 < vsig_last_row_decimal and vsig_last_row_decimal < 1:
             logger.debug("Vsig in valid range (-1 to 1). Proceeding to echem experiment")
@@ -301,10 +303,11 @@ def mock_CA(MCAvi, MCAti, MCArate):
     global SIGNAL
     global DTAQ_SINK
     global CONNECTION
+    global GAMRY_COM
     global ACTIVE
     ACTIVE = True
 
-    logger.debug("made it to run")
+    logger.debug("mock ca: made it to run")
 
     # signal and dtaq object creation
     SIGNAL = client.CreateObject("GamryCOM.GamrySignalConst")
@@ -322,7 +325,7 @@ def mock_CA(MCAvi, MCAti, MCArate):
 
     DTAQ.Run(True)
     # start_time = time.time()
-    # logger.debug("made it to run end")
+    logger.debug("mock ca: made it to run end")
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -402,7 +405,7 @@ if __name__ == "__main__":
             )
             # chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
             logger.debug("made it to try")
-            while ACTIVE == True:
+            while ACTIVE is True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data

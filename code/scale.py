@@ -29,6 +29,12 @@ class Sartorius(serial.Serial):
         self.parity = serial.PARITY_ODD
         self.timeout = 0.5
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
     def value(self):
         """
         Return displayed scale value.

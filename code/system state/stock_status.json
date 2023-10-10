@@ -31,9 +31,9 @@
         "x": -2,
         "y": -109,
         "name": "peg",
-        "volume": 17410.0,
+        "volume": 13895.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 1
     },
     {
         "position": "S3",
@@ -43,7 +43,7 @@
         "x": -2,
         "y": -142,
         "name": "acrylate",
-        "volume": 18335.0,
+        "volume": 15560.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -55,7 +55,7 @@
         "x": -2,
         "y": -175,
         "name": "ferrocene",
-        "volume": 10190.0,
+        "volume": 8710.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -67,7 +67,7 @@
         "x": -2,
         "y": -208,
         "name": "rinse0",
-        "volume": 6640.0,
+        "volume": 5310.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -79,7 +79,7 @@
         "x": -2,
         "y": -241,
         "name": "rinse1",
-        "volume": 6640.0,
+        "volume": 5310.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -91,7 +91,7 @@
         "x": -2,
         "y": -274,
         "name": "rinse2",
-        "volume": 6640.0,
+        "volume": 5310.0,
         "capacity": 20000,
         "contamination": 0
     }
