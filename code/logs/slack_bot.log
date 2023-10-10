@@ -251,3 +251,9 @@ cv_scan_rate
 2023-10-10 18:35:35,676:slack_functions:Message sent: Experiment 0 ended with status error
 2023-10-10 18:35:36,991:slack_functions:Message sent: ePANDA was interrupted by the user
 2023-10-10 18:35:37,169:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 18:52:59,825:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 18:53:02,094:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 18:53:02,275:slack_functions:Message sent: Running experiment 0
+2023-10-10 18:54:17,201:slack_functions:Message sent: Experiment 0 ended with status error
+2023-10-10 18:54:17,381:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 18:54:17,541:slack_functions:Message sent: ePANDA is shutting down...goodbye

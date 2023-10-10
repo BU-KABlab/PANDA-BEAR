@@ -14327,3 +14327,115 @@ Setting up eChem experiments...
 2023-10-10 18:35:36,992:controller:Pump closed
 2023-10-10 18:35:36,993:controller:Mill closed
 2023-10-10 18:35:37,169:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-10 18:52:59,656:controller:
+    
+                                                                                        
+     _       _ _   _       _ _     _             
+    (_)     (_) | (_)     | (_)   (_)            
+     _ _ __  _| |_ _  __ _| |_ _____ _ __   __ _ 
+    | | '_ \| | __| |/ _` | | |_  / | '_ \ / _` |
+    | | | | | | |_| | (_| | | |/ /| | | | | (_| |
+    |_|_| |_|_|\__|_|\__,_|_|_/___|_|_| |_|\__, |
+                                            __/ |
+                                            |___/ 
+        
+                                                          @@@@@@@@@@@@@            
+         @@@@@@                         @@@@@         @@@               @@@@        @@@@@@
+       @@@@@                               @@@                              @@@   @@     @@
+       @   @@@@@@@@@@@         @@@@@@@@@@@                                     @@ @@     @@@
+        @@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@                                   @@  @@@@@ @@
+      @@@@@@@@@     @@@@@   @@@@@     @@@@@@@@                                   @@               
+     @@@@@@@@@@     @@@@@   @@@@@     @@@@@@@@       @@@@@@@@                    @@              
+    @@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@       @@@@@      @@              
+    @@@@@@@@@@@@@@@@@@          @@@@@@@@@  @@   @@@@@@@@@@@@@@@@   @@@@@         @@              
+    @@@@                @@@@@                  @@@@@@@@@@@@@@@@@@ @@@@@         @@@              
+    @@@                   @                   @@@@@         @@@@@ @@@@@@      @@@@@              
+     @@                                       @@@@           @@@@ @@@@@@@@@@@@@@@@              
+      @@@                                     @@@            @@@   @@@@@@@@@@@@@@              
+         @@@                                   @@            @@      @@@@@@@@@                   
+                
+    
+2023-10-10 18:52:59,825:slack_functions:Message sent: ePANDA is starting up
+2023-10-10 18:52:59,826:controller:Checking for required files and directories
+2023-10-10 18:53:01,920:controller:Connected to instruments
+2023-10-10 18:53:02,094:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-10 18:53:02,095:controller:System state established
+2023-10-10 18:53:02,096:controller:Stock vial custom contains custom with volume 1930
+2023-10-10 18:53:02,096:controller:Stock vial dmf contains dmf with volume 20000
+2023-10-10 18:53:02,096:controller:Stock vial peg contains peg with volume 13895
+2023-10-10 18:53:02,096:controller:Stock vial acrylate contains acrylate with volume 15560
+2023-10-10 18:53:02,096:controller:Stock vial ferrocene contains ferrocene with volume 8710
+2023-10-10 18:53:02,096:controller:Stock vial rinse0 contains rinse0 with volume 5310
+2023-10-10 18:53:02,096:controller:Stock vial rinse1 contains rinse1 with volume 5310
+2023-10-10 18:53:02,096:controller:Stock vial rinse2 contains rinse2 with volume 5310
+2023-10-10 18:53:02,096:controller:Waste vial waste contains waste with volume 1000
+2023-10-10 18:53:02,096:controller:Waste vial waste contains waste with volume 1000
+2023-10-10 18:53:02,096:controller:Waste vial waste contains waste with volume 1000
+2023-10-10 18:53:02,096:controller:Waste vial waste contains waste with volume 1000
+2023-10-10 18:53:02,096:controller:Waste vial waste contains waste with volume 1000
+2023-10-10 18:53:02,096:controller:Waste vial rinse0 contains Rinse0 with volume 6110
+2023-10-10 18:53:02,096:controller:Waste vial rinse1 contains Rinse1 with volume 6110
+2023-10-10 18:53:02,096:controller:Waste vial rinse2 contains Rinse2 with volume 6110
+2023-10-10 18:53:02,112:controller:Running experiment 0
+2023-10-10 18:53:02,275:slack_functions:Message sent: Running experiment 0
+2023-10-10 18:53:02,285:scheduler:Well H5 status changed to running
+2023-10-10 18:53:02,285:logger:INFO:0:H5:Beginning experiment 0
+2023-10-10 18:53:02,285:logger:INFO:0:H5:Pipetting 145.0 ul of peg into H5...
+2023-10-10 18:53:02,285:logger:INFO:0:H5:Repetition 1 of 1
+2023-10-10 18:53:02,285:logger:DEBUG:0:H5:Selected stock vial: peg in position {'x': -2, 'y': -109, 'z': -20}
+2023-10-10 18:53:02,285:logger:DEBUG:0:H5:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-10 18:53:02,285:logger:DEBUG:0:H5:Withdrawing 40.000000 of air gap...
+2023-10-10 18:53:02,341:logger:DEBUG:0:H5:Withdrawing 0.040000 ml...
+2023-10-10 18:53:07,749:logger:DEBUG:0:H5:Done Withdrawing
+2023-10-10 18:53:09,767:logger:DEBUG:0:H5:Pump has withdrawn: 0.04 ml
+2023-10-10 18:53:09,835:logger:INFO:0:H5:Moving to peg...
+2023-10-10 18:53:09,835:mill_control:Moving pipette to position: (-2, -109, 0)
+2023-10-10 18:53:09,836:mill_control:Moving pipette to position: (-2, -109, -75)
+2023-10-10 18:53:09,893:logger:DEBUG:0:H5:Withdrawing 0.185000 ml...
+2023-10-10 18:53:32,713:logger:DEBUG:0:H5:Done Withdrawing
+2023-10-10 18:53:34,731:logger:DEBUG:0:H5:Pump has withdrawn: 0.185 ml
+2023-10-10 18:53:34,797:mill_control:Moving pipette to position: (-2, -109, 0)
+2023-10-10 18:53:34,798:logger:INFO:0:H5:Moving to purge vial: waste...
+2023-10-10 18:53:34,798:mill_control:Moving pipette to position: (-47, -13, 0)
+2023-10-10 18:53:34,799:mill_control:Moving pipette to position: (-47, -13, -20)
+2023-10-10 18:53:34,800:logger:DEBUG:0:H5:Purging 20.000000 ul...
+2023-10-10 18:53:34,855:logger:DEBUG:0:H5:Infusing 0.020000 ml...
+2023-10-10 18:53:37,872:logger:DEBUG:0:H5:Done Infusing
+2023-10-10 18:53:39,889:logger:DEBUG:0:H5:Pump has infused: 0.02 ml
+2023-10-10 18:53:39,956:logger:DEBUG:0:H5:Purged 20.0 ul
+2023-10-10 18:53:39,956:mill_control:Moving pipette to position: (-47, -13, 0)
+2023-10-10 18:53:39,956:logger:INFO:0:H5:Moving to target well: H5...
+2023-10-10 18:53:39,956:mill_control:Moving pipette to position: (-281, -110, 0)
+2023-10-10 18:53:39,957:mill_control:Moving pipette to position: (-281, -110, -77)
+2023-10-10 18:53:39,957:logger:INFO:0:H5:Infusing peg into well H5...
+2023-10-10 18:53:40,011:logger:DEBUG:0:H5:Infusing 0.145000 ml...
+2023-10-10 18:53:58,035:logger:DEBUG:0:H5:Done Infusing
+2023-10-10 18:54:00,053:logger:DEBUG:0:H5:Pump has infused: 0.145 ml
+2023-10-10 18:54:00,120:logger:INFO:0:H5:Well H5 volume: 145.000000
+2023-10-10 18:54:00,120:mill_control:Moving pipette to position: (-281, -110, 0)
+2023-10-10 18:54:00,120:logger:DEBUG:0:H5:Moving to purge vial: waste...
+2023-10-10 18:54:00,120:mill_control:Moving pipette to position: (-47, -13, 0)
+2023-10-10 18:54:00,120:mill_control:Moving pipette to position: (-47, -13, -20)
+2023-10-10 18:54:00,123:logger:DEBUG:0:H5:Purging 20.000000 ul...
+2023-10-10 18:54:00,175:logger:DEBUG:0:H5:Infusing 0.020000 ml...
+2023-10-10 18:54:03,190:logger:DEBUG:0:H5:Done Infusing
+2023-10-10 18:54:05,209:logger:DEBUG:0:H5:Pump has infused: 0.02 ml
+2023-10-10 18:54:05,275:logger:DEBUG:0:H5:Purged 20.0 ul
+2023-10-10 18:54:05,328:logger:DEBUG:0:H5:Infusing 0.040000 ml...
+2023-10-10 18:54:16,982:logger:WARNING:0:H5:Keyboard Interrupt
+2023-10-10 18:54:17,044:logger:INFO:0:H5:Saved interrupted instructions for experiment 0
+2023-10-10 18:54:17,045:logger:INFO:0:H5:Returning completed instructions for experiment 0
+2023-10-10 18:54:17,045:controller:Experiment 0 ended with status error
+2023-10-10 18:54:17,201:slack_functions:Message sent: Experiment 0 ended with status error
+2023-10-10 18:54:17,204:scheduler:Well H5 status changed to ExperimentStatus.ERROR
+2023-10-10 18:54:17,207:scheduler:Saving experiment 0 results to database
+2023-10-10 18:54:17,210:controller:No new experiments to run...waiting 1 minute for new experiments
+2023-10-10 18:54:17,231:controller:Keyboard interrupt detected
+2023-10-10 18:54:17,381:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-10 18:54:17,381:controller:Disconnecting from instruments:
+2023-10-10 18:54:17,382:controller:Scale closed
+2023-10-10 18:54:17,382:controller:Pump closed
+2023-10-10 18:54:17,382:mill_control:Homing the mill
+2023-10-10 18:54:17,383:mill_control:Disconnecting from the mill
+2023-10-10 18:54:17,383:controller:Mill closed
+2023-10-10 18:54:17,541:slack_functions:Message sent: ePANDA is shutting down...goodbye
