@@ -10,15 +10,13 @@ from mill_control import Mill, MockMill, Instruments
 from wellplate import Wells as Wellplate
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-# formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
-# system_handler = logging.FileHandler("code/logs/ePANDA.log")
-# system_handler.setFormatter(formatter)
-# logger.addHandler(system_handler)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
+system_handler.setFormatter(formatter)
+logger.addHandler(system_handler)
 
-from logger import CustomLogger
-logger = CustomLogger.get_logger()
 
 class Pump:
     """
