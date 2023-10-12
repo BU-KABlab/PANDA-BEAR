@@ -26,7 +26,7 @@ import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
 from experiment_class import Experiment, ExperimentResult
-from vials import Vial, read_vials, update_vials
+from vials import Vial
 import wellplate as wellplate_module
 from scale import Sartorius as Scale
 
@@ -318,6 +318,50 @@ def connect_to_instruments():
     instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
     return instruments
 
+def read_vials(filename) -> list[Vial]:
+    """
+    Read in the virtual vials from the json file
+    """
+    filename_ob = Path.cwd() / filename
+    with open(filename_ob, "r", encoding="ascii") as file:
+        vial_parameters = json.load(file)
 
+    list_of_solutions = []
+    for items in vial_parameters:
+        list_of_solutions.append(
+            Vial(
+                position=items["position"],
+                x_coord=items["x"],
+                y_coord=items["y"],
+                volume=items["volume"],
+                name=items["name"],
+                contents=items["contents"],
+                # capacity=items["capacity"],
+                # bottom=items["bottom"],
+                # height=items["height"],
+                filepath=filename,
+            )
+        )
+    return list_of_solutions
+
+def update_vials(vial_objects: list[Vial], filename):
+    """
+    Update the vials in the json file
+    """
+    filename_ob = Path.cwd() / filename
+    with open(filename_ob, "r", encoding="ascii") as file:
+        vial_parameters = json.load(file)
+
+    for vial in vial_objects:
+        for items in vial_parameters:
+            if items["name"] == vial.name:
+                items["volume"] = vial.volume
+                items["contamination"] = vial.contamination
+                break
+
+    with open(filename_ob, "w", encoding="ascii") as file:
+        json.dump(vial_parameters, file, indent=4)
+
+    return 0
 if __name__ == "__main__":
     main()
