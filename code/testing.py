@@ -11,10 +11,18 @@
 # move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
 
 #
+from tkinter import Scale
+from pump_control import Pump
+from regex import P
 from mill_control import Mill, Instruments
 from wellplate import Wells
-from vials import read_vials
+from vials import Vial
 import gamry_control_WIP as echem
+from scale import Sartorius as Scale
+from controller import read_vials, update_vials
+from experiment_class import Experiment, ExperimentResult, ExperimentStatus
+from config.pin import CURRENT_PIN
+from datetime import datetime
 
 wellplate = Wells(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
 
@@ -171,8 +179,63 @@ def interactive():
 
         return 0
 
+def mixing_test():
+    """
+    A protocol to test the mixing of the solution in the wellplate.
+    Experiment name format: MixingTest_wellID_echemType
+
+    The contents and variable parameters of each well are as follows:
+    
+    Well | Solution(s)              | Mixing repetitions
+    --------------------------------------------------------
+    C1   | Premixed Solution        | 0
+    C2   | Premix                   | 0
+    C3   | PEG, Acrylate, DmFc      | 1
+    C4   | PEG, Acrylate, DmFc      | 1
+    C5   | PEG, Acrylate, DmFc      | 3
+    C6   | PEG, Acrylate, DmFc      | 3
+    C7   | PEG, Acrylate, DmFc      | 6
+    C8   | PEG, Acrylate, DmFc      | 6
+    C9   | PEG, Acrylate, DmFc      | 9
+    C10  | PEG, Acrylate, DmFc      | 9
+    C11  | Premixed Solution        | 0
+    C12  | Premixed Solution        | 0
+
+    For each well, the following steps are also performed:
+    - deposition (CA) of the solution onto the substrate.
+    - plotting the results
+    - clearing the well
+    - rinsing the well
+    - rinsing the electrode
+    - cleaning the electrode (CV)
+    - rinsing the electrode
+    - characterizing (CV) the well
+    - plotting the results
+    - rinsing the electrode
+    - clearing the well
+    - rinsing the well
+
+    
+    """
+    from mixing_test_experiments import experiments
+    wells = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8","C9","C10","C11","C12"]
+    solution_names = ["peg", "acrylate", "dmfc"]
+    stock_vials = read_vials("stock_status.json")
+    waste_vials = read_vials("waste_status.json")
+
+    
+    with Mill() as mill:
+        with Scale() as scale:
+            pump = Pump(mill, scale)
+            echem.pstatconnect()
+            for experiment in experiments:
+                
+                
+
+
 
 if __name__ == "__main__":
-    cv_cleaning_test()
+    #cv_cleaning_test()
     # main()
     # interactive()
+    mixing_test()
