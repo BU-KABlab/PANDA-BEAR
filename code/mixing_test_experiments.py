@@ -1,0 +1,438 @@
+"""
+Experiments for mixing test
+
+The contents and variable parameters of each well are as follows:
+    
+    Well | Solution(s)              | Mixing repetitions
+    --------------------------------------------------------
+    C1   | Premixed Solution        | 0
+    C2   | Premix                   | 0
+    C3   | PEG, Acrylate, DmFc      | 1
+    C4   | PEG, Acrylate, DmFc      | 1
+    C5   | PEG, Acrylate, DmFc      | 3
+    C6   | PEG, Acrylate, DmFc      | 3
+    C7   | PEG, Acrylate, DmFc      | 6
+    C8   | PEG, Acrylate, DmFc      | 6
+    C9   | PEG, Acrylate, DmFc      | 9
+    C10  | PEG, Acrylate, DmFc      | 9
+    C11  | Premixed Solution        | 0
+    C12  | Premixed Solution        | 0
+
+The following steps will be performed for each well:
+    - Solutions will be pipetted in the order listed above
+    - The solution will be mixed according to the number of repetitions listed above
+    - deposition (CA) of the solution onto the substrate.
+    - rinsing the electrode
+    - plotting the results
+    - clearing the well
+    - rinsing the well
+    - characterizing (CV) the well
+    - rinsing the electrode
+    - plotting the results
+    - clearing the well
+    - rinsing the well
+
+
+"""
+from datetime import datetime
+from experiment_class import Experiment, ExperimentStatus
+from config.pin import CURRENT_PIN
+
+experiment_c1 = Experiment(
+    id=1,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C1",
+    dmf=0,
+    peg=0,
+    acrylate=0,
+    ferrocene=0,
+    custom=290,
+    ocp=1,  # 0 = no deposition, 1 = deposition
+    ca=1,  # 0 = no deposition, 1 = deposition
+    cv=1,  # 0 = no characterization, 1 = characterization
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=0,  # 0 = no mixing, 1 = mixing
+    mix_count=0,
+    mix_vol=0,
+    mix_rate=0.00,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C1",
+    results=None,
+)
+
+experiment_c2 = Experiment(
+    id=2,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C2",
+    dmf=0,
+    peg=0,
+    acrylate=0,
+    ferrocene=0,
+    custom=290,
+    ocp=1,  # 0 = no deposition, 1 = deposition
+    ca=1,  # 0 = no deposition, 1 = deposition
+    cv=1,  # 0 = no characterization, 1 = characterization
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=0,  # 0 = no mixing, 1 = mixing
+    mix_count=0,
+    mix_vol=0,
+    mix_rate=0.00,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C2",
+    results=None,
+)
+
+experiment_c3 = Experiment(
+    id=3,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C3",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=1,
+    mix_count=1,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C3",
+    results=None,
+)
+
+experiment_c4 = Experiment(
+    id=4,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C4",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=1,
+    mix_count=1,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C4",
+    results=None,
+)
+
+experiment_c5 = Experiment(
+    id=5,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C5",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=1,
+    mix_count=3,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C5",
+    results=None,
+)
+
+experiment_c6 = Experiment(
+    id=6,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C6",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=1,
+    mix_count=3,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C6",
+    results=None,
+)
+
+experiment_c7 = Experiment(
+    id=7,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C7",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=1,
+    mix_count=6,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C7",
+    results=None,
+)
+
+experiment_c8 = Experiment(
+    id=8,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C8",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=0,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=3,
+    rinse_vol=150,
+    mix=1,
+    mix_count=6,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C8",
+    results=None,
+)
+
+experiment_c9 = Experiment(
+    id=9,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C9",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=1,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=120,
+    rinse_count=1,
+    rinse_vol=150,
+    mix=1,
+    mix_count=9,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C9",
+    results=None,
+)
+
+experiment_c10 = Experiment(
+    id=10,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C10",
+    dmf=58,
+    peg=116,
+    acrylate=116,
+    ferrocene=0,
+    custom=0,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=1,
+    dep_duration=300,
+    dep_pot=-1.7,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=0,
+    rinse_count=1,
+    rinse_vol=150,
+    mix=1,
+    mix_count=9,
+    mix_vol=145,
+    mix_rate=0.62,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C10",
+    results=None,
+)
+
+experiment_c11 = Experiment(
+    id=11,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C11",
+    dmf=0,
+    peg=0,
+    acrylate=0,
+    ferrocene=0,
+    custom=290,
+    ocp=1,
+    ca=1,
+    cv=1,
+    baseline=0,
+    dep_duration=0,
+    dep_pot=0,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=0,
+    rinse_count=0,
+    rinse_vol=0,
+    mix=0,
+    mix_count=0,
+    mix_vol=0,
+    mix_rate=0,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C11",
+    results=None,
+)
+
+experiment_c12 = Experiment(
+    id=12,
+    priority=1,
+    pin=CURRENT_PIN,
+    target_well="C12",
+    dmf=0,
+    peg=0,
+    acrylate=0,
+    ferrocene=0,
+    custom=290,
+    ocp=1,
+    ca=0,
+    cv=1,
+    baseline=0,
+    dep_duration=0,
+    dep_pot=0,
+    char_sol_name="ferrocene",
+    char_vol=290,
+    flush_sol_name="dmf",
+    flush_vol=0,
+    rinse_count=0,
+    rinse_vol=0,
+    mix=0,
+    mix_count=0,
+    mix_vol=0,
+    mix_rate=0,
+    status=ExperimentStatus.NEW,
+    status_date=datetime.now(),
+    filename="mixing_test_C12",
+    results=None,
+)
+
+experiments = [
+    experiment_c1,
+    experiment_c2,
+    experiment_c3,
+    experiment_c4,
+    experiment_c5,
+    experiment_c6,
+    experiment_c7,
+    experiment_c8,
+    experiment_c9,
+    experiment_c10,
+    experiment_c11,
+    experiment_c12,
+]
