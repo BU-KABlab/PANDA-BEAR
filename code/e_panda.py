@@ -30,6 +30,7 @@ from typing import List, Tuple
 import pytz as tz
 
 # Third party or custom imports
+from controller import read_vials
 import gamry_control_WIP as echem
 from experiment_class import (
     Experiment,
@@ -40,7 +41,7 @@ from experiment_class import (
 from mill_control import Mill as mill_control
 from pump_control import Pump as pump_class
 from scale import Sartorius as scale_class
-from vials import Vial as vial_class, read_vials
+from vials import Vial as vial_class
 import wellplate as wellplate_module
 from wellplate import Wells
 
