@@ -14439,3 +14439,639 @@ Setting up eChem experiments...
 2023-10-10 18:54:17,383:mill_control:Disconnecting from the mill
 2023-10-10 18:54:17,383:controller:Mill closed
 2023-10-10 18:54:17,541:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-11 14:25:19,610:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 14:25:21,612:mill_control:Mill connected: True
+2023-10-11 14:25:24,911:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-11 14:25:24,912:mill_control:MPos coordinates not found in the line.
+2023-10-11 14:27:07,937:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 14:27:09,939:mill_control:Mill connected: True
+2023-10-11 14:27:09,939:mill_control:execute_command: Command sent: $H
+2023-10-11 14:27:11,940:mill_control:execute_command: Returned 
+2023-10-11 14:28:15,945:mill_control:Homing completed
+2023-10-11 14:28:15,946:mill_control:execute_command: Command sent: F2000
+2023-10-11 14:28:17,946:mill_control:execute_command: Returned ok
+2023-10-11 14:29:05,820:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 14:29:07,823:mill_control:Mill connected: True
+2023-10-11 14:29:07,823:mill_control:execute_command: Command sent: $H
+2023-10-11 14:29:09,824:mill_control:execute_command: Returned 
+2023-10-11 14:30:13,829:mill_control:Homing completed
+2023-10-11 14:30:13,830:mill_control:execute_command: Command sent: F2000
+2023-10-11 14:30:15,830:mill_control:execute_command: Returned ok
+2023-10-11 14:30:15,880:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-11 14:30:15,887:mill_control:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-10-11 14:30:15,887:mill_control:current_coordinates: [0.0, 0.0, 0.0]
+2023-10-11 14:30:15,887:mill_control:execute_command: Command sent: G00 X-245
+2023-10-11 14:30:17,889:mill_control:execute_command: Initially ok
+2023-10-11 14:30:24,954:mill_control:execute_command: Returned <Idle|MPos:-248.000,-3.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 14:30:24,954:mill_control:execute_command: Command sent: G00 Y-74
+2023-10-11 14:30:26,954:mill_control:execute_command: Initially ok
+2023-10-11 14:30:28,977:mill_control:execute_command: Returned <Idle|MPos:-248.000,-77.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 14:30:28,977:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 14:30:30,978:mill_control:execute_command: Initially ok
+2023-10-11 14:30:37,670:mill_control:current_status: Error in status: <Alarm|MPos:0.000,0.000,0.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 14:30:57,753:mill_control:Error executing command G00 Z-73: Error in status: <Alarm|MPos:0.000,0.000,0.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 14:31:13,325:mill_control:execute_command: Command sent: $H
+2023-10-11 14:31:15,326:mill_control:execute_command: Returned ok
+2023-10-11 14:32:15,330:mill_control:current_status: Error in status: <Alarm|MPos:0.000,0.000,0.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 14:38:34,286:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 14:38:43,728:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 38, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 14:38:45,730:mill_control:Mill connected: True
+2023-10-11 14:38:45,730:mill_control:execute_command: Command sent: $H
+2023-10-11 14:38:47,732:mill_control:execute_command: Returned 
+2023-10-11 14:39:51,737:mill_control:Homing completed
+2023-10-11 14:39:51,738:mill_control:execute_command: Command sent: F2000
+2023-10-11 14:39:53,738:mill_control:execute_command: Returned ok
+2023-10-11 14:39:56,900:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-11 14:39:56,908:mill_control:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-10-11 14:39:56,908:mill_control:current_coordinates: [0.0, 0.0, 0.0]
+2023-10-11 14:39:56,908:mill_control:execute_command: Command sent: G00 X-207
+2023-10-11 14:39:58,910:mill_control:execute_command: Initially ok
+2023-10-11 14:40:04,967:mill_control:execute_command: Returned <Idle|MPos:-210.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 14:40:04,967:mill_control:execute_command: Command sent: G00 Y-44
+2023-10-11 14:40:06,968:mill_control:execute_command: Initially ok
+2023-10-11 14:40:07,985:mill_control:execute_command: Returned <Idle|MPos:-210.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 14:40:07,985:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 14:40:09,986:mill_control:execute_command: Initially ok
+2023-10-11 14:40:55,826:mill_control:execute_command: Command sent: $H
+2023-10-11 14:49:01,271:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 36, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 14:49:03,273:mill_control:Mill connected: True
+2023-10-11 14:49:03,273:mill_control:execute_command: Command sent: $H
+2023-10-11 14:49:05,275:mill_control:execute_command: Returned 
+2023-10-11 14:50:09,280:mill_control:Homing completed
+2023-10-11 14:50:09,281:mill_control:execute_command: Command sent: F2000
+2023-10-11 14:50:11,283:mill_control:execute_command: Returned ok
+2023-10-11 14:50:14,435:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-11 14:50:31,410:mill_control:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-10-11 14:50:31,410:mill_control:current_coordinates: [0.0, 0.0, 0.0]
+2023-10-11 14:50:31,410:mill_control:execute_command: Command sent: G00 X-209
+2023-10-11 14:50:33,411:mill_control:execute_command: Initially ok
+2023-10-11 14:50:39,464:mill_control:execute_command: Returned <Idle|MPos:-212.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 14:50:39,464:mill_control:execute_command: Command sent: G00 Y-44
+2023-10-11 14:50:41,465:mill_control:execute_command: Initially ok
+2023-10-11 14:50:42,481:mill_control:execute_command: Returned <Idle|MPos:-212.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 14:50:42,481:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 14:50:44,482:mill_control:execute_command: Initially ok
+2023-10-11 14:50:46,505:mill_control:execute_command: Returned <Idle|MPos:-212.000,-47.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 14:52:41,297:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 36, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 14:52:43,299:mill_control:Mill connected: True
+2023-10-11 14:52:43,299:mill_control:execute_command: Command sent: $H
+2023-10-11 14:52:45,302:mill_control:execute_command: Returned 
+2023-10-11 14:53:49,306:mill_control:Homing completed
+2023-10-11 14:53:49,307:mill_control:execute_command: Command sent: F2000
+2023-10-11 14:53:51,308:mill_control:execute_command: Returned ok
+2023-10-11 14:53:51,360:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-11 14:53:51,367:mill_control:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-10-11 14:53:51,367:mill_control:current_coordinates: [0.0, 0.0, 0.0]
+2023-10-11 14:53:51,367:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 14:53:53,369:mill_control:execute_command: Initially ok
+2023-10-11 14:53:58,414:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 14:53:58,414:mill_control:execute_command: Command sent: G00 Y-44
+2023-10-11 14:54:00,415:mill_control:execute_command: Initially ok
+2023-10-11 14:54:01,433:mill_control:execute_command: Returned <Idle|MPos:-185.000,-47.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 14:54:01,433:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 14:54:03,434:mill_control:execute_command: Initially ok
+2023-10-11 14:54:05,457:mill_control:execute_command: Returned <Idle|MPos:-185.000,-47.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 14:54:21,629:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W1_CV
+2023-10-11 14:54:21,629:gamry_control_WIP:cyclic: made it to run
+2023-10-11 14:54:21,686:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 14:55:18,259:gamry_control_WIP:made it to data done
+2023-10-11 14:55:21,281:gamry_control_WIP:number of data points acquired: 282
+2023-10-11 14:55:21,290:gamry_control_WIP:data saved
+2023-10-11 15:06:43,388:mill_control:MPos coordinates: X = -182.0, Y = -44.0, Z = -73.0
+2023-10-11 15:06:43,388:mill_control:current_coordinates: [-182.0, -44.0, -73.0]
+2023-10-11 15:06:43,388:mill_control:execute_command: Command sent: G00 X-182.0 Y-44.0 Z0.0
+2023-10-11 15:06:45,389:mill_control:execute_command: Initially ok
+2023-10-11 15:06:47,411:mill_control:execute_command: Returned <Idle|MPos:-185.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:06:47,411:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:06:49,412:mill_control:execute_command: Initially ok
+2023-10-11 15:06:54,461:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:06:54,461:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 15:06:56,462:mill_control:execute_command: Initially ok
+2023-10-11 15:06:57,476:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 15:06:57,476:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:06:59,477:mill_control:execute_command: Initially ok
+2023-10-11 15:07:00,492:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:07:24,538:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 15:07:24,538:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 15:07:24,539:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 15:07:26,540:mill_control:execute_command: Initially ok
+2023-10-11 15:07:31,587:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:07:31,587:mill_control:execute_command: Command sent: G00 Y-53
+2023-10-11 15:07:33,589:mill_control:execute_command: Initially ok
+2023-10-11 15:07:34,603:mill_control:execute_command: Returned <Idle|MPos:-185.000,-56.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:07:34,604:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 15:07:36,605:mill_control:execute_command: Initially ok
+2023-10-11 15:07:38,627:mill_control:execute_command: Returned <Idle|MPos:-185.000,-56.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 15:07:54,988:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W2_CA
+2023-10-11 15:07:54,988:gamry_control_WIP:chrono: made it to run
+2023-10-11 15:07:55,050:gamry_control_WIP:chrono: made it to run end
+2023-10-11 15:12:55,227:gamry_control_WIP:made it to data done
+2023-10-11 15:12:58,263:gamry_control_WIP:number of data points acquired: 29200
+2023-10-11 15:12:58,469:gamry_control_WIP:data saved
+2023-10-11 15:12:58,979:mill_control:MPos coordinates: X = -182.0, Y = -53.0, Z = -73.0
+2023-10-11 15:12:58,979:mill_control:current_coordinates: [-182.0, -53.0, -73.0]
+2023-10-11 15:12:58,979:mill_control:execute_command: Command sent: G00 X-182.0 Y-53.0 Z0.0
+2023-10-11 15:13:00,980:mill_control:execute_command: Initially ok
+2023-10-11 15:13:03,002:mill_control:execute_command: Returned <Idle|MPos:-185.000,-56.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:13:03,003:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:13:05,003:mill_control:execute_command: Initially ok
+2023-10-11 15:13:10,054:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 15:13:10,054:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 15:13:12,055:mill_control:execute_command: Initially ok
+2023-10-11 15:13:13,071:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 15:13:13,071:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:13:15,072:mill_control:execute_command: Initially ok
+2023-10-11 15:13:16,087:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:20:08,038:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 15:20:08,038:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 15:20:08,039:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 15:20:10,039:mill_control:execute_command: Initially ok
+2023-10-11 15:20:15,088:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 15:20:15,088:mill_control:execute_command: Command sent: G00 Y-62
+2023-10-11 15:20:17,089:mill_control:execute_command: Initially ok
+2023-10-11 15:20:18,105:mill_control:execute_command: Returned <Idle|MPos:-185.000,-65.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:20:18,105:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 15:20:20,107:mill_control:execute_command: Initially ok
+2023-10-11 15:20:22,128:mill_control:execute_command: Returned <Idle|MPos:-185.000,-65.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 15:20:50,478:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W3_CV
+2023-10-11 15:20:50,478:gamry_control_WIP:cyclic: made it to run
+2023-10-11 15:20:50,538:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 15:40:46,932:gamry_control_WIP:made it to data done
+2023-10-11 15:40:49,965:gamry_control_WIP:number of data points acquired: 5981
+2023-10-11 15:40:50,013:gamry_control_WIP:data saved
+2023-10-11 15:40:50,521:mill_control:MPos coordinates: X = -182.0, Y = -62.0, Z = -73.0
+2023-10-11 15:40:50,521:mill_control:current_coordinates: [-182.0, -62.0, -73.0]
+2023-10-11 15:40:50,522:mill_control:execute_command: Command sent: G00 X-182.0 Y-62.0 Z0.0
+2023-10-11 15:40:52,522:mill_control:execute_command: Initially ok
+2023-10-11 15:40:54,548:mill_control:execute_command: Returned <Idle|MPos:-185.000,-65.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 15:40:54,549:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:40:56,549:mill_control:execute_command: Initially ok
+2023-10-11 15:41:01,595:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:41:01,596:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 15:41:03,596:mill_control:execute_command: Initially ok
+2023-10-11 15:41:04,610:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 15:41:04,610:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:41:06,612:mill_control:execute_command: Initially ok
+2023-10-11 15:41:07,628:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 15:43:02,203:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 15:43:02,203:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 15:43:02,204:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 15:43:04,204:mill_control:execute_command: Initially ok
+2023-10-11 15:43:09,251:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:43:09,251:mill_control:execute_command: Command sent: G00 Y-71
+2023-10-11 15:43:11,253:mill_control:execute_command: Initially ok
+2023-10-11 15:43:13,277:mill_control:execute_command: Returned <Idle|MPos:-185.000,-74.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 15:43:13,277:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 15:43:15,278:mill_control:execute_command: Initially ok
+2023-10-11 15:43:17,302:mill_control:execute_command: Returned <Idle|MPos:-185.000,-74.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 15:43:27,275:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W4_CV
+2023-10-11 15:43:27,275:gamry_control_WIP:cyclic: made it to run
+2023-10-11 15:43:27,337:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 15:44:23,911:gamry_control_WIP:made it to data done
+2023-10-11 15:44:26,945:gamry_control_WIP:number of data points acquired: 282
+2023-10-11 15:44:26,950:gamry_control_WIP:data saved
+2023-10-11 15:44:27,459:mill_control:MPos coordinates: X = -182.0, Y = -71.0, Z = -73.0
+2023-10-11 15:44:27,459:mill_control:current_coordinates: [-182.0, -71.0, -73.0]
+2023-10-11 15:44:27,459:mill_control:execute_command: Command sent: G00 X-182.0 Y-71.0 Z0.0
+2023-10-11 15:44:29,460:mill_control:execute_command: Initially ok
+2023-10-11 15:44:31,482:mill_control:execute_command: Returned <Idle|MPos:-185.000,-74.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:44:31,482:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:44:33,484:mill_control:execute_command: Initially ok
+2023-10-11 15:44:38,532:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:44:38,532:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 15:44:40,534:mill_control:execute_command: Initially ok
+2023-10-11 15:44:41,548:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 15:44:41,548:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 15:44:43,549:mill_control:execute_command: Initially ok
+2023-10-11 15:44:44,564:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 15:45:05,245:mill_control:execute_command: Command sent: $H
+2023-10-11 15:45:07,246:mill_control:execute_command: Returned ok
+2023-10-11 15:46:10,788:mill_control:Homing completed
+2023-10-11 16:01:03,946:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 36, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 16:01:05,948:mill_control:Mill connected: True
+2023-10-11 16:01:05,948:mill_control:execute_command: Command sent: $H
+2023-10-11 16:01:07,949:mill_control:execute_command: Returned 
+2023-10-11 16:02:11,952:mill_control:Homing completed
+2023-10-11 16:02:11,952:mill_control:execute_command: Command sent: F2000
+2023-10-11 16:02:13,953:mill_control:execute_command: Returned ok
+2023-10-11 16:02:17,216:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-11 16:04:19,409:mill_control:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-10-11 16:04:19,409:mill_control:current_coordinates: [0.0, 0.0, 0.0]
+2023-10-11 16:04:19,410:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 16:04:21,411:mill_control:execute_command: Initially ok
+2023-10-11 16:04:26,455:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:04:26,455:mill_control:execute_command: Command sent: G00 Y-80
+2023-10-11 16:04:28,456:mill_control:execute_command: Initially ok
+2023-10-11 16:04:30,482:mill_control:execute_command: Returned <Idle|MPos:-185.000,-83.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:04:30,482:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 16:04:32,482:mill_control:execute_command: Initially ok
+2023-10-11 16:04:34,505:mill_control:execute_command: Returned <Idle|MPos:-185.000,-83.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 16:04:37,938:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W5_CA
+2023-10-11 16:04:37,938:gamry_control_WIP:chrono: made it to run
+2023-10-11 16:04:38,004:gamry_control_WIP:chrono: made it to run end
+2023-10-11 16:09:38,181:gamry_control_WIP:made it to data done
+2023-10-11 16:09:41,205:gamry_control_WIP:number of data points acquired: 29200
+2023-10-11 16:09:41,382:gamry_control_WIP:data saved
+2023-10-11 16:09:41,890:mill_control:MPos coordinates: X = -182.0, Y = -80.0, Z = -73.0
+2023-10-11 16:09:41,890:mill_control:current_coordinates: [-182.0, -80.0, -73.0]
+2023-10-11 16:09:41,890:mill_control:execute_command: Command sent: G00 X-182.0 Y-80.0 Z0.0
+2023-10-11 16:09:43,891:mill_control:execute_command: Initially ok
+2023-10-11 16:09:45,913:mill_control:execute_command: Returned <Idle|MPos:-185.000,-83.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:09:45,913:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:09:47,914:mill_control:execute_command: Initially ok
+2023-10-11 16:09:52,960:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:09:52,960:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:09:54,961:mill_control:execute_command: Initially ok
+2023-10-11 16:09:55,974:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:09:55,975:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:09:57,976:mill_control:execute_command: Initially ok
+2023-10-11 16:09:58,990:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:10:04,601:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 16:10:04,601:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 16:10:04,601:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 16:10:06,602:mill_control:execute_command: Initially ok
+2023-10-11 16:10:11,645:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:10:11,645:mill_control:execute_command: Command sent: G00 Y-89
+2023-10-11 16:10:13,646:mill_control:execute_command: Initially ok
+2023-10-11 16:10:15,667:mill_control:execute_command: Returned <Idle|MPos:-185.000,-92.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:10:15,667:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 16:10:17,670:mill_control:execute_command: Initially ok
+2023-10-11 16:10:19,695:mill_control:execute_command: Returned <Idle|MPos:-185.000,-92.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 16:10:25,274:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W6_CV
+2023-10-11 16:10:25,274:gamry_control_WIP:cyclic: made it to run
+2023-10-11 16:10:25,330:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 16:11:21,903:gamry_control_WIP:made it to data done
+2023-10-11 16:11:24,926:gamry_control_WIP:number of data points acquired: 282
+2023-10-11 16:11:24,931:gamry_control_WIP:data saved
+2023-10-11 16:11:25,439:mill_control:MPos coordinates: X = -182.0, Y = -89.0, Z = -73.0
+2023-10-11 16:11:25,439:mill_control:current_coordinates: [-182.0, -89.0, -73.0]
+2023-10-11 16:11:25,439:mill_control:execute_command: Command sent: G00 X-182.0 Y-89.0 Z0.0
+2023-10-11 16:11:27,440:mill_control:execute_command: Initially ok
+2023-10-11 16:11:29,462:mill_control:execute_command: Returned <Idle|MPos:-185.000,-92.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:11:29,462:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:11:31,463:mill_control:execute_command: Initially ok
+2023-10-11 16:11:36,509:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:11:36,509:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:11:38,510:mill_control:execute_command: Initially ok
+2023-10-11 16:11:39,524:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:11:39,525:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:11:41,526:mill_control:execute_command: Initially ok
+2023-10-11 16:11:42,540:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:12:05,729:mill_control:execute_command: Command sent: $H
+2023-10-11 16:12:07,730:mill_control:execute_command: Returned ok
+2023-10-11 16:13:11,288:mill_control:Homing completed
+2023-10-11 16:38:36,062:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 36, 'y': 30, 'z': 0}, 'pipette': {'x': -84, 'y': 3, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-11 16:38:38,065:mill_control:Mill connected: True
+2023-10-11 16:38:38,065:mill_control:execute_command: Command sent: $H
+2023-10-11 16:38:40,066:mill_control:execute_command: Returned 
+2023-10-11 16:39:44,070:mill_control:Homing completed
+2023-10-11 16:39:44,070:mill_control:execute_command: Command sent: F2000
+2023-10-11 16:39:46,072:mill_control:execute_command: Returned ok
+2023-10-11 16:39:49,263:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-11 16:39:49,270:mill_control:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2023-10-11 16:39:49,270:mill_control:current_coordinates: [0.0, 0.0, 0.0]
+2023-10-11 16:39:49,270:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 16:39:51,272:mill_control:execute_command: Initially ok
+2023-10-11 16:39:56,316:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:39:56,316:mill_control:execute_command: Command sent: G00 Y-98
+2023-10-11 16:39:58,316:mill_control:execute_command: Initially ok
+2023-10-11 16:40:01,348:mill_control:execute_command: Returned <Idle|MPos:-185.000,-101.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:40:01,348:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 16:40:03,349:mill_control:execute_command: Initially ok
+2023-10-11 16:40:05,372:mill_control:execute_command: Returned <Idle|MPos:-185.000,-101.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 16:40:05,372:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W7_CA
+2023-10-11 16:40:05,372:gamry_control_WIP:chrono: made it to run
+2023-10-11 16:40:05,434:gamry_control_WIP:chrono: made it to run end
+2023-10-11 16:45:05,612:gamry_control_WIP:made it to data done
+2023-10-11 16:45:08,634:gamry_control_WIP:number of data points acquired: 29200
+2023-10-11 16:45:08,816:gamry_control_WIP:data saved
+2023-10-11 16:45:09,325:mill_control:MPos coordinates: X = -182.0, Y = -98.0, Z = -73.0
+2023-10-11 16:45:09,325:mill_control:current_coordinates: [-182.0, -98.0, -73.0]
+2023-10-11 16:45:09,325:mill_control:execute_command: Command sent: G00 X-182.0 Y-98.0 Z0.0
+2023-10-11 16:45:11,325:mill_control:execute_command: Initially ok
+2023-10-11 16:45:13,348:mill_control:execute_command: Returned <Idle|MPos:-185.000,-101.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:13,348:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:45:15,349:mill_control:execute_command: Initially ok
+2023-10-11 16:45:20,392:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:20,392:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:45:22,393:mill_control:execute_command: Initially ok
+2023-10-11 16:45:23,408:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:23,408:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:45:25,409:mill_control:execute_command: Initially ok
+2023-10-11 16:45:26,423:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:26,423:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:45:28,424:mill_control:execute_command: Initially ok
+2023-10-11 16:45:29,439:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:29,439:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:45:31,440:mill_control:execute_command: Initially ok
+2023-10-11 16:45:32,454:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:32,454:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:45:34,455:mill_control:execute_command: Initially ok
+2023-10-11 16:45:35,469:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:35,469:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:45:37,469:mill_control:execute_command: Initially ok
+2023-10-11 16:45:38,484:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:38,492:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 16:45:38,492:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 16:45:38,493:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 16:45:40,493:mill_control:execute_command: Initially ok
+2023-10-11 16:45:45,540:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:45,540:mill_control:execute_command: Command sent: G00 Y-107
+2023-10-11 16:45:47,541:mill_control:execute_command: Initially ok
+2023-10-11 16:45:50,571:mill_control:execute_command: Returned <Idle|MPos:-185.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:50,571:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 16:45:52,572:mill_control:execute_command: Initially ok
+2023-10-11 16:45:54,594:mill_control:execute_command: Returned <Idle|MPos:-185.000,-110.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 16:45:54,594:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W8_CV
+2023-10-11 16:45:54,594:gamry_control_WIP:cyclic: made it to run
+2023-10-11 16:45:54,659:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 16:46:51,232:gamry_control_WIP:made it to data done
+2023-10-11 16:46:54,258:gamry_control_WIP:number of data points acquired: 282
+2023-10-11 16:46:54,263:gamry_control_WIP:data saved
+2023-10-11 16:46:54,771:mill_control:MPos coordinates: X = -182.0, Y = -107.0, Z = -73.0
+2023-10-11 16:46:54,771:mill_control:current_coordinates: [-182.0, -107.0, -73.0]
+2023-10-11 16:46:54,772:mill_control:execute_command: Command sent: G00 X-182.0 Y-107.0 Z0.0
+2023-10-11 16:46:56,773:mill_control:execute_command: Initially ok
+2023-10-11 16:46:58,796:mill_control:execute_command: Returned <Idle|MPos:-185.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:46:58,796:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:47:00,797:mill_control:execute_command: Initially ok
+2023-10-11 16:47:05,843:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:05,843:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:47:07,844:mill_control:execute_command: Initially ok
+2023-10-11 16:47:08,859:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:08,859:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:47:10,860:mill_control:execute_command: Initially ok
+2023-10-11 16:47:11,875:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:11,875:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:47:13,877:mill_control:execute_command: Initially ok
+2023-10-11 16:47:14,891:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:14,891:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:47:16,892:mill_control:execute_command: Initially ok
+2023-10-11 16:47:17,908:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 16:47:17,908:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:47:19,910:mill_control:execute_command: Initially ok
+2023-10-11 16:47:20,925:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:20,925:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:47:22,926:mill_control:execute_command: Initially ok
+2023-10-11 16:47:23,940:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:23,947:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 16:47:23,947:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 16:47:23,947:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 16:47:25,948:mill_control:execute_command: Initially ok
+2023-10-11 16:47:30,996:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 16:47:30,996:mill_control:execute_command: Command sent: G00 Y-116
+2023-10-11 16:47:32,997:mill_control:execute_command: Initially ok
+2023-10-11 16:47:36,027:mill_control:execute_command: Returned <Idle|MPos:-185.000,-119.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:36,027:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 16:47:38,028:mill_control:execute_command: Initially ok
+2023-10-11 16:47:40,051:mill_control:execute_command: Returned <Idle|MPos:-185.000,-119.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 16:47:40,051:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W9_CA
+2023-10-11 16:47:40,051:gamry_control_WIP:chrono: made it to run
+2023-10-11 16:47:40,115:gamry_control_WIP:chrono: made it to run end
+2023-10-11 16:52:40,292:gamry_control_WIP:made it to data done
+2023-10-11 16:52:43,314:gamry_control_WIP:number of data points acquired: 29200
+2023-10-11 16:52:43,495:gamry_control_WIP:data saved
+2023-10-11 16:52:44,003:mill_control:MPos coordinates: X = -182.0, Y = -116.0, Z = -73.0
+2023-10-11 16:52:44,003:mill_control:current_coordinates: [-182.0, -116.0, -73.0]
+2023-10-11 16:52:44,003:mill_control:execute_command: Command sent: G00 X-182.0 Y-116.0 Z0.0
+2023-10-11 16:52:46,004:mill_control:execute_command: Initially ok
+2023-10-11 16:52:48,029:mill_control:execute_command: Returned <Idle|MPos:-185.000,-119.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:52:48,029:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:52:50,029:mill_control:execute_command: Initially ok
+2023-10-11 16:52:55,074:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:52:55,074:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:52:57,076:mill_control:execute_command: Initially ok
+2023-10-11 16:52:58,090:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:52:58,090:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:53:00,090:mill_control:execute_command: Initially ok
+2023-10-11 16:53:01,106:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:53:01,106:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:53:03,107:mill_control:execute_command: Initially ok
+2023-10-11 16:53:04,121:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:53:04,121:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:53:06,122:mill_control:execute_command: Initially ok
+2023-10-11 16:53:07,136:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:53:07,136:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:53:09,137:mill_control:execute_command: Initially ok
+2023-10-11 16:53:10,151:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:53:10,151:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:53:12,152:mill_control:execute_command: Initially ok
+2023-10-11 16:53:13,166:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:53:13,175:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 16:53:13,175:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 16:53:13,175:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 16:53:15,176:mill_control:execute_command: Initially ok
+2023-10-11 16:53:20,221:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:53:20,221:mill_control:execute_command: Command sent: G00 Y-125
+2023-10-11 16:53:22,221:mill_control:execute_command: Initially ok
+2023-10-11 16:53:25,254:mill_control:execute_command: Returned <Idle|MPos:-185.000,-128.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 16:53:25,254:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 16:53:27,255:mill_control:execute_command: Initially ok
+2023-10-11 16:53:29,277:mill_control:execute_command: Returned <Idle|MPos:-185.000,-128.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 16:53:29,277:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W10_CV
+2023-10-11 16:53:29,277:gamry_control_WIP:cyclic: made it to run
+2023-10-11 16:53:29,331:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 16:54:25,905:gamry_control_WIP:made it to data done
+2023-10-11 16:54:28,927:gamry_control_WIP:number of data points acquired: 282
+2023-10-11 16:54:28,933:gamry_control_WIP:data saved
+2023-10-11 16:54:29,441:mill_control:MPos coordinates: X = -182.0, Y = -125.0, Z = -73.0
+2023-10-11 16:54:29,441:mill_control:current_coordinates: [-182.0, -125.0, -73.0]
+2023-10-11 16:54:29,441:mill_control:execute_command: Command sent: G00 X-182.0 Y-125.0 Z0.0
+2023-10-11 16:54:31,442:mill_control:execute_command: Initially ok
+2023-10-11 16:54:33,464:mill_control:execute_command: Returned <Idle|MPos:-185.000,-128.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:33,464:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:54:35,465:mill_control:execute_command: Initially ok
+2023-10-11 16:54:40,514:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:40,514:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:54:42,516:mill_control:execute_command: Initially ok
+2023-10-11 16:54:43,530:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:43,530:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:54:45,531:mill_control:execute_command: Initially ok
+2023-10-11 16:54:46,545:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:46,545:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:54:48,547:mill_control:execute_command: Initially ok
+2023-10-11 16:54:49,562:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:49,562:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:54:51,563:mill_control:execute_command: Initially ok
+2023-10-11 16:54:52,577:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:52,577:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 16:54:54,578:mill_control:execute_command: Initially ok
+2023-10-11 16:54:55,593:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:55,593:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 16:54:57,594:mill_control:execute_command: Initially ok
+2023-10-11 16:54:58,609:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:54:58,616:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 16:54:58,617:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 16:54:58,617:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 16:55:00,618:mill_control:execute_command: Initially ok
+2023-10-11 16:55:05,664:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:55:05,664:mill_control:execute_command: Command sent: G00 Y-134
+2023-10-11 16:55:07,665:mill_control:execute_command: Initially ok
+2023-10-11 16:55:11,703:mill_control:execute_command: Returned <Idle|MPos:-185.000,-137.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 16:55:11,703:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 16:55:13,704:mill_control:execute_command: Initially ok
+2023-10-11 16:55:15,729:mill_control:execute_command: Returned <Idle|MPos:-185.000,-137.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 16:55:15,729:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W11_CA
+2023-10-11 16:55:15,729:gamry_control_WIP:chrono: made it to run
+2023-10-11 16:55:15,782:gamry_control_WIP:chrono: made it to run end
+2023-10-11 17:00:15,959:gamry_control_WIP:made it to data done
+2023-10-11 17:00:18,988:gamry_control_WIP:number of data points acquired: 29200
+2023-10-11 17:00:19,171:gamry_control_WIP:data saved
+2023-10-11 17:00:19,679:mill_control:MPos coordinates: X = -182.0, Y = -134.0, Z = -73.0
+2023-10-11 17:00:19,679:mill_control:current_coordinates: [-182.0, -134.0, -73.0]
+2023-10-11 17:00:19,679:mill_control:execute_command: Command sent: G00 X-182.0 Y-134.0 Z0.0
+2023-10-11 17:00:21,680:mill_control:execute_command: Initially ok
+2023-10-11 17:00:23,702:mill_control:execute_command: Returned <Idle|MPos:-185.000,-137.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:00:23,702:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:00:25,703:mill_control:execute_command: Initially ok
+2023-10-11 17:00:30,751:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 17:00:30,751:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:00:32,752:mill_control:execute_command: Initially ok
+2023-10-11 17:00:33,767:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:00:33,767:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:00:35,768:mill_control:execute_command: Initially ok
+2023-10-11 17:00:36,782:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:00:36,782:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:00:38,783:mill_control:execute_command: Initially ok
+2023-10-11 17:00:39,798:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:00:39,798:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:00:41,799:mill_control:execute_command: Initially ok
+2023-10-11 17:00:42,813:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:00:42,813:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:00:44,813:mill_control:execute_command: Initially ok
+2023-10-11 17:00:45,831:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 17:00:45,831:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:00:47,832:mill_control:execute_command: Initially ok
+2023-10-11 17:00:48,846:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:00:48,854:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 17:00:48,854:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 17:00:48,854:mill_control:execute_command: Command sent: G00 X-182
+2023-10-11 17:00:50,855:mill_control:execute_command: Initially ok
+2023-10-11 17:00:55,901:mill_control:execute_command: Returned <Idle|MPos:-185.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 17:00:55,901:mill_control:execute_command: Command sent: G00 Y-143
+2023-10-11 17:00:57,902:mill_control:execute_command: Initially ok
+2023-10-11 17:01:01,939:mill_control:execute_command: Returned <Idle|MPos:-185.000,-146.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:01:01,939:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 17:01:03,941:mill_control:execute_command: Initially ok
+2023-10-11 17:01:05,963:mill_control:execute_command: Returned <Idle|MPos:-185.000,-146.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 17:01:05,963:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W12_CV
+2023-10-11 17:01:05,963:gamry_control_WIP:cyclic: made it to run
+2023-10-11 17:01:06,017:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 17:02:02,589:gamry_control_WIP:made it to data done
+2023-10-11 17:02:05,618:gamry_control_WIP:number of data points acquired: 282
+2023-10-11 17:02:05,624:gamry_control_WIP:data saved
+2023-10-11 17:02:06,131:mill_control:MPos coordinates: X = -182.0, Y = -143.0, Z = -73.0
+2023-10-11 17:02:06,131:mill_control:current_coordinates: [-182.0, -143.0, -73.0]
+2023-10-11 17:02:06,131:mill_control:execute_command: Command sent: G00 X-182.0 Y-143.0 Z0.0
+2023-10-11 17:02:08,132:mill_control:execute_command: Initially ok
+2023-10-11 17:02:10,157:mill_control:execute_command: Returned <Idle|MPos:-185.000,-146.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:10,157:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:02:12,158:mill_control:execute_command: Initially ok
+2023-10-11 17:02:17,201:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:17,201:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:02:19,203:mill_control:execute_command: Initially ok
+2023-10-11 17:02:20,217:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:20,217:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:02:22,219:mill_control:execute_command: Initially ok
+2023-10-11 17:02:23,234:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:23,234:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:02:25,236:mill_control:execute_command: Initially ok
+2023-10-11 17:02:26,250:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:26,251:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:02:28,251:mill_control:execute_command: Initially ok
+2023-10-11 17:02:29,265:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:29,265:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:02:31,266:mill_control:execute_command: Initially ok
+2023-10-11 17:02:32,281:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:32,281:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:02:34,282:mill_control:execute_command: Initially ok
+2023-10-11 17:02:35,296:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:35,305:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 17:02:35,305:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 17:02:35,305:mill_control:execute_command: Command sent: G00 X-191
+2023-10-11 17:02:37,306:mill_control:execute_command: Initially ok
+2023-10-11 17:02:42,349:mill_control:execute_command: Returned <Idle|MPos:-194.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:42,349:mill_control:execute_command: Command sent: G00 Y-44
+2023-10-11 17:02:44,351:mill_control:execute_command: Initially ok
+2023-10-11 17:02:45,365:mill_control:execute_command: Returned <Idle|MPos:-194.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:45,365:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 17:02:47,366:mill_control:execute_command: Initially ok
+2023-10-11 17:02:49,391:mill_control:execute_command: Returned <Idle|MPos:-194.000,-47.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 17:02:49,391:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W13_CA
+2023-10-11 17:02:49,391:gamry_control_WIP:chrono: made it to run
+2023-10-11 17:02:49,444:gamry_control_WIP:chrono: made it to run end
+2023-10-11 17:07:49,621:gamry_control_WIP:made it to data done
+2023-10-11 17:07:52,644:gamry_control_WIP:number of data points acquired: 29200
+2023-10-11 17:07:52,821:gamry_control_WIP:data saved
+2023-10-11 17:07:53,329:mill_control:MPos coordinates: X = -191.0, Y = -44.0, Z = -73.0
+2023-10-11 17:07:53,329:mill_control:current_coordinates: [-191.0, -44.0, -73.0]
+2023-10-11 17:07:53,329:mill_control:execute_command: Command sent: G00 X-191.0 Y-44.0 Z0.0
+2023-10-11 17:07:55,330:mill_control:execute_command: Initially ok
+2023-10-11 17:07:57,352:mill_control:execute_command: Returned <Idle|MPos:-194.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:07:57,352:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:07:59,354:mill_control:execute_command: Initially ok
+2023-10-11 17:08:04,399:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:04,399:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:08:06,400:mill_control:execute_command: Initially ok
+2023-10-11 17:08:07,415:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:07,415:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:08:09,415:mill_control:execute_command: Initially ok
+2023-10-11 17:08:10,429:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:10,429:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:08:12,430:mill_control:execute_command: Initially ok
+2023-10-11 17:08:13,444:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:13,444:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:08:15,445:mill_control:execute_command: Initially ok
+2023-10-11 17:08:16,460:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:16,460:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:08:18,461:mill_control:execute_command: Initially ok
+2023-10-11 17:08:19,477:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:19,477:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:08:21,478:mill_control:execute_command: Initially ok
+2023-10-11 17:08:22,491:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:22,499:mill_control:MPos coordinates: X = -375.0, Y = 0.0, Z = 0.0
+2023-10-11 17:08:22,499:mill_control:current_coordinates: [-375.0, 0.0, 0.0]
+2023-10-11 17:08:22,499:mill_control:execute_command: Command sent: G00 X-191
+2023-10-11 17:08:24,500:mill_control:execute_command: Initially ok
+2023-10-11 17:08:29,548:mill_control:execute_command: Returned <Idle|MPos:-194.000,-3.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-11 17:08:29,548:mill_control:execute_command: Command sent: G00 Y-53
+2023-10-11 17:08:31,549:mill_control:execute_command: Initially ok
+2023-10-11 17:08:32,563:mill_control:execute_command: Returned <Idle|MPos:-194.000,-56.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:32,563:mill_control:execute_command: Command sent: G00 Z-73
+2023-10-11 17:08:34,564:mill_control:execute_command: Initially ok
+2023-10-11 17:08:36,587:mill_control:execute_command: Returned <Idle|MPos:-194.000,-56.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-11 17:08:36,587:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-cleaning_test_W14_CV
+2023-10-11 17:08:36,587:gamry_control_WIP:cyclic: made it to run
+2023-10-11 17:08:36,648:gamry_control_WIP:cyclic: made it to run end
+2023-10-11 17:09:33,222:gamry_control_WIP:made it to data done
+2023-10-11 17:09:36,249:gamry_control_WIP:number of data points acquired: 282
+2023-10-11 17:09:36,254:gamry_control_WIP:data saved
+2023-10-11 17:09:36,761:mill_control:MPos coordinates: X = -191.0, Y = -53.0, Z = -73.0
+2023-10-11 17:09:36,761:mill_control:current_coordinates: [-191.0, -53.0, -73.0]
+2023-10-11 17:09:36,761:mill_control:execute_command: Command sent: G00 X-191.0 Y-53.0 Z0.0
+2023-10-11 17:09:38,762:mill_control:execute_command: Initially ok
+2023-10-11 17:09:40,786:mill_control:execute_command: Returned <Idle|MPos:-194.000,-56.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 17:09:40,786:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:09:42,787:mill_control:execute_command: Initially ok
+2023-10-11 17:09:47,832:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:09:47,832:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:09:49,833:mill_control:execute_command: Initially ok
+2023-10-11 17:09:50,847:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:09:50,847:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:09:52,849:mill_control:execute_command: Initially ok
+2023-10-11 17:09:53,865:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-11 17:09:53,865:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:09:55,866:mill_control:execute_command: Initially ok
+2023-10-11 17:09:56,880:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:09:56,880:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:09:58,881:mill_control:execute_command: Initially ok
+2023-10-11 17:09:59,895:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:09:59,895:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-45
+2023-10-11 17:10:01,896:mill_control:execute_command: Initially ok
+2023-10-11 17:10:02,910:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-48.000|Bf:15,127|FS:0,0>
+2023-10-11 17:10:02,910:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-11 17:10:04,911:mill_control:execute_command: Initially ok
+2023-10-11 17:10:05,925:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-11 17:10:20,932:mill_control:execute_command: Command sent: $H
+2023-10-11 17:10:22,932:mill_control:execute_command: Returned ok
+2023-10-11 17:11:26,565:mill_control:Homing completed

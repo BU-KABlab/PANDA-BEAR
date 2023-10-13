@@ -156,9 +156,9 @@ def plot_all_second_cycles(folder_path, echem_function):
 
 rows = 'D'
 columns = [9]
-folder_path = pathlib.Path(__file__).parents[2] /  "data" / "2023-08-03"
-#folder_path = pathlib.Path("C:\\Users\\Kab Lab\\Documents\\data\\2023-07-31")
+#folder_path = pathlib.Path(__file__).parents[2] /  "data"
+folder_path = pathlib.Path("C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\data")
 echem_function = "CV"
 #plot(folder_path, rows, columns, echem_function)
-#plot_second_cycle(folder_path, echem_function)
+plot_second_cycle(folder_path, echem_function)
 #plot_all_second_cycles(folder_path, echem_function)

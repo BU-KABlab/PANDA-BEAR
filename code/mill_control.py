@@ -315,8 +315,9 @@ class Mill:
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
         self.move_electrode_to_position(-411, -30, 0)
-        self.move_electrode_to_position(-411, -30, -45)
-        self.move_electrode_to_position(-411, -30, 0)
+        for _ in range(3):
+            self.move_electrode_to_position(-411, -30, -45)
+            self.move_electrode_to_position(-411, -30, 0)
         return 0
 
     def move_to_safe_position(self):
