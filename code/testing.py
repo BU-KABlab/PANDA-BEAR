@@ -11,7 +11,6 @@
 # move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
 
 #
-from tkinter import Scale
 from pump_control import Pump
 from regex import P
 from mill_control import Mill, Instruments
@@ -214,7 +213,7 @@ def interactive():
 
         return 0
 
-def mixing_test(experiments):
+def mixing_test(experiments: list[Experiment]):
     """
     A protocol to test the mixing of the solution in the wellplate.
     Experiment name format: MixingTest_wellID_echemType
@@ -275,6 +274,7 @@ def mixing_test(experiments):
 
                 # Plot results
                 analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
+                
 
             echem.disconnectpstat()
 
@@ -441,4 +441,40 @@ if __name__ == "__main__":
     #cv_cleaning_test()
     # main()
     # interactive()
+    dry_run_experiment = Experiment(
+        id=0,
+        priority=1,
+        pin=CURRENT_PIN,
+        target_well="C12",
+        dmf=50,
+        peg=50,
+        acrylate=50,
+        ferrocene=50,
+        custom=90,
+        ocp=1,
+        ca=0,  # 0 = no deposition, 1 = deposition
+        cv=1,  # 0 = no characterization, 1 = characterization
+        baseline=0,
+        dep_duration=None,
+        dep_pot= None,
+        char_sol_name=None,
+        char_vol= None,
+        flush_sol_name="dmf",
+        flush_vol=120,
+        rinse_count=0,
+        rinse_vol=150,
+        mix=1,  # 0 = no mixing, 1 = mixing
+        mix_count=3,
+        mix_vol=145,
+        mix_rate=0.62,
+        status=ExperimentStatus.NEW,
+        status_date=datetime.now(),
+        filename="mixing_test_dry_run_C12",
+        results=None,
+    )
+    input("Press enter when stock vials are in place and status updated (code/system state/stock_status.json):")
+    input("Press enter to start dry run after switching pstat to test cell:")
+    mixing_test([dry_run_experiment])
+    input("Please change pstat back to working set up and press enter to continue:")
+    input("Press enter to continue to mixing test following successful dry run:")
     mixing_test(mix_test_experiments)
