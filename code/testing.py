@@ -28,6 +28,10 @@ from typing import List, Tuple
 import e_panda
 import sys
 import pytz as tz
+from mixing_test_experiments import experiments as mix_test_experiments
+from scheduler import Scheduler
+import Analyzer as analyzer
+from pathlib import Path
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -63,12 +67,14 @@ def cv_cleaning_test():
     """A protocol to test the cleaning of the platinum electrode using CV in pure electrolyte."""
     with Mill() as mill:
         echem.pstatconnect()
-
+        wellplate = Wells(
+            a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
+        )
         # define coordinates for easy reference
-        a1_coord = Wells.get_coordinates("A1")
-        a2_coord = Wells.get_coordinates("A2")
-        a3_coord = Wells.get_coordinates("A3")
-        a4_coord = Wells.get_coordinates("A4")
+        a1_coord = wellplate.get_coordinates("A1")
+        a2_coord = wellplate.get_coordinates("A2")
+        a3_coord = wellplate.get_coordinates("A3")
+        a4_coord = wellplate.get_coordinates("A4")
 
         ## Well 1: Characterization of bare gold with DmFC sol (CV, 3 cycles, -0.2, 0.3V)
         mill.safe_move(a1_coord["x"], a1_coord["y"], a1_coord["echem_height"])
@@ -208,7 +214,7 @@ def interactive():
 
         return 0
 
-def mixing_test():
+def mixing_test(experiments):
     """
     A protocol to test the mixing of the solution in the wellplate.
     Experiment name format: MixingTest_wellID_echemType
@@ -231,37 +237,22 @@ def mixing_test():
     C12  | Premixed Solution        | 0
 
     For each well, the following steps are also performed:
-    - deposition (CA) of the solution onto the substrate.
-    - plotting the results
-    - clearing the well
-    - rinsing the well
-    - rinsing the electrode
-    - cleaning the electrode (CV)
-    - rinsing the electrode
     - characterizing (CV) the well
     - plotting the results
-    - rinsing the electrode
-    - clearing the well
-    - rinsing the well
-
-    
     """
-    from mixing_test_experiments import experiments
-    target_wells = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8","C9","C10","C11","C12"]
-    solution_names = ["peg", "acrylate", "dmfc"]
     stock_vials = read_vials("stock_status.json")
     waste_vials = read_vials("waste_status.json")
     wellplate = Wells(
         a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
     )
-    
+    scheduler = Scheduler()
     with Mill() as mill:
         with Scale() as scale:
             pump = Pump(mill, scale)
             echem.pstatconnect()
             for experiment in experiments:
                 results = ExperimentResult()
-                mixing_test_protocol(
+                experiment, results, stock_vials, waste_vials, wellplate = mixing_test_protocol(
                     experiment,
                     results,
                     mill,
@@ -271,7 +262,22 @@ def mixing_test():
                     waste_vials,
                     wellplate,
                 )
-                
+
+                ## Update the system state
+                update_vials(stock_vials, "stock_status.json")
+                update_vials(waste_vials, "waste_status.json")
+                scheduler.change_well_status(experiment.id, experiment.status)
+
+                ## Update location of experiment instructions and save results
+                scheduler.update_experiment_status(experiment)
+                scheduler.update_experiment_location(experiment)
+                scheduler.save_results(experiment, results)
+
+                # Plot results
+                analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
+
+            echem.disconnectpstat()
+
 
 def mixing_test_protocol(
     instructions: Experiment,
@@ -316,12 +322,6 @@ def mixing_test_protocol(
     try:
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
-        # Fetch list of solution names from stock_vials
-        # list of vial names to exclude
-        #exclude_list = ["rinse0", "rinse1", "rinse2"]
-        # experiment_solutions = [
-        #     vial.name for vial in stock_vials if vial.name not in exclude_list
-        # ]
         experiment_solutions = ["peg", "acrylate", "dmf", "custom"]
 
         # Deposit all experiment solutions into well
@@ -367,21 +367,21 @@ def mixing_test_protocol(
             instructions.status = ExperimentStatus.MIXING
             pump.mix(
                 mix_location=wellplate.get_coordinates(instructions.target_well),
-                mix_repetitions=3,
+                mix_repetitions=instructions.mix_count,
                 mix_volume=instructions.mix_vol,
                 mix_rate=instructions.mix_rate,
             )
             logger.info("Mixed well: %s", instructions.target_well)
 
-        e_panda.flush_pipette_tip(
-            pump,
-            waste_vials,
-            stock_vials,
-            instructions.flush_sol_name,
-            mill,
-            instructions.pumping_rate,
-            instructions.flush_vol,
-        )
+            e_panda.flush_pipette_tip(
+                pump,
+                waste_vials,
+                stock_vials,
+                instructions.flush_sol_name,
+                mill,
+                instructions.pumping_rate,
+                instructions.flush_vol,
+            )
 
         # Echem CV - characterization
         if instructions.cv == 1:
@@ -396,17 +396,6 @@ def mixing_test_protocol(
 
             logger.info("Characterization of %s complete", instructions.target_well)
             # Flushing procedure
-            e_panda.flush_pipette_tip(
-                pump,
-                waste_vials,
-                stock_vials,
-                instructions.flush_sol_name,
-                mill,
-                instructions.pumping_rate,
-                instructions.flush_vol,
-            )
-
-            logger.info("Pipette Flushed")
 
         instructions.status = ExperimentStatus.COMPLETE
         logger.info("End of Experiment: %s", instructions.id)
@@ -452,4 +441,4 @@ if __name__ == "__main__":
     #cv_cleaning_test()
     # main()
     # interactive()
-    mixing_test()
+    mixing_test(mix_test_experiments)
