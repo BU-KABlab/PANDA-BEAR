@@ -7,7 +7,7 @@
         "x": -2,
         "y": -43,
         "name": "custom",
-        "volume": 1930.0,
+        "volume": 4445.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -19,7 +19,7 @@
         "x": -2,
         "y": -76,
         "name": "dmf",
-        "volume": 20000,
+        "volume": 15000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -31,9 +31,9 @@
         "x": -2,
         "y": -109,
         "name": "peg",
-        "volume": 13710.0,
+        "volume": 6012.0,
         "capacity": 20000,
-        "contamination": 1
+        "contamination": 2
     },
     {
         "position": "S3",
@@ -43,7 +43,7 @@
         "x": -2,
         "y": -142,
         "name": "acrylate",
-        "volume": 15560.0,
+        "volume": 6908.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -55,7 +55,7 @@
         "x": -2,
         "y": -175,
         "name": "ferrocene",
-        "volume": 8710.0,
+        "volume": 9000.0,
         "capacity": 20000,
         "contamination": 0
     },

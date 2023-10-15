@@ -1,0 +1,28 @@
+2023-10-13 14:37:55,897:__main__:INFO:0:C12:Beginning experiment 0
+2023-10-13 14:37:55,897:__main__:INFO:0:C12:Pipetting 50.0 ul of peg into C12...
+2023-10-13 14:43:00,521:__main__:INFO:0:C12:Beginning experiment 0
+2023-10-13 14:43:00,521:__main__:INFO:0:C12:Pipetting 50.0 ul of peg into C12...
+2023-10-13 14:45:16,043:__main__:INFO:0:C12:Beginning experiment 0
+2023-10-13 14:45:16,044:__main__:INFO:0:C12:Pipetting 50.0 ul of peg into C12...
+2023-10-13 15:09:05,700:__main__:INFO:0:C12:Beginning experiment 0
+2023-10-13 15:09:05,700:__main__:INFO:0:C12:Pipetting 50.0 ul of peg into C12...
+2023-10-13 17:45:09,466:__main__:ERROR:0:C12:Exception: Error executing command G00 X-86 Y-106 Z0: Error in status: error:9
+2023-10-13 17:45:09,630:__main__:ERROR:0:C12:Exception type: <class 'mill_control.CommandExecutionError'>
+2023-10-13 17:45:09,812:__main__:ERROR:0:C12:File name: c:\Users\Kab Lab\Documents\GitHub\PANDA\code\testing.py
+2023-10-13 17:45:09,974:__main__:ERROR:0:C12:Line number: 340
+2023-10-13 17:45:12,756:__main__:INFO:0:C12:Returning completed instructions for experiment 0
+2023-10-13 17:55:16,756:__main__:INFO:0:C12:Beginning experiment 0
+2023-10-13 17:55:16,757:__main__:INFO:0:C12:Pipetting 50.0 ul of peg into C12...
+2023-10-13 17:58:07,503:__main__:INFO:0:C12:Pipetting 50.0 ul of acrylate into C12...
+2023-10-13 18:00:59,237:__main__:INFO:0:C12:Pipetting 50.0 ul of dmf into C12...
+2023-10-13 18:03:48,941:__main__:INFO:0:C12:Pipetting 90.0 ul of custom into C12...
+2023-10-13 18:06:46,249:__main__:INFO:0:C12:Pipetted solutions into well: C12
+2023-10-13 18:06:46,249:__main__:INFO:0:C12:Mixing well: C12
+2023-10-13 18:09:20,438:__main__:INFO:0:C12:Mixed well: C12
+2023-10-13 18:10:37,055:__main__:INFO:0:C12:Beginning eChem characterization of well: C12
+2023-10-13 18:12:53,327:__main__:INFO:0:C12:Characterization of C12 complete
+2023-10-13 18:12:53,327:__main__:INFO:0:C12:End of Experiment: 0
+2023-10-13 18:12:56,354:__main__:INFO:0:C12:EXPERIMENT 0 COMPLETED
+
+
+2023-10-13 18:12:56,427:__main__:INFO:0:C12:Returning completed instructions for experiment 0
