@@ -4,6 +4,7 @@ Wellplate data class for the echem experiment. This class is used to store the d
 import logging
 import math
 import matplotlib.pyplot as plt
+import json
 
 
 
@@ -92,20 +93,52 @@ class Wells:
                     "density": 1.0
                 }
 
+        ## update the well status from file
+        self.update_well_status_from_json_file()
+
+    def update_well_status_from_json_file(self):
+        """Update the well status from a file"""
+        with open("code\\system state\\well_status.json", "r", encoding= "UTF-8") as f:
+            data = json.load(f)
+            for well in data["Wells"]:
+                well_id = well["well_id"]
+                status = well["status"]
+                self.update_well_status(well_id, status)
+
+
+    def update_well_status_from_csv_file(self):
+        """Update the well status from a file"""
+        with open("code\\system state\\well_status.json", "r", encoding= "UTF-8") as f:
+            for line in f:
+                well_id, status = line.strip().split(",")
+                self.update_well_status(well_id, status)
+
     def visualize_well_coordinates(self):
         """Plot the well plate on a coordinate plane"""
         x_coordinates = []
         y_coordinates = []
+        color = []
         for well_id, well_data in self.wells.items():
             x_coordinates.append(well_data["coordinates"]["x"])
             y_coordinates.append(well_data["coordinates"]["y"])
-        plt.scatter(x_coordinates, y_coordinates)
+            ## designate the color of the well based on its status
+            if well_data["status"] in ["empty","new"]:
+                color.append("black")
+            elif well_data["status"] == "in use":
+                color.append("yellow")
+            elif well_data["status"] == "complete":
+                color.append("green")
+            elif well_data["status"] == "error":
+                color.append("red")
+            else:
+                color.append("black")
+        plt.scatter(x_coordinates, y_coordinates, c=color, s=50, alpha=0.5)
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.title("Well Coordinates")
-        plt.grid(True)
-        plt.xlim(-400, 0)
-        plt.ylim(-300, 0)
+        plt.grid(True,"both")
+        plt.xlim(-420, 0)
+        plt.ylim(-310, 0)
         plt.show()
 
     def get_coordinates(self, well_id) -> dict:
@@ -215,4 +248,14 @@ class OverDraftException(Exception):
 
     def __str__(self) -> str:
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
-    
+
+
+def test_well_build():
+    """Test the well plate"""
+    wellplate = Wells(
+        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
+    )
+    wellplate.visualize_well_coordinates()
+
+if __name__ == "__main__":
+    test_well_build()
