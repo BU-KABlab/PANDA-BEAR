@@ -8,7 +8,7 @@ from scale import Sartorius as Scale
 from vials import Vial
 from mill_control import Mill, MockMill, Instruments
 from wellplate import Wells as Wellplate
-
+from typing import Optional
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
@@ -72,42 +72,54 @@ class Pump:
         time.sleep(2)
         return pump
 
-    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
+    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
             volume (float): Volume to be withdrawn in milliliters but given as microliters.
-            position (dict): Dictionary containing x, y, and z coordinates of the position.
-            depth (float): Depth to plunge from the specified position in millimeters.
+            solution (Vial object): The vial to withdraw from
             rate (float): Pumping rate in milliliters per minute.
+
+        Returns:
+            The updated solution object if given one
         """
         # Perform the withdrawl
 
         # convert the volume argument from ul to ml
-        volume = volume / 1000
+        if volume > 0.0:
+            volume = round(volume / 1000.00,2)
 
-        self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
-        self.update_pipette_volume(self.pump.volume_withdrawn)
-        logging.debug(
-            "Pump has withdrawn: %f ml    Pipette vol: %f",
-            self.pump.volume_withdrawn,
-            self.pipette_volume_ul,
-        )
-        self.pump.volume_infused_clear()
-        self.pump.volume_withdrawn_clear()
-        return 0
+            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
+            self.update_pipette_volume(self.pump.volume_withdrawn)
+            logging.debug(
+                "Pump has withdrawn: %f ml    Pipette vol: %f",
+                self.pump.volume_withdrawn,
+                self.pipette_volume_ul,
+            )
+            self.pump.volume_infused_clear()
+            self.pump.volume_withdrawn_clear()
+            if solution is not None:
+                solution.update_volume(-volume)
+                return solution
+        else:
+            return None
 
-    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
+    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
             volume (float): Volume to be infused in milliliters but given as microliters.
+            solution (Vial object): The vial to infuse into
             rate (float): Pumping rate in milliliters per minute.
+
+        Returns:
+            The updated solution object if given one
         """
         # convert the volume argument from ul to ml
-        volume = volume / 1000
 
         if volume > 0.0:
+            volume = round(volume / 1000.00,2)
+
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
             self.update_pipette_volume(self.pump.volume_infused)
             logging.debug(
@@ -117,17 +129,18 @@ class Pump:
             )
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
+            if solution is not None:
+                solution.update_volume(volume)
+                return solution
         else:
-            pass
-        return 0
-
+            return None
     def purge(
         self,
         purge_vial: Vial,
         solution: Vial = None,
         purge_volume=20.00,
         pumping_rate=0.5,
-    ) -> None:
+    ) -> Vial:
         """
         Perform purging from the pipette.
         Args:
@@ -137,13 +150,15 @@ class Pump:
             pumping_rate (float): The pumping rate in ml/min (default 0.5)
 
         Returns:
-            None
+            The updated purge_vial object
         """
-        purge_vial.update_volume(purge_volume)
+
         logger.debug("Purging %f ul...", purge_volume)
         self.infuse(volume=purge_volume, rate=pumping_rate, solution=solution)
         log_msg = f"Purged {purge_volume} ul"
         logger.debug(log_msg)
+        purge_vial.update_volume(purge_volume)
+        return purge_vial
 
     def run_pump(self, direction, volume_ml, rate):
         """Combine all the common commands to run the pump into one function"""
