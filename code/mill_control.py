@@ -122,29 +122,33 @@ class Mill:
             command_bytes = command.encode()
             self.ser_mill.write(command_bytes + b"\n")
             time.sleep(2)
-            out = self.ser_mill.readline().decode().rstrip()
+            mill_response = self.ser_mill.readline().decode().rstrip()
 
             if command == "F2000":
-                logger.debug("execute_command: Returned %s", out)
+                logger.debug("execute_command: Returned %s", mill_response)
 
             elif command == "?":
-                logger.debug("execute_command: Returned %s", out)
+                logger.debug("execute_command: Returned %s", mill_response)
 
             elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
-                logger.debug("execute_command: Initially %s", out)
-                self.wait_for_completion(out)
-                out = self.current_status()
-                logger.debug("execute_command: Returned %s", out)
+                logger.debug("execute_command: Initially %s", mill_response)
+                self.wait_for_completion(mill_response)
+                mill_response = self.current_status()
+                logger.debug("execute_command: Returned %s", mill_response)
             else:
-                logger.debug("execute_command: Returned %s", out)
+                logger.debug("execute_command: Returned %s", mill_response)
 
-            return out
+            if mill_response.lower() in ["error", "alarm"]:
+                logger.error("current_status: Error in status: %s", mill_response)
+                raise StatusReturnError(f"Error in status: {mill_response}")
 
         except Exception as exep:
             logger.error("Error executing command %s: %s", command, str(exep))
             raise CommandExecutionError(
                 f"Error executing command {command}: {str(exep)}"
             ) from exep
+        
+        return mill_response
 
     def stop(self):
         """Stop the mill"""
@@ -322,17 +326,17 @@ class Mill:
             self.move_electrode_to_position(-411, -30, 0)
         return 0
 
-    def move_to_safe_position(self):
+    def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
         [initial_x, initial_y, initial_z] = self.current_coordinates()
-        self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-
+        mill_response = self.move_center_to_position(initial_x, initial_y, initial_z * 0)
+        return mill_response
     def move_pipette_to_position(
         self,
         x_coord: float = 0,
         y_coord: float = 0,
         z_coord=0.00,
-    ):
+    ) -> int:
         """
         Move the pipette to the specified coordinates.
         Args:
@@ -360,7 +364,7 @@ class Mill:
 
     def move_electrode_to_position(
         self, x_coord: float, y_coord: float, z_coord: float = 0.00
-    ):
+    ) -> int:
         """
         Move the electrode to the specified coordinates.
         Args:
