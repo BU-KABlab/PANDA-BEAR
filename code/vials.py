@@ -113,7 +113,7 @@ class Vial:
                 self.name, self.volume, added_volume, self.capacity
             )
         self.volume += added_volume
-        self.write_volume_to_disk()
+        #self.write_volume_to_disk()
         self.depth = (
             self.vial_height_calculator((self.radius * 2), self.volume)
             + self.bottom
