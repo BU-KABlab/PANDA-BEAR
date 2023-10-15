@@ -336,12 +336,14 @@ class Scheduler:
         # Update the status of the experiment
         with open(file_path, "r", encoding="UTF-8") as file:
             data = json.load(file)
-            data["status"] = experiment.status.value
-            data["status_date"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            parsed_data = experiment_class.parse_experiment(data)
+            parsed_data.status = str(experiment.status.value)
+            parsed_data.status_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
         # Save the updated file
+        serialized_data = experiment_class.serialize_experiment(parsed_data)
         with open(file_path, "w", encoding="UTF-8") as file:
-            json.dump(data, file, indent=4)
+            json.dump(serialized_data, file, indent=4)
 
     def update_experiment_location(self, experiment: Experiment) -> None:
         """
@@ -371,6 +373,16 @@ class Scheduler:
                 "Experiment %s is not complete or errored, keeping in queue",
                 experiment.id,
             )
+    def add_experiment(self, experiment: Experiment) -> None:
+        """
+        Adds an experiment to the experiment queue.
+        :param experiment: The experiment to add.
+        """
+        file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
+        # Save the updated file
+        experiment_json = experiment_class.serialize_experiment(experiment)
+        with open(file_path, "w", encoding="UTF-8") as file:
+            json.dump(experiment_json, file, indent=4)
 
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
@@ -382,7 +394,7 @@ class Scheduler:
             None
         """
         # Save the results
-        logger.info("Saving experiment %s results to database", experiment.id)
+        logger.info("Saving experiment %d results to database as %s", experiment.id, str(experiment.filename) + ".json")
         results_json = experiment_class.serialize_results(results)
         with open(
             pathlib.Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
