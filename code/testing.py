@@ -12,18 +12,18 @@
 
 #
 from pump_control import Pump
-from regex import P
 from mill_control import Mill, Instruments
 from wellplate import Wells
 from vials import Vial
 import gamry_control_WIP as echem
 from scale import Sartorius as Scale
-from controller import read_vials, update_vials
+#from controller import read_vials, update_vials
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
 from config.pin import CURRENT_PIN
 from datetime import datetime
 import logging
 from typing import List, Tuple
+from e_panda import read_vials, update_vials, pipette, flush_pipette_tip, characterization, OCPFailure
 import e_panda
 import sys
 import pytz as tz
@@ -38,7 +38,7 @@ logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter(
     "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
 )
-system_handler = logging.FileHandler("code/logs/mixing_test.log")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -239,17 +239,20 @@ def mixing_test(experiments: list[Experiment]):
     - characterizing (CV) the well
     - plotting the results
     """
-    stock_vials = read_vials("stock_status.json")
-    waste_vials = read_vials("waste_status.json")
+    stock_vials = read_vials("code\system state\stock_status.json")
+    waste_vials = read_vials("code\system state\waste_status.json")
     wellplate = Wells(
         a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
     )
     scheduler = Scheduler()
     with Mill() as mill:
+        mill.homing_sequence()
         with Scale() as scale:
             pump = Pump(mill, scale)
-            echem.pstatconnect()
+            #echem.pstatconnect()
             for experiment in experiments:
+                ## save the experiment to the experiment queue
+                scheduler.add_experiment(experiment)
                 results = ExperimentResult()
                 experiment, results, stock_vials, waste_vials, wellplate = mixing_test_protocol(
                     experiment,
@@ -263,8 +266,8 @@ def mixing_test(experiments: list[Experiment]):
                 )
 
                 ## Update the system state
-                update_vials(stock_vials, "stock_status.json")
-                update_vials(waste_vials, "waste_status.json")
+                update_vials(stock_vials, "code\system state\stock_status.json")
+                update_vials(waste_vials, "code\system state\waste_status.json")
                 scheduler.change_well_status(experiment.id, experiment.status)
 
                 ## Update location of experiment instructions and save results
@@ -273,10 +276,10 @@ def mixing_test(experiments: list[Experiment]):
                 scheduler.save_results(experiment, results)
 
                 # Plot results
-                analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
-                
+                #analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
 
-            echem.disconnectpstat()
+            if echem.CONNECTION is True:
+                echem.disconnectpstat()
 
 
 def mixing_test_protocol(
@@ -288,7 +291,7 @@ def mixing_test_protocol(
     stock_vials: list[Vial],
     waste_vials: list[Vial],
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult, List, List, Wells]:
+) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
@@ -314,6 +317,13 @@ def mixing_test_protocol(
         stock_vials (list): The list of stock vials
         waste_vials (list): The list of waste vials
         wellplate (Wells object): The wellplate object
+
+    Returns:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
     """
     # Add custom value to log format
     custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
@@ -323,7 +333,7 @@ def mixing_test_protocol(
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
         experiment_solutions = ["peg", "acrylate", "dmf", "custom"]
-
+        e_panda.apply_log_filter(instructions.id, instructions.target_well)
         # Deposit all experiment solutions into well
         for solution_name in experiment_solutions:
             if (
@@ -336,7 +346,7 @@ def mixing_test_protocol(
                     solution_name,
                     instructions.target_well,
                 )
-                e_panda.pipette(
+                experiment_solutions, waste_vials, wellplate = e_panda.pipette(
                     volume=getattr(instructions, solution_name),
                     solutions=stock_vials,  # list of vial objects passed to ePANDA
                     solution_name=solution_name,  # from the list above
@@ -350,7 +360,7 @@ def mixing_test_protocol(
                     scale=scale,
                 )
 
-                e_panda.flush_pipette_tip(
+                stock_vials, waste_vials = e_panda.flush_pipette_tip(
                     pump,
                     waste_vials,
                     stock_vials,
@@ -373,7 +383,7 @@ def mixing_test_protocol(
             )
             logger.info("Mixed well: %s", instructions.target_well)
 
-            e_panda.flush_pipette_tip(
+            stock_vials, waste_vials = e_panda.flush_pipette_tip(
                 pump,
                 waste_vials,
                 stock_vials,
@@ -441,40 +451,44 @@ if __name__ == "__main__":
     #cv_cleaning_test()
     # main()
     # interactive()
-    dry_run_experiment = Experiment(
-        id=0,
-        priority=1,
-        pin=CURRENT_PIN,
-        target_well="C12",
-        dmf=50,
-        peg=50,
-        acrylate=50,
-        ferrocene=50,
-        custom=90,
-        ocp=1,
-        ca=0,  # 0 = no deposition, 1 = deposition
-        cv=1,  # 0 = no characterization, 1 = characterization
-        baseline=0,
-        dep_duration=None,
-        dep_pot= None,
-        char_sol_name=None,
-        char_vol= None,
-        flush_sol_name="dmf",
-        flush_vol=120,
-        rinse_count=0,
-        rinse_vol=150,
-        mix=1,  # 0 = no mixing, 1 = mixing
-        mix_count=3,
-        mix_vol=145,
-        mix_rate=0.62,
-        status=ExperimentStatus.NEW,
-        status_date=datetime.now(),
-        filename="mixing_test_dry_run_C12",
-        results=None,
-    )
-    input("Press enter when stock vials are in place and status updated (code/system state/stock_status.json):")
-    input("Press enter to start dry run after switching pstat to test cell:")
-    mixing_test([dry_run_experiment])
-    input("Please change pstat back to working set up and press enter to continue:")
-    input("Press enter to continue to mixing test following successful dry run:")
+    # dry_run_experiment = Experiment(
+    #     id=0,
+    #     priority=1,
+    #     pin=CURRENT_PIN,
+    #     target_well="C12",
+    #     dmf=50,
+    #     peg=50,
+    #     acrylate=50,
+    #     ferrocene=50,
+    #     custom=90,
+    #     ocp=1,
+    #     ca=0,  # 0 = no deposition, 1 = deposition
+    #     cv=1,  # 0 = no characterization, 1 = characterization
+    #     baseline=0,
+    #     dep_duration=0,
+    #     dep_pot= 0,
+    #     char_sol_name="ferrocene",
+    #     char_vol= 0,
+    #     flush_sol_name="dmf",
+    #     flush_vol=120,
+    #     rinse_count=0,
+    #     rinse_vol=150,
+    #     mix=1,  # 0 = no mixing, 1 = mixing
+    #     mix_count=3,
+    #     mix_vol=145,
+    #     mix_rate=0.62,
+    #     status=ExperimentStatus.NEW,
+    #     status_date=datetime.now(),
+    #     filename="mixing_test_dry_run_C12",
+    #     results=None,
+    # # )
+    # dry_run_experiment.status = ExperimentStatus.RUNNING
+    # scheduler = Scheduler()
+    # scheduler.update_experiment_status(dry_run_experiment)
+    
+    # input("Press enter when stock vials are in place and status updated (code/system state/stock_status.json):")
+    # input("Press enter to start dry run after switching pstat to test cell:")
+    #mixing_test([dry_run_experiment])
+    #input("Please change pstat back to working set up and press enter to continue:")
+    #input("Press enter to continue to mixing test following successful dry run:")
     mixing_test(mix_test_experiments)
