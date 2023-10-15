@@ -12,6 +12,8 @@ stop the mill, reset the mill, home the mill, get the current status of the mill
 gcode mode of the mill, get the gcode parameters of the mill, and get the gcode parser state
 of the mill.
 """
+# pylint: disable=line-too-long
+
 # standard libraries
 import dataclasses
 import json
@@ -316,7 +318,7 @@ class Mill:
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
         self.move_electrode_to_position(-411, -30, 0)
         for _ in range(3):
-            self.move_electrode_to_position(-411, -30, -45)
+            self.move_electrode_to_position(-411, -30, -55)
             self.move_electrode_to_position(-411, -30, 0)
         return 0
 
