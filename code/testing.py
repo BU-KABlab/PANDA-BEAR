@@ -249,7 +249,7 @@ def mixing_test(experiments: list[Experiment]):
         mill.homing_sequence()
         with Scale() as scale:
             pump = Pump(mill, scale)
-            #echem.pstatconnect()
+            echem.pstatconnect()
             for experiment in experiments:
                 ## save the experiment to the experiment queue
                 scheduler.add_experiment(experiment)
