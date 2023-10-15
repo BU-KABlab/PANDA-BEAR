@@ -33,6 +33,7 @@ global DTAQ_SINK
 global CONNECTION
 global ACTIVE
 global COMPLETE_FILE_NAME
+global OPEN_CONNECTION
 
 
 def pstatconnect():
@@ -46,8 +47,10 @@ def pstatconnect():
     DEVICES = client.CreateObject("GamryCOM.GamryDeviceList")
     PSTAT.Init(DEVICES.EnumSections()[0])  # grab first pstat
     PSTAT.Open()  # open connection to pstat
+
     if DEVICES.EnumSections():
         logger.debug("\tPstat connected: %s", DEVICES.EnumSections()[0])
+        OPEN_CONNECTION = True
     else:
         logger.debug("\tPstat not connected")
 
@@ -92,18 +95,22 @@ def stopacq():
 
 
 class GamryDtaqEvents(object):
+    """Class to handle events from the data acquisition."""
     def __init__(self, dtaq_value, complete_file_name):
         self.dtaq = dtaq_value
         self.acquired_points = []
         self.complete_file_name = complete_file_name
 
     def call_stopacq(self):
+        """stop the acquisition"""
         stopacq()
 
     def call_savedata(self, complete_file_name):
+        """save the data to a file"""
         savedata(complete_file_name)
 
     def cook(self):
+        """Cook the data acquired from the data acquisition."""
         count = 1
         while count > 0:
             count, points = self.dtaq.Cook(10)
@@ -112,11 +119,13 @@ class GamryDtaqEvents(object):
             self.acquired_points.extend(zip(*points))
 
     def _IGamryDtaqEvents_OnDataAvailable(self):
+        """Called when data is available from the data acquisition."""
         self.cook()
         # loading = ["|", "/", "-", "\\"]
         # logger.debug("\rmade it to data available %s{random.choice(loading)}", end="")
 
     def _IGamryDtaqEvents_OnDataDone(self):
+        """Called when the data acquisition is complete."""
         logger.debug("made it to data done")
         self.cook()  # a final cook
         time.sleep(2.0)
@@ -126,7 +135,12 @@ class GamryDtaqEvents(object):
 
 def disconnectpstat():
     """disconnect the pstat"""
+    global PSTAT
+    global OPEN_CONNECTION
+    """disconnect the pstat"""
+    logger.debug("disconnecting pstat")
     PSTAT.Close()
+    OPEN_CONNECTION = False
     # del connection
     time.sleep(15)
 
