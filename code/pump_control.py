@@ -211,7 +211,7 @@ class Pump:
         if mix_location is None:
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(mix_volume, mix_rate)
+                self.withdraw(volume=mix_volume,rate= mix_rate)
                 current_coords = self.mill.current_coordinates()
                 current_coords = {
                     "x": current_coords[0],
@@ -222,7 +222,7 @@ class Pump:
                 self.mill.move_center_to_position(
                     current_coords["x"], current_coords["y"], current_coords["z"] + 3
                 )
-                self.infuse(mix_volume, mix_rate)
+                self.infuse(volume=mix_volume,rate= mix_rate)
                 self.mill.move_center_to_position(
                     current_coords["x"], current_coords["y"], current_coords["z"]
                 )
@@ -235,11 +235,11 @@ class Pump:
             )
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(mix_volume, mix_rate)
+                self.withdraw(volume=mix_volume,rate= mix_rate)
                 self.mill.move_pipette_to_position(
                     mix_location["x"], mix_location["y"], mix_location["depth"] + 1.5
                 )
-                self.infuse(mix_volume, mix_rate)
+                self.infuse(volume=mix_volume, rate=mix_rate)
                 self.mill.move_pipette_to_position(
                     mix_location["x"], mix_location["y"], mix_location["depth"]
                 )

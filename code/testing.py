@@ -266,7 +266,7 @@ def mixing_test(experiments: list[Experiment]):
                 # Plot results
                 #analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
 
-            if echem.CONNECTION is True:
+            if echem.OPEN_CONNECTION is True:
                 echem.disconnectpstat()
 
 

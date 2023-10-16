@@ -336,7 +336,7 @@ class Scheduler:
         # Update the status of the experiment
         with open(file_path, "r", encoding="UTF-8") as file:
             data = json.load(file)
-            data = json.dumps(file)
+            data = json.dumps(data)
             parsed_data = experiment_class.parse_experiment(data)
             parsed_data.status = str(experiment.status.value)
             parsed_data.status_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -351,9 +351,10 @@ class Scheduler:
         Updates the location of the experiment instructions file.
         :param experiment: The experiment that was just run.
         """
+        file_name_with_suffix = experiment.filename + ".json"
         file_path = pathlib.Path(
-            pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
-        ).with_suffix(".json")
+            pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / file_name_with_suffix
+        )
         if not pathlib.Path.exists(file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
@@ -361,12 +362,12 @@ class Scheduler:
         if experiment.status == ExperimentStatus.COMPLETE:
             # Move the file to the completed folder
             completed_path = pathlib.Path.cwd() / PATH_TO_COMPLETED_EXPERIMENTS
-            file_path.replace(completed_path / experiment.filename)
+            file_path.replace(completed_path / file_name_with_suffix)
 
         elif experiment.status == ExperimentStatus.ERROR:
             # Move the file to the errored folder
             errored_path = pathlib.Path.cwd() / PATH_TO_ERRORED_EXPERIMENTS
-            file_path.replace(errored_path / experiment.filename)
+            file_path.replace(errored_path / file_name_with_suffix)
 
         else:
             # If the experiment is neither complete nor errored, then we need to keep it in the queue
