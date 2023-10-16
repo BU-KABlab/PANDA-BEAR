@@ -320,7 +320,7 @@ def mixing_test_protocol(
     try:
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
-        experiment_solutions = ["peg", "acrylate", "dmf", "custom"]
+        experiment_solutions = ["peg", "acrylate", "dmf", "custom","ferrocene"]
         e_panda.apply_log_filter(instructions.id, instructions.target_well)
         # Deposit all experiment solutions into well
         for solution_name in experiment_solutions:
