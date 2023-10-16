@@ -41,6 +41,7 @@ def pstatconnect():
     global PSTAT
     global DEVICES
     global GAMRY_COM
+    global OPEN_CONNECTION
 
     GAMRY_COM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
     PSTAT = client.CreateObject("GamryCOM.GamryPC6Pstat")

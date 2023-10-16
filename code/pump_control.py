@@ -86,8 +86,8 @@ class Pump:
         # Perform the withdrawl
 
         # convert the volume argument from ul to ml
-        if volume > 0.0:
-            volume = round(volume / 1000.00,2)
+        if volume > 0.00:
+            volume = round(volume / 1000.00,3)
 
             self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
             self.update_pipette_volume(self.pump.volume_withdrawn)
@@ -117,8 +117,8 @@ class Pump:
         """
         # convert the volume argument from ul to ml
 
-        if volume > 0.0:
-            volume = round(volume / 1000.00,2)
+        if volume > 0.00:
+            volume = round(volume / 1000.00,3)
 
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
             self.update_pipette_volume(self.pump.volume_infused)
@@ -250,15 +250,15 @@ class Pump:
         """Set the volume of the pipette in ul"""
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
             self.pipette_volume_ul -= volume_ul
-            self.pipette_volume_ml -= volume_ul / 1000
+            self.pipette_volume_ml -= volume_ul / 1000.000
         else:
             self.pipette_volume_ul += volume_ul
-            self.pipette_volume_ml += volume_ul / 1000
+            self.pipette_volume_ml += volume_ul / 1000.000
 
     def set_pipette_capacity(self, capacity_ul):
         """Set the capacity of the pipette in ul"""
         self.pipette_capacity_ml = capacity_ul
-        self.pipette_capacity_ul = capacity_ul / 1000
+        self.pipette_capacity_ul = capacity_ul / 1000.000
 
 
 class MockPump(Pump):

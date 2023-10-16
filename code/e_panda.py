@@ -149,7 +149,7 @@ def pipette(
             # First half: pick up solution
             logger.debug("Withdrawing %f of air gap...", air_gap)
             pump.withdraw(
-                air_gap, pumping_rate
+                volume=air_gap, rate=pumping_rate
             )  # withdraw air gap to engage screw
 
             logger.info("Moving to %s...", solution.name)
@@ -181,7 +181,7 @@ def pipette(
             )  # purge_vial.depth replaced with height
 
             purge_vial = pump.purge(
-                purge_vial, purge_volume
+                purge_vial=purge_vial, purge_volume= purge_volume
             )  # remaining vol in pipette is now air gap + repition vol + 1 purge
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
@@ -233,7 +233,7 @@ def pipette(
             )  # purge_vial.depth replaced with height
 
             pump.purge(
-                purge_vial, purge_volume
+                purge_vial=purge_vial, purge_volume=purge_volume
             )  # remaining vol in pipette is now air gap
             # Pump out the air gap
             pump.infuse(volume=air_gap, rate=0.5)  # purge the pipette tip
@@ -303,7 +303,7 @@ def clear_well(
         logger.info("Repitition %d of %d", j + 1, repetition)
         logger.debug("Withdrawing %f of air gap...", AIR_GAP)
         # withdraw a little to engange screw
-        pump.withdraw(AIR_GAP, pumping_rate)
+        pump.withdraw(volume=AIR_GAP, rate=pumping_rate)
         logger.debug("Moving to %s...", target_well)
         mill.move_pipette_to_position(
             wellplate.get_coordinates(target_well)["x"],
@@ -342,7 +342,7 @@ def clear_well(
         )  # purge_vial.depth replaced with height
 
         purge_vial = pump.purge(
-            purge_vial, wellplate.density(target_well), repetition_vol
+            purge_vial = purge_vial, purge_volume= repetition_vol
         )  # repitition volume
         logger.info("Purging the air gap...")
         pump.infuse(volume=AIR_GAP, rate=0.5)  # extra purge to clear pipette
@@ -460,7 +460,7 @@ def flush_pipette_tip(
         flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
     )
     logger.debug("Withdrawing %f of air gap...", AIR_GAP)
-    pump.withdraw(AIR_GAP, pumping_rate)
+    pump.withdraw(volume=AIR_GAP,rate= pumping_rate)
 
     mill.move_pipette_to_position(
         flush_solution.coordinates["x"],

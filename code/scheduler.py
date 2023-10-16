@@ -328,14 +328,14 @@ class Scheduler:
         Updates the status of the experiment in the experiment instructions file.
         :param experiment: The experiment that was just run.
         """
-        file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
+        file_path = (pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename).with_suffix(".json")
         if not pathlib.Path.exists(file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
 
         # Update the status of the experiment
         with open(file_path, "r", encoding="UTF-8") as file:
-            data = json.load(file)
+            data = json.dumps(file)
             parsed_data = experiment_class.parse_experiment(data)
             parsed_data.status = str(experiment.status.value)
             parsed_data.status_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -343,7 +343,7 @@ class Scheduler:
         # Save the updated file
         serialized_data = experiment_class.serialize_experiment(parsed_data)
         with open(file_path, "w", encoding="UTF-8") as file:
-            json.dump(serialized_data, file, indent=4)
+            file.write(serialized_data)
 
     def update_experiment_location(self, experiment: Experiment) -> None:
         """
@@ -352,7 +352,7 @@ class Scheduler:
         """
         file_path = pathlib.Path(
             pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
-        )
+        ).with_suffix(".json")
         if not pathlib.Path.exists(file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
@@ -381,7 +381,7 @@ class Scheduler:
         file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
         # Save the updated file
         experiment_json = experiment_class.serialize_experiment(experiment)
-        with open(file_path, "w", encoding="UTF-8") as file:
+        with open(file_path.with_suffix(".json"), "w", encoding="UTF-8") as file:
             file.write(experiment_json)
 
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:

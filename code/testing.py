@@ -1,15 +1,4 @@
-# from EdepDemo import  read_vials
-#
-# Run this file using the debug python file option to establish a connection to the mill and be able to send commands via the debug console.
-
-# You can then run the following commands in the debug console to move the pipette and electrode to the desired positions:
-# move_center_to_position(mill, x, y, z)
-# move_electrode_to_position(mill, x, y, z)
-# move_pipette_to_position(mill, x, y, z)
-
-# Because this script reads in the wellplate and vials you can also try sending a tool to one of these objects. For example:
-# move_pipette_to_position(mill, wellplate.get_coordinates('H1')['x'], wellplate.get_coordinates('H1')['y'],0)
-
+"""For building new protocols and testing new features."""
 #
 from pump_control import Pump
 from mill_control import Mill, Instruments
@@ -19,11 +8,10 @@ import gamry_control_WIP as echem
 from scale import Sartorius as Scale
 #from controller import read_vials, update_vials
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
-from config.pin import CURRENT_PIN
 from datetime import datetime
 import logging
-from typing import List, Tuple
-from e_panda import read_vials, update_vials, pipette, flush_pipette_tip, characterization, OCPFailure
+from typing import Tuple
+from e_panda import read_vials, update_vials
 import e_panda
 import sys
 import pytz as tz
