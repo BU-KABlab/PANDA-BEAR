@@ -382,7 +382,7 @@ class Scheduler:
         # Save the updated file
         experiment_json = experiment_class.serialize_experiment(experiment)
         with open(file_path, "w", encoding="UTF-8") as file:
-            json.dump(experiment_json, file, indent=4)
+            file.write(experiment_json)
 
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
