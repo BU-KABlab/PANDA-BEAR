@@ -335,6 +335,7 @@ class Scheduler:
 
         # Update the status of the experiment
         with open(file_path, "r", encoding="UTF-8") as file:
+            data = json.load(file)
             data = json.dumps(file)
             parsed_data = experiment_class.parse_experiment(data)
             parsed_data.status = str(experiment.status.value)
