@@ -1,6 +1,6 @@
 [
     {
-        "position": "S0",
+        "position": "s0",
         "contents": "custom",
         "viscocity_rank": 1,
         "density": 0.95,
@@ -12,7 +12,7 @@
         "contamination": 4
     },
     {
-        "position": "S1",
+        "position": "s1",
         "contents": "dmf",
         "viscocity_rank": 1,
         "density": 0.95,
@@ -24,7 +24,7 @@
         "contamination": 46
     },
     {
-        "position": "S2",
+        "position": "s2",
         "contents": "peg",
         "viscocity_rank": 1,
         "density": 1,
@@ -36,7 +36,7 @@
         "contamination": 18
     },
     {
-        "position": "S3",
+        "position": "s3",
         "contents": "acrylate",
         "viscocity_rank": 1,
         "density": 1,
@@ -48,7 +48,7 @@
         "contamination": 14
     },
     {
-        "position": "S4",
+        "position": "s4",
         "contents": "ferrocene",
         "viscocity_rank": 1,
         "density": 1.5,
@@ -60,7 +60,7 @@
         "contamination": 0
     },
     {
-        "position": "R0",
+        "position": "r0",
         "contents": "rinse0",
         "viscocity_rank": 1,
         "density": 1,
@@ -72,7 +72,7 @@
         "contamination": 0
     },
     {
-        "position": "R1",
+        "position": "r1",
         "contents": "rinse1",
         "viscocity_rank": 1,
         "density": 1,
@@ -84,7 +84,7 @@
         "contamination": 0
     },
     {
-        "position": "R2",
+        "position": "r2",
         "contents": "rinse2",
         "viscocity_rank": 1,
         "density": 1,
