@@ -81,6 +81,61 @@ class Sartorius(serial.Serial):
         """
         self.write(b'\033V\n')
 
+class MockSartorius:
+    """
+    Mock Sartorius Serial Interface for
+    EA, EB, GD, GE, TE scales.
+    """
+    def __init__(self, com_port: str = 'COM6'):
+        """
+        Initialise Sartorius device.
+
+            Example:
+            scale = Sartorius('COM1')
+        """
+        self.com_port = com_port
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+        
+    def value(self):
+        """
+        Return displayed scale value.
+        """
+        return 0.0
+
+    def display_unit(self):
+        """
+        Return unit.
+        """
+        return "g"
+
+    def tara_zero(self):
+        """
+        Tara and zeroing combined.
+        """
+        pass
+
+    def tara(self):
+        """
+        Tara.
+        """
+        pass
+
+    def zero(self):
+        """
+        Zero.
+        """
+        pass
+
+    def close(self):
+        """
+        Close connection.
+        """
+        pass
+
 if __name__ == '__main__':
     scale = Sartorius('COM6')
     print(scale.value())
