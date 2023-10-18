@@ -7,6 +7,7 @@ from pathlib import Path
 from pydantic import ConfigDict, FilePath, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
 from config.pin import CURRENT_PIN
+import json
 
 
 class ExperimentStatus(str, Enum):
@@ -23,6 +24,8 @@ class ExperimentStatus(str, Enum):
     COMPLETE = 'complete'
     ERROR = 'error'
     MIXING = 'mixing'
+
+
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class ExperimentResult:
@@ -41,6 +44,101 @@ class ExperimentResult:
     characterization_max_value: float = None
     characterization_min_value: float = None
 
+@dataclass(config=ConfigDict(validate_assignment=True))
+class ExperimentBase():
+    '''Define the common data used to run and define an experiment'''
+    id: int
+    experiment_name: str
+    priority: int
+    target_well: str
+    pin: int
+    project_id: int
+    results: Optional[ExperimentResult] = None
+    s0: float = 0 #Solution 0 volume
+    s1: float = 0 #Solution 1 volume
+    s2: float = 0 #Solution 2 volume
+    s3: float = 0 #Solution 3 volume
+    solution_names: dict = None #Solution configuration
+    status: ExperimentStatus = ExperimentStatus.NEW
+    status_date: datetime = field(default_factory=datetime.now)
+    filename: str = None #Optional[FilePath] = None
+
+    def read_in_solution_names(self, solution_file: str):
+        '''Read in the solution names from a json config file'''
+        dictionary = {'s0': 'solution name', 's1': 'solution name', 's2': 'solution name', 's3': 'solution name'}
+        with open(solution_file, 'r', encoding = 'utf-8') as f:
+            data = json.load(f)
+            dictionary[0]['name'] = data['s0']
+            dictionary[1]['name'] = data['s1']
+            dictionary[2]['name'] = data['s2']
+            dictionary[3]['name'] = data['s3']
+
+        self.solution_names = dictionary
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class PEG_ACR_Instructions(ExperimentBase):
+    '''Define the data that is used to run an experiment'''
+    ocp: int #Open Circuit Potential
+    ca: int #Cyclic Amperometry
+    cv: int #Cyclic Voltammetry
+    baseline: int #Baseline
+    dep_duration: int #Deposition duration
+    dep_pot: float #Deposition potential
+    char_sol_name: str #Characterization solution name
+    char_vol: int   #Characterization solution volume
+    flush_sol_name: str #Flush solution name
+    flush_vol: int #Flush solution volume
+    ca_sample_period: float = 0.01 #Deposition sample period
+    cv_sample_period: float = 0.01 #Characterization sample period
+    cv_scan_rate: float = 0.05 #Scan rate
+    pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
+    rinse_count: int = 3 #Default rinse count
+    rinse_vol: int = 150 #Default rinse volume
+    mix: int = 1 #Binary mix or dont mix
+    mix_count: int = 3 #Number of times to mix
+    mix_vol: int = 200 #Volume to mix
+    mix_rate: float = 0.62 #Rate for pump to mix at
+    
+    def is_replicate(self, other):
+        '''Check if two experiments have the same parameters but different ids'''
+        if isinstance(other, PEG_ACR_Instructions):
+            return (self.s0 == other.s0
+                    and self.s1 == other.s1
+                    and self.s2 == other.s2
+                    and self.s3 == other.s3
+            )
+        return False
+
+    def is_same_id(self, other):
+        '''Check if two experiments have the same id'''
+        if isinstance(other, PEG_ACR_Instructions):
+            return self.id == other.id
+        return False
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class PEG2P_Test_Instructions(ExperimentBase):
+    '''Define the data that is used to run an experiment'''
+    ocp: int #Open Circuit Potential
+    ca: int #Cyclic Amperometry
+    cv: int #Cyclic Voltammetry
+    baseline: int #Baseline
+    dep_duration: int #Deposition duration
+    dep_pot: float #Deposition potential
+    char_sol_name: str #Characterization solution name
+    char_vol: int   #Characterization solution volume
+    flush_sol_name: str #Flush solution name
+    flush_vol: int #Flush solution volume
+    ca_sample_period: float = 0.01 #Deposition sample period
+    cv_sample_period: float = 0.01 #Characterization sample period
+    cv_scan_rate: float = 0.05 #Scan rate
+    pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
+    rinse_count: int = 3 #Default rinse count
+    rinse_vol: int = 150 #Default rinse volume
+    mix: int = 1 #Binary mix or dont mix
+    mix_count: int = 3 #Number of times to mix
+    mix_vol: int = 200 #Volume to mix
+    mix_rate: float = 0.62 #Rate for pump to mix at
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class Experiment:
@@ -204,7 +302,6 @@ def test_serialize():
 def test_schema():
     '''Test that the class can generate a json schema'''
     # Useful if you have tools that validate your json externally
-    import json
     print(json.dumps(TypeAdapter(Experiment).json_schema(), indent=4))
 
 if __name__ == "__main__":
