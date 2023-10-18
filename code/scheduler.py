@@ -248,37 +248,55 @@ class Scheduler:
         :return: The next experiment.
         """
         file_path = pathlib.Path.cwd() / "code" / "system state" / "queue.csv"
+        ## Starting with the queue.csv file to get the experiment id and filename
+        ## The we want to get the experiment with the highest priority (lowest number)
         if not pathlib.Path.exists(file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
+
+        # Read the queue file
+        with open(file_path, "r", encoding="ascii") as file:
+            data = file.readlines()
+
+        # Find the highest priority in the queue
+        highest_priority = 100
+        for line in data:
+            priority = int(line.split(",")[1])
+            if priority < highest_priority:
+                highest_priority = priority
+
+        # Get all experiments with the highest priority so that we can randomly select one of them
+        experiments = []
+        for line in data:
+            priority = int(line.split(",")[1])
+            if priority == highest_priority:
+                experiments.append(line.split(",")[2].strip()) # adds the filename to the list of experiments
+
+        if experiments == []:
+            logger.info("No experiments in queue")
+            return None, None
 
         file_path = pathlib.Path.cwd() / "code" / "experiment_queue"
         if not pathlib.Path.exists(file_path):
             logger.error("experiment_queue folder not found")
             raise FileNotFoundError("experiment queue folder")
 
-        # check if folder is not empty
-        if os.listdir(file_path):
-            # if there is a baseline test in the queue run that first
+        # Pick a random experiment from the list of experiments with the highest priority
+        random_experiment = random.choice(experiments)
+        file_path = file_path / random_experiment
+        if not pathlib.Path.exists(file_path):
+            logger.error("experiment file not found")
+            raise FileNotFoundError("experiment file")
 
-            # if there are any experiments are in queue pick one at random
-            file_list = os.listdir(file_path)
-            count = 0
-            while count < len(file_list):
-                random_file = random.choice(file_list)
-                count += 1
-                with open(file_path / random_file, "r", encoding="ascii") as file:
-                    data = json.load(file)
-                    if data["baseline"] == 0 and data["status"] in ["queued","new"]:
-                        data = (
-                            experiment_class.RootModel[Experiment]
-                            .model_validate_json(json.dumps(data))
-                            .root
-                        )
-                        return data, (file_path / random_file)
-
-        else:
-            return None, None
+        # Read the experiment file
+        with open(file_path, "r", encoding="ascii") as file:
+            data = json.load(file)
+            data = (
+                experiment_class.RootModel[Experiment]
+                .model_validate_json(json.dumps(data))
+                .root
+            )
+            return data, file_path
 
     def update_queue(self, experiment: Experiment) -> None:
         """
@@ -362,6 +380,12 @@ class Scheduler:
         experiment_json = experiment_class.serialize_experiment(experiment)
         with open(file_path.with_suffix(".json"), "w", encoding="UTF-8") as file:
             file.write(experiment_json)
+
+        # Add the experiment to the queue
+        queue_file_path = pathlib.Path.cwd() / "code" / "system state" / "queue.csv"
+        with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
+            line = f"{experiment.id},{experiment.priority},{experiment.filename}"
+            queue_file.write(line)
 
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
