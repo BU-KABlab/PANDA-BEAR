@@ -4,15 +4,18 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 import logging
 import time
 import nesp_lib
-from scale import Sartorius as Scale
+from scale import Sartorius as Scale, MockSartorius as MockScale
 from vials import Vial
+from log_tools import CustomLoggingFilter
 from mill_control import Mill, MockMill, Instruments
 from wellplate import Wells as Wellplate
 from typing import Optional
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+formatter = logging.Formatter(
+    "%(asctime)s:%(name)s:%(levelname)s:%(message)s"
+)
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -55,6 +58,15 @@ class Pump:
         self.pipette_volume_ml = 0.0  # mL
         self.mill = mill
         self.scale = scale
+
+    def apply_log_filter(self, experiment_id: int, target_well: str = None):
+        """Add custom value to log format"""
+        experiment_formatter = logging.Formatter(
+            "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
+            )
+        system_handler.setFormatter(experiment_formatter)
+        custom_filter = CustomLoggingFilter(experiment_id, target_well)
+        logger.addFilter(custom_filter)
 
     def set_up_pump(self):
         """
@@ -220,7 +232,7 @@ class Pump:
                 }
                 self.mill.set_feed_rate(500)
                 self.mill.move_center_to_position(
-                    current_coords["x"], current_coords["y"], current_coords["z"] + 3
+                    current_coords["x"], current_coords["y"], current_coords["z"] + 1.5
                 )
                 self.infuse(volume=mix_volume,rate= mix_rate)
                 self.mill.move_center_to_position(
@@ -236,6 +248,7 @@ class Pump:
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
                 self.withdraw(volume=mix_volume,rate= mix_rate)
+                self.mill.set_feed_rate(500)
                 self.mill.move_pipette_to_position(
                     mix_location["x"], mix_location["y"], mix_location["depth"] + 1.5
                 )
@@ -243,6 +256,7 @@ class Pump:
                 self.mill.move_pipette_to_position(
                     mix_location["x"], mix_location["y"], mix_location["depth"]
                 )
+                self.mill.set_feed_rate(2000)
             # move back to original position
             self.mill.move_pipette_to_position(mix_location["x"], mix_location["y"], 0)
 
@@ -267,49 +281,62 @@ class MockPump(Pump):
     """
 
     def __init__(self, mill: Mill, scale: Scale):
-        super().__init__(mill, scale)  # Call the constructor of the base class
+        self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+        self.syringe_capacity = 1.0  # mL
+        self.pipette_capacity_ml = 0.2  # mL
+        self.pipette_capacity_ul = 200  # uL
+        self.pipette_volume_ul = 0.0  # uL
+        self.pipette_volume_ml = 0.0  # mL
+        self.mill = mill
+        self.scale = scale
 
-    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
+    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
 
         # Check if the requested volume is greater than the pipette's capacity
-        volume_ml = volume / 1000
+        if volume > 0.000:
+            volume_ml = volume / 1000.0
 
-        # self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
-        self.pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
-        self.update_pipette_volume(volume)
-        logging.debug(
+            # self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
+            self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+            self.update_pipette_volume(volume)
+            logging.debug(
             "Mock Pump has withdrawn: %f ml    Pipette vol: %f",
             volume_ml,
             self.pipette_volume_ul,
-        )
-
+            )
+            if solution is not None:
+                solution.update_volume(-volume)
+                return solution
         return 0
 
-    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> int:
+    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
         # Simulate infuse behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
 
         # convert the volume argument from ul to ml
-        volume_ml = volume / 1000
+        volume_ml = volume / 1000.0
 
-        if volume > 0.0:
+        if volume > 0.000:
             # self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
-            self.pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+            self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume)
             logging.debug(
                 "Mock Pump has infused: %f ml  Pipette volume: %f",
                 volume_ml,
                 self.pipette_volume_ul,
             )
+            if solution is not None:
+                solution.update_volume(-volume)
+                return solution
         else:
             pass
         return 0
 
     def update_pipette_volume(self, volume_ul):
         """Set the volume of the pipette in ul"""
-        if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
+        if self.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
             self.pipette_volume_ul -= volume_ul
             self.pipette_volume_ml -= volume_ul / 1000
         else:
@@ -362,7 +389,7 @@ def test_mixing():
 def mock_pump_testing_routine():
     """Test the pump"""
     with MockMill() as mill:
-        with Scale() as scale:
+        with MockScale() as scale:
             mill.homing_sequence()
             mock_pump = MockPump(mill=mill, scale=scale)
             mock_pump.withdraw(100)
