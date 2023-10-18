@@ -105,7 +105,7 @@ class Vial:
         """
         Updates the volume of the vial
         """
-        logging.info("Updating %s volume...", self.name)
+        logging.info("%s: Updating volume...", self.name)
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         if self.volume + added_volume < 0:
@@ -120,7 +120,7 @@ class Vial:
         )
         if self.depth < self.bottom:
             self.depth = self.bottom
-        logging.debug("New volume: %s | New depth: %s", self.volume, self.depth)
+        logging.debug("%s: New volume: %s | New depth: %s",self.name, self.volume, self.depth)
         self.contamination += 1
         return 0
 
