@@ -39,7 +39,7 @@ class Wells:
         self.radius = 4.0
         self.well_offset = 9  # mm from center to center
         self.well_capacity = 300  # ul
-        self.echem_height = -73 #-68
+        self.echem_height = -73 # for every well
 
         a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
         volume = 0.00
@@ -81,7 +81,7 @@ class Wells:
                         }
                     contents = []
 
-                    depth = self.z_bottom
+                    depth = self.z_bottom # the depth is set here for each well instead of the wellpate as a whole
 
                 self.wells[well_id] = {
                     "coordinates": coordinates,
@@ -132,14 +132,7 @@ class Wells:
                 color.append("red")
             else:
                 color.append("black")
-        plt.scatter(x_coordinates, y_coordinates, c=color, s=50, alpha=0.5)
-        plt.xlabel("X")
-        plt.ylabel("Y")
-        plt.title("Well Coordinates")
-        plt.grid(True,"both")
-        plt.xlim(-420, 0)
-        plt.ylim(-310, 0)
-        plt.show()
+        return x_coordinates, y_coordinates, color
 
     def get_coordinates(self, well_id) -> dict:
         """
@@ -147,13 +140,13 @@ class Wells:
         Args:
             well_id (str): The well ID
         Returns:
-            dict: The coordinates of the well in the form {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
+            dict: The coordinates of the well in the form 
+            {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
         """
         coordinates_dict = self.wells[well_id]["coordinates"]
         coordinates_dict["depth"] = self.wells[well_id]["depth"]
         coordinates_dict["echem_height"] = self.echem_height
         return coordinates_dict
-        
 
     def contents(self, well_id):
         """Return the contents of a specific well"""
@@ -166,7 +159,7 @@ class Wells:
     def depth(self, well_id):
         """Return the depth of a specific well"""
         return self.wells[well_id]["depth"]
-    
+
     def density(self, well_id):
         """Return the density of a specific well"""
         return self.wells[well_id]["density"]
@@ -235,7 +228,6 @@ class OverFillException(Exception):
     def __str__(self) -> str:
         return f"OverFillException: {self.name} has {self.volume} + {self.added_volume} > {self.capacity}"
 
-
 class OverDraftException(Exception):
     """Raised when a vessel if over drawn"""
 
@@ -250,12 +242,69 @@ class OverDraftException(Exception):
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
 
 
-def test_well_build():
+def test_stage_display():
     """Test the well plate"""
     wellplate = Wells(
         a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
     )
-    wellplate.visualize_well_coordinates()
+    ## Well coordinate
+    x_coordinates, y_coordinates, color = wellplate.visualize_well_coordinates()
 
+
+    ## Vial coordinates
+    vial_x = []
+    vial_y = []
+    vial_color = []
+
+    ## Vials
+    stock_vial_path = "code\\system state\\stock_status.json"
+    waste_vial_path = "code\\system state\\waste_status.json"
+    with open(stock_vial_path, 'r', encoding='utf-8') as stock:
+        data = json.load(stock)
+        for vial in data:
+            vial_x.append(vial["x"])
+            vial_y.append(vial["y"])
+            volume = vial["volume"]
+            capacity = vial["capacity"]
+            if volume/capacity > 0.5:
+                vial_color.append("green")
+            elif volume/capacity > 0.25:
+                vial_color.append("yellow")
+            else:
+                vial_color.append("red")
+
+    with open(waste_vial_path, 'r', encoding='utf-8') as stock:
+        data = json.load(stock)
+        for vial in data:
+            vial_x.append(vial["x"])
+            vial_y.append(vial["y"])
+            volume = vial["volume"]
+            capacity = vial["capacity"]
+            if volume/capacity > 0.75:
+                vial_color.append("red")
+            elif volume/capacity > 0.50:
+                vial_color.append("yellow")
+            else:
+                vial_color.append("green")
+
+    rinse_vial = {"x": -411, "y": -30}
+    vial_x.append(rinse_vial["x"])
+    vial_y.append(rinse_vial["y"])
+    vial_color.append("blue")
+    ## combine the well and vial coordinates
+    #x_coordinates.extend(stock_vial_x)
+    #y_coordinates.extend(stock_vial_y)
+    #color.extend(vial_color)
+
+    # Plot the well plate
+    plt.scatter(x_coordinates, y_coordinates, c=color, s=50, alpha=0.5)
+    plt.scatter(vial_x, vial_y, c=vial_color, s=100, alpha=1)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Status of Stage Items")
+    plt.grid(True,"both")
+    plt.xlim(-420, 0)
+    plt.ylim(-310, 0)
+    plt.show()
 if __name__ == "__main__":
-    test_well_build()
+    test_stage_display()
