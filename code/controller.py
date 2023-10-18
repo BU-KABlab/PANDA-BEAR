@@ -19,7 +19,7 @@ from pathlib import Path
 from print_panda import printpanda
 from mill_control import MockMill as Mill
 from pump_control import Pump
-import gamry_control as echem
+import gamry_control_WIP as echem
 
 # import obs_controls as obs
 import slack_functions as slack
@@ -33,7 +33,7 @@ from scale import Sartorius as Scale
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -50,10 +50,6 @@ def main():
     """Main function"""
     logger.info(printpanda())
     slack.send_slack_message("alert", "ePANDA is starting up")
-    mill_connected = False
-    pstat_connected = False
-    pump_connected = False
-    scale_connected = False
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
         ## Check for required files
@@ -65,10 +61,6 @@ def main():
         mill = toolkit.mill
         scale = toolkit.scale
         pump = toolkit.pump
-        mill_connected = True
-        pstat_connected = False #echem.pstatconnect()
-        pump_connected = True
-        scale_connected = True
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
 
@@ -134,7 +126,7 @@ def main():
 
             ## Update the system state with new vial and wellplate information
             scheduler.change_well_status(
-                updated_experiment.target_well, updated_experiment.status
+                updated_experiment.target_well, updated_experiment.status, updated_experiment.status_date, updated_experiment.id
             )  # this function should probably be in the wellplate module
             update_vials(stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
             update_vials(waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
@@ -156,24 +148,7 @@ def main():
 
     finally:
         # close out of serial connections
-        logger.info("Disconnecting from instruments:")
-        if scale_connected:
-            scale.close()
-            logger.info("Scale closed")
-            scale_connected = False
-        if pump_connected:
-            # pump.close()
-            logger.info("Pump closed")
-            pump_connected = False
-        if pstat_connected:
-            echem.disconnectpstat()
-            logger.info("Pstat closed")
-            pstat_connected = False
-        if mill_connected:
-            mill.home()
-            mill.disconnect()
-            logger.info("Mill closed")
-            mill_connected = False
+        disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
 
 
@@ -318,6 +293,17 @@ def connect_to_instruments():
     instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
     return instruments
 
+def disconnect_from_instruments(instruments: Toolkit):
+    """Disconnect from the instruments"""
+    logger.info("Disconnecting from instruments:")
+    instruments.mill.disconnect()
+    instruments.scale.disconnect()
+    instruments.pump.disconnect()
+    if echem.OPEN_CONNECTION:
+        echem.disconnectpstat()
+
+    logger.info("Disconnected from instruments")
+
 def read_vials(filename) -> list[Vial]:
     """
     Read in the virtual vials from the json file
@@ -363,5 +349,30 @@ def update_vials(vial_objects: list[Vial], filename):
         json.dump(vial_parameters, file, indent=4)
 
     return 0
+
+def reset_well_statuses():
+    """Loop through the well statuses and set them all to new"""
+    well_status_file = Path.cwd() / 'system state' / "well_status.json"
+    # input("This will reset all well statuses to new. Press enter to continue.")
+
+    # Confirm that the user wants this
+    choice = input(
+        "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
+    )
+    if choice == "n":
+        print("Exiting program.")
+        return 0
+    with open(well_status_file, "r", encoding="UTF-8") as file:
+        well_status = json.load(file)
+    for catergory in well_status:
+        for well in well_status[catergory]:
+            well["status"] = "new"
+    with open(well_status_file, "w", encoding="UTF-8") as file:
+        json.dump(well_status, file, indent=4)
+
+    print("Well statuses reset to new.")
+    return 0
+
+
 if __name__ == "__main__":
     main()
