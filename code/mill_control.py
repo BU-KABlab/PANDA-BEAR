@@ -92,6 +92,8 @@ class Mill:
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit the context manager"""
+        logger.info("Exiting the mill context manager")
+        logger.debug("Disconnecting from the mill")
         self.home()
         self.disconnect()
 
