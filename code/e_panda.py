@@ -812,7 +812,7 @@ def run_experiment(
             logger.info("Mixing well: %s", instructions.target_well)
             instructions.status = ExperimentStatus.MIXING
             pump.mix(
-                mix_location=wellplate.get_coordinates(instructions.target_well),
+                mix_location=wellplate.get_coordinates(instructions.target_well), # fetch x, y, z, depth, and echem height coordinates of well
                 mix_repetitions=3,
                 mix_volume=instructions.mix_vol,
                 mix_rate=instructions.mix_rate,
