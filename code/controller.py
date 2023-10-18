@@ -6,16 +6,24 @@ The controller is responsible for the following:
     - Recieve data from the experiment, and store it in the database
     - Update system state (vials, wells, etc.)
     - Running the analyzer
+
+Additionally controller should be able to:
+    - Reset the well statuses
+    - Update the vial statuses
 """
 # pylint: disable=line-too-long
 
 # import standard libraries
+from hmac import new
 import json
 import logging
 import time
 
 # import third-party libraries
 from pathlib import Path
+from wsgiref.validate import InputWrapper
+
+from anyio import open_file
 from print_panda import printpanda
 from mill_control import MockMill as Mill
 from pump_control import Pump
@@ -67,11 +75,11 @@ def main():
         ## Initialize scheduler
         scheduler = Scheduler()
 
-        ## Establish state of system
-        stock_vials, waste_vials, wellplate = establish_system_state()
-
         ## Begin outer loop
         while True:
+            ## Establish state of system - we do this each time because each experiment changes the system state
+            stock_vials, waste_vials, wellplate = establish_system_state()
+
             ## Ask the scheduler for the next experiment
             new_experiment, new_experiment_path = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
@@ -128,8 +136,8 @@ def main():
             scheduler.change_well_status(
                 updated_experiment.target_well, updated_experiment.status, updated_experiment.status_date, updated_experiment.id
             )  # this function should probably be in the wellplate module
-            update_vials(stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
-            update_vials(waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
+            update_vial_state_file(stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
+            update_vial_state_file(waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
 
             ## Update location of experiment instructions and save results
             scheduler.update_experiment_status(updated_experiment)
@@ -257,29 +265,30 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
         )
         slack.send_slack_message("alert", "The program is continuing")
 
-    # read the wellplate json and log the status of each well in a grid
-    # number_of_clear_wells = 0
-    # with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
-    #     wellplate_status = json.load(file)
-    # for row in wellplate_status:
-    #     for well in row:
-    #         if well["status"] == "clear":
-    #             number_of_clear_wells += 1
-    #         logger.debug(
-    #             "Well %s has status %s", well["name"], well["status"].value
-    #         )
+    ## read the wellplate json and log the status of each well in a grid
+    number_of_clear_wells = 0
+    with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
+        wellplate_status = json.load(file)
+    for row in wellplate_status:
+        for well in row:
+            if well["status"] in ["clear", "new"]:
+                number_of_clear_wells += 1
+            logger.debug(
+                "Well %s has status %s", well["name"], well["status"]
+            )
 
-    # logger.info("There are %d clear wells", number_of_clear_wells)
-    # if number_of_clear_wells == 0:
-    #     slack.send_slack_message("alert", "There are no clear wells on the wellplate")
-    #     slack.send_slack_message(
-    #         "alert",
-    #         "Please replace the wellplate and confirm in the terminal that the program should continue",
-    #     )
-    #     input(
-    #         "Confirm that the program should continue by pressing enter or ctrl+c to exit"
-    #     )
-    #     slack.send_slack_message("alert", "The program is continuing")
+    logger.info("There are %d clear wells", number_of_clear_wells)
+    if number_of_clear_wells == 0:
+        slack.send_slack_message("alert", "There are no clear wells on the wellplate")
+        slack.send_slack_message(
+            "alert",
+            "Please replace the wellplate and confirm in the terminal that the program should continue",
+        )
+        input(
+            "Confirm that the program should continue by pressing enter or ctrl+c to exit"
+        )
+        reset_wellplate()
+        slack.send_slack_message("alert", "Wellplate has been reset. Continuing...")
 
     return stock_vials, waste_vials, wellplate
 
@@ -330,7 +339,7 @@ def read_vials(filename) -> list[Vial]:
         )
     return list_of_solutions
 
-def update_vials(vial_objects: list[Vial], filename):
+def update_vial_state_file(vial_objects: list[Vial], filename):
     """
     Update the vials in the json file
     """
@@ -350,7 +359,56 @@ def update_vials(vial_objects: list[Vial], filename):
 
     return 0
 
-def reset_well_statuses():
+def input_new_vial_values(vialgroup: str):
+    """For user inputting the new vial values for the state file"""
+    ## Fetch the current state file
+    if vialgroup == "stock":
+        filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
+    elif vialgroup == "waste":
+        filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+
+    with open(filename, "r", encoding="UTF-8") as file:
+        vial_parameters = json.load(file)
+
+    ## Loop through each vial and ask for the new values except for position
+    for vial in vial_parameters:
+        print(f"Vial {vial['position']}")
+        vial["name"] = input("Enter the name of the vial: ").lower()
+        vial["contents"] = input("Enter the contents of the vial: ").lower()
+        vial["volume"] = int(input("Enter the volume of the vial: "))
+        vial["capacity"] = int(input("Enter the capacity of the vial: "))
+        vial["contamination"] = input("Enter the contamination of the vial: ").lower()
+
+    ## Write the new values to the state file
+    with open(filename, "w", encoding="UTF-8") as file:
+        json.dump(vial_parameters, file, indent=4)
+
+def reset_vials(vialgroup: str):
+    """
+    Resets the volume and contamination of the current vials to their capacity and 0 respectively
+    
+    Valid vial groups are 'stock' and 'waste'
+    """
+    ## Fetch the current state file
+    if vialgroup == "stock":
+        filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
+    elif vialgroup == "waste":
+        filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+
+    with open(filename, "r", encoding="UTF-8") as file:
+        vial_parameters = json.load(file)
+
+    ## Loop through each vial and ask for the new values except for position
+    for vial in vial_parameters:
+        vial["volume"] = vial["capacity"]
+        vial["contamination"] = "0"
+
+    ## Write the new values to the state file
+    with open(filename, "w", encoding="UTF-8") as file:
+        json.dump(vial_parameters, file, indent=4)
+
+
+def reset_wellplate():
     """Loop through the well statuses and set them all to new"""
     well_status_file = Path.cwd() / 'system state' / "well_status.json"
     # input("This will reset all well statuses to new. Press enter to continue.")
@@ -360,15 +418,35 @@ def reset_well_statuses():
         "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
     )
     if choice == "n":
-        print("Exiting program.")
         return 0
+
+    ## Open the current status file for the plate id , type number, and wells
     with open(well_status_file, "r", encoding="UTF-8") as file:
-        well_status = json.load(file)
-    for catergory in well_status:
-        for well in well_status[catergory]:
-            well["status"] = "new"
+        current_wellplate = json.load(file)
+    current_plate_id = current_wellplate["plate_id"]
+    current_type_number = current_wellplate["type_number"]
+
+    ## Save each well to the well_history.csv file in the data folder
+    ## plate id, type number, well id, experiment id, project id, status, status date, contents
+    with open_file("data\\well_history.csv", "a", encoding="UTF-8") as file:
+        for well in current_wellplate['wells']:
+            file.write(f"{current_plate_id},{current_type_number},{well['id']},{well['project_id']},{well['status']},{well['status_date']}\n")
+
+    print("Well statuses saved to well_history.csv")
+
+    new_wellplate_type_number = int(input(f"Enter the new wellplate type number (current type number: {current_type_number}): "))
+    ## Go through a reset all fields and apply new plate id
+    new_wellplate = current_wellplate
+    new_wellplate["plate_id"] = current_plate_id + 1
+    new_wellplate["type_number"] = new_wellplate_type_number
+    for well in new_wellplate['wells']:
+        well["status"] = "new"
+        well["status_date"] = ""
+        well["experiment_id"] = ""
+        well["project_id"] = ""
+
     with open(well_status_file, "w", encoding="UTF-8") as file:
-        json.dump(well_status, file, indent=4)
+        json.dump(new_wellplate, file, indent=4)
 
     print("Well statuses reset to new.")
     return 0

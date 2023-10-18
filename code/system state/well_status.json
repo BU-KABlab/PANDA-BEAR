@@ -1,5 +1,7 @@
 {
-    "Wells": [
+    "plate_id": 4,
+    "type_number": 1,
+    "wells": [
         {
             "well_id": "A1",
             "status": "complete",
