@@ -8,7 +8,7 @@ from vials import Vial
 import gamry_control_WIP as echem
 from scale import Sartorius as Scale
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
-from controller import read_vials, update_vials
+from controller import read_vials, update_vial_state_file
 from e_panda import mixing_test_protocol
 from mixing_test_experiments import experiments as mix_test_experiments
 from scheduler import Scheduler
@@ -246,8 +246,8 @@ def mixing_test(experiments: list[Experiment]):
                 )
 
                 ## Update the system state
-                update_vials(stock_vials, "code\system state\stock_status.json")
-                update_vials(waste_vials, "code\system state\waste_status.json")
+                update_vial_state_file(stock_vials, "code\system state\stock_status.json")
+                update_vial_state_file(waste_vials, "code\system state\waste_status.json")
                 scheduler.change_well_status(
                     experiment.target_well, experiment.status, experiment.status_date, experiment.id
                     )
