@@ -40,6 +40,8 @@ class Wells:
         self.well_offset = 9  # mm from center to center
         self.well_capacity = 300  # ul
         self.echem_height = -73 # for every well
+        self.type_number = 0 # The type of wellplate
+        self.plate_id = 0 # The id of the wellplate
 
         a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
         volume = 0.00
@@ -80,8 +82,8 @@ class Wells:
                             "z": self.z_top,
                         }
                     contents = []
-
-                    depth = self.z_bottom # the depth is set here for each well instead of the wellpate as a whole
+                    # the depth is set here for each well instead of the wellpate as a whole
+                    depth = self.z_bottom
 
                 self.wells[well_id] = {
                     "coordinates": coordinates,
@@ -93,7 +95,7 @@ class Wells:
                     "density": 1.0
                 }
 
-        ## update the well status from file
+        ## update the well info from file
         self.update_well_status_from_json_file()
 
     def update_well_status_from_json_file(self):
@@ -104,6 +106,8 @@ class Wells:
                 well_id = well["well_id"]
                 status = well["status"]
                 self.update_well_status(well_id, status)
+                self.plate_id = data["plate_id"]
+                self.type_number = data["type_number"]
 
 
     def update_well_status_from_csv_file(self):
@@ -112,27 +116,6 @@ class Wells:
             for line in f:
                 well_id, status = line.strip().split(",")
                 self.update_well_status(well_id, status)
-
-    def visualize_well_coordinates(self):
-        """Plot the well plate on a coordinate plane"""
-        x_coordinates = []
-        y_coordinates = []
-        color = []
-        for well_id, well_data in self.wells.items():
-            x_coordinates.append(well_data["coordinates"]["x"])
-            y_coordinates.append(well_data["coordinates"]["y"])
-            ## designate the color of the well based on its status
-            if well_data["status"] in ["empty","new"]:
-                color.append("black")
-            elif well_data["status"] == "in use":
-                color.append("yellow")
-            elif well_data["status"] == "complete":
-                color.append("green")
-            elif well_data["status"] == "error":
-                color.append("red")
-            else:
-                color.append("black")
-        return x_coordinates, y_coordinates, color
 
     def get_coordinates(self, well_id) -> dict:
         """
@@ -173,8 +156,6 @@ class Wells:
                 well_id, self.volume, added_volume, self.well_capacity
             )
 
-        # elif self.wells[well_id]["volume"] + added_volume < 0:
-        #    raise OverDraftException(well_id, self.volume, added_volume, self.well_capacity)
         else:
             info_message = f"{added_volume} can fit in {well_id}"
             logging.info(info_message)
@@ -214,7 +195,52 @@ class Wells:
         """Check the status of all wells"""
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s",well_id,well_data["status"])
-           
+
+
+    def visualize_well_coordinates(self):
+        """Plot the well plate on a coordinate plane"""
+        x_coordinates = []
+        y_coordinates = []
+        color = []
+        marker = [] # a sqaure for these square wells
+        for well_id, well_data in self.wells.items():
+            x_coordinates.append(well_data["coordinates"]["x"])
+            y_coordinates.append(well_data["coordinates"]["y"])
+            ## designate the color of the well based on its status
+            if well_data["status"] in ["empty","new"]:
+                color.append("black")
+            elif well_data["status"] == "in use":
+                color.append("yellow")
+            elif well_data["status"] == "complete":
+                color.append("green")
+            elif well_data["status"] == "error":
+                color.append("red")
+            else:
+                color.append("black")
+            marker.append("s")
+        return x_coordinates, y_coordinates, color, marker
+
+
+class CircularWellPlate(Wells):
+    """
+    A Wells class with different radius and well offset. 
+    This also changes capacity, and echem height.
+    """
+
+    def __init__(
+            self,
+            a1_x:float=0,
+            a1_y:float=0,
+            orientation:int=0,
+            columns:str = 'ABCDEFGH',
+            rows:int = 13
+            ):
+        super().__init__(a1_x, a1_y, orientation, columns, rows)
+        self.radius = 3.5
+        self.well_offset = 7.5  # mm from center to center
+        self.well_capacity = 200  # ul
+        self.echem_height = -73 # for every well
+
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
 
@@ -248,14 +274,14 @@ def test_stage_display():
         a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
     )
     ## Well coordinate
-    x_coordinates, y_coordinates, color = wellplate.visualize_well_coordinates()
+    x_coordinates, y_coordinates, color, marker = wellplate.visualize_well_coordinates()
 
 
     ## Vial coordinates
     vial_x = []
     vial_y = []
     vial_color = []
-
+    vial_marker = []  # a circle for these circular vials
     ## Vials
     stock_vial_path = "code\\system state\\stock_status.json"
     waste_vial_path = "code\\system state\\waste_status.json"
@@ -272,6 +298,7 @@ def test_stage_display():
                 vial_color.append("yellow")
             else:
                 vial_color.append("red")
+            vial_marker.append("o")
 
     with open(waste_vial_path, 'r', encoding='utf-8') as stock:
         data = json.load(stock)
@@ -286,6 +313,7 @@ def test_stage_display():
                 vial_color.append("yellow")
             else:
                 vial_color.append("green")
+            vial_marker.append("o")
 
     rinse_vial = {"x": -411, "y": -30}
     vial_x.append(rinse_vial["x"])
@@ -297,8 +325,8 @@ def test_stage_display():
     #color.extend(vial_color)
 
     # Plot the well plate
-    plt.scatter(x_coordinates, y_coordinates, c=color, s=50, alpha=0.5)
-    plt.scatter(vial_x, vial_y, c=vial_color, s=100, alpha=1)
+    plt.scatter(x_coordinates, y_coordinates,marker= 's', c=color, s=50, alpha=0.5)
+    plt.scatter(vial_x, vial_y, marker= 'o', c=vial_color, s=100, alpha=1)
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("Status of Stage Items")
