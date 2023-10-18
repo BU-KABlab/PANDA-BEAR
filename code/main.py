@@ -14,8 +14,8 @@ if __name__ == "__main__":
             print("01. Reset the wellplate")
             print("02. Input new stock vials")
             print("03. Reset the waste vials")
-            print("04. Change the position of the stock vials")
-            print("05. Change the position of the waste vials")
+            print("04. Input new stock vials")
+            print("05. Input new waste vials")
             print("06. Change the position of the wellplate")
             print("07. Change the position of the pipette")
             print("08. Change the position of the electrode")
@@ -29,15 +29,15 @@ if __name__ == "__main__":
             elif user_choice == '1':
                 controller.reset_wellplate()
             elif user_choice == '2':
-                controller.input_stock_vials()
+                controller.reset_vials('stock')
             elif user_choice == '3':
-                controller.reset_waste_vials()
+                controller.reset_vials('waste')
             elif user_choice == '4':
-                controller.change_stock_vials()
+                controller.input_new_vial_values('stock')
             elif user_choice == '5':
-                controller.change_waste_vials()
+                controller.input_new_vial_values('waste')
             elif user_choice == '6':
-                controller.change_wellplate()
+                controller.change_wellplate_location()
             elif user_choice == '7':
                 controller.change_pipette()
             elif user_choice == '8':
