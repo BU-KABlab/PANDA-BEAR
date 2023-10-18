@@ -13,7 +13,7 @@ import os
 import pathlib
 import random
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import Tuple
 import experiment_class
 from experiment_class import (
     Experiment,
@@ -33,7 +33,7 @@ PATH_TO_ERRORED_EXPERIMENTS = "code/experiments_error"
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -94,7 +94,7 @@ class Scheduler:
                     return well["well_id"]
             return None
 
-    def change_well_status(self, well: str, status: str) -> None:
+    def change_well_status(self, well: str, status: str, status_date: str = datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), experiment_id: int = None) -> None:
         """
         Changes the status of a well in well_status.json.
         :param well: The well to change.
@@ -110,7 +110,8 @@ class Scheduler:
             for wells in data["Wells"]:
                 if wells["well_id"] == well:
                     wells["status"] = status
-                    wells["status_date"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+                    wells["status_date"] = status_date
+                    wells["experiment_id"] = experiment_id
                     break
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
@@ -240,30 +241,6 @@ class Scheduler:
                     )
 
         return count, complete
-
-    # def insert_control_tests(self):
-    #     """
-    #     Creates a baseline test experiment and saves it to the queue.
-    #     Args:
-    #         None
-    #     Returns:
-    #         None
-    #     """
-
-    #     ## Insert the baseline tests to the queue directory
-    #     target_well = self.choose_alternative_well(baseline=True)
-    #     filename = f"{datetime.now().strftime('%Y-%m-%d')}_baseline_{target_well}.json"
-    #     baseline = make_baseline_value()
-    #     baseline.target_well = target_well
-    #     baseline.filename = filename
-    #     ## save the experiment as a separate file in the experiment_queue subfolder
-    #     subfolder_path = pathlib.Path.cwd() / "code" / "experiment_queue"
-    #     subfolder_path.mkdir(parents=True, exist_ok=True)
-    #     file_to_save = subfolder_path / filename
-    #     with open(file_to_save, "w", encoding="UTF-8") as outfile:
-    #         json.dump(baseline, outfile, indent=4)
-    #     ## change the status of the well
-    #     self.change_well_status(target_well, "queued")
 
     def read_next_experiment_from_queue(self) -> Tuple[Experiment, pathlib.Path]:
         """
@@ -402,29 +379,6 @@ class Scheduler:
             pathlib.Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
         ) as results_file:
             results_file.write(results_json)
-
-    def reset_well_statuses(self):
-        """Loop through the well statuses and set them all to new"""
-        well_status_file = pathlib.Path(__file__).parents[0] / "well_status copy.json"
-        # input("This will reset all well statuses to new. Press enter to continue.")
-
-        # Confirm that the user wants this
-        choice = input(
-            "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
-        )
-        if choice == "n":
-            print("Exiting program.")
-            return 0
-        with open(well_status_file, "r", encoding="UTF-8") as file:
-            well_status = json.load(file)
-        for catergory in well_status:
-            for well in well_status[catergory]:
-                well["status"] = "new"
-        with open(well_status_file, "w", encoding="UTF-8") as file:
-            json.dump(well_status, file, indent=4)
-
-        print("Well statuses reset to new.")
-        return 0
 
 
 ####################################################################################################
