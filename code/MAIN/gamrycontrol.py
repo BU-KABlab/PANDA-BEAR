@@ -278,22 +278,23 @@ def activecheck():
         client.PumpEvents(1)
         time.sleep(0.5)
 
-def check_vsig_range(filename):
+
+def check_vf_range(filename):
     try:
         ocp_data = pd.read_csv(filename, sep=" ", header=None, names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
-        vsig_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vsig")]
-        print("Vsig last row:", vsig_last_row_scientific)
-        vsig_last_row_decimal = float(vsig_last_row_scientific)
-        print("Vsig last row:", vsig_last_row_decimal)
+        vf_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vf")]
+        print("Vf last row:", vf_last_row_scientific)
+        vf_last_row_decimal = float(vf_last_row_scientific)
+        print("Vf last row:", vf_last_row_decimal)
 
-        if -1 < vsig_last_row_decimal and vsig_last_row_decimal < 1:
-            print("Vsig in valid range (-1 to 1). Proceeding to echem experiment")
+        if -1 < vf_last_row_decimal and vf_last_row_decimal < 1:
+            print("Vf in valid range (-1 to 1). Proceeding to echem experiment")
             return True
         else:
-            print("Vsig not in valid range. Aborting echem experiment")
+            print("Vf not in valid range. Aborting echem experiment")
             return False
     except Exception as e:
-        print("Error occurred while checking Vsig:", e)
+        print("Error occurred while checking Vf:", e)
         return False
 
 # CV Setup Parameters
@@ -347,7 +348,7 @@ if __name__ == "__main__":
                 #client.PumpEvents(1)
                 #time.sleep(0.5)
         ## echem CA - deposition
-        if check_vsig_range(complete_file_name.with_suffix('.txt')):
+        if check_vf_range(complete_file_name.with_suffix('.txt')):
             complete_file_name = setfilename('F1', 'CV')
             cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
             #chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
