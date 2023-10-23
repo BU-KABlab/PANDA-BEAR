@@ -101,18 +101,20 @@ class Vial:
             json.dump(solutions, file, indent=4)
         return 0
 
-    def update_volume(self, added_volume: float):
+    def update_volume(self, added_volume_ul: float):
         """
-        Updates the volume of the vial
+        Updates the volume of the vial.
+        Args:
+            added_volume (float): volume (ul) to be added to the vial
         """
         logging.info("Updating %s volume...", self.name)
-        if self.volume + added_volume > self.capacity:
-            raise OverFillException(self.name, self.volume, added_volume, self.capacity)
-        if self.volume + added_volume < 0:
+        if self.volume + added_volume_ul > self.capacity:
+            raise OverFillException(self.name, self.volume, added_volume_ul, self.capacity)
+        if self.volume + added_volume_ul < 0:
             raise OverDraftException(
-                self.name, self.volume, added_volume, self.capacity
+                self.name, self.volume, added_volume_ul, self.capacity
             )
-        self.volume += added_volume
+        self.volume += round(added_volume_ul,3)
         #self.write_volume_to_disk()
         self.depth = (
             self.vial_height_calculator((self.radius * 2), self.volume)

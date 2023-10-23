@@ -1,12 +1,12 @@
 {
-    "id": 9990003,
+    "id": 9993001,
     "priority": 1,
     "pin": 2001001001,
     "target_well": "B6",
     "dmf": 0.0,
     "peg": 0.0,
     "acrylate": 0.0,
-    "ferrocene": 290.0,
+    "ferrocene": 0.0,
     "custom": 0.0,
     "ocp": 1,
     "ca": 0,
@@ -17,7 +17,7 @@
     "char_sol_name": "ferrocene",
     "char_vol": 0,
     "flush_sol_name": "dmf",
-    "flush_vol": 120,
+    "flush_vol": 0,
     "ca_sample_period": 0.01,
     "cv_sample_period": 0.01,
     "cv_scan_rate": 0.05,
@@ -29,7 +29,7 @@
     "mix_vol": 0,
     "mix_rate": 0.0,
     "status": "complete",
-    "status_date": "2023-10-16T11:43:18",
+    "status_date": "2023-10-17T16:34:55",
     "filename": "mixing_test_B6",
     "results": null
 }

@@ -7,7 +7,7 @@
         "x": -2,
         "y": -43,
         "name": "custom",
-        "volume": 4444.84,
+        "volume": 10999.840000000004,
         "capacity": 20000,
         "contamination": 0
     },
@@ -19,9 +19,9 @@
         "x": -2,
         "y": -76,
         "name": "dmf",
-        "volume": 15000.0,
+        "volume": 13000.0,
         "capacity": 20000,
-        "contamination": 8
+        "contamination": 6
     },
     {
         "position": "S2",
@@ -31,9 +31,9 @@
         "x": -2,
         "y": -109,
         "name": "peg",
-        "volume": 6010.884000000001,
+        "volume": 9839.880000000003,
         "capacity": 20000,
-        "contamination": 2
+        "contamination": 4
     },
     {
         "position": "S3",
@@ -43,9 +43,9 @@
         "x": -2,
         "y": -142,
         "name": "acrylate",
-        "volume": 6907.200000000001,
+        "volume": 10999.51999999999,
         "capacity": 20000,
-        "contamination": 2
+        "contamination": 0
     },
     {
         "position": "S4",
@@ -55,9 +55,9 @@
         "x": -2,
         "y": -175,
         "name": "ferrocene",
-        "volume": 8999.60000000001,
+        "volume": 14390.0,
         "capacity": 20000,
-        "contamination": 2
+        "contamination": 7
     },
     {
         "position": "R0",
@@ -67,9 +67,9 @@
         "x": -2,
         "y": -208,
         "name": "rinse0",
-        "volume": 5310.0,
+        "volume": 14920.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 2
     },
     {
         "position": "R1",
@@ -79,9 +79,9 @@
         "x": -2,
         "y": -241,
         "name": "rinse1",
-        "volume": 5310.0,
+        "volume": 14920.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 2
     },
     {
         "position": "R2",
@@ -91,8 +91,8 @@
         "x": -2,
         "y": -274,
         "name": "rinse2",
-        "volume": 5310.0,
+        "volume": 14920.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 2
     }
 ]

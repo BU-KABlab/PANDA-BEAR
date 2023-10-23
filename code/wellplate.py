@@ -34,12 +34,12 @@ class Wells:
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
-        self.z_bottom = -77  # -64
+        self.z_bottom = -76
         self.z_top = 0
         self.radius = 4.0
         self.well_offset = 9  # mm from center to center
         self.well_capacity = 300  # ul
-        self.echem_height = -73 #-68
+        self.echem_height = -73
 
         a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
         volume = 0.00
@@ -167,6 +167,7 @@ class Wells:
         """Return the depth of a specific well"""
         return self.wells[well_id]["depth"]
     
+        
     def density(self, well_id):
         """Return the density of a specific well"""
         return self.wells[well_id]["density"]
@@ -174,7 +175,7 @@ class Wells:
     def check_volume(self, well_id, added_volume: float):
         """Check if a volume can fit in a specific well"""
         info_message = f"Checking if {added_volume} can fit in {well_id} ..."
-        logging.info(info_message)
+        logger.info(info_message)
         if self.wells[well_id]["volume"] + added_volume >= self.well_capacity:
             raise OverFillException(
                 well_id, self.volume, added_volume, self.well_capacity
@@ -184,7 +185,7 @@ class Wells:
         #    raise OverDraftException(well_id, self.volume, added_volume, self.well_capacity)
         else:
             info_message = f"{added_volume} can fit in {well_id}"
-            logging.info(info_message)
+            logger.info(info_message)
             return True
 
     def update_volume(self, well_id, added_volume: float):
@@ -207,7 +208,7 @@ class Wells:
             if self.wells[well_id]["depth"] < self.z_bottom:
                 self.wells[well_id]["depth"] = self.z_bottom
             debug_message = f"New volume: {self.wells[well_id]['volume']} | New depth: {self.wells[well_id]['depth']}"
-            logging.debug(debug_message)
+            logger.debug(debug_message)
 
     def check_well_status(self, well_id):
         """Check the status of a specific well"""
