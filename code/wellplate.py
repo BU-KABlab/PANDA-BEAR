@@ -1,12 +1,13 @@
 '''
 Wellplate data class for the echem experiment. This class is used to store the data for the wellplate and the wells in it.
 '''
+# pylint: disable=line-too-long
+
 import logging
 import math
 import matplotlib.pyplot as plt
 import json
-
-
+from config.file_locations import *
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -108,7 +109,7 @@ class Wells:
                 self.update_well_status(well_id, status)
                 self.plate_id = data["plate_id"]
                 self.type_number = data["type_number"]
-
+                self.z_bottom = data["z_bottom"]
 
     def update_well_status_from_csv_file(self):
         """Update the well status from a file"""
@@ -203,7 +204,7 @@ class Wells:
         y_coordinates = []
         color = []
         marker = [] # a sqaure for these square wells
-        for well_id, well_data in self.wells.items():
+        for _, well_data in self.wells.items():
             x_coordinates.append(well_data["coordinates"]["x"])
             y_coordinates.append(well_data["coordinates"]["y"])
             ## designate the color of the well based on its status
@@ -220,6 +221,30 @@ class Wells:
             marker.append("s")
         return x_coordinates, y_coordinates, color, marker
 
+class GraceBioLabsWellPlate(Wells):
+    """
+    Well type for the Grace BioLabs 96 well plate
+    Type 1 is gold
+    Type 2 is ito
+    """
+
+    def __init__(
+            self,
+            a1_x:float=0,
+            a1_y:float=0,
+            orientation:int=0,
+            columns:str = 'ABCDEFGH',
+            rows:int = 13,
+            type_number:int = 0
+            ):
+        super().__init__(a1_x, a1_y, orientation, columns, rows)
+
+        self.type_number = type_number
+
+        ## Get the well plate parameters from the well_type.csv file in config
+        self.radius, self.well_offset, self.well_capacity, height = read_well_type_characteristics(self.type_number)
+        self.echem_height = -73 # for every well
+        self.z_top = self.z_bottom + height
 
 class CircularWellPlate(Wells):
     """
@@ -236,10 +261,9 @@ class CircularWellPlate(Wells):
             rows:int = 13
             ):
         super().__init__(a1_x, a1_y, orientation, columns, rows)
-        self.radius = 3.5
-        self.well_offset = 7.5  # mm from center to center
-        self.well_capacity = 200  # ul
+        self.radius, self.well_offset, self.well_capacity, height = read_well_type_characteristics(self.type_number)
         self.echem_height = -73 # for every well
+        self.z_top = self.z_bottom + height
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
@@ -266,6 +290,20 @@ class OverDraftException(Exception):
 
     def __str__(self) -> str:
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
+
+def read_well_type_characteristics(type_number: int) -> tuple[float, float, float, float]:
+    with open("code\\config\\well_type.csv", "r", encoding= "UTF-8") as f:
+        for line in f:
+            if line[0] == "#":
+                continue
+            line = line.strip().split(",")
+            if int(line[0]) == type_number:
+                radius = float(line[4])
+                well_offset = float(line[5])
+                well_capacity = float(line[9])
+                height= float(line[7])
+                break
+    return radius, well_offset, well_capacity, height
 
 
 def test_stage_display():
