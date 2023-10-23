@@ -18,7 +18,7 @@ Returns:
     Wellplate: The updated wellplate object.
     Vials: The updated vials object.
 """
-# pylint: disable=line-too-long, too-many-arguments
+# pylint: disable=line-too-long, too-many-arguments, too-many-lines
 
 # Standard library imports
 import logging
