@@ -7,12 +7,11 @@ import sys
 from pump_control import Pump
 from mill_control import Mill, Instruments
 from wellplate import Wells
-from vials import Vial
 import gamry_control_WIP as echem
 from scale import Sartorius as Scale
 from experiment_class import Experiment, ExperimentResult, ExperimentStatus
 from controller import read_vials, update_vial_state_file
-from e_panda import mixing_test_protocol
+from e_panda import mixing_test_protocol, peg2p_protocol
 from mixing_test_experiments import experiments as mix_test_experiments
 from peg2p_experiments import experiments as peg2p_experiments
 from scheduler import Scheduler
@@ -167,9 +166,13 @@ def peg2p_test(experiments: list[Experiment]):
 
     The following steps will be performed for each well:
         - deposition using the deposition parameters listed
+        - rinsing of the electrode
+        - clearing of the well
+        - rinsing of the well
         - characterizing (CV) the well
         - rinsing the electrode
-        - flushing the well
+        - clearing the well
+        - rinsing the well
 
     """
     stock_vials = read_vials(STOCK_STATUS_FILE)
@@ -215,230 +218,75 @@ def peg2p_test(experiments: list[Experiment]):
             if echem.OPEN_CONNECTION is True:
                 echem.disconnectpstat()
 
-
-def peg2p_protocol(
-    instructions: Experiment,
-    results: ExperimentResult,
-    mill: Mill,
-    pump: Pump,
-    scale: Scale,
-    stock_vials: list[Vial],
-    waste_vials: list[Vial],
-    wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
+def mixing_test(experiments: list[Experiment]):
     """
-    Run the standard experiment:
-    1. Deposit solutions into well
-        for each solution:
-            a. Withdraw air gap
-            b. Withdraw solution
-            c. Purge
-            d. Deposit into well
-            e. Purge
-            f. Blow out
-            g. Flush pipette tip
-    2. Flush pipette tip
-    3. Electrodeposit film with CA
-    4. Rinse the well
-    5. Deposit characterization solution into well
-    6. Characterize the film on the substrate
-    7. Return results, stock_vials, waste_vials, wellplate
-    8. Update the system state
-    9. Update location of experiment instructions and save results
+    A protocol to test the mixing of the solution in the wellplate.
+    Experiment name format: MixingTest_wellID_echemType
+
+    The contents and variable parameters of each well are as follows:
     
-    Args:
-        instructions (Experiment object): The experiment instructions
-        results (ExperimentResult object): The experiment results
-        mill (object): The mill object
-        pump (object): The pump object
-        scale (object): The scale object
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
-        wellplate (Wells object): The wellplate object
+    Well | Solution(s)              | Mixing repetitions
+    --------------------------------------------------------
+    C1   | Premixed Solution        | 0
+    C2   | Premix                   | 0
+    C3   | PEG, Acrylate, DmFc      | 1
+    C4   | PEG, Acrylate, DmFc      | 1
+    C5   | PEG, Acrylate, DmFc      | 3
+    C6   | PEG, Acrylate, DmFc      | 3
+    C7   | PEG, Acrylate, DmFc      | 6
+    C8   | PEG, Acrylate, DmFc      | 6
+    C9   | PEG, Acrylate, DmFc      | 9
+    C10  | PEG, Acrylate, DmFc      | 9
+    C11  | Premixed Solution        | 0
+    C12  | Premixed Solution        | 0
 
-    Returns:
-        instructions (Experiment object): The experiment instructions
-        results (ExperimentResult object): The experiment results
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
-        wellplate (Wells object): The wellplate object
+    For each well, the following steps are also performed:
+    - characterizing (CV) the well
+    - plotting the results
     """
-    # Add custom value to log format
-    custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
-    logger.addFilter(custom_filter)
-
-    try:
-        logger.info("Beginning experiment %d", instructions.id)
-        results.id = instructions.id
-        experiment_solutions = ["dmf", "peg"]
-        e_panda.apply_log_filter(instructions.id, instructions.target_well)
-        # Deposit all experiment solutions into well
-        for solution_name in experiment_solutions:
-            if (
-                getattr(instructions, solution_name) > 0
-                and solution_name[0:4] != "rinse"
-            ):  # if there is a solution to deposit
-                logger.info(
-                    "Pipetting %s ul of %s into %s...",
-                    getattr(instructions, solution_name),
-                    solution_name,
-                    instructions.target_well,
-                )
-                experiment_solutions, waste_vials, wellplate = e_panda.pipette(
-                    volume=getattr(instructions, solution_name),
-                    solutions=stock_vials,  # list of vial objects passed to ePANDA
-                    solution_name=solution_name,  # from the list above
-                    target_well=instructions.target_well,
-                    pumping_rate=instructions.pumping_rate,
-                    waste_vials=waste_vials,  # list of vial objects passed to ePANDA
-                    waste_solution_name="waste",
-                    wellplate=wellplate,
-                    pump=pump,
-                    mill=mill,
-                    scale=scale,
-                )
-
-                stock_vials, waste_vials = e_panda.flush_pipette_tip(
-                    pump,
-                    waste_vials,
-                    stock_vials,
-                    instructions.flush_sol_name,
+    stock_vials = read_vials("code\system state\stock_status.json")
+    waste_vials = read_vials("code\system state\waste_status.json")
+    wellplate = Wells(
+        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
+    )
+    scheduler = Scheduler()
+    with Mill() as mill:
+        mill.homing_sequence()
+        with Scale() as scale:
+            pump = Pump(mill, scale)
+            echem.pstatconnect()
+            for experiment in experiments:
+                ## save the experiment to the experiment queue
+                scheduler.add_experiment(experiment)
+                results = ExperimentResult()
+                experiment, results, stock_vials, waste_vials, wellplate = mixing_test_protocol(
+                    experiment,
+                    results,
                     mill,
-                    instructions.pumping_rate,
-                    instructions.flush_vol,
+                    pump,
+                    stock_vials,
+                    waste_vials,
+                    wellplate,
                 )
-        logger.info("Pipetted solutions into well: %s", instructions.target_well)
 
-        # Echem CA - deposition
-        if instructions.ca == 1:
-            instructions.status = ExperimentStatus.DEPOSITING
-            instructions, results = e_panda.deposition(instructions, results, mill, wellplate)
-            logger.info("deposition completed for well: %s", instructions.target_well)
+                ## Update the system state
+                update_vial_state_file(stock_vials, "code\system state\stock_status.json")
+                update_vial_state_file(waste_vials, "code\system state\waste_status.json")
+                scheduler.change_well_status(
+                    experiment.target_well, experiment.status, experiment.status_date, experiment.id
+                    )
 
-            waste_vials, wellplate = e_panda.clear_well(
-                volume=wellplate.volume(instructions.target_well),
-                target_well=instructions.target_well,
-                wellplate=wellplate,
-                pumping_rate=instructions.pumping_rate,
-                pump=pump,
-                waste_vials=waste_vials,
-                mill=mill,
-                solution_name="waste",
-            )
+                ## Update location of experiment instructions and save results
+                scheduler.update_experiment_status(experiment)
+                scheduler.update_experiment_location(experiment)
+                scheduler.save_results(experiment, results)
 
-            logger.info("Cleared dep_sol from well: %s", instructions.target_well)
+                # Plot results
+                #analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
 
-            # Rinse the well 3x
-            stock_vials, waste_vials, wellplate = e_panda.rinse(
-                wellplate=wellplate,
-                instructions=instructions,
-                pump=pump,
-                scale=scale,
-                mill=mill,
-                waste_vials=waste_vials,
-                stock_vials=stock_vials,
-            )
-
-            logger.info("Rinsed well: %s", instructions.target_well)
-        # Echem CV - characterization
-        if instructions.cv == 1:
-            logger.info(
-                "Beginning eChem characterization of well: %s", instructions.target_well
-            )
-            # Deposit characterization solution into well
-
-            logger.info(
-                "Infuse %s into well %s...",
-                instructions.char_sol_name,
-                instructions.target_well,
-            )
-            stock_vials, waste_vials, wellplate = e_panda.pipette(
-                volume=instructions.char_vol,
-                solutions=stock_vials,
-                solution_name=instructions.char_sol_name,
-                target_well=instructions.target_well,
-                pumping_rate=instructions.pumping_rate,
-                waste_vials=waste_vials,
-                waste_solution_name="waste",
-                wellplate=wellplate,
-                pump=pump,
-                mill=mill,
-                scale=scale,
-            )
-
-            logger.info("Deposited char_sol in well: %s", instructions.target_well)
-
-            instructions, results = e_panda.characterization(
-                instructions, results, mill, wellplate
-            )
-
-            logger.info("Characterization of %s complete", instructions.target_well)
-
-            waste_vials, wellplate = e_panda.clear_well(
-                instructions.char_vol,
-                instructions.target_well,
-                wellplate,
-                instructions.pumping_rate,
-                pump,
-                waste_vials,
-                mill,
-                "waste",
-            )
-
-            logger.info("Well %s cleared", instructions.target_well)
-
-            # Flushing procedure
-            stock_vials, waste_vials = e_panda.flush_pipette_tip(
-                pump,
-                waste_vials,
-                stock_vials,
-                instructions.flush_sol_name,
-                mill,
-                instructions.pumping_rate,
-                instructions.flush_vol,
-            )
-
-            logger.info("Pipette Flushed")
-            instructions.status = ExperimentStatus.COMPLETE
-        logger.info("End of Experiment: %s", instructions.id)
-
-        mill.move_to_safe_position()
-        logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
-
-    except e_panda.OCPFailure as ocp_failure:
-        logger.error(ocp_failure)
-        instructions.status = ExperimentStatus.ERROR
-        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
-        logger.info("Failed instructions updated for experiment %s", instructions.id)
-        return instructions, results, stock_vials, waste_vials, wellplate
-
-    except KeyboardInterrupt:
-        logger.warning("Keyboard Interrupt")
-        instructions.status = ExperimentStatus.ERROR
-        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
-        logger.info("Saved interrupted instructions for experiment %s", instructions.id)
-        return instructions, results, stock_vials, waste_vials, wellplate
-
-    except Exception as general_exception:
-        exception_type, _, exception_traceback = sys.exc_info()
-        filename = exception_traceback.tb_frame.f_code.co_filename
-        line_number = exception_traceback.tb_lineno
-        logger.error("Exception: %s", general_exception)
-        logger.error("Exception type: %s", exception_type)
-        logger.error("File name: %s", filename)
-        logger.error("Line number: %d", line_number)
-        instructions.status = ExperimentStatus.ERROR
-        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
-        return instructions, results, stock_vials, waste_vials, wellplate
-
-    finally:
-        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
-        logger.info(
-            "Returning completed instructions for experiment %s", instructions.id
-        )
-
-    return instructions, results, stock_vials, waste_vials, wellplate
-
+            if echem.OPEN_CONNECTION is True:
+                echem.disconnectpstat()
+ 
 if __name__ == "__main__":
     #mixing_test(mix_test_experiments)
     peg2p_test(peg2p_experiments)
