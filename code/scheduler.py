@@ -340,6 +340,8 @@ class Scheduler:
         with open(file_path, "w", encoding="UTF-8") as file:
             file.write(serialized_data)
 
+        logger.info("Experiment %s status changed to %s", experiment.id, experiment.status)
+
     def update_experiment_location(self, experiment: Experiment) -> None:
         """
         Updates the location of the experiment instructions file.
@@ -369,6 +371,9 @@ class Scheduler:
                 "Experiment %s is not complete or errored, keeping in queue",
                 experiment.id,
             )
+        
+        logger.info("Experiment %s location updated to %s", experiment.id, experiment.status)
+        
     def add_experiment(self, experiment: Experiment) -> None:
         """
         Adds an experiment to the experiment queue.

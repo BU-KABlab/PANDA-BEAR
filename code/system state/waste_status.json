@@ -51,9 +51,9 @@
         "x": -47,
         "y": -178,
         "name": "rinse0",
-        "volume": 1000.0,
+        "volume": 1570.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 3
     },
     {
         "position": "RW1",
@@ -61,9 +61,9 @@
         "x": -47,
         "y": -211,
         "name": "rinse1",
-        "volume": 1000.0,
+        "volume": 1570.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 3
     },
     {
         "position": "RW2",
@@ -71,8 +71,8 @@
         "x": -47,
         "y": -244,
         "name": "rinse2",
-        "volume": 1000.0,
+        "volume": 1570.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 3
     }
 ]

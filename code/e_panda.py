@@ -140,7 +140,6 @@ def pipette(
                 solution.coordinates["x"], solution.coordinates["y"], solution.bottom
             )  # go to solution depth (depth replaced with height)
 
-            #solution.update_volume(-(repetition_and_purge_vol))
             solution = pump.withdraw(
                 volume=repetition_and_purge_vol, solution=solution, rate=pumping_rate
             )  # pipette now has air gap + repitition + 2 purge vol
@@ -166,7 +165,7 @@ def pipette(
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
-           # purge_vial.update_volume(purge_volume)
+
             # Second Half: Deposit to well
             logger.info("Moving to target well: %s...", target_well)
             mill.move_pipette_to_position(
@@ -212,7 +211,7 @@ def pipette(
                 purge_vial.height,
             )  # purge_vial.depth replaced with height
 
-            pump.purge(
+            purge_vial = pump.purge(
                 purge_vial=purge_vial, purge_volume=purge_volume
             )  # remaining vol in pipette is now air gap
             # Pump out the air gap
@@ -225,17 +224,6 @@ def pipette(
                 "Remaining volume in pipette: %f ",
                 pump.pump.volume_withdrawn,
             )  # should always be zero, pause if not
-
-            if round(pump.pipette_volume_ul, 2) != 0.00:
-                while pump.pipette_volume_ul > 0.00:
-                    logger.warning(
-                        "Pipette not empty. Volume: %f. Attempting to purge",
-                        pump.pipette_volume_ul,
-                    )
-                    pump.infuse(volume=pump.pipette_volume_ul, rate=pumping_rate)
-                    time.sleep(1)
-
-                logger.debug("Pipette empty. Continuing...")
 
     return solutions, waste_vials, wellplate
 
@@ -300,7 +288,7 @@ def clear_well(
         logger.debug("Withdrawing %f from %s...", repetition_vol, target_well)
         pump.withdraw(
             volume=repetition_vol,
-            solution=wellplate.density(target_well),
+            solution= None,
             rate=pumping_rate,
         )  # withdraw the volume from the well
 
@@ -331,17 +319,7 @@ def clear_well(
             purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
         )
         logger.info("Remaining volume in well: %f", wellplate.volume(target_well))
-        # if round(pump.pipette_volume_ul, 2) != 0.00:
-        #     while pump.pipette_volume_ul != 0:
-        #         logger.warning(
-        #             "Pipette not empty. Volume: %f. Attempting to purge",
-        #             pump.pipette_volume_ul,
-        #         )
-        #         pump.infuse(pump.pipette_volume_ul, pumping_rate)
-        #         time.sleep(1)
-
-        #     logger.debug("Pipette empty. Continuing...")
-        return waste_vials, wellplate
+    return waste_vials, wellplate
 
 
 def rinse(
@@ -379,7 +357,7 @@ def rinse(
         rinse_solution_name = "rinse" + str(rep)
         # purge_vial = waste_selector(rinse_solution_name, rinse_vol)
         # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
-        logger.info("Rinse %d of %d", rep + 1, instructions.rinse_count)
+        logger.info("Rinse %d of %d", rep+1, instructions.rinse_count)
         stock_vials, waste_vials, wellplate = pipette(
             instructions.rinse_vol,
             stock_vials,
@@ -402,6 +380,8 @@ def rinse(
             mill,
             solution_name=rinse_solution_name,
         )
+        logger.info("Rinse %d of %d complete", rep+1, instructions.rinse_count)
+        logger.debug("Remaining volume in well: %f", wellplate.volume(instructions.target_well))
     return stock_vials, waste_vials, wellplate
 
 def flush_pipette_tip(
@@ -578,7 +558,7 @@ def deposition(
         echem.potentiostat_ocp_parameters.OCPrate,
     )  # OCP
     echem.activecheck()
-    dep_results.ocp_dep_pass = echem.check_vsig_range(
+    dep_results.ocp_dep_pass = echem.check_vf_range(
         dep_results.ocp_dep_file.with_suffix(".txt")
     )
 
@@ -656,7 +636,7 @@ def characterization(
         echem.potentiostat_ocp_parameters.OCPrate,
     )  # OCP
     echem.activecheck()
-    char_results.ocp_char_pass = echem.check_vsig_range(
+    char_results.ocp_char_pass = echem.check_vf_range(
         char_results.ocp_char_file.with_suffix(".txt")
     )
     # echem CV - characterization
