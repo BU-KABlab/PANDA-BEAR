@@ -47142,3 +47142,1092 @@ Setting up eChem experiments...
 2023-10-23 15:27:44,624:scheduler:Experiment 9994028 status changed to ExperimentStatus.COMPLETE
 2023-10-23 15:27:47,662:scheduler:Experiment 9994028 location updated to ExperimentStatus.COMPLETE
 2023-10-23 15:27:49,845:scheduler:Saving experiment 9994028 results to database as peg2p-test_H12.json
+2023-10-23 15:29:32,457:mill_control:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 36, 'y': 30, 'z': 0}, 'pipette': {'x': -85, 'y': 2, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -420, 'y': -310, 'z': -110}}
+2023-10-23 15:29:34,459:mill_control:Mill connected: True
+2023-10-23 15:29:34,459:mill_control:execute_command: Command sent: $H
+2023-10-23 15:29:36,460:mill_control:execute_command: Returned 
+2023-10-23 15:30:40,466:mill_control:Homing completed
+2023-10-23 15:30:40,466:mill_control:execute_command: Command sent: F2000
+2023-10-23 15:30:42,467:mill_control:execute_command: Returned ok
+2023-10-23 15:30:42,550:pump_control:Pump found at address 0
+2023-10-23 15:30:44,630:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-23 15:31:02,309:__main__:INFO:9994023:H1:Beginning experiment 9994023
+2023-10-23 15:31:02,309:__main__:INFO:9994023:H1:Pipetting 290.0 ul of peg into H1...
+2023-10-23 15:31:02,309:e_panda:INFO:9994023:H1:Repetition 1 of 2
+2023-10-23 15:31:02,310:e_panda:DEBUG:9994023:H1:Selected stock vial: peg in position {'x': -2, 'y': -109, 'z': -20}
+2023-10-23 15:31:02,310:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 15:31:02,310:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:31:02,364:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:31:07,771:pump_control:Done Withdrawing
+2023-10-23 15:31:09,788:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:31:09,855:e_panda:INFO:9994023:H1:Moving to peg...
+2023-10-23 15:31:09,856:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z0
+2023-10-23 15:31:11,858:mill_control:execute_command: Initially ok
+2023-10-23 15:31:14,888:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:31:14,889:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z-75
+2023-10-23 15:31:16,891:mill_control:execute_command: Initially ok
+2023-10-23 15:31:18,916:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-23 15:31:18,972:pump_control:Withdrawing 0.185000 ml...
+2023-10-23 15:31:41,804:pump_control:Done Withdrawing
+2023-10-23 15:31:43,823:pump_control:Pump has withdrawn: 0.185 ml
+2023-10-23 15:31:43,889:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z0
+2023-10-23 15:31:45,891:mill_control:execute_command: Initially ok
+2023-10-23 15:31:47,918:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:31:47,919:e_panda:INFO:9994023:H1:Moving to purge vial: waste...
+2023-10-23 15:31:47,919:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:31:49,920:mill_control:execute_command: Initially ok
+2023-10-23 15:31:51,943:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:31:51,944:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 15:31:53,945:mill_control:execute_command: Initially ok
+2023-10-23 15:31:54,961:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:31:54,962:pump_control:Purging 20.000000 ul...
+2023-10-23 15:31:55,017:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:31:58,048:pump_control:Done Infusing
+2023-10-23 15:32:00,066:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:32:00,133:pump_control:Purged 20.0 ul
+2023-10-23 15:32:00,134:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:32:02,135:mill_control:execute_command: Initially ok
+2023-10-23 15:32:03,151:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:32:03,152:e_panda:INFO:9994023:H1:Moving to target well: H1...
+2023-10-23 15:32:03,152:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:32:05,153:mill_control:execute_command: Initially ok
+2023-10-23 15:32:12,219:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:32:12,220:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-76
+2023-10-23 15:32:14,221:mill_control:execute_command: Initially ok
+2023-10-23 15:32:16,244:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:32:16,245:wellplate:New volume: 145.0 | New depth: -75.99999711531666
+2023-10-23 15:32:16,246:e_panda:INFO:9994023:H1:Infusing peg into well H1...
+2023-10-23 15:32:16,300:pump_control:Infusing 0.145000 ml...
+2023-10-23 15:32:34,292:pump_control:Done Infusing
+2023-10-23 15:32:36,310:pump_control:Pump has infused: 0.145 ml
+2023-10-23 15:32:36,377:e_panda:INFO:9994023:H1:Well H1 volume: 145.000000
+2023-10-23 15:32:36,378:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:32:38,379:mill_control:execute_command: Initially ok
+2023-10-23 15:32:40,403:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:32:40,404:e_panda:DEBUG:9994023:H1:Moving to purge vial: waste...
+2023-10-23 15:32:40,404:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:32:42,406:mill_control:execute_command: Initially ok
+2023-10-23 15:32:49,473:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 15:32:49,474:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 15:32:51,475:mill_control:execute_command: Initially ok
+2023-10-23 15:32:52,490:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:32:52,491:pump_control:Purging 20.000000 ul...
+2023-10-23 15:32:52,545:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:32:55,575:pump_control:Done Infusing
+2023-10-23 15:32:57,594:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:32:57,661:pump_control:Purged 20.0 ul
+2023-10-23 15:32:57,715:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:33:03,126:pump_control:Done Infusing
+2023-10-23 15:33:05,144:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:33:05,211:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:33:07,212:mill_control:execute_command: Initially ok
+2023-10-23 15:33:08,228:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:33:08,246:e_panda:DEBUG:9994023:H1:Remaining volume in pipette: 0.000000 
+2023-10-23 15:33:08,246:e_panda:INFO:9994023:H1:Repetition 2 of 2
+2023-10-23 15:33:08,247:e_panda:DEBUG:9994023:H1:Selected stock vial: peg in position {'x': -2, 'y': -109, 'z': -20}
+2023-10-23 15:33:08,247:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 15:33:08,248:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:33:08,303:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:33:13,715:pump_control:Done Withdrawing
+2023-10-23 15:33:15,734:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:33:15,800:e_panda:INFO:9994023:H1:Moving to peg...
+2023-10-23 15:33:15,801:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z0
+2023-10-23 15:33:17,802:mill_control:execute_command: Initially ok
+2023-10-23 15:33:19,825:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:33:19,826:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z-75
+2023-10-23 15:33:21,827:mill_control:execute_command: Initially ok
+2023-10-23 15:33:23,854:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-78.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 15:33:23,908:pump_control:Withdrawing 0.185000 ml...
+2023-10-23 15:33:46,733:pump_control:Done Withdrawing
+2023-10-23 15:33:48,751:pump_control:Pump has withdrawn: 0.185 ml
+2023-10-23 15:33:48,818:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z0
+2023-10-23 15:33:50,819:mill_control:execute_command: Initially ok
+2023-10-23 15:33:52,843:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:33:52,843:e_panda:INFO:9994023:H1:Moving to purge vial: waste...
+2023-10-23 15:33:52,845:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:33:54,846:mill_control:execute_command: Initially ok
+2023-10-23 15:33:56,868:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:33:56,869:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 15:33:58,871:mill_control:execute_command: Initially ok
+2023-10-23 15:33:59,886:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:33:59,887:pump_control:Purging 20.000000 ul...
+2023-10-23 15:33:59,942:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:34:02,977:pump_control:Done Infusing
+2023-10-23 15:34:04,996:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:34:05,063:pump_control:Purged 20.0 ul
+2023-10-23 15:34:05,063:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:34:07,064:mill_control:execute_command: Initially ok
+2023-10-23 15:34:08,083:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 15:34:08,084:e_panda:INFO:9994023:H1:Moving to target well: H1...
+2023-10-23 15:34:08,084:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:34:10,085:mill_control:execute_command: Initially ok
+2023-10-23 15:34:17,149:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:34:17,150:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999711531666
+2023-10-23 15:34:19,151:mill_control:execute_command: Initially ok
+2023-10-23 15:34:21,176:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:34:21,177:wellplate:New volume: 290.0 | New depth: -75.99999423063332
+2023-10-23 15:34:21,177:e_panda:INFO:9994023:H1:Infusing peg into well H1...
+2023-10-23 15:34:21,231:pump_control:Infusing 0.145000 ml...
+2023-10-23 15:34:39,237:pump_control:Done Infusing
+2023-10-23 15:34:41,256:pump_control:Pump has infused: 0.145 ml
+2023-10-23 15:34:41,323:e_panda:INFO:9994023:H1:Well H1 volume: 290.000000
+2023-10-23 15:34:41,323:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:34:43,324:mill_control:execute_command: Initially ok
+2023-10-23 15:34:45,348:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:34:45,350:e_panda:DEBUG:9994023:H1:Moving to purge vial: waste...
+2023-10-23 15:34:45,350:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:34:47,351:mill_control:execute_command: Initially ok
+2023-10-23 15:34:54,417:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:34:54,418:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 15:34:56,419:mill_control:execute_command: Initially ok
+2023-10-23 15:34:57,435:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:34:57,436:pump_control:Purging 20.000000 ul...
+2023-10-23 15:34:57,489:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:35:00,521:pump_control:Done Infusing
+2023-10-23 15:35:02,539:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:35:02,605:pump_control:Purged 20.0 ul
+2023-10-23 15:35:02,659:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:35:08,073:pump_control:Done Infusing
+2023-10-23 15:35:10,090:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:35:10,158:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:35:12,159:mill_control:execute_command: Initially ok
+2023-10-23 15:35:13,175:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:35:13,193:e_panda:DEBUG:9994023:H1:Remaining volume in pipette: 0.000000 
+2023-10-23 15:35:13,194:e_panda:INFO:9994023:H1:Flushing pipette tip with 120.000000 ul of dmf...
+2023-10-23 15:35:13,195:e_panda:DEBUG:9994023:H1:Selected stock vial: dmf in position {'x': -2, 'y': -76, 'z': -20}
+2023-10-23 15:35:13,195:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 15:35:13,195:e_panda:INFO:9994023:H1:Moving to flush solution dmf...
+2023-10-23 15:35:13,195:mill_control:execute_command: Command sent: G00 X-87 Y-74 Z0
+2023-10-23 15:35:15,197:mill_control:execute_command: Initially ok
+2023-10-23 15:35:17,220:mill_control:execute_command: Returned <Idle|MPos:-90.000,-77.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:35:17,221:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:35:17,278:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:35:22,683:pump_control:Done Withdrawing
+2023-10-23 15:35:24,701:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:35:24,768:mill_control:execute_command: Command sent: G00 X-87 Y-74 Z-75
+2023-10-23 15:35:26,769:mill_control:execute_command: Initially ok
+2023-10-23 15:35:28,793:mill_control:execute_command: Returned <Idle|MPos:-90.000,-77.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-23 15:35:28,794:e_panda:DEBUG:9994023:H1:Withdrawing dmf...
+2023-10-23 15:35:28,848:pump_control:Withdrawing 0.120000 ml...
+2023-10-23 15:35:43,842:pump_control:Done Withdrawing
+2023-10-23 15:35:45,860:pump_control:Pump has withdrawn: 0.12 ml
+2023-10-23 15:35:45,927:mill_control:execute_command: Command sent: G00 X-87 Y-74 Z0
+2023-10-23 15:35:47,928:mill_control:execute_command: Initially ok
+2023-10-23 15:35:49,952:mill_control:execute_command: Returned <Idle|MPos:-90.000,-77.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:35:49,953:e_panda:DEBUG:9994023:H1:Moving to purge...
+2023-10-23 15:35:49,953:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:35:51,954:mill_control:execute_command: Initially ok
+2023-10-23 15:35:53,978:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:35:53,979:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 15:35:55,980:mill_control:execute_command: Initially ok
+2023-10-23 15:35:57,000:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 15:35:57,001:e_panda:DEBUG:9994023:H1:Purging...
+2023-10-23 15:35:57,001:pump_control:Purging 120.000000 ul...
+2023-10-23 15:35:57,058:pump_control:Infusing 0.120000 ml...
+2023-10-23 15:36:12,064:pump_control:Done Infusing
+2023-10-23 15:36:14,083:pump_control:Pump has infused: 0.12 ml
+2023-10-23 15:36:14,150:pump_control:Purged 120 ul
+2023-10-23 15:36:14,150:e_panda:DEBUG:9994023:H1:Purging the air gap...
+2023-10-23 15:36:14,203:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:36:19,625:pump_control:Done Infusing
+2023-10-23 15:36:21,643:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:36:21,710:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:36:23,711:mill_control:execute_command: Initially ok
+2023-10-23 15:36:24,725:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:36:24,726:__main__:INFO:9994023:H1:Pipetted solutions into well: H1
+2023-10-23 15:36:24,727:e_panda:INFO:9994023:H1:
+
+Setting up eChem experiments...
+2023-10-23 15:36:24,740:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-23 15:36:24,740:e_panda:INFO:9994023:H1:Beginning eChem OCP of well: H1
+2023-10-23 15:36:24,740:mill_control:execute_command: Command sent: G00 X-245 Y-44 Z0
+2023-10-23 15:36:26,741:mill_control:execute_command: Initially ok
+2023-10-23 15:36:29,773:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:36:29,774:mill_control:execute_command: Command sent: G00 X-245 Y-44 Z-73
+2023-10-23 15:36:31,776:mill_control:execute_command: Initially ok
+2023-10-23 15:36:33,803:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-76.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-23 15:36:33,804:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-9994023_OCP
+2023-10-23 15:36:33,805:gamry_control_WIP:ocp: made it to run
+2023-10-23 15:36:33,860:gamry_control_WIP:ocp: made it to run end
+2023-10-23 15:36:49,034:gamry_control_WIP:made it to data done
+2023-10-23 15:36:52,061:gamry_control_WIP:number of data points acquired: 30
+2023-10-23 15:36:52,065:gamry_control_WIP:data saved
+2023-10-23 15:36:52,575:e_panda:INFO:9994023:H1:Beginning eChem deposition of well: H1
+2023-10-23 15:36:52,575:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-9994023_CA
+2023-10-23 15:36:52,576:gamry_control_WIP:chrono: made it to run
+2023-10-23 15:36:52,630:gamry_control_WIP:chrono: made it to run end
+2023-10-23 15:46:52,815:gamry_control_WIP:made it to data done
+2023-10-23 15:46:55,850:gamry_control_WIP:number of data points acquired: 58397
+2023-10-23 15:46:56,255:gamry_control_WIP:data saved
+2023-10-23 15:46:56,765:mill_control:MPos coordinates: X = -245.0, Y = -44.0, Z = -73.0
+2023-10-23 15:46:56,767:mill_control:current_coordinates: [-245.0, -44.0, -73.0]
+2023-10-23 15:46:56,767:mill_control:execute_command: Command sent: G00 X-245.0 Y-44.0 Z0.0
+2023-10-23 15:46:58,768:mill_control:execute_command: Initially ok
+2023-10-23 15:47:00,792:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:00,800:mill_control:MPos coordinates: X = -245.0, Y = -44.0, Z = 0.0
+2023-10-23 15:47:00,801:mill_control:current_coordinates: [-245.0, -44.0, 0.0]
+2023-10-23 15:47:00,801:mill_control:execute_command: Command sent: G00 X-245.0 Y-44.0 Z0.0
+2023-10-23 15:47:02,803:mill_control:execute_command: Initially ok
+2023-10-23 15:47:03,818:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:03,819:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 15:47:05,820:mill_control:execute_command: Initially ok
+2023-10-23 15:47:09,861:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:09,862:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-55
+2023-10-23 15:47:11,864:mill_control:execute_command: Initially ok
+2023-10-23 15:47:12,879:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-58.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:12,880:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 15:47:14,882:mill_control:execute_command: Initially ok
+2023-10-23 15:47:15,899:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:15,900:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-55
+2023-10-23 15:47:17,901:mill_control:execute_command: Initially ok
+2023-10-23 15:47:18,917:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-58.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:18,918:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 15:47:20,919:mill_control:execute_command: Initially ok
+2023-10-23 15:47:21,934:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:21,935:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-55
+2023-10-23 15:47:23,937:mill_control:execute_command: Initially ok
+2023-10-23 15:47:24,953:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-58.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:24,954:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 15:47:26,955:mill_control:execute_command: Initially ok
+2023-10-23 15:47:27,970:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:47:27,971:gamry_control_WIP:disconnecting pstat
+2023-10-23 15:47:42,978:__main__:INFO:9994023:H1:deposition completed for well: H1
+2023-10-23 15:49:00,303:e_panda:INFO:9994023:H1:Clearing well H1 with 2x repetitions of 145.000000
+2023-10-23 15:49:04,701:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 15:49:05,260:e_panda:INFO:9994023:H1:Repitition 1 of 2
+2023-10-23 15:49:05,753:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:49:06,302:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:49:11,753:pump_control:Done Withdrawing
+2023-10-23 15:49:13,773:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:49:17,017:e_panda:DEBUG:9994023:H1:Moving to H1...
+2023-10-23 15:49:17,018:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:49:19,019:mill_control:execute_command: Initially ok
+2023-10-23 15:49:21,043:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:49:21,044:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999423063332
+2023-10-23 15:49:23,046:mill_control:execute_command: Initially ok
+2023-10-23 15:49:25,068:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:49:25,069:wellplate:New volume: 145.0 | New depth: -75.99999711531666
+2023-10-23 15:49:25,070:e_panda:DEBUG:9994023:H1:Withdrawing 145.000000 from H1...
+2023-10-23 15:49:25,124:pump_control:Withdrawing 0.145000 ml...
+2023-10-23 15:49:43,126:pump_control:Done Withdrawing
+2023-10-23 15:49:45,144:pump_control:Pump has withdrawn: 0.145 ml
+2023-10-23 15:49:45,212:e_panda:DEBUG:9994023:H1:Well H1 volume: 145.000000
+2023-10-23 15:49:45,212:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:49:47,213:mill_control:execute_command: Initially ok
+2023-10-23 15:49:49,238:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:49:49,239:e_panda:INFO:9994023:H1:Moving to purge vial waste...
+2023-10-23 15:49:49,239:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:49:51,241:mill_control:execute_command: Initially ok
+2023-10-23 15:49:58,306:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:49:58,307:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 15:50:00,308:mill_control:execute_command: Initially ok
+2023-10-23 15:50:01,325:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:50:01,326:pump_control:Purging 145.000000 ul...
+2023-10-23 15:50:01,382:pump_control:Infusing 0.145000 ml...
+2023-10-23 15:50:19,384:pump_control:Done Infusing
+2023-10-23 15:50:21,402:pump_control:Pump has infused: 0.145 ml
+2023-10-23 15:50:21,469:pump_control:Purged 145.0 ul
+2023-10-23 15:50:21,470:e_panda:INFO:9994023:H1:Purging the air gap...
+2023-10-23 15:50:21,523:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:50:26,933:pump_control:Done Infusing
+2023-10-23 15:50:28,951:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:50:29,018:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:50:31,019:mill_control:execute_command: Initially ok
+2023-10-23 15:50:32,034:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:50:32,035:e_panda:INFO:9994023:H1:Remaining volume in well: 145.000000
+2023-10-23 15:50:56,401:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 15:50:56,401:e_panda:INFO:9994023:H1:Repitition 2 of 2
+2023-10-23 15:50:56,402:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:50:56,456:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:51:01,864:pump_control:Done Withdrawing
+2023-10-23 15:51:03,882:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:51:03,950:e_panda:DEBUG:9994023:H1:Moving to H1...
+2023-10-23 15:51:03,950:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:51:05,951:mill_control:execute_command: Initially ok
+2023-10-23 15:51:13,018:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:51:13,019:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999711531666
+2023-10-23 15:51:15,020:mill_control:execute_command: Initially ok
+2023-10-23 15:51:17,043:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:51:17,045:wellplate:New volume: 0.0 | New depth: -76.0
+2023-10-23 15:51:17,045:e_panda:DEBUG:9994023:H1:Withdrawing 145.000000 from H1...
+2023-10-23 15:51:17,099:pump_control:Withdrawing 0.145000 ml...
+2023-10-23 15:51:35,111:pump_control:Done Withdrawing
+2023-10-23 15:51:37,129:pump_control:Pump has withdrawn: 0.145 ml
+2023-10-23 15:51:37,197:e_panda:DEBUG:9994023:H1:Well H1 volume: 0.000000
+2023-10-23 15:51:37,198:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:51:39,198:mill_control:execute_command: Initially ok
+2023-10-23 15:51:41,222:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:51:41,223:e_panda:INFO:9994023:H1:Moving to purge vial waste...
+2023-10-23 15:51:41,224:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:51:43,225:mill_control:execute_command: Initially ok
+2023-10-23 15:51:50,290:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:51:50,291:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 15:51:52,293:mill_control:execute_command: Initially ok
+2023-10-23 15:51:53,309:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:51:53,310:pump_control:Purging 145.000000 ul...
+2023-10-23 15:51:53,365:pump_control:Infusing 0.145000 ml...
+2023-10-23 15:52:11,369:pump_control:Done Infusing
+2023-10-23 15:52:13,387:pump_control:Pump has infused: 0.145 ml
+2023-10-23 15:52:13,454:pump_control:Purged 145.0 ul
+2023-10-23 15:52:13,454:e_panda:INFO:9994023:H1:Purging the air gap...
+2023-10-23 15:52:13,509:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:52:18,922:pump_control:Done Infusing
+2023-10-23 15:52:20,941:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:52:21,008:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 15:52:23,009:mill_control:execute_command: Initially ok
+2023-10-23 15:52:24,025:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 15:52:24,026:e_panda:INFO:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 15:52:57,091:__main__:INFO:9994023:H1:Cleared dep_sol from well: H1
+2023-10-23 15:53:03,459:e_panda:INFO:9994023:H1:Rinsing well H1 3x...
+2023-10-23 15:53:03,459:e_panda:INFO:9994023:H1:Rinse 1 of 3
+2023-10-23 15:53:03,460:e_panda:INFO:9994023:H1:Repetition 1 of 1
+2023-10-23 15:53:03,460:e_panda:DEBUG:9994023:H1:Selected stock vial: rinse0 in position {'x': -2, 'y': -208, 'z': -20}
+2023-10-23 15:53:03,461:e_panda:DEBUG:9994023:H1:Selected waste vial: rinse0 in position {'x': -47, 'y': -178, 'z': -20}
+2023-10-23 15:53:03,461:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:53:03,516:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:53:08,913:pump_control:Done Withdrawing
+2023-10-23 15:53:10,931:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:53:10,998:e_panda:INFO:9994023:H1:Moving to rinse0...
+2023-10-23 15:53:10,998:mill_control:execute_command: Command sent: G00 X-87 Y-206 Z0
+2023-10-23 15:53:13,000:mill_control:execute_command: Initially ok
+2023-10-23 15:53:18,047:mill_control:execute_command: Returned <Idle|MPos:-90.000,-209.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:53:18,049:mill_control:execute_command: Command sent: G00 X-87 Y-206 Z-75
+2023-10-23 15:53:20,050:mill_control:execute_command: Initially ok
+2023-10-23 15:53:22,075:mill_control:execute_command: Returned <Idle|MPos:-90.000,-209.000,-78.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-23 15:53:22,129:pump_control:Withdrawing 0.190000 ml...
+2023-10-23 15:53:45,543:pump_control:Done Withdrawing
+2023-10-23 15:53:47,561:pump_control:Pump has withdrawn: 0.19 ml
+2023-10-23 15:53:47,627:mill_control:execute_command: Command sent: G00 X-87 Y-206 Z0
+2023-10-23 15:53:49,629:mill_control:execute_command: Initially ok
+2023-10-23 15:53:51,653:mill_control:execute_command: Returned <Idle|MPos:-90.000,-209.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:53:51,654:e_panda:INFO:9994023:H1:Moving to purge vial: rinse0...
+2023-10-23 15:53:51,655:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z0
+2023-10-23 15:53:53,656:mill_control:execute_command: Initially ok
+2023-10-23 15:53:54,672:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:53:54,673:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z-20
+2023-10-23 15:53:56,673:mill_control:execute_command: Initially ok
+2023-10-23 15:53:57,688:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:53:57,690:pump_control:Purging 20.000000 ul...
+2023-10-23 15:53:57,744:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:54:00,770:pump_control:Done Infusing
+2023-10-23 15:54:02,788:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:54:02,855:pump_control:Purged 20.0 ul
+2023-10-23 15:54:02,855:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z0
+2023-10-23 15:54:04,857:mill_control:execute_command: Initially ok
+2023-10-23 15:54:05,873:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:54:05,874:e_panda:INFO:9994023:H1:Moving to target well: H1...
+2023-10-23 15:54:05,875:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:54:07,876:mill_control:execute_command: Initially ok
+2023-10-23 15:54:14,942:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:54:14,943:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-76.0
+2023-10-23 15:54:16,944:mill_control:execute_command: Initially ok
+2023-10-23 15:54:18,968:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:54:18,969:wellplate:New volume: 150.0 | New depth: -75.99999701584481
+2023-10-23 15:54:18,969:e_panda:INFO:9994023:H1:Infusing rinse0 into well H1...
+2023-10-23 15:54:19,023:pump_control:Infusing 0.150000 ml...
+2023-10-23 15:54:37,669:pump_control:Done Infusing
+2023-10-23 15:54:39,687:pump_control:Pump has infused: 0.15 ml
+2023-10-23 15:54:39,754:e_panda:INFO:9994023:H1:Well H1 volume: 150.000000
+2023-10-23 15:54:39,755:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:54:41,757:mill_control:execute_command: Initially ok
+2023-10-23 15:54:43,781:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:54:43,782:e_panda:DEBUG:9994023:H1:Moving to purge vial: rinse0...
+2023-10-23 15:54:43,782:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z0
+2023-10-23 15:54:45,784:mill_control:execute_command: Initially ok
+2023-10-23 15:54:52,849:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:54:52,850:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z-20
+2023-10-23 15:54:54,851:mill_control:execute_command: Initially ok
+2023-10-23 15:54:55,867:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:54:55,867:pump_control:Purging 20.000000 ul...
+2023-10-23 15:54:55,920:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:54:58,937:pump_control:Done Infusing
+2023-10-23 15:55:00,955:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:55:01,022:pump_control:Purged 20.0 ul
+2023-10-23 15:55:01,075:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:55:06,515:pump_control:Done Infusing
+2023-10-23 15:55:08,533:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:55:08,599:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z0
+2023-10-23 15:55:10,601:mill_control:execute_command: Initially ok
+2023-10-23 15:55:11,616:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:55:11,633:e_panda:DEBUG:9994023:H1:Remaining volume in pipette: 0.000000 
+2023-10-23 15:55:11,633:e_panda:INFO:9994023:H1:Clearing well H1 with 1x repetitions of 150.000000
+2023-10-23 15:55:11,634:e_panda:DEBUG:9994023:H1:Selected waste vial: rinse0 in position {'x': -47, 'y': -178, 'z': -20}
+2023-10-23 15:55:11,634:e_panda:INFO:9994023:H1:Repitition 1 of 1
+2023-10-23 15:55:11,634:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:55:11,690:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:55:17,130:pump_control:Done Withdrawing
+2023-10-23 15:55:19,148:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:55:19,214:e_panda:DEBUG:9994023:H1:Moving to H1...
+2023-10-23 15:55:19,214:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:55:21,216:mill_control:execute_command: Initially ok
+2023-10-23 15:55:28,280:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:55:28,281:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999701584481
+2023-10-23 15:55:30,283:mill_control:execute_command: Initially ok
+2023-10-23 15:55:32,306:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:55:32,306:wellplate:New volume: 0.0 | New depth: -76.0
+2023-10-23 15:55:32,307:e_panda:DEBUG:9994023:H1:Withdrawing 150.000000 from H1...
+2023-10-23 15:55:32,360:pump_control:Withdrawing 0.150000 ml...
+2023-10-23 15:55:50,962:pump_control:Done Withdrawing
+2023-10-23 15:55:52,980:pump_control:Pump has withdrawn: 0.15 ml
+2023-10-23 15:55:53,047:e_panda:DEBUG:9994023:H1:Well H1 volume: 0.000000
+2023-10-23 15:55:53,047:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:55:55,048:mill_control:execute_command: Initially ok
+2023-10-23 15:55:57,070:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:55:57,071:e_panda:INFO:9994023:H1:Moving to purge vial rinse0...
+2023-10-23 15:55:57,071:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z0
+2023-10-23 15:55:59,072:mill_control:execute_command: Initially ok
+2023-10-23 15:56:06,131:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:56:06,132:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z-20
+2023-10-23 15:56:08,133:mill_control:execute_command: Initially ok
+2023-10-23 15:56:09,149:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:56:09,149:pump_control:Purging 150.000000 ul...
+2023-10-23 15:56:09,203:pump_control:Infusing 0.150000 ml...
+2023-10-23 15:56:27,811:pump_control:Done Infusing
+2023-10-23 15:56:29,829:pump_control:Pump has infused: 0.15 ml
+2023-10-23 15:56:29,895:pump_control:Purged 150.0 ul
+2023-10-23 15:56:29,895:e_panda:INFO:9994023:H1:Purging the air gap...
+2023-10-23 15:56:29,950:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:56:35,394:pump_control:Done Infusing
+2023-10-23 15:56:37,412:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:56:37,479:mill_control:execute_command: Command sent: G00 X-132 Y-176 Z0
+2023-10-23 15:56:39,480:mill_control:execute_command: Initially ok
+2023-10-23 15:56:40,496:mill_control:execute_command: Returned <Idle|MPos:-135.000,-179.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 15:56:40,497:e_panda:INFO:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 15:56:40,497:e_panda:INFO:9994023:H1:Rinse 1 of 3 complete
+2023-10-23 15:56:40,497:e_panda:DEBUG:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 15:56:40,497:e_panda:INFO:9994023:H1:Rinse 2 of 3
+2023-10-23 15:56:40,498:e_panda:INFO:9994023:H1:Repetition 1 of 1
+2023-10-23 15:56:40,498:e_panda:DEBUG:9994023:H1:Selected stock vial: rinse1 in position {'x': -2, 'y': -241, 'z': -20}
+2023-10-23 15:56:40,498:e_panda:DEBUG:9994023:H1:Selected waste vial: rinse1 in position {'x': -47, 'y': -211, 'z': -20}
+2023-10-23 15:56:40,499:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:56:40,553:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:56:45,996:pump_control:Done Withdrawing
+2023-10-23 15:56:48,013:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:56:48,080:e_panda:INFO:9994023:H1:Moving to rinse1...
+2023-10-23 15:56:48,080:mill_control:execute_command: Command sent: G00 X-87 Y-239 Z0
+2023-10-23 15:56:50,081:mill_control:execute_command: Initially ok
+2023-10-23 15:56:52,102:mill_control:execute_command: Returned <Idle|MPos:-90.000,-242.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:56:52,102:mill_control:execute_command: Command sent: G00 X-87 Y-239 Z-75
+2023-10-23 15:56:54,104:mill_control:execute_command: Initially ok
+2023-10-23 15:56:56,126:mill_control:execute_command: Returned <Idle|MPos:-90.000,-242.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-23 15:56:56,180:pump_control:Withdrawing 0.190000 ml...
+2023-10-23 15:57:19,575:pump_control:Done Withdrawing
+2023-10-23 15:57:21,593:pump_control:Pump has withdrawn: 0.19 ml
+2023-10-23 15:57:21,659:mill_control:execute_command: Command sent: G00 X-87 Y-239 Z0
+2023-10-23 15:57:23,661:mill_control:execute_command: Initially ok
+2023-10-23 15:57:25,685:mill_control:execute_command: Returned <Idle|MPos:-90.000,-242.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-23 15:57:25,685:e_panda:INFO:9994023:H1:Moving to purge vial: rinse1...
+2023-10-23 15:57:25,685:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z0
+2023-10-23 15:57:27,686:mill_control:execute_command: Initially ok
+2023-10-23 15:57:28,702:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:57:28,703:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z-20
+2023-10-23 15:57:30,704:mill_control:execute_command: Initially ok
+2023-10-23 15:57:31,719:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:57:31,719:pump_control:Purging 20.000000 ul...
+2023-10-23 15:57:31,774:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:57:34,785:pump_control:Done Infusing
+2023-10-23 15:57:36,803:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:57:36,871:pump_control:Purged 20.0 ul
+2023-10-23 15:57:36,871:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z0
+2023-10-23 15:57:38,872:mill_control:execute_command: Initially ok
+2023-10-23 15:57:39,887:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:57:39,887:e_panda:INFO:9994023:H1:Moving to target well: H1...
+2023-10-23 15:57:39,887:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:57:41,888:mill_control:execute_command: Initially ok
+2023-10-23 15:57:48,952:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:57:48,953:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-76.0
+2023-10-23 15:57:50,954:mill_control:execute_command: Initially ok
+2023-10-23 15:57:52,976:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:57:52,976:wellplate:New volume: 150.0 | New depth: -75.99999701584481
+2023-10-23 15:57:52,977:e_panda:INFO:9994023:H1:Infusing rinse1 into well H1...
+2023-10-23 15:57:53,030:pump_control:Infusing 0.150000 ml...
+2023-10-23 15:58:11,625:pump_control:Done Infusing
+2023-10-23 15:58:13,642:pump_control:Pump has infused: 0.15 ml
+2023-10-23 15:58:13,709:e_panda:INFO:9994023:H1:Well H1 volume: 150.000000
+2023-10-23 15:58:13,709:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:58:15,711:mill_control:execute_command: Initially ok
+2023-10-23 15:58:17,733:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:58:17,733:e_panda:DEBUG:9994023:H1:Moving to purge vial: rinse1...
+2023-10-23 15:58:17,734:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z0
+2023-10-23 15:58:19,735:mill_control:execute_command: Initially ok
+2023-10-23 15:58:26,794:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:58:26,795:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z-20
+2023-10-23 15:58:28,796:mill_control:execute_command: Initially ok
+2023-10-23 15:58:29,811:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:58:29,811:pump_control:Purging 20.000000 ul...
+2023-10-23 15:58:29,865:pump_control:Infusing 0.020000 ml...
+2023-10-23 15:58:32,878:pump_control:Done Infusing
+2023-10-23 15:58:34,896:pump_control:Pump has infused: 0.02 ml
+2023-10-23 15:58:34,962:pump_control:Purged 20.0 ul
+2023-10-23 15:58:35,015:pump_control:Infusing 0.040000 ml...
+2023-10-23 15:58:40,459:pump_control:Done Infusing
+2023-10-23 15:58:42,477:pump_control:Pump has infused: 0.04 ml
+2023-10-23 15:58:42,543:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z0
+2023-10-23 15:58:44,544:mill_control:execute_command: Initially ok
+2023-10-23 15:58:45,561:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:58:45,578:e_panda:DEBUG:9994023:H1:Remaining volume in pipette: 0.000000 
+2023-10-23 15:58:45,578:e_panda:INFO:9994023:H1:Clearing well H1 with 1x repetitions of 150.000000
+2023-10-23 15:58:45,579:e_panda:DEBUG:9994023:H1:Selected waste vial: rinse1 in position {'x': -47, 'y': -211, 'z': -20}
+2023-10-23 15:58:45,579:e_panda:INFO:9994023:H1:Repitition 1 of 1
+2023-10-23 15:58:45,580:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 15:58:45,634:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 15:58:51,073:pump_control:Done Withdrawing
+2023-10-23 15:58:53,091:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 15:58:53,157:e_panda:DEBUG:9994023:H1:Moving to H1...
+2023-10-23 15:58:53,157:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:58:55,159:mill_control:execute_command: Initially ok
+2023-10-23 15:59:02,221:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-23 15:59:02,221:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999701584481
+2023-10-23 15:59:04,222:mill_control:execute_command: Initially ok
+2023-10-23 15:59:06,245:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 15:59:06,245:wellplate:New volume: 0.0 | New depth: -76.0
+2023-10-23 15:59:06,246:e_panda:DEBUG:9994023:H1:Withdrawing 150.000000 from H1...
+2023-10-23 15:59:06,300:pump_control:Withdrawing 0.150000 ml...
+2023-10-23 15:59:24,916:pump_control:Done Withdrawing
+2023-10-23 15:59:26,934:pump_control:Pump has withdrawn: 0.15 ml
+2023-10-23 15:59:27,000:e_panda:DEBUG:9994023:H1:Well H1 volume: 0.000000
+2023-10-23 15:59:27,000:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 15:59:29,001:mill_control:execute_command: Initially ok
+2023-10-23 15:59:31,023:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:59:31,024:e_panda:INFO:9994023:H1:Moving to purge vial rinse1...
+2023-10-23 15:59:31,024:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z0
+2023-10-23 15:59:33,025:mill_control:execute_command: Initially ok
+2023-10-23 15:59:40,088:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 15:59:40,088:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z-20
+2023-10-23 15:59:42,090:mill_control:execute_command: Initially ok
+2023-10-23 15:59:43,104:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 15:59:43,104:pump_control:Purging 150.000000 ul...
+2023-10-23 15:59:43,160:pump_control:Infusing 0.150000 ml...
+2023-10-23 16:00:01,797:pump_control:Done Infusing
+2023-10-23 16:00:03,815:pump_control:Pump has infused: 0.15 ml
+2023-10-23 16:00:03,882:pump_control:Purged 150.0 ul
+2023-10-23 16:00:03,883:e_panda:INFO:9994023:H1:Purging the air gap...
+2023-10-23 16:00:03,935:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:00:09,372:pump_control:Done Infusing
+2023-10-23 16:00:11,390:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:00:11,457:mill_control:execute_command: Command sent: G00 X-132 Y-209 Z0
+2023-10-23 16:00:13,458:mill_control:execute_command: Initially ok
+2023-10-23 16:00:14,473:mill_control:execute_command: Returned <Idle|MPos:-135.000,-212.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:00:14,473:e_panda:INFO:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 16:00:14,474:e_panda:INFO:9994023:H1:Rinse 2 of 3 complete
+2023-10-23 16:00:14,474:e_panda:DEBUG:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 16:00:14,474:e_panda:INFO:9994023:H1:Rinse 3 of 3
+2023-10-23 16:00:14,474:e_panda:INFO:9994023:H1:Repetition 1 of 1
+2023-10-23 16:00:14,474:e_panda:DEBUG:9994023:H1:Selected stock vial: rinse2 in position {'x': -2, 'y': -274, 'z': -20}
+2023-10-23 16:00:14,475:e_panda:DEBUG:9994023:H1:Selected waste vial: rinse2 in position {'x': -47, 'y': -244, 'z': -20}
+2023-10-23 16:00:14,475:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 16:00:14,530:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:00:19,976:pump_control:Done Withdrawing
+2023-10-23 16:00:21,994:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:00:22,061:e_panda:INFO:9994023:H1:Moving to rinse2...
+2023-10-23 16:00:22,062:mill_control:execute_command: Command sent: G00 X-87 Y-272 Z0
+2023-10-23 16:00:24,063:mill_control:execute_command: Initially ok
+2023-10-23 16:00:26,087:mill_control:execute_command: Returned <Idle|MPos:-90.000,-275.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:00:26,088:mill_control:execute_command: Command sent: G00 X-87 Y-272 Z-75
+2023-10-23 16:00:28,091:mill_control:execute_command: Initially ok
+2023-10-23 16:00:30,114:mill_control:execute_command: Returned <Idle|MPos:-90.000,-275.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-23 16:00:30,170:pump_control:Withdrawing 0.190000 ml...
+2023-10-23 16:00:53,566:pump_control:Done Withdrawing
+2023-10-23 16:00:55,583:pump_control:Pump has withdrawn: 0.19 ml
+2023-10-23 16:00:55,650:mill_control:execute_command: Command sent: G00 X-87 Y-272 Z0
+2023-10-23 16:00:57,652:mill_control:execute_command: Initially ok
+2023-10-23 16:00:59,675:mill_control:execute_command: Returned <Idle|MPos:-90.000,-275.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:00:59,676:e_panda:INFO:9994023:H1:Moving to purge vial: rinse2...
+2023-10-23 16:00:59,676:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z0
+2023-10-23 16:01:01,677:mill_control:execute_command: Initially ok
+2023-10-23 16:01:02,693:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:01:02,694:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z-20
+2023-10-23 16:01:04,695:mill_control:execute_command: Initially ok
+2023-10-23 16:01:05,712:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-23.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:01:05,712:pump_control:Purging 20.000000 ul...
+2023-10-23 16:01:05,767:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:01:08,786:pump_control:Done Infusing
+2023-10-23 16:01:10,804:pump_control:Pump has infused: 0.02 ml
+2023-10-23 16:01:10,871:pump_control:Purged 20.0 ul
+2023-10-23 16:01:10,872:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z0
+2023-10-23 16:01:12,872:mill_control:execute_command: Initially ok
+2023-10-23 16:01:13,886:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:01:13,887:e_panda:INFO:9994023:H1:Moving to target well: H1...
+2023-10-23 16:01:13,888:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:01:15,889:mill_control:execute_command: Initially ok
+2023-10-23 16:01:22,952:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:01:22,952:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-76.0
+2023-10-23 16:01:24,953:mill_control:execute_command: Initially ok
+2023-10-23 16:01:26,976:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 16:01:26,976:wellplate:New volume: 150.0 | New depth: -75.99999701584481
+2023-10-23 16:01:26,977:e_panda:INFO:9994023:H1:Infusing rinse2 into well H1...
+2023-10-23 16:01:27,030:pump_control:Infusing 0.150000 ml...
+2023-10-23 16:01:45,629:pump_control:Done Infusing
+2023-10-23 16:01:47,647:pump_control:Pump has infused: 0.15 ml
+2023-10-23 16:01:47,713:e_panda:INFO:9994023:H1:Well H1 volume: 150.000000
+2023-10-23 16:01:47,714:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:01:49,715:mill_control:execute_command: Initially ok
+2023-10-23 16:01:51,737:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:01:51,737:e_panda:DEBUG:9994023:H1:Moving to purge vial: rinse2...
+2023-10-23 16:01:51,737:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z0
+2023-10-23 16:01:53,739:mill_control:execute_command: Initially ok
+2023-10-23 16:02:00,803:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:02:00,804:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z-20
+2023-10-23 16:02:02,805:mill_control:execute_command: Initially ok
+2023-10-23 16:02:03,820:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:02:03,821:pump_control:Purging 20.000000 ul...
+2023-10-23 16:02:03,873:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:02:06,891:pump_control:Done Infusing
+2023-10-23 16:02:08,909:pump_control:Pump has infused: 0.02 ml
+2023-10-23 16:02:08,976:pump_control:Purged 20.0 ul
+2023-10-23 16:02:09,030:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:02:14,469:pump_control:Done Infusing
+2023-10-23 16:02:16,487:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:02:16,554:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z0
+2023-10-23 16:02:18,555:mill_control:execute_command: Initially ok
+2023-10-23 16:02:19,570:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:02:19,588:e_panda:DEBUG:9994023:H1:Remaining volume in pipette: 0.000000 
+2023-10-23 16:02:19,589:e_panda:INFO:9994023:H1:Clearing well H1 with 1x repetitions of 150.000000
+2023-10-23 16:02:19,589:e_panda:DEBUG:9994023:H1:Selected waste vial: rinse2 in position {'x': -47, 'y': -244, 'z': -20}
+2023-10-23 16:02:19,589:e_panda:INFO:9994023:H1:Repitition 1 of 1
+2023-10-23 16:02:19,590:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 16:02:19,644:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:02:25,087:pump_control:Done Withdrawing
+2023-10-23 16:02:27,105:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:02:27,172:e_panda:DEBUG:9994023:H1:Moving to H1...
+2023-10-23 16:02:27,172:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:02:29,173:mill_control:execute_command: Initially ok
+2023-10-23 16:02:36,231:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:02:36,232:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999701584481
+2023-10-23 16:02:38,233:mill_control:execute_command: Initially ok
+2023-10-23 16:02:40,256:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 16:02:40,256:wellplate:New volume: 0.0 | New depth: -76.0
+2023-10-23 16:02:40,257:e_panda:DEBUG:9994023:H1:Withdrawing 150.000000 from H1...
+2023-10-23 16:02:40,310:pump_control:Withdrawing 0.150000 ml...
+2023-10-23 16:02:58,912:pump_control:Done Withdrawing
+2023-10-23 16:03:00,931:pump_control:Pump has withdrawn: 0.15 ml
+2023-10-23 16:03:00,998:e_panda:DEBUG:9994023:H1:Well H1 volume: 0.000000
+2023-10-23 16:03:00,998:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:03:02,999:mill_control:execute_command: Initially ok
+2023-10-23 16:03:05,022:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:03:05,023:e_panda:INFO:9994023:H1:Moving to purge vial rinse2...
+2023-10-23 16:03:05,023:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z0
+2023-10-23 16:03:07,024:mill_control:execute_command: Initially ok
+2023-10-23 16:03:14,086:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:03:14,087:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z-20
+2023-10-23 16:03:16,089:mill_control:execute_command: Initially ok
+2023-10-23 16:03:17,103:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:03:17,104:pump_control:Purging 150.000000 ul...
+2023-10-23 16:03:17,160:pump_control:Infusing 0.150000 ml...
+2023-10-23 16:03:35,762:pump_control:Done Infusing
+2023-10-23 16:03:37,779:pump_control:Pump has infused: 0.15 ml
+2023-10-23 16:03:37,845:pump_control:Purged 150.0 ul
+2023-10-23 16:03:37,846:e_panda:INFO:9994023:H1:Purging the air gap...
+2023-10-23 16:03:37,901:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:03:43,342:pump_control:Done Infusing
+2023-10-23 16:03:45,360:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:03:45,427:mill_control:execute_command: Command sent: G00 X-132 Y-242 Z0
+2023-10-23 16:03:47,428:mill_control:execute_command: Initially ok
+2023-10-23 16:03:48,442:mill_control:execute_command: Returned <Idle|MPos:-135.000,-245.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:03:48,443:e_panda:INFO:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 16:03:48,443:e_panda:INFO:9994023:H1:Rinse 3 of 3 complete
+2023-10-23 16:03:48,443:e_panda:DEBUG:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 16:03:48,444:__main__:INFO:9994023:H1:Rinsed well: H1
+2023-10-23 16:03:48,444:__main__:INFO:9994023:H1:Beginning eChem characterization of well: H1
+2023-10-23 16:03:48,445:__main__:INFO:9994023:H1:Infuse ferrocene into well H1...
+2023-10-23 16:03:48,445:e_panda:INFO:9994023:H1:Repetition 1 of 2
+2023-10-23 16:03:48,445:e_panda:DEBUG:9994023:H1:Selected stock vial: ferrocene in position {'x': -2, 'y': -175, 'z': -20}
+2023-10-23 16:03:48,445:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 16:03:48,446:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 16:03:48,503:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:03:53,942:pump_control:Done Withdrawing
+2023-10-23 16:03:55,960:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:03:56,026:e_panda:INFO:9994023:H1:Moving to ferrocene...
+2023-10-23 16:03:56,026:mill_control:execute_command: Command sent: G00 X-87 Y-173 Z0
+2023-10-23 16:03:58,028:mill_control:execute_command: Initially ok
+2023-10-23 16:04:00,049:mill_control:execute_command: Returned <Idle|MPos:-90.000,-176.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:04:00,050:mill_control:execute_command: Command sent: G00 X-87 Y-173 Z-75
+2023-10-23 16:04:02,052:mill_control:execute_command: Initially ok
+2023-10-23 16:04:04,078:mill_control:execute_command: Returned <Idle|MPos:-90.000,-176.000,-78.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:04:04,131:pump_control:Withdrawing 0.185000 ml...
+2023-10-23 16:04:26,941:pump_control:Done Withdrawing
+2023-10-23 16:04:28,960:pump_control:Pump has withdrawn: 0.185 ml
+2023-10-23 16:04:29,026:mill_control:execute_command: Command sent: G00 X-87 Y-173 Z0
+2023-10-23 16:04:31,027:mill_control:execute_command: Initially ok
+2023-10-23 16:04:33,049:mill_control:execute_command: Returned <Idle|MPos:-90.000,-176.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:04:33,049:e_panda:INFO:9994023:H1:Moving to purge vial: waste...
+2023-10-23 16:04:33,050:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:04:35,051:mill_control:execute_command: Initially ok
+2023-10-23 16:04:39,087:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:04:39,087:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:04:41,088:mill_control:execute_command: Initially ok
+2023-10-23 16:04:42,106:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:04:42,107:pump_control:Purging 20.000000 ul...
+2023-10-23 16:04:42,164:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:04:45,184:pump_control:Done Infusing
+2023-10-23 16:04:47,202:pump_control:Pump has infused: 0.02 ml
+2023-10-23 16:04:47,269:pump_control:Purged 20.0 ul
+2023-10-23 16:04:47,269:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:04:49,270:mill_control:execute_command: Initially ok
+2023-10-23 16:04:50,285:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:04:50,285:e_panda:INFO:9994023:H1:Moving to target well: H1...
+2023-10-23 16:04:50,286:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:04:52,286:mill_control:execute_command: Initially ok
+2023-10-23 16:04:59,349:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:04:59,350:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-76.0
+2023-10-23 16:05:01,351:mill_control:execute_command: Initially ok
+2023-10-23 16:05:03,372:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 16:05:03,372:wellplate:New volume: 145.0 | New depth: -75.99999711531666
+2023-10-23 16:05:03,373:e_panda:INFO:9994023:H1:Infusing ferrocene into well H1...
+2023-10-23 16:05:03,427:pump_control:Infusing 0.145000 ml...
+2023-10-23 16:05:21,441:pump_control:Done Infusing
+2023-10-23 16:05:23,458:pump_control:Pump has infused: 0.145 ml
+2023-10-23 16:05:23,525:e_panda:INFO:9994023:H1:Well H1 volume: 145.000000
+2023-10-23 16:05:23,525:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:05:25,526:mill_control:execute_command: Initially ok
+2023-10-23 16:05:27,548:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:05:27,548:e_panda:DEBUG:9994023:H1:Moving to purge vial: waste...
+2023-10-23 16:05:27,549:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:05:29,550:mill_control:execute_command: Initially ok
+2023-10-23 16:05:36,612:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:05:36,613:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:05:38,614:mill_control:execute_command: Initially ok
+2023-10-23 16:05:39,629:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:05:39,629:pump_control:Purging 20.000000 ul...
+2023-10-23 16:05:39,681:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:05:42,702:pump_control:Done Infusing
+2023-10-23 16:05:44,719:pump_control:Pump has infused: 0.02 ml
+2023-10-23 16:05:44,786:pump_control:Purged 20.0 ul
+2023-10-23 16:05:44,840:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:05:50,276:pump_control:Done Infusing
+2023-10-23 16:05:52,294:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:05:52,361:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:05:54,362:mill_control:execute_command: Initially ok
+2023-10-23 16:05:55,376:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:05:55,394:e_panda:DEBUG:9994023:H1:Remaining volume in pipette: 0.000000 
+2023-10-23 16:05:55,394:e_panda:INFO:9994023:H1:Repetition 2 of 2
+2023-10-23 16:05:55,395:e_panda:DEBUG:9994023:H1:Selected stock vial: ferrocene in position {'x': -2, 'y': -175, 'z': -20}
+2023-10-23 16:05:55,395:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 16:05:55,395:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 16:05:55,450:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:06:00,896:pump_control:Done Withdrawing
+2023-10-23 16:06:02,914:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:06:02,980:e_panda:INFO:9994023:H1:Moving to ferrocene...
+2023-10-23 16:06:02,980:mill_control:execute_command: Command sent: G00 X-87 Y-173 Z0
+2023-10-23 16:06:04,982:mill_control:execute_command: Initially ok
+2023-10-23 16:06:09,019:mill_control:execute_command: Returned <Idle|MPos:-90.000,-176.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:06:09,020:mill_control:execute_command: Command sent: G00 X-87 Y-173 Z-75
+2023-10-23 16:06:11,021:mill_control:execute_command: Initially ok
+2023-10-23 16:06:13,043:mill_control:execute_command: Returned <Idle|MPos:-90.000,-176.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-23 16:06:13,097:pump_control:Withdrawing 0.185000 ml...
+2023-10-23 16:06:35,920:pump_control:Done Withdrawing
+2023-10-23 16:06:37,937:pump_control:Pump has withdrawn: 0.185 ml
+2023-10-23 16:06:38,004:mill_control:execute_command: Command sent: G00 X-87 Y-173 Z0
+2023-10-23 16:06:40,005:mill_control:execute_command: Initially ok
+2023-10-23 16:06:42,027:mill_control:execute_command: Returned <Idle|MPos:-90.000,-176.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:06:42,027:e_panda:INFO:9994023:H1:Moving to purge vial: waste...
+2023-10-23 16:06:42,027:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:06:44,029:mill_control:execute_command: Initially ok
+2023-10-23 16:06:48,067:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:06:48,067:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:06:50,068:mill_control:execute_command: Initially ok
+2023-10-23 16:06:51,083:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:06:51,083:pump_control:Purging 20.000000 ul...
+2023-10-23 16:06:51,137:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:06:54,159:pump_control:Done Infusing
+2023-10-23 16:06:56,176:pump_control:Pump has infused: 0.02 ml
+2023-10-23 16:06:56,243:pump_control:Purged 20.0 ul
+2023-10-23 16:06:56,244:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:06:58,245:mill_control:execute_command: Initially ok
+2023-10-23 16:06:59,259:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:06:59,259:e_panda:INFO:9994023:H1:Moving to target well: H1...
+2023-10-23 16:06:59,259:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:07:01,261:mill_control:execute_command: Initially ok
+2023-10-23 16:07:08,322:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:07:08,322:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999711531666
+2023-10-23 16:07:10,324:mill_control:execute_command: Initially ok
+2023-10-23 16:07:12,346:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 16:07:12,347:wellplate:New volume: 290.0 | New depth: -75.99999423063332
+2023-10-23 16:07:12,347:e_panda:INFO:9994023:H1:Infusing ferrocene into well H1...
+2023-10-23 16:07:12,401:pump_control:Infusing 0.145000 ml...
+2023-10-23 16:07:30,434:pump_control:Done Infusing
+2023-10-23 16:07:32,452:pump_control:Pump has infused: 0.145 ml
+2023-10-23 16:07:32,518:e_panda:INFO:9994023:H1:Well H1 volume: 290.000000
+2023-10-23 16:07:32,519:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:07:34,520:mill_control:execute_command: Initially ok
+2023-10-23 16:07:36,543:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:07:36,543:e_panda:DEBUG:9994023:H1:Moving to purge vial: waste...
+2023-10-23 16:07:36,543:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:07:38,544:mill_control:execute_command: Initially ok
+2023-10-23 16:07:45,604:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:07:45,604:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:07:47,605:mill_control:execute_command: Initially ok
+2023-10-23 16:07:48,620:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:07:48,620:pump_control:Purging 20.000000 ul...
+2023-10-23 16:07:48,673:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:07:51,694:pump_control:Done Infusing
+2023-10-23 16:07:53,712:pump_control:Pump has infused: 0.02 ml
+2023-10-23 16:07:53,778:pump_control:Purged 20.0 ul
+2023-10-23 16:07:53,832:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:07:59,274:pump_control:Done Infusing
+2023-10-23 16:08:01,292:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:08:01,358:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:08:03,359:mill_control:execute_command: Initially ok
+2023-10-23 16:08:04,373:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:08:04,390:e_panda:DEBUG:9994023:H1:Remaining volume in pipette: 0.000000 
+2023-10-23 16:08:04,391:__main__:INFO:9994023:H1:Deposited char_sol in well: H1
+2023-10-23 16:08:04,392:e_panda:INFO:9994023:H1:Characterizing well: H1
+2023-10-23 16:08:04,392:e_panda:INFO:9994023:H1:Beginning eChem OCP of well: H1
+2023-10-23 16:08:04,409:gamry_control_WIP:	Pstat connected: IFC1010-29110
+2023-10-23 16:08:04,410:mill_control:execute_command: Command sent: G00 X-245 Y-44 Z0
+2023-10-23 16:08:06,411:mill_control:execute_command: Initially ok
+2023-10-23 16:08:09,440:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:08:09,441:mill_control:execute_command: Command sent: G00 X-245 Y-44 Z-73
+2023-10-23 16:08:11,442:mill_control:execute_command: Initially ok
+2023-10-23 16:08:13,468:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-76.000|Bf:15,127|FS:0,0>
+2023-10-23 16:08:13,468:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-9994023_OCP_char
+2023-10-23 16:08:13,469:gamry_control_WIP:ocp: made it to run
+2023-10-23 16:08:13,522:gamry_control_WIP:ocp: made it to run end
+2023-10-23 16:08:28,695:gamry_control_WIP:made it to data done
+2023-10-23 16:08:31,735:gamry_control_WIP:number of data points acquired: 30
+2023-10-23 16:08:31,738:gamry_control_WIP:data saved
+2023-10-23 16:08:32,242:e_panda:INFO:9994023:H1:Beginning eChem CV of well: H1
+2023-10-23 16:08:32,243:gamry_control_WIP:eChem: complete file name is: C:\Users\Kab Lab\Documents\GitHub\PANDA\data\experiment-9994023_CV
+2023-10-23 16:08:32,243:gamry_control_WIP:cyclic: made it to run
+2023-10-23 16:08:32,296:gamry_control_WIP:cyclic: made it to run end
+2023-10-23 16:09:28,870:gamry_control_WIP:made it to data done
+2023-10-23 16:09:31,902:gamry_control_WIP:number of data points acquired: 282
+2023-10-23 16:09:31,907:gamry_control_WIP:data saved
+2023-10-23 16:09:32,415:mill_control:MPos coordinates: X = -245.0, Y = -44.0, Z = -73.0
+2023-10-23 16:09:32,416:mill_control:current_coordinates: [-245.0, -44.0, -73.0]
+2023-10-23 16:09:32,416:mill_control:execute_command: Command sent: G00 X-245.0 Y-44.0 Z0.0
+2023-10-23 16:09:34,417:mill_control:execute_command: Initially ok
+2023-10-23 16:09:36,439:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:36,447:mill_control:MPos coordinates: X = -245.0, Y = -44.0, Z = 0.0
+2023-10-23 16:09:36,448:mill_control:current_coordinates: [-245.0, -44.0, 0.0]
+2023-10-23 16:09:36,448:mill_control:execute_command: Command sent: G00 X-245.0 Y-44.0 Z0.0
+2023-10-23 16:09:38,449:mill_control:execute_command: Initially ok
+2023-10-23 16:09:39,463:mill_control:execute_command: Returned <Idle|MPos:-248.000,-47.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:39,464:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 16:09:41,465:mill_control:execute_command: Initially ok
+2023-10-23 16:09:44,496:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:44,496:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-55
+2023-10-23 16:09:46,498:mill_control:execute_command: Initially ok
+2023-10-23 16:09:47,513:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-58.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:47,513:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 16:09:49,514:mill_control:execute_command: Initially ok
+2023-10-23 16:09:50,529:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:50,529:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-55
+2023-10-23 16:09:52,530:mill_control:execute_command: Initially ok
+2023-10-23 16:09:53,544:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-58.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:53,545:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 16:09:55,546:mill_control:execute_command: Initially ok
+2023-10-23 16:09:56,560:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:56,561:mill_control:execute_command: Command sent: G00 X-375 Y0 Z-55
+2023-10-23 16:09:58,561:mill_control:execute_command: Initially ok
+2023-10-23 16:09:59,576:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-58.000|Bf:15,127|FS:0,0>
+2023-10-23 16:09:59,576:mill_control:execute_command: Command sent: G00 X-375 Y0 Z0
+2023-10-23 16:10:01,577:mill_control:execute_command: Initially ok
+2023-10-23 16:10:02,591:mill_control:execute_command: Returned <Idle|MPos:-378.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:10:02,592:gamry_control_WIP:disconnecting pstat
+2023-10-23 16:10:17,598:__main__:INFO:9994023:H1:Characterization of H1 complete
+2023-10-23 16:10:17,598:e_panda:INFO:9994023:H1:Clearing well H1 with 2x repetitions of 145.000000
+2023-10-23 16:10:17,598:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 16:10:17,599:e_panda:INFO:9994023:H1:Repitition 1 of 2
+2023-10-23 16:10:17,599:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 16:10:17,654:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:10:23,095:pump_control:Done Withdrawing
+2023-10-23 16:10:25,113:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:10:25,179:e_panda:DEBUG:9994023:H1:Moving to H1...
+2023-10-23 16:10:25,180:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:10:27,181:mill_control:execute_command: Initially ok
+2023-10-23 16:10:29,203:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:10:29,203:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999423063332
+2023-10-23 16:10:31,204:mill_control:execute_command: Initially ok
+2023-10-23 16:10:33,230:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:10:33,230:wellplate:New volume: 145.0 | New depth: -75.99999711531666
+2023-10-23 16:10:33,231:e_panda:DEBUG:9994023:H1:Withdrawing 145.000000 from H1...
+2023-10-23 16:10:33,284:pump_control:Withdrawing 0.145000 ml...
+2023-10-23 16:10:51,311:pump_control:Done Withdrawing
+2023-10-23 16:10:53,330:pump_control:Pump has withdrawn: 0.145 ml
+2023-10-23 16:10:53,396:e_panda:DEBUG:9994023:H1:Well H1 volume: 145.000000
+2023-10-23 16:10:53,396:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:10:55,397:mill_control:execute_command: Initially ok
+2023-10-23 16:10:57,418:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:10:57,419:e_panda:INFO:9994023:H1:Moving to purge vial waste...
+2023-10-23 16:10:57,419:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:10:59,420:mill_control:execute_command: Initially ok
+2023-10-23 16:11:06,482:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:11:06,483:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:11:08,484:mill_control:execute_command: Initially ok
+2023-10-23 16:11:09,499:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:11:09,499:pump_control:Purging 145.000000 ul...
+2023-10-23 16:11:09,554:pump_control:Infusing 0.145000 ml...
+2023-10-23 16:11:27,586:pump_control:Done Infusing
+2023-10-23 16:11:29,604:pump_control:Pump has infused: 0.145 ml
+2023-10-23 16:11:29,670:pump_control:Purged 145.0 ul
+2023-10-23 16:11:29,671:e_panda:INFO:9994023:H1:Purging the air gap...
+2023-10-23 16:11:29,723:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:11:35,161:pump_control:Done Infusing
+2023-10-23 16:11:37,180:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:11:37,245:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:11:39,247:mill_control:execute_command: Initially ok
+2023-10-23 16:11:40,261:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:11:40,261:e_panda:INFO:9994023:H1:Remaining volume in well: 145.000000
+2023-10-23 16:11:40,262:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 16:11:40,262:e_panda:INFO:9994023:H1:Repitition 2 of 2
+2023-10-23 16:11:40,262:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 16:11:40,316:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:11:45,759:pump_control:Done Withdrawing
+2023-10-23 16:11:47,777:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:11:47,843:e_panda:DEBUG:9994023:H1:Moving to H1...
+2023-10-23 16:11:47,844:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:11:49,845:mill_control:execute_command: Initially ok
+2023-10-23 16:11:56,907:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:11:56,908:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z-75.99999711531666
+2023-10-23 16:11:58,909:mill_control:execute_command: Initially ok
+2023-10-23 16:12:00,931:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 16:12:00,932:wellplate:New volume: 0.0 | New depth: -76.0
+2023-10-23 16:12:00,932:e_panda:DEBUG:9994023:H1:Withdrawing 145.000000 from H1...
+2023-10-23 16:12:00,985:pump_control:Withdrawing 0.145000 ml...
+2023-10-23 16:12:19,016:pump_control:Done Withdrawing
+2023-10-23 16:12:21,034:pump_control:Pump has withdrawn: 0.145 ml
+2023-10-23 16:12:21,100:e_panda:DEBUG:9994023:H1:Well H1 volume: 0.000000
+2023-10-23 16:12:21,101:mill_control:execute_command: Command sent: G00 X-366 Y-72 Z0
+2023-10-23 16:12:23,102:mill_control:execute_command: Initially ok
+2023-10-23 16:12:25,123:mill_control:execute_command: Returned <Idle|MPos:-369.000,-75.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:12:25,124:e_panda:INFO:9994023:H1:Moving to purge vial waste...
+2023-10-23 16:12:25,124:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:12:27,125:mill_control:execute_command: Initially ok
+2023-10-23 16:12:34,184:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:12:34,184:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:12:36,185:mill_control:execute_command: Initially ok
+2023-10-23 16:12:37,202:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-23 16:12:37,202:pump_control:Purging 145.000000 ul...
+2023-10-23 16:12:37,258:pump_control:Infusing 0.145000 ml...
+2023-10-23 16:12:55,291:pump_control:Done Infusing
+2023-10-23 16:12:57,308:pump_control:Pump has infused: 0.145 ml
+2023-10-23 16:12:57,375:pump_control:Purged 145.0 ul
+2023-10-23 16:12:57,376:e_panda:INFO:9994023:H1:Purging the air gap...
+2023-10-23 16:12:57,431:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:13:02,875:pump_control:Done Infusing
+2023-10-23 16:13:04,892:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:13:04,959:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:13:06,961:mill_control:execute_command: Initially ok
+2023-10-23 16:13:07,977:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:13:07,977:e_panda:INFO:9994023:H1:Remaining volume in well: 0.000000
+2023-10-23 16:13:07,977:__main__:INFO:9994023:H1:Well H1 cleared
+2023-10-23 16:13:07,978:e_panda:INFO:9994023:H1:Flushing pipette tip with 120.000000 ul of dmf...
+2023-10-23 16:13:07,978:e_panda:DEBUG:9994023:H1:Selected stock vial: dmf in position {'x': -2, 'y': -76, 'z': -20}
+2023-10-23 16:13:07,978:e_panda:DEBUG:9994023:H1:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 16:13:07,979:e_panda:INFO:9994023:H1:Moving to flush solution dmf...
+2023-10-23 16:13:07,979:mill_control:execute_command: Command sent: G00 X-87 Y-74 Z0
+2023-10-23 16:13:09,980:mill_control:execute_command: Initially ok
+2023-10-23 16:13:12,001:mill_control:execute_command: Returned <Idle|MPos:-90.000,-77.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:13:12,002:e_panda:DEBUG:9994023:H1:Withdrawing 40.000000 of air gap...
+2023-10-23 16:13:12,055:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:13:17,452:pump_control:Done Withdrawing
+2023-10-23 16:13:19,470:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:13:19,536:mill_control:execute_command: Command sent: G00 X-87 Y-74 Z-75
+2023-10-23 16:13:21,538:mill_control:execute_command: Initially ok
+2023-10-23 16:13:23,560:mill_control:execute_command: Returned <Idle|MPos:-90.000,-77.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-23 16:13:23,561:e_panda:DEBUG:9994023:H1:Withdrawing dmf...
+2023-10-23 16:13:23,614:pump_control:Withdrawing 0.120000 ml...
+2023-10-23 16:13:38,608:pump_control:Done Withdrawing
+2023-10-23 16:13:40,626:pump_control:Pump has withdrawn: 0.12 ml
+2023-10-23 16:13:40,693:mill_control:execute_command: Command sent: G00 X-87 Y-74 Z0
+2023-10-23 16:13:42,693:mill_control:execute_command: Initially ok
+2023-10-23 16:13:44,718:mill_control:execute_command: Returned <Idle|MPos:-90.000,-77.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:13:44,719:e_panda:DEBUG:9994023:H1:Moving to purge...
+2023-10-23 16:13:44,719:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:13:46,721:mill_control:execute_command: Initially ok
+2023-10-23 16:13:48,743:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:13:48,744:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:13:50,744:mill_control:execute_command: Initially ok
+2023-10-23 16:13:51,758:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:13:51,759:e_panda:DEBUG:9994023:H1:Purging...
+2023-10-23 16:13:51,759:pump_control:Purging 120.000000 ul...
+2023-10-23 16:13:51,814:pump_control:Infusing 0.120000 ml...
+2023-10-23 16:14:06,861:pump_control:Done Infusing
+2023-10-23 16:14:08,878:pump_control:Pump has infused: 0.12 ml
+2023-10-23 16:14:08,945:pump_control:Purged 120 ul
+2023-10-23 16:14:08,945:e_panda:DEBUG:9994023:H1:Purging the air gap...
+2023-10-23 16:14:09,001:pump_control:Infusing 0.040000 ml...
+2023-10-23 16:14:14,402:pump_control:Done Infusing
+2023-10-23 16:14:16,421:pump_control:Pump has infused: 0.04 ml
+2023-10-23 16:14:16,488:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:14:18,490:mill_control:execute_command: Initially ok
+2023-10-23 16:14:19,504:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:14:19,505:__main__:INFO:9994023:H1:Pipette Flushed
+2023-10-23 16:14:19,505:__main__:INFO:9994023:H1:End of Experiment: 9994023
+2023-10-23 16:14:19,513:mill_control:MPos coordinates: X = -132.0, Y = -11.0, Z = 0.0
+2023-10-23 16:14:19,514:mill_control:current_coordinates: [-132.0, -11.0, 0.0]
+2023-10-23 16:14:19,514:mill_control:execute_command: Command sent: G00 X-132.0 Y-11.0 Z0.0
+2023-10-23 16:14:21,516:mill_control:execute_command: Initially ok
+2023-10-23 16:14:22,534:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:14:22,534:__main__:INFO:9994023:H1:EXPERIMENT 9994023 COMPLETED
+
+
+2023-10-23 16:14:22,676:__main__:INFO:9994023:H1:Returning completed instructions for experiment 9994023
+2023-10-23 16:14:22,698:scheduler:Well H1 status changed to ExperimentStatus.COMPLETE
+2023-10-23 16:14:22,726:scheduler:Experiment 9994023 status changed to ExperimentStatus.COMPLETE
+2023-10-23 16:14:22,728:scheduler:Experiment 9994023 location updated to ExperimentStatus.COMPLETE
+2023-10-23 16:14:22,729:scheduler:Saving experiment 9994023 results to database as peg2p-test_H1.json
+2023-10-23 16:14:30,233:__main__:INFO:9994024:H2:Beginning experiment 9994024
+2023-10-23 16:14:30,233:__main__:INFO:9994024:H2:Pipetting 290.0 ul of peg into H2...
+2023-10-23 16:14:30,234:e_panda:INFO:9994024:H2:Repetition 1 of 2
+2023-10-23 16:14:30,234:e_panda:DEBUG:9994024:H2:Selected stock vial: peg in position {'x': -2, 'y': -109, 'z': -20}
+2023-10-23 16:14:30,235:e_panda:DEBUG:9994024:H2:Selected waste vial: waste in position {'x': -47, 'y': -13, 'z': -20}
+2023-10-23 16:14:30,235:e_panda:DEBUG:9994024:H2:Withdrawing 40.000000 of air gap...
+2023-10-23 16:14:30,291:pump_control:Withdrawing 0.040000 ml...
+2023-10-23 16:14:35,690:pump_control:Done Withdrawing
+2023-10-23 16:14:37,708:pump_control:Pump has withdrawn: 0.04 ml
+2023-10-23 16:14:37,775:e_panda:INFO:9994024:H2:Moving to peg...
+2023-10-23 16:14:37,775:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z0
+2023-10-23 16:14:39,776:mill_control:execute_command: Initially ok
+2023-10-23 16:14:41,800:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:14:41,801:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z-75
+2023-10-23 16:14:43,802:mill_control:execute_command: Initially ok
+2023-10-23 16:14:45,825:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-78.000|Bf:15,127|FS:0,0>
+2023-10-23 16:14:45,881:pump_control:Withdrawing 0.185000 ml...
+2023-10-23 16:15:08,711:pump_control:Done Withdrawing
+2023-10-23 16:15:10,729:pump_control:Pump has withdrawn: 0.185 ml
+2023-10-23 16:15:10,798:mill_control:execute_command: Command sent: G00 X-87 Y-107 Z0
+2023-10-23 16:15:12,799:mill_control:execute_command: Initially ok
+2023-10-23 16:15:14,826:mill_control:execute_command: Returned <Idle|MPos:-90.000,-110.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2023-10-23 16:15:14,827:e_panda:INFO:9994024:H2:Moving to purge vial: waste...
+2023-10-23 16:15:14,827:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:15:16,828:mill_control:execute_command: Initially ok
+2023-10-23 16:15:18,853:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:15:18,854:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:15:20,855:mill_control:execute_command: Initially ok
+2023-10-23 16:15:21,870:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0>
+2023-10-23 16:15:21,872:pump_control:Purging 20.000000 ul...
+2023-10-23 16:15:21,928:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:15:24,962:pump_control:Done Infusing
+2023-10-23 16:15:26,980:pump_control:Pump has infused: 0.02 ml
+2023-10-23 16:15:27,049:pump_control:Purged 20.0 ul
+2023-10-23 16:15:27,050:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:15:29,051:mill_control:execute_command: Initially ok
+2023-10-23 16:15:30,067:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:15:30,068:e_panda:INFO:9994024:H2:Moving to target well: H2...
+2023-10-23 16:15:30,068:mill_control:execute_command: Command sent: G00 X-366 Y-81 Z0
+2023-10-23 16:15:32,070:mill_control:execute_command: Initially ok
+2023-10-23 16:15:39,136:mill_control:execute_command: Returned <Idle|MPos:-369.000,-84.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:15:39,137:mill_control:execute_command: Command sent: G00 X-366 Y-81 Z-76
+2023-10-23 16:15:41,138:mill_control:execute_command: Initially ok
+2023-10-23 16:15:43,162:mill_control:execute_command: Returned <Idle|MPos:-369.000,-84.000,-79.000|Bf:15,127|FS:0,0>
+2023-10-23 16:15:43,163:wellplate:New volume: 145.0 | New depth: -75.99999711531666
+2023-10-23 16:15:43,163:e_panda:INFO:9994024:H2:Infusing peg into well H2...
+2023-10-23 16:15:43,218:pump_control:Infusing 0.145000 ml...
+2023-10-23 16:16:01,255:pump_control:Done Infusing
+2023-10-23 16:16:03,273:pump_control:Pump has infused: 0.145 ml
+2023-10-23 16:16:03,341:e_panda:INFO:9994024:H2:Well H2 volume: 145.000000
+2023-10-23 16:16:03,341:mill_control:execute_command: Command sent: G00 X-366 Y-81 Z0
+2023-10-23 16:16:05,342:mill_control:execute_command: Initially ok
+2023-10-23 16:16:07,366:mill_control:execute_command: Returned <Idle|MPos:-369.000,-84.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:16:07,366:e_panda:DEBUG:9994024:H2:Moving to purge vial: waste...
+2023-10-23 16:16:07,366:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z0
+2023-10-23 16:16:09,367:mill_control:execute_command: Initially ok
+2023-10-23 16:16:16,430:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-3.000|Bf:15,127|FS:0,0>
+2023-10-23 16:16:16,431:mill_control:execute_command: Command sent: G00 X-132 Y-11 Z-20
+2023-10-23 16:16:18,432:mill_control:execute_command: Initially ok
+2023-10-23 16:16:19,448:mill_control:execute_command: Returned <Idle|MPos:-135.000,-14.000,-23.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2023-10-23 16:16:19,448:pump_control:Purging 20.000000 ul...
+2023-10-23 16:16:19,502:pump_control:Infusing 0.020000 ml...
+2023-10-23 16:16:22,522:pump_control:Done Infusing

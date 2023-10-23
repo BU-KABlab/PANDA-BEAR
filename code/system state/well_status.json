@@ -842,8 +842,8 @@
         },
         {
             "well_id": "H1",
-            "status": "new",
-            "status_date": "2023-08-08_16_46_34",
+            "status": "complete",
+            "status_date": "2023-10-23T16:14:22",
             "contents": [],
             "OCP_file": null,
             "OCP_pass": null,
