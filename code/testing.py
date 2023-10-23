@@ -12,6 +12,7 @@ from controller import read_vials, update_vial_state_file
 from e_panda import mixing_test_protocol
 from mixing_test_experiments import experiments as mix_test_experiments
 from scheduler import Scheduler
+from config.file_locations import *
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -220,8 +221,8 @@ def mixing_test(experiments: list[Experiment]):
     - characterizing (CV) the well
     - plotting the results
     """
-    stock_vials = read_vials("code\system state\stock_status.json")
-    waste_vials = read_vials("code\system state\waste_status.json")
+    stock_vials = read_vials(STOCK_STATUS_FILE)
+    waste_vials = read_vials(WASTE_STATUS_FILE)
     wellplate = Wells(
         a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
     )
@@ -246,8 +247,8 @@ def mixing_test(experiments: list[Experiment]):
                 )
 
                 ## Update the system state
-                update_vial_state_file(stock_vials, "code\system state\stock_status.json")
-                update_vial_state_file(waste_vials, "code\system state\waste_status.json")
+                update_vial_state_file(stock_vials, STOCK_STATUS_FILE)
+                update_vial_state_file(waste_vials, WASTE_STATUS_FILE)
                 scheduler.change_well_status(
                     experiment.target_well, experiment.status, experiment.status_date, experiment.id
                     )
@@ -264,47 +265,4 @@ def mixing_test(experiments: list[Experiment]):
                 echem.disconnectpstat()
 
 if __name__ == "__main__":
-    #cv_cleaning_test()
-    # main()
-    # interactive()
-    # dry_run_experiment = Experiment(
-    #     id=0,
-    #     priority=1,
-    #     pin=CURRENT_PIN,
-    #     target_well="C12",
-    #     dmf=50,
-    #     peg=50,
-    #     acrylate=50,
-    #     ferrocene=50,
-    #     custom=90,
-    #     ocp=1,
-    #     ca=0,  # 0 = no deposition, 1 = deposition
-    #     cv=1,  # 0 = no characterization, 1 = characterization
-    #     baseline=0,
-    #     dep_duration=0,
-    #     dep_pot= 0,
-    #     char_sol_name="ferrocene",
-    #     char_vol= 0,
-    #     flush_sol_name="dmf",
-    #     flush_vol=120,
-    #     rinse_count=0,
-    #     rinse_vol=150,
-    #     mix=1,  # 0 = no mixing, 1 = mixing
-    #     mix_count=3,
-    #     mix_vol=145,
-    #     mix_rate=0.62,
-    #     status=ExperimentStatus.NEW,
-    #     status_date=datetime.now(),
-    #     filename="mixing_test_dry_run_C12",
-    #     results=None,
-    # # )
-    # dry_run_experiment.status = ExperimentStatus.RUNNING
-    # scheduler = Scheduler()
-    # scheduler.update_experiment_status(dry_run_experiment)
-    
-    # input("Press enter when stock vials are in place and status updated (code/system state/stock_status.json):")
-    # input("Press enter to start dry run after switching pstat to test cell:")
-    #mixing_test([dry_run_experiment])
-    #input("Please change pstat back to working set up and press enter to continue:")
-    #input("Press enter to continue to mixing test following successful dry run:")
     mixing_test(mix_test_experiments)
