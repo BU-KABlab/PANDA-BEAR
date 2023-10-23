@@ -10,12 +10,11 @@ from log_tools import CustomLoggingFilter
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 from typing import Optional
+
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter(
-    "%(asctime)s:%(name)s:%(levelname)s:%(message)s"
-)
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -63,7 +62,7 @@ class Pump:
         """Add custom value to log format"""
         experiment_formatter = logging.Formatter(
             "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
-            )
+        )
         system_handler.setFormatter(experiment_formatter)
         custom_filter = CustomLoggingFilter(experiment_id, target_well)
         logger.addFilter(custom_filter)
@@ -84,7 +83,9 @@ class Pump:
         time.sleep(2)
         return pump
 
-    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
+    def withdraw(
+        self, volume: float, solution: Vial = None, rate: float = 0.5
+    ) -> Optional[Vial]:
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
@@ -98,7 +99,7 @@ class Pump:
         # Perform the withdrawl
         volume_ul = volume
         if volume > 0:
-            volume_ml = volume / 1000.00 # convert the volume argument from ul to ml
+            volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
 
             self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate)
             self.update_pipette_volume(self.pump.volume_withdrawn)
@@ -115,7 +116,9 @@ class Pump:
         else:
             return None
 
-    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
+    def infuse(
+        self, volume: float, solution: Vial = None, rate: float = 0.5
+    ) -> Optional[Vial]:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -147,6 +150,7 @@ class Pump:
                 return None
         else:
             return None
+
     def purge(
         self,
         purge_vial: Vial,
@@ -226,7 +230,7 @@ class Pump:
         if mix_location is None:
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(volume=mix_volume,rate= mix_rate)
+                self.withdraw(volume=mix_volume, rate=mix_rate)
                 current_coords = self.mill.current_coordinates()
                 current_coords = {
                     "x": current_coords[0],
@@ -237,7 +241,7 @@ class Pump:
                 self.mill.move_center_to_position(
                     current_coords["x"], current_coords["y"], current_coords["z"] + 5
                 )
-                self.infuse(volume=mix_volume,rate= mix_rate)
+                self.infuse(volume=mix_volume, rate=mix_rate)
                 self.mill.move_center_to_position(
                     current_coords["x"], current_coords["y"], current_coords["z"]
                 )
@@ -250,7 +254,7 @@ class Pump:
             )
             for i in range(mix_repetitions):
                 logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(volume=mix_volume,rate= mix_rate)
+                self.withdraw(volume=mix_volume, rate=mix_rate)
                 self.mill.set_feed_rate(500)
                 self.mill.move_pipette_to_position(
                     mix_location["x"], mix_location["y"], mix_location["depth"] + 1.5
@@ -293,7 +297,9 @@ class MockPump(Pump):
         self.mill = mill
         self.scale = scale
 
-    def withdraw(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
+    def withdraw(
+        self, volume: float, solution: Vial = None, rate: float = 0.5
+    ) -> Optional[Vial]:
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
 
@@ -309,13 +315,15 @@ class MockPump(Pump):
             "Mock Pump has withdrawn: %f ml    Pipette vol: %f",
             volume_ml,
             self.pipette_volume_ul,
-            )
+        )
         if solution is not None:
             solution.update_volume(-volume_ul)
             return solution
         return 0
 
-    def infuse(self, volume: float, solution: Vial = None, rate: float = 0.5) -> Optional[Vial]:
+    def infuse(
+        self, volume: float, solution: Vial = None, rate: float = 0.5
+    ) -> Optional[Vial]:
         # Simulate infuse behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
 
@@ -343,16 +351,16 @@ class MockPump(Pump):
         """Change the pipette volume by the given amount
         Args:
             volume_ml (float): The amount to change the pipette volume by
-            
+
         Returns:
             None
         """
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
             self.pipette_volume_ul -= volume_ml * 1000
-            self.pipette_volume_ml -= volume_ml 
+            self.pipette_volume_ml -= volume_ml
         else:
             self.pipette_volume_ul += volume_ml * 1000
-            self.pipette_volume_ml += volume_ml 
+            self.pipette_volume_ml += volume_ml
 
 
 class OverFillException(Exception):

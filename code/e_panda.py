@@ -45,14 +45,13 @@ from wellplate import Wells
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter(
-    "%(asctime)s:%(name)s:%(levelname)s:%(message)s"
-)
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
 AIR_GAP = 40  # ul
+
 
 def pipette(
     volume: float,  # volume in ul
@@ -158,7 +157,7 @@ def pipette(
             )  # purge_vial.depth replaced with height
 
             purge_vial = pump.purge(
-                purge_vial=purge_vial, purge_volume= purge_volume
+                purge_vial=purge_vial, purge_volume=purge_volume
             )  # remaining vol in pipette is now air gap + repition vol + 1 purge
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
@@ -225,6 +224,7 @@ def pipette(
 
     return solutions, waste_vials, wellplate
 
+
 def clear_well(
     volume: float,
     target_well: str,
@@ -274,14 +274,14 @@ def clear_well(
             wellplate.get_coordinates(target_well)["x"],
             wellplate.get_coordinates(target_well)["y"],
             wellplate.depth(target_well),
-            Instruments.PIPETTE
+            Instruments.PIPETTE,
         )  # go to bottom of well
 
         wellplate.update_volume(target_well, -repetition_vol)
         logger.debug("Withdrawing %f from %s...", repetition_vol, target_well)
         pump.withdraw(
             volume=repetition_vol,
-            solution= None,
+            solution=None,
             rate=pumping_rate,
         )  # withdraw the volume from the well
 
@@ -297,11 +297,11 @@ def clear_well(
             purge_vial.coordinates["x"],
             purge_vial.coordinates["y"],
             purge_vial.height,
-            Instruments.PIPETTE
+            Instruments.PIPETTE,
         )
 
         purge_vial = pump.purge(
-            purge_vial = purge_vial, purge_volume= repetition_vol
+            purge_vial=purge_vial, purge_volume=repetition_vol
         )  # repitition volume
         logger.info("Purging the air gap...")
         pump.infuse(volume=AIR_GAP, rate=0.5)  # extra purge to clear pipette
@@ -312,6 +312,7 @@ def clear_well(
         logger.info("Remaining volume in well: %f", wellplate.volume(target_well))
 
     return waste_vials, wellplate
+
 
 def rinse(
     wellplate: Wells,
@@ -347,7 +348,7 @@ def rinse(
         rinse_solution_name = "rinse" + str(rep)
         # purge_vial = waste_selector(rinse_solution_name, rinse_vol)
         # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
-        logger.info("Rinse %d of %d", rep+1, instructions.rinse_count)
+        logger.info("Rinse %d of %d", rep + 1, instructions.rinse_count)
         stock_vials, waste_vials, wellplate = pipette(
             instructions.rinse_vol,
             stock_vials,
@@ -370,9 +371,12 @@ def rinse(
             mill,
             solution_name=rinse_solution_name,
         )
-        logger.info("Rinse %d of %d complete", rep+1, instructions.rinse_count)
-        logger.debug("Remaining volume in well: %f", wellplate.volume(instructions.target_well))
+        logger.info("Rinse %d of %d complete", rep + 1, instructions.rinse_count)
+        logger.debug(
+            "Remaining volume in well: %f", wellplate.volume(instructions.target_well)
+        )
     return stock_vials, waste_vials, wellplate
+
 
 def flush_pipette_tip(
     pump: Pump,
@@ -401,9 +405,13 @@ def flush_pipette_tip(
 
     if flush_volume > 0.000:
         logger.info(
-        "Flushing pipette tip with %f ul of %s...", flush_volume, flush_solution_name
+            "Flushing pipette tip with %f ul of %s...",
+            flush_volume,
+            flush_solution_name,
         )
-        flush_solution = solution_selector(stock_vials, flush_solution_name, flush_volume)
+        flush_solution = solution_selector(
+            stock_vials, flush_solution_name, flush_volume
+        )
         purge_vial = waste_selector(waste_vials, "waste", flush_volume)
 
         logger.info("Moving to flush solution %s...", flush_solution.name)
@@ -411,7 +419,7 @@ def flush_pipette_tip(
             flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
         )
         logger.debug("Withdrawing %f of air gap...", AIR_GAP)
-        pump.withdraw(volume=AIR_GAP,rate= pumping_rate)
+        pump.withdraw(volume=AIR_GAP, rate=pumping_rate)
 
         mill.move_pipette_to_position(
             flush_solution.coordinates["x"],
@@ -420,7 +428,9 @@ def flush_pipette_tip(
         )  # depth replaced with height
 
         logger.debug("Withdrawing %s...", flush_solution.name)
-        flush_solution = pump.withdraw(volume=flush_volume, solution=flush_solution, rate=pumping_rate)
+        flush_solution = pump.withdraw(
+            volume=flush_volume, solution=flush_solution, rate=pumping_rate
+        )
         mill.move_pipette_to_position(
             flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
         )
@@ -443,9 +453,8 @@ def flush_pipette_tip(
         logger.info("No flushing required. Flush volume is 0. Continuing...")
     return stock_vials, waste_vials
 
-def solution_selector(
-    solutions: list[Vial], solution_name: str, volume: float
-) -> Vial:
+
+def solution_selector(solutions: list[Vial], solution_name: str, volume: float) -> Vial:
     """
     Select the solution from which to withdraw from, from the list of solution objects
     Args:
@@ -468,9 +477,7 @@ def solution_selector(
     raise NoAvailableSolution(solution_name)
 
 
-def waste_selector(
-    solutions: list[Vial], solution_name: str, volume: float
-) -> Vial:
+def waste_selector(solutions: list[Vial], solution_name: str, volume: float) -> Vial:
     """
     Select the solution in which to deposit into from the list of solution objects
     Args:
@@ -494,6 +501,7 @@ def waste_selector(
             return waste_solution
     raise NoAvailableSolution(solution_name)
 
+
 def deposition(
     dep_instructions: Experiment,
     dep_results: ExperimentResult,
@@ -502,9 +510,9 @@ def deposition(
 ) -> Tuple[Experiment, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
-    
+
     No pipetting is performed in this step.
-    
+
     Args:
         dep_instructions (Experiment): The experiment instructions
         dep_results (ExperimentResult): The experiment results
@@ -574,6 +582,7 @@ def deposition(
 
     return dep_instructions, dep_results
 
+
 def characterization(
     char_instructions: Experiment,
     char_results: ExperimentResult,
@@ -582,9 +591,9 @@ def characterization(
 ) -> Tuple[Experiment, ExperimentResult]:
     """
     Characterization of the solutions on the substrate
-    
+
     No pipetting is performed in this step.
-    
+
     Args:
         char_instructions (Experiment): The experiment instructions
         char_results (ExperimentResult): The experiment results
@@ -660,14 +669,16 @@ def characterization(
         echem.disconnectpstat()
         raise OCPFailure("CV")
 
+
 def apply_log_filter(experiment_id: int, target_well: str = None):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
         "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
-        )
+    )
     system_handler.setFormatter(experiment_formatter)
     custom_filter = CustomLoggingFilter(experiment_id, target_well)
     logger.addFilter(custom_filter)
+
 
 def run_experiment(
     instructions: Experiment,
@@ -772,7 +783,9 @@ def run_experiment(
             logger.info("Mixing well: %s", instructions.target_well)
             instructions.status = ExperimentStatus.MIXING
             pump.mix(
-                mix_location=wellplate.get_coordinates(instructions.target_well), # fetch x, y, z, depth, and echem height coordinates of well
+                mix_location=wellplate.get_coordinates(
+                    instructions.target_well
+                ),  # fetch x, y, z, depth, and echem height coordinates of well
                 mix_repetitions=3,
                 mix_volume=instructions.mix_vol,
                 mix_rate=instructions.mix_rate,
@@ -930,6 +943,7 @@ def run_experiment(
         )
 
     return instructions, results, stock_vials, waste_vials, wellplate
+
 
 def mixing_test_protocol(
     instructions: Experiment,
@@ -1094,7 +1108,7 @@ def mixing_test_protocol(
 
     return instructions, results, stock_vials, waste_vials, wellplate
 
-               
+
 def peg2p_protocol(
     instructions: Experiment,
     results: ExperimentResult,
@@ -1123,7 +1137,7 @@ def peg2p_protocol(
     7. Return results, stock_vials, waste_vials, wellplate
     8. Update the system state
     9. Update location of experiment instructions and save results
-    
+
     Args:
         instructions (Experiment object): The experiment instructions
         results (ExperimentResult object): The experiment results

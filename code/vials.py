@@ -1,10 +1,11 @@
-'''
+"""
 Vial class for creating vial objects with their position and contents
-'''
+"""
 # pylint: disable=line-too-long
 import json
 import logging
 import math
+
 
 class Vial:
     """
@@ -18,6 +19,7 @@ class Vial:
         capacity in ml
 
     """
+
     def __init__(
         self,
         position: str,
@@ -42,7 +44,9 @@ class Vial:
         self.height = height
         self.volume = volume
         self.base = math.pi * math.pow(self.radius, 2.0)
-        self.depth = self.vial_height_calculator(self.radius*2,self.volume) + self.bottom
+        self.depth = (
+            self.vial_height_calculator(self.radius * 2, self.volume) + self.bottom
+        )
         self.contamination = 0
         self.filepath = filepath
 
@@ -109,20 +113,23 @@ class Vial:
         """
         logging.info("Updating %s volume...", self.name)
         if self.volume + added_volume_ul > self.capacity:
-            raise OverFillException(self.name, self.volume, added_volume_ul, self.capacity)
+            raise OverFillException(
+                self.name, self.volume, added_volume_ul, self.capacity
+            )
         if self.volume + added_volume_ul < 0:
             raise OverDraftException(
                 self.name, self.volume, added_volume_ul, self.capacity
             )
-        self.volume += round(added_volume_ul,3)
-        #self.write_volume_to_disk()
+        self.volume += round(added_volume_ul, 3)
+        # self.write_volume_to_disk()
         self.depth = (
-            self.vial_height_calculator((self.radius * 2), self.volume)
-            + self.bottom
+            self.vial_height_calculator((self.radius * 2), self.volume) + self.bottom
         )
         if self.depth < self.bottom:
             self.depth = self.bottom
-        logging.debug("%s: New volume: %s | New depth: %s",self.name, self.volume, self.depth)
+        logging.debug(
+            "%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth
+        )
         self.contamination += 1
         return 0
 

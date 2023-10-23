@@ -150,10 +150,11 @@ def cv_cleaning_test():
         input("Press enter to end")
         echem.disconnectpstat()
 
+
 def peg2p_test(experiments: list[Experiment]):
     """
-    Experiments for 3.4k PEG2P test 
-        
+    Experiments for 3.4k PEG2P test
+
         Well | Solution(s)  | Deposition  | Characterization
         -----------------------------------------------------------------------
         G10  | DmFc         | None        | DmFc, 50 mV/s, 2 mV/step, 3 cycles
@@ -162,7 +163,7 @@ def peg2p_test(experiments: list[Experiment]):
         H1   | PEG2Pc       | 1.2 V, 600s | DmFc, 50 mV/s, 2 mV/step, 3 cycles
         H2   | PEG2Pc       | 1.5 V, 600s | DmFc, 50 mV/s, 2 mV/step, 3 cycles
         H3   | DmFc         | None        | DmFc, 50 mV/s, 2 mV/step, 3 cycles
-        
+
 
     The following steps will be performed for each well:
         - deposition using the deposition parameters listed
@@ -177,9 +178,7 @@ def peg2p_test(experiments: list[Experiment]):
     """
     stock_vials = read_vials(STOCK_STATUS_FILE)
     waste_vials = read_vials(WASTE_STATUS_FILE)
-    wellplate = Wells(
-        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
-    )
+    wellplate = Wells(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
     scheduler = Scheduler()
     with Mill() as mill:
         mill.homing_sequence()
@@ -190,7 +189,13 @@ def peg2p_test(experiments: list[Experiment]):
                 ## save the experiment to the experiment queue
                 scheduler.add_experiment(experiment)
                 results = ExperimentResult()
-                experiment, results, stock_vials, waste_vials, wellplate = peg2p_protocol(
+                (
+                    experiment,
+                    results,
+                    stock_vials,
+                    waste_vials,
+                    wellplate,
+                ) = peg2p_protocol(
                     experiment,
                     results,
                     mill,
@@ -204,8 +209,11 @@ def peg2p_test(experiments: list[Experiment]):
                 update_vial_state_file(stock_vials, STOCK_STATUS_FILE)
                 update_vial_state_file(waste_vials, WASTE_STATUS_FILE)
                 scheduler.change_well_status(
-                    experiment.target_well, experiment.status, experiment.status_date, experiment.id
-                    )
+                    experiment.target_well,
+                    experiment.status,
+                    experiment.status_date,
+                    experiment.id,
+                )
 
                 ## Update location of experiment instructions and save results
                 scheduler.update_experiment_status(experiment)
@@ -213,10 +221,11 @@ def peg2p_test(experiments: list[Experiment]):
                 scheduler.save_results(experiment, results)
 
                 # Plot results
-                #analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
+                # analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
 
             if echem.OPEN_CONNECTION is True:
                 echem.disconnectpstat()
+
 
 def mixing_test(experiments: list[Experiment]):
     """
@@ -224,7 +233,7 @@ def mixing_test(experiments: list[Experiment]):
     Experiment name format: MixingTest_wellID_echemType
 
     The contents and variable parameters of each well are as follows:
-    
+
     Well | Solution(s)              | Mixing repetitions
     --------------------------------------------------------
     C1   | Premixed Solution        | 0
@@ -246,9 +255,7 @@ def mixing_test(experiments: list[Experiment]):
     """
     stock_vials = read_vials("code\system state\stock_status.json")
     waste_vials = read_vials("code\system state\waste_status.json")
-    wellplate = Wells(
-        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
-    )
+    wellplate = Wells(a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13)
     scheduler = Scheduler()
     with Mill() as mill:
         mill.homing_sequence()
@@ -259,7 +266,13 @@ def mixing_test(experiments: list[Experiment]):
                 ## save the experiment to the experiment queue
                 scheduler.add_experiment(experiment)
                 results = ExperimentResult()
-                experiment, results, stock_vials, waste_vials, wellplate = mixing_test_protocol(
+                (
+                    experiment,
+                    results,
+                    stock_vials,
+                    waste_vials,
+                    wellplate,
+                ) = mixing_test_protocol(
                     experiment,
                     results,
                     mill,
@@ -270,11 +283,18 @@ def mixing_test(experiments: list[Experiment]):
                 )
 
                 ## Update the system state
-                update_vial_state_file(stock_vials, "code\system state\stock_status.json")
-                update_vial_state_file(waste_vials, "code\system state\waste_status.json")
+                update_vial_state_file(
+                    stock_vials, "code\system state\stock_status.json"
+                )
+                update_vial_state_file(
+                    waste_vials, "code\system state\waste_status.json"
+                )
                 scheduler.change_well_status(
-                    experiment.target_well, experiment.status, experiment.status_date, experiment.id
-                    )
+                    experiment.target_well,
+                    experiment.status,
+                    experiment.status_date,
+                    experiment.id,
+                )
 
                 ## Update location of experiment instructions and save results
                 scheduler.update_experiment_status(experiment)
@@ -282,11 +302,12 @@ def mixing_test(experiments: list[Experiment]):
                 scheduler.save_results(experiment, results)
 
                 # Plot results
-                #analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
+                # analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
 
             if echem.OPEN_CONNECTION is True:
                 echem.disconnectpstat()
- 
+
+
 if __name__ == "__main__":
-    #mixing_test(mix_test_experiments)
+    # mixing_test(mix_test_experiments)
     peg2p_test(peg2p_experiments)
