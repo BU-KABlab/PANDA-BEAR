@@ -351,11 +351,13 @@ class potentiostat_cv_parameters:
 
     # CV Setup Parameters
     CVvi: float = 0.0  # initial voltage
-    CVap1: float = 0.3
-    CVap2: float = -0.2
-    CVvf: float = -0.2
-    CVstep: float = 0.01  # testing step, 100 mv/s
-    CVsr1: float = 0.1
+    CVap1: float = 0.5 #changed from 0.3 V
+    CVap2: float = -0.3 #same
+    CVvf: float = 0.0  # final voltage
+    CVstep: float = 0.002  # testing step, 2 mV/s
+    CVsr1: float = 0.05
+    #CVstep: float = 0.01  # testing step, 10 mv/s
+    #CVsr1: float = 0.1
     CVcycle: int = 3
     CVsr2: float = CVsr1
     CVsr3: float = CVsr1

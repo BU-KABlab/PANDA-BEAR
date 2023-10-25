@@ -21,7 +21,7 @@
         "name": "dmf",
         "volume": 13000.0,
         "capacity": 20000,
-        "contamination": 4
+        "contamination": 20
     },
     {
         "position": "S2",
@@ -31,9 +31,9 @@
         "x": -2,
         "y": -109,
         "name": "peg",
-        "volume": 9759.880000000003,
+        "volume": 9359.880000000003,
         "capacity": 20000,
-        "contamination": 4
+        "contamination": 16
     },
     {
         "position": "S3",
@@ -55,9 +55,9 @@
         "x": -2,
         "y": -175,
         "name": "ferrocene",
-        "volume": 14310.0,
+        "volume": 13670.0,
         "capacity": 20000,
-        "contamination": 4
+        "contamination": 24
     },
     {
         "position": "R0",
@@ -67,9 +67,9 @@
         "x": -2,
         "y": -208,
         "name": "rinse0",
-        "volume": 14880.0,
+        "volume": 14680.0,
         "capacity": 20000,
-        "contamination": 2
+        "contamination": 8
     },
     {
         "position": "R1",
@@ -79,9 +79,9 @@
         "x": -2,
         "y": -241,
         "name": "rinse1",
-        "volume": 14880.0,
+        "volume": 14680.0,
         "capacity": 20000,
-        "contamination": 2
+        "contamination": 8
     },
     {
         "position": "R2",
@@ -91,8 +91,8 @@
         "x": -2,
         "y": -274,
         "name": "rinse2",
-        "volume": 14880.0,
+        "volume": 14680.0,
         "capacity": 20000,
-        "contamination": 2
+        "contamination": 8
     }
 ]
