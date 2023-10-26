@@ -3,13 +3,14 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 """
 import logging
 import time
+from typing import Optional
+
 import nesp_lib
 from scale import Sartorius as Scale, MockSartorius as MockScale
 from vials import Vial
 from log_tools import CustomLoggingFilter
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
-from typing import Optional
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -19,6 +20,13 @@ system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
+# set up logging to log to both the pump_control.log file and the ePANDA.log file
+scale_logger = logging.getLogger(__name__)
+scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+formatter = logging.Formatter("%(asctime)s,%(name)s,%(levelname)s,%(message)s")
+system_handler = logging.FileHandler("code/logs/scale.log")
+system_handler.setFormatter(formatter)
+scale_logger.addHandler(system_handler)
 
 class Pump:
     """
@@ -177,7 +185,7 @@ class Pump:
         purge_vial.update_volume(purge_volume)
         return purge_vial
 
-    def run_pump(self, direction, volume_ml, rate):
+    def run_pump(self, direction, volume_ml, rate, density=1.0):
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
             return
@@ -190,6 +198,12 @@ class Pump:
             if direction == nesp_lib.PumpingDirection.WITHDRAW
             else "Infusing"
         )
+
+        ## Get scale value prior to pump action
+        pre_weight = self.scale.value()
+        scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
+        scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
+
         logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
         self.pump.run()
@@ -197,6 +211,15 @@ class Pump:
             pass
         logger.debug("Done %s", action)
         time.sleep(2)
+
+        ## Get scale value after pump action
+        post_weight = self.scale.value()
+        scale_logger.debug("Scale reading after %s: %f", action, post_weight)
+        scale_logger.debug("Scale reading difference: %f", pre_weight - post_weight)
+        scale_logger.info("Data,%s,%f,%f,%f,%f", 
+                          action, volume_ml, density, pre_weight, post_weight
+                          )
+
         action_type = (
             "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
         )
