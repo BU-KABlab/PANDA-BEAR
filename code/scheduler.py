@@ -418,12 +418,14 @@ def test_well_status_update():
     Tests the change_well_status function.
     """
     scheduler = Scheduler()
+    current_status = scheduler.check_well_status("A1")
     scheduler.change_well_status("A1", "running")
     assert scheduler.check_well_status("A1") == "running"
     scheduler.change_well_status("A1", "complete")
     assert scheduler.check_well_status("A1") == "complete"
     scheduler.change_well_status("A1", "new")
     assert scheduler.check_well_status("A1") == "new"
+    scheduler.change_well_status("A1", current_status)
 
 
 if __name__ == "__main__":
