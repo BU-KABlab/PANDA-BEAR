@@ -311,8 +311,9 @@ def clear_well(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
             logger.info("Remaining volume in well: %f", wellplate.volume(target_well))
+
     else:
-        logger.info("No clearing required. Clear volume is 0. Continuing...")
+        logger.info("No volume to clear from well %s. Input volume was 0", target_well)
     return waste_vials, wellplate
 
 
