@@ -287,7 +287,7 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
         input(
             "Confirm that the program should continue by pressing enter or ctrl+c to exit"
         )
-        reset_wellplate()
+        load_new_wellplate()
         slack.send_slack_message("alert", "Wellplate has been reset. Continuing...")
 
     return stock_vials, waste_vials, wellplate
@@ -407,18 +407,29 @@ def reset_vials(vialgroup: str):
     with open(filename, "w", encoding="UTF-8") as file:
         json.dump(vial_parameters, file, indent=4)
 
+def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wellplate_type_number: int = None) -> int:
+    """
+    Save the current wellplate, reset the well statuses to new. 
+    If no plate id or type number given assume same type number and increment id by 1
 
-def reset_wellplate():
-    """Loop through the well statuses and set them all to new"""
+    Args:
+        override (bool, optional): Set to true to skip inputs. Defaults to False.
+        new_plate_id (int, optional): The plate id being loaded. Defaults to None. If None, the plate id will be incremented by 1
+        new_wellplate_type_number (int, optional): The type of wellplate. Defaults to None. If None, the type number will not be changed
+
+    Returns:
+        int
+    """
     well_status_file = Path.cwd() / 'system state' / "well_status.json"
     # input("This will reset all well statuses to new. Press enter to continue.")
 
     # Confirm that the user wants this
-    choice = input(
-        "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
-    )
-    if choice == "n":
-        return 0
+    if override is False:
+        choice = input(
+            "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
+        )
+        if choice == "n":
+            return 0
 
     ## Open the current status file for the plate id , type number, and wells
     with open(well_status_file, "r", encoding="UTF-8") as file:
@@ -428,16 +439,24 @@ def reset_wellplate():
 
     ## Save each well to the well_history.csv file in the data folder
     ## plate id, type number, well id, experiment id, project id, status, status date, contents
+    logger.debug("Saving well statuses to well_history.csv")
     with open_file("data\\well_history.csv", "a", encoding="UTF-8") as file:
         for well in current_wellplate['wells']:
-            file.write(f"{current_plate_id},{current_type_number},{well['id']},{well['project_id']},{well['status']},{well['status_date']}\n")
+            file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
 
-    print("Well statuses saved to well_history.csv")
+    logger.debug("Well statuses saved to well_history.csv")
 
-    new_wellplate_type_number = int(input(f"Enter the new wellplate type number (current type number: {current_type_number}): "))
+    ## If no plate id or type number given assume same type number and incremend id by 1
+    if new_wellplate_type_number is None:
+        new_wellplate_type_number = current_type_number
+
+    if new_plate_id is None:
+        new_plate_id = current_plate_id + 1
+
     ## Go through a reset all fields and apply new plate id
+    logger.debug("Resetting well statuses to new")
     new_wellplate = current_wellplate
-    new_wellplate["plate_id"] = current_plate_id + 1
+    new_wellplate["plate_id"] = new_plate_id
     new_wellplate["type_number"] = new_wellplate_type_number
     for well in new_wellplate['wells']:
         well["status"] = "new"
@@ -448,7 +467,8 @@ def reset_wellplate():
     with open(well_status_file, "w", encoding="UTF-8") as file:
         json.dump(new_wellplate, file, indent=4)
 
-    print("Well statuses reset to new.")
+    logger.debug("Well statuses reset to new")
+    logger.info("Wellplate %d saved and wellplate %d loaded", current_plate_id, new_plate_id)
     return 0
 
 

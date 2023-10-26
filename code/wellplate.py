@@ -5,10 +5,11 @@ Wellplate data class for the echem experiment. This class is used to store the d
 
 import logging
 import math
-import matplotlib.pyplot as plt
 import json
-from config.file_locations import *
 import os
+
+import matplotlib.pyplot as plt
+from config.file_locations import *
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ class Wells:
         self.echem_height = -73 # for every well
         self.type_number = type_number # The type of wellplate
         self.plate_id = 0 # The id of the wellplate
-        
+
         #overwrite the default values with the values from the well_type.csv file        
         self.radius, self.well_offset, self.well_capacity, height, self.shape = read_well_type_characteristics(self.type_number)
         self.echem_height = -73 # for every well
@@ -115,13 +116,6 @@ class Wells:
                 self.update_well_status(well_id, status)
                 self.plate_id = data["plate_id"]
                 self.type_number = data["type_number"]
-
-    def update_well_status_from_csv_file(self):
-        """Update the well status from a file"""
-        with open("code\\system state\\well_status.json", "r", encoding= "UTF-8") as f:
-            for line in f:
-                well_id, status = line.strip().split(",")
-                self.update_well_status(well_id, status)
 
     def get_coordinates(self, well_id) -> dict:
         """
@@ -203,7 +197,7 @@ class Wells:
             logger.info("Well %s status: %s",well_id,well_data["status"])
 
 
-    def visualize_well_coordinates(self):
+    def well_coordinates_and_status_color(self):
         """Plot the well plate on a coordinate plane"""
         x_coordinates = []
         y_coordinates = []
@@ -270,6 +264,29 @@ class CircularWellPlate(Wells):
         self.echem_height = -73 # for every well
         self.z_top = self.z_bottom + height
 
+def read_well_type_characteristics(type_number: int) -> tuple[float, float, float, float]:
+    """Read the well type characteristics from the well_type.csv config file"""
+
+    file_path = "code\\config\\well_type.csv"
+
+    #check it exists
+    if not os.path.exists(file_path):
+        logger.warning("Well type file not found at %s. Returning defaults", file_path)
+        return 3.25, 9, 300, -73, "circular"
+
+    with open("code\\config\\well_type.csv", "r", encoding= "UTF-8") as f:
+        next(f)
+        for line in f:
+            line = line.strip().split(",")
+            if int(line[0]) == type_number:
+                shape = str(line[4]).strip()
+                radius = float(line[5])
+                well_offset = float(line[6])
+                well_capacity = float(line[9])
+                height= float(line[7])
+                break
+    return radius, well_offset, well_capacity, height, shape
+
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
 
@@ -296,29 +313,6 @@ class OverDraftException(Exception):
     def __str__(self) -> str:
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
 
-def read_well_type_characteristics(type_number: int) -> tuple[float, float, float, float]:
-    """Read the well type characteristics from the well_type.csv file"""
-
-    file_path = "code\\config\\well_type.csv"
-
-    #check it exists
-    if not os.path.exists(file_path):
-        logger.warning("Well type file not found at %s. Returning defaults", file_path)
-        return 3.25, 9, 300, -73, "circular"
-
-    with open("code\\config\\well_type.csv", "r", encoding= "UTF-8") as f:
-        next(f)
-        for line in f:
-            line = line.strip().split(",")
-            if int(line[0]) == type_number:
-                shape = str(line[4]).strip()
-                radius = float(line[5])
-                well_offset = float(line[6])
-                well_capacity = float(line[9])
-                height= float(line[7])
-                break
-    return radius, well_offset, well_capacity, height, shape
-
 
 def test_stage_display():
     """Test the well plate"""
@@ -326,7 +320,7 @@ def test_stage_display():
         a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=3
     )
     ## Well coordinate
-    x_coordinates, y_coordinates, color = wellplate.visualize_well_coordinates()
+    x_coordinates, y_coordinates, color = wellplate.well_coordinates_and_status_color()
     if wellplate.shape == "circular":
         marker = "o"
     else:
