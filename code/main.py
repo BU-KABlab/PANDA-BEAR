@@ -27,7 +27,7 @@ if __name__ == "__main__":
             if user_choice == '00':
                 controller.main()
             elif user_choice == '1':
-                controller.reset_wellplate()
+                controller.load_new_wellplate()
             elif user_choice == '2':
                 controller.reset_vials('stock')
             elif user_choice == '3':
