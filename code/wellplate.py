@@ -36,9 +36,9 @@ class Wells:
         self.orientation = orientation
         self.z_bottom = -76
         self.z_top = 0
-        self.radius = 4.0
+        self.radius = 3.25 #new circular wells
         self.well_offset = 9  # mm from center to center
-        self.well_capacity = 300  # ul
+        self.well_capacity = 180  # ul - new circular wells
         self.echem_height = -73
 
         a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1

@@ -351,13 +351,11 @@ class potentiostat_cv_parameters:
 
     # CV Setup Parameters
     CVvi: float = 0.0  # initial voltage
-    CVap1: float = 0.5 #changed from 0.3 V
-    CVap2: float = -0.3 #same
+    CVap1: float = 0.3 #changed from 0.3 V
+    CVap2: float = -0.2 #same
     CVvf: float = 0.0  # final voltage
-    CVstep: float = 0.002  # testing step, 2 mV/s
-    CVsr1: float = 0.05
-    #CVstep: float = 0.01  # testing step, 10 mv/s
-    #CVsr1: float = 0.1
+    CVstep: float = 0.01
+    CVsr1: float = 0.1
     CVcycle: int = 3
     CVsr2: float = CVsr1
     CVsr3: float = CVsr1
@@ -371,11 +369,11 @@ class potentiostat_ca_parameters:
     # CA/CP Setup Parameters
     CAvi: float = 0.0  # Pre-step voltage (V)
     CAti: float = 0.0  # Pre-step delay time (s)
-    CAv1: float = -2.4  # Step 1 voltage (V)
+    CAv1: float = -1.7  # Step 1 voltage (V)
     CAt1: float = 300.0  # run time 300 seconds
     CAv2: float = 0.0  # Step 2 voltage (V)
     CAt2: float = 0.0  # Step 2 time (s)
-    CAsamplerate: float = 0.05  # sample period (s)
+    CAsamplerate: float = 0.5  # sample period (s)
     # Max current (mA)
     # Limit I (mA/cm^2)
     # PF Corr. (ohm)

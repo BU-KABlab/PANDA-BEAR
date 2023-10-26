@@ -53,7 +53,7 @@
         "name": "rinse0",
         "volume": 2520.0,
         "capacity": 20000,
-        "contamination": 12
+        "contamination": 0
     },
     {
         "position": "RW1",
@@ -63,7 +63,7 @@
         "name": "rinse1",
         "volume": 2520.0,
         "capacity": 20000,
-        "contamination": 12
+        "contamination": 0
     },
     {
         "position": "RW2",
@@ -73,6 +73,6 @@
         "name": "rinse2",
         "volume": 2520.0,
         "capacity": 20000,
-        "contamination": 12
+        "contamination": 0
     }
 ]
