@@ -13,6 +13,7 @@ import random
 import Analyzer
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict, FilePath, RootModel, TypeAdapter
+# pylint: disable = global-statement
 
 # global variables
 PSTAT = None
@@ -26,7 +27,8 @@ START_TIME = None
 ACTIVE = None
 COMPLETE_FILE_NAME = None
 
-def pstatconnect():    
+
+def pstatconnect():
     global PSTAT
     global DEVICES
     global GAMRY_COM
@@ -41,6 +43,7 @@ def pstatconnect():
     else:
         print("\tPstat not connected")
 
+
 class GamryCOMError(Exception):
     pass
 
@@ -54,20 +57,21 @@ def gamry_error_decoder(e):
             )
     return e
 
+
 def initializepstat():
     PSTAT.SetCtrlMode(GAMRY_COM.PstatMode)
     PSTAT.SetCell(GAMRY_COM.CellOff)
     PSTAT.SetIEStability(GAMRY_COM.StabilityNorm)
     PSTAT.SetVchRangeMode(True)
-    PSTAT.SetVchRange(10.0) #Expected Max Voltage
-    PSTAT.SetIERangeMode(True) #True = Auto, False = Manual
+    PSTAT.SetVchRange(10.0)  # Expected Max Voltage
+    PSTAT.SetIERangeMode(True)  # True = Auto, False = Manual
     # the following command allows us to set our range manually
     # pstat.SetIERange (x)
 
 
 def stopacq():
     global ACTIVE
-    
+
     ACTIVE = False
     PSTAT.SetCell(GAMRY_COM.CellOff)
     time.sleep(1)
@@ -115,8 +119,8 @@ def disconnectpstat():
 
 
 def savedata(complete_file_name):
-    ''' save the data to a file'''
-    #print(dtaqsink.acquired_points)
+    """save the data to a file"""
+    # print(dtaqsink.acquired_points)
     print("number of data points acquired")
     print(len(DTAQ_SINK.acquired_points))
     # savedata
@@ -126,15 +130,16 @@ def savedata(complete_file_name):
     np.savetxt(complete_file_name.with_suffix(".txt"), output)
     print("data saved")
 
+
 def setfilename(id, experiment):
-    ''' set the file name for the experiment'''
+    """set the file name for the experiment"""
     global COMPLETE_FILE_NAME
     current_time = datetime.datetime.now()
     fileDate = current_time.strftime("%Y-%m-%d")
     cwd = pathlib.Path().absolute()
     filePathPar = pathlib.Path(cwd.parents[1].__str__() + "/data")
     filePath = filePathPar / fileDate
-    #complete_file_name = filePath / (target_well + "_" + experiment)
+    # complete_file_name = filePath / (target_well + "_" + experiment)
     COMPLETE_FILE_NAME = filePath / ("experiment-" + id + "_" + experiment)
     print(f"eChem: complete file name is: {COMPLETE_FILE_NAME}")
     if not pathlib.Path.exists(filePath):
@@ -143,19 +148,17 @@ def setfilename(id, experiment):
     else:
         print(f"folder {filePath} exists")
     return COMPLETE_FILE_NAME
-        
-        
+
 
 def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
-    ''' cyclic voltammetry'''
+    """cyclic voltammetry"""
     global DTAQ
     global SIGNAL
     global DTAQ_SINK
     global CONNECTION
-    global START_TIME
     global ACTIVE
-    #global complete_file_name
-    
+    # global complete_file_name
+
     print("made it to run")
     ACTIVE = True
 
@@ -187,7 +190,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     PSTAT.SetCell(GAMRY_COM.CellOn)
     DTAQ.Run(True)
     # Code for timing started
-    #start_time = time.time()
+    # start_time = time.time()
     print("made it to run end")
 
 
@@ -198,7 +201,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global CONNECTION
     global START_TIME
     global ACTIVE
-    #global complete_file_name
+    # global complete_file_name
 
     ACTIVE = True
     print("made it to run")
@@ -222,7 +225,7 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     DTAQ.Run(True)
 
     # Code for timing started
-    #start_time = time.time()
+    # start_time = time.time()
     print("made it to run end")
 
 
@@ -231,7 +234,6 @@ def OCP(OCPvi, OCPti, OCPrate):
     global SIGNAL
     global DTAQ_SINK
     global CONNECTION
-    global START_TIME
     global ACTIVE
 
     ACTIVE = True
@@ -244,7 +246,7 @@ def OCP(OCPvi, OCPti, OCPrate):
 
     DTAQ_SINK = GamryDtaqEvents(DTAQ, COMPLETE_FILE_NAME)
     CONNECTION = client.GetEvents(DTAQ, DTAQ_SINK)
-    
+
     SIGNAL.Init(PSTAT, OCPvi, OCPti, OCPrate, GAMRY_COM.PstatMode)
     initializepstat()
 
@@ -253,39 +255,38 @@ def OCP(OCPvi, OCPti, OCPrate):
     PSTAT.SetCell(GAMRY_COM.CellOff)
 
     DTAQ.Run(True)
-    #start_time = time.time()
-    #print("made it to run end")
 
 
 def mock_CA(MCAvi, MCAti, MCArate):
-    global dtaq
-    global signal
-    global dtaqsink
-    global connection
-    global start_time
-    global active
+    global DTAQ
+    global SIGNAL
+    global DTAQSINK
+    global CONNECTION
+    global ACTIVE
+    global COMPLETE_FILE_NAME
+    global GAMRY_COM
+    global PSTAT
 
-    active = True
+    ACTIVE = True
 
     print("made it to run")
 
     # signal and dtaq object creation
-    signal = client.CreateObject("GamryCOM.GamrySignalConst")
-    dtaq = client.CreateObject("GamryCOM.GamryDtaqOcv")
+    SIGNAL = client.CreateObject("GamryCOM.GamrySignalConst")
+    DTAQ = client.CreateObject("GamryCOM.GamryDtaqOcv")
 
-    dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
-    connection = client.GetEvents(dtaq, dtaqsink)
-    
-    signal.Init(pstat, MCAvi, MCAti, MCArate, GamryCOM.PstatMode)
+    DTAQSINK = GamryDtaqEvents(DTAQ, COMPLETE_FILE_NAME)
+    CONNECTION = client.GetEvents(DTAQ, DTAQSINK)
+
+    SIGNAL.Init(PSTAT, MCAvi, MCAti, MCArate, GAMRY_COM.PstatMode)
     initializepstat()
 
-    dtaq.Init(pstat)
-    pstat.SetSignal(signal)
-    pstat.SetCell(GamryCOM.CellOff)
+    DTAQ.Init(PSTAT)
+    PSTAT.SetSignal(SIGNAL)
+    PSTAT.SetCell(GAMRY_COM.CellOff)
 
-    dtaq.Run(True)
-    #start_time = time.time()
-    #print("made it to run end")
+    DTAQ.Run(True)
+
 
 def activecheck():
     while ACTIVE == True:
@@ -295,7 +296,12 @@ def activecheck():
 
 def check_vf_range(filename):
     try:
-        ocp_data = pd.read_csv(filename, sep=" ", header=None, names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
+        ocp_data = pd.read_csv(
+            filename,
+            sep=" ",
+            header=None,
+            names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"],
+        )
         vf_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vf")]
         print("Vf last row:", vf_last_row_scientific)
         vf_last_row_decimal = float(vf_last_row_scientific)
@@ -311,32 +317,36 @@ def check_vf_range(filename):
         print("Error occurred while checking Vsig:", exception)
         return False
 
+
 @dataclass(config=ConfigDict(validate_assignment=True))
 class potentiostat_cv_parameters:
-    ''' CV Setup Parameters'''
+    """CV Setup Parameters"""
+
     # CV Setup Parameters
-    CVvi:float = 0.0  # initial voltage
-    CVap1:float = 0.3
-    CVap2:float = -0.2
-    CVvf:float = -0.2
-    CVstep:float = 0.01  # testing step, 100 mv/s
-    CVsr1:float = 0.1
-    CVcycle:int = 3
-    CVsr2:float = CVsr1
-    CVsr3:float = CVsr1
-    CVsamplerate:float = CVstep / CVsr1
+    CVvi: float = 0.0  # initial voltage
+    CVap1: float = 0.3
+    CVap2: float = -0.2
+    CVvf: float = -0.2
+    CVstep: float = 0.01  # testing step, 100 mv/s
+    CVsr1: float = 0.1
+    CVcycle: int = 3
+    CVsr2: float = CVsr1
+    CVsr3: float = CVsr1
+    CVsamplerate: float = CVstep / CVsr1
+
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class potentiostat_ca_parameters:
-    ''' CA Setup Parameters'''
+    """CA Setup Parameters"""
+
     # CA/CP Setup Parameters
-    CAvi:float = 0.0 #Pre-step voltage (V)
-    CAti:float = 0.0 #Pre-step delay time (s)
-    CAv1:float = -2.4 #Step 1 voltage (V)
-    CAt1:float = 300.0 #run time 300 seconds
-    CAv2:float = 0.0 #Step 2 voltage (V)
-    CAt2:float = 0.0 #Step 2 time (s)
-    CAsamplerate:float = 0.05 #sample period (s)
+    CAvi: float = 0.0  # Pre-step voltage (V)
+    CAti: float = 0.0  # Pre-step delay time (s)
+    CAv1: float = -2.4  # Step 1 voltage (V)
+    CAt1: float = 300.0  # run time 300 seconds
+    CAv2: float = 0.0  # Step 2 voltage (V)
+    CAt2: float = 0.0  # Step 2 time (s)
+    CAsamplerate: float = 0.05  # sample period (s)
     # Max current (mA)
     # Limit I (mA/cm^2)
     # PF Corr. (ohm)
@@ -344,15 +354,19 @@ class potentiostat_ca_parameters:
     # Expected Max V (V)
     # Initial Delay on
     # Initial Delay (s)
+
+
 @dataclass(config=ConfigDict(validate_assignment=True))
 class potentiostat_ocp_parameters:
-    ''' OCP Setup Parameters'''
-    # OCP Setup Parameters
-    OCPvi:float = 0.0
-    OCPti:float = 15.0
-    OCPrate:float = 0.5
+    """OCP Setup Parameters"""
 
-#Mock_CA Setup parameters
+    # OCP Setup Parameters
+    OCPvi: float = 0.0
+    OCPti: float = 15.0
+    OCPrate: float = 0.5
+
+
+# Mock_CA Setup parameters
 MCAvi = 0.0
 MCAti = 300
 MCArate = 0.5
@@ -360,32 +374,37 @@ MCArate = 0.5
 if __name__ == "__main__":
     try:
         pstatconnect()  # grab first pstat
-        COMPLETE_FILE_NAME = setfilename('F1','OCP')
-        OCP(potentiostat_ocp_parameters.OCPvi, potentiostat_ocp_parameters.OCPti,potentiostat_ocp_parameters.OCPrate)
+        COMPLETE_FILE_NAME = setfilename("F1", "OCP")
+        OCP(
+            potentiostat_ocp_parameters.OCPvi,
+            potentiostat_ocp_parameters.OCPti,
+            potentiostat_ocp_parameters.OCPrate,
+        )
         activecheck()
-#        while active == True:
-                #client.PumpEvents(1)
-                #time.sleep(0.5)
+        #        while active == True:
+        # client.PumpEvents(1)
+        # time.sleep(0.5)
         ## echem CA - deposition
-        if check_vsig_range(COMPLETE_FILE_NAME.with_suffix('.txt')):
-            COMPLETE_FILE_NAME = setfilename('F1', 'CV')
-            cyclic(potentiostat_cv_parameters.CVvi,
-                   potentiostat_cv_parameters.CVap1, 
-                   potentiostat_cv_parameters.CVap2, 
-                   potentiostat_cv_parameters.CVvf,
-                   potentiostat_cv_parameters.CVsr1,
-                   potentiostat_cv_parameters.CVsr2,
-                   potentiostat_cv_parameters.CVsr3,
-                   potentiostat_cv_parameters.CVsamplerate, 
-                   potentiostat_cv_parameters.CVcycle
-                   )
-            #chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
+        if check_vf_range(COMPLETE_FILE_NAME.with_suffix(".txt")):
+            COMPLETE_FILE_NAME = setfilename("F1", "CV")
+            cyclic(
+                potentiostat_cv_parameters.CVvi,
+                potentiostat_cv_parameters.CVap1,
+                potentiostat_cv_parameters.CVap2,
+                potentiostat_cv_parameters.CVvf,
+                potentiostat_cv_parameters.CVsr1,
+                potentiostat_cv_parameters.CVsr2,
+                potentiostat_cv_parameters.CVsr3,
+                potentiostat_cv_parameters.CVsamplerate,
+                potentiostat_cv_parameters.CVcycle,
+            )
+            # chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
             print("made it to try")
             while ACTIVE == True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data
-            Analyzer.plotdata('CV', COMPLETE_FILE_NAME)
+            Analyzer.plotdata("CV", COMPLETE_FILE_NAME)
         disconnectpstat()
         del CONNECTION
 
