@@ -59,6 +59,11 @@ class ExperimentBase():
     filename: str = None #Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
 
+    def is_same_id(self, other):
+        '''Check if two experiments have the same id'''
+        if isinstance(other, PEG_ACR_Instructions):
+            return self.id == other.id
+        return False
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class PEG_ACR_Instructions(ExperimentBase):
@@ -87,14 +92,18 @@ class PEG_ACR_Instructions(ExperimentBase):
     def is_replicate(self, other):
         '''Check if two experiments have the same parameters but different ids'''
         if isinstance(other, PEG_ACR_Instructions):
-            return (self.solutions == other.solutions
+            return (
+                self.solutions == other.solutions,
+                self.dep_duration == other.dep_duration,
+                self.dep_pot == other.dep_pot,
+                self.char_sol_name == other.char_sol_name,
+                self.ca_sample_period == other.ca_sample_period,
+                self.cv_sample_period == other.cv_sample_period,
+                self.cv_scan_rate == other.cv_scan_rate,
+                self.rinse_count == other.rinse_count,
+                self.mix == other.mix,
+                self.mix_count == other.mix_count,
             )
-        return False
-
-    def is_same_id(self, other):
-        '''Check if two experiments have the same id'''
-        if isinstance(other, PEG_ACR_Instructions):
-            return self.id == other.id
         return False
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -120,6 +129,23 @@ class PEG2P_Test_Instructions(ExperimentBase):
     mix_count: int = 3 #Number of times to mix
     mix_vol: int = 200 #Volume to mix
     mix_rate: float = 0.62 #Rate for pump to mix at
+
+    def is_replicate(self, other):
+        '''Check if two experiments have the same parameters but different ids'''
+        if isinstance(other, PEG2P_Test_Instructions):
+            return (
+                self.solutions == other.solutions,
+                self.dep_duration == other.dep_duration,
+                self.dep_pot == other.dep_pot,
+                self.char_sol_name == other.char_sol_name,
+                self.ca_sample_period == other.ca_sample_period,
+                self.cv_sample_period == other.cv_sample_period,
+                self.cv_scan_rate == other.cv_scan_rate,
+                self.rinse_count == other.rinse_count,
+                self.mix == other.mix,
+                self.mix_count == other.mix_count,
+            )
+        return False
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class Experiment:
