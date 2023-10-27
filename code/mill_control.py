@@ -23,12 +23,13 @@ import re
 import time
 import serial
 
+from log_tools import CustomLoggingFilter
 import wellplate as Wells
 
 # Configure the logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -149,7 +150,7 @@ class Mill:
             raise CommandExecutionError(
                 f"Error executing command {command}: {str(exep)}"
             ) from exep
-        
+ 
         return mill_response
 
     def stop(self):
@@ -468,6 +469,14 @@ class Mill:
 
         return 0
 
+    def apply_log_filter(self, experiment_id: int, target_well: str = None):
+        """Add custom value to log format"""
+        experiment_formatter = logging.Formatter(
+            "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
+            )
+        system_handler.setFormatter(experiment_formatter)
+        custom_filter = CustomLoggingFilter(experiment_id, target_well)
+        logger.addFilter(custom_filter)
 
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""

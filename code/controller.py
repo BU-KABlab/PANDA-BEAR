@@ -6,20 +6,28 @@ The controller is responsible for the following:
     - Recieve data from the experiment, and store it in the database
     - Update system state (vials, wells, etc.)
     - Running the analyzer
+
+Additionally controller should be able to:
+    - Reset the well statuses
+    - Update the vial statuses
 """
 # pylint: disable=line-too-long
 
 # import standard libraries
+from hmac import new
 import json
 import logging
 import time
 
 # import third-party libraries
 from pathlib import Path
+from wsgiref.validate import InputWrapper
+
+from anyio import open_file
 from print_panda import printpanda
 from mill_control import MockMill as Mill
 from pump_control import Pump
-import gamry_control as echem
+import gamry_control_WIP as echem
 
 # import obs_controls as obs
 import slack_functions as slack
@@ -33,7 +41,7 @@ from scale import Sartorius as Scale
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -50,10 +58,6 @@ def main():
     """Main function"""
     logger.info(printpanda())
     slack.send_slack_message("alert", "ePANDA is starting up")
-    mill_connected = False
-    pstat_connected = False
-    pump_connected = False
-    scale_connected = False
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
         ## Check for required files
@@ -65,21 +69,17 @@ def main():
         mill = toolkit.mill
         scale = toolkit.scale
         pump = toolkit.pump
-        mill_connected = True
-        pstat_connected = False #echem.pstatconnect()
-        pump_connected = True
-        scale_connected = True
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
 
         ## Initialize scheduler
         scheduler = Scheduler()
 
-        ## Establish state of system
-        stock_vials, waste_vials, wellplate = establish_system_state()
-
         ## Begin outer loop
         while True:
+            ## Establish state of system - we do this each time because each experiment changes the system state
+            stock_vials, waste_vials, wellplate = establish_system_state()
+
             ## Ask the scheduler for the next experiment
             new_experiment, new_experiment_path = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
@@ -121,7 +121,6 @@ def main():
                 results=experiment_results,
                 mill=mill,
                 pump=pump,
-                scale=scale,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
                 wellplate=wellplate,
@@ -134,10 +133,10 @@ def main():
 
             ## Update the system state with new vial and wellplate information
             scheduler.change_well_status(
-                updated_experiment.target_well, updated_experiment.status
+                updated_experiment.target_well, updated_experiment.status, updated_experiment.status_date, updated_experiment.id
             )  # this function should probably be in the wellplate module
-            update_vials(stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
-            update_vials(waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
+            update_vial_state_file(stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
+            update_vial_state_file(waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
 
             ## Update location of experiment instructions and save results
             scheduler.update_experiment_status(updated_experiment)
@@ -156,24 +155,7 @@ def main():
 
     finally:
         # close out of serial connections
-        logger.info("Disconnecting from instruments:")
-        if scale_connected:
-            scale.close()
-            logger.info("Scale closed")
-            scale_connected = False
-        if pump_connected:
-            # pump.close()
-            logger.info("Pump closed")
-            pump_connected = False
-        if pstat_connected:
-            echem.disconnectpstat()
-            logger.info("Pstat closed")
-            pstat_connected = False
-        if mill_connected:
-            mill.home()
-            mill.disconnect()
-            logger.info("Mill closed")
-            mill_connected = False
+        disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
 
 
@@ -282,29 +264,30 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
         )
         slack.send_slack_message("alert", "The program is continuing")
 
-    # read the wellplate json and log the status of each well in a grid
-    # number_of_clear_wells = 0
-    # with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
-    #     wellplate_status = json.load(file)
-    # for row in wellplate_status:
-    #     for well in row:
-    #         if well["status"] == "clear":
-    #             number_of_clear_wells += 1
-    #         logger.debug(
-    #             "Well %s has status %s", well["name"], well["status"].value
-    #         )
+    ## read the wellplate json and log the status of each well in a grid
+    number_of_clear_wells = 0
+    with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
+        wellplate_status = json.load(file)
+    for row in wellplate_status:
+        for well in row:
+            if well["status"] in ["clear", "new"]:
+                number_of_clear_wells += 1
+            logger.debug(
+                "Well %s has status %s", well["name"], well["status"]
+            )
 
-    # logger.info("There are %d clear wells", number_of_clear_wells)
-    # if number_of_clear_wells == 0:
-    #     slack.send_slack_message("alert", "There are no clear wells on the wellplate")
-    #     slack.send_slack_message(
-    #         "alert",
-    #         "Please replace the wellplate and confirm in the terminal that the program should continue",
-    #     )
-    #     input(
-    #         "Confirm that the program should continue by pressing enter or ctrl+c to exit"
-    #     )
-    #     slack.send_slack_message("alert", "The program is continuing")
+    logger.info("There are %d clear wells", number_of_clear_wells)
+    if number_of_clear_wells == 0:
+        slack.send_slack_message("alert", "There are no clear wells on the wellplate")
+        slack.send_slack_message(
+            "alert",
+            "Please replace the wellplate and confirm in the terminal that the program should continue",
+        )
+        input(
+            "Confirm that the program should continue by pressing enter or ctrl+c to exit"
+        )
+        load_new_wellplate()
+        slack.send_slack_message("alert", "Wellplate has been reset. Continuing...")
 
     return stock_vials, waste_vials, wellplate
 
@@ -317,6 +300,17 @@ def connect_to_instruments():
     # pstat_connected = echem.pstatconnect()
     instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
     return instruments
+
+def disconnect_from_instruments(instruments: Toolkit):
+    """Disconnect from the instruments"""
+    logger.info("Disconnecting from instruments:")
+    instruments.mill.disconnect()
+    instruments.scale.disconnect()
+    instruments.pump.disconnect()
+    if echem.OPEN_CONNECTION:
+        echem.disconnectpstat()
+
+    logger.info("Disconnected from instruments")
 
 def read_vials(filename) -> list[Vial]:
     """
@@ -344,7 +338,7 @@ def read_vials(filename) -> list[Vial]:
         )
     return list_of_solutions
 
-def update_vials(vial_objects: list[Vial], filename):
+def update_vial_state_file(vial_objects: list[Vial], filename):
     """
     Update the vials in the json file
     """
@@ -363,5 +357,119 @@ def update_vials(vial_objects: list[Vial], filename):
         json.dump(vial_parameters, file, indent=4)
 
     return 0
+
+def input_new_vial_values(vialgroup: str):
+    """For user inputting the new vial values for the state file"""
+    ## Fetch the current state file
+    if vialgroup == "stock":
+        filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
+    elif vialgroup == "waste":
+        filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+
+    with open(filename, "r", encoding="UTF-8") as file:
+        vial_parameters = json.load(file)
+
+    ## Loop through each vial and ask for the new values except for position
+    for vial in vial_parameters:
+        print(f"Vial {vial['position']}")
+        vial["name"] = input("Enter the name of the vial: ").lower()
+        vial["contents"] = input("Enter the contents of the vial: ").lower()
+        vial["volume"] = int(input("Enter the volume of the vial: "))
+        vial["capacity"] = int(input("Enter the capacity of the vial: "))
+        vial["contamination"] = input("Enter the contamination of the vial: ").lower()
+
+    ## Write the new values to the state file
+    with open(filename, "w", encoding="UTF-8") as file:
+        json.dump(vial_parameters, file, indent=4)
+
+def reset_vials(vialgroup: str):
+    """
+    Resets the volume and contamination of the current vials to their capacity and 0 respectively
+    
+    Valid vial groups are 'stock' and 'waste'
+    """
+    ## Fetch the current state file
+    if vialgroup == "stock":
+        filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
+    elif vialgroup == "waste":
+        filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+
+    with open(filename, "r", encoding="UTF-8") as file:
+        vial_parameters = json.load(file)
+
+    ## Loop through each vial and ask for the new values except for position
+    for vial in vial_parameters:
+        vial["volume"] = vial["capacity"]
+        vial["contamination"] = "0"
+
+    ## Write the new values to the state file
+    with open(filename, "w", encoding="UTF-8") as file:
+        json.dump(vial_parameters, file, indent=4)
+
+def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wellplate_type_number: int = None) -> int:
+    """
+    Save the current wellplate, reset the well statuses to new. 
+    If no plate id or type number given assume same type number and increment id by 1
+
+    Args:
+        override (bool, optional): Set to true to skip inputs. Defaults to False.
+        new_plate_id (int, optional): The plate id being loaded. Defaults to None. If None, the plate id will be incremented by 1
+        new_wellplate_type_number (int, optional): The type of wellplate. Defaults to None. If None, the type number will not be changed
+
+    Returns:
+        int
+    """
+    well_status_file = Path.cwd() / 'system state' / "well_status.json"
+    # input("This will reset all well statuses to new. Press enter to continue.")
+
+    # Confirm that the user wants this
+    if override is False:
+        choice = input(
+            "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
+        )
+        if choice == "n":
+            return 0
+
+    ## Open the current status file for the plate id , type number, and wells
+    with open(well_status_file, "r", encoding="UTF-8") as file:
+        current_wellplate = json.load(file)
+    current_plate_id = current_wellplate["plate_id"]
+    current_type_number = current_wellplate["type_number"]
+
+    ## Save each well to the well_history.csv file in the data folder
+    ## plate id, type number, well id, experiment id, project id, status, status date, contents
+    logger.debug("Saving well statuses to well_history.csv")
+    with open_file("data\\well_history.csv", "a", encoding="UTF-8") as file:
+        for well in current_wellplate['wells']:
+            file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
+
+    logger.debug("Well statuses saved to well_history.csv")
+
+    ## If no plate id or type number given assume same type number and incremend id by 1
+    if new_wellplate_type_number is None:
+        new_wellplate_type_number = current_type_number
+
+    if new_plate_id is None:
+        new_plate_id = current_plate_id + 1
+
+    ## Go through a reset all fields and apply new plate id
+    logger.debug("Resetting well statuses to new")
+    new_wellplate = current_wellplate
+    new_wellplate["plate_id"] = new_plate_id
+    new_wellplate["type_number"] = new_wellplate_type_number
+    for well in new_wellplate['wells']:
+        well["status"] = "new"
+        well["status_date"] = ""
+        well["experiment_id"] = ""
+        well["project_id"] = ""
+
+    with open(well_status_file, "w", encoding="UTF-8") as file:
+        json.dump(new_wellplate, file, indent=4)
+
+    logger.debug("Well statuses reset to new")
+    logger.info("Wellplate %d saved and wellplate %d loaded", current_plate_id, new_plate_id)
+    return 0
+
+
 if __name__ == "__main__":
     main()

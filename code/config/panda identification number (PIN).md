@@ -15,7 +15,7 @@ Example PIN:
 
 ## Categories
 
-Mill | Pump | Potentiostat | Reference Electrode | Working Electrode | Wells | Pipette Adapter | Camera | Scale
+Mill | Pump | Potentiostat | Reference Electrode | Working Electrode | Wells | Pipette Adapter | Optics | Scale
 
 mill 1 = Prover 3018 \
 mill 2 = Prover 4030 Pro

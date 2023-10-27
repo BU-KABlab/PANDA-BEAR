@@ -9,11 +9,11 @@ The scheduler module will be responsible for:
 # pylint: disable = line-too-long
 import json
 import logging
-import os
 import pathlib
+from pathlib import Path
 import random
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import Tuple
 import experiment_class
 from experiment_class import (
     Experiment,
@@ -26,6 +26,7 @@ from config.pin import CURRENT_PIN
 PATH_TO_CONFIG = "code/config/mill_config.json"
 PATH_TO_STATUS = "code/system state"
 PATH_TO_QUEUE = "code/system state/queue.csv"
+PATH_TO_EXPERIMENT_INBOX = "code/experiments_inbox"
 PATH_TO_EXPERIMENT_QUEUE = "code/experiment_queue"
 PATH_TO_COMPLETED_EXPERIMENTS = "code/experiments_completed"
 PATH_TO_ERRORED_EXPERIMENTS = "code/experiments_error"
@@ -33,7 +34,7 @@ PATH_TO_ERRORED_EXPERIMENTS = "code/experiments_error"
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -57,8 +58,8 @@ class Scheduler:
         :param well: The well to check.
         :return: The status of the well. Or None if the well is not found.
         """
-        file_to_open = pathlib.Path.cwd() / "code" / "system state" / "well_status.json"
-        if not pathlib.Path.exists(file_to_open):
+        file_to_open = Path.cwd() / "code" / "system state" / "well_status.json"
+        if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
 
@@ -78,8 +79,8 @@ class Scheduler:
         :param baseline: Whether or not the experiment is a baseline test.
         :return: The alternative well. Or None if no wells are available.
         """
-        file_to_open = pathlib.Path.cwd() / "code" / "system state" / "well_status.json"
-        if not pathlib.Path.exists(file_to_open):
+        file_to_open = Path.cwd() / "code" / "system state" / "well_status.json"
+        if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
 
@@ -94,14 +95,14 @@ class Scheduler:
                     return well["well_id"]
             return None
 
-    def change_well_status(self, well: str, status: str) -> None:
+    def change_well_status(self, well: str, status: str, status_date: str = datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), experiment_id: int = None) -> None:
         """
         Changes the status of a well in well_status.json.
         :param well: The well to change.
         :param status: The new status of the well.
         """
-        file_to_open = pathlib.Path.cwd() / "code" / "system state" / "well_status.json"
-        if not pathlib.Path.exists(file_to_open):
+        file_to_open = Path.cwd() / "code" / "system state" / "well_status.json"
+        if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
 
@@ -110,7 +111,8 @@ class Scheduler:
             for wells in data["Wells"]:
                 if wells["well_id"] == well:
                     wells["status"] = status
-                    wells["status_date"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+                    wells["status_date"] = status_date
+                    wells["experiment_id"] = experiment_id
                     break
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
@@ -125,9 +127,8 @@ class Scheduler:
         """
         experiments_read = 0
         complete = True
-        cwd = pathlib.Path(__file__).parents[0]
-        file_path = cwd / "experiments_inbox"
-        file_to_open = file_path / filename
+        inbox_dir = Path.cwd() / "experiments_inbox"
+        file_to_open = inbox_dir / filename
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
             for experiment in data["Experiments"]:
@@ -186,9 +187,9 @@ class Scheduler:
                 )
 
                 # Save the experiment as a separate file in the experiment_que subfolder
-                subfolder_path = cwd / "experiment_queue"
-                subfolder_path.mkdir(parents=True, exist_ok=True)
-                file_to_save = subfolder_path / filename
+                queue_dir = Path.cwd() / "experiment_queue"
+                queue_dir.mkdir(parents=True, exist_ok=True)
+                file_to_save = queue_dir / filename
                 with open(file_to_save, "w", encoding="UTF-8") as outfile:
                     json.dump(instructions, outfile, indent=4)
 
@@ -216,8 +217,7 @@ class Scheduler:
         :return: the count of new experiments.
         """
 
-        cwd = pathlib.Path(__file__).parents[0]
-        file_path = cwd / "experiments_inbox"
+        file_path = Path.cwd() / "experiments_inbox"
         count = 0
         for file in file_path.iterdir():
             # If there are files but 0 added then begin by inserting a baseline test
@@ -241,75 +241,69 @@ class Scheduler:
 
         return count, complete
 
-    # def insert_control_tests(self):
-    #     """
-    #     Creates a baseline test experiment and saves it to the queue.
-    #     Args:
-    #         None
-    #     Returns:
-    #         None
-    #     """
-
-    #     ## Insert the baseline tests to the queue directory
-    #     target_well = self.choose_alternative_well(baseline=True)
-    #     filename = f"{datetime.now().strftime('%Y-%m-%d')}_baseline_{target_well}.json"
-    #     baseline = make_baseline_value()
-    #     baseline.target_well = target_well
-    #     baseline.filename = filename
-    #     ## save the experiment as a separate file in the experiment_queue subfolder
-    #     subfolder_path = pathlib.Path.cwd() / "code" / "experiment_queue"
-    #     subfolder_path.mkdir(parents=True, exist_ok=True)
-    #     file_to_save = subfolder_path / filename
-    #     with open(file_to_save, "w", encoding="UTF-8") as outfile:
-    #         json.dump(baseline, outfile, indent=4)
-    #     ## change the status of the well
-    #     self.change_well_status(target_well, "queued")
-
-    def read_next_experiment_from_queue(self) -> Tuple[Experiment, pathlib.Path]:
+    def read_next_experiment_from_queue(self) -> Tuple[Experiment, Path]:
         """
         Reads the next experiment from the queue.
         :return: The next experiment.
         """
-        file_path = pathlib.Path.cwd() / "code" / "system state" / "queue.csv"
-        if not pathlib.Path.exists(file_path):
+        file_path = Path.cwd() / "code" / "system state" / "queue.csv"
+        ## Starting with the queue.csv file to get the experiment id and filename
+        ## The we want to get the experiment with the highest priority (lowest number)
+        if not Path.exists(file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
 
-        file_path = pathlib.Path.cwd() / "code" / "experiment_queue"
-        if not pathlib.Path.exists(file_path):
+        # Read the queue file
+        with open(file_path, "r", encoding="ascii") as file:
+            data = file.readlines()
+
+        # Find the highest priority in the queue
+        highest_priority = 100
+        for line in data:
+            priority = int(line.split(",")[1])
+            if priority < highest_priority:
+                highest_priority = priority
+
+        # Get all experiments with the highest priority so that we can randomly select one of them
+        experiments = []
+        for line in data:
+            priority = int(line.split(",")[1])
+            if priority == highest_priority:
+                experiments.append(line.split(",")[2].strip()) # adds the filename to the list of experiments
+
+        if not experiments:
+            logger.info("No experiments in queue")
+            return None, None
+
+        file_path = Path.cwd() / "code" / "experiment_queue"
+        if not Path.exists(file_path):
             logger.error("experiment_queue folder not found")
             raise FileNotFoundError("experiment queue folder")
 
-        # check if folder is not empty
-        if os.listdir(file_path):
-            # if there is a baseline test in the queue run that first
+        # Pick a random experiment from the list of experiments with the highest priority
+        random_experiment = random.choice(experiments)
+        file_path = file_path / random_experiment
+        if not Path.exists(file_path):
+            logger.error("experiment file not found")
+            raise FileNotFoundError("experiment file")
 
-            # if there are any experiments are in queue pick one at random
-            file_list = os.listdir(file_path)
-            count = 0
-            while count < len(file_list):
-                random_file = random.choice(file_list)
-                count += 1
-                with open(file_path / random_file, "r", encoding="ascii") as file:
-                    data = json.load(file)
-                    if data["baseline"] == 0 and data["status"] in ["queued","new"]:
-                        data = (
-                            experiment_class.RootModel[Experiment]
-                            .model_validate_json(json.dumps(data))
-                            .root
-                        )
-                        return data, (file_path / random_file)
-
-        else:
-            return None, None
+        # Read the experiment file
+        with open(file_path, "r", encoding="ascii") as file:
+            data = json.load(file)
+            data = (
+                experiment_class.RootModel[Experiment]
+                .model_validate_json(json.dumps(data))
+                .root
+            )
+            return data, file_path
 
     def update_queue(self, experiment: Experiment) -> None:
         """
         Updates the queue file to remove the experiment that was just run.
         :param experiment: The experiment that was just run.
         """
-        file_path = pathlib.Path.cwd() / "code" / "system state" / "queue.csv"
-        if not pathlib.Path.exists(file_path):
+        file_path = Path.cwd() / "code" / "system state" / "queue.csv"
+        if not Path.exists(file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
 
@@ -328,8 +322,8 @@ class Scheduler:
         Updates the status of the experiment in the experiment instructions file.
         :param experiment: The experiment that was just run.
         """
-        file_path = (pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename).with_suffix(".json")
-        if not pathlib.Path.exists(file_path):
+        file_path = (Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename).with_suffix(".json")
+        if not Path.exists(file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
 
@@ -354,21 +348,21 @@ class Scheduler:
         :param experiment: The experiment that was just run.
         """
         file_name_with_suffix = experiment.filename + ".json"
-        file_path = pathlib.Path(
-            pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / file_name_with_suffix
+        file_path = Path(
+            Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / file_name_with_suffix
         )
-        if not pathlib.Path.exists(file_path):
+        if not Path.exists(file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
 
         if experiment.status == ExperimentStatus.COMPLETE:
             # Move the file to the completed folder
-            completed_path = pathlib.Path.cwd() / PATH_TO_COMPLETED_EXPERIMENTS
+            completed_path = Path.cwd() / PATH_TO_COMPLETED_EXPERIMENTS
             file_path.replace(completed_path / file_name_with_suffix)
 
         elif experiment.status == ExperimentStatus.ERROR:
             # Move the file to the errored folder
-            errored_path = pathlib.Path.cwd() / PATH_TO_ERRORED_EXPERIMENTS
+            errored_path = Path.cwd() / PATH_TO_ERRORED_EXPERIMENTS
             file_path.replace(errored_path / file_name_with_suffix)
 
         else:
@@ -385,11 +379,20 @@ class Scheduler:
         Adds an experiment to the experiment queue.
         :param experiment: The experiment to add.
         """
-        file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename
-        # Save the updated file
+        # Save the new experiment to a file in the inbox folder
+        file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_INBOX / experiment.filename
         experiment_json = experiment_class.serialize_experiment(experiment)
         with open(file_path.with_suffix(".json"), "w", encoding="UTF-8") as file:
             file.write(experiment_json)
+
+        # read the experiment to the queue
+        self.read_new_experiments(experiment.filename)
+
+        # # Add the experiment to the queue
+        # queue_file_path = Path.cwd() / "code" / "system state" / "queue.csv"
+        # with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
+        #     line = f"{experiment.id},{experiment.priority},{experiment.filename}"
+        #     queue_file.write(line)
 
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
@@ -404,32 +407,9 @@ class Scheduler:
         logger.info("Saving experiment %d results to database as %s", experiment.id, str(experiment.filename) + ".json")
         results_json = experiment_class.serialize_results(results)
         with open(
-            pathlib.Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
+            Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
         ) as results_file:
             results_file.write(results_json)
-
-    def reset_well_statuses(self):
-        """Loop through the well statuses and set them all to new"""
-        well_status_file = pathlib.Path(__file__).parents[0] / "well_status copy.json"
-        # input("This will reset all well statuses to new. Press enter to continue.")
-
-        # Confirm that the user wants this
-        choice = input(
-            "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
-        )
-        if choice == "n":
-            print("Exiting program.")
-            return 0
-        with open(well_status_file, "r", encoding="UTF-8") as file:
-            well_status = json.load(file)
-        for catergory in well_status:
-            for well in well_status[catergory]:
-                well["status"] = "new"
-        with open(well_status_file, "w", encoding="UTF-8") as file:
-            json.dump(well_status, file, indent=4)
-
-        print("Well statuses reset to new.")
-        return 0
 
 
 ####################################################################################################
@@ -438,12 +418,14 @@ def test_well_status_update():
     Tests the change_well_status function.
     """
     scheduler = Scheduler()
+    current_status = scheduler.check_well_status("A1")
     scheduler.change_well_status("A1", "running")
     assert scheduler.check_well_status("A1") == "running"
     scheduler.change_well_status("A1", "complete")
     assert scheduler.check_well_status("A1") == "complete"
     scheduler.change_well_status("A1", "new")
     assert scheduler.check_well_status("A1") == "new"
+    scheduler.change_well_status("A1", current_status)
 
 
 if __name__ == "__main__":

@@ -18,39 +18,34 @@ Returns:
     Wellplate: The updated wellplate object.
     Vials: The updated vials object.
 """
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, too-many-arguments, too-many-lines
 
 # Standard library imports
 import logging
 import math
 from datetime import datetime
 import sys
-import time
-from typing import List, Tuple
+from typing import Tuple
 import pytz as tz
 
 # Third party or custom imports
-from controller import read_vials, update_vials
 import gamry_control_WIP as echem
 from experiment_class import (
     Experiment,
     ExperimentResult,
     ExperimentStatus,
-    make_test_value,
 )
-from mill_control import Mill as mill_control
-from pump_control import Pump as pump_class
-from scale import Sartorius as scale_class
-from vials import Vial as vial_class
-import wellplate as wellplate_module
+from log_tools import CustomLoggingFilter
+from mill_control import Mill, Instruments
+from pump_control import Pump
+from scale import Sartorius as Scale
+from vials import Vial
 from wellplate import Wells
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter(
-    "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
-)
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -58,37 +53,19 @@ logger.addHandler(system_handler)
 AIR_GAP = 40  # ul
 
 
-class CustomLoggingFilter(logging.Filter):
-    """This is a filter which injects custom values into the log record.
-    From: https://stackoverflow.com/questions/56776576/how-to-add-custom-values-to-python-logging
-    The values will be the experiment id and the well id
-    """
-
-    def __init__(self, custom1, custom2):
-        super().__init__()
-        self.custom1 = custom1
-        self.custom2 = custom2
-
-    def filter(self, record):
-        record.custom1 = self.custom1
-        record.custom2 = self.custom2
-        return True
-
-
 def pipette(
     volume: float,  # volume in ul
-    solutions: list[vial_class],
+    solutions: list[Vial],
     solution_name: str,
     target_well: str,
     pumping_rate: float,
-    waste_vials: list[vial_class],
+    waste_vials: list[Vial],
     waste_solution_name: str,
     wellplate: Wells,
-    pump: pump_class,
-    mill: mill_control,
-    scale: scale_class = None,
+    pump: Pump,
+    mill: Mill,
     purge_volume: float = 20.00,
-) -> Tuple[list[vial_class], list[vial_class], Wells]:
+) -> Tuple[list[Vial], list[Vial], Wells]:
     """
     Perform the full pipetting sequence:
     1. Determine the number of repetitions
@@ -180,7 +157,7 @@ def pipette(
             )  # purge_vial.depth replaced with height
 
             purge_vial = pump.purge(
-                purge_vial=purge_vial, purge_volume= purge_volume
+                purge_vial=purge_vial, purge_volume=purge_volume
             )  # remaining vol in pipette is now air gap + repition vol + 1 purge
             mill.move_pipette_to_position(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
@@ -253,11 +230,11 @@ def clear_well(
     target_well: str,
     wellplate: Wells,
     pumping_rate: float,
-    pump: pump_class,
-    waste_vials: list[vial_class],
-    mill: mill_control,
+    pump: Pump,
+    waste_vials: list[Vial],
+    mill: Mill,
     solution_name="waste",
-) -> Tuple[list[vial_class], Wells]:
+) -> Tuple[list[Vial], Wells]:
     """
     Clear the well of the specified volume with the specified solution.
     Involves withdrawing the solution from the well and purging it into the waste vial
@@ -294,22 +271,18 @@ def clear_well(
             # withdraw a little to engange screw
             pump.withdraw(volume=AIR_GAP, rate=pumping_rate)
             logger.debug("Moving to %s...", target_well)
-            mill.move_pipette_to_position(
-                wellplate.get_coordinates(target_well)["x"],
-                wellplate.get_coordinates(target_well)["y"],
-                0,
-            )  # start at safe height
-            mill.move_pipette_to_position(
+            mill.safe_move(
                 wellplate.get_coordinates(target_well)["x"],
                 wellplate.get_coordinates(target_well)["y"],
                 wellplate.depth(target_well),
+                Instruments.PIPETTE,
             )  # go to bottom of well
 
             wellplate.update_volume(target_well, -repetition_vol)
             logger.debug("Withdrawing %f from %s...", repetition_vol, target_well)
             pump.withdraw(
                 volume=repetition_vol,
-                solution= None,
+                solution=None,
                 rate=pumping_rate,
             )  # withdraw the volume from the well
 
@@ -321,17 +294,15 @@ def clear_well(
             )  # return to safe height
 
             logger.info("Moving to purge vial %s...", purge_vial.name)
-            mill.move_pipette_to_position(
-                purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
-            )
-            mill.move_pipette_to_position(
+            mill.safe_move(
                 purge_vial.coordinates["x"],
                 purge_vial.coordinates["y"],
                 purge_vial.height,
-            )  # purge_vial.depth replaced with height
+                Instruments.PIPETTE,
+            )
 
             purge_vial = pump.purge(
-                purge_vial = purge_vial, purge_volume= repetition_vol
+                purge_vial=purge_vial, purge_volume=repetition_vol
             )  # repitition volume
             logger.info("Purging the air gap...")
             pump.infuse(volume=AIR_GAP, rate=0.5)  # extra purge to clear pipette
@@ -349,12 +320,11 @@ def clear_well(
 def rinse(
     wellplate: Wells,
     instructions: Experiment,
-    pump: pump_class,
-    scale: scale_class,
-    mill: mill_control,
-    stock_vials: list[vial_class],
-    waste_vials: list[vial_class],
-) -> Tuple[list[vial_class], list[vial_class], Wells]:
+    pump: Pump,
+    mill: Mill,
+    stock_vials: list[Vial],
+    waste_vials: list[Vial],
+) -> Tuple[list[Vial], list[Vial], Wells]:
     """
     Rinse the well with rinse_vol ul of ACN.
     Involves pipetteing and then clearing the well with no purging steps
@@ -381,7 +351,7 @@ def rinse(
         rinse_solution_name = "rinse" + str(rep)
         # purge_vial = waste_selector(rinse_solution_name, rinse_vol)
         # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
-        logger.info("Rinse %d of %d", rep+1, instructions.rinse_count)
+        logger.info("Rinse %d of %d", rep + 1, instructions.rinse_count)
         stock_vials, waste_vials, wellplate = pipette(
             instructions.rinse_vol,
             stock_vials,
@@ -393,7 +363,6 @@ def rinse(
             wellplate,
             pump,
             mill,
-            scale=scale,
         )
         waste_vials, wellplate = clear_well(
             instructions.rinse_vol,
@@ -405,19 +374,22 @@ def rinse(
             mill,
             solution_name=rinse_solution_name,
         )
-        logger.info("Rinse %d of %d complete", rep+1, instructions.rinse_count)
-        logger.debug("Remaining volume in well: %f", wellplate.volume(instructions.target_well))
+        logger.info("Rinse %d of %d complete", rep + 1, instructions.rinse_count)
+        logger.debug(
+            "Remaining volume in well: %f", wellplate.volume(instructions.target_well)
+        )
     return stock_vials, waste_vials, wellplate
 
+
 def flush_pipette_tip(
-    pump: pump_class,
-    waste_vials: list[vial_class],
-    stock_vials: list[vial_class],
+    pump: Pump,
+    waste_vials: list[Vial],
+    stock_vials: list[Vial],
     flush_solution_name: str,
-    mill: mill_control,
+    mill: Mill,
     pumping_rate=0.5,
     flush_volume=120,
-) -> Tuple[list[vial_class], list[vial_class]]:
+) -> Tuple[list[Vial], list[Vial]]:
     """
     Flush the pipette tip with the designated flush_volume ul of DMF to remove any residue
     Args:
@@ -433,51 +405,59 @@ def flush_pipette_tip(
         stock_vials (list): The updated list of stock vials
         waste_vials (list): The updated list of waste vials
     """
-    logger.info(
-        "Flushing pipette tip with %f ul of %s...", flush_volume, flush_solution_name
-    )
-    flush_solution = solution_selector(stock_vials, flush_solution_name, flush_volume)
-    purge_vial = waste_selector(waste_vials, "waste", flush_volume)
 
-    logger.info("Moving to flush solution %s...", flush_solution.name)
-    mill.move_pipette_to_position(
-        flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
-    )
-    logger.debug("Withdrawing %f of air gap...", AIR_GAP)
-    pump.withdraw(volume=AIR_GAP,rate= pumping_rate)
+    if flush_volume > 0.000:
+        logger.info(
+            "Flushing pipette tip with %f ul of %s...",
+            flush_volume,
+            flush_solution_name,
+        )
+        flush_solution = solution_selector(
+            stock_vials, flush_solution_name, flush_volume
+        )
+        purge_vial = waste_selector(waste_vials, "waste", flush_volume)
 
-    mill.move_pipette_to_position(
-        flush_solution.coordinates["x"],
-        flush_solution.coordinates["y"],
-        flush_solution.bottom,
-    )  # depth replaced with height
+        logger.info("Moving to flush solution %s...", flush_solution.name)
+        mill.move_pipette_to_position(
+            flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
+        )
+        logger.debug("Withdrawing %f of air gap...", AIR_GAP)
+        pump.withdraw(volume=AIR_GAP, rate=pumping_rate)
 
-    logger.debug("Withdrawing %s...", flush_solution.name)
-    flush_solution = pump.withdraw(volume=flush_volume, solution=flush_solution, rate=pumping_rate)
-    mill.move_pipette_to_position(
-        flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
-    )
+        mill.move_pipette_to_position(
+            flush_solution.coordinates["x"],
+            flush_solution.coordinates["y"],
+            flush_solution.bottom,
+        )  # depth replaced with height
 
-    logger.debug("Moving to purge...")
-    mill.move_pipette_to_position(
-        purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
-    )
-    mill.move_pipette_to_position(
-        purge_vial.coordinates["x"], purge_vial.coordinates["y"], purge_vial.height
-    )  # purge_vial.depth replaced with height
-    logger.debug("Purging...")
-    purge_vial = pump.purge(purge_vial, flush_solution, flush_volume)
-    logger.debug("Purging the air gap...")
-    pump.infuse(volume=AIR_GAP, rate=0.5)  # purge the pipette tip
-    mill.move_pipette_to_position(
-        purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
-    )  # move back to safe height (top)
+        logger.debug("Withdrawing %s...", flush_solution.name)
+        flush_solution = pump.withdraw(
+            volume=flush_volume, solution=flush_solution, rate=pumping_rate
+        )
+        mill.move_pipette_to_position(
+            flush_solution.coordinates["x"], flush_solution.coordinates["y"], 0
+        )
 
+        logger.debug("Moving to purge...")
+        mill.move_pipette_to_position(
+            purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+        )
+        mill.move_pipette_to_position(
+            purge_vial.coordinates["x"], purge_vial.coordinates["y"], purge_vial.height
+        )  # purge_vial.depth replaced with height
+        logger.debug("Purging...")
+        purge_vial = pump.purge(purge_vial, flush_solution, flush_volume)
+        logger.debug("Purging the air gap...")
+        pump.infuse(volume=AIR_GAP, rate=0.5)  # purge the pipette tip
+        mill.move_pipette_to_position(
+            purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+        )  # move back to safe height (top)
+    else:
+        logger.info("No flushing required. Flush volume is 0. Continuing...")
     return stock_vials, waste_vials
 
-def solution_selector(
-    solutions: list[vial_class], solution_name: str, volume: float
-) -> vial_class:
+
+def solution_selector(solutions: list[Vial], solution_name: str, volume: float) -> Vial:
     """
     Select the solution from which to withdraw from, from the list of solution objects
     Args:
@@ -500,9 +480,7 @@ def solution_selector(
     raise NoAvailableSolution(solution_name)
 
 
-def waste_selector(
-    solutions: list[vial_class], solution_name: str, volume: float
-) -> vial_class:
+def waste_selector(solutions: list[Vial], solution_name: str, volume: float) -> Vial:
     """
     Select the solution in which to deposit into from the list of solution objects
     Args:
@@ -527,26 +505,17 @@ def waste_selector(
     raise NoAvailableSolution(solution_name)
 
 
-class NoAvailableSolution(Exception):
-    """Raised when no available solution is found"""
-
-    def __init__(self, solution_name):
-        self.solution_name = solution_name
-        self.message = f"No available solution of {solution_name} found"
-        super().__init__(self.message)
-
-
 def deposition(
     dep_instructions: Experiment,
     dep_results: ExperimentResult,
-    mill: mill_control,
+    mill: Mill,
     wellplate: Wells,
 ) -> Tuple[Experiment, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
-    
+
     No pipetting is performed in this step.
-    
+
     Args:
         dep_instructions (Experiment): The experiment instructions
         dep_results (ExperimentResult): The experiment results
@@ -610,23 +579,25 @@ def deposition(
 
         mill.rinse_electrode()
         echem.disconnectpstat()
-        return dep_instructions, dep_results
+
     else:
         echem.disconnectpstat()
         raise OCPFailure("CA")
+
+    return dep_instructions, dep_results
 
 
 def characterization(
     char_instructions: Experiment,
     char_results: ExperimentResult,
-    mill: mill_control,
+    mill: Mill,
     wellplate: Wells,
 ) -> Tuple[Experiment, ExperimentResult]:
     """
     Characterization of the solutions on the substrate
-    
+
     No pipetting is performed in this step.
-    
+
     Args:
         char_instructions (Experiment): The experiment instructions
         char_results (ExperimentResult): The experiment results
@@ -702,21 +673,26 @@ def characterization(
         echem.disconnectpstat()
         raise OCPFailure("CV")
 
+
 def apply_log_filter(experiment_id: int, target_well: str = None):
     """Add custom value to log format"""
+    experiment_formatter = logging.Formatter(
+        "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
+    )
+    system_handler.setFormatter(experiment_formatter)
     custom_filter = CustomLoggingFilter(experiment_id, target_well)
     logger.addFilter(custom_filter)
+
 
 def run_experiment(
     instructions: Experiment,
     results: ExperimentResult,
-    mill: mill_control,
-    pump: pump_class,
-    scale: scale_class,
-    stock_vials: list[vial_class],
-    waste_vials: list[vial_class],
+    mill: Mill,
+    pump: Pump,
+    stock_vials: list[Vial],
+    waste_vials: list[Vial],
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult, list[vial_class], list[vial_class], Wells]:
+) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
@@ -792,7 +768,6 @@ def run_experiment(
                     wellplate=wellplate,
                     pump=pump,
                     mill=mill,
-                    scale=scale,
                 )
 
                 stock_vials, waste_vials = flush_pipette_tip(
@@ -811,7 +786,9 @@ def run_experiment(
             logger.info("Mixing well: %s", instructions.target_well)
             instructions.status = ExperimentStatus.MIXING
             pump.mix(
-                mix_location=wellplate.get_coordinates(instructions.target_well),
+                mix_location=wellplate.get_coordinates(
+                    instructions.target_well
+                ),  # fetch x, y, z, depth, and echem height coordinates of well
                 mix_repetitions=3,
                 mix_volume=instructions.mix_vol,
                 mix_rate=instructions.mix_rate,
@@ -853,7 +830,6 @@ def run_experiment(
                 wellplate=wellplate,
                 instructions=instructions,
                 pump=pump,
-                scale=scale,
                 mill=mill,
                 waste_vials=waste_vials,
                 stock_vials=stock_vials,
@@ -884,7 +860,6 @@ def run_experiment(
                 wellplate=wellplate,
                 pump=pump,
                 mill=mill,
-                scale=scale,
             )
 
             logger.info("Deposited char_sol in well: %s", instructions.target_well)
@@ -926,7 +901,6 @@ def run_experiment(
             wellplate=wellplate,
             instructions=instructions,
             pump=pump,
-            scale=scale,
             mill=mill,
             waste_vials=waste_vials,
             stock_vials=stock_vials,
@@ -934,6 +908,390 @@ def run_experiment(
         logger.info("Final Rinse")
 
         instructions.status = ExperimentStatus.COMPLETE
+        logger.info("End of Experiment: %s", instructions.id)
+
+        mill.move_to_safe_position()
+        logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
+
+    except OCPFailure as ocp_failure:
+        logger.error(ocp_failure)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Failed instructions updated for experiment %s", instructions.id)
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    except KeyboardInterrupt:
+        logger.warning("Keyboard Interrupt")
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Saved interrupted instructions for experiment %s", instructions.id)
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    except Exception as general_exception:
+        exception_type, _, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        logger.error("Exception: %s", general_exception)
+        logger.error("Exception type: %s", exception_type)
+        logger.error("File name: %s", filename)
+        logger.error("Line number: %d", line_number)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    finally:
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info(
+            "Returning completed instructions for experiment %s", instructions.id
+        )
+
+    return instructions, results, stock_vials, waste_vials, wellplate
+
+
+def mixing_test_protocol(
+    instructions: Experiment,
+    results: ExperimentResult,
+    mill: Mill,
+    pump: Pump,
+    stock_vials: list[Vial],
+    waste_vials: list[Vial],
+    wellplate: Wells,
+) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
+    """
+    Run the standard experiment:
+    1. Deposit solutions into well
+        for each solution:
+            a. Withdraw air gap
+            b. Withdraw solution
+            c. Purge
+            d. Deposit into well
+            e. Purge
+            f. Blow out
+            g. Flush pipette tip
+    2. Mix solutions in well
+    3. Flush pipette tip
+    7. Characterize the film on the substrate
+    8. Return results, stock_vials, waste_vials, wellplate
+
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        mill (object): The mill object
+        pump (object): The pump object
+        scale (object): The scale object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
+
+    Returns:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
+    """
+    # Add custom value to log format
+    custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
+    logger.addFilter(custom_filter)
+
+    try:
+        logger.info("Beginning experiment %d", instructions.id)
+        results.id = instructions.id
+        experiment_solutions = ["peg", "acrylate", "dmf", "custom", "ferrocene"]
+        apply_log_filter(instructions.id, instructions.target_well)
+        # Deposit all experiment solutions into well
+        for solution_name in experiment_solutions:
+            if (
+                getattr(instructions, solution_name) > 0
+                and solution_name[0:4] != "rinse"
+            ):  # if there is a solution to deposit
+                logger.info(
+                    "Pipetting %s ul of %s into %s...",
+                    getattr(instructions, solution_name),
+                    solution_name,
+                    instructions.target_well,
+                )
+                experiment_solutions, waste_vials, wellplate = pipette(
+                    volume=getattr(instructions, solution_name),
+                    solutions=stock_vials,  # list of vial objects passed to ePANDA
+                    solution_name=solution_name,  # from the list above
+                    target_well=instructions.target_well,
+                    pumping_rate=instructions.pumping_rate,
+                    waste_vials=waste_vials,  # list of vial objects passed to ePANDA
+                    waste_solution_name="waste",
+                    wellplate=wellplate,
+                    pump=pump,
+                    mill=mill,
+                )
+
+                stock_vials, waste_vials = flush_pipette_tip(
+                    pump,
+                    waste_vials,
+                    stock_vials,
+                    instructions.flush_sol_name,
+                    mill,
+                    instructions.pumping_rate,
+                    instructions.flush_vol,
+                )
+        logger.info("Pipetted solutions into well: %s", instructions.target_well)
+
+        # Mix solutions in well
+        if instructions.mix == 1:
+            logger.info("Mixing well: %s", instructions.target_well)
+            instructions.status = ExperimentStatus.MIXING
+            pump.mix(
+                mix_location=wellplate.get_coordinates(instructions.target_well),
+                mix_repetitions=instructions.mix_count,
+                mix_volume=instructions.mix_vol,
+                mix_rate=instructions.mix_rate,
+            )
+            logger.info("Mixed well: %s", instructions.target_well)
+
+            stock_vials, waste_vials = flush_pipette_tip(
+                pump,
+                waste_vials,
+                stock_vials,
+                instructions.flush_sol_name,
+                mill,
+                instructions.pumping_rate,
+                instructions.flush_vol,
+            )
+
+        # Echem CV - characterization
+        if instructions.cv == 1:
+            logger.info(
+                "Beginning eChem characterization of well: %s", instructions.target_well
+            )
+            # Deposit characterization solution into well
+
+            instructions, results = characterization(
+                instructions, results, mill, wellplate
+            )
+
+            logger.info("Characterization of %s complete", instructions.target_well)
+            # Flushing procedure
+
+        instructions.status = ExperimentStatus.COMPLETE
+        logger.info("End of Experiment: %s", instructions.id)
+
+        mill.move_to_safe_position()
+        logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
+
+    except OCPFailure as ocp_failure:
+        logger.error(ocp_failure)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Failed instructions updated for experiment %s", instructions.id)
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    except KeyboardInterrupt:
+        logger.warning("Keyboard Interrupt")
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Saved interrupted instructions for experiment %s", instructions.id)
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    except Exception as general_exception:
+        exception_type, _, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        logger.error("Exception: %s", general_exception)
+        logger.error("Exception type: %s", exception_type)
+        logger.error("File name: %s", filename)
+        logger.error("Line number: %d", line_number)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    finally:
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info(
+            "Returning completed instructions for experiment %s", instructions.id
+        )
+
+    return instructions, results, stock_vials, waste_vials, wellplate
+
+
+def peg2p_protocol(
+    instructions: Experiment,
+    results: ExperimentResult,
+    mill: Mill,
+    pump: Pump,
+    stock_vials: list[Vial],
+    waste_vials: list[Vial],
+    wellplate: Wells,
+) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
+    """
+    Run the standard experiment:
+    1. Deposit solutions into well
+        for each solution:
+            a. Withdraw air gap
+            b. Withdraw solution
+            c. Purge
+            d. Deposit into well
+            e. Purge
+            f. Blow out
+            g. Flush pipette tip
+    2. Flush pipette tip
+    3. Electrodeposit film with CA
+    4. Rinse the well
+    5. Deposit characterization solution into well
+    6. Characterize the film on the substrate
+    7. Return results, stock_vials, waste_vials, wellplate
+    8. Update the system state
+    9. Update location of experiment instructions and save results
+
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        mill (object): The mill object
+        pump (object): The pump object
+        scale (object): The scale object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
+
+    Returns:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
+    """
+    # Add custom value to log format
+    custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
+    logger.addFilter(custom_filter)
+
+    try:
+        logger.info("Beginning experiment %d", instructions.id)
+        results.id = instructions.id
+        experiment_solutions = ["dmf", "peg"]
+        apply_log_filter(instructions.id, instructions.target_well)
+        # Deposit all experiment solutions into well
+        for solution_name in experiment_solutions:
+            if (
+                getattr(instructions, solution_name) > 0
+                and solution_name[0:4] != "rinse"
+            ):  # if there is a solution to deposit
+                logger.info(
+                    "Pipetting %s ul of %s into %s...",
+                    getattr(instructions, solution_name),
+                    solution_name,
+                    instructions.target_well,
+                )
+                experiment_solutions, waste_vials, wellplate = pipette(
+                    volume=getattr(instructions, solution_name),
+                    solutions=stock_vials,  # list of vial objects passed to ePANDA
+                    solution_name=solution_name,  # from the list above
+                    target_well=instructions.target_well,
+                    pumping_rate=instructions.pumping_rate,
+                    waste_vials=waste_vials,  # list of vial objects passed to ePANDA
+                    waste_solution_name="waste",
+                    wellplate=wellplate,
+                    pump=pump,
+                    mill=mill,
+                )
+
+                stock_vials, waste_vials = flush_pipette_tip(
+                    pump,
+                    waste_vials,
+                    stock_vials,
+                    instructions.flush_sol_name,
+                    mill,
+                    instructions.pumping_rate,
+                    instructions.flush_vol,
+                )
+        logger.info("Pipetted solutions into well: %s", instructions.target_well)
+
+        # Echem CA - deposition
+        if instructions.ca == 1:
+            instructions.status = ExperimentStatus.DEPOSITING
+            instructions, results = deposition(instructions, results, mill, wellplate)
+            logger.info("deposition completed for well: %s", instructions.target_well)
+
+            waste_vials, wellplate = clear_well(
+                volume=wellplate.volume(instructions.target_well),
+                target_well=instructions.target_well,
+                wellplate=wellplate,
+                pumping_rate=instructions.pumping_rate,
+                pump=pump,
+                waste_vials=waste_vials,
+                mill=mill,
+                solution_name="waste",
+            )
+
+            logger.info("Cleared dep_sol from well: %s", instructions.target_well)
+
+            # Rinse the well 3x
+            stock_vials, waste_vials, wellplate = rinse(
+                wellplate=wellplate,
+                instructions=instructions,
+                pump=pump,
+                mill=mill,
+                waste_vials=waste_vials,
+                stock_vials=stock_vials,
+            )
+
+            logger.info("Rinsed well: %s", instructions.target_well)
+        # Echem CV - characterization
+        if instructions.cv == 1:
+            logger.info(
+                "Beginning eChem characterization of well: %s", instructions.target_well
+            )
+            # Deposit characterization solution into well
+
+            logger.info(
+                "Infuse %s into well %s...",
+                instructions.char_sol_name,
+                instructions.target_well,
+            )
+            stock_vials, waste_vials, wellplate = pipette(
+                volume=instructions.char_vol,
+                solutions=stock_vials,
+                solution_name=instructions.char_sol_name,
+                target_well=instructions.target_well,
+                pumping_rate=instructions.pumping_rate,
+                waste_vials=waste_vials,
+                waste_solution_name="waste",
+                wellplate=wellplate,
+                pump=pump,
+                mill=mill,
+            )
+
+            logger.info("Deposited char_sol in well: %s", instructions.target_well)
+
+            instructions, results = characterization(
+                instructions, results, mill, wellplate
+            )
+
+            logger.info("Characterization of %s complete", instructions.target_well)
+
+            waste_vials, wellplate = clear_well(
+                instructions.char_vol,
+                instructions.target_well,
+                wellplate,
+                instructions.pumping_rate,
+                pump,
+                waste_vials,
+                mill,
+                "waste",
+            )
+
+            logger.info("Well %s cleared", instructions.target_well)
+
+            # Flushing procedure
+            stock_vials, waste_vials = flush_pipette_tip(
+                pump,
+                waste_vials,
+                stock_vials,
+                instructions.flush_sol_name,
+                mill,
+                instructions.pumping_rate,
+                instructions.flush_vol,
+            )
+
+            logger.info("Pipette Flushed")
+            instructions.status = ExperimentStatus.COMPLETE
         logger.info("End of Experiment: %s", instructions.id)
 
         mill.move_to_safe_position()
@@ -983,31 +1341,10 @@ class OCPFailure(Exception):
         super().__init__(self.message)
 
 
-if __name__ == "__main__":
-    import pathlib
+class NoAvailableSolution(Exception):
+    """Raised when no available solution is found"""
 
-    mill_driver = mill_control()
-    Sartorius = scale_class()
-    pump_driver = pump_class(mill=mill_driver, scale=Sartorius)
-    echem.pstatconnect()
-    path_to_state = pathlib.Path.cwd() / "code/state"
-    stock_vials_list = read_vials(path_to_state / "vial_status.json")
-    waste_vials_list = read_vials(path_to_state / "waste_status.json")
-    wells_object = wellplate_module.Wells(-218, -74, 0, 0)
-    test_instructions = make_test_value()
-    test_results = ExperimentResult()
-    run_experiment(
-        instructions=test_instructions,
-        results=test_results,
-        mill=mill_driver,
-        pump=pump_driver,
-        scale=Sartorius,
-        stock_vials=stock_vials_list,
-        waste_vials=waste_vials_list,
-        wellplate=wells_object,
-    )
-    print(test_results)
-
-    # close connections
-    echem.disconnectpstat()
-    mill_driver.disconnect()
+    def __init__(self, solution_name):
+        self.solution_name = solution_name
+        self.message = f"No available solution of {solution_name} found"
+        super().__init__(self.message)
