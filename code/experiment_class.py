@@ -53,27 +53,11 @@ class ExperimentBase():
     target_well: str
     pin: int
     project_id: int
-    results: Optional[ExperimentResult] = None
-    s0: float = 0 #Solution 0 volume
-    s1: float = 0 #Solution 1 volume
-    s2: float = 0 #Solution 2 volume
-    s3: float = 0 #Solution 3 volume
-    solution_names: dict = None #Solution configuration
+    solutions: dict
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None #Optional[FilePath] = None
-
-    def read_in_solution_names(self, solution_file: str):
-        '''Read in the solution names from a json config file'''
-        dictionary = {'s0': 'solution name', 's1': 'solution name', 's2': 'solution name', 's3': 'solution name'}
-        with open(solution_file, 'r', encoding = 'utf-8') as f:
-            data = json.load(f)
-            dictionary[0]['name'] = data['s0']
-            dictionary[1]['name'] = data['s1']
-            dictionary[2]['name'] = data['s2']
-            dictionary[3]['name'] = data['s3']
-
-        self.solution_names = dictionary
+    results: Optional[ExperimentResult] = None
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -99,14 +83,11 @@ class PEG_ACR_Instructions(ExperimentBase):
     mix_count: int = 3 #Number of times to mix
     mix_vol: int = 200 #Volume to mix
     mix_rate: float = 0.62 #Rate for pump to mix at
-    
+
     def is_replicate(self, other):
         '''Check if two experiments have the same parameters but different ids'''
         if isinstance(other, PEG_ACR_Instructions):
-            return (self.s0 == other.s0
-                    and self.s1 == other.s1
-                    and self.s2 == other.s2
-                    and self.s3 == other.s3
+            return (self.solutions == other.solutions
             )
         return False
 
