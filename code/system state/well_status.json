@@ -660,7 +660,7 @@
         },
         {
             "well_id": "G11",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-10-20T15:48:56",
             "contents": [],
             "experiment_id": null,
@@ -668,7 +668,7 @@
         },
         {
             "well_id": "G12",
-            "status": "error",
+            "status": "new",
             "status_date": "2023-10-23T10:49:30",
             "contents": [],
             "experiment_id": null,
