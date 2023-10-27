@@ -688,7 +688,6 @@ def run_experiment(
     results: ExperimentResult,
     mill: Mill,
     pump: Pump,
-    scale: Scale,
     stock_vials: list[Vial],
     waste_vials: list[Vial],
     wellplate: Wells,
