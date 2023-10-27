@@ -594,6 +594,7 @@ def deposition(
 
         # TODO have chrono return the max and min values for the deposition
         # and save them to the results
+        # don't have any parameters hardcoded, switch these all to instructions
         echem.chrono(
             echem.potentiostat_ca_parameters.CAvi,
             echem.potentiostat_ca_parameters.CAti,
@@ -690,7 +691,7 @@ def characterization(
             CVsamplerate=(
                 echem.potentiostat_cv_parameters.CVstep / char_instructions.cv_scan_rate
             ),
-            CVcycle=echem.potentiostat_cv_parameters.CVcycle,
+            CVcycle=echem.potentiostat_cv_parameters.CVcycle,     
         )
         echem.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well

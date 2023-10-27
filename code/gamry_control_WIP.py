@@ -351,8 +351,8 @@ class potentiostat_cv_parameters:
 
     # CV Setup Parameters
     CVvi: float = 0.0  # initial voltage
-    CVap1: float = 0.3 #changed from 0.3 V
-    CVap2: float = -0.2 #same
+    CVap1: float = 0.5 
+    CVap2: float = -0.2 
     CVvf: float = 0.0  # final voltage
     CVstep: float = 0.01
     CVsr1: float = 0.1
