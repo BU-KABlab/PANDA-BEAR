@@ -12,8 +12,8 @@ from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 import time
 import Analyzer
-
-# pylint: disable=global-statement
+from decimal import Decimal
+# pylint: disable=global-statement, invalid-name, global-variable-undefined
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -177,7 +177,6 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     global DTAQ_SINK
     global CONNECTION
     global GAMRY_COM
-    global START_TIME
     global ACTIVE
     # global complete_file_name
 
@@ -222,7 +221,6 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     global DTAQ_SINK
     global CONNECTION
     global GAMRY_COM
-    global START_TIME
     global ACTIVE
     # global complete_file_name
 
@@ -300,18 +298,18 @@ def check_vf_range(filename):
             names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"],
         )
         vf_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vf")]
-        print("Vf last row:", vf_last_row_scientific)
+        logger.debug("Vf last row (sci): %.2E", Decimal(vf_last_row_scientific))
         vf_last_row_decimal = float(vf_last_row_scientific)
-        print("Vf last row:", vf_last_row_decimal)
+        logger.debug("Vf last row (float): %f", vf_last_row_decimal)
 
         if -1 < vf_last_row_decimal and vf_last_row_decimal < 1:
-            print("Vf in valid range (-1 to 1). Proceeding to echem experiment")
+            logger.debug("Vf in valid range (-1 to 1). Proceeding to echem experiment")
             return True
         else:
-            print("Vf not in valid range. Aborting echem experiment")
+            logger.error("Vf not in valid range. Aborting echem experiment")
             return False
-    except Exception as e:
-        print("Error occurred while checking Vf:", e)
+    except Exception as error:
+        logger.error("Error occurred while checking Vf: %s", error)
         return False
 
 

@@ -108,7 +108,7 @@ class Scheduler:
 
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
-            for wells in data["Wells"]:
+            for wells in data["wells"]:
                 if wells["well_id"] == well:
                     wells["status"] = status
                     wells["status_date"] = status_date
@@ -259,14 +259,14 @@ class Scheduler:
 
         # Find the highest priority in the queue
         highest_priority = 100
-        for line in data:
+        for line in data[1:]:
             priority = int(line.split(",")[1])
             if priority < highest_priority:
                 highest_priority = priority
 
         # Get all experiments with the highest priority so that we can randomly select one of them
         experiments = []
-        for line in data:
+        for line in data[1:]:
             priority = int(line.split(",")[1])
             if priority == highest_priority:
                 experiments.append(line.split(",")[2].strip()) # adds the filename to the list of experiments
@@ -289,13 +289,20 @@ class Scheduler:
 
         # Read the experiment file
         with open(file_path, "r", encoding="ascii") as file:
-            data = json.load(file)
-            data = (
+            experiment = json.load(file)
+            experiment = (
                 experiment_class.RootModel[Experiment]
-                .model_validate_json(json.dumps(data))
+                .model_validate_json(json.dumps(experiment))
                 .root
             )
-            return data, file_path
+
+        # Remove the selected experiment from the queue by rewriting the queue file and excluding the experiment
+        with open(file_path, "w", encoding="ascii") as file:
+            for line in data:
+                if line.split(",")[0] != experiment.id:
+                    file.write(line)
+
+        return experiment, file_path
 
     def update_queue(self, experiment: Experiment) -> None:
         """

@@ -14,18 +14,14 @@ Additionally controller should be able to:
 # pylint: disable=line-too-long
 
 # import standard libraries
-from hmac import new
 import json
 import logging
 import time
 
 # import third-party libraries
 from pathlib import Path
-from wsgiref.validate import InputWrapper
-
-from anyio import open_file
 from print_panda import printpanda
-from mill_control import MockMill as Mill
+from mill_control import Mill #MockMill as Mill
 from pump_control import Pump
 import gamry_control_WIP as echem
 
@@ -67,7 +63,6 @@ def main():
         # TODO clean this up and make it more robust
         toolkit = connect_to_instruments()
         mill = toolkit.mill
-        scale = toolkit.scale
         pump = toolkit.pump
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
@@ -81,7 +76,7 @@ def main():
             stock_vials, waste_vials, wellplate = establish_system_state()
 
             ## Ask the scheduler for the next experiment
-            new_experiment, new_experiment_path = scheduler.read_next_experiment_from_queue()
+            new_experiment, _ = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
                 logger.info(
                     "No new experiments to run...waiting 1 minute for new experiments"
@@ -133,7 +128,7 @@ def main():
 
             ## Update the system state with new vial and wellplate information
             scheduler.change_well_status(
-                updated_experiment.target_well, updated_experiment.status, updated_experiment.status_date, updated_experiment.id
+                updated_experiment.target_well, updated_experiment.status, updated_experiment.status_date.strftime("%Y-%m-%dT%H:%M:%S"), updated_experiment.id
             )  # this function should probably be in the wellplate module
             update_vial_state_file(stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
             update_vial_state_file(waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
@@ -268,13 +263,12 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
     number_of_clear_wells = 0
     with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
         wellplate_status = json.load(file)
-    for row in wellplate_status:
-        for well in row:
-            if well["status"] in ["clear", "new"]:
-                number_of_clear_wells += 1
-            logger.debug(
-                "Well %s has status %s", well["name"], well["status"]
-            )
+    for well in wellplate_status['wells']:
+        if well["status"] in ["clear", "new"]:
+            number_of_clear_wells += 1
+        logger.debug(
+            "Well %s has status %s", well["well_id"], well["status"]
+        )
 
     logger.info("There are %d clear wells", number_of_clear_wells)
     if number_of_clear_wells == 0:
@@ -305,8 +299,7 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
-    instruments.scale.disconnect()
-    instruments.pump.disconnect()
+    instruments.scale.close()
     if echem.OPEN_CONNECTION:
         echem.disconnectpstat()
 
@@ -439,7 +432,7 @@ def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wel
     ## Save each well to the well_history.csv file in the data folder
     ## plate id, type number, well id, experiment id, project id, status, status date, contents
     logger.debug("Saving well statuses to well_history.csv")
-    with open_file("data\\well_history.csv", "a", encoding="UTF-8") as file:
+    with open("data\\well_history.csv", "a", encoding="UTF-8") as file:
         for well in current_wellplate['wells']:
             file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
 

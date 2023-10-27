@@ -68,16 +68,16 @@ class ExperimentBase():
 @dataclass(config=ConfigDict(validate_assignment=True))
 class PEG_ACR_Instructions(ExperimentBase):
     '''Define the data that is used to run an experiment'''
-    ocp: int #Open Circuit Potential
-    ca: int #Cyclic Amperometry
-    cv: int #Cyclic Voltammetry
-    baseline: int #Baseline
-    dep_duration: int #Deposition duration
-    dep_pot: float #Deposition potential
-    char_sol_name: str #Characterization solution name
-    char_vol: int   #Characterization solution volume
-    flush_sol_name: str #Flush solution name
-    flush_vol: int #Flush solution volume
+    ocp: int = 1#Open Circuit Potential
+    ca: int = 1#Cyclic Amperometry
+    cv: int = 1#Cyclic Voltammetry
+    baseline: int = 0#Baseline
+    dep_duration: int = 300#Deposition duration
+    dep_pot: float = -1.7#Deposition potential
+    char_sol_name: str = 'ferrocene' #Characterization solution name
+    char_vol: int   = 130 #Characterization solution volume
+    flush_sol_name: str = 'dmf' #Flush solution name
+    flush_vol: int = 100 #Flush solution volume
     ca_sample_period: float = 0.01 #Deposition sample period
     cv_sample_period: float = 0.01 #Characterization sample period
     cv_scan_rate: float = 0.05 #Scan rate
@@ -109,16 +109,16 @@ class PEG_ACR_Instructions(ExperimentBase):
 @dataclass(config=ConfigDict(validate_assignment=True))
 class PEG2P_Test_Instructions(ExperimentBase):
     '''Define the data that is used to run an experiment'''
-    ocp: int #Open Circuit Potential
-    ca: int #Cyclic Amperometry
-    cv: int #Cyclic Voltammetry
-    baseline: int #Baseline
-    dep_duration: int #Deposition duration
-    dep_pot: float #Deposition potential
-    char_sol_name: str #Characterization solution name
-    char_vol: int   #Characterization solution volume
-    flush_sol_name: str #Flush solution name
-    flush_vol: int #Flush solution volume
+    ocp: int = 1#Open Circuit Potential
+    ca: int = 1#Cyclic Amperometry
+    cv: int = 1#Cyclic Voltammetry
+    baseline: int = 0#Baseline
+    dep_duration: int = 300#Deposition duration
+    dep_pot: float = -1.7#Deposition potential
+    char_sol_name: str = 'ferrocene' #Characterization solution name
+    char_vol: int   = 130 #Characterization solution volume
+    flush_sol_name: str = 'dmf' #Flush solution name
+    flush_vol: int = 100 #Flush solution volume
     ca_sample_period: float = 0.01 #Deposition sample period
     cv_sample_period: float = 0.01 #Characterization sample period
     cv_scan_rate: float = 0.05 #Scan rate
