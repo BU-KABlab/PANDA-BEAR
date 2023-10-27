@@ -256,24 +256,56 @@ def OCP(OCPvi, OCPti, OCPrate):
     #start_time = time.time()
     #print("made it to run end")
 
+
+def mock_CA(MCAvi, MCAti, MCArate):
+    global dtaq
+    global signal
+    global dtaqsink
+    global connection
+    global start_time
+    global active
+
+    active = True
+
+    print("made it to run")
+
+    # signal and dtaq object creation
+    signal = client.CreateObject("GamryCOM.GamrySignalConst")
+    dtaq = client.CreateObject("GamryCOM.GamryDtaqOcv")
+
+    dtaqsink = GamryDtaqEvents(dtaq, complete_file_name)
+    connection = client.GetEvents(dtaq, dtaqsink)
+    
+    signal.Init(pstat, MCAvi, MCAti, MCArate, GamryCOM.PstatMode)
+    initializepstat()
+
+    dtaq.Init(pstat)
+    pstat.SetSignal(signal)
+    pstat.SetCell(GamryCOM.CellOff)
+
+    dtaq.Run(True)
+    #start_time = time.time()
+    #print("made it to run end")
+
 def activecheck():
     while ACTIVE == True:
         client.PumpEvents(1)
         time.sleep(0.5)
 
-def check_vsig_range(filename):
+
+def check_vf_range(filename):
     try:
         ocp_data = pd.read_csv(filename, sep=" ", header=None, names=["Time", "Vf", "Vu", "Vsig", "Ach", "Overload", "StopTest", "Temp"])
-        vsig_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vsig")]
-        print("Vsig last row:", vsig_last_row_scientific)
-        vsig_last_row_decimal = float(vsig_last_row_scientific)
-        print("Vsig last row:", vsig_last_row_decimal)
+        vf_last_row_scientific = ocp_data.iloc[-2, ocp_data.columns.get_loc("Vf")]
+        print("Vf last row:", vf_last_row_scientific)
+        vf_last_row_decimal = float(vf_last_row_scientific)
+        print("Vf last row:", vf_last_row_decimal)
 
-        if -1 < vsig_last_row_decimal and vsig_last_row_decimal < 1:
-            print("Vsig in valid range (-1 to 1). Proceeding to echem experiment")
+        if -1 < vf_last_row_decimal and vf_last_row_decimal < 1:
+            print("Vf in valid range (-1 to 1). Proceeding to echem experiment")
             return True
         else:
-            print("Vsig not in valid range. Aborting echem experiment")
+            print("Vf not in valid range. Aborting echem experiment")
             return False
     except Exception as exception:
         print("Error occurred while checking Vsig:", exception)
@@ -320,6 +352,10 @@ class potentiostat_ocp_parameters:
     OCPti:float = 15.0
     OCPrate:float = 0.5
 
+#Mock_CA Setup parameters
+MCAvi = 0.0
+MCAti = 300
+MCArate = 0.5
 
 if __name__ == "__main__":
     try:
