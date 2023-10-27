@@ -121,7 +121,6 @@ def main():
                 results=experiment_results,
                 mill=mill,
                 pump=pump,
-                scale=scale,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
                 wellplate=wellplate,
