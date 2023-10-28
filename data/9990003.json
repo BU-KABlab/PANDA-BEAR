@@ -1,10 +1,10 @@
 {
     "id": 9990003,
-    "ocp_dep_file": null,
-    "ocp_dep_pass": null,
+    "ocp_dep_file": "C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\data\\experiment-9990003_OCP",
+    "ocp_dep_pass": true,
     "ocp_char_file": "C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\data\\experiment-9990003_OCP_char",
     "ocp_char_pass": true,
-    "deposition_data_file": null,
+    "deposition_data_file": "C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\data\\experiment-9990003_CA",
     "deposition_plot_file": null,
     "deposition_max_value": null,
     "depsotion_min_value": null,

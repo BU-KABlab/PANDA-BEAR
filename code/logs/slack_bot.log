@@ -320,3 +320,19 @@ cv_scan_rate
 2023-10-27 18:39:48,229:slack_functions:Message sent: Experiment 9990003 ended with status complete
 2023-10-28 09:38:01,033:slack_functions:Message sent: ePANDA encountered an error: experiment file
 2023-10-28 09:38:25,380:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-28 09:50:11,606:slack_functions:Message sent: ePANDA is starting up
+2023-10-28 09:50:13,858:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-28 10:01:35,696:slack_functions:Message sent: ePANDA is starting up
+2023-10-28 10:01:37,954:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-28 10:02:06,629:slack_functions:Message sent: Running experiment 9990001
+2023-10-28 10:28:47,956:slack_functions:Message sent: Experiment 9990001 ended with status complete
+2023-10-28 11:14:55,451:slack_functions:Message sent: ePANDA is starting up
+2023-10-28 11:14:57,698:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-28 11:14:57,871:slack_functions:Message sent: Running experiment 9990002
+2023-10-28 11:41:38,542:slack_functions:Message sent: Experiment 9990002 ended with status complete
+2023-10-28 11:41:38,737:slack_functions:Message sent: Running experiment 9990001
+2023-10-28 12:08:16,108:slack_functions:Message sent: Experiment 9990001 ended with status complete
+2023-10-28 12:08:16,315:slack_functions:Message sent: Running experiment 9990003
+2023-10-28 12:34:53,420:slack_functions:Message sent: Experiment 9990003 ended with status complete
+2023-10-28 18:39:30,774:slack_functions:Message sent: ePANDA encountered an error: cannot access local variable 'complete' where it is not associated with a value
+2023-10-28 18:39:38,898:slack_functions:Message sent: ePANDA is shutting down...goodbye

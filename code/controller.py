@@ -21,7 +21,7 @@ import time
 # import third-party libraries
 from pathlib import Path
 from print_panda import printpanda
-from mill_control import Mill #MockMill as Mill
+from mill_control import MockMill as Mill
 from pump_control import Pump
 import gamry_control_WIP as echem
 
@@ -76,12 +76,15 @@ def main():
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
+                slack.send_slack_message("alert", "No new experiments to run...monitoring inbox for new experiments")
+            while new_experiment is None:
                 logger.info(
                     "No new experiments to run...waiting 1 minute for new experiments"
                 )
                 time.sleep(60)
                 # Replace with slack alert and wait for response from user
                 scheduler.check_inbox()
+                new_experiment, _ = scheduler.read_next_experiment_from_queue()
 
             ## confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, Experiment):

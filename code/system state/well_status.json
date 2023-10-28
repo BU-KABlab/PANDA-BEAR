@@ -308,10 +308,10 @@
         },
         {
             "well_id": "D3",
-            "status": "new",
-            "status_date": "2023-08-04_15_08_11",
+            "status": "complete",
+            "status_date": "2023-10-28T12:34:53",
             "contents": [],
-            "experiment_id": null,
+            "experiment_id": 9990003,
             "project_id": null
         },
         {

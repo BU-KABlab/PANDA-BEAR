@@ -219,6 +219,7 @@ class Scheduler:
 
         file_path = Path.cwd() / "code" / "experiments_inbox"
         count = 0
+        complete = True
         for file in file_path.iterdir():
             # If there are files but 0 added then begin by inserting a baseline test
             # or every tenth experiment
