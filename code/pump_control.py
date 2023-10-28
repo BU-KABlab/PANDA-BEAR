@@ -185,7 +185,7 @@ class Pump:
         purge_vial.update_volume(purge_volume)
         return purge_vial
 
-    def run_pump(self, direction, volume_ml, rate, density=1.0):
+    def run_pump(self, direction, volume_ml, rate, density=None):
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
             return
@@ -200,9 +200,10 @@ class Pump:
         )
 
         ## Get scale value prior to pump action
-        pre_weight = self.scale.value()
-        scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
-        scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
+        if density is not None:
+            pre_weight = self.scale.value()
+            scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
+            scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
         logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
@@ -213,12 +214,13 @@ class Pump:
         time.sleep(2)
 
         ## Get scale value after pump action
-        post_weight = self.scale.value()
-        scale_logger.debug("Scale reading after %s: %f", action, post_weight)
-        scale_logger.debug("Scale reading difference: %f", pre_weight - post_weight)
-        scale_logger.info("Data,%s,%f,%f,%f,%f", 
-                          action, volume_ml, density, pre_weight, post_weight
-                          )
+        if density is not None:
+            post_weight = self.scale.value()
+            scale_logger.debug("Scale reading after %s: %f", action, post_weight)
+            scale_logger.debug("Scale reading difference: %f", pre_weight - post_weight)
+            scale_logger.info("Data,%s,%f,%f,%f,%f", 
+                            action, volume_ml, density, pre_weight, post_weight
+                            )
 
         action_type = (
             "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"

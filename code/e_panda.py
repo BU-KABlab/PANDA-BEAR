@@ -526,7 +526,7 @@ def deposition(
         dep_results (ExperimentResult): The updated experiment results
     """
     # echem setup
-    logger.info("\n\nSetting up eChem experiments...")
+    logger.info("Setting up eChem experiments...")
     echem.pstatconnect()
     # echem OCP
     logger.info("Beginning eChem OCP of well: %s", dep_instructions.target_well)

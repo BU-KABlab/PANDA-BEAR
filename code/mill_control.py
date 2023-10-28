@@ -29,7 +29,7 @@ import wellplate as Wells
 # Configure the logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)

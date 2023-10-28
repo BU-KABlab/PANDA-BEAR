@@ -62,8 +62,6 @@ def main():
         # Connect to equipment
         # TODO clean this up and make it more robust
         toolkit = connect_to_instruments()
-        mill = toolkit.mill
-        pump = toolkit.pump
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
 
@@ -114,8 +112,8 @@ def main():
             ) = e_panda.run_experiment(
                 instructions=new_experiment,
                 results=experiment_results,
-                mill=mill,
-                pump=pump,
+                mill=toolkit.mill,
+                pump=toolkit.pump,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
                 wellplate=wellplate,
@@ -289,6 +287,7 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
 def connect_to_instruments():
     """Connect to the instruments"""
     mill = Mill()
+    mill.homing_sequence()
     scale = Scale()
     pump = Pump(mill=mill, scale=scale)
     # pstat_connected = echem.pstatconnect()

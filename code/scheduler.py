@@ -217,7 +217,7 @@ class Scheduler:
         :return: the count of new experiments.
         """
 
-        file_path = Path.cwd() / "experiments_inbox"
+        file_path = Path.cwd() / "code" / "experiments_inbox"
         count = 0
         for file in file_path.iterdir():
             # If there are files but 0 added then begin by inserting a baseline test
@@ -246,27 +246,27 @@ class Scheduler:
         Reads the next experiment from the queue.
         :return: The next experiment.
         """
-        file_path = Path.cwd() / "code" / "system state" / "queue.csv"
+        queue_file_path = Path.cwd() / "code" / "system state" / "queue.csv"
         ## Starting with the queue.csv file to get the experiment id and filename
         ## The we want to get the experiment with the highest priority (lowest number)
-        if not Path.exists(file_path):
+        if not Path.exists(queue_file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        with open(file_path, "r", encoding="ascii") as file:
-            data = file.readlines()
+        with open(queue_file_path, "r", encoding="ascii") as queue_file:
+            queue = queue_file.readlines()
 
         # Find the highest priority in the queue
         highest_priority = 100
-        for line in data[1:]:
+        for line in queue[1:]:
             priority = int(line.split(",")[1])
             if priority < highest_priority:
                 highest_priority = priority
 
         # Get all experiments with the highest priority so that we can randomly select one of them
         experiments = []
-        for line in data[1:]:
+        for line in queue[1:]:
             priority = int(line.split(",")[1])
             if priority == highest_priority:
                 experiments.append(line.split(",")[2].strip()) # adds the filename to the list of experiments
@@ -275,21 +275,21 @@ class Scheduler:
             logger.info("No experiments in queue")
             return None, None
 
-        file_path = Path.cwd() / "code" / "experiment_queue"
-        if not Path.exists(file_path):
+        queue_dir_path = Path.cwd() / "code" / "experiment_queue"
+        if not Path.exists(queue_dir_path):
             logger.error("experiment_queue folder not found")
             raise FileNotFoundError("experiment queue folder")
 
         # Pick a random experiment from the list of experiments with the highest priority
         random_experiment = random.choice(experiments)
-        file_path = file_path / random_experiment
-        if not Path.exists(file_path):
+        experiment_file_path = queue_dir_path / random_experiment
+        if not Path.exists(experiment_file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
 
         # Read the experiment file
-        with open(file_path, "r", encoding="ascii") as file:
-            experiment = json.load(file)
+        with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
+            experiment = json.load(experiment_file)
             experiment = (
                 experiment_class.RootModel[Experiment]
                 .model_validate_json(json.dumps(experiment))
@@ -297,12 +297,12 @@ class Scheduler:
             )
 
         # Remove the selected experiment from the queue by rewriting the queue file and excluding the experiment
-        with open(file_path, "w", encoding="ascii") as file:
-            for line in data:
+        with open(queue_file_path, "w", encoding="ascii") as file:
+            for line in queue:
                 if line.split(",")[0] != experiment.id:
                     file.write(line)
 
-        return experiment, file_path
+        return experiment, experiment_file_path
 
     def update_queue(self, experiment: Experiment) -> None:
         """

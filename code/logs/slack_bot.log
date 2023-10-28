@@ -257,3 +257,66 @@ cv_scan_rate
 2023-10-10 18:54:17,201:slack_functions:Message sent: Experiment 0 ended with status error
 2023-10-10 18:54:17,381:slack_functions:Message sent: ePANDA was interrupted by the user
 2023-10-10 18:54:17,541:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-27 15:40:25,296:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:40:27,540:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:41:48,230:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:41:50,460:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:42:27,154:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:42:29,386:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:45:28,840:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:45:31,145:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:45:49,096:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:45:51,349:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:46:52,999:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:46:55,264:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:47:30,625:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:47:32,859:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:48:06,742:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:48:08,985:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:49:32,069:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:49:34,309:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:49:34,511:slack_functions:Message sent: Running experiment 9990001
+2023-10-27 15:50:10,486:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 15:50:12,728:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 15:50:12,897:slack_functions:Message sent: Running experiment 9990002
+2023-10-27 16:16:57,268:slack_functions:Message sent: Experiment 9990002 ended with status complete
+2023-10-27 16:21:29,408:slack_functions:Message sent: ePANDA encountered an error: Object of type datetime is not JSON serializable
+2023-10-27 16:32:24,369:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:32:28,638:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:34:45,119:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:34:49,379:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:36:28,594:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:37:04,382:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:38:37,342:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:38:48,921:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:39:19,201:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:39:27,071:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:39:27,279:slack_functions:Message sent: Running experiment 9990002
+2023-10-27 16:42:45,760:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:42:50,026:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:47:08,558:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:47:12,810:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:47:29,342:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:47:33,593:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:48:26,665:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:49:38,952:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 16:56:10,750:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 16:57:23,024:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 17:00:16,134:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 17:01:28,386:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 17:04:14,564:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 17:05:26,828:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 17:09:41,941:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 17:10:54,283:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 17:11:47,419:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 17:12:59,689:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 17:13:40,180:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 17:14:52,464:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 17:15:43,541:slack_functions:Message sent: ePANDA is starting up
+2023-10-27 17:16:55,790:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-27 17:16:55,971:slack_functions:Message sent: Running experiment 9990002
+2023-10-27 17:58:22,511:slack_functions:Message sent: Experiment 9990002 ended with status complete
+2023-10-27 17:58:22,736:slack_functions:Message sent: Running experiment 9990003
+2023-10-27 18:39:48,229:slack_functions:Message sent: Experiment 9990003 ended with status complete
+2023-10-28 09:38:01,033:slack_functions:Message sent: ePANDA encountered an error: experiment file
+2023-10-28 09:38:25,380:slack_functions:Message sent: ePANDA is shutting down...goodbye
