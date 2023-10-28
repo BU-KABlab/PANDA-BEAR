@@ -299,7 +299,7 @@ class Scheduler:
         # Remove the selected experiment from the queue by rewriting the queue file and excluding the experiment
         with open(queue_file_path, "w", encoding="ascii") as file:
             for line in queue:
-                if line.split(",")[0] != experiment.id:
+                if line.split(",")[0] != str(experiment.id):
                     file.write(line)
 
         return experiment, experiment_file_path
