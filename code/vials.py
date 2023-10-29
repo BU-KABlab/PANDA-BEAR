@@ -39,6 +39,7 @@ class Vial:
         z_bottom=-75,
         name="vial",
         filepath=None,
+        density=1.0,  # g/ml
     ):
         self.name = name
         self.position_name = position
@@ -49,6 +50,7 @@ class Vial:
         self.radius = radius
         self.height = height
         self.volume = volume
+        self.density = density
         self.base = math.pi * math.pow(self.radius, 2.0)
         self.depth = (
             self.vial_height_calculator(self.radius * 2, self.volume) + self.bottom
