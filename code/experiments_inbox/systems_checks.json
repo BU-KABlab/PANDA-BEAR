@@ -30,7 +30,7 @@
             "mix_count": 3,
             "mix_vol": 100,
             "mix_rate": 0.62,
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-10-28T12:08:16",
             "filename": "systems_check_D2",
             "results": null
@@ -65,7 +65,7 @@
             "mix_count": 3,
             "mix_vol": 100,
             "mix_rate": 0.62,
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-10-28T19:17:09",
             "filename": "systems_check_D3",
             "results": null
@@ -100,7 +100,7 @@
             "mix_count": 3,
             "mix_vol": 100,
             "mix_rate": 0.62,
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-10-29T00:37:26",
             "filename": "systems_check_D4",
             "results": null
@@ -135,7 +135,7 @@
             "mix_count": 3,
             "mix_vol": 100,
             "mix_rate": 0.62,
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-10-28T19:43:47",
             "filename": "systems_check_D6",
             "results": null
@@ -170,7 +170,7 @@
             "mix_count": 3,
             "mix_vol": 100,
             "mix_rate": 0.62,
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-10-29T00:37:26",
             "filename": "systems_check_D7",
             "results": null

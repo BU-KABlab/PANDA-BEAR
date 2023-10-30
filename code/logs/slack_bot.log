@@ -351,3 +351,7 @@ cv_scan_rate
 2023-10-29 00:37:26,952:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
 2023-10-30 08:43:05,098:slack_functions:Message sent: ePANDA encountered an error: [Errno 2] No such file or directory: 'C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\experiments_inbox\\systems_check_D7.json'
 2023-10-30 08:43:12,395:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-30 08:57:07,845:slack_functions:Message sent: ePANDA is starting up
+2023-10-30 08:57:10,162:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-30 08:57:10,333:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 09:21:13,213:slack_functions:Message sent: ePANDA encountered an error: 'Wells'

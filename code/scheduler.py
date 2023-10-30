@@ -65,7 +65,7 @@ class Scheduler:
 
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
-            for well in data["Wells"]:
+            for well in data["wells"]:
                 if well["well_id"] == well_to_check:
                     return well["status"]
                 else:
@@ -86,7 +86,7 @@ class Scheduler:
 
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
-            for well in data["Wells"]:
+            for well in data["wells"]:
                 if well["status"] == "new":
                     if baseline:
                         # Baseline tests can only be run in rows 1 or 12

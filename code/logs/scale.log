@@ -5680,3 +5680,4 @@
 2023-10-29 00:37:19,046,pump_control,DEBUG,Infusing 0.040000 ml...
 2023-10-29 00:37:24,459,pump_control,DEBUG,Done Infusing
 2023-10-29 00:37:26,478,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-30 08:57:07,926,pump_control,INFO,Pump found at address 0
