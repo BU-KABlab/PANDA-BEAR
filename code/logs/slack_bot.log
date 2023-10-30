@@ -336,3 +336,18 @@ cv_scan_rate
 2023-10-28 12:34:53,420:slack_functions:Message sent: Experiment 9990003 ended with status complete
 2023-10-28 18:39:30,774:slack_functions:Message sent: ePANDA encountered an error: cannot access local variable 'complete' where it is not associated with a value
 2023-10-28 18:39:38,898:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-28 18:48:39,974:slack_functions:Message sent: ePANDA is starting up
+2023-10-28 18:48:42,211:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-28 18:48:42,407:slack_functions:Message sent: Running experiment 9990001
+2023-10-28 18:50:25,342:slack_functions:Message sent: ePANDA is starting up
+2023-10-28 18:50:27,593:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-28 18:50:27,775:slack_functions:Message sent: Running experiment 9990002
+2023-10-28 19:17:09,208:slack_functions:Message sent: Experiment 9990002 ended with status complete
+2023-10-28 19:17:09,418:slack_functions:Message sent: Running experiment 9990003
+2023-10-28 19:43:47,481:slack_functions:Message sent: Experiment 9990003 ended with status complete
+2023-10-28 19:43:47,709:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-29 00:10:48,576:slack_functions:Message sent: Running experiment 9990004
+2023-10-29 00:37:26,724:slack_functions:Message sent: Experiment 9990004 ended with status complete
+2023-10-29 00:37:26,952:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 08:43:05,098:slack_functions:Message sent: ePANDA encountered an error: [Errno 2] No such file or directory: 'C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\experiments_inbox\\systems_check_D7.json'
+2023-10-30 08:43:12,395:slack_functions:Message sent: ePANDA is shutting down...goodbye

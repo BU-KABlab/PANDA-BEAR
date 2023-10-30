@@ -4127,3 +4127,1556 @@
 2023-10-28 12:34:45,755,pump_control,DEBUG,Infusing 0.040000 ml...
 2023-10-28 12:34:51,168,pump_control,DEBUG,Done Infusing
 2023-10-28 12:34:53,187,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:48:40,058,pump_control,INFO,Pump found at address 0
+2023-10-28 18:48:42,471,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:48:47,879,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:48:49,897,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:50:25,424,pump_control,INFO,Pump found at address 0
+2023-10-28 18:50:27,837,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:50:33,236,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:50:35,254,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:50:35,390,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 18:50:35,391,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:50:35,391,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 18:50:46,803,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:50:48,827,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:50:48,827,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:50:48,828,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 18:50:48,845,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 18:50:48,914,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:50:48,970,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:50:51,999,pump_control,DEBUG,Done Infusing
+2023-10-28 18:50:54,018,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:50:54,085,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:50:54,153,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 18:50:54,153,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:50:54,154,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 18:51:00,786,pump_control,DEBUG,Done Infusing
+2023-10-28 18:51:02,799,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:51:02,801,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:51:02,801,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 18:51:02,818,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 18:51:02,886,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:51:02,940,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:51:05,964,pump_control,DEBUG,Done Infusing
+2023-10-28 18:51:07,982,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:51:08,048,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:51:08,102,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:51:13,506,pump_control,DEBUG,Done Infusing
+2023-10-28 18:51:15,525,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:51:15,667,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:51:21,082,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:51:23,100,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:51:23,234,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:51:23,235,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:51:23,235,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 18:51:38,246,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:51:40,260,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:51:40,260,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:51:40,261,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:51:40,278,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 18:51:40,346,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 18:51:40,427,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:51:40,427,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:51:40,428,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 18:51:55,441,pump_control,DEBUG,Done Infusing
+2023-10-28 18:51:57,454,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:51:57,455,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:51:57,456,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:51:57,473,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 18:51:57,541,pump_control,DEBUG,Purged 120 ul
+2023-10-28 18:51:57,598,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:52:03,011,pump_control,DEBUG,Done Infusing
+2023-10-28 18:52:05,029,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:52:05,153,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:52:10,560,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:52:12,579,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:52:12,713,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 18:52:12,714,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:52:12,714,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 18:52:24,159,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:52:26,173,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:52:26,174,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:52:26,174,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 18:52:26,192,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 18:52:26,261,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:52:26,317,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:52:29,353,pump_control,DEBUG,Done Infusing
+2023-10-28 18:52:31,371,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:52:31,439,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:52:31,510,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 18:52:31,511,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:52:31,511,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 18:52:38,146,pump_control,DEBUG,Done Infusing
+2023-10-28 18:52:40,159,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:52:40,160,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:52:40,160,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 18:52:40,178,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 18:52:40,246,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:52:40,299,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:52:43,327,pump_control,DEBUG,Done Infusing
+2023-10-28 18:52:45,345,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:52:45,413,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:52:45,467,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:52:50,883,pump_control,DEBUG,Done Infusing
+2023-10-28 18:52:52,901,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:52:53,044,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:52:58,455,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:53:00,473,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:53:00,605,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:53:00,605,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:53:00,605,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 18:53:15,641,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:53:17,655,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:53:17,655,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:53:17,656,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:53:17,673,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 18:53:17,742,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 18:53:17,830,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:53:17,831,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:53:17,831,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 18:53:32,827,pump_control,DEBUG,Done Infusing
+2023-10-28 18:53:34,841,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:53:34,842,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:53:34,843,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:53:34,860,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 18:53:34,928,pump_control,DEBUG,Purged 120 ul
+2023-10-28 18:53:34,982,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:53:40,395,pump_control,DEBUG,Done Infusing
+2023-10-28 18:53:42,413,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:53:42,537,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:53:47,949,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:53:49,967,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:53:50,101,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 18:53:50,102,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:53:50,102,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 18:54:01,496,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:54:03,510,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:54:03,511,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:54:03,512,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 18:54:03,529,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 18:54:03,598,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:54:03,653,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:54:06,681,pump_control,DEBUG,Done Infusing
+2023-10-28 18:54:08,699,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:54:08,767,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:54:08,835,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 18:54:08,836,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:54:08,836,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 18:54:15,472,pump_control,DEBUG,Done Infusing
+2023-10-28 18:54:17,485,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:54:17,486,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:54:17,486,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 18:54:17,504,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 18:54:17,572,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:54:17,628,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:54:20,662,pump_control,DEBUG,Done Infusing
+2023-10-28 18:54:22,680,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:54:22,747,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:54:22,801,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:54:28,212,pump_control,DEBUG,Done Infusing
+2023-10-28 18:54:30,230,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:54:30,371,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:54:35,782,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:54:37,801,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:54:37,934,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:54:37,935,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:54:37,936,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 18:54:52,983,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:54:54,997,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:54:54,998,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:54:54,998,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:54:55,016,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 18:54:55,086,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 18:54:55,153,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:54:55,154,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:54:55,154,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 18:55:10,149,pump_control,DEBUG,Done Infusing
+2023-10-28 18:55:12,163,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:55:12,165,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:55:12,165,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:55:12,183,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 18:55:12,251,pump_control,DEBUG,Purged 120 ul
+2023-10-28 18:55:12,307,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:55:17,721,pump_control,DEBUG,Done Infusing
+2023-10-28 18:55:19,740,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:55:19,865,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:55:25,280,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:55:27,298,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:55:27,433,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 18:55:27,434,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:55:27,435,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 18:55:38,882,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:55:40,896,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:55:40,897,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:55:40,897,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 18:55:40,915,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 18:55:40,984,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:55:41,040,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:55:44,071,pump_control,DEBUG,Done Infusing
+2023-10-28 18:55:46,089,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:55:46,157,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:55:46,233,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 18:55:46,234,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:55:46,234,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 18:55:52,869,pump_control,DEBUG,Done Infusing
+2023-10-28 18:55:54,883,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:55:54,884,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:55:54,884,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 18:55:54,901,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 18:55:54,970,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:55:55,023,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:55:58,052,pump_control,DEBUG,Done Infusing
+2023-10-28 18:56:00,070,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:56:00,137,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:56:00,191,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:56:05,599,pump_control,DEBUG,Done Infusing
+2023-10-28 18:56:07,618,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:56:07,760,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:56:13,175,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:56:15,193,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:56:15,327,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:56:15,328,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:56:15,328,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 18:56:30,322,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:56:32,335,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:56:32,336,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:56:32,337,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:56:32,354,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 18:56:32,424,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 18:56:32,493,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:56:32,494,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:56:32,494,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 18:56:47,534,pump_control,DEBUG,Done Infusing
+2023-10-28 18:56:49,548,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:56:49,549,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:56:49,549,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:56:49,567,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 18:56:49,634,pump_control,DEBUG,Purged 120 ul
+2023-10-28 18:56:49,688,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:56:55,099,pump_control,DEBUG,Done Infusing
+2023-10-28 18:56:57,117,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:56:57,240,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:57:02,645,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:57:04,663,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:57:04,797,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 18:57:04,798,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:57:04,799,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 18:57:16,203,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:57:18,216,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:57:18,217,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:57:18,218,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 18:57:18,236,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 18:57:18,306,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:57:18,360,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:57:21,396,pump_control,DEBUG,Done Infusing
+2023-10-28 18:57:23,414,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:57:23,481,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:57:23,549,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 18:57:23,551,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:57:23,552,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 18:57:30,178,pump_control,DEBUG,Done Infusing
+2023-10-28 18:57:32,191,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:57:32,192,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:57:32,192,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 18:57:32,210,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 18:57:32,278,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 18:57:32,331,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 18:57:35,360,pump_control,DEBUG,Done Infusing
+2023-10-28 18:57:37,378,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 18:57:37,446,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 18:57:37,499,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:57:42,917,pump_control,DEBUG,Done Infusing
+2023-10-28 18:57:44,935,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:57:45,078,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:57:50,489,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:57:52,508,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:57:52,641,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:57:52,642,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:57:52,642,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 18:58:07,639,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:58:09,652,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 18:58:09,653,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:58:09,654,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:58:09,671,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 18:58:09,740,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 18:58:09,836,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:58:09,837,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 18:58:09,837,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 18:58:24,831,pump_control,DEBUG,Done Infusing
+2023-10-28 18:58:26,845,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 18:58:26,846,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 18:58:26,847,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 18:58:26,864,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 18:58:26,932,pump_control,DEBUG,Purged 120 ul
+2023-10-28 18:58:26,988,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 18:58:32,401,pump_control,DEBUG,Done Infusing
+2023-10-28 18:58:34,419,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 18:58:34,487,pump_control,INFO,Mixing 3 times
+2023-10-28 18:58:34,488,pump_control,DEBUG,Mixing 0 of 3 times
+2023-10-28 18:58:34,543,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-28 18:58:44,837,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:58:46,855,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-28 18:58:46,977,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-28 18:58:57,275,pump_control,DEBUG,Done Infusing
+2023-10-28 18:58:59,293,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-28 18:58:59,362,pump_control,DEBUG,Mixing 1 of 3 times
+2023-10-28 18:58:59,417,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-28 18:59:09,707,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:59:11,726,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-28 18:59:11,862,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-28 18:59:22,150,pump_control,DEBUG,Done Infusing
+2023-10-28 18:59:24,169,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-28 18:59:24,237,pump_control,DEBUG,Mixing 2 of 3 times
+2023-10-28 18:59:24,291,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-28 18:59:34,578,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:59:36,597,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-28 18:59:36,721,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-28 18:59:47,013,pump_control,DEBUG,Done Infusing
+2023-10-28 18:59:49,031,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-28 18:59:49,159,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 18:59:54,576,pump_control,DEBUG,Done Withdrawing
+2023-10-28 18:59:56,595,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 18:59:56,730,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 18:59:56,730,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 18:59:56,730,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:00:11,728,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:00:13,742,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:00:13,743,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:00:13,744,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:00:13,761,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:00:13,830,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:00:13,899,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:00:13,900,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:00:13,900,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:00:28,900,pump_control,DEBUG,Done Infusing
+2023-10-28 19:00:30,914,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:00:30,915,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:00:30,915,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:00:30,932,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:00:31,001,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:00:31,057,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:00:36,469,pump_control,DEBUG,Done Infusing
+2023-10-28 19:00:38,487,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:06:29,695,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:06:35,115,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:06:37,133,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:06:37,258,pump_control,DEBUG,Withdrawing 0.125000 ml...
+2023-10-28 19:06:52,899,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:06:54,918,pump_control,DEBUG,Pump has withdrawn: 0.125 ml
+2023-10-28 19:06:54,986,pump_control,DEBUG,Purging 125.000000 ul...
+2023-10-28 19:06:55,042,pump_control,DEBUG,Infusing 0.125000 ml...
+2023-10-28 19:07:10,661,pump_control,DEBUG,Done Infusing
+2023-10-28 19:07:12,679,pump_control,DEBUG,Pump has infused: 0.125 ml
+2023-10-28 19:07:12,747,pump_control,DEBUG,Purged 125.0 ul
+2023-10-28 19:07:12,802,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:07:18,214,pump_control,DEBUG,Done Infusing
+2023-10-28 19:07:20,232,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:07:20,358,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:07:25,772,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:07:27,791,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:07:27,913,pump_control,DEBUG,Withdrawing 0.125000 ml...
+2023-10-28 19:07:43,553,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:07:45,571,pump_control,DEBUG,Pump has withdrawn: 0.125 ml
+2023-10-28 19:07:45,640,pump_control,DEBUG,Purging 125.000000 ul...
+2023-10-28 19:07:45,698,pump_control,DEBUG,Infusing 0.125000 ml...
+2023-10-28 19:08:01,319,pump_control,DEBUG,Done Infusing
+2023-10-28 19:08:03,337,pump_control,DEBUG,Pump has infused: 0.125 ml
+2023-10-28 19:08:03,404,pump_control,DEBUG,Purged 125.0 ul
+2023-10-28 19:08:03,458,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:08:08,876,pump_control,DEBUG,Done Infusing
+2023-10-28 19:08:10,894,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:08:11,020,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:08:16,426,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:08:18,444,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:08:18,580,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-28 19:08:18,581,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:08:18,581,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-28 19:08:39,606,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:08:41,619,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:08:41,620,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:08:41,620,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-28 19:08:41,638,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-28 19:08:41,707,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:08:41,762,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:08:44,792,pump_control,DEBUG,Done Infusing
+2023-10-28 19:08:46,811,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:08:46,878,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:08:46,947,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-28 19:08:46,948,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:08:46,948,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:09:03,151,pump_control,DEBUG,Done Infusing
+2023-10-28 19:09:05,164,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:09:05,165,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:09:05,165,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-28 19:09:05,183,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:09:05,253,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:09:05,307,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:09:08,334,pump_control,DEBUG,Done Infusing
+2023-10-28 19:09:10,353,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:09:10,421,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:09:10,478,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:09:15,888,pump_control,DEBUG,Done Infusing
+2023-10-28 19:09:17,907,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:09:18,047,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:09:23,457,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:09:25,475,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:09:25,598,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-28 19:09:41,814,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:09:43,832,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-28 19:09:43,899,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-28 19:09:43,955,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:10:00,154,pump_control,DEBUG,Done Infusing
+2023-10-28 19:10:02,173,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:10:02,240,pump_control,DEBUG,Purged 130.0 ul
+2023-10-28 19:10:02,298,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:10:07,710,pump_control,DEBUG,Done Infusing
+2023-10-28 19:10:09,728,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:10:09,852,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:10:15,272,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:10:17,290,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:10:17,424,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-28 19:10:17,425,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:10:17,425,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-28 19:10:38,451,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:10:40,464,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:10:40,465,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:10:40,466,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-28 19:10:40,484,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-28 19:10:40,553,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:10:40,610,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:10:43,642,pump_control,DEBUG,Done Infusing
+2023-10-28 19:10:45,660,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:10:45,728,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:10:45,797,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-28 19:10:45,798,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:10:45,798,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:11:02,015,pump_control,DEBUG,Done Infusing
+2023-10-28 19:11:04,028,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:11:04,029,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:11:04,030,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-28 19:11:04,048,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:11:04,118,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:11:04,171,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:11:07,197,pump_control,DEBUG,Done Infusing
+2023-10-28 19:11:09,215,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:11:09,283,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:11:09,337,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:11:14,748,pump_control,DEBUG,Done Infusing
+2023-10-28 19:11:16,766,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:13:28,791,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:13:34,205,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:13:36,223,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:13:36,345,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-28 19:13:52,567,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:13:54,585,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-28 19:13:54,654,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-28 19:13:54,712,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:14:10,918,pump_control,DEBUG,Done Infusing
+2023-10-28 19:14:12,936,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:14:13,004,pump_control,DEBUG,Purged 130.0 ul
+2023-10-28 19:14:13,058,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:14:18,471,pump_control,DEBUG,Done Infusing
+2023-10-28 19:14:20,489,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:14:20,615,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:14:26,025,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:14:28,043,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:14:28,181,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:14:28,182,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:14:28,183,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:14:43,230,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:14:45,244,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:14:45,245,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:14:45,246,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:14:45,263,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:14:45,334,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:14:45,404,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:14:45,405,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:14:45,405,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:15:00,447,pump_control,DEBUG,Done Infusing
+2023-10-28 19:15:02,461,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:15:02,462,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:15:02,463,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:15:02,480,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:15:02,547,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:15:02,601,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:15:08,015,pump_control,DEBUG,Done Infusing
+2023-10-28 19:15:10,033,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:15:10,158,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:15:15,575,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:15:17,593,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:15:17,727,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-28 19:15:17,728,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:15:17,728,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-28 19:15:38,751,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:15:40,764,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:15:40,765,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:15:40,766,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-28 19:15:40,783,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-28 19:15:40,852,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:15:40,907,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:15:43,942,pump_control,DEBUG,Done Infusing
+2023-10-28 19:15:45,960,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:15:46,027,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:15:46,095,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-28 19:15:46,096,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:15:46,096,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:16:02,299,pump_control,DEBUG,Done Infusing
+2023-10-28 19:16:04,313,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:16:04,314,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:16:04,315,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-28 19:16:04,332,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:16:04,402,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:16:04,457,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:16:07,490,pump_control,DEBUG,Done Infusing
+2023-10-28 19:16:09,508,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:16:09,575,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:16:09,629,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:16:15,040,pump_control,DEBUG,Done Infusing
+2023-10-28 19:16:17,058,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:16:17,201,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:16:22,609,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:16:24,627,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:16:24,750,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-28 19:16:40,950,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:16:42,969,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-28 19:16:43,038,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-28 19:16:43,095,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:16:59,302,pump_control,DEBUG,Done Infusing
+2023-10-28 19:17:01,319,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:17:01,387,pump_control,DEBUG,Purged 130.0 ul
+2023-10-28 19:17:01,442,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:17:06,851,pump_control,DEBUG,Done Infusing
+2023-10-28 19:17:08,869,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:17:09,483,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:17:14,901,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:17:16,919,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:17:17,062,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 19:17:17,063,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:17:17,063,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 19:17:28,510,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:17:30,524,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:17:30,525,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:17:30,526,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 19:17:30,543,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 19:17:30,613,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:17:30,668,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:17:33,698,pump_control,DEBUG,Done Infusing
+2023-10-28 19:17:35,717,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:17:35,784,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:17:35,863,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 19:17:35,864,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:17:35,864,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 19:17:42,496,pump_control,DEBUG,Done Infusing
+2023-10-28 19:17:44,509,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:17:44,510,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:17:44,510,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 19:17:44,527,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 19:17:44,594,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:17:44,648,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:17:47,683,pump_control,DEBUG,Done Infusing
+2023-10-28 19:17:49,701,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:17:49,769,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:17:49,825,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:17:55,237,pump_control,DEBUG,Done Infusing
+2023-10-28 19:17:57,256,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:17:57,401,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:18:02,816,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:18:04,834,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:18:04,970,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:18:04,970,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:18:04,970,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:18:20,019,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:18:22,032,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:18:22,033,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:18:22,034,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:18:22,052,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:18:22,121,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:18:22,190,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:18:22,191,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:18:22,191,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:18:37,188,pump_control,DEBUG,Done Infusing
+2023-10-28 19:18:39,201,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:18:39,202,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:18:39,203,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:18:39,220,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:18:39,289,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:18:39,343,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:18:44,758,pump_control,DEBUG,Done Infusing
+2023-10-28 19:18:46,776,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:18:46,901,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:18:52,314,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:18:54,332,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:18:54,467,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 19:18:54,468,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:18:54,468,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 19:19:05,910,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:19:07,923,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:19:07,924,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:19:07,925,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 19:19:07,942,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 19:19:08,011,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:19:08,068,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:19:11,099,pump_control,DEBUG,Done Infusing
+2023-10-28 19:19:13,118,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:19:13,186,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:19:13,265,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 19:19:13,266,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:19:13,266,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 19:19:19,899,pump_control,DEBUG,Done Infusing
+2023-10-28 19:19:21,912,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:19:21,913,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:19:21,914,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 19:19:21,931,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 19:19:21,999,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:19:22,053,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:19:25,084,pump_control,DEBUG,Done Infusing
+2023-10-28 19:19:27,102,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:19:27,169,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:19:27,223,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:19:32,635,pump_control,DEBUG,Done Infusing
+2023-10-28 19:19:34,653,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:19:34,798,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:19:40,213,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:19:42,232,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:19:42,367,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:19:42,368,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:19:42,369,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:19:57,368,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:19:59,381,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:19:59,381,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:19:59,382,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:19:59,399,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:19:59,469,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:19:59,537,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:19:59,538,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:19:59,539,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:20:14,584,pump_control,DEBUG,Done Infusing
+2023-10-28 19:20:16,598,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:20:16,599,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:20:16,600,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:20:16,618,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:20:16,686,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:20:16,740,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:20:22,152,pump_control,DEBUG,Done Infusing
+2023-10-28 19:20:24,170,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:20:24,297,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:20:29,712,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:20:31,730,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:20:31,867,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 19:20:31,868,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:20:31,868,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 19:20:43,263,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:20:45,277,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:20:45,278,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:20:45,279,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 19:20:45,296,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 19:20:45,366,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:20:45,420,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:20:48,448,pump_control,DEBUG,Done Infusing
+2023-10-28 19:20:50,466,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:20:50,535,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:20:50,604,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 19:20:50,604,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:20:50,605,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 19:20:57,233,pump_control,DEBUG,Done Infusing
+2023-10-28 19:20:59,247,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:20:59,248,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:20:59,249,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 19:20:59,266,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 19:20:59,335,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:20:59,388,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:21:02,422,pump_control,DEBUG,Done Infusing
+2023-10-28 19:21:04,440,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:21:04,508,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:21:04,562,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:21:09,978,pump_control,DEBUG,Done Infusing
+2023-10-28 19:21:11,996,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:21:12,138,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:21:17,551,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:21:19,568,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:21:19,703,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:21:19,705,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:21:19,705,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:21:34,747,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:21:36,760,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:21:36,761,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:21:36,762,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:21:36,780,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:21:36,849,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:21:36,917,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:21:36,919,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:21:36,919,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:21:51,914,pump_control,DEBUG,Done Infusing
+2023-10-28 19:21:53,928,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:21:53,928,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:21:53,929,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:21:53,946,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:21:54,014,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:21:54,068,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:21:59,470,pump_control,DEBUG,Done Infusing
+2023-10-28 19:22:01,488,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:22:01,611,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:22:07,026,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:22:09,045,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:22:09,180,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 19:22:09,181,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:22:09,181,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 19:22:20,579,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:22:22,593,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:22:22,594,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:22:22,595,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 19:22:22,612,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 19:22:22,681,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:22:22,738,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:22:25,768,pump_control,DEBUG,Done Infusing
+2023-10-28 19:22:27,786,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:22:27,854,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:22:27,922,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 19:22:27,923,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:22:27,923,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 19:22:34,555,pump_control,DEBUG,Done Infusing
+2023-10-28 19:22:36,569,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:22:36,570,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:22:36,570,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 19:22:36,587,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 19:22:36,655,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:22:36,708,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:22:39,737,pump_control,DEBUG,Done Infusing
+2023-10-28 19:22:41,755,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:22:41,823,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:22:41,878,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:22:47,285,pump_control,DEBUG,Done Infusing
+2023-10-28 19:22:49,303,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:22:49,448,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:22:54,858,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:22:56,876,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:22:57,010,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:22:57,011,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:22:57,011,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:23:12,006,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:23:14,019,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:23:14,021,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:23:14,021,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:23:14,039,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:23:14,109,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:23:14,178,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:23:14,179,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:23:14,180,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:23:29,215,pump_control,DEBUG,Done Infusing
+2023-10-28 19:23:31,230,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:23:31,230,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:23:31,230,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:23:31,248,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:23:31,316,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:23:31,370,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:23:36,777,pump_control,DEBUG,Done Infusing
+2023-10-28 19:23:38,796,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:23:38,920,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:23:44,337,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:23:46,355,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:23:46,490,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-28 19:23:46,491,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:23:46,492,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-28 19:23:57,940,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:23:59,954,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:23:59,955,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:23:59,956,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-28 19:23:59,974,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-28 19:24:00,043,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:24:00,098,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:24:03,131,pump_control,DEBUG,Done Infusing
+2023-10-28 19:24:05,149,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:24:05,217,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:24:05,287,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-28 19:24:05,288,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:24:05,288,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-28 19:24:11,915,pump_control,DEBUG,Done Infusing
+2023-10-28 19:24:13,928,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:24:13,928,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:24:13,929,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-28 19:24:13,946,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-28 19:24:14,014,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:24:14,068,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:24:17,096,pump_control,DEBUG,Done Infusing
+2023-10-28 19:24:19,115,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:24:19,182,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:24:19,238,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:24:24,646,pump_control,DEBUG,Done Infusing
+2023-10-28 19:24:26,664,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:24:26,808,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:24:32,217,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:24:34,235,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:24:34,370,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:24:34,371,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:24:34,371,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:24:49,366,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:24:51,379,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:24:51,380,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:24:51,380,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:24:51,397,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:24:51,466,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:24:51,533,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:24:51,534,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:24:51,534,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:25:06,565,pump_control,DEBUG,Done Infusing
+2023-10-28 19:25:08,578,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:25:08,579,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:25:08,580,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:25:08,598,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:25:08,665,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:25:08,719,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:25:14,132,pump_control,DEBUG,Done Infusing
+2023-10-28 19:25:16,151,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:25:16,220,pump_control,INFO,Mixing 3 times
+2023-10-28 19:25:16,221,pump_control,DEBUG,Mixing 0 of 3 times
+2023-10-28 19:25:16,279,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-28 19:25:26,565,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:25:28,583,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-28 19:25:28,708,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-28 19:25:39,003,pump_control,DEBUG,Done Infusing
+2023-10-28 19:25:41,021,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-28 19:25:41,089,pump_control,DEBUG,Mixing 1 of 3 times
+2023-10-28 19:25:41,145,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-28 19:25:51,430,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:25:53,448,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-28 19:25:53,571,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-28 19:26:03,860,pump_control,DEBUG,Done Infusing
+2023-10-28 19:26:05,878,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-28 19:26:05,947,pump_control,DEBUG,Mixing 2 of 3 times
+2023-10-28 19:26:06,002,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-28 19:26:16,292,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:26:18,310,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-28 19:26:18,433,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-28 19:26:28,716,pump_control,DEBUG,Done Infusing
+2023-10-28 19:26:30,734,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-28 19:26:30,861,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:26:36,278,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:26:38,296,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:26:38,431,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:26:38,432,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:26:38,433,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:26:53,470,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:26:55,484,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:26:55,484,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:26:55,485,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:26:55,502,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:26:55,570,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:26:55,675,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:26:55,676,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:26:55,676,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:27:10,718,pump_control,DEBUG,Done Infusing
+2023-10-28 19:27:12,731,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:27:12,732,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:27:12,733,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:27:12,751,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:27:12,818,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:27:12,873,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:27:18,285,pump_control,DEBUG,Done Infusing
+2023-10-28 19:27:20,304,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:33:08,180,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:33:13,599,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:33:15,617,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:33:15,741,pump_control,DEBUG,Withdrawing 0.125000 ml...
+2023-10-28 19:33:31,372,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:33:33,391,pump_control,DEBUG,Pump has withdrawn: 0.125 ml
+2023-10-28 19:33:33,461,pump_control,DEBUG,Purging 125.000000 ul...
+2023-10-28 19:33:33,516,pump_control,DEBUG,Infusing 0.125000 ml...
+2023-10-28 19:33:49,141,pump_control,DEBUG,Done Infusing
+2023-10-28 19:33:51,159,pump_control,DEBUG,Pump has infused: 0.125 ml
+2023-10-28 19:33:51,227,pump_control,DEBUG,Purged 125.0 ul
+2023-10-28 19:33:51,281,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:33:56,696,pump_control,DEBUG,Done Infusing
+2023-10-28 19:33:58,714,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:33:58,841,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:34:04,250,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:34:06,268,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:34:06,391,pump_control,DEBUG,Withdrawing 0.125000 ml...
+2023-10-28 19:34:22,014,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:34:24,032,pump_control,DEBUG,Pump has withdrawn: 0.125 ml
+2023-10-28 19:34:24,100,pump_control,DEBUG,Purging 125.000000 ul...
+2023-10-28 19:34:24,155,pump_control,DEBUG,Infusing 0.125000 ml...
+2023-10-28 19:34:39,790,pump_control,DEBUG,Done Infusing
+2023-10-28 19:34:41,808,pump_control,DEBUG,Pump has infused: 0.125 ml
+2023-10-28 19:34:41,875,pump_control,DEBUG,Purged 125.0 ul
+2023-10-28 19:34:41,929,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:34:47,334,pump_control,DEBUG,Done Infusing
+2023-10-28 19:34:49,352,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:34:49,478,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:34:54,889,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:34:56,907,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:34:57,042,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-28 19:34:57,043,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:34:57,044,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-28 19:35:18,074,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:35:20,088,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:35:20,089,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:35:20,090,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-28 19:35:20,107,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-28 19:35:20,176,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:35:20,231,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:35:23,265,pump_control,DEBUG,Done Infusing
+2023-10-28 19:35:25,283,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:35:25,351,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:35:25,420,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-28 19:35:25,421,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:35:25,421,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:35:41,639,pump_control,DEBUG,Done Infusing
+2023-10-28 19:35:43,653,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:35:43,654,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:35:43,654,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-28 19:35:43,672,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:35:43,740,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:35:43,795,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:35:46,821,pump_control,DEBUG,Done Infusing
+2023-10-28 19:35:48,840,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:35:48,907,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:35:48,961,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:35:54,377,pump_control,DEBUG,Done Infusing
+2023-10-28 19:35:56,395,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:35:56,538,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:36:01,957,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:36:03,976,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:36:04,098,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-28 19:36:20,307,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:36:22,325,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-28 19:36:22,394,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-28 19:36:22,451,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:36:38,670,pump_control,DEBUG,Done Infusing
+2023-10-28 19:36:40,688,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:36:40,756,pump_control,DEBUG,Purged 130.0 ul
+2023-10-28 19:36:40,810,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:36:46,219,pump_control,DEBUG,Done Infusing
+2023-10-28 19:36:48,237,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:36:48,361,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:36:53,774,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:36:55,792,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:36:55,928,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-28 19:36:55,928,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:36:55,929,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-28 19:37:16,971,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:37:18,985,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:37:18,986,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:37:18,987,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-28 19:37:19,004,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-28 19:37:19,074,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:37:19,131,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:37:22,159,pump_control,DEBUG,Done Infusing
+2023-10-28 19:37:24,177,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:37:24,245,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:37:24,314,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-28 19:37:24,315,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:37:24,315,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:37:40,510,pump_control,DEBUG,Done Infusing
+2023-10-28 19:37:42,524,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:37:42,525,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:37:42,526,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-28 19:37:42,543,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:37:42,614,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:37:42,668,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:37:45,699,pump_control,DEBUG,Done Infusing
+2023-10-28 19:37:47,717,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:37:47,785,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:37:47,839,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:37:53,247,pump_control,DEBUG,Done Infusing
+2023-10-28 19:37:55,265,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:40:07,201,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:40:12,620,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:40:14,638,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:40:14,761,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-28 19:40:30,984,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:40:33,002,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-28 19:40:33,071,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-28 19:40:33,129,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:40:49,346,pump_control,DEBUG,Done Infusing
+2023-10-28 19:40:51,365,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:40:51,432,pump_control,DEBUG,Purged 130.0 ul
+2023-10-28 19:40:51,488,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:40:56,899,pump_control,DEBUG,Done Infusing
+2023-10-28 19:40:58,916,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:40:59,042,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:41:04,455,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:41:06,474,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:41:06,607,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:41:06,609,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:41:06,609,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-28 19:41:21,602,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:41:23,615,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:41:23,616,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:41:23,617,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:41:23,635,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-28 19:41:23,704,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-28 19:41:23,774,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-28 19:41:23,775,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:41:23,775,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-28 19:41:38,770,pump_control,DEBUG,Done Infusing
+2023-10-28 19:41:40,784,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:41:40,785,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:41:40,786,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-28 19:41:40,803,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-28 19:41:40,870,pump_control,DEBUG,Purged 120 ul
+2023-10-28 19:41:40,925,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:41:46,334,pump_control,DEBUG,Done Infusing
+2023-10-28 19:41:48,353,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:41:48,481,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:41:53,889,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:41:55,907,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:41:56,040,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-28 19:41:56,041,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-28 19:41:56,041,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-28 19:42:17,088,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:42:19,102,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-28 19:42:19,103,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:42:19,104,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-28 19:42:19,121,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-28 19:42:19,191,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:42:19,245,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:42:22,279,pump_control,DEBUG,Done Infusing
+2023-10-28 19:42:24,297,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:42:24,365,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:42:24,434,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-28 19:42:24,435,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-28 19:42:24,436,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:42:40,649,pump_control,DEBUG,Done Infusing
+2023-10-28 19:42:42,662,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-28 19:42:42,663,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-28 19:42:42,663,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-28 19:42:42,680,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:42:42,749,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-28 19:42:42,801,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-28 19:42:45,833,pump_control,DEBUG,Done Infusing
+2023-10-28 19:42:47,852,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-28 19:42:47,920,pump_control,DEBUG,Purged 20.0 ul
+2023-10-28 19:42:47,973,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:42:53,392,pump_control,DEBUG,Done Infusing
+2023-10-28 19:42:55,411,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-28 19:42:55,552,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-28 19:43:00,971,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:43:02,989,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-28 19:43:03,111,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-28 19:43:19,311,pump_control,DEBUG,Done Withdrawing
+2023-10-28 19:43:21,329,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-28 19:43:21,398,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-28 19:43:21,453,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-28 19:43:37,660,pump_control,DEBUG,Done Infusing
+2023-10-28 19:43:39,678,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-28 19:43:39,746,pump_control,DEBUG,Purged 130.0 ul
+2023-10-28 19:43:39,801,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-28 19:43:45,208,pump_control,DEBUG,Done Infusing
+2023-10-28 19:43:47,227,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:10:48,647,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:10:54,053,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:10:56,071,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:10:56,204,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-29 00:10:56,205,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:10:56,205,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-29 00:11:07,642,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:11:09,655,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:11:09,656,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:11:09,656,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-29 00:11:09,674,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-29 00:11:09,742,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:11:09,797,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:11:12,824,pump_control,DEBUG,Done Infusing
+2023-10-29 00:11:14,842,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:11:14,910,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:11:14,978,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-29 00:11:14,978,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:11:14,979,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-29 00:11:21,606,pump_control,DEBUG,Done Infusing
+2023-10-29 00:11:23,620,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:11:23,621,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:11:23,622,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-29 00:11:23,639,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-29 00:11:23,709,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:11:23,762,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:11:26,788,pump_control,DEBUG,Done Infusing
+2023-10-29 00:11:28,807,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:11:28,874,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:11:28,929,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:11:34,379,pump_control,DEBUG,Done Infusing
+2023-10-29 00:11:36,396,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:11:36,538,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:11:41,991,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:11:44,009,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:11:44,145,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:11:44,146,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:11:44,147,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-29 00:11:59,185,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:12:01,199,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:12:01,200,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:12:01,201,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:12:01,218,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-29 00:12:01,287,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-29 00:12:01,355,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:12:01,356,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:12:01,357,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-29 00:12:16,414,pump_control,DEBUG,Done Infusing
+2023-10-29 00:12:18,427,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:12:18,428,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:12:18,429,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:12:18,446,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-29 00:12:18,514,pump_control,DEBUG,Purged 120 ul
+2023-10-29 00:12:18,569,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:12:23,985,pump_control,DEBUG,Done Infusing
+2023-10-29 00:12:26,003,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:12:26,127,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:12:31,523,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:12:33,541,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:12:33,675,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-29 00:12:33,676,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:12:33,676,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-29 00:12:45,117,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:12:47,130,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:12:47,131,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:12:47,133,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-29 00:12:47,150,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-29 00:12:47,220,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:12:47,275,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:12:50,305,pump_control,DEBUG,Done Infusing
+2023-10-29 00:12:52,324,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:12:52,391,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:12:52,459,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-29 00:12:52,460,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:12:52,460,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-29 00:12:59,101,pump_control,DEBUG,Done Infusing
+2023-10-29 00:13:01,116,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:13:01,116,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:13:01,117,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-29 00:13:01,135,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-29 00:13:01,204,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:13:01,257,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:13:04,288,pump_control,DEBUG,Done Infusing
+2023-10-29 00:13:06,306,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:13:06,373,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:13:06,429,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:13:11,843,pump_control,DEBUG,Done Infusing
+2023-10-29 00:13:13,861,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:13:14,002,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:13:19,419,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:13:21,437,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:13:21,570,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:13:21,571,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:13:21,571,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-29 00:13:36,619,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:13:38,633,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:13:38,633,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:13:38,634,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:13:38,653,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-29 00:13:38,721,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-29 00:13:38,789,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:13:38,790,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:13:38,790,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-29 00:13:53,831,pump_control,DEBUG,Done Infusing
+2023-10-29 00:13:55,844,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:13:55,845,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:13:55,846,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:13:55,863,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-29 00:13:55,931,pump_control,DEBUG,Purged 120 ul
+2023-10-29 00:13:55,987,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:14:01,398,pump_control,DEBUG,Done Infusing
+2023-10-29 00:14:03,416,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:14:03,539,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:14:08,955,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:14:10,973,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:14:11,106,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-29 00:14:11,107,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:14:11,108,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-29 00:14:22,520,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:14:24,535,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:14:24,535,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:14:24,535,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-29 00:14:24,554,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-29 00:14:24,623,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:14:24,677,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:14:27,706,pump_control,DEBUG,Done Infusing
+2023-10-29 00:14:29,723,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:14:29,790,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:14:29,860,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-29 00:14:29,860,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:14:29,861,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-29 00:14:36,486,pump_control,DEBUG,Done Infusing
+2023-10-29 00:14:38,499,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:14:38,500,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:14:38,500,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-29 00:14:38,518,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-29 00:14:38,587,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:14:38,642,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:14:41,671,pump_control,DEBUG,Done Infusing
+2023-10-29 00:14:43,689,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:14:43,756,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:14:43,812,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:14:49,223,pump_control,DEBUG,Done Infusing
+2023-10-29 00:14:51,241,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:14:51,382,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:14:56,793,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:14:58,812,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:14:58,945,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:14:58,945,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:14:58,946,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-29 00:15:13,994,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:15:16,008,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:15:16,009,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:15:16,010,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:15:16,028,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-29 00:15:16,098,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-29 00:15:16,165,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:15:16,166,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:15:16,166,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-29 00:15:31,162,pump_control,DEBUG,Done Infusing
+2023-10-29 00:15:33,175,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:15:33,176,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:15:33,177,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:15:33,195,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-29 00:15:33,263,pump_control,DEBUG,Purged 120 ul
+2023-10-29 00:15:33,316,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:15:38,720,pump_control,DEBUG,Done Infusing
+2023-10-29 00:15:40,738,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:15:40,863,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:15:46,276,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:15:48,295,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:15:48,427,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-29 00:15:48,428,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:15:48,428,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-29 00:15:59,822,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:16:01,836,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:16:01,837,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:16:01,838,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-29 00:16:01,856,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-29 00:16:01,925,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:16:01,980,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:16:05,014,pump_control,DEBUG,Done Infusing
+2023-10-29 00:16:07,032,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:16:07,100,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:16:07,168,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-29 00:16:07,169,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:16:07,169,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-29 00:16:13,805,pump_control,DEBUG,Done Infusing
+2023-10-29 00:16:15,817,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:16:15,819,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:16:15,820,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-29 00:16:15,838,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-29 00:16:15,906,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:16:15,960,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:16:18,986,pump_control,DEBUG,Done Infusing
+2023-10-29 00:16:21,004,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:16:21,071,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:16:21,126,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:16:26,539,pump_control,DEBUG,Done Infusing
+2023-10-29 00:16:28,557,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:16:28,700,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:16:34,097,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:16:36,116,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:16:36,249,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:16:36,250,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:16:36,251,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-29 00:16:51,290,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:16:53,303,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:16:53,304,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:16:53,304,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:16:53,322,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-29 00:16:53,393,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-29 00:16:53,501,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:16:53,502,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:16:53,502,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-29 00:17:08,534,pump_control,DEBUG,Done Infusing
+2023-10-29 00:17:10,547,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:17:10,548,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:17:10,549,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:17:10,567,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-29 00:17:10,635,pump_control,DEBUG,Purged 120 ul
+2023-10-29 00:17:10,689,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:17:16,098,pump_control,DEBUG,Done Infusing
+2023-10-29 00:17:18,116,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:17:18,239,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:17:23,651,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:17:25,669,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:17:25,802,pump_control,DEBUG,Expected difference in scale reading: 0.090000
+2023-10-29 00:17:25,802,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:17:25,802,pump_control,DEBUG,Withdrawing 0.090000 ml...
+2023-10-29 00:17:37,235,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:17:39,249,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:17:39,250,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:17:39,251,pump_control,INFO,Data,Withdrawing,0.090000,1.000000,0.000000,0.000000
+2023-10-29 00:17:39,267,pump_control,DEBUG,Pump has withdrawn: 0.09 ml
+2023-10-29 00:17:39,337,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:17:39,393,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:17:42,425,pump_control,DEBUG,Done Infusing
+2023-10-29 00:17:44,445,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:17:44,512,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:17:44,582,pump_control,DEBUG,Expected difference in scale reading: 0.050000
+2023-10-29 00:17:44,583,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:17:44,583,pump_control,DEBUG,Infusing 0.050000 ml...
+2023-10-29 00:17:51,213,pump_control,DEBUG,Done Infusing
+2023-10-29 00:17:53,226,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:17:53,227,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:17:53,227,pump_control,INFO,Data,Infusing,0.050000,1.000000,0.000000,0.000000
+2023-10-29 00:17:53,246,pump_control,DEBUG,Pump has infused: 0.05 ml
+2023-10-29 00:17:53,314,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:17:53,367,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:17:56,396,pump_control,DEBUG,Done Infusing
+2023-10-29 00:17:58,414,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:17:58,481,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:17:58,536,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:18:03,946,pump_control,DEBUG,Done Infusing
+2023-10-29 00:18:05,964,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:18:06,105,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:18:11,521,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:18:13,540,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:18:13,675,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:18:13,676,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:18:13,676,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-29 00:18:28,726,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:18:30,739,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:18:30,740,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:18:30,741,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:18:30,759,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-29 00:18:30,829,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-29 00:18:30,904,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:18:30,905,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:18:30,905,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-29 00:18:45,945,pump_control,DEBUG,Done Infusing
+2023-10-29 00:18:47,959,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:18:47,960,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:18:47,960,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:18:47,978,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-29 00:18:48,046,pump_control,DEBUG,Purged 120 ul
+2023-10-29 00:18:48,103,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:18:53,512,pump_control,DEBUG,Done Infusing
+2023-10-29 00:18:55,530,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:18:55,598,pump_control,INFO,Mixing 3 times
+2023-10-29 00:18:55,599,pump_control,DEBUG,Mixing 0 of 3 times
+2023-10-29 00:18:55,657,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-29 00:19:05,943,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:19:07,961,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-29 00:19:08,086,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-29 00:19:18,371,pump_control,DEBUG,Done Infusing
+2023-10-29 00:19:20,390,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-29 00:19:20,457,pump_control,DEBUG,Mixing 1 of 3 times
+2023-10-29 00:19:20,513,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-29 00:19:30,793,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:19:32,811,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-29 00:19:32,933,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-29 00:19:43,215,pump_control,DEBUG,Done Infusing
+2023-10-29 00:19:45,234,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-29 00:19:45,302,pump_control,DEBUG,Mixing 2 of 3 times
+2023-10-29 00:19:45,357,pump_control,DEBUG,Withdrawing 0.100000 ml...
+2023-10-29 00:19:55,645,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:19:57,663,pump_control,DEBUG,Pump has withdrawn: 0.1 ml
+2023-10-29 00:19:57,786,pump_control,DEBUG,Infusing 0.100000 ml...
+2023-10-29 00:20:08,082,pump_control,DEBUG,Done Infusing
+2023-10-29 00:20:10,100,pump_control,DEBUG,Pump has infused: 0.1 ml
+2023-10-29 00:20:10,227,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:20:15,639,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:20:17,657,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:20:17,790,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:20:17,790,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:20:17,791,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-29 00:20:32,814,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:20:34,828,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:20:34,829,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:20:34,830,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:20:34,848,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-29 00:20:34,917,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-29 00:20:34,985,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:20:34,986,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:20:34,986,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-29 00:20:50,001,pump_control,DEBUG,Done Infusing
+2023-10-29 00:20:52,015,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:20:52,016,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:20:52,016,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:20:52,033,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-29 00:20:52,102,pump_control,DEBUG,Purged 120 ul
+2023-10-29 00:20:52,155,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:20:57,554,pump_control,DEBUG,Done Infusing
+2023-10-29 00:20:59,572,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:26:47,476,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:26:52,882,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:26:54,900,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:26:55,023,pump_control,DEBUG,Withdrawing 0.125000 ml...
+2023-10-29 00:27:10,656,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:27:12,674,pump_control,DEBUG,Pump has withdrawn: 0.125 ml
+2023-10-29 00:27:12,743,pump_control,DEBUG,Purging 125.000000 ul...
+2023-10-29 00:27:12,797,pump_control,DEBUG,Infusing 0.125000 ml...
+2023-10-29 00:27:28,411,pump_control,DEBUG,Done Infusing
+2023-10-29 00:27:30,430,pump_control,DEBUG,Pump has infused: 0.125 ml
+2023-10-29 00:27:30,497,pump_control,DEBUG,Purged 125.0 ul
+2023-10-29 00:27:30,553,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:27:35,967,pump_control,DEBUG,Done Infusing
+2023-10-29 00:27:37,986,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:27:38,108,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:27:43,520,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:27:45,538,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:27:45,660,pump_control,DEBUG,Withdrawing 0.125000 ml...
+2023-10-29 00:28:01,277,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:28:03,295,pump_control,DEBUG,Pump has withdrawn: 0.125 ml
+2023-10-29 00:28:03,365,pump_control,DEBUG,Purging 125.000000 ul...
+2023-10-29 00:28:03,420,pump_control,DEBUG,Infusing 0.125000 ml...
+2023-10-29 00:28:19,047,pump_control,DEBUG,Done Infusing
+2023-10-29 00:28:21,066,pump_control,DEBUG,Pump has infused: 0.125 ml
+2023-10-29 00:28:21,133,pump_control,DEBUG,Purged 125.0 ul
+2023-10-29 00:28:21,188,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:28:26,598,pump_control,DEBUG,Done Infusing
+2023-10-29 00:28:28,617,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:28:28,740,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:28:34,153,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:28:36,171,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:28:36,318,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-29 00:28:36,319,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:28:36,319,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-29 00:28:57,345,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:28:59,359,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:28:59,360,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:28:59,360,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-29 00:28:59,378,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-29 00:28:59,448,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:28:59,503,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:29:02,533,pump_control,DEBUG,Done Infusing
+2023-10-29 00:29:04,552,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:29:04,619,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:29:04,687,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-29 00:29:04,687,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:29:04,687,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-29 00:29:20,892,pump_control,DEBUG,Done Infusing
+2023-10-29 00:29:22,906,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:29:22,907,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:29:22,907,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-29 00:29:22,925,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-29 00:29:22,995,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:29:23,048,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:29:26,083,pump_control,DEBUG,Done Infusing
+2023-10-29 00:29:28,101,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:29:28,167,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:29:28,223,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:29:33,641,pump_control,DEBUG,Done Infusing
+2023-10-29 00:29:35,660,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:29:35,803,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:29:41,211,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:29:43,229,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:29:43,353,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-29 00:29:59,564,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:30:01,583,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-29 00:30:01,651,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-29 00:30:01,706,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-29 00:30:17,907,pump_control,DEBUG,Done Infusing
+2023-10-29 00:30:19,926,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-29 00:30:19,993,pump_control,DEBUG,Purged 130.0 ul
+2023-10-29 00:30:20,046,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:30:25,454,pump_control,DEBUG,Done Infusing
+2023-10-29 00:30:27,472,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:30:27,596,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:30:33,007,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:30:35,025,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:30:35,159,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-29 00:30:35,160,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:30:35,160,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-29 00:30:56,185,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:30:58,199,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:30:58,200,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:30:58,201,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-29 00:30:58,218,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-29 00:30:58,288,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:30:58,343,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:31:01,373,pump_control,DEBUG,Done Infusing
+2023-10-29 00:31:03,391,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:31:03,458,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:31:03,527,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-29 00:31:03,528,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:31:03,528,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-29 00:31:19,730,pump_control,DEBUG,Done Infusing
+2023-10-29 00:31:21,744,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:31:21,745,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:31:21,745,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-29 00:31:21,762,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-29 00:31:21,832,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:31:21,884,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:31:24,916,pump_control,DEBUG,Done Infusing
+2023-10-29 00:31:26,934,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:31:27,002,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:31:27,056,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:31:32,467,pump_control,DEBUG,Done Infusing
+2023-10-29 00:31:34,486,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:33:46,403,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:33:51,815,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:33:53,833,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:33:53,954,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-29 00:34:10,154,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:34:12,172,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-29 00:34:12,240,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-29 00:34:12,297,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-29 00:34:28,537,pump_control,DEBUG,Done Infusing
+2023-10-29 00:34:30,556,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-29 00:34:30,624,pump_control,DEBUG,Purged 130.0 ul
+2023-10-29 00:34:30,678,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:34:36,093,pump_control,DEBUG,Done Infusing
+2023-10-29 00:34:38,111,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:34:38,236,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:34:43,650,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:34:45,668,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:34:45,803,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:34:45,803,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:34:45,804,pump_control,DEBUG,Withdrawing 0.120000 ml...
+2023-10-29 00:35:00,801,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:35:02,814,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:35:02,815,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:35:02,816,pump_control,INFO,Data,Withdrawing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:35:02,834,pump_control,DEBUG,Pump has withdrawn: 0.12 ml
+2023-10-29 00:35:02,902,pump_control,DEBUG,Purging 120.000000 ul...
+2023-10-29 00:35:02,969,pump_control,DEBUG,Expected difference in scale reading: 0.120000
+2023-10-29 00:35:02,969,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:35:02,970,pump_control,DEBUG,Infusing 0.120000 ml...
+2023-10-29 00:35:18,006,pump_control,DEBUG,Done Infusing
+2023-10-29 00:35:20,020,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:35:20,021,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:35:20,022,pump_control,INFO,Data,Infusing,0.120000,1.000000,0.000000,0.000000
+2023-10-29 00:35:20,039,pump_control,DEBUG,Pump has infused: 0.12 ml
+2023-10-29 00:35:20,107,pump_control,DEBUG,Purged 120 ul
+2023-10-29 00:35:20,164,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:35:25,569,pump_control,DEBUG,Done Infusing
+2023-10-29 00:35:27,588,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:35:27,713,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:35:33,133,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:35:35,152,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:35:35,287,pump_control,DEBUG,Expected difference in scale reading: 0.170000
+2023-10-29 00:35:35,288,pump_control,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-10-29 00:35:35,288,pump_control,DEBUG,Withdrawing 0.170000 ml...
+2023-10-29 00:35:56,323,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:35:58,338,pump_control,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-10-29 00:35:58,339,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:35:58,340,pump_control,INFO,Data,Withdrawing,0.170000,1.000000,0.000000,0.000000
+2023-10-29 00:35:58,357,pump_control,DEBUG,Pump has withdrawn: 0.17 ml
+2023-10-29 00:35:58,427,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:35:58,484,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:36:01,515,pump_control,DEBUG,Done Infusing
+2023-10-29 00:36:03,532,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:36:03,599,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:36:03,666,pump_control,DEBUG,Expected difference in scale reading: 0.130000
+2023-10-29 00:36:03,667,pump_control,DEBUG,Scale reading before Infusing: 0.000000
+2023-10-29 00:36:03,667,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-29 00:36:19,886,pump_control,DEBUG,Done Infusing
+2023-10-29 00:36:21,900,pump_control,DEBUG,Scale reading after Infusing: 0.000000
+2023-10-29 00:36:21,901,pump_control,DEBUG,Scale reading difference: 0.000000
+2023-10-29 00:36:21,901,pump_control,INFO,Data,Infusing,0.130000,1.000000,0.000000,0.000000
+2023-10-29 00:36:21,918,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-29 00:36:21,988,pump_control,DEBUG,Purging 20.000000 ul...
+2023-10-29 00:36:22,043,pump_control,DEBUG,Infusing 0.020000 ml...
+2023-10-29 00:36:25,070,pump_control,DEBUG,Done Infusing
+2023-10-29 00:36:27,088,pump_control,DEBUG,Pump has infused: 0.02 ml
+2023-10-29 00:36:27,155,pump_control,DEBUG,Purged 20.0 ul
+2023-10-29 00:36:27,208,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:36:32,619,pump_control,DEBUG,Done Infusing
+2023-10-29 00:36:34,637,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-10-29 00:36:34,778,pump_control,DEBUG,Withdrawing 0.040000 ml...
+2023-10-29 00:36:40,189,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:36:42,207,pump_control,DEBUG,Pump has withdrawn: 0.04 ml
+2023-10-29 00:36:42,331,pump_control,DEBUG,Withdrawing 0.130000 ml...
+2023-10-29 00:36:58,538,pump_control,DEBUG,Done Withdrawing
+2023-10-29 00:37:00,557,pump_control,DEBUG,Pump has withdrawn: 0.13 ml
+2023-10-29 00:37:00,625,pump_control,DEBUG,Purging 130.000000 ul...
+2023-10-29 00:37:00,681,pump_control,DEBUG,Infusing 0.130000 ml...
+2023-10-29 00:37:16,905,pump_control,DEBUG,Done Infusing
+2023-10-29 00:37:18,924,pump_control,DEBUG,Pump has infused: 0.13 ml
+2023-10-29 00:37:18,992,pump_control,DEBUG,Purged 130.0 ul
+2023-10-29 00:37:19,046,pump_control,DEBUG,Infusing 0.040000 ml...
+2023-10-29 00:37:24,459,pump_control,DEBUG,Done Infusing
+2023-10-29 00:37:26,478,pump_control,DEBUG,Pump has infused: 0.04 ml
