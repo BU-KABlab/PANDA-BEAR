@@ -4,7 +4,7 @@ from datetime import datetime
 from dataclasses import field
 from typing import Optional
 from pathlib import Path
-from pydantic import ConfigDict, FilePath, RootModel, TypeAdapter
+from pydantic import ConfigDict, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
 from config.pin import CURRENT_PIN
 import json
