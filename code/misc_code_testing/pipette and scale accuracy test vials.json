@@ -1,63 +1,63 @@
 [
     {
         "position": "s0",
-        "contents": "custom",
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 0.95,
         "x": -2,
         "y": -43,
-        "name": "custom",
+        "name": "water",
         "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 2
     },
     {
         "position": "s1",
-        "contents": "dmf",
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 0.95,
         "x": -2,
         "y": -76,
-        "name": "dmf",
+        "name": "water",
         "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 16
     },
     {
         "position": "s2",
-        "contents": "peg",
+        "contents": null,
         "viscocity_rank": 1,
         "density": 1,
         "x": -2,
         "y": -109,
-        "name": "peg",
-        "volume": 20000.0,
+        "name": null,
+        "volume": 0.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 2
     },
     {
         "position": "s3",
-        "contents": "acrylate",
+        "contents": null,
         "viscocity_rank": 1,
         "density": 1,
         "x": -2,
         "y": -142,
-        "name": "acrylate",
-        "volume": 20000.0,
+        "name": null,
+        "volume": 0.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 2
     },
     {
         "position": "s4",
-        "contents": "ferrocene",
+        "contents": null,
         "viscocity_rank": 1,
         "density": 1.5,
         "x": -2,
         "y": -175,
-        "name": "ferrocene",
-        "volume": 20000.0,
+        "name": null,
+        "volume": 0.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 4
     },
     {
         "position": "r0",
@@ -69,7 +69,7 @@
         "name": "rinse0",
         "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 4
     },
     {
         "position": "r1",
