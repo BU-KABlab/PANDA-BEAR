@@ -78,13 +78,16 @@ def main():
             if new_experiment is None:
                 slack.send_slack_message("alert", "No new experiments to run...monitoring inbox for new experiments")
             while new_experiment is None:
+                scheduler.check_inbox()
+                new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                if new_experiment is not None:
+                    slack.send_slack_message("alert", f"New experiment {new_experiment.id} found")
+                    break
                 logger.info(
                     "No new experiments to run...waiting 5 minutes for new experiments"
                 )
                 time.sleep(600)
-                # Replace with slack alert and wait for response from user
-                scheduler.check_inbox()
-                new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                # Replace with slack alert and wait for response from user 
 
             ## confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, Experiment):
@@ -262,15 +265,20 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
 
     ## read the wellplate json and log the status of each well in a grid
     number_of_clear_wells = 0
+    number_of_wells = 0
     with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
         wellplate_status = json.load(file)
     for well in wellplate_status['wells']:
+        number_of_wells += 1
         if well["status"] in ["clear", "new"]:
             number_of_clear_wells += 1
         logger.debug(
             "Well %s has status %s", well["well_id"], well["status"]
         )
-
+    ## check that wellplate has the appropriate number of wells
+    if number_of_wells != len(wellplate.wells):
+        logger.error("Wellplate status file does not have the correct number of wells. File may be corrupted")
+        raise ValueError
     logger.info("There are %d clear wells", number_of_clear_wells)
     if number_of_clear_wells == 0:
         slack.send_slack_message("alert", "There are no clear wells on the wellplate")
@@ -302,8 +310,11 @@ def disconnect_from_instruments(instruments: Toolkit):
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
     instruments.scale.close()
-    if echem.OPEN_CONNECTION:
-        echem.disconnectpstat()
+    try:
+        if echem.OPEN_CONNECTION:
+            echem.disconnectpstat()
+    except AttributeError:
+        pass
 
     logger.info("Disconnected from instruments")
 

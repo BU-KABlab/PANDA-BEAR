@@ -355,3 +355,47 @@ cv_scan_rate
 2023-10-30 08:57:10,162:slack_functions:Message sent: ePANDA has connected to equipment
 2023-10-30 08:57:10,333:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
 2023-10-30 09:21:13,213:slack_functions:Message sent: ePANDA encountered an error: 'Wells'
+2023-10-30 09:23:58,504:slack_functions:Message sent: ePANDA is starting up
+2023-10-30 09:24:00,753:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-30 09:24:00,931:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 09:28:24,255:slack_functions:Message sent: ePANDA encountered an error: Object of type Experiment is not JSON serializable
+2023-10-30 09:29:39,873:slack_functions:Message sent: ePANDA is starting up
+2023-10-30 09:29:42,123:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-30 09:29:42,298:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 09:30:52,910:slack_functions:Message sent: ePANDA encountered an error: unsupported operand type(s) for /: 'str' and 'str'
+2023-10-30 09:31:01,204:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-30 09:31:37,491:slack_functions:Message sent: ePANDA is starting up
+2023-10-30 09:31:39,743:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-30 09:31:39,900:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 09:50:24,861:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-30 09:50:25,017:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-30 10:01:10,004:slack_functions:Message sent: ePANDA is starting up
+2023-10-30 10:01:12,252:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-30 10:01:12,455:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 10:02:49,452:slack_functions:Message sent: New experiment 9990001 found
+2023-10-30 10:02:49,620:slack_functions:Message sent: Running experiment 9990001
+2023-10-30 11:04:04,708:slack_functions:Message sent: Experiment 9990001 ended with status error
+2023-10-30 11:17:16,098:slack_functions:Message sent: ePANDA encountered an error: 'str' object has no attribute 'with_suffix'
+2023-10-30 11:17:26,297:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-30 11:22:24,038:slack_functions:Message sent: ePANDA is starting up
+2023-10-30 11:22:27,563:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-30 11:22:27,758:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 11:26:22,491:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-30 11:26:22,646:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-10-30 11:28:56,176:slack_functions:Message sent: ePANDA is starting up
+2023-10-30 11:28:58,408:slack_functions:Message sent: ePANDA has connected to equipment
+2023-10-30 11:28:58,587:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 11:28:58,827:slack_functions:Message sent: New experiment 9990002 found
+2023-10-30 11:28:59,006:slack_functions:Message sent: Running experiment 9990002
+2023-10-30 11:56:39,310:slack_functions:Message sent: Experiment 9990002 ended with status complete
+2023-10-30 11:56:39,565:slack_functions:Message sent: Running experiment 9990001
+2023-10-30 12:24:16,569:slack_functions:Message sent: Experiment 9990001 ended with status complete
+2023-10-30 12:24:16,782:slack_functions:Message sent: Running experiment 9990003
+2023-10-30 12:51:54,233:slack_functions:Message sent: Experiment 9990003 ended with status complete
+2023-10-30 12:51:54,503:slack_functions:Message sent: Running experiment 9990005
+2023-10-30 13:19:32,588:slack_functions:Message sent: Experiment 9990005 ended with status complete
+2023-10-30 13:19:32,872:slack_functions:Message sent: Running experiment 9990004
+2023-10-30 13:47:10,221:slack_functions:Message sent: Experiment 9990004 ended with status complete
+2023-10-30 13:47:10,460:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
+2023-10-30 13:58:32,689:slack_functions:Message sent: ePANDA was interrupted by the user
+2023-10-30 13:58:32,842:slack_functions:Message sent: ePANDA is shutting down...goodbye

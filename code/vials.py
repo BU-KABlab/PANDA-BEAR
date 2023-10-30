@@ -148,7 +148,7 @@ class Vial:
         radius_mm = diameter_mm / 2
         area_mm2 = 3.141592653589793 * radius_mm**2
         volume_mm3 = volume_ul  # 1 ul = 1 mm3
-        liquid_height_mm = volume_mm3 / area_mm2
+        liquid_height_mm = round(volume_mm3 / area_mm2, 3)
         return liquid_height_mm
 
 

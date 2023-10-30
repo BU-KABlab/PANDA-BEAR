@@ -60,8 +60,8 @@ class Scheduler:
         """
         file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
         if not Path.exists(file_to_open):
-            logger.error("well_status.json not found")
-            raise FileNotFoundError("well_status.json")
+            logger.error("%s not found", file_to_open)
+            raise FileNotFoundError("%s not found", file_to_open)
 
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
@@ -155,7 +155,7 @@ class Scheduler:
                 else:
                     target_well = desired_well
 
-                filename = f"{datetime.now().strftime('%Y-%m-%d')}_experiment-{experiment['id']}_{target_well}.json"
+                filename = f"{experiment['id']}_{target_well}.json"
 
                 # populate an experiment instance
                 # TODO make the planner json output conform to schema so it can just be read in
@@ -186,19 +186,27 @@ class Scheduler:
                     filename=filename,
                 )
 
-                # Save the experiment as a separate file in the experiment_que subfolder
+                # Save the experiment as a separate file in the experiment_queue subfolder
                 queue_dir = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
                 queue_dir.mkdir(parents=True, exist_ok=True)
                 file_to_save = queue_dir / filename
-                with open(file_to_save, "w", encoding="UTF-8") as outfile:
-                    json.dump(instructions, outfile, indent=4)
+
+                serialized_data = experiment_class.serialize_experiment(instructions)
+                with open(file_to_save, "w", encoding="UTF-8") as file:
+                    file.write(serialized_data)
+                logger.debug("Experiment %s saved to %s", instructions.id, file_to_save)
+                # with open(file_to_save, "w", encoding="UTF-8") as outfile:
+                #     text_version = json.dumps(instructions)
+                #     json.dump(text_version, outfile, indent=4)
 
                 # Add the experiment to the queue
-                queue_file_path = "code" / "system state" / "queue.csv"
+                queue_file_path = Path.cwd() / PATH_TO_QUEUE
                 with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
                     line = f"{instructions.id},{instructions.priority},{instructions.filename}"
                     queue_file.write(line)
+                    queue_file.write("\n")
 
+                logger.debug("Experiment %s added to queue", instructions.id)
                 # Change the status of the well
                 self.change_well_status(target_well, "queued")
 
@@ -283,7 +291,7 @@ class Scheduler:
 
         # Pick a random experiment from the list of experiments with the highest priority
         random_experiment = random.choice(experiments)
-        experiment_file_path = (queue_dir_path / random_experiment).with_suffix(".json")
+        experiment_file_path = Path(queue_dir_path / random_experiment).with_suffix(".json")
         if not Path.exists(experiment_file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
@@ -302,6 +310,7 @@ class Scheduler:
             for line in queue:
                 if line.split(",")[0] != str(experiment.id):
                     file.write(line)
+        logger.info("Experiment %s read from queue", experiment.id)
 
         return experiment, experiment_file_path
 
@@ -355,9 +364,9 @@ class Scheduler:
         Updates the location of the experiment instructions file.
         :param experiment: The experiment that was just run.
         """
-        file_name_with_suffix = experiment.filename.with_suffix(".json")
+        file_name_with_suffix = Path(experiment.filename).with_suffix(".json")
         file_path = Path(
-            Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / file_name_with_suffix
+            Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / file_name_with_suffix.name
         )
         if not Path.exists(file_path):
             logger.error("experiment file not found")
@@ -406,7 +415,9 @@ class Scheduler:
             None
         """
         # Save the results
-        logger.info("Saving experiment %d results to database as %s", experiment.id, str(experiment.filename) + ".json")
+        filename_with_suffix = Path(experiment.filename).with_suffix(".json")
+        filename = filename_with_suffix.name
+        logger.info("Saving experiment %d results to database as %s", experiment.id, str(filename))
         results_json = experiment_class.serialize_results(results)
         with open(
             Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
