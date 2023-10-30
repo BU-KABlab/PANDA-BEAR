@@ -61,8 +61,6 @@ def main():
 
         # Connect to equipment
         toolkit = connect_to_instruments()
-        mill = toolkit.mill
-        pump = toolkit.pump
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
 
@@ -77,12 +75,18 @@ def main():
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
-                logger.info(
-                    "No new experiments to run...waiting 1 minute for new experiments"
-                )
-                time.sleep(60)
-                # Replace with slack alert and wait for response from user
+                slack.send_slack_message("alert", "No new experiments to run...monitoring inbox for new experiments")
+            while new_experiment is None:
                 scheduler.check_inbox()
+                new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                if new_experiment is not None:
+                    slack.send_slack_message("alert", f"New experiment {new_experiment.id} found")
+                    break
+                logger.info(
+                    "No new experiments to run...waiting 5 minutes for new experiments"
+                )
+                time.sleep(600)
+                # Replace with slack alert and wait for response from user 
 
             ## confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, Experiment):
@@ -113,8 +117,8 @@ def main():
             ) = e_panda.standard_experiment_protocol(
                 instructions=new_experiment,
                 results=experiment_results,
-                mill=mill,
-                pump=pump,
+                mill=toolkit.mill,
+                pump=toolkit.pump,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
                 wellplate=wellplate,
@@ -130,7 +134,7 @@ def main():
 
             ## Update the system state with new vial and wellplate information
             scheduler.change_well_status(
-                updated_experiment.target_well, updated_experiment.status, updated_experiment.status_date, updated_experiment.id
+                updated_experiment.target_well, updated_experiment.status, updated_experiment.status_date.strftime("%Y-%m-%dT%H:%M:%S"), updated_experiment.id
             )  # this function should probably be in the wellplate module
             update_vial_state_file(stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json")
             update_vial_state_file(waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json")
@@ -259,16 +263,20 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
 
     ## read the wellplate json and log the status of each well in a grid
     number_of_clear_wells = 0
+    number_of_wells = 0
     with open(Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8") as file:
         wellplate_status = json.load(file)
-    for row in wellplate_status:
-        for well in row:
-            if well["status"] in ["clear", "new"]:
-                number_of_clear_wells += 1
-            logger.debug(
-                "Well %s has status %s", well["name"], well["status"]
-            )
-
+    for well in wellplate_status['wells']:
+        number_of_wells += 1
+        if well["status"] in ["clear", "new"]:
+            number_of_clear_wells += 1
+        logger.debug(
+            "Well %s has status %s", well["well_id"], well["status"]
+        )
+    ## check that wellplate has the appropriate number of wells
+    if number_of_wells != len(wellplate.wells):
+        logger.error("Wellplate status file does not have the correct number of wells. File may be corrupted")
+        raise ValueError
     logger.info("There are %d clear wells", number_of_clear_wells)
     if number_of_clear_wells == 0:
         slack.send_slack_message("alert", "There are no clear wells on the wellplate")
@@ -287,6 +295,7 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
 def connect_to_instruments():
     """Connect to the instruments"""
     mill = Mill()
+    mill.homing_sequence()
     scale = Scale()
     pump = Pump(mill=mill, scale=scale)
     # pstat_connected = echem.pstatconnect()
@@ -297,10 +306,12 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
-    instruments.scale.disconnect()
-    instruments.pump.disconnect()
-    if echem.OPEN_CONNECTION:
-        echem.disconnectpstat()
+    instruments.scale.close()
+    try:
+        if echem.OPEN_CONNECTION:
+            echem.disconnectpstat()
+    except AttributeError:
+        pass
 
     logger.info("Disconnected from instruments")
 

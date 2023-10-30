@@ -52,9 +52,9 @@ def send_slack_message(channel_id: str, message) -> None:
         # print(result)
         # Log the result
         if result["ok"]:
-            logger.info("Message sent: %s", message)
+            logger.info("Message sent:%s", message)
         else:
-            logger.error("Error sending message: %s", message)
+            logger.error("Error sending message:%s", message)
     except SlackApiError as error:
         logger.error("Error posting message: %s", error)
 

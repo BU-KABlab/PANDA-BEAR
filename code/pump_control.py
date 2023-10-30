@@ -12,7 +12,7 @@ from log_tools import CustomLoggingFilter
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 
-# set up logging to log to both the pump_control.log file and the ePANDA.log file
+# set up logging to log to the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
@@ -20,7 +20,7 @@ system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
-# set up logging to log to both the pump_control.log file and the ePANDA.log file
+# set a logger for the scale
 scale_logger = logging.getLogger(__name__)
 scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s,%(name)s,%(levelname)s,%(message)s")
@@ -108,8 +108,12 @@ class Pump:
         volume_ul = volume
         if volume > 0:
             volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
+            if solution is not None:
+                density = solution.density
+            else:
+                density = None
 
-            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate)
+            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
             self.update_pipette_volume(self.pump.volume_withdrawn)
             logging.debug(
                 "Pump has withdrawn: %f ml    Pipette vol: %f",
@@ -141,8 +145,12 @@ class Pump:
         volume_ul = volume
         if volume_ul > 0:
             volume_ml = volume_ul / 1000.000
+            if solution is not None:
+                density = solution.density
+            else:
+                density = None
 
-            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate)
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
             self.update_pipette_volume(self.pump.volume_infused)
             logging.debug(
                 "Pump has infused: %f ml  Pipette volume: %f",
@@ -185,7 +193,7 @@ class Pump:
         purge_vial.update_volume(purge_volume)
         return purge_vial
 
-    def run_pump(self, direction, volume_ml, rate, density=1.0):
+    def run_pump(self, direction, volume_ml, rate, density=None):
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
             return
@@ -200,9 +208,10 @@ class Pump:
         )
 
         ## Get scale value prior to pump action
-        pre_weight = self.scale.value()
-        scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
-        scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
+        if density is not None:
+            pre_weight = self.scale.value()
+            scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
+            scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
         logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
@@ -213,12 +222,13 @@ class Pump:
         time.sleep(2)
 
         ## Get scale value after pump action
-        post_weight = self.scale.value()
-        scale_logger.debug("Scale reading after %s: %f", action, post_weight)
-        scale_logger.debug("Scale reading difference: %f", pre_weight - post_weight)
-        scale_logger.info("Data,%s,%f,%f,%f,%f", 
-                          action, volume_ml, density, pre_weight, post_weight
-                          )
+        if density is not None:
+            post_weight = self.scale.value()
+            scale_logger.debug("Scale reading after %s: %f", action, post_weight)
+            scale_logger.debug("Scale reading difference: %f", pre_weight - post_weight)
+            scale_logger.info("Data,%s,%f,%f,%f,%f",
+                            action, volume_ml, density, pre_weight, post_weight
+                            )
 
         action_type = (
             "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"

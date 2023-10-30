@@ -5,7 +5,13 @@ Vial class for creating vial objects with their position and contents
 import json
 import logging
 import math
-
+# set up A logger for the vials module
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+system_handler = logging.FileHandler("code/logs/ePANDA.log")
+system_handler.setFormatter(formatter)
+logger.addHandler(system_handler)
 
 class Vial:
     """
@@ -33,6 +39,7 @@ class Vial:
         z_bottom=-75,
         name="vial",
         filepath=None,
+        density=1.0,  # g/ml
     ):
         self.name = name
         self.position_name = position
@@ -43,6 +50,7 @@ class Vial:
         self.radius = radius
         self.height = height
         self.volume = volume
+        self.density = density
         self.base = math.pi * math.pow(self.radius, 2.0)
         self.depth = (
             self.vial_height_calculator(self.radius * 2, self.volume) + self.bottom
@@ -66,7 +74,7 @@ class Vial:
         Updates the volume of the vial
         """
         logging_msg = f"Checking if {added_volume} can fit in {self.name} ..."
-        logging.info(logging_msg)
+        logger.info(logging_msg)
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
@@ -75,7 +83,7 @@ class Vial:
             )
         else:
             logging_msg = f"{added_volume} can fit in {self.name}"
-            logging.info(logging_msg)
+            logger.info(logging_msg)
             return True
 
     def write_volume_to_disk(self):
@@ -86,7 +94,7 @@ class Vial:
         # with open(self.filepath, 'w') as f:
         #     json.dump(self.volume, f, indent=4)
         # return 0
-        logging.info("Writing %s volume to vial file...", self.name)
+        logger.info("Writing %s volume to vial file...", self.name)
 
         ## Open the file and read the contents
         with open(self.filepath, "r", encoding="UTF-8") as file:
@@ -111,7 +119,7 @@ class Vial:
         Args:
             added_volume (float): volume (ul) to be added to the vial
         """
-        logging.info("Updating %s volume...", self.name)
+        logger.info("Updating %s volume...", self.name)
         if self.volume + added_volume_ul > self.capacity:
             raise OverFillException(
                 self.name, self.volume, added_volume_ul, self.capacity
@@ -127,7 +135,7 @@ class Vial:
         )
         if self.depth < self.bottom:
             self.depth = self.bottom
-        logging.debug(
+        logger.debug(
             "%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth
         )
         self.contamination += 1
@@ -140,7 +148,7 @@ class Vial:
         radius_mm = diameter_mm / 2
         area_mm2 = 3.141592653589793 * radius_mm**2
         volume_mm3 = volume_ul  # 1 ul = 1 mm3
-        liquid_height_mm = volume_mm3 / area_mm2
+        liquid_height_mm = round(volume_mm3 / area_mm2, 3)
         return liquid_height_mm
 
 

@@ -51,9 +51,9 @@
         "x": -47,
         "y": -178,
         "name": "rinse0",
-        "volume": 2520.0,
+        "volume": 7280.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 6
     },
     {
         "position": "RW1",
