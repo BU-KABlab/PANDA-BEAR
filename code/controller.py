@@ -14,16 +14,12 @@ Additionally controller should be able to:
 # pylint: disable=line-too-long
 
 # import standard libraries
-from hmac import new
 import json
 import logging
 import time
 
 # import third-party libraries
 from pathlib import Path
-from wsgiref.validate import InputWrapper
-
-from anyio import open_file
 from print_panda import printpanda
 from mill_control import MockMill as Mill
 from pump_control import Pump
@@ -64,10 +60,8 @@ def main():
         check_required_files()
 
         # Connect to equipment
-        # TODO clean this up and make it more robust
         toolkit = connect_to_instruments()
         mill = toolkit.mill
-        scale = toolkit.scale
         pump = toolkit.pump
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
@@ -81,7 +75,7 @@ def main():
             stock_vials, waste_vials, wellplate = establish_system_state()
 
             ## Ask the scheduler for the next experiment
-            new_experiment, new_experiment_path = scheduler.read_next_experiment_from_queue()
+            new_experiment, _ = scheduler.read_next_experiment_from_queue()
             if new_experiment is None:
                 logger.info(
                     "No new experiments to run...waiting 1 minute for new experiments"
@@ -116,7 +110,7 @@ def main():
                 stock_vials,
                 waste_vials,
                 wellplate,
-            ) = e_panda.run_experiment(
+            ) = e_panda.standard_experiment_protocol(
                 instructions=new_experiment,
                 results=experiment_results,
                 mill=mill,
@@ -125,6 +119,9 @@ def main():
                 waste_vials=waste_vials,
                 wellplate=wellplate,
             )
+
+            ## Add the results to the experiment file
+            updated_experiment.results = experiment_results
 
             ## With returned experiment and results, update the experiment status and post the final status
             post_experiment_status_msg = f"Experiment {updated_experiment.id} ended with status {updated_experiment.status.value}"
@@ -158,7 +155,6 @@ def main():
         disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
 
-
 class Toolkit:
     """A class to hold all of the instruments"""
 
@@ -168,7 +164,6 @@ class Toolkit:
         self.pump = pump
         self.pstat = pstat
 
-
 def test_build_toolkit():
     """Test the building of the toolkit and checking that they are connected or not"""
     mill = Mill()
@@ -176,7 +171,6 @@ def test_build_toolkit():
     pump = Pump(mill=mill, scale=scale)
     instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
     return instruments
-
 
 def check_required_files():
     """Confirm all required directories and files exist"""
@@ -195,7 +189,6 @@ def check_required_files():
             logger.error("The %s is missing", file)
             slack.send_slack_message("alert", f"The {file} is missing")
             raise FileNotFoundError
-
 
 def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.Wells]:
     """
@@ -290,7 +283,6 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
         slack.send_slack_message("alert", "Wellplate has been reset. Continuing...")
 
     return stock_vials, waste_vials, wellplate
-
 
 def connect_to_instruments():
     """Connect to the instruments"""
@@ -439,7 +431,7 @@ def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wel
     ## Save each well to the well_history.csv file in the data folder
     ## plate id, type number, well id, experiment id, project id, status, status date, contents
     logger.debug("Saving well statuses to well_history.csv")
-    with open_file("data\\well_history.csv", "a", encoding="UTF-8") as file:
+    with open("data\\well_history.csv", "a", encoding="UTF-8") as file:
         for well in current_wellplate['wells']:
             file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
 
