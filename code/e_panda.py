@@ -683,7 +683,7 @@ def apply_log_filter(experiment_id: int, target_well: str = None):
     logger.addFilter(custom_filter)
 
 
-def run_experiment(
+def standard_experiment_protocol(
     instructions: Experiment,
     results: ExperimentResult,
     mill: Mill,
