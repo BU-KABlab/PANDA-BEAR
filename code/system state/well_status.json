@@ -308,7 +308,7 @@
         },
         {
             "well_id": "D3",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-10-28T19:43:47",
             "contents": [],
             "experiment_id": 9990003,
@@ -324,7 +324,7 @@
         },
         {
             "well_id": "D5",
-            "status": "complete",
+            "status": "new",
             "status_date": "2023-10-29T00:37:26",
             "contents": [],
             "experiment_id": 9990004,
