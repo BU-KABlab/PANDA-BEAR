@@ -21,6 +21,7 @@ Returns:
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines
 
 # Standard library imports
+import json
 import logging
 import math
 from datetime import datetime
@@ -34,11 +35,12 @@ from experiment_class import (
     Experiment,
     ExperimentResult,
     ExperimentStatus,
+    ExperimentBase,
+    PEG2P_Test_Instructions,
 )
 from log_tools import CustomLoggingFilter
 from mill_control import Mill, Instruments
 from pump_control import Pump
-from scale import Sartorius as Scale
 from vials import Vial
 from wellplate import Wells
 
@@ -949,7 +951,7 @@ def standard_experiment_protocol(
 
 
 def pipette_accurancy_protocol(
-    instructions: Experiment,
+    instructions: ExperimentBase,
     results: ExperimentResult,
     mill: Mill,
     pump: Pump,
@@ -996,28 +998,34 @@ def pipette_accurancy_protocol(
         # Fetch list of solution names from stock_vials
         # list of vial names to exclude
         exclude_list = ["rinse0", "rinse1", "rinse2"]
-        experiment_solutions = [
+        available_solutions = [
             vial.name for vial in stock_vials if vial.name not in exclude_list
         ]
-        # experiment_solutions = ["acrylate", "peg", "dmf", "ferrocene", "custom"]
 
-        # Deposit all experiment solutions into well
-        for solution_name in experiment_solutions:
+        # although we already checked before running the experiment we want to check again that all requested solutions are found
+        experiment_solution_count = len(instructions.solutions)
+        matched = 0
+
+        ## Deposit all experiment solutions into well
+        for solution_name in instructions.solutions:
+            solution_name = str(solution_name).lower()
+            solution_volume = instructions.solutions[solution_name]
             if (
-                getattr(instructions, solution_name) > 0
-                and solution_name[0:4] != "rinse"
+                solution_volume > 0
+                and solution_name in available_solutions
             ):  # if there is a solution to deposit
+                matched += 1
                 logger.info(
                     "Pipetting %s ul of %s into %s...",
-                    getattr(instructions, solution_name),
+                    solution_volume,
                     solution_name,
                     instructions.target_well,
                 )
                 stock_vials, waste_vials, wellplate = pipette(
                     # volume in ul
-                    volume=getattr(instructions, solution_name),
+                    volume=solution_volume,
                     solutions=stock_vials,  # list of vial objects passed to ePANDA
-                    solution_name=solution_name,  # from the list above
+                    solution_name=solution_name,
                     target_well=instructions.target_well,
                     pumping_rate=instructions.pumping_rate,
                     waste_vials=waste_vials,  # list of vial objects passed to ePANDA
@@ -1028,143 +1036,24 @@ def pipette_accurancy_protocol(
                     mill=mill,
                 )
 
-                stock_vials, waste_vials = flush_pipette_tip(
-                    pump,
-                    waste_vials,
-                    stock_vials,
-                    instructions.flush_sol_name,
-                    mill,
-                    instructions.pumping_rate,
-                    instructions.flush_vol,
-                )
-        logger.info("Pipetted solutions into well: %s", instructions.target_well)
+        if matched != experiment_solution_count:
+            raise NoAvailableSolution("One or more solutions are not available")
 
-        # Mix solutions in well
-        if instructions.mix == 1:
-            logger.info("Mixing well: %s", instructions.target_well)
-            instructions.status = ExperimentStatus.MIXING
-            pump.mix(
-                mix_location=wellplate.get_coordinates(
-                    instructions.target_well
-                ),  # fetch x, y, z, depth, and echem height coordinates of well
-                mix_repetitions=3,
-                mix_volume=instructions.mix_vol,
-                mix_rate=instructions.mix_rate,
-            )
-            logger.info("Mixed well: %s", instructions.target_well)
+        logger.info("Pipetted %s into well: %s", json.dumps(instructions.solutions), instructions.target_well)
 
-        stock_vials, waste_vials = flush_pipette_tip(
-            pump,
-            waste_vials,
-            stock_vials,
-            instructions.flush_sol_name,
-            mill,
-            instructions.pumping_rate,
-            instructions.flush_vol,
-        )
-
-        if instructions.ca == 1:
-            instructions.status = ExperimentStatus.DEPOSITING
-            instructions, results = deposition(instructions, results, mill, wellplate)
-
-            logger.info("Deposition completed for well: %s", instructions.target_well)
-
-            # Withdraw all well volume into waste
-            waste_vials, wellplate = clear_well(
-                volume=wellplate.volume(instructions.target_well),
-                target_well=instructions.target_well,
-                wellplate=wellplate,
-                pumping_rate=instructions.pumping_rate,
-                pump=pump,
-                waste_vials=waste_vials,
-                mill=mill,
-                solution_name="waste",
-            )
-
-            logger.info("Cleared dep_sol from well: %s", instructions.target_well)
-
-            # Rinse the well 3x
-            stock_vials, waste_vials, wellplate = rinse(
-                wellplate=wellplate,
-                instructions=instructions,
-                pump=pump,
-                mill=mill,
-                waste_vials=waste_vials,
-                stock_vials=stock_vials,
-            )
-
-            logger.info("Rinsed well: %s", instructions.target_well)
-
-        # Echem CV - characterization
-        if instructions.cv == 1:
-            logger.info(
-                "Beginning eChem characterization of well: %s", instructions.target_well
-            )
-            # Deposit characterization solution into well
-
-            logger.info(
-                "Infuse %s into well %s...",
-                instructions.char_sol_name,
-                instructions.target_well,
-            )
-            stock_vials, waste_vials, wellplate = pipette(
-                volume=instructions.char_vol,
-                solutions=stock_vials,
-                solution_name=instructions.char_sol_name,
-                target_well=instructions.target_well,
-                pumping_rate=instructions.pumping_rate,
-                waste_vials=waste_vials,
-                waste_solution_name="waste",
-                wellplate=wellplate,
-                pump=pump,
-                mill=mill,
-            )
-
-            logger.info("Deposited char_sol in well: %s", instructions.target_well)
-
-            instructions, results = characterization(
-                instructions, results, mill, wellplate
-            )
-
-            logger.info("Characterization of %s complete", instructions.target_well)
-
-            waste_vials, wellplate = clear_well(
-                instructions.char_vol,
-                instructions.target_well,
-                wellplate,
-                instructions.pumping_rate,
-                pump,
-                waste_vials,
-                mill,
-                "waste",
-            )
-
-            logger.info("Well %s cleared", instructions.target_well)
-
-            # Flushing procedure
-            stock_vials, waste_vials = flush_pipette_tip(
-                pump,
-                waste_vials,
-                stock_vials,
-                instructions.flush_sol_name,
-                mill,
-                instructions.pumping_rate,
-                instructions.flush_vol,
-            )
-
-            logger.info("Pipette Flushed")
-
-        instructions.status = ExperimentStatus.FINAL_RINSE
-        stock_vials, waste_vials, wellplate = rinse(
+        # Withdraw all well volume into waste
+        logger.info("Withdrawing all well %s volume into waste", instructions.target_well)
+        waste_vials, wellplate = clear_well(
+            volume=wellplate.volume(instructions.target_well),
+            target_well=instructions.target_well,
             wellplate=wellplate,
-            instructions=instructions,
+            pumping_rate=instructions.pumping_rate,
             pump=pump,
-            mill=mill,
             waste_vials=waste_vials,
-            stock_vials=stock_vials,
+            mill=mill,
+            solution_name="waste",
         )
-        logger.info("Final Rinse")
-
+        logger.info("Cleared well %s into waste", instructions.target_well)
         instructions.status = ExperimentStatus.COMPLETE
         logger.info("End of Experiment: %s", instructions.id)
 
@@ -1370,7 +1259,7 @@ def mixing_test_protocol(
 
 
 def peg2p_protocol(
-    instructions: Experiment,
+    instructions: PEG2P_Test_Instructions,
     results: ExperimentResult,
     mill: Mill,
     pump: Pump,

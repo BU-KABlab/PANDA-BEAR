@@ -9,6 +9,7 @@ The scheduler module will be responsible for:
 # pylint: disable = line-too-long
 import json
 import logging
+from math import exp
 import pathlib
 from pathlib import Path
 import random
@@ -305,16 +306,13 @@ class Scheduler:
                 .root
             )
 
-        # Remove the selected experiment from the queue by rewriting the queue file and excluding the experiment
-        with open(queue_file_path, "w", encoding="ascii") as file:
-            for line in queue:
-                if line.split(",")[0] != str(experiment.id):
-                    file.write(line)
+        # Remove the selected experiment from the queue
+        self.remove_from_queue(experiment)
         logger.info("Experiment %s read from queue", experiment.id)
 
         return experiment, experiment_file_path
 
-    def update_queue(self, experiment: Experiment) -> None:
+    def remove_from_queue(self, experiment: Experiment) -> None:
         """
         Updates the queue file to remove the experiment that was just run.
         :param experiment: The experiment that was just run.
@@ -333,6 +331,30 @@ class Scheduler:
             for line in data:
                 if line.split(",")[0] != experiment.id:
                     file.write(line)
+
+    def update_experiment_queue_priority(self, experiment_id: int, priority: int):
+        """Update the priority of experiments in the queue"""
+        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        if not Path.exists(queue_file_path):
+            logger.error("queue file not found")
+            raise FileNotFoundError("experiment queue file")
+
+        # Read the queue file
+        with open(queue_file_path, "r", encoding="ascii") as queue_file:
+            queue = queue_file.readlines()
+
+        # Find the experiment in the queue
+        for line in queue[1:]:
+            if line.split(",")[0] == str(experiment_id):
+                # Update the priority
+                line.split(",")[1] = str(priority)
+
+        # Rewrite the queue csv file
+        with open(queue_file_path, "w", encoding="ascii") as file:
+            for line in queue:
+                file.write(line)
+                file.write("\n")
+
 
     def update_experiment_status(self, experiment: Experiment) -> None:
         """

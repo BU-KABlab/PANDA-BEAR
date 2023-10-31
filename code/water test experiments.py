@@ -18,7 +18,7 @@ EXPERIMENT_NAME = 'Water test'
 experiments = []
 # Create a new experiment
 for column in COLUMNS:
-    for row in range(ROWS):
+    for row in range(1,ROWS):
         experiments.append(experiment_class.ExperimentBase(
                 id=experiment_id,
                 experiment_name= EXPERIMENT_NAME,
@@ -28,6 +28,7 @@ for column in COLUMNS:
                 project_id=PROJECT_ID,
                 solutions={'water': 1},
                 status='new',
+                filename='water_test_' + str(experiment_id),
                 )
             )
         experiment_id += 1

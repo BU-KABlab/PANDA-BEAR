@@ -20,6 +20,7 @@ import time
 
 # import third-party libraries
 from pathlib import Path
+
 from print_panda import printpanda
 from mill_control import MockMill as Mill
 from pump_control import Pump
@@ -29,7 +30,7 @@ import gamry_control_WIP as echem
 import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
-from experiment_class import Experiment, ExperimentResult
+from experiment_class import Experiment, ExperimentResult, ExperimentBase
 from vials import Vial
 import wellplate as wellplate_module
 from scale import Sartorius as Scale
@@ -69,8 +70,7 @@ def main():
 
         ## Begin outer loop
         while True:
-            ## Establish state of system - we do this each time because each experiment changes the system state
-            stock_vials, waste_vials, wellplate = establish_system_state()
+            
 
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue()
@@ -94,6 +94,24 @@ def main():
                 slack.send_slack_message(
                     "alert", "An invalid experiment object was passed to the controller"
                 )
+                break
+
+            ## Establish state of system - we do this each time because each experiment changes the system state
+            stock_vials, waste_vials, wellplate = establish_system_state()
+
+            ## Check that there is enough volume in the stock vials to run the experiment
+            if not check_stock_vials(new_experiment, stock_vials):
+
+                error_message = f"Experiment {new_experiment.id} cannot be run because there is not enough volume in the stock vials"
+                slack.send_slack_message(
+                    "alert",
+                    error_message,
+                )
+                logger.error(error_message)
+                new_experiment.status = "insufficient stock"
+                new_experiment.priority = 999
+                scheduler.update_experiment_status(new_experiment)
+                scheduler.update_experiment_queue_priority(new_experiment.id, new_experiment.priority)
                 break
 
             ## Initialize a results object
@@ -292,6 +310,44 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
 
     return stock_vials, waste_vials, wellplate
 
+def check_stock_vials(experiment: ExperimentBase, stock_vials: list[Vial]) -> bool:
+    """
+    Check that there is enough volume in the stock vials to run the experiment
+
+    Args:
+        experiment (Experiment): The experiment to be run
+        stock_vials (list[Vial]): The stock vials
+
+    Returns:
+        bool: True if there is enough volume in the stock vials to run the experiment
+    """
+    ## Check that the experiment has solutions and those soltuions are in the stock vials
+    if len(experiment.solutions) == 0:
+        logger.error("The experiment has no solutions")
+        return False
+    for solution in experiment.solutions:
+        if solution not in [vial.name for vial in stock_vials]:
+            logger.error(
+                "The experiment requires solution %s but it is not in the stock vials",
+                solution,
+            )
+            return False
+
+    ## Check that there is enough volume in the stock vials to run the experiment
+    ## Note there may be multiple of the same stock vial so we need to sum the volumes
+    for solution in experiment.solutions:
+        volume_required = experiment.solutions[solution]
+        volume_available = sum(
+            [vial.volume for vial in stock_vials if vial.name == solution]
+        )
+        if volume_available < volume_required:
+            logger.error(
+                "There is not enough volume of solution %s to run the experiment",
+                solution,
+            )
+            return False
+    return True    
+
 def connect_to_instruments():
     """Connect to the instruments"""
     mill = Mill()
@@ -333,9 +389,7 @@ def read_vials(filename) -> list[Vial]:
                 volume=items["volume"],
                 name=items["name"],
                 contents=items["contents"],
-                # capacity=items["capacity"],
-                # bottom=items["bottom"],
-                # height=items["height"],
+                capacity=items["capacity"],
                 filepath=filename,
             )
         )
@@ -422,31 +476,15 @@ def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wel
     Returns:
         int
     """
+    save_current_wellplate()
     well_status_file = Path.cwd() / 'system state' / "well_status.json"
     # input("This will reset all well statuses to new. Press enter to continue.")
-
-    # Confirm that the user wants this
-    if override is False:
-        choice = input(
-            "This will reset all well statuses to new. Press enter to continue. Or enter 'n' to cancel: "
-        )
-        if choice == "n":
-            return 0
 
     ## Open the current status file for the plate id , type number, and wells
     with open(well_status_file, "r", encoding="UTF-8") as file:
         current_wellplate = json.load(file)
     current_plate_id = current_wellplate["plate_id"]
     current_type_number = current_wellplate["type_number"]
-
-    ## Save each well to the well_history.csv file in the data folder
-    ## plate id, type number, well id, experiment id, project id, status, status date, contents
-    logger.debug("Saving well statuses to well_history.csv")
-    with open("data\\well_history.csv", "a", encoding="UTF-8") as file:
-        for well in current_wellplate['wells']:
-            file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
-
-    logger.debug("Well statuses saved to well_history.csv")
 
     ## If no plate id or type number given assume same type number and incremend id by 1
     if new_wellplate_type_number is None:
@@ -473,6 +511,46 @@ def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wel
     logger.info("Wellplate %d saved and wellplate %d loaded", current_plate_id, new_plate_id)
     return 0
 
+def save_current_wellplate():
+    """Save the current wellplate"""
+    well_status_file = Path.cwd() / 'system state' / "well_status.json"
+
+    ## Go through a reset all fields and apply new plate id
+    logger.debug("Saving wellplate")
+    ## Open the current status file for the plate id , type number, and wells
+    with open(well_status_file, "r", encoding="UTF-8") as file:
+        current_wellplate = json.load(file)
+    current_plate_id = current_wellplate["plate_id"]
+    current_type_number = current_wellplate["type_number"]
+
+    ## Save each well to the well_history.csv file in the data folder even if it is empty
+    ## plate id, type number, well id, experiment id, project id, status, status date, contents
+    logger.debug("Saving well statuses to well_history.csv")
+    
+    # if the plate has been partially used before then there will be entries in the well_history.csv file
+    # these entries will have the same plate id as the current wellplate
+    # we want to write over these entries with the current well statuses
+
+    ## Start by getting a copy of the existing well_history.csv file
+    with open("data\\well_history.csv", "r", encoding="UTF-8") as file:
+        well_history = file.readlines()
+
+    # write back all lines that are not the same plate id as the current wellplate
+    with open("data\\well_history.csv", "w", encoding="UTF-8") as file:
+        for line in file:
+            # if same plate, skip
+            if line.split(",")[0] != current_plate_id:
+                file.write(line)
+                file.write("\n")
+
+    # write the current well statuses to the well_history.csv file
+    with open("data\\well_history.csv", "a", encoding="UTF-8") as file:   
+        for well in current_wellplate['wells']:
+            file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
+            file.write("\n")
+
+    logger.debug("Wellplate saved")
+    logger.info("Wellplate %d saved", current_plate_id)
 
 if __name__ == "__main__":
     main()
