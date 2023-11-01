@@ -413,9 +413,9 @@ class Scheduler:
 
         logger.info("Experiment %s location updated to %s", experiment.id, experiment.status)
 
-    def add_experiment(self, experiment: Experiment) -> None:
+    def add_nonfile_experiment(self, experiment: Experiment) -> None:
         """
-        Adds an experiment to the experiment queue.
+        Adds an experiment which is not a file to the experiment queue.
         :param experiment: The experiment to add.
         """
         # Save the new experiment to a file in the inbox folder
