@@ -5,10 +5,11 @@ Each column is a replicate and every row is a different volume
 """
 
 import experiment_class
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+#import pandas as pd
+#import numpy as np
+#import matplotlib.pyplot as plt
 from config.pin import CURRENT_PIN
+from scheduler import Scheduler
 
 COLUMNS = 'ABCDEFGH'
 ROWS = 12
@@ -18,7 +19,7 @@ EXPERIMENT_NAME = 'Water test'
 experiments = []
 # Create a new experiment
 for column in COLUMNS:
-    for row in range(1,ROWS):
+    for row in range(1,ROWS+1):
         experiments.append(experiment_class.ExperimentBase(
                 id=experiment_id,
                 experiment_name= EXPERIMENT_NAME,
@@ -32,9 +33,12 @@ for column in COLUMNS:
                 )
             )
         experiment_id += 1
+scheduler = Scheduler()
+for experiment in experiments:
+    scheduler.add_nonfile_experiment(experiment)
 
 # Create a dataframe to store the results
-results = pd.DataFrame(columns=['experiment_id', 'volume', 'mass'])
+#results = pd.DataFrame(columns=['experiment_id', 'volume', 'mass'])
 
 # # Run the experiments
 # for experiment in experiments:
