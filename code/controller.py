@@ -22,10 +22,10 @@ import time
 from pathlib import Path
 
 from print_panda import printpanda
-#from mill_control import Mill
-from mill_control import MockMill as Mill
-#from pump_control import Pump
-from pump_control import MockPump as Pump
+from mill_control import Mill
+#from mill_control import MockMill as Mill
+from pump_control import Pump
+#from pump_control import MockPump as Pump
 import gamry_control_WIP as echem
 
 # import obs_controls as obs
@@ -36,6 +36,7 @@ from experiment_class import Experiment, ExperimentResult, ExperimentBase
 from vials import Vial
 import wellplate as wellplate_module
 from scale import Sartorius as Scale
+#from scale import MockSartorius as Scale
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
