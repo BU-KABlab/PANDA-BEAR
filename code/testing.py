@@ -184,7 +184,7 @@ def peg2p_test(experiments: list[Experiment]):
             echem.pstatconnect()
             for experiment in experiments:
                 ## save the experiment to the experiment queue
-                scheduler.add_experiment(experiment)
+                scheduler.add_nonfile_experiment(experiment)
                 results = ExperimentResult()
                 (
                     experiment,
@@ -261,7 +261,7 @@ def mixing_test(experiments: list[Experiment]):
             echem.pstatconnect()
             for experiment in experiments:
                 ## save the experiment to the experiment queue
-                scheduler.add_experiment(experiment)
+                scheduler.add_nonfile_experiment(experiment)
                 results = ExperimentResult()
                 (
                     experiment,
