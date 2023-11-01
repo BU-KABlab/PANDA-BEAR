@@ -16,15 +16,16 @@ Additionally controller should be able to:
 # import standard libraries
 import json
 import logging
-from math import e
 import time
 
 # import third-party libraries
 from pathlib import Path
 
 from print_panda import printpanda
+#from mill_control import Mill
 from mill_control import MockMill as Mill
-from pump_control import Pump
+#from pump_control import Pump
+from pump_control import MockPump as Pump
 import gamry_control_WIP as echem
 
 # import obs_controls as obs
@@ -71,7 +72,6 @@ def main():
 
         ## Begin outer loop
         while True:
-            
 
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue()
@@ -606,6 +606,55 @@ def save_current_wellplate():
 
     logger.debug("Wellplate saved")
     logger.info("Wellplate %d saved", current_plate_id)
+
+def change_wellplate_location():
+    """Change the location of the wellplate"""
+    ## Ask for the new location
+    while True:
+        new_location_x = float(input("Enter the new x location of the wellplate: "))
+
+        if new_location_x > -415 or new_location_x < 0:
+            break
+        else:
+            print("Invalid input. Please enter a value between -415 and 0.")
+
+    while True:
+        new_location_y = float(input("Enter the new y location of the wellplate: "))
+
+        if new_location_y > -300 or new_location_y < 0:
+            break
+        else:
+            print("Invalid input. Please enter a value between -300 and 0.")
+
+    # Keep asking for input until the user enters a valid input
+    while True:
+        new_orientation = int(input("""
+                                Orientation of the wellplate:
+                                    0 - Vertical, wells become more negative from A1
+                                    1 - Vertical, wells become less negative from A1
+                                    2 - Horizontal, wells become more negative from A1
+                                    3 - Horizontal, wells become less negative from A1
+                                Enter the new orientation of the wellplate: """))
+        if new_orientation in [0, 1, 2, 3]:
+            break
+        else:
+            print("Invalid input. Please enter 0, 1, 2, or 3.")
+
+    ## Get the current location config
+    with open(Path.cwd() / PATH_TO_CONFIG / "wellplate_location.json", "r", encoding="UTF-8") as file:
+        current_location = json.load(file)
+
+    new_location = {
+    "x": new_location_x,
+    "y": new_location_y,
+    "orientation": new_orientation,
+    "rows": current_location['rows'],
+    "cols": current_location['cols'],
+    "z-bottom": current_location['z-bottom']
+    }
+    ## Write the new location to the wellplate_location.txt file
+    with open(Path.cwd() / PATH_TO_CONFIG / "wellplate_location.json", "w", encoding="UTF-8") as file:
+        json.dump(new_location, file, indent=4)
 
 if __name__ == "__main__":
     #main()
