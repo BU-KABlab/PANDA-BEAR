@@ -8,9 +8,9 @@ EA, EB, GD, GE, TE scales.
 2010-2011 Robert Gieseke - robert.gieseke@gmail.com
 See LICENSE.
 """
-
-import serial
 import logging
+import serial
+
 scale_logger = logging.getLogger(__name__)
 scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s,%(name)s,%(levelname)s,%(message)s")
@@ -93,20 +93,21 @@ class MockSartorius:
     Mock Sartorius Serial Interface for
     EA, EB, GD, GE, TE scales.
     """
-    def __init__(self, com_port: str = 'COM6'):
+    def __init__(self):
         """
         Initialise Sartorius device.
 
             Example:
             scale = Sartorius('COM1')
         """
-        self.com_port = com_port
+        pass
+
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
-        
+
     def value(self):
         """
         Return displayed scale value.
@@ -143,7 +144,7 @@ class MockSartorius:
         """
         pass
 
-def scale_variance_check():
+def scale_variance_check(mock: bool = False):
     """
     Log multiple series of reading from the scale to determine the variance in the readings. 
 
@@ -169,7 +170,10 @@ def scale_variance_check():
     scale_logger.info("Time: %s", datetime.datetime.now())
 
     scale_logger.info("Creating scale object")
-    scale = Sartorius('COM6')
+    if mock:
+        scale = MockSartorius()
+    else:
+        scale = Sartorius('COM6')
     scale_logger.info("Scale object created")
 
     scale_logger.info("Creating data arrays")
@@ -182,7 +186,7 @@ def scale_variance_check():
     scale_logger.info("Data arrays created")
 
     scale_logger.info("Starting 10s loop")
-    for i in range(100):
+    for i in range(60):
         ten_sec_array[i] = scale.value()
         time.sleep(10)
     scale_logger.info("10s loop complete")
@@ -190,7 +194,7 @@ def scale_variance_check():
     time.sleep(10)
 
     scale_logger.info("Starting 5s loop")
-    for i in range(200):
+    for i in range(120):
         five_sec_array[i] = scale.value()
         time.sleep(5)
     scale_logger.info("5s loop complete")
@@ -198,7 +202,7 @@ def scale_variance_check():
     time.sleep(10)
 
     scale_logger.info("Starting 1s loop")
-    for i in range(1000):
+    for i in range(600):
         one_sec_array[i] = scale.value()
         time.sleep(1)
     scale_logger.info("1s loop complete")
@@ -224,11 +228,19 @@ def scale_variance_check():
     plt.xlabel("Reading number")
     plt.savefig("code/logs/scale_testing.png")
     plt.show()
+    plt.subplots_adjust(hspace=0.5)
     scale_logger.info("Plotting complete")
 
-
-if __name__ == '__main__':
-    sartorius_scale = Sartorius('COM6')
+def function_test(mock: bool = False):
+    """
+    Test scale functions.
+    """
+    if mock:
+        scale = MockSartorius()
+    else:
+        scale = Sartorius('COM6')
+    scale_logger.info("Scale object created")
+    sartorius_scale = scale
     print(sartorius_scale.value())
     print(sartorius_scale.display_unit())
     sartorius_scale.tara_zero()
@@ -238,3 +250,6 @@ if __name__ == '__main__':
     sartorius_scale.zero()
     print(sartorius_scale.value())
     sartorius_scale.close()
+
+if __name__ == '__main__':
+    scale_variance_check(True)
