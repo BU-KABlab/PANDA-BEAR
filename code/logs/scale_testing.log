@@ -1,0 +1,23 @@
+2023-11-01 10:34:07,009,__main__,INFO,Starting scale variance check
+2023-11-01 10:34:07,010,__main__,INFO,Current working directory: C:\Users\grego\SynologyDrive\Documents\GitHub\KABLAB
+2023-11-01 10:34:07,011,__main__,INFO,Python version: 3.10.12 | packaged by Anaconda, Inc. | (main, Jul  5 2023, 19:09:20) [MSC v.1916 64 bit (AMD64)]
+2023-11-01 10:34:07,011,__main__,INFO,Numpy version: 1.25.0
+2023-11-01 10:34:07,012,__main__,INFO,Matplotlib version: 3.7.1
+2023-11-01 10:34:07,012,__main__,INFO,Time: 2023-11-01 10:34:07.012201
+2023-11-01 10:34:07,013,__main__,INFO,Creating scale object
+2023-11-01 10:34:07,013,__main__,INFO,Scale object created
+2023-11-01 10:34:07,013,__main__,INFO,Creating data arrays
+2023-11-01 10:34:07,015,__main__,INFO,Creating 10s array
+2023-11-01 10:34:07,015,__main__,INFO,Creating 5s array
+2023-11-01 10:34:07,015,__main__,INFO,Creating 1s array
+2023-11-01 10:34:07,015,__main__,INFO,Data arrays created
+2023-11-01 10:34:07,015,__main__,INFO,Starting 10s loop
+2023-11-01 10:50:47,748,__main__,INFO,10s loop complete
+2023-11-01 10:50:57,758,__main__,INFO,Starting 5s loop
+2023-11-01 11:07:39,367,__main__,INFO,5s loop complete
+2023-11-01 11:07:49,372,__main__,INFO,Starting 1s loop
+2023-11-01 11:24:36,433,__main__,INFO,1s loop complete
+2023-11-01 11:24:36,433,__main__,INFO,Closing scale object
+2023-11-01 11:24:36,433,__main__,INFO,Scale object closed
+2023-11-01 11:24:36,433,__main__,INFO,Plotting data
+2023-11-01 11:24:37,440,__main__,INFO,Plotting complete

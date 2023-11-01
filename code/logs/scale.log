@@ -8719,3 +8719,31 @@
 2023-10-30 13:47:02,471,pump_control,DEBUG,Infusing 0.040000 ml...
 2023-10-30 13:47:07,921,pump_control,DEBUG,Done Infusing
 2023-10-30 13:47:09,938,pump_control,DEBUG,Pump has infused: 0.04 ml
+2023-11-01 10:00:57,179,__main__,INFO,Mixing 3 times
+2023-11-01 10:00:57,180,__main__,DEBUG,Mixing 0 of 3 times
+2023-11-01 10:00:57,184,__main__,DEBUG,Mixing 1 of 3 times
+2023-11-01 10:00:57,188,__main__,DEBUG,Mixing 2 of 3 times
+2023-11-01 10:02:34,373,__main__,DEBUG,Mock Pump has withdrawn: 0.100000 ml    Pipette vol: 100.000000
+2023-11-01 10:02:34,374,__main__,DEBUG,Mock Pump has infused: 0.100000 ml  Pipette volume: 0.000000
+2023-11-01 10:02:34,374,__main__,INFO,Mixing 3 times
+2023-11-01 10:02:34,374,__main__,DEBUG,Mixing 0 of 3 times
+2023-11-01 10:02:34,374,__main__,DEBUG,Mock Pump has withdrawn: 0.200000 ml    Pipette vol: 200.000000
+2023-11-01 10:02:34,374,__main__,DEBUG,Mock Pump has infused: 0.200000 ml  Pipette volume: 0.000000
+2023-11-01 10:02:34,375,__main__,DEBUG,Mixing 1 of 3 times
+2023-11-01 10:02:34,375,__main__,DEBUG,Mock Pump has withdrawn: 0.200000 ml    Pipette vol: 200.000000
+2023-11-01 10:02:34,375,__main__,DEBUG,Mock Pump has infused: 0.200000 ml  Pipette volume: 0.000000
+2023-11-01 10:02:34,376,__main__,DEBUG,Mixing 2 of 3 times
+2023-11-01 10:02:34,376,__main__,DEBUG,Mock Pump has withdrawn: 0.200000 ml    Pipette vol: 200.000000
+2023-11-01 10:02:34,376,__main__,DEBUG,Mock Pump has infused: 0.200000 ml  Pipette volume: 0.000000
+2023-11-01 10:07:07,523,__main__,DEBUG,Mock Pump has withdrawn: 0.100000 ml    Pipette vol: 100.000000
+2023-11-01 10:07:07,523,__main__,DEBUG,Mock Pump has infused: 0.100000 ml  Pipette volume: 0.000000
+2023-11-01 10:07:07,524,__main__,INFO,Mixing 3 times
+2023-11-01 10:07:07,525,__main__,DEBUG,Mixing 0 of 3 times
+2023-11-01 10:07:07,525,__main__,DEBUG,Mock Pump has withdrawn: 0.200000 ml    Pipette vol: 200.000000
+2023-11-01 10:07:07,525,__main__,DEBUG,Mock Pump has infused: 0.200000 ml  Pipette volume: 0.000000
+2023-11-01 10:07:07,525,__main__,DEBUG,Mixing 1 of 3 times
+2023-11-01 10:07:07,525,__main__,DEBUG,Mock Pump has withdrawn: 0.200000 ml    Pipette vol: 200.000000
+2023-11-01 10:07:07,525,__main__,DEBUG,Mock Pump has infused: 0.200000 ml  Pipette volume: 0.000000
+2023-11-01 10:07:07,527,__main__,DEBUG,Mixing 2 of 3 times
+2023-11-01 10:07:07,527,__main__,DEBUG,Mock Pump has withdrawn: 0.200000 ml    Pipette vol: 200.000000
+2023-11-01 10:07:07,527,__main__,DEBUG,Mock Pump has infused: 0.200000 ml  Pipette volume: 0.000000
