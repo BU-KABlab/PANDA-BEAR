@@ -18,6 +18,9 @@ from typing import Tuple
 import experiment_class
 from experiment_class import (
     Experiment,
+    ExperimentBase,
+    PEG2P_Test_Instructions,
+    PEG_ACR_Instructions,
     ExperimentStatus,
     ExperimentResult,
 )  # , make_baseline_value
@@ -62,7 +65,7 @@ class Scheduler:
         file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
         if not Path.exists(file_to_open):
             logger.error("%s not found", file_to_open)
-            raise FileNotFoundError("%s not found", file_to_open)
+            raise FileNotFoundError("%s not found", file_to_open.stem)
 
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
@@ -80,6 +83,7 @@ class Scheduler:
         :param baseline: Whether or not the experiment is a baseline test.
         :return: The alternative well. Or None if no wells are available.
         """
+        logger.debug("Choosing alternative well")
         file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
@@ -102,6 +106,7 @@ class Scheduler:
         :param well: The well to change.
         :param status: The new status of the well.
         """
+        logger.debug("Changing well %s status to %s", well, status)
         file_to_open = Path.cwd() / PATH_TO_STATUS/ "well_status.json"
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
@@ -129,90 +134,91 @@ class Scheduler:
         experiments_read = 0
         complete = True
         inbox_dir = Path.cwd() / PATH_TO_EXPERIMENT_INBOX
-        file_to_open = inbox_dir / filename
-        with open(file_to_open, "r", encoding="ascii") as file:
+        file_to_open = (inbox_dir / filename).with_suffix(".json")
+        with open(file_to_open.__str__(), "r", encoding="ascii") as file:
             data = json.load(file)
-            for experiment in data["Experiments"]:
-                existing_status = experiment["status"]
-                if existing_status != "new":
-                    continue
-                # Get the experiment id and create a filename
-                desired_well = experiment["target_well"]
+        for experiment in data["Experiments"]:
+            existing_status = experiment["status"]
+            if existing_status != "new":
+                continue
+            # Get the experiment id and create a filename
+            desired_well = experiment["target_well"]
 
-                # Check if the well is available
-                if self.check_well_status(desired_well) != "new":
-                    # Find the next available well
-                    target_well = self.choose_alternative_well(desired_well)
-                    if target_well == "none":
-                        print(
-                            f"No wells available for experiment originally for well {desired_well}."
-                        )
-                        complete = False
-                        continue
-                    print(
-                        f"Experiment originally for well {desired_well} is now for well {target_well}."
+            # Check if the well is available
+            if self.check_well_status(desired_well) != "new":
+                # Find the next available well
+                target_well = self.choose_alternative_well(desired_well)
+                if target_well == "none":
+                    logger.info(
+                        "No wells available for experiment originally for well %s" ,desired_well
                     )
-                    experiment["target_well"] = target_well
-                else:
-                    target_well = desired_well
-
-                filename = f"{experiment['id']}_{target_well}.json"
-
-                # populate an experiment instance
-                # TODO make the planner json output conform to schema so it can just be read in
-                instructions = Experiment(
-                    id=experiment["id"],
-                    priority=experiment["priority"],
-                    pin=CURRENT_PIN,
-                    target_well=target_well,
-                    dmf=experiment["dmf"],
-                    peg=experiment["peg"],
-                    acrylate=experiment["acrylate"],
-                    ferrocene=experiment["ferrocene"],
-                    custom=experiment["custom"],
-                    ocp=experiment["ocp"],
-                    ca=experiment["ca"],
-                    cv=experiment["cv"],
-                    baseline=experiment["baseline"],
-                    dep_duration=experiment["dep_duration"],
-                    dep_pot=experiment["dep_pot"],
-                    char_sol_name=experiment["char_sol_name"],
-                    char_vol=experiment["char_vol"],
-                    flush_sol_name=experiment["flush_sol_name"],
-                    flush_vol=experiment["flush_vol"],
-                    pumping_rate=experiment["pumping_rate"],
-                    rinse_count=experiment["rinse_count"],
-                    rinse_vol=experiment["rinse_vol"],
-                    status=ExperimentStatus.QUEUED,
-                    filename=filename,
+                    complete = False
+                    continue
+                logger.info(
+                    "Experiment originally for well %s is now for well %s", desired_well, target_well
                 )
+                experiment["target_well"] = target_well
+            else:
+                target_well = desired_well
 
-                # Save the experiment as a separate file in the experiment_queue subfolder
-                queue_dir = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
-                queue_dir.mkdir(parents=True, exist_ok=True)
-                file_to_save = queue_dir / filename
+            filename = f"{experiment['id']}_{target_well}.json"
 
-                serialized_data = experiment_class.serialize_experiment(instructions)
-                with open(file_to_save, "w", encoding="UTF-8") as file:
-                    file.write(serialized_data)
-                logger.debug("Experiment %s saved to %s", instructions.id, file_to_save)
-                # with open(file_to_save, "w", encoding="UTF-8") as outfile:
-                #     text_version = json.dumps(instructions)
-                #     json.dump(text_version, outfile, indent=4)
+            # populate an experiment instance
+            # TODO make the planner json output conform to schema so it can just be read in
 
-                # Add the experiment to the queue
-                queue_file_path = Path.cwd() / PATH_TO_QUEUE
-                with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
-                    line = f"{instructions.id},{instructions.priority},{instructions.filename}"
-                    queue_file.write(line)
-                    queue_file.write("\n")
+            instructions = Experiment(
+                id=experiment["id"],
+                priority=experiment["priority"],
+                pin=CURRENT_PIN,
+                target_well=target_well,
+                dmf=experiment["dmf"],
+                peg=experiment["peg"],
+                acrylate=experiment["acrylate"],
+                ferrocene=experiment["ferrocene"],
+                custom=experiment["custom"],
+                ocp=experiment["ocp"],
+                ca=experiment["ca"],
+                cv=experiment["cv"],
+                baseline=experiment["baseline"],
+                dep_duration=experiment["dep_duration"],
+                dep_pot=experiment["dep_pot"],
+                char_sol_name=experiment["char_sol_name"],
+                char_vol=experiment["char_vol"],
+                flush_sol_name=experiment["flush_sol_name"],
+                flush_vol=experiment["flush_vol"],
+                pumping_rate=experiment["pumping_rate"],
+                rinse_count=experiment["rinse_count"],
+                rinse_vol=experiment["rinse_vol"],
+                status=ExperimentStatus.QUEUED,
+                filename=filename,
+            )
 
-                logger.debug("Experiment %s added to queue", instructions.id)
-                # Change the status of the well
-                self.change_well_status(target_well, "queued")
+            # Save the experiment as a separate file in the experiment_queue subfolder
+            queue_dir = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
+            queue_dir.mkdir(parents=True, exist_ok=True)
+            file_to_save = queue_dir / filename
 
-                # Add the experiment to the list of experiments read
-                experiments_read += 1
+            serialized_data = experiment_class.serialize_experiment(instructions)
+            with open(file_to_save, "w", encoding="UTF-8") as file:
+                file.write(serialized_data)
+            logger.debug("Experiment %s saved to %s", instructions.id, file_to_save)
+            # with open(file_to_save, "w", encoding="UTF-8") as outfile:
+            #     text_version = json.dumps(instructions)
+            #     json.dump(text_version, outfile, indent=4)
+
+            # Add the experiment to the queue
+            queue_file_path = Path.cwd() / PATH_TO_QUEUE
+            with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
+                line = f"{instructions.id},{instructions.priority},{instructions.filename}"
+                queue_file.write(line)
+                queue_file.write("\n")
+
+            logger.debug("Experiment %s added to queue", instructions.id)
+            # Change the status of the well
+            self.change_well_status(target_well, "queued")
+
+            # Add the experiment to the list of experiments read
+            experiments_read += 1
 
         # Save the updated file
         with open(file_to_open, "w", encoding="UTF-8") as file:
@@ -236,18 +242,18 @@ class Scheduler:
             #     self.insert_control_tests()   # so we are not doing this here.
 
             if file.is_file():
-                [count, complete] = self.read_new_experiments(file.name)
+                logger.info("Reading file %s for experiments", file.name)
+                count, complete = self.read_new_experiments(file.name)
 
                 # Move the file to archive if it has been completely read
                 if complete:
+                    logger.debug("Moving file %s to archive", file.name)
                     archive_path = file_path / "archive"
                     archive_path.mkdir(parents=True, exist_ok=True)
                     file.replace(archive_path / file.name)
-                    print(f"File {file.name} moved to archive.")
+                    logger.info("File %s moved to archive.", file.name)
                 else:
-                    print(
-                        f"File {file.name} not moved to archive. Not all experiments queued."
-                    )
+                    logger.info("File %s not moved to archive. Not all experiments queued.", file.name)
 
         return count, complete
 
@@ -413,19 +419,72 @@ class Scheduler:
 
         logger.info("Experiment %s location updated to %s", experiment.id, experiment.status)
 
-    def add_nonfile_experiment(self, experiment: Experiment) -> None:
+    def add_nonfile_experiment(self, experiment: Experiment) -> str:
         """
-        Adds an experiment which is not a file to the experiment queue.
+        Adds an experiment which is not a file to the experiment queue directly.
         :param experiment: The experiment to add.
         """
-        # Save the new experiment to a file in the inbox folder
-        file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_INBOX / experiment.filename
-        experiment_json = experiment_class.serialize_experiment(experiment)
-        with open(file_path.with_suffix(".json"), "w", encoding="UTF-8") as file:
-            file.write(experiment_json)
+        # # Save the new experiment to a file in the inbox folder
+        # file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_INBOX / experiment.filename
+        # experiment_json = experiment_class.serialize_experiment(experiment)
+        # # Modify the experiment json to look like the multi-experiment json
+        # # {"Experiments": [
+        # #     {
+        # #    }
+        # #]
+        # #}
+        # # replace only the first instance of { with {"Experiments": [
+        # experiment_json = experiment_json.replace("{", '{"Experiments": [{',1)
+        # # replace only the last instance of } with ]}
+        # experiment_json = experiment_json[::-1].replace("}", '}]}',1)[::-1]
+        # with open(file_path.with_suffix(".json"), "w", encoding="UTF-8") as file:
+        #     file.write(experiment_json)
 
         # read the experiment to the queue
-        self.read_new_experiments(experiment.filename)
+        # self.read_new_experiments(experiment)
+
+        ## First check the existing status, if not new or queued, then do not add to queue
+        if experiment.status not in [ExperimentStatus.NEW, ExperimentStatus.QUEUED]:
+            message = f"Experiment {experiment.id} is not new or queued, not adding to queue"
+            logger.info(message)
+            return message
+
+        ## Check if the well is available
+        if self.check_well_status(experiment.target_well) != "new":
+            # Find the next available well
+            target_well = self.choose_alternative_well(experiment.target_well)
+            if target_well == "none":
+                logger.info(
+                    "No wells available for experiment originally for well %s.",
+                    experiment.target_well
+                )
+                return "No wells available"
+            logger.info(
+                "Experiment originally for well %s is now for well %s.",
+                experiment.target_well,
+                target_well
+            )
+            experiment.target_well = target_well
+
+        # Save the experiment as a separate file in the experiment_queue subfolder
+        queue_dir = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
+        file_to_save = (queue_dir / experiment.filename).with_suffix(".json")
+        with open(file_to_save, "w", encoding="UTF-8") as file:
+            serialized_data = experiment_class.serialize_experiment(experiment)
+            file.write(serialized_data)
+
+        ## Add the experiment to the queue
+        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
+            line = f"{experiment.id},{experiment.priority},{experiment.filename}"
+            queue_file.write(line)
+            queue_file.write("\n")
+
+        ## Change the status of the well
+        self.change_well_status(experiment.target_well, "queued")
+
+        logger.info("Experiment %s added to queue", experiment.id)
+        return "success"
 
     def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder

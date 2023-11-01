@@ -9,7 +9,10 @@ EA, EB, GD, GE, TE scales.
 See LICENSE.
 """
 import logging
+import random
 import serial
+import time
+from tqdm import tqdm
 
 scale_logger = logging.getLogger(__name__)
 scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
@@ -100,7 +103,6 @@ class MockSartorius:
             Example:
             scale = Sartorius('COM1')
         """
-        pass
 
     def __enter__(self):
         return self
@@ -112,7 +114,7 @@ class MockSartorius:
         """
         Return displayed scale value.
         """
-        return 0.0
+        return random.uniform(-10, 10)
 
     def display_unit(self):
         """
@@ -124,25 +126,21 @@ class MockSartorius:
         """
         Tara and zeroing combined.
         """
-        pass
 
     def tara(self):
         """
         Tara.
         """
-        pass
 
     def zero(self):
         """
         Zero.
         """
-        pass
 
     def close(self):
         """
         Close connection.
         """
-        pass
 
 def scale_variance_check(mock: bool = False):
     """
@@ -178,15 +176,15 @@ def scale_variance_check(mock: bool = False):
 
     scale_logger.info("Creating data arrays")
     scale_logger.info("Creating 10s array")
-    ten_sec_array = np.zeros(100)
+    ten_sec_array = np.zeros(60)
     scale_logger.info("Creating 5s array")
-    five_sec_array = np.zeros(200)
-    scale_logger.info("Creating 1s array")
-    one_sec_array = np.zeros(1000)
+    five_sec_array = np.zeros(120)
+    scale_logger.info("Creating 3s array")
+    three_sec_array = np.zeros(200)
     scale_logger.info("Data arrays created")
 
     scale_logger.info("Starting 10s loop")
-    for i in range(60):
+    for i in tqdm(range(60)):
         ten_sec_array[i] = scale.value()
         time.sleep(10)
     scale_logger.info("10s loop complete")
@@ -194,18 +192,18 @@ def scale_variance_check(mock: bool = False):
     time.sleep(10)
 
     scale_logger.info("Starting 5s loop")
-    for i in range(120):
+    for i in tqdm(range(120)):
         five_sec_array[i] = scale.value()
         time.sleep(5)
     scale_logger.info("5s loop complete")
 
     time.sleep(10)
 
-    scale_logger.info("Starting 1s loop")
-    for i in range(600):
-        one_sec_array[i] = scale.value()
-        time.sleep(1)
-    scale_logger.info("1s loop complete")
+    scale_logger.info("Starting 3s loop")
+    for i in tqdm(range(200)):
+        three_sec_array[i] = scale.value()
+        time.sleep(3)
+    scale_logger.info("3s loop complete")
 
     scale_logger.info("Closing scale object")
     scale.close()
@@ -222,14 +220,32 @@ def scale_variance_check(mock: bool = False):
     plt.title("5s between readings")
     plt.ylabel("Reading (g)")
     plt.subplot(3,1,3)
-    plt.plot(one_sec_array)
-    plt.title("1s between readings")
+    plt.plot(three_sec_array)
+    plt.title("3s between readings")
     plt.ylabel("Reading (g)")
     plt.xlabel("Reading number")
-    plt.savefig("code/logs/scale_testing.png")
+    plt.savefig("code/data/scale_testing.png")
     plt.show()
-    plt.subplots_adjust(hspace=0.5)
+    plt.subplots_adjust(hspace=10)
     scale_logger.info("Plotting complete")
+
+    scale_logger.info("Calculating variance")
+    ten_sec_variance = np.var(ten_sec_array)
+    five_sec_variance = np.var(five_sec_array)
+    one_sec_variance = np.var(three_sec_array)
+    scale_logger.info("Variance calculated")
+
+    scale_logger.info("Writing variance to log")
+    scale_logger.info("10s variance: %s", ten_sec_variance)
+    scale_logger.info("5s variance: %s", five_sec_variance)
+    scale_logger.info("3s variance: %s", one_sec_variance)
+    scale_logger.info("Variance written to log")
+
+    scale_logger.info("Saving data to file")
+    np.savetxt("code/data/scale_testing_ten_sec.txt", ten_sec_array)
+    np.savetxt("code/data/scale_testing_five_sec.txt", five_sec_array)
+    np.savetxt("code/data/scale_testing_three_sec.txt", three_sec_array)
+    scale_logger.info("Scale variance check complete")
 
 def function_test(mock: bool = False):
     """

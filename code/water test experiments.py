@@ -35,7 +35,9 @@ for column in COLUMNS:
         experiment_id += 1
 scheduler = Scheduler()
 for experiment in experiments:
-    scheduler.add_nonfile_experiment(experiment)
+    result = scheduler.add_nonfile_experiment(experiment)
+    if result != 'success':
+        print(result)
 
 # Create a dataframe to store the results
 #results = pd.DataFrame(columns=['experiment_id', 'volume', 'mass'])
@@ -47,7 +49,7 @@ for experiment in experiments:
 #                               'volume': experiment.volume,
 #                               'mass': experiment.mass},
 #                              ignore_index=True)
-    
+
 # # Plot the results
 # plt.figure()
 # plt.plot(results['volume'], results['mass'], 'o')

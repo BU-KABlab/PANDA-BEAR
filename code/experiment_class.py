@@ -1,4 +1,5 @@
 """ Experiment data class"""
+from ctypes import Union
 from enum import Enum
 from datetime import datetime
 from dataclasses import field
@@ -61,7 +62,6 @@ class ExperimentBase():
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None #Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
-    
 
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''
@@ -280,9 +280,26 @@ def parse_experiment(json_string: str) -> Experiment:
     '''Parse an experiment from a json string'''
     return RootModel[Experiment].model_validate_json(json_string).root
 
-def serialize_experiment(experiment: Experiment) -> str:
-    '''Serialize an experiment to a json string'''
-    return RootModel[Experiment](experiment).model_dump_json(indent=4)
+def parse_experimentbase(json_string: str) -> ExperimentBase:
+    '''Parse an experiment from a json string'''
+    return RootModel[ExperimentBase].model_validate_json(json_string).root
+
+# def serialize_experiment(experiment: (Experiment,ExperimentBase)) -> str:
+#     '''Serialize an experiment to a json string'''
+#     if isinstance(experiment, Experiment):
+#         return RootModel[Experiment](experiment).model_dump_json(indent=4)
+
+def serialize_experiment(experiment: (ExperimentBase, Experiment, PEG2P_Test_Instructions, PEG_ACR_Instructions)) -> str:
+    """Given an experiment, determine the type and then pass back the serialized json form"""
+    if isinstance(experiment, ExperimentBase):
+        return RootModel[ExperimentBase](experiment).model_dump_json(indent=4)
+    if isinstance(experiment, Experiment):
+        return RootModel[Experiment](experiment).model_dump_json(indent=4)
+    if isinstance(experiment, PEG2P_Test_Instructions):
+        return RootModel[PEG2P_Test_Instructions](experiment).model_dump_json(indent=4)
+    if isinstance(experiment, PEG_ACR_Instructions):
+        return RootModel[PEG_ACR_Instructions](experiment).model_dump_json(indent=4)
+    return None
 
 def parse_results(json_string: str) -> ExperimentResult:
     '''Parse an experiment result from a json string'''

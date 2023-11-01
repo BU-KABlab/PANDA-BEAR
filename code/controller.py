@@ -22,10 +22,10 @@ import time
 from pathlib import Path
 
 from print_panda import printpanda
-from mill_control import Mill
-#from mill_control import MockMill as Mill
-from pump_control import Pump
-#from pump_control import MockPump as Pump
+#from mill_control import Mill
+from mill_control import MockMill as Mill
+#from pump_control import Pump
+from pump_control import MockPump as Pump
 import gamry_control_WIP as echem
 
 # import obs_controls as obs
@@ -35,8 +35,8 @@ import e_panda
 from experiment_class import Experiment, ExperimentResult, ExperimentBase
 from vials import Vial
 import wellplate as wellplate_module
-from scale import Sartorius as Scale
-#from scale import MockSartorius as Scale
+#from scale import Sartorius as Scale
+from scale import MockSartorius as Scale
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ def main():
                     "No new experiments to run...waiting 5 minutes for new experiments"
                 )
                 time.sleep(600)
-                # Replace with slack alert and wait for response from user 
+                # Replace with slack alert and wait for response from user
 
             ## confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, Experiment):
@@ -348,7 +348,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: list[Vial]) -> bo
                 solution,
             )
             return False
-    return True    
+    return True
 
 def connect_to_instruments():
     """Connect to the instruments"""
@@ -485,7 +485,7 @@ def load_new_wellplate(new_plate_id: int = None, new_wellplate_type_number: int 
         current_wellplate = json.load(file)
     current_plate_id = current_wellplate["plate_id"]
     current_type_number = current_wellplate["type_number"]
-    
+
     ## Check if the plate id exists in the well_history.csv file already. If so we will load in that wellplate
     ## If not we will create a new wellplate
     existing_wellplate_found = False
@@ -601,9 +601,11 @@ def save_current_wellplate():
 
 
     # write the current well statuses to the well_history.csv file
-    with open("data\\well_history.csv", "a", encoding="UTF-8") as file:   
+    with open("data\\well_history.csv", "a", encoding="UTF-8") as file:
         for well in current_wellplate['wells']:
-            file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
+            file.write(
+                f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n"
+                )
 
     logger.debug("Wellplate saved")
     logger.info("Wellplate %d saved", current_plate_id)
@@ -616,16 +618,16 @@ def change_wellplate_location():
 
         if new_location_x > -415 or new_location_x < 0:
             break
-        else:
-            print("Invalid input. Please enter a value between -415 and 0.")
+
+        print("Invalid input. Please enter a value between -415 and 0.")
 
     while True:
         new_location_y = float(input("Enter the new y location of the wellplate: "))
 
         if new_location_y > -300 or new_location_y < 0:
             break
-        else:
-            print("Invalid input. Please enter a value between -300 and 0.")
+
+        print("Invalid input. Please enter a value between -300 and 0.")
 
     # Keep asking for input until the user enters a valid input
     while True:
