@@ -115,7 +115,7 @@ class Pump:
 
             self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
             self.update_pipette_volume(self.pump.volume_withdrawn)
-            logging.debug(
+            logger.debug(
                 "Pump has withdrawn: %f ml    Pipette vol: %f",
                 self.pump.volume_withdrawn,
                 self.pipette_volume_ul,
@@ -152,7 +152,7 @@ class Pump:
 
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
             self.update_pipette_volume(self.pump.volume_infused)
-            logging.debug(
+            logger.debug(
                 "Pump has infused: %f ml  Pipette volume: %f",
                 self.pump.volume_infused,
                 self.pipette_volume_ul,
@@ -314,21 +314,20 @@ class Pump:
         self.pipette_capacity_ul = capacity_ul
         self.pipette_capacity_ml = capacity_ul / 1000.000
 
-
 class MockPump(Pump):
-    """
-    Subclass of Pump that mocks the behavior of the external pump.
-    """
-
-    def __init__(self, mill: Mill, scale: Scale):
-        self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+    """Mock pump class for testing"""
+    def __init__(self, mill, scale):
+        super().__init__(mill, scale)
         self.syringe_capacity = 1.0  # mL
         self.pipette_capacity_ml = 0.2  # mL
         self.pipette_capacity_ul = 200  # uL
         self.pipette_volume_ul = 0.0  # uL
         self.pipette_volume_ml = 0.0  # mL
-        self.mill = mill
-        self.scale = scale
+        self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+
+    def set_up_pump(self):
+        pump = object()
+        return pump
 
     def withdraw(
         self, volume: float, solution: Vial = None, rate: float = 0.5
@@ -342,9 +341,9 @@ class MockPump(Pump):
             volume_ml = volume / 1000.0
 
         # self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
-        self.pump.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+        self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         self.update_pipette_volume(volume_ml)
-        logging.debug(
+        logger.debug(
             "Mock Pump has withdrawn: %f ml    Pipette vol: %f",
             volume_ml,
             self.pipette_volume_ul,
@@ -366,9 +365,9 @@ class MockPump(Pump):
 
         if volume_ul > 0.000:
             # self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
-            self.pump.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+            self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume_ml)
-            logging.debug(
+            logger.debug(
                 "Mock Pump has infused: %f ml  Pipette volume: %f",
                 volume_ml,
                 self.pipette_volume_ul,
@@ -388,27 +387,16 @@ class MockPump(Pump):
         Returns:
             None
         """
-        if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
+        if self.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
             self.pipette_volume_ul -= volume_ml * 1000
             self.pipette_volume_ml -= volume_ml
         else:
             self.pipette_volume_ul += volume_ml * 1000
             self.pipette_volume_ml += volume_ml
 
-
-class OverFillException(Exception):
-    """Raised when a vessel is over filled"""
-
-    def __init__(self, volume, added_volume, capacity) -> None:
-        super().__init__(self)
-        self.volume = volume
-        self.added_volume = added_volume
-        self.capacity = capacity
-
-    def __str__(self):
-        return (
-            f"OverFillException: {self.volume} + {self.added_volume} > {self.capacity}"
-        )
+    def set_pipette_capacity(self, capacity_ul):
+        self.pipette_capacity_ul = capacity_ul
+        self.pipette_capacity_ml = capacity_ul / 1000.000
 
 
 class OverDraftException(Exception):
@@ -442,13 +430,11 @@ def mock_pump_testing_routine():
     """Test the pump"""
     with MockMill() as mill:
         with MockScale() as scale:
-            mill.homing_sequence()
             mock_pump = MockPump(mill=mill, scale=scale)
             mock_pump.withdraw(100)
             assert mock_pump.pipette_volume_ul == 100
             mock_pump.infuse(100)
             assert mock_pump.pipette_volume_ul == 0
-
             mock_pump.mix()
 
 
