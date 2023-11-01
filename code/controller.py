@@ -16,6 +16,7 @@ Additionally controller should be able to:
 # import standard libraries
 import json
 import logging
+from math import e
 import time
 
 # import third-party libraries
@@ -463,7 +464,7 @@ def reset_vials(vialgroup: str):
     with open(filename, "w", encoding="UTF-8") as file:
         json.dump(vial_parameters, file, indent=4)
 
-def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wellplate_type_number: int = None) -> int:
+def load_new_wellplate(new_plate_id: int = None, new_wellplate_type_number: int = None) -> int:
     """
     Save the current wellplate, reset the well statuses to new. 
     If no plate id or type number given assume same type number and increment id by 1
@@ -477,15 +478,65 @@ def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wel
         int
     """
     save_current_wellplate()
-    well_status_file = Path.cwd() / 'system state' / "well_status.json"
-    # input("This will reset all well statuses to new. Press enter to continue.")
-
+    well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
     ## Open the current status file for the plate id , type number, and wells
     with open(well_status_file, "r", encoding="UTF-8") as file:
         current_wellplate = json.load(file)
     current_plate_id = current_wellplate["plate_id"]
     current_type_number = current_wellplate["type_number"]
+    
+    ## Check if the plate id exists in the well_history.csv file already. If so we will load in that wellplate
+    ## If not we will create a new wellplate
+    existing_wellplate_found = False
+    existing_wellplate = []
+    with open("data\\well_history.csv", "r", encoding="UTF-8") as file:
+        for line in file:
+            if line.split(",")[0] == str(new_plate_id):
+                logger.debug("Wellplate %d found in well_history.csv", new_plate_id)
+                existing_wellplate.append(line.split(","))
+                existing_wellplate_found = True
+                existing_wellplate_type_number = line.split(",")[1]
+                break
+        else:
+            logger.debug("Wellplate %d not found in well_history.csv", new_plate_id)
+    if existing_wellplate_found and new_wellplate_type_number is not None and existing_wellplate_type_number != new_wellplate_type_number:
+        logger.error("The type number of the wellplate in well_history.csv does not match the given type number")
+        user_choice = input("the type number of the wellplate in well_history.csv does not match the given type number. Would you like to continue? (y/n): ")
+        if user_choice.lower() == "n":
+            logger.info("Wellplate %d not loaded", new_plate_id)
+            return 1
+        elif user_choice.lower() == "y":
+            pass # and ignore the type number
 
+    ## If the plate id exists in the well_history.csv file, load that wellplate
+    if existing_wellplate_found:
+        logger.debug("Loading wellplate %d from well_history.csv", new_plate_id)
+        new_wellplate = current_wellplate # This is a scaffold for us to populate with the existing wellplate
+        new_wellplate["plate_id"] = new_plate_id
+        new_wellplate["type_number"] = existing_wellplate_type_number
+
+        for well in existing_wellplate:
+            well_id = well[2]
+            experiment_id = well[3]
+            project_id = well[4]
+            status = well[5]
+            status_date = well[6]
+            contents = well[7]
+            for well in new_wellplate['wells']:
+                if well['well_id'] == well_id:
+                    well["status"] = status
+                    well["status_date"] = status_date
+                    well["experiment_id"] = experiment_id
+                    well["project_id"] = project_id
+                    well["contents"] = contents
+                    break
+
+        with open(well_status_file, "w", encoding="UTF-8") as file:
+            json.dump(new_wellplate, file, indent=4)
+        logger.debug("Wellplate %d loaded from well_history.csv", new_plate_id)
+        logger.info("Wellplate %d saved and wellplate %d loaded", current_plate_id, new_plate_id)
+        return 0
+    ## If no existing wellplate found, create a new wellplate
     ## If no plate id or type number given assume same type number and incremend id by 1
     if new_wellplate_type_number is None:
         new_wellplate_type_number = current_type_number
@@ -513,7 +564,7 @@ def load_new_wellplate(override: bool = False, new_plate_id: int = None, new_wel
 
 def save_current_wellplate():
     """Save the current wellplate"""
-    well_status_file = Path.cwd() / 'system state' / "well_status.json"
+    well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
 
     ## Go through a reset all fields and apply new plate id
     logger.debug("Saving wellplate")
@@ -526,31 +577,36 @@ def save_current_wellplate():
     ## Save each well to the well_history.csv file in the data folder even if it is empty
     ## plate id, type number, well id, experiment id, project id, status, status date, contents
     logger.debug("Saving well statuses to well_history.csv")
-    
+
     # if the plate has been partially used before then there will be entries in the well_history.csv file
     # these entries will have the same plate id as the current wellplate
     # we want to write over these entries with the current well statuses
 
-    ## Start by getting a copy of the existing well_history.csv file
-    with open("data\\well_history.csv", "r", encoding="UTF-8") as file:
-        well_history = file.readlines()
-
     # write back all lines that are not the same plate id as the current wellplate
-    with open("data\\well_history.csv", "w", encoding="UTF-8") as file:
-        for line in file:
-            # if same plate, skip
-            if line.split(",")[0] != current_plate_id:
-                file.write(line)
-                file.write("\n")
+
+    with open("data\\well_history.csv", "r", encoding="UTF-8") as input_file:
+        with open("data\\new_well_history.csv", "w", encoding="UTF-8") as output_file:
+            for line in input_file:
+                # Check if the line has the same plate ID as the current_plate_id
+                if line.split(",")[0] == str(current_plate_id):
+                    continue  # Skip this line
+                # If the plate ID is different, write the line to the output file
+                output_file.write(line)
+    ## delete the old well_history.csv file
+    Path("data\\well_history.csv").unlink()
+
+    ## rename the new_well_history.csv file to well_history.csv
+    Path("data\\new_well_history.csv").rename("data\\well_history.csv")
+
 
     # write the current well statuses to the well_history.csv file
     with open("data\\well_history.csv", "a", encoding="UTF-8") as file:   
         for well in current_wellplate['wells']:
             file.write(f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}\n")
-            file.write("\n")
 
     logger.debug("Wellplate saved")
     logger.info("Wellplate %d saved", current_plate_id)
 
 if __name__ == "__main__":
-    main()
+    #main()
+    load_new_wellplate(new_plate_id=5)
