@@ -151,7 +151,7 @@ class Mill:
             raise CommandExecutionError(
                 f"Error executing command {command}: {str(exep)}"
             ) from exep
- 
+
         return mill_response
 
     def stop(self):
@@ -555,6 +555,7 @@ class MockMill:
 
     def __enter__(self):
         """Enter the context manager"""
+        self.homing_sequence()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
