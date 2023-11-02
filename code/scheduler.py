@@ -257,7 +257,7 @@ class Scheduler:
 
         return count, complete
 
-    def read_next_experiment_from_queue(self) -> Tuple[Experiment, Path]:
+    def read_next_experiment_from_queue(self) -> Tuple[ExperimentBase, Path]:
         """
         Reads the next experiment from the queue.
         :return: The next experiment.
@@ -307,7 +307,7 @@ class Scheduler:
         with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
             experiment = json.load(experiment_file)
             experiment = (
-                experiment_class.RootModel[Experiment]
+                experiment_class.RootModel[ExperimentBase]
                 .model_validate_json(json.dumps(experiment))
                 .root
             )
@@ -318,7 +318,7 @@ class Scheduler:
 
         return experiment, experiment_file_path
 
-    def remove_from_queue(self, experiment: Experiment) -> None:
+    def remove_from_queue(self, experiment: ExperimentBase) -> None:
         """
         Updates the queue file to remove the experiment that was just run.
         :param experiment: The experiment that was just run.
@@ -335,7 +335,7 @@ class Scheduler:
         # Remove the experiment from the queue file
         with open(file_path, "w", encoding="ascii") as file:
             for line in data:
-                if line.split(",")[0] != experiment.id:
+                if line.split(",")[0] != str(experiment.id):
                     file.write(line)
 
     def update_experiment_queue_priority(self, experiment_id: int, priority: int):
@@ -362,7 +362,7 @@ class Scheduler:
                 file.write("\n")
 
 
-    def update_experiment_status(self, experiment: Experiment) -> None:
+    def update_experiment_status(self, experiment: ExperimentBase) -> None:
         """
         Updates the status of the experiment in the experiment instructions file.
         :param experiment: The experiment that was just run.
@@ -387,7 +387,7 @@ class Scheduler:
 
         logger.info("Experiment %s status changed to %s", experiment.id, experiment.status)
 
-    def update_experiment_location(self, experiment: Experiment) -> None:
+    def update_experiment_location(self, experiment: ExperimentBase) -> None:
         """
         Updates the location of the experiment instructions file.
         :param experiment: The experiment that was just run.
@@ -419,7 +419,7 @@ class Scheduler:
 
         logger.info("Experiment %s location updated to %s", experiment.id, experiment.status)
 
-    def add_nonfile_experiment(self, experiment: Experiment) -> str:
+    def add_nonfile_experiment(self, experiment: ExperimentBase) -> str:
         """
         Adds an experiment which is not a file to the experiment queue directly.
         :param experiment: The experiment to add.
@@ -481,12 +481,23 @@ class Scheduler:
             queue_file.write("\n")
 
         ## Change the status of the well
-        self.change_well_status(experiment.target_well, "queued")
+        self.change_well_status(experiment.target_well, "queued", experiment_id=experiment.id)
 
         logger.info("Experiment %s added to queue", experiment.id)
         return "success"
 
-    def save_results(self, experiment: Experiment, results: ExperimentResult) -> None:
+    def add_nonfile_experiments(self, experiments: list) -> str:
+        """
+        Adds a list of experiments which are not files to the experiment queue directly.
+        :param experiments: The experiments to add.
+        """
+        for experiment in experiments:
+            response = self.add_nonfile_experiment(experiment)
+            if response != "success":
+                return response
+        return "success"
+    
+    def save_results(self, experiment: ExperimentBase, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
         Args:
             experiment (Experiment): The experiment that was just run

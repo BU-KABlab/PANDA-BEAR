@@ -13,7 +13,7 @@ from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 
 # set up logging to log to the ePANDA.log file
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("pump_control_logger")
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
@@ -21,7 +21,7 @@ system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
 # set a logger for the scale
-scale_logger = logging.getLogger(__name__)
+scale_logger = logging.getLogger("scale_logger")
 scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s,%(name)s,%(levelname)s,%(message)s")
 system_handler = logging.FileHandler("code/logs/scale.log")

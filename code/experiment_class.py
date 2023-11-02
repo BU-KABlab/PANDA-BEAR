@@ -276,9 +276,9 @@ def make_baseline_value() -> Experiment:
         filename= None, #f"test_{datetime.now}.json",
         results=None)
 
-def parse_experiment(json_string: str) -> Experiment:
+def parse_experiment(json_string: str) -> ExperimentBase:
     '''Parse an experiment from a json string'''
-    return RootModel[Experiment].model_validate_json(json_string).root
+    return RootModel[ExperimentBase].model_validate_json(json_string).root
 
 def parse_experimentbase(json_string: str) -> ExperimentBase:
     '''Parse an experiment from a json string'''

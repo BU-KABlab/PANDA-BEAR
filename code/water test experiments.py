@@ -33,11 +33,10 @@ for column in COLUMNS:
                 )
             )
         experiment_id += 1
+
 scheduler = Scheduler()
-for experiment in experiments:
-    result = scheduler.add_nonfile_experiment(experiment)
-    if result != 'success':
-        print(result)
+result = scheduler.add_nonfile_experiments(experiments)
+print(result)
 
 # Create a dataframe to store the results
 #results = pd.DataFrame(columns=['experiment_id', 'volume', 'mass'])

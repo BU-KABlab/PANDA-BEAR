@@ -32,7 +32,7 @@ import gamry_control_WIP as echem
 import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
-from experiment_class import Experiment, ExperimentResult, ExperimentBase
+from experiment_class import ExperimentResult, ExperimentBase
 from vials import Vial
 import wellplate as wellplate_module
 #from scale import Sartorius as Scale
@@ -91,7 +91,7 @@ def main():
                 # Replace with slack alert and wait for response from user
 
             ## confirm that the new experiment is a valid experiment object
-            if not isinstance(new_experiment, Experiment):
+            if not isinstance(new_experiment, ExperimentBase):
                 logger.error("The experiment object is not valid")
                 slack.send_slack_message(
                     "alert", "An invalid experiment object was passed to the controller"
@@ -128,13 +128,28 @@ def main():
             scheduler.change_well_status(new_experiment.target_well, "running")
 
             ## Run the experiment
+            # (
+            #     updated_experiment,
+            #     experiment_results,
+            #     stock_vials,
+            #     waste_vials,
+            #     wellplate,
+            # ) = e_panda.standard_experiment_protocol(
+            #     instructions=new_experiment,
+            #     results=experiment_results,
+            #     mill=toolkit.mill,
+            #     pump=toolkit.pump,
+            #     stock_vials=stock_vials,
+            #     waste_vials=waste_vials,
+            #     wellplate=wellplate,
+            # )
             (
                 updated_experiment,
                 experiment_results,
                 stock_vials,
                 waste_vials,
                 wellplate,
-            ) = e_panda.standard_experiment_protocol(
+            ) = e_panda.pipette_accurancy_protocol(
                 instructions=new_experiment,
                 results=experiment_results,
                 mill=toolkit.mill,
@@ -288,11 +303,11 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
         wellplate_status = json.load(file)
     for well in wellplate_status['wells']:
         number_of_wells += 1
-        if well["status"] in ["clear", "new"]:
+        if well["status"] in ["clear", "new", "queued"]:
             number_of_clear_wells += 1
-        logger.debug(
-            "Well %s has status %s", well["well_id"], well["status"]
-        )
+        # logger.debug(
+        #     "Well %s has status %s", well["well_id"], well["status"]
+        # )
     ## check that wellplate has the appropriate number of wells
     if number_of_wells != len(wellplate.wells):
         logger.error("Wellplate status file does not have the correct number of wells. File may be corrupted")
@@ -383,17 +398,18 @@ def read_vials(filename) -> list[Vial]:
 
     list_of_solutions = []
     for items in vial_parameters:
-        list_of_solutions.append(
-            Vial(
-                position=items["position"],
-                x_coord=items["x"],
-                y_coord=items["y"],
-                volume=items["volume"],
-                name=items["name"],
-                contents=items["contents"],
-                capacity=items["capacity"],
-                filepath=filename,
-            )
+        if items['name'] is not None:
+            list_of_solutions.append(
+                Vial(
+                    position=items["position"],
+                    x_coord=items["x"],
+                    y_coord=items["y"],
+                    volume=items["volume"],
+                    name=items["name"],
+                    contents=items["contents"],
+                    capacity=items["capacity"],
+                    filepath=filename,
+                )
         )
     return list_of_solutions
 
@@ -660,5 +676,5 @@ def change_wellplate_location():
         json.dump(new_location, file, indent=4)
 
 if __name__ == "__main__":
-    #main()
-    load_new_wellplate(new_plate_id=5)
+    main()
+    #load_new_wellplate(new_plate_id=5)

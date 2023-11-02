@@ -219,10 +219,10 @@ def pipette(
                 purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
             )
 
-            logger.debug(
-                "Remaining volume in pipette: %f ",
-                pump.pump.volume_withdrawn,
-            )  # should always be zero, pause if not
+            # logger.debug(
+            #     "Remaining volume in pipette: %f ",
+            #     pump.pump.volume_withdrawn,
+            # )  # should always be zero, pause if not
 
     return solutions, waste_vials, wellplate
 
@@ -321,7 +321,7 @@ def clear_well(
 
 def rinse(
     wellplate: Wells,
-    instructions: Experiment,
+    instructions: ExperimentBase,
     pump: Pump,
     mill: Mill,
     stock_vials: list[Vial],
@@ -508,11 +508,11 @@ def waste_selector(solutions: list[Vial], solution_name: str, volume: float) -> 
 
 
 def deposition(
-    dep_instructions: Experiment,
+    dep_instructions: ExperimentBase,
     dep_results: ExperimentResult,
     mill: Mill,
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult]:
+) -> Tuple[ExperimentBase, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
 
@@ -590,11 +590,11 @@ def deposition(
 
 
 def characterization(
-    char_instructions: Experiment,
+    char_instructions: ExperimentBase,
     char_results: ExperimentResult,
     mill: Mill,
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult]:
+) -> Tuple[ExperimentBase, ExperimentResult]:
     """
     Characterization of the solutions on the substrate
 
@@ -687,14 +687,14 @@ def apply_log_filter(experiment_id: int, target_well: str = None):
 
 
 def standard_experiment_protocol(
-    instructions: Experiment,
+    instructions: ExperimentBase,
     results: ExperimentResult,
     mill: Mill,
     pump: Pump,
     stock_vials: list[Vial],
     waste_vials: list[Vial],
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
+) -> Tuple[ExperimentBase, ExperimentResult, list[Vial], list[Vial], Wells]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
@@ -958,7 +958,7 @@ def pipette_accurancy_protocol(
     stock_vials: list[Vial],
     waste_vials: list[Vial],
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
+) -> Tuple[ExperimentBase, ExperimentResult, list[Vial], list[Vial], Wells]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
@@ -1095,14 +1095,14 @@ def pipette_accurancy_protocol(
     return instructions, results, stock_vials, waste_vials, wellplate
 
 def mixing_test_protocol(
-    instructions: Experiment,
+    instructions: ExperimentBase,
     results: ExperimentResult,
     mill: Mill,
     pump: Pump,
     stock_vials: list[Vial],
     waste_vials: list[Vial],
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
+) -> Tuple[ExperimentBase, ExperimentResult, list[Vial], list[Vial], Wells]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
@@ -1266,7 +1266,7 @@ def peg2p_protocol(
     stock_vials: list[Vial],
     waste_vials: list[Vial],
     wellplate: Wells,
-) -> Tuple[Experiment, ExperimentResult, list[Vial], list[Vial], Wells]:
+) -> Tuple[PEG2P_Test_Instructions, ExperimentResult, list[Vial], list[Vial], Wells]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
