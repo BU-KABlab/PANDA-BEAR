@@ -21,3 +21,12 @@
 2023-11-01 11:24:36,433,__main__,INFO,Scale object closed
 2023-11-01 11:24:36,433,__main__,INFO,Plotting data
 2023-11-01 11:24:37,440,__main__,INFO,Plotting complete
+2023-11-02 15:52:14,991,__main__,INFO,Scale tared
+2023-11-02 15:52:14,991,__main__,INFO,Creating data arrays
+2023-11-02 15:52:14,991,__main__,INFO,Creating 10s array
+2023-11-02 15:52:14,991,__main__,INFO,Creating 5s array
+2023-11-02 15:52:14,991,__main__,INFO,Creating 3s array
+2023-11-02 15:52:14,991,__main__,INFO,Data arrays created
+2023-11-02 15:52:14,992,__main__,INFO,Starting 10s loop
+2023-11-02 16:02:15,838,__main__,INFO,10s loop complete
+2023-11-02 16:02:25,838,__main__,INFO,Starting 5s loop

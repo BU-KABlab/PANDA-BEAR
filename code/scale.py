@@ -166,6 +166,8 @@ def scale_variance_check(mock: bool = False):
     scale_logger.info("Numpy version: %s", np.__version__)
     scale_logger.info("Matplotlib version: %s", matplotlib.__version__)
     scale_logger.info("Time: %s", datetime.datetime.now())
+    scale_logger.info("Mock: %s", mock)
+    scale_logger.info("Test 02 | Apparent filter = final readout | plate type 5")
 
     scale_logger.info("Creating scale object")
     if mock:
@@ -173,6 +175,11 @@ def scale_variance_check(mock: bool = False):
     else:
         scale = Sartorius('COM6')
     scale_logger.info("Scale object created")
+
+    scale_logger.info("Taring scale")
+    scale.tara()
+    time.sleep(60)
+    scale_logger.info("Scale tared")
 
     scale_logger.info("Creating data arrays")
     scale_logger.info("Creating 10s array")
@@ -224,27 +231,28 @@ def scale_variance_check(mock: bool = False):
     plt.title("3s between readings")
     plt.ylabel("Reading (g)")
     plt.xlabel("Reading number")
-    plt.savefig("code/data/scale_testing.png")
+    plt.subplots_adjust(hspace=0.5)
+    plt.savefig("data/scale_testing_02_appfilt_finalrd_platetype5.png")
     plt.show()
-    plt.subplots_adjust(hspace=10)
+    plt.subplots_adjust(hspace=0.5)
     scale_logger.info("Plotting complete")
 
     scale_logger.info("Calculating variance")
     ten_sec_variance = np.var(ten_sec_array)
     five_sec_variance = np.var(five_sec_array)
-    one_sec_variance = np.var(three_sec_array)
+    three_sec_variance = np.var(three_sec_array)
     scale_logger.info("Variance calculated")
 
     scale_logger.info("Writing variance to log")
     scale_logger.info("10s variance: %s", ten_sec_variance)
     scale_logger.info("5s variance: %s", five_sec_variance)
-    scale_logger.info("3s variance: %s", one_sec_variance)
+    scale_logger.info("3s variance: %s", three_sec_variance)
     scale_logger.info("Variance written to log")
 
     scale_logger.info("Saving data to file")
-    np.savetxt("code/data/scale_testing_ten_sec.txt", ten_sec_array)
-    np.savetxt("code/data/scale_testing_five_sec.txt", five_sec_array)
-    np.savetxt("code/data/scale_testing_three_sec.txt", three_sec_array)
+    np.savetxt("data/scale_testing_02_appfilt_finalrd_platetype5_ten_sec.txt", ten_sec_array)
+    np.savetxt("data/scale_testing_02_appfilt_finalrd_platetype5_five_sec.txt", five_sec_array)
+    np.savetxt("data/scale_testing_02_appfilt_finalrd_platetype5_three_sec.txt", three_sec_array)
     scale_logger.info("Scale variance check complete")
 
 def function_test(mock: bool = False):
@@ -268,4 +276,4 @@ def function_test(mock: bool = False):
     sartorius_scale.close()
 
 if __name__ == '__main__':
-    scale_variance_check(True)
+    scale_variance_check(False)
