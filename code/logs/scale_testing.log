@@ -30,3 +30,19 @@
 2023-11-02 15:52:14,992,__main__,INFO,Starting 10s loop
 2023-11-02 16:02:15,838,__main__,INFO,10s loop complete
 2023-11-02 16:02:25,838,__main__,INFO,Starting 5s loop
+2023-11-02 16:12:27,548,__main__,INFO,5s loop complete
+2023-11-02 16:12:37,550,__main__,INFO,Starting 3s loop
+2023-11-02 16:22:40,342,__main__,INFO,3s loop complete
+2023-11-02 16:22:40,342,__main__,INFO,Closing scale object
+2023-11-02 16:22:40,342,__main__,INFO,Scale object closed
+2023-11-02 16:22:40,343,__main__,INFO,Plotting data
+2023-11-02 16:22:40,821,__main__,INFO,Plotting complete
+2023-11-02 16:22:40,821,__main__,INFO,Calculating variance
+2023-11-02 16:22:40,821,__main__,INFO,Variance calculated
+2023-11-02 16:22:40,821,__main__,INFO,Writing variance to log
+2023-11-02 16:22:40,821,__main__,INFO,10s variance: 4.8445555555555553e-05
+2023-11-02 16:22:40,821,__main__,INFO,5s variance: 2.7472222222222222e-05
+2023-11-02 16:22:40,821,__main__,INFO,3s variance: 5.3194375000000005e-05
+2023-11-02 16:22:40,821,__main__,INFO,Variance written to log
+2023-11-02 16:22:40,821,__main__,INFO,Saving data to file
+2023-11-02 16:22:40,826,__main__,INFO,Scale variance check complete
