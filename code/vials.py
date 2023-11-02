@@ -38,6 +38,7 @@ class Vial:
         height=-20,
         z_bottom=-75,
         name="vial",
+        contamination=0,
         filepath=None,
         density=1.0,  # g/ml
     ):
@@ -55,7 +56,7 @@ class Vial:
         self.depth = (
             self.vial_height_calculator(self.radius * 2, self.volume) + self.bottom
         )
-        self.contamination = 0
+        self.contamination = contamination
         self.filepath = filepath
 
     @property

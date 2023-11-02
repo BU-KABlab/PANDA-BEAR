@@ -32,7 +32,6 @@ import pytz as tz
 # Third party or custom imports
 import gamry_control_WIP as echem
 from experiment_class import (
-    Experiment,
     ExperimentResult,
     ExperimentStatus,
     ExperimentBase,
@@ -664,7 +663,7 @@ def characterization(
             CVsamplerate=(
                 echem.potentiostat_cv_parameters.CVstep / char_instructions.cv_scan_rate
             ),
-            CVcycle=echem.potentiostat_cv_parameters.CVcycle,     
+            CVcycle=echem.potentiostat_cv_parameters.CVcycle,
         )
         echem.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well
@@ -913,7 +912,7 @@ def standard_experiment_protocol(
         logger.info("End of Experiment: %s", instructions.id)
 
         mill.move_to_safe_position()
-        logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
+        logger.info("EXPERIMENT %s COMPLETED", instructions.id)
 
     except OCPFailure as ocp_failure:
         logger.error(ocp_failure)
@@ -1058,7 +1057,7 @@ def pipette_accurancy_protocol(
         logger.info("End of Experiment: %s", instructions.id)
 
         mill.move_to_safe_position()
-        logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
+        logger.info("EXPERIMENT %s COMPLETED", instructions.id)
 
     except OCPFailure as ocp_failure:
         logger.error(ocp_failure)
@@ -1221,7 +1220,7 @@ def mixing_test_protocol(
         logger.info("End of Experiment: %s", instructions.id)
 
         mill.move_to_safe_position()
-        logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
+        logger.info("EXPERIMENT %s COMPLETED", instructions.id)
 
     except OCPFailure as ocp_failure:
         logger.error(ocp_failure)
@@ -1441,7 +1440,7 @@ def peg2p_protocol(
         logger.info("End of Experiment: %s", instructions.id)
 
         mill.move_to_safe_position()
-        logger.info("EXPERIMENT %s COMPLETED\n\n", instructions.id)
+        logger.info("EXPERIMENT %s COMPLETED", instructions.id)
 
     except OCPFailure as ocp_failure:
         logger.error(ocp_failure)

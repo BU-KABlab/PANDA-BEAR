@@ -892,3 +892,45 @@ The server responded with: {'ok': False, 'error': 'ratelimited'}
 2023-11-01 18:37:48,006:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
 The server responded with: {'ok': False, 'error': 'ratelimited'}
 2023-11-01 18:37:48,240:slack_functions:Message sent:No new experiments to run...monitoring inbox for new experiments
+2023-11-02 17:18:55,626:slack_functions:Message sent:ePANDA is starting up
+2023-11-02 17:18:55,775:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-02 17:18:55,976:slack_functions:Message sent:Running experiment 9991061
+2023-11-02 17:20:15,691:slack_functions:Message sent:Experiment 9991061 ended with status complete
+2023-11-02 17:20:15,971:slack_functions:Message sent:Running experiment 9991019
+2023-11-02 17:20:37,620:slack_functions:Message sent:Experiment 9991019 ended with status complete
+2023-11-02 17:22:56,733:slack_functions:Message sent:Running experiment 9991062
+2023-11-02 17:22:56,922:slack_functions:Message sent:Experiment 9991062 ended with status complete
+2023-11-02 17:37:11,537:slack_functions:Message sent:ePANDA is starting up
+2023-11-02 17:37:11,699:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-02 17:37:11,886:slack_functions:Message sent:Running experiment 9991038
+2023-11-02 17:37:12,219:slack_functions:Message sent:Experiment 9991038 ended with status complete
+2023-11-02 17:37:55,323:slack_functions:Message sent:Running experiment 9991086
+2023-11-02 17:37:55,505:slack_functions:Message sent:Experiment 9991086 ended with status complete
+2023-11-02 17:38:01,626:slack_functions:Message sent:Running experiment 9991056
+2023-11-02 17:38:01,850:slack_functions:Message sent:Experiment 9991056 ended with status complete
+2023-11-02 17:38:09,433:slack_functions:Message sent:Running experiment 9991062
+2023-11-02 17:38:09,653:slack_functions:Message sent:Experiment 9991062 ended with status complete
+2023-11-02 17:41:52,786:slack_functions:Message sent:ePANDA is starting up
+2023-11-02 17:41:52,941:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-02 17:41:53,153:slack_functions:Message sent:Running experiment 9991023
+2023-11-02 17:41:53,484:slack_functions:Message sent:Experiment 9991023 ended with status complete
+2023-11-02 17:41:56,909:slack_functions:Message sent:Running experiment 9991019
+2023-11-02 17:41:57,095:slack_functions:Message sent:Experiment 9991019 ended with status complete
+2023-11-02 17:42:00,433:slack_functions:Message sent:Running experiment 9991007
+2023-11-02 17:42:00,621:slack_functions:Message sent:Experiment 9991007 ended with status complete
+2023-11-02 17:42:13,444:slack_functions:Message sent:Running experiment 9991032
+2023-11-02 17:42:13,648:slack_functions:Message sent:Experiment 9991032 ended with status complete
+2023-11-02 17:42:14,916:slack_functions:Message sent:Running experiment 9991040
+2023-11-02 17:42:15,117:slack_functions:Message sent:Experiment 9991040 ended with status complete
+2023-11-02 17:42:16,980:slack_functions:Message sent:Running experiment 9991010
+2023-11-02 17:42:17,160:slack_functions:Message sent:Experiment 9991010 ended with status complete
+2023-11-02 17:42:18,608:slack_functions:Message sent:Running experiment 9991084
+2023-11-02 17:42:18,806:slack_functions:Message sent:Experiment 9991084 ended with status complete
+2023-11-02 17:42:19,656:slack_functions:Message sent:Running experiment 9991031
+2023-11-02 17:42:19,863:slack_functions:Message sent:Experiment 9991031 ended with status complete
+2023-11-02 17:42:20,617:slack_functions:Message sent:Running experiment 9991093
+2023-11-02 17:42:20,819:slack_functions:Message sent:Experiment 9991093 ended with status complete
+2023-11-02 17:42:21,610:slack_functions:Message sent:Running experiment 9991070
+2023-11-02 17:42:21,816:slack_functions:Message sent:Experiment 9991070 ended with status complete
+2023-11-02 17:42:22,545:slack_functions:Message sent:Running experiment 9991089
+2023-11-02 17:42:22,757:slack_functions:Message sent:Experiment 9991089 ended with status complete
