@@ -57,7 +57,7 @@ class Sartorius(serial.Serial):
                 answer = float(answer[0:11].replace(' ', ''))
             else: # menu code 7.1.2
                 answer = float(answer[6:17].replace(' ',''))
-            return answer
+            return round(answer,4)
         except Exception as e:
             return "NA"
 
