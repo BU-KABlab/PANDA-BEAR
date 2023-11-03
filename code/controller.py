@@ -37,6 +37,7 @@ from vials import Vial
 import wellplate as wellplate_module
 #from scale import Sartorius as Scale
 from scale import MockSartorius as Scale
+from config.file_locations import MILL_CONFIG_FILE, PATH_TO_STATUS, PATH_TO_COMPLETED_EXPERIMENTS, PATH_TO_ERRORED_EXPERIMENTS, PATH_TO_DATA, PATH_TO_LOGS
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -45,14 +46,6 @@ formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
-
-PATH_TO_CONFIG = "code/config/mill_config.json"
-PATH_TO_STATUS = "code/system state"
-PATH_TO_COMPLETED_EXPERIMENTS = "code/experiments_completed"
-PATH_TO_ERRORED_EXPERIMENTS = "code/experiments_error"
-PATH_TO_DATA = "data"
-PATH_TO_LOGS = "code/logs"
-
 
 def main():
     """Main function"""
@@ -215,7 +208,7 @@ def check_required_files():
     """Confirm all required directories and files exist"""
     logger.info("Checking for required files and directories")
     required_files = [
-        PATH_TO_CONFIG,
+        MILL_CONFIG_FILE,
         PATH_TO_STATUS,
         PATH_TO_COMPLETED_EXPERIMENTS,
         PATH_TO_ERRORED_EXPERIMENTS,
@@ -408,6 +401,7 @@ def read_vials(filename) -> list[Vial]:
                     name=items["name"],
                     contents=items["contents"],
                     capacity=items["capacity"],
+                    contamination=items["contamination"],
                     filepath=filename,
                 )
         )
@@ -423,7 +417,7 @@ def update_vial_state_file(vial_objects: list[Vial], filename):
 
     for vial in vial_objects:
         for items in vial_parameters:
-            if items["name"] == vial.name:
+            if items["name"] == vial.name and items["position"] == vial.position_name:
                 items["volume"] = vial.volume
                 items["contamination"] = vial.contamination
                 break
@@ -660,7 +654,7 @@ def change_wellplate_location():
             print("Invalid input. Please enter 0, 1, 2, or 3.")
 
     ## Get the current location config
-    with open(Path.cwd() / PATH_TO_CONFIG / "wellplate_location.json", "r", encoding="UTF-8") as file:
+    with open(Path.cwd() / MILL_CONFIG_FILE / "wellplate_location.json", "r", encoding="UTF-8") as file:
         current_location = json.load(file)
 
     new_location = {
@@ -672,7 +666,7 @@ def change_wellplate_location():
     "z-bottom": current_location['z-bottom']
     }
     ## Write the new location to the wellplate_location.txt file
-    with open(Path.cwd() / PATH_TO_CONFIG / "wellplate_location.json", "w", encoding="UTF-8") as file:
+    with open(Path.cwd() / MILL_CONFIG_FILE / "wellplate_location.json", "w", encoding="UTF-8") as file:
         json.dump(new_location, file, indent=4)
 
 if __name__ == "__main__":

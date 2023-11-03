@@ -399,3 +399,538 @@ cv_scan_rate
 2023-10-30 13:47:10,460:slack_functions:Message sent: No new experiments to run...monitoring inbox for new experiments
 2023-10-30 13:58:32,689:slack_functions:Message sent: ePANDA was interrupted by the user
 2023-10-30 13:58:32,842:slack_functions:Message sent: ePANDA is shutting down...goodbye
+2023-11-01 17:49:34,168:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 17:49:34,324:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 17:49:34,546:slack_functions:Message sent:ePANDA encountered an error: 15 validation errors for RootModel[Experiment]
+dmf
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+peg
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+acrylate
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+ferrocene
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+custom
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+ocp
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+ca
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+cv
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+baseline
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+dep_duration
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+dep_pot
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+char_sol_name
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+char_vol
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+flush_sol_name
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+flush_vol
+  Field required [type=missing, input_value={'id': 9991063, 'experime...91063', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+2023-11-01 17:49:34,701:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 17:53:22,620:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 17:53:22,777:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 17:53:22,954:slack_functions:Message sent:An invalid experiment object was passed to the controller
+2023-11-01 17:53:23,131:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:00:36,157:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:00:36,348:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:00:36,598:slack_functions:Message sent:There are no clear wells on the wellplate
+2023-11-01 18:00:36,773:slack_functions:Message sent:Please replace the wellplate and confirm in the terminal that the program should continue
+2023-11-01 18:02:44,670:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:03:12,008:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:03:13,356:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:03:13,611:slack_functions:Message sent:Experiment 9991033 cannot be run because there is not enough volume in the stock vials
+2023-11-01 18:03:13,786:slack_functions:Message sent:ePANDA encountered an error: 1 validation error for ExperimentBase
+status
+  Input should be 'new','queued','running','ocpcheck','depositing','rinsing','baselining','characterizing','final_rinse','complete','error' or 'mixing' [type=enum, input_value='insufficient stock', input_type=str]
+2023-11-01 18:03:13,966:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:04:37,848:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:04:41,386:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:06:38,361:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:06:38,528:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:06:38,759:slack_functions:Message sent:ePANDA encountered an error: sequence item 0: expected str instance, NoneType found
+2023-11-01 18:06:38,908:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:10:22,036:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:10:22,194:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:10:22,419:slack_functions:Message sent:Running experiment 9991064
+2023-11-01 18:10:24,935:slack_functions:Message sent:Experiment 9991064 ended with status error
+2023-11-01 18:10:25,171:slack_functions:Message sent:ePANDA encountered an error: 15 validation errors for RootModel[Experiment]
+dmf
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+peg
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+acrylate
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+ferrocene
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+custom
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+ocp
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+ca
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+cv
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+baseline
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+dep_duration
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+dep_pot
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+char_sol_name
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+char_vol
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+flush_sol_name
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+flush_vol
+  Field required [type=missing, input_value={'id': 9991064, 'experime...91064', 'results': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.3/v/missing
+2023-11-01 18:10:25,342:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:11:04,271:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:11:04,447:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:11:04,697:slack_functions:Message sent:Running experiment 9991039
+2023-11-01 18:11:05,043:slack_functions:Message sent:Experiment 9991039 ended with status error
+2023-11-01 18:11:05,263:slack_functions:Message sent:Running experiment 9991046
+2023-11-01 18:11:05,476:slack_functions:Message sent:Experiment 9991046 ended with status error
+2023-11-01 18:11:05,704:slack_functions:Message sent:Running experiment 9991089
+2023-11-01 18:11:05,860:slack_functions:Message sent:Experiment 9991089 ended with status error
+2023-11-01 18:11:06,083:slack_functions:Message sent:Running experiment 9991092
+2023-11-01 18:11:06,260:slack_functions:Message sent:Experiment 9991092 ended with status error
+2023-11-01 18:11:06,497:slack_functions:Message sent:Running experiment 9991086
+2023-11-01 18:11:06,653:slack_functions:Message sent:Experiment 9991086 ended with status error
+2023-11-01 18:11:06,888:slack_functions:Message sent:ePANDA encountered an error: experiment file
+2023-11-01 18:11:07,058:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:14:21,707:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:14:21,890:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:14:22,086:slack_functions:Message sent:Running experiment 9991084
+2023-11-01 18:14:22,430:slack_functions:Message sent:Experiment 9991084 ended with status error
+2023-11-01 18:14:22,655:slack_functions:Message sent:Running experiment 9991089
+2023-11-01 18:14:22,833:slack_functions:Message sent:Experiment 9991089 ended with status error
+2023-11-01 18:14:23,057:slack_functions:Message sent:Running experiment 9991014
+2023-11-01 18:14:23,263:slack_functions:Message sent:Experiment 9991014 ended with status error
+2023-11-01 18:14:23,486:slack_functions:Message sent:Running experiment 9991072
+2023-11-01 18:14:23,646:slack_functions:Message sent:Experiment 9991072 ended with status error
+2023-11-01 18:14:23,892:slack_functions:Message sent:Running experiment 9991038
+2023-11-01 18:14:24,074:slack_functions:Message sent:Experiment 9991038 ended with status error
+2023-11-01 18:14:24,316:slack_functions:Message sent:Running experiment 9991034
+2023-11-01 18:14:24,486:slack_functions:Message sent:Experiment 9991034 ended with status error
+2023-11-01 18:14:24,677:slack_functions:Message sent:ePANDA encountered an error: experiment file
+2023-11-01 18:14:24,835:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:21:02,447:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:21:02,607:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:21:02,822:slack_functions:Message sent:Running experiment 9991028
+2023-11-01 18:21:03,160:slack_functions:Message sent:Experiment 9991028 ended with status error
+2023-11-01 18:21:03,375:slack_functions:Message sent:Running experiment 9991042
+2023-11-01 18:21:03,541:slack_functions:Message sent:Experiment 9991042 ended with status error
+2023-11-01 18:21:03,784:slack_functions:Message sent:Running experiment 9991075
+2023-11-01 18:21:03,944:slack_functions:Message sent:Experiment 9991075 ended with status error
+2023-11-01 18:21:04,151:slack_functions:Message sent:Running experiment 9991077
+2023-11-01 18:21:04,335:slack_functions:Message sent:Experiment 9991077 ended with status error
+2023-11-01 18:21:04,539:slack_functions:Message sent:Running experiment 9991074
+2023-11-01 18:21:04,709:slack_functions:Message sent:Experiment 9991074 ended with status error
+2023-11-01 18:21:04,921:slack_functions:Message sent:Running experiment 9991014
+2023-11-01 18:21:05,113:slack_functions:Message sent:Experiment 9991014 ended with status error
+2023-11-01 18:21:05,346:slack_functions:Message sent:Running experiment 9991070
+2023-11-01 18:21:05,516:slack_functions:Message sent:Experiment 9991070 ended with status error
+2023-11-01 18:21:05,734:slack_functions:Message sent:Running experiment 9991024
+2023-11-01 18:21:05,910:slack_functions:Message sent:Experiment 9991024 ended with status error
+2023-11-01 18:21:06,113:slack_functions:Message sent:Running experiment 9991053
+2023-11-01 18:21:06,280:slack_functions:Message sent:Experiment 9991053 ended with status error
+2023-11-01 18:21:06,519:slack_functions:Message sent:Running experiment 9991013
+2023-11-01 18:21:06,701:slack_functions:Message sent:Experiment 9991013 ended with status error
+2023-11-01 18:21:06,927:slack_functions:Message sent:Running experiment 9991095
+2023-11-01 18:21:07,110:slack_functions:Message sent:Experiment 9991095 ended with status error
+2023-11-01 18:21:07,365:slack_functions:Message sent:Running experiment 9991025
+2023-11-01 18:21:07,540:slack_functions:Message sent:Experiment 9991025 ended with status error
+2023-11-01 18:21:07,749:slack_functions:Message sent:Running experiment 9991034
+2023-11-01 18:21:07,917:slack_functions:Message sent:Experiment 9991034 ended with status error
+2023-11-01 18:21:08,163:slack_functions:Message sent:Running experiment 9991082
+2023-11-01 18:21:08,358:slack_functions:Message sent:Experiment 9991082 ended with status error
+2023-11-01 18:21:08,584:slack_functions:Message sent:ePANDA encountered an error: experiment file
+2023-11-01 18:21:08,741:slack_functions:Message sent:ePANDA is shutting down...goodbye
+2023-11-01 18:24:28,321:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:24:28,500:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:26:37,569:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:26:37,724:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:26:55,659:slack_functions:Message sent:Running experiment 9991048
+2023-11-01 18:32:35,614:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:32:37,648:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:32:57,949:slack_functions:Message sent:Running experiment 9991001
+2023-11-01 18:34:58,274:slack_functions:Message sent:ePANDA is starting up
+2023-11-01 18:34:58,456:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-01 18:35:01,985:slack_functions:Message sent:Running experiment 9991030
+2023-11-01 18:37:08,861:slack_functions:Message sent:Experiment 9991030 ended with status complete
+2023-11-01 18:37:13,044:slack_functions:Message sent:Running experiment 9991046
+2023-11-01 18:37:13,236:slack_functions:Message sent:Experiment 9991046 ended with status complete
+2023-11-01 18:37:13,472:slack_functions:Message sent:Running experiment 9991056
+2023-11-01 18:37:13,648:slack_functions:Message sent:Experiment 9991056 ended with status complete
+2023-11-01 18:37:13,870:slack_functions:Message sent:Running experiment 9991042
+2023-11-01 18:37:14,055:slack_functions:Message sent:Experiment 9991042 ended with status complete
+2023-11-01 18:37:14,318:slack_functions:Message sent:Running experiment 9991027
+2023-11-01 18:37:14,499:slack_functions:Message sent:Experiment 9991027 ended with status complete
+2023-11-01 18:37:14,804:slack_functions:Message sent:Running experiment 9991078
+2023-11-01 18:37:14,989:slack_functions:Message sent:Experiment 9991078 ended with status complete
+2023-11-01 18:37:15,221:slack_functions:Message sent:Running experiment 9991083
+2023-11-01 18:37:15,400:slack_functions:Message sent:Experiment 9991083 ended with status complete
+2023-11-01 18:37:15,627:slack_functions:Message sent:Running experiment 9991058
+2023-11-01 18:37:15,798:slack_functions:Message sent:Experiment 9991058 ended with status complete
+2023-11-01 18:37:15,996:slack_functions:Message sent:Running experiment 9991066
+2023-11-01 18:37:16,166:slack_functions:Message sent:Experiment 9991066 ended with status complete
+2023-11-01 18:37:16,367:slack_functions:Message sent:Running experiment 9991094
+2023-11-01 18:37:16,561:slack_functions:Message sent:Experiment 9991094 ended with status complete
+2023-11-01 18:37:16,782:slack_functions:Message sent:Running experiment 9991018
+2023-11-01 18:37:16,974:slack_functions:Message sent:Experiment 9991018 ended with status complete
+2023-11-01 18:37:17,183:slack_functions:Message sent:Running experiment 9991047
+2023-11-01 18:37:17,371:slack_functions:Message sent:Experiment 9991047 ended with status complete
+2023-11-01 18:37:17,576:slack_functions:Message sent:Running experiment 9991081
+2023-11-01 18:37:17,774:slack_functions:Message sent:Experiment 9991081 ended with status complete
+2023-11-01 18:37:17,995:slack_functions:Message sent:Running experiment 9991072
+2023-11-01 18:37:18,171:slack_functions:Message sent:Experiment 9991072 ended with status complete
+2023-11-01 18:37:18,387:slack_functions:Message sent:Running experiment 9991090
+2023-11-01 18:37:18,565:slack_functions:Message sent:Experiment 9991090 ended with status complete
+2023-11-01 18:37:18,772:slack_functions:Message sent:Running experiment 9991063
+2023-11-01 18:37:18,949:slack_functions:Message sent:Experiment 9991063 ended with status complete
+2023-11-01 18:37:19,176:slack_functions:Message sent:Running experiment 9991012
+2023-11-01 18:37:19,379:slack_functions:Message sent:Experiment 9991012 ended with status complete
+2023-11-01 18:37:19,585:slack_functions:Message sent:Running experiment 9991045
+2023-11-01 18:37:19,783:slack_functions:Message sent:Experiment 9991045 ended with status complete
+2023-11-01 18:37:20,010:slack_functions:Message sent:Running experiment 9991061
+2023-11-01 18:37:20,185:slack_functions:Message sent:Experiment 9991061 ended with status complete
+2023-11-01 18:37:20,382:slack_functions:Message sent:Running experiment 9991013
+2023-11-01 18:37:20,560:slack_functions:Message sent:Experiment 9991013 ended with status complete
+2023-11-01 18:37:20,764:slack_functions:Message sent:Running experiment 9991059
+2023-11-01 18:37:20,970:slack_functions:Message sent:Experiment 9991059 ended with status complete
+2023-11-01 18:37:21,180:slack_functions:Message sent:Running experiment 9991029
+2023-11-01 18:37:21,375:slack_functions:Message sent:Experiment 9991029 ended with status complete
+2023-11-01 18:37:21,628:slack_functions:Message sent:Running experiment 9991092
+2023-11-01 18:37:21,812:slack_functions:Message sent:Experiment 9991092 ended with status complete
+2023-11-01 18:37:22,034:slack_functions:Message sent:Running experiment 9991022
+2023-11-01 18:37:22,252:slack_functions:Message sent:Experiment 9991022 ended with status complete
+2023-11-01 18:37:22,447:slack_functions:Message sent:Running experiment 9991084
+2023-11-01 18:37:22,626:slack_functions:Message sent:Experiment 9991084 ended with status complete
+2023-11-01 18:37:22,864:slack_functions:Message sent:Running experiment 9991057
+2023-11-01 18:37:23,063:slack_functions:Message sent:Experiment 9991057 ended with status complete
+2023-11-01 18:37:23,300:slack_functions:Message sent:Running experiment 9991082
+2023-11-01 18:37:23,471:slack_functions:Message sent:Experiment 9991082 ended with status complete
+2023-11-01 18:37:23,695:slack_functions:Message sent:Running experiment 9991021
+2023-11-01 18:37:23,893:slack_functions:Message sent:Experiment 9991021 ended with status complete
+2023-11-01 18:37:24,107:slack_functions:Message sent:Running experiment 9991077
+2023-11-01 18:37:24,282:slack_functions:Message sent:Experiment 9991077 ended with status complete
+2023-11-01 18:37:24,480:slack_functions:Message sent:Running experiment 9991007
+2023-11-01 18:37:24,654:slack_functions:Message sent:Experiment 9991007 ended with status complete
+2023-11-01 18:37:24,869:slack_functions:Message sent:Running experiment 9991043
+2023-11-01 18:37:25,043:slack_functions:Message sent:Experiment 9991043 ended with status complete
+2023-11-01 18:37:25,290:slack_functions:Message sent:Running experiment 9991075
+2023-11-01 18:37:25,458:slack_functions:Message sent:Experiment 9991075 ended with status complete
+2023-11-01 18:37:25,671:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:25,817:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:26,002:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:26,170:slack_functions:Message sent:Experiment 9991091 ended with status complete
+2023-11-01 18:37:26,343:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:26,486:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:26,686:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:26,843:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:27,048:slack_functions:Message sent:Running experiment 9991069
+2023-11-01 18:37:27,196:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:27,382:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:27,523:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:27,718:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:27,882:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:28,099:slack_functions:Message sent:Running experiment 9991052
+2023-11-01 18:37:28,247:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:28,438:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:28,594:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:28,782:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:28,934:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:29,160:slack_functions:Message sent:Running experiment 9991087
+2023-11-01 18:37:29,325:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:29,489:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:29,652:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:29,840:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:29,977:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:30,291:slack_functions:Message sent:Running experiment 9991068
+2023-11-01 18:37:30,436:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:30,624:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:30,782:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:30,970:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:31,157:slack_functions:Message sent:Experiment 9991010 ended with status complete
+2023-11-01 18:37:31,344:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:31,520:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:31,685:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:31,830:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:32,059:slack_functions:Message sent:Running experiment 9991002
+2023-11-01 18:37:32,243:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:32,425:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:32,581:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:32,767:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:32,924:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:33,144:slack_functions:Message sent:Running experiment 9991015
+2023-11-01 18:37:33,294:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:33,479:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:33,634:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:33,817:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:33,954:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:34,157:slack_functions:Message sent:Running experiment 9991024
+2023-11-01 18:37:34,304:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:34,485:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:34,650:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:34,881:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:35,160:slack_functions:Message sent:Experiment 9991053 ended with status complete
+2023-11-01 18:37:35,336:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:35,478:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:35,658:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:35,806:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:35,987:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:36,159:slack_functions:Message sent:Experiment 9991036 ended with status complete
+2023-11-01 18:37:36,349:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:36,497:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:36,690:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:36,835:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:37,050:slack_functions:Message sent:Running experiment 9991023
+2023-11-01 18:37:37,221:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:37,395:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:37,560:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:37,731:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:37,895:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:38,107:slack_functions:Message sent:Running experiment 9991079
+2023-11-01 18:37:38,276:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:38,443:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:38,601:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:38,792:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:38,940:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:39,141:slack_functions:Message sent:Running experiment 9991038
+2023-11-01 18:37:39,283:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:39,475:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:39,644:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:39,834:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:40,002:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:40,208:slack_functions:Message sent:Running experiment 9991080
+2023-11-01 18:37:40,355:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:40,544:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:40,682:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:40,845:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:41,048:slack_functions:Message sent:Experiment 9991086 ended with status complete
+2023-11-01 18:37:41,225:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:41,395:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:41,585:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:41,732:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:41,892:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:42,075:slack_functions:Message sent:Experiment 9991033 ended with status complete
+2023-11-01 18:37:42,278:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:42,432:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:42,617:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:42,756:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:42,943:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:43,121:slack_functions:Message sent:Experiment 9991074 ended with status complete
+2023-11-01 18:37:43,312:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:43,466:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:43,666:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:43,809:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:43,969:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:44,167:slack_functions:Message sent:Experiment 9991014 ended with status complete
+2023-11-01 18:37:44,394:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:44,552:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:44,727:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:44,892:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:45,110:slack_functions:Message sent:Running experiment 9991009
+2023-11-01 18:37:45,259:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:45,433:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:45,580:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:45,751:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:45,895:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:46,127:slack_functions:Message sent:Running experiment 9991039
+2023-11-01 18:37:46,298:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:46,487:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:46,653:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:46,844:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:47,009:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:47,206:slack_functions:Message sent:Running experiment 9991076
+2023-11-01 18:37:47,352:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:47,525:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:47,671:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:47,855:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:48,006:slack_functions:Error posting message: The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)
+The server responded with: {'ok': False, 'error': 'ratelimited'}
+2023-11-01 18:37:48,240:slack_functions:Message sent:No new experiments to run...monitoring inbox for new experiments
+2023-11-02 17:18:55,626:slack_functions:Message sent:ePANDA is starting up
+2023-11-02 17:18:55,775:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-02 17:18:55,976:slack_functions:Message sent:Running experiment 9991061
+2023-11-02 17:20:15,691:slack_functions:Message sent:Experiment 9991061 ended with status complete
+2023-11-02 17:20:15,971:slack_functions:Message sent:Running experiment 9991019
+2023-11-02 17:20:37,620:slack_functions:Message sent:Experiment 9991019 ended with status complete
+2023-11-02 17:22:56,733:slack_functions:Message sent:Running experiment 9991062
+2023-11-02 17:22:56,922:slack_functions:Message sent:Experiment 9991062 ended with status complete
+2023-11-02 17:37:11,537:slack_functions:Message sent:ePANDA is starting up
+2023-11-02 17:37:11,699:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-02 17:37:11,886:slack_functions:Message sent:Running experiment 9991038
+2023-11-02 17:37:12,219:slack_functions:Message sent:Experiment 9991038 ended with status complete
+2023-11-02 17:37:55,323:slack_functions:Message sent:Running experiment 9991086
+2023-11-02 17:37:55,505:slack_functions:Message sent:Experiment 9991086 ended with status complete
+2023-11-02 17:38:01,626:slack_functions:Message sent:Running experiment 9991056
+2023-11-02 17:38:01,850:slack_functions:Message sent:Experiment 9991056 ended with status complete
+2023-11-02 17:38:09,433:slack_functions:Message sent:Running experiment 9991062
+2023-11-02 17:38:09,653:slack_functions:Message sent:Experiment 9991062 ended with status complete
+2023-11-02 17:41:52,786:slack_functions:Message sent:ePANDA is starting up
+2023-11-02 17:41:52,941:slack_functions:Message sent:ePANDA has connected to equipment
+2023-11-02 17:41:53,153:slack_functions:Message sent:Running experiment 9991023
+2023-11-02 17:41:53,484:slack_functions:Message sent:Experiment 9991023 ended with status complete
+2023-11-02 17:41:56,909:slack_functions:Message sent:Running experiment 9991019
+2023-11-02 17:41:57,095:slack_functions:Message sent:Experiment 9991019 ended with status complete
+2023-11-02 17:42:00,433:slack_functions:Message sent:Running experiment 9991007
+2023-11-02 17:42:00,621:slack_functions:Message sent:Experiment 9991007 ended with status complete
+2023-11-02 17:42:13,444:slack_functions:Message sent:Running experiment 9991032
+2023-11-02 17:42:13,648:slack_functions:Message sent:Experiment 9991032 ended with status complete
+2023-11-02 17:42:14,916:slack_functions:Message sent:Running experiment 9991040
+2023-11-02 17:42:15,117:slack_functions:Message sent:Experiment 9991040 ended with status complete
+2023-11-02 17:42:16,980:slack_functions:Message sent:Running experiment 9991010
+2023-11-02 17:42:17,160:slack_functions:Message sent:Experiment 9991010 ended with status complete
+2023-11-02 17:42:18,608:slack_functions:Message sent:Running experiment 9991084
+2023-11-02 17:42:18,806:slack_functions:Message sent:Experiment 9991084 ended with status complete
+2023-11-02 17:42:19,656:slack_functions:Message sent:Running experiment 9991031
+2023-11-02 17:42:19,863:slack_functions:Message sent:Experiment 9991031 ended with status complete
+2023-11-02 17:42:20,617:slack_functions:Message sent:Running experiment 9991093
+2023-11-02 17:42:20,819:slack_functions:Message sent:Experiment 9991093 ended with status complete
+2023-11-02 17:42:21,610:slack_functions:Message sent:Running experiment 9991070
+2023-11-02 17:42:21,816:slack_functions:Message sent:Experiment 9991070 ended with status complete
+2023-11-02 17:42:22,545:slack_functions:Message sent:Running experiment 9991089
+2023-11-02 17:42:22,757:slack_functions:Message sent:Experiment 9991089 ended with status complete

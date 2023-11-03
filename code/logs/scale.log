@@ -8747,3 +8747,1699 @@
 2023-11-01 10:07:07,527,__main__,DEBUG,Mixing 2 of 3 times
 2023-11-01 10:07:07,527,__main__,DEBUG,Mock Pump has withdrawn: 0.200000 ml    Pipette vol: 200.000000
 2023-11-01 10:07:07,527,__main__,DEBUG,Mock Pump has infused: 0.200000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:02,846,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:02,847,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:02,848,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:02,849,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:02,849,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:02,849,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:02,850,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:02,850,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:02,851,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:02,851,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:03,388,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:03,389,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:03,390,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:03,390,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:03,390,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:03,391,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:03,393,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:03,393,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:03,393,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:03,393,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:03,799,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:03,800,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:03,801,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:03,801,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:03,801,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:03,802,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:03,803,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:03,803,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:03,803,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:03,803,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:04,165,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:04,166,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:04,167,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:04,167,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:04,167,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:04,168,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:04,169,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:04,169,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:04,169,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:04,170,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:04,558,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:04,559,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:04,560,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:04,560,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:04,560,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:04,562,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:04,563,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:04,563,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:04,563,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:04,564,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:04,938,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:04,938,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:04,939,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:04,941,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:04,941,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:04,942,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:04,943,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:04,943,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:04,943,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:04,944,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:05,359,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:05,360,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:05,360,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:05,360,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:05,361,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:05,362,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:05,362,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:05,363,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:05,363,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:05,363,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:05,756,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:05,756,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:05,757,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:05,757,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:05,757,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:05,758,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:05,759,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:05,759,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:05,759,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:05,760,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:06,127,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:06,127,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:06,128,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:06,128,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:06,128,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:06,129,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:06,130,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:06,130,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:06,130,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:06,131,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:06,540,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:06,541,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:06,542,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:06,542,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:06,542,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:06,544,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:06,545,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:06,545,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:06,545,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:06,546,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:06,953,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:06,954,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:06,955,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:06,956,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:06,956,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:06,957,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:06,959,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:06,959,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:06,959,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:06,959,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:07,382,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:07,382,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:07,384,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:07,384,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:07,384,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:07,385,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:07,385,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:07,387,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:07,387,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:07,387,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:07,768,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:07,769,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:07,770,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:07,770,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:07,770,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:07,771,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:07,772,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:07,772,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:07,773,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:07,773,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:21:08,180,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:21:08,181,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:21:08,182,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:08,182,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:21:08,182,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:08,185,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:21:08,186,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:21:08,186,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:21:08,186,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:21:08,186,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:27:12,633,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:27:12,634,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:27:12,636,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:27:12,636,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:27:12,636,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:27:12,637,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:27:12,638,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:27:12,639,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:27:12,639,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:27:12,639,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:33:04,696,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:33:04,698,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:33:04,700,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:33:04,700,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:33:04,700,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:33:04,701,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:33:04,703,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:33:04,703,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:33:04,704,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:33:04,704,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:35:36,470,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:35:36,471,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:35:36,473,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:35:36,473,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:35:36,473,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:35:36,475,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:35:36,476,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:35:36,476,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:35:36,476,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:35:36,476,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:36:48,292,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:36:48,293,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:36:48,295,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:36:48,295,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:36:48,296,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:36:48,297,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:13,061,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:13,063,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:13,065,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:13,065,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:13,065,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:13,067,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:13,068,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:13,069,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:13,069,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:13,069,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:13,072,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:13,073,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:13,074,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:13,074,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:13,075,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:13,076,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:13,489,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:13,490,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:13,490,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:13,491,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:13,491,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:13,492,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:13,493,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:13,493,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:13,494,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:13,494,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:13,495,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:13,496,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:13,497,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:13,498,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:13,498,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:13,499,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:13,893,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:13,893,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:13,894,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:13,894,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:13,895,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:13,896,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:13,897,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:13,897,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:13,897,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:13,897,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:13,899,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:13,900,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:13,900,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:13,901,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:13,901,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:13,901,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:14,335,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:14,335,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:14,337,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:14,337,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:14,337,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:14,337,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:14,338,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:14,338,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:14,339,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:14,339,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:14,340,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:14,341,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:14,341,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:14,341,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:14,342,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:14,342,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:14,826,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:14,826,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:14,827,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:14,827,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:14,828,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:14,829,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:14,830,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:14,830,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:14,830,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:14,830,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:14,832,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:14,832,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:14,833,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:14,833,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:14,833,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:14,834,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:15,235,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:15,236,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:15,237,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:15,237,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:15,237,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:15,238,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:15,239,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:15,239,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:15,239,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:15,239,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:15,240,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:15,241,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:15,241,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:15,241,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:15,242,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:15,242,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:15,648,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:15,648,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:15,649,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:15,650,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:15,650,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:15,651,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:15,653,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:15,653,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:15,654,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:15,654,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:15,655,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:15,656,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:15,657,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:15,657,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:15,657,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:15,658,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:16,012,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:16,012,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:16,013,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:16,013,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:16,013,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:16,014,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:16,015,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:16,015,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:16,015,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:16,015,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:16,016,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:16,017,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:16,017,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:16,018,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:16,018,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:16,018,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:16,385,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:16,386,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:16,387,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:16,387,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:16,387,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:16,388,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:16,389,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:16,389,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:16,389,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:16,389,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:16,390,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:16,391,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:16,391,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:16,392,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:16,392,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:16,392,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:16,798,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:16,798,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:16,799,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:16,799,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:16,799,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:16,801,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:16,801,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:16,802,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:16,802,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:16,802,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:16,803,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:16,804,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:16,804,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:16,804,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:16,804,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:16,805,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:17,198,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:17,198,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:17,199,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:17,199,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:17,199,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:17,200,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:17,201,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:17,201,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:17,201,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:17,202,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:17,203,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:17,203,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:17,204,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:17,204,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:17,204,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:17,204,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:17,599,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:17,601,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:17,601,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:17,601,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:17,601,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:17,602,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:17,603,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:17,603,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:17,603,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:17,604,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:17,605,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:17,605,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:17,606,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:17,606,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:17,606,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:17,607,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:18,013,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:18,013,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:18,014,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:18,014,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:18,015,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:18,017,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:18,018,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:18,018,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:18,018,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:18,018,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:18,019,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:18,020,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:18,020,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:18,020,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:18,020,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:18,021,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:18,402,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:18,403,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:18,404,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:18,405,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:18,405,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:18,406,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:18,407,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:18,407,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:18,407,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:18,408,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:18,409,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:18,410,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:18,410,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:18,410,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:18,410,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:18,411,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:18,785,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:18,785,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:18,786,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:18,786,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:18,786,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:18,787,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:18,788,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:18,788,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:18,789,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:18,789,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:18,790,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:18,790,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:18,791,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:18,791,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:18,791,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:18,792,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:19,189,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:19,189,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:19,190,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:19,190,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:19,191,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:19,192,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:19,193,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:19,193,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:19,193,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:19,193,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:19,194,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:19,195,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:19,196,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:19,196,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:19,196,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:19,196,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:19,606,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:19,607,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:19,609,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:19,609,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:19,610,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:19,612,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:19,614,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:19,615,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:19,615,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:19,615,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:19,616,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:19,617,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:19,617,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:19,618,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:19,618,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:19,618,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:20,030,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:20,031,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:20,032,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:20,032,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:20,032,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:20,033,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:20,034,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:20,034,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:20,034,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:20,035,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:20,036,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:20,036,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:20,037,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:20,037,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:20,037,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:20,038,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:20,398,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:20,399,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:20,399,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:20,400,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:20,400,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:20,401,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:20,402,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:20,403,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:20,403,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:20,403,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:20,405,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:20,406,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:20,407,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:20,408,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:20,408,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:20,408,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:20,782,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:20,782,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:20,783,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:20,783,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:20,783,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:20,785,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:20,786,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:20,786,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:20,786,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:20,786,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:20,789,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:20,789,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:20,791,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:20,791,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:20,792,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:20,792,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:21,196,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:21,196,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:21,197,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:21,197,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:21,197,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:21,198,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:21,199,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:21,199,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:21,199,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:21,200,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:21,201,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:21,201,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:21,202,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:21,202,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:21,203,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:21,204,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:21,648,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:21,648,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:21,649,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:21,649,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:21,649,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:21,650,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:21,652,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:21,652,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:21,652,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:21,653,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:21,654,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:21,655,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:21,655,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:21,656,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:21,656,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:21,656,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:22,055,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:22,055,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:22,057,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:22,057,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:22,057,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:22,057,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:22,060,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:22,060,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:22,060,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:22,061,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:22,061,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:22,063,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:22,064,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:22,064,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:22,064,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:22,064,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:22,468,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:22,469,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:22,470,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:22,470,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:22,470,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:22,472,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:22,474,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:22,474,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:22,474,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:22,474,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:22,475,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:22,476,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:22,477,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:22,477,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:22,477,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:22,478,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:22,878,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:22,879,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:22,881,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:22,881,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:22,881,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:22,884,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:22,885,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:22,886,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:22,886,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:22,886,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:22,887,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:22,887,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:22,888,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:22,888,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:22,888,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:22,889,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:23,316,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:23,316,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:23,317,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:23,317,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:23,318,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:23,319,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:23,320,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:23,320,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:23,320,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:23,320,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:23,321,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:23,322,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:23,323,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:23,323,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:23,323,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:23,323,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:23,714,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:23,714,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:23,715,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:23,715,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:23,715,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:23,717,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:23,718,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:23,718,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:23,718,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:23,718,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:23,719,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:23,721,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:23,721,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:23,721,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:23,722,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:23,722,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:24,124,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:24,125,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:24,126,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:24,126,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:24,126,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:24,127,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:24,128,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:24,128,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:24,129,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:24,129,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:24,130,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:24,131,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:24,133,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:24,133,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:24,133,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:24,133,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:24,499,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:24,499,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:24,500,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:24,500,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:24,500,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:24,501,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:24,502,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:24,502,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:24,503,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:24,503,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:24,504,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:24,505,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:24,506,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:24,506,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:24,506,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:24,506,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:24,882,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:24,882,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:24,883,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:24,883,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:24,883,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:24,884,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:24,885,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:24,885,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:24,885,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:24,886,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:24,887,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:24,888,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:24,888,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:24,888,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:24,889,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:24,889,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:25,304,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:25,304,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:25,305,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:25,306,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:25,306,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:25,307,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:25,308,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:25,308,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:25,309,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:25,309,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:25,310,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:25,311,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:25,311,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:25,311,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:25,312,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:25,312,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:25,687,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:25,688,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:25,688,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:25,689,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:25,689,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:25,690,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:25,691,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:25,691,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:25,691,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:25,691,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:25,692,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:25,693,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:25,695,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:25,695,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:25,695,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:25,697,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:26,017,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:26,017,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:26,018,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:26,018,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:26,018,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:26,019,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:26,020,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:26,020,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:26,020,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:26,021,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:26,022,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:26,022,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:26,023,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:26,023,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:26,023,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:26,024,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:26,361,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:26,362,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:26,362,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:26,363,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:26,363,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:26,364,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:26,365,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:26,365,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:26,365,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:26,365,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:26,366,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:26,367,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:26,368,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:26,368,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:26,368,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:26,368,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:26,699,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:26,700,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:26,701,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:26,701,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:26,701,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:26,702,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:26,703,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:26,703,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:26,703,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:26,704,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:26,705,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:26,705,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:26,706,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:26,706,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:26,706,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:26,707,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:27,062,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:27,063,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:27,063,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:27,064,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:27,064,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:27,065,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:27,066,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:27,066,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:27,066,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:27,066,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:27,067,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:27,068,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:27,069,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:27,069,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:27,069,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:27,069,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:27,397,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:27,397,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:27,398,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:27,398,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:27,398,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:27,400,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:27,401,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:27,401,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:27,401,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:27,402,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:27,403,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:27,404,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:27,405,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:27,405,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:27,405,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:27,406,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:27,733,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:27,733,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:27,734,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:27,734,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:27,735,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:27,736,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:27,736,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:27,737,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:27,737,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:27,737,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:27,739,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:27,739,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:27,740,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:27,740,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:27,740,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:27,740,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:28,116,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:28,117,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:28,118,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:28,118,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:28,119,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:28,120,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:28,121,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:28,122,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:28,122,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:28,122,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:28,124,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:28,124,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:28,125,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:28,125,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:28,126,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:28,126,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:28,453,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:28,454,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:28,455,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:28,455,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:28,455,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:28,456,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:28,457,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:28,457,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:28,457,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:28,458,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:28,459,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:28,459,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:28,460,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:28,460,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:28,460,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:28,461,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:28,797,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:28,798,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:28,798,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:28,798,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:28,799,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:28,800,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:28,801,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:28,801,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:28,801,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:28,801,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:28,802,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:28,803,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:28,804,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:28,804,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:28,804,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:28,804,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:29,183,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:29,183,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:29,185,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:29,185,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:29,185,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:29,186,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:29,187,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:29,189,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:29,189,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:29,189,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:29,191,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:29,192,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:29,193,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:29,193,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:29,194,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:29,194,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:29,507,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:29,508,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:29,510,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:29,510,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:29,510,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:29,512,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:29,513,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:29,513,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:29,513,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:29,513,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:29,515,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:29,515,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:29,516,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:29,516,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:29,516,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:29,517,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:29,852,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:29,853,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:29,854,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:29,854,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:29,854,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:29,855,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:29,856,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:29,856,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:29,856,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:29,857,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:29,858,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:29,858,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:29,859,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:29,859,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:29,859,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:29,860,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:30,311,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:30,311,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:30,312,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:30,313,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:30,313,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:30,315,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:30,316,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:30,316,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:30,316,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:30,316,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:30,318,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:30,318,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:30,319,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:30,319,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:30,319,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:30,320,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:30,640,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:30,641,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:30,642,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:30,642,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:30,642,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:30,643,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:30,644,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:30,644,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:30,644,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:30,645,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:30,646,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:30,647,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:30,647,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:30,647,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:30,648,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:30,648,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:30,984,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:30,984,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:30,985,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:30,985,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:30,985,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:30,986,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:30,987,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:30,987,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:30,988,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:30,988,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:30,989,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:30,990,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:30,991,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:30,991,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:30,991,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:30,991,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:31,361,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:31,362,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:31,363,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:31,363,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:31,363,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:31,364,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:31,365,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:31,365,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:31,365,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:31,366,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:31,367,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:31,368,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:31,368,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:31,368,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:31,368,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:31,370,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:31,704,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:31,704,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:31,705,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:31,706,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:31,706,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:31,709,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:31,711,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:31,711,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:31,711,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:31,712,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:31,713,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:31,714,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:31,714,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:31,714,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:31,715,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:31,715,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:32,084,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:32,086,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:32,088,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:32,088,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:32,089,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:32,091,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:32,094,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:32,094,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:32,094,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:32,095,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:32,098,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:32,099,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:32,100,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:32,100,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:32,100,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:32,100,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:32,445,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:32,445,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:32,446,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:32,447,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:32,447,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:32,448,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:32,449,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:32,449,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:32,449,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:32,449,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:32,451,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:32,451,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:32,452,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:32,452,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:32,452,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:32,453,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:32,780,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:32,781,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:32,782,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:32,782,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:32,782,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:32,783,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:32,784,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:32,784,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:32,784,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:32,784,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:32,786,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:32,786,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:32,787,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:32,787,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:32,787,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:32,788,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:33,168,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:33,168,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:33,169,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:33,170,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:33,170,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:33,171,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:33,172,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:33,172,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:33,172,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:33,173,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:33,174,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:33,175,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:33,176,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:33,176,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:33,176,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:33,176,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:33,496,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:33,497,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:33,498,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:33,498,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:33,498,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:33,499,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:33,500,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:33,500,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:33,500,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:33,500,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:33,502,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:33,502,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:33,503,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:33,503,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:33,503,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:33,504,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:33,831,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:33,832,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:33,833,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:33,833,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:33,833,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:33,834,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:33,835,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:33,835,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:33,835,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:33,835,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:33,837,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:33,837,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:33,838,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:33,838,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:33,838,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:33,839,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:34,175,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:34,176,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:34,177,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:34,177,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:34,177,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:34,179,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:34,180,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:34,180,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:34,181,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:34,181,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:34,183,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:34,184,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:34,185,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:34,185,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:34,185,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:34,185,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:34,501,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:34,501,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:34,502,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:34,502,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:34,502,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:34,503,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:34,504,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:34,504,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:34,504,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:34,505,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:34,507,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:34,507,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:34,508,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:34,508,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:34,508,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:34,509,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:34,899,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:34,900,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:34,901,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:34,901,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:34,901,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:34,902,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:34,903,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:34,903,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:34,903,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:34,904,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:34,905,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:34,906,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:34,906,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:34,906,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:34,907,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:34,908,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:35,355,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:35,356,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:35,357,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:35,357,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:35,357,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:35,358,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:35,359,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:35,359,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:35,359,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:35,360,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:35,361,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:35,362,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:35,362,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:35,363,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:35,363,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:35,363,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:35,675,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:35,676,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:35,677,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:35,677,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:35,677,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:35,678,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:35,679,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:35,679,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:35,680,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:35,680,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:35,681,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:35,682,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:35,683,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:35,683,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:35,683,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:35,685,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:36,002,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:36,002,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:36,003,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:36,003,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:36,003,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:36,004,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:36,005,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:36,005,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:36,005,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:36,006,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:36,007,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:36,008,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:36,008,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:36,008,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:36,009,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:36,009,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:36,371,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:36,371,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:36,372,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:36,372,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:36,373,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:36,374,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:36,375,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:36,375,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:36,375,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:36,375,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:36,376,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:36,377,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:36,378,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:36,378,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:36,378,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:36,379,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:36,709,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:36,710,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:36,711,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:36,711,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:36,711,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:36,713,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:36,714,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:36,714,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:36,714,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:36,715,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:36,716,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:36,717,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:36,717,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:36,718,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:36,718,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:36,718,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:37,074,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:37,074,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:37,076,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:37,076,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:37,076,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:37,078,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:37,079,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:37,079,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:37,079,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:37,079,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:37,081,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:37,082,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:37,083,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:37,083,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:37,083,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:37,084,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:37,410,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:37,411,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:37,412,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:37,412,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:37,412,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:37,414,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:37,415,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:37,415,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:37,415,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:37,415,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:37,417,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:37,417,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:37,418,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:37,418,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:37,419,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:37,419,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:37,750,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:37,751,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:37,752,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:37,752,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:37,753,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:37,754,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:37,755,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:37,755,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:37,755,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:37,756,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:37,757,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:37,758,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:37,758,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:37,758,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:37,759,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:37,759,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:38,133,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:38,135,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:38,135,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:38,135,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:38,135,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:38,138,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:38,140,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:38,140,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:38,140,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:38,140,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:38,142,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:38,143,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:38,144,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:38,144,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:38,144,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:38,146,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:38,466,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:38,467,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:38,468,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:38,468,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:38,468,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:38,469,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:38,470,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:38,470,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:38,470,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:38,471,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:38,472,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:38,473,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:38,474,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:38,474,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:38,474,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:38,474,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:38,814,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:38,815,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:38,816,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:38,816,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:38,816,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:38,817,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:38,819,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:38,819,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:38,819,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:38,820,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:38,821,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:38,822,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:38,823,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:38,823,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:38,823,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:38,824,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:39,155,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:39,155,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:39,157,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:39,157,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:39,157,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:39,159,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:39,160,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:39,160,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:39,161,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:39,162,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:39,164,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:39,164,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:39,165,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:39,166,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:39,166,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:39,166,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:39,498,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:39,498,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:39,499,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:39,499,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:39,500,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:39,501,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:39,502,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:39,502,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:39,502,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:39,503,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:39,504,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:39,505,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:39,505,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:39,506,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:39,506,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:39,506,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:39,850,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:39,851,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:39,852,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:39,852,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:39,852,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:39,853,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:39,855,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:39,855,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:39,855,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:39,855,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:39,857,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:39,858,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:39,859,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:39,859,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:39,859,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:39,860,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:40,226,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:40,227,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:40,228,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:40,228,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:40,228,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:40,230,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:40,231,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:40,231,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:40,231,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:40,232,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:40,233,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:40,234,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:40,234,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:40,235,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:40,235,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:40,235,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:40,559,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:40,560,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:40,561,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:40,561,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:40,561,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:40,562,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:40,563,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:40,563,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:40,563,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:40,564,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:40,565,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:40,566,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:40,566,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:40,567,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:40,567,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:40,567,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:40,862,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:40,863,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:40,864,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:40,864,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:40,864,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:40,865,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:40,866,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:40,866,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:40,867,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:40,867,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:40,868,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:40,869,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:40,870,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:40,870,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:40,870,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:40,870,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:41,246,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:41,246,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:41,247,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:41,247,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:41,247,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:41,248,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:41,249,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:41,250,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:41,250,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:41,250,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:41,251,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:41,253,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:41,254,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:41,254,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:41,254,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:41,255,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:41,600,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:41,600,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:41,602,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:41,602,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:41,602,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:41,603,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:41,604,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:41,605,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:41,605,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:41,605,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:41,606,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:41,607,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:41,607,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:41,607,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:41,607,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:41,609,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:41,907,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:41,907,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:41,908,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:41,908,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:41,908,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:41,909,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:41,910,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:41,911,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:41,911,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:41,911,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:41,913,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:41,914,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:41,915,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:41,915,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:41,916,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:41,917,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:42,294,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:42,295,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:42,296,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:42,296,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:42,296,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:42,297,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:42,298,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:42,298,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:42,299,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:42,299,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:42,300,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:42,301,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:42,302,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:42,302,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:42,302,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:42,303,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:42,635,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:42,636,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:42,637,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:42,637,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:42,637,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:42,638,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:42,639,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:42,639,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:42,639,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:42,640,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:42,641,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:42,642,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:42,642,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:42,642,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:42,643,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:42,644,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:42,958,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:42,959,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:42,960,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:42,960,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:42,960,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:42,961,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:42,962,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:42,962,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:42,962,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:42,963,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:42,964,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:42,965,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:42,966,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:42,966,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:42,966,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:42,967,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:43,327,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:43,328,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:43,328,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:43,329,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:43,329,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:43,330,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:43,331,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:43,331,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:43,331,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:43,332,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:43,333,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:43,334,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:43,334,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:43,335,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:43,335,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:43,335,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:43,685,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:43,686,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:43,687,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:43,687,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:43,687,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:43,688,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:43,689,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:43,690,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:43,690,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:43,690,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:43,692,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:43,693,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:43,694,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:43,694,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:43,694,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:43,695,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:43,988,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:43,989,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:43,989,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:43,990,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:43,990,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:43,991,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:43,992,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:43,992,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:43,992,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:43,993,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:43,994,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:43,995,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:43,996,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:43,996,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:43,996,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:43,997,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:44,412,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:44,413,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:44,414,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:44,414,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:44,414,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:44,417,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:44,419,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:44,419,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:44,419,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:44,420,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:44,423,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:44,425,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:44,426,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:44,426,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:44,426,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:44,428,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:44,742,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:44,743,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:44,744,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:44,744,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:44,744,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:44,746,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:44,747,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:44,747,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:44,748,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:44,748,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:44,750,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:44,750,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:44,751,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:44,751,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:44,751,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:44,752,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:45,127,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:45,129,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:45,130,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:45,130,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:45,130,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:45,131,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:45,133,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:45,133,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:45,133,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:45,133,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:45,135,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:45,137,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:45,139,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:45,139,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:45,139,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:45,140,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:45,454,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:45,455,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:45,456,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:45,456,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:45,456,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:45,457,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:45,458,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:45,458,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:45,458,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:45,459,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:45,460,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:45,461,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:45,462,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:45,462,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:45,462,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:45,463,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:45,768,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:45,769,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:45,770,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:45,770,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:45,770,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:45,771,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:45,773,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:45,773,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:45,773,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:45,774,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:45,775,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:45,776,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:45,776,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:45,777,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:45,777,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:45,777,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:46,149,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:46,150,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:46,151,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:46,152,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:46,152,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:46,154,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:46,156,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:46,156,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:46,156,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:46,157,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:46,159,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:46,160,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:46,161,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:46,161,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:46,162,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:46,162,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:46,505,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:46,505,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:46,506,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:46,507,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:46,507,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:46,508,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:46,510,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:46,510,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:46,510,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:46,510,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:46,512,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:46,513,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:46,513,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:46,513,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:46,514,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:46,514,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:46,858,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:46,859,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:46,860,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:46,860,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:46,860,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:46,861,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:46,862,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:46,862,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:46,862,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:46,862,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:46,864,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:46,865,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:46,866,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:46,866,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:46,866,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:46,866,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:47,224,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:47,225,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:47,226,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:47,226,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:47,226,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:47,228,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:47,229,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:47,229,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:47,229,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:47,230,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:47,231,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:47,232,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:47,233,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:47,233,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:47,233,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:47,234,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:47,544,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:47,544,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:47,545,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:47,545,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:47,546,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:47,547,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:47,548,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:47,548,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:47,548,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:47,549,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:47,552,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:47,553,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:47,554,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:47,554,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:47,555,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:47,556,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:47,872,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:47,872,pump_control,DEBUG,Mock Pump has withdrawn: 0.041000 ml    Pipette vol: 81.000000
+2023-11-01 18:37:47,873,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:47,873,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 61.000000
+2023-11-01 18:37:47,873,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:47,874,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 60.000000
+2023-11-01 18:37:47,875,pump_control,DEBUG,Purging 20.000000 ul...
+2023-11-01 18:37:47,876,pump_control,DEBUG,Mock Pump has infused: 0.020000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:47,876,pump_control,DEBUG,Purged 20.0 ul
+2023-11-01 18:37:47,876,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-01 18:37:47,878,pump_control,DEBUG,Mock Pump has withdrawn: 0.040000 ml    Pipette vol: 40.000000
+2023-11-01 18:37:47,878,pump_control,DEBUG,Mock Pump has withdrawn: 0.001000 ml    Pipette vol: 41.000000
+2023-11-01 18:37:47,879,pump_control,DEBUG,Purging 1.000000 ul...
+2023-11-01 18:37:47,879,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
+2023-11-01 18:37:47,879,pump_control,DEBUG,Purged 1.0 ul
+2023-11-01 18:37:47,880,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
