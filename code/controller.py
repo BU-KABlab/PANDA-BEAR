@@ -27,6 +27,8 @@ from mill_control import Mill
 from pump_control import Pump
 #from pump_control import MockPump as Pump
 import gamry_control_WIP as echem
+#from scale import MockSartorius as Scale
+from scale import Sartorius as Scale
 
 # import obs_controls as obs
 import slack_functions as slack
@@ -35,8 +37,7 @@ import e_panda
 from experiment_class import ExperimentResult, ExperimentBase
 from vials import Vial
 import wellplate as wellplate_module
-#from scale import Sartorius as Scale
-from scale import MockSartorius as Scale
+
 from config.file_locations import MILL_CONFIG_FILE, PATH_TO_STATUS, PATH_TO_COMPLETED_EXPERIMENTS, PATH_TO_ERRORED_EXPERIMENTS, PATH_TO_DATA, PATH_TO_LOGS
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -233,7 +234,7 @@ def establish_system_state() -> tuple[list[Vial], list[Vial], wellplate_module.W
     stock_vials = read_vials(Path.cwd() / PATH_TO_STATUS / "stock_status.json")
     waste_vials = read_vials(Path.cwd() / PATH_TO_STATUS / "waste_status.json")
     wellplate = wellplate_module.Wells(
-        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
+        -230,-35,0,columns="ABCDEFGH", rows=13, type_number =5
     )
     logger.info("System state established")
 
