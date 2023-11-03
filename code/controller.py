@@ -22,10 +22,10 @@ import time
 from pathlib import Path
 
 from print_panda import printpanda
-#from mill_control import Mill
-from mill_control import MockMill as Mill
-#from pump_control import Pump
-from pump_control import MockPump as Pump
+from mill_control import Mill
+#from mill_control import MockMill as Mill
+from pump_control import Pump
+#from pump_control import MockPump as Pump
 import gamry_control_WIP as echem
 
 # import obs_controls as obs

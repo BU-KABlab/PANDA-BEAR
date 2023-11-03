@@ -82,3 +82,73 @@
 2023-11-03 10:22:29,048,__main__,INFO,Variance written to log
 2023-11-03 10:22:29,048,__main__,INFO,Saving data to file
 2023-11-03 10:22:29,054,__main__,INFO,Scale variance check complete
+2023-11-03 11:27:00,859:__main__:INFO:Starting scale variance check
+2023-11-03 11:27:00,860:__main__:INFO:Current working directory: C:\Users\Kab Lab\Documents\GitHub\PANDA
+2023-11-03 11:27:00,860:__main__:INFO:Python version: 3.11.5 | packaged by Anaconda, Inc. | (main, Sep 11 2023, 13:26:23) [MSC v.1916 64 bit (AMD64)]
+2023-11-03 11:27:00,860:__main__:INFO:Numpy version: 1.26.0
+2023-11-03 11:27:00,861:__main__:INFO:Matplotlib version: 3.7.2
+2023-11-03 11:27:00,861:__main__:INFO:Time: 2023-11-03 11:27:00.861245
+2023-11-03 11:27:00,861:__main__:INFO:Mock: False
+2023-11-03 11:27:00,861:__main__:INFO:Test 04 | Apparent filter = final readout | plate type 5
+2023-11-03 11:27:00,861:__main__:INFO:Creating scale object
+2023-11-03 11:27:00,871:__main__:INFO:Scale object created
+2023-11-03 11:27:00,871:__main__:INFO:Taring scale
+2023-11-03 11:28:00,873:__main__:INFO:Scale tared
+2023-11-03 11:28:00,873:__main__:INFO:Creating data arrays
+2023-11-03 11:28:00,873:__main__:INFO:Creating 10s array
+2023-11-03 11:28:00,873:__main__:INFO:Creating 5s array
+2023-11-03 11:28:00,873:__main__:INFO:Creating 3s array
+2023-11-03 11:28:00,873:__main__:INFO:Data arrays created
+2023-11-03 11:28:00,874:__main__:INFO:Starting 10s loop
+2023-11-03 11:38:01,728:__main__:INFO:10s loop complete
+2023-11-03 11:38:11,729:__main__:INFO:Starting 5s loop
+2023-11-03 11:48:13,382:__main__:INFO:5s loop complete
+2023-11-03 11:48:23,383:__main__:INFO:Starting 3s loop
+2023-11-03 11:58:26,147:__main__:INFO:3s loop complete
+2023-11-03 11:58:26,147:__main__:INFO:Closing scale object
+2023-11-03 11:58:26,148:__main__:INFO:Scale object closed
+2023-11-03 11:58:26,148:__main__:INFO:Plotting data
+2023-11-03 11:59:41,758:__main__:INFO:Plotting complete
+2023-11-03 11:59:41,758:__main__:INFO:Calculating variance
+2023-11-03 11:59:41,759:__main__:INFO:Variance calculated
+2023-11-03 11:59:41,759:__main__:INFO:Writing variance to log
+2023-11-03 11:59:41,759:__main__:INFO:10s variance: 4.709e-05
+2023-11-03 11:59:41,759:__main__:INFO:5s variance: 4.8854930555555555e-05
+2023-11-03 11:59:41,759:__main__:INFO:3s variance: 5.9600975000000006e-05
+2023-11-03 11:59:41,759:__main__:INFO:Variance written to log
+2023-11-03 11:59:41,759:__main__:INFO:Saving data to file
+2023-11-03 11:59:41,767:__main__:INFO:Scale variance check complete
+2023-11-03 12:05:47,443:__main__:INFO:Starting scale variance check
+2023-11-03 12:05:47,444:__main__:INFO:Current working directory: C:\Users\Kab Lab\Documents\GitHub\PANDA
+2023-11-03 12:05:47,444:__main__:INFO:Python version: 3.11.5 | packaged by Anaconda, Inc. | (main, Sep 11 2023, 13:26:23) [MSC v.1916 64 bit (AMD64)]
+2023-11-03 12:05:47,444:__main__:INFO:Numpy version: 1.26.0
+2023-11-03 12:05:47,444:__main__:INFO:Matplotlib version: 3.7.2
+2023-11-03 12:05:47,444:__main__:INFO:Time: 2023-11-03 12:05:47.444274
+2023-11-03 12:05:47,445:__main__:INFO:Mock: False
+2023-11-03 12:05:47,445:__main__:INFO:Test 05 | Apparent filter = final readout | plate type 5
+2023-11-03 12:05:47,445:__main__:INFO:Creating scale object
+2023-11-03 12:05:47,455:__main__:INFO:Scale object created
+2023-11-03 12:05:47,455:__main__:INFO:Creating data arrays
+2023-11-03 12:05:47,455:__main__:INFO:Creating 10s array
+2023-11-03 12:05:47,455:__main__:INFO:Creating 5s array
+2023-11-03 12:05:47,456:__main__:INFO:Creating 3s array
+2023-11-03 12:05:47,456:__main__:INFO:Data arrays created
+2023-11-03 12:05:47,456:__main__:INFO:Starting 10s loop
+2023-11-03 12:15:48,302:__main__:INFO:10s loop complete
+2023-11-03 12:15:58,304:__main__:INFO:Starting 5s loop
+2023-11-03 12:25:59,972:__main__:INFO:5s loop complete
+2023-11-03 12:26:09,973:__main__:INFO:Starting 3s loop
+2023-11-03 12:36:12,733:__main__:INFO:3s loop complete
+2023-11-03 12:36:12,733:__main__:INFO:Closing scale object
+2023-11-03 12:36:12,734:__main__:INFO:Scale object closed
+2023-11-03 12:36:12,734:__main__:INFO:Plotting data
+2023-11-03 12:49:18,912:__main__:INFO:Plotting complete
+2023-11-03 12:49:18,912:__main__:INFO:Calculating variance
+2023-11-03 12:49:18,913:__main__:INFO:Variance calculated
+2023-11-03 12:49:18,913:__main__:INFO:Writing variance to log
+2023-11-03 12:49:18,913:__main__:INFO:10s variance: 2.603888888888889e-05
+2023-11-03 12:49:18,913:__main__:INFO:5s variance: 3.0228888888888892e-05
+2023-11-03 12:49:18,913:__main__:INFO:3s variance: 3.06296e-05
+2023-11-03 12:49:18,913:__main__:INFO:Variance written to log
+2023-11-03 12:49:18,913:__main__:INFO:Saving data to file
+2023-11-03 12:49:18,919:__main__:INFO:Scale variance check complete

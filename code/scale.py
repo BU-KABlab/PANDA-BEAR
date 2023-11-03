@@ -13,6 +13,12 @@ import random
 import serial
 import time
 from tqdm import tqdm
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import datetime
+import os
+import sys
 
 scale_logger = logging.getLogger(__name__)
 scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
@@ -152,14 +158,6 @@ def scale_variance_check(mock: bool = False):
     1s between readings
 
     """
-    import time
-    import numpy as np
-    import matplotlib
-    import matplotlib.pyplot as plt
-    import datetime
-    import os
-    import sys
-
     scale_logger.info("Starting scale variance check")
     scale_logger.info("Current working directory: %s", os.getcwd())
     scale_logger.info("Python version: %s", sys.version)
@@ -167,7 +165,7 @@ def scale_variance_check(mock: bool = False):
     scale_logger.info("Matplotlib version: %s", matplotlib.__version__)
     scale_logger.info("Time: %s", datetime.datetime.now())
     scale_logger.info("Mock: %s", mock)
-    scale_logger.info("Test 03 | Apparent filter = final readout | plate type 5 | no blower")
+    scale_logger.info("Test 05 | Apparent filter = final readout | plate type 5")
 
     scale_logger.info("Creating scale object")
     if mock:
@@ -176,10 +174,10 @@ def scale_variance_check(mock: bool = False):
         scale = Sartorius('COM6')
     scale_logger.info("Scale object created")
 
-    scale_logger.info("Taring scale")
-    scale.tara()
-    time.sleep(60)
-    scale_logger.info("Scale tared")
+    #scale_logger.info("Taring scale")
+    #scale.tara()
+    #time.sleep(60)
+    #scale_logger.info("Scale tared")
 
     scale_logger.info("Creating data arrays")
     scale_logger.info("Creating 10s array")
@@ -232,7 +230,7 @@ def scale_variance_check(mock: bool = False):
     plt.ylabel("Reading (g)")
     plt.xlabel("Reading number")
     plt.subplots_adjust(hspace=0.5)
-    plt.savefig("data/scale_testing_03_appfilt_finalrd_no_blower_platetype5.png")
+    plt.savefig("data/scale_testing_05_appfilt_finalrd_platetype5.png")
     plt.show()
     plt.subplots_adjust(hspace=0.5)
     scale_logger.info("Plotting complete")
@@ -250,9 +248,9 @@ def scale_variance_check(mock: bool = False):
     scale_logger.info("Variance written to log")
 
     scale_logger.info("Saving data to file")
-    np.savetxt("data/scale_testing_03_appfilt_finalrd_no_blower_platetype5_ten_sec.txt", ten_sec_array)
-    np.savetxt("data/scale_testing_03_appfilt_finalrd_no_blower_platetype5_five_sec.txt", five_sec_array)
-    np.savetxt("data/scale_testing_03_appfilt_finalrd_no_blower_platetype5_three_sec.txt", three_sec_array)
+    np.savetxt("data/scale_testing_05_appfilt_finalrd_platetype5_ten_sec.txt", ten_sec_array)
+    np.savetxt("data/scale_testing_05_appfilt_finalrd_platetype5_five_sec.txt", five_sec_array)
+    np.savetxt("data/scale_testing_05_appfilt_finalrd_platetype5_three_sec.txt", three_sec_array)
     scale_logger.info("Scale variance check complete")
 
 def function_test(mock: bool = False):
@@ -276,4 +274,4 @@ def function_test(mock: bool = False):
     sartorius_scale.close()
 
 if __name__ == '__main__':
-    scale_variance_check(False)
+    scale_variance_check(mock=False)

@@ -698,12 +698,12 @@ def movement_test():
 
     try:
         with Mill() as mill:
-            mill.homing_sequence()
+            
             a1 = wellplate.get_coordinates("A1")
             d5 = wellplate.get_coordinates("D5")
             h3 = wellplate.get_coordinates("H3")
-            mill.move_pipette_to_position(a1["x"], a1["y"], 0)
-            mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
+            # mill.move_pipette_to_position(a1["x"], a1["y"], 0)
+            # mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
             # mill.move_pipette_to_position(a1['x'], a1['y'], 0)
 
             # test that the mill current corrinates work

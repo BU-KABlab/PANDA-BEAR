@@ -1,5 +1,4 @@
 """ Experiment data class"""
-from ctypes import Union
 from enum import Enum
 from datetime import datetime
 from dataclasses import field

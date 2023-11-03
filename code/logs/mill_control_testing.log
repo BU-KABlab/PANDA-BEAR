@@ -1,0 +1,86 @@
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 36, 'y': 30, 'z': 0}, 'pipette': {'x': -85, 'y': 2, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -415, 'y': -300, 'z': -80}}
+Mill connected: True
+execute_command: Command sent: $H
+execute_command: Returned 
+Homing completed
+execute_command: Command sent: F2000
+execute_command: Returned ok
+execute_command: Command sent: $H
+execute_command: Returned 
+Homing completed
+execute_command: Command sent: F2000
+execute_command: Returned ok
+MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+current_coordinates: [0.0, 0.0, 0.0]
+execute_command: Command sent: G00 X-185
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-188.000,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+execute_command: Command sent: G00 Y-10
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-188.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-188.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -185.0, Y = -10.0, Z = 0.0
+current_coordinates: [-185.0, -10.0, 0.0]
+execute_command: Command sent: G00 X-270
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-273.000,-13.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Y-8
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-273.000,-11.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-273.000,-11.000,-3.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -270.0, Y = -8.0, Z = 0.0
+current_coordinates: [-270.0, -8.0, 0.0]
+execute_command: Command sent: G00 Z-50
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-273.000,-11.000,-53.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -270.0, Y = -8.0, Z = -50.0
+current_coordinates: [-270.0, -8.0, -50.0]
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-273.000,-11.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 X-260
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-263.000,-11.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+execute_command: Command sent: G00 Y-18
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-263.000,-21.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z-50
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-263.000,-21.000,-53.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -260.0, Y = -18.0, Z = -50.0
+current_coordinates: [-260.0, -18.0, -50.0]
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-263.000,-21.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 X-263
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-21.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Y-28
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-31.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+execute_command: Command sent: G00 Z-60
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-31.000,-63.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -263.0, Y = -28.0, Z = -60.0
+current_coordinates: [-263.0, -28.0, -60.0]
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-31.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Y-33
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-36.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z-65
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-36.000,-68.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+MPos coordinates: X = -263.0, Y = -33.0, Z = -65.0
+current_coordinates: [-263.0, -33.0, -65.0]
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-36.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z-70
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-266.000,-36.000,-73.000|Bf:15,127|FS:0,0>
