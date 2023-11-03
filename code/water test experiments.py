@@ -19,6 +19,7 @@ EXPERIMENT_NAME = 'Water test'
 experiments = []
 # Create a new experiment
 for column in COLUMNS:
+    volume = 130
     for row in range(1,ROWS+1):
         experiments.append(experiment_class.ExperimentBase(
                 id=experiment_id,
@@ -27,12 +28,13 @@ for column in COLUMNS:
                 target_well= column + str(row),
                 pin = CURRENT_PIN,
                 project_id=PROJECT_ID,
-                solutions={'water': 1},
+                solutions={'water': volume},
                 status='new',
                 filename='water_test_' + str(experiment_id),
                 )
             )
         experiment_id += 1
+        volume -= 10
 
 scheduler = Scheduler()
 result = scheduler.add_nonfile_experiments(experiments)

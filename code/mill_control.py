@@ -688,7 +688,7 @@ class MockMill:
 def movement_test():
     """Test the mill movement with a wellplate"""
     wellplate = Wells.Wells(
-        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
+        -230,-35,0,columns="ABCDEFGH", rows=13, type_number =5
     )
 
     # Configure the logger for testing
@@ -698,10 +698,11 @@ def movement_test():
 
     try:
         with Mill() as mill:
-            
+
             a1 = wellplate.get_coordinates("A1")
-            d5 = wellplate.get_coordinates("D5")
-            h3 = wellplate.get_coordinates("H3")
+            a12 = wellplate.get_coordinates("A12")
+            h1 = wellplate.get_coordinates("H1")
+            h12 = wellplate.get_coordinates("H12")
             # mill.move_pipette_to_position(a1["x"], a1["y"], 0)
             # mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
             # mill.move_pipette_to_position(a1['x'], a1['y'], 0)
@@ -711,7 +712,7 @@ def movement_test():
             assert mill_coordinates == [a1["x"], a1["y"], a1["depth"]]
 
             # test that the mill safe move works
-            mill.safe_move(d5["x"], d5["y"], d5["depth"])
+            #mill.safe_move(d5["x"], d5["y"], d5["depth"])
 
             # mill.move_pipette_to_position(d5['x'], d5['y'],0)
             # mill.move_pipette_to_position(d5['x'], d5['y'],d5['depth'])
