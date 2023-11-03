@@ -46,3 +46,39 @@
 2023-11-02 16:22:40,821,__main__,INFO,Variance written to log
 2023-11-02 16:22:40,821,__main__,INFO,Saving data to file
 2023-11-02 16:22:40,826,__main__,INFO,Scale variance check complete
+2023-11-03 09:50:47,911,__main__,INFO,Starting scale variance check
+2023-11-03 09:50:47,911,__main__,INFO,Current working directory: C:\Users\Kab Lab\Documents\GitHub\PANDA
+2023-11-03 09:50:47,911,__main__,INFO,Python version: 3.11.5 | packaged by Anaconda, Inc. | (main, Sep 11 2023, 13:26:23) [MSC v.1916 64 bit (AMD64)]
+2023-11-03 09:50:47,911,__main__,INFO,Numpy version: 1.26.0
+2023-11-03 09:50:47,912,__main__,INFO,Matplotlib version: 3.7.2
+2023-11-03 09:50:47,912,__main__,INFO,Time: 2023-11-03 09:50:47.912690
+2023-11-03 09:50:47,912,__main__,INFO,Mock: False
+2023-11-03 09:50:47,912,__main__,INFO,Test 03 | Apparent filter = final readout | plate type 5 | no blower
+2023-11-03 09:50:47,912,__main__,INFO,Creating scale object
+2023-11-03 09:50:47,922,__main__,INFO,Scale object created
+2023-11-03 09:50:47,922,__main__,INFO,Taring scale
+2023-11-03 09:51:47,923,__main__,INFO,Scale tared
+2023-11-03 09:51:47,923,__main__,INFO,Creating data arrays
+2023-11-03 09:51:47,923,__main__,INFO,Creating 10s array
+2023-11-03 09:51:47,923,__main__,INFO,Creating 5s array
+2023-11-03 09:51:47,923,__main__,INFO,Creating 3s array
+2023-11-03 09:51:47,923,__main__,INFO,Data arrays created
+2023-11-03 09:51:47,923,__main__,INFO,Starting 10s loop
+2023-11-03 10:01:48,749,__main__,INFO,10s loop complete
+2023-11-03 10:01:58,750,__main__,INFO,Starting 5s loop
+2023-11-03 10:12:00,364,__main__,INFO,5s loop complete
+2023-11-03 10:12:10,364,__main__,INFO,Starting 3s loop
+2023-11-03 10:22:13,052,__main__,INFO,3s loop complete
+2023-11-03 10:22:13,052,__main__,INFO,Closing scale object
+2023-11-03 10:22:13,053,__main__,INFO,Scale object closed
+2023-11-03 10:22:13,053,__main__,INFO,Plotting data
+2023-11-03 10:22:29,046,__main__,INFO,Plotting complete
+2023-11-03 10:22:29,047,__main__,INFO,Calculating variance
+2023-11-03 10:22:29,047,__main__,INFO,Variance calculated
+2023-11-03 10:22:29,048,__main__,INFO,Writing variance to log
+2023-11-03 10:22:29,048,__main__,INFO,10s variance: 0.0
+2023-11-03 10:22:29,048,__main__,INFO,5s variance: 0.0
+2023-11-03 10:22:29,048,__main__,INFO,3s variance: 0.0
+2023-11-03 10:22:29,048,__main__,INFO,Variance written to log
+2023-11-03 10:22:29,048,__main__,INFO,Saving data to file
+2023-11-03 10:22:29,054,__main__,INFO,Scale variance check complete
