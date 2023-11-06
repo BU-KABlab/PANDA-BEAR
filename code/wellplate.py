@@ -297,7 +297,7 @@ def read_well_type_characteristics(
     type_number: int, current_well: Wells
 ) -> tuple[float, float, float, float]:
     """Read the well type characteristics from the well_type.csv config file"""
-
+    
     file_path = "code\\config\\well_type.csv"
 
     # check it exists
@@ -316,7 +316,7 @@ def read_well_type_characteristics(
         next(f)
         for line in f:
             line = line.strip().split(",")
-            if int(line[0]) == type_number:
+            if int(line[0]) == int(type_number):
                 shape = str(line[4]).strip()
                 radius = float(line[5])
                 well_offset = float(line[6])
