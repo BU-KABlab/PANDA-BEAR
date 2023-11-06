@@ -5,9 +5,10 @@
         "x": -47,
         "y": -13,
         "name": "waste",
-        "volume": 1000,
+        "volume": 12040.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 288,
+        "density": 0
     },
     {
         "position": "W1",
@@ -17,7 +18,8 @@
         "name": "waste",
         "volume": 1000,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 0,
+        "density": 0
     },
     {
         "position": "W2",
@@ -27,7 +29,8 @@
         "name": "waste",
         "volume": 1000,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 0,
+        "density": 0
     },
     {
         "position": "W3",
@@ -37,7 +40,8 @@
         "name": "waste",
         "volume": 1000,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 0,
+        "density": 0
     },
     {
         "position": "W4",
@@ -47,7 +51,8 @@
         "name": "waste",
         "volume": 1000,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 0,
+        "density": 0
     },
     {
         "position": "RW0",
@@ -57,7 +62,8 @@
         "name": "rinse0",
         "volume": 7280.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 0,
+        "density": 0
     },
     {
         "position": "RW1",
@@ -67,7 +73,8 @@
         "name": "rinse1",
         "volume": 2520.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 0,
+        "density": 0
     },
     {
         "position": "RW2",
@@ -77,6 +84,7 @@
         "name": "rinse2",
         "volume": 2520.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 0,
+        "density": 0
     }
 ]

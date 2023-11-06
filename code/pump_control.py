@@ -13,12 +13,12 @@ from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 
 # set up logging to log to the ePANDA.log file
-logger = logging.getLogger("pump_control_logger")
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+pump_control_logger = logging.getLogger("pump_control")
+pump_control_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
+pump_control_logger.addHandler(system_handler)
 
 # set a logger for the scale
 scale_logger = logging.getLogger("scale_logger")
@@ -58,6 +58,7 @@ class Pump:
         Initialize the pump and set the capacity.
         """
         self.pump = self.set_up_pump()
+        self.max_pump_rate = 0.654 # ml/min
         self.syringe_capacity = 1.0  # mL
         self.pipette_capacity_ml = 0.2  # mL
         self.pipette_capacity_ul = 200  # uL
@@ -73,7 +74,7 @@ class Pump:
         )
         system_handler.setFormatter(experiment_formatter)
         custom_filter = CustomLoggingFilter(experiment_id, target_well)
-        logger.addFilter(custom_filter)
+        pump_control_logger.addFilter(custom_filter)
 
     def set_up_pump(self):
         """
@@ -87,18 +88,19 @@ class Pump:
         pump.volume_infused_clear()
         pump.volume_withdrawn_clear()
         log_msg = f"Pump found at address {pump.address}"
-        logger.info(log_msg)
+        pump_control_logger.info(log_msg)
         time.sleep(2)
         return pump
 
+    #TODO add the option to infuse or withdraw from a vial or a well
     def withdraw(
-        self, volume: float, solution: Vial = None, rate: float = 0.5
+        self, volume: float, solution: [Vial, str] = None, rate: float = 0.5
     ) -> Optional[Vial]:
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
             volume (float): Volume to be withdrawn in microliters.
-            solution (Vial object): The vial to withdraw from
+            solution (Vial object or str): The vial or wellplate ID to withdraw from
             rate (float): Pumping rate in milliliters per minute.
 
         Returns:
@@ -108,60 +110,69 @@ class Pump:
         volume_ul = volume
         if volume > 0:
             volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
-            if solution is not None:
+            if solution is not None and isinstance(solution, Vial):
                 density = solution.density
             else:
                 density = None
 
             self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
             self.update_pipette_volume(self.pump.volume_withdrawn)
-            logger.debug(
-                "Pump has withdrawn: %f ml    Pipette vol: %f",
+            pump_control_logger.info(
+                "Pump has withdrawn: %0.6f ml    Pipette vol: %0.3f ul",
                 self.pump.volume_withdrawn,
                 self.pipette_volume_ul,
             )
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if solution is not None:
-                solution.update_volume(-volume_ul)
+                if isinstance(solution, Vial):
+                    solution.update_volume(-volume_ul)
+                elif isinstance(solution, str):
+                    pass # TODO add well support here, currently updated elsewhere
+                else:
+                    pass
                 return solution
         else:
             return None
-
+    #TODO add the option to infuse or withdraw from a vial or a well
     def infuse(
-        self, volume: float, solution: Vial = None, rate: float = 0.5
+        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5
     ) -> Optional[Vial]:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
             volume (float): Volume to be infused in microliters.
-            solution (Vial object): The vial to infuse into
+            solution (Vial object): The solution being infused to get the density
+            destination (str or Vial): The destination of the solution (well or vial)
             rate (float): Pumping rate in milliliters per minute.
 
         Returns:
-            The updated solution object if given one
+            The updated destination object if given one
         """
         # convert the volume argument from ul to ml
-        volume_ul = volume
+        volume_ul = volume_to_infuse
         if volume_ul > 0:
             volume_ml = volume_ul / 1000.000
-            if solution is not None:
-                density = solution.density
+            if being_infused is not None:
+                density = being_infused.density
             else:
                 density = None
 
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
             self.update_pipette_volume(self.pump.volume_infused)
-            logger.debug(
-                "Pump has infused: %f ml  Pipette volume: %f",
+            pump_control_logger.info(
+                "Pump has infused: %0.6f ml  Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
                 self.pipette_volume_ul,
             )
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
-            if solution is not None:
-                solution.update_volume(volume_ul)
-                return solution
+            if infused_into is not None:
+                if isinstance(infused_into, Vial):
+                    infused_into.update_volume(volume_ul)
+                else:
+                    pass # TODO add well support here, currently updated elsewhere
+                return infused_into
             else:
                 return None
         else:
@@ -170,7 +181,7 @@ class Pump:
     def purge(
         self,
         purge_vial: Vial,
-        solution: Vial = None,
+        solution_being_purged: Vial = None,
         purge_volume=20.00,
         pumping_rate=0.5,
     ) -> Vial:
@@ -178,6 +189,7 @@ class Pump:
         Perform purging from the pipette.
         Args:
             purge_vial (Vial object): The vial to purge into
+            solution (Vial object): The solution being purged
             pump (object): The pump object to use
             purge_volume (float): The volume to purge in ml (default 20)
             pumping_rate (float): The pumping rate in ml/min (default 0.5)
@@ -186,21 +198,21 @@ class Pump:
             The updated purge_vial object
         """
 
-        logger.debug("Purging %f ul...", purge_volume)
-        self.infuse(volume=purge_volume, rate=pumping_rate, solution=solution)
+        pump_control_logger.debug("Purging %f ul...", purge_volume)
+        purge_vial, _ = self.infuse(volume_to_infuse=purge_volume, rate=pumping_rate, being_infused= solution_being_purged ,infused_into=purge_vial)
         log_msg = f"Purged {purge_volume} ul"
-        logger.debug(log_msg)
-        purge_vial.update_volume(purge_volume)
+        pump_control_logger.debug(log_msg)
+        #purge_vial.update_volume(purge_volume)
         return purge_vial
 
-    def run_pump(self, direction, volume_ml, rate, density=None):
+    def run_pump(self, direction, volume_ml, rate = None, density=None):
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
             return
         # Set the pump parameters for the run
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml
-        self.pump.pumping_rate = rate
+        self.pump.pumping_rate = self.max_pump_rate #rate
         action = (
             "Withdrawing"
             if direction == nesp_lib.PumpingDirection.WITHDRAW
@@ -208,21 +220,21 @@ class Pump:
         )
 
         ## Get scale value prior to pump action
-        if density is not None:
+        if density is not None or density != 0:
             pre_weight = self.scale.value()
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
-        logger.debug("%s %f ml...", action, volume_ml)
+        pump_control_logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
         self.pump.run()
         while self.pump.running:
             pass
-        logger.debug("Done %s", action)
+        pump_control_logger.debug("Done %s", action)
         time.sleep(2)
 
         ## Get scale value after pump action
-        if density is not None:
+        if density is not None or density != 0:
             post_weight = self.scale.value()
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
@@ -239,7 +251,7 @@ class Pump:
             else self.pump.volume_withdrawn
         )
         log_msg = f"Pump has {action_type}: {action_volume} ml"
-        logger.debug(log_msg)
+        pump_control_logger.debug(log_msg)
 
     def mix(
         self,
@@ -258,11 +270,11 @@ class Pump:
         Returns:
             None
         """
-        logger.info("Mixing %d times", mix_repetitions)
+        pump_control_logger.info("Mixing %d times", mix_repetitions)
 
         if mix_location is None:
             for i in range(mix_repetitions):
-                logger.debug("Mixing %d of %d times", i, mix_repetitions)
+                pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
                 self.withdraw(volume=mix_volume, rate=mix_rate)
                 current_coords = self.mill.current_coordinates()
                 current_coords = {
@@ -274,7 +286,7 @@ class Pump:
                 self.mill.move_center_to_position(
                     current_coords["x"], current_coords["y"], current_coords["z"] + 5
                 )
-                self.infuse(volume=mix_volume, rate=mix_rate)
+                self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
                 self.mill.move_center_to_position(
                     current_coords["x"], current_coords["y"], current_coords["z"]
                 )
@@ -286,13 +298,13 @@ class Pump:
                 mix_location["x"], mix_location["y"], mix_location["depth"]
             )
             for i in range(mix_repetitions):
-                logger.debug("Mixing %d of %d times", i, mix_repetitions)
+                pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
                 self.withdraw(volume=mix_volume, rate=mix_rate)
                 self.mill.set_feed_rate(500)
                 self.mill.move_pipette_to_position(
                     mix_location["x"], mix_location["y"], mix_location["depth"] + 1.5
                 )
-                self.infuse(volume=mix_volume, rate=mix_rate)
+                self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
                 self.mill.move_pipette_to_position(
                     mix_location["x"], mix_location["y"], mix_location["depth"]
                 )
@@ -318,6 +330,7 @@ class MockPump(Pump):
     """Mock pump class for testing"""
     def __init__(self, mill, scale):
         super().__init__(mill, scale)
+        self.max_pump_rate = 0.654 # ml/min
         self.syringe_capacity = 1.0  # mL
         self.pipette_capacity_ml = 0.2  # mL
         self.pipette_capacity_ul = 200  # uL
@@ -343,7 +356,7 @@ class MockPump(Pump):
         # self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
         self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         self.update_pipette_volume(volume_ml)
-        logger.debug(
+        pump_control_logger.debug(
             "Mock Pump has withdrawn: %f ml    Pipette vol: %f",
             volume_ml,
             self.pipette_volume_ul,
@@ -354,30 +367,49 @@ class MockPump(Pump):
         return 0
 
     def infuse(
-        self, volume: float, solution: Vial = None, rate: float = 0.5
+        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5
     ) -> Optional[Vial]:
-        # Simulate infuse behavior without sending commands to the pump
-        # Update pipette volume, log, and handle exceptions as needed
+        """
+        Simulate infuse behavior without sending commands to the pump
+        Update pipette volume, log, and handle exceptions as needed        
+        
+        Args:
+            volume (float): Volume to be infused in microliters.
+            solution (Vial object): The solution being infused to get the density
+            destination (str or Vial): The destination of the solution (well or vial)
+            rate (float): Pumping rate in milliliters per minute.
 
+        Returns:
+            The updated destination object if given one
+        """
         # convert the volume argument from ul to ml
-        volume_ul = volume
-        volume_ml = volume_ul / 1000.0
+        volume_ul = volume_to_infuse
+        if volume_ul > 0:
+            volume_ml = volume_ul / 1000.000
+            if being_infused is not None:
+                density = being_infused.density
+            else:
+                density = None
 
-        if volume_ul > 0.000:
-            # self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume, rate)
-            self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+            #self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
             self.update_pipette_volume(volume_ml)
-            logger.debug(
-                "Mock Pump has infused: %f ml  Pipette volume: %f",
+            pump_control_logger.info(
+                "Mock Pump has infused: %0.6f ml  Pipette volume: %0.3f ul",
                 volume_ml,
                 self.pipette_volume_ul,
             )
-            if solution is not None:
-                solution.update_volume(-volume_ul)
-                return solution
+            #self.pump.volume_infused_clear()
+            #self.pump.volume_withdrawn_clear()
+            if infused_into is not None:
+                if isinstance(infused_into, Vial):
+                    infused_into.update_volume(volume_ul)
+                else:
+                    pass # TODO add well support here, currently updated elsewhere
+                return infused_into
+            else:
+                return None
         else:
-            pass
-        return 0
+            return None
 
     def update_pipette_volume(self, volume_ml):
         """Change the pipette volume by the given amount
