@@ -145,7 +145,7 @@ def cv_cleaning_test():
         echem.activecheck()
         mill.rinse_electrode()
         input("Press enter to end")
-        echem.disconnectpstat()
+        echem.pstatdisconnect()
 
 
 def peg2p_test(experiments: list[Experiment]):
@@ -221,7 +221,7 @@ def peg2p_test(experiments: list[Experiment]):
                 # analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
 
             if echem.OPEN_CONNECTION is True:
-                echem.disconnectpstat()
+                echem.pstatdisconnect()
 
 
 def mixing_test(experiments: list[Experiment]):
@@ -302,7 +302,7 @@ def mixing_test(experiments: list[Experiment]):
                 # analyzer.plotdata(experiment.filename, Path.cwd() / "data" / experiment.filename)
 
             if echem.OPEN_CONNECTION is True:
-                echem.disconnectpstat()
+                echem.pstatdisconnect()
 
 
 if __name__ == "__main__":

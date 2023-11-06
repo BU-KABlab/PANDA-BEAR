@@ -30,7 +30,8 @@ from typing import Tuple
 import pytz as tz
 
 # Third party or custom imports
-import gamry_control_WIP as echem
+#import gamry_control_WIP as echem
+import gamry_control_WIP_mock as echem
 from experiment_class import (
     ExperimentResult,
     ExperimentStatus,
@@ -581,10 +582,10 @@ def deposition(
         mill.move_to_safe_position()  # move to safe height above target well
 
         mill.rinse_electrode()
-        echem.disconnectpstat()
+        echem.pstatdisconnect()
 
     else:
-        echem.disconnectpstat()
+        echem.pstatdisconnect()
         raise OCPFailure("CA")
 
     return dep_instructions, dep_results
@@ -670,10 +671,10 @@ def characterization(
         echem.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well
         mill.rinse_electrode()
-        echem.disconnectpstat()
+        echem.pstatdisconnect()
         return char_instructions, char_results
     else:
-        echem.disconnectpstat()
+        echem.pstatdisconnect()
         raise OCPFailure("CV")
 
 
@@ -1039,7 +1040,7 @@ def pipette_accurancy_protocol(
             raise NoAvailableSolution("One or more solutions are not available")
 
         logger.info("Pipetted %s into well: %s", json.dumps(instructions.solutions), instructions.target_well)
-        
+ 
         instructions.status = ExperimentStatus.COMPLETE
         logger.info("End of Experiment: %s", instructions.id)
 

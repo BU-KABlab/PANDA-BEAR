@@ -385,7 +385,7 @@ def disconnect_from_instruments(instruments: Toolkit):
     instruments.scale.close()
     try:
         if echem.OPEN_CONNECTION:
-            echem.disconnectpstat()
+            echem.pstatdisconnect()
     except AttributeError:
         pass
 

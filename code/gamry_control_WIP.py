@@ -134,7 +134,7 @@ class GamryDtaqEvents(object):
         self.call_savedata(self.complete_file_name)
 
 
-def disconnectpstat():
+def pstatdisconnect():
     """disconnect the pstat"""
     global PSTAT
     global OPEN_CONNECTION
@@ -425,7 +425,7 @@ if __name__ == "__main__":
                 time.sleep(0.5)
             ## echem plot the data
             Analyzer.plotdata("CV", COMPLETE_FILE_NAME)
-        disconnectpstat()
+        pstatdisconnect()
         del CONNECTION
 
     except Exception as e:
