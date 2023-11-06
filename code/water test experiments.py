@@ -13,14 +13,16 @@ from scheduler import Scheduler
 
 COLUMNS = 'ABCDEFGH'
 ROWS = 12
-experiment_id = 9991000
+experiment_id = 9991096
 PROJECT_ID = 3
 EXPERIMENT_NAME = 'Water test'
 experiments = []
 # Create a new experiment
-for column in COLUMNS:
+for column in 'COLUMNS':
+#for column in 'A':
     volume = 130
     for row in range(1,ROWS+1):
+    #for row in range(1,13):
         experiments.append(experiment_class.ExperimentBase(
                 id=experiment_id,
                 experiment_name= EXPERIMENT_NAME,

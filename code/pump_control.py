@@ -199,7 +199,7 @@ class Pump:
         """
 
         pump_control_logger.debug("Purging %f ul...", purge_volume)
-        purge_vial, _ = self.infuse(volume_to_infuse=purge_volume, rate=pumping_rate, being_infused= solution_being_purged ,infused_into=purge_vial)
+        purge_vial = self.infuse(volume_to_infuse=purge_volume, rate=pumping_rate, being_infused= solution_being_purged ,infused_into=purge_vial)
         log_msg = f"Purged {purge_volume} ul"
         pump_control_logger.debug(log_msg)
         #purge_vial.update_volume(purge_volume)
@@ -353,7 +353,7 @@ class MockPump(Pump):
         if volume_ul > 0.000:
             volume_ml = volume / 1000.0
 
-        # self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
+        self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
         self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
         self.update_pipette_volume(volume_ml)
         pump_control_logger.debug(
@@ -391,7 +391,7 @@ class MockPump(Pump):
             else:
                 density = None
 
-            #self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
             self.update_pipette_volume(volume_ml)
             pump_control_logger.info(
                 "Mock Pump has infused: %0.6f ml  Pipette volume: %0.3f ul",
@@ -410,6 +410,48 @@ class MockPump(Pump):
                 return None
         else:
             return None
+
+    def run_pump(self, direction, volume_ml, rate = None, density=None):
+        """Combine all the common commands to run the pump into one function"""
+        if volume_ml <= 0:
+            return
+        # Set the pump parameters for the run
+        action = (
+            "Withdrawing"
+            if direction == nesp_lib.PumpingDirection.WITHDRAW
+            else "Infusing"
+        )
+
+        ## Get scale value prior to pump action
+        if density is not None or density != 0:
+            pre_weight = self.scale.value()
+            scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
+            scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
+
+        pump_control_logger.debug("%s %f ml...", action, volume_ml)
+        time.sleep(0.5)
+        pump_control_logger.debug("Done %s", action)
+        time.sleep(2)
+
+        ## Get scale value after pump action
+        if density is not None or density != 0:
+            post_weight = self.scale.value()
+            scale_logger.debug("Scale reading after %s: %f", action, post_weight)
+            scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
+            scale_logger.info("Data,%s,%f,%f,%f,%f",
+                            action, volume_ml, density, pre_weight, post_weight
+                            )
+
+        action_type = (
+            "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
+        )
+        action_volume = (
+            volume_ml
+            if direction == nesp_lib.PumpingDirection.INFUSE
+            else volume_ml
+        )
+        log_msg = f"Pump has {action_type}: {action_volume} ml"
+        pump_control_logger.debug(log_msg)
 
     def update_pipette_volume(self, volume_ml):
         """Change the pipette volume by the given amount

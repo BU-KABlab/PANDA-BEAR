@@ -26,7 +26,8 @@ from mill_control import Mill
 from mill_control import MockMill
 from pump_control import Pump
 from pump_control import MockPump
-import gamry_control_WIP as echem
+#import gamry_control_WIP as echem
+import gamry_control_WIP_mock as echem
 from scale import MockSartorius
 from scale import Sartorius as Scale
 
@@ -680,5 +681,5 @@ def change_wellplate_location():
         json.dump(new_location, file, indent=4)
 
 if __name__ == "__main__":
-    main()
+    main(use_mock_instruments=True)
     #load_new_wellplate(new_plate_id=5)

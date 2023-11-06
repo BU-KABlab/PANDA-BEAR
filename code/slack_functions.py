@@ -48,8 +48,8 @@ def send_slack_message(channel_id: str, message) -> None:
 
     try:
         # Call the chat.postMessage method using the WebClient
-        result = client.chat_postMessage(channel=channel_id, text=message)
-        #result = {'ok': True}
+        #result = client.chat_postMessage(channel=channel_id, text=message)
+        result = {'ok': True}
         # print(result)
         # Log the result
         if result["ok"]:
