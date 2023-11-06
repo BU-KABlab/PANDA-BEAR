@@ -23,11 +23,11 @@ from pathlib import Path
 
 from print_panda import printpanda
 from mill_control import Mill
-#from mill_control import MockMill as Mill
+from mill_control import MockMill
 from pump_control import Pump
-#from pump_control import MockPump as Pump
+from pump_control import MockPump
 import gamry_control_WIP as echem
-#from scale import MockSartorius as Scale
+from scale import MockSartorius
 from scale import Sartorius as Scale
 
 # import obs_controls as obs
@@ -48,7 +48,7 @@ system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
-def main():
+def main(use_mock_instruments:bool = False):
     """Main function"""
     logger.info(printpanda())
     slack.send_slack_message("alert", "ePANDA is starting up")
@@ -58,7 +58,7 @@ def main():
         check_required_files()
 
         # Connect to equipment
-        toolkit = connect_to_instruments()
+        toolkit = connect_to_instruments(use_mock_instruments)
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
 
@@ -359,8 +359,17 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: list[Vial]) -> bo
             return False
     return True
 
-def connect_to_instruments():
+def connect_to_instruments(use_mock_instruments: bool = False):
     """Connect to the instruments"""
+    if use_mock_instruments:
+        logger.info("Using mock instruments")
+        mill = MockMill()
+        scale = MockSartorius()
+        pump = MockPump(mill=mill, scale=scale)
+        instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
+        return instruments
+
+    logger.info("Connecting to instruments:")
     mill = Mill()
     mill.homing_sequence()
     scale = Scale()
