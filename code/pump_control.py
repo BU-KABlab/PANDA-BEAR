@@ -423,7 +423,7 @@ class MockPump(Pump):
         )
 
         ## Get scale value prior to pump action
-        if density is not None or density != 0:
+        if density is not None and density != 0:
             pre_weight = self.scale.value()
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
@@ -434,7 +434,7 @@ class MockPump(Pump):
         time.sleep(2)
 
         ## Get scale value after pump action
-        if density is not None or density != 0:
+        if density is not None and density != 0:
             post_weight = self.scale.value()
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)

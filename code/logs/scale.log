@@ -11403,3 +11403,33 @@
 2023-11-03 21:22:45,093,scale_logger,DEBUG,Scale reading after Infusing: 4.927000
 2023-11-03 21:22:45,094,scale_logger,DEBUG,Scale reading difference: -0.071000
 2023-11-03 21:22:45,094,scale_logger,INFO,Data,Infusing,0.090000,1.000000,4.856000,4.927000
+2023-11-06 14:20:33,275,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-06 14:20:33,276,scale_logger,DEBUG,Scale reading before Infusing: 6.205297
+2023-11-06 14:20:35,777,scale_logger,DEBUG,Scale reading after Infusing: 3.741198
+2023-11-06 14:20:35,777,scale_logger,DEBUG,Scale reading difference: -2.464098
+2023-11-06 14:20:35,777,scale_logger,INFO,Data,Infusing,0.020000,1.000000,6.205297,3.741198
+2023-11-06 14:20:35,779,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-06 14:20:35,779,scale_logger,DEBUG,Scale reading before Infusing: 8.645390
+2023-11-06 14:20:38,281,scale_logger,DEBUG,Scale reading after Infusing: 6.132264
+2023-11-06 14:20:38,281,scale_logger,DEBUG,Scale reading difference: -2.513127
+2023-11-06 14:20:38,281,scale_logger,INFO,Data,Infusing,0.130000,1.000000,8.645390,6.132264
+2023-11-06 14:20:38,282,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-06 14:20:38,282,scale_logger,DEBUG,Scale reading before Infusing: 3.641608
+2023-11-06 14:20:40,783,scale_logger,DEBUG,Scale reading after Infusing: 0.425966
+2023-11-06 14:20:40,783,scale_logger,DEBUG,Scale reading difference: -3.215642
+2023-11-06 14:20:40,783,scale_logger,INFO,Data,Infusing,0.020000,1.000000,3.641608,0.425966
+2023-11-06 14:22:13,652,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-06 14:22:13,652,scale_logger,DEBUG,Scale reading before Infusing: -5.267029
+2023-11-06 14:22:16,154,scale_logger,DEBUG,Scale reading after Infusing: 9.342156
+2023-11-06 14:22:16,154,scale_logger,DEBUG,Scale reading difference: 14.609185
+2023-11-06 14:22:16,154,scale_logger,INFO,Data,Infusing,0.020000,1.000000,-5.267029,9.342156
+2023-11-06 14:22:16,156,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-06 14:22:16,156,scale_logger,DEBUG,Scale reading before Infusing: -2.013281
+2023-11-06 14:22:18,657,scale_logger,DEBUG,Scale reading after Infusing: -7.486393
+2023-11-06 14:22:18,657,scale_logger,DEBUG,Scale reading difference: -5.473112
+2023-11-06 14:22:18,657,scale_logger,INFO,Data,Infusing,0.130000,1.000000,-2.013281,-7.486393
+2023-11-06 14:22:18,658,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-06 14:22:18,658,scale_logger,DEBUG,Scale reading before Infusing: 6.325226
+2023-11-06 14:22:21,160,scale_logger,DEBUG,Scale reading after Infusing: 5.940580
+2023-11-06 14:22:21,160,scale_logger,DEBUG,Scale reading difference: -0.384646
+2023-11-06 14:22:21,160,scale_logger,INFO,Data,Infusing,0.020000,1.000000,6.325226,5.940580

@@ -1225,3 +1225,25 @@ The server responded with: {'ok': False, 'error': 'ratelimited'}
 2023-11-06 14:08:30,612:slack_functions:INFO:Message sent:No new experiments to run...monitoring inbox for new experiments
 2023-11-06 14:14:32,316:slack_functions:INFO:Message sent:ePANDA was interrupted by the user
 2023-11-06 14:14:34,850:slack_functions:INFO:Message sent:ePANDA is shutting down...goodbye
+2023-11-06 14:19:33,943:slack_functions:INFO:Message sent:ePANDA is starting up
+2023-11-06 14:19:33,944:slack_functions:INFO:Message sent:ePANDA has connected to equipment
+2023-11-06 14:19:33,958:slack_functions:INFO:Message sent:The following stock vials are low or empty: rinse0, rinse1, rinse2
+2023-11-06 14:19:33,958:slack_functions:INFO:Message sent:Please refill the stock vials and confirm in the terminal that the program should continue
+2023-11-06 14:19:38,890:slack_functions:INFO:Message sent:The program is continuing
+2023-11-06 14:19:38,893:slack_functions:INFO:Message sent:Running experiment 9991096
+2023-11-06 14:20:27,051:slack_functions:INFO:Message sent:ePANDA is starting up
+2023-11-06 14:20:27,052:slack_functions:INFO:Message sent:ePANDA has connected to equipment
+2023-11-06 14:20:27,067:slack_functions:INFO:Message sent:The following stock vials are low or empty: rinse0, rinse1, rinse2
+2023-11-06 14:20:27,067:slack_functions:INFO:Message sent:Please refill the stock vials and confirm in the terminal that the program should continue
+2023-11-06 14:20:28,260:slack_functions:INFO:Message sent:The program is continuing
+2023-11-06 14:20:28,261:slack_functions:INFO:Message sent:Running experiment 9991100
+2023-11-06 14:20:43,345:slack_functions:INFO:Message sent:Experiment 9991100 ended with status complete
+2023-11-06 14:20:43,367:slack_functions:INFO:Message sent:The following stock vials are low or empty: rinse0, rinse1, rinse2
+2023-11-06 14:20:43,368:slack_functions:INFO:Message sent:Please refill the stock vials and confirm in the terminal that the program should continue
+2023-11-06 14:22:08,631:slack_functions:INFO:Message sent:The program is continuing
+2023-11-06 14:22:08,633:slack_functions:INFO:Message sent:Running experiment 9991098
+2023-11-06 14:22:23,663:slack_functions:INFO:Message sent:Experiment 9991098 ended with status complete
+2023-11-06 14:22:23,686:slack_functions:INFO:Message sent:The following stock vials are low or empty: rinse0, rinse1, rinse2
+2023-11-06 14:22:23,686:slack_functions:INFO:Message sent:Please refill the stock vials and confirm in the terminal that the program should continue
+2023-11-06 14:23:28,651:slack_functions:INFO:Message sent:ePANDA was interrupted by the user
+2023-11-06 14:23:29,465:slack_functions:INFO:Message sent:ePANDA is shutting down...goodbye
