@@ -233,7 +233,6 @@ class Wells:
 
         return x_coordinates, y_coordinates, color
 
-
 class GraceBioLabsWellPlate(Wells):
     """
     Well type for the Grace BioLabs 96 well plate
@@ -332,6 +331,17 @@ def read_well_type_characteristics(
         current_well.z_bottom + height,
     )
 
+class WellPlate:
+    """
+    The foundation of every type of wellplate
+    Attributes:
+        Well count
+        Max volume
+        Well shape
+        Footprint (lenght, width, height)
+        Well measurements (Depth, diameter)
+        Spacing (x-offset, y-offset, x-spacing, y-spacing)
+    """
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
