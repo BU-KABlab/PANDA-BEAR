@@ -10443,3 +10443,963 @@
 2023-11-01 18:37:47,879,pump_control,DEBUG,Mock Pump has infused: 0.001000 ml  Pipette volume: 40.000000
 2023-11-01 18:37:47,879,pump_control,DEBUG,Purged 1.0 ul
 2023-11-01 18:37:47,880,pump_control,DEBUG,Mock Pump has infused: 0.040000 ml  Pipette volume: 0.000000
+2023-11-03 16:24:52,645,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 16:24:52,645,scale_logger,DEBUG,Scale reading before Withdrawing: 0.000000
+2023-11-03 16:25:04,889,scale_logger,DEBUG,Scale reading after Withdrawing: 0.000000
+2023-11-03 16:25:04,889,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:25:04,889,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,0.000000,0.000000
+2023-11-03 16:25:36,365,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 16:25:36,366,scale_logger,DEBUG,Scale reading before Infusing: 0.000000
+2023-11-03 16:25:43,819,scale_logger,DEBUG,Scale reading after Infusing: 0.033000
+2023-11-03 16:25:43,819,scale_logger,DEBUG,Scale reading difference: -0.033000
+2023-11-03 16:25:43,820,scale_logger,INFO,Data,Infusing,0.040000,1.000000,0.000000,0.033000
+2023-11-03 16:31:40,060,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 16:31:40,060,scale_logger,DEBUG,Scale reading before Withdrawing: 0.036000
+2023-11-03 16:31:52,305,scale_logger,DEBUG,Scale reading after Withdrawing: 0.035000
+2023-11-03 16:31:52,306,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 16:31:52,306,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,0.036000,0.035000
+2023-11-03 16:32:22,782,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 16:32:22,783,scale_logger,DEBUG,Scale reading before Infusing: 0.035000
+2023-11-03 16:32:30,241,scale_logger,DEBUG,Scale reading after Infusing: 0.068000
+2023-11-03 16:32:30,241,scale_logger,DEBUG,Scale reading difference: -0.033000
+2023-11-03 16:32:30,241,scale_logger,INFO,Data,Infusing,0.040000,1.000000,0.035000,0.068000
+2023-11-03 16:34:29,919,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 16:34:29,920,scale_logger,DEBUG,Scale reading before Withdrawing: 0.074000
+2023-11-03 16:34:39,738,scale_logger,DEBUG,Scale reading after Withdrawing: 0.073000
+2023-11-03 16:34:39,738,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 16:34:39,739,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,0.074000,0.073000
+2023-11-03 16:35:10,204,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 16:35:10,204,scale_logger,DEBUG,Scale reading before Infusing: 0.074000
+2023-11-03 16:35:15,235,scale_logger,DEBUG,Scale reading after Infusing: 0.073000
+2023-11-03 16:35:15,235,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 16:35:15,236,scale_logger,INFO,Data,Infusing,0.020000,1.000000,0.074000,0.073000
+2023-11-03 16:37:55,435,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 16:37:55,435,scale_logger,DEBUG,Scale reading before Withdrawing: 0.091000
+2023-11-03 16:38:05,258,scale_logger,DEBUG,Scale reading after Withdrawing: 0.091000
+2023-11-03 16:38:05,259,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:38:05,259,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,0.091000,0.091000
+2023-11-03 16:38:36,734,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 16:38:36,735,scale_logger,DEBUG,Scale reading before Infusing: 0.091000
+2023-11-03 16:38:41,763,scale_logger,DEBUG,Scale reading after Infusing: 0.091000
+2023-11-03 16:38:41,763,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:38:41,763,scale_logger,INFO,Data,Infusing,0.020000,1.000000,0.091000,0.091000
+2023-11-03 16:40:39,565,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 16:40:39,565,scale_logger,DEBUG,Scale reading before Withdrawing: 0.108000
+2023-11-03 16:41:01,393,scale_logger,DEBUG,Scale reading after Withdrawing: 0.108000
+2023-11-03 16:41:01,393,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:41:01,393,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,0.108000,0.108000
+2023-11-03 16:41:31,861,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 16:41:31,862,scale_logger,DEBUG,Scale reading before Infusing: 0.108000
+2023-11-03 16:41:48,911,scale_logger,DEBUG,Scale reading after Infusing: 0.212000
+2023-11-03 16:41:48,912,scale_logger,DEBUG,Scale reading difference: -0.104000
+2023-11-03 16:41:48,912,scale_logger,INFO,Data,Infusing,0.120000,1.000000,0.108000,0.212000
+2023-11-03 16:44:03,676,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 16:44:03,676,scale_logger,DEBUG,Scale reading before Withdrawing: 0.216000
+2023-11-03 16:44:17,084,scale_logger,DEBUG,Scale reading after Withdrawing: 0.215000
+2023-11-03 16:44:17,084,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 16:44:17,084,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,0.216000,0.215000
+2023-11-03 16:44:46,535,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 16:44:46,535,scale_logger,DEBUG,Scale reading before Infusing: 0.216000
+2023-11-03 16:44:55,146,scale_logger,DEBUG,Scale reading after Infusing: 0.250000
+2023-11-03 16:44:55,147,scale_logger,DEBUG,Scale reading difference: -0.034000
+2023-11-03 16:44:55,147,scale_logger,INFO,Data,Infusing,0.050000,1.000000,0.216000,0.250000
+2023-11-03 16:47:31,246,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 16:47:31,247,scale_logger,DEBUG,Scale reading before Withdrawing: 0.250000
+2023-11-03 16:47:43,484,scale_logger,DEBUG,Scale reading after Withdrawing: 0.250000
+2023-11-03 16:47:43,485,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:47:43,485,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,0.250000,0.250000
+2023-11-03 16:48:13,951,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 16:48:13,952,scale_logger,DEBUG,Scale reading before Infusing: 0.251000
+2023-11-03 16:48:21,401,scale_logger,DEBUG,Scale reading after Infusing: 0.287000
+2023-11-03 16:48:21,402,scale_logger,DEBUG,Scale reading difference: -0.036000
+2023-11-03 16:48:21,402,scale_logger,INFO,Data,Infusing,0.040000,1.000000,0.251000,0.287000
+2023-11-03 16:50:20,984,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 16:50:20,984,scale_logger,DEBUG,Scale reading before Withdrawing: 0.285000
+2023-11-03 16:50:38,009,scale_logger,DEBUG,Scale reading after Withdrawing: 0.285000
+2023-11-03 16:50:38,009,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:50:38,009,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,0.285000,0.285000
+2023-11-03 16:51:08,466,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 16:51:08,466,scale_logger,DEBUG,Scale reading before Infusing: 0.285000
+2023-11-03 16:51:20,707,scale_logger,DEBUG,Scale reading after Infusing: 0.360000
+2023-11-03 16:51:20,707,scale_logger,DEBUG,Scale reading difference: -0.075000
+2023-11-03 16:51:20,707,scale_logger,INFO,Data,Infusing,0.080000,1.000000,0.285000,0.360000
+2023-11-03 16:53:27,834,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 16:53:27,834,scale_logger,DEBUG,Scale reading before Withdrawing: 0.357000
+2023-11-03 16:53:47,254,scale_logger,DEBUG,Scale reading after Withdrawing: 0.357000
+2023-11-03 16:53:47,254,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:53:47,255,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,0.357000,0.357000
+2023-11-03 16:54:17,721,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 16:54:17,722,scale_logger,DEBUG,Scale reading before Infusing: 0.357000
+2023-11-03 16:54:32,382,scale_logger,DEBUG,Scale reading after Infusing: 0.444000
+2023-11-03 16:54:32,383,scale_logger,DEBUG,Scale reading difference: -0.087000
+2023-11-03 16:54:32,383,scale_logger,INFO,Data,Infusing,0.100000,1.000000,0.357000,0.444000
+2023-11-03 16:56:42,349,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 16:56:42,350,scale_logger,DEBUG,Scale reading before Withdrawing: 0.447000
+2023-11-03 16:57:01,796,scale_logger,DEBUG,Scale reading after Withdrawing: 0.447000
+2023-11-03 16:57:01,796,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 16:57:01,797,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,0.447000,0.447000
+2023-11-03 16:57:33,266,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 16:57:33,267,scale_logger,DEBUG,Scale reading before Infusing: 0.446000
+2023-11-03 16:57:47,924,scale_logger,DEBUG,Scale reading after Infusing: 0.535000
+2023-11-03 16:57:47,925,scale_logger,DEBUG,Scale reading difference: -0.089000
+2023-11-03 16:57:47,925,scale_logger,INFO,Data,Infusing,0.100000,1.000000,0.446000,0.535000
+2023-11-03 17:00:01,837,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 17:00:01,837,scale_logger,DEBUG,Scale reading before Withdrawing: 0.536000
+2023-11-03 17:00:11,667,scale_logger,DEBUG,Scale reading after Withdrawing: 0.536000
+2023-11-03 17:00:11,667,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:00:11,667,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,0.536000,0.536000
+2023-11-03 17:00:42,134,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 17:00:42,135,scale_logger,DEBUG,Scale reading before Infusing: 0.535000
+2023-11-03 17:00:47,162,scale_logger,DEBUG,Scale reading after Infusing: 0.535000
+2023-11-03 17:00:47,162,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:00:47,163,scale_logger,INFO,Data,Infusing,0.020000,1.000000,0.535000,0.535000
+2023-11-03 17:02:41,904,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 17:02:41,904,scale_logger,DEBUG,Scale reading before Withdrawing: 0.551000
+2023-11-03 17:03:03,722,scale_logger,DEBUG,Scale reading after Withdrawing: 0.551000
+2023-11-03 17:03:03,723,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:03:03,723,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,0.551000,0.551000
+2023-11-03 17:03:35,198,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 17:03:35,198,scale_logger,DEBUG,Scale reading before Infusing: 0.551000
+2023-11-03 17:03:52,223,scale_logger,DEBUG,Scale reading after Infusing: 0.653000
+2023-11-03 17:03:52,223,scale_logger,DEBUG,Scale reading difference: -0.102000
+2023-11-03 17:03:52,224,scale_logger,INFO,Data,Infusing,0.120000,1.000000,0.551000,0.653000
+2023-11-03 17:06:09,939,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 17:06:09,939,scale_logger,DEBUG,Scale reading before Withdrawing: 0.657000
+2023-11-03 17:06:28,191,scale_logger,DEBUG,Scale reading after Withdrawing: 0.656000
+2023-11-03 17:06:28,192,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:06:28,192,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,0.657000,0.656000
+2023-11-03 17:06:58,653,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 17:06:58,654,scale_logger,DEBUG,Scale reading before Infusing: 0.656000
+2023-11-03 17:07:12,107,scale_logger,DEBUG,Scale reading after Infusing: 0.727000
+2023-11-03 17:07:12,108,scale_logger,DEBUG,Scale reading difference: -0.071000
+2023-11-03 17:07:12,108,scale_logger,INFO,Data,Infusing,0.090000,1.000000,0.656000,0.727000
+2023-11-03 17:09:19,563,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 17:09:19,563,scale_logger,DEBUG,Scale reading before Withdrawing: 0.725000
+2023-11-03 17:09:41,393,scale_logger,DEBUG,Scale reading after Withdrawing: 0.724000
+2023-11-03 17:09:41,393,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:09:41,394,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,0.725000,0.724000
+2023-11-03 17:10:11,857,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 17:10:11,858,scale_logger,DEBUG,Scale reading before Infusing: 0.724000
+2023-11-03 17:10:28,896,scale_logger,DEBUG,Scale reading after Infusing: 0.826000
+2023-11-03 17:10:28,897,scale_logger,DEBUG,Scale reading difference: -0.102000
+2023-11-03 17:10:28,897,scale_logger,INFO,Data,Infusing,0.120000,1.000000,0.724000,0.826000
+2023-11-03 17:12:43,584,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 17:12:43,585,scale_logger,DEBUG,Scale reading before Withdrawing: 0.828000
+2023-11-03 17:13:04,189,scale_logger,DEBUG,Scale reading after Withdrawing: 0.828000
+2023-11-03 17:13:04,190,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:13:04,190,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,0.828000,0.828000
+2023-11-03 17:13:34,650,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:13:34,650,scale_logger,DEBUG,Scale reading before Infusing: 0.828000
+2023-11-03 17:13:50,482,scale_logger,DEBUG,Scale reading after Infusing: 0.920000
+2023-11-03 17:13:50,482,scale_logger,DEBUG,Scale reading difference: -0.092000
+2023-11-03 17:13:50,483,scale_logger,INFO,Data,Infusing,0.110000,1.000000,0.828000,0.920000
+2023-11-03 17:16:02,795,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 17:16:02,795,scale_logger,DEBUG,Scale reading before Withdrawing: 0.917000
+2023-11-03 17:16:17,405,scale_logger,DEBUG,Scale reading after Withdrawing: 0.917000
+2023-11-03 17:16:17,406,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:16:17,406,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,0.917000,0.917000
+2023-11-03 17:16:48,886,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 17:16:48,886,scale_logger,DEBUG,Scale reading before Infusing: 0.916000
+2023-11-03 17:16:58,706,scale_logger,DEBUG,Scale reading after Infusing: 0.959000
+2023-11-03 17:16:58,707,scale_logger,DEBUG,Scale reading difference: -0.043000
+2023-11-03 17:16:58,707,scale_logger,INFO,Data,Infusing,0.060000,1.000000,0.916000,0.959000
+2023-11-03 17:19:04,050,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 17:19:04,050,scale_logger,DEBUG,Scale reading before Withdrawing: 0.966000
+2023-11-03 17:19:27,087,scale_logger,DEBUG,Scale reading after Withdrawing: 0.966000
+2023-11-03 17:19:27,087,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:19:27,088,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,0.966000,0.966000
+2023-11-03 17:19:57,550,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 17:19:57,550,scale_logger,DEBUG,Scale reading before Infusing: 0.965000
+2023-11-03 17:20:15,795,scale_logger,DEBUG,Scale reading after Infusing: 1.073000
+2023-11-03 17:20:15,795,scale_logger,DEBUG,Scale reading difference: -0.108000
+2023-11-03 17:20:15,795,scale_logger,INFO,Data,Infusing,0.130000,1.000000,0.965000,1.073000
+2023-11-03 17:22:32,937,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 17:22:32,937,scale_logger,DEBUG,Scale reading before Withdrawing: 1.090000
+2023-11-03 17:22:43,978,scale_logger,DEBUG,Scale reading after Withdrawing: 1.088000
+2023-11-03 17:22:43,979,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 17:22:43,979,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,1.090000,1.088000
+2023-11-03 17:23:14,444,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 17:23:14,444,scale_logger,DEBUG,Scale reading before Infusing: 1.088000
+2023-11-03 17:23:20,685,scale_logger,DEBUG,Scale reading after Infusing: 1.104000
+2023-11-03 17:23:20,686,scale_logger,DEBUG,Scale reading difference: -0.016000
+2023-11-03 17:23:20,686,scale_logger,INFO,Data,Infusing,0.030000,1.000000,1.088000,1.104000
+2023-11-03 17:25:17,837,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:25:17,838,scale_logger,DEBUG,Scale reading before Withdrawing: 1.102000
+2023-11-03 17:25:33,656,scale_logger,DEBUG,Scale reading after Withdrawing: 1.101000
+2023-11-03 17:25:33,656,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:25:33,657,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,1.102000,1.101000
+2023-11-03 17:26:05,129,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 17:26:05,130,scale_logger,DEBUG,Scale reading before Infusing: 1.100000
+2023-11-03 17:26:16,160,scale_logger,DEBUG,Scale reading after Infusing: 1.152000
+2023-11-03 17:26:16,160,scale_logger,DEBUG,Scale reading difference: -0.052000
+2023-11-03 17:26:16,160,scale_logger,INFO,Data,Infusing,0.070000,1.000000,1.100000,1.152000
+2023-11-03 17:28:23,937,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 17:28:23,938,scale_logger,DEBUG,Scale reading before Withdrawing: 1.152000
+2023-11-03 17:28:34,970,scale_logger,DEBUG,Scale reading after Withdrawing: 1.151000
+2023-11-03 17:28:34,970,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:28:34,971,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,1.152000,1.151000
+2023-11-03 17:29:05,435,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 17:29:05,435,scale_logger,DEBUG,Scale reading before Infusing: 1.150000
+2023-11-03 17:29:11,673,scale_logger,DEBUG,Scale reading after Infusing: 1.167000
+2023-11-03 17:29:11,674,scale_logger,DEBUG,Scale reading difference: -0.017000
+2023-11-03 17:29:11,674,scale_logger,INFO,Data,Infusing,0.030000,1.000000,1.150000,1.167000
+2023-11-03 17:31:08,892,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 17:31:08,893,scale_logger,DEBUG,Scale reading before Withdrawing: 1.165000
+2023-11-03 17:31:23,500,scale_logger,DEBUG,Scale reading after Withdrawing: 1.164000
+2023-11-03 17:31:23,501,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:31:23,501,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,1.165000,1.164000
+2023-11-03 17:31:53,959,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 17:31:53,959,scale_logger,DEBUG,Scale reading before Infusing: 1.164000
+2023-11-03 17:32:03,771,scale_logger,DEBUG,Scale reading after Infusing: 1.200000
+2023-11-03 17:32:03,772,scale_logger,DEBUG,Scale reading difference: -0.036000
+2023-11-03 17:32:03,772,scale_logger,INFO,Data,Infusing,0.060000,1.000000,1.164000,1.200000
+2023-11-03 17:34:06,096,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:34:06,097,scale_logger,DEBUG,Scale reading before Withdrawing: 1.216000
+2023-11-03 17:34:21,908,scale_logger,DEBUG,Scale reading after Withdrawing: 1.214000
+2023-11-03 17:34:21,909,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 17:34:21,909,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,1.216000,1.214000
+2023-11-03 17:34:52,369,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 17:34:52,370,scale_logger,DEBUG,Scale reading before Infusing: 1.214000
+2023-11-03 17:35:03,397,scale_logger,DEBUG,Scale reading after Infusing: 1.265000
+2023-11-03 17:35:03,397,scale_logger,DEBUG,Scale reading difference: -0.051000
+2023-11-03 17:35:03,397,scale_logger,INFO,Data,Infusing,0.070000,1.000000,1.214000,1.265000
+2023-11-03 17:37:08,173,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:37:08,173,scale_logger,DEBUG,Scale reading before Withdrawing: 1.265000
+2023-11-03 17:37:23,992,scale_logger,DEBUG,Scale reading after Withdrawing: 1.264000
+2023-11-03 17:37:23,993,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:37:23,993,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,1.265000,1.264000
+2023-11-03 17:37:54,457,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 17:37:54,458,scale_logger,DEBUG,Scale reading before Infusing: 1.263000
+2023-11-03 17:38:05,481,scale_logger,DEBUG,Scale reading after Infusing: 1.316000
+2023-11-03 17:38:05,483,scale_logger,DEBUG,Scale reading difference: -0.053000
+2023-11-03 17:38:05,483,scale_logger,INFO,Data,Infusing,0.070000,1.000000,1.263000,1.316000
+2023-11-03 17:40:10,197,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 17:40:10,198,scale_logger,DEBUG,Scale reading before Withdrawing: 1.313000
+2023-11-03 17:40:27,226,scale_logger,DEBUG,Scale reading after Withdrawing: 1.313000
+2023-11-03 17:40:27,227,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:40:27,227,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,1.313000,1.313000
+2023-11-03 17:40:57,692,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 17:40:57,693,scale_logger,DEBUG,Scale reading before Infusing: 1.313000
+2023-11-03 17:41:09,936,scale_logger,DEBUG,Scale reading after Infusing: 1.370000
+2023-11-03 17:41:09,937,scale_logger,DEBUG,Scale reading difference: -0.057000
+2023-11-03 17:41:09,937,scale_logger,INFO,Data,Infusing,0.080000,1.000000,1.313000,1.370000
+2023-11-03 17:43:17,085,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:43:17,086,scale_logger,DEBUG,Scale reading before Withdrawing: 1.380000
+2023-11-03 17:43:32,906,scale_logger,DEBUG,Scale reading after Withdrawing: 1.379000
+2023-11-03 17:43:32,906,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:43:32,907,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,1.380000,1.379000
+2023-11-03 17:44:02,361,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 17:44:02,361,scale_logger,DEBUG,Scale reading before Infusing: 1.379000
+2023-11-03 17:44:13,397,scale_logger,DEBUG,Scale reading after Infusing: 1.428000
+2023-11-03 17:44:13,397,scale_logger,DEBUG,Scale reading difference: -0.049000
+2023-11-03 17:44:13,397,scale_logger,INFO,Data,Infusing,0.070000,1.000000,1.379000,1.428000
+2023-11-03 17:46:15,081,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:46:15,081,scale_logger,DEBUG,Scale reading before Withdrawing: 1.429000
+2023-11-03 17:46:30,888,scale_logger,DEBUG,Scale reading after Withdrawing: 1.428000
+2023-11-03 17:46:30,889,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:46:30,889,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,1.429000,1.428000
+2023-11-03 17:47:01,352,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 17:47:01,352,scale_logger,DEBUG,Scale reading before Infusing: 1.427000
+2023-11-03 17:47:12,392,scale_logger,DEBUG,Scale reading after Infusing: 1.477000
+2023-11-03 17:47:12,392,scale_logger,DEBUG,Scale reading difference: -0.050000
+2023-11-03 17:47:12,393,scale_logger,INFO,Data,Infusing,0.070000,1.000000,1.427000,1.477000
+2023-11-03 17:49:17,183,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 17:49:17,183,scale_logger,DEBUG,Scale reading before Withdrawing: 1.476000
+2023-11-03 17:49:34,236,scale_logger,DEBUG,Scale reading after Withdrawing: 1.475000
+2023-11-03 17:49:34,237,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:49:34,237,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,1.476000,1.475000
+2023-11-03 17:50:05,709,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 17:50:05,710,scale_logger,DEBUG,Scale reading before Infusing: 1.475000
+2023-11-03 17:50:17,969,scale_logger,DEBUG,Scale reading after Infusing: 1.531000
+2023-11-03 17:50:17,969,scale_logger,DEBUG,Scale reading difference: -0.056000
+2023-11-03 17:50:17,970,scale_logger,INFO,Data,Infusing,0.080000,1.000000,1.475000,1.531000
+2023-11-03 17:52:28,175,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 17:52:28,175,scale_logger,DEBUG,Scale reading before Withdrawing: 1.544000
+2023-11-03 17:52:48,793,scale_logger,DEBUG,Scale reading after Withdrawing: 1.542000
+2023-11-03 17:52:48,793,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 17:52:48,794,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,1.544000,1.542000
+2023-11-03 17:53:18,247,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:53:18,248,scale_logger,DEBUG,Scale reading before Infusing: 1.541000
+2023-11-03 17:53:34,071,scale_logger,DEBUG,Scale reading after Infusing: 1.631000
+2023-11-03 17:53:34,071,scale_logger,DEBUG,Scale reading difference: -0.090000
+2023-11-03 17:53:34,071,scale_logger,INFO,Data,Infusing,0.110000,1.000000,1.541000,1.631000
+2023-11-03 17:55:43,339,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 17:55:43,339,scale_logger,DEBUG,Scale reading before Withdrawing: 1.627000
+2023-11-03 17:55:53,154,scale_logger,DEBUG,Scale reading after Withdrawing: 1.627000
+2023-11-03 17:55:53,155,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:55:53,155,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,1.627000,1.627000
+2023-11-03 17:56:23,615,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 17:56:23,615,scale_logger,DEBUG,Scale reading before Infusing: 1.626000
+2023-11-03 17:56:28,644,scale_logger,DEBUG,Scale reading after Infusing: 1.626000
+2023-11-03 17:56:28,645,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 17:56:28,645,scale_logger,INFO,Data,Infusing,0.020000,1.000000,1.626000,1.626000
+2023-11-03 17:58:23,363,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 17:58:23,363,scale_logger,DEBUG,Scale reading before Withdrawing: 1.639000
+2023-11-03 17:58:43,970,scale_logger,DEBUG,Scale reading after Withdrawing: 1.638000
+2023-11-03 17:58:43,971,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 17:58:43,971,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,1.639000,1.638000
+2023-11-03 17:59:13,414,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 17:59:13,414,scale_logger,DEBUG,Scale reading before Infusing: 1.635000
+2023-11-03 17:59:29,230,scale_logger,DEBUG,Scale reading after Infusing: 1.725000
+2023-11-03 17:59:29,231,scale_logger,DEBUG,Scale reading difference: -0.090000
+2023-11-03 17:59:29,231,scale_logger,INFO,Data,Infusing,0.110000,1.000000,1.635000,1.725000
+2023-11-03 18:01:38,574,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 18:01:38,575,scale_logger,DEBUG,Scale reading before Withdrawing: 1.720000
+2023-11-03 18:01:49,619,scale_logger,DEBUG,Scale reading after Withdrawing: 1.719000
+2023-11-03 18:01:49,620,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 18:01:49,620,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,1.720000,1.719000
+2023-11-03 18:02:20,088,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 18:02:20,089,scale_logger,DEBUG,Scale reading before Infusing: 1.717000
+2023-11-03 18:02:26,339,scale_logger,DEBUG,Scale reading after Infusing: 1.736000
+2023-11-03 18:02:26,340,scale_logger,DEBUG,Scale reading difference: -0.019000
+2023-11-03 18:02:26,340,scale_logger,INFO,Data,Infusing,0.030000,1.000000,1.717000,1.736000
+2023-11-03 18:04:23,538,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 18:04:23,539,scale_logger,DEBUG,Scale reading before Withdrawing: 1.732000
+2023-11-03 18:04:46,552,scale_logger,DEBUG,Scale reading after Withdrawing: 1.730000
+2023-11-03 18:04:46,553,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:04:46,553,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,1.732000,1.730000
+2023-11-03 18:05:16,008,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 18:05:16,009,scale_logger,DEBUG,Scale reading before Infusing: 1.731000
+2023-11-03 18:05:34,217,scale_logger,DEBUG,Scale reading after Infusing: 1.833000
+2023-11-03 18:05:34,217,scale_logger,DEBUG,Scale reading difference: -0.102000
+2023-11-03 18:05:34,218,scale_logger,INFO,Data,Infusing,0.130000,1.000000,1.731000,1.833000
+2023-11-03 18:07:48,283,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 18:07:48,284,scale_logger,DEBUG,Scale reading before Withdrawing: 1.831000
+2023-11-03 18:08:08,933,scale_logger,DEBUG,Scale reading after Withdrawing: 1.831000
+2023-11-03 18:08:08,934,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 18:08:08,934,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,1.831000,1.831000
+2023-11-03 18:08:40,415,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 18:08:40,416,scale_logger,DEBUG,Scale reading before Infusing: 1.828000
+2023-11-03 18:08:56,259,scale_logger,DEBUG,Scale reading after Infusing: 1.918000
+2023-11-03 18:08:56,260,scale_logger,DEBUG,Scale reading difference: -0.090000
+2023-11-03 18:08:56,260,scale_logger,INFO,Data,Infusing,0.110000,1.000000,1.828000,1.918000
+2023-11-03 18:11:11,701,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 18:11:11,702,scale_logger,DEBUG,Scale reading before Withdrawing: 1.911000
+2023-11-03 18:11:29,926,scale_logger,DEBUG,Scale reading after Withdrawing: 1.910000
+2023-11-03 18:11:29,927,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 18:11:29,927,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,1.911000,1.910000
+2023-11-03 18:12:00,388,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 18:12:00,388,scale_logger,DEBUG,Scale reading before Infusing: 1.908000
+2023-11-03 18:12:13,802,scale_logger,DEBUG,Scale reading after Infusing: 1.981000
+2023-11-03 18:12:13,803,scale_logger,DEBUG,Scale reading difference: -0.073000
+2023-11-03 18:12:13,803,scale_logger,INFO,Data,Infusing,0.090000,1.000000,1.908000,1.981000
+2023-11-03 18:14:21,347,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 18:14:21,347,scale_logger,DEBUG,Scale reading before Withdrawing: 1.974000
+2023-11-03 18:14:41,994,scale_logger,DEBUG,Scale reading after Withdrawing: 1.972000
+2023-11-03 18:14:41,994,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:14:41,995,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,1.974000,1.972000
+2023-11-03 18:15:12,463,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 18:15:12,464,scale_logger,DEBUG,Scale reading before Infusing: 1.972000
+2023-11-03 18:15:28,307,scale_logger,DEBUG,Scale reading after Infusing: 2.063000
+2023-11-03 18:15:28,308,scale_logger,DEBUG,Scale reading difference: -0.091000
+2023-11-03 18:15:28,308,scale_logger,INFO,Data,Infusing,0.110000,1.000000,1.972000,2.063000
+2023-11-03 18:17:40,633,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 18:17:40,634,scale_logger,DEBUG,Scale reading before Withdrawing: 2.056000
+2023-11-03 18:18:03,645,scale_logger,DEBUG,Scale reading after Withdrawing: 2.054000
+2023-11-03 18:18:03,646,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:18:03,646,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,2.056000,2.054000
+2023-11-03 18:18:35,126,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 18:18:35,126,scale_logger,DEBUG,Scale reading before Infusing: 2.052000
+2023-11-03 18:18:53,347,scale_logger,DEBUG,Scale reading after Infusing: 2.158000
+2023-11-03 18:18:53,348,scale_logger,DEBUG,Scale reading difference: -0.106000
+2023-11-03 18:18:53,348,scale_logger,INFO,Data,Infusing,0.130000,1.000000,2.052000,2.158000
+2023-11-03 18:21:13,511,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 18:21:13,511,scale_logger,DEBUG,Scale reading before Withdrawing: 2.156000
+2023-11-03 18:21:29,362,scale_logger,DEBUG,Scale reading after Withdrawing: 2.154000
+2023-11-03 18:21:29,363,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:21:29,363,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,2.156000,2.154000
+2023-11-03 18:21:58,822,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 18:21:58,823,scale_logger,DEBUG,Scale reading before Infusing: 2.152000
+2023-11-03 18:22:09,874,scale_logger,DEBUG,Scale reading after Infusing: 2.203000
+2023-11-03 18:22:09,874,scale_logger,DEBUG,Scale reading difference: -0.051000
+2023-11-03 18:22:09,875,scale_logger,INFO,Data,Infusing,0.070000,1.000000,2.152000,2.203000
+2023-11-03 18:24:11,672,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 18:24:11,672,scale_logger,DEBUG,Scale reading before Withdrawing: 2.200000
+2023-11-03 18:24:23,927,scale_logger,DEBUG,Scale reading after Withdrawing: 2.198000
+2023-11-03 18:24:23,928,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:24:23,928,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,2.200000,2.198000
+2023-11-03 18:24:53,390,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 18:24:53,390,scale_logger,DEBUG,Scale reading before Infusing: 2.198000
+2023-11-03 18:25:00,851,scale_logger,DEBUG,Scale reading after Infusing: 2.216000
+2023-11-03 18:25:00,852,scale_logger,DEBUG,Scale reading difference: -0.018000
+2023-11-03 18:25:00,852,scale_logger,INFO,Data,Infusing,0.040000,1.000000,2.198000,2.216000
+2023-11-03 18:26:57,395,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 18:26:57,395,scale_logger,DEBUG,Scale reading before Withdrawing: 2.226000
+2023-11-03 18:27:15,601,scale_logger,DEBUG,Scale reading after Withdrawing: 2.225000
+2023-11-03 18:27:15,602,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 18:27:15,602,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,2.226000,2.225000
+2023-11-03 18:27:47,077,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 18:27:47,077,scale_logger,DEBUG,Scale reading before Infusing: 2.227000
+2023-11-03 18:28:00,499,scale_logger,DEBUG,Scale reading after Infusing: 2.298000
+2023-11-03 18:28:00,499,scale_logger,DEBUG,Scale reading difference: -0.071000
+2023-11-03 18:28:00,500,scale_logger,INFO,Data,Infusing,0.090000,1.000000,2.227000,2.298000
+2023-11-03 18:30:11,028,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 18:30:11,029,scale_logger,DEBUG,Scale reading before Withdrawing: 2.290000
+2023-11-03 18:30:25,655,scale_logger,DEBUG,Scale reading after Withdrawing: 2.289000
+2023-11-03 18:30:25,656,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 18:30:25,656,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,2.290000,2.289000
+2023-11-03 18:30:57,131,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 18:30:57,131,scale_logger,DEBUG,Scale reading before Infusing: 2.288000
+2023-11-03 18:31:06,957,scale_logger,DEBUG,Scale reading after Infusing: 2.327000
+2023-11-03 18:31:06,958,scale_logger,DEBUG,Scale reading difference: -0.039000
+2023-11-03 18:31:06,958,scale_logger,INFO,Data,Infusing,0.060000,1.000000,2.288000,2.327000
+2023-11-03 18:33:12,424,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 18:33:12,424,scale_logger,DEBUG,Scale reading before Withdrawing: 2.335000
+2023-11-03 18:33:35,441,scale_logger,DEBUG,Scale reading after Withdrawing: 2.333000
+2023-11-03 18:33:35,442,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:33:35,442,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,2.335000,2.333000
+2023-11-03 18:34:04,910,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 18:34:04,911,scale_logger,DEBUG,Scale reading before Infusing: 2.332000
+2023-11-03 18:34:23,128,scale_logger,DEBUG,Scale reading after Infusing: 2.436000
+2023-11-03 18:34:23,128,scale_logger,DEBUG,Scale reading difference: -0.104000
+2023-11-03 18:34:23,129,scale_logger,INFO,Data,Infusing,0.130000,1.000000,2.332000,2.436000
+2023-11-03 18:36:37,242,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 18:36:37,242,scale_logger,DEBUG,Scale reading before Withdrawing: 2.431000
+2023-11-03 18:36:50,665,scale_logger,DEBUG,Scale reading after Withdrawing: 2.430000
+2023-11-03 18:36:50,666,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 18:36:50,666,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,2.431000,2.430000
+2023-11-03 18:37:22,141,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 18:37:22,142,scale_logger,DEBUG,Scale reading before Infusing: 2.428000
+2023-11-03 18:37:30,757,scale_logger,DEBUG,Scale reading after Infusing: 2.463000
+2023-11-03 18:37:30,758,scale_logger,DEBUG,Scale reading difference: -0.035000
+2023-11-03 18:37:30,758,scale_logger,INFO,Data,Infusing,0.050000,1.000000,2.428000,2.463000
+2023-11-03 18:39:33,721,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 18:39:33,722,scale_logger,DEBUG,Scale reading before Withdrawing: 2.456000
+2023-11-03 18:39:44,760,scale_logger,DEBUG,Scale reading after Withdrawing: 2.454000
+2023-11-03 18:39:44,760,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:39:44,761,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,2.456000,2.454000
+2023-11-03 18:40:16,232,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 18:40:16,232,scale_logger,DEBUG,Scale reading before Infusing: 2.452000
+2023-11-03 18:40:22,483,scale_logger,DEBUG,Scale reading after Infusing: 2.469000
+2023-11-03 18:40:22,483,scale_logger,DEBUG,Scale reading difference: -0.017000
+2023-11-03 18:40:22,484,scale_logger,INFO,Data,Infusing,0.030000,1.000000,2.452000,2.469000
+2023-11-03 18:42:22,715,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 18:42:22,716,scale_logger,DEBUG,Scale reading before Withdrawing: 2.463000
+2023-11-03 18:42:32,561,scale_logger,DEBUG,Scale reading after Withdrawing: 2.463000
+2023-11-03 18:42:32,561,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 18:42:32,562,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,2.463000,2.463000
+2023-11-03 18:43:02,021,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 18:43:02,021,scale_logger,DEBUG,Scale reading before Infusing: 2.462000
+2023-11-03 18:43:07,052,scale_logger,DEBUG,Scale reading after Infusing: 2.461000
+2023-11-03 18:43:07,053,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 18:43:07,053,scale_logger,INFO,Data,Infusing,0.020000,1.000000,2.462000,2.461000
+2023-11-03 18:44:58,835,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 18:44:58,835,scale_logger,DEBUG,Scale reading before Withdrawing: 2.473000
+2023-11-03 18:45:13,463,scale_logger,DEBUG,Scale reading after Withdrawing: 2.471000
+2023-11-03 18:45:13,464,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:45:13,464,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,2.473000,2.471000
+2023-11-03 18:45:42,930,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 18:45:42,930,scale_logger,DEBUG,Scale reading before Infusing: 2.472000
+2023-11-03 18:45:52,764,scale_logger,DEBUG,Scale reading after Infusing: 2.505000
+2023-11-03 18:45:52,764,scale_logger,DEBUG,Scale reading difference: -0.033000
+2023-11-03 18:45:52,764,scale_logger,INFO,Data,Infusing,0.060000,1.000000,2.472000,2.505000
+2023-11-03 18:47:52,072,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 18:47:52,072,scale_logger,DEBUG,Scale reading before Withdrawing: 2.516000
+2023-11-03 18:48:06,708,scale_logger,DEBUG,Scale reading after Withdrawing: 2.515000
+2023-11-03 18:48:06,709,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 18:48:06,709,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,2.516000,2.515000
+2023-11-03 18:48:37,169,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 18:48:37,170,scale_logger,DEBUG,Scale reading before Infusing: 2.513000
+2023-11-03 18:48:46,977,scale_logger,DEBUG,Scale reading after Infusing: 2.548000
+2023-11-03 18:48:46,978,scale_logger,DEBUG,Scale reading difference: -0.035000
+2023-11-03 18:48:46,978,scale_logger,INFO,Data,Infusing,0.060000,1.000000,2.513000,2.548000
+2023-11-03 18:50:49,266,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 18:50:49,267,scale_logger,DEBUG,Scale reading before Withdrawing: 2.559000
+2023-11-03 18:51:12,299,scale_logger,DEBUG,Scale reading after Withdrawing: 2.556000
+2023-11-03 18:51:12,300,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 18:51:12,300,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,2.559000,2.556000
+2023-11-03 18:51:42,765,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 18:51:42,766,scale_logger,DEBUG,Scale reading before Infusing: 2.554000
+2023-11-03 18:52:01,004,scale_logger,DEBUG,Scale reading after Infusing: 2.660000
+2023-11-03 18:52:01,005,scale_logger,DEBUG,Scale reading difference: -0.106000
+2023-11-03 18:52:01,005,scale_logger,INFO,Data,Infusing,0.130000,1.000000,2.554000,2.660000
+2023-11-03 18:54:18,316,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 18:54:18,317,scale_logger,DEBUG,Scale reading before Withdrawing: 2.652000
+2023-11-03 18:54:38,931,scale_logger,DEBUG,Scale reading after Withdrawing: 2.650000
+2023-11-03 18:54:38,932,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 18:54:38,932,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,2.652000,2.650000
+2023-11-03 18:55:09,400,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 18:55:09,401,scale_logger,DEBUG,Scale reading before Infusing: 2.648000
+2023-11-03 18:55:25,208,scale_logger,DEBUG,Scale reading after Infusing: 2.739000
+2023-11-03 18:55:25,209,scale_logger,DEBUG,Scale reading difference: -0.091000
+2023-11-03 18:55:25,209,scale_logger,INFO,Data,Infusing,0.110000,1.000000,2.648000,2.739000
+2023-11-03 18:57:37,521,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 18:57:37,521,scale_logger,DEBUG,Scale reading before Withdrawing: 2.731000
+2023-11-03 18:57:56,945,scale_logger,DEBUG,Scale reading after Withdrawing: 2.727000
+2023-11-03 18:57:56,945,scale_logger,DEBUG,Scale reading difference: 0.004000
+2023-11-03 18:57:56,946,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,2.731000,2.727000
+2023-11-03 18:58:28,409,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 18:58:28,409,scale_logger,DEBUG,Scale reading before Infusing: 2.726000
+2023-11-03 18:58:43,027,scale_logger,DEBUG,Scale reading after Infusing: 2.814000
+2023-11-03 18:58:43,028,scale_logger,DEBUG,Scale reading difference: -0.088000
+2023-11-03 18:58:43,028,scale_logger,INFO,Data,Infusing,0.100000,1.000000,2.726000,2.814000
+2023-11-03 19:00:56,046,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 19:00:56,047,scale_logger,DEBUG,Scale reading before Withdrawing: 2.808000
+2023-11-03 19:01:16,693,scale_logger,DEBUG,Scale reading after Withdrawing: 2.805000
+2023-11-03 19:01:16,693,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 19:01:16,693,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,2.808000,2.805000
+2023-11-03 19:01:47,162,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 19:01:47,163,scale_logger,DEBUG,Scale reading before Infusing: 2.804000
+2023-11-03 19:02:03,008,scale_logger,DEBUG,Scale reading after Infusing: 2.892000
+2023-11-03 19:02:03,008,scale_logger,DEBUG,Scale reading difference: -0.088000
+2023-11-03 19:02:03,008,scale_logger,INFO,Data,Infusing,0.110000,1.000000,2.804000,2.892000
+2023-11-03 19:04:15,408,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 19:04:15,409,scale_logger,DEBUG,Scale reading before Withdrawing: 2.884000
+2023-11-03 19:04:26,454,scale_logger,DEBUG,Scale reading after Withdrawing: 2.882000
+2023-11-03 19:04:26,455,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:04:26,455,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,2.884000,2.882000
+2023-11-03 19:04:55,905,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 19:04:55,905,scale_logger,DEBUG,Scale reading before Infusing: 2.881000
+2023-11-03 19:05:02,153,scale_logger,DEBUG,Scale reading after Infusing: 2.896000
+2023-11-03 19:05:02,153,scale_logger,DEBUG,Scale reading difference: -0.015000
+2023-11-03 19:05:02,154,scale_logger,INFO,Data,Infusing,0.030000,1.000000,2.881000,2.896000
+2023-11-03 19:06:56,260,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 19:06:56,261,scale_logger,DEBUG,Scale reading before Withdrawing: 2.888000
+2023-11-03 19:07:08,473,scale_logger,DEBUG,Scale reading after Withdrawing: 2.886000
+2023-11-03 19:07:08,474,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:07:08,474,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,2.888000,2.886000
+2023-11-03 19:07:38,949,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 19:07:38,949,scale_logger,DEBUG,Scale reading before Infusing: 2.885000
+2023-11-03 19:07:46,411,scale_logger,DEBUG,Scale reading after Infusing: 2.901000
+2023-11-03 19:07:46,412,scale_logger,DEBUG,Scale reading difference: -0.016000
+2023-11-03 19:07:46,412,scale_logger,INFO,Data,Infusing,0.040000,1.000000,2.885000,2.901000
+2023-11-03 19:09:46,075,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 19:09:46,075,scale_logger,DEBUG,Scale reading before Withdrawing: 2.893000
+2023-11-03 19:10:05,509,scale_logger,DEBUG,Scale reading after Withdrawing: 2.891000
+2023-11-03 19:10:05,510,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:10:05,510,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,2.893000,2.891000
+2023-11-03 19:10:35,981,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 19:10:35,981,scale_logger,DEBUG,Scale reading before Infusing: 2.888000
+2023-11-03 19:10:50,620,scale_logger,DEBUG,Scale reading after Infusing: 2.973000
+2023-11-03 19:10:50,621,scale_logger,DEBUG,Scale reading difference: -0.085000
+2023-11-03 19:10:50,621,scale_logger,INFO,Data,Infusing,0.100000,1.000000,2.888000,2.973000
+2023-11-03 19:13:00,646,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 19:13:00,647,scale_logger,DEBUG,Scale reading before Withdrawing: 2.971000
+2023-11-03 19:13:17,708,scale_logger,DEBUG,Scale reading after Withdrawing: 2.969000
+2023-11-03 19:13:17,709,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:13:17,709,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,2.971000,2.969000
+2023-11-03 19:13:47,165,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 19:13:47,166,scale_logger,DEBUG,Scale reading before Infusing: 2.967000
+2023-11-03 19:13:59,425,scale_logger,DEBUG,Scale reading after Infusing: 3.036000
+2023-11-03 19:13:59,426,scale_logger,DEBUG,Scale reading difference: -0.069000
+2023-11-03 19:13:59,426,scale_logger,INFO,Data,Infusing,0.080000,1.000000,2.967000,3.036000
+2023-11-03 19:16:03,609,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 19:16:03,609,scale_logger,DEBUG,Scale reading before Withdrawing: 3.027000
+2023-11-03 19:16:13,439,scale_logger,DEBUG,Scale reading after Withdrawing: 3.026000
+2023-11-03 19:16:13,440,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 19:16:13,440,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,3.027000,3.026000
+2023-11-03 19:16:44,912,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 19:16:44,912,scale_logger,DEBUG,Scale reading before Infusing: 3.023000
+2023-11-03 19:16:49,945,scale_logger,DEBUG,Scale reading after Infusing: 3.023000
+2023-11-03 19:16:49,945,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 19:16:49,946,scale_logger,INFO,Data,Infusing,0.020000,1.000000,3.023000,3.023000
+2023-11-03 19:18:47,771,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 19:18:47,771,scale_logger,DEBUG,Scale reading before Withdrawing: 3.013000
+2023-11-03 19:19:05,984,scale_logger,DEBUG,Scale reading after Withdrawing: 3.012000
+2023-11-03 19:19:05,984,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 19:19:05,985,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,3.013000,3.012000
+2023-11-03 19:19:37,461,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 19:19:37,461,scale_logger,DEBUG,Scale reading before Infusing: 3.011000
+2023-11-03 19:19:50,877,scale_logger,DEBUG,Scale reading after Infusing: 3.079000
+2023-11-03 19:19:50,878,scale_logger,DEBUG,Scale reading difference: -0.068000
+2023-11-03 19:19:50,878,scale_logger,INFO,Data,Infusing,0.090000,1.000000,3.011000,3.079000
+2023-11-03 19:22:01,480,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 19:22:01,481,scale_logger,DEBUG,Scale reading before Withdrawing: 3.069000
+2023-11-03 19:22:14,913,scale_logger,DEBUG,Scale reading after Withdrawing: 3.069000
+2023-11-03 19:22:14,914,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 19:22:14,914,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,3.069000,3.069000
+2023-11-03 19:22:45,382,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 19:22:45,382,scale_logger,DEBUG,Scale reading before Infusing: 3.072000
+2023-11-03 19:22:54,008,scale_logger,DEBUG,Scale reading after Infusing: 3.103000
+2023-11-03 19:22:54,008,scale_logger,DEBUG,Scale reading difference: -0.031000
+2023-11-03 19:22:54,009,scale_logger,INFO,Data,Infusing,0.050000,1.000000,3.072000,3.103000
+2023-11-03 19:24:53,957,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 19:24:53,958,scale_logger,DEBUG,Scale reading before Withdrawing: 3.093000
+2023-11-03 19:25:06,215,scale_logger,DEBUG,Scale reading after Withdrawing: 3.091000
+2023-11-03 19:25:06,215,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:25:06,215,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,3.093000,3.091000
+2023-11-03 19:25:35,678,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 19:25:35,679,scale_logger,DEBUG,Scale reading before Infusing: 3.090000
+2023-11-03 19:25:43,088,scale_logger,DEBUG,Scale reading after Infusing: 3.106000
+2023-11-03 19:25:43,089,scale_logger,DEBUG,Scale reading difference: -0.016000
+2023-11-03 19:25:43,089,scale_logger,INFO,Data,Infusing,0.040000,1.000000,3.090000,3.106000
+2023-11-03 19:27:39,732,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 19:27:39,733,scale_logger,DEBUG,Scale reading before Withdrawing: 3.099000
+2023-11-03 19:27:50,786,scale_logger,DEBUG,Scale reading after Withdrawing: 3.097000
+2023-11-03 19:27:50,787,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:27:50,787,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,3.099000,3.097000
+2023-11-03 19:28:20,247,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 19:28:20,248,scale_logger,DEBUG,Scale reading before Infusing: 3.095000
+2023-11-03 19:28:26,496,scale_logger,DEBUG,Scale reading after Infusing: 3.095000
+2023-11-03 19:28:26,497,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 19:28:26,497,scale_logger,INFO,Data,Infusing,0.030000,1.000000,3.095000,3.095000
+2023-11-03 19:30:20,655,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 19:30:20,655,scale_logger,DEBUG,Scale reading before Withdrawing: 3.104000
+2023-11-03 19:30:31,705,scale_logger,DEBUG,Scale reading after Withdrawing: 3.101000
+2023-11-03 19:30:31,706,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 19:30:31,706,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,3.104000,3.101000
+2023-11-03 19:31:03,189,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 19:31:03,189,scale_logger,DEBUG,Scale reading before Infusing: 3.099000
+2023-11-03 19:31:09,442,scale_logger,DEBUG,Scale reading after Infusing: 3.117000
+2023-11-03 19:31:09,443,scale_logger,DEBUG,Scale reading difference: -0.018000
+2023-11-03 19:31:09,443,scale_logger,INFO,Data,Infusing,0.030000,1.000000,3.099000,3.117000
+2023-11-03 19:33:09,673,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 19:33:09,674,scale_logger,DEBUG,Scale reading before Withdrawing: 3.108000
+2023-11-03 19:33:23,102,scale_logger,DEBUG,Scale reading after Withdrawing: 3.106000
+2023-11-03 19:33:23,103,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:33:23,103,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,3.108000,3.106000
+2023-11-03 19:33:53,573,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 19:33:53,574,scale_logger,DEBUG,Scale reading before Infusing: 3.106000
+2023-11-03 19:34:02,200,scale_logger,DEBUG,Scale reading after Infusing: 3.139000
+2023-11-03 19:34:02,201,scale_logger,DEBUG,Scale reading difference: -0.033000
+2023-11-03 19:34:02,201,scale_logger,INFO,Data,Infusing,0.050000,1.000000,3.106000,3.139000
+2023-11-03 19:36:02,020,scale_logger,DEBUG,Expected difference in scale reading: 0.150000
+2023-11-03 19:36:02,021,scale_logger,DEBUG,Scale reading before Withdrawing: 3.129000
+2023-11-03 19:36:22,625,scale_logger,DEBUG,Scale reading after Withdrawing: 3.127000
+2023-11-03 19:36:22,626,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:36:22,626,scale_logger,INFO,Data,Withdrawing,0.150000,1.000000,3.129000,3.127000
+2023-11-03 19:36:54,110,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 19:36:54,110,scale_logger,DEBUG,Scale reading before Infusing: 3.126000
+2023-11-03 19:37:09,955,scale_logger,DEBUG,Scale reading after Infusing: 3.215000
+2023-11-03 19:37:09,956,scale_logger,DEBUG,Scale reading difference: -0.089000
+2023-11-03 19:37:09,956,scale_logger,INFO,Data,Infusing,0.110000,1.000000,3.126000,3.215000
+2023-11-03 19:39:25,404,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 19:39:25,405,scale_logger,DEBUG,Scale reading before Withdrawing: 3.203000
+2023-11-03 19:39:38,824,scale_logger,DEBUG,Scale reading after Withdrawing: 3.203000
+2023-11-03 19:39:38,825,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 19:39:38,825,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,3.203000,3.203000
+2023-11-03 19:40:10,302,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 19:40:10,303,scale_logger,DEBUG,Scale reading before Infusing: 3.200000
+2023-11-03 19:40:18,927,scale_logger,DEBUG,Scale reading after Infusing: 3.233000
+2023-11-03 19:40:18,927,scale_logger,DEBUG,Scale reading difference: -0.033000
+2023-11-03 19:40:18,928,scale_logger,INFO,Data,Infusing,0.050000,1.000000,3.200000,3.233000
+2023-11-03 19:42:21,893,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 19:42:21,894,scale_logger,DEBUG,Scale reading before Withdrawing: 3.226000
+2023-11-03 19:42:44,908,scale_logger,DEBUG,Scale reading after Withdrawing: 3.224000
+2023-11-03 19:42:44,909,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:42:44,909,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,3.226000,3.224000
+2023-11-03 19:43:16,397,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 19:43:16,398,scale_logger,DEBUG,Scale reading before Infusing: 3.222000
+2023-11-03 19:43:34,617,scale_logger,DEBUG,Scale reading after Infusing: 3.329000
+2023-11-03 19:43:34,618,scale_logger,DEBUG,Scale reading difference: -0.107000
+2023-11-03 19:43:34,618,scale_logger,INFO,Data,Infusing,0.130000,1.000000,3.222000,3.329000
+2023-11-03 19:45:54,845,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 19:45:54,845,scale_logger,DEBUG,Scale reading before Withdrawing: 3.318000
+2023-11-03 19:46:08,261,scale_logger,DEBUG,Scale reading after Withdrawing: 3.316000
+2023-11-03 19:46:08,262,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 19:46:08,262,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,3.318000,3.316000
+2023-11-03 19:46:38,724,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 19:46:38,725,scale_logger,DEBUG,Scale reading before Infusing: 3.312000
+2023-11-03 19:46:47,341,scale_logger,DEBUG,Scale reading after Infusing: 3.348000
+2023-11-03 19:46:47,341,scale_logger,DEBUG,Scale reading difference: -0.036000
+2023-11-03 19:46:47,342,scale_logger,INFO,Data,Infusing,0.050000,1.000000,3.312000,3.348000
+2023-11-03 19:48:47,298,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 19:48:47,299,scale_logger,DEBUG,Scale reading before Withdrawing: 3.342000
+2023-11-03 19:49:04,305,scale_logger,DEBUG,Scale reading after Withdrawing: 3.339000
+2023-11-03 19:49:04,305,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 19:49:04,306,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,3.342000,3.339000
+2023-11-03 19:49:33,776,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 19:49:33,777,scale_logger,DEBUG,Scale reading before Infusing: 3.338000
+2023-11-03 19:49:46,034,scale_logger,DEBUG,Scale reading after Infusing: 3.391000
+2023-11-03 19:49:46,034,scale_logger,DEBUG,Scale reading difference: -0.053000
+2023-11-03 19:49:46,035,scale_logger,INFO,Data,Infusing,0.080000,1.000000,3.338000,3.391000
+2023-11-03 19:51:50,283,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 19:51:50,284,scale_logger,DEBUG,Scale reading before Withdrawing: 3.396000
+2023-11-03 19:52:12,142,scale_logger,DEBUG,Scale reading after Withdrawing: 3.395000
+2023-11-03 19:52:12,143,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 19:52:12,143,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,3.396000,3.395000
+2023-11-03 19:52:43,620,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 19:52:43,620,scale_logger,DEBUG,Scale reading before Infusing: 3.393000
+2023-11-03 19:53:00,679,scale_logger,DEBUG,Scale reading after Infusing: 3.489000
+2023-11-03 19:53:00,680,scale_logger,DEBUG,Scale reading difference: -0.096000
+2023-11-03 19:53:00,680,scale_logger,INFO,Data,Infusing,0.120000,1.000000,3.393000,3.489000
+2023-11-03 19:55:18,498,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 19:55:18,499,scale_logger,DEBUG,Scale reading before Withdrawing: 3.491000
+2023-11-03 19:55:28,330,scale_logger,DEBUG,Scale reading after Withdrawing: 3.491000
+2023-11-03 19:55:28,330,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 19:55:28,330,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,3.491000,3.491000
+2023-11-03 19:55:58,802,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 19:55:58,802,scale_logger,DEBUG,Scale reading before Infusing: 3.486000
+2023-11-03 19:56:03,836,scale_logger,DEBUG,Scale reading after Infusing: 3.487000
+2023-11-03 19:56:03,836,scale_logger,DEBUG,Scale reading difference: -0.001000
+2023-11-03 19:56:03,837,scale_logger,INFO,Data,Infusing,0.020000,1.000000,3.486000,3.487000
+2023-11-03 19:57:58,558,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 19:57:58,558,scale_logger,DEBUG,Scale reading before Withdrawing: 3.476000
+2023-11-03 19:58:11,980,scale_logger,DEBUG,Scale reading after Withdrawing: 3.475000
+2023-11-03 19:58:11,980,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 19:58:11,980,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,3.476000,3.475000
+2023-11-03 19:58:41,436,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 19:58:41,436,scale_logger,DEBUG,Scale reading before Infusing: 3.473000
+2023-11-03 19:58:50,055,scale_logger,DEBUG,Scale reading after Infusing: 3.507000
+2023-11-03 19:58:50,056,scale_logger,DEBUG,Scale reading difference: -0.034000
+2023-11-03 19:58:50,056,scale_logger,INFO,Data,Infusing,0.050000,1.000000,3.473000,3.507000
+2023-11-03 20:00:47,017,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 20:00:47,017,scale_logger,DEBUG,Scale reading before Withdrawing: 3.500000
+2023-11-03 20:01:06,437,scale_logger,DEBUG,Scale reading after Withdrawing: 3.497000
+2023-11-03 20:01:06,438,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 20:01:06,438,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,3.500000,3.497000
+2023-11-03 20:01:35,900,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 20:01:35,901,scale_logger,DEBUG,Scale reading before Infusing: 3.493000
+2023-11-03 20:01:50,531,scale_logger,DEBUG,Scale reading after Infusing: 3.581000
+2023-11-03 20:01:50,532,scale_logger,DEBUG,Scale reading difference: -0.088000
+2023-11-03 20:01:50,532,scale_logger,INFO,Data,Infusing,0.100000,1.000000,3.493000,3.581000
+2023-11-03 20:03:57,422,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 20:03:57,423,scale_logger,DEBUG,Scale reading before Withdrawing: 3.575000
+2023-11-03 20:04:12,041,scale_logger,DEBUG,Scale reading after Withdrawing: 3.573000
+2023-11-03 20:04:12,041,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:04:12,041,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,3.575000,3.573000
+2023-11-03 20:04:41,511,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 20:04:41,512,scale_logger,DEBUG,Scale reading before Infusing: 3.572000
+2023-11-03 20:04:51,339,scale_logger,DEBUG,Scale reading after Infusing: 3.605000
+2023-11-03 20:04:51,340,scale_logger,DEBUG,Scale reading difference: -0.033000
+2023-11-03 20:04:51,340,scale_logger,INFO,Data,Infusing,0.060000,1.000000,3.572000,3.605000
+2023-11-03 20:06:50,697,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 20:06:50,698,scale_logger,DEBUG,Scale reading before Withdrawing: 3.613000
+2023-11-03 20:07:01,751,scale_logger,DEBUG,Scale reading after Withdrawing: 3.612000
+2023-11-03 20:07:01,753,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 20:07:01,753,scale_logger,INFO,Data,Withdrawing,0.070000,1.000000,3.613000,3.612000
+2023-11-03 20:07:32,222,scale_logger,DEBUG,Expected difference in scale reading: 0.030000
+2023-11-03 20:07:32,222,scale_logger,DEBUG,Scale reading before Infusing: 3.608000
+2023-11-03 20:07:38,474,scale_logger,DEBUG,Scale reading after Infusing: 3.626000
+2023-11-03 20:07:38,475,scale_logger,DEBUG,Scale reading difference: -0.018000
+2023-11-03 20:07:38,475,scale_logger,INFO,Data,Infusing,0.030000,1.000000,3.608000,3.626000
+2023-11-03 20:09:35,753,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 20:09:35,754,scale_logger,DEBUG,Scale reading before Withdrawing: 3.615000
+2023-11-03 20:09:57,564,scale_logger,DEBUG,Scale reading after Withdrawing: 3.612000
+2023-11-03 20:09:57,565,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 20:09:57,565,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,3.615000,3.612000
+2023-11-03 20:10:28,034,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 20:10:28,035,scale_logger,DEBUG,Scale reading before Infusing: 3.612000
+2023-11-03 20:10:45,042,scale_logger,DEBUG,Scale reading after Infusing: 3.708000
+2023-11-03 20:10:45,042,scale_logger,DEBUG,Scale reading difference: -0.096000
+2023-11-03 20:10:45,043,scale_logger,INFO,Data,Infusing,0.120000,1.000000,3.612000,3.708000
+2023-11-03 20:12:59,777,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 20:12:59,778,scale_logger,DEBUG,Scale reading before Withdrawing: 3.706000
+2023-11-03 20:13:16,784,scale_logger,DEBUG,Scale reading after Withdrawing: 3.704000
+2023-11-03 20:13:16,784,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:13:16,785,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,3.706000,3.704000
+2023-11-03 20:13:47,264,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 20:13:47,265,scale_logger,DEBUG,Scale reading before Infusing: 3.701000
+2023-11-03 20:13:59,478,scale_logger,DEBUG,Scale reading after Infusing: 3.753000
+2023-11-03 20:13:59,479,scale_logger,DEBUG,Scale reading difference: -0.052000
+2023-11-03 20:13:59,479,scale_logger,INFO,Data,Infusing,0.080000,1.000000,3.701000,3.753000
+2023-11-03 20:16:06,618,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 20:16:06,618,scale_logger,DEBUG,Scale reading before Withdrawing: 3.763000
+2023-11-03 20:16:26,044,scale_logger,DEBUG,Scale reading after Withdrawing: 3.761000
+2023-11-03 20:16:26,045,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:16:26,045,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,3.763000,3.761000
+2023-11-03 20:16:56,515,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 20:16:56,516,scale_logger,DEBUG,Scale reading before Infusing: 3.761000
+2023-11-03 20:17:11,134,scale_logger,DEBUG,Scale reading after Infusing: 3.841000
+2023-11-03 20:17:11,134,scale_logger,DEBUG,Scale reading difference: -0.080000
+2023-11-03 20:17:11,134,scale_logger,INFO,Data,Infusing,0.100000,1.000000,3.761000,3.841000
+2023-11-03 20:19:21,066,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 20:19:21,067,scale_logger,DEBUG,Scale reading before Withdrawing: 3.837000
+2023-11-03 20:19:34,485,scale_logger,DEBUG,Scale reading after Withdrawing: 3.835000
+2023-11-03 20:19:34,486,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:19:34,486,scale_logger,INFO,Data,Withdrawing,0.090000,1.000000,3.837000,3.835000
+2023-11-03 20:20:04,963,scale_logger,DEBUG,Expected difference in scale reading: 0.050000
+2023-11-03 20:20:04,963,scale_logger,DEBUG,Scale reading before Infusing: 3.832000
+2023-11-03 20:20:13,595,scale_logger,DEBUG,Scale reading after Infusing: 3.867000
+2023-11-03 20:20:13,596,scale_logger,DEBUG,Scale reading difference: -0.035000
+2023-11-03 20:20:13,596,scale_logger,INFO,Data,Infusing,0.050000,1.000000,3.832000,3.867000
+2023-11-03 20:22:14,396,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 20:22:14,397,scale_logger,DEBUG,Scale reading before Withdrawing: 3.857000
+2023-11-03 20:22:26,659,scale_logger,DEBUG,Scale reading after Withdrawing: 3.854000
+2023-11-03 20:22:26,660,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 20:22:26,660,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,3.857000,3.854000
+2023-11-03 20:22:57,127,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 20:22:57,127,scale_logger,DEBUG,Scale reading before Infusing: 3.858000
+2023-11-03 20:23:04,591,scale_logger,DEBUG,Scale reading after Infusing: 3.868000
+2023-11-03 20:23:04,592,scale_logger,DEBUG,Scale reading difference: -0.010000
+2023-11-03 20:23:04,592,scale_logger,INFO,Data,Infusing,0.040000,1.000000,3.858000,3.868000
+2023-11-03 20:25:04,215,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 20:25:04,216,scale_logger,DEBUG,Scale reading before Withdrawing: 3.876000
+2023-11-03 20:25:18,850,scale_logger,DEBUG,Scale reading after Withdrawing: 3.873000
+2023-11-03 20:25:18,851,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 20:25:18,851,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,3.876000,3.873000
+2023-11-03 20:25:49,325,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 20:25:49,326,scale_logger,DEBUG,Scale reading before Infusing: 3.871000
+2023-11-03 20:25:59,171,scale_logger,DEBUG,Scale reading after Infusing: 3.906000
+2023-11-03 20:25:59,171,scale_logger,DEBUG,Scale reading difference: -0.035000
+2023-11-03 20:25:59,171,scale_logger,INFO,Data,Infusing,0.060000,1.000000,3.871000,3.906000
+2023-11-03 20:28:01,609,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 20:28:01,609,scale_logger,DEBUG,Scale reading before Withdrawing: 3.913000
+2023-11-03 20:28:17,438,scale_logger,DEBUG,Scale reading after Withdrawing: 3.909000
+2023-11-03 20:28:17,439,scale_logger,DEBUG,Scale reading difference: 0.004000
+2023-11-03 20:28:17,439,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,3.913000,3.909000
+2023-11-03 20:28:47,913,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 20:28:47,913,scale_logger,DEBUG,Scale reading before Infusing: 3.908000
+2023-11-03 20:28:58,964,scale_logger,DEBUG,Scale reading after Infusing: 3.955000
+2023-11-03 20:28:58,964,scale_logger,DEBUG,Scale reading difference: -0.047000
+2023-11-03 20:28:58,964,scale_logger,INFO,Data,Infusing,0.070000,1.000000,3.908000,3.955000
+2023-11-03 20:31:03,799,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 20:31:03,800,scale_logger,DEBUG,Scale reading before Withdrawing: 3.949000
+2023-11-03 20:31:16,009,scale_logger,DEBUG,Scale reading after Withdrawing: 3.948000
+2023-11-03 20:31:16,010,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 20:31:16,010,scale_logger,INFO,Data,Withdrawing,0.080000,1.000000,3.949000,3.948000
+2023-11-03 20:31:47,486,scale_logger,DEBUG,Expected difference in scale reading: 0.040000
+2023-11-03 20:31:47,487,scale_logger,DEBUG,Scale reading before Infusing: 3.943000
+2023-11-03 20:31:54,951,scale_logger,DEBUG,Scale reading after Infusing: 3.962000
+2023-11-03 20:31:54,952,scale_logger,DEBUG,Scale reading difference: -0.019000
+2023-11-03 20:31:54,952,scale_logger,INFO,Data,Infusing,0.040000,1.000000,3.943000,3.962000
+2023-11-03 20:33:57,592,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 20:33:57,592,scale_logger,DEBUG,Scale reading before Withdrawing: 3.951000
+2023-11-03 20:34:19,445,scale_logger,DEBUG,Scale reading after Withdrawing: 3.948000
+2023-11-03 20:34:19,445,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 20:34:19,445,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,3.951000,3.948000
+2023-11-03 20:34:49,912,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 20:34:49,912,scale_logger,DEBUG,Scale reading before Infusing: 3.949000
+2023-11-03 20:35:06,928,scale_logger,DEBUG,Scale reading after Infusing: 4.043000
+2023-11-03 20:35:06,928,scale_logger,DEBUG,Scale reading difference: -0.094000
+2023-11-03 20:35:06,929,scale_logger,INFO,Data,Infusing,0.120000,1.000000,3.949000,4.043000
+2023-11-03 20:37:21,725,scale_logger,DEBUG,Expected difference in scale reading: 0.110000
+2023-11-03 20:37:21,726,scale_logger,DEBUG,Scale reading before Withdrawing: 4.039000
+2023-11-03 20:37:37,570,scale_logger,DEBUG,Scale reading after Withdrawing: 4.038000
+2023-11-03 20:37:37,570,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 20:37:37,570,scale_logger,INFO,Data,Withdrawing,0.110000,1.000000,4.039000,4.038000
+2023-11-03 20:38:09,055,scale_logger,DEBUG,Expected difference in scale reading: 0.070000
+2023-11-03 20:38:09,056,scale_logger,DEBUG,Scale reading before Infusing: 4.035000
+2023-11-03 20:38:20,106,scale_logger,DEBUG,Scale reading after Infusing: 4.084000
+2023-11-03 20:38:20,107,scale_logger,DEBUG,Scale reading difference: -0.049000
+2023-11-03 20:38:20,107,scale_logger,INFO,Data,Infusing,0.070000,1.000000,4.035000,4.084000
+2023-11-03 20:40:27,974,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 20:40:27,975,scale_logger,DEBUG,Scale reading before Withdrawing: 4.075000
+2023-11-03 20:40:45,032,scale_logger,DEBUG,Scale reading after Withdrawing: 4.074000
+2023-11-03 20:40:45,033,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 20:40:45,033,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,4.075000,4.074000
+2023-11-03 20:41:15,504,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 20:41:15,504,scale_logger,DEBUG,Scale reading before Infusing: 4.070000
+2023-11-03 20:41:27,712,scale_logger,DEBUG,Scale reading after Infusing: 4.138000
+2023-11-03 20:41:27,712,scale_logger,DEBUG,Scale reading difference: -0.068000
+2023-11-03 20:41:27,713,scale_logger,INFO,Data,Infusing,0.080000,1.000000,4.070000,4.138000
+2023-11-03 20:43:34,804,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 20:43:34,804,scale_logger,DEBUG,Scale reading before Withdrawing: 4.126000
+2023-11-03 20:43:51,859,scale_logger,DEBUG,Scale reading after Withdrawing: 4.124000
+2023-11-03 20:43:51,860,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:43:51,860,scale_logger,INFO,Data,Withdrawing,0.120000,1.000000,4.126000,4.124000
+2023-11-03 20:44:23,343,scale_logger,DEBUG,Expected difference in scale reading: 0.080000
+2023-11-03 20:44:23,343,scale_logger,DEBUG,Scale reading before Infusing: 4.124000
+2023-11-03 20:44:35,556,scale_logger,DEBUG,Scale reading after Infusing: 4.177000
+2023-11-03 20:44:35,556,scale_logger,DEBUG,Scale reading difference: -0.053000
+2023-11-03 20:44:35,557,scale_logger,INFO,Data,Infusing,0.080000,1.000000,4.124000,4.177000
+2023-11-03 20:46:45,844,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 20:46:45,845,scale_logger,DEBUG,Scale reading before Withdrawing: 4.179000
+2023-11-03 20:47:05,275,scale_logger,DEBUG,Scale reading after Withdrawing: 4.177000
+2023-11-03 20:47:05,276,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:47:05,276,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,4.179000,4.177000
+2023-11-03 20:47:34,735,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 20:47:34,735,scale_logger,DEBUG,Scale reading before Infusing: 4.174000
+2023-11-03 20:47:49,373,scale_logger,DEBUG,Scale reading after Infusing: 4.262000
+2023-11-03 20:47:49,373,scale_logger,DEBUG,Scale reading difference: -0.088000
+2023-11-03 20:47:49,374,scale_logger,INFO,Data,Infusing,0.100000,1.000000,4.174000,4.262000
+2023-11-03 20:49:56,328,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 20:49:56,328,scale_logger,DEBUG,Scale reading before Withdrawing: 4.252000
+2023-11-03 20:50:18,135,scale_logger,DEBUG,Scale reading after Withdrawing: 4.248000
+2023-11-03 20:50:18,136,scale_logger,DEBUG,Scale reading difference: 0.004000
+2023-11-03 20:50:18,136,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,4.252000,4.248000
+2023-11-03 20:50:47,614,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 20:50:47,614,scale_logger,DEBUG,Scale reading before Infusing: 4.247000
+2023-11-03 20:51:04,625,scale_logger,DEBUG,Scale reading after Infusing: 4.347000
+2023-11-03 20:51:04,626,scale_logger,DEBUG,Scale reading difference: -0.100000
+2023-11-03 20:51:04,626,scale_logger,INFO,Data,Infusing,0.120000,1.000000,4.247000,4.347000
+2023-11-03 20:53:16,427,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 20:53:16,428,scale_logger,DEBUG,Scale reading before Withdrawing: 4.342000
+2023-11-03 20:53:39,439,scale_logger,DEBUG,Scale reading after Withdrawing: 4.340000
+2023-11-03 20:53:39,439,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:53:39,440,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,4.342000,4.340000
+2023-11-03 20:54:09,911,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 20:54:09,911,scale_logger,DEBUG,Scale reading before Infusing: 4.337000
+2023-11-03 20:54:28,126,scale_logger,DEBUG,Scale reading after Infusing: 4.441000
+2023-11-03 20:54:28,126,scale_logger,DEBUG,Scale reading difference: -0.104000
+2023-11-03 20:54:28,127,scale_logger,INFO,Data,Infusing,0.130000,1.000000,4.337000,4.441000
+2023-11-03 20:56:45,266,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 20:56:45,267,scale_logger,DEBUG,Scale reading before Withdrawing: 4.430000
+2023-11-03 20:56:59,891,scale_logger,DEBUG,Scale reading after Withdrawing: 4.428000
+2023-11-03 20:56:59,891,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 20:56:59,891,scale_logger,INFO,Data,Withdrawing,0.100000,1.000000,4.430000,4.428000
+2023-11-03 20:57:30,361,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 20:57:30,361,scale_logger,DEBUG,Scale reading before Infusing: 4.425000
+2023-11-03 20:57:40,190,scale_logger,DEBUG,Scale reading after Infusing: 4.461000
+2023-11-03 20:57:40,191,scale_logger,DEBUG,Scale reading difference: -0.036000
+2023-11-03 20:57:40,191,scale_logger,INFO,Data,Infusing,0.060000,1.000000,4.425000,4.461000
+2023-11-03 20:59:42,529,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 20:59:42,530,scale_logger,DEBUG,Scale reading before Withdrawing: 4.468000
+2023-11-03 21:00:00,747,scale_logger,DEBUG,Scale reading after Withdrawing: 4.466000
+2023-11-03 21:00:00,748,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 21:00:00,748,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,4.468000,4.466000
+2023-11-03 21:00:31,217,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 21:00:31,218,scale_logger,DEBUG,Scale reading before Infusing: 4.463000
+2023-11-03 21:00:44,637,scale_logger,DEBUG,Scale reading after Infusing: 4.532000
+2023-11-03 21:00:44,637,scale_logger,DEBUG,Scale reading difference: -0.069000
+2023-11-03 21:00:44,637,scale_logger,INFO,Data,Infusing,0.090000,1.000000,4.463000,4.532000
+2023-11-03 21:02:52,144,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 21:02:52,145,scale_logger,DEBUG,Scale reading before Withdrawing: 4.521000
+2023-11-03 21:03:10,403,scale_logger,DEBUG,Scale reading after Withdrawing: 4.519000
+2023-11-03 21:03:10,404,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 21:03:10,404,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,4.521000,4.519000
+2023-11-03 21:03:39,857,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 21:03:39,857,scale_logger,DEBUG,Scale reading before Infusing: 4.515000
+2023-11-03 21:03:53,279,scale_logger,DEBUG,Scale reading after Infusing: 4.587000
+2023-11-03 21:03:53,279,scale_logger,DEBUG,Scale reading difference: -0.072000
+2023-11-03 21:03:53,280,scale_logger,INFO,Data,Infusing,0.090000,1.000000,4.515000,4.587000
+2023-11-03 21:05:57,838,scale_logger,DEBUG,Expected difference in scale reading: 0.160000
+2023-11-03 21:05:57,839,scale_logger,DEBUG,Scale reading before Withdrawing: 4.575000
+2023-11-03 21:06:19,674,scale_logger,DEBUG,Scale reading after Withdrawing: 4.573000
+2023-11-03 21:06:19,675,scale_logger,DEBUG,Scale reading difference: 0.002000
+2023-11-03 21:06:19,675,scale_logger,INFO,Data,Withdrawing,0.160000,1.000000,4.575000,4.573000
+2023-11-03 21:06:49,140,scale_logger,DEBUG,Expected difference in scale reading: 0.120000
+2023-11-03 21:06:49,140,scale_logger,DEBUG,Scale reading before Infusing: 4.568000
+2023-11-03 21:07:06,147,scale_logger,DEBUG,Scale reading after Infusing: 4.667000
+2023-11-03 21:07:06,148,scale_logger,DEBUG,Scale reading difference: -0.099000
+2023-11-03 21:07:06,148,scale_logger,INFO,Data,Infusing,0.120000,1.000000,4.568000,4.667000
+2023-11-03 21:09:17,928,scale_logger,DEBUG,Expected difference in scale reading: 0.060000
+2023-11-03 21:09:17,928,scale_logger,DEBUG,Scale reading before Withdrawing: 4.665000
+2023-11-03 21:09:27,755,scale_logger,DEBUG,Scale reading after Withdrawing: 4.664000
+2023-11-03 21:09:27,755,scale_logger,DEBUG,Scale reading difference: 0.001000
+2023-11-03 21:09:27,756,scale_logger,INFO,Data,Withdrawing,0.060000,1.000000,4.665000,4.664000
+2023-11-03 21:09:57,219,scale_logger,DEBUG,Expected difference in scale reading: 0.020000
+2023-11-03 21:09:57,219,scale_logger,DEBUG,Scale reading before Infusing: 4.661000
+2023-11-03 21:10:02,248,scale_logger,DEBUG,Scale reading after Infusing: 4.661000
+2023-11-03 21:10:02,249,scale_logger,DEBUG,Scale reading difference: 0.000000
+2023-11-03 21:10:02,249,scale_logger,INFO,Data,Infusing,0.020000,1.000000,4.661000,4.661000
+2023-11-03 21:11:54,025,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 21:11:54,025,scale_logger,DEBUG,Scale reading before Withdrawing: 4.650000
+2023-11-03 21:12:12,230,scale_logger,DEBUG,Scale reading after Withdrawing: 4.647000
+2023-11-03 21:12:12,231,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 21:12:12,231,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,4.650000,4.647000
+2023-11-03 21:12:41,694,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 21:12:41,695,scale_logger,DEBUG,Scale reading before Infusing: 4.644000
+2023-11-03 21:12:55,120,scale_logger,DEBUG,Scale reading after Infusing: 4.717000
+2023-11-03 21:12:55,121,scale_logger,DEBUG,Scale reading difference: -0.073000
+2023-11-03 21:12:55,121,scale_logger,INFO,Data,Infusing,0.090000,1.000000,4.644000,4.717000
+2023-11-03 21:14:59,690,scale_logger,DEBUG,Expected difference in scale reading: 0.170000
+2023-11-03 21:14:59,690,scale_logger,DEBUG,Scale reading before Withdrawing: 4.705000
+2023-11-03 21:15:22,702,scale_logger,DEBUG,Scale reading after Withdrawing: 4.702000
+2023-11-03 21:15:22,703,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 21:15:22,703,scale_logger,INFO,Data,Withdrawing,0.170000,1.000000,4.705000,4.702000
+2023-11-03 21:15:53,177,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 21:15:53,177,scale_logger,DEBUG,Scale reading before Infusing: 4.697000
+2023-11-03 21:16:11,398,scale_logger,DEBUG,Scale reading after Infusing: 4.803000
+2023-11-03 21:16:11,398,scale_logger,DEBUG,Scale reading difference: -0.106000
+2023-11-03 21:16:11,399,scale_logger,INFO,Data,Infusing,0.130000,1.000000,4.697000,4.803000
+2023-11-03 21:18:28,514,scale_logger,DEBUG,Expected difference in scale reading: 0.140000
+2023-11-03 21:18:28,514,scale_logger,DEBUG,Scale reading before Withdrawing: 4.791000
+2023-11-03 21:18:47,949,scale_logger,DEBUG,Scale reading after Withdrawing: 4.788000
+2023-11-03 21:18:47,950,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 21:18:47,950,scale_logger,INFO,Data,Withdrawing,0.140000,1.000000,4.791000,4.788000
+2023-11-03 21:19:18,421,scale_logger,DEBUG,Expected difference in scale reading: 0.100000
+2023-11-03 21:19:18,422,scale_logger,DEBUG,Scale reading before Infusing: 4.793000
+2023-11-03 21:19:33,057,scale_logger,DEBUG,Scale reading after Infusing: 4.858000
+2023-11-03 21:19:33,058,scale_logger,DEBUG,Scale reading difference: -0.065000
+2023-11-03 21:19:33,058,scale_logger,INFO,Data,Infusing,0.100000,1.000000,4.793000,4.858000
+2023-11-03 21:21:42,998,scale_logger,DEBUG,Expected difference in scale reading: 0.130000
+2023-11-03 21:21:42,999,scale_logger,DEBUG,Scale reading before Withdrawing: 4.861000
+2023-11-03 21:22:01,206,scale_logger,DEBUG,Scale reading after Withdrawing: 4.858000
+2023-11-03 21:22:01,207,scale_logger,DEBUG,Scale reading difference: 0.003000
+2023-11-03 21:22:01,207,scale_logger,INFO,Data,Withdrawing,0.130000,1.000000,4.861000,4.858000
+2023-11-03 21:22:31,681,scale_logger,DEBUG,Expected difference in scale reading: 0.090000
+2023-11-03 21:22:31,682,scale_logger,DEBUG,Scale reading before Infusing: 4.856000
+2023-11-03 21:22:45,093,scale_logger,DEBUG,Scale reading after Infusing: 4.927000
+2023-11-03 21:22:45,094,scale_logger,DEBUG,Scale reading difference: -0.071000
+2023-11-03 21:22:45,094,scale_logger,INFO,Data,Infusing,0.090000,1.000000,4.856000,4.927000
