@@ -7,9 +7,9 @@
         "x": -2,
         "y": -43,
         "name": "water",
-        "volume": 20000.0,
+        "volume": 8960.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 96
     },
     {
         "position": "s1",
@@ -55,7 +55,7 @@
         "x": -2,
         "y": -175,
         "name": null,
-        "volume": 0.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -67,7 +67,7 @@
         "x": -2,
         "y": -208,
         "name": "rinse0",
-        "volume": 0.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -79,7 +79,7 @@
         "x": -2,
         "y": -241,
         "name": "rinse1",
-        "volume": 0.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -91,7 +91,7 @@
         "x": -2,
         "y": -274,
         "name": "rinse2",
-        "volume": 0.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     }
