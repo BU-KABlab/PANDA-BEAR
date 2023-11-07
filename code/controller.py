@@ -28,8 +28,8 @@ from pump_control import Pump
 from pump_control import MockPump
 #import gamry_control_WIP as echem
 import gamry_control_WIP_mock as echem
-from scale import MockSartorius
-from scale import Sartorius as Scale
+from sartorius import Scale
+from sartorius.mock import Scale as MockScale
 
 # import obs_controls as obs
 import slack_functions as slack
@@ -365,7 +365,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     if use_mock_instruments:
         logger.info("Using mock instruments")
         mill = MockMill()
-        scale = MockSartorius()
+        scale = MockScale(address="COM6")
         pump = MockPump(mill=mill, scale=scale)
         instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
         return instruments
@@ -373,7 +373,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     logger.info("Connecting to instruments:")
     mill = Mill()
     mill.homing_sequence()
-    scale = Scale()
+    scale = Scale(address="COM6")
     pump = Pump(mill=mill, scale=scale)
     # pstat_connected = echem.pstatconnect()
     instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
@@ -383,7 +383,7 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
-    instruments.scale.close()
+    #instruments.scale.close()
     try:
         if echem.OPEN_CONNECTION:
             echem.pstatdisconnect()
@@ -681,5 +681,5 @@ def change_wellplate_location():
         json.dump(new_location, file, indent=4)
 
 if __name__ == "__main__":
-    main(use_mock_instruments=True)
+    main(use_mock_instruments=False)
     #load_new_wellplate(new_plate_id=5)

@@ -30,8 +30,8 @@ from typing import Tuple
 import pytz as tz
 
 # Third party or custom imports
-#import gamry_control_WIP as echem
-import gamry_control_WIP_mock as echem
+import gamry_control_WIP as echem
+#import gamry_control_WIP_mock as echem
 
 from experiment_class import (
     ExperimentResult,
@@ -106,7 +106,8 @@ def pipette(
         waste_vials (list): The updated list of waste vials
         wellplate (Wells object): The updated wellplate object
     """
-    air_gap = purge_volume * 2  # ul
+    air_gap = 40  # ul
+    drip_stop = 20  # ul
     if volume > 0.00:
         # Calculate the number of repetitions
         # based on pipette capacity and known purge volumes
@@ -123,9 +124,9 @@ def pipette(
                 solutions, solution_name, repetition_and_purge_vol
             )
             # purge_vial = waste_selector(waste_solution_name, repetition_vol)
-            purge_vial = waste_selector(
-                waste_vials, waste_solution_name, repetition_and_purge_vol
-            )
+            #purge_vial = waste_selector(
+            #    waste_vials, waste_solution_name, repetition_and_purge_vol
+            #)
             # First half: pick up solution
             logger.debug("Withdrawing %f of air gap...", air_gap)
             pump.withdraw(
@@ -143,31 +144,39 @@ def pipette(
             )  # go to solution depth (depth replaced with height)
 
             solution = pump.withdraw(
-                volume=repetition_and_purge_vol,
+                volume=repetition_vol,
                 solution=solution,
-                rate=pumping_rate
-            )  # pipette now has air gap + repitition + 2 purge vol
+                rate=pumping_rate,
+                weigh= False
+            )  # pipette now has air gap + repitition vol
 
             mill.move_to_safe_position()
+            pump.withdraw(
+                volume=drip_stop,
+                solution= None,
+                rate=pumping_rate,
+                weigh= False
+            )  # withdraw air to prevent dripping
+            # pipette now has air gap + repitition vol + drip stop
 
-            # Intermediate: Purge
-            logger.info("Moving to purge vial: %s...", purge_vial.name)
+            # # Intermediate: Purge
+            # logger.info("Moving to purge vial: %s...", purge_vial.name)
 
-            mill.safe_move(
-                purge_vial.coordinates["x"],
-                purge_vial.coordinates["y"],
-                purge_vial.height,
-                Instruments.PIPETTE,
-            )  # purge_vial.depth replaced with height
+            # mill.safe_move(
+            #     purge_vial.coordinates["x"],
+            #     purge_vial.coordinates["y"],
+            #     purge_vial.height,
+            #     Instruments.PIPETTE,
+            # )  # purge_vial.depth replaced with height
 
-            purge_vial = pump.purge(
-                purge_vial=purge_vial,
-                solution_being_purged= solution,
-                purge_volume=purge_volume
-            )  # remaining vol in pipette is now air gap + repition vol + 1 purge vol
-            mill.move_pipette_to_position(
-                purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
-            )
+            # purge_vial = pump.purge(
+            #     purge_vial=purge_vial,
+            #     solution_being_purged= solution,
+            #     purge_volume=purge_volume
+            # )  # remaining vol in pipette is now air gap + repition vol + 1 purge vol
+            # mill.move_pipette_to_position(
+            #     purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
+            # )
 
             # Second Half: Deposit to well
             logger.info("Moving to target well: %s...", target_well)
@@ -186,44 +195,45 @@ def pipette(
                 target_well,
             )
             destination = pump.infuse(
-                volume_to_infuse=repetition_vol,
+                volume_to_infuse=repetition_vol, #the volume to calulcate weight difference from
                 being_infused=solution,
                 infused_into=target_well,
-                rate=pumping_rate
+                rate=pumping_rate,
+                blowout= air_gap + drip_stop # not counted for scale expectation
             )  # remaining vol in pipette is now air gap + 1 purge vol
-            
+
             logger.info(
                 "Well %s volume: %f",
                 target_well,
                 wellplate.volume(target_well),
             )
 
-            mill.move_pipette_to_position(
-                wellplate.get_coordinates(target_well)["x"],
-                wellplate.get_coordinates(target_well)["y"],
-                0,
-            )  # return to safe height
+            #mill.move_pipette_to_position(
+            #    wellplate.get_coordinates(target_well)["x"],
+            #    wellplate.get_coordinates(target_well)["y"],
+            #    0,
+            #)  # return to safe height
 
-            # End Purge
-            logger.debug("Moving to purge vial: %s...", purge_vial.name)
-            mill.safe_move(
-                x_coord=purge_vial.coordinates["x"], 
-                y_coord=purge_vial.coordinates["y"], 
-                z_coord=purge_vial.height,
-                instrument=Instruments.PIPETTE,
-            )
+            # # End Purge
+            # logger.debug("Moving to purge vial: %s...", purge_vial.name)
+            # mill.safe_move(
+            #     x_coord=purge_vial.coordinates["x"], 
+            #     y_coord=purge_vial.coordinates["y"], 
+            #     z_coord=purge_vial.height,
+            #     instrument=Instruments.PIPETTE,
+            # )
 
-            purge_vial = pump.purge(
-                purge_vial=purge_vial,
-                solution_being_purged= solution,
-                purge_volume=purge_volume
-            )  # remaining vol in pipette is now air gap
+            # purge_vial = pump.purge(
+            #     purge_vial=purge_vial,
+            #     solution_being_purged= solution,
+            #     purge_volume=purge_volume
+            # )  # remaining vol in pipette is now air gap
             # Pump out the air gap
-            pump.infuse(volume_to_infuse=air_gap,
-                        being_infused= None,
-                        infused_into= None,
-                        rate=0.5)  # purge the pipette tip
-            mill.move_to_safe_position()
+            # pump.infuse(volume_to_infuse=air_gap,
+            #             being_infused= None,
+            #             infused_into= None,
+            #             rate=0.5)  # purge the pipette tip
+            # mill.move_to_safe_position()
 
     return solutions, waste_vials, wellplate
 
