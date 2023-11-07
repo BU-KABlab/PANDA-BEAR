@@ -703,25 +703,13 @@ def movement_test():
             a12 = wellplate.get_coordinates("A12")
             h1 = wellplate.get_coordinates("H1")
             h12 = wellplate.get_coordinates("H12")
-            # mill.move_pipette_to_position(a1["x"], a1["y"], 0)
-            # mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
-            # mill.move_pipette_to_position(a1['x'], a1['y'], 0)
 
-            # test that the mill current corrinates work
-            mill_coordinates = mill.current_coordinates(instrument=Instruments.PIPETTE)
-            assert mill_coordinates == [a1["x"], a1["y"], a1["depth"]]
+            ## Move the pipette to each well
+            mill.safe_move(a1['x'],a1['y'],a1['depth'], instrument=Instruments.PIPETTE)
+            mill.safe_move(a12['x'],a12['y'],a12['depth'], instrument=Instruments.PIPETTE)
+            mill.safe_move(h12['x'],h12['y'],h12['depth'], instrument=Instruments.PIPETTE)
+            mill.safe_move(h1['x'],h1['y'],h1['depth'], instrument=Instruments.PIPETTE)
 
-            # test that the mill safe move works
-            #mill.safe_move(d5["x"], d5["y"], d5["depth"])
-
-            # mill.move_pipette_to_position(d5['x'], d5['y'],0)
-            # mill.move_pipette_to_position(d5['x'], d5['y'],d5['depth'])
-            # mill.move_pipette_to_position(d5['x'], d5['y'],0)
-
-            # mill.move_pipette_to_position(h3['x'], h3['y'],0)
-            # mill.move_pipette_to_position(h3['x'], h3['y'],h3['depth'])
-            # mill.move_pipette_to_position(h3['x'], h3['y'],0)
-            # Perform other operations here
     except (
         MillConnectionError,
         MillConfigNotFound,
