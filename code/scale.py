@@ -8,6 +8,7 @@ EA, EB, GD, GE, TE scales.
 2010-2011 Robert Gieseke - robert.gieseke@gmail.com
 See LICENSE.
 """
+
 import logging
 import random
 import serial
@@ -58,12 +59,15 @@ class Sartorius(serial.Serial):
         try:
             if self.inWaiting() == 0:
                 self.write(b'\033P\n')
-            answer = self.readline().decode()
-            if len(answer) == 16: # menu code 7.1.1
-                answer = float(answer[0:11].replace(' ', ''))
+            response = self.readline().decode()
+            if len(response) != 22:
+                raise Exception("corrupted reponse")
             else: # menu code 7.1.2
-                answer = float(answer[6:17].replace(' ',''))
-            return round(answer,4)
+                value = float(response[6:16].replace(' ', ''))
+                units = response[17:20].replace(' ', '')
+                if units is None:
+                    value, units = self.value()
+            return round(value,4), units
         except Exception as e:
             return "NA"
 
@@ -96,6 +100,7 @@ class Sartorius(serial.Serial):
         Zero.
         """
         self.write(b'\033V\n')
+
 
 class MockSartorius:
     """
@@ -186,6 +191,7 @@ def scale_variance_check(mock: bool = False):
     five_sec_array = np.zeros(120)
     scale_logger.info("Creating 3s array")
     three_sec_array = np.zeros(200)
+
     scale_logger.info("Data arrays created")
 
     scale_logger.info("Starting 10s loop")
@@ -274,4 +280,6 @@ def function_test(mock: bool = False):
     sartorius_scale.close()
 
 if __name__ == '__main__':
-    scale_variance_check(mock=False)
+    #scale_variance_check(mock=False)
+    scale = Sartorius('COM6')
+    print(scale.value())
