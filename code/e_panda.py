@@ -199,7 +199,8 @@ def pipette(
                 being_infused=solution,
                 infused_into=target_well,
                 rate=pumping_rate,
-                blowout= air_gap + drip_stop # not counted for scale expectation
+                blowout= air_gap + drip_stop, # not counted for scale expectation
+                weigh= True
             )  # remaining vol in pipette is now air gap + 1 purge vol
 
             logger.info(
