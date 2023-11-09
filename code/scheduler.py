@@ -10,8 +10,9 @@ The scheduler module will be responsible for:
 import json
 import logging
 from math import exp
-import pathlib
 from pathlib import Path
+import pandas as pd
+from pandas.core.frame import DataFrame, Series
 import random
 from datetime import datetime
 from typing import Tuple
@@ -100,13 +101,13 @@ class Scheduler:
                     return well["well_id"]
             return None
 
-    def change_well_status(self, well: str, status: str, status_date: str = datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), experiment_id: int = None) -> None:
+    def change_well_status(self, well: str, experiment: ExperimentBase) -> None:
         """
         Changes the status of a well in well_status.json.
         :param well: The well to change.
         :param status: The new status of the well.
         """
-        logger.debug("Changing well %s status to %s", well, status)
+        logger.debug("Changing well %s status to %s", well, experiment.status.value)
         file_to_open = Path.cwd() / PATH_TO_STATUS/ "well_status.json"
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
@@ -116,14 +117,15 @@ class Scheduler:
             data = json.load(file)
             for wells in data["wells"]:
                 if wells["well_id"] == well:
-                    wells["status"] = status
-                    wells["status_date"] = status_date
-                    wells["experiment_id"] = experiment_id
+                    wells["status"] = experiment.status
+                    wells["status_date"] = experiment.status_date.strftime("%Y-%m-%dT%H:%M:%S")
+                    wells["experiment_id"] = experiment.id
+                    wells["project_id"] = experiment.project_id
                     break
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
 
-        logger.info("Well %s status changed to %s", well, status)
+        logger.info("Well %s status changed to %s", well, experiment.status)
 
     def read_new_experiments(self, filename: str) -> Tuple[int, bool]:
         """
@@ -270,26 +272,28 @@ class Scheduler:
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        with open(queue_file_path, "r", encoding="ascii") as queue_file:
-            queue = queue_file.readlines()
+        # with open(queue_file_path, "r", encoding="ascii") as queue_file:
+        #     queue = queue_file.readlines()
 
-        # Find the highest priority in the queue
-        highest_priority = 100
-        for line in queue[1:]:
-            priority = int(line.split(",")[1])
-            if priority < highest_priority:
-                highest_priority = priority
-
-        # Get all experiments with the highest priority so that we can randomly select one of them
-        experiments = []
-        for line in queue[1:]:
-            priority = int(line.split(",")[1])
-            if priority == highest_priority:
-                experiments.append(line.split(",")[2].strip()) # adds the filename to the list of experiments
-
-        if not experiments:
+        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename"], dtype={"id": int, "priority": int, "filename": str}, skipinitialspace=True)
+        # highest_priority = 100
+        # for line in queue[1:]:
+        #     priority = int(line.split(",")[1])
+        #     if priority < highest_priority:
+        #         highest_priority = priority
+        if queue.empty:
             logger.info("No experiments in queue")
             return None, None
+
+        highest_priority = queue["priority"].min()
+        # Get all experiments with the highest priority so that we can randomly select one of them
+        #experiments = []
+        experiments = queue[queue["priority"] == highest_priority]["filename"].tolist()
+
+        # for line in queue[1:]:
+        #     priority = int(line.split(",")[1])
+        #     if priority == highest_priority:
+        #         experiments.append(line.split(",")[2].strip()) # adds the filename to the list of experiments
 
         queue_dir_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
         if not Path.exists(queue_dir_path):
@@ -329,14 +333,17 @@ class Scheduler:
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        with open(file_path, "r", encoding="ascii") as file:
-            data = file.readlines()
+        queue = pd.read_csv(file_path, header=0, names=["id", "priority", "filename"], dtype= {"id": int, "priority":int, "filename": str},skipinitialspace=True)
+        # with open(file_path, "r", encoding="ascii") as file:
+        #     data = file.readlines()
 
         # Remove the experiment from the queue file
-        with open(file_path, "w", encoding="ascii") as file:
-            for line in data:
-                if line.split(",")[0] != str(experiment.id):
-                    file.write(line)
+        queue = queue[int(queue["id"]) != int(experiment.id)]
+        queue.to_csv(file_path, index=False)
+        # with open(file_path, "w", encoding="ascii") as file:
+        #     for line in data:
+        #         if line.split(",")[0] != str(experiment.id):
+        #             file.write(line)
 
     def update_experiment_queue_priority(self, experiment_id: int, priority: int):
         """Update the priority of experiments in the queue"""
@@ -346,26 +353,33 @@ class Scheduler:
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        with open(queue_file_path, "r", encoding="ascii") as queue_file:
-            queue = queue_file.readlines()
+        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename"], dtype= {"id": int, "priority":int, "filename": str}, skipinitialspace=True)
+        # with open(queue_file_path, "r", encoding="ascii") as queue_file:
+        #     queue = queue_file.readlines()
 
         # Find the experiment in the queue
-        for line in queue[1:]:
-            if line.split(",")[0] == str(experiment_id):
-                # Update the priority
-                line.split(",")[1] = str(priority)
+        queue.loc[int(queue["id"]) == experiment_id, "priority"] = priority
+        # for line in queue[1:]:
+        #     if line.split(",")[0] == str(experiment_id):
+        #         # Update the priority
+        #         line.split(",")[1] = str(priority)
 
         # Rewrite the queue csv file
-        with open(queue_file_path, "w", encoding="ascii") as file:
-            for line in queue:
-                file.write(line)
-                file.write("\n")
+        queue.to_csv(queue_file_path, index=False)
+        # with open(queue_file_path, "w", encoding="ascii") as file:
+        #     for line in queue:
+        #         file.write(line)
+        #         file.write("\n")
 
 
     def update_experiment_status(self, experiment: ExperimentBase) -> None:
         """
         Updates the status of the experiment in the experiment instructions file.
-        :param experiment: The experiment that was just run.
+        Args:
+            experiment (ExperimentBase): The experiment to update
+
+        Returns:
+            None
         """
         file_path = (Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename).with_suffix(".json")
         if not Path.exists(file_path):
@@ -389,8 +403,12 @@ class Scheduler:
 
     def update_experiment_location(self, experiment: ExperimentBase) -> None:
         """
-        Updates the location of the experiment instructions file.
-        :param experiment: The experiment that was just run.
+        Updates the location of the experiment instructions file based on status.
+        Args:
+            experiment (ExperimentBase): The experiment to update.
+        
+        Returns:
+            None
         """
         file_name_with_suffix = Path(experiment.filename).with_suffix(".json")
         file_path = Path(
@@ -412,6 +430,8 @@ class Scheduler:
 
         else:
             # If the experiment is neither complete nor errored, then we need to keep it in the queue
+            # and add it back to the queue file
+            experiment = self.add_to_queue_file(experiment)
             logger.info(
                 "Experiment %s is not complete or errored, keeping in queue",
                 experiment.id,
@@ -422,27 +442,13 @@ class Scheduler:
     def add_nonfile_experiment(self, experiment: ExperimentBase) -> str:
         """
         Adds an experiment which is not a file to the experiment queue directly.
-        :param experiment: The experiment to add.
+        
+        Args:
+            experiment (ExperimentBase): The experiment to add.
+
+        Returns:
+            str: A message indicating whether the experiment was successfully added to the queue.
         """
-        # # Save the new experiment to a file in the inbox folder
-        # file_path = pathlib.Path.cwd() / PATH_TO_EXPERIMENT_INBOX / experiment.filename
-        # experiment_json = experiment_class.serialize_experiment(experiment)
-        # # Modify the experiment json to look like the multi-experiment json
-        # # {"Experiments": [
-        # #     {
-        # #    }
-        # #]
-        # #}
-        # # replace only the first instance of { with {"Experiments": [
-        # experiment_json = experiment_json.replace("{", '{"Experiments": [{',1)
-        # # replace only the last instance of } with ]}
-        # experiment_json = experiment_json[::-1].replace("}", '}]}',1)[::-1]
-        # with open(file_path.with_suffix(".json"), "w", encoding="UTF-8") as file:
-        #     file.write(experiment_json)
-
-        # read the experiment to the queue
-        # self.read_new_experiments(experiment)
-
         ## First check the existing status, if not new or queued, then do not add to queue
         if experiment.status not in [ExperimentStatus.NEW, ExperimentStatus.QUEUED]:
             message = f"Experiment {experiment.id} is not new or queued, not adding to queue"
@@ -453,7 +459,7 @@ class Scheduler:
         if self.check_well_status(experiment.target_well) != "new":
             # Find the next available well
             target_well = self.choose_alternative_well(experiment.target_well)
-            if target_well == "none":
+            if target_well == None:
                 logger.info(
                     "No wells available for experiment originally for well %s.",
                     experiment.target_well
@@ -467,24 +473,48 @@ class Scheduler:
             experiment.target_well = target_well
 
         # Save the experiment as a separate file in the experiment_queue subfolder
+        experiment = self.add_to_queue_folder(experiment)
+
+        ## Add the experiment to the queue
+        experiment = self.add_to_queue_file(experiment)
+
+        ## Change the status of the well
+        self.change_well_status(experiment.target_well, experiment)
+
+        logger.info("Experiment %s added to queue", experiment.id)
+        return "success"
+
+    def add_to_queue_folder(self, experiment: ExperimentBase) -> ExperimentBase:
+        """Add the given experiment to the experiment_queue folder"""
         queue_dir = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
         file_to_save = (queue_dir / experiment.filename).with_suffix(".json")
         with open(file_to_save, "w", encoding="UTF-8") as file:
             serialized_data = experiment_class.serialize_experiment(experiment)
             file.write(serialized_data)
+        return experiment
 
-        ## Add the experiment to the queue
+    def add_to_queue_file(self, experiment: ExperimentBase) -> ExperimentBase:
+        """Add the given experiment to the queue.csv"""
         queue_file_path = Path.cwd() / PATH_TO_QUEUE
-        with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
-            line = f"{experiment.id},{experiment.priority},{experiment.filename}"
-            queue_file.write(line)
-            queue_file.write("\n")
+        if not Path.exists(queue_file_path):
+            logger.error("queue file not found")
+            raise FileNotFoundError("experiment queue file")
+        
+        # Read the queue file
+        # Add the experiment to the queue
+        new_row = {"id": experiment.id, "priority": experiment.priority, "filename": experiment.filename}
+        df = pd.DataFrame(new_row, index=[0])
 
-        ## Change the status of the well
-        self.change_well_status(experiment.target_well, "queued", experiment_id=experiment.id)
 
-        logger.info("Experiment %s added to queue", experiment.id)
-        return "success"
+        # Write the updated queue to the csv file
+        df.to_csv(queue_file_path,mode='a', index=False, header=False)
+        
+        # with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
+        #     line = f"{experiment.id},{experiment.priority},{experiment.filename}"
+        #     queue_file.write(line)
+        #     queue_file.write("\n")
+        experiment.status = ExperimentStatus.QUEUED
+        return experiment
 
     def add_nonfile_experiments(self, experiments: list) -> str:
         """
@@ -496,7 +526,7 @@ class Scheduler:
             if response != "success":
                 return response
         return "success"
-    
+
     def save_results(self, experiment: ExperimentBase, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder
         Args:
@@ -534,4 +564,7 @@ def test_well_status_update():
 
 
 if __name__ == "__main__":
-    test_well_status_update()
+    #test_well_status_update()
+    scheduler = Scheduler()
+    #scheduler.read_next_experiment_from_queue()
+    scheduler.update_experiment_queue_priority(2, 5)
