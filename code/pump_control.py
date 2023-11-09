@@ -61,7 +61,7 @@ class Pump:
         Initialize the pump and set the capacity.
         """
         self.pump = self.set_up_pump()
-        self.max_pump_rate = 0.652 # ml/min
+        self.max_pump_rate = 0.640 # ml/min
         self.syringe_capacity = 1.0  # mL
         self.pipette_capacity_ml = 0.2  # mL
         self.pipette_capacity_ul = 200  # uL
@@ -87,7 +87,7 @@ class Pump:
         """
         pump_port = nesp_lib.Port("COM5", 19200)
         pump = nesp_lib.Pump(pump_port)
-        pump.syringe_diameter = 4.685  # millimeters
+        pump.syringe_diameter = 4.770  # millimeters #4.643 #4.685
         pump.volume_infused_clear()
         pump.volume_withdrawn_clear()
         log_msg = f"Pump found at address {pump.address}"
