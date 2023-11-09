@@ -3,19 +3,19 @@
         "position": "s0",
         "contents": "water",
         "viscocity_rank": 1,
-        "density": 0.95,
+        "density": 1,
         "x": -2,
         "y": -43,
         "name": "water",
-        "volume": 5810.0,
+        "volume": 3070.0,
         "capacity": 20000,
-        "contamination": 190
+        "contamination": 226
     },
     {
         "position": "s1",
         "contents": "water",
         "viscocity_rank": 1,
-        "density": 0.95,
+        "density": 1,
         "x": -2,
         "y": -76,
         "name": "water",

@@ -2,15 +2,15 @@
     "id": 9991308,
     "experiment_name": "Water test",
     "priority": 1,
-    "target_well": "B10",
+    "target_well": "B11",
     "pin": 2001001001,
     "project_id": 3,
     "solutions": {
-        "water": 40
+        "water": 30
     },
     "pumping_rate": 0.5,
     "status": "complete",
-    "status_date": "2023-11-07T21:50:33",
-    "filename": "water_test_9991308",
+    "status_date": "2023-11-08T16:48:12",
+    "filename": "water_test_9991308.0",
     "results": null
 }

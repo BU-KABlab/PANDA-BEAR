@@ -5,7 +5,7 @@
         "x": -47,
         "y": -13,
         "name": "waste",
-        "volume": 15880.0,
+        "volume": 1000.0,
         "capacity": 20000,
         "contamination": 480,
         "density": 0
