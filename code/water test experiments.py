@@ -10,10 +10,19 @@ import experiment_class
 #import matplotlib.pyplot as plt
 from config.pin import CURRENT_PIN
 from scheduler import Scheduler
-
+import controller
+import pandas as pd
+from pathlib import Path
+controller.load_new_wellplate()
+well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', 
+                        names= ["plate id", "type number", "well id","experiment id", "project id", "status", "status date", "contents"],
+                        dtype={"plate id":int, "type number":int, "well id":str,"experiment id":int, "project id":int, "status":str, "status date":str, "contents":list}, 
+                        skipinitialspace=True
+                       )
+last_experiment_id = well_hx['experiment id'].max()
 COLUMNS = 'ABCDEFGH'
 ROWS = 12
-experiment_id = 9991287
+experiment_id = int(last_experiment_id+1)
 PROJECT_ID = 3
 EXPERIMENT_NAME = 'Water test'
 experiments = []
@@ -40,7 +49,10 @@ for column in COLUMNS:
 
 scheduler = Scheduler()
 result = scheduler.add_nonfile_experiments(experiments)
-print(result)
+if result == 'success':
+    controller.main()
+else:
+    print('Error: ', result)
 
 # Create a dataframe to store the results
 #results = pd.DataFrame(columns=['experiment_id', 'volume', 'mass'])
