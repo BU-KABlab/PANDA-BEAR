@@ -165,7 +165,7 @@ class Mill:
     def home(self, timeout=90):
         """Home the mill with a timeout"""
         self.execute_command("$H")
-        time.sleep(60)
+        time.sleep(30)
         start_time = time.time()
 
         while True:
