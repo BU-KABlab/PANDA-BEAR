@@ -67,7 +67,7 @@ def pipette(
     wellplate: Wells,
     pump: Pump,
     mill: Mill,
-    purge_volume: float = 20.00,
+    purge_volume: float = 5.00,
 ) -> Tuple[list[Vial], list[Vial], Wells]:
     """
     Perform the full pipetting sequence:
@@ -107,21 +107,19 @@ def pipette(
         wellplate (Wells object): The updated wellplate object
     """
     air_gap = 40  # ul
-    drip_stop = 20  # ul
+    drip_stop = 5  # ul
     if volume > 0.00:
         # Calculate the number of repetitions
         # based on pipette capacity and known purge volumes
         repetitions = math.ceil(
-            volume / (pump.pipette_capacity_ul - 2 * purge_volume)
+            volume / (pump.pipette_capacity_ul - drip_stop)
         )  # divide by pipette capacity
         repetition_vol = volume / repetitions
 
         for j in range(repetitions):
-            logger.info("Repetition %d of %d", j + 1, repetitions)
-            repetition_and_purge_vol = repetition_vol + (2 * purge_volume)
-            # solution = solution_selector(solution_name, repetition_vol)
+            logger.info("Repetition %d of %d", j + 1, repetitions)            # solution = solution_selector(solution_name, repetition_vol)
             solution = solution_selector(
-                solutions, solution_name, repetition_and_purge_vol
+                solutions, solution_name, repetition_vol
             )
             # purge_vial = waste_selector(waste_solution_name, repetition_vol)
             #purge_vial = waste_selector(
