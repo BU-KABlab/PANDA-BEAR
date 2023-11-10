@@ -459,7 +459,7 @@ class Scheduler:
         if self.check_well_status(experiment.target_well) != "new":
             # Find the next available well
             target_well = self.choose_alternative_well(experiment.target_well)
-            if target_well == None:
+            if target_well is None:
                 logger.info(
                     "No wells available for experiment originally for well %s.",
                     experiment.target_well
