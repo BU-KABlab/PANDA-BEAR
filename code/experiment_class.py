@@ -61,6 +61,7 @@ class ExperimentBase():
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None #Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
+    project_campaign_id: int = None
 
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''

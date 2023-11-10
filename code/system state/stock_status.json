@@ -7,9 +7,9 @@
         "x": -2,
         "y": -43,
         "name": "water",
-        "volume": 20000.0,
+        "volume": 12800.0,
         "capacity": 20000,
-        "contamination": 226
+        "contamination": 322
     },
     {
         "position": "s1",

@@ -5,9 +5,8 @@ Each column is a replicate and every row is a different volume
 """
 
 import experiment_class
-#import pandas as pd
 #import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from config.pin import CURRENT_PIN
 from scheduler import Scheduler
 import controller
@@ -39,6 +38,7 @@ for column in COLUMNS:
                 target_well= column + str(row),
                 pin = CURRENT_PIN,
                 project_id=PROJECT_ID,
+                project_campaign_id=1,
                 solutions={'water': volume},
                 status='new',
                 filename='water_test_' + str(experiment_id),

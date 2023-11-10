@@ -87,7 +87,7 @@ class Pump:
         """
         pump_port = nesp_lib.Port("COM5", 19200)
         pump = nesp_lib.Pump(pump_port)
-        pump.syringe_diameter = 4.770  # millimeters #4.643 #4.685
+        pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
         pump.volume_infused_clear()
         pump.volume_withdrawn_clear()
         log_msg = f"Pump found at address {pump.address}"

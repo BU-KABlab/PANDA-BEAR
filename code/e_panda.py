@@ -106,13 +106,13 @@ def pipette(
         waste_vials (list): The updated list of waste vials
         wellplate (Wells object): The updated wellplate object
     """
-    air_gap = 40  # ul
-    drip_stop = 5  # ul
+    AIR_GAP = 55  # ul
+    DRIP_STOP = 5  # ul of air to prevent dripping
     if volume > 0.00:
         # Calculate the number of repetitions
         # based on pipette capacity and known purge volumes
         repetitions = math.ceil(
-            volume / (pump.pipette_capacity_ul - drip_stop)
+            volume / (pump.pipette_capacity_ul - DRIP_STOP)
         )  # divide by pipette capacity
         repetition_vol = volume / repetitions
 
@@ -120,15 +120,15 @@ def pipette(
             logger.info("Repetition %d of %d", j + 1, repetitions)            # solution = solution_selector(solution_name, repetition_vol)
             solution = solution_selector(
                 solutions, solution_name, repetition_vol
-            )
+            ) # only account for repetition volume since the air gap and drip stop are air and not solution
             # purge_vial = waste_selector(waste_solution_name, repetition_vol)
             #purge_vial = waste_selector(
             #    waste_vials, waste_solution_name, repetition_and_purge_vol
             #)
             # First half: pick up solution
-            logger.debug("Withdrawing %f of air gap...", air_gap)
+            logger.debug("Withdrawing %f of air gap...", AIR_GAP)
             pump.withdraw(
-                volume=air_gap,
+                volume=AIR_GAP,
                 solution= None,
                 rate=pumping_rate
             )  # withdraw air gap to engage screw
@@ -150,7 +150,7 @@ def pipette(
 
             mill.move_to_safe_position()
             pump.withdraw(
-                volume=drip_stop,
+                volume=DRIP_STOP,
                 solution= None,
                 rate=pumping_rate,
                 weigh= False
@@ -197,7 +197,7 @@ def pipette(
                 being_infused=solution,
                 infused_into=target_well,
                 rate=pumping_rate,
-                blowout= air_gap + drip_stop, # not counted for scale expectation
+                blowout= AIR_GAP + DRIP_STOP, # not counted for scale expectation
                 weigh= True
             )  # remaining vol in pipette is now air gap + 1 purge vol
 

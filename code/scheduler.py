@@ -333,12 +333,12 @@ class Scheduler:
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        queue = pd.read_csv(file_path, header=0, names=["id", "priority", "filename"], dtype= {"id": int, "priority":int, "filename": str},skipinitialspace=True)
+        queue = pd.read_csv(file_path, header=0, names=["id", "priority", "filename"], dtype={"id": int, "priority": int, "filename": str}, skipinitialspace=True)
         # with open(file_path, "r", encoding="ascii") as file:
         #     data = file.readlines()
 
         # Remove the experiment from the queue file
-        queue = queue[int(queue["id"]) != int(experiment.id)]
+        queue = queue[queue["id"] != experiment.id]
         queue.to_csv(file_path, index=False)
         # with open(file_path, "w", encoding="ascii") as file:
         #     for line in data:
@@ -353,12 +353,12 @@ class Scheduler:
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename"], dtype= {"id": int, "priority":int, "filename": str}, skipinitialspace=True)
+        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename"], dtype={"id": int, "priority": int, "filename": str}, skipinitialspace=True)
         # with open(queue_file_path, "r", encoding="ascii") as queue_file:
         #     queue = queue_file.readlines()
 
         # Find the experiment in the queue
-        queue.loc[int(queue["id"]) == experiment_id, "priority"] = priority
+        queue.loc[queue["id"] == experiment_id, "priority"] = priority
         # for line in queue[1:]:
         #     if line.split(",")[0] == str(experiment_id):
         #         # Update the priority
