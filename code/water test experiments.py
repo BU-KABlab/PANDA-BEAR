@@ -14,11 +14,11 @@ import controller
 import pandas as pd
 from pathlib import Path
 controller.load_new_wellplate()
-well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', 
-                        names= ["plate id", "type number", "well id","experiment id", "project id", "status", "status date", "contents"],
-                        dtype={"plate id":int, "type number":int, "well id":str,"experiment id":int, "project id":int, "status":str, "status date":str, "contents":list}, 
-                        skipinitialspace=True
-                       )
+well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', skipinitialspace=True)
+                    #     names= ["plate id", "type number", "well id","experiment id", "project id", "status", "status date", "contents"],
+                    #     dtype={"plate id":int, "type number":int, "well id":str,"experiment id":int, "project id":int, "status":str, "status date":str, "contents":str},
+                    #     skipinitialspace=True
+                    #    )
 last_experiment_id = well_hx['experiment id'].max()
 COLUMNS = 'ABCDEFGH'
 ROWS = 12
