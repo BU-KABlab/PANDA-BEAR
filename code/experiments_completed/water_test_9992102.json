@@ -1,0 +1,17 @@
+{
+    "id": 9992102,
+    "experiment_name": "Water test",
+    "priority": 1,
+    "target_well": "D12",
+    "pin": 2001001001,
+    "project_id": 3,
+    "solutions": {
+        "water": 20
+    },
+    "pumping_rate": 0.5,
+    "status": "complete",
+    "status_date": "2023-11-10T16:44:38",
+    "filename": "water_test_9992102",
+    "results": null,
+    "project_campaign_id": 1
+}

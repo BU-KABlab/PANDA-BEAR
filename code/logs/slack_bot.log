@@ -3339,3 +3339,200 @@ The server responded with: {'ok': False, 'error': 'ratelimited'}
 2023-11-10 14:22:08,012:slack_functions:INFO:Message sent:No new experiments to run...monitoring inbox for new experiments
 2023-11-10 14:44:06,752:slack_functions:INFO:Message sent:ePANDA was interrupted by the user
 2023-11-10 14:44:21,910:slack_functions:INFO:Message sent:ePANDA is shutting down...goodbye
+2023-11-10 15:18:00,664:slack_functions:INFO:Message sent:ePANDA is starting up
+2023-11-10 15:18:42,906:slack_functions:INFO:Message sent:ePANDA has connected to equipment
+2023-11-10 15:18:43,093:slack_functions:INFO:Message sent:Running experiment 9992065
+2023-11-10 15:19:50,589:slack_functions:INFO:Message sent:Experiment 9992065 ended with status complete
+2023-11-10 15:19:50,782:slack_functions:INFO:Message sent:Running experiment 9992100
+2023-11-10 15:21:06,119:slack_functions:INFO:Message sent:Experiment 9992100 ended with status complete
+2023-11-10 15:21:06,298:slack_functions:INFO:Message sent:Running experiment 9992060
+2023-11-10 15:22:28,201:slack_functions:INFO:Message sent:Experiment 9992060 ended with status complete
+2023-11-10 15:22:28,373:slack_functions:INFO:Message sent:Running experiment 9992088
+2023-11-10 15:23:43,321:slack_functions:INFO:Message sent:Experiment 9992088 ended with status complete
+2023-11-10 15:23:43,514:slack_functions:INFO:Message sent:Running experiment 9992131
+2023-11-10 15:25:09,260:slack_functions:INFO:Message sent:Experiment 9992131 ended with status complete
+2023-11-10 15:25:09,519:slack_functions:INFO:Message sent:Running experiment 9992059
+2023-11-10 15:26:33,232:slack_functions:INFO:Message sent:Experiment 9992059 ended with status complete
+2023-11-10 15:26:33,409:slack_functions:INFO:Message sent:Running experiment 9992119
+2023-11-10 15:27:57,143:slack_functions:INFO:Message sent:Experiment 9992119 ended with status complete
+2023-11-10 15:27:57,307:slack_functions:INFO:Message sent:Running experiment 9992062
+2023-11-10 15:29:15,483:slack_functions:INFO:Message sent:Experiment 9992062 ended with status complete
+2023-11-10 15:29:15,649:slack_functions:INFO:Message sent:Running experiment 9992099
+2023-11-10 15:30:31,895:slack_functions:INFO:Message sent:Experiment 9992099 ended with status complete
+2023-11-10 15:30:32,057:slack_functions:INFO:Message sent:Running experiment 9992069
+2023-11-10 15:32:00,590:slack_functions:INFO:Message sent:Experiment 9992069 ended with status complete
+2023-11-10 15:32:00,802:slack_functions:INFO:Message sent:Running experiment 9992077
+2023-11-10 15:33:14,241:slack_functions:INFO:Message sent:Experiment 9992077 ended with status complete
+2023-11-10 15:33:14,427:slack_functions:INFO:Message sent:Running experiment 9992087
+2023-11-10 15:34:32,746:slack_functions:INFO:Message sent:Experiment 9992087 ended with status complete
+2023-11-10 15:34:32,908:slack_functions:INFO:Message sent:Running experiment 9992109
+2023-11-10 15:35:53,947:slack_functions:INFO:Message sent:Experiment 9992109 ended with status complete
+2023-11-10 15:35:54,111:slack_functions:INFO:Message sent:Running experiment 9992085
+2023-11-10 15:37:14,116:slack_functions:INFO:Message sent:Experiment 9992085 ended with status complete
+2023-11-10 15:37:14,311:slack_functions:INFO:Message sent:Running experiment 9992061
+2023-11-10 15:38:33,306:slack_functions:INFO:Message sent:Experiment 9992061 ended with status complete
+2023-11-10 15:38:33,467:slack_functions:INFO:Message sent:Running experiment 9992086
+2023-11-10 15:39:50,591:slack_functions:INFO:Message sent:Experiment 9992086 ended with status complete
+2023-11-10 15:39:50,752:slack_functions:INFO:Message sent:Running experiment 9992123
+2023-11-10 15:41:08,986:slack_functions:INFO:Message sent:Experiment 9992123 ended with status complete
+2023-11-10 15:41:09,171:slack_functions:INFO:Message sent:Running experiment 9992055
+2023-11-10 15:42:41,454:slack_functions:INFO:Message sent:Experiment 9992055 ended with status complete
+2023-11-10 15:42:41,625:slack_functions:INFO:Message sent:Running experiment 9992113
+2023-11-10 15:43:54,094:slack_functions:INFO:Message sent:Experiment 9992113 ended with status complete
+2023-11-10 15:43:54,261:slack_functions:INFO:Message sent:Running experiment 9992079
+2023-11-10 15:45:26,482:slack_functions:INFO:Message sent:Experiment 9992079 ended with status complete
+2023-11-10 15:45:26,647:slack_functions:INFO:Message sent:Running experiment 9992064
+2023-11-10 15:46:41,009:slack_functions:INFO:Message sent:Experiment 9992064 ended with status complete
+2023-11-10 15:46:41,177:slack_functions:INFO:Message sent:Running experiment 9992117
+2023-11-10 15:48:09,651:slack_functions:INFO:Message sent:Experiment 9992117 ended with status complete
+2023-11-10 15:48:09,848:slack_functions:INFO:Message sent:Running experiment 9992144
+2023-11-10 15:49:33,751:slack_functions:INFO:Message sent:Experiment 9992144 ended with status complete
+2023-11-10 15:49:34,101:slack_functions:INFO:Message sent:Running experiment 9992070
+2023-11-10 15:51:00,746:slack_functions:INFO:Message sent:Experiment 9992070 ended with status complete
+2023-11-10 15:51:01,030:slack_functions:INFO:Message sent:Running experiment 9992084
+2023-11-10 15:52:22,950:slack_functions:INFO:Message sent:Experiment 9992084 ended with status complete
+2023-11-10 15:52:23,212:slack_functions:INFO:Message sent:Running experiment 9992094
+2023-11-10 15:53:48,890:slack_functions:INFO:Message sent:Experiment 9992094 ended with status complete
+2023-11-10 15:53:49,131:slack_functions:INFO:Message sent:Running experiment 9992134
+2023-11-10 15:55:08,284:slack_functions:INFO:Message sent:Experiment 9992134 ended with status complete
+2023-11-10 15:55:08,496:slack_functions:INFO:Message sent:Running experiment 9992120
+2023-11-10 15:56:32,381:slack_functions:INFO:Message sent:Experiment 9992120 ended with status complete
+2023-11-10 15:56:32,581:slack_functions:INFO:Message sent:Running experiment 9992103
+2023-11-10 15:58:04,832:slack_functions:INFO:Message sent:Experiment 9992103 ended with status complete
+2023-11-10 15:58:05,039:slack_functions:INFO:Message sent:Running experiment 9992058
+2023-11-10 15:59:29,659:slack_functions:INFO:Message sent:Experiment 9992058 ended with status complete
+2023-11-10 15:59:29,855:slack_functions:INFO:Message sent:Running experiment 9992106
+2023-11-10 16:00:54,490:slack_functions:INFO:Message sent:Experiment 9992106 ended with status complete
+2023-11-10 16:00:54,710:slack_functions:INFO:Message sent:Running experiment 9992126
+2023-11-10 16:02:07,351:slack_functions:INFO:Message sent:Experiment 9992126 ended with status complete
+2023-11-10 16:02:07,543:slack_functions:INFO:Message sent:Running experiment 9992097
+2023-11-10 16:03:29,508:slack_functions:INFO:Message sent:Experiment 9992097 ended with status complete
+2023-11-10 16:03:29,719:slack_functions:INFO:Message sent:Running experiment 9992112
+2023-11-10 16:04:45,041:slack_functions:INFO:Message sent:Experiment 9992112 ended with status complete
+2023-11-10 16:04:45,235:slack_functions:INFO:Message sent:Running experiment 9992149
+2023-11-10 16:06:00,720:slack_functions:INFO:Message sent:Experiment 9992149 ended with status complete
+2023-11-10 16:06:00,907:slack_functions:INFO:Message sent:Running experiment 9992075
+2023-11-10 16:07:20,202:slack_functions:INFO:Message sent:Experiment 9992075 ended with status complete
+2023-11-10 16:07:21,267:slack_functions:INFO:Message sent:Running experiment 9992083
+2023-11-10 16:08:46,001:slack_functions:INFO:Message sent:Experiment 9992083 ended with status complete
+2023-11-10 16:08:46,203:slack_functions:INFO:Message sent:Running experiment 9992132
+2023-11-10 16:10:09,048:slack_functions:INFO:Message sent:Experiment 9992132 ended with status complete
+2023-11-10 16:10:09,266:slack_functions:INFO:Message sent:Running experiment 9992091
+2023-11-10 16:11:41,509:slack_functions:INFO:Message sent:Experiment 9992091 ended with status complete
+2023-11-10 16:11:41,693:slack_functions:INFO:Message sent:Running experiment 9992107
+2023-11-10 16:13:05,455:slack_functions:INFO:Message sent:Experiment 9992107 ended with status complete
+2023-11-10 16:13:05,715:slack_functions:INFO:Message sent:Running experiment 9992068
+2023-11-10 16:14:35,041:slack_functions:INFO:Message sent:Experiment 9992068 ended with status complete
+2023-11-10 16:14:35,213:slack_functions:INFO:Message sent:Running experiment 9992137
+2023-11-10 16:15:49,702:slack_functions:INFO:Message sent:Experiment 9992137 ended with status complete
+2023-11-10 16:15:49,896:slack_functions:INFO:Message sent:Running experiment 9992135
+2023-11-10 16:17:10,174:slack_functions:INFO:Message sent:Experiment 9992135 ended with status complete
+2023-11-10 16:17:10,337:slack_functions:INFO:Message sent:Running experiment 9992118
+2023-11-10 16:18:38,957:slack_functions:INFO:Message sent:Experiment 9992118 ended with status complete
+2023-11-10 16:18:39,125:slack_functions:INFO:Message sent:Running experiment 9992090
+2023-11-10 16:19:51,716:slack_functions:INFO:Message sent:Experiment 9992090 ended with status complete
+2023-11-10 16:19:51,907:slack_functions:INFO:Message sent:Running experiment 9992125
+2023-11-10 16:21:07,381:slack_functions:INFO:Message sent:Experiment 9992125 ended with status complete
+2023-11-10 16:21:07,541:slack_functions:INFO:Message sent:Running experiment 9992101
+2023-11-10 16:22:23,064:slack_functions:INFO:Message sent:Experiment 9992101 ended with status complete
+2023-11-10 16:22:23,240:slack_functions:INFO:Message sent:Running experiment 9992110
+2023-11-10 16:23:42,313:slack_functions:INFO:Message sent:Experiment 9992110 ended with status complete
+2023-11-10 16:23:42,480:slack_functions:INFO:Message sent:Running experiment 9992122
+2023-11-10 16:25:01,560:slack_functions:INFO:Message sent:Experiment 9992122 ended with status complete
+2023-11-10 16:25:01,749:slack_functions:INFO:Message sent:Running experiment 9992105
+2023-11-10 16:26:30,214:slack_functions:INFO:Message sent:Experiment 9992105 ended with status complete
+2023-11-10 16:26:30,373:slack_functions:INFO:Message sent:Running experiment 9992130
+2023-11-10 16:27:56,971:slack_functions:INFO:Message sent:Experiment 9992130 ended with status complete
+2023-11-10 16:27:57,161:slack_functions:INFO:Message sent:Running experiment 9992127
+2023-11-10 16:29:30,389:slack_functions:INFO:Message sent:Experiment 9992127 ended with status complete
+2023-11-10 16:29:30,561:slack_functions:INFO:Message sent:Running experiment 9992147
+2023-11-10 16:30:49,803:slack_functions:INFO:Message sent:Experiment 9992147 ended with status complete
+2023-11-10 16:30:49,994:slack_functions:INFO:Message sent:Running experiment 9992140
+2023-11-10 16:32:22,349:slack_functions:INFO:Message sent:Experiment 9992140 ended with status complete
+2023-11-10 16:32:22,563:slack_functions:INFO:Message sent:Running experiment 9992148
+2023-11-10 16:33:39,916:slack_functions:INFO:Message sent:Experiment 9992148 ended with status complete
+2023-11-10 16:33:40,102:slack_functions:INFO:Message sent:Running experiment 9992108
+2023-11-10 16:35:04,571:slack_functions:INFO:Message sent:Experiment 9992108 ended with status complete
+2023-11-10 16:35:04,751:slack_functions:INFO:Message sent:Running experiment 9992092
+2023-11-10 16:36:34,123:slack_functions:INFO:Message sent:Experiment 9992092 ended with status complete
+2023-11-10 16:36:34,287:slack_functions:INFO:Message sent:Running experiment 9992082
+2023-11-10 16:37:59,895:slack_functions:INFO:Message sent:Experiment 9992082 ended with status complete
+2023-11-10 16:38:00,066:slack_functions:INFO:Message sent:Running experiment 9992136
+2023-11-10 16:39:16,517:slack_functions:INFO:Message sent:Experiment 9992136 ended with status complete
+2023-11-10 16:39:16,680:slack_functions:INFO:Message sent:Running experiment 9992095
+2023-11-10 16:40:42,382:slack_functions:INFO:Message sent:Experiment 9992095 ended with status complete
+2023-11-10 16:40:42,575:slack_functions:INFO:Message sent:Running experiment 9992121
+2023-11-10 16:42:03,569:slack_functions:INFO:Message sent:Experiment 9992121 ended with status complete
+2023-11-10 16:42:03,765:slack_functions:INFO:Message sent:Running experiment 9992072
+2023-11-10 16:43:26,616:slack_functions:INFO:Message sent:Experiment 9992072 ended with status complete
+2023-11-10 16:43:26,904:slack_functions:INFO:Message sent:Running experiment 9992102
+2023-11-10 16:44:38,490:slack_functions:INFO:Message sent:Experiment 9992102 ended with status complete
+2023-11-10 16:44:38,673:slack_functions:INFO:Message sent:Running experiment 9992073
+2023-11-10 16:45:59,665:slack_functions:INFO:Message sent:Experiment 9992073 ended with status complete
+2023-11-10 16:45:59,828:slack_functions:INFO:Message sent:Running experiment 9992124
+2023-11-10 16:47:16,165:slack_functions:INFO:Message sent:Experiment 9992124 ended with status complete
+2023-11-10 16:47:16,352:slack_functions:INFO:Message sent:Running experiment 9992096
+2023-11-10 16:48:40,208:slack_functions:INFO:Message sent:Experiment 9992096 ended with status complete
+2023-11-10 16:48:40,377:slack_functions:INFO:Message sent:Running experiment 9992078
+2023-11-10 16:49:51,947:slack_functions:INFO:Message sent:Experiment 9992078 ended with status complete
+2023-11-10 16:49:52,105:slack_functions:INFO:Message sent:Running experiment 9992143
+2023-11-10 16:51:17,844:slack_functions:INFO:Message sent:Experiment 9992143 ended with status complete
+2023-11-10 16:51:18,032:slack_functions:INFO:Message sent:Running experiment 9992142
+2023-11-10 16:52:45,598:slack_functions:INFO:Message sent:Experiment 9992142 ended with status complete
+2023-11-10 16:52:45,765:slack_functions:INFO:Message sent:Running experiment 9992056
+2023-11-10 16:54:15,223:slack_functions:INFO:Message sent:Experiment 9992056 ended with status complete
+2023-11-10 16:54:15,395:slack_functions:INFO:Message sent:Running experiment 9992133
+2023-11-10 16:55:35,355:slack_functions:INFO:Message sent:Experiment 9992133 ended with status complete
+2023-11-10 16:55:35,520:slack_functions:INFO:Message sent:Running experiment 9992080
+2023-11-10 16:57:05,879:slack_functions:INFO:Message sent:Experiment 9992080 ended with status complete
+2023-11-10 16:57:06,067:slack_functions:INFO:Message sent:Running experiment 9992089
+2023-11-10 16:58:19,571:slack_functions:INFO:Message sent:Experiment 9992089 ended with status complete
+2023-11-10 16:58:19,730:slack_functions:INFO:Message sent:Running experiment 9992093
+2023-11-10 16:59:48,206:slack_functions:INFO:Message sent:Experiment 9992093 ended with status complete
+2023-11-10 16:59:48,388:slack_functions:INFO:Message sent:Running experiment 9992115
+2023-11-10 17:01:20,639:slack_functions:INFO:Message sent:Experiment 9992115 ended with status complete
+2023-11-10 17:01:20,846:slack_functions:INFO:Message sent:Running experiment 9992129
+2023-11-10 17:02:50,329:slack_functions:INFO:Message sent:Experiment 9992129 ended with status complete
+2023-11-10 17:02:50,527:slack_functions:INFO:Message sent:Running experiment 9992116
+2023-11-10 17:04:21,977:slack_functions:INFO:Message sent:Experiment 9992116 ended with status complete
+2023-11-10 17:04:22,149:slack_functions:INFO:Message sent:Running experiment 9992081
+2023-11-10 17:05:50,629:slack_functions:INFO:Message sent:Experiment 9992081 ended with status complete
+2023-11-10 17:05:50,854:slack_functions:INFO:Message sent:Running experiment 9992066
+2023-11-10 17:07:01,426:slack_functions:INFO:Message sent:Experiment 9992066 ended with status complete
+2023-11-10 17:07:01,590:slack_functions:INFO:Message sent:Running experiment 9992057
+2023-11-10 17:08:28,025:slack_functions:INFO:Message sent:Experiment 9992057 ended with status complete
+2023-11-10 17:08:28,187:slack_functions:INFO:Message sent:Running experiment 9992114
+2023-11-10 17:09:38,755:slack_functions:INFO:Message sent:Experiment 9992114 ended with status complete
+2023-11-10 17:09:38,912:slack_functions:INFO:Message sent:Running experiment 9992104
+2023-11-10 17:11:09,276:slack_functions:INFO:Message sent:Experiment 9992104 ended with status complete
+2023-11-10 17:11:09,460:slack_functions:INFO:Message sent:Running experiment 9992067
+2023-11-10 17:12:40,722:slack_functions:INFO:Message sent:Experiment 9992067 ended with status complete
+2023-11-10 17:12:40,885:slack_functions:INFO:Message sent:Running experiment 9992074
+2023-11-10 17:13:58,960:slack_functions:INFO:Message sent:Experiment 9992074 ended with status complete
+2023-11-10 17:13:59,137:slack_functions:INFO:Message sent:Running experiment 9992138
+2023-11-10 17:15:11,783:slack_functions:INFO:Message sent:Experiment 9992138 ended with status complete
+2023-11-10 17:15:11,959:slack_functions:INFO:Message sent:Running experiment 9992139
+2023-11-10 17:16:46,182:slack_functions:INFO:Message sent:Experiment 9992139 ended with status complete
+2023-11-10 17:16:46,367:slack_functions:INFO:Message sent:Running experiment 9992098
+2023-11-10 17:18:05,452:slack_functions:INFO:Message sent:Experiment 9992098 ended with status complete
+2023-11-10 17:18:05,657:slack_functions:INFO:Message sent:Running experiment 9992128
+2023-11-10 17:19:36,003:slack_functions:INFO:Message sent:Experiment 9992128 ended with status complete
+2023-11-10 17:19:36,167:slack_functions:INFO:Message sent:Running experiment 9992111
+2023-11-10 17:20:54,432:slack_functions:INFO:Message sent:Experiment 9992111 ended with status complete
+2023-11-10 17:20:54,594:slack_functions:INFO:Message sent:Running experiment 9992063
+2023-11-10 17:22:11,834:slack_functions:INFO:Message sent:Experiment 9992063 ended with status complete
+2023-11-10 17:22:12,004:slack_functions:INFO:Message sent:Running experiment 9992076
+2023-11-10 17:23:27,328:slack_functions:INFO:Message sent:Experiment 9992076 ended with status complete
+2023-11-10 17:23:27,495:slack_functions:INFO:Message sent:Running experiment 9992146
+2023-11-10 17:24:47,575:slack_functions:INFO:Message sent:Experiment 9992146 ended with status complete
+2023-11-10 17:24:47,758:slack_functions:INFO:Message sent:Running experiment 9992141
+2023-11-10 17:26:17,219:slack_functions:INFO:Message sent:Experiment 9992141 ended with status complete
+2023-11-10 17:26:17,392:slack_functions:INFO:Message sent:Running experiment 9992150
+2023-11-10 17:27:30,998:slack_functions:INFO:Message sent:Experiment 9992150 ended with status complete
+2023-11-10 17:27:31,161:slack_functions:INFO:Message sent:Running experiment 9992145
+2023-11-10 17:28:54,170:slack_functions:INFO:Message sent:Experiment 9992145 ended with status complete
+2023-11-10 17:28:54,341:slack_functions:INFO:Message sent:Running experiment 9992071
+2023-11-10 17:30:19,062:slack_functions:INFO:Message sent:Experiment 9992071 ended with status complete
+2023-11-10 17:30:19,257:slack_functions:INFO:Message sent:No new experiments to run...monitoring inbox for new experiments
+2023-11-10 17:30:24,932:slack_functions:INFO:Message sent:ePANDA was interrupted by the user
+2023-11-10 17:30:40,081:slack_functions:INFO:Message sent:ePANDA is shutting down...goodbye

@@ -333,3 +333,60 @@ execute_command: Command sent: $H
 execute_command: Returned ok
 Homing completed
 Exiting program.
+Mill config loaded: {'instrument_offsets': {'electrode': {'x': 36, 'y': 30, 'z': 0}, 'pipette': {'x': -85, 'y': 2, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -415, 'y': -300, 'z': -80}}
+Mill connected: True
+execute_command: Command sent: $H
+execute_command: Returned 
+Homing completed
+execute_command: Command sent: F2000
+execute_command: Returned ok
+MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+current_coordinates: [0.0, 0.0, 0.0]
+execute_command: Command sent: G00 X-315
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-318.000,-3.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Y-33
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-318.000,-36.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z-76
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-318.000,-36.000,-79.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -315.0, Y = -33.0, Z = -76.0
+current_coordinates: [-315.0, -33.0, -76.0]
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-318.000,-36.000,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+execute_command: Command sent: G00 Y-132.0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-318.000,-135.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z-76
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-318.000,-135.000,-79.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -315.0, Y = -132.0, Z = -76.0
+current_coordinates: [-315.0, -132.0, -76.0]
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-318.000,-135.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 X-378.0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-381.000,-135.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z-76
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-381.000,-135.000,-79.000|Bf:15,127|FS:0,0>
+MPos coordinates: X = -378.0, Y = -132.0, Z = -76.0
+current_coordinates: [-378.0, -132.0, -76.0]
+execute_command: Command sent: G00 Z0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-381.000,-135.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Y-33.0
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-381.000,-36.000,-3.000|Bf:15,127|FS:0,0>
+execute_command: Command sent: G00 Z-76
+execute_command: Initially ok
+execute_command: Returned <Idle|MPos:-381.000,-36.000,-79.000|Bf:15,127|FS:0,0>
+Exiting the mill context manager
+Disconnecting from the mill
+execute_command: Command sent: $H
+execute_command: Returned ok
+Homing completed
+Exiting program.
