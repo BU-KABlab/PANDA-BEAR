@@ -5,7 +5,7 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 
 import logging
 import time
-from typing import Optional
+from typing import Optional, Tuple
 
 import nesp_lib
 from sartorius import Scale
@@ -87,7 +87,7 @@ class Pump:
         """
         pump_port = nesp_lib.Port("COM5", 19200)
         pump = nesp_lib.Pump(pump_port)
-        pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
+        pump.syringe_diameter = 4.643  # millimeters #4.643 #4.685
         pump.volume_infused_clear()
         pump.volume_withdrawn_clear()
         log_msg = f"Pump found at address {pump.address}"
@@ -98,7 +98,7 @@ class Pump:
     #TODO add the option to infuse or withdraw from a vial or a well
     def withdraw(
         self, volume: float, solution: [Vial, str] = None, rate: float = 0.5, weigh: bool = False
-    ) -> Optional[Vial]:
+    ) -> Optional[Tuple[Vial, float]]:
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
@@ -118,7 +118,7 @@ class Pump:
             else:
                 density = None
 
-            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
+            difference = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
             self.update_pipette_volume(self.pump.volume_withdrawn)
             pump_control_logger.info(
                 "Pump has withdrawn: %0.6f ml    Pipette vol: %0.3f ul",
@@ -134,13 +134,13 @@ class Pump:
                     pass # TODO add well support here, currently updated elsewhere
                 else:
                     pass
-                return solution
+                return solution, difference
         else:
             return None
     #TODO add the option to infuse or withdraw from a vial or a well
     def infuse(
-        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5, blowout: float = 0.0, weigh: bool = False
-    ) -> Optional[Vial]:
+        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False
+    ) ->  Optional[Tuple[Vial, float]]:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -161,12 +161,12 @@ class Pump:
             else:
                 density = None
 
-            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout/1000.0, weigh)
+            difference = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ul/1000.0, weigh)
             self.update_pipette_volume(self.pump.volume_infused)
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
-                self.pump.volume_infused - blowout,
+                self.pump.volume_infused - blowout_ul,
                 self.pipette_volume_ul,
             )
             self.pump.volume_infused_clear()
@@ -176,7 +176,7 @@ class Pump:
                     infused_into.update_volume(volume_ul)
                 else:
                     pass # TODO add well support here, currently updated elsewhere
-                return infused_into
+                return infused_into, difference
             else:
                 return None
         else:
@@ -239,7 +239,7 @@ class Pump:
         while self.pump.running:
             pass
         pump_control_logger.debug("Done %s", action)
-        
+
         time.sleep(3) # let the scale settle
 
         ## Get scale value after pump action
@@ -262,6 +262,8 @@ class Pump:
         )
         log_msg = f"Pump has {action_type}: {action_volume} ml"
         pump_control_logger.debug(log_msg)
+
+        return post_weight - pre_weight
 
     def mix(
         self,
@@ -353,7 +355,7 @@ class MockPump(Pump):
         return pump
 
     def withdraw(
-        self, volume: float, solution: Vial = None, rate: float = 0.5
+        self, volume: float, solution: Vial = None, rate: float = 0.5, weigh: bool = False
     ) -> Optional[Vial]:
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
@@ -377,7 +379,7 @@ class MockPump(Pump):
         return 0
 
     def infuse(
-        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5
+        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5, blowout_ul = 0.0, weigh: bool = False
     ) -> Optional[Vial]:
         """
         Simulate infuse behavior without sending commands to the pump
@@ -421,7 +423,7 @@ class MockPump(Pump):
         else:
             return None
 
-    def run_pump(self, direction, volume_ml, rate = None, density=None):
+    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh = False)-> float:
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
             return
@@ -462,6 +464,8 @@ class MockPump(Pump):
         )
         log_msg = f"Pump has {action_type}: {action_volume} ml"
         pump_control_logger.debug(log_msg)
+
+        return post_weight - pre_weight
 
     def update_pipette_volume(self, volume_ml):
         """Change the pipette volume by the given amount

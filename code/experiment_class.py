@@ -205,6 +205,20 @@ class Experiment:
             return self.id == other.id
         return False
 
+def make_test_base_value() -> ExperimentBase:
+    '''Create a test experiment value for the class'''
+    return ExperimentBase(
+        id=0,
+        experiment_name= "test",
+        priority=2,
+        target_well="D5",
+        pin=CURRENT_PIN,
+        project_id=3,
+        solutions={'dmf': 0, 'peg': 145, 'acrylate': 145, 'ferrocene': 0, 'custom': 0},
+        status=ExperimentStatus.QUEUED,
+        status_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        filename= f"test_{0}.json",
+        results=None)
 
 def make_test_value() -> Experiment:
     '''Create a test experiment value for the class'''
@@ -289,7 +303,7 @@ def parse_experimentbase(json_string: str) -> ExperimentBase:
 #     if isinstance(experiment, Experiment):
 #         return RootModel[Experiment](experiment).model_dump_json(indent=4)
 
-def serialize_experiment(experiment: (ExperimentBase, Experiment, PEG2P_Test_Instructions, PEG_ACR_Instructions)) -> str:
+def serialize_experiment(experiment: (ExperimentBase)) -> str:
     """Given an experiment, determine the type and then pass back the serialized json form"""
     if isinstance(experiment, ExperimentBase):
         return RootModel[ExperimentBase](experiment).model_dump_json(indent=4)

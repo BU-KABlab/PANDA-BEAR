@@ -43,7 +43,7 @@ from log_tools import CustomLoggingFilter
 from mill_control import Mill, Instruments
 from pump_control import Pump
 from vials import Vial
-from wellplate import Wells
+from wellplate import Wells, Well
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -53,7 +53,8 @@ system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
-AIR_GAP = 40  # ul
+AIR_GAP = 55  # ul
+DRIP_STOP = 5  # ul of air to prevent dripping
 
 
 def pipette(
@@ -63,11 +64,10 @@ def pipette(
     target_well: str,
     pumping_rate: float,
     waste_vials: list[Vial],
-    waste_solution_name: str,
     wellplate: Wells,
     pump: Pump,
     mill: Mill,
-    purge_volume: float = 5.00,
+    waste_solution_name: str = "waste",
 ) -> Tuple[list[Vial], list[Vial], Wells]:
     """
     Perform the full pipetting sequence:
@@ -77,37 +77,30 @@ def pipette(
         b. Move to the source
         c. Withdraw the solution
         d. Move back to safe height
-    3. Purge the solution into the waste vial
-        a. Move to the waste vial
-        b. Purge the solution
-        c. Purge the air gap
-        d. Move back to safe height
-    4. Deposit the solution into the target well
+        e. Withdraw an air gap to prevent dripping
+    3. Deposit the solution into the target well
         a. Move to the target well
-        b. Deposit the solution
+        b. Deposit the solution and blow out
         c. Move back to safe height
-    5. Purge the solution into the waste vial
-        a. Move to the waste vial
-        b. Purge the solution
-        c. Purge the air gap
-        d. Move back to safe height
-    6. Repeat 2-5 until all repetitions are complete
-    7. Purge the air gap
-    8. Move back to safe height
+    4. Repeat 2-3 until all repetitions are complete
 
     Args:
-        volume (float): Volume to be pipetted into desired well
-        solution (Vial object): the vial source or solution to be pipetted
-        target_well (str): The alphanumeric name of the well you would like to pipette into
-        purge_volume (float): Desired about to purge before and after pipetting
+        volume (float): The volume to be pipetted in microliters
+        solutions (list): The list of solution objects
+        solution_name (str): The name of the solution to be pipetted
+        target_well (str): The alphanumeric name of the target well
+        pumping_rate (float): The pumping rate in ml/min
+        waste_vials (list): The list of waste vials
+        waste_solution_name (str): The name of the waste solution
+        wellplate (Wells object): The wellplate object
+        pump (object): The pump object
+        mill (object): The mill object
 
     Returns:
         solutions (list): The updated list of solution vials
         waste_vials (list): The updated list of waste vials
         wellplate (Wells object): The updated wellplate object
     """
-    AIR_GAP = 55  # ul
-    DRIP_STOP = 5  # ul of air to prevent dripping
     if volume > 0.00:
         # Calculate the number of repetitions
         # based on pipette capacity and known purge volumes
@@ -117,14 +110,12 @@ def pipette(
         repetition_vol = volume / repetitions
 
         for j in range(repetitions):
-            logger.info("Repetition %d of %d", j + 1, repetitions)            # solution = solution_selector(solution_name, repetition_vol)
+            logger.info("Repetition %d of %d", j + 1, repetitions)
             solution = solution_selector(
                 solutions, solution_name, repetition_vol
             ) # only account for repetition volume since the air gap and drip stop are air and not solution
-            # purge_vial = waste_selector(waste_solution_name, repetition_vol)
-            #purge_vial = waste_selector(
-            #    waste_vials, waste_solution_name, repetition_and_purge_vol
-            #)
+            waste_solution = waste_selector(
+                waste_vials, waste_solution_name, repetition_vol)
             # First half: pick up solution
             logger.debug("Withdrawing %f of air gap...", AIR_GAP)
             pump.withdraw(
@@ -157,25 +148,6 @@ def pipette(
             )  # withdraw air to prevent dripping
             # pipette now has air gap + repitition vol + drip stop
 
-            # # Intermediate: Purge
-            # logger.info("Moving to purge vial: %s...", purge_vial.name)
-
-            # mill.safe_move(
-            #     purge_vial.coordinates["x"],
-            #     purge_vial.coordinates["y"],
-            #     purge_vial.height,
-            #     Instruments.PIPETTE,
-            # )  # purge_vial.depth replaced with height
-
-            # purge_vial = pump.purge(
-            #     purge_vial=purge_vial,
-            #     solution_being_purged= solution,
-            #     purge_volume=purge_volume
-            # )  # remaining vol in pipette is now air gap + repition vol + 1 purge vol
-            # mill.move_pipette_to_position(
-            #     purge_vial.coordinates["x"], purge_vial.coordinates["y"], 0
-            # )
-
             # Second Half: Deposit to well
             logger.info("Moving to target well: %s...", target_well)
 
@@ -199,7 +171,7 @@ def pipette(
                 rate=pumping_rate,
                 blowout= AIR_GAP + DRIP_STOP, # not counted for scale expectation
                 weigh= True
-            )  # remaining vol in pipette is now air gap + 1 purge vol
+            )
 
             logger.info(
                 "Well %s volume: %f",
@@ -207,35 +179,106 @@ def pipette(
                 wellplate.volume(target_well),
             )
 
-            #mill.move_pipette_to_position(
-            #    wellplate.get_coordinates(target_well)["x"],
-            #    wellplate.get_coordinates(target_well)["y"],
-            #    0,
-            #)  # return to safe height
-
-            # # End Purge
-            # logger.debug("Moving to purge vial: %s...", purge_vial.name)
-            # mill.safe_move(
-            #     x_coord=purge_vial.coordinates["x"], 
-            #     y_coord=purge_vial.coordinates["y"], 
-            #     z_coord=purge_vial.height,
-            #     instrument=Instruments.PIPETTE,
-            # )
-
-            # purge_vial = pump.purge(
-            #     purge_vial=purge_vial,
-            #     solution_being_purged= solution,
-            #     purge_volume=purge_volume
-            # )  # remaining vol in pipette is now air gap
-            # Pump out the air gap
-            # pump.infuse(volume_to_infuse=air_gap,
-            #             being_infused= None,
-            #             infused_into= None,
-            #             rate=0.5)  # purge the pipette tip
-            # mill.move_to_safe_position()
+            mill.move_to_safe_position()
 
     return solutions, waste_vials, wellplate
 
+def pipette_v2(
+        volume: float,
+        from_vessel: [Vial, Well],
+        to_vessel: [Vial, Well],
+        pumping_rate: float,
+        pump: Pump,
+        mill: Mill,
+        wellplate: Wells,
+        stock_vials: list[Vial],
+        waste_vials: list[Vial],
+    )-> Tuple[list[Vial], list[Vial], Wells]:
+    """
+    Pipette a volume from one vessel to another. This depreciates the clear_well function.
+
+    Depending on the supplied vessels, this function will perform one of the following:
+    1. Pipette from a stock vial to a well
+    2. Pipette from a well to a waste vial
+    3. Pipette from a stock vial to a waste vial
+
+    It will not allow:
+    1. Pipetting from a waste vial to a well
+    2. Pipetting from a well to a stock vial
+
+    The steps that this function will perform:
+    1. Determine the number of repetitions
+    2. Withdraw the solution from the source
+        a. Withdraw an air gap to engage the screw
+        b. Move to the source
+        c. Withdraw the solution
+        d. Move back to safe height
+        e. Withdraw an air gap to prevent dripping
+    3. Deposit the solution into the destination vessel
+        a. Move to the destination
+        b. Deposit the solution and blow out
+        c. Move back to safe height
+        d. If depositing stock solution into a well, the recorded weight change will be saved to the target well 
+            in the wellplate object and the stock vial object will be updated with a corrected new volume based on the density of the solution.
+    4. Repeat 2-3 until all repetitions are complete
+
+    Args:
+        volume (float): The volume to be pipetted in microliters
+        from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
+        to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
+        pumping_rate (float): The pumping rate in ml/min
+        pump (object): The pump object
+        mill (object): The mill object
+        wellplate (Wells object): The wellplate object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+
+    Returns:
+        stock_vials (list): The updated list of stock vials
+        waste_vials (list): The updated list of waste vials
+        wellplate (Wells object): The updated wellplate object
+    """
+    if volume > 0.00:
+        # Calculate the number of repetitions
+        # based on pipette capacity and drip stop
+
+        repetitions = math.ceil(
+            volume / (pump.pipette_capacity_ul - DRIP_STOP)
+        )
+        repetition_vol = volume / repetitions
+
+        for j in range(repetitions):
+            logger.info("Repetition %d of %d", j + 1, repetitions)
+            # First half: pick up solution
+            logger.debug("Withdrawing %f of air gap...", AIR_GAP)
+            pump.withdraw(
+                volume=AIR_GAP,
+                solution= None,
+                rate=pumping_rate
+            )  # withdraw air gap to engage screw
+
+            logger.info("Moving to %s...", from_vessel.name)
+            mill.safe_move(
+                from_vessel.coordinates["x"],
+                from_vessel.coordinates["y"],
+                from_vessel.bottom,
+                Instruments.PIPETTE,
+            )  # go to solution depth (depth replaced with height)
+
+            from_vessel = pump.withdraw(
+                volume=repetition_vol,
+                solution=from_vessel,
+                rate=pumping_rate,
+                weigh= False
+            )  # pipette now has air gap + repitition vol
+
+            mill.move_to_safe_position()
+            pump.withdraw(
+                volume=DRIP_STOP,
+                solution= None,
+                rate=pumping_rate,
+                weigh= False
+            )
 
 def clear_well(
     volume: float,
@@ -265,20 +308,20 @@ def clear_well(
         wellplate (Wells object): The updated wellplate object
     """
     if volume > 0.00:
-        repetition = math.ceil(
-            volume / 200
-        )  # divide by 200 ul which is the pipette capacity to determin the number of repetitions
-        repetition_vol = volume / repetition
+        repetitions = math.ceil(
+            volume / (200-DRIP_STOP)
+        )  # divide by 200 ul - drip stop which is the pipette capacity to determin the number of repetitions
+        repetition_vol = volume / repetitions
         logger.info(
             "Clearing well %s with %dx repetitions of %f",
             target_well,
-            repetition,
+            repetitions,
             repetition_vol,
         )
-        for j in range(repetition):
-            purge_vial = waste_selector(waste_vials, solution_name, repetition_vol)
+        for j in range(repetitions):
+            destination_vial = waste_selector(waste_vials, solution_name, repetition_vol)
 
-            logger.info("Repitition %d of %d", j + 1, repetition)
+            logger.info("Repitition %d of %d", j + 1, repetitions)
             logger.debug("Withdrawing %f of air gap...", AIR_GAP)
             # withdraw a little to engange screw
             pump.withdraw(volume=AIR_GAP,
@@ -298,30 +341,25 @@ def clear_well(
                 volume=repetition_vol,
                 solution=target_well,
                 rate=pumping_rate,
+                weigh= True
             )  # withdraw the volume from the well
 
             logger.debug("Well %s volume: %f", target_well, wellplate.volume(target_well))
-            mill.move_to_safe_position()
 
-            logger.info("Moving to purge vial %s...", purge_vial.name)
+            logger.info("Moving to purge vial %s...", destination_vial.name)
             mill.safe_move(
-                purge_vial.coordinates["x"],
-                purge_vial.coordinates["y"],
-                purge_vial.height,
+                destination_vial.coordinates["x"],
+                destination_vial.coordinates["y"],
+                destination_vial.height,
                 Instruments.PIPETTE,
             )
 
-            purge_vial = pump.purge(
-                purge_vial=purge_vial, 
+            destination_vial = pump.purge(
+                purge_vial=destination_vial, 
                 solution_being_purged= None,
                 purge_volume=repetition_vol
             )  # repitition volume
             logger.info("Purging the air gap...")
-            pump.infuse(volume_to_infuse=AIR_GAP,
-                        being_infused=None,
-                        infused_into=None,
-                        rate=0.5
-                        )  # extra purge to clear pipette
 
             mill.move_to_safe_position()
             logger.info("Remaining volume in well: %f", wellplate.volume(target_well))

@@ -1,0 +1,306 @@
+"""sendSlackMessages.py"""
+# pylint: disable=line-too-long
+
+# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
+import csv
+from datetime import datetime
+
+# import json
+import logging
+from pathlib import Path
+
+# import re
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+import slack_credentials as slack_cred
+
+class SlackBot:
+    def __init__(self, mode="test"):
+        # Set up logging
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.DEBUG)
+        formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+        file_handler = logging.FileHandler("code/logs/slack_bot.log")
+        system_handler = logging.FileHandler("code/logs/ePANDA.log")
+        file_handler.setFormatter(formatter)
+        system_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        logger.addHandler(system_handler)
+        self.logger = logger
+        self.mode = mode
+
+    def send_slack_message(self, channel_id: str, message) -> None:
+        client = WebClient(slack_cred.TOKEN)
+        if channel_id == "conversation":
+            channel_id = slack_cred.CONVERSATION_CHANNEL_ID
+        elif channel_id == "alert":
+            channel_id = slack_cred.ALERT_CHANNEL_ID
+
+        try:
+            if self.mode != "test": 
+                result = client.chat_postMessage(channel=channel_id, text=message)
+            else:
+                result = {"ok": True}
+            if result["ok"]:
+                self.logger.info("Message sent:%s", message)
+            else:
+                self.logger.error("Error sending message:%s", message)
+        except SlackApiError as error:
+            self.logger.error("Error posting message: %s", error)
+
+    def send_slack_file(self, channel: str, file, message=None) -> None:
+        client = WebClient(slack_cred.TOKEN)
+        filename_to_post = file.split("\\")[-1]
+
+        if channel == "conversation":
+            channel_id = slack_cred.CONVERSATION_CHANNEL_ID
+        elif channel == "alert":
+            channel_id = slack_cred.ALERT_CHANNEL_ID
+        else:
+            return "No applicable channel"
+
+        try:
+            if self.mode != "test":
+                result = client.files_upload_v2(
+                    channel=channel_id,
+                    file=filename_to_post,
+                    filename=file,
+                    initial_comment=message,
+                )
+            else:
+                result = {"ok": True}
+            if result["ok"]:
+                self.logger.info("File sent: %s", file)
+            else:
+                self.logger.error("Error sending file: %s", file)
+        except SlackApiError as exception:
+            log_msg = f"Error uploading file: {format(exception)}"
+            self.logger.error(log_msg)
+
+    def upload_requested_experiment_info(self, experiment_id, test_type, result_type, channel):
+        """Uploads requested experiment information to Slack channel.
+
+        Args:
+            experimentID (int): The ID of the experiment to get information from.
+            test_type (str): CV, CA, or OCP
+            result_type (str): plot/graph, data, .
+            channel (str): The Slack channel to upload the information to.
+
+        """
+        # clean inputs
+        experiment_id = int(experiment_id)
+        test_type = test_type.lower()
+        result_type = result_type.lower()
+        channel = channel.lower()
+
+        # Get experiment information
+        match result_type:
+            case "plot":
+                # Get plot
+                pass
+            case "graph":
+                # Get plot
+                pass
+
+            case "data":
+                # Get data
+                pass
+            case "parameters":
+                # Get parameters
+                pass
+            case _:
+                return "No applicable result type"
+
+
+    def check_slack_messages(self, channel: str):
+        """Check Slack for messages."""
+
+        # WebClient insantiates a client that can call API methods
+        # When using Bolt, you can use either `app.client` or the `client` passed to listeners.
+        client = WebClient(token=slack_cred.TOKEN)
+        # Store conversation history
+        conversation_history = []
+        # ID of the channel you want to send the message to
+        if channel == "conversation":
+            channel_id = slack_cred.CONVERSATION_CHANNEL_ID
+        elif channel == "alert":
+            channel_id = slack_cred.ALERT_CHANNEL_ID
+        else:
+            return "No applicable channel"
+
+        # latestTS = datetime.now().timestamp()
+
+        try:
+            self.logger.info("Checking for new messages.")
+            # Call the conversations.history method using the WebClient
+            # conversations.history returns the first 100 messages by default
+            # These results are paginated, see:
+            # https://api.slack.com/methods/conversations.history$pagination
+            result = client.conversations_history(channel=channel_id)
+
+            conversation_history = result["messages"]
+
+            conversation_history2 = [
+                x
+                for x in conversation_history
+                if (x["text"][0:7] == "!epanda")
+                or (x["text"][0:7] == "!EPANDA")
+                or (x["text"][0:7] == "!ePANDA")
+                or (x["text"][0:7] == "!Epanda")
+                or (x["text"][0:7] == "!ePanda")
+            ]
+
+            for _, payload in enumerate(conversation_history2):
+                msg_id = payload["client_msg_id"]
+                msg_text = payload["text"]
+                msg_ts = payload["ts"]
+                lookup_tickets = self.find_id(msg_id)
+                if lookup_tickets is False:
+                    # Send message to Slack
+                    logging.info("New message found: %s", msg_text)
+                    response = self.parse_slack_message(msg_text[8:].rstrip(), channel_id)
+                    # Add message to csv file
+                    with open(
+                        Path(__file__).parents[0] / "slack_ticket_tracker.csv",
+                        "a",
+                        newline="",
+                        encoding="utf-8",
+                    ) as csvfile:
+                        writer = csv.DictWriter(
+                            csvfile,
+                            fieldnames=[
+                                "msg_id",
+                                "channel_id",
+                                "msg_txt",
+                                "valid_cmd",
+                                "ts",
+                                "addressed_ts",
+                            ],
+                        )
+                        writer.writerow(
+                            {
+                                "msg_id": msg_id,
+                                "channel_id": channel_id,
+                                "msg_txt": msg_text,
+                                "valid_cmd": response,
+                                "ts": msg_ts,
+                                "addressed_ts": datetime.now().timestamp(),
+                            }
+                        )
+
+            # Print results
+            # print(json.dumps(conversation_history2, indent=2))
+
+        except SlackApiError as error:
+            error_msg = f"Error creating conversation: {format(error)}"
+            self.logger.error(error_msg)
+
+
+    def find_id(self, experiment_id):
+        """Find the message ID in the slack ticket tracker csv file."""
+        with open(
+            Path(__file__).parents[0] / "slack_ticket_tracker.csv",
+            newline="",
+            encoding="utf-8",
+        ) as csvfile:
+            reader = csv.DictReader(
+                csvfile,
+                fieldnames=[
+                    "msg_id",
+                    "channel_id",
+                    "msg_txt",
+                    "valid_cmd",
+                    "ts",
+                    "addressed_ts",
+                ],
+            )
+            for row in reader:
+                if row["msg_id"] == experiment_id:
+                    return row
+        return False
+
+
+    def parse_slack_message(self, text: str, channel_id) -> int:
+        """
+        Parse the Slack message for commands.
+        If command is valid, execute command and returns 0 else return 1.
+
+        Valid commands: help, plot experiment #, share experiment #, status experiment #, vial status, well status, pause, resume, start, stop
+
+        Args:
+            message (str): The message to parse without the bot keyword !epanda.
+
+        Returns:
+            1 if command is valid, 0 if command is invalid.
+        """
+        # clean inputs
+        text = text.lower()
+
+        # Parse message
+        if text == "help":
+            message = (
+                "Here is a list of commands I understand:\n"
+                "help - displays this message\n"
+                "plot experiment # - plots plots the CV data for experiment #\n"
+                "data experiment # - sends the data files for experiment #\n"
+                "status experiment # - displays the status of experiment #\n"
+                "status vials - displays the status of the vials\n"
+                "status wells - displays the status of the wells\n"
+                "pause - pauses the current experiment\n"
+                "resume - resumes the current experiment\n"
+                "start - starts a new experiment\n"
+                "stop - stops the current experiment\n"
+            )
+            self.send_slack_message(channel_id, message)
+
+        elif text[0:15] == "plot experiment":
+            # Get experiment number
+            experiment_number = text[5:]
+            # Get plot
+
+        elif text[0:15] == "data experiment":
+            # Get experiment number
+            experiment_number = text[6:]
+            # Share experiment
+            data = self.upload_requested_experiment_info(
+                experiment_number, "CV", "data", channel_id
+            )
+            self.send_slack_message(channel_id, data)
+            return 1
+
+        elif text[0:17] == "status experiment":
+            # Get experiment number
+            experiment_number = text[7:]
+            # Get status
+            return 1
+
+        elif text[0:11] == "vial status":
+            # Get vial status
+            return 1
+
+        elif text[0:11] == "well status":
+            # Get well status
+            return 1
+
+        elif text[0:5] == "pause":
+            return 1
+
+        elif text[0:6] == "resume":
+            return 1
+
+        elif text[0:5] == "start":
+            return 1
+
+        elif text[0:4] == "stop":
+            return 1
+
+        else:
+            message = "Sorry, I don't understand that command. Type !epanda help for commands I understand."
+            self.send_slack_message(channel_id, message)
+            return 0
+
+if __name__ == "__main__":
+    slack_bot = SlackBot()
+    TEST_MESSAGE = "This is a test message."
+    EPANDA_HELLO = """Hello ePANDA team! I am ePANDA..."""
+    slack_bot.check_slack_messages("alert")
