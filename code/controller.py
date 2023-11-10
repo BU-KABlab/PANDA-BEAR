@@ -497,13 +497,15 @@ def load_new_wellplate(new_plate_id: int = None, new_wellplate_type_number: int 
     Returns:
         int
     """
-    current_wellplate_id, current_type_number = save_current_wellplate()
+    current_wellplate_id, current_type_number, current_wellplate_is_new = save_current_wellplate()
     well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+    if current_wellplate_is_new:
+        return 0
 
-    if new_plate_id is None:
+    if new_plate_id is None or new_plate_id == '':
         new_plate_id = current_wellplate_id + 1
 
-    if new_wellplate_type_number is None:
+    if new_wellplate_type_number is None or new_wellplate_type_number == '':
         new_wellplate_type_number = current_type_number
 
     ## Go through a reset all fields and apply new plate id
@@ -523,6 +525,7 @@ def load_new_wellplate(new_plate_id: int = None, new_wellplate_type_number: int 
 
 def save_current_wellplate():
     """Save the current wellplate"""
+    wellplate_is_new = True
     well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
 
     ## Go through a reset all fields and apply new plate id
@@ -532,6 +535,11 @@ def save_current_wellplate():
         current_wellplate = json.load(file)
     current_plate_id = current_wellplate["plate_id"]
     current_type_number = current_wellplate["type_number"]
+    ## Check if the wellplate is new still or not
+    for well in current_wellplate['wells']:
+        if well['status'] != "new":
+            wellplate_is_new = False
+            break
 
     ## Save each well to the well_history.csv file in the data folder even if it is empty
     ## plate id, type number, well id, experiment id, project id, status, status date, contents
@@ -574,7 +582,7 @@ def save_current_wellplate():
 
     logger.debug("Wellplate saved")
     logger.info("Wellplate %d saved", int(current_plate_id))
-    return int(current_plate_id), int(current_type_number)
+    return int(current_plate_id), int(current_type_number), wellplate_is_new
 
 def change_wellplate_location():
     """Change the location of the wellplate"""
