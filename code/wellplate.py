@@ -10,6 +10,7 @@ import os
 
 import matplotlib.pyplot as plt
 from config.file_locations import *
+from vials import Vessel
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -260,15 +261,16 @@ class Wells2:
         self.columns = columns
         self.orientation = orientation
         self.z_bottom = -76
-        self.z_top = 0
-        self.radius = 3.25  # new circular wells
-        self.well_offset = 9  # mm from center to center
-        self.well_capacity = 300  # ul
         self.echem_height = -73  # for every well
         self.type_number = type_number  # The type of wellplate
         self.plate_id = 0  # The id of the wellplate
+        
+        # From the well_type.csv file in config but has defaults
+        self.z_top = 0
         self.height = 6.0  # The height of the wellplate in mm
-
+        self.radius = 3.25  # new circular wells
+        self.well_offset = 9  # mm from center to center
+        self.well_capacity = 300  # ul
         # overwrite the default values with the values from the well_type.csv file
         (
             self.radius,
@@ -322,14 +324,17 @@ class Wells2:
                     depth = self.z_bottom
 
                 self.wells[well_id] = Well(
-                        well_id=well_id,
-                        coordinates=coordinates,
-                        contents=contents,
-                        volume=volume,
-                        depth=depth,
-                        status="new",
-                        density=1.0,
-                    )
+                    well_id=well_id,
+                    coordinates=coordinates,
+                    contents=contents,
+                    volume=volume,
+                    height=self.height,
+                    depth=depth,
+                    status="new",
+                    density=1.0,
+                    capacity=self.well_capacity,
+                )
+
 
         ## update the well info from file
         self.update_well_status_from_json_file()
@@ -343,7 +348,7 @@ class Wells2:
             for well in data["wells"]:
                 well_id = well["well_id"]
                 status = well["status"]
-                self.update_well_status(well_id, status)
+                self.set_well_status(well_id, status)
                 self.plate_id = data["plate_id"]
                 self.type_number = data["type_number"]
 
@@ -413,12 +418,12 @@ class Wells2:
             debug_message = f"New volume: {self.wells[well_id]['volume']} | New depth: {self.wells[well_id]['depth']}"
             logger.debug(debug_message)
 
-    def check_well_status(self, well_id):
-        """Check the status of a specific well"""
+    def check_well_status(self, well_id: str) -> str:
+        """Check the status of a specific well."""
         return self.wells[well_id]["status"]
 
-    def update_well_status(self, well_id, status):
-        """Update the status of a specific well"""
+    def set_well_status(self, well_id: str, status: str) -> None:
+        """Update the status of a specific well."""
         self.wells[well_id]["status"] = status
 
     def check_all_wells_status(self):
@@ -426,25 +431,20 @@ class Wells2:
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s", well_id, well_data["status"])
 
+    def _get_well_color(self, status: str) -> str:
+        """Get the color of a well based on its status."""
+        color_mapping = {"empty": "black", "new": "black", "in use": "yellow", "complete": "green", "error": "red"}
+        return color_mapping.get(status, "black")
+    
     def well_coordinates_and_status_color(self):
-        """Plot the well plate on a coordinate plane"""
+        """Plot the well plate on a coordinate plane."""
         x_coordinates = []
         y_coordinates = []
         color = []
         for _, well_data in self.wells.items():
             x_coordinates.append(well_data["coordinates"]["x"])
             y_coordinates.append(well_data["coordinates"]["y"])
-            ## designate the color of the well based on its status
-            if well_data["status"] in ["empty", "new"]:
-                color.append("black")
-            elif well_data["status"] == "in use":
-                color.append("yellow")
-            elif well_data["status"] == "complete":
-                color.append("green")
-            elif well_data["status"] == "error":
-                color.append("red")
-            else:
-                color.append("black")
+            color.append(self._get_well_color(well_data["status"]))
 
         return x_coordinates, y_coordinates, color
 
@@ -545,6 +545,33 @@ def read_well_type_characteristics(
         shape,
         current_well.z_bottom + height,
     )
+
+class Well(Vessel):
+    def __init__(self, well_id: str, coordinates: dict, contents: list, volume: float, height: float, depth: float, status: str, density: float, capacity: float):
+        """
+        Represents a well object.
+
+        Args:
+            well_id (str): The ID of the well.
+            coordinates (dict): The coordinates of the well.
+            contents (list): The contents of the well.
+            volume (float): The volume of the well.
+            height (float): The height of the well.
+            depth (float): The depth of the well.
+            status (str): The status of the well.
+            density (float): The density of the well.
+            capacity (float): The capacity of the well.
+        """
+        self.well_id = well_id
+        self.status = status
+        self.contents = contents
+        self.height = height
+        self.depth = depth
+        super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density)
+
+    def __str__(self) -> str:
+        """Returns a string representation of the well."""
+        return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
 
 class WellPlate:
     """
@@ -656,16 +683,6 @@ def test_stage_display():
     plt.ylim(-310, 0)
     plt.show()
 
-class Well:
-    def __init__(self, well_id, coordinates, contents, volume, depth, status, density):
-        self.well_id = well_id
-        self.coordinates = coordinates
-        self.contents = contents
-        self.volume = volume
-        self.depth = depth
-        self.status = status
-        self.density = density
 
-    
 if __name__ == "__main__":
     test_stage_display()
