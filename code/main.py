@@ -11,9 +11,7 @@ def run_epanda_mock():
 
 def change_wellplate():
     """Changes the current wellplate."""
-    new_wellplate_id = input("Enter the new wellplate ID: ")
-    new_wellplate_type = input("Enter the new wellplate type #: ")
-    controller.load_new_wellplate(new_wellplate_id, new_wellplate_type)
+    controller.load_new_wellplate(ask = True)
 
 def reset_vials_stock():
     """Resets the stock vials."""

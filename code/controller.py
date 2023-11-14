@@ -417,23 +417,18 @@ def read_vials(filename) -> list[Vial]:
         )
     return list_of_solutions
 
+
 def update_vial_state_file(vial_objects: list[Vial], filename):
     """
     Update the vials in the json file
     """
     filename_ob = Path.cwd() / filename
-    with open(filename_ob, "r", encoding="ascii") as file:
-        vial_parameters = json.load(file)
+    df = pd.read_json(filename_ob)
 
     for vial in vial_objects:
-        for items in vial_parameters:
-            if items["name"] == vial.name and items["position"] == vial.position_name:
-                items["volume"] = vial.volume
-                items["contamination"] = vial.contamination
-                break
+        df.loc[(df['name'] == vial.name) & (df['position'] == vial.position_name), ['volume', 'contamination']] = [vial.volume, vial.contamination]
 
-    with open(filename_ob, "w", encoding="ascii") as file:
-        json.dump(vial_parameters, file, indent=4)
+    df.to_json(filename_ob, indent=4)
 
     return 0
 
@@ -448,9 +443,15 @@ def input_new_vial_values(vialgroup: str):
     with open(filename, "r", encoding="UTF-8") as file:
         vial_parameters = json.load(file)
 
+    ## Print the current vials and their values
+    print("Current vials:")
+    print(f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Volume':<10} {'Capacity':<10} {'Contamination':<15}")
+    for vial in vial_parameters:
+        print(f"{vial['position']:<10} {vial['name']:<20} {vial['contents']:<20} {vial['volume']:<10} {vial['capacity']:<10} {vial['contamination']:<15}")
+
     ## Loop through each vial and ask for the new values except for position
     for vial in vial_parameters:
-        print(f"Vial {vial['position']}")
+        print(f"\nVial {vial['position']}:")
         vial["name"] = input("Enter the name of the vial: ").lower()
         vial["contents"] = input("Enter the contents of the vial: ").lower()
         vial["volume"] = int(input("Enter the volume of the vial: "))
@@ -465,7 +466,8 @@ def reset_vials(vialgroup: str):
     """
     Resets the volume and contamination of the current vials to their capacity and 0 respectively
     
-    Valid vial groups are 'stock' and 'waste'
+    Args:
+        vialgroup (str): The group of vials to be reset. Either "stock" or "waste"
     """
     ## Fetch the current state file
     if vialgroup == "stock":
@@ -476,16 +478,19 @@ def reset_vials(vialgroup: str):
     with open(filename, "r", encoding="UTF-8") as file:
         vial_parameters = json.load(file)
 
-    ## Loop through each vial and ask for the new values except for position
+    ## Loop through each vial and set the volume and contamination
     for vial in vial_parameters:
-        vial["volume"] = vial["capacity"]
+        if vialgroup == "stock":
+            vial["volume"] = vial["capacity"]
+        elif vialgroup == "waste":
+            vial["volume"] = 1000
         vial["contamination"] = "0"
 
     ## Write the new values to the state file
     with open(filename, "w", encoding="UTF-8") as file:
         json.dump(vial_parameters, file, indent=4)
 
-def load_new_wellplate(new_plate_id: int = None, new_wellplate_type_number: int = None) -> int:
+def load_new_wellplate(ask: bool = False) -> int:
     """
     Save the current wellplate, reset the well statuses to new. 
     If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1
@@ -498,15 +503,17 @@ def load_new_wellplate(new_plate_id: int = None, new_wellplate_type_number: int 
         int
     """
     current_wellplate_id, current_type_number, current_wellplate_is_new = save_current_wellplate()
+
+    if ask:
+        new_plate_id = int(input("Enter the new wellplate id (Current id is {current_wellplate_id}): "))
+        new_wellplate_type_number = int(input(f"Enter the new wellplate type number (Current type is {current_type_number}): "))
+    else:
+        new_plate_id = current_wellplate_id +1
+        new_wellplate_type_number = current_type_number
+
     well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
     if current_wellplate_is_new:
         return 0
-
-    if new_plate_id is None or new_plate_id == '':
-        new_plate_id = current_wellplate_id + 1
-
-    if new_wellplate_type_number is None or new_wellplate_type_number == '':
-        new_wellplate_type_number = current_type_number
 
     ## Go through a reset all fields and apply new plate id
     logger.debug("Resetting well statuses to new")
@@ -586,22 +593,27 @@ def save_current_wellplate():
 
 def change_wellplate_location():
     """Change the location of the wellplate"""
+    ## Load the working volume from mill_config.json
+    with open(Path.cwd() / MILL_CONFIG_FILE / "mill_config.json", "r", encoding="UTF-8") as file:
+        mill_config = json.load(file)
+    working_volume = mill_config["working_volume"]
+
     ## Ask for the new location
     while True:
         new_location_x = float(input("Enter the new x location of the wellplate: "))
 
-        if new_location_x > -415 or new_location_x < 0:
+        if new_location_x > working_volume['x'] and new_location_x < 0:
             break
 
-        print("Invalid input. Please enter a value between -415 and 0.")
+        print(f"Invalid input. Please enter a value between {working_volume['x']} and 0.")
 
     while True:
         new_location_y = float(input("Enter the new y location of the wellplate: "))
 
-        if new_location_y > -300 or new_location_y < 0:
+        if new_location_y > working_volume['y'] and new_location_y < 0:
             break
 
-        print("Invalid input. Please enter a value between -300 and 0.")
+        print(f"Invalid input. Please enter a value between {working_volume['y']} and 0.")
 
     # Keep asking for input until the user enters a valid input
     while True:

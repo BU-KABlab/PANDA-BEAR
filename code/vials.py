@@ -154,25 +154,25 @@ class Vial:
         volume_mm3 = volume_ul  # 1 ul = 1 mm3
         liquid_height_mm = round(volume_mm3 / area_mm2, 3)
         return liquid_height_mm
+
 class Vessel:
     """
-    The vessel class is a simple container for holding liquid
-    It has the following attributes:
-    - name
-    - volume
-    - capacity
-    - density
-    - coordinates
-    """
+    Represents a vessel object.
 
-    def __init__(
-        self,
-        name: str,
-        volume: float,
-        capacity: float,
-        density: float,
-        coordinates: dict,
-    ) -> None:
+    Attributes:
+        name (str): The name of the vessel.
+        volume (float): The current volume of the vessel.
+        capacity (float): The maximum capacity of the vessel.
+        density (float): The density of the solution in the vessel.
+        coordinates (dict): The coordinates of the vessel. 
+
+    Methods:
+    --------
+    update_volume(added_volume: float) -> None
+        Updates the volume of the vessel by adding the specified volume.
+
+    """
+    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict) -> None:
         self.name = name
         self.volume = volume
         self.capacity = capacity
@@ -183,128 +183,255 @@ class Vessel:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
 
     def update_volume(self, added_volume: float) -> None:
-        """
-        Updates the volume of the vessel
-        """
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
-            raise OverDraftException(
-                self.name, self.volume, added_volume, self.capacity
-            )
+            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
             return self
+    def calculate_depth(self) -> float:
+        pass
+
+    def check_volume(self, volume_to_add: float) -> bool:
+        """
+        Checks if the volume to be added to the vessel is within the vessel's capacity.
+
+        Args:
+        -----
+        volume_to_add (float): The volume to be added to the vessel.
+
+        Returns:
+            bool: True if the volume to be added is within the vessel's capacity, False otherwise.
+        """
+        if self.volume + volume_to_add > self.capacity:
+            raise OverFillException(self.name, self.volume, volume_to_add, self.capacity)
+        elif self.volume + volume_to_add < 0:
+            raise OverDraftException(self.name, self.volume, volume_to_add, self.capacity)
+        else:
+            return True
+
+    def write_volume_to_disk(self) -> None:
+        """
+        Writes the current volume of the vessel to the appropriate file.
+        """
+        pass
+
+    def update_contamination(self, new_contamination: int = None) -> None:
+        """
+        Updates the contamination count of the vessel.
+
+        Parameters:
+        -----------
+        new_contamination (int, optional): The new contamination count of the vessel.
+        """
+        pass
 
 class Vial2(Vessel):
-    """A vial object that inherits from the Vessel class"""
+    """
+    Represents a vial object that inherits from the Vessel class.
 
-    def __init__(
-        self,
-        name: str,
-        category: int,
-        volume: float,
-        capacity: float,
-        density: float,
-        coordinates: dict,
-        radius: float,
-        height: float,
-        z_bottom: float,
-    ) -> None:
+    Attributes:
+        name (str): The name of the vial.
+        category (int): The category of the vial (0 for stock, 1 for waste).
+        volume (float): The current volume of the vial.
+        capacity (float): The maximum capacity of the vial.
+        density (float): The density of the solution in the vial.
+        coordinates (dict): The coordinates of the vial.
+        radius (float): The radius of the vial.
+        height (float): The height of the vial.
+        z_bottom (float): The z-coordinate of the bottom of the vial.
+        base (float): The base area of the vial.
+        depth (float): The current depth of the solution in the vial.
+        contamination (int): The number of times the vial has been contaminated.
+        category (int): The category of the vial (0 for stock, 1 for waste).
+    """
+
+    def __init__(self, name: str, category: int, volume: float, capacity: float, density: float,
+                 coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
+        """
+        Initializes a new instance of the Vial2 class.
+
+        Args:
+        name (str): The name of the vial.
+        category (int): The category of the vial (0 for stock, 1 for waste).
+        volume (float): The current volume of the vial.
+        capacity (float): The maximum capacity of the vial.
+        density (float): The density of the solution in the vial.
+        coordinates (dict): The coordinates of the vial.
+        radius (float): The radius of the vial.
+        height (float): The height of the vial.
+        z_bottom (float): The z-coordinate of the bottom of the vial.
+        """
         super().__init__(name, volume, capacity, density, coordinates)
         self.radius = radius
         self.height = height
         self.z_bottom = z_bottom
-        self.base = round(math.pi * math.pow(self.radius, 2.0),6)
-        self.depth = self.vial_depth_calculator()
+        self.base = round(math.pi * math.pow(self.radius, 2.0), 6)
+        self.depth = self.calculate_depth()
         self.contamination = 0
         self.category = category
 
-    def __str__(self) -> str:
-        return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
-
-    def vial_depth_calculator(self):
+    def calculate_depth(self) -> float:
         """
-        Calculates the depth of a volume of liquid in a vial given the vial diameter (in mm).
+        Calculates the current depth of the solution in the vial.
+
+        Returns:
+        --------
+            float: The current depth of the solution in the vial.
         """
         radius_mm = self.radius
-        area_mm2 = math.pi * radius_mm**2
-        volume_mm3 = self.volume  # 1 ul = 1 mm3
-        self.depth = round(volume_mm3 / area_mm2, 3)
-        return self.depth
+        area_mm2 = math.pi * radius_mm ** 2
+        volume_mm3 = self.volume
+        return round(volume_mm3 / area_mm2, 3)
 
-    def check_volume(self, volume_to_add: float):
+    def check_volume(self, volume_to_add: float) -> bool:
         """
-        Updates the volume of the vial
+        Checks if the volume to be added to the vial is within the vial's capacity.
+
+        Args:
+        -----
+        volume_to_add (float): The volume to be added to the vial.
+
+        Returns:
+            bool: True if the volume to be added is within the vial's capacity, False otherwise.
         """
-        logging_msg = f"Checking if {volume_to_add} can fit in {self.name} ..."
-        logger.debug(logging_msg)
         if self.volume + volume_to_add > self.capacity:
             raise OverFillException(self.name, self.volume, volume_to_add, self.capacity)
         elif self.volume + volume_to_add < 0:
-            raise OverDraftException(
-                self.name, self.volume, volume_to_add, self.capacity
-            )
+            raise OverDraftException(self.name, self.volume, volume_to_add, self.capacity)
         else:
-            logging_msg = f"{volume_to_add} can fit in {self.name}"
-            logger.debug(logging_msg)
             return True
 
     def update_volume(self, added_volume: float) -> None:
         """
-        Updates the volume of the vial and updates the contamination
+        Updates the volume of the vial by adding the specified volume.
+
+        Parameters:
+        -----------
+        added_volume : float
+            The volume to be added to the vial.
         """
-        logger.debug("Updating %s volume...", self.name)
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
-            raise OverDraftException(
-                self.name, self.volume, added_volume, self.capacity
-            )
+            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
-            self.depth = self.vial_depth_calculator()
+            self.depth = self.calculate_depth()
             self.contamination += 1
             logger.debug("%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth)
             return self
 
-    def write_volume_to_disk(self):
+    def write_volume_to_disk(self) -> None:
         """
-        Writes the current volume to a json file
+        Writes the current volume and contamination of the vial to the appropriate file.
         """
         logger.info("Writing %s volume to vial file...", self.name)
+        vial_file_path = STOCK_STATUS_FILE if self.category == 0 else WASTE_STATUS_FILE
 
-        # Get the correct file path
-        if self.category == 0:
-            vial_file_path = STOCK_STATUS_FILE
-        elif self.category == 1:
-            vial_file_path = WASTE_STATUS_FILE
-
-        ## Open the file and read the contents
         with open(vial_file_path, "r", encoding="UTF-8") as file:
             solutions = json.load(file)
 
-        ## Find matching solution name and update the volume
-        # solutions = solutions['solutions']
         for solution in solutions:
             if solution["name"] == self.name:
                 solution["volume"] = self.volume
                 solution["contamination"] = self.contamination
                 break
 
-        ## Write the updated contents back to the file
         with open(vial_file_path, "w", encoding="UTF-8") as file:
             json.dump(solutions, file, indent=4)
-        return 0
 
-    def update_contamination(self, new_contamination: int = None):
+    def update_contamination(self, new_contamination: int = None) -> None:
         """
-        Updates the contamination of the vial
+        Updates the contamination count of the vial.
+
+        Parameters:
+        -----------
+        new_contamination (int, optional): The new contamination count of the vial.
         """
         if new_contamination is not None:
             self.contamination = new_contamination
-        self.contamination += 1
+        else:
+            self.contamination += 1
         return self
+
+    def __str__(self) -> str:
+        return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
+
+class StockVial(Vial2):
+    """
+    Represents a stock vial object that inherits from the Vial2 class.
+
+    Attributes:
+        name (str): The name of the stock vial.
+        volume (float): The current volume of the stock vial.
+        capacity (float): The maximum capacity of the stock vial.
+        density (float): The density of the solution in the stock vial.
+        coordinates (dict): The coordinates of the stock vial.
+        radius (float): The radius of the stock vial.
+        height (float): The height of the stock vial.
+        z_bottom (float): The z-coordinate of the bottom of the stock vial.
+        base (float): The base area of the stock vial.
+        depth (float): The current depth of the solution in the stock vial.
+        contamination (int): The number of times the stock vial has been contaminated.
+        category (int): The category of the stock vial (0 for stock, 1 for waste).
+    """
+
+    def __init__(self, name: str, volume: float, capacity: float, density: float,
+                 coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
+        """
+        Initializes a new instance of the StockVial class.
+
+        Args:
+        name (str): The name of the stock vial.
+        volume (float): The current volume of the stock vial.
+        capacity (float): The maximum capacity of the stock vial.
+        density (float): The density of the solution in the stock vial.
+        coordinates (dict): The coordinates of the stock vial.
+        radius (float): The radius of the stock vial.
+        height (float): The height of the stock vial.
+        z_bottom (float): The z-coordinate of the bottom of the stock vial.
+        """
+        super().__init__(name, 0, capacity, density, coordinates, radius, height, z_bottom)
+        self.category = 0
+
+class WasteVial(Vial2):
+    """
+    Represents a waste vial object that inherits from the Vial2 class.
+
+    Attributes:
+        name (str): The name of the waste vial.
+        volume (float): The current volume of the waste vial.
+        capacity (float): The maximum capacity of the waste vial.
+        density (float): The density of the solution in the waste vial.
+        coordinates (dict): The coordinates of the waste vial.
+        radius (float): The radius of the waste vial.
+        height (float): The height of the waste vial.
+        z_bottom (float): The z-coordinate of the bottom of the waste vial.
+        base (float): The base area of the waste vial.
+        depth (float): The current depth of the solution in the waste vial.
+        contamination (int): The number of times the waste vial has been contaminated.
+        category (int): The category of the waste vial (0 for stock, 1 for waste).
+    """
+
+    def __init__(self, name: str, volume: float, capacity: float, density: float,
+                 coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
+        """
+        Initializes a new instance of the WasteVial class.
+
+        Args:
+        name (str): The name of the waste vial.
+        volume (float): The current volume of the waste vial.
+        capacity (float): The maximum capacity of the waste vial.
+        density (float): The density of the solution in the waste vial.
+        coordinates (dict): The coordinates of the waste vial.
+        radius (float): The radius of the waste vial.
+        height (float): The height of the waste vial.
+        z_bottom (float): The z-coordinate of the bottom of the waste vial.
+        """
+        super().__init__(name, 1, volume, capacity, density, coordinates, radius, height, z_bottom)
+        self.category = 1
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""

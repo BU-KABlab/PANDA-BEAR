@@ -7,6 +7,7 @@ import logging
 import math
 import json
 import os
+from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 from config.file_locations import *
@@ -19,6 +20,33 @@ formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
+
+class Well(Vessel):
+    def __init__(self, well_id: str, coordinates: dict, contents: list, volume: float, height: float, depth: float, status: str, density: float, capacity: float):
+        """
+        Represents a well object.
+
+        Args:
+            well_id (str): The ID of the well.
+            coordinates (dict): The coordinates of the well.
+            contents (list): The contents of the well.
+            volume (float): The volume of the well.
+            height (float): The height of the well.
+            depth (float): The depth of the well.
+            status (str): The status of the well.
+            density (float): The density of the well.
+            capacity (float): The capacity of the well.
+        """
+        self.well_id = well_id
+        self.status = status
+        self.contents = contents
+        self.height = height
+        self.depth = depth
+        super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density)
+
+    def __str__(self) -> str:
+        """Returns a string representation of the well."""
+        return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
 
 
 class Wells:
@@ -236,15 +264,59 @@ class Wells:
     
 class Wells2:
     """
-    Position of well plate and each well in it.
-    Orientation is defined by:
-        0 - Vertical, wells become more negative from A1
+    Represents a well plate and each well in it.
 
-        1 - Vertical, wells become less negative from A1
+    Attributes:
+        a1_x (float): X-coordinate of well A1.
+        a1_y (float): Y-coordinate of well A1.
+        orientation (int): Orientation of the well plate (0-3).
+        columns (str): String representation of well plate columns.
+        rows (int): Number of rows in the well plate.
+        type_number (int): Type of well plate.
 
-        2 - Horizontal, wells become more negative from A1
+    Methods:
+        __init__(self, a1_x: float = 0, a1_y: float = 0, orientation: int = 0,
+                 columns: str = "ABCDEFGH", rows: int = 13, type_number: int = 1) -> None:
+            Initializes a new instance of the Wells2 class.
 
-        3 - Horizontal, wells become less negative from A1
+        __getitem__(self, well_id: str) -> Well:
+            Gets a Well object by well ID.
+
+        update_well_status_from_json_file(self) -> None:
+            Updates well status from a JSON file.
+
+        get_coordinates(self, well_id: str) -> Dict[str, float]:
+            Returns the coordinates of a specific well.
+
+        contents(self, well_id: str) -> List[Optional[str]]:
+            Returns the contents of a specific well.
+
+        volume(self, well_id: str) -> float:
+            Returns the volume of a specific well.
+
+        depth(self, well_id: str) -> float:
+            Returns the depth of a specific well.
+
+        density(self, well_id: str) -> float:
+            Returns the density of a specific well.
+
+        check_volume(self, well_id: str, added_volume: float) -> bool:
+            Checks if a volume can fit in a specific well.
+
+        update_volume(self, well_id: str, added_volume: float) -> None:
+            Updates the volume of a specific well.
+
+        check_well_status(self, well_id: str) -> str:
+            Checks the status of a specific well.
+
+        set_well_status(self, well_id: str, status: str) -> None:
+            Updates the status of a specific well.
+
+        check_all_wells_status(self) -> None:
+            Checks the status of all wells.
+
+        well_coordinates_and_status_color(self) -> Tuple[List[float], List[float], List[str]]:
+            Plots the well plate on a coordinate plane.
     """
 
     def __init__(
@@ -255,19 +327,30 @@ class Wells2:
         columns: str = "ABCDEFGH",
         rows: int = 13,
         type_number: int = 1,
-    ):
-        self.wells = {}
+    ) -> None:
+        """
+        Initializes a new instance of the Wells2 class.
+
+        Args:
+            a1_x (float): X-coordinate of well A1.
+            a1_y (float): Y-coordinate of well A1.
+            orientation (int): Orientation of the well plate (0-3).
+            columns (str): String representation of well plate columns.
+            rows (int): Number of rows in the well plate.
+            type_number (int): Type of well plate.
+        """
+        self.wells: Dict[str, Well] = {}
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
         self.z_bottom = -76
         self.echem_height = -73  # for every well
-        self.type_number = type_number  # The type of wellplate
-        self.plate_id = 0  # The id of the wellplate
-        
+        self.type_number = type_number  # The type of well plate
+        self.plate_id = 0  # The id of the well plate
+
         # From the well_type.csv file in config but has defaults
         self.z_top = 0
-        self.height = 6.0  # The height of the wellplate in mm
+        self.height = 6.0  # The height of the well plate in mm
         self.radius = 3.25  # new circular wells
         self.well_offset = 9  # mm from center to center
         self.well_capacity = 300  # ul
@@ -320,7 +403,7 @@ class Wells2:
                             "z": self.z_top,
                         }
                     contents = []
-                    # the depth is set here for each well instead of the wellpate as a whole
+                    # the depth is set here for each well instead of the well plate as a whole
                     depth = self.z_bottom
 
                 self.wells[well_id] = Well(
@@ -335,15 +418,16 @@ class Wells2:
                     capacity=self.well_capacity,
                 )
 
-
-        ## update the well info from file
+        # Update the well info from file
         self.update_well_status_from_json_file()
-    def __getitem__(self, well_id):
+
+    def __getitem__(self, well_id: str) -> Well:
+        """Gets a Well object by well ID."""
         return self.wells[well_id]
-    
+
     def update_well_status_from_json_file(self):
         """Update the well status from a file"""
-        with open("code\\system state\\well_status.json", "r", encoding="UTF-8") as f:
+        with open("code\\system state\\well_status.json", "r", encoding="utf-8") as f:
             data = json.load(f)
             for well in data["wells"]:
                 well_id = well["well_id"]
@@ -545,33 +629,6 @@ def read_well_type_characteristics(
         shape,
         current_well.z_bottom + height,
     )
-
-class Well(Vessel):
-    def __init__(self, well_id: str, coordinates: dict, contents: list, volume: float, height: float, depth: float, status: str, density: float, capacity: float):
-        """
-        Represents a well object.
-
-        Args:
-            well_id (str): The ID of the well.
-            coordinates (dict): The coordinates of the well.
-            contents (list): The contents of the well.
-            volume (float): The volume of the well.
-            height (float): The height of the well.
-            depth (float): The depth of the well.
-            status (str): The status of the well.
-            density (float): The density of the well.
-            capacity (float): The capacity of the well.
-        """
-        self.well_id = well_id
-        self.status = status
-        self.contents = contents
-        self.height = height
-        self.depth = depth
-        super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density)
-
-    def __str__(self) -> str:
-        """Returns a string representation of the well."""
-        return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
 
 class WellPlate:
     """

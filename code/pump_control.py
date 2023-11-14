@@ -10,7 +10,7 @@ from typing import Optional, Tuple
 import nesp_lib
 from sartorius import Scale
 from sartorius.mock import Scale as MockScale
-from vials import Vial
+from vials import Vial, Vessel
 from log_tools import CustomLoggingFilter
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
@@ -95,10 +95,9 @@ class Pump:
         time.sleep(2)
         return pump
 
-    #TODO add the option to infuse or withdraw from a vial or a well
     def withdraw(
-        self, volume: float, solution: [Vial, str] = None, rate: float = 0.5, weigh: bool = False
-    ) -> Optional[Tuple[Vial, float]]:
+        self, volume: float, solution: Vessel = None, rate: float = 0.5, weigh: bool = False
+    ) -> Optional[Vessel]:
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
@@ -128,19 +127,14 @@ class Pump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if solution is not None:
-                if isinstance(solution, Vial):
-                    solution.update_volume(-volume_ul)
-                elif isinstance(solution, str):
-                    pass # TODO add well support here, currently updated elsewhere
-                else:
-                    pass
+                solution.update_volume(-volume_ul)
                 return solution, difference
         else:
             return None
-    #TODO add the option to infuse or withdraw from a vial or a well
+
     def infuse(
-        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False
-    ) ->  Optional[Tuple[Vial, float]]:
+        self, volume_to_infuse: float, being_infused: Vessel = None, infused_into: Vessel = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False
+    ) ->  Optional[Vessel]:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -172,10 +166,7 @@ class Pump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if infused_into is not None:
-                if isinstance(infused_into, Vial):
-                    infused_into.update_volume(volume_ul)
-                else:
-                    pass # TODO add well support here, currently updated elsewhere
+                infused_into.update_volume(volume_ul)
                 return infused_into, difference
             else:
                 return None

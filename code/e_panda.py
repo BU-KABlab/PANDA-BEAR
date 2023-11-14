@@ -42,7 +42,7 @@ from experiment_class import (
 from log_tools import CustomLoggingFilter
 from mill_control import Mill, Instruments
 from pump_control import Pump
-from vials import Vial
+from vials import Vessel, Vial, StockVial, WasteVial
 from wellplate import Wells, Well
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -185,15 +185,12 @@ def pipette(
 
 def pipette_v2(
         volume: float,
-        from_vessel: [Vial, Well],
-        to_vessel: [Vial, Well],
+        from_vessel: Vessel,
+        to_vessel: Vessel,
         pumping_rate: float,
         pump: Pump,
         mill: Mill,
-        wellplate: Wells,
-        stock_vials: list[Vial],
-        waste_vials: list[Vial],
-    )-> Tuple[list[Vial], list[Vial], Wells]:
+    ):
     """
     Pipette a volume from one vessel to another. This depreciates the clear_well function.
 
@@ -205,6 +202,7 @@ def pipette_v2(
     It will not allow:
     1. Pipetting from a waste vial to a well
     2. Pipetting from a well to a stock vial
+    3. Pipetting from a stock vial toa  stock vial
 
     The steps that this function will perform:
     1. Determine the number of repetitions
@@ -234,11 +232,19 @@ def pipette_v2(
         waste_vials (list): The list of waste vials
 
     Returns:
-        stock_vials (list): The updated list of stock vials
-        waste_vials (list): The updated list of waste vials
-        wellplate (Wells object): The updated wellplate object
+        None (void function) since the objects are passed by reference
+        
     """
     if volume > 0.00:
+
+        # Check to ensure that the from_vessel and to_vessel are an allowed combination
+        if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
+            raise ValueError("Cannot pipette from a well to a vial")
+        elif isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
+            raise ValueError("Cannot pipette from a waste vial to a well")
+        elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
+            raise ValueError("Cannot pipette from a stock vial to a stock vial")
+
         # Calculate the number of repetitions
         # based on pipette capacity and drip stop
 
@@ -251,6 +257,8 @@ def pipette_v2(
             logger.info("Repetition %d of %d", j + 1, repetitions)
             # First half: pick up solution
             logger.debug("Withdrawing %f of air gap...", AIR_GAP)
+
+            # withdraw a little to engange screw receive nothing
             pump.withdraw(
                 volume=AIR_GAP,
                 solution= None,
@@ -265,6 +273,7 @@ def pipette_v2(
                 Instruments.PIPETTE,
             )  # go to solution depth (depth replaced with height)
 
+            # Withdraw the solution from the source and receive the updated vessel object
             from_vessel = pump.withdraw(
                 volume=repetition_vol,
                 solution=from_vessel,
@@ -273,12 +282,42 @@ def pipette_v2(
             )  # pipette now has air gap + repitition vol
 
             mill.move_to_safe_position()
+
+            # Withdraw an air gap to prevent dripping, receive nothing
             pump.withdraw(
                 volume=DRIP_STOP,
                 solution= None,
                 rate=pumping_rate,
                 weigh= False
             )
+
+            # Second Half: Deposit to well
+            logger.info("Moving to: %s...", to_vessel.name)
+
+            mill.safe_move(
+                to_vessel.coordinates["x"],
+                to_vessel.coordinates["y"],
+                to_vessel.depth,
+                Instruments.PIPETTE,
+            )
+
+            # Infuse into the to_vessel and receive the updated vessel object
+            to_vessel = pump.infuse(
+                volume_to_infuse=repetition_vol,
+                being_infused=from_vessel,
+                infused_into=to_vessel,
+                rate=pumping_rate,
+                blowout= AIR_GAP + DRIP_STOP,
+                weigh= True
+            )
+
+            logger.info(
+                "Vessel %s volume: %f",
+                to_vessel.name,
+                to_vessel.volume,
+            )
+
+            mill.move_to_safe_position()
 
 def clear_well(
     volume: float,
@@ -441,7 +480,7 @@ def flush_pipette_tip(
     mill: Mill,
     pumping_rate=0.5,
     flush_volume=120,
-) -> Tuple[list[Vial], list[Vial]]:
+):
     """
     Flush the pipette tip with the designated flush_volume ul of DMF to remove any residue
     Args:
@@ -506,7 +545,6 @@ def flush_pipette_tip(
         )  # move back to safe height (top)
     else:
         logger.info("No flushing required. Flush volume is 0. Continuing...")
-    return stock_vials, waste_vials
 
 
 def solution_selector(solutions: list[Vial], solution_name: str, volume: float) -> Vial:
@@ -822,7 +860,7 @@ def standard_experiment_protocol(
                     mill=mill,
                 )
 
-                stock_vials, waste_vials = flush_pipette_tip(
+                flush_pipette_tip(
                     pump,
                     waste_vials,
                     stock_vials,
@@ -847,7 +885,7 @@ def standard_experiment_protocol(
             )
             logger.info("Mixed well: %s", instructions.target_well)
 
-        stock_vials, waste_vials = flush_pipette_tip(
+        flush_pipette_tip(
             pump,
             waste_vials,
             stock_vials,
@@ -936,7 +974,7 @@ def standard_experiment_protocol(
             logger.info("Well %s cleared", instructions.target_well)
 
             # Flushing procedure
-            stock_vials, waste_vials = flush_pipette_tip(
+            flush_pipette_tip(
                 pump,
                 waste_vials,
                 stock_vials,
@@ -1205,7 +1243,7 @@ def mixing_test_protocol(
                     mill=mill,
                 )
 
-                stock_vials, waste_vials = flush_pipette_tip(
+                flush_pipette_tip(
                     pump,
                     waste_vials,
                     stock_vials,
@@ -1228,7 +1266,7 @@ def mixing_test_protocol(
             )
             logger.info("Mixed well: %s", instructions.target_well)
 
-            stock_vials, waste_vials = flush_pipette_tip(
+            flush_pipette_tip(
                 pump,
                 waste_vials,
                 stock_vials,
@@ -1373,7 +1411,7 @@ def peg2p_protocol(
                     mill=mill,
                 )
 
-                stock_vials, waste_vials = flush_pipette_tip(
+                flush_pipette_tip(
                     pump,
                     waste_vials,
                     stock_vials,
@@ -1461,7 +1499,7 @@ def peg2p_protocol(
             logger.info("Well %s cleared", instructions.target_well)
 
             # Flushing procedure
-            stock_vials, waste_vials = flush_pipette_tip(
+            flush_pipette_tip(
                 pump,
                 waste_vials,
                 stock_vials,
