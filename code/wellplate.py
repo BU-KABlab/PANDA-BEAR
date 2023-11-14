@@ -22,24 +22,26 @@ system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
 class Well(Vessel):
-    def __init__(self, well_id: str, coordinates: dict, contents: list, volume: float, height: float, depth: float, status: str, density: float, capacity: float):
+    """
+    Represents a well object. Inherits from the Vessel class.
+    
+    Args:
+    -----
+        well_id (str): The ID of the well.
+        coordinates (dict): The coordinates of the well.
+        contents (list): The contents of the well.
+        volume (float): The volume of the well.
+        height (float): The height of the well.
+        depth (float): The depth of the well.
+        status (str): The status of the well.
+        density (float): The density of the well.
+        capacity (float): The capacity of the well.
+    """
+    def __init__(self, well_id: str, coordinates: dict, volume: float, height: float, depth: float, status: str, density: float, capacity: float):
         """
-        Represents a well object.
-
-        Args:
-            well_id (str): The ID of the well.
-            coordinates (dict): The coordinates of the well.
-            contents (list): The contents of the well.
-            volume (float): The volume of the well.
-            height (float): The height of the well.
-            depth (float): The depth of the well.
-            status (str): The status of the well.
-            density (float): The density of the well.
-            capacity (float): The capacity of the well.
         """
         self.well_id = well_id
         self.status = status
-        self.contents = contents
         self.height = height
         self.depth = depth
         super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density)
@@ -261,7 +263,7 @@ class Wells:
                 color.append("black")
 
         return x_coordinates, y_coordinates, color
-    
+   
 class Wells2:
     """
     Represents a well plate and each well in it.
@@ -402,14 +404,12 @@ class Wells2:
                             "y": a1_coordinates["y"] + y_offset,
                             "z": self.z_top,
                         }
-                    contents = []
                     # the depth is set here for each well instead of the well plate as a whole
                     depth = self.z_bottom
 
                 self.wells[well_id] = Well(
                     well_id=well_id,
                     coordinates=coordinates,
-                    contents=contents,
                     volume=volume,
                     height=self.height,
                     depth=depth,
@@ -519,7 +519,7 @@ class Wells2:
         """Get the color of a well based on its status."""
         color_mapping = {"empty": "black", "new": "black", "in use": "yellow", "complete": "green", "error": "red"}
         return color_mapping.get(status, "black")
-    
+
     def well_coordinates_and_status_color(self):
         """Plot the well plate on a coordinate plane."""
         x_coordinates = []
@@ -595,7 +595,7 @@ def read_well_type_characteristics(
     type_number: int, current_well: Wells
 ) -> tuple[float, float, float, float]:
     """Read the well type characteristics from the well_type.csv config file"""
-    
+
     file_path = "code\\config\\well_type.csv"
 
     # check it exists

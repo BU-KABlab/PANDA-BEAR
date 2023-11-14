@@ -178,6 +178,7 @@ class Vessel:
         self.capacity = capacity
         self.density = density
         self.coordinates = coordinates
+        self.contents = []
 
     def __str__(self) -> str:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
@@ -227,6 +228,23 @@ class Vessel:
         """
         pass
 
+    def update_contents(self, solution_name: str, volume: float) -> None:
+        """
+        Updates the contents of the vessel.
+
+        Parameters:
+        -----------
+        solution_name (str): The name of the solution to be added to the vessel.
+        volume (float): The volume of the solution to be added to the vessel.
+        """
+        # check if the solution_name already exists in the vessel, if so update the volume by adding the new volume
+        for solution in self.contents:
+            if solution["name"] == solution_name:
+                solution["volume"] += volume
+                return self
+        # otherwise, add the solution to the vessel
+        self.contents.append({"name": solution_name, "volume": volume})
+        return self
 class Vial2(Vessel):
     """
     Represents a vial object that inherits from the Vessel class.
@@ -393,7 +411,7 @@ class StockVial(Vial2):
         height (float): The height of the stock vial.
         z_bottom (float): The z-coordinate of the bottom of the stock vial.
         """
-        super().__init__(name, 0, capacity, density, coordinates, radius, height, z_bottom)
+        super().__init__(name, 0, volume, capacity, density, coordinates, radius, height, z_bottom)
         self.category = 0
 
 class WasteVial(Vial2):

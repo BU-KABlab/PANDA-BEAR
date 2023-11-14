@@ -163,7 +163,7 @@ class Scheduler:
             else:
                 target_well = desired_well
 
-            filename = f"{experiment['id']}_{target_well}.json"
+            filename = f"{experiment['id']}.json"
 
             # populate an experiment instance
             # TODO make the planner json output conform to schema so it can just be read in
@@ -193,6 +193,7 @@ class Scheduler:
                 rinse_vol=experiment["rinse_vol"],
                 status=ExperimentStatus.QUEUED,
                 filename=filename,
+                protocol_type = 1,
             )
 
             # Save the experiment as a separate file in the experiment_queue subfolder
@@ -211,7 +212,7 @@ class Scheduler:
             # Add the experiment to the queue
             queue_file_path = Path.cwd() / PATH_TO_QUEUE
             with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
-                line = f"{instructions.id},{instructions.priority},{instructions.filename}"
+                line = f"{instructions.id},{instructions.priority},{instructions.filename},{instructions.protocol_type}"
                 queue_file.write(line)
                 queue_file.write("\n")
 
@@ -275,25 +276,15 @@ class Scheduler:
         # with open(queue_file_path, "r", encoding="ascii") as queue_file:
         #     queue = queue_file.readlines()
 
-        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename"], dtype={"id": int, "priority": int, "filename": str}, skipinitialspace=True)
-        # highest_priority = 100
-        # for line in queue[1:]:
-        #     priority = int(line.split(",")[1])
-        #     if priority < highest_priority:
-        #         highest_priority = priority
+        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename","protocol_type"], dtype={"id": int, "priority": int, "filename": str, "protocol_type":int}, skipinitialspace=True)
         if queue.empty:
             logger.info("No experiments in queue")
             return None, None
 
         highest_priority = queue["priority"].min()
         # Get all experiments with the highest priority so that we can randomly select one of them
-        #experiments = []
-        experiments = queue[queue["priority"] == highest_priority]["filename"].tolist()
-
-        # for line in queue[1:]:
-        #     priority = int(line.split(",")[1])
-        #     if priority == highest_priority:
-        #         experiments.append(line.split(",")[2].strip()) # adds the filename to the list of experiments
+        # Exclude layered protocols (protocol_type = 2)
+        experiments = queue[queue["priority"] == highest_priority & queue["protocol_type" != 2]]["filename"].tolist()
 
         queue_dir_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
         if not Path.exists(queue_dir_path):
@@ -333,17 +324,11 @@ class Scheduler:
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        queue = pd.read_csv(file_path, header=0, names=["id", "priority", "filename"], dtype={"id": int, "priority": int, "filename": str}, skipinitialspace=True)
-        # with open(file_path, "r", encoding="ascii") as file:
-        #     data = file.readlines()
+        queue = pd.read_csv(file_path, header=0, names=["id", "priority", "filename", "protocol_type"], dtype={"id": int, "priority": int, "filename": str, "protocol_type":int}, skipinitialspace=True)
 
         # Remove the experiment from the queue file
         queue = queue[queue["id"] != experiment.id]
         queue.to_csv(file_path, index=False)
-        # with open(file_path, "w", encoding="ascii") as file:
-        #     for line in data:
-        #         if line.split(",")[0] != str(experiment.id):
-        #             file.write(line)
 
     def update_experiment_queue_priority(self, experiment_id: int, priority: int):
         """Update the priority of experiments in the queue"""
@@ -353,24 +338,13 @@ class Scheduler:
             raise FileNotFoundError("experiment queue file")
 
         # Read the queue file
-        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename"], dtype={"id": int, "priority": int, "filename": str}, skipinitialspace=True)
-        # with open(queue_file_path, "r", encoding="ascii") as queue_file:
-        #     queue = queue_file.readlines()
+        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename","protocol_type"], dtype={"id": int, "priority": int, "filename": str, "protocol_type":int}, skipinitialspace=True)
 
         # Find the experiment in the queue
         queue.loc[queue["id"] == experiment_id, "priority"] = priority
-        # for line in queue[1:]:
-        #     if line.split(",")[0] == str(experiment_id):
-        #         # Update the priority
-        #         line.split(",")[1] = str(priority)
 
         # Rewrite the queue csv file
         queue.to_csv(queue_file_path, index=False)
-        # with open(queue_file_path, "w", encoding="ascii") as file:
-        #     for line in queue:
-        #         file.write(line)
-        #         file.write("\n")
-
 
     def update_experiment_status(self, experiment: ExperimentBase) -> None:
         """
@@ -499,20 +473,14 @@ class Scheduler:
         if not Path.exists(queue_file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
-        
+
         # Read the queue file
         # Add the experiment to the queue
-        new_row = {"id": experiment.id, "priority": experiment.priority, "filename": experiment.filename}
+        new_row = {"id": experiment.id, "priority": experiment.priority, "filename": experiment.filename, "protocol_type": experiment.protocol_type}
         df = pd.DataFrame(new_row, index=[0])
-
 
         # Write the updated queue to the csv file
         df.to_csv(queue_file_path,mode='a', index=False, header=False)
-        
-        # with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
-        #     line = f"{experiment.id},{experiment.priority},{experiment.filename}"
-        #     queue_file.write(line)
-        #     queue_file.write("\n")
         experiment.status = ExperimentStatus.QUEUED
         return experiment
 
@@ -545,6 +513,125 @@ class Scheduler:
             Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
         ) as results_file:
             results_file.write(results_json)
+
+    def count_available_wells(self) -> int:
+        """Return the number of wells available for experiments
+
+        Returns:
+            int: the number of experiments we can queue from the inbox
+        """
+        file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+        if not Path.exists(file_to_open):
+            logger.error("well_status.json not found")
+            raise FileNotFoundError("well_status.json")
+
+        with open(file_to_open, "r", encoding="ascii") as file:
+            data = json.load(file)
+            count = 0
+            for wells in data["wells"]:
+                if wells["status"] == "new":
+                    count += 1
+            return count
+
+    def generate_layered_protocol_experiment_list(self) -> list[ExperimentBase]:
+        """Generate a list of experiments for a layered protocol
+        
+        This method will run through the queue and generate a list of experiments that can be run together given the current well availability.
+        It will avoid running experiments that require the same well.
+
+        Layered protocols are identified as protocol_type = 2 in the queue.csv file and the experiment object.
+
+        Along with returning the list, all of theses experiments will be removed from the queue.csv file and the experiment_queue folder as they will be run all together.
+
+        Returns:
+            list: a list of experiments
+        """
+        # Read the queue file
+        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        if not Path.exists(queue_file_path):
+            logger.error("queue file not found")
+            raise FileNotFoundError(f"experiment queue file {queue_file_path.stem}")
+
+        queue_df = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename","protocol_type"], dtype={"id": int, "priority": int, "filename": str, "protocol_type":int}, skipinitialspace=True)
+
+        # Get the list of experiments that are in the queue and are layered protocols
+        layered_queue = queue_df[(queue_df["protocol_type"] == 2)]["id"].tolist()
+
+        # Filter the the layered_queue to only include experiments for wells that are available
+        # First get the list of available wells
+        available_wells = []
+        file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+        if not Path.exists(file_to_open):
+            logger.error("well_status.json not found")
+            raise FileNotFoundError(f"{file_to_open.stem} not found")
+
+        with open(file_to_open, "r", encoding="ascii") as file:
+            data = json.load(file)
+            for wells in data["wells"]:
+                if wells["status"] == "new":
+                    available_wells.append(wells["well_id"])
+
+        # Now filter the layered_queue to only include experiments for wells that are available
+        # This involves openening each experiment file and checking the target well since the filenames are just the experiment id
+        filtered_layered_queue = []
+        for experiment_id in layered_queue:
+            experiment_file_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
+            if not Path.exists(experiment_file_path):
+                logger.error("experiment file not found")
+                raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
+
+            with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
+                experiment = json.load(experiment_file)
+                experiment = (
+                    experiment_class.RootModel[ExperimentBase] #TODO I think this line will cause an error, might need a special model for layered protocols
+                    .model_validate_json(json.dumps(experiment))
+                    .root
+                )
+                if experiment.target_well in available_wells:
+                    filtered_layered_queue.append(experiment_id)
+
+        # Now we have a list of experiments that are in the queue and are layered protocols and are for available wells
+        # We need to generate a list of experiments that can be run together
+        # We will do this by looping through the list of experiments and checking if the target well is already in the list
+        # If it is, then we will skip that experiment
+        # If it is not, then we will add it to the list
+
+        # We don't need to check the queue again because we will be skipping the experiments that are already in the list
+        # We will just loop through the filtered_layered_queue and add the experiments to the list
+        experiment_list = []
+        for experiment_id in filtered_layered_queue:
+            experiment_file_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
+            if not Path.exists(experiment_file_path):
+                logger.error("experiment file not found")
+                raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
+
+            with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
+                experiment = json.load(experiment_file)
+                experiment = (
+                    experiment_class.RootModel[ExperimentBase]
+                    .model_validate_json(json.dumps(experiment))
+                    .root
+                )
+                if experiment.target_well not in experiment_list:
+                    experiment_list.append(experiment)
+
+        # Now we have a list of experiments that can be run together
+        # We need to remove these experiments from the queue.csv file and the experiment_queue folder
+        # We will do this by looping through the list of experiments and removing them from the queue
+        for experiment_id in filtered_layered_queue:
+            experiment_file_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
+            if not Path.exists(experiment_file_path):
+                logger.error("experiment file not found")
+                raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
+
+            # Remove the experiment from the queue file
+            queue_df = DataFrame(queue_df[queue_df["id"] != experiment_id])
+            queue_df.to_csv(queue_file_path, index=False)
+
+            # Remove the experiment from the experiment_queue folder
+            experiment_file_path.unlink()
+
+        return experiment_list
 
 
 ####################################################################################################

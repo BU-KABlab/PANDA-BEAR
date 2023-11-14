@@ -434,6 +434,18 @@ class Mill:
         Returns:
             str: Response from the mill after executing the commands.
         """
+        # Double check that the target coordinates are within the working volume
+        working_volume = self.config["working_volume"]
+        if x_coord > 0 or x_coord < working_volume["x"]:
+            logger.error("x coordinate out of range")
+            raise ValueError("x coordinate out of range")
+        if y_coord > 0 or y_coord < working_volume["y"]:
+            logger.error("y coordinate out of range")
+            raise ValueError("y coordinate out of range")
+        if z_coord > 0 or z_coord < working_volume["z"]:
+            logger.error("z coordinate out of range")
+            raise ValueError("z coordinate out of range")
+
         # Get the current coordinates
         current_x, current_y, current_z = self.current_coordinates()
 
@@ -443,7 +455,7 @@ class Mill:
 
         # Fetch offsets for the specified instrument
         offsets = self.config["instrument_offsets"][instrument]
-        # updated target coordinates
+        # updated target coordinates with offsets so the center of the mill moves to the right spot
         x_coord = x_coord + offsets["x"]
         y_coord = y_coord + offsets["y"]
         z_coord = z_coord + offsets["z"]

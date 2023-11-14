@@ -62,6 +62,7 @@ class ExperimentBase():
     filename: str = None #Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
+    protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
 
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''
@@ -70,14 +71,35 @@ class ExperimentBase():
         return False
 
 @dataclass(config=ConfigDict(validate_assignment=True))
+class LayeredExperiments(ExperimentBase):
+    '''Define the data that is used to run an experiment'''
+    ocp: int = 1 #Open Circuit Potential
+    ca: int = 1 #Cyclic Amperometry
+    cv: int = 1 #Cyclic Voltammetry
+    baseline: int = 0 #Baseline
+    dep_duration: int = 300 #Deposition duration
+    dep_pot: float = -1.7 #Deposition potential
+    char_sol_name: str = 'ferrocene' #Characterization solution name
+    char_vol: int   = 130 #Characterization solution volume
+    flush_sol_name: str = 'dmf' #Flush solution name
+    flush_vol: int = 100 #Flush solution volume
+    ca_sample_period: float = 0.01 #Deposition sample period
+    cv_sample_period: float = 0.01 #Characterization sample period
+    cv_scan_rate: float = 0.05 #Scan rate
+    mix = 1 #Binary mix or dont mix
+    mix_count: int = 3 #Number of times to mix
+    mix_volume: int = 130 #Volume to mix
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
 class PEG_ACR_Instructions(ExperimentBase):
     '''Define the data that is used to run an experiment'''
-    ocp: int = 1#Open Circuit Potential
-    ca: int = 1#Cyclic Amperometry
-    cv: int = 1#Cyclic Voltammetry
-    baseline: int = 0#Baseline
-    dep_duration: int = 300#Deposition duration
-    dep_pot: float = -1.7#Deposition potential
+    ocp: int = 1 #Open Circuit Potential
+    ca: int = 1 #Cyclic Amperometry
+    cv: int = 1 #Cyclic Voltammetry
+    baseline: int = 0 #Baseline
+    dep_duration: int = 300 #Deposition duration
+    dep_pot: float = -1.7 #Deposition potential
     char_sol_name: str = 'ferrocene' #Characterization solution name
     char_vol: int   = 130 #Characterization solution volume
     flush_sol_name: str = 'dmf' #Flush solution name
@@ -188,6 +210,7 @@ class Experiment:
     filename: str = None #Optional[FilePath] = None
     # The optional fields seemed to be that way because they were experiment results
     results: Optional[ExperimentResult] = None
+    protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
 
     def is_replicate(self, other):
         '''Check if two experiments have the same parameters but different ids'''
