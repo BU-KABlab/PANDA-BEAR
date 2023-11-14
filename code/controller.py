@@ -20,7 +20,6 @@ import time
 
 # import third-party libraries
 from pathlib import Path
-import pandas as pd
 from print_panda import printpanda
 from mill_control import Mill
 from mill_control import MockMill
