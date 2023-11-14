@@ -273,7 +273,9 @@ def check_required_files():
             raise FileNotFoundError
 
 
-def establish_system_state() -> tuple[list[StockVial], list[WasteVial], wellplate_module.Wells]:
+def establish_system_state() -> (
+    tuple[list[StockVial], list[WasteVial], wellplate_module.Wells]
+):
     """
     Establish state of system
     Returns:

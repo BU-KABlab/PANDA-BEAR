@@ -333,8 +333,11 @@ class Mill:
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
         [initial_x, initial_y, initial_z] = self.current_coordinates()
-        mill_response = self.move_center_to_position(initial_x, initial_y, initial_z * 0)
+        mill_response = self.move_center_to_position(
+            initial_x, initial_y, initial_z * 0
+        )
         return mill_response
+
     def move_pipette_to_position(
         self,
         x_coord: float = 0,
@@ -486,10 +489,11 @@ class Mill:
         """Add custom value to log format"""
         experiment_formatter = logging.Formatter(
             "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
-            )
+        )
         system_handler.setFormatter(experiment_formatter)
         custom_filter = CustomLoggingFilter(experiment_id, target_well)
         logger.addFilter(custom_filter)
+
 
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""
@@ -699,9 +703,7 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wells(
-        -230,-35,0,columns="ABCDEFGH", rows=13, type_number =5
-    )
+    wellplate = Wells.Wells(-230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
 
     # Configure the logger for testing
     testing_handler = logging.FileHandler("code/logs/mill_control_testing.log")
@@ -710,17 +712,24 @@ def movement_test():
 
     try:
         with Mill() as mill:
-
             a1 = wellplate.get_coordinates("A1")
             a12 = wellplate.get_coordinates("A12")
             h1 = wellplate.get_coordinates("H1")
             h12 = wellplate.get_coordinates("H12")
 
             ## Move the pipette to each well
-            mill.safe_move(a1['x'],a1['y'],a1['depth'], instrument=Instruments.PIPETTE)
-            mill.safe_move(a12['x'],a12['y'],a12['depth'], instrument=Instruments.PIPETTE)
-            mill.safe_move(h12['x'],h12['y'],h12['depth'], instrument=Instruments.PIPETTE)
-            mill.safe_move(h1['x'],h1['y'],h1['depth'], instrument=Instruments.PIPETTE)
+            mill.safe_move(
+                a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
+            )
 
     except (
         MillConnectionError,
