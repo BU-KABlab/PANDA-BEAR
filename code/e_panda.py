@@ -306,12 +306,12 @@ def pipette_v2(
             )
 
             # Infuse into the to_vessel and receive the updated vessel object
-            to_vessel = pump.infuse(
+            pump.infuse(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,
                 infused_into=to_vessel,
                 rate=pumping_rate,
-                blowout= AIR_GAP + DRIP_STOP,
+                blowout_ul= AIR_GAP + DRIP_STOP,
                 weigh= True
             )
 
@@ -1174,6 +1174,131 @@ def pipette_accurancy_protocol(
 
     return instructions, results, stock_vials, waste_vials, wellplate
 
+def pipette_accurancy_protocol_v2(
+    instructions: ExperimentBase,
+    results: ExperimentResult,
+    mill: Mill,
+    pump: Pump,
+    stock_vials: list[Vial],
+    waste_vials: list[Vial],
+    wellplate: Wells2,
+):
+    """
+    Run the standard experiment:
+    1. Deposit solutions into well
+        for each solution:
+            a. Withdraw air gap
+            b. Withdraw solution
+            c. Purge
+            d. Deposit into well
+            e. Purge
+            f. Blow out
+            
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        mill (object): The mill object
+        pump (object): The pump object
+        scale (object): The scale object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
+
+    Returns:
+        instructions (Experiment object): The updated experiment instructions
+        results (ExperimentResult object): The updated experiment results
+        stock_vials (list): The updated list of stock vials
+        waste_vials (list): The updated list of waste vials
+        wellplate (Wells object): The updated wellplate object
+
+    """
+    apply_log_filter(instructions.id, instructions.target_well)
+
+    try:
+        logger.info("Beginning experiment %d", instructions.id)
+        results.id = instructions.id
+        # Fetch list of solution names from stock_vials
+        # list of vial names to exclude
+        exclude_list = ["rinse0", "rinse1", "rinse2"]
+        available_solutions = [
+            vial.name for vial in stock_vials if vial.name not in exclude_list
+        ]
+
+        # although we already checked before running the experiment we want to check again that all requested solutions are found
+        experiment_solution_count = len(instructions.solutions)
+        matched = 0
+
+        ## Deposit all experiment solutions into well
+        for solution_name in instructions.solutions:
+            solution_name = str(solution_name).lower()
+            solution_volume = instructions.solutions[solution_name]
+            if (
+                solution_volume > 0
+                and solution_name in available_solutions
+            ):  # if there is a solution to deposit
+                matched += 1
+                logger.info(
+                    "Pipetting %s ul of %s into %s...",
+                    solution_volume,
+                    solution_name,
+                    instructions.target_well,
+                )
+                
+                stock_vial = solution_selector(stock_vials, solution_name, solution_volume)
+                waste_vial = waste_selector(waste_vials, "waste", solution_volume)
+                pipette_v2(
+                    volume = solution_volume,
+                    from_vessel= stock_vial,
+                    to_vessel= wellplate.wells[instructions.target_well],
+                    pump=pump,
+                    mill=mill,
+                )
+
+        if matched != experiment_solution_count:
+            raise NoAvailableSolution("One or more solutions are not available")
+
+        logger.info("Pipetted %s into well: %s", json.dumps(instructions.solutions), instructions.target_well)
+ 
+        instructions.status = ExperimentStatus.COMPLETE
+        logger.info("End of Experiment: %s", instructions.id)
+
+        mill.move_to_safe_position()
+        logger.info("EXPERIMENT %s COMPLETED", instructions.id)
+
+    except OCPFailure as ocp_failure:
+        logger.error(ocp_failure)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Failed instructions updated for experiment %s", instructions.id)
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    except KeyboardInterrupt:
+        logger.warning("Keyboard Interrupt")
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Saved interrupted instructions for experiment %s", instructions.id)
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    except Exception as general_exception:
+        exception_type, _, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        logger.error("Exception: %s", general_exception)
+        logger.error("Exception type: %s", exception_type)
+        logger.error("File name: %s", filename)
+        logger.error("Line number: %d", line_number)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        return instructions, results, stock_vials, waste_vials, wellplate
+
+    finally:
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info(
+            "Returning completed instructions for experiment %s", instructions.id
+        )
+
+    return instructions, results, stock_vials, waste_vials, wellplate
+
 def mixing_test_protocol(
     instructions: ExperimentBase,
     results: ExperimentResult,
@@ -1644,6 +1769,7 @@ def layered_solution_protocol(
         if instruction.ca == 1:
             instruction.status = ExperimentStatus.DEPOSITING
             instruction, results = deposition(instruction, results, mill, wellplate)
+            instruction.results = results
             logger.info("deposition completed for well: %s", instruction.target_well)
 
             waste_vial = next(
@@ -1679,7 +1805,7 @@ def layered_solution_protocol(
                 "Beginning eChem characterization of well: %s", instruction.target_well
             )
             # Deposit characterization solution into well
-
+            instruction.status = ExperimentStatus.CHARACTERIZING
             logger.info(
                 "Infuse %s into well %s...",
                 instruction.char_sol_name,
@@ -1703,7 +1829,7 @@ def layered_solution_protocol(
             instruction, results = characterization(
                 instruction, results, mill, wellplate
             )
-
+            instruction.results = results
             logger.info("Characterization of %s complete", instruction.target_well)
 
             waste_vial = next(
@@ -1736,9 +1862,6 @@ def layered_solution_protocol(
             instruction.status = ExperimentStatus.COMPLETE
 
     logger.info("End of Experiment: %s", instructions.id)
-    
-            
-    
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""

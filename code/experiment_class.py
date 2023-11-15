@@ -243,6 +243,21 @@ def make_test_base_value() -> ExperimentBase:
         filename= f"test_{0}.json",
         results=None)
 
+def make_test_layered_value(id:int = 0) -> LayeredExperiments:
+    '''Create a test experiment value for the class'''
+    return LayeredExperiments(
+        id=id,
+        experiment_name= "test",
+        priority=2,
+        target_well="D5",
+        pin=CURRENT_PIN,
+        project_id=3,
+        solutions={'dmf': 0, 'peg': 145, 'acrylate': 145, 'ferrocene': 0, 'custom': 0},
+        status=ExperimentStatus.QUEUED,
+        status_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        filename= f"test_{id}.json",
+        results=None)
+
 def make_test_value() -> Experiment:
     '''Create a test experiment value for the class'''
     return Experiment(

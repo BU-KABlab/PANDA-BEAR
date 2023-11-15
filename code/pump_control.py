@@ -404,7 +404,7 @@ class MockPump(Pump):
             #self.pump.volume_infused_clear()
             #self.pump.volume_withdrawn_clear()
             if infused_into is not None:
-                if isinstance(infused_into, Vial):
+                if isinstance(infused_into, Vessel):
                     infused_into.update_volume(volume_ul)
                 else:
                     pass # TODO add well support here, currently updated elsewhere
@@ -455,8 +455,10 @@ class MockPump(Pump):
         )
         log_msg = f"Pump has {action_type}: {action_volume} ml"
         pump_control_logger.debug(log_msg)
-
-        return post_weight - pre_weight
+        if density is not None and density != 0:
+            return post_weight - pre_weight
+        else:
+            return 0
 
     def update_pipette_volume(self, volume_ml):
         """Change the pipette volume by the given amount

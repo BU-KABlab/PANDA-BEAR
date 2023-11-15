@@ -179,6 +179,7 @@ class Vessel:
         self.density = density
         self.coordinates = coordinates
         self.contents = []
+        self.depth = 0.0
 
     def __str__(self) -> str:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"

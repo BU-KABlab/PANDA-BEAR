@@ -422,7 +422,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     if use_mock_instruments:
         logger.info("Using mock instruments")
         mill = MockMill()
-        scale = MockScale(address="COM6")
+        scale = MockScale()
         pump = MockPump(mill=mill, scale=scale)
         instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
         return instruments
