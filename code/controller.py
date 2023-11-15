@@ -28,8 +28,8 @@ from pump_control import MockPump
 
 # import gamry_control_WIP as echem
 import gamry_control_WIP_mock as echem
-from sartorius import Scale
-from sartorius.mock import Scale as MockScale
+from sartorius_local import Scale
+from sartorius_local.mock import Scale as MockScale
 
 # import obs_controls as obs
 import slack_functions as slack
