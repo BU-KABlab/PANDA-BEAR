@@ -332,10 +332,12 @@ class Mill:
 
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
-        [initial_x, initial_y, initial_z] = self.current_coordinates()
-        mill_response = self.move_center_to_position(
-            initial_x, initial_y, initial_z * 0
-        )
+        # [initial_x, initial_y, initial_z] = self.current_coordinates()
+        # mill_response = self.move_center_to_position(
+        #     initial_x, initial_y, 0
+        # )
+
+        mill_response = self.execute_command("G00 Z0")
         return mill_response
 
     def move_pipette_to_position(
