@@ -598,6 +598,12 @@ class TestEPanda(unittest.TestCase):
 
 
 class CustomTestResult(unittest.TextTestResult):
+    """
+    Custom test result class to print test results to the console
+
+    Args:
+        unittest (TextTestResult): TextTestResult class from unittest (https://docs.python.org/3/library/unittest.html#unittest.TextTestResult
+    """
     def addSuccess(self, test):
         super().addSuccess(test)
         print(f"SUCCESS: {test}")
@@ -616,7 +622,7 @@ class CustomTestResult(unittest.TextTestResult):
 
     def printErrors(self):
         super().printErrors()
-        print("\n\nTest Summary:")
+        print("Test Summary:")
         print("Ran: ", self.testsRun)
         print("Errors: ", len(self.errors))
         print("Failures: ", len(self.failures))
@@ -624,6 +630,9 @@ class CustomTestResult(unittest.TextTestResult):
 
 
 class CustomTestRunner(unittest.TextTestRunner):
+    """
+    Custom test runner class to print test results to the console
+    """
     resultclass = CustomTestResult
 
 
