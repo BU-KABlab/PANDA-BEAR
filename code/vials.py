@@ -172,14 +172,14 @@ class Vessel:
         Updates the volume of the vessel by adding the specified volume.
 
     """
-    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict) -> None:
+    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict, contents: list = [], depth: float = 0) -> None:
         self.name = name
         self.volume = volume
         self.capacity = capacity
         self.density = density
         self.coordinates = coordinates
-        self.contents = []
-        self.depth = 0.0
+        self.contents = contents
+        self.depth = depth
 
     def __str__(self) -> str:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
@@ -266,7 +266,7 @@ class Vial2(Vessel):
         category (int): The category of the vial (0 for stock, 1 for waste).
     """
 
-    def __init__(self, name: str, category: int, volume: float, capacity: float, density: float,
+    def __init__(self, name: str, category: int, position: str, volume: float, capacity: float, density: float,
                  coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
         """
         Initializes a new instance of the Vial2 class.
@@ -283,6 +283,7 @@ class Vial2(Vessel):
         z_bottom (float): The z-coordinate of the bottom of the vial.
         """
         super().__init__(name, volume, capacity, density, coordinates)
+        self.position = position
         self.radius = radius
         self.height = height
         self.z_bottom = z_bottom
@@ -397,7 +398,7 @@ class StockVial(Vial2):
         category (int): The category of the stock vial (0 for stock, 1 for waste).
     """
 
-    def __init__(self, name: str, volume: float, capacity: float, density: float,
+    def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
                  coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
         """
         Initializes a new instance of the StockVial class.
@@ -412,7 +413,7 @@ class StockVial(Vial2):
         height (float): The height of the stock vial.
         z_bottom (float): The z-coordinate of the bottom of the stock vial.
         """
-        super().__init__(name, 0, volume, capacity, density, coordinates, radius, height, z_bottom)
+        super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom)
         self.category = 0
 
 class WasteVial(Vial2):
@@ -434,7 +435,7 @@ class WasteVial(Vial2):
         category (int): The category of the waste vial (0 for stock, 1 for waste).
     """
 
-    def __init__(self, name: str, volume: float, capacity: float, density: float,
+    def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
                  coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
         """
         Initializes a new instance of the WasteVial class.
@@ -449,7 +450,7 @@ class WasteVial(Vial2):
         height (float): The height of the waste vial.
         z_bottom (float): The z-coordinate of the bottom of the waste vial.
         """
-        super().__init__(name, 1, volume, capacity, density, coordinates, radius, height, z_bottom)
+        super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom)
         self.category = 1
 
 class OverFillException(Exception):

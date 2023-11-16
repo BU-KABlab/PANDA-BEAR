@@ -67,7 +67,7 @@
     },
     {
         "position": "RW1",
-        "contents": "Rinse1",
+        "contents": "rinse1",
         "x": -47,
         "y": -211,
         "name": "rinse1",
@@ -78,7 +78,7 @@
     },
     {
         "position": "RW2",
-        "contents": "Rinse2",
+        "contents": "rinse2",
         "x": -47,
         "y": -244,
         "name": "rinse2",

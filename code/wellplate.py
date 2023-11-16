@@ -7,6 +7,7 @@ import logging
 import math
 import json
 import os
+import select
 from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
@@ -44,7 +45,7 @@ class Well(Vessel):
         self.status = status
         self.height = height
         self.depth = depth
-        super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density)
+        super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density, contents= [], depth = depth)
 
     def __str__(self) -> str:
         """Returns a string representation of the well."""
@@ -267,6 +268,8 @@ class Wells:
 class Wells2:
     """
     Represents a well plate and each well in it.
+    To access the atributes of an individual well, use the well ID as the key.
+    Ex. to get the volume of well A1, use well_plate["A1"].volume
 
     Attributes:
         a1_x (float): X-coordinate of well A1.
@@ -345,7 +348,7 @@ class Wells2:
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
-        self.z_bottom = -76
+        self.z_bottom = -76.0
         self.echem_height = -73  # for every well
         self.type_number = type_number  # The type of well plate
         self.plate_id = 0  # The id of the well plate
@@ -445,34 +448,34 @@ class Wells2:
             dict: The coordinates of the well in the form
             {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
         """
-        coordinates_dict = self.wells[well_id]["coordinates"]
-        coordinates_dict["depth"] = self.wells[well_id]["depth"]
+        coordinates_dict = self.wells[well_id].coordinates
+        coordinates_dict["depth"] = self.wells[well_id].depth
         coordinates_dict["echem_height"] = self.echem_height
         return coordinates_dict
 
-    def contents(self, well_id):
+    def get_contents(self, well_id):
         """Return the contents of a specific well"""
-        return self.wells[well_id]["contents"]
+        return self.wells[well_id].contents
 
-    def volume(self, well_id):
+    def get_volume(self, well_id):
         """Return the volume of a specific well"""
-        return self.wells[well_id]["volume"]
+        return self.wells[well_id].volume
 
-    def depth(self, well_id):
+    def get_depth(self, well_id):
         """Return the depth of a specific well"""
-        return self.wells[well_id]["depth"]
+        return self.wells[well_id].depth
 
-    def density(self, well_id):
+    def get_density(self, well_id):
         """Return the density of a specific well"""
-        return self.wells[well_id]["density"]
+        return self.wells[well_id].density
 
     def check_volume(self, well_id, added_volume: float):
         """Check if a volume can fit in a specific well"""
         info_message = f"Checking if {added_volume} can fit in {well_id} ..."
         logger.info(info_message)
-        if self.wells[well_id]["volume"] + added_volume >= self.well_capacity:
+        if self.wells[well_id].volume + added_volume >= self.well_capacity:
             raise OverFillException(
-                well_id, self.volume, added_volume, self.well_capacity
+                well_id, self.get_volume, added_volume, self.well_capacity
             )
 
         else:
@@ -482,33 +485,43 @@ class Wells2:
 
     def update_volume(self, well_id, added_volume: float):
         """Update the volume of a specific well"""
-        if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
+        if self.wells[well_id].volume + added_volume > self.well_capacity:
             raise OverFillException(
-                self.wells[well_id],
-                self.wells[well_id]["volume"],
+                well_id,
+                self.wells[well_id].volume,
                 added_volume,
                 self.well_capacity,
             )
 
-        # elif self.wells[well_id]["volume"] + added_volume < 0:
+        # elif self.wells[well_id].volume + added_volume < 0:
         #    raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
-            self.wells[well_id]["volume"] += added_volume
-            self.wells[well_id]["depth"] = (self.wells[well_id]["volume"] / 1000000) / (
-                math.pi * math.pow(self.radius, 2.0)
-            ) + self.z_bottom
-            if self.wells[well_id]["depth"] < self.z_bottom:
-                self.wells[well_id]["depth"] = self.z_bottom
-            debug_message = f"New volume: {self.wells[well_id]['volume']} | New depth: {self.wells[well_id]['depth']}"
+            self.wells[well_id].volume += added_volume
+            radius_mm = self.radius
+            area_mm2 = math.pi * radius_mm ** 2
+            volume_mm3 = self.wells[well_id].volume
+            depth = round(float(volume_mm3) / float(area_mm2), 2) + self.z_bottom
+            if depth < self.z_bottom:
+                depth = self.z_bottom
+            if depth - 0.05 > self.z_bottom:
+                depth -= 0.05
+            self.wells[well_id].depth = depth
+
+            # self.wells[well_id].depth = (self.wells[well_id].volume / 1000000) / (
+            #     math.pi * math.pow(self.radius, 2.0)
+            # ) + self.z_bottom
+            if self.wells[well_id].depth < self.z_bottom:
+                self.wells[well_id].depth = self.z_bottom
+            debug_message = f"New volume: {self.wells[well_id].volume} | New depth: {self.wells[well_id].depth}"
             logger.debug(debug_message)
 
     def check_well_status(self, well_id: str) -> str:
         """Check the status of a specific well."""
-        return self.wells[well_id]["status"]
+        return self.wells[well_id].status
 
     def set_well_status(self, well_id: str, status: str) -> None:
         """Update the status of a specific well."""
-        self.wells[well_id]["status"] = status
+        self.wells[well_id].status = status
 
     def check_all_wells_status(self):
         """Check the status of all wells"""
@@ -526,9 +539,9 @@ class Wells2:
         y_coordinates = []
         color = []
         for _, well_data in self.wells.items():
-            x_coordinates.append(well_data["coordinates"]["x"])
-            y_coordinates.append(well_data["coordinates"]["y"])
-            color.append(self._get_well_color(well_data["status"]))
+            x_coordinates.append(well_data.coordinates["x"])
+            y_coordinates.append(well_data.coordinates["y"])
+            color.append(self._get_well_color(well_data.status))
 
         return x_coordinates, y_coordinates, color
 

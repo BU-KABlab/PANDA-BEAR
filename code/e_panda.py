@@ -478,6 +478,66 @@ def rinse(
         )
     return stock_vials, waste_vials, wellplate
 
+def rinse_v2(
+    wellplate: Wells2,
+    instructions: ExperimentBase,
+    pump: Pump,
+    mill: Mill,
+    stock_vials: list[StockVial],
+    waste_vials: list[WasteVial],
+):
+    """
+    Rinse the well with rinse_vol ul of ACN.
+    Involves pipetteing and then clearing the well with no purging steps
+
+    Args:
+        wellplate (Wells object): The wellplate object
+        target_well (str): The alphanumeric name of the well you would like to rinse
+        pumping_rate (float): The pumping rate in ml/min
+        pump (object): The pump object
+        waste_vials (list): The list of waste vials
+        mill (object): The mill object
+        rinse_repititions (int): The number of times to rinse
+        rinse_vol (float): The volume to rinse with in microliters
+    Returns:
+        None (void function) since the objects are passed by reference
+    """
+
+    logger.info(
+        "Rinsing well %s %dx...", instructions.target_well, instructions.rinse_count
+    )
+    for rep in range(instructions.rinse_count):  # 0, 1, 2...
+        rinse_solution_name = "rinse" + str(rep)
+        # purge_vial = waste_selector(rinse_solution_name, rinse_vol)
+        # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
+        logger.info("Rinse %d of %d", rep + 1, instructions.rinse_count)
+
+        # Withdraw the rinse volume from the rinse solution into the well
+        rinse_solution = solution_selector(stock_vials, rinse_solution_name, instructions.rinse_vol)
+        pipette_v2(
+            instructions.rinse_vol,
+            from_vessel=rinse_solution,
+            to_vessel=wellplate.wells(instructions.target_well),
+            pump=pump,
+            mill=mill,
+            pumping_rate=None,
+        )
+        # Remove the rinse volume from the well to a waste vial
+        rinse_waste = waste_selector(waste_vials, rinse_solution_name, instructions.rinse_vol)
+        pipette_v2(
+            instructions.rinse_vol,
+            from_vessel=wellplate.wells(instructions.target_well),
+            to_vessel=rinse_waste,
+            pump=pump,
+            mill=mill,
+            pumping_rate=None,
+        )
+
+        logger.info("Rinse %d of %d complete", rep + 1, instructions.rinse_count)
+        logger.debug(
+            "Remaining volume in well: %f", wellplate.get_volume(instructions.target_well)
+        )
+    return 0
 
 def flush_pipette_tip(
     pump: Pump,
@@ -554,7 +614,7 @@ def flush_pipette_tip(
         logger.info("No flushing required. Flush volume is 0. Continuing...")
 
 
-def solution_selector(solutions: list[Vial], solution_name: str, volume: float) -> Vial:
+def solution_selector(solutions: list[Vial], solution_name: str, volume: float) -> StockVial:
     """
     Select the solution from which to withdraw from, from the list of solution objects
     Args:
@@ -565,8 +625,8 @@ def solution_selector(solutions: list[Vial], solution_name: str, volume: float) 
         solution (object): The solution object
     """
     for solution in solutions:
-        if solution.name.lower() == solution_name.lower() and solution.volume > (
-            volume + 1000
+        if solution.name.lower() == solution_name.lower() and solution.volume - 0.05*solution.capacity > (
+            volume
         ):
             logger.debug(
                 "Selected stock vial: %s in position %s",
@@ -577,7 +637,7 @@ def solution_selector(solutions: list[Vial], solution_name: str, volume: float) 
     raise NoAvailableSolution(solution_name)
 
 
-def waste_selector(solutions: list[Vial], solution_name: str, volume: float) -> Vial:
+def waste_selector(solutions: list[Vial], solution_name: str, volume: float) -> WasteVial:
     """
     Select the solution in which to deposit into from the list of solution objects
     Args:
@@ -1776,7 +1836,7 @@ def layered_solution_protocol(
                 vial for vial in waste_vials if vial.name == "waste"
             )
             pipette_v2(
-                volume=wellplate.volume(instruction.target_well),
+                volume=wellplate.get_volume(instruction.target_well),
                 to_vessel= waste_vial,
                 from_vessel= wellplate.wells[instruction.target_well],
                 pumping_rate=None,

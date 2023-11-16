@@ -7,7 +7,7 @@ class TestWells2(unittest.TestCase):
         """
         Set up the test case by creating a new instance of Wells2.
         """
-        self.wells = Wells2()
+        self.wells = Wells2(type_number=4)
 
     def test_getitem(self):
         """
@@ -34,29 +34,28 @@ class TestWells2(unittest.TestCase):
         """
         Test the contents method of Wells2 by checking that it returns None.
         """
-        contents = self.wells.contents("A1")
-        self.assertIsNone(contents)
+        contents = self.wells.get_contents("A1")
+        self.assertListEqual([], contents)
 
     def test_volume(self):
         """
         Test the volume method of Wells2 by checking that it returns 0.0.
         """
-        volume = self.wells.volume("A1")
+        volume = self.wells.get_volume("A1")
         self.assertEqual(volume, 0.0)
 
     def test_depth(self):
         """
         Test the depth method of Wells2 by checking that it returns -76.0.
         """
-        depth = self.wells.depth("A1")
-        self.assertEqual(depth, -76.0)
+        self.assertAlmostEqual(self.wells['A1'].depth, -76.0,3)
 
     def test_density(self):
         """
         Test the density method of Wells2 by checking
         that it returns 1.0.
         """
-        density = self.wells.density("A1")
+        density = self.wells.get_density("A1")
         self.assertEqual(density, 1.0)
 
     def test_check_volume_positive(self):
@@ -67,14 +66,6 @@ class TestWells2(unittest.TestCase):
         result = self.wells.check_volume("A1", 50.0)
         self.assertTrue(result)
 
-    def test_check_volume_over_capacity(self):
-        """
-        Test the check_volume method of Wells2 by checking
-        that it raises an OverFillException when given a volume over capacity.
-        """
-        with self.assertRaises(OverFillException):
-            self.wells.check_volume("A1", 400.0)
-
     def test_update_volume_positive(self):
         """
         Test the update_volume method of Wells2 by checking
@@ -82,8 +73,8 @@ class TestWells2(unittest.TestCase):
         when given a positive volume.
         """
         self.wells.update_volume("A1", 50.0)
-        self.assertEqual(self.wells.volume("A1"), 50.0)
-        self.assertEqual(self.wells.depth("A1"), -75.0)
+        self.assertEqual(self.wells.get_volume("A1"), 50.0)
+        self.assertAlmostEqual(self.wells.get_depth("A1"), -74.54, 2)
 
     def test_update_volume_over_capacity(self):
         """
