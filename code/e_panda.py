@@ -198,8 +198,9 @@ def pipette_v2(
 
     Depending on the supplied vessels, this function will perform one of the following:
     1. Pipette from a stock vial to a well
-    2. Pipette from a well to a waste vial
-    3. Pipette from a stock vial to a waste vial
+    2. Pipette from a well to a waste vial*
+    3. Pipette from a stock vial to a waste vial*
+        * When pipetting to a waste vial the dispesnsing height will be above the solution depth to avoid contamination
 
     It will not allow:
     1. Pipetting from a waste vial to a well
@@ -295,15 +296,23 @@ def pipette_v2(
                 weigh= False
             )
 
-            # Second Half: Deposit to well
+            # Second Half: Deposit to to_vessel
             logger.info("Moving to: %s...", to_vessel.name)
-
-            mill.safe_move(
-                to_vessel.coordinates["x"],
-                to_vessel.coordinates["y"],
-                to_vessel.depth,
-                Instruments.PIPETTE,
-            )
+            # determine if the destination is a well or a waste vial
+            if isinstance(to_vessel, Well): # go to solution depth
+                mill.safe_move(
+                    to_vessel.coordinates["x"],
+                    to_vessel.coordinates["y"],
+                    to_vessel.depth,
+                    Instruments.PIPETTE,
+                )  
+            else: # go to safe height above waste vial
+                mill.safe_move(
+                    to_vessel.coordinates["x"],
+                    to_vessel.coordinates["y"],
+                    to_vessel.depth + 5 ,
+                    Instruments.PIPETTE,
+                )  
 
             # Infuse into the to_vessel and receive the updated vessel object
             pump.infuse(
@@ -487,7 +496,7 @@ def rinse_v2(
     waste_vials: list[WasteVial],
 ):
     """
-    Rinse the well with rinse_vol ul of ACN.
+    Rinse the well with rinse_vol ul.
     Involves pipetteing and then clearing the well with no purging steps
 
     Args:
@@ -517,7 +526,7 @@ def rinse_v2(
         pipette_v2(
             instructions.rinse_vol,
             from_vessel=rinse_solution,
-            to_vessel=wellplate.wells(instructions.target_well),
+            to_vessel=wellplate[instructions.target_well],
             pump=pump,
             mill=mill,
             pumping_rate=None,
@@ -526,7 +535,7 @@ def rinse_v2(
         rinse_waste = waste_selector(waste_vials, rinse_solution_name, instructions.rinse_vol)
         pipette_v2(
             instructions.rinse_vol,
-            from_vessel=wellplate.wells(instructions.target_well),
+            from_vessel=wellplate[instructions.target_well],
             to_vessel=rinse_waste,
             pump=pump,
             mill=mill,
@@ -612,6 +621,56 @@ def flush_pipette_tip(
         )  # move back to safe height (top)
     else:
         logger.info("No flushing required. Flush volume is 0. Continuing...")
+
+def flush_v2(
+    waste_vials: list[WasteVial],
+    stock_vials: list[StockVial],
+    flush_solution_name: str,
+    mill: Mill,
+    pump: Pump,
+    pumping_rate=0.5,
+    flush_volume=120,
+    ):
+    """
+    Flush the pipette tip with the designated flush_volume ul of DMF to remove any residue
+    Args:
+        pump (object): The pump object
+        waste_vials (list): The list of waste vials
+        stock_vials (list): The list of stock vials
+        flush_solution_name (str): The name of the flush solution
+        mill (object): The mill object
+        pumping_rate (float): The pumping rate in ml/min
+        flush_volume (float): The volume to flush with in microliters
+
+    Returns:
+        stock_vials (list): The updated list of stock vials
+        waste_vials (list): The updated list of waste vials
+    """
+
+    if flush_volume > 0.000:
+        logger.info(
+            "Flushing pipette tip with %f ul of %s...",
+            flush_volume,
+            flush_solution_name,
+        )
+        flush_solution = solution_selector(
+            stock_vials, flush_solution_name, flush_volume
+        )
+        waste_vial = waste_selector(waste_vials, "waste", flush_volume)
+
+        pipette_v2(
+            flush_volume,
+            from_vessel=flush_solution,
+            to_vessel=waste_vial,
+            pump=pump,
+            mill=mill,
+            pumping_rate=pumping_rate,
+        )
+
+        logger.info("Flushed pipette tip with %f ul of %s...", flush_volume, flush_solution_name)
+    else:
+        logger.info("No flushing required. Flush volume is 0. Continuing...")
+    return 0
 
 
 def solution_selector(solutions: list[Vial], solution_name: str, volume: float) -> StockVial:
