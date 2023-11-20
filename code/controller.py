@@ -57,18 +57,14 @@ system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
 
-def main(use_mock_instruments: bool = False, workflow: int = 0):
+def main(use_mock_instruments: bool = False, one_off: bool = False):
     """
     Main function
 
     Args:
     ----
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
-        workflow (int, optional): The workflow to use. Defaults to 0
-            0 - Standard workflow of running experiments one by one
-            1 - Run a single experiment
-            2 - Read all experiments in the queue, assign results to them, and then generate a list of solutions used.
-                Pass this list of solutions to a protocol that expects the experiments to be given like this.
+        one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
     logger.info(printpanda())
     slack.send_slack_message("alert", "ePANDA is starting up")
@@ -87,56 +83,62 @@ def main(use_mock_instruments: bool = False, workflow: int = 0):
 
         ## Begin outer loop
         while True:
-            ## Ask the scheduler for the next experiment
-            new_experiment, _ = scheduler.read_next_experiment_from_queue()
-            if new_experiment is None:
-                slack.send_slack_message(
-                    "alert",
-                    "No new experiments to run...monitoring inbox for new experiments",
-                )
-            while new_experiment is None:
-                scheduler.check_inbox()
-                new_experiment, _ = scheduler.read_next_experiment_from_queue()
-                if new_experiment is not None:
-                    slack.send_slack_message(
-                        "alert", f"New experiment {new_experiment.id} found"
-                    )
-                    break
-                logger.info(
-                    "No new experiments to run...waiting 5 minutes for new experiments"
-                )
-                time.sleep(600)
-                # Replace with slack alert and wait for response from user
-
-            ## confirm that the new experiment is a valid experiment object
-            if not isinstance(new_experiment, ExperimentBase):
-                logger.error("The experiment object is not valid")
-                slack.send_slack_message(
-                    "alert", "An invalid experiment object was passed to the controller"
-                )
-                break
-
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, wellplate = establish_system_state()
 
-            ## Check that there is enough volume in the stock vials to run the experiment
-            if not check_stock_vials(new_experiment, stock_vials):
-                error_message = f"Experiment {new_experiment.id} cannot be run because there is not enough volume in the stock vials"
-                slack.send_slack_message(
-                    "alert",
-                    error_message,
-                )
-                logger.error(error_message)
-                new_experiment.status = "insufficient stock"
-                new_experiment.priority = 999
-                scheduler.update_experiment_status(new_experiment)
-                scheduler.update_experiment_queue_priority(
-                    new_experiment.id, new_experiment.priority
-                )
-                break
+            ## Check the qeueue for any protocol type 2 experiments
+            queue = scheduler.get_queue()
+            for experiment in queue:
+                if experiment.protocol_type == 2:
+                    protocol_type = 2
+                    break # break out of the for loop
 
-            ## Select appropriate workflow
-            if workflow in [0, 1]:
+            if protocol_type in [0,1]:
+                ## Ask the scheduler for the next experiment
+                new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                if new_experiment is None:
+                    slack.send_slack_message(
+                        "alert",
+                        "No new experiments to run...monitoring inbox for new experiments",
+                    )
+                while new_experiment is None:
+                    scheduler.check_inbox()
+                    new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                    if new_experiment is not None:
+                        slack.send_slack_message(
+                            "alert", f"New experiment {new_experiment.id} found"
+                        )
+                        break # break out of the while new experiment is None loop
+                    logger.info(
+                        "No new experiments to run...waiting 5 minutes for new experiments"
+                    )
+                    time.sleep(600)
+                    # Replace with slack alert and wait for response from user
+
+                ## confirm that the new experiment is a valid experiment object
+                if not isinstance(new_experiment, ExperimentBase):
+                    logger.error("The experiment object is not valid")
+                    slack.send_slack_message(
+                        "alert", "An invalid experiment object was passed to the controller"
+                    )
+                    break # break out of the while True loop
+
+                ## Check that there is enough volume in the stock vials to run the experiment
+                if not check_stock_vials(new_experiment, stock_vials):
+                    error_message = f"Experiment {new_experiment.id} cannot be run because there is not enough volume in the stock vials"
+                    slack.send_slack_message(
+                        "alert",
+                        error_message,
+                    )
+                    logger.error(error_message)
+                    new_experiment.status = "insufficient stock"
+                    new_experiment.priority = 999
+                    scheduler.update_experiment_status(new_experiment)
+                    scheduler.update_experiment_queue_priority(
+                        new_experiment.id, new_experiment.priority
+                    )
+                    break # break out of the while True loop
+
                 ## Initialize a results object
                 experiment_results = ExperimentResult()
                 # Announce the experiment
@@ -149,13 +151,7 @@ def main(use_mock_instruments: bool = False, workflow: int = 0):
                 scheduler.change_well_status(new_experiment.target_well, new_experiment)
 
                 ## Run the experiment
-                (
-                    updated_experiment,
-                    experiment_results,
-                    stock_vials,
-                    waste_vials,
-                    wellplate,
-                ) = e_panda.pipette_accurancy_protocol(
+                e_panda.forward_vs_reverse_pipetting(
                     instructions=new_experiment,
                     results=experiment_results,
                     mill=toolkit.mill,
@@ -166,31 +162,42 @@ def main(use_mock_instruments: bool = False, workflow: int = 0):
                 )
 
                 ## Add the results to the experiment file
-                updated_experiment.results = experiment_results
+                new_experiment.results = experiment_results
 
                 ## With returned experiment and results, update the experiment status and post the final status
-                post_experiment_status_msg = f"Experiment {updated_experiment.id} ended with status {updated_experiment.status.value}"
+                post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status.value}"
                 logger.info(post_experiment_status_msg)
                 slack.send_slack_message("alert", post_experiment_status_msg)
 
                 ## Update the system state with new vial and wellplate information
                 scheduler.change_well_status(
-                    updated_experiment.target_well, updated_experiment
+                    new_experiment.target_well, new_experiment
                 )
 
                 ## Update location of experiment instructions and save results
-                scheduler.update_experiment_status(updated_experiment)
-                scheduler.update_experiment_location(updated_experiment)
-                scheduler.save_results(updated_experiment, experiment_results)
+                scheduler.update_experiment_status(new_experiment)
+                scheduler.update_experiment_location(new_experiment)
+                scheduler.save_results(new_experiment, experiment_results)
 
-            if workflow == 1:
-                break
+                if one_off:
+                    break # break out of the while True loop
 
-            if workflow == 2:
-                ## Initialize the list of experiments to be run (restricting to available wells)
+            elif protocol_type == 2:
+                ## Ask the scheduler for the list of type 2 protocols
                 experiments_to_run = (
                     scheduler.generate_layered_protocol_experiment_list()
                 )
+
+                ## Check that there is enough volume in the stock vials to run the experiments
+                for experiment in experiments_to_run:
+                    if not check_stock_vials(experiment, stock_vials):
+                        error_message = f"Experiment {experiment.id} cannot be run because there is not enough volume in the stock vials"
+                        slack.send_slack_message(
+                            "alert",
+                            error_message,
+                        )
+                        logger.error(error_message)
+                        input("Not enough volume in stock vials to run layered protocol. Press enter to continue or ctrl+c to exit")
 
                 ## Initialize a results object
                 for experiment in experiments_to_run:
