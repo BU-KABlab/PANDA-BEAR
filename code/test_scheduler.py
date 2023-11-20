@@ -143,39 +143,8 @@ class TestScheduler(unittest.TestCase):
         self.assertIsNotNone(experiment)
         self.assertIsNotNone(file_path)
 
-    def test_add_to_queue_file(self):
-        """
-        Test the add_to_queue_file method of the Scheduler class.
-        """
-        # Create a sample experiment
-        experiment = ExperimentBase(
-            4, "unitetest4", 2, "B2", CURRENT_PIN, 3, {"water": 100}, "new", "file4"
-        )
-
-        # Call the add_to_queue_file method
-        scheduler = Scheduler()
-        scheduler.add_to_queue_file(experiment)
-
-        # Check that the experiment was added to the queue file
-        queue_file = Path.cwd() / PATH_TO_QUEUE
-        expected_queue_data = {
-            "id": [1, 2, 3, 4],
-            "priority": [1, 2, 3, 2],
-            "filename": ["file1", "file2", "file3", "file4"],
-        }
-        expected_queue_df = pd.DataFrame(expected_queue_data)
-        expected_queue_df.to_csv(queue_file, index=False)
-
-        with open(queue_file, "r", encoding='utf-8') as f:
-            actual_data = f.read()
-
-        with open("expected_queue.csv", "r", encoding='utf-8') as f:
-            expected_data = f.read()
-
-        assert actual_data == expected_data
-        assert experiment.status == ExperimentStatus.QUEUED
-
     def test_update_experiment_queue_priority(self):
+        """Tests the update_experiment_queue_priority method of the Scheduler class."""
         # Create a sample queue file
         queue_file = Path.cwd() / "test_queue.csv"
         queue_data = {"id": [1, 2, 3], "priority": [1, 2, 3], "filename": ["file1", "file2", "file3"]}
@@ -201,6 +170,8 @@ class TestScheduler(unittest.TestCase):
         assert actual_data == expected_data
 
     def test_update_experiment_status(self):
+        """_summary_
+        """
         # Create a sample experiment
         experiment = ExperimentBase(1, "unittests", 1, "A1", CURRENT_PIN, 3, {"water": 100}, "new", "unittests_1")
 
@@ -219,13 +190,16 @@ class TestScheduler(unittest.TestCase):
             # Check that the status was updated in the experiment file
             expected_status = ExperimentStatus.QUEUED
             expected_status_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-            expected_data = json.dumps(experiment._replace(status=str(expected_status.value), status_date=expected_status_date))
+            experiment.status = expected_status
+            experiment.status_date = expected_status_date
+            expected_data = json.dumps(experiment)
             with open(experiment_file, "r", encoding="UTF-8") as f:
                 actual_data = f.read()
 
             assert actual_data == expected_data
 
     def test_update_experiment_location(self):
+        """Test the update_experiment_location method of the Scheduler class."""
         # Create a sample experiment
         experiment = ExperimentBase(1, "unittests", 1, "A1", CURRENT_PIN, 3, {"water": 100}, "complete", "unittests_1")
 
@@ -246,6 +220,7 @@ class TestScheduler(unittest.TestCase):
             assert expected_completed_file.exists()
 
     def test_add_nonfile_experiment(self):
+        """Test the add_nonfile_experiment method of the Scheduler class."""
         # Create a sample experiment
         experiment = ExperimentBase(1, "unittests", 1, "A1", CURRENT_PIN, 3, {"water": 100}, "new", "unittests_1")
 
@@ -261,6 +236,7 @@ class TestScheduler(unittest.TestCase):
                 assert result == "success"
 
     def test_add_to_queue_folder(self):
+        """Test the add_to_queue_folder method of the Scheduler class."""
         # Create a sample experiment
         experiment = ExperimentBase(1, "unittests", 1, "A1", CURRENT_PIN, 3, {"water": 100}, "new", "unittests_1")
 
@@ -274,6 +250,7 @@ class TestScheduler(unittest.TestCase):
         assert result == experiment
 
     def test_add_to_queue_file(self):
+        """Test the add_to_queue_file method of the Scheduler class."""
         # Create a sample experiment
         experiment = ExperimentBase(1, "unittests", 1, "A1", CURRENT_PIN, 3, {"water": 100}, "new", "unittests_1")
 
@@ -300,7 +277,11 @@ class TestScheduler(unittest.TestCase):
         assert actual_data == expected_data
         assert result == experiment
 
+        # Clean up the test queue file
+        queue_file.unlink()
+
     def test_add_nonfile_experiments(self):
+        """Test the add_nonfile_experiments method of the Scheduler class."""
         # Create a list of sample experiments
         experiments = [
             ExperimentBase(1, "unittests", 1, "A1", CURRENT_PIN, 3, {"water": 100}, "new", "unittests_1"),
@@ -316,6 +297,7 @@ class TestScheduler(unittest.TestCase):
             assert result == "success"
 
     def test_save_results(self):
+        """Test the save_results method of the Scheduler class."""
         # Create a sample experiment
         experiment = ExperimentBase(1, "unittests", 1, "A1", CURRENT_PIN, 3, {"water": 100}, "new", "unittests_1")
 

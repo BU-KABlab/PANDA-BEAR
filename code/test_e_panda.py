@@ -1,19 +1,21 @@
 import unittest
 from unittest.mock import MagicMock
 from e_panda import (
-    pipette_v2,
+    forward_pipette_v2,
     solution_selector,
     waste_selector,
     NoAvailableSolution,
     flush_v2,
     rinse_v2,
+    deposition
 )
 from vials import Vessel, StockVial, WasteVial
 from mill_control import MockMill
 from pump_control import MockPump
+from gamry_control_WIP_mock import GamryPotentiostat
 from wellplate import Well, Wells2
 from sartorius.mock import Scale as MockScale
-from experiment_class import PEG_ACR_Instructions
+from experiment_class import PEG_ACR_Instructions, EchemExperimentBase
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines
 
@@ -51,7 +53,7 @@ class TestEPanda(unittest.TestCase):
             self.from_vessel.volume = 50.0
             self.to_vessel.volume = 50.0
             volume = 20.0
-            pipette_v2(
+            forward_pipette_v2(
                 volume=volume,
                 from_vessel=self.from_vessel,
                 to_vessel=self.to_vessel,
@@ -88,7 +90,7 @@ class TestEPanda(unittest.TestCase):
             self.from_vessel.volume = 50.0
             self.to_vessel.volume = 50.0
             volume = 20.0
-            pipette_v2(
+            forward_pipette_v2(
                 volume=volume,
                 from_vessel=self.from_vessel,
                 to_vessel=self.to_vessel,
@@ -126,7 +128,7 @@ class TestEPanda(unittest.TestCase):
             self.from_vessel.volume = 50.0
             self.to_vessel.volume = 50.0
             volume = 20.0
-            pipette_v2(
+            forward_pipette_v2(
                 volume=volume,
                 from_vessel=self.from_vessel,
                 to_vessel=self.to_vessel,
@@ -163,7 +165,7 @@ class TestEPanda(unittest.TestCase):
                 z_bottom=0,
             )
             with self.assertRaises(ValueError):
-                pipette_v2(
+                forward_pipette_v2(
                     volume=20.0,
                     from_vessel=self.from_vessel,
                     to_vessel=self.to_vessel,
@@ -198,7 +200,7 @@ class TestEPanda(unittest.TestCase):
                 status="new",
             )
             with self.assertRaises(ValueError):
-                pipette_v2(
+                forward_pipette_v2(
                     volume=20.0,
                     from_vessel=self.from_vessel,
                     to_vessel=self.to_vessel,
@@ -234,7 +236,7 @@ class TestEPanda(unittest.TestCase):
                 z_bottom=0,
             )
             with self.assertRaises(ValueError):
-                pipette_v2(
+                forward_pipette_v2(
                     volume=20.0,
                     from_vessel=self.from_vessel,
                     to_vessel=self.to_vessel,
@@ -597,6 +599,50 @@ class TestEPanda(unittest.TestCase):
             self.assertEqual(waste_vials[0].volume, 50.0)
 
 
+# class TestEPandaProtocols(unittest.TestCase):
+#     """
+#     Unit tests to specifically test the protocols in e_panda.py
+#     This will require the use of mocks for the hardware, especially the potentiostat
+
+#     Args:
+#         unittest (_type_): _description_
+#     """
+#     def setUp(self):
+#         self.mill = MockMill()
+#         self.scale = MockScale()
+#         self.pump = MockPump(self.mill, self.scale)
+#         self.gamry = GamryPotentiostat()
+#         self.gamry.connect()
+#         self.test_experiment = EchemExperimentBase(
+#             id=0,
+#             experiment_name="test",
+#             priority=1,
+#             target_well="A1",
+#             pin=0,
+#             project_id=0,
+#             solutions={'dmf': 60, 'water': 40},
+#         )
+#         self.wellplate = Wells2(-100,-100)
+#     def test_deposition(self):
+#         """_summary_"""
+#         # Test deposition protocol
+#         with self.subTest("Test deposition protocol"):
+#             deposition_parameters = {
+#                 "deposition_time": self.test_experiment.CAt1,
+#                 "deposition_voltage": self.test_experiment.CAv1,
+#                 "deposition_current": 0.1,
+#                 "deposition_cycles": 3,
+#                 "deposition_step": 0.01,
+#                 "deposition_rate": 0.1,
+#                 "deposition_file": "test_deposition",
+#             }
+#             deposition_parameters = deposition(
+#                 dep_instructions=self.test_experiment,
+#                 dep_results= self.test_experiment.results,
+#                 mill=self.mill,
+#                 wellplate=self.wellplate
+#             )
+
 class CustomTestResult(unittest.TextTestResult):
     """
     Custom test result class to print test results to the console
@@ -604,6 +650,7 @@ class CustomTestResult(unittest.TextTestResult):
     Args:
         unittest (TextTestResult): TextTestResult class from unittest (https://docs.python.org/3/library/unittest.html#unittest.TextTestResult
     """
+
     def addSuccess(self, test):
         super().addSuccess(test)
         print(f"SUCCESS: {test}")
@@ -633,6 +680,7 @@ class CustomTestRunner(unittest.TextTestRunner):
     """
     Custom test runner class to print test results to the console
     """
+
     resultclass = CustomTestResult
 
 
