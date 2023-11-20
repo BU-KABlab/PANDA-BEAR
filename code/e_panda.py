@@ -49,7 +49,7 @@ from wellplate import Wells, Well, Wells2
 from gamry_control_WIP_mock import GamryPotentiostat
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("e_panda")
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
@@ -1062,15 +1062,14 @@ def characterization(
         echem.pstatdisconnect()
         raise OCPFailure("CV")
 
-def apply_log_filter(experiment_id: int, target_well: str = None):
+def apply_log_filter(experiment_id: int, target_well: str = None, campaign_id: int = None):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
-        "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
+        "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(custom3)s:%(message)s"
     )
     system_handler.setFormatter(experiment_formatter)
-    custom_filter = CustomLoggingFilter(experiment_id, target_well)
+    custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well)
     logger.addFilter(custom_filter)
-
 
 def standard_experiment_protocol(
     instructions: ExperimentBase,
@@ -1118,7 +1117,7 @@ def standard_experiment_protocol(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well)
+    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1374,7 +1373,7 @@ def pipette_accuracy_protocol(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well)
+    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1502,7 +1501,7 @@ def pipette_accuracy_protocol_v2(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well)
+    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1625,7 +1624,7 @@ def forward_vs_reverse_pipetting(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well)
+    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1767,14 +1766,14 @@ def mixing_test_protocol(
         wellplate (Wells object): The wellplate object
     """
     # Add custom value to log format
-    custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
+    custom_filter = CustomLoggingFilter(instructions.project_campaign_id, instructions.id, instructions.target_well)
     logger.addFilter(custom_filter)
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
         experiment_solutions = ["peg", "acrylate", "dmf", "custom", "ferrocene"]
-        apply_log_filter(instructions.id, instructions.target_well)
+        apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
         # Deposit all experiment solutions into well
         for solution_name in experiment_solutions:
             if (
@@ -1935,14 +1934,14 @@ def peg2p_protocol(
         wellplate (Wells object): The wellplate object
     """
     # Add custom value to log format
-    custom_filter = CustomLoggingFilter(instructions.id, instructions.target_well)
+    custom_filter = CustomLoggingFilter(instructions.project_campaign_id, instructions.id, instructions.target_well)
     logger.addFilter(custom_filter)
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
         experiment_solutions = ["dmf", "peg"]
-        apply_log_filter(instructions.id, instructions.target_well)
+        apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
         # Deposit all experiment solutions into well
         for solution_name in experiment_solutions:
             if (
