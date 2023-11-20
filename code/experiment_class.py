@@ -71,106 +71,134 @@ class ExperimentBase():
         return False
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class LayeredExperiments(ExperimentBase):
-    '''Define the data that is used to run an experiment'''
+class EchemExperimentBase(ExperimentBase):
+    '''
+    Define the data that is used to run an experiment
+    
+    This is the base class for all echem experiments
+    Attributes:
+    ------------
+    ocp: int
+        Open Circuit Potential
+    ca: int
+        Cyclic Amperometry
+    cv: int
+        Cyclic Voltammetry
+    baseline: int
+        Baseline
+    flush_sol_name: str
+        Flush solution name
+    flush_vol: int
+        Flush solution volume
+    mix = 1
+        Binary mix or dont mix
+    mix_count: int
+        Number of times to mix
+    mix_volume: int
+        Volume to mix
+    rinse_count: int
+        Default rinse count
+    rinse_vol: int
+        Default rinse volume
+    ca_sample_period: float
+        Deposition sample period
+    CAvi: float
+        Pre-step voltage (V)
+    CAti: float
+        Pre-step delay time (s)
+    CAv1: float
+        Step 1 voltage (V), deposition potential (V)
+    CAt1: float
+        run time 300 seconds, deposition duration (s)
+    CAv2: float
+        Step 2 voltage (V)
+    CAt2: float
+        Step 2 time (s)
+    CAsamplerate: float
+        sample period (s)
+    char_sol_name: str
+        Characterization solution name
+    char_vol: int
+        Characterization solution volume
+    cv_sample_period: float
+        Characterization sample period
+    cv_scan_rate: float
+        Scan rate
+    CVvi: float
+        initial voltage
+    CVap1: float
+        first anodic peak
+    CVap2: float
+        second anodic peak
+    CVvf: float
+        final voltage
+    CVstep: float
+        step size
+    CVsr1: float
+        scan rate 1
+    CVcycle: int
+        number of cycles
+    CVsr2: float
+        CVsr1
+    CVsr3: float
+        CVsr1
+    CVsamplerate: float
+        CVstep / CVsr1
+
+    '''
     ocp: int = 1 #Open Circuit Potential
     ca: int = 1 #Cyclic Amperometry
     cv: int = 1 #Cyclic Voltammetry
     baseline: int = 0 #Baseline
-    dep_duration: int = 300 #Deposition duration
-    dep_pot: float = -1.7 #Deposition potential
-    char_sol_name: str = 'ferrocene' #Characterization solution name
-    char_vol: int   = 130 #Characterization solution volume
+
     flush_sol_name: str = 'dmf' #Flush solution name
     flush_vol: int = 100 #Flush solution volume
-    ca_sample_period: float = 0.01 #Deposition sample period
-    cv_sample_period: float = 0.01 #Characterization sample period
-    cv_scan_rate: float = 0.05 #Scan rate
+
     mix = 1 #Binary mix or dont mix
     mix_count: int = 3 #Number of times to mix
     mix_volume: int = 130 #Volume to mix
-
-
-@dataclass(config=ConfigDict(validate_assignment=True))
-class PEG_ACR_Instructions(ExperimentBase):
-    '''Define the data that is used to run an experiment'''
-    ocp: int = 1 #Open Circuit Potential
-    ca: int = 1 #Cyclic Amperometry
-    cv: int = 1 #Cyclic Voltammetry
-    baseline: int = 0 #Baseline
-    dep_duration: int = 300 #Deposition duration
-    dep_pot: float = -1.7 #Deposition potential
-    char_sol_name: str = 'ferrocene' #Characterization solution name
-    char_vol: int   = 130 #Characterization solution volume
-    flush_sol_name: str = 'dmf' #Flush solution name
-    flush_vol: int = 100 #Flush solution volume
-    ca_sample_period: float = 0.01 #Deposition sample period
-    cv_sample_period: float = 0.01 #Characterization sample period
-    cv_scan_rate: float = 0.05 #Scan rate
     rinse_count: int = 3 #Default rinse count
     rinse_vol: int = 150 #Default rinse volume
-    mix: int = 1 #Binary mix or dont mix
-    mix_count: int = 3 #Number of times to mix
-    mix_vol: int = 200 #Volume to mix
-    mix_rate: float = 0.62 #Rate for pump to mix at
 
-    def is_replicate(self, other):
-        '''Check if two experiments have the same parameters but different ids'''
-        if isinstance(other, PEG_ACR_Instructions):
-            return (
-                self.solutions == other.solutions,
-                self.dep_duration == other.dep_duration,
-                self.dep_pot == other.dep_pot,
-                self.char_sol_name == other.char_sol_name,
-                self.ca_sample_period == other.ca_sample_period,
-                self.cv_sample_period == other.cv_sample_period,
-                self.cv_scan_rate == other.cv_scan_rate,
-                self.rinse_count == other.rinse_count,
-                self.mix == other.mix,
-                self.mix_count == other.mix_count,
-            )
-        return False
+    ca_sample_period: float = 0.1 #Deposition sample period
+    CAvi: float = 0.0  # Pre-step voltage (V)
+    CAti: float = 0.0  # Pre-step delay time (s)
+    CAv1: float = -1.7  # Step 1 voltage (V), deposition potential (V)
+    CAt1: float = 300.0  # run time 300 seconds, deposition duration (s)
+    CAv2: float = 0.0  # Step 2 voltage (V)
+    CAt2: float = 0.0  # Step 2 time (s)
+    CAsamplerate: float = 0.5  # sample period (s)
 
-@dataclass(config=ConfigDict(validate_assignment=True))
-class PEG2P_Test_Instructions(ExperimentBase):
-    '''Define the data that is used to run an experiment'''
-    ocp: int = 1#Open Circuit Potential
-    ca: int = 1#Cyclic Amperometry
-    cv: int = 1#Cyclic Voltammetry
-    baseline: int = 0#Baseline
-    dep_duration: int = 300#Deposition duration
-    dep_pot: float = -1.7#Deposition potential
+
     char_sol_name: str = 'ferrocene' #Characterization solution name
     char_vol: int   = 130 #Characterization solution volume
-    flush_sol_name: str = 'dmf' #Flush solution name
-    flush_vol: int = 100 #Flush solution volume
-    ca_sample_period: float = 0.01 #Deposition sample period
-    cv_sample_period: float = 0.01 #Characterization sample period
+    cv_sample_period: float = 0.1 #Characterization sample period
     cv_scan_rate: float = 0.05 #Scan rate
-    pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
-    rinse_count: int = 3 #Default rinse count
-    rinse_vol: int = 150 #Default rinse volume
-    mix: int = 1 #Binary mix or dont mix
-    mix_count: int = 3 #Number of times to mix
-    mix_vol: int = 200 #Volume to mix
-    mix_rate: float = 0.62 #Rate for pump to mix at
+    CVvi: float = 0.0  # initial voltage
+    CVap1: float = 0.5  # first anodic peak
+    CVap2: float = -0.2 # second anodic peak
+    CVvf: float = 0.0  # final voltage
+    CVstep: float = 0.01 # step size
+    CVsr1: float = 0.1 # scan rate 1
+    CVcycle: int = 3 # number of cycles
+    CVsr2: float = CVsr1
+    CVsr3: float = CVsr1
+    CVsamplerate: float = CVstep / CVsr1
 
-    def is_replicate(self, other):
-        '''Check if two experiments have the same parameters but different ids'''
-        if isinstance(other, PEG2P_Test_Instructions):
-            return (
-                self.solutions == other.solutions,
-                self.dep_duration == other.dep_duration,
-                self.dep_pot == other.dep_pot,
-                self.char_sol_name == other.char_sol_name,
-                self.ca_sample_period == other.ca_sample_period,
-                self.cv_sample_period == other.cv_sample_period,
-                self.cv_scan_rate == other.cv_scan_rate,
-                self.rinse_count == other.rinse_count,
-                self.mix == other.mix,
-                self.mix_count == other.mix_count,
-            )
-        return False
+@dataclass(config=ConfigDict(validate_assignment=True))
+class LayeredExperiments(EchemExperimentBase):
+    '''Define the data that is used to run an experiment'''
+    project_id: int = 4
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class PEG_ACR_Instructions(EchemExperimentBase):
+    '''Define the data that is used to run an experiment'''
+    project_id: int = 1
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class PEG2P_Test_Instructions(EchemExperimentBase):
+    '''Define the data that is used to run an experiment'''
+    project_id: int = 2
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class Experiment:
@@ -243,10 +271,10 @@ def make_test_base_value() -> ExperimentBase:
         filename= f"test_{0}.json",
         results=None)
 
-def make_test_layered_value(id:int = 0) -> LayeredExperiments:
+def make_test_layered_value(experiment_id: int = 0) -> LayeredExperiments:
     '''Create a test experiment value for the class'''
     return LayeredExperiments(
-        id=id,
+        id=experiment_id,
         experiment_name= "test",
         priority=2,
         target_well="D5",
