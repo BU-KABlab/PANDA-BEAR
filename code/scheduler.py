@@ -284,7 +284,7 @@ class Scheduler:
         highest_priority = queue["priority"].min()
         # Get all experiments with the highest priority so that we can randomly select one of them
         # Exclude layered protocols (protocol_type = 2)
-        experiments = queue[queue["priority"] == highest_priority & queue["protocol_type" != 2]]["filename"].tolist()
+        experiments = queue[queue["priority"] == highest_priority & queue["protocol_type"] != 2]["filename"].tolist()
 
         queue_dir_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
         if not Path.exists(queue_dir_path):
@@ -633,6 +633,16 @@ class Scheduler:
 
         return experiment_list
 
+    def get_queue(self) -> DataFrame:
+        """Return the queue as a DataFrame"""
+        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        if not Path.exists(queue_file_path):
+            logger.error("queue file not found")
+            raise FileNotFoundError("experiment queue file")
+
+        # Read the queue file
+        queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename","protocol_type"], dtype={"id": int, "priority": int, "filename": str, "protocol_type":int}, skipinitialspace=True)
+        return queue
 
 ####################################################################################################
 def test_well_status_update():
