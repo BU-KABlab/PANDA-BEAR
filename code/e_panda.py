@@ -46,7 +46,6 @@ from mill_control import Mill, Instruments
 from pump_control import Pump
 from vials import Vessel, Vial, Vial2, StockVial, WasteVial
 from wellplate import Wells, Well, Wells2
-from gamry_control_WIP_mock import GamryPotentiostat
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
