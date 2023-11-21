@@ -304,7 +304,7 @@ def forward_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.echem_height,
+                    to_vessel.height,
                     Instruments.PIPETTE,
                 )
             else: # go to safe height above waste vial
@@ -459,7 +459,7 @@ def reverse_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.echem_height,
+                    to_vessel.height,
                     Instruments.PIPETTE,
                 )
                 logger.info("Moved to well %s", to_vessel.name)

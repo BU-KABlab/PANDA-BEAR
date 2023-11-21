@@ -1,7 +1,7 @@
 [
     {
         "position": "s0",
-        "contents": "water",
+        "contents": {},
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -12,13 +12,13 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 19700.0,
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 4
+        "contamination": 0
     },
     {
         "position": "s1",
-        "contents": "water",
+        "contents": {},
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -35,7 +35,7 @@
     },
     {
         "position": "s2",
-        "contents": "water",
+        "contents": {},
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -52,7 +52,7 @@
     },
     {
         "position": "s3",
-        "contents": "water",
+        "contents": {},
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -69,9 +69,10 @@
     },
     {
         "position": "s4",
-        "contents": "water",
+        "contents": {},
         "viscocity_rank": 1,
         "density": 1.5,
+        "category": 0,
         "x": -2,
         "y": -175,
         "z_bottom": -75,
@@ -102,7 +103,7 @@
     },
     {
         "position": "s5",
-        "contents": "water",
+        "contents": {},
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -119,7 +120,7 @@
     },
     {
         "position": "s6",
-        "contents": "water",
+        "contents": {},
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
