@@ -105,19 +105,22 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                         "alert",
                         "No new experiments to run...monitoring inbox for new experiments",
                     )
-                while new_experiment is None:
-                    scheduler.check_inbox()
-                    new_experiment, _ = scheduler.read_next_experiment_from_queue()
-                    if new_experiment is not None:
-                        slack.send_slack_message(
-                            "alert", f"New experiment {new_experiment.id} found"
-                        )
-                        break # break out of the while new experiment is None loop
-                    logger.info(
-                        "No new experiments to run...waiting 5 minutes for new experiments"
-                    )
-                    time.sleep(600)
-                    # Replace with slack alert and wait for response from user
+                if new_experiment is not None:
+                    break # break out of the while True loop
+
+                # while new_experiment is None:
+                #     scheduler.check_inbox()
+                #     new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                #     if new_experiment is not None:
+                #         slack.send_slack_message(
+                #             "alert", f"New experiment {new_experiment.id} found"
+                #         )
+                #         break # break out of the while new experiment is None loop
+                #     logger.info(
+                #         "No new experiments to run...waiting 5 minutes for new experiments"
+                #     )
+                #     time.sleep(600)
+                #     # Replace with slack alert and wait for response from user
 
                 ## confirm that the new experiment is a valid experiment object
                 if not isinstance(new_experiment, ExperimentBase):
@@ -374,16 +377,17 @@ def establish_system_state() -> (
         raise ValueError
     logger.info("There are %d clear wells", number_of_clear_wells)
     if number_of_clear_wells == 0:
-        slack.send_slack_message("alert", "There are no clear wells on the wellplate")
-        slack.send_slack_message(
-            "alert",
-            "Please replace the wellplate and confirm in the terminal that the program should continue",
-        )
-        input(
-            "Confirm that the program should continue by pressing enter or ctrl+c to exit"
-        )
-        load_new_wellplate()
-        slack.send_slack_message("alert", "Wellplate has been reset. Continuing...")
+        # slack.send_slack_message("alert", "There are no clear wells on the wellplate")
+        # slack.send_slack_message(
+        #     "alert",
+        #     "Please replace the wellplate and confirm in the terminal that the program should continue",
+        # )
+        # input(
+        #     "Confirm that the program should continue by pressing enter or ctrl+c to exit"
+        # )
+        # load_new_wellplate()
+        # slack.send_slack_message("alert", "Wellplate has been reset. Continuing...")
+        pass
 
     return stock_vials, waste_vials, wellplate
 
@@ -500,7 +504,7 @@ def update_vial_state_file(vial_objects: list[Vial2], filename):
 
     for vial in vial_objects:
         for vial_param in vial_parameters:
-            if vial_param["position"] == vial.position:
+            if str(vial_param["position"]) == vial.position.lower():
                 vial_param["volume"] = vial.volume
                 vial_param["contamination"] = vial.contamination
                 vial_param["contents"] = vial.contents

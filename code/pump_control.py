@@ -433,9 +433,9 @@ class MockPump(Pump):
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
         pump_control_logger.debug("%s %f ml...", action, volume_ml)
-        time.sleep(0.5)
+        time.sleep(0.05)
         pump_control_logger.debug("Done %s", action)
-        time.sleep(0.5)
+        time.sleep(0.05)
 
         ## Get scale value after pump action
         if density is not None and density != 0:
