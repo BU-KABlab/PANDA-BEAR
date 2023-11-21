@@ -44,7 +44,7 @@ from experiment_class import (
 from log_tools import CustomLoggingFilter
 from mill_control import Mill, Instruments
 from pump_control import Pump
-from vials import Vessel, Vial, StockVial, WasteVial
+from vials import Vessel, Vial, Vial2, StockVial, WasteVial
 from wellplate import Wells, Well, Wells2
 from gamry_control_WIP_mock import GamryPotentiostat
 
@@ -280,7 +280,7 @@ def forward_pipette_v2(
             )  # go to solution depth (depth replaced with height)
 
             # Withdraw the solution from the source and receive the updated vessel object
-            from_vessel = pump.withdraw(
+            pump.withdraw(
                 volume=repetition_vol,
                 solution=from_vessel,
                 rate=pumping_rate,
@@ -306,7 +306,7 @@ def forward_pipette_v2(
                     to_vessel.coordinates["y"],
                     to_vessel.depth,
                     Instruments.PIPETTE,
-                )  
+                )
             else: # go to safe height above waste vial
                 mill.safe_move(
                     to_vessel.coordinates["x"],
@@ -392,7 +392,7 @@ def reverse_pipette_v2(
         None (void function) since the objects are passed by reference
         
     """
-    purge_volume = round(0.05 * volume,2)
+    purge_volume = 20 # ul
     if volume > 0.00:
 
         # Check to ensure that the from_vessel and to_vessel are an allowed combination
@@ -434,7 +434,7 @@ def reverse_pipette_v2(
             )  # go to solution depth (depth replaced with height)
 
             # Withdraw the solution from the source and receive the updated vessel object
-            from_vessel = pump.withdraw(
+            pump.withdraw(
                 volume=repetition_vol + purge_volume,
                 solution=from_vessel,
                 rate=pumping_rate,
@@ -455,21 +455,26 @@ def reverse_pipette_v2(
             logger.info("Moving to: %s...", to_vessel.name)
             # determine if the destination is a well or a waste vial
             if isinstance(to_vessel, Well): # go to solution depth
+                logger.debug("%s is a Well", to_vessel.name)
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
                     to_vessel.depth,
                     Instruments.PIPETTE,
                 )
+                logger.info("Moved to well %s", to_vessel.name)
             else: # go to safe height above vial
+                logger.debug("%s is a Vial", to_vessel.name)
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
                     to_vessel.depth + 5 ,
                     Instruments.PIPETTE,
                 )
+                logger.info("Moved to vial %s", to_vessel.name)
 
             # Infuse into the to_vessel and receive the updated vessel object
+            logger.info("Infusing %s into %s", from_vessel.name, to_vessel.name)
             pump.infuse(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,
@@ -478,10 +483,12 @@ def reverse_pipette_v2(
                 blowout_ul= DRIP_STOP,
                 weigh= True
             ) # pipette now has purge volume + air gap
-
+            logger.info("Infused %s into %s. Moving to safe position", from_vessel.name, to_vessel.name)
             mill.move_to_safe_position()
+            logger.info("Moved to safe position")
             # Update the contentes of the to_vessel
             # TODO change from repitition volume to corrected volume
+            logger.debug("Updating contents of %s", to_vessel.name)
             to_vessel.update_contents(from_vessel, repetition_vol)
 
             logger.info(
@@ -509,10 +516,11 @@ def reverse_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=purge_vessel,
                 rate=pumping_rate,
-                blowout_ul= AIR_GAP + DRIP_STOP, 
+                blowout_ul= AIR_GAP + DRIP_STOP,
                 weigh= False # Vials are not on the scale
             ) # Pipette should be empty after this
-            logger.info("Purged the purge volume")
+            logger.info("Purged the purge volume, updating contents of %s - %s", purge_vessel.position, purge_vessel.name)
+            purge_vessel.update_contents(from_vessel, purge_volume)
 
             mill.move_to_safe_position()
 
@@ -854,7 +862,7 @@ def flush_v2(
     return 0
 
 
-def solution_selector(solutions: list[Vial], solution_name: str, volume: float) -> StockVial:
+def solution_selector(solutions: list[Vial2], solution_name: str, volume: float) -> StockVial:
     """
     Select the solution from which to withdraw from, from the list of solution objects
     Args:
@@ -877,7 +885,7 @@ def solution_selector(solutions: list[Vial], solution_name: str, volume: float) 
     raise NoAvailableSolution(solution_name)
 
 
-def waste_selector(solutions: list[Vial], solution_name: str, volume: float) -> WasteVial:
+def waste_selector(solutions: list[Vial2], solution_name: str, volume: float) -> WasteVial:
     """
     Select the solution in which to deposit into from the list of solution objects
     Args:
@@ -1714,7 +1722,7 @@ def forward_vs_reverse_pipetting(
         logger.error("Line number: %d", line_number)
         instructions.status = ExperimentStatus.ERROR
         instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
-        
+
 
     finally:
         instructions.status_date = datetime.now(tz.timezone("US/Eastern"))

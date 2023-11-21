@@ -14,6 +14,8 @@ Additionally controller should be able to:
 # pylint: disable=line-too-long
 
 # import standard libraries
+import datetime
+from hmac import new
 import json
 import logging
 import time
@@ -36,7 +38,7 @@ import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
 from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
-from vials import StockVial, Vial, WasteVial
+from vials import StockVial, Vial, Vial2, WasteVial
 import wellplate as wellplate_module
 
 from config.file_locations import (
@@ -88,10 +90,12 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
             ## Check the qeueue for any protocol type 2 experiments
             queue = scheduler.get_queue()
-            for experiment in queue:
-                if experiment.protocol_type == 2:
+            # check if any of the experiments in the queue pandas dataframe are type 2
+            protocol_type = 0
+            for _, row in queue.iterrows():
+                if row['protocol_type'] == 2:
                     protocol_type = 2
-                    break # break out of the for loop
+                    break
 
             if protocol_type in [0,1]:
                 ## Ask the scheduler for the next experiment
@@ -148,7 +152,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
                 ## Update the experiment status to running
                 new_experiment.status = ExperimentStatus.RUNNING
-                scheduler.change_well_status(new_experiment.target_well, new_experiment)
+                new_experiment.status_date = datetime.datetime.now()
+                scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
 
                 ## Run the experiment
                 e_panda.forward_vs_reverse_pipetting(
@@ -170,9 +175,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 slack.send_slack_message("alert", post_experiment_status_msg)
 
                 ## Update the system state with new vial and wellplate information
-                scheduler.change_well_status(
-                    new_experiment.target_well, new_experiment
-                )
+                scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
 
                 ## Update location of experiment instructions and save results
                 scheduler.update_experiment_status(new_experiment)
@@ -281,7 +284,7 @@ def check_required_files():
 
 
 def establish_system_state() -> (
-    tuple[list[StockVial], list[WasteVial], wellplate_module.Wells]
+    tuple[list[StockVial], list[WasteVial], wellplate_module.Wells2]
 ):
     """
     Establish state of system
@@ -292,7 +295,7 @@ def establish_system_state() -> (
     """
     stock_vials = read_vials(Path.cwd() / PATH_TO_STATUS / "stock_status.json")
     waste_vials = read_vials(Path.cwd() / PATH_TO_STATUS / "waste_status.json")
-    wellplate = wellplate_module.Wells(
+    wellplate = wellplate_module.Wells2(
         -230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5
     )
     logger.info("System state established")
@@ -385,7 +388,7 @@ def establish_system_state() -> (
     return stock_vials, waste_vials, wellplate
 
 
-def check_stock_vials(experiment: ExperimentBase, stock_vials: list[Vial]) -> bool:
+def check_stock_vials(experiment: ExperimentBase, stock_vials: list[Vial2]) -> bool:
     """
     Check that there is enough volume in the stock vials to run the experiment
 
@@ -458,7 +461,7 @@ def disconnect_from_instruments(instruments: Toolkit):
     logger.info("Disconnected from instruments")
 
 
-def read_vials(filename) -> list[Vial]:
+def read_vials(filename) -> list[Vial2]:
     """
     Read in the virtual vials from the json file
     """
@@ -470,22 +473,24 @@ def read_vials(filename) -> list[Vial]:
     for items in vial_parameters:
         if items["name"] is not None:
             list_of_solutions.append(
-                Vial(
-                    position=items["position"],
-                    x_coord=items["x"],
-                    y_coord=items["y"],
-                    volume=items["volume"],
+                Vial2(
                     name=items["name"],
-                    contents=items["contents"],
+                    category=items["category"],
+                    position=items["position"],
+                    volume=items["volume"],
                     capacity=items["capacity"],
-                    contamination=items["contamination"],
-                    filepath=filename,
-                )
+                    density=items["density"],
+                    coordinates={"x": items["x"], "y": items["y"]},
+                    z_bottom=items["z_bottom"],
+                    radius=items["radius"],
+                    height=items["height"],
+                    contamination=items["contamination"],            
+                    )
             )
     return list_of_solutions
 
 
-def update_vial_state_file(vial_objects: list[Vial], filename):
+def update_vial_state_file(vial_objects: list[Vial2], filename):
     """
     Update the vials in the json file. This is used to update the volume and contamination of the vials
     """
@@ -498,6 +503,7 @@ def update_vial_state_file(vial_objects: list[Vial], filename):
             if vial_param["position"] == vial.position:
                 vial_param["volume"] = vial.volume
                 vial_param["contamination"] = vial.contamination
+                vial_param["contents"] = vial.contents
                 break
 
     with open(filename_ob, "w", encoding="UTF-8") as file:
@@ -563,7 +569,8 @@ def reset_vials(vialgroup: str):
             vial["volume"] = vial["capacity"]
         elif vialgroup == "waste":
             vial["volume"] = 1000
-        vial["contamination"] = "0"
+            vial["contents"] = {}
+        vial["contamination"] = 0
 
     ## Write the new values to the state file
     with open(filename, "w", encoding="UTF-8") as file:

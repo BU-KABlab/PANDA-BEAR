@@ -24,14 +24,14 @@ from wellplate import Wells as Wellplate
 # pump_control_logger.addHandler(system_handler)
 
 pump_control_logger = logging.getLogger("e_panda")
-
+scale_logger = logging.getLogger("e_panda")
 # set a logger for the scale
-scale_logger = logging.getLogger("scale_logger")
-scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s,%(name)s,%(levelname)s,%(message)s")
-system_handler = logging.FileHandler("code/logs/scale.log")
-system_handler.setFormatter(formatter)
-scale_logger.addHandler(system_handler)
+# scale_logger = logging.getLogger("scale_logger")
+# scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+# formatter = logging.Formatter("%(asctime)s,%(name)s,%(levelname)s,%(message)s")
+# system_handler = logging.FileHandler("code/logs/scale.log")
+# system_handler.setFormatter(formatter)
+# scale_logger.addHandler(system_handler)
 
 class Pump:
     """
@@ -72,15 +72,6 @@ class Pump:
         self.mill = mill
         self.scale = scale
 
-    def apply_log_filter(self, experiment_id: int, target_well: str = None):
-        """Add custom value to log format"""
-        experiment_formatter = logging.Formatter(
-            "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(message)s"
-        )
-        system_handler.setFormatter(experiment_formatter)
-        custom_filter = CustomLoggingFilter(experiment_id, target_well)
-        pump_control_logger.addFilter(custom_filter)
-
     def set_up_pump(self):
         """
         Set up the syringe pump using hardcoded settings.
@@ -99,7 +90,7 @@ class Pump:
 
     def withdraw(
         self, volume: float, solution: Vessel = None, rate: float = 0.5, weigh: bool = False
-    ) -> Optional[Vessel]:
+    ):
         """
         Withdraw the given volume at the given rate and depth from the specified position.
         Args:
@@ -130,13 +121,13 @@ class Pump:
             self.pump.volume_withdrawn_clear()
             if solution is not None:
                 solution.update_volume(-volume_ul)
-                return solution, difference
+                return None
         else:
             return None
 
     def infuse(
         self, volume_to_infuse: float, being_infused: Vessel = None, infused_into: Vessel = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False
-    ) ->  Optional[Vessel]:
+    ) ->  int:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -158,7 +149,7 @@ class Pump:
                 density = None
 
             difference = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ul/1000.0, weigh)
-            self.update_pipette_volume(self.pump.volume_infused)
+            self.update_pipette_volume(self.pump.volume_infused + blowout_ul/1000.0)
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
@@ -169,11 +160,11 @@ class Pump:
             self.pump.volume_withdrawn_clear()
             if infused_into is not None:
                 infused_into.update_volume(volume_ul)
-                return infused_into, difference
+                return 0
             else:
-                return None
+                return 0
         else:
-            return None
+            return 0
 
     def purge(
         self,
@@ -316,9 +307,11 @@ class Pump:
                 self.mill.set_feed_rate(2000)
             # move back to original position
             self.mill.move_pipette_to_position(mix_location["x"], mix_location["y"], 0)
+            return None
 
     def update_pipette_volume(self, volume_ml: float):
         """Change the volume of the pipette in ml"""
+        volume_ml = round(volume_ml, 4)
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
             self.pipette_volume_ul -= volume_ml * 1000
             self.pipette_volume_ml -= volume_ml
@@ -353,27 +346,35 @@ class MockPump(Pump):
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
 
-        # Check if the requested volume is greater than the pipette's capacity
+        # Perform the withdrawl
         volume_ul = volume
-        if volume_ul > 0.000:
-            volume_ml = volume / 1000.0
+        if volume > 0:
+            volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
+            
+            if solution is not None and isinstance(solution, Vial):
+                density = solution.density
+            else:
+                density = None
 
-        self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume, rate)
-        self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
-        self.update_pipette_volume(volume_ml)
-        pump_control_logger.debug(
-            "Mock Pump has withdrawn: %f ml    Pipette vol: %f",
-            volume_ml,
-            self.pipette_volume_ul,
-        )
-        if solution is not None:
-            solution.update_volume(-volume_ul)
-            return solution
-        return 0
+            difference = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
+            self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+            self.update_pipette_volume(volume_ml)
+            pump_control_logger.info(
+                "Pump has withdrawn: %0.6f ml    Pipette vol: %0.3f ul",
+                volume_ml,
+                self.pipette_volume_ul,
+            )
+
+            if solution is not None:
+                #TODO change update_volume to check the pumping direction to determine if it should add or subtract
+                solution.update_volume(-volume_ul)
+                return solution, difference
+        else:
+            return None
 
     def infuse(
-        self, volume_to_infuse: float, being_infused: Vial = None, infused_into: [str,Vial] = None, rate: float = 0.5, blowout_ul = 0.0, weigh: bool = False
-    ) -> Optional[Vial]:
+        self, volume_to_infuse: float, being_infused: Vessel = None, infused_into: Vessel = None, rate: float = 0.5, blowout_ul = 0.0, weigh: bool = False
+    ) -> Optional[Vessel]:
         """
         Simulate infuse behavior without sending commands to the pump
         Update pipette volume, log, and handle exceptions as needed        
@@ -397,7 +398,8 @@ class MockPump(Pump):
                 density = None
 
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
-            self.update_pipette_volume(-volume_ml)
+            self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
+            self.update_pipette_volume(volume_ml + blowout_ul/1000.0)
             pump_control_logger.info(
                 "Mock Pump has infused: %0.6f ml  Pipette volume: %0.3f ul",
                 volume_ml,
@@ -406,11 +408,8 @@ class MockPump(Pump):
             #self.pump.volume_infused_clear()
             #self.pump.volume_withdrawn_clear()
             if infused_into is not None:
-                if isinstance(infused_into, Vessel):
-                    infused_into.update_volume(volume_ul)
-                else:
-                    pass # TODO add well support here, currently updated elsewhere
-                return infused_into
+                infused_into.update_volume(volume_ul)
+                return None
             else:
                 return None
         else:
@@ -436,7 +435,7 @@ class MockPump(Pump):
         pump_control_logger.debug("%s %f ml...", action, volume_ml)
         time.sleep(0.5)
         pump_control_logger.debug("Done %s", action)
-        time.sleep(2)
+        time.sleep(0.5)
 
         ## Get scale value after pump action
         if density is not None and density != 0:
@@ -470,6 +469,7 @@ class MockPump(Pump):
         Returns:
             None
         """
+        volume_ml = round(volume_ml, 4)
         if self.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
             self.pipette_volume_ul -= volume_ml * 1000
             self.pipette_volume_ml -= volume_ml

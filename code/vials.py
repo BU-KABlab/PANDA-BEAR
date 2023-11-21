@@ -9,12 +9,13 @@ import math
 from config.file_locations import STOCK_STATUS_FILE, WASTE_STATUS_FILE
 
 # set up A logger for the vials module
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-system_handler = logging.FileHandler("code/logs/ePANDA.log")
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+# formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+# system_handler = logging.FileHandler("code/logs/ePANDA.log")
+# system_handler.setFormatter(formatter)
+# logger.addHandler(system_handler)
+vial_logger = logging.getLogger("e_panda")
 
 class Vial:
     """
@@ -78,7 +79,7 @@ class Vial:
         Updates the volume of the vial
         """
         logging_msg = f"Checking if {added_volume} can fit in {self.name} ..."
-        logger.info(logging_msg)
+        vial_logger.info(logging_msg)
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         elif self.volume + added_volume < 0:
@@ -87,7 +88,7 @@ class Vial:
             )
         else:
             logging_msg = f"{added_volume} can fit in {self.name}"
-            logger.info(logging_msg)
+            vial_logger.info(logging_msg)
             return True
 
     def write_volume_to_disk(self):
@@ -98,7 +99,7 @@ class Vial:
         # with open(self.filepath, 'w') as f:
         #     json.dump(self.volume, f, indent=4)
         # return 0
-        logger.info("Writing %s volume to vial file...", self.name)
+        vial_logger.info("Writing %s volume to vial file...", self.name)
 
         ## Open the file and read the contents
         with open(self.filepath, "r", encoding="UTF-8") as file:
@@ -123,7 +124,7 @@ class Vial:
         Args:
             added_volume (float): volume (ul) to be added to the vial
         """
-        logger.info("Updating %s volume...", self.name)
+        vial_logger.info("Updating %s volume...", self.name)
         if self.volume + added_volume_ul > self.capacity:
             raise OverFillException(
                 self.name, self.volume, added_volume_ul, self.capacity
@@ -139,7 +140,7 @@ class Vial:
         )
         if self.depth < self.bottom:
             self.depth = self.bottom
-        logger.debug(
+        vial_logger.debug(
             "%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth
         )
         self.contamination += 1
@@ -172,7 +173,7 @@ class Vessel:
         Updates the volume of the vessel by adding the specified volume.
 
     """
-    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict, contents: list = [], depth: float = 0) -> None:
+    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict, contents: dict = {}, depth: float = 0) -> None:
         self.name = name
         self.volume = volume
         self.capacity = capacity
@@ -229,7 +230,7 @@ class Vessel:
         """
         pass
 
-    def update_contents(self, solution_name: str, volume: float) -> None:
+    def update_contents(self, solution: 'Vessel', volume: float) -> None:
         """
         Updates the contents of the vessel.
 
@@ -238,14 +239,16 @@ class Vessel:
         solution_name (str): The name of the solution to be added to the vessel.
         volume (float): The volume of the solution to be added to the vessel.
         """
-        # check if the solution_name already exists in the vessel, if so update the volume by adding the new volume
-        for solution in self.contents:
-            if solution["name"] == solution_name:
-                solution["volume"] += volume
-                return self
-        # otherwise, add the solution to the vessel
-        self.contents.append({"name": solution_name, "volume": volume})
+        # check if the solution_name already exists in the vessel's contents dict, if so update the volume by adding the new volume
+        if solution.name in self.contents:
+            self.contents[solution.name] += volume
+
+        # otherwise, add the solution to the vessel's contents dictionary
+        else:
+            self.contents[solution.name] = volume
+        vial_logger.debug("%s: New contents: %s", self.name, self.contents)
         return self
+
 class Vial2(Vessel):
     """
     Represents a vial object that inherits from the Vessel class.
@@ -267,7 +270,7 @@ class Vial2(Vessel):
     """
 
     def __init__(self, name: str, category: int, position: str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}) -> None:
         """
         Initializes a new instance of the Vial2 class.
 
@@ -282,14 +285,14 @@ class Vial2(Vessel):
         height (float): The height of the vial.
         z_bottom (float): The z-coordinate of the bottom of the vial.
         """
-        super().__init__(name, volume, capacity, density, coordinates)
+        super().__init__(name, volume, capacity, density, coordinates, contents=contents)
         self.position = position
         self.radius = radius
         self.height = height
         self.z_bottom = z_bottom
         self.base = round(math.pi * math.pow(self.radius, 2.0), 6)
         self.depth = self.calculate_depth()
-        self.contamination = 0
+        self.contamination = contamination
         self.category = category
 
     def calculate_depth(self) -> float:
@@ -340,14 +343,14 @@ class Vial2(Vessel):
             self.volume += added_volume
             self.depth = self.calculate_depth()
             self.contamination += 1
-            logger.debug("%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth)
+            vial_logger.debug("%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth)
             return self
 
     def write_volume_to_disk(self) -> None:
         """
         Writes the current volume and contamination of the vial to the appropriate file.
         """
-        logger.info("Writing %s volume to vial file...", self.name)
+        vial_logger.info("Writing %s volume to vial file...", self.name)
         vial_file_path = STOCK_STATUS_FILE if self.category == 0 else WASTE_STATUS_FILE
 
         with open(vial_file_path, "r", encoding="UTF-8") as file:
@@ -357,6 +360,8 @@ class Vial2(Vessel):
             if solution["name"] == self.name:
                 solution["volume"] = self.volume
                 solution["contamination"] = self.contamination
+                solution["depth"] = self.depth
+                solution["contents"] = self.contents
                 break
 
         with open(vial_file_path, "w", encoding="UTF-8") as file:
@@ -399,7 +404,7 @@ class StockVial(Vial2):
     """
 
     def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}) -> None:
         """
         Initializes a new instance of the StockVial class.
 
@@ -413,7 +418,7 @@ class StockVial(Vial2):
         height (float): The height of the stock vial.
         z_bottom (float): The z-coordinate of the bottom of the stock vial.
         """
-        super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom)
+        super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents)
         self.category = 0
 
 class WasteVial(Vial2):
@@ -436,7 +441,7 @@ class WasteVial(Vial2):
     """
 
     def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}) -> None:
         """
         Initializes a new instance of the WasteVial class.
 
@@ -450,7 +455,7 @@ class WasteVial(Vial2):
         height (float): The height of the waste vial.
         z_bottom (float): The z-coordinate of the bottom of the waste vial.
         """
-        super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom)
+        super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents)
         self.category = 1
 
 class OverFillException(Exception):

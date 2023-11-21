@@ -30,7 +30,7 @@ class Well(Vessel):
     -----
         well_id (str): The ID of the well.
         coordinates (dict): The coordinates of the well.
-        contents (list): The contents of the well.
+        contents (dict): The contents of the well.
         volume (float): The volume of the well.
         height (float): The height of the well.
         depth (float): The depth of the well.
@@ -38,14 +38,18 @@ class Well(Vessel):
         density (float): The density of the well.
         capacity (float): The capacity of the well.
     """
-    def __init__(self, well_id: str, coordinates: dict, volume: float, height: float, depth: float, status: str, density: float, capacity: float):
+    def __init__(self, well_id: str, coordinates: dict, volume: float, height: float, depth: float, status: str, density: float, capacity: float, contents: dict = {}):
         """
         """
         self.well_id = well_id
+        self.experiment_id = None
+        self.project_id = None
         self.status = status
+        self.status_date = None
         self.height = height
         self.depth = depth
-        super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density, contents= [], depth = depth)
+        self.name = well_id
+        super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density, contents= {}, depth = depth)
 
     def __str__(self) -> str:
         """Returns a string representation of the well."""
@@ -105,7 +109,7 @@ class Wells:
                 well_id = col + str(row)
                 if well_id == "A1":
                     coordinates = a1_coordinates
-                    contents = None
+                    contents = {}
                     depth = self.z_bottom
                     if depth < self.z_bottom:
                         depth = self.z_bottom
@@ -136,7 +140,7 @@ class Wells:
                             "y": a1_coordinates["y"] + y_offset,
                             "z": self.z_top,
                         }
-                    contents = []
+                    contents = {}
                     # the depth is set here for each well instead of the wellpate as a whole
                     depth = self.z_bottom
 
@@ -146,7 +150,6 @@ class Wells:
                     "volume": volume,
                     "depth": depth,
                     "status": "empty",
-                    "CV-results": None,
                     "density": 1.0,
                 }
 
@@ -178,23 +181,23 @@ class Wells:
         coordinates_dict["echem_height"] = self.echem_height
         return coordinates_dict
 
-    def contents(self, well_id):
+    def contents(self, well_id) -> dict:
         """Return the contents of a specific well"""
         return self.wells[well_id]["contents"]
 
-    def volume(self, well_id):
+    def volume(self, well_id) -> float:
         """Return the volume of a specific well"""
         return self.wells[well_id]["volume"]
 
-    def depth(self, well_id):
+    def depth(self, well_id) -> float:
         """Return the depth of a specific well"""
         return self.wells[well_id]["depth"]
 
-    def density(self, well_id):
+    def density(self, well_id) -> float:
         """Return the density of a specific well"""
         return self.wells[well_id]["density"]
 
-    def check_volume(self, well_id, added_volume: float):
+    def check_volume(self, well_id, added_volume: float) -> bool:
         """Check if a volume can fit in a specific well"""
         info_message = f"Checking if {added_volume} can fit in {well_id} ..."
         logger.info(info_message)
@@ -230,7 +233,7 @@ class Wells:
             debug_message = f"New volume: {self.wells[well_id]['volume']} | New depth: {self.wells[well_id]['depth']}"
             logger.debug(debug_message)
 
-    def check_well_status(self, well_id):
+    def check_well_status(self, well_id) -> str:
         """Check the status of a specific well"""
         return self.wells[well_id]["status"]
 
@@ -243,7 +246,7 @@ class Wells:
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s", well_id, well_data["status"])
 
-    def well_coordinates_and_status_color(self):
+    def well_coordinates_and_status_color(self) -> Tuple[List[float], List[float], List[str]]:
         """Plot the well plate on a coordinate plane"""
         x_coordinates = []
         y_coordinates = []
@@ -264,7 +267,7 @@ class Wells:
                 color.append("black")
 
         return x_coordinates, y_coordinates, color
-   
+
 class Wells2:
     """
     Represents a well plate and each well in it.
@@ -376,7 +379,6 @@ class Wells2:
                 well_id = col + str(row)
                 if well_id == "A1":
                     coordinates = a1_coordinates
-                    contents = None
                     depth = self.z_bottom
                     if depth < self.z_bottom:
                         depth = self.z_bottom
@@ -419,6 +421,7 @@ class Wells2:
                     status="new",
                     density=1.0,
                     capacity=self.well_capacity,
+                    contents={},
                 )
 
         # Update the well info from file
@@ -438,6 +441,7 @@ class Wells2:
                 self.set_well_status(well_id, status)
                 self.plate_id = data["plate_id"]
                 self.type_number = data["type_number"]
+                self.contents = dict(well["contents"])
 
     def get_coordinates(self, well_id) -> dict:
         """
@@ -453,23 +457,23 @@ class Wells2:
         coordinates_dict["echem_height"] = self.echem_height
         return coordinates_dict
 
-    def get_contents(self, well_id):
+    def get_contents(self, well_id) -> dict:
         """Return the contents of a specific well"""
         return self.wells[well_id].contents
 
-    def get_volume(self, well_id):
+    def get_volume(self, well_id) -> float:
         """Return the volume of a specific well"""
         return self.wells[well_id].volume
 
-    def get_depth(self, well_id):
+    def get_depth(self, well_id) -> float:
         """Return the depth of a specific well"""
         return self.wells[well_id].depth
 
-    def get_density(self, well_id):
+    def get_density(self, well_id) -> float:
         """Return the density of a specific well"""
         return self.wells[well_id].density
 
-    def check_volume(self, well_id, added_volume: float):
+    def check_volume(self, well_id, added_volume: float) -> bool:
         """Check if a volume can fit in a specific well"""
         info_message = f"Checking if {added_volume} can fit in {well_id} ..."
         logger.info(info_message)

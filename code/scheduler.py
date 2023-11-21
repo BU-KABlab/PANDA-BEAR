@@ -26,7 +26,7 @@ from experiment_class import (
     ExperimentResult,
 )  # , make_baseline_value
 from config.pin import CURRENT_PIN
-
+from wellplate import Well
 # define constants or globals
 PATH_TO_CONFIG = "code/config/mill_config.json"
 PATH_TO_STATUS = "code/system state"
@@ -126,6 +126,37 @@ class Scheduler:
             json.dump(data, file, indent=4)
 
         logger.info("Well %s status changed to %s", well, experiment.status)
+
+    def change_well_status_v2(self, well: Well, experiment: ExperimentBase) -> None:
+        """
+        Changes the status of a well in well_status.json.
+        :param well: The well to change.
+        :param status: The new status of the well.
+        """
+        logger.debug("Changing well %s status to %s", well, well.status)
+
+        well.status = experiment.status
+        well.status_date = experiment.status_date
+
+        file_to_open = Path.cwd() / PATH_TO_STATUS/ "well_status.json"
+        if not Path.exists(file_to_open):
+            logger.error("well_status.json not found")
+            raise FileNotFoundError("well_status.json")
+
+        with open(file_to_open, "r", encoding="ascii") as file:
+            data = json.load(file)
+            for wells in data["wells"]:
+                if wells["well_id"] == well.well_id:
+                    wells["status"] = well.status.value
+                    wells["status_date"] = well.status_date.strftime("%Y-%m-%dT%H:%M:%S")
+                    wells["experiment_id"] = well.experiment_id
+                    wells["project_id"] = well.project_id
+                    wells['contents'] = well.contents
+                    break
+        with open(file_to_open, "w", encoding="ascii") as file:
+            json.dump(data, file, indent=4)
+
+        logger.info("Well %s status changed to %s", well, well.status)
 
     def read_new_experiments(self, filename: str) -> Tuple[int, bool]:
         """
@@ -284,7 +315,7 @@ class Scheduler:
         highest_priority = queue["priority"].min()
         # Get all experiments with the highest priority so that we can randomly select one of them
         # Exclude layered protocols (protocol_type = 2)
-        experiments = queue[queue["priority"] == highest_priority & queue["protocol_type"] != 2]["filename"].tolist()
+        experiments = queue[(queue["priority"] == highest_priority) & (queue["protocol_type"] != 2)]["filename"].tolist()
 
         queue_dir_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
         if not Path.exists(queue_dir_path):

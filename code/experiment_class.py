@@ -48,13 +48,13 @@ class ExperimentResult:
 @dataclass(config=ConfigDict(validate_assignment=True))
 class ExperimentBase():
     '''Define the common data used to run and define an experiment'''
-    id: int
-    experiment_name: str
-    priority: int
-    target_well: str
-    pin: int
-    project_id: int
-    solutions: dict
+    id: int = None
+    experiment_name: str = None
+    priority: int = None
+    target_well: str = None
+    pin: int = None
+    project_id: int = None
+    solutions: dict = None
     well_type_number = 1
     pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
     status: ExperimentStatus = ExperimentStatus.NEW
