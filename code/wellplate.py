@@ -352,7 +352,7 @@ class Wells2:
         self.columns = columns
         self.orientation = orientation
         self.z_bottom = -76.0
-        self.echem_height = -73  # for every well
+        self.echem_height = -60 #-73  # for every well
         self.type_number = type_number  # The type of well plate
         self.plate_id = 0  # The id of the well plate
 
