@@ -7,9 +7,7 @@ import logging
 import math
 import json
 import os
-import select
-from typing import Dict, List, Optional, Tuple
-
+from typing import Dict, List, Tuple
 import matplotlib.pyplot as plt
 from config.file_locations import *
 from vials import Vessel
@@ -55,6 +53,28 @@ class Well(Vessel):
         """Returns a string representation of the well."""
         return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
 
+    def update_contents(self, solution: Vessel, volume: float) -> None:
+        """Updates the contents of the well in the well_status.json file."""
+        # Check if the solution is already in the well
+        logger.debug("Updating contents of %s with %s", self.name, solution.name)
+        if solution.name in self.contents:
+            self.contents[solution.name] += volume
+        else:
+            self.contents[solution.name] = volume
+        logger.debug("New %s contents: %s", self.name, self.contents)
+        # Update the well status file
+        logger.debug("Updating well status file...")
+        with open(WELL_STATUS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            for well in data["wells"]:
+                if well["well_id"] == self.well_id:
+                    well["contents"] = self.contents
+                    logger.debug("Well %s contents updated to %s", self.name, self.contents)
+                    break
+
+        with open(WELL_STATUS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+        logger.debug("Well status file updated")
 
 class Wells:
     """
@@ -166,6 +186,9 @@ class Wells:
                 self.update_well_status(well_id, status)
                 self.plate_id = data["plate_id"]
                 self.type_number = data["type_number"]
+                self.contents = dict(well["contents"])
+                self.experiment_id = well["experiment_id"]
+                self.project_id = well["project_id"]
 
     def get_coordinates(self, well_id) -> dict:
         """
@@ -181,11 +204,11 @@ class Wells:
         coordinates_dict["echem_height"] = self.echem_height
         return coordinates_dict
 
-    def contents(self, well_id) -> dict:
+    def read_contents(self, well_id) -> dict:
         """Return the contents of a specific well"""
         return self.wells[well_id]["contents"]
 
-    def volume(self, well_id) -> float:
+    def read_volume(self, well_id) -> float:
         """Return the volume of a specific well"""
         return self.wells[well_id]["volume"]
 
@@ -203,7 +226,7 @@ class Wells:
         logger.info(info_message)
         if self.wells[well_id]["volume"] + added_volume >= self.well_capacity:
             raise OverFillException(
-                well_id, self.volume, added_volume, self.well_capacity
+                well_id, self.read_volume, added_volume, self.well_capacity
             )
 
         else:
@@ -431,17 +454,26 @@ class Wells2:
         """Gets a Well object by well ID."""
         return self.wells[well_id]
 
-    def update_well_status_from_json_file(self):
+    def update_well_status_from_json_file(self: "Wells2") -> None:
         """Update the well status from a file"""
+
+        logger.debug("Updating well status's from file...")
         with open("code\\system state\\well_status.json", "r", encoding="utf-8") as f:
             data = json.load(f)
-            for well in data["wells"]:
-                well_id = well["well_id"]
-                status = well["status"]
-                self.set_well_status(well_id, status)
-                self.plate_id = data["plate_id"]
-                self.type_number = data["type_number"]
-                self.contents = dict(well["contents"])
+            for saved_well in data["wells"]:
+                for well_id, well in self.wells.items():
+                    if saved_well["well_id"] == well_id:
+                        well.status = saved_well["status"]
+                        well.contents = saved_well["contents"]
+                        well.experiment_id = saved_well["experiment_id"]
+                        well.project_id = saved_well["project_id"]
+                        well.status_date = saved_well["status_date"]
+                        self.type_number = data["type_number"]
+                        self.plate_id = data["plate_id"]
+                        logger.debug("Well %s updated from file", well.name)
+                        break
+
+                
 
     def get_coordinates(self, well_id) -> dict:
         """
@@ -646,18 +678,6 @@ def read_well_type_characteristics(
         shape,
         current_well.z_bottom + height,
     )
-
-class WellPlate:
-    """
-    The foundation of every type of wellplate
-    Attributes:
-        Well count
-        Max volume
-        Well shape
-        Footprint (lenght, width, height)
-        Well measurements (Depth, diameter)
-        Spacing (x-offset, y-offset, x-spacing, y-spacing)
-    """
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""

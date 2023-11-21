@@ -1,7 +1,7 @@
 [
     {
         "position": "s0",
-        "contents": {},
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -18,7 +18,7 @@
     },
     {
         "position": "s1",
-        "contents": {},
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -35,7 +35,7 @@
     },
     {
         "position": "s2",
-        "contents": {},
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -52,7 +52,7 @@
     },
     {
         "position": "s3",
-        "contents": {},
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -69,7 +69,7 @@
     },
     {
         "position": "s4",
-        "contents": {},
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 1.5,
         "category": 0,
@@ -103,7 +103,7 @@
     },
     {
         "position": "s5",
-        "contents": {},
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,
@@ -120,7 +120,7 @@
     },
     {
         "position": "s6",
-        "contents": {},
+        "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
         "category": 0,

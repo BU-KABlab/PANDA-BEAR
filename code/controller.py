@@ -15,10 +15,8 @@ Additionally controller should be able to:
 
 # import standard libraries
 import datetime
-from hmac import new
 import json
 import logging
-import time
 
 # import third-party libraries
 from pathlib import Path
@@ -38,7 +36,7 @@ import slack_functions as slack
 from scheduler import Scheduler
 import e_panda
 from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
-from vials import StockVial, Vial, Vial2, WasteVial
+from vials import StockVial, Vial2, WasteVial
 import wellplate as wellplate_module
 
 from config.file_locations import (
@@ -100,12 +98,12 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
             if protocol_type in [0,1]:
                 ## Ask the scheduler for the next experiment
                 new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                # if new_experiment is None:
+                #     slack.send_slack_message(
+                #         "alert",
+                #         "No new experiments to run...monitoring inbox for new experiments",
+                #     )
                 if new_experiment is None:
-                    slack.send_slack_message(
-                        "alert",
-                        "No new experiments to run...monitoring inbox for new experiments",
-                    )
-                if new_experiment is not None:
                     break # break out of the while True loop
 
                 # while new_experiment is None:
@@ -147,7 +145,10 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     break # break out of the while True loop
 
                 ## Initialize a results object
-                experiment_results = ExperimentResult()
+                experiment_results = ExperimentResult(
+                    id=new_experiment.id,
+                    well_id=new_experiment.target_well,
+                )
                 # Announce the experiment
                 pre_experiment_status_msg = f"Running experiment {new_experiment.id}"
                 logger.info(pre_experiment_status_msg)
@@ -476,8 +477,7 @@ def read_vials(filename) -> list[Vial2]:
     list_of_solutions = []
     for items in vial_parameters:
         if items["name"] is not None:
-            list_of_solutions.append(
-                Vial2(
+            read_vial = Vial2(
                     name=items["name"],
                     category=items["category"],
                     position=items["position"],
@@ -488,9 +488,10 @@ def read_vials(filename) -> list[Vial2]:
                     z_bottom=items["z_bottom"],
                     radius=items["radius"],
                     height=items["height"],
-                    contamination=items["contamination"],            
+                    contamination=items["contamination"],
+                    contents=items["contents"],
                     )
-            )
+            list_of_solutions.append(read_vial)
     return list_of_solutions
 
 
@@ -626,7 +627,7 @@ def load_new_wellplate(ask: bool = False) -> int:
                 "well_id": chr(65 + (i // 12)) + str(i % 12 + 1),
                 "status": "new",
                 "status_date": "",
-                "contents": [],
+                "contents": {},
                 "experiment_id": "",
                 "project_id": "",
             }

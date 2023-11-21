@@ -179,7 +179,7 @@ def pipette(
             logger.info(
                 "Well %s volume: %f",
                 target_well,
-                wellplate.volume(target_well),
+                wellplate.read_volume(target_well),
             )
 
             mill.move_to_safe_position()
@@ -588,7 +588,7 @@ def clear_well(
                 weigh= True
             )  # withdraw the volume from the well
 
-            logger.debug("Well %s volume: %f", target_well, wellplate.volume(target_well))
+            logger.debug("Well %s volume: %f", target_well, wellplate.read_volume(target_well))
 
             logger.info("Moving to purge vial %s...", destination_vial.name)
             mill.safe_move(
@@ -606,7 +606,7 @@ def clear_well(
             logger.info("Purging the air gap...")
 
             mill.move_to_safe_position()
-            logger.info("Remaining volume in well: %f", wellplate.volume(target_well))
+            logger.info("Remaining volume in well: %f", wellplate.read_volume(target_well))
 
     else:
         logger.info("No volume to clear from well %s. Input volume was 0", target_well)
@@ -672,7 +672,7 @@ def rinse(
         )
         logger.info("Rinse %d of %d complete", rep + 1, instructions.rinse_count)
         logger.debug(
-            "Remaining volume in well: %f", wellplate.volume(instructions.target_well)
+            "Remaining volume in well: %f", wellplate.read_volume(instructions.target_well)
         )
     return stock_vials, waste_vials, wellplate
 
@@ -873,8 +873,10 @@ def solution_selector(solutions: list[Vial2], solution_name: str, volume: float)
         solution (object): The solution object
     """
     for solution in solutions:
-        if solution.name.lower() == solution_name.lower() and solution.volume - 0.05*solution.capacity > (
-            volume
+        # if the solution names match and the requested volume is less than the available volume (volume - 15% of capacity)
+        if (
+            solution.name.lower() == solution_name.lower() 
+            and solution.volume - 0.15*solution.capacity > (volume)
         ):
             logger.debug(
                 "Selected stock vial: %s in position %s",
@@ -1208,7 +1210,7 @@ def standard_experiment_protocol(
 
             # Withdraw all well volume into waste
             waste_vials, wellplate = clear_well(
-                volume=wellplate.volume(instructions.target_well),
+                volume=wellplate.read_volume(instructions.target_well),
                 target_well=instructions.target_well,
                 wellplate=wellplate,
                 pumping_rate=instructions.pumping_rate,
@@ -1993,7 +1995,7 @@ def peg2p_protocol(
             logger.info("deposition completed for well: %s", instructions.target_well)
 
             waste_vials, wellplate = clear_well(
-                volume=wellplate.volume(instructions.target_well),
+                volume=wellplate.read_volume(instructions.target_well),
                 target_well=instructions.target_well,
                 wellplate=wellplate,
                 pumping_rate=instructions.pumping_rate,

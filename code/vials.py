@@ -108,7 +108,7 @@ class Vial:
         ## Find matching solution name and update the volume
         # solutions = solutions['solutions']
         for solution in solutions:
-            if solution["name"] == self.name:
+            if solution["name"] == self.name and solution["position"] == self.position_name:
                 solution["volume"] = self.volume
                 solution["contamination"] = self.contamination
                 break
@@ -173,7 +173,7 @@ class Vessel:
         Updates the volume of the vessel by adding the specified volume.
 
     """
-    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict, contents: dict = {}, depth: float = 0) -> None:
+    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict, contents, depth: float = 0) -> None:
         self.name = name
         self.volume = volume
         self.capacity = capacity
@@ -240,14 +240,7 @@ class Vessel:
         volume (float): The volume of the solution to be added to the vessel.
         """
         # check if the solution_name already exists in the vessel's contents dict, if so update the volume by adding the new volume
-        if solution.name in self.contents:
-            self.contents[solution.name] += volume
-
-        # otherwise, add the solution to the vessel's contents dictionary
-        else:
-            self.contents[solution.name] = volume
-        vial_logger.debug("%s: New contents: %s", self.name, self.contents)
-        return self
+        pass
 
 class Vial2(Vessel):
     """
@@ -270,7 +263,7 @@ class Vial2(Vessel):
     """
 
     def __init__(self, name: str, category: int, position: str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents) -> None:
         """
         Initializes a new instance of the Vial2 class.
 
@@ -357,11 +350,11 @@ class Vial2(Vessel):
             solutions = json.load(file)
 
         for solution in solutions:
-            if solution["name"] == self.name:
+            if solution["name"] == self.name and solution["position"] == self.position:
                 solution["volume"] = self.volume
                 solution["contamination"] = self.contamination
                 solution["depth"] = self.depth
-                solution["contents"] = self.contents
+                #solution["contents"] = self.contents
                 break
 
         with open(vial_file_path, "w", encoding="UTF-8") as file:
@@ -404,7 +397,7 @@ class StockVial(Vial2):
     """
 
     def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents:str) -> None:
         """
         Initializes a new instance of the StockVial class.
 
@@ -420,7 +413,9 @@ class StockVial(Vial2):
         """
         super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents)
         self.category = 0
-
+    def update_contents(self, solution: Vessel, volume: float) -> None:
+        "Stock vial contents don't change"
+        return self
 class WasteVial(Vial2):
     """
     Represents a waste vial object that inherits from the Vial2 class.
@@ -458,6 +453,16 @@ class WasteVial(Vial2):
         super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents)
         self.category = 1
 
+    def update_contents(self, solution: Vessel, volume: float) -> None:
+        vial_logger.debug("Updating %s %s contents...", self.name, self.position)
+        if solution.name in self.contents:
+            self.contents[solution.name] += volume
+
+        # otherwise, add the solution to the vessel's contents dictionary
+        else:
+            self.contents[solution.name] = volume
+        vial_logger.debug("%s %s: New contents: %s", self.name, self.position, self.contents)
+        return self
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
 

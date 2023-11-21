@@ -1,6 +1,6 @@
 [
     {
-        "position": "W0",
+        "position": "w0",
         "contents": {},
         "x": -47,
         "y": -13,
@@ -16,7 +16,7 @@
         "category": 1
     },
     {
-        "position": "W1",
+        "position": "w1",
         "contents": {},
         "x": -47,
         "y": -46,
@@ -32,7 +32,7 @@
         "category": 1
     },
     {
-        "position": "W2",
+        "position": "w2",
         "contents": {},
         "x": -47,
         "y": -79,
@@ -48,7 +48,7 @@
         "category": 1
     },
     {
-        "position": "W3",
+        "position": "w3",
         "contents": {},
         "x": -47,
         "y": -112,
@@ -64,7 +64,7 @@
         "category": 1
     },
     {
-        "position": "W4",
+        "position": "w4",
         "contents": {},
         "x": -47,
         "y": -145,
@@ -80,7 +80,7 @@
         "category": 1
     },
     {
-        "position": "RW0",
+        "position": "w5",
         "contents": {},
         "x": -47,
         "y": -178,
@@ -88,7 +88,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "rinse0",
+        "name": "waste",
         "volume": 1000,
         "capacity": 20000,
         "contamination": 0,
@@ -96,7 +96,7 @@
         "category": 1
     },
     {
-        "position": "RW1",
+        "position": "w6",
         "contents": {},
         "x": -47,
         "y": -211,
@@ -104,7 +104,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "rinse1",
+        "name": "waste",
         "volume": 1000,
         "capacity": 20000,
         "contamination": 0,
@@ -112,7 +112,7 @@
         "category": 1
     },
     {
-        "position": "RW2",
+        "position": "w7",
         "contents": {},
         "x": -47,
         "y": -244,
@@ -120,7 +120,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "rinse2",
+        "name": "waste",
         "volume": 1000,
         "capacity": 20000,
         "contamination": 0,

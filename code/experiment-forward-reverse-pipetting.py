@@ -64,5 +64,5 @@ for i in range(1,7):
         controller.main(use_mock_instruments=True)
     else:
         print('Error: ', result)
-
+controller.load_new_wellplate()
 print('Finished running forward reverse pipetting experiments')
