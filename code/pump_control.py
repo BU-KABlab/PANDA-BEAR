@@ -5,13 +5,12 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 
 import logging
 import time
-from typing import Optional, Tuple
+from typing import Optional
 
 import nesp_lib
 from sartorius import Scale
 from sartorius.mock import Scale as MockScale
 from vials import Vial, Vessel
-from log_tools import CustomLoggingFilter
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 
@@ -163,6 +162,8 @@ class Pump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if infused_into is not None:
+                #TODO change update_volume to check the pumping direction to determine if it should add or subtract
+                #TODO correct the volume change based on the difference in weight
                 infused_into.update_volume(volume_ul)
                 return 0
             else:
@@ -201,10 +202,10 @@ class Pump:
     #     #purge_vial.update_volume(purge_volume)
     #     return purge_vial
 
-    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False):
+    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False) -> float:
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
-            return
+            return 0
         # Set the pump parameters for the run
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml+blowout_ml #ml
@@ -252,8 +253,8 @@ class Pump:
         pump_control_logger.debug(log_msg)
         if density is not None and density != 0 and weigh:
             return post_weight - pre_weight
-        else:
-            return 0
+
+        return 0
 
     def mix(
         self,
@@ -348,7 +349,7 @@ class MockPump(Pump):
 
     def withdraw(
         self, volume: float, solution: Vessel = None, rate: float = 0.5, weigh: bool = False
-    ) -> Optional[Vial]:
+    ) -> Optional[float]:
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
 
@@ -408,8 +409,9 @@ class MockPump(Pump):
             self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume_ml + blowout_ml)
             pump_control_logger.info(
-                "Mock Pump has infused: %0.6f ml  Pipette volume: %0.3f ul",
+                "Pump has infused: %0.6f ml (%0.6f of solution) Pipette volume: %0.3f ul",
                 volume_ml,
+                volume_ml - blowout_ml,
                 self.pipette_volume_ul,
             )
             #self.pump.volume_infused_clear()

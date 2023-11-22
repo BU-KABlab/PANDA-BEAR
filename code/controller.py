@@ -27,13 +27,13 @@ from pump_control import Pump
 from pump_control import MockPump
 
 # import gamry_control_WIP as echem
-import gamry_control_WIP as echem
-import gamry_control_WIP_mock as echem_mock
+# import gamry_control_WIP as echem
+# import gamry_control_WIP_mock as echem_mock
 from sartorius_local import Scale
 from sartorius_local.mock import Scale as MockScale
 
 # import obs_controls as obs
-import slack_functions as slack
+from slack_functions2 import SlackBot
 from scheduler import Scheduler
 import e_panda
 from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
@@ -45,8 +45,8 @@ from config.file_locations import (
     PATH_TO_STATUS,
     PATH_TO_COMPLETED_EXPERIMENTS,
     PATH_TO_ERRORED_EXPERIMENTS,
-    PATH_TO_DATA,
-    PATH_TO_LOGS,
+    PATH_TO_NETWORK_DATA as PATH_TO_DATA,
+    PATH_TO_NETWORK_LOGS as PATH_TO_LOGS,
 )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -56,6 +56,7 @@ formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(f
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
+slack = SlackBot()
 
 
 def main(use_mock_instruments: bool = False, one_off: bool = False):
@@ -68,6 +69,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
     logger.info(printpanda())
+    slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
@@ -449,7 +451,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     mill.homing_sequence()
     scale = Scale(address="COM6")
     pump = Pump(mill=mill, scale=scale)
-    # pstat_connected = echem.pstatconnect()
+    #pstat_connected = echem.pstatconnect()
     instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
     return instruments
 
@@ -458,11 +460,11 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
-    try:
-        if echem.OPEN_CONNECTION:
-            echem.pstatdisconnect()
-    except AttributeError:
-        pass
+    # try:
+    #     if echem.OPEN_CONNECTION:
+    #         echem.pstatdisconnect()
+    # except AttributeError:
+    #     pass
 
     logger.info("Disconnected from instruments")
 

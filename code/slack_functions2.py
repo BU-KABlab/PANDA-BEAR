@@ -15,21 +15,23 @@ from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
 
 class SlackBot:
-    def __init__(self, mode="test"):
+    """Class for sending messages to Slack."""
+    def __init__(self, test: bool = False):
         # Set up logging
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging.DEBUG)
-        formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-        file_handler = logging.FileHandler("code/logs/slack_bot.log")
-        system_handler = logging.FileHandler("code/logs/ePANDA.log")
-        file_handler.setFormatter(formatter)
-        system_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-        logger.addHandler(system_handler)
-        self.logger = logger
-        self.mode = mode
+        # logger = logging.getLogger(__name__)
+        # logger.setLevel(logging.DEBUG)
+        # formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+        # file_handler = logging.FileHandler("code/logs/slack_bot.log")
+        # system_handler = logging.FileHandler("code/logs/ePANDA.log")
+        # file_handler.setFormatter(formatter)
+        # system_handler.setFormatter(formatter)
+        # logger.addHandler(file_handler)
+        # logger.addHandler(system_handler)
+        self.logger = logging.getLogger("e_panda")
+        self.test = test
 
     def send_slack_message(self, channel_id: str, message) -> None:
+        """Send a message to Slack."""
         client = WebClient(slack_cred.TOKEN)
         if channel_id == "conversation":
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
@@ -37,7 +39,7 @@ class SlackBot:
             channel_id = slack_cred.ALERT_CHANNEL_ID
 
         try:
-            if self.mode != "test": 
+            if not self.test:
                 result = client.chat_postMessage(channel=channel_id, text=message)
             else:
                 result = {"ok": True}
@@ -49,6 +51,7 @@ class SlackBot:
             self.logger.error("Error posting message: %s", error)
 
     def send_slack_file(self, channel: str, file, message=None) -> None:
+        """Send a file to Slack."""
         client = WebClient(slack_cred.TOKEN)
         filename_to_post = file.split("\\")[-1]
 
@@ -60,7 +63,7 @@ class SlackBot:
             return "No applicable channel"
 
         try:
-            if self.mode != "test":
+            if not self.test:
                 result = client.files_upload_v2(
                     channel=channel_id,
                     file=filename_to_post,
@@ -300,7 +303,8 @@ class SlackBot:
             return 0
 
 if __name__ == "__main__":
-    slack_bot = SlackBot()
+    slack_bot = SlackBot(test = False)
     TEST_MESSAGE = "This is a test message."
     EPANDA_HELLO = """Hello ePANDA team! I am ePANDA..."""
-    slack_bot.check_slack_messages("alert")
+    #slack_bot.check_slack_messages("alert")
+    slack_bot.send_slack_message("alert", TEST_MESSAGE)
