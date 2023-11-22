@@ -105,6 +105,7 @@ class Pump:
         volume_ul = volume
         if volume > 0:
             volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
+
             if solution is not None and isinstance(solution, Vial):
                 density = solution.density
             else:
@@ -149,7 +150,7 @@ class Pump:
                 density = None
 
             difference = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ul/1000.0, weigh)
-            self.update_pipette_volume(self.pump.volume_infused + blowout_ul/1000.0)
+            self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
@@ -166,36 +167,36 @@ class Pump:
         else:
             return 0
 
-    def purge(
-        self,
-        purge_vial: Vial,
-        solution_being_purged: Vial = None,
-        purge_volume=20.00,
-        pumping_rate=0.5,
-    ) -> Vial:
-        """
-        Perform purging from the pipette.
-        Args:
-            purge_vial (Vial object): The vial to purge into
-            solution (Vial object): The solution being purged
-            pump (object): The pump object to use
-            purge_volume (float): The volume to purge in ml (default 20)
-            pumping_rate (float): The pumping rate in ml/min (default 0.5)
+    # def purge(
+    #     self,
+    #     purge_vial: Vial,
+    #     solution_being_purged: Vial = None,
+    #     purge_volume=20.00,
+    #     pumping_rate=0.5,
+    # ) -> Vial:
+    #     """
+    #     Perform purging from the pipette.
+    #     Args:
+    #         purge_vial (Vial object): The vial to purge into
+    #         solution (Vial object): The solution being purged
+    #         pump (object): The pump object to use
+    #         purge_volume (float): The volume to purge in ml (default 20)
+    #         pumping_rate (float): The pumping rate in ml/min (default 0.5)
 
-        Returns:
-            The updated purge_vial object
-        """
+    #     Returns:
+    #         The updated purge_vial object
+    #     """
 
-        pump_control_logger.debug("Purging %f ul...", purge_volume)
-        purge_vial = self.infuse(volume_to_infuse=purge_volume,
-                                 rate=pumping_rate,
-                                 being_infused= solution_being_purged,
-                                 infused_into=purge_vial
-                                 )
-        log_msg = f"Purged {purge_volume} ul"
-        pump_control_logger.debug(log_msg)
-        #purge_vial.update_volume(purge_volume)
-        return purge_vial
+    #     pump_control_logger.debug("Purging %f ul...", purge_volume)
+    #     purge_vial = self.infuse(volume_to_infuse=purge_volume,
+    #                              rate=pumping_rate,
+    #                              being_infused= solution_being_purged,
+    #                              infused_into=purge_vial
+    #                              )
+    #     log_msg = f"Purged {purge_volume} ul"
+    #     pump_control_logger.debug(log_msg)
+    #     #purge_vial.update_volume(purge_volume)
+    #     return purge_vial
 
     def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False):
         """Combine all the common commands to run the pump into one function"""
@@ -246,8 +247,10 @@ class Pump:
         )
         log_msg = f"Pump has {action_type}: {action_volume} ml"
         pump_control_logger.debug(log_msg)
-
-        return post_weight - pre_weight
+        if density is not None and density != 0 and weigh:
+            return post_weight - pre_weight
+        else:
+            return 0
 
     def mix(
         self,
@@ -341,7 +344,7 @@ class MockPump(Pump):
         return pump
 
     def withdraw(
-        self, volume: float, solution: Vial = None, rate: float = 0.5, weigh: bool = False
+        self, volume: float, solution: Vessel = None, rate: float = 0.5, weigh: bool = False
     ) -> Optional[Vial]:
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
@@ -350,7 +353,7 @@ class MockPump(Pump):
         volume_ul = volume
         if volume > 0:
             volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
-            
+
             if solution is not None and isinstance(solution, Vial):
                 density = solution.density
             else:
@@ -368,7 +371,7 @@ class MockPump(Pump):
             if solution is not None:
                 #TODO change update_volume to check the pumping direction to determine if it should add or subtract
                 solution.update_volume(-volume_ul)
-                return solution, difference
+                return None
         else:
             return None
 
@@ -427,7 +430,7 @@ class MockPump(Pump):
         )
 
         ## Get scale value prior to pump action
-        if density is not None and density != 0:
+        if density is not None and density != 0 and weigh:
             pre_weight = self.scale.read_scale()
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
@@ -438,7 +441,7 @@ class MockPump(Pump):
         time.sleep(0.05)
 
         ## Get scale value after pump action
-        if density is not None and density != 0:
+        if density is not None and density != 0 and weigh:
             post_weight = self.scale.read_scale()
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
@@ -456,7 +459,7 @@ class MockPump(Pump):
         )
         log_msg = f"Pump has {action_type}: {action_volume} ml"
         pump_control_logger.debug(log_msg)
-        if density is not None and density != 0:
+        if density is not None and density != 0 and weigh:
             return post_weight - pre_weight
         else:
             return 0
