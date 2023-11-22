@@ -27,7 +27,8 @@ from pump_control import Pump
 from pump_control import MockPump
 
 # import gamry_control_WIP as echem
-import gamry_control_WIP_mock as echem
+import gamry_control_WIP as echem
+import gamry_control_WIP_mock as echem_mock
 from sartorius_local import Scale
 from sartorius_local.mock import Scale as MockScale
 
@@ -51,7 +52,7 @@ from config.file_locations import (
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -439,6 +440,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
         mill = MockMill()
         scale = MockScale()
         pump = MockPump(mill=mill, scale=scale)
+        #pstat = echem_mock.GamryPotentiostat.connect()
         instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
         return instruments
 
@@ -456,7 +458,6 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
-    # instruments.scale.close()
     try:
         if echem.OPEN_CONNECTION:
             echem.pstatdisconnect()

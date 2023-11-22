@@ -55,7 +55,7 @@ system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
-AIR_GAP = 55  # ul
+AIR_GAP = 50  # ul
 DRIP_STOP = 5  # ul of air to prevent dripping
 
 
@@ -479,7 +479,7 @@ def reverse_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=to_vessel,
                 rate=pumping_rate,
-                blowout_ul= DRIP_STOP,
+                blowout_ul= DRIP_STOP + AIR_GAP,
                 weigh= True
             ) # pipette now has purge volume + air gap
             logger.info("Infused %s into %s. Moving to safe position", from_vessel.name, to_vessel.name)
@@ -515,7 +515,7 @@ def reverse_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=purge_vessel,
                 rate=pumping_rate,
-                blowout_ul= AIR_GAP + DRIP_STOP,
+                blowout_ul= DRIP_STOP,
                 weigh= False # Vials are not on the scale
             ) # Pipette should be empty after this
             logger.info("Purged the purge volume, updating contents of %s - %s", purge_vessel.position, purge_vessel.name)

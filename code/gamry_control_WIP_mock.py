@@ -21,6 +21,9 @@ class GamryPotentiostat:
     def disconnect(self):
         self.OPEN_CONNECTION = False
 
+    def pstatdisconnect(self):
+        self.OPEN_CONNECTION = False
+
     def OCP(self, OCPvi, OCPti, OCPrate):
         pass
 

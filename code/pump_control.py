@@ -80,7 +80,7 @@ class Pump:
         """
         pump_port = nesp_lib.Port("COM5", 19200)
         pump = nesp_lib.Pump(pump_port)
-        pump.syringe_diameter = 4.643  # millimeters #4.643 #4.685
+        pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
         pump.volume_infused_clear()
         pump.volume_withdrawn_clear()
         log_msg = f"Pump found at address {pump.address}"
@@ -136,12 +136,15 @@ class Pump:
             solution (Vial object): The solution being infused to get the density
             destination (str or Vial): The destination of the solution (well or vial)
             rate (float): Pumping rate in milliliters per minute.
+            blowout_ul (float): The volume to blowout in microliters
+            weigh (bool): If true, will weigh the solution before and after infusing and log the difference
 
         Returns:
-            The updated destination object if given one
+            int: The difference in weight if weighing, otherwise 0
         """
         # convert the volume argument from ul to ml
         volume_ul = volume_to_infuse
+        blowout_ml = blowout_ul / 1000.0
         if volume_ul > 0:
             volume_ml = volume_ul / 1000.000
             if being_infused is not None:
@@ -149,12 +152,12 @@ class Pump:
             else:
                 density = None
 
-            difference = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ul/1000.0, weigh)
+            difference = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
-                self.pump.volume_infused - blowout_ul,
+                self.pump.volume_infused - blowout_ml,
                 self.pipette_volume_ul,
             )
             self.pump.volume_infused_clear()
@@ -393,6 +396,7 @@ class MockPump(Pump):
         """
         # convert the volume argument from ul to ml
         volume_ul = volume_to_infuse
+        blowout_ml = blowout_ul / 1000.0
         if volume_ul > 0:
             volume_ml = volume_ul / 1000.000
             if being_infused is not None:
@@ -402,7 +406,7 @@ class MockPump(Pump):
 
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
             self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
-            self.update_pipette_volume(volume_ml + blowout_ul/1000.0)
+            self.update_pipette_volume(volume_ml + blowout_ml)
             pump_control_logger.info(
                 "Mock Pump has infused: %0.6f ml  Pipette volume: %0.3f ul",
                 volume_ml,
