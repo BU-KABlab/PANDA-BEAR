@@ -582,7 +582,7 @@ def reset_vials(vialgroup: str):
         json.dump(vial_parameters, file, indent=4)
 
 
-def load_new_wellplate(ask: bool = False) -> int:
+def load_new_wellplate(ask: bool = False, new_plate_id: int = None,new_wellplate_type_number: int = None ) -> int:
     """
     Save the current wellplate, reset the well statuses to new.
     If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1
@@ -610,8 +610,10 @@ def load_new_wellplate(ask: bool = False) -> int:
             )
         )
     else:
-        new_plate_id = current_wellplate_id + 1
-        new_wellplate_type_number = current_type_number
+        if new_plate_id is None:
+            new_plate_id = current_wellplate_id + 1
+        if new_wellplate_type_number is None:
+            new_wellplate_type_number = current_type_number
 
     well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
     if current_wellplate_is_new:

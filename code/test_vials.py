@@ -6,7 +6,8 @@ class TestVessel(unittest.TestCase):
     """Test class for Vessel"""
     def setUp(self):
         self.vessel = Vessel(name="Test Vessel", volume=50.0, 
-                             capacity=100.0, density=1.0, coordinates={}
+                             capacity=100.0, density=1.0, coordinates={},
+                             contents={}
                              )
 
     def test_update_volume_positive(self):
@@ -39,19 +40,21 @@ class TestVial2(unittest.TestCase):
             name="Test Vial",
             position = 'S0',
             category=0,
-            volume=19000.0,
+            volume=20000.0,
             capacity=20000.0,
             density=1.5,
             coordinates={},
             radius=10.83,
             height=55.0,
-            z_bottom=-75.0
+            z_bottom=-75.0,
+            contents={},
+            contamination=0,
         )
 
     def test_calculate_depth(self):
         """Test the calculate_depth method"""
         depth = self.vial.calculate_depth()
-        self.assertAlmostEqual(depth, 51.564,3)
+        self.assertAlmostEqual(depth, self.vial.z_bottom + 53.277,2)
 
     def test_check_volume_positive(self):
         """Test the check_volume method with a positive value"""
@@ -72,7 +75,7 @@ class TestVial2(unittest.TestCase):
         """Test the update_volume method with a positive value"""
         self.vial.update_volume(-50.0)
         self.assertEqual(self.vial.volume, 18950.0)
-        self.assertEqual(self.vial.depth, 51.428)
+        self.assertEqual(self.vial.depth, self.vial.z_bottom -1 + 51.428)
         self.assertEqual(self.vial.contamination, 1)
 
     def test_update_volume_negative_overdraft(self):

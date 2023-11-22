@@ -34,7 +34,7 @@ VOLUME = 100
 
 for i in range(1,7):
     # Change wellplate and load new wellplate
-    controller.load_new_wellplate()
+    controller.load_new_wellplate(new_wellplate_type_number=6)
     experiment_id = determine_next_experiment_id()
     experiments = []
 
@@ -61,7 +61,7 @@ for i in range(1,7):
     scheduler = Scheduler()
     result = scheduler.add_nonfile_experiments(experiments)
     if result == 'success':
-        controller.main(use_mock_instruments=True)
+        controller.main(use_mock_instruments=False)
     else:
         print('Error: ', result)
 controller.load_new_wellplate()

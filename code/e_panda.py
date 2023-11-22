@@ -274,7 +274,7 @@ def forward_pipette_v2(
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],
-                from_vessel.depth,
+                from_vessel.z_bottom, #from_vessel.depth,
                 Instruments.PIPETTE,
             )  # go to solution depth (depth replaced with height)
 
@@ -310,7 +310,7 @@ def forward_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.depth + 5 ,
+                    to_vessel.height,
                     Instruments.PIPETTE,
                 )
 
@@ -428,7 +428,7 @@ def reverse_pipette_v2(
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],
-                from_vessel.depth,
+                from_vessel.z_bottom, #from_vessel.depth,
                 Instruments.PIPETTE,
             )  # go to solution depth (depth replaced with height)
 
@@ -467,7 +467,7 @@ def reverse_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.depth + 5 ,
+                    from_vessel.z_bottom, #to_vessel.depth + 5 ,
                     Instruments.PIPETTE,
                 )
                 logger.info("Moved to vial %s", to_vessel.name)

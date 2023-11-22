@@ -299,7 +299,11 @@ class Vial2(Vessel):
         radius_mm = self.radius
         area_mm2 = math.pi * radius_mm ** 2
         volume_mm3 = self.volume
-        return round(volume_mm3 / area_mm2, 3)
+        height = round(volume_mm3 / area_mm2, 4)
+        depth = height + self.z_bottom - 2
+        if depth < self.z_bottom + 1:
+            depth = self.z_bottom + 1
+        return depth
 
     def check_volume(self, volume_to_add: float) -> bool:
         """

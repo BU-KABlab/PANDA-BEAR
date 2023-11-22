@@ -705,7 +705,9 @@ def movement_test():
     testing_handler = logging.FileHandler("code/logs/mill_control_testing.log")
     testing_handler.setFormatter(formatter)
     logger.addHandler(testing_handler)
-
+    from controller import read_vials
+    from config.file_locations import STOCK_STATUS_FILE, WASTE_STATUS_FILE
+    from pathlib import Path
     try:
         with Mill() as mill:
             a1 = wellplate.get_coordinates("A1")
@@ -713,19 +715,37 @@ def movement_test():
             h1 = wellplate.get_coordinates("H1")
             h12 = wellplate.get_coordinates("H12")
 
+            ## Load the vials
+            stock_vials = read_vials(Path.cwd() / STOCK_STATUS_FILE)
+            waste_vials = read_vials(Path.cwd() / WASTE_STATUS_FILE)
+
             ## Move the pipette to each well
-            mill.safe_move(
-                a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
-            )
+            # mill.safe_move(
+            #     a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
+            # )
+            # mill.safe_move(
+            #     a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
+            # )
+            # mill.safe_move(
+            #     h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
+            # )
+            # mill.safe_move(
+            #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
+            # )
+
+            ## Move pipette to first vial
+            mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
+            ## Move pipette to first vial depth
+            mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], stock_vials[0].depth, instrument=Instruments.PIPETTE)
+            mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], stock_vials[0].height, instrument=Instruments.PIPETTE)
+            mill.move_to_safe_position()
+
+
+
+            ## Move pipette to first waste vial then to the depth and then to safe position
+            mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
+            mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].depth, instrument=Instruments.PIPETTE)
+            mill.move_to_safe_position()
 
     except (
         MillConnectionError,
