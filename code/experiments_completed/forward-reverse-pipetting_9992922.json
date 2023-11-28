@@ -1,0 +1,18 @@
+{
+    "id": 9992922,
+    "experiment_name": "Forward Reverse Pipetting",
+    "priority": 1,
+    "target_well": "A4",
+    "pin": 2001001001,
+    "project_id": 6,
+    "solutions": {
+        "water": 100
+    },
+    "pumping_rate": 0.5,
+    "status": "complete",
+    "status_date": "2023-11-27T16:44:10",
+    "filename": "forward-reverse-pipetting_9992922",
+    "results": null,
+    "project_campaign_id": 9,
+    "protocol_type": 1
+}

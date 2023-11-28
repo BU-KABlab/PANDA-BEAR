@@ -5,13 +5,12 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 
 import logging
 import time
-from typing import Optional, Tuple
+from typing import Optional
 
 import nesp_lib
 from sartorius import Scale
 from sartorius.mock import Scale as MockScale
 from vials import Vial, Vessel
-from log_tools import CustomLoggingFilter
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 

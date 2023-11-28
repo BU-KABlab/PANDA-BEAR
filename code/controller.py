@@ -253,7 +253,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 class Toolkit:
     """A class to hold all of the instruments"""
 
-    def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat):
+    def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat = None):
         self.mill = mill
         self.scale = scale
         self.pump = pump
@@ -458,11 +458,11 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
-    try:
-        if echem.OPEN_CONNECTION:
-            echem.pstatdisconnect()
-    except AttributeError:
-        pass
+    # try:
+    #     if echem.OPEN_CONNECTION:
+    #         echem.pstatdisconnect()
+    # except AttributeError:
+    #     pass
 
     logger.info("Disconnected from instruments")
 

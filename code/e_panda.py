@@ -50,14 +50,14 @@ from wellplate import Wells, Well, Wells2
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
 system_handler = logging.FileHandler("code/logs/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
-AIR_GAP = 50  # ul
-DRIP_STOP = 5  # ul of air to prevent dripping
-
+AIR_GAP = 40  # ul
+DRIP_STOP = 0  # ul of air to prevent dripping
+PURGE_VOLUME = 20  # ul
 
 def pipette(
     volume: float,  # volume in ul
@@ -369,7 +369,7 @@ def reverse_pipette_v2(
         e. Withdraw an air gap to prevent dripping
     3. Deposit the solution into the destination vessel
         a. Move to the destination
-        b. Deposit the solution
+        b. Deposit the solution and blow out
         c. Move to the purge vessel
         d. Purge the purge volume
         If depositing stock solution into a well, the recorded weight change will be saved to the target well 
@@ -391,7 +391,7 @@ def reverse_pipette_v2(
         None (void function) since the objects are passed by reference
         
     """
-    purge_volume = 20 # ul
+    purge_volume = PURGE_VOLUME # ul
     if volume > 0.00:
 
         # Check to ensure that the from_vessel and to_vessel are an allowed combination
@@ -479,9 +479,9 @@ def reverse_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=to_vessel,
                 rate=pumping_rate,
-                blowout_ul= DRIP_STOP + AIR_GAP,
+                blowout_ul= DRIP_STOP,
                 weigh= True
-            ) # pipette now has purge volume + air gap
+            ) # pipette now has purge volume
             logger.info("Infused %s into %s. Moving to safe position", from_vessel.name, to_vessel.name)
             mill.move_to_safe_position()
             logger.info("Moved to safe position")
@@ -515,7 +515,7 @@ def reverse_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=purge_vessel,
                 rate=pumping_rate,
-                blowout_ul= DRIP_STOP,
+                blowout_ul= DRIP_STOP + AIR_GAP,
                 weigh= False # Vials are not on the scale
             ) # Pipette should be empty after this
             logger.info("Purged the purge volume, updating contents of %s - %s", purge_vessel.position, purge_vessel.name)
@@ -1074,7 +1074,7 @@ def characterization(
 def apply_log_filter(experiment_id: int, target_well: str = None, campaign_id: int = None):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
-        "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(custom3)s:%(message)s"
+        "%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(custom1)s:%(custom2)s:%(custom3)s:%(message)s"
     )
     system_handler.setFormatter(experiment_formatter)
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well)

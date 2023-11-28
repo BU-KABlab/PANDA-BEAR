@@ -3,6 +3,8 @@ Using a 96 well plate, generate experiments to test the water
 Each column is a replicate and every row is a different volume
 
 """
+from pathlib import Path
+
 import experiment_class
 #import numpy as np
 #import matplotlib.pyplot as plt
@@ -10,7 +12,6 @@ from config.pin import CURRENT_PIN
 from scheduler import Scheduler
 import controller
 import pandas as pd
-from pathlib import Path
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
@@ -28,6 +29,7 @@ ROWS = 12
 PROJECT_ID = 6
 EXPERIMENT_NAME = 'Forward Reverse Pipetting'
 VOLUME = 100
+PREVIOUS_CAMPAIGN_ID = 6
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
@@ -50,7 +52,7 @@ for i in range(1,7):
                     target_well= column + str(row),
                     pin = CURRENT_PIN,
                     project_id=PROJECT_ID,
-                    project_campaign_id=i,
+                    project_campaign_id=PREVIOUS_CAMPAIGN_ID+i,
                     solutions={'water': VOLUME},
                     status='new',
                     filename='forward-reverse-pipetting_' + str(experiment_id),
