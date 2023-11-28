@@ -297,7 +297,7 @@ def forward_pipette_v2(
                 rate=pumping_rate,
                 weigh= False
             )
-
+            logger.debug("From Vessel %s volume: %f depth: %f", from_vessel.name, from_vessel.volume, from_vessel.depth)
             # Second Half: Deposit to to_vessel
             logger.info("Moving to: %s...", to_vessel.name)
             # determine if the destination is a well or a waste vial
