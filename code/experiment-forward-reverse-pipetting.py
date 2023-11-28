@@ -25,7 +25,7 @@ def determine_next_experiment_id() -> int:
 # Create experiments
 COLUMNS = 'ABCDEFGH'
 ROWS = 12
-PROJECT_ID = 6
+PROJECT_ID = 7
 EXPERIMENT_NAME = 'Forward Reverse Pipetting'
 VOLUME = 100
 
@@ -61,8 +61,20 @@ for i in range(1,7):
     scheduler = Scheduler()
     result = scheduler.add_nonfile_experiments(experiments)
     if result == 'success':
-        controller.main(use_mock_instruments=False)
+        controller.main(use_mock_instruments=True)
     else:
         print('Error: ', result)
 controller.load_new_wellplate()
 print('Finished running forward reverse pipetting experiments')
+
+## ANALYSIS
+# Load well history
+well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', skipinitialspace=True)
+well_hx = well_hx.dropna(subset=['experiment id'])
+well_hx = well_hx.drop_duplicates(subset=['experiment id'])
+well_hx = well_hx[well_hx['experiment id'] != 'None']
+well_hx['experiment id'] = well_hx['experiment id'].astype(int)
+well_hx['experiment id'] = well_hx['project id'].astype(int)
+
+# Filter for current project id
+well_hx = well_hx[well_hx['project id'] == PROJECT_ID]

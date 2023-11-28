@@ -46,18 +46,21 @@ from mill_control import Mill, Instruments
 from pump_control import Pump
 from vials import Vessel, Vial, Vial2, StockVial, WasteVial
 from wellplate import Wells, Well, Wells2
-
+from config.file_locations import (
+    PATH_TO_NETWORK_LOGS,
+)
+from config.config import (
+    AIR_GAP,
+    DRIP_STOP,
+    PURGE_VOLUME,
+)
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
-system_handler = logging.FileHandler("code/logs/ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS + "/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
-
-AIR_GAP = 50  # ul
-DRIP_STOP = 5  # ul of air to prevent dripping
-
 
 def pipette(
     volume: float,  # volume in ul
@@ -239,7 +242,7 @@ def forward_pipette_v2(
         
     """
     if volume > 0.00:
-
+        logger.info("Forward pipetting %f ul from %s to %s", volume, from_vessel.name, to_vessel.name)
         # Check to ensure that the from_vessel and to_vessel are an allowed combination
         if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
             raise ValueError("Cannot pipette from a well to a vial")
@@ -274,10 +277,9 @@ def forward_pipette_v2(
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],
-                from_vessel.z_bottom, #from_vessel.depth,
+                from_vessel.depth,
                 Instruments.PIPETTE,
-            )  # go to solution depth (depth replaced with height)
-
+            )  # go to solution depth
             # Withdraw the solution from the source and receive the updated vessel object
             pump.withdraw(
                 volume=repetition_vol,
@@ -310,7 +312,7 @@ def forward_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.height,
+                    to_vessel.depth + 5 , # depth but slightly higher to avoid contamination
                     Instruments.PIPETTE,
                 )
 
@@ -329,9 +331,10 @@ def forward_pipette_v2(
             to_vessel.update_contents(from_vessel, repetition_vol)
 
             logger.info(
-                "Vessel %s volume: %f",
+                "Vessel %s volume: %f depth: %f",
                 to_vessel.name,
                 to_vessel.volume,
+                to_vessel.depth,
             )
 
             mill.move_to_safe_position()
@@ -391,9 +394,9 @@ def reverse_pipette_v2(
         None (void function) since the objects are passed by reference
         
     """
-    purge_volume = 20 # ul
+    purge_volume = PURGE_VOLUME
     if volume > 0.00:
-
+        logger.info("Reverse pipetting %f ul from %s to %s", volume, from_vessel.name, to_vessel.name)
         # Check to ensure that the from_vessel and to_vessel are an allowed combination
         if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
             raise ValueError("Cannot pipette from a well to a vial")
@@ -875,7 +878,7 @@ def solution_selector(solutions: list[Vial2], solution_name: str, volume: float)
         # if the solution names match and the requested volume is less than the available volume (volume - 15% of capacity)
         if (
             solution.name.lower() == solution_name.lower() 
-            and solution.volume - 0.15*solution.capacity > (volume)
+            and solution.volume - 0.20*solution.capacity > (volume)
         ):
             logger.debug(
                 "Selected stock vial: %s in position %s",
@@ -1074,7 +1077,7 @@ def characterization(
 def apply_log_filter(experiment_id: int, target_well: str = None, campaign_id: int = None):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
-        "%(asctime)s:%(name)s:%(levelname)s:%(custom1)s:%(custom2)s:%(custom3)s:%(message)s"
+        "%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(custom1)s:%(custom2)s:%(custom3)s:%(message)s"
     )
     system_handler.setFormatter(experiment_formatter)
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well)
@@ -1731,6 +1734,127 @@ def forward_vs_reverse_pipetting(
             "Returning completed instructions for experiment %s", instructions.id
         )
 
+def vial_depth_tracking_protocol(
+    instructions: ExperimentBase,
+    results: ExperimentResult,
+    mill: Mill,
+    pump: Pump,
+    stock_vials: list[StockVial],
+    waste_vials: list[WasteVial],
+    wellplate: Wells2,
+):
+    """
+    Protocol for testing whether the vial depth calculations are accurate for the stock vials
+    1. Deposit solutions into well
+        for each solution:
+            a. Withdraw air gap
+            b. Withdraw solution
+            c. Purge
+            d. Deposit into well
+            e. Purge
+            f. Blow out
+            
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        mill (object): The mill object
+        pump (object): The pump object
+        scale (object): The scale object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
+
+    Returns:
+        instructions (Experiment object): The updated experiment instructions
+        results (ExperimentResult object): The updated experiment results
+        stock_vials (list): The updated list of stock vials
+        waste_vials (list): The updated list of waste vials
+        wellplate (Wells object): The updated wellplate object
+
+    """
+    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+
+    try:
+        logger.info("Beginning experiment %d", instructions.id)
+        results.id = instructions.id
+        # Fetch list of solution names from stock_vials
+        # list of vial names to exclude
+        exclude_list = ["rinse0", "rinse1", "rinse2"]
+        available_solutions = [
+            vial.name for vial in stock_vials if vial.name not in exclude_list
+        ]
+
+        # although we already checked before running the experiment we want to check again that all requested solutions are found
+        experiment_solution_count = len(instructions.solutions)
+        matched = 0
+
+        ## Deposit all experiment solutions into well
+        for solution_name in instructions.solutions:
+            solution_name = str(solution_name).lower()
+            solution_volume = instructions.solutions[solution_name]
+            if (
+                solution_volume > 0
+                and solution_name in available_solutions
+            ):  # if there is a solution to deposit
+                matched += 1
+                logger.info(
+                    "Pipetting %s ul of %s into %s...",
+                    solution_volume,
+                    solution_name,
+                    instructions.target_well,
+                )
+
+                stock_vial = solution_selector(stock_vials, solution_name, solution_volume)
+                forward_pipette_v2(
+                    volume = solution_volume,
+                    from_vessel= stock_vial,
+                    to_vessel= wellplate.wells[instructions.target_well],
+                    pump=pump,
+                    mill=mill,
+                )
+
+        if matched != experiment_solution_count:
+            raise NoAvailableSolution("One or more solutions are not available")
+
+        logger.info("Pipetted %s into well: %s", json.dumps(instructions.solutions), instructions.target_well)
+
+        instructions.status = ExperimentStatus.COMPLETE
+        logger.info("End of Experiment: %s", instructions.id)
+
+        mill.move_to_safe_position()
+        logger.info("EXPERIMENT %s COMPLETED", instructions.id)
+
+    except OCPFailure as ocp_failure:
+        logger.error(ocp_failure)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Failed instructions updated for experiment %s", instructions.id)
+
+
+    except KeyboardInterrupt:
+        logger.warning("Keyboard Interrupt")
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Saved interrupted instructions for experiment %s", instructions.id)
+
+
+    except Exception as general_exception:
+        exception_type, _, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        logger.error("Exception: %s", general_exception)
+        logger.error("Exception type: %s", exception_type)
+        logger.error("File name: %s", filename)
+        logger.error("Line number: %d", line_number)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+
+
+    finally:
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info(
+            "Returning completed instructions for experiment %s", instructions.id
+        )
 
 def mixing_test_protocol(
     instructions: ExperimentBase,

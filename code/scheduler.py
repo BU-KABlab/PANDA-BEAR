@@ -9,38 +9,42 @@ The scheduler module will be responsible for:
 # pylint: disable = line-too-long
 import json
 import logging
-from math import exp
-from pathlib import Path
-import pandas as pd
-from pandas.core.frame import DataFrame, Series
-import random
 from datetime import datetime
+from pathlib import Path
 from typing import Tuple
-import experiment_class
+import random
+
+import pandas as pd
+from pandas.core.frame import DataFrame
+
+from config.file_locations import (
+    PATH_TO_DATA,
+    PATH_TO_NETWORK_LOGS,
+    QUEUE_FILE as PATH_TO_QUEUE,
+    MILL_CONFIG_FILE as PATH_TO_CONFIG,
+    PATH_TO_STATUS,
+    PATH_TO_EXPERIMENT_INBOX,
+    PATH_TO_EXPERIMENT_QUEUE,
+    PATH_TO_COMPLETED_EXPERIMENTS,
+    PATH_TO_ERRORED_EXPERIMENTS,
+
+)
+from config.pin import CURRENT_PIN
 from experiment_class import (
     Experiment,
     ExperimentBase,
-    PEG2P_Test_Instructions,
-    PEG_ACR_Instructions,
-    ExperimentStatus,
     ExperimentResult,
-)  # , make_baseline_value
-from config.pin import CURRENT_PIN
+    ExperimentStatus,
+)
+import experiment_class
+
 from wellplate import Well
-# define constants or globals
-PATH_TO_CONFIG = "code/config/mill_config.json"
-PATH_TO_STATUS = "code/system state"
-PATH_TO_QUEUE = "code/system state/queue.csv"
-PATH_TO_EXPERIMENT_INBOX = "code/experiments_inbox"
-PATH_TO_EXPERIMENT_QUEUE = "code/experiment_queue"
-PATH_TO_COMPLETED_EXPERIMENTS = "code/experiments_completed"
-PATH_TO_ERRORED_EXPERIMENTS = "code/experiments_error"
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-system_handler = logging.FileHandler("code/logs/ePANDA.log")
+formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
+system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS + "/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -541,7 +545,7 @@ class Scheduler:
         logger.info("Saving experiment %d results to database as %s", experiment.id, str(filename))
         results_json = experiment_class.serialize_results(results)
         with open(
-            Path.cwd() / "data" / f"{experiment.id}.json", "w", encoding="UTF-8"
+            Path(PATH_TO_DATA) / f"{experiment.id}.json", "w", encoding="UTF-8"
         ) as results_file:
             results_file.write(results_json)
 

@@ -53,9 +53,11 @@ from config.file_locations import (
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
-system_handler = logging.FileHandler("code/logs/ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_LOGS + "/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
+
+# set up slack globally so that it can be used in the main function and others
 slack = SlackBot()
 
 
