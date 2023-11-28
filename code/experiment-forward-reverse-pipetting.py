@@ -32,7 +32,7 @@ VOLUME = 100
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
 
-for i in range(1,7):
+for i in range(1,2):
     # Change wellplate and load new wellplate
     controller.load_new_wellplate(new_wellplate_type_number=6)
     experiment_id = determine_next_experiment_id()
@@ -67,14 +67,14 @@ for i in range(1,7):
 controller.load_new_wellplate()
 print('Finished running forward reverse pipetting experiments')
 
-## ANALYSIS
-# Load well history
-well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', skipinitialspace=True)
-well_hx = well_hx.dropna(subset=['experiment id'])
-well_hx = well_hx.drop_duplicates(subset=['experiment id'])
-well_hx = well_hx[well_hx['experiment id'] != 'None']
-well_hx['experiment id'] = well_hx['experiment id'].astype(int)
-well_hx['experiment id'] = well_hx['project id'].astype(int)
+# ## ANALYSIS
+# # Load well history
+# well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', skipinitialspace=True)
+# well_hx = well_hx.dropna(subset=['experiment id'])
+# well_hx = well_hx.drop_duplicates(subset=['experiment id'])
+# well_hx = well_hx[well_hx['experiment id'] != 'None']
+# well_hx['experiment id'] = well_hx['experiment id'].astype(int)
+# well_hx['experiment id'] = well_hx['project id'].astype(int)
 
-# Filter for current project id
-well_hx = well_hx[well_hx['project id'] == PROJECT_ID]
+# # Filter for current project id
+# well_hx = well_hx[well_hx['project id'] == PROJECT_ID]

@@ -1074,7 +1074,7 @@ def characterization(
         echem.pstatdisconnect()
         raise OCPFailure("CV")
 
-def apply_log_filter(experiment_id: int, target_well: str = None, campaign_id: int = None):
+def apply_log_filter(experiment_id: int, target_well: str = None, campaign_id: str = None):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
         "%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(custom1)s:%(custom2)s:%(custom3)s:%(message)s"
@@ -1129,7 +1129,7 @@ def standard_experiment_protocol(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+    apply_log_filter(instructions.id, instructions.target_well, str(instructions.project_id) +"."+str(instructions.project_campaign_id))
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1385,7 +1385,7 @@ def pipette_accuracy_protocol(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+    apply_log_filter(instructions.id, instructions.target_well, str(instructions.project_id) +"."+str(instructions.project_campaign_id))
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1513,7 +1513,7 @@ def pipette_accuracy_protocol_v2(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+    apply_log_filter(instructions.id, instructions.target_well, str(instructions.project_id) +"."+str(instructions.project_campaign_id))
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1636,7 +1636,7 @@ def forward_vs_reverse_pipetting(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+    apply_log_filter(instructions.id, instructions.target_well, str(instructions.project_id) +"."+str(instructions.project_campaign_id))
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1772,7 +1772,7 @@ def vial_depth_tracking_protocol(
         wellplate (Wells object): The updated wellplate object
 
     """
-    apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+    apply_log_filter(instructions.id, instructions.target_well, str(instructions.project_id) +"."+str(instructions.project_campaign_id))
 
     try:
         logger.info("Beginning experiment %d", instructions.id)
@@ -1906,7 +1906,7 @@ def mixing_test_protocol(
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
         experiment_solutions = ["peg", "acrylate", "dmf", "custom", "ferrocene"]
-        apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+        apply_log_filter(instructions.id, instructions.target_well, str(instructions.project_id) +"."+str(instructions.project_campaign_id))
         # Deposit all experiment solutions into well
         for solution_name in experiment_solutions:
             if (
@@ -2074,7 +2074,8 @@ def peg2p_protocol(
         logger.info("Beginning experiment %d", instructions.id)
         results.id = instructions.id
         experiment_solutions = ["dmf", "peg"]
-        apply_log_filter(instructions.id, instructions.target_well, instructions.project_campaign_id)
+        apply_log_filter(instructions.id, instructions.target_well, str(instructions.project_id) +"."+str(instructions.project_campaign_id))
+
         # Deposit all experiment solutions into well
         for solution_name in experiment_solutions:
             if (

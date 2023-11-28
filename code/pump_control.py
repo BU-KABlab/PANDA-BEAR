@@ -405,7 +405,7 @@ class MockPump(Pump):
             else:
                 density = None
 
-            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density)
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume_ml + blowout_ml)
             pump_control_logger.info(

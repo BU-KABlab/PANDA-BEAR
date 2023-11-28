@@ -165,7 +165,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
 
                 ## Run the experiment
-                e_panda.forward_vs_reverse_pipetting(
+                e_panda.vial_depth_tracking_protocol(
                     instructions=new_experiment,
                     results=experiment_results,
                     mill=toolkit.mill,
