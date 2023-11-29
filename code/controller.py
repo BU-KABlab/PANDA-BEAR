@@ -52,7 +52,7 @@ from config.file_locations import (
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
+formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
 system_handler = logging.FileHandler(PATH_TO_LOGS + "/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -70,7 +70,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
-    logger.info(printpanda())
+    print(printpanda())
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong

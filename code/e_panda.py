@@ -57,7 +57,7 @@ from config.config import (
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
+formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
 system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS + "/ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -1077,7 +1077,7 @@ def characterization(
 def apply_log_filter(experiment_id: int, target_well: str = None, campaign_id: str = None):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
-        "%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(custom1)s:%(custom2)s:%(custom3)s:%(message)s"
+        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s"
     )
     system_handler.setFormatter(experiment_formatter)
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well)

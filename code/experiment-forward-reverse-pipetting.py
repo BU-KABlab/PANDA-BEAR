@@ -66,15 +66,3 @@ for i in range(1,2):
         print('Error: ', result)
 controller.load_new_wellplate()
 print('Finished running forward reverse pipetting experiments')
-
-# ## ANALYSIS
-# # Load well history
-# well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', skipinitialspace=True)
-# well_hx = well_hx.dropna(subset=['experiment id'])
-# well_hx = well_hx.drop_duplicates(subset=['experiment id'])
-# well_hx = well_hx[well_hx['experiment id'] != 'None']
-# well_hx['experiment id'] = well_hx['experiment id'].astype(int)
-# well_hx['experiment id'] = well_hx['project id'].astype(int)
-
-# # Filter for current project id
-# well_hx = well_hx[well_hx['project id'] == PROJECT_ID]
