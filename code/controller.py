@@ -88,6 +88,10 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
         ## Begin outer loop
         while True:
+            ## Reset the logger to log to the ePANDA.log file and format
+            system_handler.setFormatter(formatter)
+            logger.addHandler(system_handler)
+
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, wellplate = establish_system_state()
 
@@ -174,6 +178,9 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     waste_vials=waste_vials,
                     wellplate=wellplate,
                 )
+                ## Reset the logger to log to the ePANDA.log file and format
+                system_handler.setFormatter(formatter)
+                logger.addHandler(system_handler)
 
                 ## Add the results to the experiment file
                 new_experiment.results = experiment_results

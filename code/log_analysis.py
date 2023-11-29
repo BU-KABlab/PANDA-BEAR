@@ -1,14 +1,14 @@
 import pandas as pd
 from pathlib import Path
-from config.config import PATH_TO_NETWORK_LOGS
+from config.config import PATH_TO_NETWORK_LOGS, PATH_TO_NETWORK_DATA
 from matplotlib import pyplot as plt
 
 # ## ANALYSIS
 #ids = [9992200, 9992151, 9992152, 9992153, 9992154, 9992155, 9992156, 9992157, 9992158, 9992159, 9992160, 9992161, 9992162, 9992163, 9992164]
-project_ids = ['7']
+project_ids = ['6']
 # Load well history
-well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', skipinitialspace=True)
-
+#well_hx = pd.read_csv(Path.cwd() / 'data' / 'well_history.csv', skipinitialspace=True)
+well_hx = pd.read_csv(PATH_TO_NETWORK_DATA + "/well_history.csv", skipinitialspace=True)
 # Filter well history to those ids in the ids list
 well_hx = well_hx[well_hx['project id'].astype(str).isin(project_ids)]
 if len(well_hx) == 0:
