@@ -27,9 +27,9 @@ def determine_next_experiment_id() -> int:
 COLUMNS = 'ABCDEFGH'
 ROWS = 12
 PROJECT_ID = 7
-EXPERIMENT_NAME = 'Forward Reverse Pipetting'
+EXPERIMENT_NAME = 'Vial depth tracking'
 VOLUME = 100
-PREVIOUS_CAMPAIGN_ID = 6
+PREVIOUS_CAMPAIGN_ID = 0
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
@@ -63,8 +63,8 @@ for i in range(1,2):
     scheduler = Scheduler()
     result = scheduler.add_nonfile_experiments(experiments)
     if result == 'success':
-        controller.main(use_mock_instruments=True)
+        controller.main(use_mock_instruments=False)
     else:
         print('Error: ', result)
-controller.load_new_wellplate()
-print('Finished running forward reverse pipetting experiments')
+        break
+print('Finished running vial depth tracking experiments')

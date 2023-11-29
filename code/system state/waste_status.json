@@ -9,9 +9,9 @@
         "height": -20,
         "depth": 0,
         "name": "waste",
-        "volume": 6760,
+        "volume": 1000,
         "capacity": 20000,
-        "contamination": 288,
+        "contamination": 0,
         "density": 0,
         "category": 1
     },
@@ -25,9 +25,9 @@
         "height": -20,
         "depth": 0,
         "name": "waste",
-        "volume": 1000,
+        "volume": 6760,
         "capacity": 20000,
-        "contamination": 0,
+        "contamination": 288,
         "density": 0,
         "category": 1
     },

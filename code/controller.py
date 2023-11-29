@@ -43,6 +43,7 @@ import wellplate as wellplate_module
 from config.config import (
     MILL_CONFIG_FILE,
     WELLPLATE_CONFIG_FILE,
+    WELL_STATUS_FILE,
     PATH_TO_STATUS,
     PATH_TO_COMPLETED_EXPERIMENTS,
     PATH_TO_ERRORED_EXPERIMENTS,
@@ -470,7 +471,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
 def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
-    instruments.mill.disconnect()
+    instruments.mill.__exit__()
     # try:
     #     if echem.OPEN_CONNECTION:
     #         echem.pstatdisconnect()
@@ -629,7 +630,7 @@ def load_new_wellplate(ask: bool = False, new_plate_id: int = None,new_wellplate
         if new_wellplate_type_number is None:
             new_wellplate_type_number = current_type_number
 
-    well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+    well_status_file = WELL_STATUS_FILE
     if current_wellplate_is_new:
         return 0
 
@@ -666,7 +667,7 @@ def load_new_wellplate(ask: bool = False, new_plate_id: int = None,new_wellplate
 def save_current_wellplate():
     """Save the current wellplate"""
     wellplate_is_new = True
-    well_status_file = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+    well_status_file = WELL_STATUS_FILE
 
     ## Go through a reset all fields and apply new plate id
     logger.debug("Saving wellplate")

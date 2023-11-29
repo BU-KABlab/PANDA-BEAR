@@ -12,9 +12,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 3060.0,
+        "volume": 9400.0,
         "capacity": 20000,
-        "contamination": 154
+        "contamination": 86
     },
     {
         "position": "s1",
@@ -29,9 +29,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 3060.0,
+        "volume": 18000.0,
         "capacity": 20000,
-        "contamination": 154
+        "contamination": 0
     },
     {
         "position": "s2",
@@ -46,9 +46,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 3040.0,
+        "volume": 18000.0,
         "capacity": 20000,
-        "contamination": 154
+        "contamination": 0
     },
     {
         "position": "s3",
@@ -63,9 +63,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 7480.0,
+        "volume": 18000.0,
         "capacity": 20000,
-        "contamination": 114
+        "contamination": 0
     },
     {
         "position": "s4",
@@ -80,9 +80,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 20000,
+        "volume": 3060.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 154
     },
     {
         "position": "s4",
@@ -97,9 +97,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 20000,
+        "volume": 3060.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 154
     },
     {
         "position": "s5",
@@ -114,9 +114,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 20000,
+        "volume": 3060.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 154
     },
     {
         "position": "s6",
@@ -131,8 +131,8 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 20000,
+        "volume": 3060.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 154
     }
 ]

@@ -121,26 +121,26 @@ class Mill:
     def execute_command(self, command):
         """Encodes and sends commands to the mill and returns the response"""
         try:
-            logger.debug("execute_command: Command sent: %s", command)
+            logger.debug("Command sent: %s", command)
 
-            command_bytes = command.encode()
+            command_bytes = str(command).encode()
             self.ser_mill.write(command_bytes + b"\n")
             time.sleep(2)
             mill_response = self.ser_mill.readline().decode().rstrip()
 
             if command == "F2000":
-                logger.debug("execute_command: Returned %s", mill_response)
+                logger.debug("Returned %s", mill_response)
 
             elif command == "?":
-                logger.debug("execute_command: Returned %s", mill_response)
+                logger.debug("eturned %s", mill_response)
 
             elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
-                logger.debug("execute_command: Initially %s", mill_response)
+                logger.debug("Initially %s", mill_response)
                 self.wait_for_completion(mill_response)
                 mill_response = self.current_status()
-                logger.debug("execute_command: Returned %s", mill_response)
+                logger.debug("Returned %s", mill_response)
             else:
-                logger.debug("execute_command: Returned %s", mill_response)
+                logger.debug("Returned %s", mill_response)
 
             if mill_response.lower() in ["error", "alarm"]:
                 logger.error("current_status: Error in status: %s", mill_response)
@@ -737,14 +737,13 @@ def movement_test():
             mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
             ## Move pipette to first vial depth
             mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], stock_vials[0].depth, instrument=Instruments.PIPETTE)
-            mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], stock_vials[0].height, instrument=Instruments.PIPETTE)
             mill.move_to_safe_position()
 
 
 
             ## Move pipette to first waste vial then to the depth and then to safe position
             mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
-            mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].depth, instrument=Instruments.PIPETTE)
+            mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
             mill.move_to_safe_position()
 
     except (

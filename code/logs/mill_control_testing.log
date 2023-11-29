@@ -390,3 +390,6 @@ execute_command: Command sent: $H
 execute_command: Returned ok
 Homing completed
 Exiting program.
+2023-11-29 12:46:05,051:__main__:INFO:Exiting program.
+2023-11-29 14:57:04,608:__main__:INFO:Exiting program.
+2023-11-29 15:18:52,471:__main__:INFO:Exiting program.

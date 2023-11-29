@@ -58,7 +58,7 @@ class Vial:
         self.density = density
         self.base = math.pi * math.pow(self.radius, 2.0)
         self.depth = (
-            self.vial_height_calculator(self.radius * 2, self.volume) + self.bottom
+            self.vial_depth_calculator(self.radius * 2, self.volume)
         )
         self.contamination = contamination
         self.filepath = filepath
@@ -136,7 +136,7 @@ class Vial:
         self.volume += round(added_volume_ul, 3)
         # self.write_volume_to_disk()
         self.depth = (
-            self.vial_height_calculator((self.radius * 2), self.volume) + self.bottom
+            self.vial_depth_calculator((self.radius * 2), self.volume)
         )
         if self.depth < self.bottom:
             self.depth = self.bottom
@@ -146,15 +146,16 @@ class Vial:
         self.contamination += 1
         return 0
 
-    def vial_height_calculator(self, diameter_mm, volume_ul):
+    def vial_depth_calculator(self, diameter_mm, volume_ul):
         """
         Calculates the height of a volume of liquid in a vial given its diameter (in mm).
         """
-        radius_mm = diameter_mm / 2
-        area_mm2 = 3.141592653589793 * radius_mm**2
-        volume_mm3 = volume_ul  # 1 ul = 1 mm3
-        liquid_height_mm = round(volume_mm3 / area_mm2, 3)
-        return liquid_height_mm
+        # radius_mm = diameter_mm / 2
+        # area_mm2 = 3.141592653589793 * radius_mm**2
+        # volume_mm3 = abs(volume_ul)  # 1 ul = 1 mm3
+        # liquid_height_mm = round(volume_mm3 / area_mm2, 3)
+        # return liquid_height_mm + self.bottom
+        return self.bottom
 
 class Vessel:
     """
@@ -303,7 +304,8 @@ class Vial2(Vessel):
         depth = height + self.z_bottom - 2
         if depth < self.z_bottom + 1:
             depth = self.z_bottom + 1
-        return depth
+        # FIXME return depth
+        return self.z_bottom
 
     def check_volume(self, volume_to_add: float) -> bool:
         """
