@@ -55,7 +55,7 @@ for i in range(1,2):
                     project_campaign_id=PREVIOUS_CAMPAIGN_ID+i,
                     solutions={'water': VOLUME},
                     status='new',
-                    filename='forward-reverse-pipetting_' + str(experiment_id),
+                    filename='vial_volume_tracking_' + str(experiment_id),
                     )
                 )
             experiment_id += 1
