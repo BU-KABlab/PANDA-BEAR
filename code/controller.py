@@ -40,20 +40,22 @@ from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
 from vials import StockVial, Vial2, WasteVial
 import wellplate as wellplate_module
 
-from config.file_locations import (
+from config.config import (
     MILL_CONFIG_FILE,
+    WELLPLATE_CONFIG_FILE,
     PATH_TO_STATUS,
     PATH_TO_COMPLETED_EXPERIMENTS,
     PATH_TO_ERRORED_EXPERIMENTS,
     PATH_TO_NETWORK_DATA as PATH_TO_DATA,
     PATH_TO_NETWORK_LOGS as PATH_TO_LOGS,
+    PATH_TO_NETWORK_WELL_HX as PATH_TO_WELL_HX,
 )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-system_handler = logging.FileHandler(PATH_TO_LOGS + "/ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_LOGS + "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -689,8 +691,8 @@ def save_current_wellplate():
 
     # write back all lines that are not the same plate id as the current wellplate
 
-    with open("data\\well_history.csv", "r", encoding="UTF-8") as input_file:
-        with open("data\\new_well_history.csv", "w", encoding="UTF-8") as output_file:
+    with open(PATH_TO_WELL_HX, "r", encoding="UTF-8") as input_file:
+        with open(PATH_TO_DATA + "new_well_history.csv", "w", encoding="UTF-8") as output_file:
             for line in input_file:
                 # Check if the line has the same plate ID as the current_plate_id
                 if line.split(",")[0] == str(current_plate_id):
@@ -698,13 +700,13 @@ def save_current_wellplate():
                 # If the plate ID is different, write the line to the output file
                 output_file.write(line)
     ## delete the old well_history.csv file
-    Path("data\\well_history.csv").unlink()
+    Path(PATH_TO_WELL_HX).unlink()
 
     ## rename the new_well_history.csv file to well_history.csv
-    Path("data\\new_well_history.csv").rename("data\\well_history.csv")
+    Path(PATH_TO_DATA + "new_well_history.csv").rename(PATH_TO_WELL_HX)
 
     # write the current well statuses to the well_history.csv file
-    with open("data\\well_history.csv", "a", encoding="UTF-8") as file:
+    with open(PATH_TO_WELL_HX, "a", encoding="UTF-8") as file:
         for well in current_wellplate["wells"]:
             # if the well is still queued then there is nothing in it and we can unallocated it
             if well["status"] == "queued":
@@ -726,7 +728,7 @@ def change_wellplate_location():
     """Change the location of the wellplate"""
     ## Load the working volume from mill_config.json
     with open(
-        Path.cwd() / MILL_CONFIG_FILE / "mill_config.json", "r", encoding="UTF-8"
+        MILL_CONFIG_FILE, "r", encoding="UTF-8"
     ) as file:
         mill_config = json.load(file)
     working_volume = mill_config["working_volume"]
@@ -773,7 +775,7 @@ def change_wellplate_location():
 
     ## Get the current location config
     with open(
-        Path.cwd() / MILL_CONFIG_FILE / "wellplate_location.json", "r", encoding="UTF-8"
+        WELLPLATE_CONFIG_FILE, "r", encoding="UTF-8"
     ) as file:
         current_location = json.load(file)
 
@@ -787,7 +789,7 @@ def change_wellplate_location():
     }
     ## Write the new location to the wellplate_location.txt file
     with open(
-        Path.cwd() / MILL_CONFIG_FILE / "wellplate_location.json", "w", encoding="UTF-8"
+        WELLPLATE_CONFIG_FILE, "w", encoding="UTF-8"
     ) as file:
         json.dump(new_location, file, indent=4)
 

@@ -46,10 +46,8 @@ from mill_control import Mill, Instruments
 from pump_control import Pump
 from vials import Vessel, Vial, Vial2, StockVial, WasteVial
 from wellplate import Wells, Well, Wells2
-from config.file_locations import (
-    PATH_TO_NETWORK_LOGS,
-)
 from config.config import (
+    PATH_TO_NETWORK_LOGS,
     AIR_GAP,
     DRIP_STOP,
     PURGE_VOLUME,

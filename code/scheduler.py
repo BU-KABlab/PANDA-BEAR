@@ -17,18 +17,18 @@ import random
 import pandas as pd
 from pandas.core.frame import DataFrame
 
-from config.file_locations import (
+from config.config import (
     PATH_TO_DATA,
     PATH_TO_NETWORK_LOGS,
     QUEUE_FILE as PATH_TO_QUEUE,
-    MILL_CONFIG_FILE as PATH_TO_CONFIG,
+    WELL_STATUS_FILE,
     PATH_TO_STATUS,
     PATH_TO_EXPERIMENT_INBOX,
     PATH_TO_EXPERIMENT_QUEUE,
     PATH_TO_COMPLETED_EXPERIMENTS,
     PATH_TO_ERRORED_EXPERIMENTS,
-
 )
+
 from config.pin import CURRENT_PIN
 from experiment_class import (
     Experiment,
@@ -44,7 +44,7 @@ from wellplate import Well
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS + "/ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS + "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -67,7 +67,7 @@ class Scheduler:
         :param well: The well to check.
         :return: The status of the well. Or None if the well is not found.
         """
-        file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+        file_to_open = WELL_STATUS_FILE
         if not Path.exists(file_to_open):
             logger.error("%s not found", file_to_open)
             raise FileNotFoundError("%s not found", file_to_open.stem)
@@ -89,7 +89,7 @@ class Scheduler:
         :return: The alternative well. Or None if no wells are available.
         """
         logger.debug("Choosing alternative well")
-        file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+        file_to_open = WELL_STATUS_FILE
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -112,7 +112,7 @@ class Scheduler:
         :param status: The new status of the well.
         """
         logger.debug("Changing well %s status to %s", well, experiment.status.value)
-        file_to_open = Path.cwd() / PATH_TO_STATUS/ "well_status.json"
+        file_to_open = WELL_STATUS_FILE
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -142,7 +142,7 @@ class Scheduler:
         well.status = experiment.status
         well.status_date = experiment.status_date
 
-        file_to_open = Path.cwd() / PATH_TO_STATUS/ "well_status.json"
+        file_to_open = WELL_STATUS_FILE
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -170,7 +170,7 @@ class Scheduler:
         """
         experiments_read = 0
         complete = True
-        inbox_dir = Path.cwd() / PATH_TO_EXPERIMENT_INBOX
+        inbox_dir = PATH_TO_EXPERIMENT_INBOX
         file_to_open = (inbox_dir / filename).with_suffix(".json")
         with open(file_to_open.__str__(), "r", encoding="ascii") as file:
             data = json.load(file)
@@ -232,7 +232,7 @@ class Scheduler:
             )
 
             # Save the experiment as a separate file in the experiment_queue subfolder
-            queue_dir = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
+            queue_dir = PATH_TO_EXPERIMENT_QUEUE
             queue_dir.mkdir(parents=True, exist_ok=True)
             file_to_save = queue_dir / filename
 
@@ -245,7 +245,7 @@ class Scheduler:
             #     json.dump(text_version, outfile, indent=4)
 
             # Add the experiment to the queue
-            queue_file_path = Path.cwd() / PATH_TO_QUEUE
+            queue_file_path = PATH_TO_QUEUE
             with open(queue_file_path, "a", encoding="UTF-8") as queue_file:
                 line = f"{instructions.id},{instructions.priority},{instructions.filename},{instructions.protocol_type}"
                 queue_file.write(line)
@@ -270,7 +270,7 @@ class Scheduler:
         :return: the count of new experiments.
         """
 
-        file_path = Path.cwd() / PATH_TO_EXPERIMENT_INBOX
+        file_path = PATH_TO_EXPERIMENT_INBOX
         count = 0
         complete = True
         for file in file_path.iterdir():
@@ -300,7 +300,7 @@ class Scheduler:
         Reads the next experiment from the queue.
         :return: The next experiment.
         """
-        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        queue_file_path = PATH_TO_QUEUE
         ## Starting with the queue.csv file to get the experiment id and filename
         ## The we want to get the experiment with the highest priority (lowest number)
         if not Path.exists(queue_file_path):
@@ -321,7 +321,7 @@ class Scheduler:
         # Exclude layered protocols (protocol_type = 2)
         experiments = queue[(queue["priority"] == highest_priority) & (queue["protocol_type"] != 2)]["filename"].tolist()
 
-        queue_dir_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
+        queue_dir_path = PATH_TO_EXPERIMENT_QUEUE
         if not Path.exists(queue_dir_path):
             logger.error("experiment_queue folder not found")
             raise FileNotFoundError("experiment queue folder")
@@ -353,7 +353,7 @@ class Scheduler:
         Updates the queue file to remove the experiment that was just run.
         :param experiment: The experiment that was just run.
         """
-        file_path = Path.cwd() / PATH_TO_QUEUE
+        file_path = PATH_TO_QUEUE
         if not Path.exists(file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
@@ -367,7 +367,7 @@ class Scheduler:
 
     def update_experiment_queue_priority(self, experiment_id: int, priority: int):
         """Update the priority of experiments in the queue"""
-        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        queue_file_path = PATH_TO_QUEUE
         if not Path.exists(queue_file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
@@ -390,7 +390,7 @@ class Scheduler:
         Returns:
             None
         """
-        file_path = (Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / experiment.filename).with_suffix(".json")
+        file_path = (PATH_TO_EXPERIMENT_QUEUE / experiment.filename).with_suffix(".json")
         if not Path.exists(file_path):
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
@@ -421,7 +421,7 @@ class Scheduler:
         """
         file_name_with_suffix = Path(experiment.filename).with_suffix(".json")
         file_path = Path(
-            Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / file_name_with_suffix.name
+            PATH_TO_EXPERIMENT_QUEUE / file_name_with_suffix.name
         )
         if not Path.exists(file_path):
             logger.error("experiment file not found")
@@ -429,12 +429,12 @@ class Scheduler:
 
         if experiment.status == ExperimentStatus.COMPLETE:
             # Move the file to the completed folder
-            completed_path = Path.cwd() / PATH_TO_COMPLETED_EXPERIMENTS
+            completed_path = PATH_TO_COMPLETED_EXPERIMENTS
             file_path.replace(completed_path / file_name_with_suffix)
 
         elif experiment.status == ExperimentStatus.ERROR:
             # Move the file to the errored folder
-            errored_path = Path.cwd() / PATH_TO_ERRORED_EXPERIMENTS
+            errored_path = PATH_TO_ERRORED_EXPERIMENTS
             file_path.replace(errored_path / file_name_with_suffix)
 
         else:
@@ -495,7 +495,7 @@ class Scheduler:
 
     def add_to_queue_folder(self, experiment: ExperimentBase) -> ExperimentBase:
         """Add the given experiment to the experiment_queue folder"""
-        queue_dir = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE
+        queue_dir = PATH_TO_EXPERIMENT_QUEUE
         file_to_save = (queue_dir / experiment.filename).with_suffix(".json")
         with open(file_to_save, "w", encoding="UTF-8") as file:
             serialized_data = experiment_class.serialize_experiment(experiment)
@@ -504,7 +504,7 @@ class Scheduler:
 
     def add_to_queue_file(self, experiment: ExperimentBase) -> ExperimentBase:
         """Add the given experiment to the queue.csv"""
-        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        queue_file_path = PATH_TO_QUEUE
         if not Path.exists(queue_file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
@@ -555,7 +555,7 @@ class Scheduler:
         Returns:
             int: the number of experiments we can queue from the inbox
         """
-        file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+        file_to_open = WELL_STATUS_FILE
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -582,7 +582,7 @@ class Scheduler:
             list: a list of experiments
         """
         # Read the queue file
-        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        queue_file_path = PATH_TO_QUEUE
         if not Path.exists(queue_file_path):
             logger.error("queue file not found")
             raise FileNotFoundError(f"experiment queue file {queue_file_path.stem}")
@@ -595,7 +595,7 @@ class Scheduler:
         # Filter the the layered_queue to only include experiments for wells that are available
         # First get the list of available wells
         available_wells = []
-        file_to_open = Path.cwd() / PATH_TO_STATUS / "well_status.json"
+        file_to_open = WELL_STATUS_FILE
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError(f"{file_to_open.stem} not found")
@@ -610,7 +610,7 @@ class Scheduler:
         # This involves openening each experiment file and checking the target well since the filenames are just the experiment id
         filtered_layered_queue = []
         for experiment_id in layered_queue:
-            experiment_file_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
+            experiment_file_path = PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
             if not Path.exists(experiment_file_path):
                 logger.error("experiment file not found")
                 raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
@@ -635,7 +635,7 @@ class Scheduler:
         # We will just loop through the filtered_layered_queue and add the experiments to the list
         experiment_list = []
         for experiment_id in filtered_layered_queue:
-            experiment_file_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
+            experiment_file_path = PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
             if not Path.exists(experiment_file_path):
                 logger.error("experiment file not found")
                 raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
@@ -654,7 +654,7 @@ class Scheduler:
         # We need to remove these experiments from the queue.csv file and the experiment_queue folder
         # We will do this by looping through the list of experiments and removing them from the queue
         for experiment_id in filtered_layered_queue:
-            experiment_file_path = Path.cwd() / PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
+            experiment_file_path = PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
             if not Path.exists(experiment_file_path):
                 logger.error("experiment file not found")
                 raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
@@ -670,7 +670,7 @@ class Scheduler:
 
     def get_queue(self) -> DataFrame:
         """Return the queue as a DataFrame"""
-        queue_file_path = Path.cwd() / PATH_TO_QUEUE
+        queue_file_path = PATH_TO_QUEUE
         if not Path.exists(queue_file_path):
             logger.error("queue file not found")
             raise FileNotFoundError("experiment queue file")
