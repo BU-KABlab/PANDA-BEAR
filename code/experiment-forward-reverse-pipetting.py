@@ -3,6 +3,7 @@ Using a 96 well plate, generate experiments to test the water
 Each column is a replicate and every row is a different volume
 
 """
+
 import experiment_class
 #import numpy as np
 #import matplotlib.pyplot as plt
@@ -28,6 +29,7 @@ ROWS = 12
 PROJECT_ID = 7
 EXPERIMENT_NAME = 'Forward Reverse Pipetting'
 VOLUME = 100
+PREVIOUS_CAMPAIGN_ID = 6
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
@@ -50,7 +52,7 @@ for i in range(1,2):
                     target_well= column + str(row),
                     pin = CURRENT_PIN,
                     project_id=PROJECT_ID,
-                    project_campaign_id=i,
+                    project_campaign_id=PREVIOUS_CAMPAIGN_ID+i,
                     solutions={'water': VOLUME},
                     status='new',
                     filename='forward-reverse-pipetting_' + str(experiment_id),

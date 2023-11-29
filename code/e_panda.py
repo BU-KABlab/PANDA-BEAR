@@ -56,7 +56,7 @@ from config.config import (
 logger = logging.getLogger("e_panda")
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS + "/ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS + "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -370,7 +370,7 @@ def reverse_pipette_v2(
         e. Withdraw an air gap to prevent dripping
     3. Deposit the solution into the destination vessel
         a. Move to the destination
-        b. Deposit the solution
+        b. Deposit the solution and blow out
         c. Move to the purge vessel
         d. Purge the purge volume
         If depositing stock solution into a well, the recorded weight change will be saved to the target well 
@@ -480,9 +480,9 @@ def reverse_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=to_vessel,
                 rate=pumping_rate,
-                blowout_ul= DRIP_STOP + AIR_GAP,
+                blowout_ul= DRIP_STOP,
                 weigh= True
-            ) # pipette now has purge volume + air gap
+            ) # pipette now has purge volume
             logger.info("Infused %s into %s. Moving to safe position", from_vessel.name, to_vessel.name)
             mill.move_to_safe_position()
             logger.info("Moved to safe position")
@@ -516,7 +516,7 @@ def reverse_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=purge_vessel,
                 rate=pumping_rate,
-                blowout_ul= DRIP_STOP,
+                blowout_ul= DRIP_STOP + AIR_GAP,
                 weigh= False # Vials are not on the scale
             ) # Pipette should be empty after this
             logger.info("Purged the purge volume, updating contents of %s - %s", purge_vessel.position, purge_vessel.name)

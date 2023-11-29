@@ -1,0 +1,16 @@
+{
+    "id": 9992893,
+    "well_id": "F11",
+    "ocp_dep_file": null,
+    "ocp_dep_pass": null,
+    "ocp_char_file": null,
+    "ocp_char_pass": null,
+    "deposition_data_file": null,
+    "deposition_plot_file": null,
+    "deposition_max_value": null,
+    "depsotion_min_value": null,
+    "characterization_data_file": null,
+    "characterization_plot_file": null,
+    "characterization_max_value": null,
+    "characterization_min_value": null
+}

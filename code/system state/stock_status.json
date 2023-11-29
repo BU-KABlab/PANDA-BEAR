@@ -12,9 +12,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 19500.0,
+        "volume": 3060.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 154
     },
     {
         "position": "s1",
@@ -29,9 +29,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 20000,
+        "volume": 3060.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 154
     },
     {
         "position": "s2",
@@ -46,9 +46,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 20000,
+        "volume": 3040.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 154
     },
     {
         "position": "s3",
@@ -63,9 +63,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 20000,
+        "volume": 7480.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 114
     },
     {
         "position": "s4",
