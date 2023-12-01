@@ -29,12 +29,12 @@ ROWS = 12
 PROJECT_ID = 8
 EXPERIMENT_NAME = 'Pipette wear test'
 VOLUME = 100
-PREVIOUS_CAMPAIGN_ID = 9
+PREVIOUS_CAMPAIGN_ID = 17
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
 
-for i in range(1,13):
+for i in range(1,14):
     # Change wellplate and load new wellplate
     controller.load_new_wellplate(new_wellplate_type_number=6)
     experiment_id = determine_next_experiment_id()

@@ -7,6 +7,7 @@ from datetime import datetime
 
 # import json
 import logging
+import matplotlib.pyplot as plt
 from pathlib import Path
 import pandas as pd
 
@@ -61,6 +62,8 @@ class SlackBot:
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
         elif channel == "alert":
             channel_id = slack_cred.ALERT_CHANNEL_ID
+        elif channel in [slack_cred.CONVERSATION_CHANNEL_ID, slack_cred.ALERT_CHANNEL_ID]:
+            channel_id = channel
         else:
             return "No applicable channel"
 
@@ -291,6 +294,34 @@ class SlackBot:
 
         elif text[0:11] == "vial status":
             # Get vial status
+            ## Load the vial status json file
+            stock_vials = pd.read_json(PATH_TO_CODE / "system state/stock_status.json")
+            ## Filter for just the vial position and volume
+            stock_vials = stock_vials[["position", "volume"]]
+            ## set position to be a string and volume to be a float
+            stock_vials["position"] = stock_vials["position"].astype(str)
+            stock_vials["volume"] = stock_vials["volume"].astype(float)
+            ## Create a bar graph with volume on the x-axis and position on the y-axis
+            ## Send the graph to slack
+            plt.bar(stock_vials["position"], stock_vials["volume"], align="center", alpha=0.5, color="blue")
+            # label each bar with the volume
+            for i, v in enumerate(stock_vials["volume"]):
+                plt.text(i, v, str(v/1000), color="black", ha="center")
+
+            # Draw a horizontal line at 4000
+            plt.axhline(y=4000, color="red", linestyle="-")
+            
+            # increase the space between x-axis ticks
+            plt.xlabel("Position")
+            plt.ylabel("Volume")
+            plt.title("Stock Vial Status")
+            plt.savefig("vial_status.png")
+            self.send_slack_file(channel_id, "vial_status.png")
+
+            ## Delete the graph file
+            Path("vial_status.png").unlink()
+            plt.close()
+
             return 1
 
         elif text[0:11] == "well status":

@@ -1,0 +1,18 @@
+{
+    "id": 9994759,
+    "experiment_name": "Pipette wear test",
+    "priority": 1,
+    "target_well": "B5",
+    "pin": 2001001001,
+    "project_id": 8,
+    "solutions": {
+        "water": 100
+    },
+    "pumping_rate": 0.5,
+    "status": "complete",
+    "status_date": "2023-12-01T11:47:47",
+    "filename": "Pipette wear test9994759",
+    "results": null,
+    "project_campaign_id": 16,
+    "protocol_type": 1
+}

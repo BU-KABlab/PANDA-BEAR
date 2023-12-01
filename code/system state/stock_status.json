@@ -12,9 +12,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 13300.0,
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 67
+        "contamination": 0
     },
     {
         "position": "s1",
@@ -85,7 +85,7 @@
         "contamination": 0
     },
     {
-        "position": "s4",
+        "position": "s5",
         "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
@@ -102,7 +102,7 @@
         "contamination": 0
     },
     {
-        "position": "s5",
+        "position": "s6",
         "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
@@ -119,7 +119,7 @@
         "contamination": 0
     },
     {
-        "position": "s6",
+        "position": "s7",
         "contents": "water",
         "viscocity_rank": 1,
         "density": 1,
@@ -134,5 +134,69 @@
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0
+    },
+    {
+        "position": "s8",
+        "contents": "water",
+        "x": -47,
+        "y": -13,
+        "z_bottom": -75,
+        "radius": 14,
+        "height": -20,
+        "depth": 0,
+        "name": "water",
+        "volume": 20000,
+        "capacity": 20000,
+        "contamination": 0,
+        "density": 0,
+        "category": 0
+    },
+    {
+        "position": "s9",
+        "contents": "water",
+        "x": -47,
+        "y": -46,
+        "z_bottom": -75,
+        "radius": 14,
+        "height": -20,
+        "depth": 0,
+        "name": "water",
+        "volume": 20000,
+        "capacity": 20000,
+        "contamination": 0,
+        "density": 0,
+        "category": 0
+    },
+    {
+        "position": "s10",
+        "contents": "water",
+        "x": -47,
+        "y": -79,
+        "z_bottom": -75,
+        "radius": 14,
+        "height": -20,
+        "depth": 0,
+        "name": "waste",
+        "volume": 20000,
+        "capacity": 20000,
+        "contamination": 0,
+        "density": 0,
+        "category": 0
+    },
+    {
+        "position": "s11",
+        "contents": "water",
+        "x": -47,
+        "y": -112,
+        "z_bottom": -75,
+        "radius": 14,
+        "height": -20,
+        "depth": 0,
+        "name": "waste",
+        "volume": 20000,
+        "capacity": 20000,
+        "contamination": 0,
+        "density": 0,
+        "category": 0
     }
 ]
