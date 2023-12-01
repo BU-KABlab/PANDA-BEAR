@@ -56,7 +56,7 @@ from config.config import (
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-system_handler = logging.FileHandler(PATH_TO_LOGS + "ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -92,6 +92,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         ## Begin outer loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
+            formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
             system_handler.setFormatter(formatter)
             logger.addHandler(system_handler)
 
@@ -191,7 +192,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 ## With returned experiment and results, update the experiment status and post the final status
                 post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status.value}"
                 logger.info(post_experiment_status_msg)
-                slack.send_slack_message("alert", post_experiment_status_msg)
+                #slack.send_slack_message("alert", post_experiment_status_msg)
 
                 ## Update the system state with new vial and wellplate information
                 scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
@@ -312,8 +313,8 @@ def establish_system_state() -> (
         waste_vials (list[Vial]): list of waste vials
         wellplate (wellplate_module.Wells): wellplate object
     """
-    stock_vials = read_vials(Path.cwd() / PATH_TO_STATUS / "stock_status.json")
-    waste_vials = read_vials(Path.cwd() / PATH_TO_STATUS / "waste_status.json")
+    stock_vials = read_vials(PATH_TO_STATUS / "stock_status.json")
+    waste_vials = read_vials(PATH_TO_STATUS / "waste_status.json")
     wellplate = wellplate_module.Wells2(
         -230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5
     )
@@ -375,7 +376,7 @@ def establish_system_state() -> (
     number_of_clear_wells = 0
     number_of_wells = 0
     with open(
-        Path.cwd() / PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8"
+        PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8"
     ) as file:
         wellplate_status = json.load(file)
     for well in wellplate_status["wells"]:
@@ -471,7 +472,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
 def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
-    instruments.mill.__exit__()
+    instruments.mill.disconnect()
     # try:
     #     if echem.OPEN_CONNECTION:
     #         echem.pstatdisconnect()
@@ -693,7 +694,7 @@ def save_current_wellplate():
     # write back all lines that are not the same plate id as the current wellplate
 
     with open(PATH_TO_WELL_HX, "r", encoding="UTF-8") as input_file:
-        with open(PATH_TO_DATA + "new_well_history.csv", "w", encoding="UTF-8") as output_file:
+        with open(PATH_TO_DATA / "new_well_history.csv", "w", encoding="UTF-8") as output_file:
             for line in input_file:
                 # Check if the line has the same plate ID as the current_plate_id
                 if line.split(",")[0] == str(current_plate_id):
@@ -704,7 +705,7 @@ def save_current_wellplate():
     Path(PATH_TO_WELL_HX).unlink()
 
     ## rename the new_well_history.csv file to well_history.csv
-    Path(PATH_TO_DATA + "new_well_history.csv").rename(PATH_TO_WELL_HX)
+    Path(PATH_TO_DATA / "new_well_history.csv").rename(PATH_TO_WELL_HX)
 
     # write the current well statuses to the well_history.csv file
     with open(PATH_TO_WELL_HX, "a", encoding="UTF-8") as file:

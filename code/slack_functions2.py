@@ -8,11 +8,13 @@ from datetime import datetime
 # import json
 import logging
 from pathlib import Path
+import pandas as pd
 
 # import re
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
+from config.config import PATH_TO_CODE
 
 class SlackBot:
     """Class for sending messages to Slack."""
@@ -115,7 +117,7 @@ class SlackBot:
                 return "No applicable result type"
 
 
-    def check_slack_messages(self, channel: str):
+    def check_slack_messages(self, channel: str) -> int:
         """Check Slack for messages."""
 
         # WebClient insantiates a client that can call API methods
@@ -129,7 +131,7 @@ class SlackBot:
         elif channel == "alert":
             channel_id = slack_cred.ALERT_CHANNEL_ID
         else:
-            return "No applicable channel"
+            return 0
 
         # latestTS = datetime.now().timestamp()
 
@@ -190,7 +192,14 @@ class SlackBot:
                                 "addressed_ts": datetime.now().timestamp(),
                             }
                         )
+                    if response == 0:
+                        return 0
+                    else:
+                        return 1
+                else:
+                    continue
 
+            return 1
             # Print results
             # print(json.dumps(conversation_history2, indent=2))
 
@@ -249,16 +258,19 @@ class SlackBot:
                 "status experiment # - displays the status of experiment #\n"
                 "status vials - displays the status of the vials\n"
                 "status wells - displays the status of the wells\n"
+                "queue length - displays the length of the queue\n"
                 "pause - pauses the current experiment\n"
                 "resume - resumes the current experiment\n"
                 "start - starts a new experiment\n"
                 "stop - stops the current experiment\n"
+                "exit - exits the program\n"
             )
             self.send_slack_message(channel_id, message)
 
         elif text[0:15] == "plot experiment":
             # Get experiment number
             experiment_number = text[5:]
+            return 1
             # Get plot
 
         elif text[0:15] == "data experiment":
@@ -285,6 +297,16 @@ class SlackBot:
             # Get well status
             return 1
 
+        elif text[0:12] == "queue length":
+            # Get queue length
+            queue_length = 0
+            queue_file = pd.read_csv(PATH_TO_CODE / "system state/queue.csv", skipinitialspace=True, header=None, names=['id', 'priority', 'filename', 'protocol_type'])
+            # the columsn to id,priority,filename,protocol_type
+            queue_length = len(queue_file)-1
+            message = f"The queue length is {queue_length}."
+            self.send_slack_message(channel_id, message)
+            return 1
+
         elif text[0:5] == "pause":
             return 1
 
@@ -297,10 +319,13 @@ class SlackBot:
         elif text[0:4] == "stop":
             return 1
 
+        elif text[0:4] == "exit":
+            return 0
+
         else:
             message = "Sorry, I don't understand that command. Type !epanda help for commands I understand."
             self.send_slack_message(channel_id, message)
-            return 0
+            return 1
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test = False)

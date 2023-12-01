@@ -12,9 +12,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 9400.0,
+        "volume": 13300.0,
         "capacity": 20000,
-        "contamination": 86
+        "contamination": 67
     },
     {
         "position": "s1",
@@ -29,7 +29,7 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 18000.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -46,7 +46,7 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 18000.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -63,7 +63,7 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 18000.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
     },
@@ -80,9 +80,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 3060.0,
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 154
+        "contamination": 0
     },
     {
         "position": "s4",
@@ -97,9 +97,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 3060.0,
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 154
+        "contamination": 0
     },
     {
         "position": "s5",
@@ -114,9 +114,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 3060.0,
+        "volume": 20000,
         "capacity": 20000,
-        "contamination": 154
+        "contamination": 0
     },
     {
         "position": "s6",
@@ -131,8 +131,8 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 3060.0,
+        "volume": 20000,
         "capacity": 20000,
-        "contamination": 154
+        "contamination": 0
     }
 ]

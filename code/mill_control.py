@@ -23,7 +23,6 @@ import re
 import time
 import serial
 
-from log_tools import CustomLoggingFilter
 import wellplate as Wells
 
 # Configure the logger

@@ -11,7 +11,7 @@ from config.pin import CURRENT_PIN
 from scheduler import Scheduler
 import controller
 import pandas as pd
-from config.config import PATH_TO_NETWORK_DATA, PATH_TO_NETWORK_WELL_HX
+from config.config import PATH_TO_NETWORK_WELL_HX
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
@@ -26,15 +26,15 @@ def determine_next_experiment_id() -> int:
 # Create experiments
 COLUMNS = 'ABCDEFGH'
 ROWS = 12
-PROJECT_ID = 7
-EXPERIMENT_NAME = 'Vial depth tracking'
+PROJECT_ID = 8
+EXPERIMENT_NAME = 'Pipette wear test'
 VOLUME = 100
-PREVIOUS_CAMPAIGN_ID = 0
+PREVIOUS_CAMPAIGN_ID = 9
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
 
-for i in range(1,2):
+for i in range(1,13):
     # Change wellplate and load new wellplate
     controller.load_new_wellplate(new_wellplate_type_number=6)
     experiment_id = determine_next_experiment_id()
@@ -55,7 +55,7 @@ for i in range(1,2):
                     project_campaign_id=PREVIOUS_CAMPAIGN_ID+i,
                     solutions={'water': VOLUME},
                     status='new',
-                    filename='vial_volume_tracking_' + str(experiment_id),
+                    filename=EXPERIMENT_NAME + str(experiment_id),
                     )
                 )
             experiment_id += 1
@@ -67,4 +67,4 @@ for i in range(1,2):
     else:
         print('Error: ', result)
         break
-print('Finished running vial depth tracking experiments')
+print(f'Finished running {EXPERIMENT_NAME} experiments')
