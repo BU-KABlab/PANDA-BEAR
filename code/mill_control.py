@@ -731,19 +731,23 @@ def movement_test():
             # mill.safe_move(
             #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
             # )
-
-            ## Move pipette to first vial
-            mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
-            ## Move pipette to first vial depth
-            mill.safe_move(stock_vials[0].coordinates['x'],stock_vials[0].coordinates['y'], stock_vials[0].depth, instrument=Instruments.PIPETTE)
-            mill.move_to_safe_position()
-
-
-
-            ## Move pipette to first waste vial then to the depth and then to safe position
-            mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
-            mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
-            mill.move_to_safe_position()
+            if len(stock_vials) != 0:
+                for i in range(len(stock_vials)):
+                    mill.safe_move(
+                        stock_vials[i].coordinates["x"],
+                        stock_vials[i].coordinates["y"],
+                        stock_vials[i].depth,
+                        instrument=Instruments.PIPETTE,
+                    )
+                mill.move_to_safe_position()
+            mill.safe_move(
+                h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
+            )  
+            if len(waste_vials) != 0:
+                ## Move pipette to first waste vial then to the depth and then to safe position
+                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
+                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
+                mill.move_to_safe_position()
 
     except (
         MillConnectionError,
