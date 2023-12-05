@@ -739,8 +739,8 @@ def rinse_v2(
 
 def flush_pipette_tip(
     pump: Pump,
-    waste_vials: list[Vial],
-    stock_vials: list[Vial],
+    waste_vials: list[WasteVial],
+    stock_vials: list[StockVial],
     flush_solution_name: str,
     mill: Mill,
     pumping_rate=0.5,

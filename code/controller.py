@@ -50,6 +50,7 @@ from config.config import (
     PATH_TO_NETWORK_DATA as PATH_TO_DATA,
     PATH_TO_NETWORK_LOGS as PATH_TO_LOGS,
     PATH_TO_NETWORK_WELL_HX as PATH_TO_WELL_HX,
+    RANDOM_FLAG,
 )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -110,13 +111,20 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
             if protocol_type in [0,1]:
                 ## Ask the scheduler for the next experiment
-                new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                new_experiment, _ = scheduler.read_next_experiment_from_queue(random_pick=RANDOM_FLAG)
                 # if new_experiment is None:
                 #     slack.send_slack_message(
                 #         "alert",
                 #         "No new experiments to run...monitoring inbox for new experiments",
                 #     )
                 if new_experiment is None:
+                    # e_panda.flush_pipette_tip(pump=toolkit.pump, 
+                    #                           mill=toolkit.mill, 
+                    #                           stock_vials=stock_vials, 
+                    #                           waste_vials=waste_vials, 
+                    #                           flush_solution_name='water',
+                    #                           flush_volume=120,
+                    #                           )
                     break # break out of the while True loop
 
                 # while new_experiment is None:
