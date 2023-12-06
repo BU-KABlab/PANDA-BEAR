@@ -14,25 +14,31 @@
         },
         {
             "well_id": "A2",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:38:25",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997231,
             "project_id": 8
         },
         {
             "well_id": "A3",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:58:34",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997232,
             "project_id": 8
         },
         {
             "well_id": "A4",
-            "status": "running",
-            "status_date": "2023-12-05T17:09:20",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:10:50",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997233,
             "project_id": 8
         },
@@ -48,9 +54,11 @@
         },
         {
             "well_id": "A6",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:15:22",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997235,
             "project_id": 8
         },
@@ -66,9 +74,11 @@
         },
         {
             "well_id": "A8",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T18:01:36",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997237,
             "project_id": 8
         },
@@ -104,9 +114,11 @@
         },
         {
             "well_id": "A12",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:57:04",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997241,
             "project_id": 8
         },
@@ -122,9 +134,11 @@
         },
         {
             "well_id": "B2",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:39:59",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997243,
             "project_id": 8
         },
@@ -170,9 +184,11 @@
         },
         {
             "well_id": "B7",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T18:00:06",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997248,
             "project_id": 8
         },
@@ -208,9 +224,11 @@
         },
         {
             "well_id": "B11",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:41:30",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997252,
             "project_id": 8
         },
@@ -236,9 +254,11 @@
         },
         {
             "well_id": "C2",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:52:25",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997255,
             "project_id": 8
         },
@@ -264,9 +284,11 @@
         },
         {
             "well_id": "C5",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:35:20",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997258,
             "project_id": 8
         },
@@ -282,25 +304,31 @@
         },
         {
             "well_id": "C7",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T18:03:06",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997260,
             "project_id": 8
         },
         {
             "well_id": "C8",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:24:39",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997261,
             "project_id": 8
         },
         {
             "well_id": "C9",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:26:10",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997262,
             "project_id": 8
         },
@@ -346,9 +374,11 @@
         },
         {
             "well_id": "D2",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:50:50",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997267,
             "project_id": 8
         },
@@ -374,33 +404,41 @@
         },
         {
             "well_id": "D5",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:30:42",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997270,
             "project_id": 8
         },
         {
             "well_id": "D6",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:13:52",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997271,
             "project_id": 8
         },
         {
             "well_id": "D7",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:27:41",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997272,
             "project_id": 8
         },
         {
             "well_id": "D8",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:36:54",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997273,
             "project_id": 8
         },
@@ -536,25 +574,31 @@
         },
         {
             "well_id": "E10",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:29:11",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997287,
             "project_id": 8
         },
         {
             "well_id": "E11",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:49:19",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997288,
             "project_id": 8
         },
         {
             "well_id": "E12",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:21:32",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997289,
             "project_id": 8
         },
@@ -670,17 +714,21 @@
         },
         {
             "well_id": "F12",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:20:00",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997301,
             "project_id": 8
         },
         {
             "well_id": "G1",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:23:05",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997302,
             "project_id": 8
         },
@@ -696,9 +744,11 @@
         },
         {
             "well_id": "G3",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:18:27",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997304,
             "project_id": 8
         },
@@ -724,17 +774,21 @@
         },
         {
             "well_id": "G6",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:54:01",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997307,
             "project_id": 8
         },
         {
             "well_id": "G7",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:32:16",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997308,
             "project_id": 8
         },
@@ -760,25 +814,31 @@
         },
         {
             "well_id": "G10",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:33:48",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997311,
             "project_id": 8
         },
         {
             "well_id": "G11",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:16:53",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997312,
             "project_id": 8
         },
         {
             "well_id": "G12",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:12:21",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997313,
             "project_id": 8
         },
@@ -804,9 +864,11 @@
         },
         {
             "well_id": "H3",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:46:14",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997316,
             "project_id": 8
         },
@@ -852,17 +914,21 @@
         },
         {
             "well_id": "H8",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:44:36",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997321,
             "project_id": 8
         },
         {
             "well_id": "H9",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:43:02",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997322,
             "project_id": 8
         },
@@ -878,17 +944,21 @@
         },
         {
             "well_id": "H11",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:55:34",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997324,
             "project_id": 8
         },
         {
             "well_id": "H12",
-            "status": "queued",
-            "status_date": "2023-12-05T15:31:30",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2023-12-05T17:47:48",
+            "contents": {
+                "water": 100.0
+            },
             "experiment_id": 9997325,
             "project_id": 8
         }

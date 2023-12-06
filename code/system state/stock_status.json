@@ -114,9 +114,9 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 13300.0,
+        "volume": 9800.0,
         "capacity": 20000,
-        "contamination": 67
+        "contamination": 102
     },
     {
         "position": "s7",
