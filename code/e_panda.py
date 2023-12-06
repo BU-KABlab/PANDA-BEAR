@@ -1919,14 +1919,12 @@ def layered_solution_protocol(
             logger.info("Well %s cleared", instruction.target_well)
 
             # Flushing procedure
-            flush_pipette_tip(
-                pump,
-                waste_vials,
-                stock_vials,
-                instructions.flush_sol_name,
-                mill,
-                instructions.pumping_rate,
-                instructions.flush_vol,
+            flush_v2(
+                pump=pump,
+                waste_vials=waste_vials,
+                stock_vials=stock_vials,
+                flush_solution_name=instructions[0].flush_sol_name,
+                mill=mill
             )
 
             logger.info("Pipette Flushed")
