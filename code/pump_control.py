@@ -9,9 +9,9 @@ from typing import Optional, Union
 
 
 import nesp_lib
-from sartorius.driver import Scale
-from sartorius.mock import Scale as MockScale
-from slack_functions2 import SlackBot 
+from sartorius_local.driver import Scale
+from sartorius_local.mock import Scale as MockScale
+from slack_functions2 import SlackBot
 from vials import Vial, Vessel
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
