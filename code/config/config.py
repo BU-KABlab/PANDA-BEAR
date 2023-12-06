@@ -44,6 +44,7 @@ PATH_TO_NETWORK_QUEUE = Path("p:") / "system state/queue.csv"
 AIR_GAP = 40
 DRIP_STOP = 5
 PURGE_VOLUME = 20
+RANDOM_FLAG = False # Set to True to randomize the order of the experiments
 
 ## Validate that all paths exist
 for path in [

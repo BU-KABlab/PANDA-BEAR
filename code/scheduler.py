@@ -295,7 +295,7 @@ class Scheduler:
 
         return count, complete
 
-    def read_next_experiment_from_queue(self) -> Tuple[ExperimentBase, Path]:
+    def read_next_experiment_from_queue(self, random_pick: bool = True) -> Tuple[ExperimentBase, Path]:
         """
         Reads the next experiment from the queue.
         :return: The next experiment.
@@ -319,19 +319,29 @@ class Scheduler:
         highest_priority = queue["priority"].min()
         # Get all experiments with the highest priority so that we can randomly select one of them
         # Exclude layered protocols (protocol_type = 2)
-        experiments = queue[(queue["priority"] == highest_priority) & (queue["protocol_type"] != 2)]["filename"].tolist()
-
+        experiments = queue[(queue["priority"] == highest_priority) & (queue["protocol_type"] != 2)]["filename"]
+        experiments_list = experiments.tolist()
         queue_dir_path = PATH_TO_EXPERIMENT_QUEUE
         if not Path.exists(queue_dir_path):
             logger.error("experiment_queue folder not found")
             raise FileNotFoundError("experiment queue folder")
 
-        # Pick a random experiment from the list of experiments with the highest priority
-        random_experiment = random.choice(experiments)
-        experiment_file_path = Path(queue_dir_path / random_experiment).with_suffix(".json")
-        if not Path.exists(experiment_file_path):
-            logger.error("experiment file not found")
-            raise FileNotFoundError("experiment file")
+        if random_pick:
+            # Pick a random experiment from the list of experiments with the highest priority
+            random_experiment = random.choice(experiments_list)
+            experiment_file_path = Path(queue_dir_path / random_experiment).with_suffix(".json")
+            if not Path.exists(experiment_file_path):
+                logger.error("experiment file not found")
+                raise FileNotFoundError("experiment file")
+        else:
+            # Sort the queue by experiment id and then by priority, excluding type 2 protocols
+            queue = queue.sort_values(by=["id", "priority"], ascending=[True, True])
+            queue = queue[queue["protocol_type"] != 2]
+            # Get the first experiment in the queue
+            experiment_file_path = Path(queue_dir_path / queue["filename"].iloc[0]).with_suffix(".json")
+            if not Path.exists(experiment_file_path):
+                logger.error("experiment file not found")
+                raise FileNotFoundError("experiment file")
 
         # Read the experiment file
         with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
