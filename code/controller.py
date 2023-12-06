@@ -15,14 +15,12 @@ Additionally controller should be able to:
 
 # import standard libraries
 import datetime
-from genericpath import exists
 import json
-from json import tool
 import logging
+from typing import Optional, Sequence, Union
 
 # import third-party libraries
 from pathlib import Path
-from typing import Optional, Sequence, Union
 from print_panda import printpanda
 from mill_control import Mill
 from mill_control import MockMill
@@ -80,6 +78,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
     print(printpanda())
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
+    toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
         ## Check for required files
@@ -103,6 +102,14 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, wellplate = establish_system_state()
 
+            ## Flush the pipette tip with water
+            e_panda.flush_v2(stock_vials=stock_vials,
+                             waste_vials=waste_vials,
+                             flush_solution_name='water',
+                             flush_volume=120,
+                             pump=toolkit.pump,
+                             mill=toolkit.mill,
+                             )
             ## Check the qeueue for any protocol type 2 experiments
             queue = scheduler.get_queue()
             # check if any of the experiments in the queue pandas dataframe are type 2
@@ -184,7 +191,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
 
                 ## Run the experiment
-                e_panda.vial_depth_tracking_protocol(
+                e_panda.viscosity_experiments_protocol(
                     instructions=new_experiment,
                     results=experiment_results,
                     mill=toolkit.mill,
@@ -193,6 +200,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     waste_vials=waste_vials,
                     wellplate=wellplate,
                 )
+
                 ## Reset the logger to log to the ePANDA.log file and format
                 system_handler.setFormatter(formatter)
                 logger.addHandler(system_handler)
@@ -271,7 +279,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         raise KeyboardInterrupt from exc
 
     finally:
-        # close out of serial connections 
+        # close out of serial connections
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
