@@ -1,7 +1,7 @@
 [
     {
         "position": "s0",
-        "contents": "1:1 H20:Glycerol",
+        "contents": "1000:1 H20:Glycerol",
         "viscocity_rank": 1,
         "density": 0.9983,
         "category": 0,
@@ -11,7 +11,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "1:1 H20:Glycerol",
+        "name": "1000:1 H20:Glycerol",
         "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0

@@ -53,7 +53,7 @@ ROWS = 12
 PROJECT_ID = 9
 EXPERIMENT_NAME = "Viscocity test"
 VOLUME = 100
-PREVIOUS_CAMPAIGN_ID = 31
+PREVIOUS_CAMPAIGN_ID = 0
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
@@ -88,14 +88,20 @@ for solution_number, solution in enumerate(solutions):
                         project_id=PROJECT_ID,
                         project_campaign_id=PREVIOUS_CAMPAIGN_ID + solution_number,
                         solutions={str(solution): float(VOLUME)},
-                        # for columns ABCD of the first wellplate use pumping rate 0.064,
-                        # for columns EFGH of the first wellplate use pumping rate 0.138,
-                        # for columns ABCD of the second wellplate use pumping rate 0.297,
-                        # for columns EFGH of the second wellplate use pumping rate 0.640
-                        pumping_rate=pumping_rates[solution_number]
-                        if plate_number_per_solution == 1
-                        else pumping_rates[solution_number + 2],
-                        status=experiment_class.ExperimentStatus.NEW,
+                        # for columns ABCD of the plate 1 use pumping rate 0.064 (0),
+                        # ex. plate_number_per_solution = 1, column = 'A' -> pumping rate = 0.064
+                        # for columns EFGH of the plate 1 use pumping rate 0.138 (1),
+                        # ex. plate_number_per_solution = 1, column = 'E' -> pumping rate = 0.138
+                        # for columns ABCD of the plate 2 use pumping rate 0.297 (2),
+                        # ex. plate_number_per_solution = 2, column = 'A' -> pumping rate = 0.297
+                        # for columns EFGH of the plate 2 use pumping rate 0.640 (3)
+                        # ex. plate_number_per_solution = 2, column = 'E' -> pumping rate = 0.640
+                        pumping_rate = pumping_rates[
+                            (plate_number_per_solution - 1) * 2
+                            + (column in "EFGH")
+                        ],
+
+                        status = experiment_class.ExperimentStatus.NEW,
                         filename=EXPERIMENT_NAME + str(experiment_id),
                     )
                 )
@@ -111,21 +117,33 @@ for solution_number, solution in enumerate(solutions):
         # and 0.640 for the remaining 48 experiments
 
         if plate_number_per_solution == 1:
-            expected_pumping_rates = [0.064, 0.064, 0.138, 0.138]
+            expected_pumping_rates = [0.064, 0.138]
         else:
-            expected_pumping_rates = [0.297, 0.297, 0.640, 0.640]
+            expected_pumping_rates = [0.297, 0.640]
 
-        pumping_rates = [experiment.pumping_rate for experiment in experiments]
-        assert pd.Series(pumping_rates[:48]).equals(pd.Series(expected_pumping_rates[:2])), "Pumping rate should be 0.064 for the first 48 experiments"
-        assert pd.Series(pumping_rates[48:]).equals(pd.Series(expected_pumping_rates[2:])), "Pumping rate should be 0.138 for the remaining 48 experiments"
+        pumping_rates_in_experiments = [experiment.pumping_rate for experiment in experiments]
+        pumping_rates_first_48 = pumping_rates_in_experiments[:48]
+        pumping_rates_remaining = pumping_rates_in_experiments[48:]
 
-        scheduler = Scheduler()
-        result = scheduler.add_nonfile_experiments(experiments)
-        if result == "success":
-            controller.main(use_mock_instruments=TEST)
-        else:
-            print("Error: ", result)
-            break
+        expected_pumping_rate_first_48 = expected_pumping_rates[0]
+        expected_pumping_rate_remaining = expected_pumping_rates[1]
+
+        assert all(rate == expected_pumping_rate_first_48 for rate in pumping_rates_first_48), "Pumping rate should be 0.064  or 0.297 for the first 48 experiments"
+        assert all(rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
+        ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
+        print(f"Solution: {solution}")
+        print(f"Plate number: {plate_number_per_solution}")
+        print(f"Pumping rate of first 0-47: {expected_pumping_rate_first_48}")
+        print(f"Pumping rate of remaining 48-95: {expected_pumping_rate_remaining}")
+        print(f"Project campaign id: {PREVIOUS_CAMPAIGN_ID + solution_number}")
+
+        # scheduler = Scheduler()
+        # result = scheduler.add_nonfile_experiments(experiments)
+        # if result == "success":
+        #     controller.main(use_mock_instruments=TEST)
+        # else:
+        #     print("Error: ", result)
+        #     break
 
 message = f"Finished running {EXPERIMENT_NAME} experiments"
 print(message)

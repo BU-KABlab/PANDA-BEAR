@@ -5,5 +5,5 @@ from slack_functions2 import SlackBot
 bot = SlackBot(test = False)
 STATUS = bot.check_slack_messages(channel="alert")
 while STATUS == 1:
-    time.sleep(15)
+    time.sleep(10)
     STATUS = bot.check_slack_messages(channel="alert")
