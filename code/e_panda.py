@@ -1882,9 +1882,9 @@ def viscosity_experiments_protocol(
 #     return instructions, results, stock_vials, waste_vials, wellplate
 
 def layered_solution_protocol(
-    instructions: Sequence[LayeredExperiments],
-    mill: Mill,
-    pump: Pump,
+    instructions: list[LayeredExperiments],
+    mill: Union[Mill, MockMill],
+    pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
     wellplate: Wells2,
@@ -2012,7 +2012,7 @@ def layered_solution_protocol(
                 instruction.target_well,
             )
             char_vial = next(
-                vial for vial in stock_vials if vial.name == instruction.char_sol_name & ((vial.volume - instruction.char_vol) > 3000)
+                vial for vial in stock_vials if vial.name == instruction.char_sol_name and ((vial.volume - instruction.char_vol) > 3000)
             )
 
             forward_pipette_v2(
@@ -2059,7 +2059,7 @@ def layered_solution_protocol(
             logger.info("Pipette Flushed")
             instruction.status = ExperimentStatus.COMPLETE
 
-    logger.info("End of Experiment: %s", instructions.id)
+    logger.info("End of Experiment: %s", instruction.id)
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""

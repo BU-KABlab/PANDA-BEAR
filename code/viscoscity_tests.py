@@ -71,7 +71,7 @@ for solution_number, solution in enumerate(solutions):
         # Change wellplate and load new wellplate
         controller.load_new_wellplate(new_wellplate_type_number=6)
         experiment_id = determine_next_experiment_id()
-        experiments = []
+        experiments : list[experiment_class.ExperimentBase]= []
 
         # Create 96 new experiemnts for the solution
         for column in COLUMNS:
@@ -106,35 +106,18 @@ for solution_number, solution in enumerate(solutions):
 
         ## Chech that the pumping rates are correct for the plate number
         ## If the plate number is 0 then the pumping rate should be 0.064 for the first 48 experiments
-        # and 0.138 for the remaining 48 experiments 
+        # and 0.138 for the remaining 48 experiments
         ## If the plate number is 1, then the pumping rate should be 0.297 for the first 48 experiments
         # and 0.640 for the remaining 48 experiments
+
         if plate_number_per_solution == 1:
-            assert (
-                experiments[0].pumping_rate == 0.064
-            ), "Pumping rate should be 0.064 for the first 48 experiments"
-            assert (
-                experiments[47].pumping_rate == 0.064
-            ), "Pumping rate should be 0.064 for the first 48 experiments"
-            assert (
-                experiments[48].pumping_rate == 0.138
-            ), "Pumping rate should be 0.138 for the remaining 48 experiments"
-            assert (
-                experiments[95].pumping_rate == 0.138
-            ), "Pumping rate should be 0.138 for the remaining 48 experiments"
+            expected_pumping_rates = [0.064, 0.064, 0.138, 0.138]
         else:
-            assert (
-                experiments[0].pumping_rate == 0.297
-            ), "Pumping rate should be 0.297 for the first 48 experiments"
-            assert (
-                experiments[47].pumping_rate == 0.297
-            ), "Pumping rate should be 0.297 for the first 48 experiments"
-            assert (
-                experiments[48].pumping_rate == 0.640
-            ), "Pumping rate should be 0.640 for the remaining 48 experiments"
-            assert (
-                experiments[95].pumping_rate == 0.640
-            ), "Pumping rate should be 0.640 for the remaining 48 experiments"
+            expected_pumping_rates = [0.297, 0.297, 0.640, 0.640]
+
+        pumping_rates = [experiment.pumping_rate for experiment in experiments]
+        assert pd.Series(pumping_rates[:48]).equals(pd.Series(expected_pumping_rates[:2])), "Pumping rate should be 0.064 for the first 48 experiments"
+        assert pd.Series(pumping_rates[48:]).equals(pd.Series(expected_pumping_rates[2:])), "Pumping rate should be 0.138 for the remaining 48 experiments"
 
         scheduler = Scheduler()
         result = scheduler.add_nonfile_experiments(experiments)
