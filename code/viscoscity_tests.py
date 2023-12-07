@@ -45,7 +45,7 @@ def determine_next_experiment_id() -> int:
     return int(last_experiment_id + 1)
 
 
-TEST = True
+TEST = False
 print("TEST MODE: ", TEST)
 # Create experiments
 COLUMNS = "ABCDEFGH"

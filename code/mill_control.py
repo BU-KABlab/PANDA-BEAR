@@ -61,7 +61,7 @@ class Mill:
         self.set_feed_rate(2000)  # Set feed rate to 2000
         self.clear_buffers()
 
-    def connect_to_mill(self):
+    def connect_to_mill(self) -> serial.Serial:
         """Connect to the mill"""
         try:
             ser_mill = serial.Serial(
@@ -459,7 +459,7 @@ class Mill:
             self.execute_command("G00 Z0")
 
         # Fetch offsets for the specified instrument
-        offsets = self.config["instrument_offsets"][instrument]
+        offsets = self.config["instrument_offsets"][instrument.value]
         # updated target coordinates with offsets so the center of the mill moves to the right spot
         x_coord = x_coord + offsets["x"]
         y_coord = y_coord + offsets["y"]
@@ -720,35 +720,35 @@ def movement_test():
             waste_vials = read_vials(Path.cwd() / WASTE_STATUS_FILE)
 
             ## Move the pipette to each well
-            # mill.safe_move(
-            #     a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
-            # )
-            # mill.safe_move(
-            #     a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
-            # )
-            # mill.safe_move(
-            #     h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
-            # )
-            # mill.safe_move(
-            #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
-            # )
-            if len(stock_vials) != 0:
-                for i in range(len(stock_vials)):
-                    mill.safe_move(
-                        stock_vials[i].coordinates["x"],
-                        stock_vials[i].coordinates["y"],
-                        stock_vials[i].depth,
-                        instrument=Instruments.PIPETTE,
-                    )
-                mill.move_to_safe_position()
+            mill.safe_move(
+                a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
+            )
             mill.safe_move(
                 h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
-            )  
-            if len(waste_vials) != 0:
-                ## Move pipette to first waste vial then to the depth and then to safe position
-                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
-                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
-                mill.move_to_safe_position()
+            )
+            # if len(stock_vials) != 0:
+            #     for i in range(len(stock_vials)):
+            #         mill.safe_move(
+            #             stock_vials[i].coordinates["x"],
+            #             stock_vials[i].coordinates["y"],
+            #             stock_vials[i].depth,
+            #             instrument=Instruments.PIPETTE,
+            #         )
+            #     mill.move_to_safe_position()
+            # mill.safe_move(
+            #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
+            # )  
+            # if len(waste_vials) != 0:
+            #     ## Move pipette to first waste vial then to the depth and then to safe position
+            #     mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
+            #     mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
+            #     mill.move_to_safe_position()
 
     except (
         MillConnectionError,
