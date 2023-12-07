@@ -17,6 +17,7 @@ Additionally controller should be able to:
 import datetime
 import json
 import logging
+from typing import Optional, Sequence, Union
 
 # import third-party libraries
 from pathlib import Path
@@ -77,6 +78,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
     print(printpanda())
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
+    toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
         ## Check for required files
@@ -90,11 +92,23 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         ## Initialize scheduler
         scheduler = Scheduler()
 
+
+        ## Establish state of system - we do this each time because each experiment changes the system state
+        stock_vials, waste_vials, wellplate = establish_system_state()
+
+        ## Flush the pipette tip with water before we start
+        e_panda.flush_v2(stock_vials=stock_vials,
+                            waste_vials=waste_vials,
+                            flush_solution_name='water',
+                            flush_volume=120,
+                            pump=toolkit.pump,
+                            mill=toolkit.mill,
+                            )
         ## Begin outer loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
-            formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-            system_handler.setFormatter(formatter)
+            experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+            system_handler.setFormatter(experiment_formatter)
             logger.addHandler(system_handler)
 
             ## Establish state of system - we do this each time because each experiment changes the system state
@@ -157,7 +171,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                         error_message,
                     )
                     logger.error(error_message)
-                    new_experiment.status = "insufficient stock"
+                    new_experiment.status = ExperimentStatus.ERROR
                     new_experiment.priority = 999
                     scheduler.update_experiment_status(new_experiment)
                     scheduler.update_experiment_queue_priority(
@@ -181,7 +195,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
 
                 ## Run the experiment
-                e_panda.vial_depth_tracking_protocol(
+                e_panda.viscosity_experiments_protocol(
                     instructions=new_experiment,
                     results=experiment_results,
                     mill=toolkit.mill,
@@ -190,6 +204,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     waste_vials=waste_vials,
                     wellplate=wellplate,
                 )
+
                 ## Reset the logger to log to the ePANDA.log file and format
                 system_handler.setFormatter(formatter)
                 logger.addHandler(system_handler)
@@ -269,14 +284,15 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
     finally:
         # close out of serial connections
-        disconnect_from_instruments(toolkit)
+        if toolkit is not None:
+            disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
 
 
 class Toolkit:
     """A class to hold all of the instruments"""
 
-    def __init__(self, mill: Mill, scale: Scale, pump: Pump, pstat = None):
+    def __init__(self, mill: Union[Mill,MockMill], scale: Union[Scale, MockScale], pump: Union[Pump,MockPump], pstat = None):
         self.mill = mill
         self.scale = scale
         self.pump = pump
@@ -312,7 +328,7 @@ def check_required_files():
 
 
 def establish_system_state() -> (
-    tuple[list[StockVial], list[WasteVial], wellplate_module.Wells2]
+    tuple[Sequence[StockVial], Sequence[WasteVial], wellplate_module.Wells2]
 ):
     """
     Establish state of system
@@ -323,13 +339,15 @@ def establish_system_state() -> (
     """
     stock_vials = read_vials(PATH_TO_STATUS / "stock_status.json")
     waste_vials = read_vials(PATH_TO_STATUS / "waste_status.json")
+    stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
+    waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = wellplate_module.Wells2(
         -230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5
     )
     logger.info("System state established")
 
     ## read through the stock vials and log their name, contents, and volume
-    for vial in stock_vials:
+    for vial in stock_vials_only:
         logger.debug(
             "Stock vial %s contains %s with volume %d",
             vial.name,
@@ -338,7 +356,7 @@ def establish_system_state() -> (
         )
 
     ## if any stock vials are empty, send a slack message prompting the user to refill them and confirm if program should continue
-    empty_stock_vials = [vial for vial in stock_vials if vial.volume < 1000]
+    empty_stock_vials = [vial for vial in stock_vials_only if vial.volume < 1000]
     if len(empty_stock_vials) > 0:
         slack.send_slack_message(
             "alert",
@@ -355,7 +373,7 @@ def establish_system_state() -> (
         slack.send_slack_message("alert", "The program is continuing")
 
     ## read through the waste vials and log their name, contents, and volume
-    for vial in waste_vials:
+    for vial in waste_vials_only:
         logger.debug(
             "Waste vial %s contains %s with volume %d",
             vial.name,
@@ -364,7 +382,7 @@ def establish_system_state() -> (
         )
 
     ## if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
-    full_waste_vials = [vial for vial in waste_vials if vial.volume > 19000]
+    full_waste_vials = [vial for vial in waste_vials_only if vial.volume > 19000]
     if len(full_waste_vials) > 0:
         slack.send_slack_message(
             "alert",
@@ -414,10 +432,10 @@ def establish_system_state() -> (
         # slack.send_slack_message("alert", "Wellplate has been reset. Continuing...")
         pass
 
-    return stock_vials, waste_vials, wellplate
+    return stock_vials_only, waste_vials_only, wellplate
 
 
-def check_stock_vials(experiment: ExperimentBase, stock_vials: list[Vial2]) -> bool:
+def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) -> bool:
     """
     Check that there is enough volume in the stock vials to run the experiment
 
@@ -433,7 +451,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: list[Vial2]) -> b
         logger.error("The experiment has no solutions")
         return False
     for solution in experiment.solutions:
-        if solution not in [vial.name for vial in stock_vials]:
+        if str(solution).lower() not in [str(vial.name).lower() for vial in stock_vials]:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
@@ -490,7 +508,7 @@ def disconnect_from_instruments(instruments: Toolkit):
     logger.info("Disconnected from instruments")
 
 
-def read_vials(filename) -> list[Vial2]:
+def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
     """
     Read in the virtual vials from the json file
     """
@@ -501,10 +519,10 @@ def read_vials(filename) -> list[Vial2]:
     list_of_solutions = []
     for items in vial_parameters:
         if items["name"] is not None:
-            read_vial = Vial2(
-                    name=items["name"],
-                    category=items["category"],
-                    position=items["position"],
+            if items["category"] == 0:
+                read_vial = StockVial(
+                    name=str(items["name"]).lower(),
+                    position=str(items["position"]).lower(),
                     volume=items["volume"],
                     capacity=items["capacity"],
                     density=items["density"],
@@ -515,11 +533,26 @@ def read_vials(filename) -> list[Vial2]:
                     contamination=items["contamination"],
                     contents=items["contents"],
                     )
-            list_of_solutions.append(read_vial)
+                list_of_solutions.append(read_vial)
+            elif items["category"] == 1:
+                read_vial = WasteVial(
+                    name=str(items["name"]).lower(),
+                    position=str(items["position"]).lower(),
+                    volume=items["volume"],
+                    capacity=items["capacity"],
+                    density=items["density"],
+                    coordinates={"x": items["x"], "y": items["y"]},
+                    z_bottom=items["z_bottom"],
+                    radius=items["radius"],
+                    height=items["height"],
+                    contamination=items["contamination"],
+                    contents=items["contents"],
+                    )
+                list_of_solutions.append(read_vial)
     return list_of_solutions
 
 
-def update_vial_state_file(vial_objects: list[Vial2], filename):
+def update_vial_state_file(vial_objects: Sequence[Vial2], filename):
     """
     Update the vials in the json file. This is used to update the volume and contamination of the vials
     """
@@ -544,10 +577,14 @@ def update_vial_state_file(vial_objects: list[Vial2], filename):
 def input_new_vial_values(vialgroup: str):
     """For user inputting the new vial values for the state file"""
     ## Fetch the current state file
+    filename = ""
     if vialgroup == "stock":
         filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
     elif vialgroup == "waste":
         filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+    else:
+        logger.error("Invalid vialgroup")
+        raise ValueError
 
     with open(filename, "r", encoding="UTF-8") as file:
         vial_parameters = json.load(file)
@@ -584,10 +621,14 @@ def reset_vials(vialgroup: str):
         vialgroup (str): The group of vials to be reset. Either "stock" or "waste"
     """
     ## Fetch the current state file
+    filename = ""
     if vialgroup == "stock":
         filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
     elif vialgroup == "waste":
         filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+    else:
+        logger.error("Invalid vialgroup")
+        raise ValueError
 
     with open(filename, "r", encoding="UTF-8") as file:
         vial_parameters = json.load(file)
@@ -606,7 +647,7 @@ def reset_vials(vialgroup: str):
         json.dump(vial_parameters, file, indent=4)
 
 
-def load_new_wellplate(ask: bool = False, new_plate_id: int = None,new_wellplate_type_number: int = None ) -> int:
+def load_new_wellplate(ask: bool = False, new_plate_id: Optional[int] = None,new_wellplate_type_number: Optional[int] = None ) -> int:
     """
     Save the current wellplate, reset the well statuses to new.
     If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1

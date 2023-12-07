@@ -16,6 +16,7 @@ of the mill.
 
 # standard libraries
 import dataclasses
+from enum import Enum
 import json
 import logging
 import pathlib
@@ -35,7 +36,7 @@ import wellplate as Wells
 logger = logging.getLogger("e_panda")
 
 @dataclasses.dataclass
-class Instruments:
+class Instruments(Enum):
     """Class for naming of the mill instruments"""
 
     CENTER = "center"

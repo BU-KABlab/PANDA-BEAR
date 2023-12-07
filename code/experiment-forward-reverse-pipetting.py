@@ -54,7 +54,7 @@ for i in range(1,12):
                     project_id=PROJECT_ID,
                     project_campaign_id=PREVIOUS_CAMPAIGN_ID+i,
                     solutions={'water': VOLUME},
-                    status='new',
+                    status=experiment_class.ExperimentStatus.NEW,
                     filename=EXPERIMENT_NAME + str(experiment_id),
                     )
                 )

@@ -1,966 +1,774 @@
 {
-    "plate_id": 71,
+    "plate_id": 72,
     "type_number": 6,
     "wells": [
         {
             "well_id": "A1",
-            "status": "complete",
-            "status_date": "2023-12-05T16:49:25",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997230,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A2",
-            "status": "complete",
-            "status_date": "2023-12-05T17:38:25",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997231,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A3",
-            "status": "complete",
-            "status_date": "2023-12-05T17:58:34",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997232,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A4",
-            "status": "complete",
-            "status_date": "2023-12-05T17:10:50",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997233,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A5",
-            "status": "complete",
-            "status_date": "2023-12-05T15:47:59",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997234,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A6",
-            "status": "complete",
-            "status_date": "2023-12-05T17:15:22",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997235,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A7",
-            "status": "complete",
-            "status_date": "2023-12-05T17:09:20",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997236,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A8",
-            "status": "complete",
-            "status_date": "2023-12-05T18:01:36",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997237,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A9",
-            "status": "complete",
-            "status_date": "2023-12-05T16:25:22",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997238,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A10",
-            "status": "complete",
-            "status_date": "2023-12-05T15:35:40",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997239,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A11",
-            "status": "complete",
-            "status_date": "2023-12-05T17:04:49",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997240,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A12",
-            "status": "complete",
-            "status_date": "2023-12-05T17:57:04",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997241,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B1",
-            "status": "complete",
-            "status_date": "2023-12-05T16:40:06",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997242,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B2",
-            "status": "complete",
-            "status_date": "2023-12-05T17:39:59",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997243,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B3",
-            "status": "complete",
-            "status_date": "2023-12-05T15:46:27",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997244,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B4",
-            "status": "complete",
-            "status_date": "2023-12-05T16:20:50",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997245,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B5",
-            "status": "complete",
-            "status_date": "2023-12-05T16:26:52",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997246,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B6",
-            "status": "complete",
-            "status_date": "2023-12-05T15:38:44",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997247,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B7",
-            "status": "complete",
-            "status_date": "2023-12-05T18:00:06",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997248,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B8",
-            "status": "complete",
-            "status_date": "2023-12-05T17:07:50",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997249,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B9",
-            "status": "complete",
-            "status_date": "2023-12-05T16:00:36",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997250,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B10",
-            "status": "complete",
-            "status_date": "2023-12-05T15:43:21",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997251,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B11",
-            "status": "complete",
-            "status_date": "2023-12-05T17:41:30",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997252,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B12",
-            "status": "complete",
-            "status_date": "2023-12-05T16:05:13",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997253,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C1",
-            "status": "complete",
-            "status_date": "2023-12-05T16:44:49",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997254,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C2",
-            "status": "complete",
-            "status_date": "2023-12-05T17:52:25",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997255,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C3",
-            "status": "complete",
-            "status_date": "2023-12-05T16:47:53",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997256,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C4",
-            "status": "complete",
-            "status_date": "2023-12-05T16:28:27",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997257,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C5",
-            "status": "complete",
-            "status_date": "2023-12-05T17:35:20",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997258,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C6",
-            "status": "complete",
-            "status_date": "2023-12-05T15:52:38",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997259,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C7",
-            "status": "complete",
-            "status_date": "2023-12-05T18:03:06",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997260,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C8",
-            "status": "complete",
-            "status_date": "2023-12-05T17:24:39",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997261,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C9",
-            "status": "complete",
-            "status_date": "2023-12-05T17:26:10",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997262,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C10",
-            "status": "complete",
-            "status_date": "2023-12-05T16:31:27",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997263,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C11",
-            "status": "complete",
-            "status_date": "2023-12-05T16:29:57",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997264,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C12",
-            "status": "complete",
-            "status_date": "2023-12-05T16:38:34",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997265,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D1",
-            "status": "complete",
-            "status_date": "2023-12-05T16:12:58",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997266,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D2",
-            "status": "complete",
-            "status_date": "2023-12-05T17:50:50",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997267,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D3",
-            "status": "complete",
-            "status_date": "2023-12-05T15:49:32",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997268,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D4",
-            "status": "complete",
-            "status_date": "2023-12-05T16:37:03",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997269,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D5",
-            "status": "complete",
-            "status_date": "2023-12-05T17:30:42",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997270,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D6",
-            "status": "complete",
-            "status_date": "2023-12-05T17:13:52",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997271,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D7",
-            "status": "complete",
-            "status_date": "2023-12-05T17:27:41",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997272,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D8",
-            "status": "complete",
-            "status_date": "2023-12-05T17:36:54",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997273,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D9",
-            "status": "complete",
-            "status_date": "2023-12-05T16:22:22",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997274,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D10",
-            "status": "complete",
-            "status_date": "2023-12-05T16:58:40",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997275,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D11",
-            "status": "complete",
-            "status_date": "2023-12-05T15:34:12",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997276,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D12",
-            "status": "complete",
-            "status_date": "2023-12-05T16:54:02",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997277,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E1",
-            "status": "complete",
-            "status_date": "2023-12-05T16:16:06",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997278,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E2",
-            "status": "complete",
-            "status_date": "2023-12-05T16:19:14",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997279,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E3",
-            "status": "complete",
-            "status_date": "2023-12-05T17:01:45",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997280,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E4",
-            "status": "complete",
-            "status_date": "2023-12-05T16:52:31",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997281,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E5",
-            "status": "complete",
-            "status_date": "2023-12-05T16:50:58",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997282,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E6",
-            "status": "complete",
-            "status_date": "2023-12-05T15:55:52",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997283,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E7",
-            "status": "complete",
-            "status_date": "2023-12-05T16:46:21",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997284,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E8",
-            "status": "complete",
-            "status_date": "2023-12-05T16:23:52",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997285,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E9",
-            "status": "complete",
-            "status_date": "2023-12-05T15:41:47",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997286,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E10",
-            "status": "complete",
-            "status_date": "2023-12-05T17:29:11",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997287,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E11",
-            "status": "complete",
-            "status_date": "2023-12-05T17:49:19",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997288,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E12",
-            "status": "complete",
-            "status_date": "2023-12-05T17:21:32",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997289,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F1",
-            "status": "complete",
-            "status_date": "2023-12-05T15:57:26",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997290,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F2",
-            "status": "complete",
-            "status_date": "2023-12-05T16:43:13",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997291,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F3",
-            "status": "complete",
-            "status_date": "2023-12-05T17:03:18",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997292,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F4",
-            "status": "complete",
-            "status_date": "2023-12-05T16:09:48",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997293,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F5",
-            "status": "complete",
-            "status_date": "2023-12-05T16:11:24",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997294,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F6",
-            "status": "complete",
-            "status_date": "2023-12-05T16:55:32",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997295,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F7",
-            "status": "complete",
-            "status_date": "2023-12-05T16:02:07",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997296,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F8",
-            "status": "complete",
-            "status_date": "2023-12-05T16:41:39",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997297,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F9",
-            "status": "complete",
-            "status_date": "2023-12-05T17:06:18",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997298,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F10",
-            "status": "complete",
-            "status_date": "2023-12-05T16:06:43",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997299,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F11",
-            "status": "complete",
-            "status_date": "2023-12-05T15:44:53",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997300,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F12",
-            "status": "complete",
-            "status_date": "2023-12-05T17:20:00",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997301,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G1",
-            "status": "complete",
-            "status_date": "2023-12-05T17:23:05",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997302,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G2",
-            "status": "complete",
-            "status_date": "2023-12-05T16:03:41",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997303,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G3",
-            "status": "complete",
-            "status_date": "2023-12-05T17:18:27",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997304,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G4",
-            "status": "complete",
-            "status_date": "2023-12-05T17:00:11",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997305,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G5",
-            "status": "complete",
-            "status_date": "2023-12-05T16:17:40",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997306,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G6",
-            "status": "complete",
-            "status_date": "2023-12-05T17:54:01",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997307,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G7",
-            "status": "complete",
-            "status_date": "2023-12-05T17:32:16",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997308,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G8",
-            "status": "complete",
-            "status_date": "2023-12-05T16:08:15",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997309,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G9",
-            "status": "complete",
-            "status_date": "2023-12-05T16:14:32",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997310,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G10",
-            "status": "complete",
-            "status_date": "2023-12-05T17:33:48",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997311,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G11",
-            "status": "complete",
-            "status_date": "2023-12-05T17:16:53",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997312,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G12",
-            "status": "complete",
-            "status_date": "2023-12-05T17:12:21",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997313,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H1",
-            "status": "complete",
-            "status_date": "2023-12-05T15:54:14",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997314,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H2",
-            "status": "complete",
-            "status_date": "2023-12-05T16:57:06",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997315,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H3",
-            "status": "complete",
-            "status_date": "2023-12-05T17:46:14",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997316,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H4",
-            "status": "complete",
-            "status_date": "2023-12-05T15:37:11",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997317,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H5",
-            "status": "complete",
-            "status_date": "2023-12-05T16:32:59",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997318,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H6",
-            "status": "complete",
-            "status_date": "2023-12-05T15:59:04",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997319,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H7",
-            "status": "complete",
-            "status_date": "2023-12-05T15:51:05",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997320,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H8",
-            "status": "complete",
-            "status_date": "2023-12-05T17:44:36",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997321,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H9",
-            "status": "complete",
-            "status_date": "2023-12-05T17:43:02",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997322,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H10",
-            "status": "complete",
-            "status_date": "2023-12-05T15:40:17",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997323,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H11",
-            "status": "complete",
-            "status_date": "2023-12-05T17:55:34",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997324,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H12",
-            "status": "complete",
-            "status_date": "2023-12-05T17:47:48",
-            "contents": {
-                "water": 100.0
-            },
-            "experiment_id": 9997325,
-            "project_id": 8
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         }
     ]
 }

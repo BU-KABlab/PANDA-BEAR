@@ -7,8 +7,10 @@ from datetime import datetime
 
 # import json
 import logging
-import matplotlib.pyplot as plt
+import re
 from pathlib import Path
+import matplotlib.pyplot as plt
+
 import pandas as pd
 
 # import re
@@ -53,7 +55,7 @@ class SlackBot:
         except SlackApiError as error:
             self.logger.error("Error posting message: %s", error)
 
-    def send_slack_file(self, channel: str, file, message=None) -> None:
+    def send_slack_file(self, channel: str, file, message=None) -> int:
         """Send a file to Slack."""
         client = WebClient(slack_cred.TOKEN)
         filename_to_post = file.split("\\")[-1]
@@ -65,7 +67,7 @@ class SlackBot:
         elif channel in [slack_cred.CONVERSATION_CHANNEL_ID, slack_cred.ALERT_CHANNEL_ID]:
             channel_id = channel
         else:
-            return "No applicable channel"
+            return 0
 
         try:
             if not self.test:
@@ -79,11 +81,14 @@ class SlackBot:
                 result = {"ok": True}
             if result["ok"]:
                 self.logger.info("File sent: %s", file)
+                return 1
             else:
                 self.logger.error("Error sending file: %s", file)
+                return 0
         except SlackApiError as exception:
             log_msg = f"Error uploading file: {format(exception)}"
             self.logger.error(log_msg)
+            return 0
 
     def upload_requested_experiment_info(self, experiment_id, test_type, result_type, channel):
         """Uploads requested experiment information to Slack channel.
@@ -151,11 +156,7 @@ class SlackBot:
             conversation_history2 = [
                 x
                 for x in conversation_history
-                if (x["text"][0:7] == "!epanda")
-                or (x["text"][0:7] == "!EPANDA")
-                or (x["text"][0:7] == "!ePANDA")
-                or (x["text"][0:7] == "!Epanda")
-                or (x["text"][0:7] == "!ePanda")
+                if (str(x["text"][0:7]).lower() == "!epanda")
             ]
 
             for _, payload in enumerate(conversation_history2):
@@ -209,6 +210,7 @@ class SlackBot:
         except SlackApiError as error:
             error_msg = f"Error creating conversation: {format(error)}"
             self.logger.error(error_msg)
+            return 0
 
 
     def find_id(self, experiment_id):
@@ -256,19 +258,20 @@ class SlackBot:
             message = (
                 "Here is a list of commands I understand:\n"
                 "help - displays this message\n"
-                "plot experiment # - plots plots the CV data for experiment #\n"
-                "data experiment # - sends the data files for experiment #\n"
-                "status experiment # - displays the status of experiment #\n"
+                #"plot experiment # - plots plots the CV data for experiment #\n"
+                #"data experiment # - sends the data files for experiment #\n"
+                #"status experiment # - displays the status of experiment #\n"
                 "status vials - displays the status of the vials\n"
-                "status wells - displays the status of the wells\n"
+                #"status wells - displays the status of the wells\n"
                 "queue length - displays the length of the queue\n"
-                "pause - pauses the current experiment\n"
-                "resume - resumes the current experiment\n"
-                "start - starts a new experiment\n"
-                "stop - stops the current experiment\n"
+                #"pause - pauses the current experiment\n"
+                #"resume - resumes the current experiment\n"
+                #"start - starts a new experiment\n"
+                #"stop - stops the current experiment\n"
                 "exit - exits the program\n"
             )
             self.send_slack_message(channel_id, message)
+            return 1
 
         elif text[0:15] == "plot experiment":
             # Get experiment number
@@ -297,7 +300,7 @@ class SlackBot:
             ## Load the vial status json file
             stock_vials = pd.read_json(PATH_TO_CODE / "system state/stock_status.json")
             ## Filter for just the vial position and volume
-            stock_vials = stock_vials[["position", "volume"]]
+            stock_vials = stock_vials[["position", "volume", "name"]]
             ## set position to be a string and volume to be a float
             stock_vials["position"] = stock_vials["position"].astype(str)
             stock_vials["volume"] = stock_vials["volume"].astype(float)
@@ -310,8 +313,9 @@ class SlackBot:
 
             # Draw a horizontal line at 4000
             plt.axhline(y=4000, color="red", linestyle="-")
-            
-            # increase the space between x-axis ticks
+            # Write the name of the vial vertically in the bar
+            for i, v in enumerate(stock_vials["name"]):
+                plt.text(i, 10, str(v), color="black", ha="center", rotation=90)       
             plt.xlabel("Position")
             plt.ylabel("Volume")
             plt.title("Stock Vial Status")
@@ -320,6 +324,27 @@ class SlackBot:
 
             ## Delete the graph file
             Path("vial_status.png").unlink()
+            plt.close()
+
+            # And the same for the waste vials
+            waste_vials = pd.read_json(PATH_TO_CODE / "system state/waste_status.json")
+            waste_vials = waste_vials[["position", "volume", "name"]]
+            # Drop any vials that have null values
+            waste_vials = waste_vials.dropna()
+            waste_vials["position"] = waste_vials["position"].astype(str)
+            waste_vials["volume"] = waste_vials["volume"].astype(float)
+            plt.bar(waste_vials["position"], waste_vials["volume"], align="center", alpha=0.5, color="blue")
+            for i, v in enumerate(waste_vials["volume"]):
+                plt.text(i, v, str(v/1000), color="black", ha="center")
+            plt.axhline(y=20000, color="red", linestyle="-")
+            for i, v in enumerate(waste_vials["name"]):
+                plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
+            plt.xlabel("Position")
+            plt.ylabel("Volume")
+            plt.title("Waste Vial Status")
+            plt.savefig("waste_status.png")
+            self.send_slack_file(channel_id, "waste_status.png")
+            Path("waste_status.png").unlink()
             plt.close()
 
             return 1
