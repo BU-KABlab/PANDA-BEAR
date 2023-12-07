@@ -115,7 +115,7 @@ class Pump:
             self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
             self.update_pipette_volume(self.pump.volume_withdrawn)
             pump_control_logger.info(
-                "Pump has withdrawn: %0.6f ml at %f   Pipette vol: %0.3f ul",
+                "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
                 self.pump.volume_withdrawn,
                 self.pump.pumping_rate,
                 self.pipette_volume_ul,
@@ -157,7 +157,7 @@ class Pump:
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
-                "Pump has infused: %0.6f ml (%0.6f of solution) at %f Pipette volume: %0.3f ul",
+                "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
                 self.pump.pumping_rate,
                 self.pump.volume_infused - blowout_ml,
@@ -384,7 +384,7 @@ class MockPump(Pump):
             self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
             self.update_pipette_volume(volume_ml)
             pump_control_logger.info(
-                "Pump has withdrawn: %0.6f ml at %f   Pipette vol: %0.3f ul",
+                "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
                 volume_ml,
                 self.pumping_rate,
                 self.pipette_volume_ul,
@@ -427,7 +427,7 @@ class MockPump(Pump):
             self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume_ml + blowout_ml)
             pump_control_logger.info(
-                "Pump has infused: %0.6f ml (%0.6f of solution) at %f Pipette volume: %0.3f ul",
+                "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
                 volume_ml,
                 self.pumping_rate,
                 volume_ml - blowout_ml,
