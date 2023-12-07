@@ -245,8 +245,8 @@ class Pump:
             post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
-            scale_logger.info("Data,%s,%f,%f,%f,%f",
-                            action, volume_ml, density, pre_weight, post_weight
+            scale_logger.info("Data,%s,%f,%f,%f,%f, %f",
+                            action, volume_ml, density, pre_weight, post_weight, self.pump.pumping_rate
                             )
 
         action_type = (
@@ -471,8 +471,8 @@ class MockPump(Pump):
             post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
-            scale_logger.info("Data,%s,%f,%f,%f,%f",
-                            action, volume_ml, density, pre_weight, post_weight
+            scale_logger.info("Data,%s,%f,%f,%f,%f, %f",
+                            action, volume_ml, density, pre_weight, post_weight, self.pumping_rate
                             )
 
         action_type = (

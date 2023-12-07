@@ -52,6 +52,9 @@ from config.config import (
     PATH_TO_NETWORK_LOGS as PATH_TO_LOGS,
     PATH_TO_NETWORK_WELL_HX as PATH_TO_WELL_HX,
     RANDOM_FLAG,
+    STOCK_STATUS_FILE,
+    WASTE_STATUS_FILE
+
 )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -104,6 +107,14 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                             pump=toolkit.pump,
                             mill=toolkit.mill,
                             )
+        ## Update the system state with new vial and wellplate information
+        update_vial_state_file(
+            stock_vials, STOCK_STATUS_FILE
+        )
+        update_vial_state_file(
+            waste_vials, WASTE_STATUS_FILE
+        )
+
         ## Begin outer loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format

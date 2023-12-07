@@ -13,6 +13,17 @@ STOCK_STATUS_FILE_NAME = "stock_status.json"
 WASTE_STATUS_FILE_NAME = "waste_status.json"
 WELL_STATUS_FILE_NAME = "well_status.json"
 WELL_TYPE_FILE_NAME = "well_type.csv"
+SLACK_TICKETS_FILE_NAME = "slack_ticket_tracker.csv"
+
+## Project directory names
+STATUS = "system state"
+CONFIG = "config"
+EXPERIMENTS_COMPLETED = "experiments_completed"
+EXPERIMENTS_ERROR = "experiments_error"
+DATA = "data"
+LOGS = "logs"
+EXPERIMENT_INBOX = "experiments_inbox"
+EXPERIMENT_QUEUE = "experiment_queue"
 
 ## Paths of project directories
 PATH_TO_STATUS = PATH_TO_CODE / "system state/"
@@ -38,7 +49,10 @@ WELL_STATUS_FILE = PATH_TO_STATUS / "well_status.json"
 PATH_TO_LOCAL_WELL_HX = PATH_TO_DATA / "well_history.csv"
 
 PATH_TO_NETWORK_WELL_HX = PATH_TO_NETWORK_DATA / "well_history.csv"
-PATH_TO_NETWORK_QUEUE = Path("p:") / "system state/queue.csv"
+PATH_TO_NETWORK_QUEUE = NETWORK_DRIVE / STATUS / "queue.csv"
+PATH_TO_NETWORK_STOCK_STATUS = NETWORK_DRIVE / STATUS / "stock_status.json"
+PATH_TO_NETWORK_WASTE_STATUS = NETWORK_DRIVE / STATUS / "waste_status.json"
+PATH_TO_NETWORK_SLACK_TICKETS = NETWORK_DRIVE / STATUS / "slack_ticket_tracker.csv"
 
 ## Common values for the project
 AIR_GAP = 40
