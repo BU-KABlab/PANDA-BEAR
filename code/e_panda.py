@@ -193,7 +193,7 @@ def forward_pipette_v2(
                 weigh = True
             else:
                 weigh = False
-                
+
             pump.infuse(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,

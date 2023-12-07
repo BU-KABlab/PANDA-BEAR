@@ -12,9 +12,9 @@
         "height": -20,
         "depth": 0,
         "name": "1000:1 H20:Glycerol",
-        "volume": 20000.0,
+        "volume": 4100.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 159
     },
     {
         "position": "s1",
@@ -29,9 +29,9 @@
         "height": -20,
         "depth": 0,
         "name": "1000:1 H20:Glycerol",
-        "volume": 20000.0,
+        "volume": 16700.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 33
     },
     {
         "position": "s2",
@@ -46,9 +46,9 @@
         "height": -20,
         "depth": 0,
         "name": "100:1 H20:Glycerol",
-        "volume": 20000.0,
+        "volume": 11000.0,
         "capacity": 20000,
-        "contamination": 0
+        "contamination": 90
     },
     {
         "position": "s3",

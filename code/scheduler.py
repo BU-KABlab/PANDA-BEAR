@@ -418,7 +418,7 @@ class Scheduler:
         with open(file_path, "w", encoding="UTF-8") as file:
             file.write(serialized_data)
 
-        logger.info("Experiment %s status changed to %s", experiment.id, experiment.status)
+        logger.info("Experiment %s status changed to %s", experiment.id, experiment.status.value)
 
     def update_experiment_location(self, experiment: ExperimentBase) -> None:
         """

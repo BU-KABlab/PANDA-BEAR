@@ -1,0 +1,18 @@
+{
+    "id": 9997603,
+    "experiment_name": "Viscocity test",
+    "priority": 1,
+    "target_well": "H2",
+    "pin": 2001001001,
+    "project_id": 9,
+    "solutions": {
+        "100:1 h20:glycerol": 100.0
+    },
+    "pumping_rate": 0.138,
+    "status": "complete",
+    "status_date": "2023-12-07T16:06:07",
+    "filename": "Viscocity test9997603",
+    "results": null,
+    "project_campaign_id": 1,
+    "protocol_type": 1
+}
