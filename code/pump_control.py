@@ -112,7 +112,7 @@ class Pump:
             else:
                 density = None
 
-            difference = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
+            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
             self.update_pipette_volume(self.pump.volume_withdrawn)
             pump_control_logger.info(
                 "Pump has withdrawn: %0.6f ml at %f   Pipette vol: %0.3f ul",
@@ -154,7 +154,7 @@ class Pump:
             else:
                 density = None
 
-            difference = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %f Pipette volume: %0.3f ul",
@@ -230,7 +230,7 @@ class Pump:
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
-        pump_control_logger.debug("%s %f ml at %f mL/min...", action, volume_ml, self.pump.pumping_rate)
+        pump_control_logger.info("%s %f ml at %f mL/min...", action, volume_ml, self.pump.pumping_rate)
         time.sleep(0.5)
         self.pump.run()
         while self.pump.running:
@@ -380,7 +380,7 @@ class MockPump(Pump):
             else:
                 density = None
             self.pumping_rate = rate
-            difference = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.pumping_rate, density, weigh)
+            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.pumping_rate, density, weigh)
             self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
             self.update_pipette_volume(volume_ml)
             pump_control_logger.info(
