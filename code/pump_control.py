@@ -90,7 +90,7 @@ class Pump:
         return pump
 
     def withdraw(
-        self, volume: float, solution: Optional[Vessel] = None, rate: float = 0.5, weigh: bool = False
+        self, volume: float, solution: Optional[Vessel] = None, rate: float = None, weigh: bool = False
     ):
         """
         Withdraw the given volume at the given rate and depth from the specified position.
@@ -213,7 +213,10 @@ class Pump:
         # Set the pump parameters for the run
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml+blowout_ml #ml
-        self.pump.pumping_rate = rate #rate
+        if rate is None:
+            self.pump.pumping_rate = self.max_pump_rate
+        else:
+            self.pump.pumping_rate = rate
         action = (
             "Withdrawing"
             if direction == nesp_lib.PumpingDirection.WITHDRAW
