@@ -87,7 +87,7 @@ for solution_number, solution in enumerate(solutions):
                         pin=CURRENT_PIN,
                         project_id=PROJECT_ID,
                         project_campaign_id=PREVIOUS_CAMPAIGN_ID + solution_number,
-                        solutions={str(solution): float(VOLUME)},
+                        solutions={str(solution).lower(): float(VOLUME)},
                         # for columns ABCD of the plate 1 use pumping rate 0.064 (0),
                         # ex. plate_number_per_solution = 1, column = 'A' -> pumping rate = 0.064
                         # for columns EFGH of the plate 1 use pumping rate 0.138 (1),
@@ -132,18 +132,18 @@ for solution_number, solution in enumerate(solutions):
         assert all(rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
         ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
         print(f"Solution: {solution}")
-        print(f"Plate number: {plate_number_per_solution}")
+        print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
         print(f"Pumping rate of first 0-47: {expected_pumping_rate_first_48}")
         print(f"Pumping rate of remaining 48-95: {expected_pumping_rate_remaining}")
         print(f"Project campaign id: {PREVIOUS_CAMPAIGN_ID + solution_number}")
 
-        # scheduler = Scheduler()
-        # result = scheduler.add_nonfile_experiments(experiments)
-        # if result == "success":
-        #     controller.main(use_mock_instruments=TEST)
-        # else:
-        #     print("Error: ", result)
-        #     break
+        scheduler = Scheduler()
+        result = scheduler.add_nonfile_experiments(experiments)
+        if result == "success":
+            controller.main(use_mock_instruments=TEST)
+        else:
+            print("Error: ", result)
+            break
 
 message = f"Finished running {EXPERIMENT_NAME} experiments"
 print(message)

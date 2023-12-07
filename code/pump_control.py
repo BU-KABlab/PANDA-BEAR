@@ -115,8 +115,9 @@ class Pump:
             difference = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
             self.update_pipette_volume(self.pump.volume_withdrawn)
             pump_control_logger.info(
-                "Pump has withdrawn: %0.6f ml    Pipette vol: %0.3f ul",
+                "Pump has withdrawn: %0.6f ml at %f   Pipette vol: %0.3f ul",
                 self.pump.volume_withdrawn,
+                self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
             self.pump.volume_infused_clear()
@@ -156,8 +157,9 @@ class Pump:
             difference = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
-                "Pump has infused: %0.6f ml (%0.6f of solution) Pipette volume: %0.3f ul",
+                "Pump has infused: %0.6f ml (%0.6f of solution) at %f Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
+                self.pump.pumping_rate,
                 self.pump.volume_infused - blowout_ml,
                 self.pipette_volume_ul,
             )
@@ -211,7 +213,7 @@ class Pump:
         # Set the pump parameters for the run
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml+blowout_ml #ml
-        self.pump.pumping_rate = self.max_pump_rate #rate
+        self.pump.pumping_rate = rate #rate
         action = (
             "Withdrawing"
             if direction == nesp_lib.PumpingDirection.WITHDRAW
@@ -225,7 +227,7 @@ class Pump:
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
-        pump_control_logger.debug("%s %f ml...", action, volume_ml)
+        pump_control_logger.debug("%s %f ml at %f mL/min...", action, volume_ml, self.pump.pumping_rate)
         time.sleep(0.5)
         self.pump.run()
         while self.pump.running:
@@ -353,6 +355,7 @@ class MockPump(Pump):
         self.pipette_volume_ul = 0.0  # uL
         self.pipette_volume_ml = 0.0  # mL
         self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
+        self.pumping_rate = self.max_pump_rate
 
     def set_up_pump(self):
         pump = object()
@@ -373,13 +376,14 @@ class MockPump(Pump):
                 density = solution.density
             else:
                 density = None
-
-            difference = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
+            self.pumping_rate = rate
+            difference = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.pumping_rate, density, weigh)
             self.pumping_direction = nesp_lib.PumpingDirection.WITHDRAW
             self.update_pipette_volume(volume_ml)
             pump_control_logger.info(
-                "Pump has withdrawn: %0.6f ml    Pipette vol: %0.3f ul",
+                "Pump has withdrawn: %0.6f ml at %f   Pipette vol: %0.3f ul",
                 volume_ml,
+                self.pumping_rate,
                 self.pipette_volume_ul,
             )
 
@@ -415,13 +419,14 @@ class MockPump(Pump):
                 density = being_infused.density
             else:
                 density = None
-
-            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
+            self.pumping_rate = rate
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, self.pumping_rate, density, blowout_ml, weigh)
             self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume_ml + blowout_ml)
             pump_control_logger.info(
-                "Pump has infused: %0.6f ml (%0.6f of solution) Pipette volume: %0.3f ul",
+                "Pump has infused: %0.6f ml (%0.6f of solution) at %f Pipette volume: %0.3f ul",
                 volume_ml,
+                self.pumping_rate,
                 volume_ml - blowout_ml,
                 self.pipette_volume_ul,
             )
@@ -453,7 +458,7 @@ class MockPump(Pump):
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
-        pump_control_logger.debug("%s %f ml...", action, volume_ml)
+        pump_control_logger.debug("%s %f ml at %f mL/min...", action, volume_ml, rate)
         time.sleep(0.05)
         pump_control_logger.debug("Done %s", action)
         time.sleep(0.05)

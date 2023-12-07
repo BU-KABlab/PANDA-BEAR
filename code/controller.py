@@ -92,6 +92,18 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         ## Initialize scheduler
         scheduler = Scheduler()
 
+
+        ## Establish state of system - we do this each time because each experiment changes the system state
+        stock_vials, waste_vials, wellplate = establish_system_state()
+
+        ## Flush the pipette tip with water before we start
+        e_panda.flush_v2(stock_vials=stock_vials,
+                            waste_vials=waste_vials,
+                            flush_solution_name='water',
+                            flush_volume=120,
+                            pump=toolkit.pump,
+                            mill=toolkit.mill,
+                            )
         ## Begin outer loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
@@ -102,14 +114,6 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, wellplate = establish_system_state()
 
-            ## Flush the pipette tip with water
-            e_panda.flush_v2(stock_vials=stock_vials,
-                             waste_vials=waste_vials,
-                             flush_solution_name='water',
-                             flush_volume=120,
-                             pump=toolkit.pump,
-                             mill=toolkit.mill,
-                             )
             ## Check the qeueue for any protocol type 2 experiments
             queue = scheduler.get_queue()
             # check if any of the experiments in the queue pandas dataframe are type 2
@@ -447,7 +451,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
         logger.error("The experiment has no solutions")
         return False
     for solution in experiment.solutions:
-        if solution not in [vial.name for vial in stock_vials]:
+        if str(solution).lower() not in [str(vial.name).lower() for vial in stock_vials]:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
@@ -517,8 +521,8 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
         if items["name"] is not None:
             if items["category"] == 0:
                 read_vial = StockVial(
-                    name=items["name"],
-                    position=items["position"],
+                    name=str(items["name"]).lower(),
+                    position=str(items["position"]).lower(),
                     volume=items["volume"],
                     capacity=items["capacity"],
                     density=items["density"],
@@ -532,8 +536,8 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
                 list_of_solutions.append(read_vial)
             elif items["category"] == 1:
                 read_vial = WasteVial(
-                    name=items["name"],
-                    position=items["position"],
+                    name=str(items["name"]).lower(),
+                    position=str(items["position"]).lower(),
                     volume=items["volume"],
                     capacity=items["capacity"],
                     density=items["density"],

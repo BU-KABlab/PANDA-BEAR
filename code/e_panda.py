@@ -145,7 +145,7 @@ def forward_pipette_v2(
                 rate=pumping_rate
             )  # withdraw air gap to engage screw
 
-            logger.info("Moving to %s...", from_vessel.name)
+            logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],
@@ -1067,6 +1067,7 @@ def pipette_accuracy_protocol_v2(
                     to_vessel= wellplate.wells[instructions.target_well],
                     pump=pump,
                     mill=mill,
+                    pumping_rate=None,
                 )
 
         if matched != experiment_solution_count:
@@ -1447,6 +1448,7 @@ def viscosity_experiments_protocol(
                     to_vessel= wellplate.wells[instructions.target_well],
                     pump=pump,
                     mill=mill,
+                    pumping_rate=instructions.pumping_rate,
                 )
 
         if matched != experiment_solution_count:
