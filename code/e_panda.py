@@ -189,13 +189,18 @@ def forward_pipette_v2(
                 )
 
             # Infuse into the to_vessel and receive the updated vessel object
+            if isinstance(to_vessel, Well):
+                weigh = True
+            else:
+                weigh = False
+                
             pump.infuse(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,
                 infused_into=to_vessel,
                 rate=pumping_rate,
                 blowout_ul= AIR_GAP + DRIP_STOP,
-                weigh= True
+                weigh= weigh
             )
 
             # Update the contentes of the to_vessel
