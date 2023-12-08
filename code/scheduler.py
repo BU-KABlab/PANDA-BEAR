@@ -160,7 +160,7 @@ class Scheduler:
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
 
-        logger.info("Well %s status changed to %s", well, well.status)
+        logger.info("Well %s status changed to %s", well, well.status.value)
 
     def read_new_experiments(self, filename: str) -> Tuple[int, bool]:
         """

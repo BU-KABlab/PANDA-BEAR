@@ -217,7 +217,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 )
 
                 ## Reset the logger to log to the ePANDA.log file and format
-                system_handler.setFormatter(formatter)
+                experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+                system_handler.setFormatter(experiment_formatter)
                 logger.addHandler(system_handler)
 
                 ## Add the results to the experiment file
@@ -678,7 +679,7 @@ def load_new_wellplate(ask: bool = False, new_plate_id: Optional[int] = None,new
 
     if ask:
         new_plate_id = int(
-            input("Enter the new wellplate id (Current id is {current_wellplate_id}): ")
+            input(f"Enter the new wellplate id (Current id is {current_wellplate_id}): ")
         )
         new_wellplate_type_number = int(
             input(

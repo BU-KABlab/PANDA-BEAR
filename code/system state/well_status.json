@@ -1,954 +1,774 @@
 {
-    "plate_id": 74,
+    "plate_id": 79,
     "type_number": 6,
     "wells": [
         {
             "well_id": "A1",
-            "status": "complete",
-            "status_date": "2023-12-07T09:51:30",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997518,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A2",
-            "status": "complete",
-            "status_date": "2023-12-07T09:56:59",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997519,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A3",
-            "status": "complete",
-            "status_date": "2023-12-07T10:02:27",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997520,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A4",
-            "status": "complete",
-            "status_date": "2023-12-07T10:07:54",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997521,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A5",
-            "status": "complete",
-            "status_date": "2023-12-07T10:13:21",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997522,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A6",
-            "status": "complete",
-            "status_date": "2023-12-07T10:18:48",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997523,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A7",
-            "status": "complete",
-            "status_date": "2023-12-07T10:24:15",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997524,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A8",
-            "status": "complete",
-            "status_date": "2023-12-07T10:29:42",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997525,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A9",
-            "status": "complete",
-            "status_date": "2023-12-07T10:35:09",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997526,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A10",
-            "status": "complete",
-            "status_date": "2023-12-07T10:40:35",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997527,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A11",
-            "status": "complete",
-            "status_date": "2023-12-07T10:46:03",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997528,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "A12",
-            "status": "complete",
-            "status_date": "2023-12-07T10:51:30",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997529,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B1",
-            "status": "complete",
-            "status_date": "2023-12-07T10:56:59",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997530,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B2",
-            "status": "complete",
-            "status_date": "2023-12-07T11:02:30",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997531,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B3",
-            "status": "complete",
-            "status_date": "2023-12-07T11:08:00",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997532,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B4",
-            "status": "complete",
-            "status_date": "2023-12-07T11:13:29",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997533,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B5",
-            "status": "complete",
-            "status_date": "2023-12-07T11:18:58",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997534,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B6",
-            "status": "complete",
-            "status_date": "2023-12-07T11:24:26",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997535,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B7",
-            "status": "complete",
-            "status_date": "2023-12-07T11:29:55",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997536,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B8",
-            "status": "complete",
-            "status_date": "2023-12-07T11:35:24",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997537,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B9",
-            "status": "complete",
-            "status_date": "2023-12-07T11:40:53",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997538,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B10",
-            "status": "complete",
-            "status_date": "2023-12-07T11:46:22",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997539,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B11",
-            "status": "complete",
-            "status_date": "2023-12-07T11:51:51",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997540,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "B12",
-            "status": "complete",
-            "status_date": "2023-12-07T11:57:20",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997541,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C1",
-            "status": "complete",
-            "status_date": "2023-12-07T12:02:50",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997542,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C2",
-            "status": "complete",
-            "status_date": "2023-12-07T12:08:21",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997543,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C3",
-            "status": "complete",
-            "status_date": "2023-12-07T12:13:51",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997544,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C4",
-            "status": "complete",
-            "status_date": "2023-12-07T12:19:20",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997545,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C5",
-            "status": "complete",
-            "status_date": "2023-12-07T12:24:49",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997546,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C6",
-            "status": "complete",
-            "status_date": "2023-12-07T12:30:18",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997547,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C7",
-            "status": "complete",
-            "status_date": "2023-12-07T12:35:47",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997548,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C8",
-            "status": "complete",
-            "status_date": "2023-12-07T12:41:16",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997549,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C9",
-            "status": "complete",
-            "status_date": "2023-12-07T12:46:45",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997550,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C10",
-            "status": "complete",
-            "status_date": "2023-12-07T12:52:14",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997551,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C11",
-            "status": "complete",
-            "status_date": "2023-12-07T12:57:43",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997552,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "C12",
-            "status": "complete",
-            "status_date": "2023-12-07T13:03:12",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997553,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D1",
-            "status": "complete",
-            "status_date": "2023-12-07T13:08:41",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997554,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D2",
-            "status": "complete",
-            "status_date": "2023-12-07T13:14:13",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997555,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D3",
-            "status": "complete",
-            "status_date": "2023-12-07T13:19:42",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997556,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D4",
-            "status": "complete",
-            "status_date": "2023-12-07T13:25:11",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997557,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D5",
-            "status": "complete",
-            "status_date": "2023-12-07T13:30:40",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997558,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D6",
-            "status": "complete",
-            "status_date": "2023-12-07T13:36:09",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997559,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D7",
-            "status": "complete",
-            "status_date": "2023-12-07T13:41:39",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997560,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D8",
-            "status": "complete",
-            "status_date": "2023-12-07T13:47:08",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997561,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D9",
-            "status": "complete",
-            "status_date": "2023-12-07T13:52:36",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997562,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D10",
-            "status": "complete",
-            "status_date": "2023-12-07T13:58:05",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997563,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D11",
-            "status": "complete",
-            "status_date": "2023-12-07T14:03:34",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997564,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "D12",
-            "status": "complete",
-            "status_date": "2023-12-07T14:09:03",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997565,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E1",
-            "status": "complete",
-            "status_date": "2023-12-07T14:12:07",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997566,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E2",
-            "status": "complete",
-            "status_date": "2023-12-07T14:15:12",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997567,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E3",
-            "status": "complete",
-            "status_date": "2023-12-07T14:18:16",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997568,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E4",
-            "status": "complete",
-            "status_date": "2023-12-07T14:21:19",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997569,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E5",
-            "status": "complete",
-            "status_date": "2023-12-07T14:24:22",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997570,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E6",
-            "status": "complete",
-            "status_date": "2023-12-07T14:27:25",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997571,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E7",
-            "status": "complete",
-            "status_date": "2023-12-07T14:30:28",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997572,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E8",
-            "status": "complete",
-            "status_date": "2023-12-07T14:33:31",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997573,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E9",
-            "status": "complete",
-            "status_date": "2023-12-07T14:36:34",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997574,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E10",
-            "status": "complete",
-            "status_date": "2023-12-07T14:39:37",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997575,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E11",
-            "status": "complete",
-            "status_date": "2023-12-07T14:42:40",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997576,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "E12",
-            "status": "complete",
-            "status_date": "2023-12-07T14:45:44",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997577,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F1",
-            "status": "complete",
-            "status_date": "2023-12-07T14:48:49",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997578,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F2",
-            "status": "complete",
-            "status_date": "2023-12-07T14:51:56",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997579,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F3",
-            "status": "complete",
-            "status_date": "2023-12-07T14:55:02",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997580,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F4",
-            "status": "complete",
-            "status_date": "2023-12-07T14:58:08",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997581,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F5",
-            "status": "complete",
-            "status_date": "2023-12-07T15:01:13",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997582,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F6",
-            "status": "complete",
-            "status_date": "2023-12-07T15:04:18",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997583,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F7",
-            "status": "complete",
-            "status_date": "2023-12-07T15:07:23",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997584,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F8",
-            "status": "complete",
-            "status_date": "2023-12-07T15:10:28",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997585,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F9",
-            "status": "complete",
-            "status_date": "2023-12-07T15:13:33",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997586,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F10",
-            "status": "complete",
-            "status_date": "2023-12-07T15:16:38",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997587,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F11",
-            "status": "complete",
-            "status_date": "2023-12-07T15:19:43",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997588,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "F12",
-            "status": "complete",
-            "status_date": "2023-12-07T15:22:48",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997589,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G1",
-            "status": "complete",
-            "status_date": "2023-12-07T15:25:54",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997590,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G2",
-            "status": "complete",
-            "status_date": "2023-12-07T15:29:01",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997591,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G3",
-            "status": "complete",
-            "status_date": "2023-12-07T15:32:07",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997592,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G4",
-            "status": "complete",
-            "status_date": "2023-12-07T15:35:13",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997593,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G5",
-            "status": "complete",
-            "status_date": "2023-12-07T15:38:18",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997594,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G6",
-            "status": "complete",
-            "status_date": "2023-12-07T15:41:23",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997595,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G7",
-            "status": "complete",
-            "status_date": "2023-12-07T15:44:28",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997596,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G8",
-            "status": "complete",
-            "status_date": "2023-12-07T15:47:33",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997597,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G9",
-            "status": "complete",
-            "status_date": "2023-12-07T15:50:38",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997598,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G10",
-            "status": "complete",
-            "status_date": "2023-12-07T15:53:43",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997599,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G11",
-            "status": "complete",
-            "status_date": "2023-12-07T15:56:48",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997600,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "G12",
-            "status": "complete",
-            "status_date": "2023-12-07T15:59:53",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997601,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H1",
-            "status": "complete",
-            "status_date": "2023-12-07T16:02:59",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997602,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H2",
-            "status": "complete",
-            "status_date": "2023-12-07T16:06:07",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997603,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H3",
-            "status": "complete",
-            "status_date": "2023-12-07T16:09:13",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997604,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H4",
-            "status": "complete",
-            "status_date": "2023-12-07T16:12:18",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997605,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H5",
-            "status": "complete",
-            "status_date": "2023-12-07T16:15:23",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997606,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H6",
-            "status": "complete",
-            "status_date": "2023-12-07T16:18:28",
-            "contents": {
-                "100:1 h20:glycerol": 100.0
-            },
-            "experiment_id": 9997607,
-            "project_id": 9
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H7",
-            "status": "running",
-            "status_date": "2023-12-07T16:18:28",
+            "status": "new",
+            "status_date": "",
             "contents": {},
-            "experiment_id": 9997608,
-            "project_id": 9
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H8",
-            "status": "queued",
-            "status_date": "2023-12-07T09:43:28",
+            "status": "new",
+            "status_date": "",
             "contents": {},
-            "experiment_id": 9997609,
-            "project_id": 9
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H9",
-            "status": "queued",
-            "status_date": "2023-12-07T09:43:28",
+            "status": "new",
+            "status_date": "",
             "contents": {},
-            "experiment_id": 9997610,
-            "project_id": 9
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H10",
-            "status": "queued",
-            "status_date": "2023-12-07T09:43:28",
+            "status": "new",
+            "status_date": "",
             "contents": {},
-            "experiment_id": 9997611,
-            "project_id": 9
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H11",
-            "status": "queued",
-            "status_date": "2023-12-07T09:43:28",
+            "status": "new",
+            "status_date": "",
             "contents": {},
-            "experiment_id": 9997612,
-            "project_id": 9
+            "experiment_id": "",
+            "project_id": ""
         },
         {
             "well_id": "H12",
-            "status": "queued",
-            "status_date": "2023-12-07T09:43:28",
+            "status": "new",
+            "status_date": "",
             "contents": {},
-            "experiment_id": 9997613,
-            "project_id": 9
+            "experiment_id": "",
+            "project_id": ""
         }
     ]
 }
