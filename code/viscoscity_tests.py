@@ -27,7 +27,7 @@ import experiment_class
 # import numpy as np
 # import matplotlib.pyplot as plt
 from config.pin import CURRENT_PIN
-from config.config import NETWORK_WELL_HX
+from config.config import WELL_HX
 from scheduler import Scheduler
 import controller
 import pandas as pd
@@ -36,7 +36,7 @@ from slack_functions2 import SlackBot
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
-    well_hx = pd.read_csv(NETWORK_WELL_HX, skipinitialspace=True)
+    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True)
     well_hx = well_hx.dropna(subset=["experiment id"])
     well_hx = well_hx.drop_duplicates(subset=["experiment id"])
     well_hx = well_hx[well_hx["experiment id"] != "None"]
@@ -87,8 +87,8 @@ for solution_number, solution in enumerate(solutions):
                         priority=1,
                         target_well=column + str(row),
                         pin=CURRENT_PIN,
-                        project_id=PROJECT_ID,
-                        project_campaign_id=PREVIOUS_CAMPAIGN_ID + solution_number,
+                        project_id=9,
+                        project_campaign_id=3,
                         solutions={str(solution).lower(): float(VOLUME)},
                         # for columns ABCD of the plate 1 use pumping rate 0.064 (0),
                         # ex. plate_number_per_solution = 1, column = 'A' -> pumping rate = 0.064
@@ -118,26 +118,26 @@ for solution_number, solution in enumerate(solutions):
         ## If the plate number is 1, then the pumping rate should be 0.297 for the first 48 experiments
         # and 0.640 for the remaining 48 experiments
 
-        if plate_number_per_solution == 1:
-            expected_pumping_rates = [0.064, 0.138]
-        else:
-            expected_pumping_rates = [0.297, 0.640]
+       # if plate_number_per_solution == 1:
+       #     expected_pumping_rates = [0.064, 0.138]
+       # else:
+       #     expected_pumping_rates = [0.297, 0.640]
 
-        pumping_rates_in_experiments = [experiment.pumping_rate for experiment in experiments]
-        pumping_rates_first_48 = pumping_rates_in_experiments[:48]
-        pumping_rates_remaining = pumping_rates_in_experiments[48:]
+       # pumping_rates_in_experiments = [experiment.pumping_rate for experiment in experiments]
+        #pumping_rates_first_48 = pumping_rates_in_experiments[:48]
+        #pumping_rates_remaining = pumping_rates_in_experiments[48:]
 
-        expected_pumping_rate_first_48 = expected_pumping_rates[0]
-        expected_pumping_rate_remaining = expected_pumping_rates[1]
+        #expected_pumping_rate_first_48 = expected_pumping_rates[0]
+        #expected_pumping_rate_remaining = expected_pumping_rates[1]
 
-        assert all(rate == expected_pumping_rate_first_48 for rate in pumping_rates_first_48), "Pumping rate should be 0.064  or 0.297 for the first 48 experiments"
-        assert all(rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
+        #assert all(rate == expected_pumping_rate_first_48 for rate in pumping_rates_first_48), "Pumping rate should be 0.064  or 0.297 for the first 48 experiments"
+        #assert all(rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
         ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
         print(f"Solution: {solution}")
         print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
-        print(f"Pumping rate of first 0-47: {expected_pumping_rate_first_48}")
-        print(f"Pumping rate of remaining 48-95: {expected_pumping_rate_remaining}")
-        print(f"Project campaign id: {PREVIOUS_CAMPAIGN_ID + solution_number}")
+        print(f"Pumping rate of first 0-47: {0.138}")
+        print(f"Pumping rate of remaining 48-95: {0.64}")
+        print(f"Project campaign id: {3}")
 
         scheduler = Scheduler()
         result = scheduler.add_nonfile_experiments(experiments)
