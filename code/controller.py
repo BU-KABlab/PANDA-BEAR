@@ -41,20 +41,34 @@ from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
 from vials import StockVial, Vial2, WasteVial
 import wellplate as wellplate_module
 
+# from config.config import (
+#     MILL_CONFIG_FILE,
+#     WELLPLATE_CONFIG_FILE,
+#     WELL_STATUS_FILE,
+#     PATH_TO_SYSTEM_STATE,
+#     PATH_TO_COMPLETED_EXPERIMENTS,
+#     PATH_TO_ERRORED_EXPERIMENTS,
+#     PATH_TO_NETWORK_DATA as PATH_TO_DATA,
+#     PATH_TO_NETWORK_LOGS as PATH_TO_LOGS,
+#     NETWORK_WELL_HX as PATH_TO_WELL_HX,
+#     RANDOM_FLAG,
+#     STOCK_STATUS_FILE,
+#     WASTE_STATUS_FILE
+
+# )
 from config.config import (
-    MILL_CONFIG_FILE,
-    WELLPLATE_CONFIG_FILE,
-    WELL_STATUS_FILE,
-    PATH_TO_STATUS,
+    MILL_CONFIG,
+    WELLPLATE_LOCATION as WELLPLATE_CONFIG_FILE,
+    PATH_TO_SYSTEM_STATE,
     PATH_TO_COMPLETED_EXPERIMENTS,
     PATH_TO_ERRORED_EXPERIMENTS,
-    PATH_TO_NETWORK_DATA as PATH_TO_DATA,
-    PATH_TO_NETWORK_LOGS as PATH_TO_LOGS,
-    PATH_TO_NETWORK_WELL_HX as PATH_TO_WELL_HX,
+    PATH_TO_DATA,
+    PATH_TO_LOGS,
+    LOCAL_WELL_HX as PATH_TO_WELL_HX,
     RANDOM_FLAG,
-    STOCK_STATUS_FILE,
-    WASTE_STATUS_FILE
-
+    STOCK_STATUS,
+    WASTE_STATUS,
+    WELL_STATUS
 )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -109,10 +123,10 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                             )
         ## Update the system state with new vial and wellplate information
         update_vial_state_file(
-            stock_vials, STOCK_STATUS_FILE
+            stock_vials, STOCK_STATUS
         )
         update_vial_state_file(
-            waste_vials, WASTE_STATUS_FILE
+            waste_vials, WASTE_STATUS
         )
 
         ## Begin outer loop
@@ -278,10 +292,10 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(
-                stock_vials, Path.cwd() / PATH_TO_STATUS / "stock_status.json"
+                stock_vials, Path.cwd() / PATH_TO_SYSTEM_STATE / "stock_status.json"
             )
             update_vial_state_file(
-                waste_vials, Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+                waste_vials, Path.cwd() / PATH_TO_SYSTEM_STATE / "waste_status.json"
             )
 
     except Exception as error:
@@ -324,8 +338,8 @@ def check_required_files():
     """Confirm all required directories and files exist"""
     logger.info("Checking for required files and directories")
     required_files = [
-        MILL_CONFIG_FILE,
-        PATH_TO_STATUS,
+        MILL_CONFIG,
+        PATH_TO_SYSTEM_STATE,
         PATH_TO_COMPLETED_EXPERIMENTS,
         PATH_TO_ERRORED_EXPERIMENTS,
         PATH_TO_DATA,
@@ -349,8 +363,8 @@ def establish_system_state() -> (
         waste_vials (list[Vial]): list of waste vials
         wellplate (wellplate_module.Wells): wellplate object
     """
-    stock_vials = read_vials(PATH_TO_STATUS / "stock_status.json")
-    waste_vials = read_vials(PATH_TO_STATUS / "waste_status.json")
+    stock_vials = read_vials(PATH_TO_SYSTEM_STATE / "stock_status.json")
+    waste_vials = read_vials(PATH_TO_SYSTEM_STATE / "waste_status.json")
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = wellplate_module.Wells2(
@@ -414,7 +428,7 @@ def establish_system_state() -> (
     number_of_clear_wells = 0
     number_of_wells = 0
     with open(
-        PATH_TO_STATUS / "well_status.json", "r", encoding="UTF-8"
+        PATH_TO_SYSTEM_STATE / "well_status.json", "r", encoding="UTF-8"
     ) as file:
         wellplate_status = json.load(file)
     for well in wellplate_status["wells"]:
@@ -591,9 +605,9 @@ def input_new_vial_values(vialgroup: str):
     ## Fetch the current state file
     filename = ""
     if vialgroup == "stock":
-        filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
+        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "stock_status.json"
     elif vialgroup == "waste":
-        filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "waste_status.json"
     else:
         logger.error("Invalid vialgroup")
         raise ValueError
@@ -635,9 +649,9 @@ def reset_vials(vialgroup: str):
     ## Fetch the current state file
     filename = ""
     if vialgroup == "stock":
-        filename = Path.cwd() / PATH_TO_STATUS / "stock_status.json"
+        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "stock_status.json"
     elif vialgroup == "waste":
-        filename = Path.cwd() / PATH_TO_STATUS / "waste_status.json"
+        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "waste_status.json"
     else:
         logger.error("Invalid vialgroup")
         raise ValueError
@@ -692,7 +706,7 @@ def load_new_wellplate(ask: bool = False, new_plate_id: Optional[int] = None,new
         if new_wellplate_type_number is None:
             new_wellplate_type_number = current_type_number
 
-    well_status_file = WELL_STATUS_FILE
+    well_status_file = WELL_STATUS
     if current_wellplate_is_new:
         return 0
 
@@ -729,7 +743,7 @@ def load_new_wellplate(ask: bool = False, new_plate_id: Optional[int] = None,new
 def save_current_wellplate():
     """Save the current wellplate"""
     wellplate_is_new = True
-    well_status_file = WELL_STATUS_FILE
+    well_status_file = WELL_STATUS
 
     ## Go through a reset all fields and apply new plate id
     logger.debug("Saving wellplate")
@@ -791,7 +805,7 @@ def change_wellplate_location():
     """Change the location of the wellplate"""
     ## Load the working volume from mill_config.json
     with open(
-        MILL_CONFIG_FILE, "r", encoding="UTF-8"
+        MILL_CONFIG, "r", encoding="UTF-8"
     ) as file:
         mill_config = json.load(file)
     working_volume = mill_config["working_volume"]

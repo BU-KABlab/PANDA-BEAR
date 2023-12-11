@@ -1,7 +1,7 @@
 from math import log
 import pandas as pd
 from pathlib import Path
-from config.config import PATH_TO_NETWORK_LOGS, PATH_TO_NETWORK_DATA, PATH_TO_NETWORK_WELL_HX, PATH_TO_LOCAL_WELL_HX
+from config.config import PATH_TO_NETWORK_LOGS, PATH_TO_NETWORK_DATA, NETWORK_WELL_HX, LOCAL_WELL_HX
 from matplotlib import pyplot as plt
 
 def plate_analysis():
@@ -10,7 +10,7 @@ def plate_analysis():
     campaign_ids = ['8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9', '8.10', '8.11']
     # Load well history
     # plate id, type number, well id, experiment id, project id, status, status date, contents
-    well_hx = pd.read_csv(PATH_TO_NETWORK_WELL_HX, skipinitialspace=True)
+    well_hx = pd.read_csv(NETWORK_WELL_HX, skipinitialspace=True)
     #well_hx = pd.read_csv(PATH_TO_NETWORK_DATA + "/well_history.csv", skipinitialspace=True)
     # Filter well history to those ids in the ids list
     well_hx = well_hx[well_hx['project id'].astype(str).isin(project_ids)]

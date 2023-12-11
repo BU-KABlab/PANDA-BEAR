@@ -11,11 +11,11 @@ from config.pin import CURRENT_PIN
 from scheduler import Scheduler
 import controller
 import pandas as pd
-from config.config import PATH_TO_NETWORK_WELL_HX
+from config.config import NETWORK_WELL_HX
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
-    well_hx = pd.read_csv(PATH_TO_NETWORK_WELL_HX, skipinitialspace=True)
+    well_hx = pd.read_csv(NETWORK_WELL_HX, skipinitialspace=True)
     well_hx = well_hx.dropna(subset=['experiment id'])
     well_hx = well_hx.drop_duplicates(subset=['experiment id'])
     well_hx = well_hx[well_hx['experiment id'] != 'None']

@@ -17,7 +17,7 @@ import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
-from config.config import PATH_TO_CODE
+from config.config import PATH_TO_CODE, SLACK_TICKETS
 
 class SlackBot:
     """Class for sending messages to Slack."""
@@ -170,7 +170,7 @@ class SlackBot:
                     response = self.parse_slack_message(msg_text[8:].rstrip(), channel_id)
                     # Add message to csv file
                     with open(
-                        Path(__file__).parents[0] / "slack_ticket_tracker.csv",
+                        SLACK_TICKETS,
                         "a",
                         newline="",
                         encoding="utf-8",
