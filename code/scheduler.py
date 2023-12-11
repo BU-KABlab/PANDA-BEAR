@@ -20,9 +20,8 @@ from pandas.core.frame import DataFrame
 from config.config import (
     PATH_TO_DATA,
     PATH_TO_NETWORK_LOGS,
-    QUEUE_FILE as PATH_TO_QUEUE,
-    WELL_STATUS_FILE,
-    PATH_TO_SYSTEM_STATE,
+    QUEUE as PATH_TO_QUEUE,
+    WELL_STATUS,
     PATH_TO_EXPERIMENT_INBOX,
     PATH_TO_EXPERIMENT_QUEUE,
     PATH_TO_COMPLETED_EXPERIMENTS,
@@ -67,10 +66,10 @@ class Scheduler:
         :param well: The well to check.
         :return: The status of the well. Or None if the well is not found.
         """
-        file_to_open = WELL_STATUS_FILE
+        file_to_open = WELL_STATUS
         if not Path.exists(file_to_open):
             logger.error("%s not found", file_to_open)
-            raise FileNotFoundError("%s not found", file_to_open.stem)
+            raise FileNotFoundError("{} not found".format(file_to_open.stem))
 
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
@@ -89,7 +88,7 @@ class Scheduler:
         :return: The alternative well. Or None if no wells are available.
         """
         logger.debug("Choosing alternative well")
-        file_to_open = WELL_STATUS_FILE
+        file_to_open = WELL_STATUS
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -112,7 +111,7 @@ class Scheduler:
         :param status: The new status of the well.
         """
         logger.debug("Changing well %s status to %s", well, experiment.status.value)
-        file_to_open = WELL_STATUS_FILE
+        file_to_open = WELL_STATUS
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -142,7 +141,7 @@ class Scheduler:
         well.status = experiment.status
         well.status_date = experiment.status_date
 
-        file_to_open = WELL_STATUS_FILE
+        file_to_open = WELL_STATUS
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -565,7 +564,7 @@ class Scheduler:
         Returns:
             int: the number of experiments we can queue from the inbox
         """
-        file_to_open = WELL_STATUS_FILE
+        file_to_open = WELL_STATUS
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError("well_status.json")
@@ -605,7 +604,7 @@ class Scheduler:
         # Filter the the layered_queue to only include experiments for wells that are available
         # First get the list of available wells
         available_wells = []
-        file_to_open = WELL_STATUS_FILE
+        file_to_open = WELL_STATUS
         if not Path.exists(file_to_open):
             logger.error("well_status.json not found")
             raise FileNotFoundError(f"{file_to_open.stem} not found")
@@ -694,19 +693,17 @@ def test_well_status_update():
     """
     Tests the change_well_status function.
     """
-    scheduler = Scheduler()
-    current_status = scheduler.check_well_status("A1")
-    scheduler.change_well_status("A1", "running")
-    assert scheduler.check_well_status("A1") == "running"
-    scheduler.change_well_status("A1", "complete")
-    assert scheduler.check_well_status("A1") == "complete"
-    scheduler.change_well_status("A1", "new")
-    assert scheduler.check_well_status("A1") == "new"
-    scheduler.change_well_status("A1", current_status)
+    test_scheduler = Scheduler()
+    current_status = test_scheduler.check_well_status("A1")
+    test_scheduler.change_well_status("A1", "running")
+    assert test_scheduler.check_well_status("A1") == "running"
+    test_scheduler.change_well_status("A1", "complete")
+    assert test_scheduler.check_well_status("A1") == "complete"
+    test_scheduler.change_well_status("A1", "new")
+    assert test_scheduler.check_well_status("A1") == "new"
+    test_scheduler.change_well_status("A1", current_status)
 
 
 if __name__ == "__main__":
-    #test_well_status_update()
-    scheduler = Scheduler()
+    test_well_status_update()
     #scheduler.read_next_experiment_from_queue()
-    scheduler.update_experiment_queue_priority(2, 5)

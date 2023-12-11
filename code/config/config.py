@@ -1,4 +1,5 @@
-"""The home of all project specific strings and values that are better to be set in one place than to be scattered around the code."""
+"""The home of all project specific strings and values that are 
+better to be set in one place than to be scattered around the code."""
 from pathlib import Path
 
 ## Project values
@@ -67,7 +68,7 @@ if USE_LOCAL_PATHS:
     SLACK_TICKETS = PATH_TO_SYSTEM_STATE / SLACK_TICKETS_FILE_NAME
 else:
     # Directories
-    PATH_TO_CODE = NETWORK_PATH / CODE 
+    PATH_TO_CODE = NETWORK_PATH / CODE
     PATH_TO_SYSTEM_STATE = NETWORK_PATH / SYS_STATE
     PATH_TO_CONFIG = NETWORK_PATH / CONFIG
     PATH_TO_COMPLETED_EXPERIMENTS = NETWORK_PATH / EXPERIMENTS_COMPLETED

@@ -16,23 +16,8 @@ from vials import Vial, Vessel
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 
-# set up logging to log to the ePANDA.log file
-# pump_control_logger = logging.getLogger("pump_control")
-# pump_control_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-# formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-# system_handler = logging.FileHandler("code/logs/ePANDA.log")
-# system_handler.setFormatter(formatter)
-# pump_control_logger.addHandler(system_handler)
-
 pump_control_logger = logging.getLogger("e_panda")
 scale_logger = logging.getLogger("e_panda")
-# set a logger for the scale
-# scale_logger = logging.getLogger("scale_logger")
-# scale_logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-# formatter = logging.Formatter("%(asctime)s,%(name)s,%(levelname)s,%(message)s")
-# system_handler = logging.FileHandler("code/logs/scale.log")
-# system_handler.setFormatter(formatter)
-# scale_logger.addHandler(system_handler)
 
 class Pump:
     """

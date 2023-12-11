@@ -1,5 +1,7 @@
 """
-Wellplate data class for the echem experiment. This class is used to store the data for the wellplate and the wells in it.
+Wellplate data class for the echem experiment. 
+This class is used to store the data for the 
+wellplate and the wells in it.
 """
 # pylint: disable=line-too-long
 
@@ -9,7 +11,10 @@ import json
 import os
 from typing import Dict, List, Tuple
 import matplotlib.pyplot as plt
-from config.file_locations import *
+#from config.file_locations import *
+from config.config import (
+    WELL_STATUS as WELL_STATUS_FILE,
+)
 from vials import Vessel
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -473,8 +478,6 @@ class Wells2:
                         self.plate_id = data["plate_id"]
                         logger.debug("Well %s updated from file", well.name)
                         break
-
-                
 
     def get_coordinates(self, well_id) -> dict:
         """

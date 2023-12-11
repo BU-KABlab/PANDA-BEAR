@@ -1,5 +1,5 @@
-import controller
 import sys
+import controller
 
 def run_epanda():
     """Runs ePANDA."""
