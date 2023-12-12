@@ -53,7 +53,7 @@ ROWS = 12
 PROJECT_ID = 9
 EXPERIMENT_NAME = "Viscocity test"
 VOLUME = 100
-PREVIOUS_CAMPAIGN_ID = 0
+PREVIOUS_CAMPAIGN_ID = 3
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
@@ -133,11 +133,12 @@ for solution_number, solution in enumerate(solutions):
         #assert all(rate == expected_pumping_rate_first_48 for rate in pumping_rates_first_48), "Pumping rate should be 0.064  or 0.297 for the first 48 experiments"
         #assert all(rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
         ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
+        print(f"Experiment name: {EXPERIMENT_NAME}")
         print(f"Solution: {solution}")
         print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
         print(f"Pumping rate of first 0-47: {0.138}")
         print(f"Pumping rate of remaining 48-95: {0.64}")
-        print(f"Project campaign id: {3}")
+        print(f"Project campaign id: {3}\n")
 
         scheduler = Scheduler()
         result = scheduler.add_nonfile_experiments(experiments)

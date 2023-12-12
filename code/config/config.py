@@ -12,7 +12,7 @@ RANDOM_FLAG = False # Set to True to randomize the order of the experiments
 USE_LOCAL_PATHS = False
 
 ## Define local repository path
-LOCAL_REPO_PATH = Path.cwd()
+LOCAL_REPO_PATH = Path.cwd().parent / "PANDA"
 
 ## Define network path
 NETWORK_PATH = Path("//engnas.bu.edu/research/eng_research_kablab/Shared Resources/PANDA/")
@@ -113,7 +113,7 @@ for path in [
     path = Path(path)
     if not path.exists():
         print(f"Creating {path}")
-        path.mkdir()
+        #path.mkdir()
         print(f"Created {path}")
 
 ## Validate that all files exist and create them if they don't
@@ -134,5 +134,5 @@ for file in [
     file_path = Path(PATH_TO_SYSTEM_STATE / file)
     if not file_path.exists():
         print(f"Creating {file_path}")
-        file_path.touch()
+        #file_path.touch()
         print(f"Created {file_path}")
