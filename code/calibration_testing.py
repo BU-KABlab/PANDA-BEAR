@@ -8,7 +8,8 @@ tested in that order, so the first wellplate will be associated with 'water', th
 second with '1000:1 H20:Glycerol', etc.
 
 Volumes:
-Each solution should get a calibration curve with experiments pipetting volumes from 20µL - 140µL spaced apart by 10µL:
+Each solution should get a calibration curve with experiments pipetting volumes from 
+20µL - 140µL spaced apart by 10µL:
 20,
 30
 40
@@ -22,8 +23,8 @@ Each solution should get a calibration curve with experiments pipetting volumes 
 120
 130
 140
-Each volume should be done 6x for each solution.
-So it winds up being 1 well plate per solution.
+Each volume should be done 8x for each solution.
+So it winds up being 1 well plate of 96 experiment per solution.
 
 Pumping Rate: Following the viscocity testing on 12/08/2023, 
 the pumping rate will be set to 0.640 for all solutions.
@@ -99,7 +100,7 @@ for solution_number, solution in enumerate(solutions):
     controller.load_new_wellplate(new_wellplate_type_number=6)
     experiment_id = determine_next_experiment_id()
     experiments : list[experiment_class.ExperimentBase]= []
-    well_number = 0
+    WELL_NUMBER = 0
     # Create 6 new experiments for the solution
     for column in COLUMNS:
         # ex: for column in 'A':
@@ -114,14 +115,14 @@ for solution_number, solution in enumerate(solutions):
                     pin=CURRENT_PIN,
                     project_id=9,
                     project_campaign_id=solution_number + 1,
-                    solutions={str(solution).lower(): float(volumes[well_number])},
+                    solutions={str(solution).lower(): float(volumes[WELL_NUMBER])},
                     pumping_rate=PUMPING_RATE,
                     status=experiment_class.ExperimentStatus.NEW,
                     filename=EXPERIMENT_NAME + str(experiment_id),
                 )
             )
             experiment_id += 1
-            well_number += 1
+            WELL_NUMBER += 1
 
 
     ## Make sure we have 96 experiments
@@ -134,7 +135,7 @@ for solution_number, solution in enumerate(solutions):
     print(f"Solution: {solution}")
     print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
     print(f"Pumping rate: {PUMPING_RATE}")
-    print(f"Project campaign id: {solution_number}")
+    print(f"Project campaign id: {PROJECT_ID}.{solution_number}\n")
 
 
     # Add experiments to the queue and run them
