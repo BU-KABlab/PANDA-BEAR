@@ -527,7 +527,7 @@ def solution_selector(solutions: Sequence[StockVial], solution_name: str, volume
     for solution in solutions:
         # if the solution names match and the requested volume is less than the available volume (volume - 15% of capacity)
         if (
-            solution.name.lower() == solution_name.lower() 
+            solution.name.lower() == solution_name.lower()
             and solution.volume - 0.20*solution.capacity > (volume)
         ):
             logger.debug(

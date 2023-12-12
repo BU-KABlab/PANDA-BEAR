@@ -4,20 +4,14 @@
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 import csv
 from datetime import datetime
-
-# import json
 import logging
-import re
 from pathlib import Path
 import matplotlib.pyplot as plt
-
 import pandas as pd
-
-# import re
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
-from config.config import PATH_TO_CODE, SLACK_TICKETS
+from config.config import PATH_TO_CODE, SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS
 
 class SlackBot:
     """Class for sending messages to Slack."""
@@ -216,7 +210,7 @@ class SlackBot:
     def find_id(self, experiment_id):
         """Find the message ID in the slack ticket tracker csv file."""
         with open(
-            Path(__file__).parents[0] / "slack_ticket_tracker.csv",
+            SLACK_TICKETS,
             newline="",
             encoding="utf-8",
         ) as csvfile:
@@ -298,9 +292,11 @@ class SlackBot:
         elif text[0:11] == "vial status":
             # Get vial status
             ## Load the vial status json file
-            stock_vials = pd.read_json(PATH_TO_CODE / "system state/stock_status.json")
+            stock_vials = pd.read_json(STOCK_STATUS)
             ## Filter for just the vial position and volume
             stock_vials = stock_vials[["position", "volume", "name"]]
+            # Drop any vials that have null values
+            stock_vials = stock_vials.dropna()
             ## set position to be a string and volume to be a float
             stock_vials["position"] = stock_vials["position"].astype(str)
             stock_vials["volume"] = stock_vials["volume"].astype(float)
@@ -315,7 +311,7 @@ class SlackBot:
             plt.axhline(y=4000, color="red", linestyle="-")
             # Write the name of the vial vertically in the bar
             for i, v in enumerate(stock_vials["name"]):
-                plt.text(i, 10, str(v), color="black", ha="center", rotation=90)       
+                plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
             plt.xlabel("Position")
             plt.ylabel("Volume")
             plt.title("Stock Vial Status")
@@ -327,7 +323,7 @@ class SlackBot:
             plt.close()
 
             # And the same for the waste vials
-            waste_vials = pd.read_json(PATH_TO_CODE / "system state/waste_status.json")
+            waste_vials = pd.read_json(WASTE_STATUS)
             waste_vials = waste_vials[["position", "volume", "name"]]
             # Drop any vials that have null values
             waste_vials = waste_vials.dropna()
@@ -335,7 +331,7 @@ class SlackBot:
             waste_vials["volume"] = waste_vials["volume"].astype(float)
             plt.bar(waste_vials["position"], waste_vials["volume"], align="center", alpha=0.5, color="blue")
             for i, v in enumerate(waste_vials["volume"]):
-                plt.text(i, v, str(v/1000), color="black", ha="center")
+                plt.text(i, v, str(v), color="black", ha="center")
             plt.axhline(y=20000, color="red", linestyle="-")
             for i, v in enumerate(waste_vials["name"]):
                 plt.text(i, 10, str(v), color="black", ha="center", rotation=90)

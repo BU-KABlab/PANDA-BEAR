@@ -45,7 +45,7 @@ def determine_next_experiment_id() -> int:
     return int(last_experiment_id + 1)
 
 
-TEST = False
+TEST = True
 print("TEST MODE: ", TEST)
 # Create experiments
 COLUMNS = "ABCDEFGH"
@@ -69,7 +69,7 @@ pumping_rates = [ 0.297, 0.640]
 # iterate over the solutions we are testing
 for solution_number, solution in enumerate(solutions):
     # for each solution we want two wellplates
-    for plate_number_per_solution in range(1, 3):
+    for plate_number_per_solution in range(1, 2):
         # Change wellplate and load new wellplate
         controller.load_new_wellplate(new_wellplate_type_number=6)
         experiment_id = determine_next_experiment_id()

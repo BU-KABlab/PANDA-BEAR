@@ -64,7 +64,7 @@ from config.config import (
     PATH_TO_ERRORED_EXPERIMENTS,
     PATH_TO_DATA,
     PATH_TO_LOGS,
-    LOCAL_WELL_HX as PATH_TO_WELL_HX,
+    WELL_HX as PATH_TO_WELL_HX,
     RANDOM_FLAG,
     STOCK_STATUS,
     WASTE_STATUS,
@@ -116,8 +116,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         ## Flush the pipette tip with water before we start
         e_panda.flush_v2(stock_vials=stock_vials,
                             waste_vials=waste_vials,
-                            flush_solution_name='water',
-                            flush_volume=120,
+                            flush_solution_name='rinse0',
+                            flush_volume=140,
                             pump=toolkit.pump,
                             mill=toolkit.mill,
                             )
@@ -292,10 +292,10 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(
-                stock_vials, Path.cwd() / PATH_TO_SYSTEM_STATE / "stock_status.json"
+                stock_vials, STOCK_STATUS
             )
             update_vial_state_file(
-                waste_vials, Path.cwd() / PATH_TO_SYSTEM_STATE / "waste_status.json"
+                waste_vials, WASTE_STATUS
             )
 
     except Exception as error:
@@ -363,8 +363,8 @@ def establish_system_state() -> (
         waste_vials (list[Vial]): list of waste vials
         wellplate (wellplate_module.Wells): wellplate object
     """
-    stock_vials = read_vials(PATH_TO_SYSTEM_STATE / "stock_status.json")
-    waste_vials = read_vials(PATH_TO_SYSTEM_STATE / "waste_status.json")
+    stock_vials = read_vials(STOCK_STATUS)
+    waste_vials = read_vials(WASTE_STATUS)
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = wellplate_module.Wells2(
@@ -428,7 +428,7 @@ def establish_system_state() -> (
     number_of_clear_wells = 0
     number_of_wells = 0
     with open(
-        PATH_TO_SYSTEM_STATE / "well_status.json", "r", encoding="UTF-8"
+        WELL_STATUS, "r", encoding="UTF-8"
     ) as file:
         wellplate_status = json.load(file)
     for well in wellplate_status["wells"]:
@@ -605,9 +605,9 @@ def input_new_vial_values(vialgroup: str):
     ## Fetch the current state file
     filename = ""
     if vialgroup == "stock":
-        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "stock_status.json"
+        filename = STOCK_STATUS
     elif vialgroup == "waste":
-        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "waste_status.json"
+        filename = WASTE_STATUS
     else:
         logger.error("Invalid vialgroup")
         raise ValueError
@@ -649,9 +649,9 @@ def reset_vials(vialgroup: str):
     ## Fetch the current state file
     filename = ""
     if vialgroup == "stock":
-        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "stock_status.json"
+        filename = STOCK_STATUS
     elif vialgroup == "waste":
-        filename = Path.cwd() / PATH_TO_SYSTEM_STATE / "waste_status.json"
+        filename = WASTE_STATUS
     else:
         logger.error("Invalid vialgroup")
         raise ValueError
