@@ -12,8 +12,7 @@ RANDOM_FLAG = False # Set to True to randomize the order of the experiments
 USE_LOCAL_PATHS = False
 
 ## Define local repository path
-LOCAL_REPO_PATH = Path.cwd().parent / "PANDA"
-
+LOCAL_REPO_PATH = Path("C:/Users/Kab Lab/Documents/GitHub/PANDA")
 ## Define network path
 NETWORK_PATH = Path("//engnas.bu.edu/research/eng_research_kablab/Shared Resources/PANDA/")
 
@@ -30,31 +29,31 @@ __WELLPLATE_CONFIG_FILE_NAME = "wellplate_location.json"
 __WELL_HISTORY = "well_history.csv"
 
 ## Project directory names
-CODE = "code"
-CONFIG = "config"
-DATA = "data"
-EXPERIMENT_INBOX = "experiments_inbox"
-EXPERIMENT_QUEUE = "experiment_queue"
-EXPERIMENTS_COMPLETED = "experiments_completed"
-EXPERIMENTS_ERROR = "experiments_error"
-LOGS = "logs"
-SYS_STATE = "system state"
+__CODE = "code"
+__CONFIG = "config"
+__DATA = "data"
+__EXPERIMENT_INBOX = "experiments_inbox"
+__EXPERIMENT_QUEUE = "experiment_queue"
+__EXPERIMENTS_COMPLETED = "experiments_completed"
+__EXPERIMENTS_ERROR = "experiments_error"
+__LOGS = "logs"
+__SYS_STATE = "system state"
 
 ## Build complete paths for each project directory or file
 if USE_LOCAL_PATHS:
     # Directories
-    PATH_TO_CODE = LOCAL_REPO_PATH / CODE
-    PATH_TO_SYSTEM_STATE = PATH_TO_CODE / SYS_STATE
-    PATH_TO_CONFIG = PATH_TO_CODE / CONFIG
-    PATH_TO_COMPLETED_EXPERIMENTS = PATH_TO_CODE / EXPERIMENTS_COMPLETED
-    PATH_TO_ERRORED_EXPERIMENTS = PATH_TO_CODE / EXPERIMENTS_ERROR
-    PATH_TO_DATA = LOCAL_REPO_PATH / DATA
-    PATH_TO_LOGS = PATH_TO_CODE / LOGS
-    PATH_TO_EXPERIMENT_INBOX = PATH_TO_CODE / EXPERIMENT_INBOX
-    PATH_TO_EXPERIMENT_QUEUE = PATH_TO_CODE / EXPERIMENT_QUEUE
-    PATH_TO_DATA = LOCAL_REPO_PATH / DATA
-    PATH_TO_LOGS = PATH_TO_CODE / LOGS
-    PATH_TO_STATUS = PATH_TO_CODE / SYS_STATE
+    PATH_TO_CODE = LOCAL_REPO_PATH / __CODE
+    PATH_TO_SYSTEM_STATE = PATH_TO_CODE / __SYS_STATE
+    PATH_TO_CONFIG = PATH_TO_CODE / __CONFIG
+    PATH_TO_COMPLETED_EXPERIMENTS = PATH_TO_CODE / __EXPERIMENTS_COMPLETED
+    PATH_TO_ERRORED_EXPERIMENTS = PATH_TO_CODE / __EXPERIMENTS_ERROR
+    PATH_TO_DATA = LOCAL_REPO_PATH / __DATA
+    PATH_TO_LOGS = PATH_TO_CODE / __LOGS
+    PATH_TO_EXPERIMENT_INBOX = PATH_TO_CODE / __EXPERIMENT_INBOX
+    PATH_TO_EXPERIMENT_QUEUE = PATH_TO_CODE / __EXPERIMENT_QUEUE
+    PATH_TO_DATA = LOCAL_REPO_PATH / __DATA
+    PATH_TO_LOGS = PATH_TO_CODE / __LOGS
+    PATH_TO_STATUS = PATH_TO_CODE / __SYS_STATE
 
     # Files
     MILL_CONFIG = PATH_TO_CONFIG / __MILL_CONFIG_FILE_NAME
@@ -71,18 +70,18 @@ if USE_LOCAL_PATHS:
 
 else: # Use network paths
     # Directories
-    PATH_TO_CODE = LOCAL_REPO_PATH / CODE
-    PATH_TO_SYSTEM_STATE = PATH_TO_CODE / SYS_STATE
-    PATH_TO_CONFIG = PATH_TO_CODE / CONFIG
-    PATH_TO_EXPERIMENT_INBOX = NETWORK_PATH / EXPERIMENT_INBOX
-    PATH_TO_EXPERIMENT_QUEUE = NETWORK_PATH / EXPERIMENT_QUEUE
-    PATH_TO_COMPLETED_EXPERIMENTS = NETWORK_PATH / EXPERIMENTS_COMPLETED
-    PATH_TO_ERRORED_EXPERIMENTS = NETWORK_PATH / EXPERIMENTS_ERROR
-    PATH_TO_DATA = NETWORK_PATH / DATA
-    PATH_TO_LOGS = NETWORK_PATH / LOGS
-    PATH_TO_NETWORK_DATA = NETWORK_PATH / DATA
-    PATH_TO_NETWORK_LOGS = NETWORK_PATH / LOGS
-    PATH_TO_NETWORK_STATUS = NETWORK_PATH / SYS_STATE
+    PATH_TO_CODE = LOCAL_REPO_PATH / __CODE
+    PATH_TO_SYSTEM_STATE = PATH_TO_CODE / __SYS_STATE
+    PATH_TO_CONFIG = PATH_TO_CODE / __CONFIG
+    PATH_TO_EXPERIMENT_INBOX = NETWORK_PATH / __EXPERIMENT_INBOX
+    PATH_TO_EXPERIMENT_QUEUE = NETWORK_PATH / __EXPERIMENT_QUEUE
+    PATH_TO_COMPLETED_EXPERIMENTS = NETWORK_PATH / __EXPERIMENTS_COMPLETED
+    PATH_TO_ERRORED_EXPERIMENTS = NETWORK_PATH / __EXPERIMENTS_ERROR
+    PATH_TO_DATA = NETWORK_PATH / __DATA
+    PATH_TO_LOGS = NETWORK_PATH / __LOGS
+    PATH_TO_NETWORK_DATA = NETWORK_PATH / __DATA
+    PATH_TO_NETWORK_LOGS = NETWORK_PATH / __LOGS
+    PATH_TO_NETWORK_STATUS = NETWORK_PATH / __SYS_STATE
 
     #Files
     PROJECT_LIST = PATH_TO_SYSTEM_STATE / __PROJECT_LIST_FILE_NAME
@@ -113,7 +112,7 @@ for path in [
     path = Path(path)
     if not path.exists():
         print(f"Creating {path}")
-        #path.mkdir()
+        path.mkdir()
         print(f"Created {path}")
 
 ## Validate that all files exist and create them if they don't
@@ -134,5 +133,5 @@ for file in [
     file_path = Path(PATH_TO_SYSTEM_STATE / file)
     if not file_path.exists():
         print(f"Creating {file_path}")
-        #file_path.touch()
+        file_path.touch()
         print(f"Created {file_path}")

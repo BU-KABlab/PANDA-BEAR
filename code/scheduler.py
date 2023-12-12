@@ -128,7 +128,7 @@ class Scheduler:
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
 
-        logger.info("Well %s status changed to %s", well, experiment.status)
+        logger.info("Well %s status changed to %s", well, experiment.status.value)
 
     def change_well_status_v2(self, well: Well, experiment: ExperimentBase) -> None:
         """
@@ -136,7 +136,7 @@ class Scheduler:
         :param well: The well to change.
         :param status: The new status of the well.
         """
-        logger.debug("Changing well %s status to %s", well, well.status)
+        logger.debug("Changing well %s status to %s", well, well.status.value)
 
         well.status = experiment.status
         well.status_date = experiment.status_date
@@ -320,15 +320,14 @@ class Scheduler:
         # Exclude layered protocols (protocol_type = 2)
         experiments = queue[(queue["priority"] == highest_priority) & (queue["protocol_type"] != 2)]["filename"]
         experiments_list = experiments.tolist()
-        queue_dir_path = PATH_TO_EXPERIMENT_QUEUE
-        if not Path.exists(queue_dir_path):
+        if not Path.exists(PATH_TO_EXPERIMENT_QUEUE):
             logger.error("experiment_queue folder not found")
             raise FileNotFoundError("experiment queue folder")
 
         if random_pick:
             # Pick a random experiment from the list of experiments with the highest priority
             random_experiment = random.choice(experiments_list)
-            experiment_file_path = Path(queue_dir_path / random_experiment).with_suffix(".json")
+            experiment_file_path = Path(PATH_TO_EXPERIMENT_QUEUE / random_experiment).with_suffix(".json")
             if not Path.exists(experiment_file_path):
                 logger.error("experiment file not found")
                 raise FileNotFoundError("experiment file")
@@ -337,7 +336,7 @@ class Scheduler:
             queue = queue.sort_values(by=["id", "priority"], ascending=[True, True])
             queue = queue[queue["protocol_type"] != 2]
             # Get the first experiment in the queue
-            experiment_file_path = Path(queue_dir_path / queue["filename"].iloc[0]).with_suffix(".json")
+            experiment_file_path = Path(PATH_TO_EXPERIMENT_QUEUE / queue["filename"].iloc[0]).with_suffix(".json")
             if not Path.exists(experiment_file_path):
                 logger.error("experiment file not found")
                 raise FileNotFoundError("experiment file")
@@ -455,7 +454,7 @@ class Scheduler:
                 experiment.id,
             )
 
-        logger.info("Experiment %s location updated to %s", experiment.id, experiment.status)
+        logger.info("Experiment %s location updated to %s", experiment.id, experiment.status.value)
 
     def add_nonfile_experiment(self, experiment: ExperimentBase) -> str:
         """
