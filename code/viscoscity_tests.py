@@ -146,7 +146,7 @@ for solution_number, solution in enumerate(solutions):
         else:
             print("Error: ", result)
             break
-
+controller.load_new_wellplate(new_wellplate_type_number=6)
 message = f"Finished running {EXPERIMENT_NAME} experiments"
 print(message)
 bot = SlackBot(test=TEST)
