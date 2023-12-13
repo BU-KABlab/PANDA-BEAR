@@ -233,7 +233,6 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 ## Reset the logger to log to the ePANDA.log file and format
                 experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
                 system_handler.setFormatter(experiment_formatter)
-                logger.addHandler(system_handler)
 
                 ## Add the results to the experiment file
                 new_experiment.results = experiment_results

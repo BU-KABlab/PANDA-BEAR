@@ -11,7 +11,7 @@ import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
-from config.config import PATH_TO_CODE, SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS
+from config.config import SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS, QUEUE
 
 class SlackBot:
     """Class for sending messages to Slack."""
@@ -352,7 +352,7 @@ class SlackBot:
         elif text[0:12] == "queue length":
             # Get queue length
             queue_length = 0
-            queue_file = pd.read_csv(PATH_TO_CODE / "system state/queue.csv", skipinitialspace=True, header=None, names=['id', 'priority', 'filename', 'protocol_type'])
+            queue_file = pd.read_csv(QUEUE, skipinitialspace=True, header=None, names=['id', 'priority', 'filename', 'protocol_type'])
             # the columsn to id,priority,filename,protocol_type
             queue_length = len(queue_file)-1
             message = f"The queue length is {queue_length}."

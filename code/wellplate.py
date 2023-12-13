@@ -14,7 +14,10 @@ import matplotlib.pyplot as plt
 #from config.file_locations import *
 from config.config import (
     WELL_STATUS as WELL_STATUS_FILE,
+    STOCK_STATUS,
+    WASTE_STATUS,
 )
+from experiment_class import ExperimentStatus
 from vials import Vessel
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -45,14 +48,14 @@ class Well(Vessel):
     def __init__(self, well_id: str, coordinates: dict, volume: float, height: float, depth: float, status: str, density: float, capacity: float, contents: dict = {}):
         """
         """
-        self.well_id = well_id
-        self.experiment_id = None
-        self.project_id = None
-        self.status = status
-        self.status_date = None
-        self.height = height
-        self.depth = depth
-        self.name = well_id
+        self.well_id:str = well_id
+        self.experiment_id:int = None
+        self.project_id:int = None
+        self.status:str = status
+        self.status_date:str = None
+        self.height:float = height
+        self.depth:float = depth
+        self.name:str = well_id
         super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density, contents= {}, depth = depth)
 
     def __str__(self) -> str:
@@ -184,7 +187,7 @@ class Wells:
 
     def update_well_status_from_json_file(self):
         """Update the well status from a file"""
-        with open("code\\system state\\well_status.json", "r", encoding="UTF-8") as f:
+        with open(WELL_STATUS_FILE, "r", encoding="UTF-8") as f:
             data = json.load(f)
             for well in data["wells"]:
                 well_id = well["well_id"]
@@ -464,7 +467,7 @@ class Wells2:
         """Update the well status from a file"""
 
         logger.debug("Updating well status's from file...")
-        with open("code\\system state\\well_status.json", "r", encoding="utf-8") as f:
+        with open(WELL_STATUS_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
             for saved_well in data["wells"]:
                 for well_id, well in self.wells.items():
@@ -729,8 +732,8 @@ def test_stage_display():
     vial_color = []
     vial_marker = []  # a circle for these circular vials
     ## Vials
-    stock_vial_path = "code\\system state\\stock_status.json"
-    waste_vial_path = "code\\system state\\waste_status.json"
+    stock_vial_path = STOCK_STATUS
+    waste_vial_path = WASTE_STATUS
     with open(stock_vial_path, "r", encoding="utf-8") as stock:
         data = json.load(stock)
         for vial in data:
