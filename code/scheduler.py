@@ -136,9 +136,9 @@ class Scheduler:
         :param well: The well to change.
         :param status: The new status of the well.
         """
-        logger.debug("Changing well %s status to %s", well, well.status.value)
+        logger.debug("Changing well %s status to %s", well, well.status)
 
-        well.status = experiment.status
+        well.status = experiment.status.value
         well.status_date = experiment.status_date
 
         file_to_open = WELL_STATUS
@@ -150,7 +150,7 @@ class Scheduler:
             data = json.load(file)
             for wells in data["wells"]:
                 if wells["well_id"] == well.well_id:
-                    wells["status"] = well.status.value
+                    wells["status"] = well.status
                     wells["status_date"] = well.status_date.strftime("%Y-%m-%dT%H:%M:%S")
                     wells["experiment_id"] = well.experiment_id
                     wells["project_id"] = well.project_id
@@ -159,7 +159,7 @@ class Scheduler:
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
 
-        logger.info("Well %s status changed to %s", well, well.status.value)
+        logger.info("Well %s status changed to %s", well, well.status)
 
     def read_new_experiments(self, filename: str) -> Tuple[int, bool]:
         """

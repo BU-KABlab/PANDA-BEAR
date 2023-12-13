@@ -45,13 +45,13 @@ class Well(Vessel):
         density (float): The density of the well.
         capacity (float): The capacity of the well.
     """
-    def __init__(self, well_id: str, coordinates: dict, volume: float, height: float, depth: float, status: ExperimentStatus, density: float, capacity: float, contents: dict = {}):
+    def __init__(self, well_id: str, coordinates: dict, volume: float, height: float, depth: float, status: str, density: float, capacity: float, contents: dict = {}):
         """
         """
         self.well_id:str = well_id
         self.experiment_id:int = None
         self.project_id:int = None
-        self.status:ExperimentStatus = status
+        self.status:str = status
         self.status_date:str = None
         self.height:float = height
         self.depth:float = depth
@@ -60,7 +60,7 @@ class Well(Vessel):
 
     def __str__(self) -> str:
         """Returns a string representation of the well."""
-        return f"Well {self.well_id} with volume {self.volume} and status {self.status.value}"
+        return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
 
     def update_contents(self, solution: Vessel, volume: float) -> None:
         """Updates the contents of the well in the well_status.json file."""
