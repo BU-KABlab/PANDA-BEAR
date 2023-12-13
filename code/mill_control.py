@@ -278,17 +278,25 @@ class Mill:
         pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 
         match = pattern.search(status)  # Decoding the bytes to string
-        if match:
-            x_coord = float(match.group(1)) + 3
-            y_coord = float(match.group(2)) + 3
-            z_coord = float(match.group(3)) + 3
-            log_message = (
-                f"MPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
-            )
-            logger.info(log_message)
-        else:
-            logger.info("MPos coordinates not found in the line.")
-            raise LocationNotFound
+        max_attempts = 3
+        for _ in range(max_attempts):
+            try:
+                if match:
+                    x_coord = float(match.group(1)) + 3
+                    y_coord = float(match.group(2)) + 3
+                    z_coord = float(match.group(3)) + 3
+                    log_message = (
+                        f"MPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
+                    )
+                    logger.info(log_message)
+                    break
+                else:
+                    logger.warning("MPos coordinates not found in the line. Trying again...")
+                    raise LocationNotFound
+            except LocationNotFound as e:
+                logger.error("Error occurred while getting MPos coordinates: %s",str(e))
+                if _ == max_attempts - 1:
+                    raise
 
         if instrument in [Instruments.CENTER, Instruments.LENS]:
             current_coordinates = [x_coord, y_coord, z_coord]
@@ -593,11 +601,13 @@ class MockMill:
         self.current_x = 0.0
         self.current_y = 0.0
         self.current_z = 0.0
+        self.logger.debug("timeout for homing is %s", str(timeout))
         self.logger.info("Homing the mill")
 
     def wait_for_completion(self, incoming_status, timeout=90):
         """Simulate waiting for completion"""
         self.logger.info("Waiting for completion with status: %s", incoming_status)
+        self.logger.debug("timeout for waiting is %s", str(timeout))
 
     def current_status(self) -> str:
         """Simulate getting the current status"""
@@ -643,7 +653,7 @@ class MockMill:
 
     def current_coordinates(self, instrument=Instruments.CENTER) -> list:
         """Return the tracked current coordinates"""
-        self.logger.info("Getting current coordinates")
+        self.logger.info("Getting current coordinates of %s", instrument.value)
         return [self.current_x, self.current_y, self.current_z]
 
     def move_pipette_to_position(
@@ -689,7 +699,7 @@ class MockMill:
         self.current_y = y_coord
         self.current_z = z_coord
         self.logger.info(
-            "Safe move to position: (%s, %s, %s)", x_coord, y_coord, z_coord
+            "Safe move %s to position: (%s, %s, %s)", instrument.value,x_coord, y_coord, z_coord
         )
         return 0
 
@@ -732,23 +742,21 @@ def movement_test():
             mill.safe_move(
                 h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
             )
-            # if len(stock_vials) != 0:
-            #     for i in range(len(stock_vials)):
-            #         mill.safe_move(
-            #             stock_vials[i].coordinates["x"],
-            #             stock_vials[i].coordinates["y"],
-            #             stock_vials[i].depth,
-            #             instrument=Instruments.PIPETTE,
-            #         )
-            #     mill.move_to_safe_position()
-            # mill.safe_move(
-            #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
-            # )  
-            # if len(waste_vials) != 0:
-            #     ## Move pipette to first waste vial then to the depth and then to safe position
-            #     mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
-            #     mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
-            #     mill.move_to_safe_position()
+            if len(stock_vials) != 0:
+                for i in range(len(stock_vials)):
+                    mill.safe_move(
+                        stock_vials[i].coordinates["x"],
+                        stock_vials[i].coordinates["y"],
+                        stock_vials[i].height,
+                        instrument=Instruments.PIPETTE,
+                    )
+                mill.move_to_safe_position()
+
+            if len(waste_vials) != 0:
+                ## Move pipette to first waste vial then to the depth and then to safe position
+                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
+                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
+                mill.move_to_safe_position()
 
     except (
         MillConnectionError,

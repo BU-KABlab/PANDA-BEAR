@@ -68,29 +68,29 @@ COLUMNS = "ABCDEFGH"
 ROWS = 12
 PROJECT_ID = 10
 EXPERIMENT_NAME = "Calibration tests"
-PREVIOUS_CAMPAIGN_ID = 0
+PREVIOUS_CAMPAIGN_ID = 5
 
 solutions = [
-    "water",
-    "1000:1 H20:Glycerol",
-    "100:1 H20:Glycerol",
-    "10:1 H20:Glycerol",
+    # "water",
+    # "1000:1 H20:Glycerol",
+    # "100:1 H20:Glycerol",
+    # "10:1 H20:Glycerol",
     "1:1 H20:Glycerol",
 ]
 
 volumes = [
-           30,30,30,30,30,30,30, 30,
-           40,40,40,40,40,40, 40, 40,
-           50,50,50,50,50,50, 50,50,
-           60,60,60,60,60,60, 60,60,
-           70,70,70,70,70,70, 70,70,
-           80, 80,80,80,80,80,80,80,
-           90, 90,90,90,90,90,90,90,
-           100, 100,100,100,100,100,100,100,
-           110, 110,110,110,110,110,110,110,
-           120,120,120,120,120,120,120,120,
+            30,30,30,30,30,30,30,30,
+            40,40,40,40,40,40,40,40,
+            50,50,50,50,50,50,50,50,
+            60,60,60,60,60,60,60,60,
+            70,70,70,70,70,70,70,70,
+            80,80,80,80,80,80,80,80,
+            90,90,90,90,90,90,90,90,
+            100,100,100,100,100,100,100,100,
+            110,110,110,110,110,110,110,110,
+            120,120,120,120,120,120,120,120,
             130,130,130,130,130,130,130,130,
-           140,140,140,140,140,140,140,140,
+            140,140,140,140,140,140,140,140,
            ]
 PUMPING_RATE = 0.640
 # iterate over the solutions we are testing
@@ -113,7 +113,7 @@ for solution_number, solution in enumerate(solutions):
                     priority=1,
                     target_well=column + str(row),
                     pin=CURRENT_PIN,
-                    project_id=9,
+                    project_id=PROJECT_ID,
                     project_campaign_id=solution_number + 1,
                     solutions={str(solution).lower(): float(volumes[WELL_NUMBER])},
                     pumping_rate=PUMPING_RATE,
@@ -135,7 +135,7 @@ for solution_number, solution in enumerate(solutions):
     print(f"Solution: {solution}")
     print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
     print(f"Pumping rate: {PUMPING_RATE}")
-    print(f"Project campaign id: {PROJECT_ID}.{solution_number}\n")
+    print(f"Project campaign id: {PROJECT_ID}.{6}\n") #TODO: change this to be the solution number
 
 
     # Add experiments to the queue and run them

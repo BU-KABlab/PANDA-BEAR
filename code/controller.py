@@ -620,6 +620,8 @@ def input_new_vial_values(vialgroup: str):
         f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Volume':<10} {'Capacity':<10} {'Contamination':<15}"
     )
     for vial in vial_parameters:
+        if vial["name"] is None:
+            vial["name"] = ""
         print(
             f"{vial['position']:<10} {vial['name']:<20} {vial['contents']:<20} {vial['volume']:<10} {vial['capacity']:<10} {vial['contamination']:<15}"
         )

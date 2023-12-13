@@ -144,8 +144,8 @@ class Pump:
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
-                self.pump.pumping_rate,
                 self.pump.volume_infused - blowout_ml,
+                self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
             self.pump.volume_infused_clear()
@@ -536,4 +536,6 @@ def mock_pump_testing_routine():
 
 if __name__ == "__main__":
     # test_mixing()
-    mock_pump_testing_routine()
+    #mock_pump_testing_routine()
+    pump = Pump(mill=MockMill(), scale=MockScale())
+    pump.infuse(160, rate=0.64, blowout_ul=50)
