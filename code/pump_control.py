@@ -144,8 +144,8 @@ class Pump:
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
-                self.pump.pumping_rate,
                 self.pump.volume_infused - blowout_ml,
+                self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
             self.pump.volume_infused_clear()
