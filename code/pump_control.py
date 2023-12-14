@@ -1,7 +1,7 @@
 """
 A "driver" class for controlling a new era A-1000 syringe pump using the nesp-lib library
 """
-# pylint: disable=line-too-long, too-many-arguments, too-many-lines
+# pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals
 
 import logging
 import time
@@ -65,14 +65,14 @@ class Pump:
             Pump: Initialized pump object.
         """
         pump_port = nesp_lib.Port("COM5", 19200)
-        pump = nesp_lib.Pump(pump_port)
-        pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
-        pump.volume_infused_clear()
-        pump.volume_withdrawn_clear()
-        log_msg = f"Pump found at address {pump.address}"
+        syringe_pump = nesp_lib.Pump(pump_port)
+        syringe_pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
+        syringe_pump.volume_infused_clear()
+        syringe_pump.volume_withdrawn_clear()
+        log_msg = f"Pump found at address {syringe_pump.address}"
         pump_control_logger.info(log_msg)
         time.sleep(2)
-        return pump
+        return syringe_pump
 
     def withdraw(
         self, volume: float, solution: Optional[Vessel] = None, rate: float = None, weigh: bool = False
@@ -130,6 +130,7 @@ class Pump:
             int: The difference in weight if weighing, otherwise 0
         """
         # convert the volume argument from ul to ml
+        #pumprecord = {}
         volume_ul = volume_to_infuse
         blowout_ml = blowout_ul / 1000.0
         if volume_ul > 0:
@@ -138,7 +139,7 @@ class Pump:
                 density = being_infused.density
             else:
                 density = None
-
+            # _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)  
             self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
@@ -151,12 +152,9 @@ class Pump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if infused_into is not None:
-                #TODO change update_volume to check the pumping direction to determine if it should add or subtract
-                #TODO correct the volume change based on the difference in weight
                 infused_into.update_volume(volume_ul)
                 return 0
-            else:
-                return 0
+            return 0
         else:
             return 0
 
@@ -191,10 +189,10 @@ class Pump:
     #     #purge_vial.update_volume(purge_volume)
     #     return purge_vial
 
-    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False) -> float:
+    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False) -> tuple[float, dict]:
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
-            return 0
+            return 0, {}
         # Set the pump parameters for the run
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml+blowout_ml #ml
@@ -233,6 +231,15 @@ class Pump:
             scale_logger.info("Data,%s,%f,%f,%f,%f, %f",
                             action, volume_ml, density, pre_weight, post_weight, self.pump.pumping_rate
                             )
+            pumping_record = {
+                "action": action,
+                "solution": "",
+                "volume": volume_ml,
+                "density": density,
+                "pre_weight": pre_weight,
+                "post_weight": post_weight,
+                "pumping_rate": self.pump.pumping_rate
+            }
 
         action_type = (
             "infused" if direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
@@ -253,9 +260,9 @@ class Pump:
             if percent_error > .50:
                 scale_logger.warning("Percent error is above 50%")
                 SlackBot().send_slack_message('alert',f'WARNING: Percent Error was {percent_error*100}% for most recent experiment')
-            return difference
+            return difference, pumping_record
 
-        return 0
+        return 0, pumping_record
 
     def mix(
         self,
@@ -346,8 +353,7 @@ class MockPump(Pump):
         self.pumping_rate = self.max_pump_rate
 
     def set_up_pump(self):
-        pump = object()
-        return pump
+        return object()
 
     def withdraw(
         self, volume: float, solution: Optional[Vessel] = None, rate: float = 0.5, weigh: bool = False
@@ -376,7 +382,6 @@ class MockPump(Pump):
             )
 
             if solution is not None:
-                #TODO change update_volume to check the pumping direction to determine if it should add or subtract
                 solution.update_volume(-volume_ul)
                 return None
         else:
@@ -517,10 +522,10 @@ def test_mixing():
     a1 = wellplate.get_coordinates("A1")
     with Mill() as mill:
         mill.homing_sequence()
-        pump = Pump(mill=mill, scale=Scale())
+        syringe_pump = Pump(mill=mill, scale=Scale())
         mill.move_pipette_to_position(a1["x"], a1["y"], 0)
         mill.move_pipette_to_position(a1["x"], a1["y"], a1["depth"])
-        pump.mix()
+        syringe_pump.mix()
 
 
 def mock_pump_testing_routine():

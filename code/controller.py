@@ -92,12 +92,16 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
+    ## Reset the logger to log to the ePANDA.log file and format
+    experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+    system_handler.setFormatter(experiment_formatter)
     print(printpanda())
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
     toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
+        
         ## Check for required files
         check_required_files()
 
@@ -134,7 +138,6 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
             ## Reset the logger to log to the ePANDA.log file and format
             experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
             system_handler.setFormatter(experiment_formatter)
-            logger.addHandler(system_handler)
 
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, wellplate = establish_system_state()
