@@ -101,7 +101,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
     toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
-        
+
         ## Check for required files
         check_required_files()
 
@@ -160,10 +160,10 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 #         "No new experiments to run...monitoring inbox for new experiments",
                 #     )
                 if new_experiment is None:
-                    # e_panda.flush_pipette_tip(pump=toolkit.pump, 
-                    #                           mill=toolkit.mill, 
-                    #                           stock_vials=stock_vials, 
-                    #                           waste_vials=waste_vials, 
+                    # e_panda.flush_pipette_tip(pump=toolkit.pump,
+                    #                           mill=toolkit.mill,
+                    #                           stock_vials=stock_vials,
+                    #                           waste_vials=waste_vials,
                     #                           flush_solution_name='water',
                     #                           flush_volume=120,
                     #                           )
