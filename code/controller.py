@@ -226,7 +226,6 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     mill=toolkit.mill,
                     pump=toolkit.pump,
                     stock_vials=stock_vials,
-                    waste_vials=waste_vials,
                     wellplate=wellplate,
                 )
 

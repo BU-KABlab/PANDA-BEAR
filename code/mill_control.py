@@ -19,13 +19,12 @@ import dataclasses
 from enum import Enum
 import json
 import logging
-import pathlib
 import re
 import time
 import serial
 
 import wellplate as Wells
-
+from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS
 # Configure the logger
 # logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
@@ -106,7 +105,7 @@ class Mill:
     def read_json_config(self):
         """Read the config file"""
         try:
-            config_file_path = pathlib.Path.cwd() / "code/config" / self.config_file
+            config_file_path = MILL_CONFIG
             with open(config_file_path, "r", encoding="UTF-8") as file:
                 configuration = json.load(file)
             logger.debug("Mill config loaded: %s", configuration)
@@ -419,7 +418,7 @@ class Mill:
         }
 
         self.config["instrument_offsets"][offset_type] = offset
-        config_file_path = pathlib.Path.cwd() / "code/config" / self.config_file
+        config_file_path = MILL_CONFIG
         if not config_file_path.exists():
             logger.error("Config file not found")
             raise MillConfigNotFound
@@ -709,15 +708,13 @@ def movement_test():
     wellplate = Wells.Wells(-230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
 
     # Configure the logger for testing
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
+    test_logger = logging.getLogger(__name__)
+    test_logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
     formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
     testing_handler = logging.FileHandler("code/logs/mill_control_testing.log")
     testing_handler.setFormatter(formatter)
-    logger.addHandler(testing_handler)
-    from controller import read_vials
-    from config.file_locations import STOCK_STATUS_FILE, WASTE_STATUS_FILE
-    from pathlib import Path
+    test_logger.addHandler(testing_handler)
+
     try:
         with Mill() as mill:
             a1 = wellplate.get_coordinates("A1")
@@ -726,10 +723,12 @@ def movement_test():
             h12 = wellplate.get_coordinates("H12")
 
             ## Load the vials
-            stock_vials = read_vials(Path.cwd() / STOCK_STATUS_FILE)
-            waste_vials = read_vials(Path.cwd() / WASTE_STATUS_FILE)
+            from controller import read_vials
 
-            ## Move the pipette to each well
+            stock_vials = read_vials(STOCK_STATUS)
+            waste_vials = read_vials(WASTE_STATUS)
+
+            ## Move the pipette to each well corner
             mill.safe_move(
                 a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
             )
@@ -743,19 +742,24 @@ def movement_test():
                 h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
             )
             if len(stock_vials) != 0:
-                for i in range(len(stock_vials)):
+                for _, vial in enumerate(stock_vials):
                     mill.safe_move(
-                        stock_vials[i].coordinates["x"],
-                        stock_vials[i].coordinates["y"],
-                        stock_vials[i].height,
+                        vial.coordinates["x"],
+                        vial.coordinates["y"],
+                        vial.height,
                         instrument=Instruments.PIPETTE,
                     )
                 mill.move_to_safe_position()
 
             if len(waste_vials) != 0:
-                ## Move pipette to first waste vial then to the depth and then to safe position
-                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], 0, instrument=Instruments.PIPETTE)
-                mill.safe_move(waste_vials[0].coordinates['x'],waste_vials[0].coordinates['y'], waste_vials[0].height, instrument=Instruments.PIPETTE)
+                ## Move pipette to first waste vial then to the depth and then to safe positionfor
+                for _, vial in enumerate(waste_vials):
+                    mill.safe_move(
+                        vial.coordinates["x"],
+                        vial.coordinates["y"],
+                        vial.height,
+                        instrument=Instruments.PIPETTE,
+                    )
                 mill.move_to_safe_position()
 
     except (

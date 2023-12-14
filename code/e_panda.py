@@ -18,7 +18,7 @@ Returns:
     Wellplate: The updated wellplate object.
     Vials: The updated vials object.
 """
-# pylint: disable=line-too-long, too-many-arguments, too-many-lines
+# pylint: disable=line-too-long, too-many-arguments, too-many-lines, broad-exception-caught
 
 # Standard library imports
 import json
@@ -37,14 +37,13 @@ from experiment_class import (
     ExperimentResult,
     ExperimentStatus,
     ExperimentBase,
-    PEG2P_Test_Instructions,
     LayeredExperiments,
     EchemExperimentBase
 )
 from log_tools import CustomLoggingFilter
 from mill_control import Mill, Instruments, MockMill
 from pump_control import MockPump, Pump
-from vials import Vessel, Vial, Vial2, StockVial, WasteVial
+from vials import Vessel, StockVial, WasteVial
 from wellplate import Wells, Well, Wells2
 from config.config import (
     PATH_TO_NETWORK_LOGS,
@@ -189,10 +188,7 @@ def forward_pipette_v2(
                 )
 
             # Infuse into the to_vessel and receive the updated vessel object
-            if isinstance(to_vessel, Well):
-                weigh = True
-            else:
-                weigh = False
+            weigh = bool(isinstance(to_vessel, Well))
 
             pump.infuse(
                 volume_to_infuse=repetition_vol,
@@ -204,7 +200,7 @@ def forward_pipette_v2(
             )
 
             # Update the contentes of the to_vessel
-            # TODO change from repitition volume to corrected volume
+            # FEATURE change from repitition volume to corrected volume
             to_vessel.update_contents(from_vessel, repetition_vol)
 
             logger.info(
@@ -366,7 +362,6 @@ def reverse_pipette_v2(
             mill.move_to_safe_position()
             logger.info("Moved to safe position")
             # Update the contentes of the to_vessel
-            # TODO change from repitition volume to corrected volume
             logger.debug("Updating contents of %s", to_vessel.name)
             to_vessel.update_contents(from_vessel, repetition_vol)
 
@@ -616,7 +611,7 @@ def deposition(
         )
         dep_results.deposition_data_file = echem.setfilename(dep_instructions.id, "CA")
 
-        # TODO have chrono return the max and min values for the deposition
+        # FEATURE have chrono return the max and min values for the deposition
         # and save them to the results
         # don't have any parameters hardcoded, switch these all to instructions
         echem.chrono(
@@ -700,7 +695,7 @@ def characterization(
             char_instructions.id, test_type
         )
 
-        # TODO have cyclic return the max and min values for the characterization
+        # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
         echem.cyclic(
             echem.potentiostat_cv_parameters.CVvi,
@@ -720,9 +715,9 @@ def characterization(
         mill.rinse_electrode()
         echem.pstatdisconnect()
         return char_instructions, char_results
-    else:
-        echem.pstatdisconnect()
-        raise OCPFailure("CV")
+
+    echem.pstatdisconnect()
+    raise OCPFailure("CV")
 
 def apply_log_filter(experiment_id: int, target_well: Optional[str] = None, campaign_id: Optional[str] = None):
     """Add custom value to log format"""
@@ -1382,7 +1377,6 @@ def viscosity_experiments_protocol(
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
     wellplate: Wells2,
 ):
     """
