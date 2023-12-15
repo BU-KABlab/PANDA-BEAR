@@ -1,3 +1,9 @@
+"""
+The main menue of ePANDA.
+
+Useful for one-off tasks that don't require the full ePANDA program to run.
+Or starting the ePANDA either with or without mock instruments.
+"""
 import sys
 import controller
 
