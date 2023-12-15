@@ -40,22 +40,8 @@ import e_panda
 from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
 from vials import StockVial, Vial2, WasteVial
 import wellplate as wellplate_module
+import protocols
 
-# from config.config import (
-#     MILL_CONFIG_FILE,
-#     WELLPLATE_CONFIG_FILE,
-#     WELL_STATUS_FILE,
-#     PATH_TO_SYSTEM_STATE,
-#     PATH_TO_COMPLETED_EXPERIMENTS,
-#     PATH_TO_ERRORED_EXPERIMENTS,
-#     PATH_TO_NETWORK_DATA as PATH_TO_DATA,
-#     PATH_TO_NETWORK_LOGS as PATH_TO_LOGS,
-#     NETWORK_WELL_HX as PATH_TO_WELL_HX,
-#     RANDOM_FLAG,
-#     STOCK_STATUS_FILE,
-#     WASTE_STATUS_FILE
-
-# )
 from config.config import (
     MILL_CONFIG,
     WELLPLATE_LOCATION as WELLPLATE_CONFIG_FILE,
@@ -68,14 +54,15 @@ from config.config import (
     RANDOM_FLAG,
     STOCK_STATUS,
     WASTE_STATUS,
-    WELL_STATUS
+    WELL_STATUS,
 )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
-    )
+formatter = logging.Formatter(
+    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
+)
 system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -101,7 +88,6 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
     toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
-
         ## Check for required files
         check_required_files()
 
@@ -113,25 +99,21 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         ## Initialize scheduler
         scheduler = Scheduler()
 
-
         ## Establish state of system - we do this each time because each experiment changes the system state
         stock_vials, waste_vials, wellplate = establish_system_state()
 
         ## Flush the pipette tip with water before we start
-        e_panda.flush_v2(stock_vials=stock_vials,
-                            waste_vials=waste_vials,
-                            flush_solution_name='rinse0',
-                            flush_volume=140,
-                            pump=toolkit.pump,
-                            mill=toolkit.mill,
-                            )
+        e_panda.flush_v2(
+            stock_vials=stock_vials,
+            waste_vials=waste_vials,
+            flush_solution_name="rinse0",
+            flush_volume=140,
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+        )
         ## Update the system state with new vial and wellplate information
-        update_vial_state_file(
-            stock_vials, STOCK_STATUS
-        )
-        update_vial_state_file(
-            waste_vials, WASTE_STATUS
-        )
+        update_vial_state_file(stock_vials, STOCK_STATUS)
+        update_vial_state_file(waste_vials, WASTE_STATUS)
 
         ## Begin outer loop
         while True:
@@ -146,13 +128,15 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
             # check if any of the experiments in the queue pandas dataframe are type 2
             protocol_type = 0
             for _, row in queue.iterrows():
-                if row['protocol_type'] == 2:
+                if row["protocol_type"] == 2:
                     protocol_type = 2
                     break
 
-            if protocol_type in [0,1]:
+            if protocol_type in [0, 1]:
                 ## Ask the scheduler for the next experiment
-                new_experiment, _ = scheduler.read_next_experiment_from_queue(random_pick=RANDOM_FLAG)
+                new_experiment, _ = scheduler.read_next_experiment_from_queue(
+                    random_pick=RANDOM_FLAG
+                )
                 # if new_experiment is None:
                 #     slack.send_slack_message(
                 #         "alert",
@@ -166,7 +150,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     #                           flush_solution_name='water',
                     #                           flush_volume=120,
                     #                           )
-                    break # break out of the while True loop
+                    break  # break out of the while True loop
 
                 # while new_experiment is None:
                 #     scheduler.check_inbox()
@@ -186,9 +170,10 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 if not isinstance(new_experiment, ExperimentBase):
                     logger.error("The experiment object is not valid")
                     slack.send_slack_message(
-                        "alert", "An invalid experiment object was passed to the controller"
+                        "alert",
+                        "An invalid experiment object was passed to the controller",
                     )
-                    break # break out of the while True loop
+                    break  # break out of the while True loop
 
                 ## Check that there is enough volume in the stock vials to run the experiment
                 if not check_stock_vials(new_experiment, stock_vials):
@@ -204,7 +189,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     scheduler.update_experiment_queue_priority(
                         new_experiment.id, new_experiment.priority
                     )
-                    break # break out of the while True loop
+                    break  # break out of the while True loop
 
                 ## Initialize a results object
                 experiment_results = ExperimentResult(
@@ -219,21 +204,31 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 ## Update the experiment status to running
                 new_experiment.status = ExperimentStatus.RUNNING
                 new_experiment.status_date = datetime.datetime.now()
-                scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
+                scheduler.change_well_status_v2(
+                    wellplate.wells[new_experiment.target_well], new_experiment
+                )
 
                 ## Run the experiment
-                e_panda.viscosity_experiments_protocol(
+                e_panda.apply_log_filter(
+                    new_experiment.id,
+                    new_experiment.target_well,
+                    str(new_experiment.project_id)
+                    + "."
+                    + str(new_experiment.project_campaign_id),
+                    test=use_mock_instruments,
+                )
+                protocols.viscosity_experiments_protocol(
                     instructions=new_experiment,
                     results=experiment_results,
                     mill=toolkit.mill,
                     pump=toolkit.pump,
                     stock_vials=stock_vials,
                     wellplate=wellplate,
+                    logger=logger,
                 )
 
                 ## Reset the logger to log to the ePANDA.log file and format
                 e_panda.apply_log_filter()
-
 
                 ## Add the results to the experiment file
                 new_experiment.results = experiment_results
@@ -241,10 +236,12 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 ## With returned experiment and results, update the experiment status and post the final status
                 post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status.value}"
                 logger.info(post_experiment_status_msg)
-                #slack.send_slack_message("alert", post_experiment_status_msg)
+                # slack.send_slack_message("alert", post_experiment_status_msg)
 
                 ## Update the system state with new vial and wellplate information
-                scheduler.change_well_status_v2(wellplate.wells[new_experiment.target_well], new_experiment)
+                scheduler.change_well_status_v2(
+                    wellplate.wells[new_experiment.target_well], new_experiment
+                )
 
                 ## Update location of experiment instructions and save results
                 scheduler.update_experiment_status(new_experiment)
@@ -252,7 +249,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 scheduler.save_results(new_experiment, experiment_results)
 
                 if one_off:
-                    break # break out of the while True loop
+                    break  # break out of the while True loop
 
             elif protocol_type == 2:
                 ## Ask the scheduler for the list of type 2 protocols
@@ -269,19 +266,30 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                             error_message,
                         )
                         logger.error(error_message)
-                        input("Not enough volume in stock vials to run layered protocol. Press enter to continue or ctrl+c to exit")
+                        input(
+                            "Not enough volume in stock vials to run layered protocol. Press enter to continue or ctrl+c to exit"
+                        )
 
                 ## Initialize a results object
                 for experiment in experiments_to_run:
                     experiment.results = ExperimentResult()
 
-                e_panda.layered_solution_protocol(
+                e_panda.apply_log_filter(
+                    experiment.id,
+                    experiment.target_well,
+                    str(experiment.project_id)
+                    + "."
+                    + str(experiment.project_campaign_id),
+                    test=use_mock_instruments,
+                )
+                protocols.layered_solution_protocol(
                     instructions=experiments_to_run,
                     mill=toolkit.mill,
                     pump=toolkit.pump,
                     stock_vials=stock_vials,
                     waste_vials=waste_vials,
                     wellplate=wellplate,
+                    logger=logger,
                 )
                 e_panda.apply_log_filter()
                 ## Update location of experiment instructions and save results
@@ -291,12 +299,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     scheduler.save_results(experiment, experiment.results)
 
             ## Update the system state with new vial and wellplate information
-            update_vial_state_file(
-                stock_vials, STOCK_STATUS
-            )
-            update_vial_state_file(
-                waste_vials, WASTE_STATUS
-            )
+            update_vial_state_file(stock_vials, STOCK_STATUS)
+            update_vial_state_file(waste_vials, WASTE_STATUS)
 
     except Exception as error:
         logger.error(error)
@@ -320,7 +324,13 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 class Toolkit:
     """A class to hold all of the instruments"""
 
-    def __init__(self, mill: Union[Mill,MockMill], scale: Union[Scale, MockScale], pump: Union[Pump,MockPump], pstat = None):
+    def __init__(
+        self,
+        mill: Union[Mill, MockMill],
+        scale: Union[Scale, MockScale],
+        pump: Union[Pump, MockPump],
+        pstat=None,
+    ):
         self.mill = mill
         self.scale = scale
         self.pump = pump
@@ -429,9 +439,7 @@ def establish_system_state() -> (
     ## read the wellplate json and log the status of each well in a grid
     number_of_clear_wells = 0
     number_of_wells = 0
-    with open(
-        WELL_STATUS, "r", encoding="UTF-8"
-    ) as file:
+    with open(WELL_STATUS, "r", encoding="UTF-8") as file:
         wellplate_status = json.load(file)
     for well in wellplate_status["wells"]:
         number_of_wells += 1
@@ -479,7 +487,9 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
         logger.error("The experiment has no solutions")
         return False
     for solution in experiment.solutions:
-        if str(solution).lower() not in [str(vial.name).lower() for vial in stock_vials]:
+        if str(solution).lower() not in [
+            str(vial.name).lower() for vial in stock_vials
+        ]:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
@@ -509,7 +519,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
         mill = MockMill()
         scale = MockScale()
         pump = MockPump(mill=mill, scale=scale)
-        #pstat = echem_mock.GamryPotentiostat.connect()
+        # pstat = echem_mock.GamryPotentiostat.connect()
         instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
         return instruments
 
@@ -518,7 +528,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     mill.homing_sequence()
     scale = Scale(address="COM6")
     pump = Pump(mill=mill, scale=scale)
-    #pstat_connected = echem.pstatconnect()
+    # pstat_connected = echem.pstatconnect()
     instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
     return instruments
 
@@ -560,7 +570,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
                     height=items["height"],
                     contamination=items["contamination"],
                     contents=items["contents"],
-                    )
+                )
                 list_of_solutions.append(read_vial)
             elif items["category"] == 1:
                 read_vial = WasteVial(
@@ -575,7 +585,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
                     height=items["height"],
                     contamination=items["contamination"],
                     contents=items["contents"],
-                    )
+                )
                 list_of_solutions.append(read_vial)
     return list_of_solutions
 
@@ -636,21 +646,33 @@ def input_new_vial_values(vialgroup: str):
             break
         for vial in vial_parameters:
             if vial["position"] == choice:
-                print("Please enter the new values for the vial, if you leave any blank the value will not be changed")
+                print(
+                    "Please enter the new values for the vial, if you leave any blank the value will not be changed"
+                )
                 print(f"\nVial {vial['position']}:")
-                new_name = input(f"Enter the new name of the vial (Current name is {vial['name']}): ")
+                new_name = input(
+                    f"Enter the new name of the vial (Current name is {vial['name']}): "
+                )
                 if new_name != "":
                     vial["name"] = new_name
-                new_contents = input(f"Enter the new contents of the vial (Current contents are {vial['contents']}): ")
+                new_contents = input(
+                    f"Enter the new contents of the vial (Current contents are {vial['contents']}): "
+                )
                 if new_contents != "":
                     vial["contents"] = new_contents
-                new_volume = input(f"Enter the new volume of the vial (Current volume is {vial['volume']}): ")
+                new_volume = input(
+                    f"Enter the new volume of the vial (Current volume is {vial['volume']}): "
+                )
                 if new_volume != "":
                     vial["volume"] = int(new_volume)
-                new_capacity = input(f"Enter the new capacity of the vial (Current capacity is {vial['capacity']}): ")
+                new_capacity = input(
+                    f"Enter the new capacity of the vial (Current capacity is {vial['capacity']}): "
+                )
                 if new_capacity != "":
                     vial["capacity"] = int(new_capacity)
-                new_contamination = input(f"Enter the new contamination of the vial (Current contamination is {vial['contamination']}): ")
+                new_contamination = input(
+                    f"Enter the new contamination of the vial (Current contamination is {vial['contamination']}): "
+                )
                 if new_contamination != "":
                     vial["contamination"] = int(new_contamination)
                 break
@@ -697,7 +719,11 @@ def reset_vials(vialgroup: str):
         json.dump(vial_parameters, file, indent=4)
 
 
-def load_new_wellplate(ask: bool = False, new_plate_id: Optional[int] = None,new_wellplate_type_number: Optional[int] = None ) -> int:
+def load_new_wellplate(
+    ask: bool = False,
+    new_plate_id: Optional[int] = None,
+    new_wellplate_type_number: Optional[int] = None,
+) -> int:
     """
     Save the current wellplate, reset the well statuses to new.
     If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1
@@ -717,7 +743,9 @@ def load_new_wellplate(ask: bool = False, new_plate_id: Optional[int] = None,new
 
     if ask:
         new_plate_id = int(
-            input(f"Enter the new wellplate id (Current id is {current_wellplate_id}): ")
+            input(
+                f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
+            )
         )
         new_wellplate_type_number = int(
             input(
@@ -793,7 +821,9 @@ def save_current_wellplate():
     # write back all lines that are not the same plate id as the current wellplate
 
     with open(PATH_TO_WELL_HX, "r", encoding="UTF-8") as input_file:
-        with open(PATH_TO_DATA / "new_well_history.csv", "w", encoding="UTF-8") as output_file:
+        with open(
+            PATH_TO_DATA / "new_well_history.csv", "w", encoding="UTF-8"
+        ) as output_file:
             for line in input_file:
                 # Check if the line has the same plate ID as the current_plate_id
                 if line.split(",")[0] == str(current_plate_id):
@@ -828,9 +858,7 @@ def save_current_wellplate():
 def change_wellplate_location():
     """Change the location of the wellplate"""
     ## Load the working volume from mill_config.json
-    with open(
-        MILL_CONFIG, "r", encoding="UTF-8"
-    ) as file:
+    with open(MILL_CONFIG, "r", encoding="UTF-8") as file:
         mill_config = json.load(file)
     working_volume = mill_config["working_volume"]
 
@@ -875,9 +903,7 @@ def change_wellplate_location():
             print("Invalid input. Please enter 0, 1, 2, or 3.")
 
     ## Get the current location config
-    with open(
-        WELLPLATE_CONFIG_FILE, "r", encoding="UTF-8"
-    ) as file:
+    with open(WELLPLATE_CONFIG_FILE, "r", encoding="UTF-8") as file:
         current_location = json.load(file)
 
     new_location = {
@@ -889,9 +915,7 @@ def change_wellplate_location():
         "z-bottom": current_location["z-bottom"],
     }
     ## Write the new location to the wellplate_location.txt file
-    with open(
-        WELLPLATE_CONFIG_FILE, "w", encoding="UTF-8"
-    ) as file:
+    with open(WELLPLATE_CONFIG_FILE, "w", encoding="UTF-8") as file:
         json.dump(new_location, file, indent=4)
 
 
