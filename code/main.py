@@ -47,7 +47,7 @@ options = {
     '5': input_new_vial_values_stock,
     '6': input_new_vial_values_waste,
     '7': change_wellplate_location,
-    '12': exit_program  # changed from 'exit' to 'exit_program'
+    'q': exit_program
 }
 
 if __name__ == "__main__":

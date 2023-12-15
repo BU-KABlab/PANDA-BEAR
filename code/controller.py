@@ -628,15 +628,35 @@ def input_new_vial_values(vialgroup: str):
         print(
             f"{vial['position']:<10} {vial['name']:<20} {vial['contents']:<20} {vial['volume']:<10} {vial['capacity']:<10} {vial['contamination']:<15}"
         )
-
-    ## Loop through each vial and ask for the new values except for position
-    for vial in vial_parameters:
-        print(f"\nVial {vial['position']}:")
-        vial["name"] = input("Enter the name of the vial: ").lower()
-        vial["contents"] = input("Enter the contents of the vial: ").lower()
-        vial["volume"] = int(input("Enter the volume of the vial: "))
-        vial["capacity"] = int(input("Enter the capacity of the vial: "))
-        vial["contamination"] = input("Enter the contamination of the vial: ").lower()
+    while True:
+        choice = input(
+            "Which vial would you like to change? Enter the position of the vial or 'q' if finished: "
+        )
+        if choice == "q":
+            break
+        for vial in vial_parameters:
+            if vial["position"] == choice:
+                print("Please enter the new values for the vial, if you leave any blank the value will not be changed")
+                print(f"\nVial {vial['position']}:")
+                new_name = input(f"Enter the new name of the vial (Current name is {vial['name']}): ")
+                if new_name != "":
+                    vial["name"] = new_name
+                new_contents = input(f"Enter the new contents of the vial (Current contents are {vial['contents']}): ")
+                if new_contents != "":
+                    vial["contents"] = new_contents
+                new_volume = input(f"Enter the new volume of the vial (Current volume is {vial['volume']}): ")
+                if new_volume != "":
+                    vial["volume"] = int(new_volume)
+                new_capacity = input(f"Enter the new capacity of the vial (Current capacity is {vial['capacity']}): ")
+                if new_capacity != "":
+                    vial["capacity"] = int(new_capacity)
+                new_contamination = input(f"Enter the new contamination of the vial (Current contamination is {vial['contamination']}): ")
+                if new_contamination != "":
+                    vial["contamination"] = int(new_contamination)
+                break
+        else:
+            print("Invalid vial position")
+            continue
 
     ## Write the new values to the state file
     with open(filename, "w", encoding="UTF-8") as file:
