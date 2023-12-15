@@ -44,6 +44,7 @@ class ExperimentResult:
     characterization_plot_file: Path = None
     characterization_max_value: float = None
     characterization_min_value: float = None
+    pumping_record: list = None
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class ExperimentBase():

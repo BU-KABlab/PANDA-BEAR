@@ -15,6 +15,7 @@ from slack_functions2 import SlackBot
 from vials import Vial, Vessel
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
+from experiment_class import ExperimentResult
 
 pump_control_logger = logging.getLogger("e_panda")
 scale_logger = logging.getLogger("e_panda")
@@ -75,7 +76,7 @@ class Pump:
         return syringe_pump
 
     def withdraw(
-        self, volume: float, solution: Optional[Vessel] = None, rate: float = None, weigh: bool = False
+        self, volume: float, solution: Optional[Vessel] = None, rate: float = None, weigh: bool = False, results: ExperimentResult = None
     ):
         """
         Withdraw the given volume at the given rate and depth from the specified position.
@@ -97,7 +98,7 @@ class Pump:
             else:
                 density = None
 
-            self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
+            _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
             self.update_pipette_volume(self.pump.volume_withdrawn)
             pump_control_logger.info(
                 "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
@@ -105,6 +106,9 @@ class Pump:
                 self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
+            pumprecord["solution"] = solution.name
+            if results is not None:
+                results.pumping_record.append(pumprecord)
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if solution is not None:
@@ -114,7 +118,7 @@ class Pump:
             return None
 
     def infuse(
-        self, volume_to_infuse: float, being_infused: Optional[Vessel] = None, infused_into: Optional[Vessel] = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False
+        self, volume_to_infuse: float, being_infused: Optional[Vessel] = None, infused_into: Optional[Vessel] = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False, results: ExperimentResult = None
     ) ->  int:
         """
         Infuse the given volume at the given rate and depth from the specified position.
@@ -140,7 +144,7 @@ class Pump:
             else:
                 density = None
             # _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
-            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
+            _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
@@ -149,6 +153,9 @@ class Pump:
                 self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
+            pumprecord["solution"] = being_infused.name
+            if results is not None:
+                results.pumping_record.append(pumprecord)
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if infused_into is not None:
@@ -356,7 +363,7 @@ class MockPump(Pump):
         return object()
 
     def withdraw(
-        self, volume: float, solution: Optional[Vessel] = None, rate: float = 0.5, weigh: bool = False
+        self, volume: float, solution: Optional[Vessel] = None, rate: float = 0.5, weigh: bool = False, results: ExperimentResult = None
     ) -> Optional[float]:
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
@@ -388,7 +395,7 @@ class MockPump(Pump):
             return None
 
     def infuse(
-        self, volume_to_infuse: float, being_infused: Optional[Vessel] = None, infused_into: Optional[Vessel] = None, rate: float = 0.5, blowout_ul = 0.0, weigh: bool = False
+        self, volume_to_infuse: float, being_infused: Optional[Vessel] = None, infused_into: Optional[Vessel] = None, rate: float = 0.5, blowout_ul = 0.0, weigh: bool = False, results: ExperimentResult = None
     ) -> Optional[Vessel]:
         """
         Simulate infuse behavior without sending commands to the pump
