@@ -310,6 +310,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         raise KeyboardInterrupt from exc
 
     finally:
+        # Save the current wellplate
+        load_new_wellplate()
         # close out of serial connections
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
