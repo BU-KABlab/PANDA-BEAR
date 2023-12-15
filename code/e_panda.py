@@ -719,13 +719,13 @@ def characterization(
     echem.pstatdisconnect()
     raise OCPFailure("CV")
 
-def apply_log_filter(experiment_id: int, target_well: Optional[str] = None, campaign_id: Optional[str] = None):
+def apply_log_filter(experiment_id: int = None, target_well: Optional[str] = None, campaign_id: Optional[str] = None, test:bool = False):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
-        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s"
+        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
     )
     system_handler.setFormatter(experiment_formatter)
-    custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well)
+    custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
     logger.addFilter(custom_filter)
 
 # def standard_experiment_protocol(

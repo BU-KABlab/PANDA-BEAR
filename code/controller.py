@@ -74,7 +74,8 @@ from config.config import (
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
+    )
 system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
@@ -93,8 +94,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
     ## Reset the logger to log to the ePANDA.log file and format
-    experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-    system_handler.setFormatter(experiment_formatter)
+    e_panda.apply_log_filter()
     print(printpanda())
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
@@ -136,8 +136,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         ## Begin outer loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
-            experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-            system_handler.setFormatter(experiment_formatter)
+            e_panda.apply_log_filter()
 
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, wellplate = establish_system_state()
@@ -233,8 +232,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 )
 
                 ## Reset the logger to log to the ePANDA.log file and format
-                experiment_formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
-                system_handler.setFormatter(experiment_formatter)
+                e_panda.apply_log_filter()
+
 
                 ## Add the results to the experiment file
                 new_experiment.results = experiment_results
@@ -284,7 +283,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     waste_vials=waste_vials,
                     wellplate=wellplate,
                 )
-
+                e_panda.apply_log_filter()
                 ## Update location of experiment instructions and save results
                 for experiment in experiments_to_run:
                     scheduler.update_experiment_status(experiment)
