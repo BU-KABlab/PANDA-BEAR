@@ -165,37 +165,6 @@ class Pump:
         else:
             return 0
 
-    # def purge(
-    #     self,
-    #     purge_vial: Vial,
-    #     solution_being_purged: Vial = None,
-    #     purge_volume=20.00,
-    #     pumping_rate=0.5,
-    # ) -> Vial:
-    #     """
-    #     Perform purging from the pipette.
-    #     Args:
-    #         purge_vial (Vial object): The vial to purge into
-    #         solution (Vial object): The solution being purged
-    #         pump (object): The pump object to use
-    #         purge_volume (float): The volume to purge in ml (default 20)
-    #         pumping_rate (float): The pumping rate in ml/min (default 0.5)
-
-    #     Returns:
-    #         The updated purge_vial object
-    #     """
-
-    #     pump_control_logger.debug("Purging %f ul...", purge_volume)
-    #     purge_vial = self.infuse(volume_to_infuse=purge_volume,
-    #                              rate=pumping_rate,
-    #                              being_infused= solution_being_purged,
-    #                              infused_into=purge_vial
-    #                              )
-    #     log_msg = f"Purged {purge_volume} ul"
-    #     pump_control_logger.debug(log_msg)
-    #     #purge_vial.update_volume(purge_volume)
-    #     return purge_vial
-
     def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False) -> tuple[float, dict]:
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
