@@ -13,6 +13,8 @@ USE_LOCAL_PATHS = False
 
 ## Define local repository path
 LOCAL_REPO_PATH = Path("C:/Users/Kab Lab/Documents/GitHub/PANDA")
+#LOCAL_REPO_PATH = Path(r"C:\Users\grego\SynologyDrive\Documents\GitHub\PANDA-BEAR")
+
 ## Define network path
 NETWORK_PATH = Path("//engnas.bu.edu/research/eng_research_kablab/Shared Resources/PANDA/")
 

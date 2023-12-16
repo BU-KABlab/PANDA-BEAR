@@ -289,8 +289,8 @@ class Wells:
             ## designate the color of the well based on its status
             if well_data["status"] in ["empty", "new"]:
                 color.append("black")
-            elif well_data["status"] == "in use":
-                color.append("yellow")
+            elif well_data["status"] == "queued":
+                color.append("orange")
             elif well_data["status"] == "complete":
                 color.append("green")
             elif well_data["status"] == "error":
@@ -573,7 +573,7 @@ class Wells2:
 
     def _get_well_color(self, status: str) -> str:
         """Get the color of a well based on its status."""
-        color_mapping = {"empty": "black", "new": "black", "in use": "yellow", "complete": "green", "error": "red"}
+        color_mapping = {"empty": "black", "new": "black", "queued": "orange", "complete": "green", "error": "red"}
         return color_mapping.get(status, "black")
 
     def well_coordinates_and_status_color(self):
