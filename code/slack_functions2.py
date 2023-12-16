@@ -4,14 +4,17 @@
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 import csv
 from datetime import datetime
+import json
 import logging
+import time
 from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
-from config.config import SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS, QUEUE
+from config.config import SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS, QUEUE, WELL_STATUS, WELL_TYPE
+from wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wells2
 
 class SlackBot:
     """Class for sending messages to Slack."""
@@ -83,41 +86,6 @@ class SlackBot:
             log_msg = f"Error uploading file: {format(exception)}"
             self.logger.error(log_msg)
             return 0
-
-    def upload_requested_experiment_info(self, experiment_id, test_type, result_type, channel):
-        """Uploads requested experiment information to Slack channel.
-
-        Args:
-            experimentID (int): The ID of the experiment to get information from.
-            test_type (str): CV, CA, or OCP
-            result_type (str): plot/graph, data, .
-            channel (str): The Slack channel to upload the information to.
-
-        """
-        # clean inputs
-        experiment_id = int(experiment_id)
-        test_type = test_type.lower()
-        result_type = result_type.lower()
-        channel = channel.lower()
-
-        # Get experiment information
-        match result_type:
-            case "plot":
-                # Get plot
-                pass
-            case "graph":
-                # Get plot
-                pass
-
-            case "data":
-                # Get data
-                pass
-            case "parameters":
-                # Get parameters
-                pass
-            case _:
-                return "No applicable result type"
-
 
     def check_slack_messages(self, channel: str) -> int:
         """Check Slack for messages."""
@@ -249,116 +217,38 @@ class SlackBot:
 
         # Parse message
         if text == "help":
-            message = (
-                "Here is a list of commands I understand:\n"
-                "help - displays this message\n"
-                #"plot experiment # - plots plots the CV data for experiment #\n"
-                #"data experiment # - sends the data files for experiment #\n"
-                #"status experiment # - displays the status of experiment #\n"
-                "status vials - displays the status of the vials\n"
-                #"status wells - displays the status of the wells\n"
-                "queue length - displays the length of the queue\n"
-                #"pause - pauses the current experiment\n"
-                #"resume - resumes the current experiment\n"
-                #"start - starts a new experiment\n"
-                #"stop - stops the current experiment\n"
-                "exit - exits the program\n"
-            )
-            self.send_slack_message(channel_id, message)
+            self.__help_menu(channel_id=channel_id)
             return 1
-
-        elif text[0:15] == "plot experiment":
-            # Get experiment number
-            experiment_number = text[5:]
-            return 1
-            # Get plot
 
         elif text[0:15] == "data experiment":
-            # Get experiment number
-            experiment_number = text[6:]
-            # Share experiment
-            data = self.upload_requested_experiment_info(
-                experiment_number, "CV", "data", channel_id
-            )
-            self.send_slack_message(channel_id, data)
+            # Get experiment number.
+            #experiment_number = text[7:]
             return 1
 
         elif text[0:17] == "status experiment":
             # Get experiment number
-            experiment_number = text[7:]
+            #experiment_number = text[7:]
             # Get status
             return 1
 
         elif text[0:11] == "vial status":
-            # Get vial status
-            ## Load the vial status json file
-            stock_vials = pd.read_json(STOCK_STATUS)
-            ## Filter for just the vial position and volume
-            stock_vials = stock_vials[["position", "volume", "name"]]
-            # Drop any vials that have null values
-            stock_vials = stock_vials.dropna()
-            ## set position to be a string and volume to be a float
-            stock_vials["position"] = stock_vials["position"].astype(str)
-            stock_vials["volume"] = stock_vials["volume"].astype(float)
-            ## Create a bar graph with volume on the x-axis and position on the y-axis
-            ## Send the graph to slack
-            plt.bar(stock_vials["position"], stock_vials["volume"], align="center", alpha=0.5, color="blue")
-            # label each bar with the volume
-            for i, v in enumerate(stock_vials["volume"]):
-                plt.text(i, v, str(v/1000), color="black", ha="center")
-
-            # Draw a horizontal line at 4000
-            plt.axhline(y=4000, color="red", linestyle="-")
-            # Write the name of the vial vertically in the bar
-            for i, v in enumerate(stock_vials["name"]):
-                plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
-            plt.xlabel("Position")
-            plt.ylabel("Volume")
-            plt.title("Stock Vial Status")
-            plt.savefig("vial_status.png")
-            self.send_slack_file(channel_id, "vial_status.png")
-
-            ## Delete the graph file
-            Path("vial_status.png").unlink()
-            plt.close()
-
-            # And the same for the waste vials
-            waste_vials = pd.read_json(WASTE_STATUS)
-            waste_vials = waste_vials[["position", "volume", "name"]]
-            # Drop any vials that have null values
-            waste_vials = waste_vials.dropna()
-            waste_vials["position"] = waste_vials["position"].astype(str)
-            waste_vials["volume"] = waste_vials["volume"].astype(float)
-            plt.bar(waste_vials["position"], waste_vials["volume"], align="center", alpha=0.5, color="blue")
-            for i, v in enumerate(waste_vials["volume"]):
-                plt.text(i, v, str(v), color="black", ha="center")
-            plt.axhline(y=20000, color="red", linestyle="-")
-            for i, v in enumerate(waste_vials["name"]):
-                plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
-            plt.xlabel("Position")
-            plt.ylabel("Volume")
-            plt.title("Waste Vial Status")
-            plt.savefig("waste_status.png")
-            self.send_slack_file(channel_id, "waste_status.png")
-            Path("waste_status.png").unlink()
-            plt.close()
-
+            self.__vial_status(channel_id=channel_id)
             return 1
 
         elif text[0:11] == "well status":
             # Get well status
+            self.__well_status(channel_id=channel_id)
             return 1
 
         elif text[0:12] == "queue length":
-            # Get queue length
-            queue_length = 0
-            queue_file = pd.read_csv(QUEUE, skipinitialspace=True, header=None, names=['id', 'priority', 'filename', 'protocol_type'])
-            # the columsn to id,priority,filename,protocol_type
-            queue_length = len(queue_file)-1
-            message = f"The queue length is {queue_length}."
-            self.send_slack_message(channel_id, message)
+            self.__queue_length(channel_id=channel_id)
             return 1
-
+        elif text[0:6] == "status":
+            self.__queue_length(channel_id=channel_id)
+            self.__well_status(channel_id=channel_id)
+            time.sleep(1)
+            self.__vial_status(channel_id=channel_id)
+            return 1
         elif text[0:5] == "pause":
             return 1
 
@@ -378,6 +268,193 @@ class SlackBot:
             message = "Sorry, I don't understand that command. Type !epanda help for commands I understand."
             self.send_slack_message(channel_id, message)
             return 1
+
+    def __help_menu(self, channel_id):
+        """Sends the help menu to the user."""
+        message = (
+                "Here is a list of commands I understand:\n"
+                "help - displays this message\n"
+                #"plot experiment # - plots plots the CV data for experiment #\n"
+                #"data experiment # - sends the data files for experiment #\n"
+                #"status experiment # - displays the status of experiment #\n"
+                "vial status - displays the status of the vials\n"
+                "wells status - displays the status of the wells and the rest of the deck\n"
+                "queue length - displays the length of the queue\n"
+                "status - displays the status of the vials, wells, and queue\n"
+                #"pause - pauses the current experiment\n"
+                #"resume - resumes the current experiment\n"
+                #"start - starts a new experiment\n"
+                #"stop - stops the current experiment\n"
+                "exit - exits the program\n"
+            )
+        self.send_slack_message(channel_id, message)
+        return 1
+
+    def __vial_status(self, channel_id):
+        """Sends the vial status to the user."""
+        # Get vial status
+        ## Load the vial status json file
+        stock_vials = pd.read_json(STOCK_STATUS)
+        ## Filter for just the vial position and volume
+        stock_vials = stock_vials[["position", "volume", "name"]]
+        # Drop any vials that have null values
+        stock_vials = stock_vials.dropna()
+        ## set position to be a string and volume to be a float
+        stock_vials["position"] = stock_vials["position"].astype(str)
+        stock_vials["volume"] = stock_vials["volume"].astype(float)
+        ## Create a bar graph with volume on the x-axis and position on the y-axis
+        ## Send the graph to slack
+        plt.bar(stock_vials["position"], stock_vials["volume"], align="center", alpha=0.5, color="blue")
+        # label each bar with the volume
+        for i, v in enumerate(stock_vials["volume"]):
+            plt.text(i, v, str(v/1000), color="black", ha="center")
+
+        # Draw a horizontal line at 4000
+        plt.axhline(y=4000, color="red", linestyle="-")
+        # Write the name of the vial vertically in the bar
+        for i, v in enumerate(stock_vials["name"]):
+            plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
+        plt.xlabel("Position")
+        plt.ylabel("Volume")
+        plt.title("Stock Vial Status")
+        plt.savefig("vial_status.png")
+        self.send_slack_file(channel_id, "vial_status.png")
+
+        ## Delete the graph file
+        Path("vial_status.png").unlink()
+        plt.close()
+
+        # And the same for the waste vials
+        waste_vials = pd.read_json(WASTE_STATUS)
+        waste_vials = waste_vials[["position", "volume", "name"]]
+        # Drop any vials that have null values
+        waste_vials = waste_vials.dropna()
+        waste_vials["position"] = waste_vials["position"].astype(str)
+        waste_vials["volume"] = waste_vials["volume"].astype(float)
+        plt.bar(waste_vials["position"], waste_vials["volume"], align="center", alpha=0.5, color="blue")
+        for i, v in enumerate(waste_vials["volume"]):
+            plt.text(i, v, str(v), color="black", ha="center")
+        plt.axhline(y=20000, color="red", linestyle="-")
+        for i, v in enumerate(waste_vials["name"]):
+            plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
+        plt.xlabel("Position")
+        plt.ylabel("Volume")
+        plt.title("Waste Vial Status")
+        plt.savefig("waste_status.png")
+        self.send_slack_file(channel_id, "waste_status.png")
+        Path("waste_status.png").unlink()
+        plt.close()
+
+    def __well_status(self, channel_id):
+        """Sends the well status to the user."""
+        # Check current wellplate type
+        with open (WELL_STATUS, "r", encoding="utf-8") as well:
+            data = json.load(well)
+            type_number = data["type_number"]
+        with open (WELL_TYPE, "r", encoding="utf-8") as well:
+            data = csv.reader(well)
+            for row in data:
+                if str(row[0]) == str(type_number):
+                    wellplate_type = str(row[4]).strip()
+                    break
+
+        # Choose the correct wellplate object based on the wellplate type
+        wellplate: Wells2 = None
+        if wellplate_type == "circular":
+            wellplate = CircularWellPlate(
+                a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=type_number
+            )
+        elif wellplate_type == "square":
+            wellplate = GraceBioLabsWellPlate(
+                a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=type_number
+            )
+
+        ## Well coordinate
+        x_coordinates, y_coordinates, color = wellplate.well_coordinates_and_status_color()
+        if wellplate.shape == "circular":
+            marker = "o"
+        else:
+            marker = "s"
+
+        ## Vial coordinates
+        vial_x = []
+        vial_y = []
+        vial_color = []
+        vial_marker = []  # a circle for these circular vials
+        ## Vials
+        with open(WASTE_STATUS, "r", encoding="utf-8") as stock:
+            data = json.load(stock)
+            for vial in data:
+                vial_x.append(vial["x"])
+                vial_y.append(vial["y"])
+                volume = vial["volume"]
+                capacity = vial["capacity"]
+                if vial["name"] is None or vial["name"] == "":
+                    vial_color.append("black")
+                    vial_marker.append("x")
+                elif volume / capacity > 0.75:
+                    vial_color.append("red")
+                    vial_marker.append("o")
+                elif volume / capacity > 0.50:
+                    vial_color.append("yellow")
+                    vial_marker.append("o")
+                else:
+                    vial_color.append("green")
+                    vial_marker.append("o")
+        with open(STOCK_STATUS, "r", encoding="utf-8") as stock:
+            data = json.load(stock)
+            for vial in data:
+                vial_x.append(vial["x"])
+                vial_y.append(vial["y"])
+                volume = vial["volume"]
+                capacity = vial["capacity"]
+                if vial["name"] is None or vial["name"] == "":
+                    vial_color.append("black")
+                    vial_marker.append("x")
+                elif volume / capacity > 0.5:
+                    vial_color.append("green")
+                    vial_marker.append("o")
+                elif volume / capacity > 0.25:
+                    vial_color.append("yellow")
+                    vial_marker.append("o")
+                else:
+                    vial_color.append("red")
+                    vial_marker.append("o")
+
+        rinse_vial = {"x": -411, "y": -30}
+        vial_x.append(rinse_vial["x"])
+        vial_y.append(rinse_vial["y"])
+        vial_color.append("black")
+        ## combine the well and vial coordinates
+        # x_coordinates.extend(stock_vial_x)
+        # y_coordinates.extend(stock_vial_y)
+        # color.extend(vial_color)
+
+        # Plot the well plate
+        plt.scatter(x_coordinates, y_coordinates, marker=marker, c=color, s=75, alpha=0.5)
+        plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=200, alpha=1)
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        plt.title("Status of Stage Items")
+        plt.grid(True, "both")
+        plt.xlim(-420, 0)
+        plt.ylim(-310, 0)
+        plt.savefig("well_status.png", format='png')
+        plt.close()
+        # Send the plot to Slack
+        self.send_slack_file(channel_id, "well_status.png")
+        Path("well_status.png").unlink()
+        return 1
+
+    def __queue_length(self, channel_id):
+        # Get queue length
+        queue_length = 0
+        queue_file = pd.read_csv(QUEUE, skipinitialspace=True, header=None, names=['id', 'priority', 'filename', 'protocol_type'])
+        # the columsn to id,priority,filename,protocol_type
+        queue_length = len(queue_file)-1
+        message = f"The queue length is {queue_length}."
+        self.send_slack_message(channel_id, message)
+        return 1
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test = False)
