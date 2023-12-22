@@ -61,7 +61,7 @@ from config.config import (
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter(
-    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
+    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
 )
 system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
 system_handler.setFormatter(formatter)
@@ -82,7 +82,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
     """
     ## Reset the logger to log to the ePANDA.log file and format
     e_panda.apply_log_filter()
-    print(printpanda())
+    #print(printpanda())
+    print("Starting ePANDA...")
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
     toolkit = None
@@ -319,6 +320,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
+        print("ePANDA is shutting down...goodbye")
 
 
 class Toolkit:
@@ -733,7 +735,7 @@ def load_new_wellplate(
         new_wellplate_type_number (int, optional): The type of wellplate. Defaults to None. If None, the type number will not be changed
 
     Returns:
-        int
+        int: The new wellplate id
     """
     (
         current_wellplate_id,
@@ -760,7 +762,7 @@ def load_new_wellplate(
 
     well_status_file = WELL_STATUS
     if current_wellplate_is_new:
-        return 0
+        return current_wellplate_id
 
     ## Go through a reset all fields and apply new plate id
     logger.debug("Resetting well statuses to new")
@@ -789,7 +791,7 @@ def load_new_wellplate(
         int(current_wellplate_id),
         int(new_plate_id),
     )
-    return 0
+    return new_plate_id
 
 
 def save_current_wellplate():

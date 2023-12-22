@@ -22,15 +22,12 @@ Reviewed on:
 
 """
 import json
-import experiment_class
-
-# import numpy as np
-# import matplotlib.pyplot as plt
+import pandas as pd
 from config.pin import CURRENT_PIN
 from config.config import WELL_HX, WELL_STATUS
 from scheduler import Scheduler
 import controller
-import pandas as pd
+import experiment_class
 from slack_functions2 import SlackBot
 
 
@@ -63,7 +60,7 @@ def determine_next_experiment_id() -> int:
     return int(last_experiment_id + 1)
 
 
-TEST = False
+TEST = True
 print("TEST MODE: ", TEST)
 # Create experiments
 COLUMNS = "ABCDEFGH"
@@ -75,21 +72,27 @@ PREVIOUS_CAMPAIGN_ID = 3
 
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
-# solutions = [
-#     "1000:1 H20:Glycerol",
-#     "100:1 H20:Glycerol",
-#     "10:1 H20:Glycerol",
-#     "1:1 H20:Glycerol",
-# ]
-solutions = ["1:1 H20:Glycerol"]
-# pumping_rates = [0.064, 0.138, 0.297, 0.640]
-pumping_rates = [0.297, 0.640]
+
+solutions = [
+    "water",
+"2:1 water:glycerol",
+"4:5 water:glycerol",
+"2:5 water:glycerol"
+]
+# solutions = ["1:1 H20:Glycerol"]
+## starting with the slowest, going up to the fastest
+# 0.064 mL/min
+# 0.138 mL/min
+# 0.297 mL/min
+# 0.64 mL/min
+pumping_rates = [0.064, 0.138, 0.297, 0.640]
+# pumping_rates = [0.297, 0.640]
 # iterate over the solutions we are testing
 for solution_number, solution in enumerate(solutions):
     # for each solution we want two wellplates
     for plate_number_per_solution in range(1, 2):
         # Change wellplate and load new wellplate
-        controller.load_new_wellplate(new_wellplate_type_number=6)
+        plate_number = controller.load_new_wellplate(new_wellplate_type_number=6)
         experiment_id = determine_next_experiment_id()
         experiments: list[experiment_class.ExperimentBase] = []
 
@@ -106,7 +109,7 @@ for solution_number, solution in enumerate(solutions):
                         target_well=column + str(row),
                         pin=CURRENT_PIN,
                         project_id=PROJECT_ID,
-                        project_campaign_id=3,
+                        project_campaign_id=PREVIOUS_CAMPAIGN_ID + solution_number+1,
                         solutions={str(solution).lower(): float(VOLUME)},
                         # for columns ABCD of the plate 1 use pumping rate 0.064 (0),
                         # ex. plate_number_per_solution = 1, column = 'A' -> pumping rate = 0.064
@@ -116,13 +119,13 @@ for solution_number, solution in enumerate(solutions):
                         # ex. plate_number_per_solution = 2, column = 'A' -> pumping rate = 0.297
                         # for columns EFGH of the plate 2 use pumping rate 0.640 (3)
                         # ex. plate_number_per_solution = 2, column = 'E' -> pumping rate = 0.640
-                        # pumping_rate = pumping_rates[
-                        #     (plate_number_per_solution - 1) * 2
-                        #      + (column in "EFGH")
-                        #  ],
-                        pumping_rate=pumping_rates[
-                            (plate_number_per_solution - 1) * 2 + (column in "EFGH")
-                        ],
+                        pumping_rate = pumping_rates[
+                            (plate_number_per_solution - 1) * 2
+                             + (column in "EFGH")
+                         ],
+                        # pumping_rate=pumping_rates[
+                        #     (plate_number_per_solution - 1) * 2 + (column in "EFGH")
+                        # ],
                         # pumping_rate = pumping_rates[plate_number_per_solution-1],
                         status=experiment_class.ExperimentStatus.NEW,
                         filename=EXPERIMENT_NAME + str(experiment_id),
@@ -134,15 +137,17 @@ for solution_number, solution in enumerate(solutions):
         assert len(experiments) == 96
 
         ## Chech that the pumping rates are correct for the plate number
-        ## If the plate number is 0 then the pumping rate should be 0.064 
-        ## for the first 48 experiments and 0.138 for the remaining 48 experiments
-        ## If the plate number is 1, then the pumping rate should be 0.297 
-        ## for the first 48 experiments and 0.640 for the remaining 48 experiments
+        ## If the plate number is 0 then the pumping rate should be:
+        ## 0.064 for the first 48 experiments
+        ## 0.138 for the remaining 48 experiments
+        ## If the plate number is 1, then the pumping rate should be:
+        ## 0.297 for the first 48 experiments
+        ## 0.640 for the remaining 48 experiments
 
-    # if plate_number_per_solution == 1:
-    #     expected_pumping_rates = [0.064, 0.138]
-    # else:
-    #     expected_pumping_rates = [0.297, 0.640]
+    if plate_number_per_solution == 1:
+        expected_pumping_rates = [0.064, 0.138]
+    else:
+        expected_pumping_rates = [0.297, 0.640]
 
     pumping_rates_in_experiments = [
         experiment.pumping_rate for experiment in experiments
@@ -150,22 +155,22 @@ for solution_number, solution in enumerate(solutions):
     pumping_rates_first_48 = pumping_rates_in_experiments[:48]
     pumping_rates_remaining = pumping_rates_in_experiments[48:]
 
-    expected_pumping_rate_first_48 = pumping_rates[0]
-    expected_pumping_rate_remaining = pumping_rates[1]
+    expected_pumping_rate_first_48 = expected_pumping_rates[0]
+    expected_pumping_rate_remaining = expected_pumping_rates[1]
 
     assert all(
         rate == expected_pumping_rate_first_48 for rate in pumping_rates_first_48
-    ), "Pumping rate should be 0.064  or 0.297 for the first 48 experiments"
+    ), "Pumping rate should be 0.064 or 0.297 for the first 48 experiments"
     assert all(
         rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining
     ), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
     ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
     print(f"Experiment name: {EXPERIMENT_NAME}")
     print(f"Solution: {solution}")
-    print(f"Plate number: {3 + solution_number}")
+    print(f"Plate number: {plate_number}")
     print(f"Pumping rate of first 0-47: {min(pumping_rates_first_48)}")
     print(f"Pumping rate of remaining 48-95: {min(pumping_rates_remaining)}")
-    print(f"Project campaign id: {PROJECT_ID}.{3}\n")
+    print(f"Project campaign id: {experiments[0].project_id}.{experiments[0].project_campaign_id}\n")
 
     scheduler = Scheduler()
     result = scheduler.add_nonfile_experiments(experiments)
