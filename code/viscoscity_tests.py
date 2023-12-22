@@ -75,9 +75,9 @@ PREVIOUS_CAMPAIGN_ID = 3
 
 solutions = [
     "water",
-"2:1 water:glycerol",
-"4:5 water:glycerol",
-"2:5 water:glycerol"
+"2:1 h20:glycerol",
+"4:5 h20:glycerol",
+"2:5 h20:glycerol"
 ]
 # solutions = ["1:1 H20:Glycerol"]
 ## starting with the slowest, going up to the fastest
