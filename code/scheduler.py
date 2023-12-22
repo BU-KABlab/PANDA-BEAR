@@ -42,7 +42,7 @@ from wellplate import Well
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&")
 system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS / "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
