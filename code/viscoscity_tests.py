@@ -90,7 +90,7 @@ pumping_rates = [0.064, 0.138, 0.297, 0.640]
 # iterate over the solutions we are testing
 for solution_number, solution in enumerate(solutions):
     # for each solution we want two wellplates
-    for plate_number_per_solution in range(1, 2):
+    for plate_number_per_solution in range(1, 3):
         # Change wellplate and load new wellplate
         plate_number = controller.load_new_wellplate(new_wellplate_type_number=6)
         experiment_id = determine_next_experiment_id()
@@ -168,6 +168,7 @@ for solution_number, solution in enumerate(solutions):
     print(f"Experiment name: {EXPERIMENT_NAME}")
     print(f"Solution: {solution}")
     print(f"Plate number: {plate_number}")
+    print(f"Solution plate number: {plate_number_per_solution}")
     print(f"Pumping rate of first 0-47: {min(pumping_rates_first_48)}")
     print(f"Pumping rate of remaining 48-95: {min(pumping_rates_remaining)}")
     print(f"Project campaign id: {experiments[0].project_id}.{experiments[0].project_campaign_id}\n")
