@@ -1,9 +1,9 @@
 [
     {
         "position": "s0",
-        "contents": "1000:1 H20:Glycerol",
+        "contents": "water",
         "viscocity_rank": 1,
-        "density": 0.9983,
+        "density": 0.99714,
         "category": 0,
         "x": -2,
         "y": -43,
@@ -11,16 +11,16 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "1000:1 H20:Glycerol",
-        "volume": 4100.0,
+        "name": "water",
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 159
+        "contamination": 0
     },
     {
         "position": "s1",
-        "contents": "1000:1 H20:Glycerol",
+        "contents": "2:1 H20:Glycerol",
         "viscocity_rank": 1,
-        "density": 0.9983,
+        "density": 1.0938,
         "category": 0,
         "x": -2,
         "y": -75,
@@ -28,16 +28,16 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "1000:1 H20:Glycerol",
-        "volume": 16700.0,
+        "name": "2:1 H20:Glycerol",
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 33
+        "contamination": 0
     },
     {
         "position": "s2",
-        "contents": "100:1 H20:Glycerol",
+        "contents": "4:5 H20:Glycerol",
         "viscocity_rank": 2,
-        "density": 1.0009,
+        "density": 1.1545,
         "category": 0,
         "x": -2,
         "y": -109,
@@ -45,16 +45,16 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "100:1 H20:Glycerol",
-        "volume": 4100.0,
+        "name": "4:5 H20:Glycerol",
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 159
+        "contamination": 0
     },
     {
         "position": "s3",
-        "contents": "100:1 H20:Glycerol",
+        "contents": "2:5 H20:Glycerol",
         "viscocity_rank": 2,
-        "density": 1.0009,
+        "density": 1.1945,
         "category": 0,
         "x": -2,
         "y": -142,
@@ -62,10 +62,10 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "100:1 H20:Glycerol",
-        "volume": 16700.0,
+        "name": "2:5 H20:Glycerol",
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 33
+        "contamination": 0
     },
     {
         "position": "s4",
@@ -79,7 +79,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "10:1 H20:Glycerol",
+        "name": null,
         "volume": 4100.0,
         "capacity": 20000,
         "contamination": 159
@@ -96,7 +96,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "10:1 H20:Glycerol",
+        "name": null,
         "volume": 16700.0,
         "capacity": 20000,
         "contamination": 33
@@ -113,7 +113,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "1:1 H20:Glycerol",
+        "name": null,
         "volume": 10400.0,
         "capacity": 20000,
         "contamination": 96
@@ -130,7 +130,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "1:1 H20:Glycerol",
+        "name": null,
         "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0
@@ -144,7 +144,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "water",
+        "name": null,
         "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0,
