@@ -632,14 +632,19 @@ def input_new_vial_values(vialgroup: str):
     ## Print the current vials and their values
     print("Current vials:")
     print(
-        f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Volume':<10} {'Capacity':<10} {'Contamination':<15}"
+        f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Density':<15} {'Volume':<15} {'Capacity':<15} {'Contamination':<15}"
     )
     for vial in vial_parameters:
-        if vial["name"] is None:
-            vial["name"] = ""
+        vial = Vial2(**vial)
         print(
-            f"{vial['position']:<10} {vial['name']:<20} {vial['contents']:<20} {vial['volume']:<10} {vial['capacity']:<10} {vial['contamination']:<15}"
+            f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
         )
+        # for key, value in vial.items():
+        #     if value is None:
+        #         vial[key] = ""
+        # print(
+        #     f"{vial['position']:<10} {vial['name']:<20} {vial['contents']:<20} {vial["density"]} {vial['volume']:<10} {vial['capacity']:<10} {vial['contamination']:<15}"
+        # )
     while True:
         choice = input(
             "Which vial would you like to change? Enter the position of the vial or 'q' if finished: "
@@ -647,7 +652,7 @@ def input_new_vial_values(vialgroup: str):
         if choice == "q":
             break
         for vial in vial_parameters:
-            if vial["position"] == choice:
+            if vial['position'] == choice:
                 print(
                     "Please enter the new values for the vial, if you leave any blank the value will not be changed"
                 )
@@ -662,6 +667,11 @@ def input_new_vial_values(vialgroup: str):
                 )
                 if new_contents != "":
                     vial["contents"] = new_contents
+                new_density = input(
+                    f"Enter the new density of the vial (Current density is {vial['density']}): "
+                )
+                if new_density != "":
+                    vial["density"] = float(new_density)                
                 new_volume = input(
                     f"Enter the new volume of the vial (Current volume is {vial['volume']}): "
                 )
@@ -677,6 +687,16 @@ def input_new_vial_values(vialgroup: str):
                 )
                 if new_contamination != "":
                     vial["contamination"] = int(new_contamination)
+                #print("\r" + " " * 100 + "\r", end="")  # Clear the previous table
+                print("\nCurrent vials:")
+                print(
+                    f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Density':<15} {'Volume':<15} {'Capacity':<15} {'Contamination':<15}"
+                )
+                for vial in vial_parameters:
+                    vial = Vial2(**vial)
+                    print(
+                        f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
+                    )
                 break
         else:
             print("Invalid vial position")
@@ -922,5 +942,5 @@ def change_wellplate_location():
 
 
 if __name__ == "__main__":
-    main(use_mock_instruments=False)
+    main(use_mock_instruments=True)
     # load_new_wellplate(new_plate_id=5)

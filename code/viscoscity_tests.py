@@ -75,9 +75,9 @@ PREVIOUS_CAMPAIGN_ID = 3
 
 solutions = [
     "water",
-"2:1 h20:glycerol",
-"4:5 h20:glycerol",
-"2:5 h20:glycerol"
+"2:1 h2o:glycerol",
+"4:5 h2o:glycerol",
+"2:5 h2o:glycerol"
 ]
 # solutions = ["1:1 H20:Glycerol"]
 ## starting with the slowest, going up to the fastest
@@ -144,42 +144,42 @@ for solution_number, solution in enumerate(solutions):
         ## 0.297 for the first 48 experiments
         ## 0.640 for the remaining 48 experiments
 
-    if plate_number_per_solution == 1:
-        expected_pumping_rates = [0.064, 0.138]
-    else:
-        expected_pumping_rates = [0.297, 0.640]
+        if plate_number_per_solution == 1:
+            expected_pumping_rates = [0.064, 0.138]
+        else:
+            expected_pumping_rates = [0.297, 0.640]
 
-    pumping_rates_in_experiments = [
-        experiment.pumping_rate for experiment in experiments
-    ]
-    pumping_rates_first_48 = pumping_rates_in_experiments[:48]
-    pumping_rates_remaining = pumping_rates_in_experiments[48:]
+        pumping_rates_in_experiments = [
+            experiment.pumping_rate for experiment in experiments
+        ]
+        pumping_rates_first_48 = pumping_rates_in_experiments[:48]
+        pumping_rates_remaining = pumping_rates_in_experiments[48:]
 
-    expected_pumping_rate_first_48 = expected_pumping_rates[0]
-    expected_pumping_rate_remaining = expected_pumping_rates[1]
+        expected_pumping_rate_first_48 = expected_pumping_rates[0]
+        expected_pumping_rate_remaining = expected_pumping_rates[1]
 
-    assert all(
-        rate == expected_pumping_rate_first_48 for rate in pumping_rates_first_48
-    ), "Pumping rate should be 0.064 or 0.297 for the first 48 experiments"
-    assert all(
-        rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining
-    ), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
-    ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
-    print(f"Experiment name: {EXPERIMENT_NAME}")
-    print(f"Solution: {solution}")
-    print(f"Plate number: {plate_number}")
-    print(f"Solution plate number: {plate_number_per_solution}")
-    print(f"Pumping rate of first 0-47: {min(pumping_rates_first_48)}")
-    print(f"Pumping rate of remaining 48-95: {min(pumping_rates_remaining)}")
-    print(f"Project campaign id: {experiments[0].project_id}.{experiments[0].project_campaign_id}\n")
+        assert all(
+            rate == expected_pumping_rate_first_48 for rate in pumping_rates_first_48
+        ), "Pumping rate should be 0.064 or 0.297 for the first 48 experiments"
+        assert all(
+            rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining
+        ), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
+        ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
+        print(f"Experiment name: {EXPERIMENT_NAME}")
+        print(f"Solution: {solution}")
+        print(f"Plate number: {plate_number}")
+        print(f"Solution plate number: {plate_number_per_solution}")
+        print(f"Pumping rate of first 0-47: {min(pumping_rates_first_48)}")
+        print(f"Pumping rate of remaining 48-95: {min(pumping_rates_remaining)}")
+        print(f"Project campaign id: {experiments[0].project_id}.{experiments[0].project_campaign_id}\n")
 
-    scheduler = Scheduler()
-    result = scheduler.add_nonfile_experiments(experiments)
-    if result == "success":
-        controller.main(use_mock_instruments=TEST)
-    else:
-        print("Error: ", result)
-        break
+        scheduler = Scheduler()
+        result = scheduler.add_nonfile_experiments(experiments)
+        if result == "success":
+            controller.main(use_mock_instruments=TEST)
+        else:
+            print("Error: ", result)
+            break
 controller.load_new_wellplate(new_wellplate_type_number=6)
 message = f"Finished running {EXPERIMENT_NAME} experiments"
 print(message)

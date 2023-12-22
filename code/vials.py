@@ -264,20 +264,26 @@ class Vial2(Vessel):
     """
 
     def __init__(self, name: str, category: int, position: str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents, viscocity_rank: int = 0, x: float = 0, y: float = 0, depth: float = 0) -> None:
         """
         Initializes a new instance of the Vial2 class.
 
         Args:
-        name (str): The name of the vial.
-        category (int): The category of the vial (0 for stock, 1 for waste).
-        volume (float): The current volume of the vial.
-        capacity (float): The maximum capacity of the vial.
-        density (float): The density of the solution in the vial.
-        coordinates (dict): The coordinates of the vial.
-        radius (float): The radius of the vial.
-        height (float): The height of the vial.
-        z_bottom (float): The z-coordinate of the bottom of the vial.
+            name (str): The name of the vial.
+            category (int): The category of the vial (0 for stock, 1 for waste).
+            position (str): The position of the vial.
+            volume (float): The current volume of the vial.
+            capacity (float): The maximum capacity of the vial.
+            density (float): The density of the solution in the vial.
+            coordinates (dict): The coordinates of the vial.
+            radius (float): The radius of the vial.
+            height (float): The height of the vial.
+            z_bottom (float): The z-coordinate of the bottom of the vial.
+            contamination (int): The number of times the vial has been contaminated.
+            contents: The contents of the vial.
+            viscocity_rank (int, optional): The viscosity rank of the vial. Defaults to 0.
+            x (float, optional): The x-coordinate of the vial. Defaults to 0.
+            y (float, optional): The y-coordinate of the vial. Defaults to 0.
         """
         super().__init__(name, volume, capacity, density, coordinates, contents=contents)
         self.position = position
@@ -288,6 +294,9 @@ class Vial2(Vessel):
         self.depth = self.calculate_depth()
         self.contamination = contamination
         self.category = category
+        self.viscosity_rank = viscocity_rank
+        self.x = x
+        self.y = y
 
     def calculate_depth(self) -> float:
         """

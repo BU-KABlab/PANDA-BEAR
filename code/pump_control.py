@@ -19,13 +19,9 @@ from config.config import PATH_TO_LOGS
 pump_control_logger = logging.getLogger("e_panda")
 scale_logger = logging.getLogger("e_panda")
 # Create a file handler
-file_handler = logging.FileHandler(PATH_TO_LOGS / "scale.log")
 if not pump_control_logger.handlers:
     # Create a formatter and add it to the handlers
-    file_formatter = logging.Formatter(
-        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"      
-    )
-    file_handler.setFormatter(file_formatter)
+    file_handler = logging.FileHandler(PATH_TO_LOGS / "scale.log")
     scale_logger.addHandler(file_handler)
 scale_logger.setLevel(logging.INFO)
 
