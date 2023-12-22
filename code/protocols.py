@@ -1,5 +1,5 @@
 """The standard experiment protocol for eChem experiments."""
-#pylint: disable=too-many-lines
+# pylint: disable=too-many-lines
 # Standard imports
 from datetime import datetime
 import json
@@ -44,7 +44,9 @@ def standard_experiment_protocol(
     waste_vials: Sequence[WasteVial],
     wellplate: Wells,
     logger: logging.Logger,
-) -> Tuple[ExperimentBase, ExperimentResult, Sequence[StockVial], Sequence[WasteVial], Wells]:
+) -> Tuple[
+    ExperimentBase, ExperimentResult, Sequence[StockVial], Sequence[WasteVial], Wells
+]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
@@ -225,9 +227,7 @@ def standard_experiment_protocol(
             forward_pipette_v2(
                 volume=instructions.char_vol,
                 from_vessel=wellplate.wells[instructions.target_well],
-                to_vessel=waste_selector(
-                    waste_vials, "waste", instructions.char_vol
-                ),
+                to_vessel=waste_selector(waste_vials, "waste", instructions.char_vol),
                 pump=pump,
                 mill=mill,
                 pumping_rate=instructions.pumping_rate,
@@ -310,7 +310,11 @@ def peg2p_protocol(
     wellplate: Wells,
     logger: logging.Logger,
 ) -> Tuple[
-    PEG2P_Test_Instructions, ExperimentResult, Sequence[StockVial], Sequence[WasteVial], Wells
+    PEG2P_Test_Instructions,
+    ExperimentResult,
+    Sequence[StockVial],
+    Sequence[WasteVial],
+    Wells,
 ]:
     """
     Run the standard experiment:
@@ -459,9 +463,7 @@ def peg2p_protocol(
             forward_pipette_v2(
                 volume=instructions.char_vol,
                 from_vessel=wellplate.wells[instructions.target_well],
-                to_vessel=waste_selector(
-                    waste_vials, "waste", instructions.char_vol
-                ),
+                to_vessel=waste_selector(waste_vials, "waste", instructions.char_vol),
                 pump=pump,
                 mill=mill,
                 pumping_rate=instructions.pumping_rate,
@@ -531,7 +533,9 @@ def mixing_test_protocol(
     waste_vials: Sequence[WasteVial],
     wellplate: Wells,
     logger: logging.Logger,
-) -> Tuple[ExperimentBase, ExperimentResult, Sequence[StockVial], Sequence[WasteVial], Wells]:
+) -> Tuple[
+    ExperimentBase, ExperimentResult, Sequence[StockVial], Sequence[WasteVial], Wells
+]:
     """
     Run the standard experiment:
     1. Deposit solutions into well
@@ -866,7 +870,8 @@ def forward_vs_reverse_pipetting(
             vial.name for vial in stock_vials if vial.name not in exclude_list
         ]
 
-        # although we already checked before running the experiment we want to check again that all requested solutions are found
+        # although we already checked before running the experiment we want to check again
+        # that all requested solutions are found
         experiment_solution_count = len(instructions.solutions)
         matched = 0
 
@@ -1009,7 +1014,8 @@ def vial_depth_tracking_protocol(
             vial.name for vial in stock_vials if vial.name not in exclude_list
         ]
 
-        # although we already checked before running the experiment we want to check again that all requested solutions are found
+        # although we already checked before running the experiment we want to check again 
+        # that all requested solutions are found
         experiment_solution_count = len(instructions.solutions)
         matched = 0
 
@@ -1143,7 +1149,8 @@ def viscosity_experiments_protocol(
             vial.name for vial in stock_vials if vial.name not in exclude_list
         ]
 
-        # although we already checked before running the experiment we want to check again that all requested solutions are found
+        # although we already checked before running the experiment we want to check again
+        # that all requested solutions are found
         experiment_solution_count = len(instructions.solutions)
         matched = 0
 
@@ -1235,7 +1242,8 @@ def layered_solution_protocol(
     logger: logging.Logger,
 ):
     """
-    For a layered protocol we want to deposit each solution into every well that requires it in one "pass" followed by a flush of the pipette tip.
+    For a layered protocol we want to deposit each solution into every well that requires 
+    it in one "pass" followed by a flush of the pipette tip.
     Then repeat until each solution has been desposited into each well that requires it.
     We then will work well by well to mix and characterize the solutions in each well.
     """
