@@ -16,6 +16,7 @@ from config.config import (
     WELL_STATUS as WELL_STATUS_FILE,
     STOCK_STATUS,
     WASTE_STATUS,
+    WELL_TYPE
 )
 from experiment_class import ExperimentStatus
 from vials import Vessel
@@ -295,6 +296,8 @@ class Wells:
                 color.append("green")
             elif well_data["status"] == "error":
                 color.append("red")
+            elif well_data["status"] == "running":
+                color.append("gold")
             else:
                 color.append("black")
 
@@ -573,7 +576,7 @@ class Wells2:
 
     def _get_well_color(self, status: str) -> str:
         """Get the color of a well based on its status."""
-        color_mapping = {"empty": "black", "new": "black", "queued": "orange", "complete": "green", "error": "red"}
+        color_mapping = {"empty": "black", "new": "grey", "queued": "orange", "complete": "green", "error": "red", "running": "gold"}
         return color_mapping.get(status, "black")
 
     def well_coordinates_and_status_color(self):
@@ -652,7 +655,7 @@ def read_well_type_characteristics(
 ) -> tuple[float, float, float, float]:
     """Read the well type characteristics from the well_type.csv config file"""
 
-    file_path = "code\\config\\well_type.csv"
+    file_path = WELL_TYPE
 
     # check it exists
     if not os.path.exists(file_path):
@@ -666,7 +669,7 @@ def read_well_type_characteristics(
             current_well.z_top,
         )
 
-    with open("code\\config\\well_type.csv", "r", encoding="UTF-8") as f:
+    with open(WELL_TYPE, "r", encoding="UTF-8") as f:
         next(f)
         for line in f:
             line = line.strip().split(",")

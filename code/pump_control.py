@@ -14,16 +14,10 @@ from vials import Vial, Vessel
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 from experiment_class import ExperimentResult
-from config.config import PATH_TO_LOGS
+#from config.config import PATH_TO_LOGS
 
 pump_control_logger = logging.getLogger("e_panda")
 scale_logger = logging.getLogger("e_panda")
-# Create a file handler
-if not pump_control_logger.handlers:
-    # Create a formatter and add it to the handlers
-    file_handler = logging.FileHandler(PATH_TO_LOGS / "scale.log")
-    scale_logger.addHandler(file_handler)
-scale_logger.setLevel(logging.INFO)
 
 class Pump:
     """
@@ -102,6 +96,7 @@ class Pump:
                 density = solution.density
             else:
                 density = None
+                rate = self.max_pump_rate # if no solution, assume air and use the max pump rate
 
             _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh)
             self.update_pipette_volume(self.pump.volume_withdrawn)
@@ -111,7 +106,8 @@ class Pump:
                 self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
-            pumprecord["solution"] = solution.name
+            if solution is not None and isinstance(solution, Vial):
+                pumprecord["solution"] = solution.name
             if results is not None:
                 results.pumping_record.append(pumprecord)
             self.pump.volume_infused_clear()
@@ -148,6 +144,7 @@ class Pump:
                 density = being_infused.density
             else:
                 density = None
+                rate = self.max_pump_rate # if no solution, assume air and use the max pump rate
             # _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
@@ -158,7 +155,8 @@ class Pump:
                 self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
-            pumprecord["solution"] = being_infused.name
+            if being_infused is not None and isinstance(being_infused, Vial):
+                pumprecord["solution"] = being_infused.name
             if results is not None:
                 results.pumping_record.append(pumprecord)
             self.pump.volume_infused_clear()
@@ -172,8 +170,9 @@ class Pump:
 
     def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False) -> tuple[float, dict]:
         """Combine all the common commands to run the pump into one function"""
+        pumping_record = {}
         if volume_ml <= 0:
-            return 0, {}
+            return 0, pumping_record
         # Set the pump parameters for the run
         self.pump.pumping_direction = direction
         self.pump.pumping_volume = volume_ml+blowout_ml #ml

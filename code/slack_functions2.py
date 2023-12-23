@@ -278,7 +278,7 @@ class SlackBot:
                 #"data experiment # - sends the data files for experiment #\n"
                 #"status experiment # - displays the status of experiment #\n"
                 "vial status - displays the status of the vials\n"
-                "wells status - displays the status of the wells and the rest of the deck\n"
+                "well status - displays the status of the wells and the rest of the deck\n"
                 "queue length - displays the length of the queue\n"
                 "status - displays the status of the vials, wells, and queue\n"
                 #"pause - pauses the current experiment\n"
@@ -437,8 +437,8 @@ class SlackBot:
         plt.ylabel("Y")
         plt.title("Status of Stage Items")
         plt.grid(True, "both")
-        plt.xlim(-420, 0)
-        plt.ylim(-310, 0)
+        plt.xlim(-420, 10)
+        plt.ylim(-310, 10)
         plt.savefig("well_status.png", format='png')
         plt.close()
         # Send the plot to Slack
