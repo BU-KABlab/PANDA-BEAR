@@ -61,23 +61,27 @@ def determine_next_experiment_id() -> int:
 
 
 TEST = False
-print("TEST MODE: ", TEST)
+if TEST:
+    print("TEST MODE")
+else:
+    print("LIVE MODE")
+
 # Create experiments
 COLUMNS = "ABCDEFGH"
 ROWS = 12
 PROJECT_ID = 9
 EXPERIMENT_NAME = "Viscocity test"
 VOLUME = 100
-PREVIOUS_CAMPAIGN_ID = 3
-
+PREVIOUS_CAMPAIGN_ID = 7
+print(f"Experiment name: {EXPERIMENT_NAME}")
 ## We will be looping through 6 wellplates - changing the wellplate, and project campaign id
 ## Our volume will be the same for every well
 
 solutions = [
     "water",
-"2:1 h2o:glycerol",
-"4:5 h2o:glycerol",
-"2:5 h2o:glycerol"
+# "2:1 h2o:glycerol",
+# "4:5 h2o:glycerol",
+# "2:5 h2o:glycerol"
 ]
 # solutions = ["1:1 H20:Glycerol"]
 ## starting with the slowest, going up to the fastest
@@ -165,7 +169,6 @@ for solution_number, solution in enumerate(solutions):
             rate == expected_pumping_rate_remaining for rate in pumping_rates_remaining
         ), "Pumping rate should be 0.138 or 0.640 for the remaining 48 experiments"
         ## Print a recipt of the wellplate and its experiments noting the pumping rate and solution
-        print(f"Experiment name: {EXPERIMENT_NAME}")
         print(f"Solution: {solution}")
         print(f"Plate number: {plate_number}")
         print(f"Solution plate number: {plate_number_per_solution}")
