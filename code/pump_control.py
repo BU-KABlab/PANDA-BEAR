@@ -64,6 +64,7 @@ class Pump:
         Returns:
             Pump: Initialized pump object.
         """
+        pump_control_logger.info("Setting up pump...")
         pump_port = nesp_lib.Port("COM5", 19200)
         syringe_pump = nesp_lib.Pump(pump_port)
         syringe_pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
@@ -523,4 +524,5 @@ if __name__ == "__main__":
     # test_mixing()
     #mock_pump_testing_routine()
     pump = Pump(mill=MockMill(), scale=MockScale())
-    pump.infuse(160, rate=0.64, blowout_ul=50)
+    #pump.withdraw(160, rate=0.64)
+    pump.infuse(20, rate=0.64, blowout_ul=0)

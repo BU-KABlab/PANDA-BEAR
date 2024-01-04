@@ -161,6 +161,7 @@ class SlackBot:
                     if response == 0:
                         return 0
                     else:
+                        print(f'responded to {msg_id}')
                         return 1
                 else:
                     continue
