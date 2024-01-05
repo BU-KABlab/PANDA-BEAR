@@ -143,13 +143,13 @@ class Pump:
             volume_ml = volume_ul / 1000.000
             if being_infused is not None:
                 density = being_infused.density
-                viscocity = being_infused.viscocity_cp
+                viscosity = being_infused.viscosity_cp
             else:
                 density = None
-                viscocity = None
+                viscosity = None
                 rate = self.max_pump_rate # if no solution, assume air and use the max pump rate
             # _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
-            _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh, viscocity)
+            _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh, viscosity)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
@@ -171,7 +171,7 @@ class Pump:
         else:
             return 0
 
-    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False, viscocity: float = None) -> tuple[float, dict]:
+    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False, viscosity: float = None) -> tuple[float, dict]:
         """Combine all the common commands to run the pump into one function"""
         pumping_record = {}
         if volume_ml <= 0:
@@ -211,8 +211,8 @@ class Pump:
             post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
-            scale_logger.info("Data,%s,%f,%f,%f,%f, %f, %f",
-                            action, volume_ml, density, pre_weight, post_weight, self.pump.pumping_rate, viscocity
+            scale_logger.info("Data,%s,%f,%f,%f,%f,%f,%f",
+                            action, volume_ml, density, pre_weight, post_weight, self.pump.pumping_rate, viscosity
                             )
             pumping_record = {
                 "action": action,
@@ -221,7 +221,8 @@ class Pump:
                 "density": density,
                 "pre_weight": pre_weight,
                 "post_weight": post_weight,
-                "pumping_rate": self.pump.pumping_rate
+                "pumping_rate": self.pump.pumping_rate,
+                "viscosity": viscosity
             }
 
         action_type = (
@@ -396,7 +397,7 @@ class MockPump(Pump):
             else:
                 density = None
             self.pumping_rate = rate
-            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, self.pumping_rate, density, blowout_ml, weigh)
+            self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, self.pumping_rate, density, blowout_ml, weigh, viscosity = being_infused.viscosity_cp if being_infused is not None else None)
             self.pumping_direction = nesp_lib.PumpingDirection.INFUSE
             self.update_pipette_volume(volume_ml + blowout_ml)
             pump_control_logger.info(
@@ -416,7 +417,7 @@ class MockPump(Pump):
         else:
             return None
 
-    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh = False)-> float:
+    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh = False,  viscosity: float = None)-> float:
         """Combine all the common commands to run the pump into one function"""
         if volume_ml <= 0:
             return 0
@@ -444,8 +445,8 @@ class MockPump(Pump):
             post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
-            scale_logger.info("Data,%s,%f,%f,%f,%f, %f",
-                            action, volume_ml, density, pre_weight, post_weight, self.pumping_rate
+            scale_logger.info("Data,%s,%f,%f,%f,%f,%f,%f",
+                            action, volume_ml, density, pre_weight, post_weight, self.pumping_rate, viscosity
                             )
 
         action_type = (

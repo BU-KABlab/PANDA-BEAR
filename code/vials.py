@@ -227,7 +227,7 @@ class Vessel:
         self.volume = volume
         self.capacity = capacity
         self.density = density
-        self.viscocity_cp = 0.0
+        self.viscosity_cp = 0.0
         self.coordinates = coordinates
         self.contents = contents
         self.depth = depth
@@ -329,7 +329,7 @@ class Vial2(Vessel):
     """
 
     def __init__(self, name: str, category: int, position: str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents, viscocity_cp: float = 0.0, x: float = 0, y: float = 0, depth: float = 0) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents, viscosity_cp: float = 0.0, x: float = 0, y: float = 0, depth: float = 0) -> None:
         """
         Initializes a new instance of the Vial2 class.
 
@@ -346,7 +346,7 @@ class Vial2(Vessel):
             z_bottom (float): The z-coordinate of the bottom of the vial.
             contamination (int): The number of times the vial has been contaminated.
             contents: The contents of the vial.
-            viscocity_cp (float, optional): The viscocity of the vial contents. Defaults to 0.0.
+            viscosity_cp (float, optional): The viscosity of the vial contents. Defaults to 0.0.
             x (float, optional): The x-coordinate of the vial. Defaults to 0.
             y (float, optional): The y-coordinate of the vial. Defaults to 0.
         """
@@ -359,7 +359,7 @@ class Vial2(Vessel):
         self.depth = self.calculate_depth()
         self.contamination = contamination
         self.category = category
-        self.viscocity_cp = viscocity_cp
+        self.viscosity_cp = viscosity_cp
         self.x = x
         self.y = y
 
@@ -477,7 +477,7 @@ class StockVial(Vial2):
     """
 
     def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents:str, viscocity_cp:float = 0.0) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents:str, viscosity_cp:float = 0.0) -> None:
         """
         Initializes a new instance of the StockVial class.
 
@@ -491,7 +491,7 @@ class StockVial(Vial2):
         height (float): The height of the stock vial.
         z_bottom (float): The z-coordinate of the bottom of the stock vial.
         """
-        super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscocity_cp=viscocity_cp)
+        super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
         self.category = 0
     def update_contents(self, solution: Vessel, volume: float) -> None:
         "Stock vial contents don't change"
@@ -516,7 +516,7 @@ class WasteVial(Vial2):
     """
 
     def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}, viscocity_cp:float = 0.0) -> None:
+                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}, viscosity_cp:float = 0.0) -> None:
         """
         Initializes a new instance of the WasteVial class.
 
@@ -530,7 +530,7 @@ class WasteVial(Vial2):
         height (float): The height of the waste vial.
         z_bottom (float): The z-coordinate of the bottom of the waste vial.
         """
-        super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscocity_cp=viscocity_cp)
+        super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
         self.category = 1
 
     def update_contents(self, solution: Vessel, volume: float) -> None:

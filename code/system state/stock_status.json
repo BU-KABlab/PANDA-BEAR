@@ -2,7 +2,7 @@
     {
         "position": "s0",
         "contents": "water",
-        "viscocity_rank": 1,
+        "viscocity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
         "x": -2,
@@ -12,7 +12,7 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 19000.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -24,7 +24,7 @@
     {
         "position": "s1",
         "contents": "water",
-        "viscocity_rank": 1,
+        "viscocity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
         "x": -2,
@@ -33,8 +33,8 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "water",
-        "volume": 19000.0,
+        "name": null,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -46,7 +46,7 @@
     {
         "position": "s2",
         "contents": "2:1 h2o:glycerol",
-        "viscocity_rank": 2,
+        "viscocity_cp": 3.0617,
         "density": 1.0938,
         "category": 0,
         "x": -2,
@@ -68,7 +68,7 @@
     {
         "position": "s3",
         "contents": "2:1 h2o:glycerol",
-        "viscocity_rank": 2,
+        "viscocity_cp": 3.0617,
         "density": 1.0938,
         "category": 0,
         "x": -2,
@@ -77,10 +77,10 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "2:1 h2o:glycerol",
+        "name": null,
         "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 0,
+        "contamination": 33,
         "coordinates": {
             "x": -2,
             "y": -142,
@@ -90,7 +90,7 @@
     {
         "position": "s4",
         "contents": "4:5 h2o:glycerol",
-        "viscocity_rank": 3,
+        "viscocity_cp": 9.9617,
         "density": 1.1545,
         "category": 0,
         "x": -2,
@@ -112,7 +112,7 @@
     {
         "position": "s5",
         "contents": "4:5 h2o:glycerol",
-        "viscocity_rank": 3,
+        "viscocity_cp": 9.9617,
         "density": 1.1545,
         "category": 0,
         "x": -2,
@@ -121,7 +121,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "4:5 h2o:glycerol",
+        "name": null,
         "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0,
@@ -134,7 +134,7 @@
     {
         "position": "s6",
         "contents": "2:5 h2o:glycerol",
-        "viscocity_rank": 4,
+        "viscocity_cp": 31.882,
         "density": 1.1945,
         "category": 0,
         "x": -2,
@@ -156,7 +156,7 @@
     {
         "position": "s7",
         "contents": "2:5 h2o:glycerol",
-        "viscocity_rank": 4,
+        "viscocity_cp": 31.882,
         "density": 1.1945,
         "category": 0,
         "x": -2,
@@ -165,7 +165,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "2:5 h2o:glycerol",
+        "name": null,
         "volume": 20000.0,
         "capacity": 20000,
         "contamination": 0,
@@ -178,7 +178,7 @@
     {
         "position": "s8",
         "contents": "water",
-        "viscocity_rank": 1,
+        "viscocity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
         "x": -47,
