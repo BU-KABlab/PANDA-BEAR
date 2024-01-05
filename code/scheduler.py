@@ -19,7 +19,7 @@ from pandas.core.frame import DataFrame
 
 from config.config import (
     PATH_TO_DATA,
-    PATH_TO_NETWORK_LOGS,
+    PATH_TO_LOGS,
     QUEUE as PATH_TO_QUEUE,
     WELL_STATUS,
     PATH_TO_EXPERIMENT_INBOX,
@@ -43,7 +43,7 @@ from wellplate import Well
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&")
-system_handler = logging.FileHandler(PATH_TO_NETWORK_LOGS / "ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 

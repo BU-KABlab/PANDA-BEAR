@@ -2,7 +2,8 @@
 The script generates a series of wellplates for volume correction testing.
 
 Volumes:
-Each volume will have a correction factor applied to it. The correction factor is determined by the following equation:
+Each volume will have a correction factor applied to it. The correction factor is 
+determined by the following equation:
 Correction factor = 
 20µL - 140µL spaced apart by 10µL:
 20,
@@ -70,7 +71,7 @@ print(f"Experiment name: {EXPERIMENT_NAME}")
 solutions = [
     "water",
     "1:1 h2o:Glycerol",
-    "1:1 h2o:Glycerol",
+    "1:10 h2o:Glycerol",
 ]
 
 volumes = [
@@ -88,15 +89,15 @@ volumes = [
             140,140,140,140,140,140,140,140,
            ]
 PUMPING_RATE = 0.3
+experiment_id = determine_next_experiment_id()
 # iterate over the solutions we are testing
 for solution_number, solution in enumerate(solutions):
     # for each solution we want one wellplate of 6x of each volume
     # Change wellplate and load new wellplate
     controller.load_new_wellplate(new_wellplate_type_number=WELLPLATE_TYPE_NUMBER)
-    experiment_id = determine_next_experiment_id()
     experiments : list[experiment_class.ExperimentBase]= []
     WELL_NUMBER = 0
-    campaign_id = PREVIOUS_CAMPAIGN_ID + solution_number + 1
+    campaign_id = PREVIOUS_CAMPAIGN_ID + solution_number + (1 if PREVIOUS_CAMPAIGN_ID != 0 else 0)
     # Create 6 new experiments for the solution
     for column in COLUMNS:
         # ex: for column in 'A':
@@ -130,18 +131,21 @@ for solution_number, solution in enumerate(solutions):
     print(f"Solution: {solution}")
     print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
     print(f"Pumping rate: {PUMPING_RATE}")
-    print(f"Project campaign id: {PROJECT_ID}.{campaign_id}\n")
+    print(f"Project campaign id: {PROJECT_ID}.{campaign_id}")
+    ids = pd.DataFrame([experiment.id for experiment in experiments], columns=["experiment id"])
+    print(f"Experiment IDs: {ids['experiment id'].min()} - {ids['experiment id'].max()}")
+    print()
 
     # Add experiments to the queue and run them
-#     scheduler = Scheduler()
-#     if scheduler.add_nonfile_experiments(experiments): #fails if not all experiments are added
-#         controller.main(use_mock_instruments=TEST)
-#     else:
-#         print("Error loading experiments")
-#         break
+    scheduler = Scheduler()
+    if scheduler.add_nonfile_experiments(experiments): #fails if not all experiments are added
+        controller.main(use_mock_instruments=TEST)
+    else:
+        print("Error loading experiments")
+        break
 
-# controller.load_new_wellplate(new_wellplate_type_number=6)
-# message = f"Finished running {EXPERIMENT_NAME} experiments"
-# print(message)
-# bot = SlackBot(test=TEST)
-# bot.send_slack_message(message=message, channel_id="alert")
+controller.load_new_wellplate(new_wellplate_type_number=6)
+message = f"Finished running {EXPERIMENT_NAME} experiments"
+print(message)
+bot = SlackBot(test=TEST)
+bot.send_slack_message(message=message, channel_id="alert")
