@@ -70,8 +70,9 @@ print(f"Experiment name: {EXPERIMENT_NAME}")
 
 solutions = [
     "water",
-    "1:1 h2o:Glycerol",
-    "1:10 h2o:Glycerol",
+    "2:1 h2o:glycerol",
+    "4:5 h2o:glycerol",
+    "2:5 h2o:glycerol"
 ]
 
 volumes = [
@@ -146,6 +147,5 @@ for solution_number, solution in enumerate(solutions):
 
 controller.load_new_wellplate(new_wellplate_type_number=6)
 message = f"Finished running {EXPERIMENT_NAME} experiments"
-print(message)
 bot = SlackBot(test=TEST)
 bot.send_slack_message(message=message, channel_id="alert")

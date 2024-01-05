@@ -45,6 +45,7 @@ class SlackBot:
                 result = client.chat_postMessage(channel=channel_id, text=message)
             else:
                 result = {"ok": True}
+                print(message)
             if result["ok"]:
                 self.logger.info("Message sent:%s", message)
             else:

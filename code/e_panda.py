@@ -44,6 +44,7 @@ from config.config import (
     AIR_GAP,
     DRIP_STOP,
     PURGE_VOLUME,
+    TESTING,
 )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -746,7 +747,7 @@ def apply_log_filter(
     experiment_id: int = None,
     target_well: Optional[str] = None,
     campaign_id: Optional[str] = None,
-    test: bool = False,
+    test: bool = TESTING,
 ):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
