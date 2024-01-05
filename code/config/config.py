@@ -7,7 +7,7 @@ AIR_GAP = 40 #ul
 DRIP_STOP = 5 #ul
 PURGE_VOLUME = 20 #ul
 RANDOM_FLAG = True # Set to True to randomize the order of the experiments
-TESTING = True # Set to True to run in testing mode
+TESTING = False # Set to True to run in testing mode
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 
@@ -87,7 +87,7 @@ if USE_LOCAL_PATHS:
         path = Path(path)
         if not path.exists():
             #print(f"Creating {path}")
-            # path.mkdir()
+            path.mkdir()
             print(f"Created {path}")
 
 else: # Use network paths
