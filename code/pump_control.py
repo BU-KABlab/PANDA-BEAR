@@ -143,11 +143,13 @@ class Pump:
             volume_ml = volume_ul / 1000.000
             if being_infused is not None:
                 density = being_infused.density
+                viscocity = being_infused.viscocity_cp
             else:
                 density = None
+                viscocity = None
                 rate = self.max_pump_rate # if no solution, assume air and use the max pump rate
             # _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
-            _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh)
+            _, pumprecord = self.run_pump(nesp_lib.PumpingDirection.INFUSE, volume_ml, rate, density, blowout_ml, weigh, viscocity)
             self.update_pipette_volume(self.pump.volume_infused) # doesn't need to include blowout because the pump will count that as infused
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
@@ -169,7 +171,7 @@ class Pump:
         else:
             return 0
 
-    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False) -> tuple[float, dict]:
+    def run_pump(self, direction, volume_ml, rate = None, density=None, blowout_ml = 0.0, weigh: bool = False, viscocity: float = None) -> tuple[float, dict]:
         """Combine all the common commands to run the pump into one function"""
         pumping_record = {}
         if volume_ml <= 0:
@@ -209,8 +211,8 @@ class Pump:
             post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
-            scale_logger.info("Data,%s,%f,%f,%f,%f, %f",
-                            action, volume_ml, density, pre_weight, post_weight, self.pump.pumping_rate
+            scale_logger.info("Data,%s,%f,%f,%f,%f, %f, %f",
+                            action, volume_ml, density, pre_weight, post_weight, self.pump.pumping_rate, viscocity
                             )
             pumping_record = {
                 "action": action,

@@ -218,7 +218,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     + str(new_experiment.project_campaign_id),
                     test=use_mock_instruments,
                 )
-                protocols.viscosity_experiments_protocol(
+                protocols.viscocity_experiments_protocol(
                     instructions=new_experiment,
                     results=experiment_results,
                     mill=toolkit.mill,
@@ -572,6 +572,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
                     height=items["height"],
                     contamination=items["contamination"],
                     contents=items["contents"],
+                    viscocity_cp=items["viscocity_cp"],
                 )
                 list_of_solutions.append(read_vial)
             elif items["category"] == 1:
@@ -587,6 +588,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
                     height=items["height"],
                     contamination=items["contamination"],
                     contents=items["contents"],
+                    viscocity_cp=items["viscocity_cp"],
                 )
                 list_of_solutions.append(read_vial)
     return list_of_solutions

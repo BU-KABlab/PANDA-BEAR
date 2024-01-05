@@ -5,30 +5,6 @@ Volumes:
 Each volume will have a correction factor applied to it. The correction factor is 
 determined by the following equation:
 Correction factor = 
-20µL - 140µL spaced apart by 10µL:
-20,
-30
-40
-50
-60
-70
-80
-90
-100
-110
-120
-130
-140
-Each volume should be done 8x for each solution.
-So it winds up being 1 well plate of 96 experiment per solution.
-
-Pumping Rate: Following the viscocity testing on 12/08/2023, 
-the pumping rate will be set to 0.640 for all solutions.
-
-Project Campaign ID: The project campaign ID is incremented for each solution, and thus 
-each wellplate. The first wellplate will have a project campaign ID of 1, the second wellplate 
-will have a project campaign ID of 2, etc.
-
 
 Created on January 5 2024
 Created by: Gregory Robben

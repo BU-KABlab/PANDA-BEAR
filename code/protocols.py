@@ -1096,7 +1096,7 @@ def vial_depth_tracking_protocol(
         )
 
 
-def viscosity_experiments_protocol(
+def viscocity_experiments_protocol(
     instructions: ExperimentBase,
     results: ExperimentResult,
     mill: Union[Mill, MockMill],

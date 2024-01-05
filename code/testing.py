@@ -12,7 +12,7 @@ from e_panda import mixing_test_protocol, peg2p_protocol
 from mixing_test_experiments import experiments as mix_test_experiments
 from peg2p_experiments import experiments as peg2p_experiments
 from scheduler import Scheduler
-from config.file_locations import *
+from config.config import *
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
