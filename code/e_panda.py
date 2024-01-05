@@ -756,6 +756,24 @@ def apply_log_filter(
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
     logger.addFilter(custom_filter)
 
+def volume_correction(volume, density = None, viscosity = None):
+    """
+    Corrects the volume of the solution based on the density and viscosity of the solution
+
+    Args:
+        volume (float): The volume to be corrected
+        density (float): The density of the solution
+        viscosity (float): The viscosity of the solution
+
+    Returns:
+        corrected_volume (float): The corrected volume
+    """
+    if density is None:
+        density = 1.0
+    if viscosity is None:
+        viscosity = 1.0
+    corrected_volume = volume * (1.0 + (1.0 - density) * (1.0 - viscosity))
+    return corrected_volume
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""

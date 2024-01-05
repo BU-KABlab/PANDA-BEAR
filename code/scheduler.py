@@ -161,7 +161,7 @@ class Scheduler:
 
         logger.info("Well %s status changed to %s", well, well.status)
 
-    def read_new_experiments(self, filename: str) -> Tuple[int, bool]:
+    def ingest_inbox_experiments(self, filename: str) -> Tuple[int, bool]:
         """
         Reads a JSON file and returns the experiment instructions/recipie as a dictionary.
         :param filename: The name of the JSON file to read.
@@ -280,7 +280,7 @@ class Scheduler:
 
             if file.is_file():
                 logger.info("Reading file %s for experiments", file.name)
-                count, complete = self.read_new_experiments(file.name)
+                count, complete = self.ingest_inbox_experiments(file.name)
 
                 # Move the file to archive if it has been completely read
                 if complete:
@@ -389,7 +389,7 @@ class Scheduler:
         # Rewrite the queue csv file
         queue.to_csv(queue_file_path, index=False)
 
-    def update_experiment_status(self, experiment: ExperimentBase) -> None:
+    def update_experiment_file(self, experiment: ExperimentBase) -> None:
         """
         Updates the status of the experiment in the experiment instructions file.
         Args:

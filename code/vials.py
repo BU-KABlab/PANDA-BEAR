@@ -22,11 +22,47 @@ class Vial:
     Class for creating vial objects with their position and contents
 
     Args:
-        x
-        y
-        contents
-        volume in ml
-        capacity in ml
+        position (str): The position of the vial.
+        x_coord (float): The x-coordinate of the vial's position.
+        y_coord (float): The y-coordinate of the vial's position.
+        contents (str): The contents of the vial.
+        volume (float, optional): The current volume of the vial in ml. Defaults to 0.00.
+        capacity (int, optional): The maximum capacity of the vial in ml. Defaults to 20000.
+        radius (int, optional): The radius of the vial in mm. Defaults to 14.
+        height (int, optional): The height of the vial in mm. Defaults to -20.
+        z_bottom (int, optional): The z-coordinate of the bottom of the vial. Defaults to -75.
+        name (str, optional): The name of the vial. Defaults to "vial".
+        contamination (int, optional): The contamination level of the vial. Defaults to 0.
+        filepath (str, optional): The filepath to the vial file. Defaults to None.
+        density (float, optional): The density of the vial's contents in g/ml. Defaults to 1.0.
+
+    Attributes:
+        name (str): The name of the vial.
+        position_name (str): The position name of the vial.
+        coordinates (dict): The coordinates of the vial {x:#, y:#, z:#}.
+        bottom (int): The z-coordinate of the bottom of the vial.
+        contents (str): The contents of the vial.
+        capacity (int): The maximum capacity of the vial in ml.
+        radius (int): The radius of the vial in mm.
+        height (int): The height of the vial in mm.
+        volume (float): The current volume of the vial in ml.
+        density (float): The density of the vial's contents in g/ml.
+        base (float): The base area of the vial.
+        depth (float): The current depth of the liquid in the vial.
+        contamination (int): The contamination level of the vial.
+        filepath (str): The filepath to the vial file.
+
+    Methods:
+        position() -> dict:
+            Returns the coordinates of the vial.
+        check_volume(added_volume: float) -> bool:
+            Checks if the added volume can fit in the vial.
+        write_volume_to_disk() -> int:
+            Writes the current volume to a json file.
+        update_volume(added_volume_ul: float) -> int:
+            Updates the volume of the vial.
+        vial_depth_calculator(diameter_mm, volume_ul) -> float:
+            Calculates the height of a volume of liquid in a vial given its diameter (in mm).
 
     """
 
@@ -64,7 +100,7 @@ class Vial:
         self.filepath = filepath
 
     @property
-    def position(self):
+    def position(self) -> dict:
         """
         Returns
         -------
@@ -74,7 +110,7 @@ class Vial:
         """
         return self.coordinates
 
-    def check_volume(self, added_volume: float):
+    def check_volume(self, added_volume: float) -> bool:
         """
         Updates the volume of the vial
         """
@@ -91,7 +127,7 @@ class Vial:
             vial_logger.info(logging_msg)
             return True
 
-    def write_volume_to_disk(self):
+    def write_volume_to_disk(self) -> int:
         """
         Writes the current volume to a json file
         """
@@ -118,7 +154,7 @@ class Vial:
             json.dump(solutions, file, indent=4)
         return 0
 
-    def update_volume(self, added_volume_ul: float):
+    def update_volume(self, added_volume_ul: float) -> int:
         """
         Updates the volume of the vial.
         Args:
@@ -146,7 +182,7 @@ class Vial:
         self.contamination += 1
         return 0
 
-    def vial_depth_calculator(self, diameter_mm, volume_ul):
+    def vial_depth_calculator(self, diameter_mm, volume_ul) -> float:
         """
         Calculates the height of a volume of liquid in a vial given its diameter (in mm).
         """
@@ -167,11 +203,23 @@ class Vessel:
         capacity (float): The maximum capacity of the vessel.
         density (float): The density of the solution in the vessel.
         coordinates (dict): The coordinates of the vessel. 
+        contents (dict): The contents of the vessel.
+        depth (float): The current depth of the solution in the vessel.
 
     Methods:
     --------
     update_volume(added_volume: float) -> None
         Updates the volume of the vessel by adding the specified volume.
+    calculate_depth() -> float
+        Calculates the current depth of the solution in the vessel.
+    check_volume(volume_to_add: float) -> bool
+        Checks if the volume to be added to the vessel is within the vessel's capacity.
+    write_volume_to_disk() -> None
+        Writes the current volume of the vessel to the appropriate file.
+    update_contamination(new_contamination: int = None) -> None
+        Updates the contamination count of the vessel.
+    update_contents(solution: 'Vessel', volume: float) -> None
+        Updates the contents of the vessel.
 
     """
     def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict, contents, depth: float = 0) -> None:
@@ -261,6 +309,22 @@ class Vial2(Vessel):
         depth (float): The current depth of the solution in the vial.
         contamination (int): The number of times the vial has been contaminated.
         category (int): The category of the vial (0 for stock, 1 for waste).
+
+    Methods:
+    --------
+    update_volume(added_volume: float) -> None
+        Updates the volume of the vial by adding the specified volume.
+    calculate_depth() -> float
+        Calculates the current depth of the solution in the vial.
+    check_volume(volume_to_add: float) -> bool
+        Checks if the volume to be added to the vial is within the vial's capacity.
+    write_volume_to_disk() -> None
+        Writes the current volume and contamination of the vial to the appropriate file.
+    update_contamination(new_contamination: int = None) -> None
+        Updates the contamination count of the vial.
+    update_contents(solution: 'Vessel', volume: float) -> None
+        Updates the contents of the vial.
+
     """
 
     def __init__(self, name: str, category: int, position: str, volume: float, capacity: float, density: float,

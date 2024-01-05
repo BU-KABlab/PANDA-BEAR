@@ -119,7 +119,7 @@ class TestScheduler(unittest.TestCase):
         Test the read_new_experiments method of the Scheduler class.
         """
         # Test that the method reads a file and adds experiments to the queue
-        experiments_read, complete = self.scheduler.read_new_experiments(
+        experiments_read, complete = self.scheduler.ingest_inbox_experiments(
             "test_experiment"
         )
         self.assertEqual(experiments_read, 1)
@@ -185,7 +185,7 @@ class TestScheduler(unittest.TestCase):
             mock_open.return_value.__enter__.return_value.read.return_value = serialized_data
 
             # Call the update_experiment_status method
-            self.scheduler.update_experiment_status(experiment)
+            self.scheduler.update_experiment_file(experiment)
 
             # Check that the status was updated in the experiment file
             expected_status = ExperimentStatus.QUEUED

@@ -72,6 +72,12 @@ class ExperimentBase():
         return False
 
 @dataclass(config=ConfigDict(validate_assignment=True))
+class CorrectionFactorExperiment(ExperimentBase):
+    '''Define the data that is used to run an experiment'''
+    project_id: int = 11
+    correction_factor: float = 1.0
+
+@dataclass(config=ConfigDict(validate_assignment=True))
 class EchemExperimentBase(ExperimentBase):
     '''
     Define the data that is used to run an experiment

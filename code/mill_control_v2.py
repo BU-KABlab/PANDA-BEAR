@@ -25,6 +25,7 @@ import serial
 
 import wellplate as Wells
 from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS
+
 # Configure the logger
 # logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
@@ -33,6 +34,7 @@ from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS
 # system_handler.setFormatter(formatter)
 # logger.addHandler(system_handler)
 logger = logging.getLogger("e_panda")
+
 
 @dataclasses.dataclass
 class Instruments(Enum):
@@ -47,9 +49,66 @@ class Instruments(Enum):
 class MillController:
     """
     Set up the mill connection and pass commands, including special commands
+
+    Attributes:
+        config_file (str): The name of the configuration file.
+        config (dict): The configuration loaded from the JSON file.
+        ser_mill (serial.Serial): The serial connection to the mill.
+
+    Methods:
+        homing_sequence(self): 
+            Homes the mill, sets the feed rate, and clears the buffers.
+
+        connect_to_mill(self) -> serial.Serial: 
+            Connects to the mill.
+
+        disconnect(self): 
+            Closes the serial connection to the mill.
+
+        read_json_config(self): 
+            Reads the config file.
+
+        execute_command(self, command): 
+            Encodes and sends commands to the mill and returns the response.
+
+        stop(self): 
+            Stops the mill.
+
+        reset(self): 
+            Resets the mill.
+
+        home(self, timeout=90): 
+            Homes the mill with a timeout.
+
+        wait_for_completion(self, incoming_status, timeout=90): 
+            Waits for the mill to complete the previous command.
+
+        current_status(self) -> str: 
+            Gets the current status of the mill.
+
+        set_feed_rate(self, rate): 
+            Sets the feed rate.
+
+        clear_buffers(self):
+            Clears input and output buffers.
+
+        gcode_mode(self):
+            Asks the mill for its gcode mode.
+
+        gcode_parameters(self):
+            Asks the mill for its gcode parameters.
+
+        gcode_parser_state(self):
+            Asks the mill for its gcode parser state.
+
+        move_center_to_position(self, x_coord, y_coord, z_coord) -> int: 
+            Moves the mill to the specified coordinates.
+            
+        current_coordinates(self, instrument=Instruments.CENTER) -> list: 
+            Gets the current coordinates of the mill.
     """
 
-    def __init__(self, config_file_name:str):
+    def __init__(self, config_file_name: str):
         self.config_file = config_file_name
         self.config = self.read_json_config()
         self.ser_mill = None
@@ -291,10 +350,14 @@ class MillController:
                     logger.info(log_message)
                     break
                 else:
-                    logger.warning("MPos coordinates not found in the line. Trying again...")
+                    logger.warning(
+                        "MPos coordinates not found in the line. Trying again..."
+                    )
                     raise LocationNotFound
             except LocationNotFound as e:
-                logger.error("Error occurred while getting MPos coordinates: %s",str(e))
+                logger.error(
+                    "Error occurred while getting MPos coordinates: %s", str(e)
+                )
                 if _ == max_attempts - 1:
                     raise
 
@@ -321,9 +384,35 @@ class MillController:
         logger.debug("current_coordinates: %s", current_coordinates)
         return current_coordinates
 
+
 class Mill(MillController):
     """
-    Class for controlling the mill
+    Class for controlling the mill.
+
+    Attributes:
+        config_file (str): The path to the mill configuration file.
+
+    Methods:
+        move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
+            Moves the mill to the specified coordinates.
+
+        move_pipette_to_position(self, x_coord: float = 0, y_coord: float = 0, z_coord=0.00) -> int:
+            Moves the pipette to the specified coordinates.
+
+        move_electrode_to_position(self, x_coord: float, y_coord: float, z_coord: float = 0.00) -> int:
+            Moves the electrode to the specified coordinates.
+
+        update_offset(self, offset_type, offset_x, offset_y, offset_z):
+            Updates the offset in the config file.
+
+        safe_move(self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER) -> int:
+            Moves the mill to the specified coordinates using only horizontal and vertical movements.
+
+        rinse_electrode(self):
+            Rinses the electrode by moving it to the rinse position and back to the center position.
+
+        move_to_safe_position(self) -> str:
+            Moves the mill to its current x,y location and z = 0.
     """
 
     def __init__(self, config_file="mill_config.json"):
@@ -383,8 +472,7 @@ class Mill(MillController):
         offsets = self.config["instrument_offsets"]["pipette"]
         mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
         command = mill_move.format(
-            x_coord + offsets["x"], y_coord +
-            offsets["y"], z_coord + offsets["z"]
+            x_coord + offsets["x"], y_coord + offsets["y"], z_coord + offsets["z"]
         )
         self.execute_command(str(command))
         return 0
@@ -403,8 +491,7 @@ class Mill(MillController):
         # move to specified coordinates
         mill_move = "G00 X{} Y{} Z{}"
         command = mill_move.format(
-            (x_coord + offsets["x"]), (y_coord +
-                                       offsets["y"]), (z_coord + offsets["z"])
+            (x_coord + offsets["x"]), (y_coord + offsets["y"]), (z_coord + offsets["z"])
         )
         self.execute_command(str(command))
         return 0
@@ -513,7 +600,7 @@ class Mill(MillController):
             self.move_electrode_to_position(-411, -30, -55)
             self.move_electrode_to_position(-411, -30, 0)
         return 0
-    
+
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
         # [initial_x, initial_y, initial_z] = self.current_coordinates()
@@ -523,7 +610,7 @@ class Mill(MillController):
 
         mill_response = self.execute_command("G00 Z0")
         return mill_response
-    
+
 
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""
@@ -728,7 +815,11 @@ class MockMill:
         self.current_y = y_coord
         self.current_z = z_coord
         self.logger.info(
-            "Safe move %s to position: (%s, %s, %s)", instrument.value,x_coord, y_coord, z_coord
+            "Safe move %s to position: (%s, %s, %s)",
+            instrument.value,
+            x_coord,
+            y_coord,
+            z_coord,
         )
         return 0
 

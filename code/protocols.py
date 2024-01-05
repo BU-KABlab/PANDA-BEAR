@@ -30,6 +30,7 @@ from e_panda import (
     reverse_pipette_v2,
     flush_v2,
     rinse_v2,
+    volume_correction,
     OCPFailure,
     NoAvailableSolution,
 )
@@ -1418,3 +1419,144 @@ def layered_solution_protocol(
             instruction.status = ExperimentStatus.COMPLETE
 
     logger.info("End of Experiment: %s", instruction.id)
+
+def correction_factor_tests_protocol(
+    instructions: ExperimentBase,
+    results: ExperimentResult,
+    mill: Union[Mill, MockMill],
+    pump: Union[Pump, MockPump],
+    stock_vials: Sequence[StockVial],
+    wellplate: Wells2,
+    logger: logging.Logger,
+):
+    """
+    Protocol for testing the use of a correction factor when pipetting.
+    The correction factor is applied prior to calling forward_pipette_v2 so that the volume
+    used to calculate repetitions and selecting the correct vial is the corrected volume.
+
+    Order of operations:
+    1. Deposit solutions into well
+        for each solution:
+            a.  Withdraw air gap
+            b.  Withdraw solution
+            c.  Read the scale
+            d.  Deposit into well
+            e.  Blow out
+            f.  Read the scale
+
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        mill (object): The mill object
+        pump (object): The pump object
+        scale (object): The scale object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+        wellplate (Wells object): The wellplate object
+
+    Returns:
+        instructions (Experiment object): The updated experiment instructions
+        results (ExperimentResult object): The updated experiment results
+        stock_vials (list): The updated list of stock vials
+        waste_vials (list): The updated list of waste vials
+        wellplate (Wells object): The updated wellplate object
+
+    """
+    apply_log_filter(
+        instructions.id,
+        instructions.target_well,
+        str(instructions.project_id) + "." + str(instructions.project_campaign_id),
+    )
+
+    try:
+        logger.info("Beginning experiment %d", instructions.id)
+        results.id = instructions.id
+        # Fetch list of solution names from stock_vials
+        # list of vial names to exclude
+        exclude_list = ["rinse0", "rinse1", "rinse2"]
+        available_solutions = [
+            vial.name for vial in stock_vials if vial.name not in exclude_list
+        ]
+
+        # although we already checked before running the experiment we want to check again
+        # that all requested solutions are found
+        experiment_solution_count = len(instructions.solutions)
+        matched = 0
+
+        ## Deposit all experiment solutions into well
+        for solution_name in instructions.solutions:
+            solution_name = str(solution_name).lower()
+            solution_volume = instructions.solutions[solution_name]
+            if (
+                solution_volume > 0
+                and solution_name in available_solutions
+            ):  # is there is an available solution to deposit
+                matched += 1
+                logger.info(
+                    "Pipetting %s ul of %s into %s...",
+                    solution_volume,
+                    solution_name,
+                    instructions.target_well,
+                )
+                corrected_volume = volume_correction(solution_volume)
+                stock_vial = solution_selector(
+                    stock_vials, solution_name, corrected_volume
+                )
+                forward_pipette_v2(
+                    volume=corrected_volume,
+                    from_vessel=stock_vial,
+                    to_vessel=wellplate.wells[instructions.target_well],
+                    pump=pump,
+                    mill=mill,
+                    pumping_rate=instructions.pumping_rate,
+                )
+
+        if matched != experiment_solution_count:
+            raise NoAvailableSolution("One or more solutions are not available")
+
+        logger.info(
+            "Pipetted %s into well: %s",
+            json.dumps(instructions.solutions),
+            instructions.target_well,
+        )
+
+        instructions.status = ExperimentStatus.COMPLETE
+        logger.info("End of Experiment: %s", instructions.id)
+
+        mill.move_to_safe_position()
+        logger.info("EXPERIMENT %s COMPLETED", instructions.id)
+
+    except OCPFailure as ocp_failure:
+        logger.error(ocp_failure)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Failed instructions updated for experiment %s", instructions.id)
+
+    except KeyboardInterrupt:
+        logger.warning("Keyboard Interrupt")
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info("Saved interrupted instructions for experiment %s", instructions.id)
+
+    except Exception as general_exception:
+        exception_type = type(general_exception).__name__
+        exception_traceback = sys.exc_info()[2]
+        if exception_traceback is not None:
+            frame = exception_traceback.tb_frame
+            filename = frame.f_code.co_filename
+            line_number = exception_traceback.tb_lineno
+        else:
+            filename = "Unknown"
+            line_number = -1
+        logger.error("Exception: %s", general_exception)
+        logger.error("Exception type: %s", exception_type)
+        logger.error("File name: %s", filename)
+        logger.error("Line number: %d", line_number)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+
+    finally:
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        logger.info(
+            "Returning completed instructions for experiment %s", instructions.id
+        )

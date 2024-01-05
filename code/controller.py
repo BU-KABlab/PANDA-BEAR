@@ -186,7 +186,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     logger.error(error_message)
                     new_experiment.status = ExperimentStatus.ERROR
                     new_experiment.priority = 999
-                    scheduler.update_experiment_status(new_experiment)
+                    scheduler.update_experiment_file(new_experiment)
                     scheduler.update_experiment_queue_priority(
                         new_experiment.id, new_experiment.priority
                     )
@@ -245,7 +245,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 )
 
                 ## Update location of experiment instructions and save results
-                scheduler.update_experiment_status(new_experiment)
+                scheduler.update_experiment_file(new_experiment)
                 scheduler.update_experiment_location(new_experiment)
                 scheduler.save_results(new_experiment, experiment_results)
 
@@ -295,7 +295,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                 e_panda.apply_log_filter()
                 ## Update location of experiment instructions and save results
                 for experiment in experiments_to_run:
-                    scheduler.update_experiment_status(experiment)
+                    scheduler.update_experiment_file(experiment)
                     scheduler.update_experiment_location(experiment)
                     scheduler.save_results(experiment, experiment.results)
 

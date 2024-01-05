@@ -9,3 +9,4 @@ project_id, project name
 8, 'Pipette wear testing'
 9, 'Pipette accuracy with viscous liquids'
 10, 'Pipette calibration with viscous liquids'
+11, 'Pipette with correction factor'

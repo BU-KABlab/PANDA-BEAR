@@ -213,7 +213,7 @@ def peg2p_test(experiments: list[Experiment]):
                 )
 
                 ## Update location of experiment instructions and save results
-                scheduler.update_experiment_status(experiment)
+                scheduler.update_experiment_file(experiment)
                 scheduler.update_experiment_location(experiment)
                 scheduler.save_results(experiment, results)
 
@@ -294,7 +294,7 @@ def mixing_test(experiments: list[Experiment]):
                 )
 
                 ## Update location of experiment instructions and save results
-                scheduler.update_experiment_status(experiment)
+                scheduler.update_experiment_file(experiment)
                 scheduler.update_experiment_location(experiment)
                 scheduler.save_results(experiment, results)
 
