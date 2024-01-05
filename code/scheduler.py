@@ -535,8 +535,10 @@ class Scheduler:
         for experiment in experiments:
             response = self.add_nonfile_experiment(experiment)
             if response != "success":
-                return response
-        return "success"
+                print(response)
+                logger.warning(response)
+                return 0
+        return 1
 
     def save_results(self, experiment: ExperimentBase, results: ExperimentResult) -> None:
         """Save the results of the experiment as a json file in the data folder

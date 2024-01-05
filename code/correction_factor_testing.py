@@ -1,14 +1,9 @@
 """
-The script generates a series of wellplates for calibration testing. Each wellplate is associated 
-with a specific solution. The differences between each wellplate are:
-
-Solutions: The script tests five different solutions, 'water, '1000:1 H20:Glycerol', 
-'100:1 H20:Glycerol', '10:1 H20:Glycerol', and '1:1 H20:Glycerol'. The solutions are 
-tested in that order, so the first wellplate will be associated with 'water', the 
-second with '1000:1 H20:Glycerol', etc.
+The script generates a series of wellplates for volume correction testing.
 
 Volumes:
-Each solution should get a calibration curve with experiments pipetting volumes from 
+Each volume will have a correction factor applied to it. The correction factor is determined by the following equation:
+Correction factor = 
 20µL - 140µL spaced apart by 10µL:
 20,
 30
@@ -34,7 +29,7 @@ each wellplate. The first wellplate will have a project campaign ID of 1, the se
 will have a project campaign ID of 2, etc.
 
 
-Created on Tuesday December 11 2023
+Created on January 5 2024
 Created by: Gregory Robben
 Reviewed by:
 Reviewed on:
@@ -43,7 +38,7 @@ Reviewed on:
 
 import experiment_class
 from config.pin import CURRENT_PIN
-from config.config import WELL_HX
+from config.config import WELL_HX, TESTING
 from scheduler import Scheduler
 import controller
 import pandas as pd
@@ -61,21 +56,21 @@ def determine_next_experiment_id() -> int:
     return int(last_experiment_id + 1)
 
 
-TEST = True
+TEST = TESTING
 print("TEST MODE: ", TEST)
 # Create experiments
 COLUMNS = "ABCDEFGH"
 ROWS = 12
-PROJECT_ID = 10
-EXPERIMENT_NAME = "Calibration tests"
-PREVIOUS_CAMPAIGN_ID = 5
+WELLPLATE_TYPE_NUMBER = 6
+PROJECT_ID = 11
+EXPERIMENT_NAME = "Correction factor tests"
+PREVIOUS_CAMPAIGN_ID = 0
+print(f"Experiment name: {EXPERIMENT_NAME}")
 
 solutions = [
-    # "water",
-    # "1000:1 H20:Glycerol",
-    # "100:1 H20:Glycerol",
-    # "10:1 H20:Glycerol",
-    "1:1 H20:Glycerol",
+    "water",
+    "1:1 h2o:Glycerol",
+    "1:1 h2o:Glycerol",
 ]
 
 volumes = [
@@ -92,15 +87,16 @@ volumes = [
             130,130,130,130,130,130,130,130,
             140,140,140,140,140,140,140,140,
            ]
-PUMPING_RATE = 0.640
+PUMPING_RATE = 0.3
 # iterate over the solutions we are testing
 for solution_number, solution in enumerate(solutions):
     # for each solution we want one wellplate of 6x of each volume
     # Change wellplate and load new wellplate
-    controller.load_new_wellplate(new_wellplate_type_number=6)
+    controller.load_new_wellplate(new_wellplate_type_number=WELLPLATE_TYPE_NUMBER)
     experiment_id = determine_next_experiment_id()
     experiments : list[experiment_class.ExperimentBase]= []
     WELL_NUMBER = 0
+    campaign_id = PREVIOUS_CAMPAIGN_ID + solution_number + 1
     # Create 6 new experiments for the solution
     for column in COLUMNS:
         # ex: for column in 'A':
@@ -114,7 +110,7 @@ for solution_number, solution in enumerate(solutions):
                     target_well=column + str(row),
                     pin=CURRENT_PIN,
                     project_id=PROJECT_ID,
-                    project_campaign_id=solution_number + 1,
+                    project_campaign_id=campaign_id,
                     solutions={str(solution).lower(): float(volumes[WELL_NUMBER])},
                     pumping_rate=PUMPING_RATE,
                     status=experiment_class.ExperimentStatus.NEW,
@@ -131,24 +127,21 @@ for solution_number, solution in enumerate(solutions):
     experiment_solutions = [solution for solution in solutions]
     experiment_volumes = [volume for volume in volumes]
     ## Print a recipt of the wellplate and its experiments noting the solution and volume
-    print(f"Experiment name: {EXPERIMENT_NAME}")
     print(f"Solution: {solution}")
     print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
     print(f"Pumping rate: {PUMPING_RATE}")
-    print(f"Project campaign id: {PROJECT_ID}.{6}\n") #TODO: change this to be the solution number
-
+    print(f"Project campaign id: {PROJECT_ID}.{campaign_id}\n")
 
     # Add experiments to the queue and run them
-    scheduler = Scheduler()
-    result = scheduler.add_nonfile_experiments(experiments)
-    if result == "success":
-        controller.main(use_mock_instruments=TEST)
-    else:
-        print("Error: ", result)
-        break
+#     scheduler = Scheduler()
+#     if scheduler.add_nonfile_experiments(experiments): #fails if not all experiments are added
+#         controller.main(use_mock_instruments=TEST)
+#     else:
+#         print("Error loading experiments")
+#         break
 
-controller.load_new_wellplate(new_wellplate_type_number=6)
-message = f"Finished running {EXPERIMENT_NAME} experiments"
-print(message)
-bot = SlackBot(test=TEST)
-bot.send_slack_message(message=message, channel_id="alert")
+# controller.load_new_wellplate(new_wellplate_type_number=6)
+# message = f"Finished running {EXPERIMENT_NAME} experiments"
+# print(message)
+# bot = SlackBot(test=TEST)
+# bot.send_slack_message(message=message, channel_id="alert")
