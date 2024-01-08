@@ -1,38 +1,29 @@
+import sys
 import pandas as pd
 from pathlib import Path
-from config.config import EPANDA_LOG, WELL_HX
+from config.config import EPANDA_LOG, WELL_HX, PATH_TO_DATA
 from matplotlib import pyplot as plt
 
 
-def plate_analysis():
-    '''
-    This function analyzes the data from the well history and the logs to 
+def plate_analysis(
+    project_ids: list = None, campaign_ids: list = None, destination=PATH_TO_DATA
+):
+    """
+    This function analyzes the data from the well history and the logs to
     determine the accuracy of the pump
-    '''
+    """
     # ## ANALYSIS
-    project_ids = ["8"]
-    campaign_ids = [
-        "8.1",
-        "8.2",
-        "8.3",
-        "8.4",
-        "8.5",
-        "8.6",
-        "8.7",
-        "8.8",
-        "8.9",
-        "8.10",
-        "8.11",
-    ]
     # Load well history
     # plate id, type number, well id, experiment id, project id, status, status date, contents
     well_hx = pd.read_csv(WELL_HX, skipinitialspace=True)
     # well_hx = pd.read_csv(PATH_TO_NETWORK_DATA + "/well_history.csv", skipinitialspace=True)
     # Filter well history to those ids in the ids list
-    well_hx = well_hx[well_hx["project id"].astype(str).isin(project_ids)]
+    well_hx = well_hx.dropna()
+    if project_ids is not None:
+        well_hx = well_hx[well_hx["project id"].astype(int).isin(project_ids)]
     if len(well_hx) == 0:
         print("No experiments found for project ids: " + str(project_ids))
-        exit()
+        sys.exit()
     # Filter well history to only those experiments that were completed
     well_hx = well_hx[well_hx["status"] == "complete"]
 
@@ -47,7 +38,7 @@ def plate_analysis():
     well_hx["contents"] = well_hx["contents"].astype(str)
 
     # Get the logs and filter to only those experiments in our filtered well history dataframe
-    # The logs have a formatted output of 
+    # The logs have a formatted output of
     # "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s"
     logs = pd.read_csv(
         EPANDA_LOG,
@@ -65,74 +56,107 @@ def plate_analysis():
             "custom2",
             "custom3",
             "message",
+            "custom4",
         ],
     )
 
     # filter on module = e_panda
     logs = logs[logs["module"] == "pump_control"]
-
-    # set custom1 to str, custom2 to int, and custom3 to str
-    logs["custom1"] = logs["custom1"].astype(str)
+    logs = logs[logs["function"] == "run_pump"]
+    logs = logs.dropna()
+    # Convert date colume to datetime format from 2023-12-22 18:34:18,505 to 2024-01-05 23:38:44.921
+    logs["date"] = pd.to_datetime(logs["date"],format = "%Y-%m-%d %H:%M:%S,%f")
+    logs["custom1"] = logs["custom1"].astype(float)
     logs["custom2"] = logs["custom2"].astype(int)
     logs["custom3"] = logs["custom3"].astype(str)
+    logs["custom4"] = logs["custom4"].astype(bool)
     # rename custom1 to campaign id, custom2 to experiment ID, custom3 to well
     logs = logs.rename(
         columns={
             "custom1": "campaign id",
             "custom2": "experiment id",
             "custom3": "well",
+            "custom4": "testing",
         }
     )
     # filter on experiment ids in the well history dataframe
     logs = logs[logs["experiment id"].isin(well_hx["experiment id"])]
 
     # filter on campaign ids in the campaign ids list
-    logs = logs[logs["campaign id"].isin(campaign_ids)]
+    if campaign_ids is not None:
+        logs = logs[logs["campaign id"].isin(campaign_ids)]
 
     if logs.empty:
-        print("No experiments found for project ids: " + str(project_ids))
-        exit()
+        print("No experiments found for project ids: " + int(project_ids))
+        sys.exit()
 
     # filter on message containing 'Data'
     logs = logs[logs["message"].str.contains("Data")]
 
-    # split message into 6 columns called 'message', 'action', 'volume', 'density', 'preweight', 'postweight'
-    logs[["message", "action", "volume", "density", "preweight", "postweight"]] = logs[
-        "message"
-    ].str.split(",", expand=True)
+    # split message into 7 columns called 'message, 'action', 'volume', 'density', 'preweight', 'postweight', 'pumping_rate', 'viscosity'
+    logs[
+        [
+            "message",
+            "action",
+            "volume",
+            "density",
+            "preweight",
+            "postweight",
+            "pumping_rate",
+            "viscosity",
+        ]
+    ] = logs["message"].str.split(",", expand=True)
+
+    # set the type of volume, desnity, preweight, postweight, pumping_rate, and viscosity to float
+    logs["volume"] = logs["volume"].astype(float)
+    logs["density"] = logs["density"].astype(float)
+    logs["preweight"] = logs["preweight"].astype(float)
+    logs["postweight"] = logs["postweight"].astype(float)
+    logs["pumping_rate"] = logs["pumping_rate"].astype(float)
+    logs["viscosity"] = logs["viscosity"].astype(float)
 
     # add a column called 'weight change' that is postweight - preweight
     logs["weight change"] = logs["postweight"].astype(float) - logs["preweight"].astype(
         float
     )
 
-    # add a column that is percent error betwen the actual weight change and the expected weight change based on the volume * density
+    # add a column that is percent error betwen the actual weight change and the expected weight change
+    # based on the volume * density
     logs["percent error"] = (
         logs["weight change"]
         - (logs["volume"].astype(float) * logs["density"].astype(float))
     ) / (logs["volume"].astype(float) * logs["density"].astype(float))
 
-    # scatter Plot the percent error for each experiment, grouped by experiment id
-    logs.plot.scatter(x="experiment id", y="percent error", c="DarkBlue")
-    plt.xlabel("Experiment #")
-    # set the x axis to be the experiment ids in order and replace with 1 - n, sorting so that the x axis is in order
-    plt.xticks(
-        logs["experiment id"].sort_values().unique(),
-        range(1, len(logs["experiment id"].sort_values().unique()) + 1),
-    )
-    # rotate the x axis labels by 75 degrees
-    plt.xticks(rotation=85)
-    plt.ylabel("Percent Error")
-    plt.title("Percent Error by Experiment #")
-    plt.show()
+    # Reduce all float columns to 3 decimal places
+    logs = logs.round(3)
 
-    # Histogram of the actual volume dispensed vs the expected volume dispensed (.100 mL)
-    logs["weight change"].astype(float).hist()
 
-    plt.xlabel("Volume Dispensed (mL)")
-    plt.ylabel("Frequency")
-    plt.title("Volume Dispensed Histogram")
-    plt.show()
+    # # scatter Plot the percent error for each experiment, grouped by experiment id
+    # logs.plot.scatter(x="experiment id", y="percent error", c="DarkBlue")
+    # plt.xlabel("Experiment #")
+    # set the x axis to be the exp ids in order and replace with 1 - n, sorting so that the x axis is in order
+    # plt.xticks(
+    #     logs["experiment id"].sort_values().unique(),
+    #     range(1, len(logs["experiment id"].sort_values().unique()) + 1),
+    # )
+    # # rotate the x axis labels by 75 degrees
+    # plt.xticks(rotation=85)
+    # plt.ylabel("Percent Error")
+    # plt.title("Percent Error by Experiment #")
+    # plt.show()
+
+    # # Histogram of the actual volume dispensed vs the expected volume dispensed (.100 mL)
+    # logs["weight change"].astype(float).hist()
+
+    # plt.xlabel("Volume Dispensed (mL)")
+    # plt.ylabel("Frequency")
+    # plt.title("Volume Dispensed Histogram")
+    # plt.show()
+    if project_ids is not None:
+        filename = f"pumping_logs_{project_ids[0]}"
+    else:
+        filename = "pumping_logs"
+    logs.to_csv(f"{destination}/{filename}.csv", index=False)
 
 
 def direct_log_analysis():
@@ -343,5 +367,5 @@ def direct_log_analysis():
 
 
 if __name__ == "__main__":
-    # plate_analysis()
-    direct_log_analysis()
+    plate_analysis()
+    # direct_log_analysis()

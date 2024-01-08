@@ -2,7 +2,7 @@
     {
         "position": "s0",
         "contents": "water",
-        "viscocity_cp": 0.91,
+        "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
         "x": -2,
@@ -24,7 +24,7 @@
     {
         "position": "s1",
         "contents": "water",
-        "viscocity_cp": 0.91,
+        "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
         "x": -2,
@@ -46,7 +46,7 @@
     {
         "position": "s2",
         "contents": "2:1 h2o:glycerol",
-        "viscocity_cp": 3.0617,
+        "viscosity_cp": 3.0617,
         "density": 1.0938,
         "category": 0,
         "x": -2,
@@ -68,7 +68,7 @@
     {
         "position": "s3",
         "contents": "2:1 h2o:glycerol",
-        "viscocity_cp": 3.0617,
+        "viscosity_cp": 3.0617,
         "density": 1.0938,
         "category": 0,
         "x": -2,
@@ -90,7 +90,7 @@
     {
         "position": "s4",
         "contents": "4:5 h2o:glycerol",
-        "viscocity_cp": 9.9617,
+        "viscosity_cp": 9.9617,
         "density": 1.1545,
         "category": 0,
         "x": -2,
@@ -112,7 +112,7 @@
     {
         "position": "s5",
         "contents": "4:5 h2o:glycerol",
-        "viscocity_cp": 9.9617,
+        "viscosity_cp": 9.9617,
         "density": 1.1545,
         "category": 0,
         "x": -2,
@@ -134,7 +134,7 @@
     {
         "position": "s6",
         "contents": "2:5 h2o:glycerol",
-        "viscocity_cp": 31.882,
+        "viscosity_cp": 31.882,
         "density": 1.1945,
         "category": 0,
         "x": -2,
@@ -156,7 +156,7 @@
     {
         "position": "s7",
         "contents": "2:5 h2o:glycerol",
-        "viscocity_cp": 31.882,
+        "viscosity_cp": 31.882,
         "density": 1.1945,
         "category": 0,
         "x": -2,
@@ -178,7 +178,7 @@
     {
         "position": "s8",
         "contents": "water",
-        "viscocity_cp": 0.91,
+        "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
         "x": -47,

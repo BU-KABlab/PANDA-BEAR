@@ -104,7 +104,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         stock_vials, waste_vials, wellplate = establish_system_state()
 
         ## Flush the pipette tip with water before we start
-        e_panda.flush_v2(
+        for _ in range(3):
+            e_panda.flush_v2(
             stock_vials=stock_vials,
             waste_vials=waste_vials,
             flush_solution_name="rinse0",
@@ -112,9 +113,9 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
             pump=toolkit.pump,
             mill=toolkit.mill,
         )
-        ## Update the system state with new vial and wellplate information
-        update_vial_state_file(stock_vials, STOCK_STATUS)
-        update_vial_state_file(waste_vials, WASTE_STATUS)
+            ## Update the system state with new vial and wellplate information
+            update_vial_state_file(stock_vials, STOCK_STATUS)
+            update_vial_state_file(waste_vials, WASTE_STATUS)
 
         ## Begin outer loop
         while True:
@@ -638,6 +639,17 @@ def input_new_vial_values(vialgroup: str):
     )
     for vial in vial_parameters:
         vial = Vial2(**vial)
+        if vial.contents is None:
+            vial.contents = {}
+        if vial.name is None:
+            # All parameters are blank except for position
+            vial.name = ""
+            vial.contents = ""
+            vial.density = ""
+            vial.volume = ""
+            vial.capacity = ""
+            vial.contamination = ""
+
         print(
             f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
         )
@@ -696,6 +708,17 @@ def input_new_vial_values(vialgroup: str):
                 )
                 for vial in vial_parameters:
                     vial = Vial2(**vial)
+                    if vial.contents is None:
+                        vial.contents = {}
+                    if vial.name is None:
+                        # All parameters are blank except for position
+                        vial.name = ""
+                        vial.contents = ""
+                        vial.density = ""
+                        vial.volume = ""
+                        vial.capacity = ""
+                        vial.contamination = ""
+                        
                     print(
                         f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
                     )

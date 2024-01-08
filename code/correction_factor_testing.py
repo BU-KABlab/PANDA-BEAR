@@ -6,7 +6,7 @@ Each volume will have a correction factor applied to it. The correction factor i
 determined by the following equation:
 Correction factor = 
 
-Created on January 5 2024
+Created on January 8 2024
 Created by: Gregory Robben
 Reviewed by:
 Reviewed on:
@@ -20,6 +20,9 @@ from scheduler import Scheduler
 import controller
 import pandas as pd
 from slack_functions2 import SlackBot
+from log_analysis import plate_analysis
+
+from correction_factors import correction_factor
 
 
 def determine_next_experiment_id() -> int:
@@ -40,15 +43,22 @@ COLUMNS = "ABCDEFGH"
 ROWS = 12
 WELLPLATE_TYPE_NUMBER = 6
 PROJECT_ID = 11
-EXPERIMENT_NAME = "Correction factor tests"
-PREVIOUS_CAMPAIGN_ID = 0
+EXPERIMENT_NAME = "Correction factor tests part 2"
+PREVIOUS_CAMPAIGN_ID = 3
 print(f"Experiment name: {EXPERIMENT_NAME}")
 
-solutions = [
+solutions_to_use = [
     "water",
     "2:1 h2o:glycerol",
     "4:5 h2o:glycerol",
     "2:5 h2o:glycerol"
+]
+
+viscosities = [
+    0.91,
+    3.06,
+    9.96,
+    31.88
 ]
 
 volumes = [
@@ -68,7 +78,7 @@ volumes = [
 PUMPING_RATE = 0.3
 experiment_id = determine_next_experiment_id()
 # iterate over the solutions we are testing
-for solution_number, solution in enumerate(solutions):
+for solution_number, solution in enumerate(solutions_to_use):
     # for each solution we want one wellplate of 6x of each volume
     # Change wellplate and load new wellplate
     controller.load_new_wellplate(new_wellplate_type_number=WELLPLATE_TYPE_NUMBER)
@@ -89,7 +99,7 @@ for solution_number, solution in enumerate(solutions):
                     pin=CURRENT_PIN,
                     project_id=PROJECT_ID,
                     project_campaign_id=campaign_id,
-                    solutions={str(solution).lower(): float(volumes[WELL_NUMBER])},
+                    solutions={str(solution).lower(): float(correction_factor(volumes[WELL_NUMBER],viscosities[solution_number]))},
                     pumping_rate=PUMPING_RATE,
                     status=experiment_class.ExperimentStatus.NEW,
                     filename=EXPERIMENT_NAME + str(experiment_id),
@@ -102,12 +112,18 @@ for solution_number, solution in enumerate(solutions):
     ## Make sure we have 96 experiments
     assert len(experiments) == 96
 
-    experiment_solutions = [solution for solution in solutions]
-    experiment_volumes = [volume for volume in volumes]
+    experiment_solutions = [solution for solution in solutions_to_use]
+    vols = []
+    for experiment in experiments:
+        vols.append(experiment.solutions[solution])
+    vols = list(dict.fromkeys(vols))
+    #experiment_volumes = set(experiment_volumes)
     ## Print a recipt of the wellplate and its experiments noting the solution and volume
     print(f"Solution: {solution}")
-    print(f"Plate number: {PREVIOUS_CAMPAIGN_ID + solution_number}")
+    print(f"Plate number: {campaign_id}")
     print(f"Pumping rate: {PUMPING_RATE}")
+    #vols = pd.DataFrame([volume for volume in volumes], columns=["volume"])
+    print(f"Volume range: {vols}")
     print(f"Project campaign id: {PROJECT_ID}.{campaign_id}")
     ids = pd.DataFrame([experiment.id for experiment in experiments], columns=["experiment id"])
     print(f"Experiment IDs: {ids['experiment id'].min()} - {ids['experiment id'].max()}")
@@ -125,3 +141,5 @@ controller.load_new_wellplate(new_wellplate_type_number=6)
 message = f"Finished running {EXPERIMENT_NAME} experiments"
 bot = SlackBot(test=TEST)
 bot.send_slack_message(message=message, channel_id="alert")
+
+plate_analysis(PROJECT_ID)

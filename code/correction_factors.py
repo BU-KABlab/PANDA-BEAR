@@ -1,0 +1,36 @@
+'''
+0.91 cP // y = 0.99x - 6.23
+3.06 cP // y = 0.97x - 4.91
+9.96 cP // y = 0.97x - 2.78
+31.88 cP // y = 0.98x + 3.68
+'''
+
+from math import isclose
+
+
+def correction_factor(x,viscosity):
+    '''
+    Calculate the correction factor to applied to the programmed volume
+    for the viscosity of the sample.
+    
+    0.91 cP // y = 1.01x + 6.23
+    3.06 cP // y = 1.03x + 4.91
+    9.96 cP // y = 1.03x + 2.78
+    31.88 cP // y = 1.02x -3.68
+    
+    with x = programmed volume
+    '''
+    if viscosity is None:
+        corrected_volume = x
+    elif isclose(viscosity,0.91):
+        corrected_volume = 1.01*x + 6.23
+    elif isclose(viscosity,3.06):
+        corrected_volume = 1.03*x + 4.91
+    elif isclose(viscosity,9.96):
+        corrected_volume = 1.03*x + 2.78
+    elif isclose(viscosity,31.88):
+        corrected_volume = 1.02*x - 3.68
+    else:
+        corrected_volume = x
+
+    return round(corrected_volume,3)
