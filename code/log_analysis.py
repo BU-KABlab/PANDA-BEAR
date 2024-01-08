@@ -98,60 +98,38 @@ def plate_analysis(
         [
             "message",
             "action",
-            "volume",
+            "PV (µL)",
             "density",
             "preweight",
             "postweight",
             "pumping_rate",
-            "viscosity",
+            "Viscosity (cP)",
         ]
     ] = logs["message"].str.split(",", expand=True)
 
     # set the type of volume, desnity, preweight, postweight, pumping_rate, and viscosity to float
-    logs["volume"] = logs["volume"].astype(float)
+    logs["PV (µL)"] = logs["PV (µL)"].astype(float)
     logs["density"] = logs["density"].astype(float)
     logs["preweight"] = logs["preweight"].astype(float)
     logs["postweight"] = logs["postweight"].astype(float)
     logs["pumping_rate"] = logs["pumping_rate"].astype(float)
-    logs["viscosity"] = logs["viscosity"].astype(float)
+    logs["Viscosity (cP)"] = logs["Viscosity (cP)"].astype(float)
 
     # add a column called 'weight change' that is postweight - preweight
-    logs["weight change"] = logs["postweight"].astype(float) - logs["preweight"].astype(
+    logs["Volume"] = logs["postweight"].astype(float) - logs["preweight"].astype(
         float
     )
 
     # add a column that is percent error betwen the actual weight change and the expected weight change
     # based on the volume * density
     logs["percent error"] = (
-        logs["weight change"]
-        - (logs["volume"].astype(float) * logs["density"].astype(float))
-    ) / (logs["volume"].astype(float) * logs["density"].astype(float))
+        logs["Volume"]
+        - (logs["PV (µL)"].astype(float) * logs["density"].astype(float))
+    ) / (logs["PV (µL)"].astype(float) * logs["density"].astype(float))
 
     # Reduce all float columns to 3 decimal places
     logs = logs.round(3)
 
-
-    # # scatter Plot the percent error for each experiment, grouped by experiment id
-    # logs.plot.scatter(x="experiment id", y="percent error", c="DarkBlue")
-    # plt.xlabel("Experiment #")
-    # set the x axis to be the exp ids in order and replace with 1 - n, sorting so that the x axis is in order
-    # plt.xticks(
-    #     logs["experiment id"].sort_values().unique(),
-    #     range(1, len(logs["experiment id"].sort_values().unique()) + 1),
-    # )
-    # # rotate the x axis labels by 75 degrees
-    # plt.xticks(rotation=85)
-    # plt.ylabel("Percent Error")
-    # plt.title("Percent Error by Experiment #")
-    # plt.show()
-
-    # # Histogram of the actual volume dispensed vs the expected volume dispensed (.100 mL)
-    # logs["weight change"].astype(float).hist()
-
-    # plt.xlabel("Volume Dispensed (mL)")
-    # plt.ylabel("Frequency")
-    # plt.title("Volume Dispensed Histogram")
-    # plt.show()
     if project_ids is not None:
         filename = f"pumping_logs_{project_ids[0]}"
     else:
