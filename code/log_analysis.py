@@ -132,8 +132,10 @@ def plate_analysis(
     # Reduce all float columns to 3 decimal places
     logs = logs.round(3)
 
-    if project_ids is not None:
+    if project_ids is not None and isinstance(project_ids, list):
         filename = f"pumping_logs_{project_ids[0]}"
+    elif project_ids is not None and isinstance(project_ids, int):
+        filename = f"pumping_logs_{project_ids}"
     else:
         filename = "pumping_logs"
     logs.to_csv(f"{destination}/{filename}.csv", index=False)
