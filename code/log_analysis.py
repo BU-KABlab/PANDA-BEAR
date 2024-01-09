@@ -19,8 +19,10 @@ def plate_analysis(
     # well_hx = pd.read_csv(PATH_TO_NETWORK_DATA + "/well_history.csv", skipinitialspace=True)
     # Filter well history to those ids in the ids list
     well_hx = well_hx.dropna()
-    if project_ids is not None:
+    if project_ids is not None and isinstance(project_ids, list):
         well_hx = well_hx[well_hx["project id"].astype(int).isin(project_ids)]
+    elif project_ids is not None and isinstance(project_ids, int):
+        well_hx = well_hx[well_hx["project id"].astype(int) == project_ids]
     if len(well_hx) == 0:
         print("No experiments found for project ids: " + str(project_ids))
         sys.exit()
