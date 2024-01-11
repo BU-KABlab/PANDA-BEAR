@@ -737,7 +737,7 @@ def characterization(
         )
         pstat.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well
-        mill.rinse_electrode()
+        #mill.rinse_electrode()
         pstat.pstatdisconnect()
         return char_instructions, char_results
 
