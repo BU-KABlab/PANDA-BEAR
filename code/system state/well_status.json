@@ -1,10 +1,10 @@
 {
-    "plate_id": 79,
-    "type_number": 6,
+    "plate_id": 106,
+    "type_number": 3,
     "wells": [
         {
             "well_id": "A1",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -12,7 +12,7 @@
         },
         {
             "well_id": "A2",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -20,7 +20,7 @@
         },
         {
             "well_id": "A3",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -28,7 +28,7 @@
         },
         {
             "well_id": "A4",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -36,7 +36,7 @@
         },
         {
             "well_id": "A5",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -44,7 +44,7 @@
         },
         {
             "well_id": "A6",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -52,7 +52,7 @@
         },
         {
             "well_id": "A7",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -60,7 +60,7 @@
         },
         {
             "well_id": "A8",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -68,7 +68,7 @@
         },
         {
             "well_id": "A9",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -76,7 +76,7 @@
         },
         {
             "well_id": "A10",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -84,7 +84,7 @@
         },
         {
             "well_id": "A11",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -92,7 +92,7 @@
         },
         {
             "well_id": "A12",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -100,7 +100,7 @@
         },
         {
             "well_id": "B1",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -108,7 +108,7 @@
         },
         {
             "well_id": "B2",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -116,7 +116,7 @@
         },
         {
             "well_id": "B3",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -124,7 +124,7 @@
         },
         {
             "well_id": "B4",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -132,7 +132,7 @@
         },
         {
             "well_id": "B5",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -140,7 +140,7 @@
         },
         {
             "well_id": "B6",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -148,7 +148,7 @@
         },
         {
             "well_id": "B7",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -156,7 +156,7 @@
         },
         {
             "well_id": "B8",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -164,7 +164,7 @@
         },
         {
             "well_id": "B9",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -172,7 +172,7 @@
         },
         {
             "well_id": "B10",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -180,7 +180,7 @@
         },
         {
             "well_id": "B11",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -188,7 +188,7 @@
         },
         {
             "well_id": "B12",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -196,7 +196,7 @@
         },
         {
             "well_id": "C1",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -204,7 +204,7 @@
         },
         {
             "well_id": "C2",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -212,7 +212,7 @@
         },
         {
             "well_id": "C3",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -220,7 +220,7 @@
         },
         {
             "well_id": "C4",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -228,7 +228,7 @@
         },
         {
             "well_id": "C5",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -236,7 +236,7 @@
         },
         {
             "well_id": "C6",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -244,7 +244,7 @@
         },
         {
             "well_id": "C7",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -252,7 +252,7 @@
         },
         {
             "well_id": "C8",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -260,7 +260,7 @@
         },
         {
             "well_id": "C9",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -268,7 +268,7 @@
         },
         {
             "well_id": "C10",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -276,7 +276,7 @@
         },
         {
             "well_id": "C11",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",
@@ -284,7 +284,7 @@
         },
         {
             "well_id": "C12",
-            "status": "new",
+            "status": "complete",
             "status_date": "",
             "contents": {},
             "experiment_id": "",

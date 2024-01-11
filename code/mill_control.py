@@ -94,7 +94,6 @@ class Mill:
         """Exit the context manager"""
         logger.info("Exiting the mill context manager")
         logger.debug("Disconnecting from the mill")
-        self.home()
         self.disconnect()
 
     def disconnect(self):
@@ -331,11 +330,24 @@ class Mill:
         """
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-        self.move_electrode_to_position(-411, -30, 0)
+        self.move_electrode_to_position(-373, -16, 0)
         for _ in range(3):
-            self.move_electrode_to_position(-411, -30, -55)
-            self.move_electrode_to_position(-411, -30, 0)
+            self.move_electrode_to_position(-373, -16, -45)
+            self.move_electrode_to_position(-373, -16, 0)
         return 0
+
+    def rest_electrode(self):
+        """
+        Rinse the electrode by moving it to the rinse position and back to the
+        center position.
+        Args:
+            None
+        Returns:
+            None
+        """
+        self.safe_move(-373, -16, 0, instrument=Instruments.ELECTRODE)
+        return 0
+
 
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
@@ -705,7 +717,7 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wells(-230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
+    wellplate = Wells.Wells(-233, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)

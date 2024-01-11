@@ -6,8 +6,8 @@ from pathlib import Path
 AIR_GAP = 40 #ul
 DRIP_STOP = 5 #ul
 PURGE_VOLUME = 20 #ul
-RANDOM_FLAG = True # Set to True to randomize the order of the experiments
-TESTING = True # Set to True to run in testing mode
+RANDOM_FLAG = False # Set to True to randomize the order of the experiments
+TESTING = False # Set to True to run in testing mode
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 
