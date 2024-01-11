@@ -42,6 +42,7 @@ def contamination_assessment(
     """
     if instructions.solutions['5mm_fecn3'] > 0:
         # Pipette 120ul of fecn3 solution into waste to dirty the pipette tip
+        print("1. Pipetting 120ul of 5mm_fecn3 into waste")
         forward_pipette_v2(
             volume=instructions.solutions['5mm_fecn3'],
             from_vessel=solution_selector(
@@ -58,6 +59,7 @@ def contamination_assessment(
         )
 
         # Flush the pipette tip x3 with electrolyte rinse
+        print("2. Flushing the pipette tip x3 with electrolyte rinse")
         for _ in range(3):
             forward_pipette_v2(
                 volume=instructions.solutions['rinse0'],
@@ -73,6 +75,7 @@ def contamination_assessment(
             )
 
         # Pipette 120ul of electrolyte solution into well
+        print("3. Pipetting 120ul of electrolyte into well")
         forward_pipette_v2(
             volume=instructions.solutions["electrolyte"], #120
             from_vessel=solution_selector(
@@ -88,6 +91,7 @@ def contamination_assessment(
 
     else:
         # Pipette 120ul of electrolyte solution into well
+        print("1. Pipetting 120ul of electrolyte into well")
         forward_pipette_v2(
             volume=instructions.solutions["electrolyte"], #120
             from_vessel=solution_selector(
@@ -102,6 +106,7 @@ def contamination_assessment(
         )
 
     # Perform CV
+    print("2. Performing CV")
     characterization(
         char_instructions=instructions,
         char_results=instructions.results,
@@ -110,6 +115,7 @@ def contamination_assessment(
     )
 
     # Rinse the electrode with electrode rinse
+    print("3. Rinsing electrode")
     toolkit.mill.rinse_electrode()
 
     # End of experiment
