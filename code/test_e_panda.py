@@ -489,7 +489,7 @@ class TestEPanda(unittest.TestCase):
                 id=00,
                 experiment_name="Rinse Test",
                 priority=1,
-                target_well="A1",
+                well_id="A1",
                 pin=000,
                 project_id=0,
                 solutions={},

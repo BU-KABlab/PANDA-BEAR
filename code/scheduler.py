@@ -473,21 +473,21 @@ class Scheduler:
             return message
 
         ## Check if the well is available
-        if self.check_well_status(experiment.target_well) != "new":
+        if self.check_well_status(experiment.well_id) != "new":
             # Find the next available well
-            target_well = self.choose_alternative_well(experiment.target_well)
+            target_well = self.choose_alternative_well(experiment.well_id)
             if target_well is None:
                 logger.info(
                     "No wells available for experiment originally for well %s.",
-                    experiment.target_well
+                    experiment.well_id
                 )
                 return "No wells available"
             logger.info(
                 "Experiment originally for well %s is now for well %s.",
-                experiment.target_well,
+                experiment.well_id,
                 target_well
             )
-            experiment.target_well = target_well
+            experiment.well_id = target_well
 
         # Save the experiment as a separate file in the experiment_queue subfolder
         experiment = self.add_to_queue_folder(experiment)
@@ -496,7 +496,7 @@ class Scheduler:
         experiment = self.add_to_queue_file(experiment)
 
         ## Change the status of the well
-        self.change_well_status(experiment.target_well, experiment)
+        self.change_well_status(experiment.well_id, experiment)
 
         logger.info("Experiment %s added to queue", experiment.id)
         return "success"
@@ -632,7 +632,7 @@ class Scheduler:
                     .model_validate_json(json.dumps(experiment))
                     .root
                 )
-                if experiment.target_well in available_wells:
+                if experiment.well_id in available_wells:
                     filtered_layered_queue.append(experiment_id)
 
         # Now we have a list of experiments that are in the queue and are layered protocols and are for available wells
@@ -657,7 +657,7 @@ class Scheduler:
                     .model_validate_json(json.dumps(experiment))
                     .root
                 )
-                if experiment.target_well not in experiment_list:
+                if experiment.well_id not in experiment_list:
                     experiment_list.append(experiment)
 
         # Now we have a list of experiments that can be run together

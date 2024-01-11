@@ -52,7 +52,7 @@ class ExperimentBase():
     id: int = None
     experiment_name: str = None
     priority: int = None
-    target_well: str = None
+    well_id: Optional[str] = None
     pin: int = None
     project_id: int = None
     solutions: dict = None
@@ -269,7 +269,7 @@ def make_test_base_value() -> ExperimentBase:
         id=0,
         experiment_name= "test",
         priority=2,
-        target_well="D5",
+        well_id="D5",
         pin=CURRENT_PIN,
         project_id=3,
         solutions={'dmf': 0, 'peg': 145, 'acrylate': 145, 'ferrocene': 0, 'custom': 0},
@@ -284,7 +284,7 @@ def make_test_layered_value(experiment_id: int = 0) -> LayeredExperiments:
         id=experiment_id,
         experiment_name= "test",
         priority=2,
-        target_well="D5",
+        well_id="D5",
         pin=CURRENT_PIN,
         project_id=3,
         solutions={'dmf': 0, 'peg': 145, 'acrylate': 145, 'ferrocene': 0, 'custom': 0},

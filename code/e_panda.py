@@ -434,7 +434,7 @@ def rinse_v2(
     """
 
     logger.info(
-        "Rinsing well %s %dx...", instructions.target_well, instructions.rinse_count
+        "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
     )
     for rep in range(instructions.rinse_count):  # 0, 1, 2...
         rinse_solution_name = "rinse" + str(rep)
@@ -449,7 +449,7 @@ def rinse_v2(
         forward_pipette_v2(
             instructions.rinse_vol,
             from_vessel=rinse_solution,
-            to_vessel=wellplate[instructions.target_well],
+            to_vessel=wellplate[instructions.well_id],
             pump=pump,
             mill=mill,
             pumping_rate=None,
@@ -460,7 +460,7 @@ def rinse_v2(
         )
         forward_pipette_v2(
             instructions.rinse_vol,
-            from_vessel=wellplate[instructions.target_well],
+            from_vessel=wellplate[instructions.well_id],
             to_vessel=rinse_waste,
             pump=pump,
             mill=mill,
@@ -470,7 +470,7 @@ def rinse_v2(
         logger.info("Rinse %d of %d complete", rep + 1, instructions.rinse_count)
         logger.debug(
             "Remaining volume in well: %f",
-            wellplate.get_volume(instructions.target_well),
+            wellplate.get_volume(instructions.well_id),
         )
     return 0
 
@@ -606,11 +606,11 @@ def deposition(
     logger.info("Setting up eChem experiments...")
     echem.pstatconnect()
     # echem OCP
-    logger.info("Beginning eChem OCP of well: %s", dep_instructions.target_well)
+    logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
     dep_instructions.status = ExperimentStatus.OCPCHECK
     mill.safe_move(
-        wellplate.get_coordinates(dep_instructions.target_well)["x"],
-        wellplate.get_coordinates(dep_instructions.target_well)["y"],
+        wellplate.get_coordinates(dep_instructions.well_id)["x"],
+        wellplate.get_coordinates(dep_instructions.well_id)["y"],
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
@@ -630,7 +630,7 @@ def deposition(
     if dep_results.ocp_dep_pass:
         dep_instructions.status = ExperimentStatus.DEPOSITING
         logger.info(
-            "Beginning eChem deposition of well: %s", dep_instructions.target_well
+            "Beginning eChem deposition of well: %s", dep_instructions.well_id
         )
         dep_results.deposition_data_file = echem.setfilename(dep_instructions.id, "CA")
 
@@ -680,14 +680,14 @@ def characterization(
         char_instructions (Experiment): The updated experiment instructions
         char_results (ExperimentResult): The updated experiment results
     """
-    logger.info("Characterizing well: %s", char_instructions.target_well)
+    logger.info("Characterizing well: %s", char_instructions.well_id)
     # echem OCP
-    logger.info("Beginning eChem OCP of well: %s", char_instructions.target_well)
+    logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
     echem.pstatconnect()
     char_instructions.status = ExperimentStatus.OCPCHECK
     mill.safe_move(
-        wellplate.get_coordinates(char_instructions.target_well)["x"],
-        wellplate.get_coordinates(char_instructions.target_well)["y"],
+        wellplate.get_coordinates(char_instructions.well_id)["x"],
+        wellplate.get_coordinates(char_instructions.well_id)["y"],
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
@@ -711,7 +711,7 @@ def characterization(
             char_instructions.status = ExperimentStatus.CHARACTERIZING
 
         logger.info(
-            "Beginning eChem %s of well: %s", test_type, char_instructions.target_well
+            "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
         )
 
         char_results.characterization_data_file = echem.setfilename(

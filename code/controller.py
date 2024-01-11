@@ -14,9 +14,11 @@ Additionally controller should be able to:
 # pylint: disable=line-too-long
 
 # import standard libraries
-import datetime
+from dataclasses import dataclass
+from datetime import datetime
 import json
 import logging
+import pytz as tz
 from typing import Optional, Sequence, Union
 
 # import third-party libraries
@@ -41,6 +43,7 @@ from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
 from vials import StockVial, Vial2, WasteVial
 import wellplate as wellplate_module
 import protocols
+import exp_b_pipette_contamination_assessment_protocol as exp_b
 
 from config.config import (
     MILL_CONFIG,
@@ -194,9 +197,9 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     break  # break out of the while True loop
 
                 ## Initialize a results object
-                experiment_results = ExperimentResult(
+                new_experiment.results = ExperimentResult(
                     id=new_experiment.id,
-                    well_id=new_experiment.target_well,
+                    well_id=new_experiment.well_id,
                 )
                 # Announce the experiment
                 pre_experiment_status_msg = f"Running experiment {new_experiment.id}"
@@ -205,35 +208,32 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
                 ## Update the experiment status to running
                 new_experiment.status = ExperimentStatus.RUNNING
-                new_experiment.status_date = datetime.datetime.now()
+                new_experiment.status_date = datetime.now()
                 scheduler.change_well_status_v2(
-                    wellplate.wells[new_experiment.target_well], new_experiment
+                    wellplate.wells[new_experiment.well_id], new_experiment
                 )
 
                 ## Run the experiment
                 e_panda.apply_log_filter(
                     new_experiment.id,
-                    new_experiment.target_well,
+                    new_experiment.well_id,
                     str(new_experiment.project_id)
                     + "."
                     + str(new_experiment.project_campaign_id),
                     test=use_mock_instruments,
                 )
-                protocols.viscosity_experiments_protocol(
+
+                logger.info("Beginning experiment %d", new_experiment.id)
+                exp_b.contamination_assessment(
                     instructions=new_experiment,
-                    results=experiment_results,
-                    mill=toolkit.mill,
-                    pump=toolkit.pump,
+                    toolkit=toolkit,
                     stock_vials=stock_vials,
-                    wellplate=wellplate,
-                    logger=logger,
+                    waste_vials=waste_vials,
                 )
+                new_experiment.status_date = datetime.now(tz.timezone("US/Eastern"))
 
                 ## Reset the logger to log to the ePANDA.log file and format
                 e_panda.apply_log_filter()
-
-                ## Add the results to the experiment file
-                new_experiment.results = experiment_results
 
                 ## With returned experiment and results, update the experiment status and post the final status
                 post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status.value}"
@@ -242,13 +242,13 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
                 ## Update the system state with new vial and wellplate information
                 scheduler.change_well_status_v2(
-                    wellplate.wells[new_experiment.target_well], new_experiment
+                    wellplate.wells[new_experiment.well_id], new_experiment
                 )
 
                 ## Update location of experiment instructions and save results
                 scheduler.update_experiment_file(new_experiment)
                 scheduler.update_experiment_location(new_experiment)
-                scheduler.save_results(new_experiment, experiment_results)
+                scheduler.save_results(new_experiment, new_experiment.results)
 
                 if one_off:
                     break  # break out of the while True loop
@@ -278,7 +278,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
                 e_panda.apply_log_filter(
                     experiment.id,
-                    experiment.target_well,
+                    experiment.well_id,
                     str(experiment.project_id)
                     + "."
                     + str(experiment.project_campaign_id),
@@ -323,29 +323,22 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
         print("ePANDA is shutting down...goodbye")
 
-
+@dataclass
 class Toolkit:
     """A class to hold all of the instruments"""
-
-    def __init__(
-        self,
-        mill: Union[Mill, MockMill],
-        scale: Union[Scale, MockScale],
-        pump: Union[Pump, MockPump],
-        pstat=None,
-    ):
-        self.mill = mill
-        self.scale = scale
-        self.pump = pump
-        self.pstat = pstat
-
+    mill: Union[Mill, MockMill]
+    scale: Union[Scale, MockScale]
+    pump: Union[Pump, MockPump]
+    wellplate: wellplate_module.Wells2 = None
+    global_logger: logging.Logger = None
+    experiment_logger: logging.Logger = None
 
 def test_build_toolkit():
     """Test the building of the toolkit and checking that they are connected or not"""
     mill = Mill()
     scale = Scale()
     pump = Pump(mill=mill, scale=scale)
-    instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
+    instruments = Toolkit(mill=mill, scale=scale, pump=pump)
     return instruments
 
 
@@ -523,7 +516,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
         scale = MockScale()
         pump = MockPump(mill=mill, scale=scale)
         # pstat = echem_mock.GamryPotentiostat.connect()
-        instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
+        instruments = Toolkit(mill=mill, scale=scale, pump=pump)
         return instruments
 
     logger.info("Connecting to instruments:")
@@ -532,7 +525,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     scale = Scale(address="COM6")
     pump = Pump(mill=mill, scale=scale)
     # pstat_connected = echem.pstatconnect()
-    instruments = Toolkit(mill=mill, scale=scale, pump=pump, pstat=None)
+    instruments = Toolkit(mill=mill, scale=scale, pump=pump)
     return instruments
 
 

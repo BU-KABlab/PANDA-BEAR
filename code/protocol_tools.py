@@ -1,40 +1,152 @@
 """The standard experiment protocol for eChem experiments."""
 # pylint: disable=too-many-lines
 # Standard imports
-from datetime import datetime
 import json
+from json import tool
 import logging
 import sys
-from typing import Sequence, Tuple, Union
+from datetime import datetime
+from typing import Callable, Sequence, Tuple, Union
 
 # Non-standard imports
 import pytz as tz
+from mill_control import Mill, MockMill
+from pump_control import MockPump, Pump
+from vials import StockVial, WasteVial
+from wellplate import Wells2 as WellplateV2
+
+from e_panda import (
+    NoAvailableSolution,
+    OCPFailure,
+    apply_log_filter,
+    characterization,
+    deposition,
+    flush_v2,
+    forward_pipette_v2,
+    reverse_pipette_v2,
+    rinse_v2,
+    solution_selector,
+    waste_selector,
+)
 from experiment_class import (
     ExperimentBase,
     ExperimentResult,
     ExperimentStatus,
-    PEG2P_Test_Instructions,
     LayeredExperiments,
+    PEG2P_Test_Instructions,
 )
-from mill_control import Mill, MockMill
-from pump_control import Pump, MockPump
-from vials import StockVial, WasteVial
-from wellplate import Wells, Wells2
-from e_panda import (
-    deposition,
-    characterization,
-    apply_log_filter,
-    solution_selector,
-    waste_selector,
-    forward_pipette_v2,
-    reverse_pipette_v2,
-    flush_v2,
-    rinse_v2,
-    volume_correction,
-    OCPFailure,
-    NoAvailableSolution,
-)
+from controller import Toolkit
 
+def run_protocol(
+        instructions: ExperimentBase,
+        toolkit: Toolkit,
+        stock_vials: Sequence[StockVial],
+        waste_vials: Sequence[WasteVial],
+        protocol_func: Callable
+):
+    """Wraps the protocol functions with the common beginning and ending sections.
+
+    Args:
+        instructions (ExperimentBase): _description_
+        toolkit (Toolkit): _description_
+        stock_vials (Sequence[StockVial]): _description_
+        waste_vials (Sequence[WasteVial]): _description_
+        protocol_func (function): _description_
+    """
+    try:
+        # Common beginning section
+        apply_log_filter(
+            instructions.id,
+            instructions.well_id,
+            str(instructions.project_id) + "." + str(instructions.project_campaign_id),
+        )
+        # Lookup the appropriate protocol
+        protocol_func = find_protocol_function(instructions.protocol_name)
+        # Your specific protocol function
+        toolkit.global_logger.info("Beginning experiment %d", instructions.id)
+        protocol_func(instructions, toolkit, stock_vials, waste_vials)
+
+        # Common ending section
+        instructions.status = ExperimentStatus.COMPLETE
+
+    # Handle exceptions and errors
+    except NoAvailableSolution as solution_error:
+        toolkit.global_logger.error(solution_error)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        toolkit.global_logger.info(
+            "Failed instructions updated for experiment %s", instructions.id
+        )
+    except OCPFailure as ocp_failure:
+        toolkit.global_logger.error(ocp_failure)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        toolkit.global_logger.info(
+            "Failed instructions updated for experiment %s", instructions.id
+        )
+
+    except KeyboardInterrupt:
+        toolkit.global_logger.warning("Keyboard Interrupt")
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        toolkit.global_logger.info(
+            "Saved interrupted instructions for experiment %s", instructions.id
+        )
+
+    except Exception as general_exception:
+        exception_type = type(general_exception).__name__
+        exception_traceback = sys.exc_info()[2]
+        if exception_traceback is not None:
+            frame = exception_traceback.tb_frame
+            filename = frame.f_code.co_filename
+            line_number = exception_traceback.tb_lineno
+        else:
+            filename = "Unknown"
+            line_number = -1
+        toolkit.global_logger.error("Exception: %s", general_exception)
+        toolkit.global_logger.error("Exception type: %s", exception_type)
+        toolkit.global_logger.error("File name: %s", filename)
+        toolkit.global_logger.error("Line number: %d", line_number)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+
+    finally:
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        toolkit.global_logger.info("End of Experiment: %s", instructions.id)
+
+def find_protocol_function(protocol_name: str) -> Callable:
+    """Finds the protocol function based on the protocol name.
+
+    Args:
+        protocol_name (str): The name of the protocol.
+
+    Returns:
+        Callable: The protocol function.
+    """
+    import os
+    import importlib.util
+
+    protocols_directory = "protocols"
+
+    # Iterate through files in the directory
+    for file_name in os.listdir(protocols_directory):
+        if file_name.endswith(".py") and file_name != "__init__.py":
+            module_name = file_name[:-3]  # Remove the ".py" extension
+            module_path = os.path.join(protocols_directory, file_name)
+
+            # Create a module object
+            spec = importlib.util.spec_from_file_location(module_name, module_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
+            # Find functions in the module and add them to output
+            for func_name in dir(module):
+                func = getattr(module, func_name)
+                if callable(func) and func_name.endswith("_protocol"):
+                    if func_name == protocol_name:
+                        return func
+            
+    raise ValueError(f"Protocol {protocol_name} not found")
 
 def standard_experiment_protocol(
     instructions: ExperimentBase,
@@ -43,10 +155,14 @@ def standard_experiment_protocol(
     pump: Pump,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
-    wellplate: Wells,
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ) -> Tuple[
-    ExperimentBase, ExperimentResult, Sequence[StockVial], Sequence[WasteVial], Wells
+    ExperimentBase,
+    ExperimentResult,
+    Sequence[StockVial],
+    Sequence[WasteVial],
+    WellplateV2,
 ]:
     """
     Run the standard experiment:
@@ -308,14 +424,14 @@ def peg2p_protocol(
     pump: Pump,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
-    wellplate: Wells,
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ) -> Tuple[
     PEG2P_Test_Instructions,
     ExperimentResult,
     Sequence[StockVial],
     Sequence[WasteVial],
-    Wells,
+    WellplateV2,
 ]:
     """
     Run the standard experiment:
@@ -532,10 +648,14 @@ def mixing_test_protocol(
     pump: Pump,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
-    wellplate: Wells,
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ) -> Tuple[
-    ExperimentBase, ExperimentResult, Sequence[StockVial], Sequence[WasteVial], Wells
+    ExperimentBase,
+    ExperimentResult,
+    Sequence[StockVial],
+    Sequence[WasteVial],
+    WellplateV2,
 ]:
     """
     Run the standard experiment:
@@ -696,7 +816,7 @@ def pipette_accuracy_protocol_v2(
     mill: Mill,
     pump: Pump,
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ):
     """
@@ -822,7 +942,7 @@ def forward_vs_reverse_pipetting(
     pump: Pump,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
-    wellplate: Wells2,
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ):
     """
@@ -967,7 +1087,8 @@ def vial_depth_tracking_protocol(
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    waste_vials: Sequence[WasteVial],
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ):
     """
@@ -1015,7 +1136,7 @@ def vial_depth_tracking_protocol(
             vial.name for vial in stock_vials if vial.name not in exclude_list
         ]
 
-        # although we already checked before running the experiment we want to check again 
+        # although we already checked before running the experiment we want to check again
         # that all requested solutions are found
         experiment_solution_count = len(instructions.solutions)
         matched = 0
@@ -1102,7 +1223,8 @@ def viscosity_experiments_protocol(
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    waste_vials: Sequence[WasteVial],
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ):
     """
@@ -1233,17 +1355,276 @@ def viscosity_experiments_protocol(
         )
 
 
+calibration_testing_protocol = viscosity_experiments_protocol
+
+
+def ferrocyanide_repeatability(
+    instructions: ExperimentBase,
+    toolkit: Toolkit,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
+    """
+    Protocol for testing the repeatability of the ferrocyanide solution cyclovoltammetry
+    1. Deposit solutions into well
+        for each solution:
+            a. Withdraw air gap
+            b. Withdraw solution
+            c. Read the scale
+            d. Deposit into well
+            e. Blow out
+            f. Read the scale
+            g. Perform CV
+            h. Clear the well
+
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        toolkit (Toolkit object): The toolkit object which contains the pump, mill, and wellplate
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+
+    Returns:
+        None - all arguments are passed by reference or are unchanged
+
+    """
+    available_solutions = [
+        vial.name
+        for vial in stock_vials
+        if vial.name not in ["rinse0", "rinse1", "rinse2"]
+    ]
+
+    # although we already checked before running the experiment we want to check again
+    # that all requested solutions are found
+    matched = 0
+
+    ## Deposit all experiment solutions into well
+    for solution_name in instructions.solutions:
+        solution_name = str(solution_name).lower()
+        if (
+            instructions.solutions[solution_name] > 0
+            and solution_name in available_solutions
+        ):  # if there is a solution to deposit
+            matched += 1
+            toolkit.global_logger.info(
+                "Pipetting %s ul of %s into %s...",
+                instructions.solutions[solution_name],
+                solution_name,
+                instructions.well_id,
+            )
+
+            forward_pipette_v2(
+                volume=instructions.solutions[solution_name],
+                from_vessel=solution_selector(
+                    stock_vials,
+                    solution_name,
+                    instructions.solutions[solution_name],
+                ),
+                to_vessel=toolkit.wellplate.wells[instructions.well_id],
+                pump=toolkit.pump,
+                mill=toolkit.mill,
+                pumping_rate=instructions.pumping_rate,
+            )
+
+    if matched != len(instructions.solutions):
+        raise NoAvailableSolution("One or more solutions are not available")
+
+    toolkit.global_logger.info(
+        "Pipetted %s into well: %s",
+        json.dumps(instructions.solutions),
+        instructions.well_id,
+    )
+    # Initial fluid handeling is done now we can perform the CV
+    characterization(instructions, instructions.results, toolkit.mill, toolkit.wellplate)
+    # Clear the well
+    forward_pipette_v2(
+        volume=toolkit.wellplate.wells[instructions.well_id].volume,
+        from_vessel=toolkit.wellplate.wells[instructions.well_id],
+        to_vessel=waste_selector(
+            waste_vials,
+            "waste",
+            toolkit.wellplate.wells[instructions.well_id].volume,
+        ),
+        pump=toolkit.pump,
+        mill=toolkit.mill,
+    )
+    instructions.status = ExperimentStatus.COMPLETE
+
+
+def contamination_assessment(
+    instructions: ExperimentBase,
+    toolkit: Toolkit,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
+    """
+    Protocol for testing the conamination coming from the pipette tip
+    1. Deposit solutions into well
+        for each solution:
+            a. Pipette 120ul of solution into waste
+            b. Flush the pipette tip x3 with electrolyte rinse
+            c. Pipette 120ul of solution into well
+            d. Perform CV
+            e. Rinse the electrode with electrode rinse
+
+    Args:
+        instructions (Experiment object): The experiment instructions
+        results (ExperimentResult object): The experiment results
+        toolkit (Toolkit object): The toolkit object which contains the pump, mill, and wellplate
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+
+    Returns:
+        None - all arguments are passed by reference or are unchanged
+
+    """
+    apply_log_filter(
+        instructions.id,
+        instructions.well_id,
+        str(instructions.project_id) + "." + str(instructions.project_campaign_id),
+    )
+
+    try:
+        toolkit.global_logger.info("Beginning experiment %d", instructions.id)
+        # Fetch list of solution names from stock_vials
+        # list of vial names to exclude
+        available_solutions = [
+            vial.name
+            for vial in stock_vials
+            if vial.name not in ["rinse0", "rinse1", "rinse2"]
+        ]
+
+        # although we already checked before running the experiment we want to check again
+        # that all requested solutions are found
+        matched = 0
+
+        ## Deposit all experiment solutions into well
+        for solution_name in instructions.solutions:
+            solution_name = str(solution_name).lower()
+            if (
+                instructions.solutions[solution_name] > 0
+                and solution_name in available_solutions
+            ):  # if there is a solution to deposit
+                matched += 1
+                toolkit.global_logger.info(
+                    "Pipetting %s ul of %s into %s...",
+                    instructions.solutions[solution_name],
+                    solution_name,
+                    instructions.well_id,
+                )
+
+                # Pipette 120ul of solution into waste
+                forward_pipette_v2(
+                    volume=instructions.solutions[solution_name],
+                    from_vessel=solution_selector(
+                        stock_vials,
+                        solution_name,
+                        instructions.solutions[solution_name],
+                    ),
+                    to_vessel=solution_selector(
+                        stock_vials, "waste", instructions.solutions[solution_name]
+                    ),
+                    pump=toolkit.pump,
+                    mill=toolkit.mill,
+                    pumping_rate=instructions.pumping_rate,
+                )
+
+                # Flush the pipette tip x3 with electrolyte rinse
+                for _ in range(3):
+                    forward_pipette_v2(
+                        volume=instructions.solutions[solution_name],
+                        from_vessel=solution_selector(
+                            stock_vials, "rinse0", instructions.solutions[solution_name]
+                        ),
+                        to_vessel=solution_selector(
+                            stock_vials, "waste", instructions.solutions[solution_name]
+                        ),
+                        pump=toolkit.pump,
+                        mill=toolkit.mill,
+                        pumping_rate=instructions.pumping_rate,
+                    )
+
+                # Pipette 120ul of solution into well
+                forward_pipette_v2(
+                    volume=instructions.solutions[solution_name],
+                    from_vessel=solution_selector(
+                        stock_vials,
+                        solution_name,
+                        instructions.solutions[solution_name],
+                    ),
+                    to_vessel=toolkit.wellplate.wells[instructions.well_id],
+                    pump=toolkit.pump,
+                    mill=toolkit.mill,
+                    pumping_rate=instructions.pumping_rate,
+                )
+
+        if matched != len(instructions.solutions):
+            raise NoAvailableSolution("One or more solutions are not available")
+
+        toolkit.global_logger.info(
+            "Pipetted %s into well: %s",
+            json.dumps(instructions.solutions),
+            instructions.well_id,
+        )
+
+        # Perform CV
+        characterization(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
+
+        # Rinse the electrode with electrode rinse
+        toolkit.mill.rinse_electrode()
+
+        # End of experiment
+        instructions.status = ExperimentStatus.COMPLETE
+
+    except OCPFailure as ocp_failure:
+        toolkit.global_logger.error(ocp_failure)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        toolkit.global_logger.info(
+            "Failed instructions updated for experiment %s", instructions.id
+        )
+
+    except KeyboardInterrupt:
+        toolkit.global_logger.warning("Keyboard Interrupt")
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        toolkit.global_logger.info(
+            "Saved interrupted instructions for experiment %s", instructions.id
+        )
+
+    except Exception as general_exception:
+        exception_type = type(general_exception).__name__
+        exception_traceback = sys.exc_info()[2]
+        if exception_traceback is not None:
+            frame = exception_traceback.tb_frame
+            filename = frame.f_code.co_filename
+            line_number = exception_traceback.tb_lineno
+        else:
+            filename = "Unknown"
+            line_number = -1
+        toolkit.global_logger.error("Exception: %s", general_exception)
+        toolkit.global_logger.error("Exception type: %s", exception_type)
+        toolkit.global_logger.error("File name: %s", filename)
+        toolkit.global_logger.error("Line number: %d", line_number)
+        instructions.status = ExperimentStatus.ERROR
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+
+    finally:
+        instructions.status_date = datetime.now(tz.timezone("US/Eastern"))
+        toolkit.global_logger.info("End of Experiment: %s", instructions.id)
+
+
 def layered_solution_protocol(
     instructions: list[LayeredExperiments],
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
-    wellplate: Wells2,
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ):
     """
-    For a layered protocol we want to deposit each solution into every well that requires 
+    For a layered protocol we want to deposit each solution into every well that requires
     it in one "pass" followed by a flush of the pipette tip.
     Then repeat until each solution has been desposited into each well that requires it.
     We then will work well by well to mix and characterize the solutions in each well.
@@ -1420,13 +1801,14 @@ def layered_solution_protocol(
 
     logger.info("End of Experiment: %s", instruction.id)
 
+
 def correction_factor_tests_protocol(
     instructions: ExperimentBase,
     results: ExperimentResult,
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    wellplate: WellplateV2,
     logger: logging.Logger,
 ):
     """
@@ -1488,8 +1870,7 @@ def correction_factor_tests_protocol(
             solution_name = str(solution_name).lower()
             solution_volume = instructions.solutions[solution_name]
             if (
-                solution_volume > 0
-                and solution_name in available_solutions
+                solution_volume > 0 and solution_name in available_solutions
             ):  # is there is an available solution to deposit
                 matched += 1
                 logger.info(
@@ -1498,7 +1879,7 @@ def correction_factor_tests_protocol(
                     solution_name,
                     instructions.well_id,
                 )
-                corrected_volume = volume_correction(solution_volume)
+                corrected_volume = solution_volume  # volume_correction(solution_volume)
                 stock_vial = solution_selector(
                     stock_vials, solution_name, corrected_volume
                 )
@@ -1560,3 +1941,16 @@ def correction_factor_tests_protocol(
         logger.info(
             "Returning completed instructions for experiment %s", instructions.id
         )
+
+
+protocol_dict = {
+    "standard": standard_experiment_protocol,
+    "mixing_test": mixing_test_protocol,
+    "pipette_accuracy": pipette_accuracy_protocol_v2,
+    "forward_vs_reverse": forward_vs_reverse_pipetting,
+    "vial_depth_tracking": vial_depth_tracking_protocol,
+    "viscosity_experiments": viscosity_experiments_protocol,
+    "calibration_testing": calibration_testing_protocol,
+    "layered": layered_solution_protocol,
+    "correction_factor_tests": correction_factor_tests_protocol,
+}

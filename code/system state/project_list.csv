@@ -10,3 +10,7 @@ project_id, project name
 9, 'Pipette accuracy with viscous liquids'
 10, 'Pipette calibration with viscous liquids'
 11, 'Pipette with correction factor'
+12, 'FeCN3 Repeatibility (exp A)'
+13, 'Contamination assessment (exp B)'
+14, 'Rinsing assessment (exp C)'
+15, 'Mixing assessment (exp D)'

@@ -49,7 +49,7 @@ for i in range(1,12):
                     id=experiment_id,
                     experiment_name= EXPERIMENT_NAME,
                     priority= 1,
-                    target_well= column + str(row),
+                    well_id= column + str(row),
                     pin = CURRENT_PIN,
                     project_id=PROJECT_ID,
                     project_campaign_id=PREVIOUS_CAMPAIGN_ID+i,
