@@ -56,9 +56,9 @@
         "height": -20,
         "depth": 0,
         "name": "rinse0",
-        "volume": 16640.0,
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 24,
+        "contamination": 0,
         "coordinates": {
             "x": -2,
             "y": -109,

@@ -693,7 +693,7 @@ def characterization(
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
-    char_results.ocp_char_file = echem.setfilename(char_instructions.id, "OCP_char",'CA')
+    char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char")
     pstat.OCP(
         OCPvi= potentiostat_ocp_parameters.OCPvi,
         OCPti=potentiostat_ocp_parameters.OCPti,

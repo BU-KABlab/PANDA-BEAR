@@ -38,7 +38,7 @@ solutions = [
 
 PUMPING_RATE = 0.3
 
-controller.load_new_wellplate(new_wellplate_type_number=6)
+#controller.load_new_wellplate(new_wellplate_type_number=6)
 experiment_id = determine_next_experiment_id()
 experiments : list[experiment_class.EchemExperimentBase]= []
 WELL_NUMBER = 1
@@ -62,8 +62,10 @@ for i in range(3):
             ca=0,
             cv_scan_rate=0.050,
             CVstep=0.02,
-            CVap1=-0.2,
-            CVap2=0.58
+            CVap2=-0.2,
+            CVap1=0.58,
+            CVsr1=0.050,
+            CVsr2=0.050,
 
 
         )

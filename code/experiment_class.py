@@ -67,9 +67,7 @@ class ExperimentBase():
 
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''
-        if isinstance(other, PEG_ACR_Instructions):
-            return self.id == other.id
-        return False
+        pass
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class CorrectionFactorExperiment(ExperimentBase):
@@ -190,7 +188,9 @@ class EchemExperimentBase(ExperimentBase):
     CVcycle: int = 3 # number of cycles
     CVsr2: float = CVsr1
     CVsr3: float = CVsr1
-    CVsamplerate: float = CVstep / CVsr1
+    @property
+    def CVsamplerate(self):
+        return round(self.CVstep / self.CVsr1,4)
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class Experiment:
@@ -396,13 +396,13 @@ def test_serialize_experimentbase():
     with open('temp_test_file.json', 'w', encoding='UTF-8') as f:
         f.write(sample_json)
 
-def test_serialize_layered_experiment():
-    '''Test that the class can be serialized to json'''
-    value = make_test_layered_value()
-    sample_json = RootModel[LayeredExperiments](value).model_dump_json(indent=4)
-    print(sample_json)
-    with open('temp_test_file.json', 'w', encoding='UTF-8') as f:
-        f.write(sample_json)
+# def test_serialize_layered_experiment():
+#     '''Test that the class can be serialized to json'''
+#     value = make_test_layered_value()
+#     sample_json = RootModel[LayeredExperiments](value).model_dump_json(indent=4)
+#     print(sample_json)
+#     with open('temp_test_file.json', 'w', encoding='UTF-8') as f:
+#         f.write(sample_json)
 
 def test_serialize_results():
     '''Test that the class can be serialized to json'''

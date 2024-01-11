@@ -317,7 +317,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
     finally:
         # Save the current wellplate
-        load_new_wellplate()
+        save_current_wellplate()
         # close out of serial connections
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
