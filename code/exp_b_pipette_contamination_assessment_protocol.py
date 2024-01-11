@@ -40,64 +40,66 @@ def contamination_assessment(
         None - all arguments are passed by reference or are unchanged
 
     """
-
-    toolkit.global_logger.info(
-        "Pipetting %s ul of %s into %s...",
-        instructions.solutions['5mm_fecn3'],
-        '5mm_fecn3',
-        'waste',
-    )
-
-    # Pipette 120ul of fecn3 solution into waste to dirty the pipette tip
-    forward_pipette_v2(
-        volume=instructions.solutions['5mm_fecn3'],
-        from_vessel=solution_selector(
-            stock_vials,
-            '5mm_fecn3',
-            instructions.solutions['5mm_fecn3'],
-        ),
-        to_vessel=waste_selector(
-            waste_vials, "waste", instructions.solutions['5mm_fecn3']
-        ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
-        pumping_rate=instructions.pumping_rate,
-    )
-
-    # Flush the pipette tip x3 with electrolyte rinse
-    for _ in range(3):
+    if instructions.solutions['5mm_fecn3'] > 0:
+        # Pipette 120ul of fecn3 solution into waste to dirty the pipette tip
         forward_pipette_v2(
-            volume=instructions.solutions['rinse0'],
+            volume=instructions.solutions['5mm_fecn3'],
             from_vessel=solution_selector(
-                stock_vials, "rinse0", instructions.solutions['rinse0']
+                stock_vials,
+                '5mm_fecn3',
+                instructions.solutions['5mm_fecn3'],
             ),
             to_vessel=waste_selector(
-                waste_vials, "waste", instructions.solutions['rinse0']
+                waste_vials, "waste", instructions.solutions['5mm_fecn3']
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
             pumping_rate=instructions.pumping_rate,
         )
 
-    # Pipette 120ul of electrolyte solution into well
-    forward_pipette_v2(
-        volume=instructions.solutions["electrolyte"], #120
-        from_vessel=solution_selector(
-            stock_vials,
-            "electrolyte",
-            instructions.solutions["electrolyte"],
-        ),
-        to_vessel=toolkit.wellplate.wells[instructions.well_id],
-        pump=toolkit.pump,
-        mill=toolkit.mill,
-        pumping_rate=instructions.pumping_rate,
-    )
+        # Flush the pipette tip x3 with electrolyte rinse
+        for _ in range(3):
+            forward_pipette_v2(
+                volume=instructions.solutions['rinse0'],
+                from_vessel=solution_selector(
+                    stock_vials, "rinse0", instructions.solutions['rinse0']
+                ),
+                to_vessel=waste_selector(
+                    waste_vials, "waste", instructions.solutions['rinse0']
+                ),
+                pump=toolkit.pump,
+                mill=toolkit.mill,
+                pumping_rate=instructions.pumping_rate,
+            )
 
-    toolkit.global_logger.info(
-        "Pipetted %s into well: %s",
-        json.dumps(instructions.solutions),
-        instructions.well_id,
-    )
+        # Pipette 120ul of electrolyte solution into well
+        forward_pipette_v2(
+            volume=instructions.solutions["electrolyte"], #120
+            from_vessel=solution_selector(
+                stock_vials,
+                "electrolyte",
+                instructions.solutions["electrolyte"],
+            ),
+            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+            pumping_rate=instructions.pumping_rate,
+        )
+
+    else:
+        # Pipette 120ul of electrolyte solution into well
+        forward_pipette_v2(
+            volume=instructions.solutions["electrolyte"], #120
+            from_vessel=solution_selector(
+                stock_vials,
+                "electrolyte",
+                instructions.solutions["electrolyte"],
+            ),
+            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+            pumping_rate=instructions.pumping_rate,
+        )
 
     # Perform CV
     characterization(
