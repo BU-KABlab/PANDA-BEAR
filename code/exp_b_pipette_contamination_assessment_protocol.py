@@ -23,13 +23,11 @@ def contamination_assessment(
 ):
     """
     Protocol for testing the conamination coming from the pipette tip
-    1. Deposit solutions into well
-        for each solution:
-            a. Pipette 120ul of solution into waste
-            b. Flush the pipette tip x3 with electrolyte rinse
-            c. Pipette 120ul of solution into well
-            d. Perform CV
-            e. Rinse the electrode with electrode rinse
+    a. Pipette 120ul of solution into waste
+    b. Flush the pipette tip x3 with electrolyte rinse
+    c. Pipette 120ul of solution into well
+    d. Perform CV
+    e. Rinse the electrode with electrode rinse
 
     Args:
         instructions (Experiment object): The experiment instructions
