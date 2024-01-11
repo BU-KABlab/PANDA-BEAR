@@ -343,13 +343,13 @@ class Scheduler:
 
         # Read the experiment file
         with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
-            experiment = json.load(experiment_file)
-            experiment = (
-                experiment_class.RootModel[ExperimentBase]
-                .model_validate_json(json.dumps(experiment))
-                .root
-            )
-
+            # experiment = json.load(experiment_file)
+            # experiment = (
+            #     experiment_class.RootModel[ExperimentBase]
+            #     .model_validate_json(json.dumps(experiment))
+            #     .root
+            # )
+            experiment = experiment_class.parse_experiment(experiment_file.read())
         # Remove the selected experiment from the queue
         self.remove_from_queue(experiment)
         logger.info("Experiment %s read from queue", experiment.id)

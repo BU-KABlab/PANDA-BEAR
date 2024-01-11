@@ -45,7 +45,7 @@
     },
     {
         "position": "s2",
-        "contents": "electrolyte",
+        "contents": "electrolyte_rinse",
         "viscosity_cp": 3.0617,
         "density": 1.0938,
         "category": 0,
@@ -56,9 +56,9 @@
         "height": -20,
         "depth": 0,
         "name": "rinse0",
-        "volume": 20000.0,
+        "volume": 16640.0,
         "capacity": 20000,
-        "contamination": 0,
+        "contamination": 24,
         "coordinates": {
             "x": -2,
             "y": -109,

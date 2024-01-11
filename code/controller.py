@@ -31,7 +31,7 @@ from pump_control import MockPump
 
 # import gamry_control_WIP as echem
 # import gamry_control_WIP as echem
-# import gamry_control_WIP_mock as echem_mock
+import gamry_control_WIP_mock as echem
 from sartorius_local import Scale
 from sartorius_local.mock import Scale as MockScale
 
@@ -42,8 +42,7 @@ import e_panda
 from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
 from vials import StockVial, Vial2, WasteVial
 import wellplate as wellplate_module
-import protocols
-import exp_b_pipette_contamination_assessment_protocol as exp_b
+
 
 from config.config import (
     MILL_CONFIG,
@@ -83,6 +82,8 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
+    import protocols
+    import exp_b_pipette_contamination_assessment_protocol as exp_b
     ## Reset the logger to log to the ePANDA.log file and format
     e_panda.apply_log_filter()
     #print(printpanda())
@@ -127,7 +128,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
 
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, wellplate = establish_system_state()
-
+            toolkit.wellplate = wellplate
             ## Check the qeueue for any protocol type 2 experiments
             queue = scheduler.get_queue()
             # check if any of the experiments in the queue pandas dataframe are type 2
@@ -284,15 +285,15 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
                     + str(experiment.project_campaign_id),
                     test=use_mock_instruments,
                 )
-                protocols.layered_solution_protocol(
-                    instructions=experiments_to_run,
-                    mill=toolkit.mill,
-                    pump=toolkit.pump,
-                    stock_vials=stock_vials,
-                    waste_vials=waste_vials,
-                    wellplate=wellplate,
-                    logger=logger,
-                )
+                # protocols.layered_solution_protocol(
+                #     instructions=experiments_to_run,
+                #     mill=toolkit.mill,
+                #     pump=toolkit.pump,
+                #     stock_vials=stock_vials,
+                #     waste_vials=waste_vials,
+                #     wellplate=wellplate,
+                #     logger=logger,
+                # )
                 e_panda.apply_log_filter()
                 ## Update location of experiment instructions and save results
                 for experiment in experiments_to_run:
@@ -516,7 +517,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
         scale = MockScale()
         pump = MockPump(mill=mill, scale=scale)
         # pstat = echem_mock.GamryPotentiostat.connect()
-        instruments = Toolkit(mill=mill, scale=scale, pump=pump)
+        instruments = Toolkit(mill=mill, scale=scale, pump=pump, wellplate=None, global_logger=logger, experiment_logger=logger)
         return instruments
 
     logger.info("Connecting to instruments:")
@@ -525,7 +526,7 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     scale = Scale(address="COM6")
     pump = Pump(mill=mill, scale=scale)
     # pstat_connected = echem.pstatconnect()
-    instruments = Toolkit(mill=mill, scale=scale, pump=pump)
+    instruments = Toolkit(mill=mill, scale=scale, pump=pump, wellplate=None, global_logger=logger, experiment_logger=logger)
     return instruments
 
 

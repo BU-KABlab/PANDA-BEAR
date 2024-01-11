@@ -15,6 +15,10 @@ class GamryPotentiostat:
     def __init__(self):
         self.OPEN_CONNECTION = False
 
+
+    def pstatconnect(self):
+        self.OPEN_CONNECTION = True
+
     def connect(self):
         self.OPEN_CONNECTION = True
 
@@ -25,12 +29,14 @@ class GamryPotentiostat:
         self.OPEN_CONNECTION = False
 
     def OCP(self, OCPvi, OCPti, OCPrate):
+        self.OPEN_CONNECTION = True
         pass
 
     def activecheck(self):
-        pass
+        return self.OPEN_CONNECTION
 
     def check_vf_range(self, file):
+        self.OPEN_CONNECTION = True
         return True
 
     def setfilename(self, experiment_id, experiment_type):
@@ -48,55 +54,57 @@ class GamryPotentiostat:
     def cyclic(self, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
         pass
 
-    @dataclass(config=ConfigDict(validate_assignment=True))
-    class potentiostat_cv_parameters:
-        """CV Setup Parameters"""
-
-        # CV Setup Parameters
-        CVvi: float = 0.0  # initial voltage
-        CVap1: float = 0.5 
-        CVap2: float = -0.2 
-        CVvf: float = 0.0  # final voltage
-        CVstep: float = 0.01
-        CVsr1: float = 0.1
-        CVcycle: int = 3
-        CVsr2: float = CVsr1
-        CVsr3: float = CVsr1
-        CVsamplerate: float = CVstep / CVsr1
-
-
-    @dataclass(config=ConfigDict(validate_assignment=True))
-    class potentiostat_ca_parameters:
-        """CA Setup Parameters"""
-
-        # CA/CP Setup Parameters
-        CAvi: float = 0.0  # Pre-step voltage (V)
-        CAti: float = 0.0  # Pre-step delay time (s)
-        CAv1: float = -1.7  # Step 1 voltage (V)
-        CAt1: float = 300.0  # run time 300 seconds
-        CAv2: float = 0.0  # Step 2 voltage (V)
-        CAt2: float = 0.0  # Step 2 time (s)
-        CAsamplerate: float = 0.5  # sample period (s)
-        # Max current (mA)
-        # Limit I (mA/cm^2)
-        # PF Corr. (ohm)
-        # Equil. time (s)
-        # Expected Max V (V)
-        # Initial Delay on
-        # Initial Delay (s)
-
-
-    @dataclass(config=ConfigDict(validate_assignment=True))
-    class potentiostat_ocp_parameters:
-        """OCP Setup Parameters"""
-
-        # OCP Setup Parameters
-        OCPvi: float = 0.0
-        OCPti: float = 15.0
-        OCPrate: float = 0.5
+    
     def __enter__(self):
         self.connect()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.disconnect()
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class potentiostat_cv_parameters:
+    """CV Setup Parameters"""
+
+    # CV Setup Parameters
+    CVvi: float = 0.0  # initial voltage
+    CVap1: float = 0.5 
+    CVap2: float = -0.2 
+    CVvf: float = 0.0  # final voltage
+    CVstep: float = 0.01
+    CVsr1: float = 0.1
+    CVcycle: int = 3
+    CVsr2: float = CVsr1
+    CVsr3: float = CVsr1
+    CVsamplerate: float = CVstep / CVsr1
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class potentiostat_ca_parameters:
+    """CA Setup Parameters"""
+
+    # CA/CP Setup Parameters
+    CAvi: float = 0.0  # Pre-step voltage (V)
+    CAti: float = 0.0  # Pre-step delay time (s)
+    CAv1: float = -1.7  # Step 1 voltage (V)
+    CAt1: float = 300.0  # run time 300 seconds
+    CAv2: float = 0.0  # Step 2 voltage (V)
+    CAt2: float = 0.0  # Step 2 time (s)
+    CAsamplerate: float = 0.5  # sample period (s)
+    # Max current (mA)
+    # Limit I (mA/cm^2)
+    # PF Corr. (ohm)
+    # Equil. time (s)
+    # Expected Max V (V)
+    # Initial Delay on
+    # Initial Delay (s)
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class potentiostat_ocp_parameters:
+    """OCP Setup Parameters"""
+
+    # OCP Setup Parameters
+    OCPvi: float = 0.0
+    OCPti: float = 15.0
+    OCPrate: float = 0.5

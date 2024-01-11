@@ -6,10 +6,10 @@ from typing import Sequence
 # Non-standard imports
 from controller import Toolkit
 from e_panda import (
-    NoAvailableSolution,
     forward_pipette_v2,
     solution_selector,
     characterization,
+    waste_selector,
 )
 from experiment_class import ExperimentBase, ExperimentStatus
 from vials import StockVial, WasteVial
@@ -58,8 +58,8 @@ def contamination_assessment(
             '5mm_fecn3',
             instructions.solutions['5mm_fecn3'],
         ),
-        to_vessel=solution_selector(
-            stock_vials, "waste", instructions.solutions['5mm_fecn3']
+        to_vessel=waste_selector(
+            waste_vials, "waste", instructions.solutions['5mm_fecn3']
         ),
         pump=toolkit.pump,
         mill=toolkit.mill,
@@ -69,25 +69,25 @@ def contamination_assessment(
     # Flush the pipette tip x3 with electrolyte rinse
     for _ in range(3):
         forward_pipette_v2(
-            volume=instructions.solutions['electrolye_rinse'],
+            volume=instructions.solutions['rinse0'],
             from_vessel=solution_selector(
-                stock_vials, "rinse0", instructions.solutions['electrolye_rinse']
+                stock_vials, "rinse0", instructions.solutions['rinse0']
             ),
-            to_vessel=solution_selector(
-                stock_vials, "waste", instructions.solutions['electrolye_rinse']
+            to_vessel=waste_selector(
+                waste_vials, "waste", instructions.solutions['rinse0']
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
             pumping_rate=instructions.pumping_rate,
         )
 
-    # Pipette 120ul of electrolye solution into well
+    # Pipette 120ul of electrolyte solution into well
     forward_pipette_v2(
-        volume=instructions.solutions["electrolye"], #120
+        volume=instructions.solutions["electrolyte"], #120
         from_vessel=solution_selector(
             stock_vials,
-            "electrolye",
-            instructions.solutions["electrolye"],
+            "electrolyte",
+            instructions.solutions["electrolyte"],
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
         pump=toolkit.pump,

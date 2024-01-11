@@ -193,21 +193,6 @@ class EchemExperimentBase(ExperimentBase):
     CVsamplerate: float = CVstep / CVsr1
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class LayeredExperiments(EchemExperimentBase):
-    '''Define the data that is used to run an experiment'''
-    project_id: int = 4
-
-@dataclass(config=ConfigDict(validate_assignment=True))
-class PEG_ACR_Instructions(EchemExperimentBase):
-    '''Define the data that is used to run an experiment'''
-    project_id: int = 1
-
-@dataclass(config=ConfigDict(validate_assignment=True))
-class PEG2P_Test_Instructions(EchemExperimentBase):
-    '''Define the data that is used to run an experiment'''
-    project_id: int = 2
-
-@dataclass(config=ConfigDict(validate_assignment=True))
 class Experiment:
     '''Define the data that is used to run an experiment'''
     id: int
@@ -276,21 +261,6 @@ def make_test_base_value() -> ExperimentBase:
         status=ExperimentStatus.QUEUED,
         status_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         filename= f"test_{0}.json",
-        results=None)
-
-def make_test_layered_value(experiment_id: int = 0) -> LayeredExperiments:
-    '''Create a test experiment value for the class'''
-    return LayeredExperiments(
-        id=experiment_id,
-        experiment_name= "test",
-        priority=2,
-        well_id="D5",
-        pin=CURRENT_PIN,
-        project_id=3,
-        solutions={'dmf': 0, 'peg': 145, 'acrylate': 145, 'ferrocene': 0, 'custom': 0},
-        status=ExperimentStatus.QUEUED,
-        status_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        filename= f"test_{id}.json",
         results=None)
 
 def make_test_value() -> Experiment:
@@ -363,12 +333,20 @@ def make_baseline_value() -> Experiment:
         filename= None, #f"test_{datetime.now}.json",
         results=None)
 
-def parse_experiment(json_string: str) -> ExperimentBase:
-    '''Parse an experiment from a json string'''
-    return RootModel[ExperimentBase].model_validate_json(json_string).root
+# def parse_experiment(json_string: str) -> ExperimentBase:
+#     '''Parse an experiment from a json string'''
+#     return RootModel[ExperimentBase].model_validate_json(json_string).root
 
-def parse_experimentbase(json_string: str) -> ExperimentBase:
+# def parse_experimentbase(json_string: str) -> ExperimentBase:
+#     '''Parse an experiment from a json string'''
+#     return RootModel[ExperimentBase].model_validate_json(json_string).root
+
+def parse_experiment(json_string: str) -> (Experiment, ExperimentBase, EchemExperimentBase):
     '''Parse an experiment from a json string'''
+    if isinstance(json_string, str):
+        parsed_json = json.loads(json_string)
+        if "ocp" in parsed_json:
+            return RootModel[EchemExperimentBase].model_validate_json(json_string).root
     return RootModel[ExperimentBase].model_validate_json(json_string).root
 
 # def serialize_experiment(experiment: (Experiment,ExperimentBase)) -> str:
@@ -376,16 +354,13 @@ def parse_experimentbase(json_string: str) -> ExperimentBase:
 #     if isinstance(experiment, Experiment):
 #         return RootModel[Experiment](experiment).model_dump_json(indent=4)
 
-def serialize_experiment(experiment: (ExperimentBase)) -> str:
+def serialize_experiment(experiment: (ExperimentBase, EchemExperimentBase)) -> str:
     """Given an experiment, determine the type and then pass back the serialized json form"""
+    
+    if isinstance(experiment, EchemExperimentBase):
+        return RootModel[EchemExperimentBase](experiment).model_dump_json(indent=4)
     if isinstance(experiment, ExperimentBase):
         return RootModel[ExperimentBase](experiment).model_dump_json(indent=4)
-    if isinstance(experiment, Experiment):
-        return RootModel[Experiment](experiment).model_dump_json(indent=4)
-    if isinstance(experiment, PEG2P_Test_Instructions):
-        return RootModel[PEG2P_Test_Instructions](experiment).model_dump_json(indent=4)
-    if isinstance(experiment, PEG_ACR_Instructions):
-        return RootModel[PEG_ACR_Instructions](experiment).model_dump_json(indent=4)
     return None
 
 def parse_results(json_string: str) -> ExperimentResult:

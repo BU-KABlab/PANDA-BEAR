@@ -36,6 +36,7 @@
     {
         "position": "w2",
         "contents": {
+            "rinse0": 3360.0
         },
         "x": -47,
         "y": -79,
@@ -44,9 +45,9 @@
         "height": -20,
         "depth": 0,
         "name": "waste",
-        "volume": 1000.0,
+        "volume": 4360.0,
         "capacity": 20000,
-        "contamination": 18,
+        "contamination": 42,
         "density": 0,
         "category": 1,
         "viscosity_cp": 0.0

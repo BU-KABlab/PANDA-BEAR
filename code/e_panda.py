@@ -25,10 +25,10 @@ import logging
 import math
 from typing import Optional, Tuple, Union, Sequence
 # Third party or custom imports
-import gamry_control_WIP as echem
+#import gamry_control_WIP as echem
 
-# import gamry_control_WIP_mock as echem
-
+from gamry_control_WIP_mock import GamryPotentiostat as echem
+from gamry_control_WIP_mock import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
 from experiment_class import (
     ExperimentResult,
     ExperimentStatus,
@@ -604,7 +604,8 @@ def deposition(
     """
     # echem setup
     logger.info("Setting up eChem experiments...")
-    echem.pstatconnect()
+    pstat = echem()
+    pstat.pstatconnect()
     # echem OCP
     logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
     dep_instructions.status = ExperimentStatus.OCPCHECK
@@ -614,15 +615,15 @@ def deposition(
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
-    base_filename = echem.setfilename(dep_instructions.id, "OCP")
+    base_filename = pstat.setfilename(dep_instructions.id, "OCP")
     dep_results.ocp_dep_file = base_filename
-    echem.OCP(
-        echem.potentiostat_ocp_parameters.OCPvi,
-        echem.potentiostat_ocp_parameters.OCPti,
-        echem.potentiostat_ocp_parameters.OCPrate,
+    pstat.OCP(
+        potentiostat_ocp_parameters.OCPvi,
+        potentiostat_ocp_parameters.OCPti,
+        potentiostat_ocp_parameters.OCPrate,
     )  # OCP
-    echem.activecheck()
-    dep_results.ocp_dep_pass = echem.check_vf_range(
+    pstat.activecheck()
+    dep_results.ocp_dep_pass = pstat.check_vf_range(
         dep_results.ocp_dep_file.with_suffix(".txt")
     )
 
@@ -632,29 +633,29 @@ def deposition(
         logger.info(
             "Beginning eChem deposition of well: %s", dep_instructions.well_id
         )
-        dep_results.deposition_data_file = echem.setfilename(dep_instructions.id, "CA")
+        dep_results.deposition_data_file = pstat.setfilename(dep_instructions.id, "CA")
 
         # FEATURE have chrono return the max and min values for the deposition
         # and save them to the results
         # don't have any parameters hardcoded, switch these all to instructions
-        echem.chrono(
-            echem.potentiostat_ca_parameters.CAvi,
-            echem.potentiostat_ca_parameters.CAti,
+        pstat.chrono(
+            potentiostat_ca_parameters.CAvi,
+            potentiostat_ca_parameters.CAti,
             CAv1=dep_instructions.CAv1,
             CAt1=dep_instructions.CAt1,
-            CAv2=echem.potentiostat_ca_parameters.CAv2,
-            CAt2=echem.potentiostat_ca_parameters.CAt2,
+            CAv2=potentiostat_ca_parameters.CAv2,
+            CAt2=potentiostat_ca_parameters.CAt2,
             CAsamplerate=dep_instructions.ca_sample_period,
         )  # CA
 
-        echem.activecheck()
+        pstat.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well
 
         mill.rinse_electrode()
-        echem.pstatdisconnect()
+        pstat.pstatdisconnect()
 
     else:
-        echem.pstatdisconnect()
+        pstat.pstatdisconnect()
         raise OCPFailure("CA")
 
     return dep_instructions, dep_results
@@ -683,7 +684,8 @@ def characterization(
     logger.info("Characterizing well: %s", char_instructions.well_id)
     # echem OCP
     logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
-    echem.pstatconnect()
+    pstat = echem()
+    pstat.pstatconnect()
     char_instructions.status = ExperimentStatus.OCPCHECK
     mill.safe_move(
         wellplate.get_coordinates(char_instructions.well_id)["x"],
@@ -691,14 +693,14 @@ def characterization(
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
-    char_results.ocp_char_file = echem.setfilename(char_instructions.id, "OCP_char")
-    echem.OCP(
-        echem.potentiostat_ocp_parameters.OCPvi,
-        echem.potentiostat_ocp_parameters.OCPti,
-        echem.potentiostat_ocp_parameters.OCPrate,
+    char_results.ocp_char_file = echem.setfilename(char_instructions.id, "OCP_char",'CA')
+    pstat.OCP(
+        OCPvi= potentiostat_ocp_parameters.OCPvi,
+        OCPti=potentiostat_ocp_parameters.OCPti,
+        OCPrate=potentiostat_ocp_parameters.OCPrate,
     )  # OCP
-    echem.activecheck()
-    char_results.ocp_char_pass = echem.check_vf_range(
+    pstat.activecheck()
+    char_results.ocp_char_pass = pstat.check_vf_range(
         char_results.ocp_char_file.with_suffix(".txt")
     )
     # echem CV - characterization
@@ -714,32 +716,32 @@ def characterization(
             "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
         )
 
-        char_results.characterization_data_file = echem.setfilename(
+        char_results.characterization_data_file = pstat.setfilename(
             char_instructions.id, test_type
         )
 
         # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
-        echem.cyclic(
-            echem.potentiostat_cv_parameters.CVvi,
-            echem.potentiostat_cv_parameters.CVap1,
-            echem.potentiostat_cv_parameters.CVap2,
-            echem.potentiostat_cv_parameters.CVvf,
+        pstat.cyclic(
+            potentiostat_cv_parameters.CVvi,
+            potentiostat_cv_parameters.CVap1,
+            potentiostat_cv_parameters.CVap2,
+            potentiostat_cv_parameters.CVvf,
             CVsr1=char_instructions.cv_scan_rate,
             CVsr2=char_instructions.cv_scan_rate,
             CVsr3=char_instructions.cv_scan_rate,
             CVsamplerate=(
-                echem.potentiostat_cv_parameters.CVstep / char_instructions.cv_scan_rate
+                potentiostat_cv_parameters.CVstep / char_instructions.cv_scan_rate
             ),
-            CVcycle=echem.potentiostat_cv_parameters.CVcycle,
+            CVcycle=potentiostat_cv_parameters.CVcycle,
         )
-        echem.activecheck()
+        pstat.activecheck()
         mill.move_to_safe_position()  # move to safe height above target well
         mill.rinse_electrode()
-        echem.pstatdisconnect()
+        pstat.pstatdisconnect()
         return char_instructions, char_results
 
-    echem.pstatdisconnect()
+    pstat.pstatdisconnect()
     raise OCPFailure("CV")
 
 
