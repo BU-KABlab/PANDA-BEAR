@@ -800,9 +800,57 @@ def load_new_wellplate(
             new_wellplate_type_number = current_type_number
 
     well_status_file = WELL_STATUS
-    if current_wellplate_is_new:
+    if current_wellplate_is_new and new_plate_id is None:
         return current_wellplate_id
 
+    ## Check if the new plate id exists in the well hx
+    ## If so, then load in that wellplate
+    ## If not, then create a new wellplate
+    if new_plate_id is None:
+        new_plate_id = current_wellplate_id + 1
+    else:
+        new_plate_id = int(new_plate_id)
+
+    if new_wellplate_type_number is None:
+        new_wellplate_type_number = current_type_number
+    else:
+        new_wellplate_type_number = int(new_wellplate_type_number)
+
+    if Path(PATH_TO_WELL_HX).exists():
+        with open(PATH_TO_WELL_HX, "r", encoding="UTF-8") as file:
+            well_hx = file.readlines()
+        wells = []
+        for line in well_hx:
+            if line.split(",")[0] == str(new_plate_id):
+                wells.append(line.strip())
+        if len(wells) > 0:
+            ## If the wellplate exists in the well hx, then load it
+            logger.debug("Loading wellplate")
+            with open(well_status_file, "w", encoding="UTF-8") as file:
+                json.dump(
+                    {
+                        "plate_id": int(new_plate_id),
+                        "type_number": int(new_wellplate_type_number),
+                        "wells": [
+                            {
+                                "well_id": line.split(",")[2],
+                                "status": line.split(",")[5],
+                                "status_date": line.split(",")[6],
+                                "contents": json.loads(line.split(",")[7]),
+                                "experiment_id": line.split(",")[3],
+                                "project_id": str(line.split(",")[4]),
+                            }
+                            for line in wells
+                        ],
+                    },
+                    file,
+                    indent=4,
+                )
+            logger.debug("Wellplate loaded")
+            logger.info("Wellplate %d loaded", int(new_plate_id))
+        return new_plate_id
+    
+    ## If the wellplate does not exist in the well hx, then create a new wellplate
     ## Go through a reset all fields and apply new plate id
     logger.debug("Resetting well statuses to new")
     new_wellplate = {

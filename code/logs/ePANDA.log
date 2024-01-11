@@ -1,0 +1,7 @@
+2024-01-11 13:51:57,663&controller&DEBUG&controller&save_current_wellplate&890&&&&Saving wellplate&
+2024-01-11 13:51:57,664&controller&DEBUG&controller&save_current_wellplate&904&&&&Saving well statuses to well_history.csv&
+2024-01-11 13:51:57,685&controller&DEBUG&controller&save_current_wellplate&942&&&&Wellplate saved&
+2024-01-11 13:51:57,685&controller&INFO&controller&save_current_wellplate&943&&&&Wellplate 105 saved&
+2024-01-11 13:52:03,707&controller&DEBUG&controller&load_new_wellplate&828&&&&Loading wellplate&
+2024-01-11 13:52:03,716&controller&DEBUG&controller&load_new_wellplate&849&&&&Wellplate loaded&
+2024-01-11 13:52:03,716&controller&INFO&controller&load_new_wellplate&850&&&&Wellplate 106 loaded&

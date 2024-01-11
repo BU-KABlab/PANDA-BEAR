@@ -8,6 +8,7 @@ from pydantic import ConfigDict, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
 from config.pin import CURRENT_PIN
 import json
+from correction_factors import correction_factor
 
 
 class ExperimentStatus(str, Enum):
@@ -56,6 +57,7 @@ class ExperimentBase():
     pin: int = None
     project_id: int = None
     solutions: dict = None
+    solutions_corrected: dict = None
     well_type_number = 1
     pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
     status: ExperimentStatus = ExperimentStatus.NEW
@@ -65,6 +67,17 @@ class ExperimentBase():
     project_campaign_id: int = None
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
 
+    # @property
+    # def solutions_corrected(self):
+    #     '''Calculate the corrected volume for each solution'''
+    #     if self.solutions is not None:
+    #         return {
+    #             key: correction_factor(value, viscosity=None)
+    #             for key, value in self.solutions.items()
+    #         }
+    #     return None
+        
+    
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''
         pass

@@ -3,11 +3,11 @@ better to be set in one place than to be scattered around the code."""
 from pathlib import Path
 
 ## Project values
-AIR_GAP = 40 #ul
-DRIP_STOP = 5 #ul
-PURGE_VOLUME = 20 #ul
-RANDOM_FLAG = False # Set to True to randomize the order of the experiments
-TESTING = True # Set to True to run in testing mode
+AIR_GAP = 40  # ul
+DRIP_STOP = 5  # ul
+PURGE_VOLUME = 20  # ul
+RANDOM_FLAG = False  # Set to True to randomize the order of the experiments
+TESTING = True  # Set to True to run in testing mode
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 
@@ -15,7 +15,9 @@ USE_LOCAL_PATHS = TESTING
 LOCAL_REPO_PATH = Path(__file__).parents[2]
 
 ## Define network path
-NETWORK_PATH = Path("//engnas.bu.edu/research/eng_research_kablab/Shared Resources/PANDA/")
+NETWORK_PATH = Path(
+    "//engnas.bu.edu/research/eng_research_kablab/Shared Resources/PANDA/"
+)
 
 ## Project File Names
 __MILL_CONFIG_FILE_NAME = "mill_config.json"
@@ -86,11 +88,11 @@ if USE_LOCAL_PATHS:
     ]:
         path = Path(path)
         if not path.exists():
-            #print(f"Creating {path}")
+            # print(f"Creating {path}")
             path.mkdir()
             print(f"Created {path}")
 
-else: # Use network paths
+else:  # Use network paths
     # Directories
     PATH_TO_CODE = LOCAL_REPO_PATH / __CODE
     PATH_TO_SYSTEM_STATE = NETWORK_PATH / __SYS_STATE
@@ -105,7 +107,7 @@ else: # Use network paths
     PATH_TO_LOGS = NETWORK_PATH / __LOGS
     PATH_TO_STATUS = NETWORK_PATH / __SYS_STATE
 
-    #Files
+    # Files
     PROJECT_LIST = PATH_TO_SYSTEM_STATE / __PROJECT_LIST_FILE_NAME
     MILL_CONFIG = PATH_TO_CONFIG / __MILL_CONFIG_FILE_NAME
     WELLPLATE_LOCATION = PATH_TO_CONFIG / __WELLPLATE_CONFIG_FILE_NAME
@@ -135,7 +137,7 @@ else: # Use network paths
     ]:
         path = Path(path)
         if not path.exists():
-            #print(f"Creating {path}")
+            # print(f"Creating {path}")
             path.mkdir()
             print(f"Created {path}")
 
@@ -155,6 +157,6 @@ for file in [
 ]:
     file_path = Path(PATH_TO_SYSTEM_STATE / file)
     if not file_path.exists():
-        #print(f"Creating {file_path}")
+        # print(f"Creating {file_path}")
         file_path.touch()
         print(f"Created {file_path}")

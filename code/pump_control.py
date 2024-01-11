@@ -14,6 +14,7 @@ from vials import Vial, Vessel
 from mill_control import Mill, MockMill
 from wellplate import Wells as Wellplate
 from experiment_class import ExperimentResult
+from correction_factors import reverse_correction_factor
 #from config.config import PATH_TO_LOGS
 
 pump_control_logger = logging.getLogger("e_panda")
@@ -211,8 +212,8 @@ class Pump:
             post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
-            scale_logger.info("Data,%s,%f,%f,%f,%f,%f,%f",
-                            action, volume_ml, density, pre_weight, post_weight, self.pump.pumping_rate, viscosity
+            scale_logger.info("Data,%s,%f,%f,%f,%f,%f,%f,%f",
+                            action, volume_ml, reverse_correction_factor(volume_ml*1000,viscosity)/1000, density, pre_weight, post_weight, self.pump.pumping_rate, viscosity
                             )
             pumping_record = {
                 "action": action,

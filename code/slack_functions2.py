@@ -423,10 +423,10 @@ class SlackBot:
                     vial_color.append("red")
                     vial_marker.append("o")
 
-        rinse_vial = {"x": -411, "y": -30}
-        vial_x.append(rinse_vial["x"])
-        vial_y.append(rinse_vial["y"])
-        vial_color.append("black")
+        # rinse_vial = {"x": -411, "y": -30}
+        # vial_x.append(rinse_vial["x"])
+        # vial_y.append(rinse_vial["y"])
+        # vial_color.append("black")
         ## combine the well and vial coordinates
         # x_coordinates.extend(stock_vial_x)
         # y_coordinates.extend(stock_vial_y)
