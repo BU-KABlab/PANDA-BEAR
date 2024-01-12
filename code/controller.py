@@ -377,9 +377,7 @@ def establish_system_state() -> (
     waste_vials = read_vials(WASTE_STATUS)
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
-    wellplate = wellplate_module.Wells2(
-        -230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5
-    )
+    wellplate = wellplate_module.Wells2()
     logger.info("System state established")
 
     ## read through the stock vials and log their name, contents, and volume
@@ -1010,5 +1008,5 @@ def change_wellplate_location():
 
 
 if __name__ == "__main__":
-    main(use_mock_instruments=True)
+    main(use_mock_instruments=False)
     # load_new_wellplate(new_plate_id=5)

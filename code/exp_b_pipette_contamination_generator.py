@@ -2,11 +2,10 @@
 import json
 import experiment_class
 from config.pin import CURRENT_PIN
-from config.config import WELL_HX
+from config.config import WELL_HX, TESTING
 from scheduler import Scheduler
 import controller
 import pandas as pd
-
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
@@ -19,7 +18,7 @@ def determine_next_experiment_id() -> int:
     return int(last_experiment_id + 1)
 
 
-TEST = True
+TEST = TESTING
 print("TEST MODE: ", TEST)
 # Create experiments
 COLUMNS = "ABCDEFGH"

@@ -1,8 +1,8 @@
 {
     "instrument_offsets": {
       "electrode": {
-        "x": 36,
-        "y": 30,
+        "x": 37.5,
+        "y": 30.5,
         "z": 0
       },
       "pipette": {

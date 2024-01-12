@@ -5,3 +5,4 @@
 2024-01-11 13:52:03,707&controller&DEBUG&controller&load_new_wellplate&828&&&&Loading wellplate&
 2024-01-11 13:52:03,716&controller&DEBUG&controller&load_new_wellplate&849&&&&Wellplate loaded&
 2024-01-11 13:52:03,716&controller&INFO&controller&load_new_wellplate&850&&&&Wellplate 106 loaded&
+2024-01-12 12:54:31,246:gamry_control_WIP:DEBUG:	Pstat connected: IFC1010-29110

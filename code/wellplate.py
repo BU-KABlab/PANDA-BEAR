@@ -16,7 +16,8 @@ from config.config import (
     WELL_STATUS as WELL_STATUS_FILE,
     STOCK_STATUS,
     WASTE_STATUS,
-    WELL_TYPE
+    WELL_TYPE,
+    WELLPLATE_LOCATION
 )
 from experiment_class import ExperimentStatus
 from vials import Vessel
@@ -106,18 +107,18 @@ class Wells:
         orientation: int = 0,
         columns: str = "ABCDEFGH",
         rows: int = 13,
-        type_number: int = 1,
+        type_number: int = 3,
     ):
         self.wells = {}
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
-        self.z_bottom = -76
+        self.z_bottom = -77
         self.z_top = 0
         self.radius = 3.25  # new circular wells
         self.well_offset = 9  # mm from center to center
         self.well_capacity = 300  # ul
-        self.echem_height = -73  # for every well
+        self.echem_height = -75  # for every well
         self.type_number = type_number  # The type of wellplate
         self.plate_id = 0  # The id of the wellplate
         self.height = 6.0  # The height of the wellplate in mm
@@ -131,7 +132,13 @@ class Wells:
             self.shape,
             self.z_top,
         ) = read_well_type_characteristics(self.type_number, self)
-
+        (self.a1_x,
+            self.a1_y,
+            self.z_bottom,
+            self.orientation,
+            self.rows,
+            self.columns,
+         ) = load_wellplate_location(self)
         a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
         volume = 0.00
         for col_idx, col in enumerate(columns):
@@ -364,12 +371,12 @@ class Wells2:
 
     def __init__(
         self,
-        a1_x: float = 0,
-        a1_y: float = 0,
+        x_a1: float = 0,
+        y_a1: float = 0,
         orientation: int = 0,
         columns: str = "ABCDEFGH",
         rows: int = 13,
-        type_number: int = 1,
+        type_number: int = 3,
     ) -> None:
         """
         Initializes a new instance of the Wells2 class.
@@ -383,6 +390,8 @@ class Wells2:
             type_number (int): Type of well plate.
         """
         self.wells: Dict[str, Well] = {}
+        self.a1_x = x_a1
+        self.a1_y = y_a1
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
@@ -406,8 +415,14 @@ class Wells2:
             self.shape,
             self.z_top,
         ) = read_well_type_characteristics(self.type_number, self)
-
-        a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
+        (self.a1_x,
+            self.a1_y,
+            self.z_bottom,
+            self.orientation,
+            self.rows,
+            self.columns,
+         ) = load_wellplate_location(self)
+        a1_coordinates = {"x": self.a1_x, "y": self.a1_y, "z": self.z_top}  # coordinates of A1
         volume = 0.00
         for col_idx, col in enumerate(columns):
             for row in range(1, rows):
@@ -689,6 +704,39 @@ def read_well_type_characteristics(
         current_well.z_bottom + height,
     )
 
+def load_wellplate_location(current_well: Wells) -> tuple[float, float, float, int, int, str]:
+    """Load the location of the well plate from the well_location.csv file"""
+
+    # check it exists
+    if not os.path.exists(WELLPLATE_LOCATION):
+        logger.warning("Well location file not found at %s. Returning defaults", WELLPLATE_LOCATION)
+        return (
+            current_well.a1_x,
+            current_well.a1_y,
+            current_well.z_bottom,
+            current_well.orientation,
+            current_well.rows,
+            current_well.columns,
+        )
+    # Looks like this:
+    # {
+    # "x": -233,
+    # "y": -35,
+    # "orientation": 0,
+    # "rows": 13,
+    # "cols": "ABCDEFGH",
+    # "z-bottom": -77
+    # }
+    with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as f:
+        data = json.load(f)
+        x = data["x"]
+        y = data["y"]
+        z_bottom = data["z-bottom"]
+        orientation = data["orientation"]
+        rows = data["rows"]
+        cols = data["cols"]
+
+    return (x, y, z_bottom, orientation, rows, cols)
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
 

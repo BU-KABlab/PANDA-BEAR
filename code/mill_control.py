@@ -87,7 +87,7 @@ class Mill:
 
     def __enter__(self):
         """Enter the context manager"""
-        self.homing_sequence()
+        self.homing_sequence()        
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -193,9 +193,11 @@ class Mill:
         """Get the current status of the mill"""
         command = "?"
         command_bytes = command.encode()
-        self.ser_mill.write(command_bytes + b"\n")
-        # time.sleep(2)
-        status = self.ser_mill.readline().decode().rstrip()
+        status = ''
+        while status == '':
+            self.ser_mill.write(command_bytes + b"\n")
+            # time.sleep(2)
+            status = self.ser_mill.readline().decode().rstrip()
         # Check for errors
         if "error" in status.lower() or "alarm" in status.lower():
             logger.error("current_status: Error in status: %s", status)
@@ -330,10 +332,10 @@ class Mill:
         """
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-        self.move_electrode_to_position(-373, -16, 0)
+        self.move_electrode_to_position(-409, -234, 0)
         for _ in range(3):
-            self.move_electrode_to_position(-373, -16, -45)
-            self.move_electrode_to_position(-373, -16, 0)
+            self.move_electrode_to_position(-409, -234, -45)
+            self.move_electrode_to_position(-409, -234, 0)
         return 0
 
     def rest_electrode(self):
@@ -345,7 +347,7 @@ class Mill:
         Returns:
             None
         """
-        self.safe_move(-373, -16, 0, instrument=Instruments.ELECTRODE)
+        self.safe_move(-409, -234, -45, instrument=Instruments.ELECTRODE)
         return 0
 
 
@@ -728,7 +730,7 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wells(-233, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
+    wellplate = Wells.Wells2()
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)
@@ -744,7 +746,10 @@ def movement_test():
             a12 = wellplate.get_coordinates("A12")
             h1 = wellplate.get_coordinates("H1")
             h12 = wellplate.get_coordinates("H12")
-
+            print(a1)
+            print(a12)
+            print(h1)
+            print(h12)
             ## Load the vials
             from controller import read_vials
 
@@ -764,6 +769,21 @@ def movement_test():
             mill.safe_move(
                 h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
             )
+
+            mill.safe_move(
+                a1["x"], a1["y"], a1["echem_height"], instrument=Instruments.ELECTRODE
+            )
+            mill.safe_move(
+                a12["x"], a12["y"], a12["echem_height"], instrument=Instruments.ELECTRODE
+            )
+            mill.safe_move(
+                h12["x"], h12["y"], h12["echem_height"], instrument=Instruments.ELECTRODE
+            )
+            mill.safe_move(
+                h1["x"], h1["y"], h1["echem_height"], instrument=Instruments.ELECTRODE
+            )
+
+
             if len(stock_vials) != 0:
                 for _, vial in enumerate(stock_vials):
                     mill.safe_move(
@@ -784,6 +804,7 @@ def movement_test():
                         instrument=Instruments.PIPETTE,
                     )
                 mill.move_to_safe_position()
+                mill.rest_electrode()
 
     except (
         MillConnectionError,
