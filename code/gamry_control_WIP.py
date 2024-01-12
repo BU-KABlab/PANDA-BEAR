@@ -161,16 +161,16 @@ def savedata(complete_file_name):
 def setfilename(experiment_id, experiment_type) -> pathlib.Path:
     """set the file name for the experiment"""
     global COMPLETE_FILE_NAME
-    COMPLETE_FILE_NAME:pathlib.Path = (
+    filename:pathlib.Path = (
             pathlib.Path.cwd()
             / "data"
             / ("experiment-" + str(experiment_id) + "_mock_" + experiment_type)
         )
     # Check if the file already exists. If it does then add a number to the end of the file name
-    if COMPLETE_FILE_NAME.exists():
+    if filename.exists():
         i = 1
-        while COMPLETE_FILE_NAME.exists():
-            COMPLETE_FILE_NAME = (
+        while filename.exists():
+            filename = (
                 pathlib.Path.cwd()
                 / "data"
                 / (
@@ -183,6 +183,7 @@ def setfilename(experiment_id, experiment_type) -> pathlib.Path:
                 )
             )
             i += 1
+    COMPLETE_FILE_NAME = filename
     return COMPLETE_FILE_NAME
 
 

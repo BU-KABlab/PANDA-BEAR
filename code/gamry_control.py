@@ -122,7 +122,18 @@ def setfilename(id, experiment):
     global complete_file_name
     filePath = pathlib.Path.cwd() + "/data"
     # complete_file_name = filePath / (target_well + "_" + experiment)
-    complete_file_name = filePath / ("experiment-" + id + "_" + experiment)
+    complete_file_name: pathlib.Path = filePath / ("experiment-" + id + "_" + experiment)
+
+    if complete_file_name.exists():
+        '''If the file already exists, append a number to the end of the file name'''
+        print(f"file {complete_file_name} already exists")
+        i = 1
+        while complete_file_name.exists():
+            complete_file_name = filePath / (
+                "experiment-" + id + "_" + experiment + "_" + str(i)
+            )
+            i += 1
+
     print(f"eChem: complete file name is: {complete_file_name}")
     if not pathlib.Path.exists(filePath):
         print(f"folder does not exist. Making folder: {filePath}")

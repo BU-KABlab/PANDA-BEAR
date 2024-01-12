@@ -24,11 +24,13 @@ Returns:
 import logging
 import math
 from typing import Optional, Tuple, Union, Sequence
-# Third party or custom imports
-#import gamry_control_WIP as echem
 
-from gamry_control_WIP_mock import GamryPotentiostat as echem
-from gamry_control_WIP_mock import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
+from numpy import isin
+# Third party or custom imports
+import gamry_control_WIP as echem
+from gamry_control_WIP import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
+#from gamry_control_WIP_mock import GamryPotentiostat as echem
+#from gamry_control_WIP_mock import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
 from experiment_class import (
     ExperimentResult,
     ExperimentStatus,
@@ -143,8 +145,10 @@ def forward_pipette_v2(
             pump.withdraw(
                 volume=AIR_GAP, solution=None, rate=pumping_rate
             )  # withdraw air gap to engage screw
-
-            logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
+            if isinstance(from_vessel, Well):
+                logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.coordinates)
+            else:
+                logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],
@@ -175,18 +179,19 @@ def forward_pipette_v2(
             logger.info("Moving to: %s...", to_vessel.name)
             # determine if the destination is a well or a waste vial
             if isinstance(to_vessel, Well):  # go to solution depth
+                to_vessel: Well = to_vessel
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    0,
+                    to_vessel.depth,  # to_vessel.depth,
                     Instruments.PIPETTE,
                 )
             else:  # go to safe height above waste vial
+                to_vessel: WasteVial = to_vessel
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.depth
-                    + 5,  # depth but slightly higher to avoid contamination
+                    to_vessel.height,
                     Instruments.PIPETTE,
                 )
 
@@ -604,7 +609,7 @@ def deposition(
     """
     # echem setup
     logger.info("Setting up eChem experiments...")
-    pstat = echem()
+    pstat = echem
     pstat.pstatconnect()
     # echem OCP
     logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
@@ -684,7 +689,7 @@ def characterization(
     logger.info("Characterizing well: %s", char_instructions.well_id)
     # echem OCP
     logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
-    pstat = echem()
+    pstat = echem
     pstat.pstatconnect()
     char_instructions.status = ExperimentStatus.OCPCHECK
     mill.safe_move(
