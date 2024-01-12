@@ -1,7 +1,21 @@
-"""For testing the contamination from the pipette tip"""
+"""
+Experiment C: Rinsing assessment protocol
+Requested: 2024-01-10
+Written: 2024-01-11
+Status: 
+Draft x
+Written x
+Tested
+Approved
+Run
+Completed
+Notes:
+    - This experiment has an interesting feature in that per experiment we will
+    be running 11 rinses and CVs. Originally we planned for 1 cv per experiment.
+    So to make this work, we will need to change how we handel saving each of these,
+    so that they are saved as seperate files but share the same experiment id.
+"""
 # Standard imports
-import json
-from json import tool
 from typing import Sequence
 
 # Non-standard imports
@@ -24,7 +38,7 @@ def rinsing_assessment(
 ):
     """
     Protocol for testing the conamination coming from the electrode
-    1. Pipette 120 µl of fecn3 into well
+    1. Pipette 120 µl of fecn6 into well
     2. Perform CV in the well
     3. Rinse the electrode in electrode bath
     4. Clear the well contents into waste
@@ -44,21 +58,14 @@ def rinsing_assessment(
         None - all arguments are passed by reference or are unchanged
 
     """
-
-    toolkit.global_logger.info(
-        "Pipetting %s ul of %s into %s...",
-        instructions.solutions['5mm_fecn3'],
-        '5mm_fecn3',
-        'waste',
-    )
-    print("1. Pipetting 120ul of 5mm_fecn3 into well: ", instructions.well_id)
+    print("1. Pipetting 120ul of 5mm_fecn6 into well: ", instructions.well_id)
     # Pipette 120ul of fecn3 solution into well
     forward_pipette_v2(
-        volume=instructions.solutions['5mm_fecn3'],
+        volume=instructions.solutions['5mm_fecn6'],
         from_vessel=solution_selector(
             stock_vials,
-            '5mm_fecn3',
-            instructions.solutions['5mm_fecn3'],
+            '5mm_fecn6',
+            instructions.solutions['5mm_fecn6'],
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
         pump=toolkit.pump,
@@ -83,12 +90,12 @@ def rinsing_assessment(
         # Clear the well contents into waste
         print(f"4.{i} Clearing well contents into waste")
         forward_pipette_v2(
-            volume=instructions.solutions['5mm_fecn3'],
+            volume=instructions.solutions['5mm_fecn6'],
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
                 waste_vials,
                 'waste',
-                instructions.solutions['5mm_fecn3'],
+                instructions.solutions['5mm_fecn6'],
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,

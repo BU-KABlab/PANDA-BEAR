@@ -1,6 +1,5 @@
 """For testing the contamination from the pipette tip"""
 # Standard imports
-import json
 from typing import Sequence
 
 # Non-standard imports
@@ -15,7 +14,8 @@ from experiment_class import ExperimentBase, ExperimentStatus
 from vials import StockVial, WasteVial
 
 from correction_factors import correction_factor
-    
+
+
 def contamination_assessment(
     instructions: ExperimentBase,
     toolkit: Toolkit,
@@ -48,41 +48,38 @@ def contamination_assessment(
     instructions.solutions_corrected["electrolyte"] = correction_factor(
         instructions.solutions["electrolyte"],
         solution_selector(
-                stock_vials,
-                'electrolyte',
-                instructions.solutions['electrolyte']).viscosity_cp
+            stock_vials, "electrolyte", instructions.solutions["electrolyte"]
+        ).viscosity_cp,
     )
-    
+
     instructions.solutions_corrected["rinse0"] = correction_factor(
         instructions.solutions["rinse0"],
         solution_selector(
-                stock_vials,
-                'rinse0',
-                instructions.solutions['rinse0']).viscosity_cp
+            stock_vials, "rinse0", instructions.solutions["rinse0"]
+        ).viscosity_cp,
     )
-    
+
     instructions.solutions_corrected["5mm_fecn6"] = correction_factor(
         instructions.solutions["5mm_fecn6"],
         solution_selector(
-                stock_vials,
-                '5mm_fecn6',
-                instructions.solutions['5mm_fecn6']).viscosity_cp
+            stock_vials, "5mm_fecn6", instructions.solutions["5mm_fecn6"]
+        ).viscosity_cp,
     )
-    
+
     print("Corrected volumes: ", instructions.solutions_corrected)
 
-    if instructions.solutions['5mm_fecn6'] > 0:
+    if instructions.solutions["5mm_fecn6"] > 0:
         # Pipette 120ul of fecn6 solution into waste to dirty the pipette tip
         print("Pipetting 120ul of fecn6 solution into waste to dirty the pipette tip")
         forward_pipette_v2(
-            volume=instructions.solutions['5mm_fecn6'],
+            volume=instructions.solutions["5mm_fecn6"],
             from_vessel=solution_selector(
                 stock_vials,
-                '5mm_fecn6',
-                instructions.solutions['5mm_fecn6'],
+                "5mm_fecn6",
+                instructions.solutions["5mm_fecn6"],
             ),
             to_vessel=waste_selector(
-                waste_vials, "waste", instructions.solutions['5mm_fecn6']
+                waste_vials, "waste", instructions.solutions["5mm_fecn6"]
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
@@ -90,15 +87,15 @@ def contamination_assessment(
         )
 
         # Flush the pipette tip x3 with electrolyte rinse
-        print("Flushing the pipette tip x3 with electrolyte rinse")
+        print("2. Flushing the pipette tip x3 with electrolyte rinse")
         for _ in range(3):
             forward_pipette_v2(
-                volume=instructions.solutions['rinse0'],
+                volume=instructions.solutions["rinse0"],
                 from_vessel=solution_selector(
-                    stock_vials, "rinse0", instructions.solutions['rinse0']
+                    stock_vials, "rinse0", instructions.solutions["rinse0"]
                 ),
                 to_vessel=waste_selector(
-                    waste_vials, "waste", instructions.solutions['rinse0']
+                    waste_vials, "waste", instructions.solutions["rinse0"]
                 ),
                 pump=toolkit.pump,
                 mill=toolkit.mill,
@@ -106,9 +103,9 @@ def contamination_assessment(
             )
 
         # Pipette 120ul of electrolyte solution into well
-        print("Pipetting 120ul of electrolyte solution into well")
+        print("3. Pipetting 120ul of electrolyte into well")
         forward_pipette_v2(
-            volume=instructions.solutions["electrolyte"], #120
+            volume=instructions.solutions["electrolyte"],  # 120
             from_vessel=solution_selector(
                 stock_vials,
                 "electrolyte",
@@ -122,9 +119,9 @@ def contamination_assessment(
 
     else:
         # Pipette 120ul of electrolyte solution into well
-        print("Pipetting 120ul of electrolyte solution into well")
+        print("1. Pipetting 120ul of electrolyte into well")
         forward_pipette_v2(
-            volume=instructions.solutions["electrolyte"], #120
+            volume=instructions.solutions["electrolyte"],  # 120
             from_vessel=solution_selector(
                 stock_vials,
                 "electrolyte",
@@ -137,7 +134,7 @@ def contamination_assessment(
         )
 
     # Perform CV
-    print("Performing CV")
+    print("4. Performing CV")
     characterization(
         char_instructions=instructions,
         char_results=instructions.results,
@@ -146,7 +143,7 @@ def contamination_assessment(
     )
 
     # Rinse the electrode with electrode rinse
-    print("Rinsing the electrode with electrode rinse")
+    print("5. Rinsing electrode")
     toolkit.mill.rinse_electrode()
 
     # End of experiment
