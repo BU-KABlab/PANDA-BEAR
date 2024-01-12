@@ -138,7 +138,6 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     global signal
     global dtaqsink
     global connection
-    global start_time
     global active
     # global complete_file_name
 

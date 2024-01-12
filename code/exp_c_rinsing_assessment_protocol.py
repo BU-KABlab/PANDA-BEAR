@@ -16,6 +16,7 @@ Notes:
     so that they are saved as seperate files but share the same experiment id.
 """
 # Standard imports
+from json import tool
 from typing import Sequence
 
 # Non-standard imports
@@ -141,6 +142,9 @@ def rinsing_assessment(
             mill=toolkit.mill,
             wellplate=toolkit.wellplate,
         )
+
+
+    toolkit.mill.rest_electrode()
 
     # End of experiment
     instructions.status = ExperimentStatus.COMPLETE

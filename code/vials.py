@@ -299,6 +299,7 @@ class Vial2(Vessel):
     Attributes:
         name (str): The name of the vial.
         category (int): The category of the vial (0 for stock, 1 for waste).
+        position (str): The position of the vial.
         volume (float): The current volume of the vial.
         capacity (float): The maximum capacity of the vial.
         density (float): The density of the solution in the vial.
@@ -306,10 +307,11 @@ class Vial2(Vessel):
         radius (float): The radius of the vial.
         height (float): The height of the vial.
         z_bottom (float): The z-coordinate of the bottom of the vial.
-        base (float): The base area of the vial.
-        depth (float): The current depth of the solution in the vial.
         contamination (int): The number of times the vial has been contaminated.
-        category (int): The category of the vial (0 for stock, 1 for waste).
+        contents: The contents of the vial.
+        viscosity_cp (float, optional): The viscosity of the vial contents. Defaults to 0.0.
+        x (float, optional): The x-coordinate of the vial. Defaults to 0.
+        y (float, optional): The y-coordinate of the vial. Defaults to 0.
 
     Methods:
     --------

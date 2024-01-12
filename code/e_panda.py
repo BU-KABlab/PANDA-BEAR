@@ -143,8 +143,10 @@ def forward_pipette_v2(
             pump.withdraw(
                 volume=AIR_GAP, solution=None, rate=pumping_rate
             )  # withdraw air gap to engage screw
-
-            logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
+            if isinstance(from_vessel, Well):
+                logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.coordinates)
+            else:
+                logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],

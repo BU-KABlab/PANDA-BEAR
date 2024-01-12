@@ -6,7 +6,6 @@ from config.config import WELL_HX
 from scheduler import Scheduler
 import controller
 import pandas as pd
-from slack_functions2 import SlackBot
 
 
 def determine_next_experiment_id() -> int:

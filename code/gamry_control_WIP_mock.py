@@ -3,6 +3,7 @@ import logging
 import pathlib
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict
+import numpy as np
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
@@ -64,6 +65,7 @@ class GamryPotentiostat:
                 i += 1
 
         logger.debug("eChem: complete file name is: %s", COMPLETE_FILE_NAME)
+        COMPLETE_FILE_NAME.touch()
         return COMPLETE_FILE_NAME
 
     def chrono(self, CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
@@ -72,6 +74,8 @@ class GamryPotentiostat:
     def cyclic(self, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
         pass
 
+    def save_data(self, complete_file_name):
+        np.savetxt(complete_file_name, np.array([[1, 2], [3, 4]]), delimiter=",")
     
     def __enter__(self):
         self.connect()

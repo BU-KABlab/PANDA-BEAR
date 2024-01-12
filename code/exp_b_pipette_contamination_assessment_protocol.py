@@ -1,5 +1,6 @@
 """For testing the contamination from the pipette tip"""
 # Standard imports
+from json import tool
 from typing import Sequence
 
 # Non-standard imports
@@ -145,6 +146,8 @@ def contamination_assessment(
     # Rinse the electrode with electrode rinse
     print("5. Rinsing electrode")
     toolkit.mill.rinse_electrode()
+
+    toolkit.mill.rest_electrode()
 
     # End of experiment
     instructions.status = ExperimentStatus.COMPLETE

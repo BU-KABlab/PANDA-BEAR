@@ -648,7 +648,18 @@ class MockMill:
     def rinse_electrode(self):
         """Simulate rinsing the electrode"""
         self.logger.info("Rinsing the electrode")
-        time.sleep(10)
+        time.sleep(5)
+
+    def rest_electrode(self):
+        """
+        Rinse the electrode by moving it to the rinse position and back to the
+        center position.
+        Args:
+            None
+        Returns:
+            None
+        """
+        pass
 
     def move_to_safe_position(self):
         """Simulate moving to a safe position"""
