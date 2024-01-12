@@ -330,10 +330,10 @@ class Mill:
         """
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-        self.move_electrode_to_position(-373, -16, 0)
+        self.move_electrode_to_position(-409, -234, 0)
         for _ in range(3):
-            self.move_electrode_to_position(-373, -16, -45)
-            self.move_electrode_to_position(-373, -16, 0)
+            self.move_electrode_to_position(-409, -234, -45)
+            self.move_electrode_to_position(-409, -234, 0)
         return 0
 
     def rest_electrode(self):
@@ -345,7 +345,7 @@ class Mill:
         Returns:
             None
         """
-        self.safe_move(-373, -16, 0, instrument=Instruments.ELECTRODE)
+        self.safe_move(-409, -234, -45, instrument=Instruments.ELECTRODE)
         return 0
 
 
@@ -773,6 +773,7 @@ def movement_test():
                         instrument=Instruments.PIPETTE,
                     )
                 mill.move_to_safe_position()
+                mill.rest_electrode()
 
     except (
         MillConnectionError,
