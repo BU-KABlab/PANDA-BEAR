@@ -3,7 +3,7 @@
 from typing import Sequence
 
 # Non-standard imports
-from controller import Toolkit
+from instrument_toolkit import Toolkit
 from e_panda import (
     forward_pipette_v2,
     solution_selector,
