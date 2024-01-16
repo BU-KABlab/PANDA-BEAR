@@ -23,29 +23,27 @@ Returns:
 # Standard library imports
 import logging
 import math
-from typing import Optional, Tuple, Union, Sequence
+from typing import Optional, Sequence, Tuple, Union
+
 # Third party or custom imports
+from pathlib import Path
 import gamry_control_WIP as echem
-from gamry_control_WIP import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
+from camera_call_camera import capture_new_image
+from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_LOGS, PURGE_VOLUME,
+                           TESTING, PATH_TO_DATA)
+import controller
 #from gamry_control_WIP_mock import GamryPotentiostat as echem
 #from gamry_control_WIP_mock import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
-from experiment_class import (
-    ExperimentResult,
-    ExperimentStatus,
-    EchemExperimentBase,
-)
+from experiment_class import (EchemExperimentBase, ExperimentResult,
+                              ExperimentStatus)
+from gamry_control_WIP import (potentiostat_ca_parameters,
+                               potentiostat_cv_parameters,
+                               potentiostat_ocp_parameters)
 from log_tools import CustomLoggingFilter
-from mill_control import Mill, Instruments, MockMill
+from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
-from vials import Vessel, StockVial, WasteVial
-from wellplate import Wells, Well, Wells2
-from config.config import (
-    PATH_TO_LOGS,
-    AIR_GAP,
-    DRIP_STOP,
-    PURGE_VOLUME,
-    TESTING,
-)
+from vials import StockVial, Vessel, WasteVial
+from wellplate import Well, Wells, Wells2
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -780,6 +778,85 @@ def volume_correction(volume, density = None, viscosity = None):
         viscosity = 1.0
     corrected_volume = volume * (1.0 + (1.0 - density) * (1.0 - viscosity))
     return corrected_volume
+
+def image_well(
+    wellplate: Wells2,
+    instructions: EchemExperimentBase,
+    toolkit: controller.Toolkit,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
+    """
+    Image the well with the camera
+
+    Args:
+        wellplate (Wells object): The wellplate object
+        target_well (str): The alphanumeric name of the well you would like to image
+        toolkit (Toolkit): The toolkit object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+
+    Returns:
+        None (void function) since the objects are passed by reference
+    """
+    try:
+        # position lens above the well
+        logger.info("Moving camera above well %s", instructions.well_id)
+        toolkit.mill.safe_move(
+            wellplate.get_coordinates(instructions.well_id)["x"],
+            wellplate.get_coordinates(instructions.well_id)["y"],
+            wellplate.image_height,
+            Instruments.LENS,
+        )
+        logger.info("Imaging well %s", instructions.well_id)
+        # capture image
+        logger.debug("Capturing image of well %s", instructions.well_id)
+        file_name=Path(PATH_TO_DATA / "_".join([
+                 instructions.project_id
+                ,instructions.project_campaign_id
+                ,instructions.id
+                ,instructions.well_id
+                ,"image"]
+            )
+        ).with_suffix(".png")
+
+        while file_name.exists():
+            i = 1
+            file_name = Path(PATH_TO_DATA / "_".join([
+                 instructions.project_id
+                ,instructions.project_campaign_id
+                ,instructions.id
+                ,instructions.well_id
+                ,"image"
+                ,str(i)]
+                )
+            ).with_suffix(".png")
+            i += 1
+
+        capture_new_image(
+            save=True,
+            num_images=1,
+            file_name=
+            "_".join([
+                 instructions.project_id
+                ,instructions.project_campaign_id
+                ,instructions.id
+                ,instructions.well_id
+                ,"image.png"]
+            ),
+        )
+        logger.debug("Image of well %s captured", instructions.well_id)
+        # upload image to OBS
+        #logger.info("Uploading image of well %s to OBS", instructions.well_id)
+
+    except Exception as e:
+        logger.exception("Failed to image well %s", instructions.well_id)
+        raise e
+    finally:
+        # move camera to safe position
+        if wellplate.image_height < 0:
+            logger.info("Moving camera to safe position")
+            toolkit.mill.move_to_safe_position()
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""

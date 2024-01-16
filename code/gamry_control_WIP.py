@@ -13,13 +13,17 @@ from pydantic.dataclasses import dataclass
 import time
 import Analyzer
 from decimal import Decimal
+from config.config import (
+    PATH_TO_DATA,
+    PATH_TO_LOGS,
+)
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-system_handler = logging.FileHandler("code/logs/ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_LOGS)
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -162,21 +166,18 @@ def setfilename(experiment_id, experiment_type) -> pathlib.Path:
     """set the file name for the experiment"""
     global COMPLETE_FILE_NAME
     filename:pathlib.Path = (
-            pathlib.Path.cwd()
-            / "data"
-            / ("experiment-" + str(experiment_id) + "_mock_" + experiment_type)
+            PATH_TO_DATA
+            / ("experiment-" + str(experiment_id) + experiment_type)
         )
     # Check if the file already exists. If it does then add a number to the end of the file name
     if filename.exists():
         i = 1
         while filename.exists():
             filename = (
-                pathlib.Path.cwd()
-                / "data"
+                PATH_TO_DATA
                 / (
                     "experiment-"
                     + str(experiment_id)
-                    + "_mock_"
                     + experiment_type
                     + "_"
                     + str(i)

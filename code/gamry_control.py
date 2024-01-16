@@ -125,7 +125,7 @@ def setfilename(id, experiment):
     complete_file_name: pathlib.Path = filePath / ("experiment-" + id + "_" + experiment)
 
     if complete_file_name.exists():
-        '''If the file already exists, append a number to the end of the file name'''
+        # If the file already exists, append a number to the end of the file name
         print(f"file {complete_file_name} already exists")
         i = 1
         while complete_file_name.exists():
