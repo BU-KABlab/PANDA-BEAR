@@ -87,7 +87,7 @@ class Mill:
 
     def __enter__(self):
         """Enter the context manager"""
-        self.homing_sequence()        
+        self.homing_sequence()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -740,10 +740,10 @@ def movement_test():
             print(h1)
             print(h12)
             ## Load the vials
-            from e_panda import controller
+            import vials
 
-            stock_vials = controller.read_vials(STOCK_STATUS)
-            waste_vials = controller.read_vials(WASTE_STATUS)
+            stock_vials = vials.read_vials(STOCK_STATUS)
+            waste_vials = vials.read_vials(WASTE_STATUS)
 
             ## Move the pipette to each well corner
             mill.safe_move(

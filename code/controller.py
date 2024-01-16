@@ -13,59 +13,44 @@ Additionally controller should be able to:
 """
 # pylint: disable=line-too-long
 
+import json
+import logging
+
 # import standard libraries
 from dataclasses import dataclass
 from datetime import datetime
-import json
-import logging
-import pytz as tz
-from typing import Optional, Sequence, Union
 
 # import third-party libraries
-from pathlib import Path
-from print_panda import printpanda
-from mill_control import Mill
-from mill_control import MockMill
-from pump_control import Pump
-from pump_control import MockPump
+from typing import Sequence, Union
 
-# import gamry_control_WIP as echem
-# import gamry_control_WIP as echem
-import gamry_control_WIP_mock as echem
-from sartorius_local import Scale
-from sartorius_local.mock import Scale as MockScale
-
-# import obs_controls as obs
-from slack_functions2 import SlackBot
-from scheduler import Scheduler
 import e_panda
-from experiment_class import ExperimentResult, ExperimentBase, ExperimentStatus
-from vials import StockVial, Vial2, WasteVial
+import pytz as tz
 import wellplate as wellplate_module
-
-
 from config.config import (
-    MILL_CONFIG,
-    WELLPLATE_LOCATION as WELLPLATE_CONFIG_FILE,
-    PATH_TO_SYSTEM_STATE,
-    PATH_TO_COMPLETED_EXPERIMENTS,
-    PATH_TO_ERRORED_EXPERIMENTS,
-    PATH_TO_DATA,
     PATH_TO_LOGS,
-    WELL_HX as PATH_TO_WELL_HX,
     RANDOM_FLAG,
     STOCK_STATUS,
     WASTE_STATUS,
     WELL_STATUS,
 )
+from experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
+from mill_control import Mill, MockMill
+from pump_control import MockPump, Pump
+from sartorius_local import Scale
+from sartorius_local.mock import Scale as MockScale
+from scheduler import Scheduler
 
+# import obs_controls as obs
+from slack_functions2 import SlackBot
+from vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
+from wellplate import save_current_wellplate
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter(
     "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
 )
-system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
+system_handler = logging.FileHandler(PATH_TO_LOGS)
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -82,20 +67,18 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
-    import protocols
     import exp_b_pipette_contamination_assessment_protocol as exp_b
+    #import protocols
+
     ## Reset the logger to log to the ePANDA.log file and format
     e_panda.apply_log_filter()
-    #print(printpanda())
+    # print(printpanda())
     print("Starting ePANDA...")
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
     toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
-        ## Check for required files
-        check_required_files()
-
         # Connect to equipment
         toolkit = connect_to_instruments(use_mock_instruments)
         logger.info("Connected to instruments")
@@ -110,13 +93,13 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         ## Flush the pipette tip with water before we start
         for _ in range(3):
             e_panda.flush_v2(
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-            flush_solution_name="rinse0",
-            flush_volume=140,
-            pump=toolkit.pump,
-            mill=toolkit.mill,
-        )
+                stock_vials=stock_vials,
+                waste_vials=waste_vials,
+                flush_solution_name="rinse0",
+                flush_volume=140,
+                pump=toolkit.pump,
+                mill=toolkit.mill,
+            )
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)
             update_vial_state_file(waste_vials, WASTE_STATUS)
@@ -332,42 +315,17 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
         print("ePANDA is shutting down...goodbye")
 
+
 @dataclass
 class Toolkit:
     """A class to hold all of the instruments"""
+
     mill: Union[Mill, MockMill]
     scale: Union[Scale, MockScale]
     pump: Union[Pump, MockPump]
     wellplate: wellplate_module.Wells2 = None
     global_logger: logging.Logger = None
     experiment_logger: logging.Logger = None
-
-def test_build_toolkit():
-    """Test the building of the toolkit and checking that they are connected or not"""
-    mill = Mill()
-    scale = Scale()
-    pump = Pump(mill=mill, scale=scale)
-    instruments = Toolkit(mill=mill, scale=scale, pump=pump)
-    return instruments
-
-
-def check_required_files():
-    """Confirm all required directories and files exist"""
-    logger.info("Checking for required files and directories")
-    required_files = [
-        MILL_CONFIG,
-        PATH_TO_SYSTEM_STATE,
-        PATH_TO_COMPLETED_EXPERIMENTS,
-        PATH_TO_ERRORED_EXPERIMENTS,
-        PATH_TO_DATA,
-        PATH_TO_LOGS,
-    ]
-
-    for file in required_files:
-        if not Path(file).exists():
-            logger.error("The %s is missing", file)
-            slack.send_slack_message("alert", f"The {file} is missing")
-            raise FileNotFoundError
 
 
 def establish_system_state() -> (
@@ -523,7 +481,14 @@ def connect_to_instruments(use_mock_instruments: bool = False):
         scale = MockScale()
         pump = MockPump(mill=mill, scale=scale)
         # pstat = echem_mock.GamryPotentiostat.connect()
-        instruments = Toolkit(mill=mill, scale=scale, pump=pump, wellplate=None, global_logger=logger, experiment_logger=logger)
+        instruments = Toolkit(
+            mill=mill,
+            scale=scale,
+            pump=pump,
+            wellplate=None,
+            global_logger=logger,
+            experiment_logger=logger,
+        )
         return instruments
 
     logger.info("Connecting to instruments:")
@@ -532,7 +497,14 @@ def connect_to_instruments(use_mock_instruments: bool = False):
     scale = Scale(address="COM6")
     pump = Pump(mill=mill, scale=scale)
     # pstat_connected = echem.pstatconnect()
-    instruments = Toolkit(mill=mill, scale=scale, pump=pump, wellplate=None, global_logger=logger, experiment_logger=logger)
+    instruments = Toolkit(
+        mill=mill,
+        scale=scale,
+        pump=pump,
+        wellplate=None,
+        global_logger=logger,
+        experiment_logger=logger,
+    )
     return instruments
 
 
@@ -549,469 +521,7 @@ def disconnect_from_instruments(instruments: Toolkit):
     logger.info("Disconnected from instruments")
 
 
-def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
-    """
-    Read in the virtual vials from the json file
-    """
-    filename_ob = Path.cwd() / filename
-    with open(filename_ob, "r", encoding="ascii") as file:
-        vial_parameters = json.load(file)
 
-    list_of_solutions = []
-    for items in vial_parameters:
-        if items["name"] is not None:
-            if items["category"] == 0:
-                read_vial = StockVial(
-                    name=str(items["name"]).lower(),
-                    position=str(items["position"]).lower(),
-                    volume=items["volume"],
-                    capacity=items["capacity"],
-                    density=items["density"],
-                    coordinates={"x": items["x"], "y": items["y"]},
-                    z_bottom=items["z_bottom"],
-                    radius=items["radius"],
-                    height=items["height"],
-                    contamination=items["contamination"],
-                    contents=items["contents"],
-                    viscosity_cp=items["viscosity_cp"],
-                )
-                list_of_solutions.append(read_vial)
-            elif items["category"] == 1:
-                read_vial = WasteVial(
-                    name=str(items["name"]).lower(),
-                    position=str(items["position"]).lower(),
-                    volume=items["volume"],
-                    capacity=items["capacity"],
-                    density=items["density"],
-                    coordinates={"x": items["x"], "y": items["y"]},
-                    z_bottom=items["z_bottom"],
-                    radius=items["radius"],
-                    height=items["height"],
-                    contamination=items["contamination"],
-                    contents=items["contents"],
-                    viscosity_cp=items["viscosity_cp"],
-                )
-                list_of_solutions.append(read_vial)
-    return list_of_solutions
-
-
-def update_vial_state_file(vial_objects: Sequence[Vial2], filename):
-    """
-    Update the vials in the json file. This is used to update the volume and contamination of the vials
-    """
-    filename_ob = Path.cwd() / filename
-    with open(filename_ob, "r", encoding="UTF-8") as file:
-        vial_parameters = json.load(file)
-
-    for vial in vial_objects:
-        for vial_param in vial_parameters:
-            if str(vial_param["position"]) == vial.position.lower():
-                vial_param["volume"] = vial.volume
-                vial_param["contamination"] = vial.contamination
-                vial_param["contents"] = vial.contents
-                break
-
-    with open(filename_ob, "w", encoding="UTF-8") as file:
-        json.dump(vial_parameters, file, indent=4)
-
-    return 0
-
-
-def input_new_vial_values(vialgroup: str):
-    """For user inputting the new vial values for the state file"""
-    ## Fetch the current state file
-    filename = ""
-    if vialgroup == "stock":
-        filename = STOCK_STATUS
-    elif vialgroup == "waste":
-        filename = WASTE_STATUS
-    else:
-        logger.error("Invalid vialgroup")
-        raise ValueError
-
-    with open(filename, "r", encoding="UTF-8") as file:
-        vial_parameters = json.load(file)
-
-    ## Print the current vials and their values
-    print("Current vials:")
-    print(
-        f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Density':<15} {'Volume':<15} {'Capacity':<15} {'Contamination':<15}"
-    )
-    for vial in vial_parameters:
-        vial = Vial2(**vial)
-        if vial.contents is None:
-            vial.contents = {}
-        if vial.name is None:
-            # All parameters are blank except for position
-            vial.name = ""
-            vial.contents = ""
-            vial.density = ""
-            vial.volume = ""
-            vial.capacity = ""
-            vial.contamination = ""
-
-        print(
-            f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
-        )
-        # for key, value in vial.items():
-        #     if value is None:
-        #         vial[key] = ""
-        # print(
-        #     f"{vial['position']:<10} {vial['name']:<20} {vial['contents']:<20} {vial["density"]} {vial['volume']:<10} {vial['capacity']:<10} {vial['contamination']:<15}"
-        # )
-    while True:
-        choice = input(
-            "Which vial would you like to change? Enter the position of the vial or 'q' if finished: "
-        )
-        if choice == "q":
-            break
-        for vial in vial_parameters:
-            if vial['position'] == choice:
-                print(
-                    "Please enter the new values for the vial, if you leave any blank the value will not be changed"
-                )
-                print(f"\nVial {vial['position']}:")
-                new_name = input(
-                    f"Enter the new name of the vial (Current name is {vial['name']}): "
-                )
-                if new_name != "":
-                    vial["name"] = new_name
-                new_contents = input(
-                    f"Enter the new contents of the vial (Current contents are {vial['contents']}): "
-                )
-                if new_contents != "":
-                    vial["contents"] = new_contents
-                new_density = input(
-                    f"Enter the new density of the vial (Current density is {vial['density']}): "
-                )
-                if new_density != "":
-                    vial["density"] = float(new_density)                
-                new_volume = input(
-                    f"Enter the new volume of the vial (Current volume is {vial['volume']}): "
-                )
-                if new_volume != "":
-                    vial["volume"] = int(new_volume)
-                new_capacity = input(
-                    f"Enter the new capacity of the vial (Current capacity is {vial['capacity']}): "
-                )
-                if new_capacity != "":
-                    vial["capacity"] = int(new_capacity)
-                new_contamination = input(
-                    f"Enter the new contamination of the vial (Current contamination is {vial['contamination']}): "
-                )
-                if new_contamination != "":
-                    vial["contamination"] = int(new_contamination)
-                #print("\r" + " " * 100 + "\r", end="")  # Clear the previous table
-                print("\nCurrent vials:")
-                print(
-                    f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Density':<15} {'Volume':<15} {'Capacity':<15} {'Contamination':<15}"
-                )
-                for vial in vial_parameters:
-                    vial = Vial2(**vial)
-                    if vial.contents is None:
-                        vial.contents = {}
-                    if vial.name is None:
-                        # All parameters are blank except for position
-                        vial.name = ""
-                        vial.contents = ""
-                        vial.density = ""
-                        vial.volume = ""
-                        vial.capacity = ""
-                        vial.contamination = ""
-                        
-                    print(
-                        f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
-                    )
-                break
-        else:
-            print("Invalid vial position")
-            continue
-
-    ## Write the new values to the state file
-    with open(filename, "w", encoding="UTF-8") as file:
-        json.dump(vial_parameters, file, indent=4)
-
-
-def reset_vials(vialgroup: str):
-    """
-    Resets the volume and contamination of the current vials to their capacity and 0 respectively
-
-    Args:
-        vialgroup (str): The group of vials to be reset. Either "stock" or "waste"
-    """
-    ## Fetch the current state file
-    filename = ""
-    if vialgroup == "stock":
-        filename = STOCK_STATUS
-    elif vialgroup == "waste":
-        filename = WASTE_STATUS
-    else:
-        logger.error("Invalid vialgroup")
-        raise ValueError
-
-    with open(filename, "r", encoding="UTF-8") as file:
-        vial_parameters = json.load(file)
-
-    ## Loop through each vial and set the volume and contamination
-    for vial in vial_parameters:
-        if vialgroup == "stock":
-            vial["volume"] = vial["capacity"]
-        elif vialgroup == "waste":
-            vial["volume"] = 1000
-            vial["contents"] = {}
-        vial["contamination"] = 0
-
-    ## Write the new values to the state file
-    with open(filename, "w", encoding="UTF-8") as file:
-        json.dump(vial_parameters, file, indent=4)
-
-
-def load_new_wellplate(
-    ask: bool = False,
-    new_plate_id: Optional[int] = None,
-    new_wellplate_type_number: Optional[int] = None,
-) -> int:
-    """
-    Save the current wellplate, reset the well statuses to new.
-    If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1
-
-    Args:
-        new_plate_id (int, optional): The plate id being loaded. Defaults to None. If None, the plate id will be incremented by 1
-        new_wellplate_type_number (int, optional): The type of wellplate. Defaults to None. If None, the type number will not be changed
-
-    Returns:
-        int: The new wellplate id
-    """
-    (
-        current_wellplate_id,
-        current_type_number,
-        current_wellplate_is_new,
-    ) = save_current_wellplate()
-
-    if ask:
-        new_plate_id = int(
-            input(
-                f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
-            )
-        )
-        new_wellplate_type_number = int(
-            input(
-                f"Enter the new wellplate type number (Current type is {current_type_number}): "
-            )
-        )
-    else:
-        if new_plate_id is None:
-            new_plate_id = current_wellplate_id + 1
-        if new_wellplate_type_number is None:
-            new_wellplate_type_number = current_type_number
-
-    well_status_file = WELL_STATUS
-    if current_wellplate_is_new and new_plate_id is None:
-        return current_wellplate_id
-
-    ## Check if the new plate id exists in the well hx
-    ## If so, then load in that wellplate
-    ## If not, then create a new wellplate
-    if new_plate_id is None:
-        new_plate_id = current_wellplate_id + 1
-    else:
-        new_plate_id = int(new_plate_id)
-
-    if new_wellplate_type_number is None:
-        new_wellplate_type_number = current_type_number
-    else:
-        new_wellplate_type_number = int(new_wellplate_type_number)
-
-    if Path(PATH_TO_WELL_HX).exists():
-        with open(PATH_TO_WELL_HX, "r", encoding="UTF-8") as file:
-            well_hx = file.readlines()
-        wells = []
-        for line in well_hx:
-            if line.split(",")[0] == str(new_plate_id):
-                wells.append(line.strip())
-        if len(wells) > 0:
-            ## If the wellplate exists in the well hx, then load it
-            logger.debug("Loading wellplate")
-            with open(well_status_file, "w", encoding="UTF-8") as file:
-                json.dump(
-                    {
-                        "plate_id": int(new_plate_id),
-                        "type_number": int(new_wellplate_type_number),
-                        "wells": [
-                            {
-                                "well_id": line.split(",")[2],
-                                "status": line.split(",")[5],
-                                "status_date": line.split(",")[6],
-                                "contents": json.loads(line.split(",")[7]),
-                                "experiment_id": line.split(",")[3],
-                                "project_id": str(line.split(",")[4]),
-                            }
-                            for line in wells
-                        ],
-                    },
-                    file,
-                    indent=4,
-                )
-            logger.debug("Wellplate loaded")
-            logger.info("Wellplate %d loaded", int(new_plate_id))
-        return new_plate_id
-    
-    ## If the wellplate does not exist in the well hx, then create a new wellplate
-    ## Go through a reset all fields and apply new plate id
-    logger.debug("Resetting well statuses to new")
-    new_wellplate = {
-        "plate_id": new_plate_id,
-        "type_number": new_wellplate_type_number,
-        "wells": [
-            {
-                "well_id": chr(65 + (i // 12)) + str(i % 12 + 1),
-                "status": "new",
-                "status_date": "",
-                "contents": {},
-                "experiment_id": "",
-                "project_id": "",
-            }
-            for i in range(96)
-        ],
-    }
-
-    with open(well_status_file, "w", encoding="UTF-8") as file:
-        json.dump(new_wellplate, file, indent=4)
-
-    logger.debug("Well statuses reset to new")
-    logger.info(
-        "Wellplate %d saved and wellplate %d loaded",
-        int(current_wellplate_id),
-        int(new_plate_id),
-    )
-    return new_plate_id
-
-
-def save_current_wellplate():
-    """Save the current wellplate"""
-    wellplate_is_new = True
-    well_status_file = WELL_STATUS
-
-    ## Go through a reset all fields and apply new plate id
-    logger.debug("Saving wellplate")
-    ## Open the current status file for the plate id , type number, and wells
-    with open(well_status_file, "r", encoding="UTF-8") as file:
-        current_wellplate = json.load(file)
-    current_plate_id = current_wellplate["plate_id"]
-    current_type_number = current_wellplate["type_number"]
-    ## Check if the wellplate is new still or not
-    for well in current_wellplate["wells"]:
-        if well["status"] != "new":
-            wellplate_is_new = False
-            break
-
-    ## Save each well to the well_history.csv file in the data folder even if it is empty
-    ## plate id, type number, well id, experiment id, project id, status, status date, contents
-    logger.debug("Saving well statuses to well_history.csv")
-
-    # if the plate has been partially used before then there will be entries in the well_history.csv file
-    # these entries will have the same plate id as the current wellplate
-    # we want to write over these entries with the current well statuses
-
-    # write back all lines that are not the same plate id as the current wellplate
-
-    with open(PATH_TO_WELL_HX, "r", encoding="UTF-8") as input_file:
-        with open(
-            PATH_TO_DATA / "new_well_history.csv", "w", encoding="UTF-8"
-        ) as output_file:
-            for line in input_file:
-                # Check if the line has the same plate ID as the current_plate_id
-                if line.split(",")[0] == str(current_plate_id):
-                    continue  # Skip this line
-                # If the plate ID is different, write the line to the output file
-                output_file.write(line)
-    ## delete the old well_history.csv file
-    Path(PATH_TO_WELL_HX).unlink()
-
-    ## rename the new_well_history.csv file to well_history.csv
-    Path(PATH_TO_DATA / "new_well_history.csv").rename(PATH_TO_WELL_HX)
-
-    # write the current well statuses to the well_history.csv file
-    with open(PATH_TO_WELL_HX, "a", encoding="UTF-8") as file:
-        for well in current_wellplate["wells"]:
-            # if the well is still queued then there is nothing in it and we can unallocated it
-            if well["status"] == "queued":
-                well["status"] = "new"
-                well["experiment_id"] = ""
-                well["project_id"] = ""
-
-            file.write(
-                f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}"
-            )
-            file.write("\n")
-
-    logger.debug("Wellplate saved")
-    logger.info("Wellplate %d saved", int(current_plate_id))
-    return int(current_plate_id), int(current_type_number), wellplate_is_new
-
-
-def change_wellplate_location():
-    """Change the location of the wellplate"""
-    ## Load the working volume from mill_config.json
-    with open(MILL_CONFIG, "r", encoding="UTF-8") as file:
-        mill_config = json.load(file)
-    working_volume = mill_config["working_volume"]
-
-    ## Ask for the new location
-    while True:
-        new_location_x = float(input("Enter the new x location of the wellplate: "))
-
-        if new_location_x > working_volume["x"] and new_location_x < 0:
-            break
-
-        print(
-            f"Invalid input. Please enter a value between {working_volume['x']} and 0."
-        )
-
-    while True:
-        new_location_y = float(input("Enter the new y location of the wellplate: "))
-
-        if new_location_y > working_volume["y"] and new_location_y < 0:
-            break
-
-        print(
-            f"Invalid input. Please enter a value between {working_volume['y']} and 0."
-        )
-
-    # Keep asking for input until the user enters a valid input
-    while True:
-        new_orientation = int(
-            input(
-                """
-                Orientation of the wellplate:
-                    0 - Vertical, wells become more negative from A1
-                    1 - Vertical, wells become less negative from A1
-                    2 - Horizontal, wells become more negative from A1
-                    3 - Horizontal, wells become less negative from A1
-                Enter the new orientation of the wellplate: 
-                """
-            )
-        )
-        if new_orientation in [0, 1, 2, 3]:
-            break
-        else:
-            print("Invalid input. Please enter 0, 1, 2, or 3.")
-
-    ## Get the current location config
-    with open(WELLPLATE_CONFIG_FILE, "r", encoding="UTF-8") as file:
-        current_location = json.load(file)
-
-    new_location = {
-        "x": new_location_x,
-        "y": new_location_y,
-        "orientation": new_orientation,
-        "rows": current_location["rows"],
-        "cols": current_location["cols"],
-        "z-bottom": current_location["z-bottom"],
-    }
-    ## Write the new location to the wellplate_location.txt file
-    with open(WELLPLATE_CONFIG_FILE, "w", encoding="UTF-8") as file:
-        json.dump(new_location, file, indent=4)
 
 
 if __name__ == "__main__":

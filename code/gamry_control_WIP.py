@@ -20,13 +20,7 @@ from config.config import (
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-system_handler = logging.FileHandler(PATH_TO_LOGS)
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
-
+logger = logging.getLogger('ePANDA')
 # global variables
 global PSTAT
 global DEVICES

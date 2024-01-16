@@ -1,8 +1,8 @@
 {
-    "x": -231.3,
-    "y": -29.1,
+    "x": -231,
+    "y": -29,
     "orientation": 0,
     "rows": 13,
     "cols": "ABCDEFGH",
-    "z-bottom": -77
+    "z-bottom": -76
 }

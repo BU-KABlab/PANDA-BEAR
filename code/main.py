@@ -6,7 +6,8 @@ Or starting the ePANDA either with or without mock instruments.
 """
 import sys
 import controller
-
+import vials
+import wellplate
 def run_epanda():
     """Runs ePANDA."""
     controller.main()
@@ -17,27 +18,27 @@ def run_epanda_mock():
 
 def change_wellplate():
     """Changes the current wellplate."""
-    controller.load_new_wellplate(ask = True)
+    wellplate.load_new_wellplate(ask = True)
 
 def reset_vials_stock():
     """Resets the stock vials."""
-    controller.reset_vials('stock')
+    vials.reset_vials('stock')
 
 def reset_vials_waste():
     """Resets the waste vials."""
-    controller.reset_vials('waste')
+    vials.reset_vials('waste')
 
 def input_new_vial_values_stock():
     """Inputs new values for the stock vials."""
-    controller.input_new_vial_values('stock')
+    vials.input_new_vial_values('stock')
 
 def input_new_vial_values_waste():
     """Inputs new values for the waste vials."""
-    controller.input_new_vial_values('waste')
+    vials.input_new_vial_values('waste')
 
 def change_wellplate_location():
     """Changes the location of the current wellplate."""
-    controller.change_wellplate_location()
+    wellplate.change_wellplate_location()
 
 def exit_program():
     """Exits the program."""

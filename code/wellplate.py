@@ -10,14 +10,20 @@ import math
 import json
 import os
 from typing import Dict, List, Tuple
+from pathlib import Path
 import matplotlib.pyplot as plt
+from typing import Optional
 #from config.file_locations import *
 from config.config import (
-    WELL_STATUS as WELL_STATUS_FILE,
+    MILL_CONFIG,
+    WELL_STATUS,
     STOCK_STATUS,
     WASTE_STATUS,
     WELL_TYPE,
-    WELLPLATE_LOCATION
+    WELLPLATE_LOCATION,
+    WELL_HX,
+    PATH_TO_DATA,
+
 )
 from experiment_class import ExperimentStatus
 from vials import Vessel
@@ -75,7 +81,7 @@ class Well(Vessel):
         logger.debug("New %s contents: %s", self.name, self.contents)
         # Update the well status file
         logger.debug("Updating well status file...")
-        with open(WELL_STATUS_FILE, "r", encoding="utf-8") as f:
+        with open(WELL_STATUS, "r", encoding="utf-8") as f:
             data = json.load(f)
             for well in data["wells"]:
                 if well["well_id"] == self.well_id:
@@ -83,7 +89,7 @@ class Well(Vessel):
                     logger.debug("Well %s contents updated to %s", self.name, self.contents)
                     break
 
-        with open(WELL_STATUS_FILE, "w", encoding="utf-8") as f:
+        with open(WELL_STATUS, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
         logger.debug("Well status file updated")
 
@@ -195,7 +201,7 @@ class Wells:
 
     def update_well_status_from_json_file(self):
         """Update the well status from a file"""
-        with open(WELL_STATUS_FILE, "r", encoding="UTF-8") as f:
+        with open(WELL_STATUS, "r", encoding="UTF-8") as f:
             data = json.load(f)
             for well in data["wells"]:
                 well_id = well["well_id"]
@@ -486,7 +492,7 @@ class Wells2:
         """Update the well status from a file"""
 
         logger.debug("Updating well status's from file...")
-        with open(WELL_STATUS_FILE, "r", encoding="utf-8") as f:
+        with open(WELL_STATUS, "r", encoding="utf-8") as f:
             data = json.load(f)
             for saved_well in data["wells"]:
                 for well_id, well in self.wells.items():
@@ -835,6 +841,253 @@ def test_stage_display():
     plt.xlim(-420, 0)
     plt.ylim(-310, 0)
     plt.show()
+
+def change_wellplate_location():
+    """Change the location of the wellplate"""
+    ## Load the working volume from mill_config.json
+    with open(MILL_CONFIG, "r", encoding="UTF-8") as file:
+        mill_config = json.load(file)
+    working_volume = mill_config["working_volume"]
+
+    ## Ask for the new location
+    while True:
+        new_location_x = float(input("Enter the new x location of the wellplate: "))
+
+        if new_location_x > working_volume["x"] and new_location_x < 0:
+            break
+
+        print(
+            f"Invalid input. Please enter a value between {working_volume['x']} and 0."
+        )
+
+    while True:
+        new_location_y = float(input("Enter the new y location of the wellplate: "))
+
+        if new_location_y > working_volume["y"] and new_location_y < 0:
+            break
+
+        print(
+            f"Invalid input. Please enter a value between {working_volume['y']} and 0."
+        )
+
+    # Keep asking for input until the user enters a valid input
+    while True:
+        new_orientation = int(
+            input(
+                """
+                Orientation of the wellplate:
+                    0 - Vertical, wells become more negative from A1
+                    1 - Vertical, wells become less negative from A1
+                    2 - Horizontal, wells become more negative from A1
+                    3 - Horizontal, wells become less negative from A1
+                Enter the new orientation of the wellplate: 
+                """
+            )
+        )
+        if new_orientation in [0, 1, 2, 3]:
+            break
+        else:
+            print("Invalid input. Please enter 0, 1, 2, or 3.")
+
+    ## Get the current location config
+    with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as file:
+        current_location = json.load(file)
+
+    new_location = {
+        "x": new_location_x,
+        "y": new_location_y,
+        "orientation": new_orientation,
+        "rows": current_location["rows"],
+        "cols": current_location["cols"],
+        "z-bottom": current_location["z-bottom"],
+    }
+    ## Write the new location to the wellplate_location.txt file
+    with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as file:
+        json.dump(new_location, file, indent=4)
+
+
+def load_new_wellplate(
+    ask: bool = False,
+    new_plate_id: Optional[int] = None,
+    new_wellplate_type_number: Optional[int] = None,
+) -> int:
+    """
+    Save the current wellplate, reset the well statuses to new.
+    If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1
+
+    Args:
+        new_plate_id (int, optional): The plate id being loaded. Defaults to None. If None, the plate id will be incremented by 1
+        new_wellplate_type_number (int, optional): The type of wellplate. Defaults to None. If None, the type number will not be changed
+
+    Returns:
+        int: The new wellplate id
+    """
+    (
+        current_wellplate_id,
+        current_type_number,
+        current_wellplate_is_new,
+    ) = save_current_wellplate()
+
+    if ask:
+        new_plate_id = int(
+            input(
+                f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
+            )
+        )
+        new_wellplate_type_number = int(
+            input(
+                f"Enter the new wellplate type number (Current type is {current_type_number}): "
+            )
+        )
+    else:
+        if new_plate_id is None:
+            new_plate_id = current_wellplate_id + 1
+        if new_wellplate_type_number is None:
+            new_wellplate_type_number = current_type_number
+
+    WELL_STATUS = WELL_STATUS
+    if current_wellplate_is_new and new_plate_id is None:
+        return current_wellplate_id
+
+    ## Check if the new plate id exists in the well hx
+    ## If so, then load in that wellplate
+    ## If not, then create a new wellplate
+    if new_plate_id is None:
+        new_plate_id = current_wellplate_id + 1
+    else:
+        new_plate_id = int(new_plate_id)
+
+    if new_wellplate_type_number is None:
+        new_wellplate_type_number = current_type_number
+    else:
+        new_wellplate_type_number = int(new_wellplate_type_number)
+
+    if Path(WELL_HX).exists():
+        with open(WELL_HX, "r", encoding="UTF-8") as file:
+            well_hx = file.readlines()
+        wells = []
+        for line in well_hx:
+            if line.split(",")[0] == str(new_plate_id):
+                wells.append(line.strip())
+        if len(wells) > 0:
+            ## If the wellplate exists in the well hx, then load it
+            logger.debug("Loading wellplate")
+            with open(WELL_STATUS, "w", encoding="UTF-8") as file:
+                json.dump(
+                    {
+                        "plate_id": int(new_plate_id),
+                        "type_number": int(new_wellplate_type_number),
+                        "wells": [
+                            {
+                                "well_id": line.split(",")[2],
+                                "status": line.split(",")[5],
+                                "status_date": line.split(",")[6],
+                                "contents": json.loads(line.split(",")[7]),
+                                "experiment_id": line.split(",")[3],
+                                "project_id": str(line.split(",")[4]),
+                            }
+                            for line in wells
+                        ],
+                    },
+                    file,
+                    indent=4,
+                )
+            logger.debug("Wellplate loaded")
+            logger.info("Wellplate %d loaded", int(new_plate_id))
+        return new_plate_id
+
+    ## If the wellplate does not exist in the well hx, then create a new wellplate
+    ## Go through a reset all fields and apply new plate id
+    logger.debug("Resetting well statuses to new")
+    new_wellplate = {
+        "plate_id": new_plate_id,
+        "type_number": new_wellplate_type_number,
+        "wells": [
+            {
+                "well_id": chr(65 + (i // 12)) + str(i % 12 + 1),
+                "status": "new",
+                "status_date": "",
+                "contents": {},
+                "experiment_id": "",
+                "project_id": "",
+            }
+            for i in range(96)
+        ],
+    }
+
+    with open(WELL_STATUS, "w", encoding="UTF-8") as file:
+        json.dump(new_wellplate, file, indent=4)
+
+    logger.debug("Well statuses reset to new")
+    logger.info(
+        "Wellplate %d saved and wellplate %d loaded",
+        int(current_wellplate_id),
+        int(new_plate_id),
+    )
+    return new_plate_id
+
+
+def save_current_wellplate():
+    """Save the current wellplate"""
+    wellplate_is_new = True
+    WELL_STATUS = WELL_STATUS
+
+    ## Go through a reset all fields and apply new plate id
+    logger.debug("Saving wellplate")
+    ## Open the current status file for the plate id , type number, and wells
+    with open(WELL_STATUS, "r", encoding="UTF-8") as file:
+        current_wellplate = json.load(file)
+    current_plate_id = current_wellplate["plate_id"]
+    current_type_number = current_wellplate["type_number"]
+    ## Check if the wellplate is new still or not
+    for well in current_wellplate["wells"]:
+        if well["status"] != "new":
+            wellplate_is_new = False
+            break
+
+    ## Save each well to the well_history.csv file in the data folder even if it is empty
+    ## plate id, type number, well id, experiment id, project id, status, status date, contents
+    logger.debug("Saving well statuses to well_history.csv")
+
+    # if the plate has been partially used before then there will be entries in the well_history.csv file
+    # these entries will have the same plate id as the current wellplate
+    # we want to write over these entries with the current well statuses
+
+    # write back all lines that are not the same plate id as the current wellplate
+
+    with open(WELL_HX, "r", encoding="UTF-8") as input_file:
+        with open(
+            PATH_TO_DATA / "new_well_history.csv", "w", encoding="UTF-8"
+        ) as output_file:
+            for line in input_file:
+                # Check if the line has the same plate ID as the current_plate_id
+                if line.split(",")[0] == str(current_plate_id):
+                    continue  # Skip this line
+                # If the plate ID is different, write the line to the output file
+                output_file.write(line)
+    ## delete the old well_history.csv file
+    Path(WELL_HX).unlink()
+
+    ## rename the new_well_history.csv file to well_history.csv
+    Path(PATH_TO_DATA / "new_well_history.csv").rename(WELL_HX)
+
+    # write the current well statuses to the well_history.csv file
+    with open(WELL_HX, "a", encoding="UTF-8") as file:
+        for well in current_wellplate["wells"]:
+            # if the well is still queued then there is nothing in it and we can unallocated it
+            if well["status"] == "queued":
+                well["status"] = "new"
+                well["experiment_id"] = ""
+                well["project_id"] = ""
+
+            file.write(
+                f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}"
+            )
+            file.write("\n")
+
+    logger.debug("Wellplate saved")
+    logger.info("Wellplate %d saved", int(current_plate_id))
+    return int(current_plate_id), int(current_type_number), wellplate_is_new
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ import gamry_control_WIP as echem
 from camera_call_camera import capture_new_image
 from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_LOGS, PURGE_VOLUME,
                            TESTING, PATH_TO_DATA)
-import controller
+import instrument_toolkit
 #from gamry_control_WIP_mock import GamryPotentiostat as echem
 #from gamry_control_WIP_mock import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
 from experiment_class import (EchemExperimentBase, ExperimentResult,
@@ -782,7 +782,7 @@ def volume_correction(volume, density = None, viscosity = None):
 def image_well(
     wellplate: Wells2,
     instructions: EchemExperimentBase,
-    toolkit: controller.Toolkit,
+    toolkit: instrument_toolkit.Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
 ):
