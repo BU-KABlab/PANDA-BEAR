@@ -740,10 +740,10 @@ def movement_test():
             print(h1)
             print(h12)
             ## Load the vials
-            from controller import read_vials
+            from e_panda import controller
 
-            stock_vials = read_vials(STOCK_STATUS)
-            waste_vials = read_vials(WASTE_STATUS)
+            stock_vials = controller.read_vials(STOCK_STATUS)
+            waste_vials = controller.read_vials(WASTE_STATUS)
 
             ## Move the pipette to each well corner
             mill.safe_move(
