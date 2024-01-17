@@ -472,7 +472,7 @@ class Wells2:
                     well_id=well_id,
                     coordinates=coordinates,
                     volume=volume,
-                    height=self.height,
+                    height=self.z_top,
                     depth=depth,
                     status="new",
                     density=1.0,

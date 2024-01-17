@@ -30,6 +30,7 @@ from config.config import (
     EPANDA_LOG,
     RANDOM_FLAG,
     STOCK_STATUS,
+    TESTING,
     WASTE_STATUS,
     WELL_STATUS,
 )
@@ -58,7 +59,7 @@ logger.addHandler(system_handler)
 slack = SlackBot()
 
 
-def main(use_mock_instruments: bool = False, one_off: bool = False):
+def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     """
     Main function
 
@@ -310,6 +311,7 @@ def main(use_mock_instruments: bool = False, one_off: bool = False):
         # Save the current wellplate
         save_current_wellplate()
         # close out of serial connections
+        toolkit.mill.rest_electrode()
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")

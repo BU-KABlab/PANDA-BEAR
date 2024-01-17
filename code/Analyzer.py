@@ -132,9 +132,9 @@ def plotdata(exp_name: str, complete_file_name: Path, showplot=False):
 
 if __name__ == "__main__":
     file = Path(
-        r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\experiment-10000370OCP_char.txt"
+        r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\experiment-10000373CV.txt"
     )
-    plotdata("OCP", file, False)
+    plotdata("CV", file, False)
 
     # file = Path(
     #     r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\experiment-0CV.txt"

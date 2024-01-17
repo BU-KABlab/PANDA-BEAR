@@ -145,12 +145,22 @@ def forward_pipette_v2(
                 logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.coordinates)
             else:
                 logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
-            mill.safe_move(
-                from_vessel.coordinates["x"],
-                from_vessel.coordinates["y"],
-                from_vessel.depth,
-                Instruments.PIPETTE,
-            )  # go to solution depth
+            # if from vessel is a well, go to well depth
+            if isinstance(from_vessel,Well):
+                from_vessel: Well = from_vessel
+                mill.safe_move(
+                    from_vessel.coordinates["x"],
+                    from_vessel.coordinates["y"],
+                    from_vessel.depth,
+                    Instruments.PIPETTE,
+                )
+            else:  # go to safe height above vial
+                mill.safe_move(
+                    from_vessel.coordinates["x"],
+                    from_vessel.coordinates["y"],
+                    from_vessel.depth,
+                    Instruments.PIPETTE,
+                )  # go to solution depth
             # Withdraw the solution from the source and receive the updated vessel object
             pump.withdraw(
                 volume=repetition_vol,
@@ -179,7 +189,7 @@ def forward_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.depth,  # to_vessel.depth,
+                    to_vessel.height,  # FIXME: to_vessel.height,
                     Instruments.PIPETTE,
                 )
             else:  # go to safe height above waste vial
@@ -661,7 +671,6 @@ def deposition(
 
     return dep_instructions, dep_results
 
-
 def characterization(
     char_instructions: EchemExperimentBase,
     char_results: ExperimentResult,
@@ -812,26 +821,26 @@ def image_well(
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
-        file_name =  "_".join([
-                 instructions.project_id
-                ,instructions.project_campaign_id
-                ,instructions.id
-                ,instructions.well_id
-                ,"image"]
-            )
-        file_path=Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+        FILE_NAME =  "_".join([
+                 str(instructions.project_id),
+                 str(instructions.project_campaign_id),
+                 str(instructions.id),
+                 str(instructions.well_id),
+                 "image"
+            ])
+        file_path=Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")
 
         while file_path.exists():
             i = 1
-            file_name = "_".join([
-                 instructions.project_id
-                ,instructions.project_campaign_id
-                ,instructions.id
-                ,instructions.well_id
+            FILE_NAME = "_".join([
+                str(instructions.project_id)
+                ,str(instructions.project_campaign_id)
+                ,str(instructions.id)
+                ,str(instructions.well_id)
                 ,"image"
                 ,str(i)]
                 )
-            file_path=Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+            file_path=Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")
             i += 1
 
         capture_new_image(
