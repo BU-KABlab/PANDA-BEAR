@@ -332,10 +332,10 @@ class Mill:
         """
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-        self.move_electrode_to_position(-409, -234, 0)
+        self.move_electrode_to_position(-409, -231, 0)
         for _ in range(3):
-            self.move_electrode_to_position(-409, -234, -45)
-            self.move_electrode_to_position(-409, -234, 0)
+            self.move_electrode_to_position(-409, -231, -45)
+            self.move_electrode_to_position(-409, -231, 0)
         return 0
 
     def rest_electrode(self):
@@ -347,7 +347,7 @@ class Mill:
         Returns:
             None
         """
-        self.safe_move(-409, -234, -45, instrument=Instruments.ELECTRODE)
+        self.safe_move(-409, -231, -50, instrument=Instruments.ELECTRODE)
         return 0
 
 

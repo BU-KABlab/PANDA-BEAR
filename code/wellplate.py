@@ -400,9 +400,9 @@ class Wells2:
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
-        self.z_bottom = -76.0
+        self.z_bottom = -72.5
         self.echem_height = -71  # for every well
-        self.image_height = 0  # The height from which to image the well in mm
+        self.image_height = -25  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
         self.plate_id = 0  # The id of the well plate
 
