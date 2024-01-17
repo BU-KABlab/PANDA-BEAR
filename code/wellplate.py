@@ -400,7 +400,7 @@ class Wells2:
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
-        self.z_bottom = -72.5
+        self.z_bottom = -72
         self.echem_height = -71  # for every well
         self.image_height = -25  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
@@ -518,6 +518,7 @@ class Wells2:
         coordinates_dict = self.wells[well_id].coordinates
         coordinates_dict["depth"] = self.wells[well_id].depth
         coordinates_dict["echem_height"] = self.echem_height
+        coordinates_dict["image_height"] = self.image_height
         return coordinates_dict
 
     def get_contents(self, well_id) -> dict:

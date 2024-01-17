@@ -760,7 +760,7 @@ def movement_test():
             # )
 
             mill.safe_move(
-                a1["x"], a1["y"], 0, instrument=Instruments.LENS
+                a1["x"], a1["y"], wellplate.image_height, instrument=Instruments.LENS
             )
             mill.safe_move(
                 a12["x"], a12["y"], a12["echem_height"], instrument=Instruments.ELECTRODE
