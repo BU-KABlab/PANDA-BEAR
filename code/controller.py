@@ -27,7 +27,7 @@ import e_panda
 import pytz as tz
 import wellplate as wellplate_module
 from config.config import (
-    PATH_TO_LOGS,
+    EPANDA_LOG,
     RANDOM_FLAG,
     STOCK_STATUS,
     WASTE_STATUS,
@@ -50,7 +50,7 @@ logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter(
     "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
 )
-system_handler = logging.FileHandler(PATH_TO_LOGS)
+system_handler = logging.FileHandler(EPANDA_LOG)
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
@@ -519,10 +519,6 @@ def disconnect_from_instruments(instruments: Toolkit):
     #     pass
 
     logger.info("Disconnected from instruments")
-
-
-
-
 
 if __name__ == "__main__":
     main(use_mock_instruments=False)

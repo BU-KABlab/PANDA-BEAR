@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 from config.config import PATH_TO_LOGS
+from pathlib import Path
 import PyCapture2
 
 
@@ -135,7 +136,7 @@ class FLIRCamera:
                 save_name = "fc2TestImage.png"
             self.camera_logger.debug("Saving the last image to {0}".format(save_name))
             newimg.save(
-                (save_path + save_name).encode("utf-8"),
+                (save_path +"\\" + save_name).encode("utf-8"),
                 PyCapture2.IMAGE_FILE_FORMAT.PNG,
             )
         return newimg
@@ -151,6 +152,10 @@ if __name__ == "__main__":
         "--save", type=bool, default=False, help="Whether to save the image"
     )
     parser.add_argument(
+        "--save_path", type=str, default="images/", help="Path to save the image"
+    )
+
+    parser.add_argument(
         "--file_name", type=str, default="", help="Name of the file to save"
     )
 
@@ -160,6 +165,6 @@ if __name__ == "__main__":
         camera.grab_images(
             num_images_to_grab=int(args.num_images),
             save=True,
-            save_path="images/",
+            save_path=args.save_path,
             save_name=args.file_name,
         )

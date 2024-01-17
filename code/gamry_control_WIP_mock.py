@@ -4,12 +4,7 @@ import pathlib
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-system_handler = logging.FileHandler("code/logs/ePANDA.log")
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
+logger = logging.getLogger("e_panda")
 
 class GamryPotentiostat:
     def __init__(self):

@@ -193,7 +193,7 @@ class Pump:
         post_weight = 0.00
         ## Get scale value prior to pump action
         if density is not None and density != 0 and weigh:
-            pre_weight = float(self.scale.read_scale())
+            #pre_weight = float(self.scale.read_scale())
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
@@ -209,7 +209,7 @@ class Pump:
         ## Get scale value after pump action
         if density is not None and density != 0 and weigh:
             #post_weight = self.scale.value()
-            post_weight = float(self.scale.read_scale())
+            #post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
             scale_logger.info("Data,%s,%f,%f,%f,%f,%f,%f,%f",
@@ -432,7 +432,7 @@ class MockPump(Pump):
         post_weight = 0.00
         ## Get scale value prior to pump action
         if density is not None and density != 0 and weigh:
-            pre_weight = float(self.scale.read_scale())
+            #pre_weight = float(self.scale.read_scale())
             scale_logger.debug("Expected difference in scale reading: %f", volume_ml * density)
             scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
@@ -443,7 +443,7 @@ class MockPump(Pump):
 
         ## Get scale value after pump action
         if density is not None and density != 0 and weigh:
-            post_weight = float(self.scale.read_scale())
+            #post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
             scale_logger.info("Data,%s,%f,%f,%f,%f,%f,%f",

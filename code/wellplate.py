@@ -25,7 +25,6 @@ from config.config import (
     PATH_TO_DATA,
 
 )
-from experiment_class import ExperimentStatus
 from vials import Vessel
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -402,7 +401,7 @@ class Wells2:
         self.columns = columns
         self.orientation = orientation
         self.z_bottom = -76.0
-        self.echem_height = -73  # for every well
+        self.echem_height = -71  # for every well
         self.image_height = 0  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
         self.plate_id = 0  # The id of the well plate
@@ -1030,8 +1029,6 @@ def load_new_wellplate(
 def save_current_wellplate():
     """Save the current wellplate"""
     wellplate_is_new = True
-    WELL_STATUS = WELL_STATUS
-
     ## Go through a reset all fields and apply new plate id
     logger.debug("Saving wellplate")
     ## Open the current status file for the plate id , type number, and wells

@@ -15,12 +15,11 @@ import Analyzer
 from decimal import Decimal
 from config.config import (
     PATH_TO_DATA,
-    PATH_TO_LOGS,
 )
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger('ePANDA')
+logger = logging.getLogger('e_panda')
 # global variables
 global PSTAT
 global DEVICES

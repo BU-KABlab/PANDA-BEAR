@@ -20,4 +20,3 @@ class Toolkit:
     wellplate: Wells2 = None
     global_logger: Logger = None
     experiment_logger: Logger = None
-

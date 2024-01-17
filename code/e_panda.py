@@ -743,6 +743,7 @@ def characterization(
         return char_instructions, char_results
 
     pstat.pstatdisconnect()
+    mill.move_to_safe_position()  # move to safe height above target well
     raise OCPFailure("CV")
 
 
@@ -811,18 +812,18 @@ def image_well(
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
-        file_name=Path(PATH_TO_DATA / "_".join([
+        file_name =  "_".join([
                  instructions.project_id
                 ,instructions.project_campaign_id
                 ,instructions.id
                 ,instructions.well_id
                 ,"image"]
             )
-        ).with_suffix(".png")
+        file_path=Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
 
-        while file_name.exists():
+        while file_path.exists():
             i = 1
-            file_name = Path(PATH_TO_DATA / "_".join([
+            file_name = "_".join([
                  instructions.project_id
                 ,instructions.project_campaign_id
                 ,instructions.id
@@ -830,20 +831,13 @@ def image_well(
                 ,"image"
                 ,str(i)]
                 )
-            ).with_suffix(".png")
+            file_path=Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
             i += 1
 
         capture_new_image(
             save=True,
             num_images=1,
-            file_name=
-            "_".join([
-                 instructions.project_id
-                ,instructions.project_campaign_id
-                ,instructions.id
-                ,instructions.well_id
-                ,"image.png"]
-            ),
+            file_name=file_path
         )
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
@@ -874,3 +868,38 @@ class NoAvailableSolution(Exception):
         self.solution_name = solution_name
         self.message = f"No available solution of {solution_name} found"
         super().__init__(self.message)
+
+if __name__ == "__main__":
+    mill = Mill()
+    mill.home()
+    try:
+        characterization(
+            char_instructions=EchemExperimentBase(
+                id=0,
+                project_id=0,
+                project_campaign_id=0,
+                well_id="D2",
+                status=ExperimentStatus.NEW,
+                baseline=0,
+                ca=0,
+                cv_scan_rate=0.050,
+                CVstep=0.02,
+                CVap2=-0.2,
+                CVap1=0.58,
+                CVsr1=0.050,
+                CVsr2=0.050,
+            ),
+            char_results=ExperimentResult(),
+            mill=mill,
+            wellplate=Wells2(),
+        )
+    except OCPFailure as e:
+        print(e.message)
+
+    from Analyzer import plotdata
+    #OCP
+    plotdata(
+        "OCP",
+        ExperimentResult().ocp_char_file.with_suffix(".txt"),
+        True,
+    )
