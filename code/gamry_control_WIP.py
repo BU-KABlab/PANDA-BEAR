@@ -172,13 +172,13 @@ def setfilename(
         file_name = "_".join(
             [str(project_campaign_id), str(campaign_id), str(experiment_id), well_id]
         )
-        file_path: pathlib.Path = PATH_TO_DATA / file_name
+        filename: pathlib.Path = PATH_TO_DATA / file_name
     # Check if the file already exists. If it does then add a number to the end of the file name
     for i, _ in enumerate(range(100)):
-        if not file_path.exists():
+        if not filename.exists():
             break
         file_name = f"{file_name}_{i}"
-        file_path = pathlib.Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+        filename = pathlib.Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
 
     COMPLETE_FILE_NAME = filename
     return COMPLETE_FILE_NAME

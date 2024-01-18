@@ -61,7 +61,7 @@ class ExperimentBase():
     solutions: dict = None
     solutions_corrected: dict = None
     well_type_number = 1
-    pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
+    pumping_rate: float = 0.3
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None #Optional[FilePath] = None
@@ -171,12 +171,12 @@ class EchemExperimentBase(ExperimentBase):
     cv: int = 1 #Cyclic Voltammetry
     baseline: int = 0 #Baseline
 
-    flush_sol_name: str = 'dmf' #Flush solution name
-    flush_vol: int = 100 #Flush solution volume
+    flush_sol_name: str = '' #Flush solution name
+    flush_vol: int = 0 #Flush solution volume
 
-    mix = 1 #Binary mix or dont mix
-    mix_count: int = 3 #Number of times to mix
-    mix_volume: int = 130 #Volume to mix
+    mix = 0 #Binary mix or dont mix
+    mix_count: int = 0 #Number of times to mix
+    mix_volume: int = 0 #Volume to mix
     rinse_count: int = 3 #Default rinse count
     rinse_vol: int = 150 #Default rinse volume
 
@@ -190,7 +190,7 @@ class EchemExperimentBase(ExperimentBase):
     CAsamplerate: float = 0.5  # sample period (s)
 
 
-    char_sol_name: str = 'ferrocene' #Characterization solution name
+    char_sol_name: str = '' #Characterization solution name
     char_vol: int   = 130 #Characterization solution volume
     cv_sample_period: float = 0.1 #Characterization sample period
     cv_scan_rate: float = 0.05 #Scan rate

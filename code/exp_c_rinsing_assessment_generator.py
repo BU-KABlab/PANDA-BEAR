@@ -53,12 +53,16 @@ for i in range(3):
             project_id=PROJECT_ID,
             project_campaign_id=CAMPAIGN_ID,
             solutions={'5mm_fecn3': 120, 'electrolyte': 120, 'rinse0': 120},
+            solutions_corrected={'5mm_fecn3': 120, 'electrolyte': 120, 'rinse0': 120},
             pumping_rate=PUMPING_RATE,
             status=experiment_class.ExperimentStatus.NEW,
             filename=EXPERIMENT_NAME + ' ' + str(experiment_id),
 
             # Echem specific
+            baseline = 0,
+            cv = 1,
             ca=0,
+            ocp=1,
             cv_scan_rate=0.050,
             CVstep=0.02,
             CVap2=-0.2,
@@ -85,4 +89,3 @@ for experiment in experiments:
 # Add experiments to the queue and run them
 scheduler = Scheduler()
 result = scheduler.add_nonfile_experiments(experiments)
-controller.main(use_mock_instruments=TEST)

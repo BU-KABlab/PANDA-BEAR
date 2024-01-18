@@ -845,13 +845,13 @@ def image_well(
         #logger.info("Uploading image of well %s to OBS", instructions.well_id)
         instructions.results.image_file = file_path
     except Exception as e:
-        logger.exception("Failed to image well %s", instructions.well_id)
-        raise e
+        logger.exception("Failed to image well %s. Error %s occured", instructions.well_id, e)
+        # don't raise anything and continue with the experiment. The image is not critical to the experiment
     finally:
         # move camera to safe position
         if wellplate.image_height < 0:
             logger.info("Moving camera to safe position")
-            toolkit.mill.move_to_safe_position()
+            toolkit.mill.move_to_safe_position() # move to safe height above target well
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""

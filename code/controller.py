@@ -218,11 +218,11 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 )
                 new_experiment.status_date = datetime.now(tz.timezone("US/Eastern"))
 
-                e_panda.image_well(
-                    wellplate=wellplate,
-                    instructions=new_experiment,
-                    toolkit=toolkit,
-                )
+                # e_panda.image_well(
+                #     wellplate=wellplate,
+                #     instructions=new_experiment,
+                #     toolkit=toolkit,
+                # )
 
                 ## Reset the logger to log to the ePANDA.log file and format
                 e_panda.apply_log_filter()
