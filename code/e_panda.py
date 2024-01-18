@@ -189,7 +189,7 @@ def forward_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.height,  # FIXME: to_vessel.height,
+                    to_vessel.height,
                     Instruments.PIPETTE,
                 )
             else:  # go to safe height above waste vial
@@ -793,9 +793,7 @@ def volume_correction(volume, density = None, viscosity = None):
 def image_well(
     wellplate: Wells2,
     instructions: EchemExperimentBase,
-    toolkit: instrument_toolkit.Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
+    toolkit: instrument_toolkit.Toolkit
 ):
     """
     Image the well with the camera
@@ -822,19 +820,19 @@ def image_well(
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
-        FILE_NAME = "_".join([
+        file_name = "_".join([
             str(instructions.project_id),
             str(instructions.project_campaign_id),
             str(instructions.id),
             str(instructions.well_id),
             "image"
         ])
-        file_path = Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")
+        file_path = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
 
         for i, _ in enumerate(range(100)):
             if not file_path.exists():
                 break
-            file_name = f"{FILE_NAME}_{i}"
+            file_name = f"{file_name}_{i}"
             file_path = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
 
         capture_new_image(
@@ -873,36 +871,4 @@ class NoAvailableSolution(Exception):
         super().__init__(self.message)
 
 if __name__ == "__main__":
-    mill = Mill()
-    mill.home()
-    try:
-        characterization(
-            char_instructions=EchemExperimentBase(
-                id=0,
-                project_id=0,
-                project_campaign_id=0,
-                well_id="D2",
-                status=ExperimentStatus.NEW,
-                baseline=0,
-                ca=0,
-                cv_scan_rate=0.050,
-                CVstep=0.02,
-                CVap2=-0.2,
-                CVap1=0.58,
-                CVsr1=0.050,
-                CVsr2=0.050,
-            ),
-            char_results=ExperimentResult(),
-            mill=mill,
-            wellplate=Wells2(),
-        )
-    except OCPFailure as e:
-        print(e.message)
-
-    from Analyzer import plotdata
-    #OCP
-    plotdata(
-        "OCP",
-        ExperimentResult().ocp_char_file.with_suffix(".txt"),
-        True,
-    )
+    pass
