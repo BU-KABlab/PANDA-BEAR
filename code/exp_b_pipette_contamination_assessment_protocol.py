@@ -146,5 +146,18 @@ def contamination_assessment(
     print("5. Rinsing electrode")
     toolkit.mill.rinse_electrode()
 
+    # Clear the well
+    print("6. Clearing well")
+    forward_pipette_v2(
+        volume=instructions.solutions["electrolyte"],
+        from_vessel=toolkit.wellplate.wells[instructions.well_id],
+        to_vessel=waste_selector(
+            waste_vials, "waste", instructions.solutions["electrolyte"]
+        ),
+        pump=toolkit.pump,
+        mill=toolkit.mill,
+        pumping_rate=instructions.pumping_rate,
+    )
+
     # End of experiment
     instructions.status = ExperimentStatus.COMPLETE
