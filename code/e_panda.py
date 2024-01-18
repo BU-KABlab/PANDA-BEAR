@@ -626,7 +626,7 @@ def deposition(
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
-    base_filename = pstat.setfilename(dep_instructions.id, "OCP")
+    base_filename = pstat.setfilename(dep_instructions.id, "OCP", dep_instructions.project_id, dep_instructions.project_campaign_id, dep_instructions.well_id)
     dep_results.ocp_dep_file = base_filename
     pstat.OCP(
         potentiostat_ocp_parameters.OCPvi,
@@ -644,7 +644,7 @@ def deposition(
         logger.info(
             "Beginning eChem deposition of well: %s", dep_instructions.well_id
         )
-        dep_results.deposition_data_file = pstat.setfilename(dep_instructions.id, "CA")
+        dep_results.deposition_data_file = pstat.setfilename(dep_instructions.id, "CA", dep_instructions.project_id, dep_instructions.project_campaign_id, dep_instructions.well_id)
 
         # FEATURE have chrono return the max and min values for the deposition
         # and save them to the results
@@ -703,7 +703,7 @@ def characterization(
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
-    char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char")
+    char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
     pstat.OCP(
         OCPvi= potentiostat_ocp_parameters.OCPvi,
         OCPti=potentiostat_ocp_parameters.OCPti,
@@ -727,7 +727,8 @@ def characterization(
         )
 
         char_results.characterization_data_file = pstat.setfilename(
-            char_instructions.id, test_type
+            char_instructions.id, test_type,
+            char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id
         )
 
         # FEATURE have cyclic return the max and min values for the characterization
@@ -821,27 +822,20 @@ def image_well(
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
-        FILE_NAME =  "_".join([
-                 str(instructions.project_id),
-                 str(instructions.project_campaign_id),
-                 str(instructions.id),
-                 str(instructions.well_id),
-                 "image"
-            ])
-        file_path=Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")
+        FILE_NAME = "_".join([
+            str(instructions.project_id),
+            str(instructions.project_campaign_id),
+            str(instructions.id),
+            str(instructions.well_id),
+            "image"
+        ])
+        file_path = Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")
 
-        while file_path.exists():
-            i = 1
-            FILE_NAME = "_".join([
-                str(instructions.project_id)
-                ,str(instructions.project_campaign_id)
-                ,str(instructions.id)
-                ,str(instructions.well_id)
-                ,"image"
-                ,str(i)]
-                )
-            file_path=Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")
-            i += 1
+        for i, _ in enumerate(range(100)):
+            if not file_path.exists():
+                break
+            file_name = f"{FILE_NAME}_{i}"
+            file_path = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
 
         capture_new_image(
             save=True,

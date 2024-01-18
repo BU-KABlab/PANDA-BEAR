@@ -16,10 +16,11 @@ from decimal import Decimal
 from config.config import (
     PATH_TO_DATA,
 )
+
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger('e_panda')
+logger = logging.getLogger("e_panda")
 # global variables
 global PSTAT
 global DEVICES
@@ -94,6 +95,7 @@ def stopacq():
 
 class GamryDtaqEvents(object):
     """Class to handle events from the data acquisition."""
+
     def __init__(self, dtaq_value, complete_file_name):
         self.dtaq = dtaq_value
         self.acquired_points = []
@@ -155,28 +157,29 @@ def savedata(complete_file_name):
     logger.debug("data saved")
 
 
-def setfilename(experiment_id, experiment_type) -> pathlib.Path:
+def setfilename(
+    experiment_id,
+    experiment_type,
+    project_campaign_id: int = None,
+    campaign_id: int = None,
+    well_id: str = None,
+) -> pathlib.Path:
     """set the file name for the experiment"""
     global COMPLETE_FILE_NAME
-    filename:pathlib.Path = (
-            PATH_TO_DATA
-            / ("experiment-" + str(experiment_id) + experiment_type)
+    if project_campaign_id is None and campaign_id is None and well_id is None:
+        filename: pathlib.Path = PATH_TO_DATA / (str(experiment_id) + experiment_type)
+    else:
+        file_name = "_".join(
+            [str(project_campaign_id), str(campaign_id), str(experiment_id), well_id]
         )
+        file_path: pathlib.Path = PATH_TO_DATA / file_name
     # Check if the file already exists. If it does then add a number to the end of the file name
-    if filename.exists():
-        i = 1
-        while filename.exists():
-            filename = (
-                PATH_TO_DATA
-                / (
-                    "experiment-"
-                    + str(experiment_id)
-                    + experiment_type
-                    + "_"
-                    + str(i)
-                )
-            )
-            i += 1
+    for i, _ in enumerate(range(100)):
+        if not file_path.exists():
+            break
+        file_name = f"{file_name}_{i}"
+        file_path = pathlib.Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+
     COMPLETE_FILE_NAME = filename
     return COMPLETE_FILE_NAME
 
@@ -360,8 +363,8 @@ class potentiostat_cv_parameters:
 
     # CV Setup Parameters
     CVvi: float = 0.0  # initial voltage
-    CVap1: float = 0.5 
-    CVap2: float = -0.2 
+    CVap1: float = 0.5
+    CVap2: float = -0.2
     CVvf: float = 0.0  # final voltage
     CVstep: float = 0.01
     CVsr1: float = 0.1
