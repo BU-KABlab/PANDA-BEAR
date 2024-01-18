@@ -68,7 +68,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
-    import exp_b_pipette_contamination_assessment_protocol as exp_b
+    #import exp_b_pipette_contamination_assessment_protocol as exp_b
+    import exp_c_rinsing_assessment_protocol as exp_c
     #import protocols
 
     ## Reset the logger to log to the ePANDA.log file and format
@@ -209,7 +210,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 )
 
                 logger.info("Beginning experiment %d", new_experiment.id)
-                exp_b.contamination_assessment(
+                exp_c.rinsing_assessment(
                     instructions=new_experiment,
                     toolkit=toolkit,
                     stock_vials=stock_vials,

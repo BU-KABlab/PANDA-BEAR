@@ -1,4 +1,5 @@
 """ Experiment data class"""
+from email.mime import image
 from enum import Enum
 from datetime import datetime
 from dataclasses import field
@@ -46,6 +47,7 @@ class ExperimentResult:
     characterization_max_value: float = None
     characterization_min_value: float = None
     pumping_record: list = None
+    image_file: Path = None
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class ExperimentBase():

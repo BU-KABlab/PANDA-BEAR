@@ -843,7 +843,7 @@ def image_well(
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
         #logger.info("Uploading image of well %s to OBS", instructions.well_id)
-
+        instructions.results.image_file = file_path
     except Exception as e:
         logger.exception("Failed to image well %s", instructions.well_id)
         raise e
