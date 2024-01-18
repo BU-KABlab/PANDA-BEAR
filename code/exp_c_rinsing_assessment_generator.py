@@ -4,13 +4,12 @@ import experiment_class
 from config.pin import CURRENT_PIN
 from config.config import WELL_HX
 from scheduler import Scheduler
-import controller
 import pandas as pd
 
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
-    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True)
+    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True, sep="&")
     well_hx = well_hx.dropna(subset=["experiment id"])
     well_hx = well_hx.drop_duplicates(subset=["experiment id"])
     well_hx = well_hx[well_hx["experiment id"] != "None"]
@@ -30,7 +29,7 @@ print(f"Experiment name: {EXPERIMENT_NAME}")
 CAMPAIGN_ID = 0
 
 solutions = [
-    "5mm_fecn3",
+    "5mm_fecn6",
     "electrolyte",
     "electrolye_rinse",
 ]
@@ -52,8 +51,8 @@ for i in range(3):
             pin=CURRENT_PIN,
             project_id=PROJECT_ID,
             project_campaign_id=CAMPAIGN_ID,
-            solutions={'5mm_fecn3': 120, 'electrolyte': 120, 'rinse0': 120},
-            solutions_corrected={'5mm_fecn3': 120, 'electrolyte': 120, 'rinse0': 120},
+            solutions={'5mm_fecn6': 120, 'electrolyte': 120, 'rinse0': 120},
+            solutions_corrected={'5mm_fecn6': 120, 'electrolyte': 120, 'rinse0': 120},
             pumping_rate=PUMPING_RATE,
             status=experiment_class.ExperimentStatus.NEW,
             filename=EXPERIMENT_NAME + ' ' + str(experiment_id),

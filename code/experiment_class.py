@@ -68,6 +68,7 @@ class ExperimentBase():
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
+    plate_id: int = None
 
     # @property
     # def solutions_corrected(self):
@@ -78,8 +79,7 @@ class ExperimentBase():
     #             for key, value in self.solutions.items()
     #         }
     #     return None
-        
-    
+
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''
         pass

@@ -209,6 +209,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                     test=use_mock_instruments,
                 )
 
+                ## Now that we know we are about to run the experiment
+                ## Add the plate id to the experiment
+                new_experiment.plate_id = wellplate.plate_id
+
                 logger.info("Beginning experiment %d", new_experiment.id)
                 exp_c.rinsing_assessment(
                     instructions=new_experiment,

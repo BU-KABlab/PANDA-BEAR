@@ -827,23 +827,22 @@ def image_well(
             str(instructions.well_id),
             "image"
         ])
-        file_path = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
-
-        for i, _ in enumerate(range(100)):
-            if not file_path.exists():
-                break
+        filepath = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+        i = 1
+        while filepath.exists():
             file_name = f"{file_name}_{i}"
-            file_path = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+            filepath = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+            i += 1
 
         capture_new_image(
             save=True,
             num_images=1,
-            file_name=file_path
+            file_name=filepath
         )
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
         #logger.info("Uploading image of well %s to OBS", instructions.well_id)
-        instructions.results.image_file = file_path
+        instructions.results.image_file = filepath
     except Exception as e:
         logger.exception("Failed to image well %s. Error %s occured", instructions.well_id, e)
         # don't raise anything and continue with the experiment. The image is not critical to the experiment

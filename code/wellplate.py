@@ -12,6 +12,8 @@ import os
 from typing import Dict, List, Tuple
 from pathlib import Path
 import matplotlib.pyplot as plt
+from numpy import save
+import pandas as pd
 from typing import Optional
 #from config.file_locations import *
 from config.config import (
@@ -945,7 +947,6 @@ def load_new_wellplate(
         if new_wellplate_type_number is None:
             new_wellplate_type_number = current_type_number
 
-    WELL_STATUS = WELL_STATUS
     if current_wellplate_is_new and new_plate_id is None:
         return current_wellplate_id
 
@@ -967,24 +968,25 @@ def load_new_wellplate(
             well_hx = file.readlines()
         wells = []
         for line in well_hx:
-            if line.split(",")[0] == str(new_plate_id):
+            if line.split("&")[0] == str(new_plate_id):
                 wells.append(line.strip())
         if len(wells) > 0:
             ## If the wellplate exists in the well hx, then load it
             logger.debug("Loading wellplate")
             with open(WELL_STATUS, "w", encoding="UTF-8") as file:
+                current_line:str = line
                 json.dump(
                     {
                         "plate_id": int(new_plate_id),
                         "type_number": int(new_wellplate_type_number),
                         "wells": [
                             {
-                                "well_id": line.split(",")[2],
-                                "status": line.split(",")[5],
-                                "status_date": line.split(",")[6],
-                                "contents": json.loads(line.split(",")[7]),
-                                "experiment_id": line.split(",")[3],
-                                "project_id": str(line.split(",")[4]),
+                                "well_id": current_line.split("&")[2],
+                                "status": current_line.split("&")[5],
+                                "status_date": current_line.split("&")[6],
+                                "contents": json.loads(current_line.split("&")[7]),
+                                "experiment_id": current_line.split("&")[3],
+                                "project_id": str(current_line.split("&")[4]),
                             }
                             for line in wells
                         ],
@@ -1041,7 +1043,6 @@ def save_current_wellplate():
     for well in current_wellplate["wells"]:
         if well["status"] != "new":
             wellplate_is_new = False
-            break
 
     ## Save each well to the well_history.csv file in the data folder even if it is empty
     ## plate id, type number, well id, experiment id, project id, status, status date, contents
@@ -1059,7 +1060,7 @@ def save_current_wellplate():
         ) as output_file:
             for line in input_file:
                 # Check if the line has the same plate ID as the current_plate_id
-                if line.split(",")[0] == str(current_plate_id):
+                if line.split("&")[0] == str(current_plate_id):
                     continue  # Skip this line
                 # If the plate ID is different, write the line to the output file
                 output_file.write(line)
@@ -1078,15 +1079,24 @@ def save_current_wellplate():
                 well["experiment_id"] = ""
                 well["project_id"] = ""
 
-            file.write(
-                f"{current_plate_id},{current_type_number},{well['well_id']},{well['experiment_id']},{well['project_id']},{well['status']},{well['status_date']},{well['contents']}"
-            )
+            file.write("&".join([
+                str(current_plate_id),
+                str(current_type_number),
+                str(well['well_id']),
+                str(well['experiment_id']),
+                str(well['project_id']),
+                str(well['status']),
+                str(well['status_date']),
+                str(well['contents'])
+            ]
+            ))
             file.write("\n")
 
     logger.debug("Wellplate saved")
     logger.info("Wellplate %d saved", int(current_plate_id))
     return int(current_plate_id), int(current_type_number), wellplate_is_new
 
-
 if __name__ == "__main__":
-    test_stage_display()
+    #test_stage_display()
+    print(load_new_wellplate(False,106,3))
+    #print(save_current_wellplate())
