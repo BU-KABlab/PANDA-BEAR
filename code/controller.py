@@ -341,7 +341,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
 
 def establish_system_state() -> (
-    tuple[Sequence[StockVial], Sequence[WasteVial], wellplate_module.Wells2]
+    tuple[Sequence[StockVial], Sequence[WasteVial], wellplate_module.Wellplate]
 ):
     """
     Establish state of system
@@ -354,7 +354,7 @@ def establish_system_state() -> (
     waste_vials = read_vials(WASTE_STATUS)
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
-    wellplate = wellplate_module.Wells2()
+    wellplate = wellplate_module.Wellplate()
     logger.info("System state established")
 
     ## read through the stock vials and log their name, contents, and volume

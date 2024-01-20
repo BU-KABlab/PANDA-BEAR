@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 from config.config import QUEUE, WELL_STATUS, WELL_TYPE, WASTE_STATUS, STOCK_STATUS
-from wellplate import Wells2, CircularWellPlate, GraceBioLabsWellPlate
+from wellplate import Wellplate, CircularWellPlate, GraceBioLabsWellPlate
 
 # Define a class for the monitoring interface
 class MonitoringInterface:
@@ -132,7 +132,7 @@ class MonitoringInterface:
                     break
 
         # Choose the correct wellplate object based on the wellplate type
-        wellplate: Wells2 = None
+        wellplate: Wellplate = None
         if wellplate_type == "circular":
             wellplate = CircularWellPlate(
                 a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=type_number

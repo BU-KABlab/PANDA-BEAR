@@ -719,7 +719,7 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wells2()
+    wellplate = Wells.Wellplate()
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)

@@ -7,7 +7,7 @@ from mill_control import Mill, MockMill
 from pump_control import MockPump, Pump
 from sartorius_local import Scale
 from sartorius_local.mock import Scale as MockScale
-from wellplate import Wells2
+from wellplate import Wellplate
 
 
 @dataclass
@@ -17,6 +17,6 @@ class Toolkit:
     mill: Union[Mill, MockMill]
     scale: Union[Scale, MockScale]
     pump: Union[Pump, MockPump]
-    wellplate: Wells2 = None
+    wellplate: Wellplate = None
     global_logger: Logger = None
     experiment_logger: Logger = None

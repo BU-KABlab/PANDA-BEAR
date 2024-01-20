@@ -43,7 +43,7 @@ from log_tools import CustomLoggingFilter
 from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
 from vials import StockVial, Vessel, WasteVial
-from wellplate import Well, Wells, Wells2
+from wellplate import Well, Wellplate
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -420,7 +420,7 @@ def reverse_pipette_v2(
 
 
 def rinse_v2(
-    wellplate: Wells2,
+    wellplate: Wellplate,
     instructions: EchemExperimentBase,
     pump: Pump,
     mill: Mill,
@@ -791,7 +791,7 @@ def volume_correction(volume, density = None, viscosity = None):
     return corrected_volume
 
 def image_well(
-    wellplate: Wells2,
+    wellplate: Wellplate,
     instructions: EchemExperimentBase,
     toolkit: instrument_toolkit.Toolkit
 ):

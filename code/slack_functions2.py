@@ -14,7 +14,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 import slack_credentials as slack_cred
 from config.config import SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS, QUEUE, WELL_STATUS, WELL_TYPE
-from wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wells2
+from wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wellplate
 
 class SlackBot:
     """Class for sending messages to Slack."""
@@ -361,7 +361,7 @@ class SlackBot:
                     break
 
         # Choose the correct wellplate object based on the wellplate type
-        wellplate: Wells2 = None
+        wellplate: Wellplate = None
         if wellplate_type == "circular":
             wellplate = CircularWellPlate(
                 a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=type_number

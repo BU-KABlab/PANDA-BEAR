@@ -94,230 +94,7 @@ class Well(Vessel):
             json.dump(data, f, indent=4)
         logger.debug("Well status file updated")
 
-class Wells:
-    """
-    Position of well plate and each well in it.
-    Orientation is defined by:
-        0 - Vertical, wells become more negative from A1
-
-        1 - Vertical, wells become less negative from A1
-
-        2 - Horizontal, wells become more negative from A1
-
-        3 - Horizontal, wells become less negative from A1
-    """
-
-    def __init__(
-        self,
-        a1_x: float = 0,
-        a1_y: float = 0,
-        orientation: int = 0,
-        columns: str = "ABCDEFGH",
-        rows: int = 13,
-        type_number: int = 3,
-    ):
-        self.wells = {}
-        self.rows = rows
-        self.columns = columns
-        self.orientation = orientation
-        self.z_bottom = -77
-        self.z_top = 0
-        self.radius = 3.25  # new circular wells
-        self.well_offset = 9  # mm from center to center
-        self.well_capacity = 300  # ul
-        self.echem_height = -75  # for every well
-        self.type_number = type_number  # The type of wellplate
-        self.plate_id = 0  # The id of the wellplate
-        self.height = 6.0  # The height of the wellplate in mm
-
-        # overwrite the default values with the values from the well_type.csv file
-        (
-            self.radius,
-            self.well_offset,
-            self.well_capacity,
-            self.height,
-            self.shape,
-            self.z_top,
-        ) = read_well_type_characteristics(self.type_number, self)
-        (self.a1_x,
-            self.a1_y,
-            self.z_bottom,
-            self.orientation,
-            self.rows,
-            self.columns,
-         ) = load_wellplate_location(self)
-        a1_coordinates = {"x": a1_x, "y": a1_y, "z": self.z_top}  # coordinates of A1
-        volume = 0.00
-        for col_idx, col in enumerate(columns):
-            for row in range(1, rows):
-                well_id = col + str(row)
-                if well_id == "A1":
-                    coordinates = a1_coordinates
-                    contents = {}
-                    depth = self.z_bottom
-                    if depth < self.z_bottom:
-                        depth = self.z_bottom
-                else:
-                    x_offset = col_idx * self.well_offset
-                    y_offset = (row - 1) * self.well_offset
-                    if orientation == 0:
-                        coordinates = {
-                            "x": a1_coordinates["x"] - x_offset,
-                            "y": a1_coordinates["y"] - y_offset,
-                            "z": self.z_top,
-                        }
-                    elif orientation == 1:
-                        coordinates = {
-                            "x": a1_coordinates["x"] + x_offset,
-                            "y": a1_coordinates["y"] + y_offset,
-                            "z": self.z_top,
-                        }
-                    elif orientation == 2:
-                        coordinates = {
-                            "x": a1_coordinates["x"] - x_offset,
-                            "y": a1_coordinates["y"] - y_offset,
-                            "z": self.z_top,
-                        }
-                    elif orientation == 3:
-                        coordinates = {
-                            "x": a1_coordinates["x"] + x_offset,
-                            "y": a1_coordinates["y"] + y_offset,
-                            "z": self.z_top,
-                        }
-                    contents = {}
-                    # the depth is set here for each well instead of the wellpate as a whole
-                    depth = self.z_bottom
-
-                self.wells[well_id] = {
-                    "coordinates": coordinates,
-                    "contents": contents,
-                    "volume": volume,
-                    "depth": depth,
-                    "status": "empty",
-                    "density": 1.0,
-                }
-
-        ## update the well info from file
-        self.update_well_status_from_json_file()
-
-    def update_well_status_from_json_file(self):
-        """Update the well status from a file"""
-        with open(WELL_STATUS, "r", encoding="UTF-8") as f:
-            data = json.load(f)
-            for well in data["wells"]:
-                well_id = well["well_id"]
-                status = well["status"]
-                self.update_well_status(well_id, status)
-                self.plate_id = data["plate_id"]
-                self.type_number = data["type_number"]
-                self.contents = dict(well["contents"])
-                self.experiment_id = well["experiment_id"]
-                self.project_id = well["project_id"]
-
-    def get_coordinates(self, well_id) -> dict:
-        """
-        Return the coordinate of a specific well
-        Args:
-            well_id (str): The well ID
-        Returns:
-            dict: The coordinates of the well in the form
-            {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
-        """
-        coordinates_dict = self.wells[well_id]["coordinates"]
-        coordinates_dict["depth"] = self.wells[well_id]["depth"]
-        coordinates_dict["echem_height"] = self.echem_height
-        return coordinates_dict
-
-    def read_contents(self, well_id) -> dict:
-        """Return the contents of a specific well"""
-        return self.wells[well_id]["contents"]
-
-    def read_volume(self, well_id) -> float:
-        """Return the volume of a specific well"""
-        return self.wells[well_id]["volume"]
-
-    def depth(self, well_id) -> float:
-        """Return the depth of a specific well"""
-        return self.wells[well_id]["depth"]
-
-    def density(self, well_id) -> float:
-        """Return the density of a specific well"""
-        return self.wells[well_id]["density"]
-
-    def check_volume(self, well_id, added_volume: float) -> bool:
-        """Check if a volume can fit in a specific well"""
-        info_message = f"Checking if {added_volume} can fit in {well_id} ..."
-        logger.info(info_message)
-        if self.wells[well_id]["volume"] + added_volume >= self.well_capacity:
-            raise OverFillException(
-                well_id, self.read_volume, added_volume, self.well_capacity
-            )
-
-        else:
-            info_message = f"{added_volume} can fit in {well_id}"
-            logger.info(info_message)
-            return True
-
-    def update_volume(self, well_id, added_volume: float):
-        """Update the volume of a specific well"""
-        if self.wells[well_id]["volume"] + added_volume > self.well_capacity:
-            raise OverFillException(
-                self.wells[well_id],
-                self.wells[well_id]["volume"],
-                added_volume,
-                self.well_capacity,
-            )
-
-        # elif self.wells[well_id]["volume"] + added_volume < 0:
-        #    raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
-        else:
-            self.wells[well_id]["volume"] += added_volume
-            self.wells[well_id]["depth"] = (self.wells[well_id]["volume"] / 1000000) / (
-                math.pi * math.pow(self.radius, 2.0)
-            ) + self.z_bottom
-            if self.wells[well_id]["depth"] < self.z_bottom:
-                self.wells[well_id]["depth"] = self.z_bottom
-            debug_message = f"New volume: {self.wells[well_id]['volume']} | New depth: {self.wells[well_id]['depth']}"
-            logger.debug(debug_message)
-
-    def check_well_status(self, well_id) -> str:
-        """Check the status of a specific well"""
-        return self.wells[well_id]["status"]
-
-    def update_well_status(self, well_id, status):
-        """Update the status of a specific well"""
-        self.wells[well_id]["status"] = status
-
-    def check_all_wells_status(self):
-        """Check the status of all wells"""
-        for well_id, well_data in self.wells.items():
-            logger.info("Well %s status: %s", well_id, well_data["status"])
-
-    def well_coordinates_and_status_color(self) -> Tuple[List[float], List[float], List[str]]:
-        """Plot the well plate on a coordinate plane"""
-        x_coordinates = []
-        y_coordinates = []
-        color = []
-        for _, well_data in self.wells.items():
-            x_coordinates.append(well_data["coordinates"]["x"])
-            y_coordinates.append(well_data["coordinates"]["y"])
-            ## designate the color of the well based on its status
-            if well_data["status"] in ["empty", "new"]:
-                color.append("black")
-            elif well_data["status"] == "queued":
-                color.append("orange")
-            elif well_data["status"] == "complete":
-                color.append("green")
-            elif well_data["status"] == "error":
-                color.append("red")
-            elif well_data["status"] == "running":
-                color.append("gold")
-            else:
-                color.append("black")
-
-        return x_coordinates, y_coordinates, color
-
-class Wells2:
+class Wellplate:
     """
     Represents a well plate and each well in it.
     To access the atributes of an individual well, use the well ID as the key.
@@ -404,7 +181,7 @@ class Wells2:
         self.orientation = orientation
         self.z_bottom = -72
         self.echem_height = -71  # for every well
-        self.image_height = -25  # The height from which to image the well in mm
+        self.image_height = -35  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
         self.plate_id = 0  # The id of the well plate
 
@@ -489,7 +266,7 @@ class Wells2:
         """Gets a Well object by well ID."""
         return self.wells[well_id]
 
-    def update_well_status_from_json_file(self: "Wells2") -> None:
+    def update_well_status_from_json_file(self: "Wellplate") -> None:
         """Update the well status from a file"""
 
         logger.debug("Updating well status's from file...")
@@ -615,7 +392,7 @@ class Wells2:
 
         return x_coordinates, y_coordinates, color
 
-class GraceBioLabsWellPlate(Wells):
+class GraceBioLabsWellPlate(Wellplate):
     """
     Well type for the Grace BioLabs 96 well plate
     Type 1 is gold
@@ -646,7 +423,7 @@ class GraceBioLabsWellPlate(Wells):
         ) = read_well_type_characteristics(self.type_number, self)
 
 
-class CircularWellPlate(Wells):
+class CircularWellPlate(Wellplate):
     """
     A Wells class with different radius and well offset.
     This also changes capacity, and echem height.
@@ -675,7 +452,7 @@ class CircularWellPlate(Wells):
 
 
 def read_well_type_characteristics(
-    type_number: int, current_well: Wells
+    type_number: int, current_well: Wellplate
 ) -> tuple[float, float, float, float]:
     """Read the well type characteristics from the well_type.csv config file"""
 
@@ -713,7 +490,7 @@ def read_well_type_characteristics(
         current_well.z_bottom + height,
     )
 
-def load_wellplate_location(current_well: Wells) -> tuple[float, float, float, int, int, str]:
+def load_wellplate_location(current_well: Wellplate) -> tuple[float, float, float, int, int, str]:
     """Load the location of the well plate from the well_location.csv file"""
 
     # check it exists
@@ -974,7 +751,6 @@ def load_new_wellplate(
             ## If the wellplate exists in the well hx, then load it
             logger.debug("Loading wellplate")
             with open(WELL_STATUS, "w", encoding="UTF-8") as file:
-                current_line:str = line
                 json.dump(
                     {
                         "plate_id": int(new_plate_id),
@@ -984,11 +760,11 @@ def load_new_wellplate(
                                 "well_id": current_line.split("&")[2],
                                 "status": current_line.split("&")[5],
                                 "status_date": current_line.split("&")[6],
-                                "contents": json.loads(current_line.split("&")[7]),
-                                "experiment_id": current_line.split("&")[3],
-                                "project_id": str(current_line.split("&")[4]),
+                                "contents": json.loads(current_line.split("&")[7].replace("'", '"')),
+                                "experiment_id": (current_line.split("&")[3]),
+                                "project_id": (current_line.split("&")[4]),
                             }
-                            for line in wells
+                            for current_line in wells
                         ],
                     },
                     file,
@@ -1079,22 +855,21 @@ def save_current_wellplate():
                 well["experiment_id"] = ""
                 well["project_id"] = ""
 
-            file.write("&".join([
-                str(current_plate_id),
-                str(current_type_number),
-                str(well['well_id']),
-                str(well['experiment_id']),
-                str(well['project_id']),
-                str(well['status']),
-                str(well['status_date']),
-                str(well['contents'])
-            ]
-            ))
-            file.write("\n")
+            file.write(f"{current_plate_id}&{current_type_number}&{str(well['well_id'])}&{well['experiment_id']}&{well['project_id']}&{str(well['status'])}&{str(well['status_date'])}&{well['contents']}\n")
 
     logger.debug("Wellplate saved")
     logger.info("Wellplate %d saved", int(current_plate_id))
     return int(current_plate_id), int(current_type_number), wellplate_is_new
+
+def determine_next_experiment_id() -> int:
+    """Load well history to get last experiment id and increment by 1"""
+    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True, sep="&")
+    well_hx = well_hx.dropna(subset=["experiment id"])
+    well_hx = well_hx.drop_duplicates(subset=["experiment id"])
+    well_hx = well_hx[well_hx["experiment id"] != "None"]
+    well_hx["experiment id"] = well_hx["experiment id"].astype(int)
+    last_experiment_id = well_hx["experiment id"].max()
+    return int(last_experiment_id + 1)
 
 if __name__ == "__main__":
     #test_stage_display()

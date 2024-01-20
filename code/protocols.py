@@ -17,7 +17,7 @@ from experiment_class import (
 from mill_control import Mill, MockMill
 from pump_control import Pump, MockPump
 from vials import StockVial, WasteVial
-from wellplate import Wells, Wells2
+from wellplate import Wells, Wellplate
 from e_panda import (
     deposition,
     characterization,
@@ -694,7 +694,7 @@ def pipette_accuracy_protocol_v2(
     mill: Mill,
     pump: Pump,
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    wellplate: Wellplate,
     logger: logging.Logger,
 ):
     """
@@ -820,7 +820,7 @@ def forward_vs_reverse_pipetting(
     pump: Pump,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
-    wellplate: Wells2,
+    wellplate: Wellplate,
     logger: logging.Logger,
 ):
     """
@@ -965,7 +965,7 @@ def vial_depth_tracking_protocol(
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    wellplate: Wellplate,
     logger: logging.Logger,
 ):
     """
@@ -1100,7 +1100,7 @@ def viscosity_experiments_protocol(
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    wellplate: Wellplate,
     logger: logging.Logger,
 ):
     """
@@ -1424,7 +1424,7 @@ def correction_factor_tests_protocol(
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     stock_vials: Sequence[StockVial],
-    wellplate: Wells2,
+    wellplate: Wellplate,
     logger: logging.Logger,
 ):
     """

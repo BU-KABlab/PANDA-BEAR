@@ -13,7 +13,7 @@ from vials import Vessel, StockVial, WasteVial
 from mill_control import MockMill
 from pump_control import MockPump
 from gamry_control_WIP_mock import GamryPotentiostat
-from wellplate import Well, Wells2
+from wellplate import Well, Wellplate
 from sartorius.mock import Scale as MockScale
 from experiment_class import PEG_ACR_Instructions, EchemExperimentBase
 
@@ -380,7 +380,7 @@ class TestEPanda(unittest.TestCase):
         """_summary_"""
         # Test rinsing a well with rinse0, rinse1, and rinse2
         with self.subTest("Test rinsing a well with rinse0, rinse1, and rinse2"):
-            wellplate = Wells2()
+            wellplate = Wellplate()
             stock_vials = [
                 StockVial(
                     name="rinse0",
