@@ -809,30 +809,45 @@ def image_well(
         None (void function) since the objects are passed by reference
     """
     try:
-        # position lens above the well
-        logger.info("Moving camera above well %s", instructions.well_id)
-        toolkit.mill.safe_move(
-            wellplate.get_coordinates(instructions.well_id)["x"],
-            wellplate.get_coordinates(instructions.well_id)["y"],
-            wellplate.image_height,
-            Instruments.LENS,
-        )
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
-        file_name = "_".join([
-            str(instructions.project_id),
-            str(instructions.project_campaign_id),
-            str(instructions.id),
-            str(instructions.well_id),
-            "image"
-        ])
+        if instructions.project_campaign_id is None:
+            project_campaign_id = "test"
+        else:
+            project_campaign_id = instructions.project_campaign_id
+        if instructions.project_id is None:
+            project_id = "test"
+        else:
+            project_id = instructions.project_id
+        if instructions.id is None:
+            exp_id = "test"
+        else:
+            exp_id = instructions.id
+        if instructions.well_id is None:
+            well_id = "test"
+        else:
+            well_id = instructions.well_id
+
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
         filepath = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
-        i = 1
+        i = 0
         while filepath.exists():
-            file_name = f"{file_name}_{i}"
-            filepath = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+            next_file_name = f"{file_name}_{i}"
+            filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".png")
             i += 1
+
+        # position lens above the well
+        logger.info("Moving camera above well %s", well_id)
+        if well_id is not None:
+            toolkit.mill.safe_move(
+                wellplate.get_coordinates(instructions.well_id)["x"],
+                wellplate.get_coordinates(instructions.well_id)["y"],
+                wellplate.image_height,
+                Instruments.LENS,
+            )
+        else:
+            pass
 
         capture_new_image(
             save=True,
