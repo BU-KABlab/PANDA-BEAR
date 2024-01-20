@@ -141,6 +141,18 @@ class FLIRCamera:
             )
         return newimg
 
+    def set_exposure(self, exposure_time):
+        """Sets the exposure time for the camera"""
+        try:
+            prop = PyCapture2.PROPERTY_TYPE.AUTO_EXPOSURE
+            auto_exposure = self.camera.getProperty(prop)
+            auto_exposure.autoManualMode = False
+            auto_exposure.absControl = True
+            auto_exposure.absValue = exposure_time
+            self.camera.setProperty(auto_exposure)
+            self.camera_logger.debug("Exposure time set to: %d", exposure_time)
+        except PyCapture2.Fc2error as fc2_err:
+            self.camera_logger.debug("Error setting exposure time: %s", fc2_err)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process some integers.")
