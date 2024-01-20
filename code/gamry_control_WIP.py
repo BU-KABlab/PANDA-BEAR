@@ -167,23 +167,21 @@ def setfilename(
     """set the file name for the experiment"""
     global COMPLETE_FILE_NAME
     if project_campaign_id is None and campaign_id is None and well_id is None:
-        file_name = "_".join([str(experiment_id), experiment_type])
-        filepath: pathlib.Path = PATH_TO_DATA / file_name
-        i = 1
+        file_name = f"{experiment_id}_{experiment_type}"
+        filepath: pathlib.Path = (PATH_TO_DATA / file_name).with_suffix(".txt")
+        i = 0
         while filepath.exists():
-            file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(PATH_TO_DATA / str(file_name)).with_suffix(".txt")
+            next_file_name = f"{file_name}_{i}"
+            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
             i += 1
     else:
-        file_name = "_".join(
-            [str(project_campaign_id), str(campaign_id), str(experiment_id), well_id, experiment_type]
-        )
-        filepath: pathlib.Path = PATH_TO_DATA / file_name
-    # Check if the file already exists. If it does then add a number to the end of the file name
-        i = 1
+        file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
+        filepath: pathlib.Path = (PATH_TO_DATA / file_name).with_suffix(".txt")
+        # Check if the file already exists. If it does then add a number to the end of the file name
+        i = 0
         while filepath.exists():
-            file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(PATH_TO_DATA / str(file_name)).with_suffix(".txt")
+            next_file_name = f"{file_name}_{i}"
+            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
             i += 1
 
     COMPLETE_FILE_NAME = filepath
