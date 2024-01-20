@@ -31,7 +31,7 @@ import gamry_control_WIP as echem
 from camera_call_camera import capture_new_image
 from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_LOGS, PURGE_VOLUME,
                            TESTING, PATH_TO_DATA)
-import controller
+import instrument_toolkit
 #from gamry_control_WIP_mock import GamryPotentiostat as echem
 #from gamry_control_WIP_mock import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
 from experiment_class import (EchemExperimentBase, ExperimentResult,
@@ -43,7 +43,7 @@ from log_tools import CustomLoggingFilter
 from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
 from vials import StockVial, Vessel, WasteVial
-from wellplate import Well, Wells, Wells2
+from wellplate import Well, Wellplate
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -145,12 +145,22 @@ def forward_pipette_v2(
                 logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.coordinates)
             else:
                 logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
-            mill.safe_move(
-                from_vessel.coordinates["x"],
-                from_vessel.coordinates["y"],
-                from_vessel.depth,
-                Instruments.PIPETTE,
-            )  # go to solution depth
+            # if from vessel is a well, go to well depth
+            if isinstance(from_vessel,Well):
+                from_vessel: Well = from_vessel
+                mill.safe_move(
+                    from_vessel.coordinates["x"],
+                    from_vessel.coordinates["y"],
+                    from_vessel.depth,
+                    Instruments.PIPETTE,
+                )
+            else:  # go to safe height above vial
+                mill.safe_move(
+                    from_vessel.coordinates["x"],
+                    from_vessel.coordinates["y"],
+                    from_vessel.depth,
+                    Instruments.PIPETTE,
+                )  # go to solution depth
             # Withdraw the solution from the source and receive the updated vessel object
             pump.withdraw(
                 volume=repetition_vol,
@@ -179,7 +189,7 @@ def forward_pipette_v2(
                 mill.safe_move(
                     to_vessel.coordinates["x"],
                     to_vessel.coordinates["y"],
-                    to_vessel.depth,  # to_vessel.depth,
+                    to_vessel.height,
                     Instruments.PIPETTE,
                 )
             else:  # go to safe height above waste vial
@@ -410,7 +420,7 @@ def reverse_pipette_v2(
 
 
 def rinse_v2(
-    wellplate: Wells2,
+    wellplate: Wellplate,
     instructions: EchemExperimentBase,
     pump: Pump,
     mill: Mill,
@@ -616,7 +626,7 @@ def deposition(
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
-    base_filename = pstat.setfilename(dep_instructions.id, "OCP")
+    base_filename = pstat.setfilename(dep_instructions.id, "OCP", dep_instructions.project_id, dep_instructions.project_campaign_id, dep_instructions.well_id)
     dep_results.ocp_dep_file = base_filename
     pstat.OCP(
         potentiostat_ocp_parameters.OCPvi,
@@ -634,7 +644,7 @@ def deposition(
         logger.info(
             "Beginning eChem deposition of well: %s", dep_instructions.well_id
         )
-        dep_results.deposition_data_file = pstat.setfilename(dep_instructions.id, "CA")
+        dep_results.deposition_data_file = pstat.setfilename(dep_instructions.id, "CA", dep_instructions.project_id, dep_instructions.project_campaign_id, dep_instructions.well_id)
 
         # FEATURE have chrono return the max and min values for the deposition
         # and save them to the results
@@ -660,7 +670,6 @@ def deposition(
         raise OCPFailure("CA")
 
     return dep_instructions, dep_results
-
 
 def characterization(
     char_instructions: EchemExperimentBase,
@@ -694,7 +703,7 @@ def characterization(
         wellplate.echem_height,
         Instruments.ELECTRODE,
     )  # move to well depth
-    char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char")
+    char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
     pstat.OCP(
         OCPvi= potentiostat_ocp_parameters.OCPvi,
         OCPti=potentiostat_ocp_parameters.OCPti,
@@ -718,7 +727,8 @@ def characterization(
         )
 
         char_results.characterization_data_file = pstat.setfilename(
-            char_instructions.id, test_type
+            char_instructions.id, test_type,
+            char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id
         )
 
         # FEATURE have cyclic return the max and min values for the characterization
@@ -743,6 +753,7 @@ def characterization(
         return char_instructions, char_results
 
     pstat.pstatdisconnect()
+    mill.move_to_safe_position()  # move to safe height above target well
     raise OCPFailure("CV")
 
 
@@ -780,11 +791,9 @@ def volume_correction(volume, density = None, viscosity = None):
     return corrected_volume
 
 def image_well(
-    wellplate: Wells2,
+    wellplate: Wellplate,
     instructions: EchemExperimentBase,
-    toolkit: controller.Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
+    toolkit: instrument_toolkit.Toolkit
 ):
     """
     Image the well with the camera
@@ -800,63 +809,63 @@ def image_well(
         None (void function) since the objects are passed by reference
     """
     try:
-        # position lens above the well
-        logger.info("Moving camera above well %s", instructions.well_id)
-        toolkit.mill.safe_move(
-            wellplate.get_coordinates(instructions.well_id)["x"],
-            wellplate.get_coordinates(instructions.well_id)["y"],
-            wellplate.image_height,
-            Instruments.LENS,
-        )
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
-        file_name=Path(PATH_TO_DATA / "_".join([
-                 instructions.project_id
-                ,instructions.project_campaign_id
-                ,instructions.id
-                ,instructions.well_id
-                ,"image"]
-            )
-        ).with_suffix(".png")
+        if instructions.project_campaign_id is None:
+            project_campaign_id = "test"
+        else:
+            project_campaign_id = instructions.project_campaign_id
+        if instructions.project_id is None:
+            project_id = "test"
+        else:
+            project_id = instructions.project_id
+        if instructions.id is None:
+            exp_id = "test"
+        else:
+            exp_id = instructions.id
+        if instructions.well_id is None:
+            well_id = "test"
+        else:
+            well_id = instructions.well_id
 
-        while file_name.exists():
-            i = 1
-            file_name = Path(PATH_TO_DATA / "_".join([
-                 instructions.project_id
-                ,instructions.project_campaign_id
-                ,instructions.id
-                ,instructions.well_id
-                ,"image"
-                ,str(i)]
-                )
-            ).with_suffix(".png")
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
+        filepath = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+        i = 0
+        while filepath.exists():
+            next_file_name = f"{file_name}_{i}"
+            filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".png")
             i += 1
+
+        # position lens above the well
+        logger.info("Moving camera above well %s", well_id)
+        if well_id is not None:
+            toolkit.mill.safe_move(
+                wellplate.get_coordinates(instructions.well_id)["x"],
+                wellplate.get_coordinates(instructions.well_id)["y"],
+                wellplate.image_height,
+                Instruments.LENS,
+            )
+        else:
+            pass
 
         capture_new_image(
             save=True,
             num_images=1,
-            file_name=
-            "_".join([
-                 instructions.project_id
-                ,instructions.project_campaign_id
-                ,instructions.id
-                ,instructions.well_id
-                ,"image.png"]
-            ),
+            file_name=filepath
         )
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
         #logger.info("Uploading image of well %s to OBS", instructions.well_id)
-
+        instructions.results.image_file = filepath
     except Exception as e:
-        logger.exception("Failed to image well %s", instructions.well_id)
-        raise e
+        logger.exception("Failed to image well %s. Error %s occured", instructions.well_id, e)
+        # don't raise anything and continue with the experiment. The image is not critical to the experiment
     finally:
         # move camera to safe position
         if wellplate.image_height < 0:
             logger.info("Moving camera to safe position")
-            toolkit.mill.move_to_safe_position()
+            toolkit.mill.move_to_safe_position() # move to safe height above target well
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""
@@ -874,3 +883,6 @@ class NoAvailableSolution(Exception):
         self.solution_name = solution_name
         self.message = f"No available solution of {solution_name} found"
         super().__init__(self.message)
+
+if __name__ == "__main__":
+    pass

@@ -24,7 +24,7 @@ import time
 import serial
 
 import wellplate as Wells
-from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS
+from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS, PATH_TO_LOGS
 # Configure the logger
 # logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
@@ -87,7 +87,7 @@ class Mill:
 
     def __enter__(self):
         """Enter the context manager"""
-        self.homing_sequence()        
+        self.homing_sequence()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -332,10 +332,10 @@ class Mill:
         """
         [initial_x, initial_y, initial_z] = self.current_coordinates()
         self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-        self.move_electrode_to_position(-409, -234, 0)
+        self.move_electrode_to_position(-409, -231, 0)
         for _ in range(3):
-            self.move_electrode_to_position(-409, -234, -45)
-            self.move_electrode_to_position(-409, -234, 0)
+            self.move_electrode_to_position(-409, -231, -45)
+            self.move_electrode_to_position(-409, -231, 0)
         return 0
 
     def rest_electrode(self):
@@ -347,7 +347,7 @@ class Mill:
         Returns:
             None
         """
-        self.safe_move(-409, -234, -45, instrument=Instruments.ELECTRODE)
+        self.safe_move(-409, -231, -50, instrument=Instruments.ELECTRODE)
         return 0
 
 
@@ -730,13 +730,13 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wells2()
+    wellplate = Wells.Wellplate()
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)
     test_logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
     formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-    testing_handler = logging.FileHandler("code/logs/mill_control_testing.log")
+    testing_handler = logging.FileHandler(PATH_TO_LOGS /"mill_control_testing.log")
     testing_handler.setFormatter(formatter)
     test_logger.addHandler(testing_handler)
 
@@ -751,27 +751,27 @@ def movement_test():
             print(h1)
             print(h12)
             ## Load the vials
-            from e_panda import controller
+            import vials
 
-            stock_vials = controller.read_vials(STOCK_STATUS)
-            waste_vials = controller.read_vials(WASTE_STATUS)
+            stock_vials = vials.read_vials(STOCK_STATUS)
+            waste_vials = vials.read_vials(WASTE_STATUS)
 
             ## Move the pipette to each well corner
-            mill.safe_move(
-                a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
-            )
+            # mill.safe_move(
+            #     a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
+            # )
+            # mill.safe_move(
+            #     a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
+            # )
+            # mill.safe_move(
+            #     h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
+            # )
+            # mill.safe_move(
+            #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
+            # )
 
             mill.safe_move(
-                a1["x"], a1["y"], a1["echem_height"], instrument=Instruments.ELECTRODE
+                a1["x"], a1["y"], wellplate.image_height, instrument=Instruments.LENS
             )
             mill.safe_move(
                 a12["x"], a12["y"], a12["echem_height"], instrument=Instruments.ELECTRODE
@@ -786,6 +786,8 @@ def movement_test():
 
             if len(stock_vials) != 0:
                 for _, vial in enumerate(stock_vials):
+                    if vial.position =="e1":
+                        continue
                     mill.safe_move(
                         vial.coordinates["x"],
                         vial.coordinates["y"],
@@ -823,3 +825,6 @@ def movement_test():
 
 if __name__ == "__main__":
     movement_test()
+
+    # with Mill() as mill:
+    #     mill.rest_electrode()

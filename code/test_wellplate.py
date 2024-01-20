@@ -1,5 +1,5 @@
 import unittest
-from wellplate import Wells2, OverFillException, OverDraftException, Well
+from wellplate import Wellplate, OverFillException, OverDraftException, Well
 
 
 class TestWells2(unittest.TestCase):
@@ -7,7 +7,7 @@ class TestWells2(unittest.TestCase):
         """
         Set up the test case by creating a new instance of Wells2.
         """
-        self.wells = Wells2(type_number=4)
+        self.wells = Wellplate(type_number=4)
 
     def test_getitem(self):
         """

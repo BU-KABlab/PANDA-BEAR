@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 from config.config import PATH_TO_LOGS
+from pathlib import Path
 import PyCapture2
 
 
@@ -135,11 +136,23 @@ class FLIRCamera:
                 save_name = "fc2TestImage.png"
             self.camera_logger.debug("Saving the last image to {0}".format(save_name))
             newimg.save(
-                (save_path + save_name).encode("utf-8"),
+                (save_path +"\\" + save_name).encode("utf-8"),
                 PyCapture2.IMAGE_FILE_FORMAT.PNG,
             )
         return newimg
 
+    def set_exposure(self, exposure_time):
+        """Sets the exposure time for the camera"""
+        try:
+            prop = PyCapture2.PROPERTY_TYPE.AUTO_EXPOSURE
+            auto_exposure = self.camera.getProperty(prop)
+            auto_exposure.autoManualMode = False
+            auto_exposure.absControl = True
+            auto_exposure.absValue = exposure_time
+            self.camera.setProperty(auto_exposure)
+            self.camera_logger.debug("Exposure time set to: %d", exposure_time)
+        except PyCapture2.Fc2error as fc2_err:
+            self.camera_logger.debug("Error setting exposure time: %s", fc2_err)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process some integers.")
@@ -151,6 +164,10 @@ if __name__ == "__main__":
         "--save", type=bool, default=False, help="Whether to save the image"
     )
     parser.add_argument(
+        "--save_path", type=str, default="images/", help="Path to save the image"
+    )
+
+    parser.add_argument(
         "--file_name", type=str, default="", help="Name of the file to save"
     )
 
@@ -160,6 +177,6 @@ if __name__ == "__main__":
         camera.grab_images(
             num_images_to_grab=int(args.num_images),
             save=True,
-            save_path="images/",
+            save_path=args.save_path,
             save_name=args.file_name,
         )

@@ -13,7 +13,7 @@ import pytz as tz
 from mill_control import Mill, MockMill
 from pump_control import MockPump, Pump
 from vials import StockVial, WasteVial
-from wellplate import Wells2 as WellplateV2
+from wellplate import Wellplate as WellplateV2
 
 from e_panda import (
     NoAvailableSolution,

@@ -2,21 +2,8 @@
 import json
 import experiment_class
 from config.pin import CURRENT_PIN
-from config.config import WELL_HX
 from scheduler import Scheduler
-import controller
-import pandas as pd
-
-
-def determine_next_experiment_id() -> int:
-    """Load well history to get last experiment id and increment by 1"""
-    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True)
-    well_hx = well_hx.dropna(subset=["experiment id"])
-    well_hx = well_hx.drop_duplicates(subset=["experiment id"])
-    well_hx = well_hx[well_hx["experiment id"] != "None"]
-    well_hx["experiment id"] = well_hx["experiment id"].astype(int)
-    last_experiment_id = well_hx["experiment id"].max()
-    return int(last_experiment_id + 1)
+from wellplate import determine_next_experiment_id
 
 
 TEST = True
@@ -40,7 +27,7 @@ PUMPING_RATE = 0.3
 #controller.load_new_wellplate(new_wellplate_type_number=6)
 experiment_id = determine_next_experiment_id()
 experiments : list[experiment_class.EchemExperimentBase]= []
-WELL_NUMBER = 5
+WELL_NUMBER = 10
 # Create 3 new experiments for the solution
 for i in range(3):
     experiments.append(
@@ -59,7 +46,10 @@ for i in range(3):
             filename=EXPERIMENT_NAME + ' ' + str(experiment_id),
 
             # Echem specific
+            baseline = 0,
+            cv = 1,
             ca=0,
+            ocp=1,
             cv_scan_rate=0.050,
             CVstep=0.02,
             CVap2=-0.2,
@@ -85,4 +75,3 @@ for experiment in experiments:
 # Add experiments to the queue and run them
 scheduler = Scheduler()
 result = scheduler.add_nonfile_experiments(experiments)
-controller.main(use_mock_instruments=TEST)

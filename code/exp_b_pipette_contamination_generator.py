@@ -4,7 +4,7 @@ import experiment_class
 from config.pin import CURRENT_PIN
 from config.config import WELL_HX, TESTING
 from scheduler import Scheduler
-import controller
+import wellplate
 import pandas as pd
 
 def determine_next_experiment_id() -> int:
@@ -37,7 +37,7 @@ solutions = [
 PUMPING_RATE = 0.3
 
 #controller.load_new_wellplate(new_wellplate_type_number=6)
-controller.load_new_wellplate()
+wellplate.load_new_wellplate()
 experiment_id = determine_next_experiment_id()
 experiments : list[experiment_class.EchemExperimentBase]= []
 WELL_NUMBER = 1
@@ -119,4 +119,3 @@ for experiment in experiments:
 # Add experiments to the queue and run them
 scheduler = Scheduler()
 result = scheduler.add_nonfile_experiments(experiments)
-controller.main(use_mock_instruments=TEST)

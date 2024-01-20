@@ -1,9 +1,12 @@
 """"Analyzer module to plot and analyze data from the Gamry potentiostat"""
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
+from matplotlib import cm
+import numpy as np
 
 
-def plotdata(exp_name, complete_file_name, showplot=False):
+def plotdata(exp_name: str, complete_file_name: Path, showplot=False):
     if exp_name == "OCP":
         df = pd.read_csv(
             complete_file_name.with_suffix(".txt"),
@@ -88,17 +91,25 @@ def plotdata(exp_name, complete_file_name, showplot=False):
         ]
 
         # Create a 'viridis' colormap with the number of colors equal to the number of cycles
-        # unused at the moment
-        #colors = cm.cool(np.linspace(0, 1, max_cycle))
+        colors = cm.cool(np.linspace(0, 1, max_cycle))
 
         # Plot values for vsig vs Im for each cycle with different dash patterns
-        # for i in range(max_cycle):
-        #     df2 = df[df['Cycle'] == i]
-        #     dashes = dash_patterns[i - 1]  # Use the corresponding dash pattern from the list
-        #     plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[i - 1], label=f'Cycle {i}')
+        for i in range(1, max_cycle):
+            df2 = df[df["Cycle"] == i]
+            dashes = dash_patterns[
+                i - 1
+            ]  # Use the corresponding dash pattern from the list
+            plt.plot(
+                df2["Vsig"],
+                df2["Im"],
+                linestyle="--",
+                dashes=dashes,
+                color=colors[i - 1],
+                label=f"Cycle {i}",
+            )
 
-        df2 = df[df["Cycle"] == 1]
-        dashes = dash_patterns[0]  # Use the corresponding dash pattern from the list
+        # df2 = df[df["Cycle"] == 1]
+        # dashes = dash_patterns[0]  # Use the corresponding dash pattern from the list
         # plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[0], label=f'Cycle 1 - index 0')
         plt.plot(
             df2["Vsig"],
@@ -117,3 +128,15 @@ def plotdata(exp_name, complete_file_name, showplot=False):
     plt.savefig(complete_file_name.with_suffix(".png"))
     plt.close()
     print("plot saved")
+
+
+if __name__ == "__main__":
+    file = Path(
+        r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\experiment-10000373CV.txt"
+    )
+    plotdata("CV", file, False)
+
+    # file = Path(
+    #     r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\experiment-0CV.txt"
+    # )
+    # plotdata("CV", file, False)

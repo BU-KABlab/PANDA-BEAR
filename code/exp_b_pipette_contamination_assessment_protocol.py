@@ -1,10 +1,9 @@
 """For testing the contamination from the pipette tip"""
 # Standard imports
-from json import tool
 from typing import Sequence
 
 # Non-standard imports
-from controller import Toolkit
+from instrument_toolkit import Toolkit
 from e_panda import (
     forward_pipette_v2,
     solution_selector,
@@ -147,7 +146,18 @@ def contamination_assessment(
     print("5. Rinsing electrode")
     toolkit.mill.rinse_electrode()
 
-    toolkit.mill.rest_electrode()
+    # Clear the well
+    print("6. Clearing well")
+    forward_pipette_v2(
+        volume=instructions.solutions["electrolyte"],
+        from_vessel=toolkit.wellplate.wells[instructions.well_id],
+        to_vessel=waste_selector(
+            waste_vials, "waste", instructions.solutions["electrolyte"]
+        ),
+        pump=toolkit.pump,
+        mill=toolkit.mill,
+        pumping_rate=instructions.pumping_rate,
+    )
 
     # End of experiment
     instructions.status = ExperimentStatus.COMPLETE

@@ -1,14 +1,14 @@
 """ Experiment data class"""
-from enum import Enum
-from datetime import datetime
+import json
 from dataclasses import field
-from typing import Optional
+from datetime import datetime
+from enum import Enum
 from pathlib import Path
+from typing import Optional
+
+from config.pin import CURRENT_PIN
 from pydantic import ConfigDict, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
-from config.pin import CURRENT_PIN
-import json
-from correction_factors import correction_factor
 
 
 class ExperimentStatus(str, Enum):
@@ -46,6 +46,7 @@ class ExperimentResult:
     characterization_max_value: float = None
     characterization_min_value: float = None
     pumping_record: list = None
+    image_file: Path = None
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class ExperimentBase():
@@ -59,13 +60,14 @@ class ExperimentBase():
     solutions: dict = None
     solutions_corrected: dict = None
     well_type_number = 1
-    pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
+    pumping_rate: float = 0.3
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None #Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
+    plate_id: int = None
 
     # @property
     # def solutions_corrected(self):
@@ -76,8 +78,7 @@ class ExperimentBase():
     #             for key, value in self.solutions.items()
     #         }
     #     return None
-        
-    
+
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''
         pass
@@ -169,12 +170,12 @@ class EchemExperimentBase(ExperimentBase):
     cv: int = 1 #Cyclic Voltammetry
     baseline: int = 0 #Baseline
 
-    flush_sol_name: str = 'dmf' #Flush solution name
-    flush_vol: int = 100 #Flush solution volume
+    flush_sol_name: str = '' #Flush solution name
+    flush_vol: int = 0 #Flush solution volume
 
-    mix = 1 #Binary mix or dont mix
-    mix_count: int = 3 #Number of times to mix
-    mix_volume: int = 130 #Volume to mix
+    mix = 0 #Binary mix or dont mix
+    mix_count: int = 0 #Number of times to mix
+    mix_volume: int = 0 #Volume to mix
     rinse_count: int = 3 #Default rinse count
     rinse_vol: int = 150 #Default rinse volume
 
@@ -188,7 +189,7 @@ class EchemExperimentBase(ExperimentBase):
     CAsamplerate: float = 0.5  # sample period (s)
 
 
-    char_sol_name: str = 'ferrocene' #Characterization solution name
+    char_sol_name: str = '' #Characterization solution name
     char_vol: int   = 130 #Characterization solution volume
     cv_sample_period: float = 0.1 #Characterization sample period
     cv_scan_rate: float = 0.05 #Scan rate
