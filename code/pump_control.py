@@ -116,6 +116,7 @@ class Pump:
             self.pump.volume_withdrawn_clear()
             if solution is not None:
                 solution.update_volume(-volume_ul)
+                # TODO: update contents if withdrawing from a wellplate
                 return None
         else:
             return None
@@ -244,7 +245,7 @@ class Pump:
             percent_error = abs((difference - expected_difference)/expected_difference)
             if percent_error > .50:
                 scale_logger.warning("Percent error is above 50%")
-                SlackBot().send_slack_message('alert',f'WARNING: Percent Error was {percent_error*100}% for most recent experiment')
+                #SlackBot().send_slack_message('alert',f'WARNING: Percent Error was {percent_error*100}% for most recent experiment')
             return difference, pumping_record
 
         return 0, pumping_record
