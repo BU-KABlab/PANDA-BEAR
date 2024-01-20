@@ -40,6 +40,7 @@ from pump_control import MockPump, Pump
 from sartorius_local import Scale
 from sartorius_local.mock import Scale as MockScale
 from scheduler import Scheduler
+from instrument_toolkit import Toolkit
 
 # import obs_controls as obs
 from slack_functions2 import SlackBot
@@ -211,7 +212,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
                 ## Now that we know we are about to run the experiment
                 ## Add the plate id to the experiment
-                new_experiment.plate_id = wellplate.plate_id
+                #new_experiment.plate_id = wellplate.plate_id
 
                 logger.info("Beginning experiment %d", new_experiment.id)
                 exp_c.rinsing_assessment(
@@ -296,21 +297,39 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                     scheduler.update_experiment_location(experiment)
                     scheduler.save_results(experiment, experiment.results)
 
+            new_experiment = None # reset new_experiment to None so that we can check the queue again
+
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)
             update_vial_state_file(waste_vials, WASTE_STATUS)
 
     except Exception as error:
+        new_experiment.status = ExperimentStatus.ERROR
+        scheduler.change_well_status_v2(
+                    wellplate.wells[new_experiment.well_id], new_experiment
+                )
+
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error
 
     except KeyboardInterrupt as exc:
+        if new_experiment is not None:
+            new_experiment.status = ExperimentStatus.ERROR
+            scheduler.change_well_status_v2(
+                    wellplate.wells[new_experiment.well_id], new_experiment
+                )
         logger.info("Keyboard interrupt detected")
         slack.send_slack_message("alert", "ePANDA was interrupted by the user")
         raise KeyboardInterrupt from exc
 
     finally:
+        if new_experiment is not None:
+            ## Update location of experiment instructions and save results
+            scheduler.update_experiment_file(new_experiment)
+            scheduler.update_experiment_location(new_experiment)
+            scheduler.save_results(new_experiment, new_experiment.results)
+
         # Save the current wellplate
         save_current_wellplate()
         # close out of serial connections
@@ -319,18 +338,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             disconnect_from_instruments(toolkit)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
         print("ePANDA is shutting down...goodbye")
-
-
-@dataclass
-class Toolkit:
-    """A class to hold all of the instruments"""
-
-    mill: Union[Mill, MockMill]
-    scale: Union[Scale, MockScale]
-    pump: Union[Pump, MockPump]
-    wellplate: wellplate_module.Wells2 = None
-    global_logger: logging.Logger = None
-    experiment_logger: logging.Logger = None
 
 
 def establish_system_state() -> (
@@ -411,9 +418,7 @@ def establish_system_state() -> (
         number_of_wells += 1
         if well["status"] in ["clear", "new", "queued"]:
             number_of_clear_wells += 1
-        # logger.debug(
-        #     "Well %s has status %s", well["well_id"], well["status"]
-        # )
+
     ## check that wellplate has the appropriate number of wells
     if number_of_wells != len(wellplate.wells):
         logger.error(
@@ -478,7 +483,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
     return True
 
 
-def connect_to_instruments(use_mock_instruments: bool = False):
+def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
     """Connect to the instruments"""
     if use_mock_instruments:
         logger.info("Using mock instruments")
@@ -517,11 +522,6 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
-    # try:
-    #     if echem.OPEN_CONNECTION:
-    #         echem.pstatdisconnect()
-    # except AttributeError:
-    #     pass
 
     logger.info("Disconnected from instruments")
 
