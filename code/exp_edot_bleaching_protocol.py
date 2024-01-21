@@ -173,7 +173,7 @@ def edot_bleaching_part_1(
     # )
 
     toolkit.mill.rest_electrode()
-    print("Experiment %d part 1 complete", instructions.id)
+    print(f"Experiment {instructions.id} part 1 complete")
 
 def edot_bleaching_part_2(
     instructions: EchemExperimentBase,
@@ -196,30 +196,20 @@ def edot_bleaching_part_2(
         5. Save video
 
     """
-    # Apply correction factor to the programmed volumes
-    print("Applying correction factor to the programmed volumes")
-    for solution in instructions.solutions:
-        instructions.solutions_corrected[solution] = correction_factor(
-            instructions.solutions[solution],
-            solution_selector(
-                stock_vials,
-                solution, # The solution name
-                instructions.solutions[solution] # The volume of the solution
-            ).viscosity_cp,
-        )
+    print(f"Experiment {instructions.id} part 2 started")
 
     # Move lens over well
     print("1. Moving lens over well")
     instructions.status = ExperimentStatus.IMAGING
     toolkit.mill.safe_move(
-        x_coord=toolkit.wellplate.wells[instructions.well_id]['x'],
-        y_coord=toolkit.wellplate.wells[instructions.well_id]['y'],
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id)['x'],
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id)['y'],
         z_coord=toolkit.wellplate.image_height,
         instrument= Instruments.LENS
     )
     # Start recording
     print("2. Starting recording")
-    input("Start recording using the SpinView software. Press enter to continue")
+    input("Start recording using the OBS software. Press enter to continue")
 
     # Run cyclic
     print("3. Running CV with the following parameters:")
@@ -239,11 +229,11 @@ def edot_bleaching_part_2(
 
     # Stop recording
     print("4. Stopping recording")
-    input("Stop recording using the SpinView software. Press enter to continue")
+    input("Stop recording using the OBS software. Press enter to continue")
 
     toolkit.mill.rest_electrode()
 
-    print("Experiment %d part 2 complete", instructions.id)
+    print(f"Experiment {instructions.id} part 2 complete")
 
 
 def edot_bleaching_protocol(

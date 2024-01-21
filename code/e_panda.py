@@ -30,8 +30,7 @@ from pathlib import Path
 #import gamry_control_WIP as echem
 #from gamry_control_WIP import (potentiostat_ocp_parameters)
 
-from gamry_control_WIP_mock import GamryPotentiostat as echem
-from gamry_control_WIP_mock import (potentiostat_ocp_parameters)
+
 
 from camera_call_camera import capture_new_image
 from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_LOGS, PURGE_VOLUME,
@@ -45,6 +44,13 @@ from pump_control import MockPump, Pump
 from vials import StockVial, Vessel, WasteVial
 from wellplate import Well, Wellplate
 from Analyzer import plotdata
+
+if TESTING:
+    from gamry_control_WIP_mock import GamryPotentiostat as echem
+    from gamry_control_WIP_mock import (potentiostat_ocp_parameters)
+else:
+    import gamry_control_WIP as echem
+    from gamry_control_WIP import (potentiostat_ocp_parameters)
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -617,7 +623,11 @@ def deposition(
     try:
         # echem setup
         logger.info("Setting up eChem deposition experiments...")
-        pstat = echem()
+
+        if TESTING:
+            pstat = echem()
+        else:
+            pstat = echem
         pstat.pstatconnect()
 
         # echem OCP
@@ -717,7 +727,10 @@ def characterization(
         logger.info("Characterizing well: %s", char_instructions.well_id)
         # echem OCP
         logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
-        pstat = echem()
+        if TESTING:
+            pstat = echem()
+        else:
+            pstat = echem
         pstat.pstatconnect()
         char_instructions.status = ExperimentStatus.OCPCHECK
         mill.safe_move(

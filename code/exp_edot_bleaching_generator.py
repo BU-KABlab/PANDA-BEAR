@@ -168,6 +168,23 @@ def experiments_part_2() -> list[experiment_class.EchemExperimentBase]:
 
 if __name__ == "__main__":
     import controller
+    print("""
+Beginning edot bleaching experiments
+
+Before starting, please ensure the following:
+    1. The OBS software is open (pinned to the taskbar) to the FLIR scene
+    2. The solutions are all uncapped and in the solutions file (located on the network drive)
+    3. In the desktop folder, click on the slackbot shortcut to run the slackbot
+    4. Confirm that your solutions are showing up as excpected by sending: "!epanda status" to the slackbot
+    5. Confirm all equipment is connected and powered on
+          
+    NOTE: 
+        - When recording with OBS it will use the start time as the file name. We can change this later if needed.
+          
+          
+"""
+)
+
 
     # # Create scheduler
     scheduler = Scheduler()
@@ -175,8 +192,8 @@ if __name__ == "__main__":
 
     if part1 == "y":
         part_1_experiments = experiments_part_1()
-        for experiment in part_1_experiments:
-            print(experiment.__str__())
+        # for experiment in part_1_experiments:
+        #     print(experiment.__str__())
         scheduler.add_nonfile_experiments(part_1_experiments)
         controller.main(part=1)
         print("Part 1 complete")
@@ -196,8 +213,8 @@ if __name__ == "__main__":
     part2 = input("Run part 2? (y/n) ")
     if part2 == "y":
         part_2_experiments = experiments_part_2()
-        for experiment in part_2_experiments:
-            print(experiment.__str__())
+        # for experiment in part_2_experiments:
+        #     print(experiment.__str__())
         scheduler.add_nonfile_experiments(part_2_experiments)
         controller.main(part=2)
     else:
