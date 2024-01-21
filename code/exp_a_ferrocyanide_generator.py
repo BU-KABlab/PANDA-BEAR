@@ -98,11 +98,11 @@ for col in COLUMNS:
                 # Echem specific
                 ca=0,
                 cv_scan_rate=0.050,
-                CVstep=0.02,
-                CVap2=-0.2,
-                CVap1=0.58,
-                CVsr1=0.050,
-                CVsr2=0.050,
+                cv_step_size=0.02,
+                cv_second_anodic_peak=-0.2,
+                cv_first_anodic_peak=0.58,
+                cv_scan_rate_cycle_1=0.050,
+                cv_scan_rate_cycle_2=0.050,
             )
 
             experiments.append(experiment)

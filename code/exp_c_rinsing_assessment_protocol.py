@@ -5,9 +5,9 @@ Written: 2024-01-11
 Status: 
 Draft x
 Written x
-Tested
-Approved
-Run
+Tested x
+Approved x
+Run x
 Completed
 Notes:
     - This experiment has an interesting feature in that per experiment we will
@@ -16,7 +16,6 @@ Notes:
     so that they are saved as seperate files but share the same experiment id.
 """
 # Standard imports
-from json import tool
 from typing import Sequence
 
 # Non-standard imports
