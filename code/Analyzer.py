@@ -91,7 +91,16 @@ def plotdata(exp_name: str, complete_file_name: Path, showplot=False):
         ]
 
         # Create a 'viridis' colormap with the number of colors equal to the number of cycles
-        colors = cm.cool(np.linspace(0, 1, max_cycle))
+        # Get the 'cool' colormap from matplotlib's colormap module
+        cool_cmap = cm.get_cmap('cool')
+
+        # Generate an array of evenly spaced values between 0 and 1
+        # The number of values is equal to the maximum cycle number
+        color_values = np.linspace(0, 1, max_cycle)
+
+        # Use the colormap to generate a sequence of colors
+        # Each value in color_values corresponds to a color in the colormap
+        colors = cool_cmap(color_values)
 
         # Plot values for vsig vs Im for each cycle with different dash patterns
         for i in range(1, max_cycle):
@@ -132,9 +141,9 @@ def plotdata(exp_name: str, complete_file_name: Path, showplot=False):
 
 if __name__ == "__main__":
     file = Path(
-        r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\experiment-10000373CV.txt"
+        r"C:\Users\grego\SynologyDrive\Downloads\\13_1_10000378_D11_CV_3.txt"
     )
-    plotdata("CV", file, False)
+    plotdata("CV", file, True)
 
     # file = Path(
     #     r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\experiment-0CV.txt"
