@@ -58,10 +58,12 @@ def edot_bleaching_part_1(
             ).viscosity_cp,
         )
 
-    print(f"Experiment {instructions.id} part 1 started")
+    print(instructions.solutions_corrected)
+
+    print(f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 1 started")
     print("Deposition using CV")
     # Pipette 120ul of edot solution into well
-    print("1. Pipetting 120ul of edot into well: ", instructions.well_id)
+    print("1. Pipetting %f ul of edot into well: %d ", instructions.solutions_corrected['edot'],instructions.well_id)
     forward_pipette_v2(
         volume=instructions.solutions_corrected['edot'],
         from_vessel=solution_selector(
@@ -83,7 +85,7 @@ def edot_bleaching_part_1(
     print("\tCVvf = ", instructions.cv_final_voltage)
     print("\tCVsr1 = ", instructions.cv_scan_rate_cycle_1)
     print("\tCvcycle = ", instructions.cv_cycle_count)
-
+    input("Press enter to continue")
     characterization(
         char_instructions=instructions,
         char_results=instructions.results,
@@ -173,8 +175,8 @@ def edot_bleaching_part_1(
     # )
 
     toolkit.mill.rest_electrode()
-    print(f"Experiment {instructions.id} part 1 complete")
-
+    print(f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 1 complete")
+    print("*" * 80,end='\n\n')
 def edot_bleaching_part_2(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
@@ -187,7 +189,7 @@ def edot_bleaching_part_2(
         2. Start recording
         3. Run cyclic
             Cvvi = 0
-            CVap1 = -1.6 (this is intentionally negative, we are scanning in the reverse direction as usual)
+            CVap1 = -1.6 (this is intentionally negative)
             CVap2 = 0.4
             CVvf = -1.6
             CVsr1 = 0.025
@@ -196,7 +198,7 @@ def edot_bleaching_part_2(
         5. Save video
 
     """
-    print(f"Experiment {instructions.id} part 2 started")
+    print(f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 started")
 
     # Move lens over well
     print("1. Moving lens over well")
@@ -219,7 +221,7 @@ def edot_bleaching_part_2(
     print("\tCVvf = -1.6")
     print("\tCVsr1 = 0.025")
     print("\tCvcycle = 3")
-
+    input("Press enter to continue")
     characterization(
         char_instructions=instructions,
         char_results=instructions.results,
@@ -233,7 +235,8 @@ def edot_bleaching_part_2(
 
     toolkit.mill.rest_electrode()
 
-    print(f"Experiment {instructions.id} part 2 complete")
+    print(f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 complete")
+    print("*" * 80,end='\n\n')
 
 
 def edot_bleaching_protocol(
@@ -314,5 +317,3 @@ def edot_bleaching_protocol(
     toolkit.global_logger.info("User confirmed electrode removal after experiment %d", instructions.id)
 
     input("Press enter to continue")
-
-    

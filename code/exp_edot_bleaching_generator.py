@@ -180,8 +180,7 @@ Before starting, please ensure the following:
           
     NOTE: 
         - When recording with OBS it will use the start time as the file name. We can change this later if needed.
-          
-          
+
 """
 )
 
@@ -197,20 +196,21 @@ Before starting, please ensure the following:
         scheduler.add_nonfile_experiments(part_1_experiments)
         controller.main(part=1)
         print("Part 1 complete")
-        print("#" * 50)
+        print("#" * 80)
         print()
     else:
         print("Skipping part 1")
 
     electrode_install = input("Install electrode on lens. Press enter to confirm")
-    print("User confirmed electrode installation")
+    print("User confirmed electrode installation",end="\n\n")
 
     pipette_lithium = input(
         "Manually pipette 120µL of 0.1M LiClO4 in water into wells. Press enter to confirm"
     )
-    print("User confirmed pipetting of lithium")
+    print("User confirmed pipetting of lithium",end="\n\n")
 
     part2 = input("Run part 2? (y/n) ")
+    print()
     if part2 == "y":
         part_2_experiments = experiments_part_2()
         # for experiment in part_2_experiments:
