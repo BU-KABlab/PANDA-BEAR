@@ -772,10 +772,11 @@ def load_new_wellplate(
                 )
             logger.debug("Wellplate loaded")
             logger.info("Wellplate %d loaded", int(new_plate_id))
-        return new_plate_id
+            return new_plate_id
 
     ## If the wellplate does not exist in the well hx, then create a new wellplate
     ## Go through a reset all fields and apply new plate id
+    logger.debug("Creating new wellplate: %d", new_plate_id)
     logger.debug("Resetting well statuses to new")
     new_wellplate = {
         "plate_id": new_plate_id,

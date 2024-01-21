@@ -12,7 +12,7 @@ from sartorius_local.mock import Scale as MockScale
 from slack_functions2 import SlackBot
 from vials import Vial, Vessel
 from mill_control import Mill, MockMill
-from wellplate import Wells as Wellplate
+from wellplate import Wellplate
 from experiment_class import ExperimentResult
 from correction_factors import reverse_correction_factor
 #from config.config import PATH_TO_LOGS
@@ -502,9 +502,7 @@ class OverDraftException(Exception):
 
 def test_mixing():
     """Test the mixing function"""
-    wellplate = Wellplate(
-        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13
-    )
+    wellplate = Wellplate()
     a1 = wellplate.get_coordinates("A1")
     with Mill() as mill:
         mill.homing_sequence()

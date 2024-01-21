@@ -1,7 +1,7 @@
 """The home of all project specific strings and values that are 
 better to be set in one place than to be scattered around the code."""
 from pathlib import Path
-
+from datetime import datetime
 ## Project values
 AIR_GAP = 40  # ul
 DRIP_STOP = 5  # ul
@@ -160,3 +160,14 @@ for file in [
         # print(f"Creating {file_path}")
         file_path.touch()
         print(f"Created {file_path}")
+
+## Rename existing log file if it exists with timestamp
+if EPANDA_LOG.exists():
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    new_name = EPANDA_LOG.with_name(f"ePANDA_{timestamp}.log")
+    EPANDA_LOG.rename(new_name)
+    print(f"Renamed {EPANDA_LOG} to {new_name}")
+
+## Create new log file
+EPANDA_LOG.touch()
+print(f"Created {EPANDA_LOG}")
