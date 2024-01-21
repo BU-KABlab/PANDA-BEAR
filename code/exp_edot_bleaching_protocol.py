@@ -19,7 +19,7 @@ from e_panda import (
     waste_selector,
     image_well,
 )
-from experiment_class import EchemExperimentBase
+from experiment_class import EchemExperimentBase, ExperimentStatus
 from vials import StockVial, WasteVial
 from correction_factors import correction_factor
 from mill_control import Instruments
@@ -58,7 +58,7 @@ def edot_bleaching_part_1(
             ).viscosity_cp,
         )
 
-    print("Experiment %d part 1 started", instructions.id)
+    print(f"Experiment {instructions.id} part 1 started")
     print("Deposition using CV")
     # Pipette 120ul of edot solution into well
     print("1. Pipetting 120ul of edot into well: ", instructions.well_id)
@@ -93,6 +93,7 @@ def edot_bleaching_part_1(
 
     # Clear the well contents into waste
     print("3. Clearing well contents into waste")
+    instructions.status = ExperimentStatus.CLEARING
     forward_pipette_v2(
         volume=instructions.solutions_corrected['edot'],
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -118,16 +119,16 @@ def edot_bleaching_part_1(
     print("4. Flushing pipette tip with electrolyte rinse")
     for _ in range(3):
         forward_pipette_v2(
-            volume=instructions.solutions_corrected['electrolyte_rinse'],
+            volume=instructions.solutions_corrected['rinse0'],
             from_vessel=solution_selector(
                 stock_vials,
-                'electrolyte_rinse',
-                instructions.solutions_corrected['electrolyte_rinse'],
+                'rinse0',
+                instructions.solutions_corrected['rinse0'],
             ),
             to_vessel=waste_selector(
                 waste_vials,
                 'waste',
-                instructions.solutions_corrected['electrolyte_rinse'],
+                instructions.solutions_corrected['rinse0'],
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
@@ -136,13 +137,14 @@ def edot_bleaching_part_1(
 
     # Rinse the well 4x with electrolyte rinse
     print("5. Rinsing well 4x with electrolyte well rinse")
+    instructions.status = ExperimentStatus.RINSING
     for _ in range(4):
         forward_pipette_v2(
-            volume=instructions.solutions_corrected['electrolyte_rinse'],
+            volume=instructions.solutions_corrected['rinse0'],
             from_vessel=solution_selector(
                 stock_vials,
-                'electrolyte_rinse',
-                instructions.solutions_corrected['electrolyte_rinse'],
+                'rinse0',
+                instructions.solutions_corrected['rinse0'],
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
             pump=toolkit.pump,
@@ -151,12 +153,12 @@ def edot_bleaching_part_1(
         )
 
         forward_pipette_v2(
-            volume=instructions.solutions_corrected['electrolyte_rinse'],
+            volume=instructions.solutions_corrected['rinse0'],
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
                 waste_vials,
                 'waste',
-                instructions.solutions_corrected['electrolyte_rinse'],
+                instructions.solutions_corrected['rinse0'],
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
@@ -208,6 +210,7 @@ def edot_bleaching_part_2(
 
     # Move lens over well
     print("1. Moving lens over well")
+    instructions.status = ExperimentStatus.IMAGING
     toolkit.mill.safe_move(
         x_coord=toolkit.wellplate.wells[instructions.well_id]['x'],
         y_coord=toolkit.wellplate.wells[instructions.well_id]['y'],

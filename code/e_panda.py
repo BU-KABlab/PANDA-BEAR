@@ -27,18 +27,18 @@ from typing import Optional, Sequence, Tuple, Union
 
 # Third party or custom imports
 from pathlib import Path
-import gamry_control_WIP as echem
+#import gamry_control_WIP as echem
+#from gamry_control_WIP import (potentiostat_ocp_parameters)
+
+from gamry_control_WIP_mock import GamryPotentiostat as echem
+from gamry_control_WIP_mock import (potentiostat_ocp_parameters)
+
 from camera_call_camera import capture_new_image
 from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_LOGS, PURGE_VOLUME,
                            TESTING, PATH_TO_DATA)
 import instrument_toolkit
-#from gamry_control_WIP_mock import GamryPotentiostat as echem
-#from gamry_control_WIP_mock import potentiostat_cv_parameters, potentiostat_ocp_parameters, potentiostat_ca_parameters
 from experiment_class import (EchemExperimentBase, ExperimentResult,
                               ExperimentStatus)
-from gamry_control_WIP import (potentiostat_ca_parameters,
-                               potentiostat_cv_parameters,
-                               potentiostat_ocp_parameters)
 from log_tools import CustomLoggingFilter
 from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
@@ -617,7 +617,7 @@ def deposition(
     try:
         # echem setup
         logger.info("Setting up eChem deposition experiments...")
-        pstat = echem
+        pstat = echem()
         pstat.pstatconnect()
 
         # echem OCP
@@ -646,7 +646,7 @@ def deposition(
         dep_results.ocp_dep_pass = pstat.check_vf_range(
             dep_results.ocp_dep_file.with_suffix(".txt")
         )
-        plotdata("OCP", dep_results.ocp_dep_file.with_suffix(".txt"))
+        #plotdata("OCP", dep_results.ocp_dep_file.with_suffix(".txt"))
 
         # echem CA - deposition
         if dep_results.ocp_dep_pass:
@@ -678,7 +678,7 @@ def deposition(
 
                 pstat.activecheck()
                 mill.move_to_safe_position()  # move to safe height above target well
-                plotdata("CA", dep_results.deposition_data_file.with_suffix(".txt"))
+                #plotdata("CA", dep_results.deposition_data_file.with_suffix(".txt"))
             except Exception as e:
                 logger.error("Exception occurred during deposition: %s", e)
                 raise CAFailure(dep_instructions.id, dep_instructions.well_id) from e
@@ -717,7 +717,7 @@ def characterization(
         logger.info("Characterizing well: %s", char_instructions.well_id)
         # echem OCP
         logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
-        pstat = echem
+        pstat = echem()
         pstat.pstatconnect()
         char_instructions.status = ExperimentStatus.OCPCHECK
         mill.safe_move(
@@ -736,12 +736,12 @@ def characterization(
         char_results.ocp_char_pass = pstat.check_vf_range(
             char_results.ocp_char_file.with_suffix(".txt")
         )
-        plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
+        #plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
     except Exception as e:
         logger.error("Exception occurred during OCP: %s", e)
         mill.move_to_safe_position()
         pstat.pstatdisconnect()
-        raise OCPFailure("OCP") from e
+        raise OCPFailure("characterization") from e
 
     if char_results.ocp_char_pass:
         try:
@@ -777,7 +777,7 @@ def characterization(
             )
             pstat.activecheck()
             mill.move_to_safe_position()  # move to safe height above target well
-            plotdata("CV", char_results.characterization_data_file.with_suffix(".txt"))
+            #plotdata("CV", char_results.characterization_data_file.with_suffix(".txt"))
         except Exception as e:
             logger.error("Exception occurred during CV: %s", e)
             mill.move_to_safe_position()

@@ -35,7 +35,11 @@ class GamryPotentiostat:
         self.OPEN_CONNECTION = True
         return True
 
-    def setfilename(self, experiment_id, experiment_type):
+    def setfilename(self, experiment_id,
+    experiment_type,
+    project_campaign_id: int = None,
+    campaign_id: int = None,
+    well_id: str = None,):
         COMPLETE_FILE_NAME:pathlib.Path = (
             pathlib.Path.cwd()
             / "data"

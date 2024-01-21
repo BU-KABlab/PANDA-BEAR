@@ -13,6 +13,7 @@ Additionally controller should be able to:
 """
 # pylint: disable=line-too-long
 
+from hmac import new
 import json
 import logging
 
@@ -60,7 +61,7 @@ logger.addHandler(system_handler)
 slack = SlackBot()
 
 
-def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
+def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int = 1):
     """
     Main function
 
@@ -210,13 +211,21 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             # import exp_c_rinsing_assessment_protocol as exp_c
             # TODO: Change to part 2 when ready
             import exp_edot_bleaching_protocol as edot
-            edot.edot_bleaching_part_1(
-                instructions=new_experiment,
-                toolkit=toolkit,
-                stock_vials=stock_vials,
-                waste_vials=waste_vials,
-            )
-
+            if part == 1:
+                edot.edot_bleaching_part_1(
+                    instructions=new_experiment,
+                    toolkit=toolkit,
+                    stock_vials=stock_vials,
+                    waste_vials=waste_vials,
+                )
+            if part == 2:
+                edot.edot_bleaching_part_2(
+                    instructions=new_experiment,
+                    toolkit=toolkit,
+                    stock_vials=stock_vials,
+                    waste_vials=waste_vials,
+                )
+            new_experiment.status = ExperimentStatus.COMPLETE
             new_experiment.status_date = datetime.now(tz.timezone("US/Eastern"))
 
             # e_panda.image_well(
@@ -243,11 +252,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             scheduler.update_experiment_location(new_experiment)
             scheduler.save_results(new_experiment, new_experiment.results)
 
+            scheduler.remove_from_queue(new_experiment)
+            new_experiment = None # reset new_experiment to None so that we can check the queue again
             if one_off:
                 break  # break out of the while True loop
-
-
-            new_experiment = None # reset new_experiment to None so that we can check the queue again
 
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)

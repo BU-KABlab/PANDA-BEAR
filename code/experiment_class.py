@@ -25,6 +25,8 @@ class ExperimentStatus(str, Enum):
     COMPLETE = 'complete'
     ERROR = 'error'
     MIXING = 'mixing'
+    IMAGING = 'imaging'
+    CLEARING = 'clearing'
 
 
 
