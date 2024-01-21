@@ -44,6 +44,7 @@ from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
 from vials import StockVial, Vessel, WasteVial
 from wellplate import Well, Wellplate
+from Analyzer import plotdata
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -597,7 +598,7 @@ def deposition(
     dep_instructions: EchemExperimentBase,
     dep_results: ExperimentResult,
     mill: Mill,
-    wellplate: Wells,
+    wellplate: Wellplate,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
@@ -613,74 +614,95 @@ def deposition(
         dep_instructions (Experiment): The updated experiment instructions
         dep_results (ExperimentResult): The updated experiment results
     """
-    # echem setup
-    logger.info("Setting up eChem experiments...")
-    pstat = echem
-    pstat.pstatconnect()
-    # echem OCP
-    logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
-    dep_instructions.status = ExperimentStatus.OCPCHECK
-    mill.safe_move(
-        wellplate.get_coordinates(dep_instructions.well_id)["x"],
-        wellplate.get_coordinates(dep_instructions.well_id)["y"],
-        wellplate.echem_height,
-        Instruments.ELECTRODE,
-    )  # move to well depth
-    base_filename = pstat.setfilename(dep_instructions.id, "OCP", dep_instructions.project_id, dep_instructions.project_campaign_id, dep_instructions.well_id)
-    dep_results.ocp_dep_file = base_filename
-    pstat.OCP(
-        potentiostat_ocp_parameters.OCPvi,
-        potentiostat_ocp_parameters.OCPti,
-        potentiostat_ocp_parameters.OCPrate,
-    )  # OCP
-    pstat.activecheck()
-    dep_results.ocp_dep_pass = pstat.check_vf_range(
-        dep_results.ocp_dep_file.with_suffix(".txt")
-    )
+    try:
+        # echem setup
+        logger.info("Setting up eChem deposition experiments...")
+        pstat = echem
+        pstat.pstatconnect()
 
-    # echem CA - deposition
-    if dep_results.ocp_dep_pass:
-        dep_instructions.status = ExperimentStatus.DEPOSITING
-        logger.info(
-            "Beginning eChem deposition of well: %s", dep_instructions.well_id
+        # echem OCP
+        logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
+        dep_instructions.status = ExperimentStatus.OCPCHECK
+        mill.safe_move(
+            wellplate.get_coordinates(dep_instructions.well_id)["x"],
+            wellplate.get_coordinates(dep_instructions.well_id)["y"],
+            wellplate.echem_height,
+            Instruments.ELECTRODE,
+        )  # move to well depth
+        base_filename = pstat.setfilename(
+            dep_instructions.id,
+            "OCP",
+            dep_instructions.project_id,
+            dep_instructions.project_campaign_id,
+            dep_instructions.well_id,
         )
-        dep_results.deposition_data_file = pstat.setfilename(dep_instructions.id, "CA", dep_instructions.project_id, dep_instructions.project_campaign_id, dep_instructions.well_id)
-
-        # FEATURE have chrono return the max and min values for the deposition
-        # and save them to the results
-        # don't have any parameters hardcoded, switch these all to instructions
-        pstat.chrono(
-            potentiostat_ca_parameters.CAvi,
-            potentiostat_ca_parameters.CAti,
-            CAv1=dep_instructions.CAv1,
-            CAt1=dep_instructions.CAt1,
-            CAv2=potentiostat_ca_parameters.CAv2,
-            CAt2=potentiostat_ca_parameters.CAt2,
-            CAsamplerate=dep_instructions.ca_sample_period,
-        )  # CA
-
+        dep_results.ocp_dep_file = base_filename
+        pstat.OCP(
+            potentiostat_ocp_parameters.OCPvi,
+            potentiostat_ocp_parameters.OCPti,
+            potentiostat_ocp_parameters.OCPrate,
+        )  # OCP
         pstat.activecheck()
-        mill.move_to_safe_position()  # move to safe height above target well
+        dep_results.ocp_dep_pass = pstat.check_vf_range(
+            dep_results.ocp_dep_file.with_suffix(".txt")
+        )
+        plotdata("OCP", dep_results.ocp_dep_file.with_suffix(".txt"))
 
+        # echem CA - deposition
+        if dep_results.ocp_dep_pass:
+            try:
+                dep_instructions.status = ExperimentStatus.DEPOSITING
+                logger.info(
+                    "Beginning eChem deposition of well: %s", dep_instructions.well_id
+                )
+                dep_results.deposition_data_file = pstat.setfilename(
+                    dep_instructions.id,
+                    "CA",
+                    dep_instructions.project_id,
+                    dep_instructions.project_campaign_id,
+                    dep_instructions.well_id,
+                )
+
+                # FEATURE have chrono return the max and min values for the deposition
+                # and save them to the results
+                # don't have any parameters hardcoded, switch these all to instructions
+                pstat.chrono(
+                    CAvi= dep_instructions.ca_prestep_voltage,
+                    CAti = dep_instructions.ca_prestep_time_delay,
+                    CAv1=dep_instructions.ca_step_1_voltage,
+                    CAt1=dep_instructions.ca_step_1_time,
+                    CAv2=dep_instructions.ca_step_2_voltage,
+                    CAt2=dep_instructions.ca_step_2_time,
+                    CAsamplerate=dep_instructions.ca_sample_period,
+                )  # CA
+
+                pstat.activecheck()
+                mill.move_to_safe_position()  # move to safe height above target well
+                plotdata("CA", dep_results.deposition_data_file.with_suffix(".txt"))
+            except Exception as e:
+                logger.error("Exception occurred during deposition: %s", e)
+                raise CAFailure(dep_instructions.id, dep_instructions.well_id) from e
+        else:
+            raise OCPFailure("CA")
+    except Exception as e:
+        logger.error("Exception occurred during deposition: %s", e)
+        raise DepositionFailure(dep_instructions.id, dep_instructions.well_id) from e
+    finally:
+        mill.move_to_safe_position()
+        pstat.pstatdisconnect()
         mill.rinse_electrode()
-        pstat.pstatdisconnect()
-
-    else:
-        pstat.pstatdisconnect()
-        raise OCPFailure("CA")
-
     return dep_instructions, dep_results
 
 def characterization(
     char_instructions: EchemExperimentBase,
     char_results: ExperimentResult,
     mill: Mill,
-    wellplate: Wells,
+    wellplate: Wellplate,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
-    Characterization of the solutions on the substrate
-
+    Characterization of the solutions on the substrate using CV.
     No pipetting is performed in this step.
+    Rinse the electrode after characterization.
 
     Args:
         char_instructions (Experiment): The experiment instructions
@@ -691,70 +713,81 @@ def characterization(
         char_instructions (Experiment): The updated experiment instructions
         char_results (ExperimentResult): The updated experiment results
     """
-    logger.info("Characterizing well: %s", char_instructions.well_id)
-    # echem OCP
-    logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
-    pstat = echem
-    pstat.pstatconnect()
-    char_instructions.status = ExperimentStatus.OCPCHECK
-    mill.safe_move(
-        wellplate.get_coordinates(char_instructions.well_id)["x"],
-        wellplate.get_coordinates(char_instructions.well_id)["y"],
-        wellplate.echem_height,
-        Instruments.ELECTRODE,
-    )  # move to well depth
-    char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
-    pstat.OCP(
-        OCPvi= potentiostat_ocp_parameters.OCPvi,
-        OCPti=potentiostat_ocp_parameters.OCPti,
-        OCPrate=potentiostat_ocp_parameters.OCPrate,
-    )  # OCP
-    pstat.activecheck()
-    char_results.ocp_char_pass = pstat.check_vf_range(
-        char_results.ocp_char_file.with_suffix(".txt")
-    )
-    # echem CV - characterization
-    if char_results.ocp_char_pass:
-        if char_instructions.baseline == 1:
-            test_type = "CV_baseline"
-            char_instructions.status = ExperimentStatus.BASELINE
-        else:
-            test_type = "CV"
-            char_instructions.status = ExperimentStatus.CHARACTERIZING
-
-        logger.info(
-            "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
-        )
-
-        char_results.characterization_data_file = pstat.setfilename(
-            char_instructions.id, test_type,
-            char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id
-        )
-
-        # FEATURE have cyclic return the max and min values for the characterization
-        # and save them to the results
-        pstat.cyclic(
-            potentiostat_cv_parameters.CVvi,
-            potentiostat_cv_parameters.CVap1,
-            potentiostat_cv_parameters.CVap2,
-            potentiostat_cv_parameters.CVvf,
-            CVsr1=char_instructions.cv_scan_rate,
-            CVsr2=char_instructions.cv_scan_rate,
-            CVsr3=char_instructions.cv_scan_rate,
-            CVsamplerate=(
-                potentiostat_cv_parameters.CVstep / char_instructions.cv_scan_rate
-            ),
-            CVcycle=potentiostat_cv_parameters.CVcycle,
-        )
+    try:
+        logger.info("Characterizing well: %s", char_instructions.well_id)
+        # echem OCP
+        logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
+        pstat = echem
+        pstat.pstatconnect()
+        char_instructions.status = ExperimentStatus.OCPCHECK
+        mill.safe_move(
+            wellplate.get_coordinates(char_instructions.well_id)["x"],
+            wellplate.get_coordinates(char_instructions.well_id)["y"],
+            wellplate.echem_height,
+            Instruments.ELECTRODE,
+        )  # move to well depth
+        char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
+        pstat.OCP(
+            OCPvi= potentiostat_ocp_parameters.OCPvi,
+            OCPti=potentiostat_ocp_parameters.OCPti,
+            OCPrate=potentiostat_ocp_parameters.OCPrate,
+        )  # OCP
         pstat.activecheck()
-        mill.move_to_safe_position()  # move to safe height above target well
-        #mill.rinse_electrode()
+        char_results.ocp_char_pass = pstat.check_vf_range(
+            char_results.ocp_char_file.with_suffix(".txt")
+        )
+        plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
+    except Exception as e:
+        logger.error("Exception occurred during OCP: %s", e)
+        mill.move_to_safe_position()
         pstat.pstatdisconnect()
-        return char_instructions, char_results
+        raise OCPFailure("OCP") from e
 
+    if char_results.ocp_char_pass:
+        try:
+            # echem CV - characterization
+            if char_instructions.baseline == 1:
+                test_type = "CV_baseline"
+                char_instructions.status = ExperimentStatus.BASELINE
+            else:
+                test_type = "CV"
+                char_instructions.status = ExperimentStatus.CHARACTERIZING
+
+            logger.info(
+                "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
+            )
+
+            char_results.characterization_data_file = pstat.setfilename(
+                char_instructions.id, test_type,
+                char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id
+            )
+
+            # FEATURE have cyclic return the max and min values for the characterization
+            # and save them to the results
+            pstat.cyclic(
+                CVvi=char_instructions.cv_initial_voltage,
+                CVap1=char_instructions.cv_first_anodic_peak,
+                CVap2 = char_instructions.cv_second_anodic_peak,
+                CVvf = char_instructions.cv_final_voltage,
+                CVsr1=char_instructions.cv_scan_rate_cycle_1,
+                CVsr2=char_instructions.cv_scan_rate_cycle_2,
+                CVsr3=char_instructions.cv_scan_rate_cycle_3,
+                CVsamplerate=char_instructions.cv_sample_rate,
+                CVcycle=char_instructions.cv_cycle_count,
+            )
+            pstat.activecheck()
+            mill.move_to_safe_position()  # move to safe height above target well
+            plotdata("CV", char_results.characterization_data_file.with_suffix(".txt"))
+        except Exception as e:
+            logger.error("Exception occurred during CV: %s", e)
+            mill.move_to_safe_position()
+            pstat.pstatdisconnect()
+            raise CVFailure(char_instructions.id, char_instructions.well_id) from e
+
+    mill.move_to_safe_position()
     pstat.pstatdisconnect()
-    mill.move_to_safe_position()  # move to safe height above target well
-    raise OCPFailure("CV")
+    mill.rinse_electrode()
+    return char_instructions, char_results
 
 
 def apply_log_filter(
@@ -793,7 +826,8 @@ def volume_correction(volume, density = None, viscosity = None):
 def image_well(
     wellplate: Wellplate,
     instructions: EchemExperimentBase,
-    toolkit: instrument_toolkit.Toolkit
+    toolkit: instrument_toolkit.Toolkit,
+    step_description: str = None,
 ):
     """
     Image the well with the camera
@@ -812,26 +846,17 @@ def image_well(
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
-        if instructions.project_campaign_id is None:
-            project_campaign_id = "test"
-        else:
-            project_campaign_id = instructions.project_campaign_id
-        if instructions.project_id is None:
-            project_id = "test"
-        else:
-            project_id = instructions.project_id
-        if instructions.id is None:
-            exp_id = "test"
-        else:
-            exp_id = instructions.id
-        if instructions.well_id is None:
-            well_id = "test"
-        else:
-            well_id = instructions.well_id
+        project_campaign_id = instructions.project_campaign_id or "test"
+        project_id = instructions.project_id or "test"
+        exp_id = instructions.id or "test"
+        well_id = instructions.well_id or "test"
 
-        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
+        if step_description is not None:
+            file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
+        else:
+            file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
         filepath = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
-        i = 0
+        i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
             filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".png")
@@ -860,6 +885,7 @@ def image_well(
         instructions.results.image_file = filepath
     except Exception as e:
         logger.exception("Failed to image well %s. Error %s occured", instructions.well_id, e)
+        raise ImageCaputreFailure(instructions.well_id)
         # don't raise anything and continue with the experiment. The image is not critical to the experiment
     finally:
         # move camera to safe position
@@ -882,6 +908,41 @@ class NoAvailableSolution(Exception):
     def __init__(self, solution_name):
         self.solution_name = solution_name
         self.message = f"No available solution of {solution_name} found"
+        super().__init__(self.message)
+
+class ImageCaputreFailure(Exception):
+    """Raised when image capture fails"""
+
+    def __init__(self, well_id):
+        self.well_id = well_id
+        self.message = f"Image capture failed for well {well_id}"
+        super().__init__(self.message)
+
+class DepositionFailure(Exception):
+    """Raised when deposition fails"""
+
+    def __init__(self, experiment_id, well_id):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        self.message = f"Deposition failed for experiment {experiment_id} well {well_id}"
+        super().__init__(self.message)
+
+class CAFailure(Exception):
+    """Raised when CA fails"""
+
+    def __init__(self, experiment_id, well_id):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        self.message = f"CA failed for experiment {experiment_id} well {well_id}"
+        super().__init__(self.message)
+
+class CVFailure(Exception):
+    """Raised when CV fails"""
+
+    def __init__(self, experiment_id, well_id):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        self.message = f"CV failed for experiment {experiment_id} well {well_id}"
         super().__init__(self.message)
 
 if __name__ == "__main__":
