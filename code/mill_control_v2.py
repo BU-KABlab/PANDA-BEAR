@@ -416,6 +416,12 @@ class Mill(MillController):
     """
 
     def __init__(self, config_file="mill_config.json"):
+        """
+        Initializes an instance of the MillControlV2 class.
+
+        Args:
+            config_file (str): The path to the configuration file. Defaults to "mill_config.json".
+        """
         super().__init__(config_file)
 
     def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
@@ -826,7 +832,7 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wells(-230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
+    wellplate = Wells.Wellplate(-230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)
