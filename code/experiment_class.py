@@ -59,7 +59,7 @@ class ExperimentBase():
     project_id: int = None
     solutions: dict = None
     solutions_corrected: dict = None
-    well_type_number = 1
+    well_type_number:int = 1
     pumping_rate: float = 0.3
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
@@ -224,6 +224,93 @@ class EchemExperimentBase(ExperimentBase):
     def cv_sample_rate(self):
         '''CVstep / CVsr1'''
         return round(self.cv_step_size / self.cv_scan_rate_cycle_1,4)
+
+    def __str__(self):
+        if self.ca:
+            ca_params = f"""
+        CA Parameters
+            Pre-step Voltage: {self.ca_prestep_voltage}
+            Pre-step Time Delay: {self.ca_prestep_time_delay}
+            Step 1 Voltage: {self.ca_step_1_voltage}
+            Step 1 Time: {self.ca_step_1_time}
+            Step 2 Voltage: {self.ca_step_2_voltage}
+            Step 2 Time: {self.ca_step_2_time}
+            CA Sample Rate: {self.ca_sample_rate}
+    """
+        else:
+            ca_params = """
+        CA Parameters
+            Pre-step Voltage: N/A
+            Pre-step Time Delay: N/A
+            Step 1 Voltage: N/A
+            Step 1 Time: N/A
+            Step 2 Voltage: N/A
+            Step 2 Time: N/A
+            CA Sample Rate: N/A
+    """
+
+        if self.cv:
+            cv_params = f"""
+        CV Parameters
+            CV: {bool(self.cv)}
+            CV Baseline: {bool(self.baseline)}
+            Sample Period: {self.cv_sample_period}
+            Initial Voltage (CVvi): {self.cv_initial_voltage}
+            First Anodic Peak (CVap1): {self.cv_first_anodic_peak}
+            Second Anodic Peak (CVap2): {self.cv_second_anodic_peak}
+            Final Voltage (CVvf): {self.cv_final_voltage}
+            Step Size (CVstep): {self.cv_step_size}
+            Cycle Count: {self.cv_cycle_count}
+            Scan Rate Cycle 1 (CVsr1): {self.cv_scan_rate_cycle_1}
+            Scan Rate Cycle 2 (CVsr2): {self.cv_scan_rate_cycle_2}
+            Scan Rate Cycle 3 (CVsr3): {self.cv_scan_rate_cycle_3}
+            CV Sample Rate: {self.cv_sample_rate}
+    """
+        else:
+            cv_params = f"""
+        CV Parameters
+            CV: {bool(self.cv)}
+            CV Baseline: {bool(self.baseline)}
+            Sample Period: N/A
+            Initial Voltage (CVvi): N/A
+            First Anodic Peak (CVap1): N/A
+            Second Anodic Peak (CVap2): N/A
+            Final Voltage (CVvf): N/A
+            Step Size (CVstep): N/A
+            Cycle Count: N/A
+            Scan Rate Cycle 1 (CVsr1): N/A
+            Scan Rate Cycle 2 (CVsr2): N/A
+            Scan Rate Cycle 3 (CVsr3): N/A
+            CV Sample Rate: N/A
+"""
+        return f"""
+{self.experiment_name} 
+        Plate #: {self.plate_id}
+        Experiment ID: {self.id}
+        Well ID: {self.well_id}
+        Status: {self.status.value}
+        Priority: {self.priority}
+        Solutions: {self.solutions}
+        Corrected Solutions: {self.solutions_corrected}
+        Filename: {self.filename}
+
+        Echem Parameters
+            Run Open Circuit Potential: {bool(self.ocp)}
+            Run Cyclic Amperometry: {bool(self.ca)}
+            Run Cyclic Voltammetry: {bool(self.cv)}
+            Run CV Baseline: {bool(self.baseline)}
+            Flush Solution Name: {self.flush_sol_name}
+            Flush Solution Volume: {self.flush_vol}
+            Mix: {bool(self.mix)}
+            Mix Count: {self.mix_count}
+            Mix Volume: {self.mix_volume}
+            Rinse Count: {self.rinse_count}
+            Rinse Volume: {self.rinse_vol}
+
+        {ca_params}
+
+        {cv_params}
+    """
 
 # @dataclass(config=ConfigDict(validate_assignment=True))
 # class Experiment:

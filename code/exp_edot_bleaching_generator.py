@@ -1,3 +1,6 @@
+'''
+Generates and prints out the experiment objects for the edot bleaching experiments
+'''
 import experiment_class
 from config.pin import CURRENT_PIN
 from config.config import TESTING
@@ -9,7 +12,7 @@ print("TEST MODE: ", TESTING)
 COLUMNS = "ABCDEFGH"
 ROWS = 12
 PROJECT_ID = 16
-EXPERIMENT_NAME = "Edot bleaching part 1"
+EXPERIMENT_NAME = "edot_bleaching_part_1"
 print(f"Experiment name: {EXPERIMENT_NAME}")
 CAMPAIGN_ID = 0
 PUMPING_RATE = 0.3
@@ -78,6 +81,8 @@ for i in range(1,4):
             pumping_rate=PUMPING_RATE,
             status=experiment_class.ExperimentStatus.NEW,
             filename=EXPERIMENT_NAME + '_' + str(experiment_id),
+            well_type_number=3,
+            plate_id=107,
 
             # Echem specific
             baseline = 0,
@@ -98,7 +103,7 @@ for i in range(1,4):
 
 WELL_NUMBER = 2
 CAMPAIGN_ID += 1
-EXPERIMENT_NAME = "Edot bleaching part 2"
+EXPERIMENT_NAME = "edot_bleaching_part_2"
 print(f"Experiment name: {EXPERIMENT_NAME}")
 
 for i in range(1,4):
@@ -116,6 +121,8 @@ for i in range(1,4):
             pumping_rate=PUMPING_RATE,
             status=experiment_class.ExperimentStatus.NEW,
             filename=EXPERIMENT_NAME + '_' + str(experiment_id),
+            well_type_number=3,
+            plate_id=107,
 
             # Echem specific
             baseline = 0,
@@ -135,7 +142,17 @@ for i in range(1,4):
     experiment_id += 1
     WELL_NUMBER += 1
 
-# Create scheduler
+for experiment in experiments_part1:
+    print(experiment.__str__())
+
+print("#"*50)
+for experiment in experiments_part2:
+    print(experiment.__str__())
+# # Create scheduler
 scheduler = Scheduler()
-scheduler.add_experiments(experiments_part1)
-scheduler.add_experiments(experiments_part2)
+
+# Uncomment out the following line to add the part 1 experiments to the queue
+# scheduler.add_nonfile_experiments(experiments_part1)
+
+# Uncomment out the following line to add the part 2 experiments to the queue
+# scheduler.add_nonfile_experiments(experiments_part2)

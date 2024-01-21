@@ -30,7 +30,6 @@ from config.config import (
 
 from config.pin import CURRENT_PIN
 from experiment_class import (
-    Experiment,
     ExperimentBase,
     ExperimentResult,
     ExperimentStatus,
@@ -201,34 +200,7 @@ class Scheduler:
 
             # populate an experiment instance
             # TODO make the planner json output conform to schema so it can just be read in
-
-            instructions = Experiment(
-                id=experiment["id"],
-                priority=experiment["priority"],
-                pin=CURRENT_PIN,
-                target_well=target_well,
-                dmf=experiment["dmf"],
-                peg=experiment["peg"],
-                acrylate=experiment["acrylate"],
-                ferrocene=experiment["ferrocene"],
-                custom=experiment["custom"],
-                ocp=experiment["ocp"],
-                ca=experiment["ca"],
-                cv=experiment["cv"],
-                baseline=experiment["baseline"],
-                dep_duration=experiment["dep_duration"],
-                dep_pot=experiment["dep_pot"],
-                char_sol_name=experiment["char_sol_name"],
-                char_vol=experiment["char_vol"],
-                flush_sol_name=experiment["flush_sol_name"],
-                flush_vol=experiment["flush_vol"],
-                pumping_rate=experiment["pumping_rate"],
-                rinse_count=experiment["rinse_count"],
-                rinse_vol=experiment["rinse_vol"],
-                status=ExperimentStatus.QUEUED,
-                filename=filename,
-                protocol_type = 1,
-            )
+            instructions = experiment_class.RootModel[ExperimentBase].model_validate_json(json.dumps(experiment)).root
 
             # Save the experiment as a separate file in the experiment_queue subfolder
             queue_dir = PATH_TO_EXPERIMENT_QUEUE

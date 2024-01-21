@@ -115,7 +115,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             stock_vials, waste_vials, wellplate = establish_system_state()
             toolkit.wellplate = wellplate
             ## Check the qeueue for any protocol type 2 experiments
-            queue = scheduler.get_queue()
+            #queue = scheduler.get_queue()
             # check if any of the experiments in the queue pandas dataframe are type 2
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue(
@@ -204,17 +204,11 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
             ## Now that we know we are about to run the experiment
             ## Add the plate id to the experiment
-            #new_experiment.plate_id = wellplate.plate_id
+            new_experiment.plate_id = wellplate.plate_id
 
             logger.info("Beginning experiment %d", new_experiment.id)
             # import exp_c_rinsing_assessment_protocol as exp_c
-
-            # exp_c.rinsing_assessment(
-            #     instructions=new_experiment,
-            #     toolkit=toolkit,
-            #     stock_vials=stock_vials,
-            #     waste_vials=waste_vials,
-            # )
+            # TODO: Change to part 2 when ready
             import exp_edot_bleaching_protocol as edot
             edot.edot_bleaching_part_1(
                 instructions=new_experiment,
@@ -482,5 +476,5 @@ def disconnect_from_instruments(instruments: Toolkit):
     logger.info("Disconnected from instruments")
 
 if __name__ == "__main__":
-    main(use_mock_instruments=False)
-    # load_new_wellplate(new_plate_id=5)
+    wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
+    main(use_mock_instruments=TESTING)
