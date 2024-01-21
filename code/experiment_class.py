@@ -176,91 +176,110 @@ class EchemExperimentBase(ExperimentBase):
     mix = 0 #Binary mix or dont mix
     mix_count: int = 0 #Number of times to mix
     mix_volume: int = 0 #Volume to mix
-    rinse_count: int = 3 #Default rinse count
-    rinse_vol: int = 150 #Default rinse volume
+    rinse_count: int = 4 #Default rinse count
+    rinse_vol: int = 0 #Default rinse volume
 
     ca_sample_period: float = 0.1 #Deposition sample period
-    CAvi: float = 0.0  # Pre-step voltage (V)
-    CAti: float = 0.0  # Pre-step delay time (s)
-    CAv1: float = -1.7  # Step 1 voltage (V), deposition potential (V)
-    CAt1: float = 300.0  # run time 300 seconds, deposition duration (s)
-    CAv2: float = 0.0  # Step 2 voltage (V)
-    CAt2: float = 0.0  # Step 2 time (s)
-    CAsamplerate: float = 0.5  # sample period (s)
+    ca_prestep_voltage: float = 0.0  # Pre-step voltage (V) 
+    # CAvi = ca_prestep_voltage
+    ca_prestep_time_delay: float = 0.0  # Pre-step delay time (s)
+    # CAti = ca_prestep_time_delay
+    ca_step_1_voltage: float = -1.7  # Step 1 voltage (V), deposition potential (V)
+    # CAv1 = ca_step_1_voltage
+    ca_step_1_time: float = 300.0  # run time 300 seconds, deposition duration (s)
+    # CAt1 = ca_step_1_time
+    ca_step_2_voltage: float = 0.0  # Step 2 voltage (V)
+    # CAv2 = ca_step_2_voltage
+    ca_step_2_time: float = 0.0  # Step 2 time (s)
+    # CAt2 = ca_step_2_time
+    ca_sample_rate: float = 0.5  # sample period (s)
+    # CAsamplerate = ca_sample_rate
 
 
     char_sol_name: str = '' #Characterization solution name
-    char_vol: int   = 130 #Characterization solution volume
+    char_vol: int   = 0 #Characterization solution volume
     cv_sample_period: float = 0.1 #Characterization sample period
-    cv_scan_rate: float = 0.05 #Scan rate
-    CVvi: float = 0.0  # initial voltage
-    CVap1: float = 0.5  # first anodic peak
-    CVap2: float = -0.2 # second anodic peak
-    CVvf: float = 0.0  # final voltage
-    CVstep: float = 0.01 # step size
-    CVsr1: float = 0.1 # scan rate 1
-    CVcycle: int = 3 # number of cycles
-    CVsr2: float = CVsr1
-    CVsr3: float = CVsr1
+    #cv_scan_rate: float = 0.05 #Scan rate
+    cv_initial_voltage: float = 0.0  # initial voltage
+    cv_first_anodic_peak: float = 0.5  # first anodic peak
+    cv_second_anodic_peak: float = -0.2 # second anodic peak
+    cv_final_voltage: float = 0.0  # final voltage
+    cv_step_size: float = 0.01 # step size
+    cv_scan_rate_cycle_1: float = 0.1 # scan rate 1
+    cv_cycle_count: int = 3 # number of cycles
+    cv_scan_rate_cycle_2: float = cv_scan_rate_cycle_1
+    cv_scan_rate_cycle_3: float = cv_scan_rate_cycle_1
+
+    # CVvi: float = 0.0  # initial voltage
+    # CVap1: float = 0.5  # first anodic peak
+    # CVap2: float = -0.2 # second anodic peak
+    # CVvf: float = 0.0  # final voltage
+    # CVstep: float = 0.01 # step size
+    # CVsr1: float = 0.1 # scan rate 1
+    # CVcycle: int = 3 # number of cycles
+    # CVsr2: float = CVsr1
+    # CVsr3: float = CVsr1
+
     @property
-    def CVsamplerate(self):
-        return round(self.CVstep / self.CVsr1,4)
+    def cv_sample_rate(self):
+        '''CVstep / CVsr1'''
+        return round(self.cv_step_size / self.cv_scan_rate_cycle_1,4)
 
-@dataclass(config=ConfigDict(validate_assignment=True))
-class Experiment:
-    '''Define the data that is used to run an experiment'''
-    id: int
-    priority: int # 0 is baseline 1 is high priority 2 is normal priority 3 is end baseline
-    pin: int
-    target_well: str
-    dmf: float
-    peg: float
-    acrylate: float
-    ferrocene: float
-    custom: float
-    ocp: int #Open Circuit Potential
-    ca: int #Cyclic Amperometry
-    cv: int #Cyclic Voltammetry
-    baseline: int #Baseline
-    dep_duration: int #Deposition duration
-    dep_pot: float #Deposition potential
-    char_sol_name: str #Characterization solution name
-    char_vol: int   #Characterization solution volume
-    flush_sol_name: str #Flush solution name
-    flush_vol: int #Flush solution volume
-    ca_sample_period: float = 0.01 #Deposition sample period
-    cv_sample_period: float = 0.01 #Characterization sample period
-    cv_scan_rate: float = 0.05 #Scan rate
-    pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
-    rinse_count: int = 3 #Default rinse count
-    rinse_vol: int = 150 #Default rinse volume
-    mix: int = 1 #Binary mix or dont mix
-    mix_count: int = 3 #Number of times to mix
-    mix_vol: int = 200 #Volume to mix
-    mix_rate: float = 0.62 #Rate for pump to mix at
-    # To restrict this to one of a few values you can use an enum
-    status: ExperimentStatus = ExperimentStatus.NEW
-    status_date: datetime = field(default_factory=datetime.now)
-    filename: str = None #Optional[FilePath] = None
-    # The optional fields seemed to be that way because they were experiment results
-    results: Optional[ExperimentResult] = None
-    protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
+# @dataclass(config=ConfigDict(validate_assignment=True))
+# class Experiment:
+#     '''Define the data that is used to run an experiment'''
+#     id: int
+#     priority: int # 0 is baseline 1 is high priority 2 is normal priority 3 is end baseline
+#     pin: int
+#     target_well: str
+#     dmf: float
+#     peg: float
+#     acrylate: float
+#     ferrocene: float
+#     custom: float
+#     ocp: int #Open Circuit Potential
+#     ca: int #Cyclic Amperometry
+#     cv: int #Cyclic Voltammetry
+#     baseline: int #Baseline
+#     dep_duration: int #Deposition duration
+#     dep_pot: float #Deposition potential
+#     char_sol_name: str #Characterization solution name
+#     char_vol: int   #Characterization solution volume
+#     flush_sol_name: str #Flush solution name
+#     flush_vol: int #Flush solution volume
+#     ca_sample_period: float = 0.01 #Deposition sample period
+#     cv_sample_period: float = 0.01 #Characterization sample period
+#     cv_scan_rate: float = 0.05 #Scan rate
+#     pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
+#     rinse_count: int = 3 #Default rinse count
+#     rinse_vol: int = 150 #Default rinse volume
+#     mix: int = 1 #Binary mix or dont mix
+#     mix_count: int = 3 #Number of times to mix
+#     mix_vol: int = 200 #Volume to mix
+#     mix_rate: float = 0.62 #Rate for pump to mix at
+#     # To restrict this to one of a few values you can use an enum
+#     status: ExperimentStatus = ExperimentStatus.NEW
+#     status_date: datetime = field(default_factory=datetime.now)
+#     filename: str = None #Optional[FilePath] = None
+#     # The optional fields seemed to be that way because they were experiment results
+#     results: Optional[ExperimentResult] = None
+#     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
 
-    def is_replicate(self, other):
-        '''Check if two experiments have the same parameters but different ids'''
-        if isinstance(other, Experiment):
-            return (self.dmf == other.dmf
-                    and self.peg == other.peg
-                    and self.acrylate == other.acrylate
-                    and self.ferrocene == other.ferrocene
-            )
-        return False
+#     def is_replicate(self, other):
+#         '''Check if two experiments have the same parameters but different ids'''
+#         if isinstance(other, Experiment):
+#             return (self.dmf == other.dmf
+#                     and self.peg == other.peg
+#                     and self.acrylate == other.acrylate
+#                     and self.ferrocene == other.ferrocene
+#             )
+#         return False
 
-    def is_same_id(self, other):
-        '''Check if two experiments have the same id'''
-        if isinstance(other, Experiment):
-            return self.id == other.id
-        return False
+#     def is_same_id(self, other):
+#         '''Check if two experiments have the same id'''
+#         if isinstance(other, Experiment):
+#             return self.id == other.id
+#         return False
 
 def make_test_base_value() -> ExperimentBase:
     '''Create a test experiment value for the class'''
@@ -277,75 +296,75 @@ def make_test_base_value() -> ExperimentBase:
         filename= f"test_{0}.json",
         results=None)
 
-def make_test_value() -> Experiment:
-    '''Create a test experiment value for the class'''
-    return Experiment(
-        id=0,
-        priority=2,
-        pin=1001001001001001,
-        target_well="D5",
-        dmf=0,
-        peg=145,
-        acrylate=145,
-        ferrocene=0,
-        custom=0,
-        ocp=1,
-        ca=1,
-        cv=1,
-        baseline = 0,
-        dep_duration=300,
-        dep_pot=-2.7,
-        ca_sample_period=0.01,
-        cv_sample_period=0.01,
-        cv_scan_rate = 0.05,
-        status=ExperimentStatus.QUEUED,
-        status_date=datetime.now(),
-        pumping_rate=0.5,
-        char_sol_name="ferrocene",
-        char_vol=290,
-        flush_sol_name="dmf",
-        flush_vol=120,
-        rinse_count=3,
-        rinse_vol=150,
-        mix = 1,
-        mix_count = 3,
-        mix_vol = 200,
-        mix_rate = 0.62,
-        filename= f"test_{datetime.now}.json",
-        results=None)
+# def make_test_value() -> Experiment:
+#     '''Create a test experiment value for the class'''
+#     return Experiment(
+#         id=0,
+#         priority=2,
+#         pin=1001001001001001,
+#         target_well="D5",
+#         dmf=0,
+#         peg=145,
+#         acrylate=145,
+#         ferrocene=0,
+#         custom=0,
+#         ocp=1,
+#         ca=1,
+#         cv=1,
+#         baseline = 0,
+#         dep_duration=300,
+#         dep_pot=-2.7,
+#         ca_sample_period=0.01,
+#         cv_sample_period=0.01,
+#         cv_scan_rate = 0.05,
+#         status=ExperimentStatus.QUEUED,
+#         status_date=datetime.now(),
+#         pumping_rate=0.5,
+#         char_sol_name="ferrocene",
+#         char_vol=290,
+#         flush_sol_name="dmf",
+#         flush_vol=120,
+#         rinse_count=3,
+#         rinse_vol=150,
+#         mix = 1,
+#         mix_count = 3,
+#         mix_vol = 200,
+#         mix_rate = 0.62,
+#         filename= f"test_{datetime.now}.json",
+#         results=None)
 
-def make_baseline_value() -> Experiment:
-    '''Create a test experiment value for the class'''
-    return Experiment(
-        id=0,
-        priority=0,
-        pin=CURRENT_PIN,
-        target_well="D5",
-        dmf=0,
-        peg=0,
-        acrylate=0,
-        ferrocene=0,
-        custom=0,
-        ocp=1,
-        ca=0,
-        cv=1,
-        baseline = 1,
-        dep_duration=300,
-        dep_pot=-2.7,
-        ca_sample_period=0.01,
-        cv_sample_period=0.01,
-        cv_scan_rate = 0.05,
-        status=ExperimentStatus.QUEUED,
-        status_date=datetime.now(),
-        pumping_rate=0.5,
-        char_sol_name="ferrocene",
-        char_vol=290,
-        flush_sol_name="dmf",
-        flush_vol=120,
-        rinse_count=3,
-        rinse_vol=150,
-        filename= None, #f"test_{datetime.now}.json",
-        results=None)
+# def make_baseline_value() -> Experiment:
+#     '''Create a test experiment value for the class'''
+#     return Experiment(
+#         id=0,
+#         priority=0,
+#         pin=CURRENT_PIN,
+#         target_well="D5",
+#         dmf=0,
+#         peg=0,
+#         acrylate=0,
+#         ferrocene=0,
+#         custom=0,
+#         ocp=1,
+#         ca=0,
+#         cv=1,
+#         baseline = 1,
+#         dep_duration=300,
+#         dep_pot=-2.7,
+#         ca_sample_period=0.01,
+#         cv_sample_period=0.01,
+#         cv_scan_rate = 0.05,
+#         status=ExperimentStatus.QUEUED,
+#         status_date=datetime.now(),
+#         pumping_rate=0.5,
+#         char_sol_name="ferrocene",
+#         char_vol=290,
+#         flush_sol_name="dmf",
+#         flush_vol=120,
+#         rinse_count=3,
+#         rinse_vol=150,
+#         filename= None, #f"test_{datetime.now}.json",
+#         results=None)
 
 # def parse_experiment(json_string: str) -> ExperimentBase:
 #     '''Parse an experiment from a json string'''
@@ -355,7 +374,22 @@ def make_baseline_value() -> Experiment:
 #     '''Parse an experiment from a json string'''
 #     return RootModel[ExperimentBase].model_validate_json(json_string).root
 
-def parse_experiment(json_string: str) -> (Experiment, ExperimentBase, EchemExperimentBase):
+def make_test_value() -> ExperimentBase:
+    '''Create a test experiment value for the class'''
+    return ExperimentBase(
+        id=0,
+        experiment_name= "test",
+        priority=2,
+        well_id="D5",
+        pin=CURRENT_PIN,
+        project_id=3,
+        solutions={'dmf': 0, 'peg': 145, 'acrylate': 145, 'ferrocene': 0, 'custom': 0},
+        status=ExperimentStatus.QUEUED,
+        status_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        filename= f"test_{0}.json",
+        results=None)
+
+def parse_experiment(json_string: str) -> (ExperimentBase, EchemExperimentBase):
     '''Parse an experiment from a json string'''
     if isinstance(json_string, str):
         parsed_json = json.loads(json_string)
@@ -389,15 +423,15 @@ def test_parse():
     '''Test that the class can be parsed from json and back'''
     value = make_test_value()
     print(f"Original---> {value}")
-    sample_json = RootModel[Experiment](value).model_dump_json(indent=4)
-    parsed_value = RootModel[Experiment].model_validate_json(sample_json).root
+    sample_json = RootModel[ExperimentBase](value).model_dump_json(indent=4)
+    parsed_value = RootModel[ExperimentBase].model_validate_json(sample_json).root
     print(f"Parsed--->{parsed_value}")
     assert value == parsed_value
 
 def test_serialize_experiment():
     '''Test that the class can be serialized to json'''
     value = make_test_value()
-    sample_json = RootModel[Experiment](value).model_dump_json(indent=4)
+    sample_json = RootModel[ExperimentBase](value).model_dump_json(indent=4)
     print(sample_json)
     with open('temp_test_file.json', 'w', encoding='UTF-8') as f:
         f.write(sample_json)
@@ -443,7 +477,7 @@ def test_serialize_results():
 def test_schema():
     '''Test that the class can generate a json schema'''
     # Useful if you have tools that validate your json externally
-    print(json.dumps(TypeAdapter(Experiment).json_schema(), indent=4))
+    print(json.dumps(TypeAdapter(ExperimentBase).json_schema(), indent=4))
 
 if __name__ == "__main__":
     test_serialize_experimentbase()
