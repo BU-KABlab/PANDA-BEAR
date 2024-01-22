@@ -201,11 +201,11 @@ Before starting, please ensure the following:
     print("Part 2:")
     print("""
 The program will prompt you:
+    - to install the elctrode to the lens AFTER homing the mill and BEFORE the first experiment
     - to pipette the lithium solution into the well
     - to start recording in OBS
     - to stop the recording in OBS
 """)
-    electrode_install = input("Install electrode on lens. Press enter to confirm")
 
     part2 = input("\nRun part 2? (y/n) ")
     print()

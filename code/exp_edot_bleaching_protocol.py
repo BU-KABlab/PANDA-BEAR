@@ -204,7 +204,8 @@ def edot_bleaching_part_2(
         z_coord=toolkit.wellplate.image_height,
         instrument=Instruments.LENS,
     )
-
+    electrode_install = input("Confirm that the electrode is installed and ready to go. Press enter to continue\n")
+    toolkit.global_logger.info("User confirmed electrode installation")
     pipette_lithium = input(
         "Manually pipette 120µL of 0.1M LiClO4 in water into well. Press enter to confirm"
     )
