@@ -378,6 +378,15 @@ class SlackBot:
         else:
             marker = "s"
 
+        ## Label the wellplate with the plate id below the bottom row and centered to the wellplate
+        # get the coordinates of wells H12 and A12
+        h12:dict = wellplate.get_coordinates("H12")
+        a12:dict = wellplate.get_coordinates("A12")
+        # calculate the center of the wellplate
+        center = h12["x"] + (a12["x"] - h12["x"]) / 2
+        # plot the plate id
+        plt.text(center, h12['y']-20, str(wellplate.plate_id), color="black", ha="center")
+
         ## Vial coordinates
         vial_x = []
         vial_y = []
