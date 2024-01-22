@@ -241,7 +241,7 @@ class Mill:
         offsets = self.config["instrument_offsets"]["center"]
         working_volume = self.config["working_volume"]
 
-        mill_move = "G00 X{} Y{} Z{}"  # Move to specified coordinates
+        mill_move = "G01 X{} Y{} Z{}"  # Move to specified coordinates
 
         command_coordinates = [
             x_coord + offsets["x"],
@@ -330,7 +330,7 @@ class Mill:
         Returns:
             None
         """
-        coords = self.config["electrode_bath_coordinates"]
+        coords = self.config["electrode_bath"]
         self.safe_move(coords['x'], coords['y'], 0, instrument=Instruments.ELECTRODE)
         for _ in range(3):
             self.move_electrode_to_position(coords['x'], coords['y'], coords['z'])
@@ -346,7 +346,7 @@ class Mill:
         Returns:
             None
         """
-        coords = self.config["electrode_bath_coordinates"]
+        coords = self.config["electrode_bath"]
         self.safe_move(coords['x'], coords['y'], coords['z'], instrument=Instruments.ELECTRODE)
         return 0
 
@@ -477,7 +477,7 @@ class Mill:
 
         # If the current z_coord is not zero, move up to z = 0 first
         if current_z != 0:
-            self.execute_command("G00 Z0")
+            self.execute_command("G01 Z0")
 
         # Fetch offsets for the specified instrument
         offsets = self.config["instrument_offsets"][instrument.value]
@@ -494,13 +494,13 @@ class Mill:
 
         # Generate horizontal movements
         if dx != 0:
-            commands.append(f"G00 X{x_coord}")
+            commands.append(f"G01 X{x_coord}")
 
         if dy != 0:
-            commands.append(f"G00 Y{y_coord}")
+            commands.append(f"G01 Y{y_coord}")
 
         # Generate vertical movements
-        commands.append(f"G00 Z{z_coord}")
+        commands.append(f"G01 Z{z_coord}")
 
         # Execute the commands one by one
         for command in commands:

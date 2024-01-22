@@ -82,6 +82,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
     toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
+        new_experiment = None
         # Connect to equipment
         toolkit = connect_to_instruments(use_mock_instruments)
         logger.info("Connected to instruments")
