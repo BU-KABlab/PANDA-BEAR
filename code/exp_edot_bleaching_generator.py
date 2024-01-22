@@ -218,4 +218,4 @@ The program will prompt you:
     else:
         print("Skipping part 2")
 
-    print("Experiments complete")
+    print("Experiments completed or skipped")
