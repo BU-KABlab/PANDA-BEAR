@@ -8,6 +8,12 @@ from scheduler import Scheduler
 from wellplate import determine_next_experiment_id
 
 print("TEST MODE: ", TESTING)
+if TESTING:
+    input("Test mode is on. Press enter to continue or ctrl+c to quit")
+    print("Continuing...")
+else:
+    input("Test mode is off. Press enter to continue or ctrl+c to quit")
+    print("Continuing...")
 # Create experiments
 COLUMNS = "ABCDEFGH"
 ROWS = 12
