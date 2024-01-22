@@ -117,16 +117,16 @@ def edot_bleaching_part_1(
     print("4. Flushing pipette tip with electrolyte rinse")
     for _ in range(3):
         forward_pipette_v2(
-            volume=instructions.solutions_corrected["rinse0"],
+            volume=instructions.solutions_corrected["electrolyte"],
             from_vessel=solution_selector(
                 stock_vials,
-                "rinse0",
-                instructions.solutions_corrected["rinse0"],
+                "electrolyte",
+                instructions.solutions_corrected["electrolyte"],
             ),
             to_vessel=waste_selector(
                 waste_vials,
                 "waste",
-                instructions.solutions_corrected["rinse0"],
+                instructions.solutions_corrected["electrolyte"],
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,

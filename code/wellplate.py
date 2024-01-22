@@ -180,7 +180,7 @@ class Wellplate:
         self.columns = columns
         self.orientation = orientation
         self.z_bottom = -72
-        self.echem_height = -71  # for every well
+        self.echem_height = -70  # for every well
         self.image_height = -35  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
         self.plate_id = 0  # The id of the well plate
