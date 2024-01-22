@@ -162,12 +162,12 @@ for file in [
         print(f"Created {file_path}")
 
 ## Rename existing log file if it exists with timestamp
-if EPANDA_LOG.exists():
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_name = EPANDA_LOG.with_name(f"ePANDA_{timestamp}.log")
-    EPANDA_LOG.rename(new_name)
-    print(f"Renamed {EPANDA_LOG} to {new_name}")
+# if EPANDA_LOG.exists():
+#     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+#     new_name = EPANDA_LOG.with_name(f"ePANDA_{timestamp}.log")
+#     EPANDA_LOG.rename(new_name)
+#     print(f"Renamed {EPANDA_LOG} to {new_name}")
 
-## Create new log file
-EPANDA_LOG.touch()
-print(f"Created {EPANDA_LOG}")
+# ## Create new log file
+# EPANDA_LOG.touch()
+# print(f"Created {EPANDA_LOG}")
