@@ -330,12 +330,11 @@ class Mill:
         Returns:
             None
         """
-        [initial_x, initial_y, initial_z] = self.current_coordinates()
-        self.move_center_to_position(initial_x, initial_y, initial_z * 0)
-        self.move_electrode_to_position(-409, -231, 0)
+        coords = self.config["electrode_bath_coordinates"]
+        self.safe_move(coords['x'], coords['y'], 0, instrument=Instruments.ELECTRODE)
         for _ in range(3):
-            self.move_electrode_to_position(-409, -231, -45)
-            self.move_electrode_to_position(-409, -231, 0)
+            self.move_electrode_to_position(coords['x'], coords['y'], coords['z'])
+            self.move_electrode_to_position(coords['x'], coords['y'], 0)
         return 0
 
     def rest_electrode(self):
@@ -347,7 +346,8 @@ class Mill:
         Returns:
             None
         """
-        self.safe_move(-409, -231, -50, instrument=Instruments.ELECTRODE)
+        coords = self.config["electrode_bath_coordinates"]
+        self.safe_move(coords['x'], coords['y'], coords['z'], instrument=Instruments.ELECTRODE)
         return 0
 
 
@@ -770,43 +770,46 @@ def movement_test():
             #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
             # )
 
-            mill.safe_move(
-                a1["x"], a1["y"], wellplate.image_height, instrument=Instruments.LENS
-            )
-            mill.safe_move(
-                a12["x"], a12["y"], a12["echem_height"], instrument=Instruments.ELECTRODE
-            )
-            mill.safe_move(
-                h12["x"], h12["y"], h12["echem_height"], instrument=Instruments.ELECTRODE
-            )
-            mill.safe_move(
-                h1["x"], h1["y"], h1["echem_height"], instrument=Instruments.ELECTRODE
-            )
+            # mill.safe_move(
+            #     a1["x"], a1["y"], wellplate.image_height, instrument=Instruments.LENS
+            # )
+            # mill.safe_move(
+            #     a12["x"], a12["y"], a12["echem_height"], instrument=Instruments.ELECTRODE
+            # )
+            # mill.safe_move(
+            #     h12["x"], h12["y"], h12["echem_height"], instrument=Instruments.ELECTRODE
+            # )
+            # mill.safe_move(
+            #     h1["x"], h1["y"], h1["echem_height"], instrument=Instruments.ELECTRODE
+            # )
 
 
-            if len(stock_vials) != 0:
-                for _, vial in enumerate(stock_vials):
-                    if vial.position =="e1":
-                        continue
-                    mill.safe_move(
-                        vial.coordinates["x"],
-                        vial.coordinates["y"],
-                        vial.height,
-                        instrument=Instruments.PIPETTE,
-                    )
-                mill.move_to_safe_position()
+            # if len(stock_vials) != 0:
+            #     for _, vial in enumerate(stock_vials):
+            #         if vial.position =="e1":
+            #             continue
+            #         mill.safe_move(
+            #             vial.coordinates["x"],
+            #             vial.coordinates["y"],
+            #             vial.height,
+            #             instrument=Instruments.PIPETTE,
+            #         )
+            #     mill.move_to_safe_position()
 
-            if len(waste_vials) != 0:
-                ## Move pipette to first waste vial then to the depth and then to safe positionfor
-                for _, vial in enumerate(waste_vials):
-                    mill.safe_move(
-                        vial.coordinates["x"],
-                        vial.coordinates["y"],
-                        vial.height,
-                        instrument=Instruments.PIPETTE,
-                    )
-                mill.move_to_safe_position()
-                mill.rest_electrode()
+            # if len(waste_vials) != 0:
+            #     ## Move pipette to first waste vial then to the depth and then to safe positionfor
+            #     for _, vial in enumerate(waste_vials):
+            #         mill.safe_move(
+            #             vial.coordinates["x"],
+            #             vial.coordinates["y"],
+            #             vial.height,
+            #             instrument=Instruments.PIPETTE,
+            #         )
+            #     mill.move_to_safe_position()
+            #     mill.rest_electrode()
+
+            mill.move_to_safe_position()
+            mill.rest_electrode()
 
     except (
         MillConnectionError,
@@ -825,6 +828,3 @@ def movement_test():
 
 if __name__ == "__main__":
     movement_test()
-
-    # with Mill() as mill:
-    #     mill.rest_electrode()

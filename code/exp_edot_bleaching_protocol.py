@@ -63,7 +63,7 @@ def edot_bleaching_part_1(
     print(f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 1 started")
     print("Deposition using CV")
     # Pipette 120ul of edot solution into well
-    print("1. Pipetting %f ul of edot into well: %d ", instructions.solutions_corrected['edot'],instructions.well_id)
+    print(f"1. Pipetting  {instructions.solutions_corrected['edot']}ul of edot into well: {instructions.well_id}")
     forward_pipette_v2(
         volume=instructions.solutions_corrected['edot'],
         from_vessel=solution_selector(
@@ -201,7 +201,7 @@ def edot_bleaching_part_2(
     print(f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 started")
 
     # Move lens over well
-    print("1. Moving lens over well")
+    print(f"1. Moving lens over well {instructions.well_id}")
     instructions.status = ExperimentStatus.IMAGING
     toolkit.mill.safe_move(
         x_coord=toolkit.wellplate.get_coordinates(instructions.well_id)['x'],
@@ -209,8 +209,14 @@ def edot_bleaching_part_2(
         z_coord=toolkit.wellplate.image_height,
         instrument= Instruments.LENS
     )
+
+    pipette_lithium = input(
+        "Manually pipette 120µL of 0.1M LiClO4 in water into well. Press enter to confirm"
+    )
+    toolkit.global_logger.info("User confirmed pipetting of lithium")
+
     # Start recording
-    print("2. Starting recording")
+    print("\n\n2. Starting recording")
     input("Start recording using the OBS software. Press enter to continue")
 
     # Run cyclic
@@ -233,87 +239,5 @@ def edot_bleaching_part_2(
     print("4. Stopping recording")
     input("Stop recording using the OBS software. Press enter to continue")
 
-    toolkit.mill.rest_electrode()
-
     print(f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 complete")
     print("*" * 80,end='\n\n')
-
-
-def edot_bleaching_protocol(
-    instructions: EchemExperimentBase,
-    toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
-):
-    """
-    Protocol to test the bleaching of EDOT in the wellplate
-
-    Steps:
-    Part 1:
-        1. Pipette 120 µL of EDOT solution into well B2
-        2. Run cyclic
-            Cvvi = 0
-            CVap1 = 2
-            CVap2 = 0.5
-            CVvf = 0.5
-            CVsr1 = 0.05
-            Cvcycle = #  <-- different for each experiment
-        3. Move EDOT solution from well B2 to waste
-        4. Rinse pipette tip 3x with electrolyte rinse
-        5 .Rinse well 4x with electrolyte well rinse
-        (well should be clear of solution)
-
-    PAUSE
-    Install electrode on lens - user confirm
-    Manually pipette 120µL of 0.1M LiClO4 in water into well B2 - user confirm
-    RESUME - user confirm
-
-    Part 2:
-        1. Move lens over well B2
-        2. Start recording
-        3. Run cyclic
-            Cvvi = 0
-            CVap1 = -1.6 (this is intentionally negative, we are scanning in the reverse direction as usual)
-            CVap2 = 0.4
-            CVvf = -1.6
-            CVsr1 = 0.025
-            Cvcycle = 3
-        4. Stop recording
-        5. Save video
-
-    Args:
-        instructions (Experiment object): The experiment instructions
-        results (ExperimentResult object): The experiment results
-        toolkit (Toolkit object): The toolkit object which contains the pump, mill, and wellplate
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
-
-    """
-    edot_bleaching_part_1(
-        instructions=instructions,
-        toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
-    )
-
-    electrode_install = input("Install electrode on lens. Press enter to confirm")
-    toolkit.global_logger.info("User confirmed electrode installation")
-
-    pipette_lithium = input("Manually pipette 120µL of 0.1M LiClO4 in water into well %s. Press enter to confirm", instructions.well_id)
-    toolkit.global_logger.info("User confirmed pipetting of lithium")
-
-    input("Press enter to continue")
-
-    edot_bleaching_part_2(
-        instructions=instructions,
-        toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
-    )
-
-    print("Experiment %d complete", instructions.id)
-
-    electrode_removal = input("Remove electrode from lens. Press enter to confirm")
-    toolkit.global_logger.info("User confirmed electrode removal after experiment %d", instructions.id)
-
-    input("Press enter to continue")

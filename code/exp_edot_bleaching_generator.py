@@ -177,6 +177,7 @@ Before starting, please ensure the following:
 
     # # Create scheduler
     scheduler = Scheduler()
+    print("Part 1: The program will only prompt you for confirmation during this part")
     part1 = input("Run part 1? (y/n) ")
 
     if part1 == "y":
@@ -191,21 +192,22 @@ Before starting, please ensure the following:
     else:
         print("Skipping part 1")
 
+    print("Part 2:")
+    print("""
+The program will prompt you:
+    - to pipette the lithium solution into the well
+    - to start recording in OBS
+    - to stop the recording in OBS
+""")
     electrode_install = input("Install electrode on lens. Press enter to confirm")
-    print("User confirmed electrode installation",end="\n\n")
 
-    pipette_lithium = input(
-        "Manually pipette 120µL of 0.1M LiClO4 in water into wells. Press enter to confirm"
-    )
-    print("User confirmed pipetting of lithium",end="\n\n")
-
-    part2 = input("Run part 2? (y/n) ")
+    part2 = input("\nRun part 2? (y/n) ")
     print()
     if part2 == "y":
         part_2_experiments = experiments_part_2()
         # for experiment in part_2_experiments:
         #     print(experiment.__str__())
-        scheduler.add_nonfile_experiments(part_2_experiments)
+        scheduler.add_nonfile_experiments(part_2_experiments,override=True)
         controller.main(part=2)
     else:
         print("Skipping part 2")

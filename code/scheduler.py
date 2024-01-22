@@ -429,7 +429,7 @@ class Scheduler:
 
         logger.info("Experiment %s location updated to %s", experiment.id, experiment.status.value)
 
-    def add_nonfile_experiment(self, experiment: ExperimentBase) -> str:
+    def add_nonfile_experiment(self, experiment: ExperimentBase, override_well_available = False) -> str:
         """
         Adds an experiment which is not a file to the experiment queue directly.
         
@@ -439,28 +439,29 @@ class Scheduler:
         Returns:
             str: A message indicating whether the experiment was successfully added to the queue.
         """
-        ## First check the existing status, if not new or queued, then do not add to queue
-        if experiment.status not in [ExperimentStatus.NEW, ExperimentStatus.QUEUED]:
-            message = f"Experiment {experiment.id} is not new or queued, not adding to queue"
-            logger.info(message)
-            return message
+        if not override_well_available:
+            ## First check the existing status, if not new or queued, then do not add to queue
+            if experiment.status not in [ExperimentStatus.NEW, ExperimentStatus.QUEUED]:
+                message = f"Experiment {experiment.id} is not new or queued, not adding to queue"
+                logger.info(message)
+                return message
 
-        ## Check if the well is available
-        if self.check_well_status(experiment.well_id) != "new":
-            # Find the next available well
-            target_well = self.choose_alternative_well(experiment.well_id)
-            if target_well is None:
+            ## Check if the well is available
+            if self.check_well_status(experiment.well_id) != "new":
+                # Find the next available well
+                target_well = self.choose_alternative_well(experiment.well_id)
+                if target_well is None:
+                    logger.info(
+                        "No wells available for experiment originally for well %s.",
+                        experiment.well_id
+                    )
+                    return "No wells available"
                 logger.info(
-                    "No wells available for experiment originally for well %s.",
-                    experiment.well_id
+                    "Experiment originally for well %s is now for well %s.",
+                    experiment.well_id,
+                    target_well
                 )
-                return "No wells available"
-            logger.info(
-                "Experiment originally for well %s is now for well %s.",
-                experiment.well_id,
-                target_well
-            )
-            experiment.well_id = target_well
+                experiment.well_id = target_well
 
         # Save the experiment as a separate file in the experiment_queue subfolder
         experiment = self.add_to_queue_folder(experiment)
@@ -500,13 +501,13 @@ class Scheduler:
         experiment.status = ExperimentStatus.QUEUED
         return experiment
 
-    def add_nonfile_experiments(self, experiments: list) -> str:
+    def add_nonfile_experiments(self, experiments: list,override=False) -> str:
         """
         Adds a list of experiments which are not files to the experiment queue directly.
         :param experiments: The experiments to add.
         """
         for experiment in experiments:
-            response = self.add_nonfile_experiment(experiment)
+            response = self.add_nonfile_experiment(experiment, override_well_available=override)
             if response != "success":
                 print(response)
                 logger.warning(response)

@@ -225,9 +225,11 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
                     stock_vials=stock_vials,
                     waste_vials=waste_vials,
                 )
+                input("If this was the last part 2 exp, remove the electrode from lens. Otherwise disregard and press enter\n")
+
+            ## Update the experiment status to complete
             new_experiment.status = ExperimentStatus.COMPLETE
             new_experiment.status_date = datetime.now(tz.timezone("US/Eastern"))
-
             # e_panda.image_well(
             #     wellplate=wellplate,
             #     instructions=new_experiment,
