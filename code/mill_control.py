@@ -504,7 +504,7 @@ class Mill:
 
         # Execute the commands one by one
         for command in commands:
-            self.execute_command(command)
+              self.execute_command(command)
 
         return 0
 

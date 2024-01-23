@@ -412,7 +412,7 @@ class potentiostat_ocp_parameters:
 if __name__ == "__main__":
     try:
         pstatconnect()  # grab first pstat
-        COMPLETE_FILE_NAME = setfilename("F1", "OCP")
+        COMPLETE_FILE_NAME = setfilename(10000384, "OCP",16,2,"B4")
         OCP(
             potentiostat_ocp_parameters.OCPvi,
             potentiostat_ocp_parameters.OCPti,
@@ -424,17 +424,17 @@ if __name__ == "__main__":
         # time.sleep(0.5)
         ## echem CA - deposition
         if check_vf_range(COMPLETE_FILE_NAME.with_suffix(".txt")):
-            COMPLETE_FILE_NAME = setfilename("F1", "CV")
+            COMPLETE_FILE_NAME = setfilename(10000384, "CV",16,2,"B4")
             cyclic(
-                potentiostat_cv_parameters.CVvi,
-                potentiostat_cv_parameters.CVap1,
-                potentiostat_cv_parameters.CVap2,
-                potentiostat_cv_parameters.CVvf,
-                potentiostat_cv_parameters.CVsr1,
-                potentiostat_cv_parameters.CVsr2,
-                potentiostat_cv_parameters.CVsr3,
-                potentiostat_cv_parameters.CVsamplerate,
-                potentiostat_cv_parameters.CVcycle,
+                0.0,
+                -2,
+                1.0,
+                -2,
+                0.05,
+                0.05,
+                0.05,
+                0.1,
+                3,
             )
             # chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
             logger.debug("made it to try")
@@ -442,7 +442,7 @@ if __name__ == "__main__":
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data
-            Analyzer.plotdata("CV", COMPLETE_FILE_NAME)
+            #Analyzer.plotdata("CV", COMPLETE_FILE_NAME)
         pstatdisconnect()
         del CONNECTION
 

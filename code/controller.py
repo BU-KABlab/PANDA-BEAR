@@ -95,18 +95,17 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
         stock_vials, waste_vials, wellplate = establish_system_state()
 
         ## Flush the pipette tip with water before we start
-        for _ in range(3):
-            e_panda.flush_v2(
-                stock_vials=stock_vials,
-                waste_vials=waste_vials,
-                flush_solution_name="rinse0",
-                flush_volume=140,
-                pump=toolkit.pump,
-                mill=toolkit.mill,
-            )
-            ## Update the system state with new vial and wellplate information
-            update_vial_state_file(stock_vials, STOCK_STATUS)
-            update_vial_state_file(waste_vials, WASTE_STATUS)
+        e_panda.flush_v2(
+            stock_vials=stock_vials,
+            waste_vials=waste_vials,
+            flush_solution_name="rinse0",
+            flush_volume=140,
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+        )
+        ## Update the system state with new vial and wellplate information
+        update_vial_state_file(stock_vials, STOCK_STATUS)
+        update_vial_state_file(waste_vials, WASTE_STATUS)
 
         ## Begin outer loop
         while True:

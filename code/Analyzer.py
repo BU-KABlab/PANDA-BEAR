@@ -120,16 +120,16 @@ def plotdata(exp_name: str, complete_file_name: Path, showplot=False):
         # df2 = df[df["Cycle"] == 1]
         # dashes = dash_patterns[0]  # Use the corresponding dash pattern from the list
         # plt.plot(df2['Vsig'], df2['Im'], linestyle='--', dashes=dashes, color=colors[0], label=f'Cycle 1 - index 0')
-        plt.plot(
-            df2["Vsig"],
-            df2["Im"],
-            linestyle="--",
-            dashes=dashes,
-            color="#5b5b5b",
-            label="Cycle 1 - index 0",
-        )
-        plt.xlabel("V vs Ag (V)")
-        plt.ylabel("Current (A)")
+            plt.plot(
+                df2["Vsig"],
+                df2["Im"],
+                linestyle="--",
+                dashes=dashes,
+                color="#5b5b5b",
+                label="Cycle 1 - index 0",
+            )
+            plt.xlabel("V vs Ag (V)")
+            plt.ylabel("Current (A)")
         if showplot is True:
             plt.show()
 
@@ -141,7 +141,7 @@ def plotdata(exp_name: str, complete_file_name: Path, showplot=False):
 
 if __name__ == "__main__":
     file = Path(
-        r"C:\Users\grego\SynologyDrive\Downloads\\13_1_10000378_D11_CV_3.txt"
+        r"\\engnas.bu.edu\research\eng_research_kablab\Shared Resources\PANDA\data\16_0_10000379_B2_CV.txt"
     )
     plotdata("CV", file, True)
 
