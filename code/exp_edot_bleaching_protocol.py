@@ -82,6 +82,14 @@ def edot_bleaching_part_1(
         pumping_rate=instructions.pumping_rate,
     )
 
+    # Move the electrode to the well
+    print("Moving electrode to well")
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id)["x"],
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id)["y"],
+        z_coord=toolkit.wellplate.echem_height,
+        instrument=Instruments.ELECTRODE,
+    )
     # Perform CV
     print("2. Performing CV with the following parameters:")
     print("\tCvvi = ", instructions.cv_initial_voltage)
@@ -90,12 +98,19 @@ def edot_bleaching_part_1(
     print("\tCVvf = ", instructions.cv_final_voltage)
     print("\tCVsr1 = ", instructions.cv_scan_rate_cycle_1)
     print("\tCvcycle = ", instructions.cv_cycle_count)
-    characterization(
-        char_instructions=instructions,
-        char_results=instructions.results,
-        mill=toolkit.mill,
-        wellplate=toolkit.wellplate,
-    )
+    try:
+        characterization(
+            char_instructions=instructions,
+            char_results=instructions.results,
+            wellplate=toolkit.wellplate,
+        )
+    except Exception as e:
+        print("Error in characterization")
+        print(e)
+        print("Continuing with the rest of the experiment")
+
+    finally:
+        toolkit.mill.rinse_electrode()
 
     # Clear the well contents into waste
     print("3. Clearing well contents into waste")
@@ -226,7 +241,6 @@ def edot_bleaching_part_2(
     characterization(
         char_instructions=instructions,
         char_results=instructions.results,
-        mill=toolkit.mill,
         wellplate=toolkit.wellplate,
     )
 
