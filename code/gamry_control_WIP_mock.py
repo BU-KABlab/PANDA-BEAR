@@ -4,7 +4,7 @@ import pathlib
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict
 import numpy as np
-
+from config.config import PATH_TO_DATA
 logger = logging.getLogger("e_panda")
 
 class GamryPotentiostat:
@@ -35,35 +35,34 @@ class GamryPotentiostat:
         self.OPEN_CONNECTION = True
         return True
 
-    def setfilename(self, experiment_id,
-    experiment_type,
-    project_campaign_id: int = None,
-    campaign_id: int = None,
-    well_id: str = None,):
-        COMPLETE_FILE_NAME:pathlib.Path = (
-            pathlib.Path.cwd()
-            / "data"
-            / ("experiment-" + str(experiment_id) + "_mock_" + experiment_type)
-        )
-        # Check if the file already exists. If it does then add a number to the end of the file name
-        if COMPLETE_FILE_NAME.exists():
-            i = 1
-            while COMPLETE_FILE_NAME.exists():
-                COMPLETE_FILE_NAME = (
-                    pathlib.Path.cwd()
-                    / "data"
-                    / (
-                        "experiment-"
-                        + str(experiment_id)
-                        + "_mock_"
-                        + experiment_type
-                        + "_"
-                        + str(i)
-                    )
-                )
+    def setfilename(self,
+        experiment_id,
+        experiment_type,
+        project_campaign_id: int = None,
+        campaign_id: int = None,
+        well_id: str = None,
+        ) -> pathlib.Path:
+        """set the file name for the experiment"""
+        global COMPLETE_FILE_NAME
+        if project_campaign_id is None and campaign_id is None and well_id is None:
+            file_name = f"{experiment_id}_{experiment_type}"
+            filepath: pathlib.Path = (PATH_TO_DATA / file_name).with_suffix(".txt")
+            i = 0
+            while filepath.exists():
+                next_file_name = f"{file_name}_{i}"
+                filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
+                i += 1
+        else:
+            file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
+            filepath: pathlib.Path = (PATH_TO_DATA / file_name).with_suffix(".txt")
+            # Check if the file already exists. If it does then add a number to the end of the file name
+            i = 0
+            while filepath.exists():
+                next_file_name = f"{file_name}_{i}"
+                filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
                 i += 1
 
-        logger.debug("eChem: complete file name is: %s", COMPLETE_FILE_NAME)
+        COMPLETE_FILE_NAME = filepath
         COMPLETE_FILE_NAME.touch()
         return COMPLETE_FILE_NAME
 

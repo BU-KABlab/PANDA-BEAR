@@ -16,11 +16,10 @@ import json
 import logging
 
 # import standard libraries
-from dataclasses import dataclass
 from datetime import datetime
 
 # import third-party libraries
-from typing import Sequence, Union
+from typing import Sequence
 
 import e_panda
 import pytz as tz
