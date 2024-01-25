@@ -227,7 +227,7 @@ class EchemExperimentBase(ExperimentBase):
         '''CVstep / CVsr1'''
         return round(self.cv_step_size / self.cv_scan_rate_cycle_1,4)
 
-    def __str__(self):
+    def print_experiment_parameters(self):
         if self.ca:
             ca_params = f"""
         CA Parameters

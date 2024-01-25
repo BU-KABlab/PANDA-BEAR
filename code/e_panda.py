@@ -838,8 +838,8 @@ def volume_correction(volume, density = None, viscosity = None):
 
 def image_well(
     wellplate: Wellplate,
-    instructions: EchemExperimentBase,
     toolkit: instrument_toolkit.Toolkit,
+    instructions: EchemExperimentBase = None,
     step_description: str = None,
 ):
     """

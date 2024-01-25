@@ -321,7 +321,7 @@ class Mill:
         logger.debug("current_coordinates: %s", current_coordinates)
         return current_coordinates
 
-    def rinse_electrode(self):
+    def rinse_electrode(self, rinses:int=3):
         """
         Rinse the electrode by moving it to the rinse position and back to the
         center position.
@@ -332,7 +332,7 @@ class Mill:
         """
         coords = self.config["electrode_bath"]
         self.safe_move(coords['x'], coords['y'], 0, instrument=Instruments.ELECTRODE)
-        for _ in range(3):
+        for _ in range(rinses):
             self.move_electrode_to_position(coords['x'], coords['y'], coords['z'])
             self.move_electrode_to_position(coords['x'], coords['y'], 0)
         return 0

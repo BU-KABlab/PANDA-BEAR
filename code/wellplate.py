@@ -189,7 +189,7 @@ class Wellplate:
         self.z_top = 0
         self.height = 6.0  # The height of the well plate in mm
         self.radius = 3.25  # new circular wells
-        self.well_offset = 9  # mm from center to center
+        self.well_offset = 9.0  # mm from center to center
         self.well_capacity = 300  # ul
         # overwrite the default values with the values from the well_type.csv file
         (
@@ -285,7 +285,7 @@ class Wellplate:
                         logger.debug("Well %s updated from file", well.name)
                         break
 
-    def get_coordinates(self, well_id) -> dict:
+    def get_coordinates(self, well_id, axis:str = None) -> dict:
         """
         Return the coordinate of a specific well
         Args:
@@ -294,6 +294,9 @@ class Wellplate:
             dict: The coordinates of the well in the form
             {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
         """
+        if axis in ["x", "y", "z"]:
+            return self.wells[well_id].coordinates[axis]
+        
         coordinates_dict = self.wells[well_id].coordinates
         coordinates_dict["depth"] = self.wells[well_id].depth
         coordinates_dict["echem_height"] = self.echem_height

@@ -10,9 +10,10 @@ from e_panda import (
     characterization,
     solution_selector,
     waste_selector,
-    NoAvailableSolution,
+    image_well,
 )
-
+from correction_factors import correction_factor
+from mill_control import Instruments
 
 def ferrocyanide_repeatability(
     instructions: ExperimentBase,
@@ -44,40 +45,57 @@ def ferrocyanide_repeatability(
         None - all arguments are passed by reference or are unchanged
 
     """
-    available_solutions = [
-        vial.name
-        for vial in stock_vials
-        if vial.name not in ["rinse0", "rinse1", "rinse2"]
-    ]
-
-    instruction_solutions = list(instructions.solutions.keys())
-
     # Check that all requested solutions are available
     # although we already checked before running the experiment we want to check again
     # that all requested solutions are found
-
-    ## Deposit the experiment solution into the well
-    for solution_name in instruction_solutions:
-        if solution_name not in available_solutions:
-            raise NoAvailableSolution(
-                "Solution {} is not available".format(solution_name)
-            )
-        forward_pipette_v2(
-            volume=instructions.solutions[solution_name],
-            from_vessel=solution_selector(
+    # Apply correction factor to the programmed volumes
+    print("Applying correction factor to the programmed volumes")
+    for solution in instructions.solutions:
+        instructions.solutions_corrected[solution] = correction_factor(
+            instructions.solutions[solution],
+            solution_selector(
                 stock_vials,
-                solution_name,
-                instructions.solutions[solution_name],
-            ),
-            to_vessel=toolkit.wellplate.wells[instructions.well_id],
-            pump=toolkit.pump,
-            mill=toolkit.mill,
-            pumping_rate=instructions.pumping_rate,
+                solution, # The solution name
+                instructions.solutions[solution] # The volume of the solution
+            ).viscosity_cp,
         )
 
+    ## Image the new well
+    image_well(
+        wellplate=toolkit.wellplate,
+        instructions=instructions.well_id,
+        toolkit=toolkit,
+        step_description="new"
+    )
+
+    instructions.status = ExperimentStatus.DEPOSITING
+    ## Deposit the experiment solution into the well
+    forward_pipette_v2(
+        volume=instructions.solutions_corrected['5mm_fecn6'],
+        from_vessel=solution_selector(
+            stock_vials,
+            '5mm_fecn6',
+            instructions.solutions_corrected['5mm_fecn6'],
+        ),
+        to_vessel=toolkit.wellplate.wells[instructions.well_id],
+        pump=toolkit.pump,
+        mill=toolkit.mill,
+        pumping_rate=instructions.pumping_rate,
+    )
+
+    ## Move the electrode to the well
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'x'),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'y'),
+        z_coord=toolkit.wellplate.echem_height,
+        instrument=Instruments.ELECTRODE,
+    )
     # Initial fluid handeling is done now we can perform the CV
     characterization(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
+    toolkit.mill.rinse_electrode(3)
+
     # Clear the well
+    instructions.status = ExperimentStatus.CLEARING
     forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -89,4 +107,11 @@ def ferrocyanide_repeatability(
         pump=toolkit.pump,
         mill=toolkit.mill,
     )
-    instructions.status = ExperimentStatus.COMPLETE
+
+    ## Image the cleared well
+    image_well(
+        wellplate=toolkit.wellplate,
+        instructions=instructions.well_id,
+        toolkit=toolkit,
+        step_description="cleared"
+    )
