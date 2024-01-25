@@ -71,6 +71,12 @@ class ExperimentBase():
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
     plate_id: int = None
 
+
+    def set_status(self, new_status: ExperimentStatus):
+        '''Set the status of the experiment'''
+        self.status = new_status
+        self.status_date = datetime.now()
+    
     # @property
     # def solutions_corrected(self):
     #     '''Calculate the corrected volume for each solution'''

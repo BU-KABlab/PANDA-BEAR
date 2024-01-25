@@ -175,6 +175,9 @@ def forward_pipette_v2(
                 rate=pumping_rate,
                 weigh=False,
             )  # pipette now has air gap + repitition vol
+            if isinstance(from_vessel, Well):
+                from_vessel: Well = from_vessel
+                from_vessel.update_contents(from_vessel, -repetition_vol)
 
             mill.move_to_safe_position()
 
@@ -221,7 +224,6 @@ def forward_pipette_v2(
             )
 
             # Update the contentes of the to_vessel
-            # FEATURE change from repitition volume to corrected volume
             to_vessel.update_contents(from_vessel, repetition_vol)
 
             logger.info(

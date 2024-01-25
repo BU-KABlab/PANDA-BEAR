@@ -1,7 +1,7 @@
 [
     {
         "position": "s0",
-        "contents": "edot in water",
+        "contents": "5mm_fecn6",
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
@@ -11,8 +11,8 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "edot",
-        "volume": 5000,
+        "name": "5mm_fecn6",
+        "volume": 10000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -23,7 +23,7 @@
     },
     {
         "position": "s1",
-        "contents": "1mM PSS electrolyte",
+        "contents": "10mm_fecn6",
         "viscosity_cp": 0.9,
         "density": 0.99714,
         "category": 0,
@@ -33,8 +33,8 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "electrolyte",
-        "volume": 5000,
+        "name": "10mm_fecn6",
+        "volume": 15000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -45,7 +45,7 @@
     },
     {
         "position": "s2",
-        "contents": "water methanol",
+        "contents": "electrolyte",
         "viscosity_cp": 0.9,
         "density": 0.99714,
         "category": 0,
@@ -55,8 +55,8 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": "rinse0",
-        "volume": 10000,
+        "name": "electrolyte",
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -67,7 +67,7 @@
     },
     {
         "position": "s3",
-        "contents": "none",
+        "contents": "rinse0",
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
@@ -77,8 +77,8 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": null,
-        "volume": 5000,
+        "name": "rinse0",
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -193,8 +193,8 @@
         "contamination": 0,
         "coordinates": {
             "x": -409,
-      "y": -34.4,
-      "z": -50
+            "y": -34.4,
+            "z": -50
         }
     }
 ]

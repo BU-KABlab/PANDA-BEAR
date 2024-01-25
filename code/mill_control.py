@@ -647,10 +647,11 @@ class MockMill:
         """Simulate getting G-code parser state"""
         self.logger.info("Getting G-code parser state")
 
-    def rinse_electrode(self):
+    def rinse_electrode(self,rinses:int=3):
         """Simulate rinsing the electrode"""
         self.logger.info("Rinsing the electrode")
-        time.sleep(5)
+        for _ in range(rinses):
+            time.sleep(5)
 
     def rest_electrode(self):
         """

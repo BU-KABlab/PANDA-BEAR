@@ -10,7 +10,6 @@ from e_panda import (
     characterization,
     solution_selector,
     waste_selector,
-    image_well,
 )
 from correction_factors import correction_factor
 from mill_control import Instruments
@@ -60,16 +59,9 @@ def ferrocyanide_repeatability(
             ).viscosity_cp,
         )
 
-    ## Image the new well
-    image_well(
-        wellplate=toolkit.wellplate,
-        instructions=instructions.well_id,
-        toolkit=toolkit,
-        step_description="new"
-    )
-
-    instructions.status = ExperimentStatus.DEPOSITING
+    instructions.set_status(new_status =ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
+    print("1. Depositing solutions into well: ", instructions.well_id)
     forward_pipette_v2(
         volume=instructions.solutions_corrected['5mm_fecn6'],
         from_vessel=solution_selector(
@@ -84,6 +76,7 @@ def ferrocyanide_repeatability(
     )
 
     ## Move the electrode to the well
+    print("2. Moving electrode to well: ", instructions.well_id)
     toolkit.mill.safe_move(
         x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'x'),
         y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'y'),
@@ -91,11 +84,13 @@ def ferrocyanide_repeatability(
         instrument=Instruments.ELECTRODE,
     )
     # Initial fluid handeling is done now we can perform the CV
+    print("3. Performing CV")
     characterization(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
     toolkit.mill.rinse_electrode(3)
 
     # Clear the well
-    instructions.status = ExperimentStatus.CLEARING
+    print("4. Clearing well contents into waste")
+    instructions.set_status(ExperimentStatus.CLEARING)
     forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -107,11 +102,4 @@ def ferrocyanide_repeatability(
         pump=toolkit.pump,
         mill=toolkit.mill,
     )
-
-    ## Image the cleared well
-    image_well(
-        wellplate=toolkit.wellplate,
-        instructions=instructions.well_id,
-        toolkit=toolkit,
-        step_description="cleared"
-    )
+    print("Experiment complete\n\n")

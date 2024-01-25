@@ -12,8 +12,6 @@ Additionally controller should be able to:
     - Update the vial statuses
 """
 # pylint: disable=line-too-long
-
-from hmac import new
 import json
 import logging
 
@@ -210,23 +208,29 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             logger.info("Beginning experiment %d", new_experiment.id)
             # import exp_c_rinsing_assessment_protocol as exp_c
             # TODO: Change to part 2 when ready
-            import exp_edot_bleaching_protocol as edot
-            if part == 1:
-                edot.edot_bleaching_part_1(
-                    instructions=new_experiment,
-                    toolkit=toolkit,
-                    stock_vials=stock_vials,
-                    waste_vials=waste_vials,
-                )
-            if part == 2:
-                edot.edot_bleaching_part_2(
-                    instructions=new_experiment,
-                    toolkit=toolkit,
-                    stock_vials=stock_vials,
-                    waste_vials=waste_vials,
-                )
-                input("If this was the last part 2 exp, remove the electrode from lens. Otherwise disregard and press enter\n")
-
+            # import exp_edot_bleaching_protocol as edot
+            # if part == 1:
+            #     edot.edot_bleaching_part_1(
+            #         instructions=new_experiment,
+            #         toolkit=toolkit,
+            #         stock_vials=stock_vials,
+            #         waste_vials=waste_vials,
+            #     )
+            # if part == 2:
+            #     edot.edot_bleaching_part_2(
+            #         instructions=new_experiment,
+            #         toolkit=toolkit,
+            #         stock_vials=stock_vials,
+            #         waste_vials=waste_vials,
+            #     )
+            #     input("If this was the last part 2 exp, remove the electrode from lens. Otherwise disregard and press enter\n")
+            import exp_a_ferrocyanide_assessment_protocol as exp_a
+            exp_a.ferrocyanide_repeatability(
+                instructions=new_experiment,
+                toolkit=toolkit,
+                stock_vials=stock_vials,
+                waste_vials=waste_vials,
+            )
             ## Update the experiment status to complete
             new_experiment.status = ExperimentStatus.COMPLETE
             new_experiment.status_date = datetime.now(tz.timezone("US/Eastern"))
@@ -264,8 +268,9 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             update_vial_state_file(waste_vials, WASTE_STATUS)
 
     except Exception as error:
-        new_experiment.status = ExperimentStatus.ERROR
-        scheduler.change_well_status_v2(
+        if new_experiment is not None:
+            new_experiment.status = ExperimentStatus.ERROR
+            scheduler.change_well_status_v2(
                     wellplate.wells[new_experiment.well_id], new_experiment
                 )
 
@@ -486,5 +491,5 @@ def disconnect_from_instruments(instruments: Toolkit):
     logger.info("Disconnected from instruments")
 
 if __name__ == "__main__":
-    wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
+    #wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
     main(use_mock_instruments=TESTING)

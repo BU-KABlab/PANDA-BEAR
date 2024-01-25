@@ -621,7 +621,7 @@ class Scheduler:
         for experiment_id in filtered_layered_queue:
             experiment_file_path = PATH_TO_EXPERIMENT_QUEUE / f"{experiment_id}.json"
             if not Path.exists(experiment_file_path):
-                logger.error("experiment file not found")
+                logger.error("experiment file %s not found", experiment_file_path.stem)
                 raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
 
             with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
