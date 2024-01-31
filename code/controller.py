@@ -44,6 +44,7 @@ from instrument_toolkit import Toolkit
 from slack_functions2 import SlackBot
 from vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
 from wellplate import save_current_wellplate
+from obs_controls import OBSController
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
@@ -56,7 +57,7 @@ logger.addHandler(system_handler)
 
 # set up slack globally so that it can be used in the main function and others
 slack = SlackBot()
-
+obs = OBSController()
 
 def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int = 1):
     """
@@ -79,12 +80,14 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
     toolkit = None
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
+        obs.place_text_on_screen("ePANDA is starting up")
+        obs.start_recording()
         new_experiment = None
         # Connect to equipment
         toolkit = connect_to_instruments(use_mock_instruments)
         logger.info("Connected to instruments")
         slack.send_slack_message("alert", "ePANDA has connected to equipment")
-
+        obs.place_text_on_screen("ePANDA has connected to equipment")
         ## Initialize scheduler
         scheduler = Scheduler()
 
@@ -92,6 +95,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
         stock_vials, waste_vials, wellplate = establish_system_state()
 
         ## Flush the pipette tip with water before we start
+        obs.place_text_on_screen("Initial flushing of pipette tip")
         e_panda.flush_v2(
             stock_vials=stock_vials,
             waste_vials=waste_vials,
@@ -107,6 +111,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
         ## Begin outer loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
+            obs.place_text_on_screen("")
             e_panda.apply_log_filter()
 
             ## Establish state of system - we do this each time because each experiment changes the system state
@@ -300,6 +305,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
         toolkit.mill.rest_electrode()
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
+        obs.place_text_on_screen("")
+        obs.stop_recording()
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
         print("ePANDA is shutting down...goodbye")
 
@@ -491,4 +498,6 @@ def disconnect_from_instruments(instruments: Toolkit):
 
 if __name__ == "__main__":
     #wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
+    print("TEST MODE: ", TESTING)
+    input("Press enter to continue or ctrl+c to exit")
     main(use_mock_instruments=TESTING)

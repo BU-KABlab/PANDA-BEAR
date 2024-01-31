@@ -76,7 +76,11 @@ class ExperimentBase():
         '''Set the status of the experiment'''
         self.status = new_status
         self.status_date = datetime.now()
-    
+        try:
+            from obs_controls import OBSController
+            OBSController().place_experiment_on_screen(self)
+        except Exception as e:
+            print(f"Error setting status: {e}")
     # @property
     # def solutions_corrected(self):
     #     '''Calculate the corrected volume for each solution'''

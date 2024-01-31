@@ -464,13 +464,14 @@ class Scheduler:
                 experiment.well_id = target_well
 
         # Save the experiment as a separate file in the experiment_queue subfolder
+        experiment.status = ExperimentStatus.QUEUED
         experiment = self.add_to_queue_folder(experiment)
 
         ## Add the experiment to the queue
         experiment = self.add_to_queue_file(experiment)
 
         ## Change the status of the well
-        self.change_well_status(experiment.well_id, experiment)
+        self.change_well_status_v2(experiment.well_id, experiment)
 
         logger.info("Experiment %s added to queue", experiment.id)
         return "success"

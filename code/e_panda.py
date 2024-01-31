@@ -635,12 +635,7 @@ def deposition(
         # echem OCP
         logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
         dep_instructions.status = ExperimentStatus.OCPCHECK
-        mill.safe_move(
-            wellplate.get_coordinates(dep_instructions.well_id)["x"],
-            wellplate.get_coordinates(dep_instructions.well_id)["y"],
-            wellplate.echem_height,
-            Instruments.ELECTRODE,
-        )  # move to well depth
+
         base_filename = pstat.setfilename(
             dep_instructions.id,
             "OCP",
@@ -689,7 +684,6 @@ def deposition(
                 )  # CA
 
                 pstat.activecheck()
-                mill.move_to_safe_position()  # move to safe height above target well
                 #plotdata("CA", dep_results.deposition_data_file.with_suffix(".txt"))
             except Exception as e:
                 logger.error("Exception occurred during deposition: %s", e)
@@ -700,9 +694,7 @@ def deposition(
         logger.error("Exception occurred during deposition: %s", e)
         raise DepositionFailure(dep_instructions.id, dep_instructions.well_id) from e
     finally:
-        mill.move_to_safe_position()
         pstat.pstatdisconnect()
-        mill.rinse_electrode()
     return dep_instructions, dep_results
 
 def characterization(
@@ -735,12 +727,6 @@ def characterization(
             pstat = echem
         pstat.pstatconnect()
         char_instructions.status = ExperimentStatus.OCPCHECK
-        mill.safe_move(
-            wellplate.get_coordinates(char_instructions.well_id)["x"],
-            wellplate.get_coordinates(char_instructions.well_id)["y"],
-            wellplate.echem_height,
-            Instruments.ELECTRODE,
-        )  # move to well depth
         char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
         pstat.OCP(
             OCPvi= potentiostat_ocp_parameters.OCPvi,
@@ -754,7 +740,6 @@ def characterization(
         #plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
     except Exception as e:
         logger.error("Exception occurred during OCP: %s", e)
-        mill.move_to_safe_position()
         pstat.pstatdisconnect()
         raise OCPFailure("characterization") from e
 
@@ -791,17 +776,13 @@ def characterization(
                 CVcycle=char_instructions.cv_cycle_count,
             )
             pstat.activecheck()
-            mill.move_to_safe_position()  # move to safe height above target well
             #plotdata("CV", char_results.characterization_data_file.with_suffix(".txt"))
         except Exception as e:
             logger.error("Exception occurred during CV: %s", e)
-            mill.move_to_safe_position()
             pstat.pstatdisconnect()
             raise CVFailure(char_instructions.id, char_instructions.well_id) from e
 
-    mill.move_to_safe_position()
     pstat.pstatdisconnect()
-    mill.rinse_electrode()
     return char_instructions, char_results
 
 

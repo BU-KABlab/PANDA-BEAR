@@ -1,13 +1,12 @@
 """The home of all project specific strings and values that are 
 better to be set in one place than to be scattered around the code."""
 from pathlib import Path
-from datetime import datetime
 ## Project values
 AIR_GAP = 40  # ul
 DRIP_STOP = 5  # ul
 PURGE_VOLUME = 20  # ul
 RANDOM_FLAG = False  # Set to True to randomize the order of the experiments
-TESTING = True  # Set to True to run in testing mode
+TESTING = False  # Set to True to run in testing mode
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 

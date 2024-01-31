@@ -50,16 +50,16 @@ print("TEST MODE: ", TEST)
 # Create experiments
 COLUMNS = "ABCDEFGH"
 ROWS = 12
-PROJECT_ID = 13
-EXPERIMENT_NAME = "Repeatability assessment (exp A)"
+PROJECT_ID = 12
+EXPERIMENT_NAME = "TEST Repeatability assessment (exp A)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
 CAMPAIGN_ID = 0
 
 PUMPING_RATE = 0.3
-
+INTENDED_PLATE = 999
 # controller.load_new_wellplate(new_wellplate_type_number=6)
 # controller.load_new_wellplate()
-load_new_wellplate(False,108,3)
+load_new_wellplate(False,INTENDED_PLATE,3)
 experiment_id = determine_next_experiment_id()
 experiments: list[experiment_class.EchemExperimentBase] = []
 WELL_NUMBER = 1
@@ -91,12 +91,12 @@ for col in COLUMNS:
                 pin=CURRENT_PIN,
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,
-                solutions={"5mm_fecn6": 120, "electrolyte": 0, "rinse0": 0},
-                solutions_corrected={"5mm_fecn6": 120, "electrolyte": 0, "rinse0": 0},
+                solutions={"5mm_fecn6": 120},
+                solutions_corrected={"5mm_fecn6": 120},
                 pumping_rate=PUMPING_RATE,
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + "_" + str(experiment_id),
-                plate_id=108,
+                plate_id=INTENDED_PLATE,
                 # Echem specific
                 ocp=1,
                 baseline=0,

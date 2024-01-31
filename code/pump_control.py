@@ -10,7 +10,7 @@ import nesp_lib
 from sartorius_local.driver import Scale
 from sartorius_local.mock import Scale as MockScale
 from slack_functions2 import SlackBot
-from vials import Vial, Vessel
+from vials import Vial2, Vessel
 from mill_control import Mill, MockMill
 from wellplate import Wellplate
 from experiment_class import ExperimentResult
@@ -94,7 +94,7 @@ class Pump:
         if volume > 0:
             volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
 
-            if solution is not None and isinstance(solution, Vial):
+            if solution is not None and isinstance(solution, Vial2):
                 density = solution.density
             else:
                 density = None
@@ -108,7 +108,7 @@ class Pump:
                 self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
-            if solution is not None and isinstance(solution, Vial):
+            if solution is not None and isinstance(solution, Vial2):
                 pumprecord["solution"] = solution.name
             if results is not None:
                 results.pumping_record.append(pumprecord)
@@ -160,7 +160,7 @@ class Pump:
                 self.pump.pumping_rate,
                 self.pipette_volume_ul,
             )
-            if being_infused is not None and isinstance(being_infused, Vial):
+            if being_infused is not None and isinstance(being_infused, Vial2):
                 pumprecord["solution"] = being_infused.name
             if results is not None:
                 results.pumping_record.append(pumprecord)
@@ -352,7 +352,7 @@ class MockPump(Pump):
         if volume > 0:
             volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
 
-            if solution is not None and isinstance(solution, Vial):
+            if solution is not None and isinstance(solution, Vial2):
                 density = solution.density
             else:
                 density = None
