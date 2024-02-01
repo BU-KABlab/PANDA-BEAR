@@ -141,8 +141,15 @@ class Mill:
                 logger.debug("Returned %s", mill_response)
 
             if mill_response.lower() in ["error", "alarm"]:
-                logger.error("current_status: Error in status: %s", mill_response)
-                raise StatusReturnError(f"Error in status: {mill_response}")
+                if "error:22" in mill_response.lower():
+                    # This is a GRBL error that occurs when the feed rate isn't set before moving with G01 command
+                    logger.error("Error in status: %s", mill_response)
+                    # Try setting the feed rate and executing the command again
+                    self.set_feed_rate(2000)
+                    mill_response = self.execute_command(command)
+                else:
+                    logger.error("current_status: Error in status: %s", mill_response)
+                    raise StatusReturnError(f"Error in status: {mill_response}")
 
         except Exception as exep:
             logger.error("Error executing command %s: %s", command, str(exep))

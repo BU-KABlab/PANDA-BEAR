@@ -18,7 +18,9 @@ class ExperimentStatus(str, Enum):
     RUNNING = 'running'
     OCPCHECK = 'ocpcheck'
     DEPOSITING = 'depositing'
+    EDEPOSITING = 'e_depositing'
     RINSING = 'rinsing'
+    ERINSING = 'rinsing electrode'
     BASELINE = 'baselining'
     CHARACTERIZING = 'characterizing'
     FINAL_RINSE = 'final_rinse'
@@ -27,6 +29,7 @@ class ExperimentStatus(str, Enum):
     MIXING = 'mixing'
     IMAGING = 'imaging'
     CLEARING = 'clearing'
+    FLUSHING = 'flushing'
 
 
 
@@ -70,10 +73,11 @@ class ExperimentBase():
     project_campaign_id: int = None
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
     plate_id: int = None
+    process_type: int = 1 # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
 
 
     def set_status(self, new_status: ExperimentStatus):
-        '''Set the status of the experiment'''
+        '''Set the status and status date of the experiment'''
         self.status = new_status
         self.status_date = datetime.now()
         try:

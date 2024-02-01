@@ -170,7 +170,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
                     error_message,
                 )
                 logger.error(error_message)
-                new_experiment.status = ExperimentStatus.ERROR
+                new_experiment.set_status(ExperimentStatus.ERROR)
                 new_experiment.priority = 999
                 scheduler.update_experiment_file(new_experiment)
                 scheduler.update_experiment_queue_priority(
@@ -189,8 +189,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             slack.send_slack_message("alert", pre_experiment_status_msg)
 
             ## Update the experiment status to running
-            new_experiment.status = ExperimentStatus.RUNNING
-            new_experiment.status_date = datetime.now()
+            new_experiment.set_status(ExperimentStatus.RUNNING)
             scheduler.change_well_status_v2(
                 wellplate.wells[new_experiment.well_id], new_experiment
             )
@@ -228,16 +227,15 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             #         waste_vials=waste_vials,
             #     )
             #     input("If this was the last part 2 exp, remove the electrode from lens. Otherwise disregard and press enter\n")
-            import exp_a_ferrocyanide_assessment_protocol as exp_a
-            exp_a.ferrocyanide_repeatability(
+            import exp_d_mixing_assessment_protocol as exp_d
+            exp_d.mixing_assessment(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
             )
             ## Update the experiment status to complete
-            new_experiment.status = ExperimentStatus.COMPLETE
-            new_experiment.status_date = datetime.now(tz.timezone("US/Eastern"))
+            new_experiment.set_status(ExperimentStatus.COMPLETE)
             # e_panda.image_well(
             #     wellplate=wellplate,
             #     instructions=new_experiment,
@@ -273,7 +271,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
 
     except Exception as error:
         if new_experiment is not None:
-            new_experiment.status = ExperimentStatus.ERROR
+            new_experiment.set_status(ExperimentStatus.ERROR)
             scheduler.change_well_status_v2(
                     wellplate.wells[new_experiment.well_id], new_experiment
                 )
@@ -284,7 +282,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
 
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
-            new_experiment.status = ExperimentStatus.ERROR
+            new_experiment.set_status(ExperimentStatus.ERROR)
             scheduler.change_well_status_v2(
                     wellplate.wells[new_experiment.well_id], new_experiment
                 )

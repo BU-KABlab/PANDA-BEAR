@@ -6,6 +6,7 @@ import logging
 import time
 
 import obsws_python as obsws
+from obsws_python import error as OBSerror
 from config.config import PATH_TO_LOGS
 from experiment_class import ExperimentBase, ExperimentStatus
 
@@ -35,7 +36,7 @@ class OBSController():
         campaign_id = instructions.project_campaign_id if instructions.project_campaign_id else 0
 
         video_information = f'''Experiment Info:
-Experiment ID: {project_id}.{campaign_id}.{exp_id}
+ID: {project_id}.{campaign_id}.{exp_id}
 Status: {status.value}
 Well: {well_id}'''
         label = self.client.get_input_settings("text")
@@ -85,8 +86,11 @@ Well: {well_id}'''
 
     def stop_recording(self):
         ''' Stop the recording'''
-        self.client.stop_record()
-        self.logger.info("Recording stopped.")
+        try:
+            self.client.stop_record()
+            self.logger.info("Recording stopped.")
+        except OBSerror.OBSSDKRequestError as e:
+            self.logger.error("Error stopping recording: %s", e)
 
 
 if __name__ == "__main__":

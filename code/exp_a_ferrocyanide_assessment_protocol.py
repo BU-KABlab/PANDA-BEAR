@@ -1,5 +1,5 @@
 """
-Protocol for testing the repeatability of the ferrocyanide solution cyclovoltammetry
+Protocol for testing the repeatability of the ferrocyanide solution cyclic voltammetry
 """
 from typing import Sequence
 from experiment_class import ExperimentBase, ExperimentStatus
@@ -21,7 +21,7 @@ def ferrocyanide_repeatability(
     waste_vials: Sequence[WasteVial],
 ):
     """
-    Protocol for testing the repeatability of the ferrocyanide solution cyclovoltammetry
+    Protocol for testing the repeatability of the ferrocyanide solution cyclic voltammetry
     1. Deposit solutions into well
         for each solution:
             a. Withdraw air gap
@@ -92,7 +92,7 @@ def ferrocyanide_repeatability(
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
-        #characterization(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
+        characterization(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
     finally:
         toolkit.mill.rinse_electrode(3)
 

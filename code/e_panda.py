@@ -503,17 +503,19 @@ def flush_v2(
     pump: Union[Pump, MockPump],
     pumping_rate=0.5,
     flush_volume=120,
+    flush_count=1,
 ):
     """
     Flush the pipette tip with the designated flush_volume ul of DMF to remove any residue
     Args:
-        pump (object): The pump object
         waste_vials (list): The list of waste vials
         stock_vials (list): The list of stock vials
-        flush_solution_name (str): The name of the flush solution
+        flush_solution_name (str): The name of the solution to flush with
         mill (object): The mill object
+        pump (object): The pump object
         pumping_rate (float): The pumping rate in ml/min
         flush_volume (float): The volume to flush with in microliters
+        flush_count (int): The number of times to flush
 
     Returns:
         stock_vials (list): The updated list of stock vials
@@ -531,17 +533,18 @@ def flush_v2(
         )
         waste_vial = waste_selector(waste_vials, "waste", flush_volume)
 
-        forward_pipette_v2(
-            flush_volume,
-            from_vessel=flush_solution,
-            to_vessel=waste_vial,
-            pump=pump,
-            mill=mill,
-            pumping_rate=pumping_rate,
-        )
+        for _ in range(flush_count):
+            forward_pipette_v2(
+                flush_volume,
+                from_vessel=flush_solution,
+                to_vessel=waste_vial,
+                pump=pump,
+                mill=mill,
+                pumping_rate=pumping_rate,
+            )
 
         logger.info(
-            "Flushed pipette tip with %f ul of %s...", flush_volume, flush_solution_name
+            "Flushed pipette tip with %f ul of %s %dx times...", flush_volume, flush_solution_name, flush_count
         )
     else:
         logger.info("No flushing required. Flush volume is 0. Continuing...")
@@ -634,7 +637,7 @@ def deposition(
 
         # echem OCP
         logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
-        dep_instructions.status = ExperimentStatus.OCPCHECK
+        dep_instructions.set_status(ExperimentStatus.OCPCHECK)
 
         base_filename = pstat.setfilename(
             dep_instructions.id,
@@ -658,7 +661,7 @@ def deposition(
         # echem CA - deposition
         if dep_results.ocp_dep_pass:
             try:
-                dep_instructions.status = ExperimentStatus.DEPOSITING
+                dep_instructions.set_status(ExperimentStatus.EDEPOSITING)
                 logger.info(
                     "Beginning eChem deposition of well: %s", dep_instructions.well_id
                 )
@@ -726,7 +729,7 @@ def characterization(
         else:
             pstat = echem
         pstat.pstatconnect()
-        char_instructions.status = ExperimentStatus.OCPCHECK
+        char_instructions.set_status(ExperimentStatus.OCPCHECK)
         char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
         pstat.OCP(
             OCPvi= potentiostat_ocp_parameters.OCPvi,
@@ -748,10 +751,10 @@ def characterization(
             # echem CV - characterization
             if char_instructions.baseline == 1:
                 test_type = "CV_baseline"
-                char_instructions.status = ExperimentStatus.BASELINE
+                char_instructions.set_status(ExperimentStatus.BASELINE)
             else:
                 test_type = "CV"
-                char_instructions.status = ExperimentStatus.CHARACTERIZING
+                char_instructions.set_status(ExperimentStatus.CHARACTERIZING)
 
             logger.info(
                 "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
