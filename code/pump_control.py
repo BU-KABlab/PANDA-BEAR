@@ -116,7 +116,6 @@ class Pump:
             self.pump.volume_withdrawn_clear()
             if solution is not None:
                 solution.update_volume(-volume_ul)
-                # TODO: update contents if withdrawing from a wellplate
                 return None
         else:
             return None

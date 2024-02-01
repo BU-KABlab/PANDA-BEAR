@@ -23,19 +23,14 @@ Returns:
 # Standard library imports
 import logging
 import math
-from typing import Optional, Sequence, Tuple, Union
-
 # Third party or custom imports
 from pathlib import Path
-#import gamry_control_WIP as echem
-#from gamry_control_WIP import (potentiostat_ocp_parameters)
+from typing import Optional, Sequence, Tuple, Union
 
-
-
-from camera_call_camera import capture_new_image
-from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_LOGS, PURGE_VOLUME,
-                           TESTING, PATH_TO_DATA)
 import instrument_toolkit
+from camera_call_camera import capture_new_image
+from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_DATA, PATH_TO_LOGS,
+                           PURGE_VOLUME, TESTING)
 from experiment_class import (EchemExperimentBase, ExperimentResult,
                               ExperimentStatus)
 from log_tools import CustomLoggingFilter
@@ -43,14 +38,16 @@ from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
 from vials import StockVial, Vessel, WasteVial
 from wellplate import Well, Wellplate
-from Analyzer import plotdata
+from obs_controls import OBSController
+#import gamry_control_WIP as echem
+#from gamry_control_WIP import (potentiostat_ocp_parameters)
 
 if TESTING:
     from gamry_control_WIP_mock import GamryPotentiostat as echem
-    from gamry_control_WIP_mock import (potentiostat_ocp_parameters)
+    from gamry_control_WIP_mock import potentiostat_ocp_parameters
 else:
     import gamry_control_WIP as echem
-    from gamry_control_WIP import (potentiostat_ocp_parameters)
+    from gamry_control_WIP import potentiostat_ocp_parameters
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -614,7 +611,6 @@ def waste_selector(
 def deposition(
     dep_instructions: EchemExperimentBase,
     dep_results: ExperimentResult,
-    mill: Mill,
     wellplate: Wellplate,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
@@ -709,7 +705,6 @@ def deposition(
 def characterization(
     char_instructions: EchemExperimentBase,
     char_results: ExperimentResult,
-    mill: Mill,
     wellplate: Wellplate,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
@@ -829,7 +824,6 @@ def volume_correction(volume, density = None, viscosity = None):
     return corrected_volume
 
 def image_well(
-    wellplate: Wellplate,
     toolkit: instrument_toolkit.Toolkit,
     instructions: EchemExperimentBase = None,
     step_description: str = None,
@@ -851,6 +845,8 @@ def image_well(
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
+
+        # create file name
         project_campaign_id = instructions.project_campaign_id or "test"
         project_id = instructions.project_id or "test"
         exp_id = instructions.id or "test"
@@ -867,13 +863,17 @@ def image_well(
             filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".png")
             i += 1
 
+        # Safely change scenese in OBS
+        logger.info("Changing to FLIR scene in OBS")
+        #TODO: OBS scene change
+        
         # position lens above the well
         logger.info("Moving camera above well %s", well_id)
         if well_id is not None:
             toolkit.mill.safe_move(
-                wellplate.get_coordinates(instructions.well_id)["x"],
-                wellplate.get_coordinates(instructions.well_id)["y"],
-                wellplate.image_height,
+                toolkit.wellplate.get_coordinates(instructions.well_id)["x"],
+                toolkit.wellplate.get_coordinates(instructions.well_id)["y"],
+                toolkit.wellplate.image_height,
                 Instruments.LENS,
             )
         else:
@@ -894,9 +894,13 @@ def image_well(
         # don't raise anything and continue with the experiment. The image is not critical to the experiment
     finally:
         # move camera to safe position
-        if wellplate.image_height < 0:
+        if toolkit.wellplate.image_height < 0:
             logger.info("Moving camera to safe position")
             toolkit.mill.move_to_safe_position() # move to safe height above target well
+        
+        # return to previous scene in OBS
+        logger.info("Returning to previous scene in OBS")
+        #TODO: OBS scene change
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""

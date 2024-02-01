@@ -5,29 +5,19 @@ wellplate and the wells in it.
 """
 # pylint: disable=line-too-long
 
+import json
 import logging
 import math
-import json
 import os
-from typing import Dict, List, Tuple
 from pathlib import Path
-import matplotlib.pyplot as plt
-from numpy import save
-import pandas as pd
-from typing import Optional
-#from config.file_locations import *
-from config.config import (
-    MILL_CONFIG,
-    WELL_STATUS,
-    STOCK_STATUS,
-    WASTE_STATUS,
-    WELL_TYPE,
-    WELLPLATE_LOCATION,
-    WELL_HX,
-    PATH_TO_DATA,
+from typing import Dict, Optional
 
-)
-from vials import Vessel
+import matplotlib.pyplot as plt
+import pandas as pd
+from config.config import (MILL_CONFIG, PATH_TO_DATA, STOCK_STATUS,
+                           WASTE_STATUS, WELL_HX, WELL_STATUS, WELL_TYPE,
+                           WELLPLATE_LOCATION)
+from vessel import Vessel
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")

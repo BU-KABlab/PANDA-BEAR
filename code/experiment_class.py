@@ -23,6 +23,8 @@ class ExperimentStatus(str, Enum):
     ERINSING = 'rinsing electrode'
     BASELINE = 'baselining'
     CHARACTERIZING = 'characterizing'
+    CA = 'cyclic-amperometry'
+    CV = 'cyclic-voltametry'
     FINAL_RINSE = 'final_rinse'
     COMPLETE = 'complete'
     ERROR = 'error'
@@ -221,10 +223,10 @@ class EchemExperimentBase(ExperimentBase):
     cv_second_anodic_peak: float = -0.2 # second anodic peak
     cv_final_voltage: float = 0.0  # final voltage
     cv_step_size: float = 0.01 # step size
-    cv_scan_rate_cycle_1: float = 0.1 # scan rate 1
     cv_cycle_count: int = 3 # number of cycles
-    cv_scan_rate_cycle_2: float = cv_scan_rate_cycle_1
-    cv_scan_rate_cycle_3: float = cv_scan_rate_cycle_1
+    cv_scan_rate_cycle_1: float = 0.1
+    cv_scan_rate_cycle_2: float = 0.1
+    cv_scan_rate_cycle_3: float = 0.1
 
     # CVvi: float = 0.0  # initial voltage
     # CVap1: float = 0.5  # first anodic peak

@@ -9,34 +9,19 @@ The scheduler module will be responsible for:
 # pylint: disable = line-too-long
 import json
 import logging
+import random
 from datetime import datetime
 from pathlib import Path
 from typing import Tuple
-import random
 
-import pandas as pd
-from pandas.core.frame import DataFrame
-
-from config.config import (
-    PATH_TO_DATA,
-    PATH_TO_LOGS,
-    QUEUE as PATH_TO_QUEUE,
-    WELL_STATUS,
-    PATH_TO_EXPERIMENT_INBOX,
-    PATH_TO_EXPERIMENT_QUEUE,
-    PATH_TO_COMPLETED_EXPERIMENTS,
-    PATH_TO_ERRORED_EXPERIMENTS,
-    EPANDA_LOG
-)
-
-from config.pin import CURRENT_PIN
-from experiment_class import (
-    ExperimentBase,
-    ExperimentResult,
-    ExperimentStatus,
-)
 import experiment_class
-
+import pandas as pd
+from config.config import (EPANDA_LOG, PATH_TO_COMPLETED_EXPERIMENTS,
+                           PATH_TO_DATA, PATH_TO_ERRORED_EXPERIMENTS,
+                           PATH_TO_EXPERIMENT_INBOX, PATH_TO_EXPERIMENT_QUEUE)
+from config.config import QUEUE as PATH_TO_QUEUE
+from config.config import WELL_STATUS
+from experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
 from wellplate import Well
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -69,7 +54,7 @@ class Scheduler:
         file_to_open = WELL_STATUS
         if not Path.exists(file_to_open):
             logger.error("%s not found", file_to_open)
-            raise FileNotFoundError("{} not found".format(file_to_open.stem))
+            raise FileNotFoundError(f"{file_to_open.stem} not found")
 
         with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
@@ -171,7 +156,7 @@ class Scheduler:
         complete = True
         inbox_dir = PATH_TO_EXPERIMENT_INBOX
         file_to_open = (inbox_dir / filename).with_suffix(".json")
-        with open(file_to_open.__str__(), "r", encoding="ascii") as file:
+        with open(file_to_open, "r", encoding="ascii") as file:
             data = json.load(file)
         for experiment in data["Experiments"]:
             existing_status = experiment["status"]
@@ -200,7 +185,6 @@ class Scheduler:
             filename = f"{experiment['id']}.json"
 
             # populate an experiment instance
-            # TODO make the planner json output conform to schema so it can just be read in
             instructions = experiment_class.RootModel[ExperimentBase].model_validate_json(json.dumps(experiment)).root
 
             # Save the experiment as a separate file in the experiment_queue subfolder
@@ -603,7 +587,7 @@ class Scheduler:
             with open(experiment_file_path, "r", encoding="ascii") as experiment_file:
                 experiment = json.load(experiment_file)
                 experiment = (
-                    experiment_class.RootModel[ExperimentBase] #TODO I think this line will cause an error, might need a special model for layered protocols
+                    experiment_class.RootModel[ExperimentBase]
                     .model_validate_json(json.dumps(experiment))
                     .root
                 )
@@ -645,7 +629,7 @@ class Scheduler:
                 raise FileNotFoundError(f"experiment file {experiment_file_path.stem}")
 
             # Remove the experiment from the queue file
-            queue_df = DataFrame(queue_df[queue_df["id"] != experiment_id])
+            queue_df = pd.DataFrame(queue_df[queue_df["id"] != experiment_id])
             queue_df.to_csv(queue_file_path, index=False)
 
             # Remove the experiment from the experiment_queue folder
@@ -653,7 +637,7 @@ class Scheduler:
 
         return experiment_list
 
-    def get_queue(self) -> DataFrame:
+    def get_queue(self) -> pd.DataFrame:
         """Return the queue as a DataFrame"""
         queue_file_path = PATH_TO_QUEUE
         if not Path.exists(queue_file_path):

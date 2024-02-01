@@ -22,8 +22,6 @@ import logging
 import re
 import time
 import serial
-
-import wellplate as Wells
 from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS, PATH_TO_LOGS
 # Configure the logger
 # logger = logging.getLogger(__name__)
@@ -511,7 +509,7 @@ class Mill:
 
         # Execute the commands one by one
         for command in commands:
-              self.execute_command(command)
+            self.execute_command(command)
 
         return 0
 
@@ -669,7 +667,6 @@ class MockMill:
         Returns:
             None
         """
-        pass
 
     def move_to_safe_position(self):
         """Simulate moving to a safe position"""
@@ -738,6 +735,8 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
+    import wellplate as Wells
+    from vials import StockVial, WasteVial, read_vials
     wellplate = Wells.Wellplate()
 
     # Configure the logger for testing
@@ -759,62 +758,62 @@ def movement_test():
             print(h1)
             print(h12)
             ## Load the vials
-            import vials
 
-            stock_vials = vials.read_vials(STOCK_STATUS)
-            waste_vials = vials.read_vials(WASTE_STATUS)
+            stock_vials:StockVial = read_vials(STOCK_STATUS)
+            waste_vials:WasteVial = read_vials(WASTE_STATUS)
 
-            ## Move the pipette to each well corner
-            # mill.safe_move(
-            #     a1["x"], a1["y"], a1["depth"], instrument=Instruments.PIPETTE
-            # )
-            # mill.safe_move(
-            #     a12["x"], a12["y"], a12["depth"], instrument=Instruments.PIPETTE
-            # )
-            # mill.safe_move(
-            #     h12["x"], h12["y"], h12["depth"], instrument=Instruments.PIPETTE
-            # )
-            # mill.safe_move(
-            #     h1["x"], h1["y"], h1["depth"], instrument=Instruments.PIPETTE
-            # )
+            # Move the pipette to each well corner
+            mill.safe_move(
+                a1["x"], a1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                a12["x"], a12["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                h12["x"], h12["y"],wellplate.z_top, instrument=Instruments.PIPETTE
+            )
+            mill.safe_move(
+                h1["x"], h1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+            )
 
-            # mill.safe_move(
-            #     a1["x"], a1["y"], wellplate.image_height, instrument=Instruments.LENS
-            # )
-            # mill.safe_move(
-            #     a12["x"], a12["y"], a12["echem_height"], instrument=Instruments.ELECTRODE
-            # )
-            # mill.safe_move(
-            #     h12["x"], h12["y"], h12["echem_height"], instrument=Instruments.ELECTRODE
-            # )
-            # mill.safe_move(
-            #     h1["x"], h1["y"], h1["echem_height"], instrument=Instruments.ELECTRODE
-            # )
+            mill.safe_move(
+                a1["x"], a1["y"], wellplate.image_height, instrument=Instruments.LENS
+            )
+            mill.safe_move(
+                a12["x"], a12["y"], wellplate.image_height, instrument=Instruments.LENS
+            )
+            mill.safe_move(
+                h12["x"], h12["y"], wellplate.image_height, instrument=Instruments.LENS
+            )
+            mill.safe_move(
+                h1["x"], h1["y"], wellplate.image_height, instrument=Instruments.LENS
+            )
 
+            ## Move pipette to stock vials then to the depth and then to safe position
+            if len(stock_vials) != 0:
+                for _, stock_vial in enumerate(stock_vials):
+                    stock_vial:StockVial = stock_vial
+                    if stock_vial.position =="e1":
+                        continue
+                    mill.safe_move(
+                        stock_vial.coordinates["x"],
+                        stock_vial.coordinates["y"],
+                        stock_vial.height,
+                        instrument=Instruments.PIPETTE,
+                    )
+                mill.move_to_safe_position()
 
-            # if len(stock_vials) != 0:
-            #     for _, vial in enumerate(stock_vials):
-            #         if vial.position =="e1":
-            #             continue
-            #         mill.safe_move(
-            #             vial.coordinates["x"],
-            #             vial.coordinates["y"],
-            #             vial.height,
-            #             instrument=Instruments.PIPETTE,
-            #         )
-            #     mill.move_to_safe_position()
-
-            # if len(waste_vials) != 0:
-            #     ## Move pipette to first waste vial then to the depth and then to safe positionfor
-            #     for _, vial in enumerate(waste_vials):
-            #         mill.safe_move(
-            #             vial.coordinates["x"],
-            #             vial.coordinates["y"],
-            #             vial.height,
-            #             instrument=Instruments.PIPETTE,
-            #         )
-            #     mill.move_to_safe_position()
-            #     mill.rest_electrode()
+            if len(waste_vials) != 0:
+                ## Move pipette to first waste vial then to the depth and then to safe positionfor
+                for _, waste_vial in enumerate(waste_vials):
+                    waste_vial:WasteVial = waste_vial
+                    mill.safe_move(
+                        waste_vial.coordinates["x"],
+                        waste_vial.coordinates["y"],
+                        waste_vial.height,
+                        instrument=Instruments.PIPETTE,
+                    )
+                mill.move_to_safe_position()
 
             mill.move_to_safe_position()
             mill.rest_electrode()

@@ -16,13 +16,11 @@ import json
 import logging
 
 # import standard libraries
-from datetime import datetime
 
 # import third-party libraries
 from typing import Sequence
 
 import e_panda
-import pytz as tz
 import wellplate as wellplate_module
 from config.config import (
     EPANDA_LOG,
@@ -209,24 +207,21 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             new_experiment.plate_id = wellplate.plate_id
 
             logger.info("Beginning experiment %d", new_experiment.id)
-            # import exp_c_rinsing_assessment_protocol as exp_c
-            # TODO: Change to part 2 when ready
-            # import exp_edot_bleaching_protocol as edot
-            # if part == 1:
-            #     edot.edot_bleaching_part_1(
-            #         instructions=new_experiment,
-            #         toolkit=toolkit,
-            #         stock_vials=stock_vials,
-            #         waste_vials=waste_vials,
-            #     )
-            # if part == 2:
-            #     edot.edot_bleaching_part_2(
-            #         instructions=new_experiment,
-            #         toolkit=toolkit,
-            #         stock_vials=stock_vials,
-            #         waste_vials=waste_vials,
-            #     )
-            #     input("If this was the last part 2 exp, remove the electrode from lens. Otherwise disregard and press enter\n")
+            import exp_edot_bleaching_protocol as edot
+            if part == 1:
+                edot.edot_bleaching_part_1(
+                    instructions=new_experiment,
+                    toolkit=toolkit,
+                    stock_vials=stock_vials,
+                    waste_vials=waste_vials,
+                )
+            if part == 2:
+                edot.edot_bleaching_part_2(
+                    instructions=new_experiment,
+                    toolkit=toolkit,
+                    stock_vials=stock_vials,
+                    waste_vials=waste_vials,
+                )
             import exp_d_mixing_assessment_protocol as exp_d
             exp_d.mixing_assessment(
                 instructions=new_experiment,
