@@ -761,7 +761,7 @@ def movement_test():
 
             stock_vials:StockVial = read_vials(STOCK_STATUS)
             waste_vials:WasteVial = read_vials(WASTE_STATUS)
-
+            input("Begin the movement test to each corner of the wellplate. Press enter to continue...")
             # Move the pipette to each well corner
             mill.safe_move(
                 a1["x"], a1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
