@@ -70,15 +70,17 @@ class Well(Vessel):
     def __str__(self) -> str:
         """Returns a string representation of the well."""
         return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
-
-    def update_contents(self, solution: Vessel, volume: float) -> None:
+    def get_contents(self) -> dict:
+        """Returns the contents of the well."""
+        return self.contents
+    def update_contents(self, solution_name:str, volume: float) -> None:
         """Updates the contents of the well in the well_status.json file."""
         # Check if the solution is already in the well
-        logger.debug("Updating contents of %s with %s", self.name, solution.name)
-        if solution.name in self.contents:
-            self.contents[solution.name] += volume
+        logger.debug("Updating contents of %s with %s", self.name, solution_name)
+        if solution_name in self.contents:
+            self.contents[solution_name] += volume
         else:
-            self.contents[solution.name] = volume
+            self.contents[solution_name] = volume
         logger.debug("New %s contents: %s", self.name, self.contents)
         # Update the well status file
         logger.debug("Updating well status file...")
@@ -711,29 +713,29 @@ def load_new_wellplate(
     ) = save_current_wellplate()
 
     if ask:
-        new_plate_id = int(
+        new_plate_id = (
             input(
                 f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
             )
         )
-        new_wellplate_type_number = int(
+        new_wellplate_type_number = (
             input(
                 f"Enter the new wellplate type number (Current type is {current_type_number}): "
             )
         )
     else:
-        if new_plate_id is None:
+        if new_plate_id is None or new_plate_id == "":
             new_plate_id = current_wellplate_id + 1
-        if new_wellplate_type_number is None:
+        if new_wellplate_type_number is None or new_wellplate_type_number == "":
             new_wellplate_type_number = current_type_number
 
-    if current_wellplate_is_new and new_plate_id is None:
+    if current_wellplate_is_new and new_plate_id is None or new_plate_id == "":
         return current_wellplate_id
 
     ## Check if the new plate id exists in the well hx
     ## If so, then load in that wellplate
     ## If not, then create a new wellplate
-    if new_plate_id is None:
+    if new_plate_id is None or new_plate_id == "":
         new_plate_id = current_wellplate_id + 1
     else:
         new_plate_id = int(new_plate_id)
@@ -854,10 +856,10 @@ def save_current_wellplate():
     with open(WELL_HX, "a", encoding="UTF-8") as file:
         for well in current_wellplate["wells"]:
             # if the well is still queued then there is nothing in it and we can unallocated it
-            if well["status"] == "queued":
-                well["status"] = "new"
-                well["experiment_id"] = ""
-                well["project_id"] = ""
+            # if well["status"] == "queued":
+            #     well["status"] = "new"
+            #     well["experiment_id"] = ""
+            #     well["project_id"] = ""
 
             file.write(f"{current_plate_id}&{current_type_number}&{str(well['well_id'])}&{well['experiment_id']}&{well['project_id']}&{str(well['status'])}&{str(well['status_date'])}&{well['contents']}\n")
 

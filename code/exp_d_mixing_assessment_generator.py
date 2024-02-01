@@ -28,7 +28,7 @@ CAMPAIGN_ID = 0
 PUMPING_RATE = 0.3
 
 #controller.load_new_wellplate(new_wellplate_type_number=6)
-wellplate.load_new_wellplate()
+wellplate.load_new_wellplate(False,108,3)
 experiment_id = determine_next_experiment_id()
 experiments : list[experiment_class.EchemExperimentBase]= []
 WELL_NUMBER = 3

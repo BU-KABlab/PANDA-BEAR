@@ -281,7 +281,7 @@ class Vessel:
         """
         pass
 
-    def update_contents(self, solution: 'Vessel', volume: float) -> None:
+    def update_contents(self, solution_name: str, volume: float) -> None:
         """
         Updates the contents of the vessel.
 
@@ -496,7 +496,7 @@ class StockVial(Vial2):
         """
         super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
         self.category = 0
-    def update_contents(self, solution: Vessel, volume: float) -> None:
+    def update_contents(self, solution_name: str, volume: float) -> None:
         "Stock vial contents don't change"
         return self
 class WasteVial(Vial2):
@@ -536,14 +536,14 @@ class WasteVial(Vial2):
         super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
         self.category = 1
 
-    def update_contents(self, solution: Vessel, volume: float) -> None:
+    def update_contents(self, solution_name: str, volume: float) -> None:
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
-        if solution.name in self.contents:
-            self.contents[solution.name] += volume
+        if solution_name in self.contents:
+            self.contents[solution_name] += volume
 
         # otherwise, add the solution to the vessel's contents dictionary
         else:
-            self.contents[solution.name] = volume
+            self.contents[solution_name] = volume
         vial_logger.debug("%s %s: New contents: %s", self.name, self.position, self.contents)
         return self
 class OverFillException(Exception):

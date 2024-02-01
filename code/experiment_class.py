@@ -72,8 +72,8 @@ class ExperimentBase():
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
-    plate_id: int = None
-    process_type: int = 1 # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
+    plate_id: Optional[int] = None
+    #process_type: int = 1 # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
 
 
     def set_status(self, new_status: ExperimentStatus):

@@ -177,7 +177,13 @@ def forward_pipette_v2(
             )  # pipette now has air gap + repitition vol
             if isinstance(from_vessel, Well):
                 from_vessel: Well = from_vessel
-                from_vessel.update_contents(from_vessel, -repetition_vol)
+                # We are removing solution from a well
+                # Assume even mixture of all contents
+                # The repetition volume removes each content proportional to its ratio
+                current_content_ratios = {key: value / from_vessel.volume for key, value in from_vessel.get_contents()}
+
+                for key, value in from_vessel.get_contents():
+                    from_vessel.update_contents(key, value - repetition_vol * current_content_ratios[key])
 
             mill.move_to_safe_position()
 
@@ -224,7 +230,7 @@ def forward_pipette_v2(
             )
 
             # Update the contentes of the to_vessel
-            to_vessel.update_contents(from_vessel, repetition_vol)
+            to_vessel.update_contents(from_vessel.name, repetition_vol)
 
             logger.info(
                 "Vessel %s volume: %f depth: %f",
@@ -391,7 +397,7 @@ def reverse_pipette_v2(
             logger.info("Moved to safe position")
             # Update the contentes of the to_vessel
             logger.debug("Updating contents of %s", to_vessel.name)
-            to_vessel.update_contents(from_vessel, repetition_vol)
+            to_vessel.update_contents(from_vessel.name, repetition_vol)
 
             logger.info(
                 "Vessel %s volume: %f",
@@ -423,7 +429,7 @@ def reverse_pipette_v2(
                 purge_vessel.position,
                 purge_vessel.name,
             )
-            purge_vessel.update_contents(from_vessel, purge_volume)
+            purge_vessel.update_contents(from_vessel.name, purge_volume)
 
             mill.move_to_safe_position()
 
