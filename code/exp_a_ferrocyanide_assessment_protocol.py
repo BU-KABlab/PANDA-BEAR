@@ -34,7 +34,6 @@ def ferrocyanide_repeatability(
 
     Args:
         instructions (Experiment object): The experiment instructions
-        results (ExperimentResult object): The experiment results
         toolkit (Toolkit object): The toolkit object which contains the pump, mill, and wellplate
         stock_vials (list): The list of stock vials
         waste_vials (list): The list of waste vials
