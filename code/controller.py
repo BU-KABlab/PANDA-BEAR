@@ -207,35 +207,31 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             new_experiment.plate_id = wellplate.plate_id
 
             logger.info("Beginning experiment %d", new_experiment.id)
-            import exp_edot_bleaching_protocol as edot
-            if part == 1:
-                edot.edot_bleaching_part_1(
-                    instructions=new_experiment,
-                    toolkit=toolkit,
-                    stock_vials=stock_vials,
-                    waste_vials=waste_vials,
-                )
-            if part == 2:
-                edot.edot_bleaching_part_2(
-                    instructions=new_experiment,
-                    toolkit=toolkit,
-                    stock_vials=stock_vials,
-                    waste_vials=waste_vials,
-                )
-            import exp_d_mixing_assessment_protocol as exp_d
-            exp_d.mixing_assessment(
+            import exp_a_ferrocyanide_assessment_protocol as exp_a
+            exp_a.ferrocyanide_repeatability(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
             )
+            # import exp_edot_bleaching_protocol as edot
+            # if part == 1:
+            #     edot.edot_bleaching_part_1(
+            #         instructions=new_experiment,
+            #         toolkit=toolkit,
+            #         stock_vials=stock_vials,
+            #         waste_vials=waste_vials,
+            #     )
+            # if part == 2:
+            #     edot.edot_bleaching_part_2(
+            #         instructions=new_experiment,
+            #         toolkit=toolkit,
+            #         stock_vials=stock_vials,
+            #         waste_vials=waste_vials,
+            #     )
+
             ## Update the experiment status to complete
             new_experiment.set_status(ExperimentStatus.COMPLETE)
-            # e_panda.image_well(
-            #     wellplate=wellplate,
-            #     instructions=new_experiment,
-            #     toolkit=toolkit,
-            # )
 
             ## Reset the logger to log to the ePANDA.log file and format
             e_panda.apply_log_filter()

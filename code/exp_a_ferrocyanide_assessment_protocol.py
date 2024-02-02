@@ -10,6 +10,7 @@ from e_panda import (
     characterization,
     solution_selector,
     waste_selector,
+    image_well
 )
 from correction_factors import correction_factor
 from mill_control import Instruments
@@ -22,16 +23,14 @@ def ferrocyanide_repeatability(
 ):
     """
     Protocol for testing the repeatability of the ferrocyanide solution cyclic voltammetry
-    1. Deposit solutions into well
-        for each solution:
-            a. Withdraw air gap
-            b. Withdraw solution
-            c. Read the scale
-            d. Deposit into well
-            e. Blow out
-            f. Read the scale
-            g. Perform CV
-            h. Clear the well
+
+    Steps:
+    0. Image the well
+    1. Deposit the experiment solution into the well
+    2. Move the electrode to the well
+    3. Perform the cyclic voltammetry   
+    4. Clear the well contents into waste
+
 
     Args:
         instructions (Experiment object): The experiment instructions
@@ -59,6 +58,10 @@ def ferrocyanide_repeatability(
             ).viscosity_cp,
         )
 
+    print("0. Imaging the well")
+    instructions.set_status(ExperimentStatus.IMAGING)
+    image_well(instructions, toolkit,"before_repeat_experiment")
+
     instructions.set_status(ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
     print("1. Depositing solutions into well: ", instructions.well_id)
@@ -77,14 +80,6 @@ def ferrocyanide_repeatability(
 
     ## Move the electrode to the well
     print("2. Moving electrode to well: ", instructions.well_id)
-    # toolkit.mill.safe_move(
-    #     x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'x'),
-    #     y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'y'),
-    #     z_coord=toolkit.wellplate.echem_height,
-    #     instrument=Instruments.ELECTRODE,
-    # )
-    # Initial fluid handeling is done now we can perform the CV
-    print("3. Performing CV")
     try:
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'x'),
@@ -92,9 +87,10 @@ def ferrocyanide_repeatability(
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
+        print("3. Performing CV")
         characterization(instructions)
     finally:
-        instructions.set_status(ExperimentStatus.FLUSHING)
+        instructions.set_status(ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well

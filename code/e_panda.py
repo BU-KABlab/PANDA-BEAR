@@ -18,29 +18,37 @@ Returns:
     Wellplate: The updated wellplate object.
     Vials: The updated vials object.
 """
+
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, broad-exception-caught
 
 # Standard library imports
 import logging
 import math
+
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
 
 import instrument_toolkit
 from camera_call_camera import capture_new_image
-from config.config import (AIR_GAP, DRIP_STOP, PATH_TO_DATA, PATH_TO_LOGS,
-                           PURGE_VOLUME, TESTING)
-from experiment_class import (EchemExperimentBase, ExperimentResult,
-                              ExperimentStatus)
+from config.config import (
+    AIR_GAP,
+    DRIP_STOP,
+    PATH_TO_DATA,
+    PATH_TO_LOGS,
+    PURGE_VOLUME,
+    TESTING,
+)
+from experiment_class import EchemExperimentBase, ExperimentResult, ExperimentStatus
 from log_tools import CustomLoggingFilter
 from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
 from vials import StockVial, Vessel, WasteVial
 from wellplate import Well, Wellplate
 from obs_controls import OBSController
-#import gamry_control_WIP as echem
-#from gamry_control_WIP import (potentiostat_ocp_parameters)
+
+# import gamry_control_WIP as echem
+# from gamry_control_WIP import (potentiostat_ocp_parameters)
 
 if TESTING:
     from gamry_control_WIP_mock import GamryPotentiostat as echem
@@ -146,11 +154,15 @@ def forward_pipette_v2(
                 volume=AIR_GAP, solution=None, rate=pumping_rate
             )  # withdraw air gap to engage screw
             if isinstance(from_vessel, Well):
-                logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.coordinates)
+                logger.info(
+                    "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
+                )
             else:
-                logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
+                logger.info(
+                    "Moving to %s at %s...", from_vessel.name, from_vessel.position
+                )
             # if from vessel is a well, go to well depth
-            if isinstance(from_vessel,Well):
+            if isinstance(from_vessel, Well):
                 from_vessel: Well = from_vessel
                 mill.safe_move(
                     from_vessel.coordinates["x"],
@@ -177,10 +189,15 @@ def forward_pipette_v2(
                 # We are removing solution from a well
                 # Assume even mixture of all contents
                 # The repetition volume removes each content proportional to its ratio
-                current_content_ratios = {key: value / from_vessel.volume for key, value in from_vessel.get_contents()}
+                current_content_ratios = {
+                    key: value / from_vessel.volume
+                    for key, value in from_vessel.get_contents()
+                }
 
                 for key, value in from_vessel.get_contents():
-                    from_vessel.update_contents(key, value - repetition_vol * current_content_ratios[key])
+                    from_vessel.update_contents(
+                        key, value - repetition_vol * current_content_ratios[key]
+                    )
 
             mill.move_to_safe_position()
 
@@ -547,7 +564,10 @@ def flush_v2(
             )
 
         logger.info(
-            "Flushed pipette tip with %f ul of %s %dx times...", flush_volume, flush_solution_name, flush_count
+            "Flushed pipette tip with %f ul of %s %dx times...",
+            flush_volume,
+            flush_solution_name,
+            flush_count,
         )
     else:
         logger.info("No flushing required. Flush volume is 0. Continuing...")
@@ -658,7 +678,7 @@ def deposition(
         dep_results.ocp_dep_pass = pstat.check_vf_range(
             dep_results.ocp_dep_file.with_suffix(".txt")
         )
-        #plotdata("OCP", dep_results.ocp_dep_file.with_suffix(".txt"))
+        # plotdata("OCP", dep_results.ocp_dep_file.with_suffix(".txt"))
 
         # echem CA - deposition
         if dep_results.ocp_dep_pass:
@@ -679,8 +699,8 @@ def deposition(
                 # and save them to the results
                 # don't have any parameters hardcoded, switch these all to instructions
                 pstat.chrono(
-                    CAvi= dep_instructions.ca_prestep_voltage,
-                    CAti = dep_instructions.ca_prestep_time_delay,
+                    CAvi=dep_instructions.ca_prestep_voltage,
+                    CAti=dep_instructions.ca_prestep_time_delay,
                     CAv1=dep_instructions.ca_step_1_voltage,
                     CAt1=dep_instructions.ca_step_1_time,
                     CAv2=dep_instructions.ca_step_2_voltage,
@@ -689,7 +709,7 @@ def deposition(
                 )  # CA
 
                 pstat.activecheck()
-                #plotdata("CA", dep_results.deposition_data_file.with_suffix(".txt"))
+                # plotdata("CA", dep_results.deposition_data_file.with_suffix(".txt"))
             except Exception as e:
                 logger.error("Exception occurred during deposition: %s", e)
                 raise CAFailure(dep_instructions.id, dep_instructions.well_id) from e
@@ -701,6 +721,7 @@ def deposition(
     finally:
         pstat.pstatdisconnect()
     return dep_instructions, dep_results
+
 
 def characterization(
     char_instructions: EchemExperimentBase,
@@ -729,9 +750,15 @@ def characterization(
             pstat = echem
         pstat.pstatconnect()
         char_instructions.set_status(ExperimentStatus.OCPCHECK)
-        char_instructions.results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
+        char_instructions.results.ocp_char_file = pstat.setfilename(
+            char_instructions.id,
+            "OCP_char",
+            char_instructions.project_id,
+            char_instructions.project_campaign_id,
+            char_instructions.well_id,
+        )
         pstat.OCP(
-            OCPvi= potentiostat_ocp_parameters.OCPvi,
+            OCPvi=potentiostat_ocp_parameters.OCPvi,
             OCPti=potentiostat_ocp_parameters.OCPti,
             OCPrate=potentiostat_ocp_parameters.OCPrate,
         )  # OCP
@@ -739,7 +766,7 @@ def characterization(
         char_instructions.results.ocp_char_pass = pstat.check_vf_range(
             char_instructions.results.ocp_char_file.with_suffix(".txt")
         )
-        #plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
+        # plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
     except Exception as e:
         logger.error("Exception occurred during OCP: %s", e)
         pstat.pstatdisconnect()
@@ -760,8 +787,11 @@ def characterization(
             )
 
             char_instructions.results.characterization_data_file = pstat.setfilename(
-                char_instructions.id, test_type,
-                char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id
+                char_instructions.id,
+                test_type,
+                char_instructions.project_id,
+                char_instructions.project_campaign_id,
+                char_instructions.well_id,
             )
 
             # FEATURE have cyclic return the max and min values for the characterization
@@ -769,8 +799,8 @@ def characterization(
             pstat.cyclic(
                 CVvi=char_instructions.cv_initial_voltage,
                 CVap1=char_instructions.cv_first_anodic_peak,
-                CVap2 = char_instructions.cv_second_anodic_peak,
-                CVvf = char_instructions.cv_final_voltage,
+                CVap2=char_instructions.cv_second_anodic_peak,
+                CVvf=char_instructions.cv_final_voltage,
                 CVsr1=char_instructions.cv_scan_rate_cycle_1,
                 CVsr2=char_instructions.cv_scan_rate_cycle_2,
                 CVsr3=char_instructions.cv_scan_rate_cycle_3,
@@ -778,7 +808,7 @@ def characterization(
                 CVcycle=char_instructions.cv_cycle_count,
             )
             pstat.activecheck()
-            #plotdata("CV", char_results.characterization_data_file.with_suffix(".txt"))
+            # plotdata("CV", char_results.characterization_data_file.with_suffix(".txt"))
         except Exception as e:
             logger.error("Exception occurred during CV: %s", e)
             pstat.pstatdisconnect()
@@ -802,7 +832,8 @@ def apply_log_filter(
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
     logger.addFilter(custom_filter)
 
-def volume_correction(volume, density = None, viscosity = None):
+
+def volume_correction(volume, density=None, viscosity=None):
     """
     Corrects the volume of the solution based on the density and viscosity of the solution
 
@@ -820,6 +851,7 @@ def volume_correction(volume, density = None, viscosity = None):
         viscosity = 1.0
     corrected_volume = volume * (1.0 + (1.0 - density) * (1.0 - viscosity))
     return corrected_volume
+
 
 def image_well(
     toolkit: instrument_toolkit.Toolkit,
@@ -863,34 +895,33 @@ def image_well(
 
         # position lens above the well
         logger.info("Moving camera above well %s", well_id)
-        if well_id is not None:
+        if well_id != "test":
             toolkit.mill.safe_move(
-                toolkit.wellplate.get_coordinates(instructions.well_id)["x"],
-                toolkit.wellplate.get_coordinates(instructions.well_id)["y"],
+                toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+                toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
                 toolkit.wellplate.image_height,
                 Instruments.LENS,
             )
         else:
             pass
 
-        capture_new_image(
-            save=True,
-            num_images=1,
-            file_name=filepath
-        )
+        capture_new_image(save=True, num_images=1, file_name=filepath)
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
-        #logger.info("Uploading image of well %s to OBS", instructions.well_id)
+        # logger.info("Uploading image of well %s to OBS", instructions.well_id)
         instructions.results.image_file = filepath
     except Exception as e:
-        logger.exception("Failed to image well %s. Error %s occured", instructions.well_id, e)
-        #raise ImageCaputreFailure(instructions.well_id) from e
+        logger.exception(
+            "Failed to image well %s. Error %s occured", instructions.well_id, e
+        )
+        # raise ImageCaputreFailure(instructions.well_id) from e
         # don't raise anything and continue with the experiment. The image is not critical to the experiment
     finally:
         # move camera to safe position
-        if toolkit.wellplate.image_height < 0:
+        if well_id != "test":
             logger.info("Moving camera to safe position")
-            toolkit.mill.move_to_safe_position() # move to safe height above target well
+            toolkit.mill.move_to_safe_position()  # move to safe height above target well
+
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""
@@ -909,6 +940,7 @@ class NoAvailableSolution(Exception):
         self.message = f"No available solution of {solution_name} found"
         super().__init__(self.message)
 
+
 class ImageCaputreFailure(Exception):
     """Raised when image capture fails"""
 
@@ -917,14 +949,18 @@ class ImageCaputreFailure(Exception):
         self.message = f"Image capture failed for well {well_id}"
         super().__init__(self.message)
 
+
 class DepositionFailure(Exception):
     """Raised when deposition fails"""
 
     def __init__(self, experiment_id, well_id):
         self.experiment_id = experiment_id
         self.well_id = well_id
-        self.message = f"Deposition failed for experiment {experiment_id} well {well_id}"
+        self.message = (
+            f"Deposition failed for experiment {experiment_id} well {well_id}"
+        )
         super().__init__(self.message)
+
 
 class CAFailure(Exception):
     """Raised when CA fails"""
@@ -935,6 +971,7 @@ class CAFailure(Exception):
         self.message = f"CA failed for experiment {experiment_id} well {well_id}"
         super().__init__(self.message)
 
+
 class CVFailure(Exception):
     """Raised when CV fails"""
 
@@ -943,6 +980,7 @@ class CVFailure(Exception):
         self.well_id = well_id
         self.message = f"CV failed for experiment {experiment_id} well {well_id}"
         super().__init__(self.message)
+
 
 if __name__ == "__main__":
     pass

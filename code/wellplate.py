@@ -756,8 +756,8 @@ def load_new_wellplate(
                                 "status": current_line.split("&")[5],
                                 "status_date": current_line.split("&")[6],
                                 "contents": json.loads(current_line.split("&")[7].replace("'", '"')),
-                                "experiment_id": (current_line.split("&")[3]),
-                                "project_id": (current_line.split("&")[4]),
+                                "experiment_id": None if (current_line.split("&")[3]) == '' else int(current_line.split("&")[3]),
+                                "project_id": None if (current_line.split("&")[4]) == '' else int(current_line.split("&")[4]),
                             }
                             for current_line in wells
                         ],
