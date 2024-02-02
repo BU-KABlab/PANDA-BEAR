@@ -704,8 +704,6 @@ def deposition(
 
 def characterization(
     char_instructions: EchemExperimentBase,
-    char_results: ExperimentResult,
-    wellplate: Wellplate,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Characterization of the solutions on the substrate using CV.
@@ -731,15 +729,15 @@ def characterization(
             pstat = echem
         pstat.pstatconnect()
         char_instructions.set_status(ExperimentStatus.OCPCHECK)
-        char_results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
+        char_instructions.results.ocp_char_file = pstat.setfilename(char_instructions.id, "OCP_char", char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id)
         pstat.OCP(
             OCPvi= potentiostat_ocp_parameters.OCPvi,
             OCPti=potentiostat_ocp_parameters.OCPti,
             OCPrate=potentiostat_ocp_parameters.OCPrate,
         )  # OCP
         pstat.activecheck()
-        char_results.ocp_char_pass = pstat.check_vf_range(
-            char_results.ocp_char_file.with_suffix(".txt")
+        char_instructions.results.ocp_char_pass = pstat.check_vf_range(
+            char_instructions.results.ocp_char_file.with_suffix(".txt")
         )
         #plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
     except Exception as e:
@@ -747,7 +745,7 @@ def characterization(
         pstat.pstatdisconnect()
         raise OCPFailure("characterization") from e
 
-    if char_results.ocp_char_pass:
+    if char_instructions.results.ocp_char_pass:
         try:
             # echem CV - characterization
             if char_instructions.baseline == 1:
@@ -761,7 +759,7 @@ def characterization(
                 "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
             )
 
-            char_results.characterization_data_file = pstat.setfilename(
+            char_instructions.results.characterization_data_file = pstat.setfilename(
                 char_instructions.id, test_type,
                 char_instructions.project_id, char_instructions.project_campaign_id, char_instructions.well_id
             )
@@ -787,7 +785,7 @@ def characterization(
             raise CVFailure(char_instructions.id, char_instructions.well_id) from e
 
     pstat.pstatdisconnect()
-    return char_instructions, char_results
+    return char_instructions
 
 
 def apply_log_filter(
@@ -863,10 +861,6 @@ def image_well(
             filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".png")
             i += 1
 
-        # Safely change scenese in OBS
-        logger.info("Changing to FLIR scene in OBS")
-        #TODO: OBS scene change
-        
         # position lens above the well
         logger.info("Moving camera above well %s", well_id)
         if well_id is not None:
@@ -890,17 +884,13 @@ def image_well(
         instructions.results.image_file = filepath
     except Exception as e:
         logger.exception("Failed to image well %s. Error %s occured", instructions.well_id, e)
-        raise ImageCaputreFailure(instructions.well_id)
+        #raise ImageCaputreFailure(instructions.well_id) from e
         # don't raise anything and continue with the experiment. The image is not critical to the experiment
     finally:
         # move camera to safe position
         if toolkit.wellplate.image_height < 0:
             logger.info("Moving camera to safe position")
             toolkit.mill.move_to_safe_position() # move to safe height above target well
-        
-        # return to previous scene in OBS
-        logger.info("Returning to previous scene in OBS")
-        #TODO: OBS scene change
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""

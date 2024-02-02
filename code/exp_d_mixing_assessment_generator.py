@@ -51,7 +51,7 @@ for i in range(3):
             status=experiment_class.ExperimentStatus.NEW,
             filename=EXPERIMENT_NAME + ' ' + str(experiment_id),
             process_type=1,
-
+            override_well_selection=0,
             # Echem specific
             ocp=1,
             baseline=0,

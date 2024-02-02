@@ -802,7 +802,14 @@ def load_new_wellplate(
 
 
 def save_current_wellplate():
-    """Save the current wellplate"""
+    """
+    Save the current wellplate
+    
+    Returns:
+        int: The current wellplate id
+        int: The current wellplate type number
+        bool: Whether the wellplate is new
+    """
     wellplate_is_new = True
     ## Go through a reset all fields and apply new plate id
     logger.debug("Saving wellplate")

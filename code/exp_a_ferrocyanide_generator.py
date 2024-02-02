@@ -24,15 +24,16 @@ The wellplate will look like this (x = test, o = no test):
 12  x x o o o o o o  
 """
 
-from json import load
 import time
+
+from numpy import save
 
 import experiment_class
 import pandas as pd
 from config.config import TESTING, WELL_HX
 from config.pin import CURRENT_PIN
 from scheduler import Scheduler
-from wellplate import load_new_wellplate
+from wellplate import load_new_wellplate, save_current_wellplate
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
@@ -45,20 +46,17 @@ def determine_next_experiment_id() -> int:
     return int(last_experiment_id + 1)
 
 
-TEST = TESTING
-print("TEST MODE: ", TEST)
+print("TEST MODE: ", TESTING)
 # Create experiments
 COLUMNS = "ABCDEFGH"
 ROWS = 12
 PROJECT_ID = 12
-EXPERIMENT_NAME = "TEST Repeatability assessment (exp A)"
+EXPERIMENT_NAME = "Repeatability assessment (exp A2)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
-CAMPAIGN_ID = 0
-
+CAMPAIGN_ID = 1
 PUMPING_RATE = 0.3
-INTENDED_PLATE = 999
-# controller.load_new_wellplate(new_wellplate_type_number=6)
-# controller.load_new_wellplate()
+INTENDED_PLATE = 108
+
 load_new_wellplate(False,INTENDED_PLATE,3)
 experiment_id = determine_next_experiment_id()
 experiments: list[experiment_class.EchemExperimentBase] = []
@@ -97,26 +95,29 @@ for col in COLUMNS:
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + "_" + str(experiment_id),
                 plate_id=INTENDED_PLATE,
+                override_well_selection= 1,
                 # Echem specific
                 ocp=1,
                 baseline=0,
                 cv=1,
                 ca=0,
-                cv_step_size=0.02,
+                cv_step_size=0.001,
                 cv_second_anodic_peak=-0.2,
                 cv_first_anodic_peak=0.58,
                 cv_scan_rate_cycle_1=0.050,
                 cv_scan_rate_cycle_2=0.050,
                 cv_scan_rate_cycle_3=0.050,
+                cv_cycle_count=3,
+                cv_initial_voltage=0.0,
+                cv_final_voltage=0.5,
+                cv_sample_period=0.1
+                # sample_rate = cv_step_size / cv_scan_rate_cycle_1 = 0.001 / 0.050 = 0.020
             )
 
             experiments.append(experiment)
             experiment_id += 1
 
 # Schedule experiments
+input("Press enter to schedule experiments")
 scheduler = Scheduler()
-scheduler.add_nonfile_experiments(experiments)
-# for experiment in experiments:
-#     ## Print a recipt of the wellplate and its experiments noting the solution and volume
-#     print(experiment.print_experiment_parameters())
-    
+scheduler.add_nonfile_experiments(experiments,override =True)

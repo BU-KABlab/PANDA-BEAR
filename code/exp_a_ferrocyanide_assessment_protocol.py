@@ -59,7 +59,7 @@ def ferrocyanide_repeatability(
             ).viscosity_cp,
         )
 
-    instructions.set_status(new_status =ExperimentStatus.DEPOSITING)
+    instructions.set_status(ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
     print("1. Depositing solutions into well: ", instructions.well_id)
     forward_pipette_v2(
@@ -92,8 +92,9 @@ def ferrocyanide_repeatability(
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
-        characterization(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
+        characterization(instructions)
     finally:
+        instructions.set_status(ExperimentStatus.FLUSHING)
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well

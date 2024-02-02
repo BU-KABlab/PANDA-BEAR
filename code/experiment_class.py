@@ -75,7 +75,8 @@ class ExperimentBase():
     project_campaign_id: int = None
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
     plate_id: Optional[int] = None
-    #process_type: int = 1 # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
+    override_well_selection: int = 0 # 0 is normal, 1 is override
+    process_type: int = 1 # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
 
 
     def set_status(self, new_status: ExperimentStatus):
@@ -217,7 +218,6 @@ class EchemExperimentBase(ExperimentBase):
     char_sol_name: str = '' #Characterization solution name
     char_vol: int   = 0 #Characterization solution volume
     cv_sample_period: float = 0.1 #Characterization sample period
-    #cv_scan_rate: float = 0.05 #Scan rate
     cv_initial_voltage: float = 0.0  # initial voltage
     cv_first_anodic_peak: float = 0.5  # first anodic peak
     cv_second_anodic_peak: float = -0.2 # second anodic peak
@@ -244,6 +244,7 @@ class EchemExperimentBase(ExperimentBase):
         return round(self.cv_step_size / self.cv_scan_rate_cycle_1,4)
 
     def print_experiment_parameters(self):
+        '''Print the experiment parameters'''
         if self.ca:
             ca_params = f"""
         CA Parameters
