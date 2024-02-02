@@ -862,12 +862,10 @@ def image_well(
     Image the well with the camera
 
     Args:
-        wellplate (Wells object): The wellplate object
-        target_well (str): The alphanumeric name of the well you would like to image
         toolkit (Toolkit): The toolkit object
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
-
+        instructions (Experiment): The experiment instructions
+        step_description (str): The description of the step
+        
     Returns:
         None (void function) since the objects are passed by reference
     """
