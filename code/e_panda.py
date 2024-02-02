@@ -189,15 +189,22 @@ def forward_pipette_v2(
                 # We are removing solution from a well
                 # Assume even mixture of all contents
                 # The repetition volume removes each content proportional to its ratio
-                current_content_ratios = {
-                    key: value / from_vessel.volume
-                    for key, value in from_vessel.get_contents()
-                }
+                try:
+                    current_content_ratios = {
+                    key: value / sum(from_vessel.get_contents().values())
+                    for key, value in from_vessel.get_contents().items()
+                    }
 
-                for key, value in from_vessel.get_contents():
-                    from_vessel.update_contents(
-                        key, value - repetition_vol * current_content_ratios[key]
-                    )
+                    for key, value in from_vessel.get_contents().items():
+                        from_vessel.update_contents(
+                            key, value - repetition_vol * current_content_ratios[key]
+                        )
+                except ZeroDivisionError:
+                    logger.error("Well %s is empty", from_vessel.name)
+
+                except Exception as e:
+                    logger.error("Error occurred while updating well contents: %s", e)
+                    logger.error("Not critical, continuing....")
 
             mill.move_to_safe_position()
 

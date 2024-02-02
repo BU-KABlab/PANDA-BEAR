@@ -45,7 +45,7 @@ class Pump:
         OverDraftException: Raised when a syringe is over drawn.
     """
 
-    def __init__(self, mill: Union[Mill, MockMill], scale: Union[Scale, MockScale]):
+    def __init__(self, mill: Union[Mill, MockMill], scale: Union[Scale, MockScale]=None):
         """
         Initialize the pump and set the capacity.
         """
@@ -57,7 +57,10 @@ class Pump:
         self.pipette_volume_ul = 0.0  # uL
         self.pipette_volume_ml = 0.0  # mL
         self.mill = mill
-        self.scale = scale
+        if scale is not None:
+            self.scale = scale
+        else:
+            self.scale = MockScale()
 
     def set_up_pump(self):
         """

@@ -121,7 +121,7 @@ class Scheduler:
         :param well: The well to change.
         :param status: The new status of the well.
         """
-        logger.debug("Changing well %s status to %s", well, well.status)
+        logger.debug("Changing %s status to %s", well, well.status)
 
         well.status = experiment.status.value
         well.status_date = experiment.status_date
@@ -144,7 +144,7 @@ class Scheduler:
         with open(file_to_open, "w", encoding="ascii") as file:
             json.dump(data, file, indent=4)
 
-        logger.info("Well %s status changed to %s", well, well.status)
+        logger.info("%s status changed to %s", well, well.status)
 
     def ingest_inbox_experiments(self, filename: str) -> Tuple[int, bool]:
         """

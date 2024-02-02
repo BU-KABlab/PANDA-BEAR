@@ -1,8 +1,9 @@
 """
 Protocol for testing the repeatability of the ferrocyanide solution cyclic voltammetry
 """
+
 from typing import Sequence
-from experiment_class import ExperimentBase, ExperimentStatus
+from experiment_class import EchemExperimentBase, ExperimentStatus
 from controller import Toolkit
 from vials import StockVial, WasteVial
 from e_panda import (
@@ -10,13 +11,14 @@ from e_panda import (
     characterization,
     solution_selector,
     waste_selector,
-    image_well
+    image_well,
 )
 from correction_factors import correction_factor
 from mill_control import Instruments
 
+
 def ferrocyanide_repeatability(
-    instructions: ExperimentBase,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -28,7 +30,7 @@ def ferrocyanide_repeatability(
     0. Image the well
     1. Deposit the experiment solution into the well
     2. Move the electrode to the well
-    3. Perform the cyclic voltammetry   
+    3. Perform the cyclic voltammetry
     4. Clear the well contents into waste
 
 
@@ -46,30 +48,37 @@ def ferrocyanide_repeatability(
     # although we already checked before running the experiment we want to check again
     # that all requested solutions are found
     # Apply correction factor to the programmed volumes
+    logger = toolkit.global_logger
     print("Applying correction factor to the programmed volumes")
+    logger.info("Applying correction factor to the programmed volumes")
     for solution in instructions.solutions:
         instructions.solutions_corrected[solution] = correction_factor(
             instructions.solutions[solution],
             solution_selector(
                 stock_vials,
-                solution, # The solution name
-                instructions.solutions[solution] # The volume of the solution
+                solution,  # The solution name
+                instructions.solutions[solution],  # The volume of the solution
             ).viscosity_cp,
         )
+    logger.info("Correction factor applied to the programmed volumes")
+    logger.debug(f"Corrected volumes: {instructions.solutions_corrected}")
+    logger.debug(f"Original volumes: {instructions.solutions}")
 
     print("0. Imaging the well")
+    logger.info("Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(instructions, toolkit,"before_repeat_experiment")
+    image_well(toolkit, instructions, "before_repeat_experiment")
 
     instructions.set_status(ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
     print("1. Depositing solutions into well: ", instructions.well_id)
+    logger.info("Depositing solutions into well: %s", instructions.well_id)
     forward_pipette_v2(
-        volume=instructions.solutions_corrected['5mm_fecn6'],
+        volume=instructions.solutions_corrected["5mm_fecn6"],
         from_vessel=solution_selector(
             stock_vials,
-            '5mm_fecn6',
-            instructions.solutions_corrected['5mm_fecn6'],
+            "5mm_fecn6",
+            instructions.solutions_corrected["5mm_fecn6"],
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
         pump=toolkit.pump,
@@ -79,14 +88,17 @@ def ferrocyanide_repeatability(
 
     ## Move the electrode to the well
     print("2. Moving electrode to well: ", instructions.well_id)
+    logger.info("Moving electrode to well: %s", instructions.well_id)
     try:
         toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'x'),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, 'y'),
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
         print("3. Performing CV")
+        logger.info("Performing CV")
+        logger.debug("%s", instructions.print_cv_parameters())
         characterization(instructions)
     finally:
         instructions.set_status(ExperimentStatus.ERINSING)
@@ -94,6 +106,7 @@ def ferrocyanide_repeatability(
 
     # Clear the well
     print("4. Clearing well contents into waste")
+    logger.info("Clearing well contents into waste")
     instructions.set_status(ExperimentStatus.CLEARING)
     forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
@@ -107,3 +120,9 @@ def ferrocyanide_repeatability(
         mill=toolkit.mill,
     )
     print("Experiment complete\n\n")
+    logger.info(
+        "Experiment %d.%d.%d complete",
+        instructions.project_id,
+        instructions.project_campaign_id,
+        instructions.id,
+    )

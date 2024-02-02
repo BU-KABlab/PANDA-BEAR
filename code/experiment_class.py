@@ -199,7 +199,7 @@ class EchemExperimentBase(ExperimentBase):
     rinse_vol: int = 0 #Default rinse volume
 
     ca_sample_period: float = 0.1 #Deposition sample period
-    ca_prestep_voltage: float = 0.0  # Pre-step voltage (V) 
+    ca_prestep_voltage: float = 0.0  # Pre-step voltage (V)
     # CAvi = ca_prestep_voltage
     ca_prestep_time_delay: float = 0.0  # Pre-step delay time (s)
     # CAti = ca_prestep_time_delay
@@ -243,10 +243,10 @@ class EchemExperimentBase(ExperimentBase):
         '''CVstep / CVsr1'''
         return round(self.cv_step_size / self.cv_scan_rate_cycle_1,4)
 
-    def print_experiment_parameters(self):
-        '''Print the experiment parameters'''
+    def print_ca_parameters(self):
+        '''Print the CA parameters'''
         if self.ca:
-            ca_params = f"""
+            return f"""
         CA Parameters
             Pre-step Voltage: {self.ca_prestep_voltage}
             Pre-step Time Delay: {self.ca_prestep_time_delay}
@@ -257,7 +257,7 @@ class EchemExperimentBase(ExperimentBase):
             CA Sample Rate: {self.ca_sample_rate}
     """
         else:
-            ca_params = """
+            return f"""
         CA Parameters
             Pre-step Voltage: N/A
             Pre-step Time Delay: N/A
@@ -268,8 +268,11 @@ class EchemExperimentBase(ExperimentBase):
             CA Sample Rate: N/A
     """
 
+
+    def print_cv_parameters(self):
+        '''Print the CV parameters'''
         if self.cv:
-            cv_params = f"""
+            return f"""
         CV Parameters
             CV: {bool(self.cv)}
             CV Baseline: {bool(self.baseline)}
@@ -286,7 +289,7 @@ class EchemExperimentBase(ExperimentBase):
             CV Sample Rate: {self.cv_sample_rate}
     """
         else:
-            cv_params = f"""
+            return f"""
         CV Parameters
             CV: {bool(self.cv)}
             CV Baseline: {bool(self.baseline)}
@@ -302,6 +305,8 @@ class EchemExperimentBase(ExperimentBase):
             Scan Rate Cycle 3 (CVsr3): N/A
             CV Sample Rate: N/A
 """
+    def print_all_experiment_parameters(self):
+        '''Print the experiment parameters'''
         return f"""
 {self.experiment_name} 
         Plate #: {self.plate_id}
@@ -326,9 +331,9 @@ class EchemExperimentBase(ExperimentBase):
             Rinse Count: {self.rinse_count}
             Rinse Volume: {self.rinse_vol}
 
-        {ca_params}
+        {self.print_ca_parameters()}
 
-        {cv_params}
+        {self.print_cv_parameters()}
     """
 
 # @dataclass(config=ConfigDict(validate_assignment=True))

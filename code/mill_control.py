@@ -78,6 +78,7 @@ class Mill:
                 time.sleep(2)
 
             logger.info("Mill connected: %s", ser_mill.isOpen())
+            print("Mill connected: ", ser_mill.isOpen())
             return ser_mill
         except Exception as exep:
             logger.error("Error connecting to the mill: %s", str(exep))
@@ -96,8 +97,11 @@ class Mill:
 
     def disconnect(self):
         """Close the serial connection to the mill"""
+        logger.info("Disconnecting from the mill")
         self.ser_mill.close()
         time.sleep(15)
+        logger.info("Mill connected: %s", self.ser_mill.isOpen())
+        print("Mill connected: ", self.ser_mill.isOpen())
 
     def read_json_config(self):
         """Read the config file"""
@@ -168,7 +172,7 @@ class Mill:
     def home(self, timeout=90):
         """Home the mill with a timeout"""
         self.execute_command("$H")
-        time.sleep(30)
+        time.sleep(15)
         start_time = time.time()
 
         while True:
@@ -465,18 +469,6 @@ class Mill:
         Returns:
             str: Response from the mill after executing the commands.
         """
-        # Double check that the target coordinates are within the working volume
-        working_volume = self.config["working_volume"]
-        if x_coord > 0 or x_coord < working_volume["x"]:
-            logger.error("x coordinate out of range")
-            raise ValueError("x coordinate out of range")
-        if y_coord > 0 or y_coord < working_volume["y"]:
-            logger.error("y coordinate out of range")
-            raise ValueError("y coordinate out of range")
-        if z_coord > 0 or z_coord < working_volume["z"]:
-            logger.error("z coordinate out of range")
-            raise ValueError("z coordinate out of range")
-
         # Get the current coordinates
         current_x, current_y, current_z = self.current_coordinates()
 
@@ -491,6 +483,19 @@ class Mill:
         y_coord = y_coord + offsets["y"]
         z_coord = z_coord + offsets["z"]
 
+        # Double check that the target coordinates are within the working volume
+        working_volume = self.config["working_volume"]
+        if x_coord > 0 or x_coord < working_volume["x"]:
+            logger.error("x coordinate out of range")
+            raise ValueError("x coordinate out of range")
+        if y_coord > 0 or y_coord < working_volume["y"]:
+            logger.error("y coordinate out of range")
+            raise ValueError("y coordinate out of range")
+        if z_coord > 0 or z_coord < working_volume["z"]:
+            logger.error("z coordinate out of range")
+            raise ValueError("z coordinate out of range")
+
+        
         # Calculate the differences between the current and target coordinates
         dx = x_coord - current_x
         dy = y_coord - current_y
