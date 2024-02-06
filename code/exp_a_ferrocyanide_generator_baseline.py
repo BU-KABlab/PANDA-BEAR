@@ -49,9 +49,9 @@ print("TEST MODE: ", TESTING)
 COLUMNS = "ABCDEFGH"
 ROWS = 12
 PROJECT_ID = 12
-EXPERIMENT_NAME = "Repeatability assessment (exp A3)"
+EXPERIMENT_NAME = "Repeatability assessment (exp A2 baseline)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
-CAMPAIGN_ID = 3
+CAMPAIGN_ID = 2
 PUMPING_RATE = 0.3
 INTENDED_PLATE = 108
 
@@ -61,18 +61,7 @@ experiments: list[experiment_class.EchemExperimentBase] = []
 WELL_NUMBER = 1
 
 experiment_wells = [
-    'H1',   'G1',   'F1',   'E1',   'D1',   'C1',   'B1',   'A1',
-    'H2',                                                   'A2',
-    'H3',                                           'B3',
-    'H4',                                   'C4',
-    'H5',                                   'C5',
-    'H6',                           'D6',
-    'H7',                           'D7',
-    'H8',                   'E8',
-    'H9',                   'E9',
-    'H10',          'F10',
-    'H11',          'F11',
-    'H12', 'G12',
+    "G2","G3","G4",
 ]
 
 for col in COLUMNS:
@@ -99,7 +88,7 @@ for col in COLUMNS:
                 baseline=0,
                 cv=1,
                 ca=0,
-                cv_step_size=0.002,
+                cv_step_size=0.001,
                 cv_second_anodic_peak=-0.2,
                 cv_first_anodic_peak=0.58,
                 cv_scan_rate_cycle_1=0.050,
@@ -109,6 +98,7 @@ for col in COLUMNS:
                 cv_initial_voltage=0.0,
                 cv_final_voltage=0.5,
                 cv_sample_period=0.1
+                # sample_rate = cv_step_size / cv_scan_rate_cycle_1 = 0.001 / 0.050 = 0.020
             )
 
             experiments.append(experiment)

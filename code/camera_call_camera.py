@@ -19,6 +19,8 @@ def capture_new_image(save=True, num_images=1, file_name:Path="test.png") -> Non
     # Path to the script to run
     script_path = CAMERA_SCRIPT_PATH
 
+    if file_name.suffix != ".png":
+        file_name = file_name.with_suffix(".png")
     # Start a new process with the Python interpreter
     subprocess.run(
         [

@@ -7,18 +7,19 @@ import PyCapture2
 
 
 class FLIRCamera:
-    def __init__(self):
+    def __init__(self, print_to_console: bool = True):
         self.camera = None
         self.bus = None
         self.num_cams = None
         self.uid = None
         self.camera_logger: logging.Logger = logging.getLogger("FLIRCamera")
         self.capturing = False
+        self.print_to_console:bool = print_to_console
 
         # Set up logging
-        self.camera_logger.setLevel(logging.DEBUG)
+        self.camera_logger.setLevel(logging.INFO if self.print_to_console else logging.DEBUG)
         ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
+        ch.setLevel(logging.INFO if self.print_to_console else logging.DEBUG)
         formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
@@ -169,6 +170,10 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--file_name", type=str, default="", help="Name of the file to save"
+    )
+
+    parser.add_argument(
+        "--print_to_console", type=bool, default=True, help="Print to console"
     )
 
     args = parser.parse_args()

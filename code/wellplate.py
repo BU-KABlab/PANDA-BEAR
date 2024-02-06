@@ -198,6 +198,7 @@ class Wellplate:
             self.orientation,
             self.rows,
             self.columns,
+            self.echem_height
          ) = load_wellplate_location(self)
         a1_coordinates = {"x": self.a1_x, "y": self.a1_y, "z": self.z_top}  # coordinates of A1
         volume = 0.00
@@ -238,6 +239,11 @@ class Wellplate:
                         }
                     # the depth is set here for each well instead of the well plate as a whole
                     depth = self.z_bottom
+
+                    # Round the coordinates to 2 decimal places
+                    coordinates["x"] = round(coordinates["x"], 2)
+                    coordinates["y"] = round(coordinates["y"], 2)
+                    coordinates["z"] = round(coordinates["z"], 2)
 
                 self.wells[well_id] = Well(
                     well_id=well_id,
@@ -485,19 +491,20 @@ def read_well_type_characteristics(
         current_well.z_bottom + height,
     )
 
-def load_wellplate_location(current_well: Wellplate) -> tuple[float, float, float, int, int, str]:
+def load_wellplate_location(current_wellplate: Wellplate) -> tuple[float, float, float, int, int, str, float]:
     """Load the location of the well plate from the well_location.csv file"""
 
     # check it exists
     if not os.path.exists(WELLPLATE_LOCATION):
         logger.warning("Well location file not found at %s. Returning defaults", WELLPLATE_LOCATION)
         return (
-            current_well.a1_x,
-            current_well.a1_y,
-            current_well.z_bottom,
-            current_well.orientation,
-            current_well.rows,
-            current_well.columns,
+            current_wellplate.a1_x,
+            current_wellplate.a1_y,
+            current_wellplate.z_bottom,
+            current_wellplate.orientation,
+            current_wellplate.rows,
+            current_wellplate.columns,
+            current_wellplate.echem_height,
         )
     # Looks like this:
     # {
@@ -516,8 +523,9 @@ def load_wellplate_location(current_well: Wellplate) -> tuple[float, float, floa
         orientation = data["orientation"]
         rows = data["rows"]
         cols = data["cols"]
+        echem_height = data["echem_height"]
 
-    return (x, y, z_bottom, orientation, rows, cols)
+    return (x, y, z_bottom, orientation, rows, cols, echem_height)
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
 
@@ -756,8 +764,8 @@ def load_new_wellplate(
                                 "status": current_line.split("&")[5],
                                 "status_date": current_line.split("&")[6],
                                 "contents": json.loads(current_line.split("&")[7].replace("'", '"')),
-                                "experiment_id": None if (current_line.split("&")[3]) == '' else int(current_line.split("&")[3]),
-                                "project_id": None if (current_line.split("&")[4]) == '' else int(current_line.split("&")[4]),
+                                "experiment_id": None if (current_line.split("&")[3] in ['','None'] or (current_line.split("&")[3]) is None) else int(current_line.split("&")[3]),
+                                "project_id": None if (current_line.split("&")[4]) in ['','None'] else int(current_line.split("&")[4]),
                             }
                             for current_line in wells
                         ],

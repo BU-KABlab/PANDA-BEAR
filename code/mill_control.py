@@ -12,17 +12,30 @@ stop the mill, reset the mill, home the mill, get the current status of the mill
 gcode mode of the mill, get the gcode parameters of the mill, and get the gcode parser state
 of the mill.
 """
+
 # pylint: disable=line-too-long
 
 # standard libraries
 import dataclasses
-from enum import Enum
 import json
 import logging
 import re
 import time
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+
+# third-party libraries
+# from pydantic.dataclasses import dataclass
 import serial
-from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS, PATH_TO_LOGS
+from config.config import (
+    MILL_CONFIG,
+    PATH_TO_DATA,
+    PATH_TO_LOGS,
+    STOCK_STATUS,
+    WASTE_STATUS,
+)
+
 # Configure the logger
 # logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
@@ -31,6 +44,16 @@ from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS, PATH_TO_LOGS
 # system_handler.setFormatter(formatter)
 # logger.addHandler(system_handler)
 logger = logging.getLogger("e_panda")
+if not logger.hasHandlers():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
+    )
+    system_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control.log")
+    system_handler.setFormatter(formatter)
+    logger.addHandler(system_handler)
+
 
 @dataclasses.dataclass
 class Instruments(Enum):
@@ -40,6 +63,48 @@ class Instruments(Enum):
     PIPETTE = "pipette"
     ELECTRODE = "electrode"
     LENS = "lens"  # Fixed the typo here
+
+
+# @dataclass
+# class MillConfiguration():
+#     """Class for the mill configuration"""
+
+#     instrument_offsets: dict
+#     working_volume: dict
+#     electrode_bath: dict
+#     safe_height_floor: float
+
+# @dataclass
+# class coordinates():
+#     """Class for the coordinates of the mill"""
+
+#     x: float
+#     y: float
+#     z: float
+
+# @dataclass
+# class electrode_offsets(coordinates):
+#     """Class for the electrode coordinates"""
+
+# @dataclass
+# class pipette_offsets(coordinates):
+#     """Class for the pipette coordinates"""
+
+# @dataclass
+# class lens_offsets(coordinates):
+#     """Class for the lens coordinates"""
+
+# @dataclass
+# class center_offsets(coordinates):
+#     """Class for the center coordinates"""
+
+# @dataclass
+# class working_volume(coordinates):
+#     """Class for the working volume of the mill"""
+
+# @dataclass
+# class electrode_bath(coordinates):
+#     """Class for the electrode bath coordinates"""
 
 
 class Mill:
@@ -202,8 +267,8 @@ class Mill:
         """Get the current status of the mill"""
         command = "?"
         command_bytes = command.encode()
-        status = ''
-        while status == '':
+        status = ""
+        while status == "":
             self.ser_mill.write(command_bytes + b"\n")
             # time.sleep(2)
             status = self.ser_mill.readline().decode().rstrip()
@@ -300,10 +365,14 @@ class Mill:
                     logger.info(log_message)
                     break
                 else:
-                    logger.warning("MPos coordinates not found in the line. Trying again...")
+                    logger.warning(
+                        "MPos coordinates not found in the line. Trying again..."
+                    )
                     raise LocationNotFound
             except LocationNotFound as e:
-                logger.error("Error occurred while getting MPos coordinates: %s",str(e))
+                logger.error(
+                    "Error occurred while getting MPos coordinates: %s", str(e)
+                )
                 if _ == max_attempts - 1:
                     raise
 
@@ -330,7 +399,7 @@ class Mill:
         logger.debug("current_coordinates: %s", current_coordinates)
         return current_coordinates
 
-    def rinse_electrode(self, rinses:int=3):
+    def rinse_electrode(self, rinses: int = 3):
         """
         Rinse the electrode by moving it to the rinse position and back to the
         center position.
@@ -340,10 +409,10 @@ class Mill:
             None
         """
         coords = self.config["electrode_bath"]
-        self.safe_move(coords['x'], coords['y'], 0, instrument=Instruments.ELECTRODE)
+        self.safe_move(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
         for _ in range(rinses):
-            self.move_electrode_to_position(coords['x'], coords['y'], coords['z'])
-            self.move_electrode_to_position(coords['x'], coords['y'], 0)
+            self.move_electrode_to_position(coords["x"], coords["y"], coords["z"])
+            self.move_electrode_to_position(coords["x"], coords["y"], 0)
         return 0
 
     def rest_electrode(self):
@@ -356,9 +425,11 @@ class Mill:
             None
         """
         coords = self.config["electrode_bath"]
-        self.safe_move(coords['x'], coords['y'], coords['z'], instrument=Instruments.ELECTRODE)
+        self.move_to_safe_position()
+        self.safe_move(
+            coords["x"], coords["y"], coords["z"], instrument=Instruments.ELECTRODE
+        )
         return 0
-
 
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
@@ -367,7 +438,7 @@ class Mill:
         #     initial_x, initial_y, 0
         # )
 
-        mill_response = self.execute_command("G00 Z0")
+        mill_response = self.execute_command("G01 Z0")
         return mill_response
 
     def move_pipette_to_position(
@@ -387,7 +458,7 @@ class Mill:
         """
         # offsets = {"x": -88, "y": 0, "z": 0}
         offsets = self.config["instrument_offsets"]["pipette"]
-        # mill_move = "G00 X{} Y{} Z{}"  # move to specified coordinates
+        # mill_move = "G01 X{} Y{} Z{}"  # move to specified coordinates
         # command = mill_move.format(
         #     x_coord + offsets["x"], y_coord +
         #     offsets["y"], z_coord + offsets["z"]
@@ -414,7 +485,7 @@ class Mill:
         # offsets = {"x": 36, "y": 30, "z": 0}
         offsets = self.config["instrument_offsets"]["electrode"]
         # move to specified coordinates
-        # mill_move = "G00 X{} Y{} Z{}"
+        # mill_move = "G01 X{} Y{} Z{}"
         # command = mill_move.format(
         #     (x_coord + offsets["x"]), (y_coord +
         #                                offsets["y"]), (z_coord + offsets["z"])
@@ -458,7 +529,12 @@ class Mill:
 
     ## Special versions of the movement commands that avoid diagonal movements
     def safe_move(
-        self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER
+        self,
+        x_coord,
+        y_coord,
+        z_coord,
+        instrument: Instruments = Instruments.CENTER,
+        fixed_z=False,
     ) -> int:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
@@ -471,8 +547,78 @@ class Mill:
         """
         # Get the current coordinates
         current_x, current_y, current_z = self.current_coordinates()
+        logger.debug("Current coordinates: %s, %s, %s", current_x, current_y, current_z)
+        logger.debug("Target coordinates: %s, %s, %s", x_coord, y_coord, z_coord)
 
-        # If the current z_coord is not zero, move up to z = 0 first
+        # combinations that WOULD trigger the command. Here are the different combinations:
+
+        # (current_z != 0 and current_z == z_coord and not fixed_z):
+        # This condition is true if:
+        #  - the current Z coordinate is not zero
+        #  - the current Z coordinate is equal to the target Z coordinate
+        #  - the fixed_z flag is not set (i.e. fixed_z = False)
+
+        # (current_z != 0 and current_z != z_coord and not fixed_z):
+        # This condition is true if:
+        #  - the current Z coordinate is not zero
+        #  - it is not equal to the target Z coordinate
+        #  - the fixed_z flag is not set (i.e. fixed_z = False)
+
+        # (current_z != 0 and current_z != z_coord and fixed_z):
+        # This condition is true if:
+        #  - the current Z coordinate is not zero
+        #  - the current Z coordinate is not equal to the target Z coordinate
+        #  - the fixed_z flag is set (i.e. fixed_z = True)
+
+        # If any of these conditions are true, the mill will move to Z = 0 before moving to the target coordinates.
+
+        # Combinations that would NOT trigger the command. Here are the different combinations:
+
+        # (current_z == 0 and current_z == z_coord and not fixed_z):
+        # This condition is false if:
+        #  - the current Z coordinate is zero
+        #  - the current Z coordinate is equal to the target Z coordinate
+        #  - the fixed_z flag is not set (i.e. fixed_z = False)
+
+        # (current_z == 0 and current_z != z_coord and not fixed_z):
+        # This condition is false if:
+        #  - the current Z coordinate is zero
+        #  - the current Z coordinate is not equal to the target Z coordinate
+        #  - the fixed_z flag is not set (i.e. fixed_z = False)
+
+        # (current_z == 0 and current_z != z_coord and fixed_z):
+        # This condition is false if:
+        #  - the current Z coordinate is zero
+        #  - the current Z coordinate is not equal to the target Z coordinate
+        #  - the fixed_z flag is set (i.e. fixed_z = True)
+
+        # If any of these conditions are true, the command within the if statement will NOT be executed.
+        if (
+            (current_z != 0 and current_z == z_coord and not fixed_z)
+            or (current_z != 0 and current_z != z_coord and not fixed_z)
+            or (current_z != 0 and current_z != z_coord and fixed_z)
+            or (current_z < self.config["safe_height_floor"])
+        ):
+            print("testing - Would be moving to Z = 0")
+            if current_z != 0 and current_z == z_coord and not fixed_z:
+                print(
+                    f"Reason:\n\tcurrent_z != 0 {current_z != 0}\n\tcurrent_z == z_coord {current_z==z_coord}\n\tnot fixed_z {fixed_z}"
+                )
+            elif current_z != 0 and current_z != z_coord and not fixed_z:
+                print(
+                    f"Reason:\n\tcurrent_z != 0 {current_z != 0}\n\tcurrent_z != z_coord {current_z!=z_coord}\n\tnot fixed_z {fixed_z}"
+                )
+            elif current_z != 0 and current_z != z_coord and fixed_z:
+                print(
+                    f"Reason:\n\tcurrent_z != 0 {current_z != 0}\n\tcurrent_z != z_coord {current_z!=z_coord}\n\tnot fixed_z {fixed_z}"
+                )
+            elif current_z < self.config["safe_height_floor"]:
+                print(
+                    f"Reason:\n\tcurrent_z < self.config['safe_height_floor'] {current_z < self.config['safe_height_floor']}"
+                )
+        else:
+            print("testing - Would not be moving to Z = 0")
+
         if current_z != 0:
             self.execute_command("G01 Z0")
 
@@ -495,7 +641,6 @@ class Mill:
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
-        
         # Calculate the differences between the current and target coordinates
         dx = x_coord - current_x
         dy = y_coord - current_y
@@ -510,12 +655,17 @@ class Mill:
             commands.append(f"G01 Y{y_coord}")
 
         # Generate vertical movements
-        commands.append(f"G01 Z{z_coord}")
+        if z_coord == -70:
+            commands.append(f"G01 Z{-64}")
+        else:
+            commands.append(f"G01 Z{z_coord}")
 
         # Execute the commands one by one
         for command in commands:
             self.execute_command(command)
-
+        if z_coord == -70:
+            input("Press enter to continue")
+            self.execute_command(f"G01 Z{-70}")
         return 0
 
 
@@ -657,7 +807,7 @@ class MockMill:
         """Simulate getting G-code parser state"""
         self.logger.info("Getting G-code parser state")
 
-    def rinse_electrode(self,rinses:int=3):
+    def rinse_electrode(self, rinses: int = 3):
         """Simulate rinsing the electrode"""
         self.logger.info("Rinsing the electrode")
         for _ in range(rinses):
@@ -733,22 +883,122 @@ class MockMill:
         self.current_y = y_coord
         self.current_z = z_coord
         self.logger.info(
-            "Safe move %s to position: (%s, %s, %s)", instrument.value,x_coord, y_coord, z_coord
+            "Safe move %s to position: (%s, %s, %s)",
+            instrument.value,
+            x_coord,
+            y_coord,
+            z_coord,
         )
         return 0
+
+
+def wellplate_scan(mill_arg: Mill = None, capture_images=False):
+    """Scan the wellplate"""
+    # Perform image scan of each well of the wellplate
+    from camera_call_camera import capture_new_image
+    from wellplate import Well, Wellplate
+
+    wellplate = Wellplate()
+    if mill_arg is None:
+        mill = Mill()
+    else:
+        mill = mill_arg
+    with mill:
+        for well in wellplate.wells.values():
+            well: Well = well
+            print("Currently imaging: {well.name}", end="\r")
+            well_coordinates = well.coordinates
+            mill.safe_move(
+                well_coordinates["x"],
+                well_coordinates["y"],
+                wellplate.image_height,
+                instrument=Instruments.LENS,
+                fixed_z=True,
+            )
+            if capture_images:
+                # create a folder in data folder with the wellplate id
+                folder = Path(f"{PATH_TO_DATA}/{wellplate.plate_id}")
+                folder.mkdir(parents=True, exist_ok=True)
+
+                # capture each image with file name as the date and the well name
+                file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{well.name}.png"
+                capture_new_image(file_name=folder / file_name)
+        if mill_arg is None:
+            mill.rest_electrode()
+
+
+def move_pipette_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top):
+    mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(h1["x"], h1["y"], z_top, instrument=Instruments.PIPETTE)
+
+
+def move_electrode_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top, echem_height):
+    mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(h1["x"], h1["y"], z_top, instrument=Instruments.ELECTRODE)
+
+    repsonse = input("Move the electrode to the echem height? y/n: ")
+    if repsonse.lower() == "y":
+        mill.safe_move(a1["x"], a1["y"], echem_height, instrument=Instruments.ELECTRODE)
+        mill.safe_move(
+            a12["x"], a12["y"], echem_height, instrument=Instruments.ELECTRODE
+        )
+        mill.safe_move(
+            h12["x"], h12["y"], echem_height, instrument=Instruments.ELECTRODE
+        )
+        mill.safe_move(h1["x"], h1["y"], echem_height, instrument=Instruments.ELECTRODE)
+
+
+def move_lens_to_each_corner(mill: Mill, image_height, a1, a12, h12, h1):
+    mill.safe_move(a1["x"], a1["y"], image_height, instrument=Instruments.LENS)
+    mill.safe_move(a12["x"], a12["y"], image_height, instrument=Instruments.LENS)
+    mill.safe_move(h12["x"], h12["y"], image_height, instrument=Instruments.LENS)
+    mill.safe_move(h1["x"], h1["y"], image_height, instrument=Instruments.LENS)
+
+
+def move_to_vials(mill: Mill, stock_vials, waste_vials):
+    from vials import StockVial, WasteVial
+
+    if len(stock_vials) != 0:
+        for _, stock_vial in enumerate(stock_vials):
+            stock_vial: StockVial
+            if stock_vial.position == "e1":
+                continue
+            mill.safe_move(
+                stock_vial.coordinates["x"],
+                stock_vial.coordinates["y"],
+                stock_vial.height,
+                instrument=Instruments.PIPETTE,
+            )
+        mill.move_to_safe_position()
+
+    if len(waste_vials) != 0:
+        for _, waste_vial in enumerate(waste_vials):
+            waste_vial: WasteVial
+            mill.safe_move(
+                waste_vial.coordinates["x"],
+                waste_vial.coordinates["y"],
+                waste_vial.height,
+                instrument=Instruments.PIPETTE,
+            )
+        mill.move_to_safe_position()
 
 
 def movement_test():
     """Test the mill movement with a wellplate"""
     import wellplate as Wells
     from vials import StockVial, WasteVial, read_vials
+
     wellplate = Wells.Wellplate()
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)
     test_logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
     formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-    testing_handler = logging.FileHandler(PATH_TO_LOGS /"mill_control_testing.log")
+    testing_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control_testing.log")
     testing_handler.setFormatter(formatter)
     test_logger.addHandler(testing_handler)
 
@@ -764,61 +1014,36 @@ def movement_test():
             print(h12)
             ## Load the vials
 
-            stock_vials:StockVial = read_vials(STOCK_STATUS)
-            waste_vials:WasteVial = read_vials(WASTE_STATUS)
-            input("Begin the movement test to each corner of the wellplate. Press enter to continue...")
-            # Move the pipette to each well corner
-            mill.safe_move(
-                a1["x"], a1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                a12["x"], a12["y"], wellplate.z_top, instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                h12["x"], h12["y"],wellplate.z_top, instrument=Instruments.PIPETTE
-            )
-            mill.safe_move(
-                h1["x"], h1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+            stock_vials: StockVial = read_vials(STOCK_STATUS)
+            waste_vials: WasteVial = read_vials(WASTE_STATUS)
+            input(
+                "Begin the movement test to each corner of the wellplate. Press enter to continue..."
             )
 
-            mill.safe_move(
-                a1["x"], a1["y"], wellplate.image_height, instrument=Instruments.LENS
-            )
-            mill.safe_move(
-                a12["x"], a12["y"], wellplate.image_height, instrument=Instruments.LENS
-            )
-            mill.safe_move(
-                h12["x"], h12["y"], wellplate.image_height, instrument=Instruments.LENS
-            )
-            mill.safe_move(
-                h1["x"], h1["y"], wellplate.image_height, instrument=Instruments.LENS
-            )
+            if (
+                input("Do you want to move the pipette to each corner? (y/n): ").lower()
+                == "y"
+            ):
+                move_pipette_to_each_corner(mill, a1, a12, h12, h1, wellplate.z_top)
 
-            ## Move pipette to stock vials then to the depth and then to safe position
-            if len(stock_vials) != 0:
-                for _, stock_vial in enumerate(stock_vials):
-                    stock_vial:StockVial = stock_vial
-                    if stock_vial.position =="e1":
-                        continue
-                    mill.safe_move(
-                        stock_vial.coordinates["x"],
-                        stock_vial.coordinates["y"],
-                        stock_vial.height,
-                        instrument=Instruments.PIPETTE,
-                    )
-                mill.move_to_safe_position()
+            if (
+                input(
+                    "Do you want to move the electrode to each corner? (y/n): "
+                ).lower()
+                == "y"
+            ):
+                move_electrode_to_each_corner(
+                    mill, a1, a12, h12, h1, wellplate.z_top, wellplate.echem_height
+                )
 
-            if len(waste_vials) != 0:
-                ## Move pipette to first waste vial then to the depth and then to safe positionfor
-                for _, waste_vial in enumerate(waste_vials):
-                    waste_vial:WasteVial = waste_vial
-                    mill.safe_move(
-                        waste_vial.coordinates["x"],
-                        waste_vial.coordinates["y"],
-                        waste_vial.height,
-                        instrument=Instruments.PIPETTE,
-                    )
-                mill.move_to_safe_position()
+            if (
+                input("Do you want to move the lens to each corner? (y/n): ").lower()
+                == "y"
+            ):
+                move_lens_to_each_corner(mill, wellplate.image_height, a1, a12, h12, h1)
+
+            if input("Do you want to move to the vials? (y/n): ").lower() == "y":
+                move_to_vials(mill, stock_vials, waste_vials)
 
             mill.move_to_safe_position()
             mill.rest_electrode()
@@ -839,4 +1064,32 @@ def movement_test():
 
 
 if __name__ == "__main__":
-    movement_test()
+
+    def menu():
+        print("Welcome to the Mill Control Menu!")
+        print("1. Run movement test")
+        print("2. Run wellplate scan")
+        print("3. Move to safe position and rest electrode")
+        print("0. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            movement_test()
+        elif choice == "2":
+            wellplate_scan(capture_images=True)
+        elif choice == "3":
+            with Mill() as mill:
+                mill.move_to_safe_position()
+                mill.rest_electrode()
+        elif choice == "0":
+            print("Exiting...")
+            return
+        else:
+            print("Invalid choice. Please try again.")
+
+        # Recursive call to keep the menu running
+        menu()
+
+    if __name__ == "__main__":
+        menu()

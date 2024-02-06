@@ -4,5 +4,6 @@
     "orientation": 0,
     "rows": 13,
     "cols": "ABCDEFGH",
-    "z-bottom": -72
+    "z-bottom": -72,
+    "echem_height": -70
 }
