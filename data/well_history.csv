@@ -10367,8 +10367,8 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 110&3&H10&&&new&&{}
 110&3&H11&&&new&&{}
 110&3&H12&&&new&&{}
-108&3&A1&10000455&12&complete&2024-02-06T17:31:32&{'5mm_fecn6': 127.43}
-108&3&A2&10000456&12&complete&2024-02-06T17:38:34&{'5mm_fecn6': 127.43}
+108&3&A1&10000455&12&complete&2024-02-06T17:31:32&{'5mm_fecn6': 0.0}
+108&3&A2&10000456&12&complete&2024-02-06T17:38:34&{'5mm_fecn6': 0.0}
 108&3&A3&10000413&15&complete&2024-01-31T20:13:10&{'5mm_fecn6': 0.0}
 108&3&A4&10000414&15&complete&2024-01-31T20:23:42&{'5mm_fecn6': 0.0}
 108&3&A5&10000415&15&complete&2024-01-31T20:34:12&{'5mm_fecn6': 0.0}
@@ -10379,9 +10379,9 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 108&3&A10&10000420&15&complete&2024-01-31T21:32:54&{'electrolyte': 0.0, '10mm_fecn6': 0.0}
 108&3&A11&10000421&15&complete&2024-01-31T21:44:44&{'electrolyte': 0.0, '10mm_fecn6': 0.0}
 108&3&A12&None&None&new&&{}
-108&3&B1&10000457&12&complete&2024-02-06T17:45:23&{'5mm_fecn6': 127.43}
+108&3&B1&10000457&12&complete&2024-02-06T17:45:23&{'5mm_fecn6': 0.0}
 108&3&B2&None&None&new&&{}
-108&3&B3&10000458&12&complete&2024-02-06T17:52:41&{'5mm_fecn6': 127.43}
+108&3&B3&10000458&12&complete&2024-02-06T17:52:41&{'5mm_fecn6': 0.0}
 108&3&B4&None&None&new&&{}
 108&3&B5&None&None&new&&{}
 108&3&B6&None&None&new&&{}
@@ -10391,11 +10391,11 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 108&3&B10&None&None&new&&{}
 108&3&B11&None&None&new&&{}
 108&3&B12&None&None&new&&{}
-108&3&C1&10000459&12&complete&2024-02-06T17:59:31&{'5mm_fecn6': 127.43}
+108&3&C1&10000459&12&complete&2024-02-06T17:59:31&{'5mm_fecn6': 0.0}
 108&3&C2&None&None&new&&{}
 108&3&C3&None&None&new&&{}
-108&3&C4&10000460&12&complete&2024-02-06T18:06:33&{'5mm_fecn6': 127.43}
-108&3&C5&10000461&12&complete&2024-02-06T18:18:22&{'5mm_fecn6': 127.43}
+108&3&C4&10000460&12&complete&2024-02-06T18:06:33&{'5mm_fecn6': 0.0}
+108&3&C5&10000461&12&complete&2024-02-06T18:18:22&{'5mm_fecn6': 0.0}
 108&3&C6&None&None&new&&{}
 108&3&C7&None&None&new&&{}
 108&3&C8&None&None&new&&{}
@@ -10403,31 +10403,31 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 108&3&C10&None&None&new&&{}
 108&3&C11&None&None&new&&{}
 108&3&C12&None&None&new&&{}
-108&3&D1&10000462&12&complete&2024-02-06T18:25:25&{'5mm_fecn6': 127.43}
+108&3&D1&10000462&12&complete&2024-02-06T18:25:25&{'5mm_fecn6': 0.0}
 108&3&D2&None&None&new&&{}
 108&3&D3&None&None&new&&{}
 108&3&D4&None&None&new&&{}
 108&3&D5&None&None&new&&{}
-108&3&D6&10000463&12&complete&2024-02-06T18:32:38&{'5mm_fecn6': 127.43}
-108&3&D7&10000464&12&complete&2024-02-06T18:40:05&{'5mm_fecn6': 127.43}
+108&3&D6&10000463&12&complete&2024-02-06T18:32:38&{'5mm_fecn6': 0.0}
+108&3&D7&10000464&12&complete&2024-02-06T18:40:05&{'5mm_fecn6': 0.0}
 108&3&D8&None&None&new&&{}
 108&3&D9&None&None&new&&{}
 108&3&D10&None&None&new&&{}
 108&3&D11&None&None&new&&{}
 108&3&D12&None&None&new&&{}
-108&3&E1&10000465&12&complete&2024-02-06T18:47:48&{'5mm_fecn6': 127.43}
+108&3&E1&10000465&12&complete&2024-02-06T18:47:48&{'5mm_fecn6': 0.0}
 108&3&E2&None&None&new&&{}
 108&3&E3&None&None&new&&{}
 108&3&E4&None&None&new&&{}
 108&3&E5&None&None&new&&{}
 108&3&E6&None&None&new&&{}
 108&3&E7&None&None&new&&{}
-108&3&E8&10000466&12&complete&2024-02-06T18:55:05&{'5mm_fecn6': 127.43}
-108&3&E9&10000467&12&complete&2024-02-06T19:02:53&{'5mm_fecn6': 127.43}
+108&3&E8&10000466&12&complete&2024-02-06T18:55:05&{'5mm_fecn6': 0.0}
+108&3&E9&10000467&12&complete&2024-02-06T19:02:53&{'5mm_fecn6': 0.0}
 108&3&E10&None&None&new&&{}
 108&3&E11&None&None&new&&{}
 108&3&E12&None&None&new&&{}
-108&3&F1&10000468&12&complete&2024-02-06T19:10:13&{'5mm_fecn6': 127.43}
+108&3&F1&10000468&12&complete&2024-02-06T19:10:13&{'5mm_fecn6': 0.0}
 108&3&F2&None&None&new&&{}
 108&3&F3&None&None&new&&{}
 108&3&F4&None&None&new&&{}
@@ -10436,10 +10436,10 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 108&3&F7&None&None&new&&{}
 108&3&F8&None&None&new&&{}
 108&3&F9&None&None&new&&{}
-108&3&F10&10000469&12&complete&2024-02-06T19:17:14&{'5mm_fecn6': 127.43}
-108&3&F11&10000470&12&complete&2024-02-06T19:24:23&{'5mm_fecn6': 127.43}
+108&3&F10&10000469&12&complete&2024-02-06T19:17:14&{'5mm_fecn6': 0.0}
+108&3&F11&10000470&12&complete&2024-02-06T19:24:23&{'5mm_fecn6': 0.0}
 108&3&F12&None&None&new&&{}
-108&3&G1&10000471&12&complete&2024-02-06T19:31:27&{'5mm_fecn6': 127.43}
+108&3&G1&10000471&12&complete&2024-02-06T19:31:27&{'5mm_fecn6': 0.0}
 108&3&G2&10000452&12&complete&2024-02-05T11:06:36&{'5mm_fecn6': 0.0}
 108&3&G3&10000453&12&complete&2024-02-05T11:13:22&{'5mm_fecn6': 0.0}
 108&3&G4&10000454&12&complete&2024-02-05T11:20:13&{'5mm_fecn6': 0.0}
@@ -10450,16 +10450,16 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 108&3&G9&None&None&new&&{}
 108&3&G10&None&None&new&&{}
 108&3&G11&None&None&new&&{}
-108&3&G12&10000472&12&complete&2024-02-06T19:39:30&{'5mm_fecn6': 127.43}
-108&3&H1&10000473&12&complete&2024-02-06T19:47:07&{'5mm_fecn6': 127.43}
-108&3&H2&10000474&12&complete&2024-02-06T19:55:05&{'5mm_fecn6': 127.43}
-108&3&H3&10000475&12&complete&2024-02-06T20:02:31&{'5mm_fecn6': 127.43}
-108&3&H4&10000476&12&complete&2024-02-06T20:11:11&{'5mm_fecn6': 127.43}
-108&3&H5&10000477&12&complete&2024-02-06T20:18:52&{'5mm_fecn6': 127.43}
-108&3&H6&10000478&12&complete&2024-02-06T20:26:24&{'5mm_fecn6': 127.43}
-108&3&H7&10000479&12&complete&2024-02-06T20:35:13&{'5mm_fecn6': 127.43}
-108&3&H8&10000480&12&complete&2024-02-06T20:42:26&{'5mm_fecn6': 127.43}
-108&3&H9&10000481&12&complete&2024-02-06T20:49:36&{'5mm_fecn6': 127.43}
-108&3&H10&10000482&12&complete&2024-02-06T20:57:46&{'5mm_fecn6': 127.43}
-108&3&H11&10000483&12&complete&2024-02-06T21:08:11&{'5mm_fecn6': 127.43}
-108&3&H12&10000484&12&complete&2024-02-06T21:15:21&{'5mm_fecn6': 127.43}
+108&3&G12&10000472&12&complete&2024-02-06T19:39:30&{'5mm_fecn6': 0.0}
+108&3&H1&10000473&12&complete&2024-02-06T19:47:07&{'5mm_fecn6': 0.0}
+108&3&H2&10000474&12&complete&2024-02-06T19:55:05&{'5mm_fecn6': 0.0}
+108&3&H3&10000475&12&complete&2024-02-06T20:02:31&{'5mm_fecn6': 0.0}
+108&3&H4&10000476&12&complete&2024-02-06T20:11:11&{'5mm_fecn6': 0.0}
+108&3&H5&10000477&12&complete&2024-02-06T20:18:52&{'5mm_fecn6': 0.0}
+108&3&H6&10000478&12&complete&2024-02-06T20:26:24&{'5mm_fecn6': 0.0}
+108&3&H7&10000479&12&complete&2024-02-06T20:35:13&{'5mm_fecn6': 0.0}
+108&3&H8&10000480&12&complete&2024-02-06T20:42:26&{'5mm_fecn6': 0.0}
+108&3&H9&10000481&12&complete&2024-02-06T20:49:36&{'5mm_fecn6': 0.0}
+108&3&H10&10000482&12&complete&2024-02-06T20:57:46&{'5mm_fecn6': 0.0}
+108&3&H11&10000483&12&complete&2024-02-06T21:08:11&{'5mm_fecn6': 0.0}
+108&3&H12&10000484&12&complete&2024-02-06T21:15:21&{'5mm_fecn6': 0.0}

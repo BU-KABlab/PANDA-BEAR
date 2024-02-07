@@ -75,7 +75,7 @@ def cv_repeatability(
         print("0. Imaging the well")
         logger.info("Imaging the well")
         instructions.set_status(ExperimentStatus.IMAGING)
-        image_well(toolkit, instructions, "before " + str(cycle + 1))
+        image_well(toolkit, instructions, "before")
 
         instructions.set_status(ExperimentStatus.DEPOSITING)
         ## Deposit the experiment solution into the well

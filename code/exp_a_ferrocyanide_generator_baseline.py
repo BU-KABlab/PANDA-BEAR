@@ -107,4 +107,4 @@ for col in COLUMNS:
 # Schedule experiments
 input("Press enter to schedule experiments")
 scheduler = Scheduler()
-scheduler.add_nonfile_experiments(experiments,override =True)
+scheduler.add_nonfile_experiments(experiments,override =False)

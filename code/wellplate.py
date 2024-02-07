@@ -55,6 +55,7 @@ class Well(Vessel):
         self.height:float = height
         self.depth:float = depth
         self.name:str = well_id
+        self.contents:dict = contents
         super().__init__(name = self.well_id, coordinates=coordinates, volume = volume, capacity=capacity, density = density, contents= {}, depth = depth)
 
     def __str__(self) -> str:
@@ -63,15 +64,17 @@ class Well(Vessel):
     def get_contents(self) -> dict:
         """Returns the contents of the well."""
         return self.contents
-    def update_contents(self, solution_name:str, volume: float) -> None:
+    def update_contents(self, solution_name:str, volume_change: float) -> None:
         """Updates the contents of the well in the well_status.json file."""
         # Check if the solution is already in the well
-        logger.debug("Updating contents of %s with %s", self.name, solution_name)
-        if solution_name in self.contents:
-            self.contents[solution_name] += volume
+        logger.debug("Updating contents of %s with %f %s", self.name, volume_change,solution_name)
+
+        if solution_name in self.contents.keys():
+            self.contents[solution_name] += volume_change
+            logger.debug("Updated %s contents: %s", self.name, self.contents)
         else:
-            self.contents[solution_name] = volume
-        logger.debug("New %s contents: %s", self.name, self.contents)
+            self.contents[solution_name] = volume_change
+            logger.debug("New %s contents: %s", self.name, self.contents)
         # Update the well status file
         logger.debug("Updating well status file...")
         with open(WELL_STATUS, "r", encoding="utf-8") as f:
@@ -870,6 +873,7 @@ def save_current_wellplate():
 
     logger.debug("Wellplate saved")
     logger.info("Wellplate %d saved", int(current_plate_id))
+
     return int(current_plate_id), int(current_type_number), wellplate_is_new
 
 def determine_next_experiment_id() -> int:

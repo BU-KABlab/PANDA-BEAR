@@ -289,7 +289,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             scheduler.save_results(new_experiment, new_experiment.results)
 
         # Save the current wellplate
-        load_new_wellplate() #load a "new" wellplate to save and update wells
+        save_current_wellplate() #load a "new" wellplate to save and update wells
         # close out of serial connections
         toolkit.mill.rest_electrode()
         if toolkit is not None:
@@ -354,7 +354,7 @@ def establish_system_state() -> (
 
     ## if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
     full_waste_vials = [vial for vial in waste_vials_only if vial.volume > 19000]
-    if len(full_waste_vials) > 0:
+    if len(full_waste_vials) == len(waste_vials_only):
         slack.send_slack_message(
             "alert",
             "The following waste vials are full: "

@@ -730,7 +730,7 @@ class MockMill:
         self.current_x = 0.0
         self.current_y = 0.0
         self.current_z = 0.0
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger
 
     def homing_sequence(self):
         """Simulate homing, setting feed rate, and clearing buffers"""
@@ -806,7 +806,7 @@ class MockMill:
         """Simulate rinsing the electrode"""
         self.logger.info("Rinsing the electrode")
         for _ in range(rinses):
-            time.sleep(5)
+            time.sleep(1)
 
     def rest_electrode(self):
         """

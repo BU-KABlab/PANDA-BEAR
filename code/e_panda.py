@@ -197,7 +197,7 @@ def forward_pipette_v2(
                     for key, value in from_vessel.get_contents().items():
                         logger.debug("Well contents: %s", from_vessel.get_contents())
                         from_vessel.update_contents(
-                            key, value - repetition_vol * current_content_ratios[key]
+                            key, -(repetition_vol * current_content_ratios[key])
                         )
                         logger.debug("Well contents updated: %s", from_vessel.get_contents())
                 except ZeroDivisionError:
@@ -904,7 +904,9 @@ def image_well(
             file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
         else:
             file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
-        filepath = Path(PATH_TO_DATA / str(file_name)).with_suffix(".png")
+        file_name = file_name.replace(" ", "_") #clean up the file name
+        file_name_start = file_name + "_0" # enumerate the file name
+        filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".png")
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
