@@ -31,7 +31,7 @@ import pandas as pd
 from config.config import TESTING, WELL_HX
 from config.pin import CURRENT_PIN
 from scheduler import Scheduler
-from wellplate import load_new_wellplate, save_current_wellplate
+from wellplate import load_new_wellplate
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
@@ -49,9 +49,9 @@ print("TEST MODE: ", TESTING)
 COLUMNS = "ABCDEFGH"
 ROWS = 12
 PROJECT_ID = 12
-EXPERIMENT_NAME = "Repeatability assessment (exp A2 baseline)"
+EXPERIMENT_NAME = "Repeatability assessment (exp A-2)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
-CAMPAIGN_ID = 2
+CAMPAIGN_ID = 4
 PUMPING_RATE = 0.3
 INTENDED_PLATE = 108
 
@@ -61,7 +61,7 @@ experiments: list[experiment_class.EchemExperimentBase] = []
 WELL_NUMBER = 1
 
 experiment_wells = [
-    "G2","G3","G4",
+    "G5","G6","G7",
 ]
 
 for col in COLUMNS:

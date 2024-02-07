@@ -41,7 +41,7 @@ from instrument_toolkit import Toolkit
 # import obs_controls as obs
 from slack_functions2 import SlackBot
 from vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
-from wellplate import save_current_wellplate
+from wellplate import load_new_wellplate, save_current_wellplate
 from obs_controls import OBSController
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -207,8 +207,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             new_experiment.plate_id = wellplate.plate_id
 
             logger.info("Beginning experiment %d", new_experiment.id)
-            import exp_a_ferrocyanide_assessment_protocol as exp_a
-            exp_a.ferrocyanide_repeatability(
+            import exp_a_2_ferrocyanide_assessment_protocol as exp_a
+            exp_a.cv_repeatability(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,
@@ -289,7 +289,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             scheduler.save_results(new_experiment, new_experiment.results)
 
         # Save the current wellplate
-        save_current_wellplate()
+        load_new_wellplate() #load a "new" wellplate to save and update wells
         # close out of serial connections
         toolkit.mill.rest_electrode()
         if toolkit is not None:
