@@ -594,10 +594,10 @@ class Mill:
 
         # If any of these conditions are true, the command within the if statement will NOT be executed.
         if (
-            (current_z != 0 and current_z == z_coord and not fixed_z)
+            ((current_z != 0 and current_z == z_coord and not fixed_z)
             or (current_z != 0 and current_z != z_coord and not fixed_z)
-            or (current_z != 0 and current_z != z_coord and fixed_z)
-            or (current_z < self.config["safe_height_floor"])
+            or (current_z != 0 and current_z != z_coord and fixed_z))
+            and (current_z < self.config["safe_height_floor"])
         ):
             print("testing - Would be moving to Z = 0")
             if current_z != 0 and current_z == z_coord and not fixed_z:
@@ -655,17 +655,12 @@ class Mill:
             commands.append(f"G01 Y{y_coord}")
 
         # Generate vertical movements
-        if z_coord == -70:
-            commands.append(f"G01 Z{-64}")
-        else:
-            commands.append(f"G01 Z{z_coord}")
+        commands.append(f"G01 Z{z_coord}")
 
         # Execute the commands one by one
         for command in commands:
             self.execute_command(command)
-        if z_coord == -70:
-            input("Press enter to continue")
-            self.execute_command(f"G01 Z{-70}")
+
         return 0
 
 

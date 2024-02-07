@@ -43,9 +43,8 @@ from experiment_class import EchemExperimentBase, ExperimentResult, ExperimentSt
 from log_tools import CustomLoggingFilter
 from mill_control import Instruments, Mill, MockMill
 from pump_control import MockPump, Pump
-from vials import StockVial, Vessel, WasteVial
+from vials import StockVial, WasteVial
 from wellplate import Well, Wellplate
-from obs_controls import OBSController
 
 # import gamry_control_WIP as echem
 # from gamry_control_WIP import (potentiostat_ocp_parameters)
@@ -70,8 +69,8 @@ logger.addHandler(system_handler)
 
 def forward_pipette_v2(
     volume: float,
-    from_vessel: Vessel,
-    to_vessel: Vessel,
+    from_vessel: Union[Well, StockVial, WasteVial],
+    to_vessel: Union[Well, WasteVial],
     pump: Union[Pump, MockPump],
     mill: Union[Mill, MockMill],
     pumping_rate: Optional[float] = None,
@@ -186,19 +185,21 @@ def forward_pipette_v2(
             )  # pipette now has air gap + repitition vol
             if isinstance(from_vessel, Well):
                 from_vessel: Well = from_vessel
-                # We are removing solution from a well
-                # Assume even mixture of all contents
+                # We are removing solution from a well and assume an even mixture of all contents
                 # The repetition volume removes each content proportional to its ratio
                 try:
+                    logger.info("Updating well contents...")
                     current_content_ratios = {
                     key: value / sum(from_vessel.get_contents().values())
                     for key, value in from_vessel.get_contents().items()
                     }
 
                     for key, value in from_vessel.get_contents().items():
+                        logger.debug("Well contents: %s", from_vessel.get_contents())
                         from_vessel.update_contents(
                             key, value - repetition_vol * current_content_ratios[key]
                         )
+                        logger.debug("Well contents updated: %s", from_vessel.get_contents())
                 except ZeroDivisionError:
                     logger.error("Well %s is empty", from_vessel.name)
 
@@ -251,22 +252,34 @@ def forward_pipette_v2(
             )
 
             # Update the contentes of the to_vessel
-            to_vessel.update_contents(from_vessel.name, repetition_vol)
+            try:
+                if isinstance(to_vessel, Well):
+                    to_vessel: Well = to_vessel
+                    to_vessel.update_contents(from_vessel.name, repetition_vol)
 
-            logger.info(
-                "Vessel %s volume: %f depth: %f",
-                to_vessel.name,
-                to_vessel.volume,
-                to_vessel.depth,
-            )
+                elif isinstance(to_vessel, WasteVial):
+                    to_vessel: WasteVial = to_vessel
+                    contents = from_vessel.get_contents().items()
+                    for key, value in contents:
+                        to_vessel.update_contents(key, value)
+
+                logger.info(
+                    "Vessel %s volume: %f depth: %f",
+                    to_vessel.name,
+                    to_vessel.volume,
+                    to_vessel.depth,
+                )
+            except Exception as e:
+                logger.error("Error occurred while updating vessel contents: %s", e)
+                logger.error("Not critical, continuing....")
 
             mill.move_to_safe_position()
 
 
 def reverse_pipette_v2(
     volume: float,
-    from_vessel: Vessel,
-    to_vessel: Vessel,
+    from_vessel: Union[Well, StockVial, WasteVial],
+    to_vessel: Union[Well, WasteVial],
     purge_vessel: WasteVial,
     pump: Union[Pump, MockPump],
     mill: Union[Mill, MockMill],

@@ -1,3 +1,6 @@
+"""
+Vessel module.
+"""
 class Vessel:
     """
     Represents a vessel object.

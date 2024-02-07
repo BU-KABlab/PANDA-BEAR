@@ -6,15 +6,17 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 import logging
 import time
 from typing import Optional, Union
+
 import nesp_lib
+from correction_factors import reverse_correction_factor
+from experiment_class import ExperimentResult
+from mill_control import Mill, MockMill
 from sartorius_local.driver import Scale
 from sartorius_local.mock import Scale as MockScale
-from slack_functions2 import SlackBot
-from vials import Vial2, Vessel
-from mill_control import Mill, MockMill
-from wellplate import Wellplate
-from experiment_class import ExperimentResult
-from correction_factors import reverse_correction_factor
+# from slack_functions2 import SlackBot
+from vials import StockVial, Vial2, WasteVial
+from wellplate import Well, Wellplate
+
 #from config.config import PATH_TO_LOGS
 
 pump_control_logger = logging.getLogger("e_panda")
@@ -80,7 +82,7 @@ class Pump:
         return syringe_pump
 
     def withdraw(
-        self, volume: float, solution: Optional[Vessel] = None, rate: float = None, weigh: bool = False, results: ExperimentResult = None
+        self, volume: float, solution: Optional[Union[Well, StockVial, WasteVial]] = None, rate: float = None, weigh: bool = False, results: ExperimentResult = None
     ):
         """
         Withdraw the given volume at the given rate and depth from the specified position.
@@ -117,14 +119,19 @@ class Pump:
                 results.pumping_record.append(pumprecord)
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
-            if solution is not None:
+            if isinstance(solution, Vial2):
+                solution: Vial2
                 solution.update_volume(-volume_ul)
                 return None
+            elif isinstance(solution, Well):
+                solution: Well
+                solution.update_volume(-volume_ul)
+                return solution
         else:
             return None
 
     def infuse(
-        self, volume_to_infuse: float, being_infused: Optional[Vessel] = None, infused_into: Optional[Vessel] = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False, results: ExperimentResult = None
+        self, volume_to_infuse: float, being_infused: Optional[Union[Well, StockVial, WasteVial]] = None, infused_into: Optional[Union[Well, StockVial, WasteVial]] = None, rate: float = 0.5, blowout_ul: float = 0.0, weigh: bool = False, results: ExperimentResult = None
     ) ->  int:
         """
         Infuse the given volume at the given rate and depth from the specified position.
@@ -344,7 +351,7 @@ class MockPump(Pump):
         return object()
 
     def withdraw(
-        self, volume: float, solution: Optional[Vessel] = None, rate: float = 0.5, weigh: bool = False, results: ExperimentResult = None
+        self, volume: float, solution: Optional[Union[Well, StockVial, WasteVial]] = None, rate: float = 0.5, weigh: bool = False, results: ExperimentResult = None
     ) -> Optional[float]:
         # Simulate withdraw behavior without sending commands to the pump
         # Update pipette volume, log, and handle exceptions as needed
@@ -376,8 +383,8 @@ class MockPump(Pump):
             return None
 
     def infuse(
-        self, volume_to_infuse: float, being_infused: Optional[Vessel] = None, infused_into: Optional[Vessel] = None, rate: float = 0.5, blowout_ul = 0.0, weigh: bool = False, results: ExperimentResult = None
-    ) -> Optional[Vessel]:
+        self, volume_to_infuse: float, being_infused: Optional[Union[Well, StockVial, WasteVial]] = None, infused_into: Optional[Union[Well, StockVial, WasteVial]] = None, rate: float = 0.5, blowout_ul = 0.0, weigh: bool = False, results: ExperimentResult = None
+    ) -> Optional[Union[Well, StockVial, WasteVial]]:
         """
         Simulate infuse behavior without sending commands to the pump
         Update pipette volume, log, and handle exceptions as needed        
