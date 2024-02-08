@@ -1,0 +1,92 @@
+2024-02-08 11:02:33,996&__main__&DEBUG&mill_control&read_json_config&177&Mill config loaded: {'instrument_offsets': {'electrode': {'x': 40.7, 'y': 26.4, 'z': 0}, 'pipette': {'x': -82.5, 'y': -2.5, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -415, 'y': -300, 'z': -80}, 'electrode_bath': {'x': -409.6, 'y': -34.4, 'z': -50}, 'safe_height_floor': -30}
+2024-02-08 11:02:35,999&__main__&INFO&mill_control&connect_to_mill&145&Mill connected: True
+2024-02-08 11:02:36,000&__main__&DEBUG&mill_control&execute_command&189&Command sent: $H
+2024-02-08 11:02:38,001&__main__&DEBUG&mill_control&execute_command&208&Returned 
+2024-02-08 11:03:08,939&__main__&INFO&mill_control&home&250&Homing completed
+2024-02-08 11:03:08,940&__main__&DEBUG&mill_control&execute_command&189&Command sent: F2000
+2024-02-08 11:03:10,941&__main__&DEBUG&mill_control&execute_command&197&Returned ok
+2024-02-08 11:03:19,637&__main__&INFO&mill_control&current_coordinates&365&MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-02-08 11:03:19,638&__main__&DEBUG&mill_control&current_coordinates&399&current_coordinates: [0.0, 0.0, 0.0]
+2024-02-08 11:03:19,638&__main__&DEBUG&mill_control&safe_move&550&Current coordinates: 0.0, 0.0, 0.0
+2024-02-08 11:03:19,638&__main__&DEBUG&mill_control&safe_move&551&Target coordinates: -220.8, -78.8, -66.0
+2024-02-08 11:03:19,639&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 X-180.10000000000002
+2024-02-08 11:03:21,640&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:26,684&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-3.000,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:26,685&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Y-52.4
+2024-02-08 11:03:28,685&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:29,700&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-55.400,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:29,700&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z-66.0
+2024-02-08 11:03:31,702&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:33,726&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-55.400,-69.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:33,733&__main__&INFO&mill_control&current_coordinates&365&MPos coordinates: X = -180.1, Y = -52.4, Z = -66.0
+2024-02-08 11:03:33,733&__main__&DEBUG&mill_control&current_coordinates&399&current_coordinates: [-180.1, -52.4, -66.0]
+2024-02-08 11:03:33,733&__main__&DEBUG&mill_control&safe_move&550&Current coordinates: -180.1, -52.4, -66.0
+2024-02-08 11:03:33,734&__main__&DEBUG&mill_control&safe_move&551&Target coordinates: -220.8, -176.7, -66.0
+2024-02-08 11:03:33,734&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z0
+2024-02-08 11:03:35,735&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:37,758&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-55.400,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:37,758&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 X-180.10000000000002
+2024-02-08 11:03:39,759&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:40,774&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-55.400,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:40,774&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Y-150.29999999999998
+2024-02-08 11:03:42,775&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:45,807&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-153.300,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:45,807&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z-66.0
+2024-02-08 11:03:47,807&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:49,830&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-153.300,-69.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:49,837&__main__&INFO&mill_control&current_coordinates&365&MPos coordinates: X = -180.1, Y = -150.3, Z = -66.0
+2024-02-08 11:03:49,838&__main__&DEBUG&mill_control&current_coordinates&399&current_coordinates: [-180.1, -150.3, -66.0]
+2024-02-08 11:03:49,838&__main__&DEBUG&mill_control&safe_move&550&Current coordinates: -180.1, -150.3, -66.0
+2024-02-08 11:03:49,838&__main__&DEBUG&mill_control&safe_move&551&Target coordinates: -283.1, -176.7, -66.0
+2024-02-08 11:03:49,839&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z0
+2024-02-08 11:03:51,840&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:53,865&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-183.100,-153.300,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2024-02-08 11:03:53,865&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 X-242.40000000000003
+2024-02-08 11:03:55,866&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:56,883&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-153.300,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:56,883&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Y-150.29999999999998
+2024-02-08 11:03:58,884&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:03:59,898&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-153.300,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:03:59,898&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z-66.0
+2024-02-08 11:04:01,900&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:03,923&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-153.300,-69.000|Bf:15,127|FS:0,0>
+2024-02-08 11:04:03,930&__main__&INFO&mill_control&current_coordinates&365&MPos coordinates: X = -242.4, Y = -150.3, Z = -66.0
+2024-02-08 11:04:03,931&__main__&DEBUG&mill_control&current_coordinates&399&current_coordinates: [-242.4, -150.3, -66.0]
+2024-02-08 11:04:03,931&__main__&DEBUG&mill_control&safe_move&550&Current coordinates: -242.4, -150.3, -66.0
+2024-02-08 11:04:03,931&__main__&DEBUG&mill_control&safe_move&551&Target coordinates: -283.1, -78.8, -66.0
+2024-02-08 11:04:03,932&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z0
+2024-02-08 11:04:05,933&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:07,958&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-153.300,-3.000|Bf:15,127|FS:0,0|Ov:100,100,100>
+2024-02-08 11:04:07,958&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 X-242.40000000000003
+2024-02-08 11:04:09,960&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:10,975&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-153.300,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:04:10,975&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Y-52.4
+2024-02-08 11:04:12,976&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:16,007&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-55.400,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:04:16,007&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z-66.0
+2024-02-08 11:04:18,008&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:20,032&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-55.400,-69.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2024-02-08 11:04:31,806&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z0
+2024-02-08 11:04:33,808&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:35,830&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-55.400,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:04:35,831&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z0
+2024-02-08 11:04:37,832&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:38,847&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-245.400,-55.400,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:04:38,854&__main__&INFO&mill_control&current_coordinates&365&MPos coordinates: X = -242.4, Y = -52.4, Z = 0.0
+2024-02-08 11:04:38,854&__main__&DEBUG&mill_control&current_coordinates&399&current_coordinates: [-242.4, -52.4, 0.0]
+2024-02-08 11:04:38,854&__main__&DEBUG&mill_control&safe_move&550&Current coordinates: -242.4, -52.4, 0.0
+2024-02-08 11:04:38,854&__main__&DEBUG&mill_control&safe_move&551&Target coordinates: -409.6, -34.4, -50
+2024-02-08 11:04:38,855&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 X-368.90000000000003
+2024-02-08 11:04:40,856&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:43,888&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-371.900,-55.400,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2024-02-08 11:04:43,888&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Y-8.0
+2024-02-08 11:04:45,890&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:46,905&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-371.900,-11.000,-3.000|Bf:15,127|FS:0,0>
+2024-02-08 11:04:46,905&__main__&DEBUG&mill_control&execute_command&189&Command sent: G01 Z-50
+2024-02-08 11:04:48,906&__main__&DEBUG&mill_control&execute_command&203&Initially ok
+2024-02-08 11:04:49,920&__main__&DEBUG&mill_control&execute_command&206&Returned <Idle|MPos:-371.900,-11.000,-53.000|Bf:15,127|FS:0,0>
+2024-02-08 11:04:49,920&__main__&INFO&mill_control&__exit__&159&Exiting the mill context manager
+2024-02-08 11:04:49,920&__main__&DEBUG&mill_control&__exit__&160&Disconnecting from the mill
+2024-02-08 11:04:49,920&__main__&INFO&mill_control&disconnect&165&Disconnecting from the mill
+2024-02-08 11:05:04,922&__main__&INFO&mill_control&disconnect&168&Mill connected: False
+2024-02-08 11:05:04,922&__main__&INFO&mill_control&movement_test&1058&Exiting program.
