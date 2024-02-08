@@ -92,19 +92,19 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
         ## Establish state of system - we do this each time because each experiment changes the system state
         stock_vials, waste_vials, wellplate = establish_system_state()
 
-        ## Flush the pipette tip with water before we start
-        # obs.place_text_on_screen("Initial flushing of pipette tip")
-        # e_panda.flush_v2(
-        #     stock_vials=stock_vials,
-        #     waste_vials=waste_vials,
-        #     flush_solution_name="rinse0",
-        #     flush_volume=140,
-        #     pump=toolkit.pump,
-        #     mill=toolkit.mill,
-        # )
-        # ## Update the system state with new vial and wellplate information
-        # update_vial_state_file(stock_vials, STOCK_STATUS)
-        # update_vial_state_file(waste_vials, WASTE_STATUS)
+        # Flush the pipette tip with water before we start
+        obs.place_text_on_screen("Initial flushing of pipette tip")
+        e_panda.flush_v2(
+            stock_vials=stock_vials,
+            waste_vials=waste_vials,
+            flush_solution_name="rinse0",
+            flush_volume=140,
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+        )
+        ## Update the system state with new vial and wellplate information
+        update_vial_state_file(stock_vials, STOCK_STATUS)
+        update_vial_state_file(waste_vials, WASTE_STATUS)
 
         ## Begin outer loop
         while True:
