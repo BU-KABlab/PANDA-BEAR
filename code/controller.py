@@ -489,4 +489,4 @@ if __name__ == "__main__":
     #wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
     print("TEST MODE: ", TESTING)
     input("Press enter to continue or ctrl+c to exit")
-    main(use_mock_instruments=TESTING)
+    main(use_mock_instruments=TESTING, one_off=True)

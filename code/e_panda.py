@@ -261,7 +261,7 @@ def forward_pipette_v2(
                     to_vessel: WasteVial = to_vessel
                     contents = from_vessel.get_contents().items()
                     for key, value in contents:
-                        to_vessel.update_contents(key, value)
+                        to_vessel.update_contents(key, repetition_vol)
 
                 logger.info(
                     "Vessel %s volume: %f depth: %f",

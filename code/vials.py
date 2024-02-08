@@ -271,6 +271,10 @@ class WasteVial(Vial2):
         else:
             self.contents[solution_name] = volume
         vial_logger.debug("%s %s: New contents: %s", self.name, self.position, self.contents)
+
+        # Update the file
+        update_vial_state_file([self], WASTE_STATUS)
+        
         return self
 
 def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
@@ -321,7 +325,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
 
 def update_vial_state_file(vial_objects: Sequence[Vial2], filename):
     """
-    Update the vials in the json file. This is used to update the volume and contamination of the vials
+    Update the vials in the json file. This is used to update the volume, contents, and contamination of the vials
     """
     filename_ob = Path.cwd() / filename
     with open(filename_ob, "r", encoding="UTF-8") as file:

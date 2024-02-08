@@ -92,6 +92,11 @@ Well: {well_id}'''
         except OBSerror.OBSSDKRequestError as e:
             self.logger.error("Error stopping recording: %s", e)
 
+    def set_recording_file_name(self, file_name: str):
+        ''' Set the recording file name'''
+        record_directory = self.client.get_record_directory()
+        return record_directory.record_directory
+        # record_name = self.client.get_recor
 
 if __name__ == "__main__":
     exp = ExperimentBase(

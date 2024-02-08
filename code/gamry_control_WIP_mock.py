@@ -46,17 +46,21 @@ class GamryPotentiostat:
         global COMPLETE_FILE_NAME
         if project_campaign_id is None and campaign_id is None and well_id is None:
             file_name = f"{experiment_id}_{experiment_type}"
-            filepath: pathlib.Path = (PATH_TO_DATA / file_name).with_suffix(".txt")
-            i = 0
+            file_name = file_name.replace(" ", "_")
+            file_name_start = file_name + "_0"
+            filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(".txt")
+            i = 1
             while filepath.exists():
                 next_file_name = f"{file_name}_{i}"
                 filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
                 i += 1
         else:
             file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
-            filepath: pathlib.Path = (PATH_TO_DATA / file_name).with_suffix(".txt")
+            file_name = file_name.replace(" ", "_")
+            file_name_start = file_name + "_0"
+            filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(".txt")
             # Check if the file already exists. If it does then add a number to the end of the file name
-            i = 0
+            i = 1
             while filepath.exists():
                 next_file_name = f"{file_name}_{i}"
                 filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
