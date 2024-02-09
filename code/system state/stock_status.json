@@ -12,9 +12,9 @@
         "height": -20,
         "depth": 0,
         "name": "5mm_fecn6",
-        "volume": 8786.159999999974,
+        "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 88,
+        "contamination": 0,
         "coordinates": {
             "x": -4,
             "y": -38,
@@ -34,7 +34,7 @@
         "height": -20,
         "depth": 0,
         "name": "10mm_fecn6",
-        "volume": 19599.01999999999,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 6,
         "coordinates": {
@@ -56,7 +56,7 @@
         "height": -20,
         "depth": 0,
         "name": "electrolyte",
-        "volume": 19599.01999999999,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 6,
         "coordinates": {
@@ -78,7 +78,7 @@
         "height": -20,
         "depth": 0,
         "name": "rinse0",
-        "volume": 15780.0,
+        "volume": 20000.0,
         "capacity": 20000,
         "contamination": 34,
         "coordinates": {
