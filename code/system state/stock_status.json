@@ -80,7 +80,7 @@
         "name": "rinse0",
         "volume": 20000.0,
         "capacity": 20000,
-        "contamination": 34,
+        "contamination": 35,
         "coordinates": {
             "x": -4,
             "y": -138,

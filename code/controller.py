@@ -95,19 +95,19 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         ## Establish state of system - we do this each time because each experiment changes the system state
         stock_vials, waste_vials, wellplate = establish_system_state()
 
-        ## Flush the pipette tip with water before we start
-        # obs.place_text_on_screen("Initial flushing of pipette tip")
-        # e_panda.flush_v2(
-        #     stock_vials=stock_vials,
-        #     waste_vials=waste_vials,
-        #     flush_solution_name="rinse0",
-        #     flush_volume=140,
-        #     pump=toolkit.pump,
-        #     mill=toolkit.mill,
-        # )
-        # ## Update the system state with new vial and wellplate information
-        # update_vial_state_file(stock_vials, STOCK_STATUS)
-        # update_vial_state_file(waste_vials, WASTE_STATUS)
+        # Flush the pipette tip with water before we start
+        obs.place_text_on_screen("Initial flushing of pipette tip")
+        e_panda.flush_v2(
+            stock_vials=stock_vials,
+            waste_vials=waste_vials,
+            flush_solution_name="rinse0",
+            flush_volume=140,
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+        )
+        ## Update the system state with new vial and wellplate information
+        update_vial_state_file(stock_vials, STOCK_STATUS)
+        update_vial_state_file(waste_vials, WASTE_STATUS)
 
         ## Begin outer loop
         while True:
@@ -248,13 +248,12 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
             scheduler.remove_from_queue(new_experiment)
             new_experiment = None # reset new_experiment to None so that we can check the queue again
-            if one_off:
-                break  # break out of the while True loop
-
+            
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)
             update_vial_state_file(waste_vials, WASTE_STATUS)
-
+            if one_off:
+                break  # break out of the while True loop
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status(ExperimentStatus.ERROR)
@@ -484,4 +483,4 @@ if __name__ == "__main__":
     #wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
     print("TEST MODE: ", TESTING)
     input("Press enter to continue or ctrl+c to exit")
-    main(use_mock_instruments=TESTING, one_off=True)
+    main(use_mock_instruments=TESTING, one_off=False)

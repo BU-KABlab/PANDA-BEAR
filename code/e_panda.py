@@ -183,7 +183,7 @@ def forward_pipette_v2(
                 rate=pumping_rate,
                 weigh=False,
             )  # pipette now has air gap + repitition vol
-            if isinstance(from_vessel, Well):
+            if isinstance(from_vessel, Well): # We only update well contents since stock has fixed contents
                 from_vessel: Well = from_vessel
                 # We are removing solution from a well and assume an even mixture of all contents
                 # The repetition volume removes each content proportional to its ratio
@@ -924,8 +924,11 @@ def image_well(
             )
         else:
             pass
-
-        capture_new_image(save=True, num_images=1, file_name=filepath)
+        
+        if TESTING:
+            Path(filepath).touch()
+        else:
+            capture_new_image(save=True, num_images=1, file_name=filepath)
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
         # logger.info("Uploading image of well %s to OBS", instructions.well_id)

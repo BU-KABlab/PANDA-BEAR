@@ -6291,3 +6291,1295 @@
 2024-02-07 19:40:16,613&__main__&INFO&controller&disconnect_from_instruments&484&&&&Disconnecting from instruments:&
 2024-02-07 19:40:16,613&__main__&INFO&controller&disconnect_from_instruments&487&&&&Disconnected from instruments&
 2024-02-07 19:41:25,612&e_panda&INFO&slack_functions2&send_slack_message&50&None&None&None&Message sent:ePANDA is shutting down...goodbye&True
+2024-02-08 11:13:54,698&scheduler&DEBUG&scheduler&change_well_status&98&&&&Changing well G5 status to queued&
+2024-02-08 11:13:54,712&scheduler&INFO&scheduler&change_well_status&116&&&&Well G5 status changed to queued&
+2024-02-08 11:13:54,712&scheduler&INFO&scheduler&add_nonfile_experiment&460&&&&Experiment 10000485 added to queue&
+2024-02-08 11:13:54,717&scheduler&DEBUG&scheduler&change_well_status&98&&&&Changing well G6 status to queued&
+2024-02-08 11:13:54,730&scheduler&INFO&scheduler&change_well_status&116&&&&Well G6 status changed to queued&
+2024-02-08 11:13:54,730&scheduler&INFO&scheduler&add_nonfile_experiment&460&&&&Experiment 10000486 added to queue&
+2024-02-08 11:13:54,734&scheduler&DEBUG&scheduler&change_well_status&98&&&&Changing well G7 status to queued&
+2024-02-08 11:13:54,747&scheduler&INFO&scheduler&change_well_status&116&&&&Well G7 status changed to queued&
+2024-02-08 11:13:54,747&scheduler&INFO&scheduler&add_nonfile_experiment&460&&&&Experiment 10000487 added to queue&
+2024-02-08 11:14:11,704&e_panda&INFO&slack_functions2&send_slack_message&50&None&None&None&Message sent:ePANDA is starting up&True
+2024-02-08 11:14:11,709&__main__&INFO&controller&connect_to_instruments&449&&&&Using mock instruments&
+2024-02-08 11:14:11,711&__main__&INFO&controller&main&86&&&&Connected to instruments&
+2024-02-08 11:14:11,711&e_panda&INFO&slack_functions2&send_slack_message&50&None&None&None&Message sent:ePANDA has connected to equipment&True
+2024-02-08 11:14:11,717&e_panda&DEBUG&wellplate&update_well_status_from_json_file&273&None&None&None&Updating well status's from file...&True
+2024-02-08 11:14:11,717&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A1 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A2 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A3 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A4 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A5 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A6 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A7 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A8 updated from file&True
+2024-02-08 11:14:11,718&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A9 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A10 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A11 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A12 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B1 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B2 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B3 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B4 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B5 updated from file&True
+2024-02-08 11:14:11,719&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B6 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B7 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B8 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B9 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B10 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B11 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B12 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C1 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C2 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C3 updated from file&True
+2024-02-08 11:14:11,720&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C4 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C5 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C6 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C7 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C8 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C9 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C10 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C11 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C12 updated from file&True
+2024-02-08 11:14:11,721&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D1 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D2 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D3 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D4 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D5 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D6 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D7 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D8 updated from file&True
+2024-02-08 11:14:11,722&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D9 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D10 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D11 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D12 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E1 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E2 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E3 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E4 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E5 updated from file&True
+2024-02-08 11:14:11,723&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E6 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E7 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E8 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E9 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E10 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E11 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E12 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F1 updated from file&True
+2024-02-08 11:14:11,724&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F2 updated from file&True
+2024-02-08 11:14:11,725&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F3 updated from file&True
+2024-02-08 11:14:11,725&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F4 updated from file&True
+2024-02-08 11:14:11,725&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F5 updated from file&True
+2024-02-08 11:14:11,725&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F6 updated from file&True
+2024-02-08 11:14:11,725&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F7 updated from file&True
+2024-02-08 11:14:11,725&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F8 updated from file&True
+2024-02-08 11:14:11,726&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F9 updated from file&True
+2024-02-08 11:14:11,726&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F10 updated from file&True
+2024-02-08 11:14:11,726&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F11 updated from file&True
+2024-02-08 11:14:11,726&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F12 updated from file&True
+2024-02-08 11:14:11,726&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G1 updated from file&True
+2024-02-08 11:14:11,726&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G2 updated from file&True
+2024-02-08 11:14:11,726&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G3 updated from file&True
+2024-02-08 11:14:11,727&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G4 updated from file&True
+2024-02-08 11:14:11,727&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G5 updated from file&True
+2024-02-08 11:14:11,727&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G6 updated from file&True
+2024-02-08 11:14:11,727&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G7 updated from file&True
+2024-02-08 11:14:11,727&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G8 updated from file&True
+2024-02-08 11:14:11,727&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G9 updated from file&True
+2024-02-08 11:14:11,727&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G10 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G11 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G12 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H1 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H2 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H3 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H4 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H5 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H6 updated from file&True
+2024-02-08 11:14:11,728&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H7 updated from file&True
+2024-02-08 11:14:11,729&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H8 updated from file&True
+2024-02-08 11:14:11,729&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H9 updated from file&True
+2024-02-08 11:14:11,729&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H10 updated from file&True
+2024-02-08 11:14:11,729&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H11 updated from file&True
+2024-02-08 11:14:11,729&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H12 updated from file&True
+2024-02-08 11:14:11,729&__main__&INFO&controller&establish_system_state&318&&&&System state established&
+2024-02-08 11:14:11,729&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial 5mm_fecn6 contains 5mm_fecn6 with volume 9000&
+2024-02-08 11:14:11,730&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial 10mm_fecn6 contains 10mm_fecn6 with volume 10000&
+2024-02-08 11:14:11,730&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial electrolyte contains electrolyte with volume 19599&
+2024-02-08 11:14:11,730&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial rinse0 contains rinse0 with volume 15780&
+2024-02-08 11:14:11,730&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial water contains water with volume 20000&
+2024-02-08 11:14:11,730&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-02-08 11:14:11,730&__main__&DEBUG&controller&establish_system_state&348&&&&Waste vial waste contains {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43} with volume 17235&
+2024-02-08 11:14:11,730&__main__&DEBUG&controller&establish_system_state&348&&&&Waste vial waste contains {} with volume 1000&
+2024-02-08 11:14:11,731&__main__&INFO&controller&establish_system_state&388&&&&There are 54 clear wells&
+2024-02-08 11:14:11,734&e_panda&INFO&e_panda&flush_v2&566&None&None&None&Flushing pipette tip with 140.000000 ul of rinse0...&True
+2024-02-08 11:14:11,734&e_panda&DEBUG&e_panda&solution_selector&615&None&None&None&Selected stock vial: rinse0 in position s3&True
+2024-02-08 11:14:11,734&e_panda&DEBUG&e_panda&waste_selector&642&None&None&None&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:11,734&e_panda&INFO&e_panda&forward_pipette_v2&124&None&None&None&Forward pipetting 140.000000 ul from rinse0 to waste&True
+2024-02-08 11:14:11,734&e_panda&INFO&e_panda&forward_pipette_v2&147&None&None&None&Repetition 1 of 1&True
+2024-02-08 11:14:11,734&e_panda&DEBUG&e_panda&forward_pipette_v2&149&None&None&None&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:11,735&e_panda&DEBUG&pump_control&run_pump&449&None&None&None&Withdrawing 0.040000 ml at 0.500000 mL/min...&True
+2024-02-08 11:14:11,786&e_panda&DEBUG&pump_control&run_pump&451&None&None&None&Done Withdrawing&True
+2024-02-08 11:14:11,837&e_panda&DEBUG&pump_control&run_pump&472&None&None&None&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:11,837&e_panda&INFO&pump_control&withdraw&372&None&None&None&Pump has withdrawn: 0.040000 ml at 0.500000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:11,837&e_panda&INFO&e_panda&forward_pipette_v2&160&None&None&None&Moving to rinse0 at s3...&True
+2024-02-08 11:14:11,838&e_panda&DEBUG&pump_control&run_pump&449&None&None&None&Withdrawing 0.140000 ml at 0.500000 mL/min...&True
+2024-02-08 11:14:11,889&e_panda&DEBUG&pump_control&run_pump&451&None&None&None&Done Withdrawing&True
+2024-02-08 11:14:11,939&e_panda&DEBUG&pump_control&run_pump&472&None&None&None&Pump has withdrawn: 0.14 ml&True
+2024-02-08 11:14:11,939&e_panda&INFO&pump_control&withdraw&372&None&None&None&Pump has withdrawn: 0.140000 ml at 0.500000mL/min  Pipette vol: 180.000 ul&True
+2024-02-08 11:14:11,939&e_panda&DEBUG&vials&update_volume&148&None&None&None&rinse0: New volume: 15640.0 | New depth: -74&True
+2024-02-08 11:14:11,939&e_panda&DEBUG&pump_control&run_pump&449&None&None&None&Withdrawing 0.005000 ml at 0.500000 mL/min...&True
+2024-02-08 11:14:11,990&e_panda&DEBUG&pump_control&run_pump&451&None&None&None&Done Withdrawing&True
+2024-02-08 11:14:12,041&e_panda&DEBUG&pump_control&run_pump&472&None&None&None&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:12,041&e_panda&INFO&pump_control&withdraw&372&None&None&None&Pump has withdrawn: 0.005000 ml at 0.500000mL/min  Pipette vol: 185.000 ul&True
+2024-02-08 11:14:12,041&e_panda&DEBUG&e_panda&forward_pipette_v2&216&None&None&None&From Vessel rinse0 volume: 15640.000000 depth: -74.000000&True
+2024-02-08 11:14:12,041&e_panda&INFO&e_panda&forward_pipette_v2&223&None&None&None&Moving to: waste...&True
+2024-02-08 11:14:12,042&e_panda&DEBUG&pump_control&run_pump&449&None&None&None&Infusing 0.140000 ml at 0.500000 mL/min...&True
+2024-02-08 11:14:12,093&e_panda&DEBUG&pump_control&run_pump&451&None&None&None&Done Infusing&True
+2024-02-08 11:14:12,144&e_panda&DEBUG&pump_control&run_pump&472&None&None&None&Pump has infused: 0.14 ml&True
+2024-02-08 11:14:12,144&e_panda&INFO&pump_control&infuse&414&None&None&None&Pump has infused: 0.140000 ml (0.500000 of solution) at 0.095000mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:12,144&e_panda&DEBUG&vials&update_volume&148&None&None&None&waste: New volume: 17375.800000000014 | New depth: -74&True
+2024-02-08 11:14:12,144&e_panda&ERROR&e_panda&forward_pipette_v2&273&None&None&None&Error occurred while updating vessel contents: 'StockVial' object has no attribute 'get_contents'&True
+2024-02-08 11:14:12,145&e_panda&ERROR&e_panda&forward_pipette_v2&274&None&None&None&Not critical, continuing....&True
+2024-02-08 11:14:12,145&e_panda&INFO&e_panda&flush_v2&586&None&None&None&Flushed pipette tip with 140.000000 ul of rinse0 1x times...&True
+2024-02-08 11:14:12,157&e_panda&DEBUG&wellplate&update_well_status_from_json_file&273&None&None&None&Updating well status's from file...&True
+2024-02-08 11:14:12,158&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A1 updated from file&True
+2024-02-08 11:14:12,158&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A2 updated from file&True
+2024-02-08 11:14:12,158&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A3 updated from file&True
+2024-02-08 11:14:12,158&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A4 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A5 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A6 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A7 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A8 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A9 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A10 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A11 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well A12 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B1 updated from file&True
+2024-02-08 11:14:12,159&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B2 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B3 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B4 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B5 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B6 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B7 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B8 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B9 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B10 updated from file&True
+2024-02-08 11:14:12,160&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B11 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well B12 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C1 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C2 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C3 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C4 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C5 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C6 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C7 updated from file&True
+2024-02-08 11:14:12,161&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C8 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C9 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C10 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C11 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well C12 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D1 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D2 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D3 updated from file&True
+2024-02-08 11:14:12,162&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D4 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D5 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D6 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D7 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D8 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D9 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D10 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D11 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well D12 updated from file&True
+2024-02-08 11:14:12,163&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E1 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E2 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E3 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E4 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E5 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E6 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E7 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E8 updated from file&True
+2024-02-08 11:14:12,164&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E9 updated from file&True
+2024-02-08 11:14:12,165&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E10 updated from file&True
+2024-02-08 11:14:12,165&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E11 updated from file&True
+2024-02-08 11:14:12,165&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well E12 updated from file&True
+2024-02-08 11:14:12,165&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F1 updated from file&True
+2024-02-08 11:14:12,165&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F2 updated from file&True
+2024-02-08 11:14:12,165&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F3 updated from file&True
+2024-02-08 11:14:12,165&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F4 updated from file&True
+2024-02-08 11:14:12,166&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F5 updated from file&True
+2024-02-08 11:14:12,166&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F6 updated from file&True
+2024-02-08 11:14:12,166&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F7 updated from file&True
+2024-02-08 11:14:12,166&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F8 updated from file&True
+2024-02-08 11:14:12,166&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F9 updated from file&True
+2024-02-08 11:14:12,166&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F10 updated from file&True
+2024-02-08 11:14:12,166&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F11 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well F12 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G1 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G2 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G3 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G4 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G5 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G6 updated from file&True
+2024-02-08 11:14:12,167&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G7 updated from file&True
+2024-02-08 11:14:12,168&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G8 updated from file&True
+2024-02-08 11:14:12,168&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G9 updated from file&True
+2024-02-08 11:14:12,168&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G10 updated from file&True
+2024-02-08 11:14:12,168&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G11 updated from file&True
+2024-02-08 11:14:12,168&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well G12 updated from file&True
+2024-02-08 11:14:12,168&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H1 updated from file&True
+2024-02-08 11:14:12,168&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H2 updated from file&True
+2024-02-08 11:14:12,169&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H3 updated from file&True
+2024-02-08 11:14:12,169&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H4 updated from file&True
+2024-02-08 11:14:12,169&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H5 updated from file&True
+2024-02-08 11:14:12,169&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H6 updated from file&True
+2024-02-08 11:14:12,169&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H7 updated from file&True
+2024-02-08 11:14:12,169&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H8 updated from file&True
+2024-02-08 11:14:12,170&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H9 updated from file&True
+2024-02-08 11:14:12,170&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H10 updated from file&True
+2024-02-08 11:14:12,170&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H11 updated from file&True
+2024-02-08 11:14:12,170&e_panda&DEBUG&wellplate&update_well_status_from_json_file&286&None&None&None&Well H12 updated from file&True
+2024-02-08 11:14:12,170&__main__&INFO&controller&establish_system_state&318&&&&System state established&
+2024-02-08 11:14:12,170&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial 5mm_fecn6 contains 5mm_fecn6 with volume 9000&
+2024-02-08 11:14:12,170&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial 10mm_fecn6 contains 10mm_fecn6 with volume 10000&
+2024-02-08 11:14:12,171&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial electrolyte contains electrolyte with volume 19599&
+2024-02-08 11:14:12,171&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial rinse0 contains rinse0 with volume 15640&
+2024-02-08 11:14:12,171&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial water contains water with volume 20000&
+2024-02-08 11:14:12,171&__main__&DEBUG&controller&establish_system_state&322&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-02-08 11:14:12,171&__main__&DEBUG&controller&establish_system_state&348&&&&Waste vial waste contains {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43} with volume 17375&
+2024-02-08 11:14:12,171&__main__&DEBUG&controller&establish_system_state&348&&&&Waste vial waste contains {} with volume 1000&
+2024-02-08 11:14:12,172&__main__&INFO&controller&establish_system_state&388&&&&There are 54 clear wells&
+2024-02-08 11:14:12,228&scheduler&INFO&scheduler&read_next_experiment_from_queue&312&&&&Experiment 10000485 read from queue&
+2024-02-08 11:14:12,228&__main__&INFO&controller&main&186&&&&Running experiment 10000485&
+2024-02-08 11:14:12,229&e_panda&INFO&slack_functions2&send_slack_message&50&None&None&None&Message sent:Running experiment 10000485&True
+2024-02-08 11:14:12,236&scheduler&DEBUG&scheduler&change_well_status_v2&124&&&&Changing Well G5 with volume 0.0 and status queued status to queued&
+2024-02-08 11:14:12,251&scheduler&INFO&scheduler&change_well_status_v2&147&&&&Well G5 with volume 0.0 and status running status changed to running&
+2024-02-08 11:14:12,251&__main__&INFO&controller&main&209&&&&Beginning experiment 10000485&
+2024-02-08 11:14:12,263&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&55&&&&Applying correction factor to the programmed volumes&
+2024-02-08 11:14:12,263&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:12,263&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&65&&&&Correction factor applied to the programmed volumes&
+2024-02-08 11:14:12,263&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&66&&&&Corrected volumes: {'5mm_fecn6': 127.43}&
+2024-02-08 11:14:12,263&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&67&&&&Original volumes: {'5mm_fecn6': 120}&
+2024-02-08 11:14:12,264&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 1 of 10&
+2024-02-08 11:14:12,264&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:12,270&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:12,270&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:12,271&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:13,948&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:13,948&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:13,954&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:13,954&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:13,954&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:13,955&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:13,955&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:13,955&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:14,006&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:14,057&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:14,057&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:14,057&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:14,057&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:14,108&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:14,159&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:14,159&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:14,159&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 8872.57 | New depth: -74&True
+2024-02-08 11:14:14,159&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:14,210&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:14,261&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:14,261&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:14,261&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 8872.570000 depth: -74.000000&True
+2024-02-08 11:14:14,261&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:14,261&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:14,262&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:14,262&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:14,313&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:14,364&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:14,364&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:14,364&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:14,364&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:14,364&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:14,364&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:14,364&e_panda&DEBUG&wellplate&update_contents&77&12.4&10000485&G5&New G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:14,364&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:14,365&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:14,378&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:14,378&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:14,379&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:14,379&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:14,380&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:14,380&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:14,380&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:14,392&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:17,400&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:17,407&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:17,407&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:17,407&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:17,407&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:17,407&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:17,458&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:17,509&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:17,509&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:17,509&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:17,509&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:17,560&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:17,610&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:17,610&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:17,611&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:17,611&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:17,611&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:17,611&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:17,611&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:17,612&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:17,625&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:17,625&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:17,625&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:17,676&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:17,727&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:17,727&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:17,727&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:17,727&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:17,727&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:17,778&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:17,829&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:17,829&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:17,829&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 17503.230000000014 | New depth: -74&True
+2024-02-08 11:14:17,829&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:17,829&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 127.43}&True
+2024-02-08 11:14:17,833&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 17503.230000 depth: -74.000000&True
+2024-02-08 11:14:17,834&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 1 of 10 complete&
+2024-02-08 11:14:17,834&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 2 of 10&
+2024-02-08 11:14:17,834&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:17,841&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:17,841&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:17,841&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:19,409&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:19,409&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:19,416&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:19,416&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:19,416&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:19,416&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:19,416&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:19,416&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:19,467&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:19,518&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:19,518&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:19,518&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:19,518&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:19,569&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:19,620&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:19,620&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:19,620&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 8745.14 | New depth: -74&True
+2024-02-08 11:14:19,620&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:19,671&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:19,722&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:19,722&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:19,722&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 8745.140000 depth: -74.000000&True
+2024-02-08 11:14:19,722&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:19,722&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:19,722&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:19,723&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:19,774&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:19,825&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:19,825&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:19,825&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:19,825&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:19,825&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:19,825&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:19,825&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:19,825&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:19,826&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:19,839&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:19,839&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:19,840&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:19,840&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:19,841&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:19,841&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:19,841&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:19,853&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:22,862&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:22,868&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:22,868&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:22,868&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:22,868&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:22,868&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:22,919&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:22,970&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:22,970&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:22,970&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:22,970&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:23,021&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:23,072&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:23,072&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:23,072&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:23,072&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:23,072&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:23,072&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:23,073&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:23,073&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:23,087&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:23,087&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:23,087&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:23,138&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:23,189&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:23,189&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:23,189&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:23,189&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:23,189&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:23,240&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:23,291&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:23,291&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:23,291&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 17630.660000000014 | New depth: -74&True
+2024-02-08 11:14:23,291&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:23,291&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 254.86}&True
+2024-02-08 11:14:23,295&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 17630.660000 depth: -74.000000&True
+2024-02-08 11:14:23,295&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 2 of 10 complete&
+2024-02-08 11:14:23,296&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 3 of 10&
+2024-02-08 11:14:23,296&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:23,302&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:23,302&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:23,303&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:24,892&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:24,893&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:24,899&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:24,899&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:24,899&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:24,900&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:24,900&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:24,900&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:24,951&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:25,001&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:25,001&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:25,002&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:25,002&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:25,053&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:25,103&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:25,103&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:25,103&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 8617.71 | New depth: -74&True
+2024-02-08 11:14:25,103&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:25,154&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:25,205&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:25,205&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:25,205&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 8617.710000 depth: -74.000000&True
+2024-02-08 11:14:25,205&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:25,205&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:25,205&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:25,206&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:25,257&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:25,308&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:25,308&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:25,308&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:25,308&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:25,308&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:25,308&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:25,308&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:25,309&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:25,309&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:25,322&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:25,323&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:25,323&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:25,324&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:25,324&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:25,324&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:25,324&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:25,336&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:28,344&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:28,351&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:28,351&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:28,351&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:28,351&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:28,351&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:28,402&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:28,453&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:28,453&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:28,453&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:28,453&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:28,504&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:28,555&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:28,555&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:28,555&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:28,555&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:28,555&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:28,555&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:28,556&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:28,556&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:28,569&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:28,569&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:28,569&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:28,620&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:28,671&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:28,671&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:28,671&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:28,671&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:28,671&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:28,722&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:28,773&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:28,773&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:28,773&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 17758.090000000015 | New depth: -74&True
+2024-02-08 11:14:28,773&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:28,773&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 382.29}&True
+2024-02-08 11:14:28,778&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 17758.090000 depth: -74.000000&True
+2024-02-08 11:14:28,778&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 3 of 10 complete&
+2024-02-08 11:14:28,778&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 4 of 10&
+2024-02-08 11:14:28,779&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:28,784&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:28,784&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:28,785&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:30,427&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:30,427&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:30,434&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:30,434&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:30,434&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:30,434&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:30,434&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:30,434&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:30,485&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:30,536&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:30,536&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:30,536&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:30,538&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:30,588&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:30,639&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:30,639&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:30,639&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 8490.279999999999 | New depth: -74&True
+2024-02-08 11:14:30,639&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:30,690&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:30,741&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:30,741&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:30,741&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 8490.280000 depth: -74.000000&True
+2024-02-08 11:14:30,741&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:30,741&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:30,742&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:30,742&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:30,793&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:30,844&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:30,844&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:30,844&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:30,844&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:30,844&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:30,844&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:30,844&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:30,845&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:30,845&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:30,858&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:30,859&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:30,859&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:30,860&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:30,860&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:30,860&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:30,860&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:30,873&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:33,882&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:33,888&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:33,888&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:33,888&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:33,888&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:33,888&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:33,939&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:33,989&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:33,989&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:33,989&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:33,989&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:34,040&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:34,091&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:34,091&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:34,091&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:34,091&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:34,091&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:34,091&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:34,091&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:34,093&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:34,106&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:34,106&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:34,107&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:34,158&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:34,208&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:34,208&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:34,208&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:34,208&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:34,208&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:34,259&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:34,310&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:34,310&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:34,310&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 17885.520000000015 | New depth: -74&True
+2024-02-08 11:14:34,310&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:34,310&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 509.72}&True
+2024-02-08 11:14:34,314&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 17885.520000 depth: -74.000000&True
+2024-02-08 11:14:34,315&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 4 of 10 complete&
+2024-02-08 11:14:34,315&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 5 of 10&
+2024-02-08 11:14:34,316&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:34,321&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:34,321&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:34,322&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:35,964&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:35,965&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:35,972&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:35,972&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:35,972&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:35,972&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:35,972&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:35,973&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:36,024&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:36,074&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:36,074&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:36,074&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:36,074&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:36,126&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:36,177&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:36,177&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:36,177&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 8362.849999999999 | New depth: -74&True
+2024-02-08 11:14:36,177&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:36,228&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:36,279&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:36,279&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:36,279&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 8362.850000 depth: -74.000000&True
+2024-02-08 11:14:36,279&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:36,280&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:36,280&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:36,280&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:36,331&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:36,382&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:36,382&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:36,382&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:36,382&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:36,382&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:36,382&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:36,383&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:36,383&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:36,383&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:36,397&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:36,397&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:36,398&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:36,398&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:36,398&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:36,398&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:36,399&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:36,414&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:39,425&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:39,431&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:39,431&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:39,431&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:39,431&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:39,431&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:39,482&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:39,533&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:39,533&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:39,533&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:39,533&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:39,584&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:39,635&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:39,635&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:39,635&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:39,635&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:39,635&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:39,635&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:39,636&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:39,636&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:39,649&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:39,650&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:39,650&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:39,701&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:39,751&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:39,751&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:39,752&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:39,752&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:39,752&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:39,803&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:39,854&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:39,854&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:39,854&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 18012.950000000015 | New depth: -74&True
+2024-02-08 11:14:39,854&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:39,854&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 637.1500000000001}&True
+2024-02-08 11:14:39,858&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 18012.950000 depth: -74.000000&True
+2024-02-08 11:14:39,859&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 5 of 10 complete&
+2024-02-08 11:14:39,859&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 6 of 10&
+2024-02-08 11:14:39,859&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:39,865&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:39,865&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:39,866&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:41,496&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:41,496&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:41,503&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:41,503&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:41,503&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:41,504&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:41,504&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:41,504&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:41,556&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:41,607&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:41,607&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:41,607&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:41,607&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:41,658&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:41,709&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:41,709&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:41,709&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 8235.419999999998 | New depth: -74&True
+2024-02-08 11:14:41,709&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:41,760&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:41,811&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:41,811&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:41,811&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 8235.420000 depth: -74.000000&True
+2024-02-08 11:14:41,811&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:41,811&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:41,811&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:41,812&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:41,863&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:41,914&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:41,914&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:41,914&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:41,914&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:41,914&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:41,914&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:41,914&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:41,915&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:41,915&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:41,928&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:41,928&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:41,929&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:41,929&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:41,929&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:41,929&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:41,929&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:41,942&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:44,950&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:44,956&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:44,956&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:44,956&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:44,957&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:44,957&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:45,008&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:45,059&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:45,059&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:45,059&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:45,059&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:45,110&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:45,161&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:45,161&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:45,161&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:45,161&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:45,161&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:45,161&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:45,161&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:45,163&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:45,176&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:45,176&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:45,176&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:45,227&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:45,278&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:45,278&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:45,278&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:45,278&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:45,278&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:45,330&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:45,381&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:45,381&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:45,381&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 18140.380000000016 | New depth: -74&True
+2024-02-08 11:14:45,381&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:45,381&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 764.5800000000002}&True
+2024-02-08 11:14:45,385&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 18140.380000 depth: -74.000000&True
+2024-02-08 11:14:45,385&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 6 of 10 complete&
+2024-02-08 11:14:45,386&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 7 of 10&
+2024-02-08 11:14:45,386&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:45,392&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:45,392&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:45,393&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:46,967&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:46,967&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:46,975&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:46,975&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:46,975&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:46,975&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:46,975&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:46,975&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:47,026&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:47,077&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:47,077&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:47,077&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:47,077&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:47,128&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:47,179&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:47,179&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:47,179&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 8107.989999999998 | New depth: -74&True
+2024-02-08 11:14:47,179&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:47,230&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:47,281&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:47,281&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:47,281&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 8107.990000 depth: -74.000000&True
+2024-02-08 11:14:47,281&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:47,281&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:47,282&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:47,282&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:47,333&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:47,384&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:47,384&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:47,384&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:47,384&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:47,384&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:47,384&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:47,384&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:47,385&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:47,385&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:47,398&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:47,398&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:47,399&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:47,399&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:47,400&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:47,400&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:47,400&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:47,413&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:50,422&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:50,428&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:50,428&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:50,428&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:50,428&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:50,428&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:50,479&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:50,530&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:50,530&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:50,530&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:50,530&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:50,581&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:50,632&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:50,632&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:50,632&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:50,632&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:50,632&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:50,632&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:50,632&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:50,633&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:50,646&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:50,646&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:50,647&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:50,698&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:50,749&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:50,749&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:50,749&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:50,749&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:50,749&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:50,800&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:50,851&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:50,851&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:50,851&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 18267.810000000016 | New depth: -74&True
+2024-02-08 11:14:50,851&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:50,851&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 892.0100000000002}&True
+2024-02-08 11:14:50,855&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 18267.810000 depth: -74.000000&True
+2024-02-08 11:14:50,856&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 7 of 10 complete&
+2024-02-08 11:14:50,856&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 8 of 10&
+2024-02-08 11:14:50,856&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:50,862&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:50,862&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:50,863&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:52,434&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:52,434&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:52,441&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:52,441&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:52,441&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:52,442&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:52,442&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:52,442&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:52,493&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:52,544&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:52,544&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:52,544&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:52,544&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:52,595&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:52,646&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:52,646&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:52,646&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 7980.559999999998 | New depth: -74&True
+2024-02-08 11:14:52,646&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:52,697&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:52,748&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:52,748&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:52,748&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 7980.560000 depth: -74.000000&True
+2024-02-08 11:14:52,748&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:52,748&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:52,748&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:52,749&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:52,800&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:52,851&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:52,851&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:52,851&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:52,851&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:52,851&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:52,851&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:52,851&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:52,852&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:52,852&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:52,865&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:52,865&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:52,866&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:52,866&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:52,866&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:52,866&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:52,867&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:52,880&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:14:55,889&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:14:55,895&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:14:55,895&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:14:55,895&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:55,895&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:55,895&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:55,946&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:55,997&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:55,997&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:55,997&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:14:55,997&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:56,048&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:56,099&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:56,099&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:56,099&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:14:56,099&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:56,099&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:14:56,099&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:56,099&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:56,101&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:56,114&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:56,114&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:14:56,114&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:56,165&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:56,215&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:56,215&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:56,216&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:14:56,216&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:14:56,216&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:14:56,267&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:56,318&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:56,318&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:56,318&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 18395.240000000016 | New depth: -74&True
+2024-02-08 11:14:56,318&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:14:56,318&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 1019.4400000000003}&True
+2024-02-08 11:14:56,322&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 18395.240000 depth: -74.000000&True
+2024-02-08 11:14:56,322&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 8 of 10 complete&
+2024-02-08 11:14:56,323&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 9 of 10&
+2024-02-08 11:14:56,323&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:14:56,329&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:14:56,329&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:14:56,330&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:14:57,911&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:14:57,911&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:14:57,918&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:14:57,918&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:14:57,918&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:14:57,918&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:14:57,918&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:14:57,919&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:57,970&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:58,020&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:14:58,020&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:14:58,020&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:14:58,020&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:58,071&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:58,122&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:14:58,122&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:14:58,122&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 7853.129999999997 | New depth: -74&True
+2024-02-08 11:14:58,122&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:58,173&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:14:58,224&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:14:58,224&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:14:58,224&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 7853.130000 depth: -74.000000&True
+2024-02-08 11:14:58,224&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:14:58,224&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:14:58,225&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:14:58,225&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:14:58,276&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:14:58,327&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:14:58,327&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:14:58,327&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:14:58,327&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:14:58,327&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:14:58,327&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:14:58,327&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:58,328&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:14:58,328&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:14:58,342&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:14:58,342&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:14:58,342&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:14:58,343&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:14:58,343&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:14:58,343&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:14:58,343&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:14:58,357&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:15:01,366&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:15:01,372&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:15:01,372&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:15:01,373&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:15:01,373&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:15:01,373&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:01,424&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:01,475&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:15:01,475&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:15:01,475&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:15:01,475&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:01,526&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:01,577&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:15:01,577&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:15:01,577&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:15:01,577&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:15:01,577&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:15:01,577&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:15:01,577&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:15:01,578&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:15:01,591&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:15:01,591&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:15:01,592&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:01,643&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:01,694&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:15:01,694&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:15:01,694&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:15:01,694&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:15:01,694&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:01,745&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:15:01,796&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:15:01,796&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:15:01,796&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 18522.670000000016 | New depth: -74&True
+2024-02-08 11:15:01,796&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:15:01,796&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 1146.8700000000003}&True
+2024-02-08 11:15:01,800&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 18522.670000 depth: -74.000000&True
+2024-02-08 11:15:01,801&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 9 of 10 complete&
+2024-02-08 11:15:01,801&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&73&&&&Repeatability assessment (exp A-2)-10000485 Cycle 10 of 10&
+2024-02-08 11:15:01,801&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&76&&&&Imaging the well&
+2024-02-08 11:15:01,809&e_panda&INFO&e_panda&image_well&893&12.4&10000485&G5&Imaging well G5&True
+2024-02-08 11:15:01,809&e_panda&DEBUG&e_panda&image_well&895&12.4&10000485&G5&Capturing image of well G5&True
+2024-02-08 11:15:01,810&e_panda&INFO&e_panda&image_well&917&12.4&10000485&G5&Moving camera above well G5&True
+2024-02-08 11:15:03,446&e_panda&DEBUG&e_panda&image_well&929&12.4&10000485&G5&Image of well G5 captured&True
+2024-02-08 11:15:03,446&e_panda&INFO&e_panda&image_well&942&12.4&10000485&G5&Moving camera to safe position&True
+2024-02-08 11:15:03,453&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&83&&&&Depositing solutions into well: G5&
+2024-02-08 11:15:03,453&e_panda&DEBUG&e_panda&solution_selector&615&12.4&10000485&G5&Selected stock vial: 5mm_fecn6 in position s0&True
+2024-02-08 11:15:03,453&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from 5mm_fecn6 to G5&True
+2024-02-08 11:15:03,453&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:15:03,454&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:15:03,454&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.300000 mL/min...&True
+2024-02-08 11:15:03,505&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:03,556&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:15:03,556&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.300000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:15:03,556&e_panda&INFO&e_panda&forward_pipette_v2&160&12.4&10000485&G5&Moving to 5mm_fecn6 at s0...&True
+2024-02-08 11:15:03,556&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:15:03,607&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:03,658&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:15:03,658&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.300000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:15:03,658&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&5mm_fecn6: New volume: 7725.699999999997 | New depth: -74&True
+2024-02-08 11:15:03,658&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.300000 mL/min...&True
+2024-02-08 11:15:03,709&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:03,760&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:15:03,760&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.300000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:15:03,760&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel 5mm_fecn6 volume: 7725.700000 depth: -74.000000&True
+2024-02-08 11:15:03,760&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: G5...&True
+2024-02-08 11:15:03,760&e_panda&DEBUG&pump_control&run_pump&446&12.4&10000485&G5&Expected difference in scale reading: 0.127066&True
+2024-02-08 11:15:03,761&e_panda&DEBUG&pump_control&run_pump&447&12.4&10000485&G5&Scale reading before Infusing: 0.000000&True
+2024-02-08 11:15:03,761&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.300000 mL/min...&True
+2024-02-08 11:15:03,811&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:15:03,862&e_panda&DEBUG&pump_control&run_pump&457&12.4&10000485&G5&Scale reading after Infusing: 0.000000&True
+2024-02-08 11:15:03,862&e_panda&DEBUG&pump_control&run_pump&458&12.4&10000485&G5&Scale reading difference: 0.000000&True
+2024-02-08 11:15:03,862&e_panda&INFO&pump_control&run_pump&459&12.4&10000485&G5&Data,Infusing,0.127430,0.997140,0.000000,0.000000,0.300000,0.910000&True
+2024-02-08 11:15:03,862&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:15:03,862&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.300000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:15:03,862&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with 127.430000 5mm_fecn6&True
+2024-02-08 11:15:03,862&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:15:03,863&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:15:03,863&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 127.43}&True
+2024-02-08 11:15:03,876&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:15:03,876&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel G5 volume: 127.430000 depth: -72.000000&True
+2024-02-08 11:15:03,877&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&99&&&&Moving electrode to well: G5&
+2024-02-08 11:15:03,878&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&108&&&&Performing CV&
+2024-02-08 11:15:03,878&__main__&DEBUG&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&109&&&&
+        CV Parameters
+            CV: True
+            CV Baseline: False
+            Sample Period: 0.1
+            Initial Voltage (CVvi): 0.0
+            First Anodic Peak (CVap1): 0.58
+            Second Anodic Peak (CVap2): -0.2
+            Final Voltage (CVvf): 0.5
+            Step Size (CVstep): 0.001
+            Cycle Count: 3
+            Scan Rate Cycle 1 (CVsr1): 0.05
+            Scan Rate Cycle 2 (CVsr2): 0.05
+            Scan Rate Cycle 3 (CVsr3): 0.05
+            CV Sample Rate: 0.02
+    &
+2024-02-08 11:15:03,878&e_panda&INFO&e_panda&characterization&764&12.4&10000485&G5&Characterizing well: G5&True
+2024-02-08 11:15:03,878&e_panda&INFO&e_panda&characterization&766&12.4&10000485&G5&Beginning eChem OCP of well: G5&True
+2024-02-08 11:15:03,891&e_panda&INFO&e_panda&characterization&805&12.4&10000485&G5&Beginning eChem CV of well: G5&True
+2024-02-08 11:15:06,901&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&117&&&&Clearing well contents into waste&
+2024-02-08 11:15:06,909&e_panda&DEBUG&e_panda&waste_selector&642&12.4&10000485&G5&Selected waste vial: waste in position w0&True
+2024-02-08 11:15:06,909&e_panda&INFO&e_panda&forward_pipette_v2&124&12.4&10000485&G5&Forward pipetting 127.430000 ul from G5 to waste&True
+2024-02-08 11:15:06,909&e_panda&INFO&e_panda&forward_pipette_v2&147&12.4&10000485&G5&Repetition 1 of 1&True
+2024-02-08 11:15:06,909&e_panda&DEBUG&e_panda&forward_pipette_v2&149&12.4&10000485&G5&Withdrawing 40.000000 of air gap...&True
+2024-02-08 11:15:06,909&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.040000 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:06,960&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:07,011&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.04 ml&True
+2024-02-08 11:15:07,011&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul&True
+2024-02-08 11:15:07,011&e_panda&INFO&e_panda&forward_pipette_v2&156&12.4&10000485&G5&Moving to G5 at {'x': -274.2, 'y': -114.4, 'z': -66.0}...&True
+2024-02-08 11:15:07,011&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:07,062&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:07,113&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.12743000000000002 ml&True
+2024-02-08 11:15:07,113&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.127430 ml at 0.654000mL/min  Pipette vol: 167.400 ul&True
+2024-02-08 11:15:07,113&e_panda&INFO&e_panda&forward_pipette_v2&191&12.4&10000485&G5&Updating well contents...&True
+2024-02-08 11:15:07,113&e_panda&DEBUG&e_panda&forward_pipette_v2&198&12.4&10000485&G5&Well contents: {'5mm_fecn6': 127.43}&True
+2024-02-08 11:15:07,114&e_panda&DEBUG&wellplate&update_contents&70&12.4&10000485&G5&Updating contents of G5 with -127.430000 5mm_fecn6&True
+2024-02-08 11:15:07,114&e_panda&DEBUG&wellplate&update_contents&74&12.4&10000485&G5&Updated G5 contents: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:15:07,114&e_panda&DEBUG&wellplate&update_contents&79&12.4&10000485&G5&Updating well status file...&True
+2024-02-08 11:15:07,115&e_panda&DEBUG&wellplate&update_contents&85&12.4&10000485&G5&Well G5 contents updated to {'5mm_fecn6': 0.0}&True
+2024-02-08 11:15:07,129&e_panda&DEBUG&wellplate&update_contents&90&12.4&10000485&G5&Well status file updated&True
+2024-02-08 11:15:07,129&e_panda&DEBUG&e_panda&forward_pipette_v2&202&12.4&10000485&G5&Well contents updated: {'5mm_fecn6': 0.0}&True
+2024-02-08 11:15:07,129&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Withdrawing 0.005000 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:07,180&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Withdrawing&True
+2024-02-08 11:15:07,231&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has withdrawn: 0.005 ml&True
+2024-02-08 11:15:07,231&e_panda&INFO&pump_control&withdraw&372&12.4&10000485&G5&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul&True
+2024-02-08 11:15:07,231&e_panda&DEBUG&e_panda&forward_pipette_v2&216&12.4&10000485&G5&From Vessel G5 volume: 0.000000 depth: -72.000000&True
+2024-02-08 11:15:07,231&e_panda&INFO&e_panda&forward_pipette_v2&223&12.4&10000485&G5&Moving to: waste...&True
+2024-02-08 11:15:07,231&e_panda&DEBUG&pump_control&run_pump&449&12.4&10000485&G5&Infusing 0.127430 ml at 0.654000 mL/min...&True
+2024-02-08 11:15:07,282&e_panda&DEBUG&pump_control&run_pump&451&12.4&10000485&G5&Done Infusing&True
+2024-02-08 11:15:07,333&e_panda&DEBUG&pump_control&run_pump&472&12.4&10000485&G5&Pump has infused: 0.12743000000000002 ml&True
+2024-02-08 11:15:07,333&e_panda&INFO&pump_control&infuse&414&12.4&10000485&G5&Pump has infused: 0.127430 ml (0.654000 of solution) at 0.082430mL/min Pipette volume: 0.000 ul&True
+2024-02-08 11:15:07,333&e_panda&DEBUG&vials&update_volume&148&12.4&10000485&G5&waste: New volume: 18650.100000000017 | New depth: -74&True
+2024-02-08 11:15:07,333&e_panda&DEBUG&vials&update_contents&266&12.4&10000485&G5&Updating waste w0 contents...&True
+2024-02-08 11:15:07,334&e_panda&DEBUG&vials&update_contents&273&12.4&10000485&G5&waste w0: New contents: {'rinse0': 4220.0, 'C5': 382.29, 'D1': 382.29, 'D6': 382.29, 'D7': 382.29, 'E1': 382.29, 'E8': 382.29, 'E9': 382.29, 'F1': 382.29, 'F10': 382.29, 'F11': 382.29, 'G1': 382.29, 'G12': 382.29, 'H1': 382.29, 'H2': 382.29, 'H3': 382.29, 'H4': 382.29, 'H5': 382.29, 'H6': 382.29, 'H7': 382.29, 'H8': 382.29, 'H9': 382.29, 'H10': 382.29, 'H11': 382.29, 'H12': 382.29, 'A3': 127.43, 'A4': 127.43, 'A5': 127.43, 'A6': 133.66, 'A7': 133.66, 'A8': 133.66, 'A9': 133.66, 'A10': 133.66, 'A11': 133.66, 'B1': 254.86, 'B3': 254.86, 'C1': 254.86, 'C4': 254.86, 'G2': 127.43, 'G3': 127.43, 'G4': 127.43, 'A1': 127.43, 'A2': 127.43, '5mm_fecn6': 1274.3000000000004}&True
+2024-02-08 11:15:07,340&e_panda&INFO&e_panda&forward_pipette_v2&266&12.4&10000485&G5&Vessel waste volume: 18650.100000 depth: -74.000000&True
+2024-02-08 11:15:07,340&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&130&&&&Cycle 10 of 10 complete&
+2024-02-08 11:15:07,341&__main__&INFO&exp_a_2_ferrocyanide_assessment_protocol&cv_repeatability&133&&&&Experiment 12.4.10000485 complete&
+2024-02-08 11:15:07,348&__main__&INFO&controller&main&241&&&&Experiment 10000485 ended with status complete&
+2024-02-08 11:15:07,349&scheduler&DEBUG&scheduler&change_well_status_v2&124&&&&Changing Well G5 with volume 0.0 and status running status to running&
+2024-02-08 11:15:07,363&scheduler&INFO&scheduler&change_well_status_v2&147&&&&Well G5 with volume 0.0 and status complete status changed to complete&
+2024-02-08 11:15:07,366&scheduler&INFO&scheduler&update_experiment_file&376&&&&Experiment 10000485 status changed to complete&
+2024-02-08 11:15:07,368&scheduler&INFO&scheduler&update_experiment_location&414&&&&Experiment 10000485 location updated to complete&
+2024-02-08 11:15:07,368&scheduler&INFO&scheduler&save_results&514&&&&Saving experiment 10000485 results to database as Repeatability assessment (exp A-2)_10000485.json&
+2024-02-08 11:15:07,389&e_panda&DEBUG&wellplate&save_current_wellplate&826&None&None&None&Saving wellplate&True
+2024-02-08 11:15:07,390&e_panda&DEBUG&wellplate&save_current_wellplate&839&None&None&None&Saving well statuses to well_history.csv&True
+2024-02-08 11:15:07,418&e_panda&DEBUG&wellplate&save_current_wellplate&874&None&None&None&Wellplate saved&True
+2024-02-08 11:15:07,418&e_panda&INFO&wellplate&save_current_wellplate&875&None&None&None&Wellplate 108 saved&True
+2024-02-08 11:15:07,418&__main__&INFO&controller&disconnect_from_instruments&483&&&&Disconnecting from instruments:&
+2024-02-08 11:15:07,418&__main__&INFO&controller&disconnect_from_instruments&486&&&&Disconnected from instruments&
+2024-02-08 11:15:07,423&e_panda&INFO&slack_functions2&send_slack_message&50&None&None&None&Message sent:ePANDA is shutting down...goodbye&True
