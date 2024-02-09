@@ -8,7 +8,7 @@
 from math import isclose
 
 
-def correction_factor(x,viscosity):
+def correction_factor(x,viscosity=0.91):
     '''
     Calculate the correction factor to applied to the programmed volume
     for the viscosity of the sample.
