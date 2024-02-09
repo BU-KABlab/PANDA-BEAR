@@ -76,7 +76,7 @@ class ExperimentBase():
     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
     plate_id: Optional[int] = None
     override_well_selection: int = 0 # 0 is normal, 1 is override
-    process_type: int = 1 # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
+    process_type: Optional[int] = 1 # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
 
 
     def set_status(self, new_status: ExperimentStatus):
@@ -100,7 +100,6 @@ class ExperimentBase():
 
     def is_same_id(self, other):
         '''Check if two experiments have the same id'''
-        pass
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class CorrectionFactorExperiment(ExperimentBase):
@@ -257,7 +256,7 @@ class EchemExperimentBase(ExperimentBase):
             CA Sample Rate: {self.ca_sample_rate}
     """
         else:
-            return f"""
+            return """
         CA Parameters
             Pre-step Voltage: N/A
             Pre-step Time Delay: N/A
