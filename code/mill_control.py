@@ -550,74 +550,23 @@ class Mill:
         logger.debug("Current coordinates: %s, %s, %s", current_x, current_y, current_z)
         logger.debug("Target coordinates: %s, %s, %s", x_coord, y_coord, z_coord)
 
-        # combinations that WOULD trigger the command. Here are the different combinations:
-
-        # (current_z != 0 and current_z == z_coord and not fixed_z):
-        # This condition is true if:
-        #  - the current Z coordinate is not zero
-        #  - the current Z coordinate is equal to the target Z coordinate
-        #  - the fixed_z flag is not set (i.e. fixed_z = False)
-
-        # (current_z != 0 and current_z != z_coord and not fixed_z):
-        # This condition is true if:
-        #  - the current Z coordinate is not zero
-        #  - it is not equal to the target Z coordinate
-        #  - the fixed_z flag is not set (i.e. fixed_z = False)
-
-        # (current_z != 0 and current_z != z_coord and fixed_z):
-        # This condition is true if:
-        #  - the current Z coordinate is not zero
-        #  - the current Z coordinate is not equal to the target Z coordinate
-        #  - the fixed_z flag is set (i.e. fixed_z = True)
-
-        # If any of these conditions are true, the mill will move to Z = 0 before moving to the target coordinates.
-
-        # Combinations that would NOT trigger the command. Here are the different combinations:
-
-        # (current_z == 0 and current_z == z_coord and not fixed_z):
-        # This condition is false if:
-        #  - the current Z coordinate is zero
-        #  - the current Z coordinate is equal to the target Z coordinate
-        #  - the fixed_z flag is not set (i.e. fixed_z = False)
-
-        # (current_z == 0 and current_z != z_coord and not fixed_z):
-        # This condition is false if:
-        #  - the current Z coordinate is zero
-        #  - the current Z coordinate is not equal to the target Z coordinate
-        #  - the fixed_z flag is not set (i.e. fixed_z = False)
-
-        # (current_z == 0 and current_z != z_coord and fixed_z):
-        # This condition is false if:
-        #  - the current Z coordinate is zero
-        #  - the current Z coordinate is not equal to the target Z coordinate
-        #  - the fixed_z flag is set (i.e. fixed_z = True)
-
-        # If any of these conditions are true, the command within the if statement will NOT be executed.
-        if (
-            ((current_z != 0 and current_z == z_coord and not fixed_z)
-            or (current_z != 0 and current_z != z_coord and not fixed_z)
-            or (current_z != 0 and current_z != z_coord and fixed_z))
-            and (current_z < self.config["safe_height_floor"])
-        ):
-            print("testing - Would be moving to Z = 0")
-            if current_z != 0 and current_z == z_coord and not fixed_z:
-                print(
-                    f"Reason:\n\tcurrent_z != 0 {current_z != 0}\n\tcurrent_z == z_coord {current_z==z_coord}\n\tnot fixed_z {fixed_z}"
-                )
-            elif current_z != 0 and current_z != z_coord and not fixed_z:
-                print(
-                    f"Reason:\n\tcurrent_z != 0 {current_z != 0}\n\tcurrent_z != z_coord {current_z!=z_coord}\n\tnot fixed_z {fixed_z}"
-                )
-            elif current_z != 0 and current_z != z_coord and fixed_z:
-                print(
-                    f"Reason:\n\tcurrent_z != 0 {current_z != 0}\n\tcurrent_z != z_coord {current_z!=z_coord}\n\tnot fixed_z {fixed_z}"
-                )
-            elif current_z < self.config["safe_height_floor"]:
-                print(
-                    f"Reason:\n\tcurrent_z < self.config['safe_height_floor'] {current_z < self.config['safe_height_floor']}"
-                )
+        if current_z != 0 and current_z != z_coord and (not fixed_z or fixed_z):
+            # This condition is true if:
+            #  - the current Z coordinate is not zero
+            #  - it is not equal to the target Z coordinate
+            #  - the fixed_z flag is not set (i.e. fixed_z = False) or it is set (i.e. fixed_z = True)
+            # Additionally, current_z should be below the safe height.
+            if current_z < self.config["safe_height_floor"]:
+                print("Testing - Would be moving to Z = 0")
+                print(f"Reason:\n\tcurrent_z is below self.config['safe_height_floor'] {current_z < self.config['safe_height_floor']}")
+                # self.execute_command("G01 Z0")
+            else:
+                print("Testing - Would not be moving to Z = 0")
+                print(f"Reason:\n\tcurrent_z is at or above self.config['safe_height_floor'] {current_z >= self.config['safe_height_floor']}")
         else:
-            print("testing - Would not be moving to Z = 0")
+            print("Testing - Would not be moving to Z = 0")
+            print(f"Reason:\n\tConditions not met.")
+
 
         if current_z != 0:
             self.execute_command("G01 Z0")

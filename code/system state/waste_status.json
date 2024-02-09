@@ -44,7 +44,8 @@
             "G3": 127.43,
             "G4": 127.43,
             "A1": 127.43,
-            "A2": 127.43
+            "A2": 127.43,
+            "5mm_fecn6": 1274.3000000000004
         },
         "x": -50,
         "y": -7,
@@ -53,9 +54,9 @@
         "height": -20,
         "depth": 0,
         "name": "waste",
-        "volume": 17235.800000000014,
+        "volume": 18650.100000000017,
         "capacity": 20000,
-        "contamination": 128,
+        "contamination": 139,
         "density": 0,
         "category": 1,
         "viscosity_cp": 0.0

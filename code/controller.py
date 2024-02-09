@@ -253,13 +253,12 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
 
             scheduler.remove_from_queue(new_experiment)
             new_experiment = None # reset new_experiment to None so that we can check the queue again
-            if one_off:
-                break  # break out of the while True loop
-
+            
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)
             update_vial_state_file(waste_vials, WASTE_STATUS)
-
+            if one_off:
+                break  # break out of the while True loop
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status(ExperimentStatus.ERROR)
@@ -489,4 +488,4 @@ if __name__ == "__main__":
     #wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
     print("TEST MODE: ", TESTING)
     input("Press enter to continue or ctrl+c to exit")
-    main(use_mock_instruments=TESTING, one_off=True)
+    main(use_mock_instruments=TESTING, one_off=False)

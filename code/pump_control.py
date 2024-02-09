@@ -86,6 +86,7 @@ class Pump:
     ):
         """
         Withdraw the given volume at the given rate and depth from the specified position.
+        Update the volume of the pipette and the solution if given.
         Args:
             volume (float): Volume to be withdrawn in microliters.
             solution (Vial object or str): The vial or wellplate ID to withdraw from

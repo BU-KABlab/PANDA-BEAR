@@ -146,6 +146,7 @@ class Vial2(Vessel):
             self.depth = self.calculate_depth()
             self.contamination += 1
             vial_logger.debug("%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth)
+            self.write_volume_to_disk()
             return self
 
     def write_volume_to_disk(self) -> None:

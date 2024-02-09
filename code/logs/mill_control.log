@@ -90,3 +90,128 @@
 2024-02-08 11:04:49,920&__main__&INFO&mill_control&disconnect&165&Disconnecting from the mill
 2024-02-08 11:05:04,922&__main__&INFO&mill_control&disconnect&168&Mill connected: False
 2024-02-08 11:05:04,922&__main__&INFO&mill_control&movement_test&1058&Exiting program.
+2024-02-08 11:14:11,837&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -137, -74)
+2024-02-08 11:14:11,939&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:12,041&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:12,145&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:12,271&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:13,948&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:14,057&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:14,159&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:14,261&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:14,378&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:14,379&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:14,399&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:17,509&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:17,625&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:17,727&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:17,833&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:17,841&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:19,409&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:19,518&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:19,620&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:19,722&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:19,839&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:19,840&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:19,859&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:22,970&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:23,087&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:23,189&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:23,295&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:23,303&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:24,893&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:25,002&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:25,103&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:25,205&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:25,323&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:25,323&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:25,343&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:28,453&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:28,569&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:28,671&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:28,778&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:28,785&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:30,427&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:30,538&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:30,639&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:30,741&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:30,859&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:30,859&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:30,880&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:33,989&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:34,106&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:34,208&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:34,315&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:34,322&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:35,965&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:36,074&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:36,177&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:36,280&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:36,397&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:36,398&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:36,423&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:39,533&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:39,650&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:39,752&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:39,858&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:39,866&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:41,496&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:41,607&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:41,709&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:41,811&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:41,928&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:41,929&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:41,949&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:45,059&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:45,176&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:45,278&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:45,385&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:45,393&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:46,967&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:47,077&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:47,179&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:47,281&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:47,398&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:47,399&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:47,420&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:50,530&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:50,646&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:50,749&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:50,855&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:50,863&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:52,434&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:52,544&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:52,646&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:52,748&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:52,865&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:52,866&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:52,887&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:14:55,997&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:14:56,114&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:56,216&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:14:56,322&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:56,330&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:14:57,912&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:58,020&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:14:58,122&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:58,224&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:14:58,342&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:14:58,343&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:14:58,364&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:15:01,475&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:15:01,591&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:15:01,694&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:15:01,800&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:15:01,811&mill_control&INFO&mill_control&safe_move&880&Safe move lens to position: (-274.2, -114.4, -35)
+2024-02-08 11:15:03,446&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:15:03,556&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-4, -38, -74)
+2024-02-08 11:15:03,658&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:15:03,760&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -66.0)
+2024-02-08 11:15:03,877&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:15:03,877&mill_control&INFO&mill_control&safe_move&880&Safe move electrode to position: (-274.2, -114.4, -70)
+2024-02-08 11:15:03,898&mill_control&INFO&mill_control&rinse_electrode&807&Rinsing the electrode
+2024-02-08 11:15:07,011&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-274.2, -114.4, -72)
+2024-02-08 11:15:07,129&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:15:07,231&mill_control&INFO&mill_control&safe_move&880&Safe move pipette to position: (-50, -7, -20)
+2024-02-08 11:15:07,340&mill_control&INFO&mill_control&move_to_safe_position&823&Moving to a safe position
+2024-02-08 11:15:07,418&mill_control&INFO&mill_control&disconnect&753&Disconnecting from the mill
