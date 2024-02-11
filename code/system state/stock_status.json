@@ -111,7 +111,7 @@
     },
     {
         "position": "s5",
-        "contents": "none",
+        "contents": "rinse0",
         "viscosity_cp": 0.91,
         "density": 1.1545,
         "category": 0,
@@ -121,7 +121,7 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": null,
+        "name": "rinse0",
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
