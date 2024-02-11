@@ -10,11 +10,11 @@
         "z_bottom": -74,
         "radius": 14,
         "height": -20,
-        "depth": 0,
+        "depth": -74,
         "name": "5mm_fecn6",
-        "volume": 9000.0,
+        "volume": 15000,
         "capacity": 20000,
-        "contamination": 88,
+        "contamination": 118,
         "coordinates": {
             "x": -4,
             "y": -38,
@@ -34,7 +34,7 @@
         "height": -20,
         "depth": 0,
         "name": "10mm_fecn6",
-        "volume": 10000.0,
+        "volume": 15000.0,
         "capacity": 20000,
         "contamination": 6,
         "coordinates": {
@@ -56,7 +56,7 @@
         "height": -20,
         "depth": 0,
         "name": "electrolyte",
-        "volume": 19599.01999999999,
+        "volume": 16000,
         "capacity": 20000,
         "contamination": 6,
         "coordinates": {
@@ -67,7 +67,7 @@
     },
     {
         "position": "s3",
-        "contents": "rinse0",
+        "contents": "rinse",
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
@@ -76,9 +76,9 @@
         "z_bottom": -74,
         "radius": 14,
         "height": -20,
-        "depth": 0,
+        "depth": -74,
         "name": "rinse0",
-        "volume": 15640.0,
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 35,
         "coordinates": {
@@ -111,7 +111,7 @@
     },
     {
         "position": "s5",
-        "contents": "none",
+        "contents": "rinse",
         "viscosity_cp": 0.91,
         "density": 1.1545,
         "category": 0,
@@ -121,8 +121,8 @@
         "radius": 14,
         "height": -20,
         "depth": 0,
-        "name": null,
-        "volume": 20000,
+        "name": "rinse1",
+        "volume": 6000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
