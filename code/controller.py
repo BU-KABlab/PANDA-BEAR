@@ -41,7 +41,7 @@ from instrument_toolkit import Toolkit
 # import obs_controls as obs
 from slack_functions2 import SlackBot
 from vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
-from wellplate import load_new_wellplate, save_current_wellplate
+from wellplate import save_current_wellplate
 from obs_controls import OBSController
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger(__name__)
@@ -52,12 +52,15 @@ formatter = logging.Formatter(
 system_handler = logging.FileHandler(EPANDA_LOG)
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
+console_logger = logging.StreamHandler()
+console_logger.setLevel(logging.INFO)
+logger.addHandler(console_logger)
 
 # set up slack globally so that it can be used in the main function and others
 slack = SlackBot()
 obs = OBSController()
 
-def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int = 1):
+def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     """
     Main function
 
@@ -207,29 +210,21 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, part: int 
             new_experiment.plate_id = wellplate.plate_id
 
             logger.info("Beginning experiment %d", new_experiment.id)
-            import exp_a_2_ferrocyanide_assessment_protocol as exp_a
-            exp_a.cv_repeatability(
+            # import exp_a_2_ferrocyanide_assessment_protocol as exp_a
+            # exp_a.cv_repeatability(
+            #     instructions=new_experiment,
+            #     toolkit=toolkit,
+            #     stock_vials=stock_vials,
+            #     waste_vials=waste_vials,
+            # )
+            #import exp_edot_bleaching_protocol as edot
+            import exp_d2_mixing_assessment_protocol as exp_d2
+            exp_d2.mixing_assessment(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
             )
-            # import exp_edot_bleaching_protocol as edot
-            # if part == 1:
-            #     edot.edot_bleaching_part_1(
-            #         instructions=new_experiment,
-            #         toolkit=toolkit,
-            #         stock_vials=stock_vials,
-            #         waste_vials=waste_vials,
-            #     )
-            # if part == 2:
-            #     edot.edot_bleaching_part_2(
-            #         instructions=new_experiment,
-            #         toolkit=toolkit,
-            #         stock_vials=stock_vials,
-            #         waste_vials=waste_vials,
-            #     )
-
             ## Update the experiment status to complete
             new_experiment.set_status(ExperimentStatus.COMPLETE)
 

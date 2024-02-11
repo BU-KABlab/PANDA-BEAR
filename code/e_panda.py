@@ -24,6 +24,7 @@ Returns:
 # Standard library imports
 import logging
 import math
+# import decimal
 
 # Third party or custom imports
 from pathlib import Path
@@ -141,7 +142,7 @@ def forward_pipette_v2(
             pumping_rate = pump.max_pump_rate
 
         repetitions = math.ceil(volume / (pump.pipette_capacity_ul - DRIP_STOP))
-        repetition_vol = volume / repetitions
+        repetition_vol = round(volume / repetitions,4)
 
         for j in range(repetitions):
             logger.info("Repetition %d of %d", j + 1, repetitions)
@@ -197,7 +198,7 @@ def forward_pipette_v2(
                     for key, value in from_vessel.get_contents().items():
                         logger.debug("Well contents: %s", from_vessel.get_contents())
                         from_vessel.update_contents(
-                            key, -(repetition_vol * current_content_ratios[key])
+                            key, round(-(repetition_vol * current_content_ratios[key]), 4)
                         )
                         logger.debug("Well contents updated: %s", from_vessel.get_contents())
                 except ZeroDivisionError:
@@ -744,7 +745,7 @@ def deposition(
 
 
 def characterization(
-    char_instructions: EchemExperimentBase,
+    char_instructions: EchemExperimentBase, file_tag: str = None
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Characterization of the solutions on the substrate using CV.
@@ -753,9 +754,7 @@ def characterization(
 
     Args:
         char_instructions (Experiment): The experiment instructions
-        char_results (ExperimentResult): The experiment results
-        mill (object): The mill object
-        wellplate (Wells object): The wellplate object
+        
     Returns:
         char_instructions (Experiment): The updated experiment instructions
         char_results (ExperimentResult): The updated experiment results
@@ -772,7 +771,7 @@ def characterization(
         char_instructions.set_status(ExperimentStatus.OCPCHECK)
         char_instructions.results.ocp_char_file = pstat.setfilename(
             char_instructions.id,
-            "OCP_char",
+            "OCP_char_" + file_tag if file_tag else "OCP_char",
             char_instructions.project_id,
             char_instructions.project_campaign_id,
             char_instructions.well_id,
@@ -808,7 +807,7 @@ def characterization(
 
             char_instructions.results.characterization_data_file = pstat.setfilename(
                 char_instructions.id,
-                test_type,
+                test_type + "_" + file_tag if file_tag else test_type,
                 char_instructions.project_id,
                 char_instructions.project_campaign_id,
                 char_instructions.well_id,
