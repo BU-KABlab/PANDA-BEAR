@@ -90,3 +90,94 @@
 2024-02-08 11:04:49,920:__main__:INFO:Disconnecting from the mill
 2024-02-08 11:05:04,922:__main__:INFO:Mill connected: False
 2024-02-08 11:05:04,922:__main__:INFO:Exiting program.
+2024-02-11 13:08:52,763:__main__:DEBUG:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 40.7, 'y': 26.4, 'z': 0}, 'pipette': {'x': -82.5, 'y': -2.5, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -415, 'y': -300, 'z': -80}, 'electrode_bath': {'x': -409.6, 'y': -34.4, 'z': -50}, 'safe_height_floor': -30}
+2024-02-11 13:08:54,766:__main__:INFO:Mill connected: True
+2024-02-11 13:08:54,766:__main__:DEBUG:Command sent: $H
+2024-02-11 13:08:56,768:__main__:DEBUG:Returned 
+2024-02-11 13:09:27,703:__main__:INFO:Homing completed
+2024-02-11 13:09:27,704:__main__:DEBUG:Command sent: F2000
+2024-02-11 13:09:29,705:__main__:DEBUG:Returned ok
+2024-02-11 13:11:22,777:__main__:INFO:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-02-11 13:11:22,777:__main__:DEBUG:current_coordinates: [0.0, 0.0, 0.0]
+2024-02-11 13:11:22,777:__main__:DEBUG:Current coordinates: 0.0, 0.0, 0.0
+2024-02-11 13:11:22,777:__main__:DEBUG:Target coordinates: -409, -34.4, 0
+2024-02-11 13:11:22,778:__main__:ERROR:x coordinate out of range
+2024-02-11 13:11:39,655:__main__:INFO:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-02-11 13:11:39,655:__main__:DEBUG:current_coordinates: [0.0, 0.0, 0.0]
+2024-02-11 13:11:39,655:__main__:DEBUG:Current coordinates: 0.0, 0.0, 0.0
+2024-02-11 13:11:39,655:__main__:DEBUG:Target coordinates: -4, -203, 0
+2024-02-11 13:11:39,656:__main__:DEBUG:Command sent: G01 X-86.5
+2024-02-11 13:11:41,657:__main__:DEBUG:Initially ok
+2024-02-11 13:11:43,679:__main__:DEBUG:Returned <Idle|MPos:-89.500,-3.000,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:11:43,679:__main__:DEBUG:Command sent: G01 Y-205.5
+2024-02-11 13:11:45,680:__main__:DEBUG:Initially ok
+2024-02-11 13:11:51,733:__main__:DEBUG:Returned <Idle|MPos:-89.500,-208.500,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:11:51,734:__main__:DEBUG:Command sent: G01 Z0
+2024-02-11 13:11:53,734:__main__:DEBUG:Initially ok
+2024-02-11 13:11:54,747:__main__:DEBUG:Returned <Idle|MPos:-89.500,-208.500,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:12:06,958:__main__:INFO:MPos coordinates: X = -86.5, Y = -205.5, Z = 0.0
+2024-02-11 13:12:06,958:__main__:DEBUG:current_coordinates: [-86.5, -205.5, 0.0]
+2024-02-11 13:12:06,958:__main__:DEBUG:Current coordinates: -86.5, -205.5, 0.0
+2024-02-11 13:12:06,958:__main__:DEBUG:Target coordinates: -4, -203, -20
+2024-02-11 13:12:06,959:__main__:DEBUG:Command sent: G01 Z-20
+2024-02-11 13:12:08,960:__main__:DEBUG:Initially ok
+2024-02-11 13:12:09,974:__main__:DEBUG:Returned <Idle|MPos:-89.500,-208.500,-23.000|Bf:15,127|FS:0,0>
+2024-02-11 13:15:12,889:__main__:INFO:MPos coordinates: X = -86.5, Y = -205.5, Z = -20.0
+2024-02-11 13:15:12,889:__main__:DEBUG:current_coordinates: [-86.5, -205.5, -20.0]
+2024-02-11 13:15:12,889:__main__:DEBUG:Current coordinates: -86.5, -205.5, -20.0
+2024-02-11 13:15:12,889:__main__:DEBUG:Target coordinates: -4, -38, -20
+2024-02-11 13:15:12,890:__main__:DEBUG:Command sent: G01 Z0
+2024-02-11 13:15:14,891:__main__:DEBUG:Initially ok
+2024-02-11 13:15:15,905:__main__:DEBUG:Returned <Idle|MPos:-89.500,-208.500,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:15:15,906:__main__:DEBUG:Command sent: G01 Y-40.5
+2024-02-11 13:15:17,908:__main__:DEBUG:Initially ok
+2024-02-11 13:15:22,952:__main__:DEBUG:Returned <Idle|MPos:-89.500,-43.500,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:15:22,952:__main__:DEBUG:Command sent: G01 Z-20
+2024-02-11 13:15:24,952:__main__:DEBUG:Initially ok
+2024-02-11 13:15:25,966:__main__:DEBUG:Returned <Idle|MPos:-89.500,-43.500,-23.000|Bf:15,127|FS:0,0>
+2024-02-11 13:38:29,367:__main__:DEBUG:Mill config loaded: {'instrument_offsets': {'electrode': {'x': 40.7, 'y': 26.4, 'z': 0}, 'pipette': {'x': -82.5, 'y': -2.5, 'z': 0}, 'lens': {'x': 0, 'y': 0, 'z': 0}, 'center': {'x': 0, 'y': 0, 'z': 0}}, 'working_volume': {'x': -415, 'y': -300, 'z': -80}, 'electrode_bath': {'x': -409.6, 'y': -34.4, 'z': -50}, 'safe_height_floor': -30}
+2024-02-11 13:38:31,369:__main__:INFO:Mill connected: True
+2024-02-11 13:38:31,370:__main__:DEBUG:Command sent: $H
+2024-02-11 13:38:33,372:__main__:DEBUG:Returned 
+2024-02-11 13:38:52,376:__main__:INFO:Homing completed
+2024-02-11 13:38:52,376:__main__:DEBUG:Command sent: F2000
+2024-02-11 13:38:54,377:__main__:DEBUG:Returned ok
+2024-02-11 13:39:46,353:__main__:INFO:MPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-02-11 13:39:46,353:__main__:DEBUG:current_coordinates: [0.0, 0.0, 0.0]
+2024-02-11 13:39:46,353:__main__:DEBUG:Current coordinates: 0.0, 0.0, 0.0
+2024-02-11 13:39:46,353:__main__:DEBUG:Target coordinates: -220.8, -78.8, -35
+2024-02-11 13:39:46,354:__main__:DEBUG:Command sent: G01 X-220.8
+2024-02-11 13:39:48,356:__main__:DEBUG:Initially ok
+2024-02-11 13:39:54,408:__main__:DEBUG:Returned <Idle|MPos:-223.800,-3.000,-3.000|Bf:15,127|FS:0,0|WCO:-3.000,-3.000,-3.000>
+2024-02-11 13:39:54,408:__main__:DEBUG:Command sent: G01 Y-78.8
+2024-02-11 13:39:56,409:__main__:DEBUG:Initially ok
+2024-02-11 13:39:58,431:__main__:DEBUG:Returned <Idle|MPos:-223.800,-81.800,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:39:58,432:__main__:DEBUG:Command sent: G01 Z-35
+2024-02-11 13:40:00,433:__main__:DEBUG:Initially ok
+2024-02-11 13:40:01,448:__main__:DEBUG:Returned <Idle|MPos:-223.800,-81.800,-38.000|Bf:15,127|FS:0,0>
+2024-02-11 13:51:29,595:__main__:INFO:MPos coordinates: X = -220.8, Y = -78.8, Z = -35.0
+2024-02-11 13:51:29,595:__main__:DEBUG:current_coordinates: [-220.8, -78.8, -35.0]
+2024-02-11 13:51:29,596:__main__:DEBUG:Current coordinates: -220.8, -78.8, -35.0
+2024-02-11 13:51:29,596:__main__:DEBUG:Target coordinates: -220.8, -176.7, -35
+2024-02-11 13:51:29,597:__main__:DEBUG:Command sent: G01 Z0
+2024-02-11 13:51:31,598:__main__:DEBUG:Initially ok
+2024-02-11 13:51:32,613:__main__:DEBUG:Returned <Idle|MPos:-223.800,-81.800,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:51:32,613:__main__:DEBUG:Command sent: G01 Y-176.7
+2024-02-11 13:51:34,614:__main__:DEBUG:Initially ok
+2024-02-11 13:51:37,646:__main__:DEBUG:Returned <Idle|MPos:-223.800,-179.700,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:51:37,646:__main__:DEBUG:Command sent: G01 Z-35
+2024-02-11 13:51:39,648:__main__:DEBUG:Initially ok
+2024-02-11 13:51:40,663:__main__:DEBUG:Returned <Idle|MPos:-223.800,-179.700,-38.000|Bf:15,127|FS:0,0>
+2024-02-11 13:52:09,230:__main__:INFO:MPos coordinates: X = -220.8, Y = -176.7, Z = -35.0
+2024-02-11 13:52:09,230:__main__:DEBUG:current_coordinates: [-220.8, -176.7, -35.0]
+2024-02-11 13:52:09,230:__main__:DEBUG:Current coordinates: -220.8, -176.7, -35.0
+2024-02-11 13:52:09,231:__main__:DEBUG:Target coordinates: -283.1, -176.7, -35
+2024-02-11 13:52:09,231:__main__:DEBUG:Command sent: G01 Z0
+2024-02-11 13:52:11,232:__main__:DEBUG:Initially ok
+2024-02-11 13:52:12,247:__main__:DEBUG:Returned <Idle|MPos:-223.800,-179.700,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:52:12,247:__main__:DEBUG:Command sent: G01 X-283.1
+2024-02-11 13:52:14,248:__main__:DEBUG:Initially ok
+2024-02-11 13:52:15,263:__main__:DEBUG:Returned <Idle|MPos:-286.100,-179.700,-3.000|Bf:15,127|FS:0,0>
+2024-02-11 13:52:15,263:__main__:DEBUG:Command sent: G01 Z-35
+2024-02-11 13:52:17,264:__main__:DEBUG:Initially ok
+2024-02-11 13:52:18,280:__main__:DEBUG:Returned <Idle|MPos:-286.100,-179.700,-38.000|Bf:15,127|FS:0,0|Ov:100,100,100>

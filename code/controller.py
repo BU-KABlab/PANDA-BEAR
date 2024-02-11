@@ -100,7 +100,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         e_panda.flush_v2(
             stock_vials=stock_vials,
             waste_vials=waste_vials,
-            flush_solution_name="rinse0",
+            flush_solution_name="rinse",
             flush_volume=140,
             pump=toolkit.pump,
             mill=toolkit.mill,

@@ -226,6 +226,11 @@ class StockVial(Vial2):
     def update_contents(self, solution_name: str, volume: float) -> None:
         "Stock vial contents don't change"
         return self
+
+    def get_contents(self) -> dict:
+        """Return the contents of the stock vial as a dictionary"""
+        return {self.name: self.volume}
+
 class WasteVial(Vial2):
     """
     Represents a waste vial object that inherits from the Vial2 class.
@@ -264,6 +269,7 @@ class WasteVial(Vial2):
         self.category = 1
 
     def update_contents(self, solution_name: str, volume: float) -> None:
+        """Update the contentes of the waste vial"""
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
         if solution_name in self.contents:
             self.contents[solution_name] += volume

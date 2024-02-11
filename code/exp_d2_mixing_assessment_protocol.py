@@ -131,7 +131,7 @@ def type_1_experiment(
         3. Rinse the electrode
         4. Clear the well
         5. Flush the pipette tip
-        6. Rinse the well 4x with rinse0
+        6. Rinse the well 4x with rinse
     """
     
     toolkit.global_logger.info("0. Imaging the well")
@@ -174,12 +174,12 @@ def type_1_experiment(
     toolkit.global_logger.info("4. Clearing well contents into waste")
     instructions.set_status(ExperimentStatus.CLEARING)
     forward_pipette_v2(
-        volume=toolkit.wellplate.wells[instructions.well_id].volume,
+        volume=correction_factor(120),
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
             waste_vials,
             "waste",
-            toolkit.wellplate.wells[instructions.well_id].volume,
+            correction_factor(120),
         ),
         pump=toolkit.pump,
         mill=toolkit.mill,
@@ -190,20 +190,20 @@ def type_1_experiment(
     flush_v2(
         waste_vials=waste_vials,
         stock_vials=stock_vials,
-        flush_solution_name="rinse0",
+        flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
         flush_count=1,
     )
 
-    toolkit.global_logger.info("6. Rinsing the well 4x with rinse0")
+    toolkit.global_logger.info("6. Rinsing the well 4x with rinse")
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
                 stock_vials,
-                "rinse0",
+                "rinse",
                 correction_factor(120),
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -243,7 +243,7 @@ def type_2_experiment(
         5. Rinse the electrode
         6. Clear the well
         7. Flush the pipette tip
-        8. Rinse the well 4x with rinse0
+        8. Rinse the well 4x with rinse
     """
     
     toolkit.global_logger.info("0. Imaging the well")
@@ -316,20 +316,20 @@ def type_2_experiment(
     flush_v2(
         waste_vials=waste_vials,
         stock_vials=stock_vials,
-        flush_solution_name="rinse0",
+        flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
         flush_count=1,
     )
 
-    toolkit.global_logger.info("8. Rinsing the well 4x with rinse0")
+    toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
                 stock_vials,
-                "rinse0",
+                "rinse",
                 correction_factor(120),
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -367,7 +367,7 @@ def type_3_experiment(
         5. Rinse the electrode
         6. Clear the well
         7. Flush the pipette tip
-        8. Rinse the well 4x with rinse0
+        8. Rinse the well 4x with rinse
     """
 
     toolkit.global_logger.info("0. Imaging the well")
@@ -440,19 +440,19 @@ def type_3_experiment(
     flush_v2(
         waste_vials=waste_vials,
         stock_vials=stock_vials,
-        flush_solution_name="rinse0",
+        flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
         flush_count=1,
     )
-    toolkit.global_logger.info("6. Rinsing the well 4x with rinse0")
+    toolkit.global_logger.info("6. Rinsing the well 4x with rinse")
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
                 stock_vials,
-                "rinse0",
+                "rinse",
                 correction_factor(120),
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],

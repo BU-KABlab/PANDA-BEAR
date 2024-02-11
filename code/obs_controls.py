@@ -46,9 +46,9 @@ class OBSController:
             )
 
             video_information = f"""Experiment Info:
-    ID: {project_id}.{campaign_id}.{exp_id}
-    Status: {status.value}
-    Well: {well_id}"""
+ID: {project_id}.{campaign_id}.{exp_id}
+Status: {status.value}
+Well: {well_id}"""
             label = self.client.get_input_settings("text")
             label.input_settings["text"] = video_information
             # label.input_settings["font"]["size"]=240

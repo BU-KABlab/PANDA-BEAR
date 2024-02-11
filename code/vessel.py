@@ -1,6 +1,17 @@
 """
 Vessel module.
 """
+import logging
+from config.config import PATH_TO_LOGS
+# Set up logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+file_handler = logging.FileHandler(PATH_TO_LOGS / 'vessel.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+
 class Vessel:
     """
     Represents a vessel object.
@@ -50,6 +61,8 @@ class Vessel:
             raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
         else:
             self.volume += added_volume
+            logger.info("%s:%s", self.name, self.volume)
+
             return self
     def calculate_depth(self) -> float:
         pass
@@ -99,6 +112,16 @@ class Vessel:
         """
         # check if the solution_name already exists in the vessel's contents dict, if so update the volume by adding the new volume
         pass
+
+    def get_contents(self) -> dict:
+        """
+        Returns the contents of the vessel.
+
+        Returns:
+        --------
+        dict: The contents of the vessel.
+        """
+        return self.contents
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""

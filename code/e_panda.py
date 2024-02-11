@@ -142,7 +142,7 @@ def forward_pipette_v2(
             pumping_rate = pump.max_pump_rate
 
         repetitions = math.ceil(volume / (pump.pipette_capacity_ul - DRIP_STOP))
-        repetition_vol = round(volume / repetitions,4)
+        repetition_vol = round(volume / repetitions,6)
 
         for j in range(repetitions):
             logger.info("Repetition %d of %d", j + 1, repetitions)
@@ -198,7 +198,7 @@ def forward_pipette_v2(
                     for key, value in from_vessel.get_contents().items():
                         logger.debug("Well contents: %s", from_vessel.get_contents())
                         from_vessel.update_contents(
-                            key, round(-(repetition_vol * current_content_ratios[key]), 4)
+                            key, round(-(repetition_vol * current_content_ratios[key]), 6)
                         )
                         logger.debug("Well contents updated: %s", from_vessel.get_contents())
                 except ZeroDivisionError:
@@ -207,7 +207,7 @@ def forward_pipette_v2(
                 except Exception as e:
                     logger.error("Error occurred while updating well contents: %s", e)
                     logger.error("Not critical, continuing....")
-
+                pump.withdraw(                    volume=20, solution=None, rate=pumping_rate, weigh=False                ) # If the from vessel is a well withdraw a little extra to ensure cleared well
             mill.move_to_safe_position()
 
             # Withdraw an air gap to prevent dripping, receive nothing
@@ -248,20 +248,24 @@ def forward_pipette_v2(
                 being_infused=from_vessel,
                 infused_into=to_vessel,
                 rate=pumping_rate,
-                blowout_ul=AIR_GAP + DRIP_STOP,
+                blowout_ul=AIR_GAP + DRIP_STOP + 20 if isinstance(from_vessel, Well) else AIR_GAP + DRIP_STOP,
                 weigh=weigh,
             )
 
             # Update the contentes of the to_vessel
             try:
-                if isinstance(to_vessel, Well):
-                    to_vessel: Well = to_vessel
-                    to_vessel.update_contents(from_vessel.name, repetition_vol)
+                if isinstance(from_vessel, StockVial):
+                    if isinstance(to_vessel, Well):
+                        to_vessel: Well = to_vessel
+                        to_vessel.update_contents(from_vessel.name, repetition_vol)
+                    elif isinstance(to_vessel, WasteVial):
+                        to_vessel: WasteVial = to_vessel
+                        to_vessel.update_contents(from_vessel.name, repetition_vol)
 
                 elif isinstance(to_vessel, WasteVial):
                     to_vessel: WasteVial = to_vessel
                     contents = from_vessel.get_contents().items()
-                    for key, value in contents:
+                    for key, _ in contents:
                         to_vessel.update_contents(key, repetition_vol)
 
                 logger.info(
