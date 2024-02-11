@@ -133,12 +133,13 @@ def type_1_experiment(
         5. Flush the pipette tip
         6. Rinse the well 4x with rinse0
     """
-    instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
-    ## Deposit the experiment solution into the well
+    
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 1 experiment")
     
+    instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
+    ## Deposit the experiment solution into the well
     toolkit.global_logger.info("1. Depositing 5mm_fecn6 into well: %s", instructions.well_id)
     forward_pipette_v2(
         volume=instructions.solutions_corrected["5mm_fecn6"],
@@ -244,12 +245,13 @@ def type_2_experiment(
         7. Flush the pipette tip
         8. Rinse the well 4x with rinse0
     """
-    instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
-    ## Deposit the experiment solution into the well
+    
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 2 experiment")
     
+    instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
+    ## Deposit the experiment solution into the well
     toolkit.global_logger.info("1. Depositing 10mm_fecn6 into well: %s", instructions.well_id)
     forward_pipette_v2(
         volume=correction_factor(60),
@@ -367,7 +369,7 @@ def type_3_experiment(
         7. Flush the pipette tip
         8. Rinse the well 4x with rinse0
     """
-    
+
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 3 experiment")
