@@ -33,34 +33,42 @@ class OBSController:
         self.logger = logging.getLogger(__name__)
 
     def place_experiment_on_screen(self, instructions: ExperimentBase):
-        """Place the experiment information on the screen"""
-        exp_id = instructions.id if instructions.id else "None"
-        project_id = instructions.project_id if instructions.project_id else "None"
-        well_id = instructions.well_id if instructions.well_id else "None"
-        status = instructions.status if instructions.status else "None"
-        campaign_id = (
-            instructions.project_campaign_id if instructions.project_campaign_id else 0
-        )
+        try:
+            """Place the experiment information on the screen"""
+            exp_id = instructions.id if instructions.id else "None"
+            project_id = instructions.project_id if instructions.project_id else "None"
+            well_id = instructions.well_id if instructions.well_id else "None"
+            status = instructions.status if instructions.status else "None"
+            campaign_id = (
+                instructions.project_campaign_id
+                if instructions.project_campaign_id
+                else 0
+            )
 
-        video_information = f"""Experiment Info:
-ID: {project_id}.{campaign_id}.{exp_id}
-Status: {status.value}
-Well: {well_id}"""
-        label = self.client.get_input_settings("text")
-        label.input_settings["text"] = video_information
-        # label.input_settings["font"]["size"]=240
-        self.client.set_input_settings("text", label.input_settings, True)
-        self.logger.info("Experiment information placed on screen.")
+            video_information = f"""Experiment Info:
+    ID: {project_id}.{campaign_id}.{exp_id}
+    Status: {status.value}
+    Well: {well_id}"""
+            label = self.client.get_input_settings("text")
+            label.input_settings["text"] = video_information
+            # label.input_settings["font"]["size"]=240
+            self.client.set_input_settings("text", label.input_settings, True)
+            self.logger.info("Experiment information placed on screen.")
+        except OBSerror.OBSSDKRequestError as e:
+            self.logger.error("Error placing experiment information on screen: %s", e)
 
     def place_text_on_screen(self, text: str = None):
         """Place the given text on the screen"""
-        if not text:
-            text = ""
-        label = self.client.get_input_settings("text")
-        label.input_settings["text"] = text
-        # label.input_settings["font"]["size"]=240
-        self.client.set_input_settings("text", label.input_settings, True)
-        self.logger.info("Text placed on screen.")
+        try:
+            if not text:
+                text = ""
+            label = self.client.get_input_settings("text")
+            label.input_settings["text"] = text
+            # label.input_settings["font"]["size"]=240
+            self.client.set_input_settings("text", label.input_settings, True)
+            self.logger.info("Text placed on screen.")
+        except Exception as e:
+            self.logger.error("Error placing text on screen: %s", e)
 
     def webcam_on(self):
         """Turn on the webcam"""
@@ -88,15 +96,19 @@ Well: {well_id}"""
 
     def start_recording(self):
         """Start the recording"""
-        self.client.start_record()
-        self.logger.info("Recording started.")
+        try:
+
+            self.client.start_record()
+            self.logger.info("Recording started.")
+        except Exception as e:
+            self.logger.error("Error starting recording: %s", e)
 
     def stop_recording(self):
         """Stop the recording"""
         try:
             self.client.stop_record()
             self.logger.info("Recording stopped.")
-        except OBSerror.OBSSDKRequestError as e:
+        except Exception as e:
             self.logger.error("Error stopping recording: %s", e)
 
     def set_recording_file_name(self, file_name: str):

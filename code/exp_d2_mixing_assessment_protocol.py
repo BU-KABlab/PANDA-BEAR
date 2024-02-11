@@ -139,7 +139,7 @@ def type_1_experiment(
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 1 experiment")
     
-    toolkit.global_logger.info("1. Depositing 5mm_fecn6 into well: ", instructions.well_id)
+    toolkit.global_logger.info("1. Depositing 5mm_fecn6 into well: %s", instructions.well_id)
     forward_pipette_v2(
         volume=instructions.solutions_corrected["5mm_fecn6"],
         from_vessel=solution_selector(
@@ -154,7 +154,7 @@ def type_1_experiment(
     )
 
     ## Move the electrode to the well
-    toolkit.global_logger.info("2. Moving electrode to well:", instructions.well_id)
+    toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
     try:
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
@@ -163,7 +163,7 @@ def type_1_experiment(
             instrument=Instruments.ELECTRODE,
         )
         toolkit.global_logger.info("2. Performing CV")
-        characterization(instructions)
+        characterization(instructions, file_tag="type_1")
     finally:
         toolkit.global_logger.info("3. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -192,18 +192,18 @@ def type_1_experiment(
         flush_solution_name="rinse0",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=3,
+        flush_count=1,
     )
 
     toolkit.global_logger.info("6. Rinsing the well 4x with rinse0")
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
-            volume=instructions.solutions_corrected["rinse0"],
+            volume=correction_factor(120),
             from_vessel=solution_selector(
                 stock_vials,
                 "rinse0",
-                instructions.solutions_corrected["rinse0"],
+                correction_factor(120),
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
             pump=toolkit.pump,
@@ -212,12 +212,12 @@ def type_1_experiment(
         )
         # Clear the well
         forward_pipette_v2(
-            volume=toolkit.wellplate.wells[instructions.well_id].volume,
+            volume=correction_factor(120),
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
                 waste_vials,
                 "waste",
-                toolkit.wellplate.wells[instructions.well_id].volume,
+                correction_factor(120),
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
@@ -250,7 +250,7 @@ def type_2_experiment(
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 2 experiment")
     
-    toolkit.global_logger.info("1. Depositing 10mm_fecn6 into well: ", instructions.well_id)
+    toolkit.global_logger.info("1. Depositing 10mm_fecn6 into well: %s", instructions.well_id)
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -263,7 +263,7 @@ def type_2_experiment(
         mill=toolkit.mill,
         pumping_rate=instructions.pumping_rate,
     )
-    toolkit.global_logger.info("2. Depositing electrolyte into well: ", instructions.well_id)
+    toolkit.global_logger.info("2. Depositing electrolyte into well: %s", instructions.well_id)
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -278,7 +278,7 @@ def type_2_experiment(
     )
 
     ## Move the electrode to the well
-    toolkit.global_logger.info("3. Moving electrode to well:", instructions.well_id)
+    toolkit.global_logger.info("3. Moving electrode to well: %s", instructions.well_id)
     try:
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
@@ -287,7 +287,7 @@ def type_2_experiment(
             instrument=Instruments.ELECTRODE,
         )
         toolkit.global_logger.info("4. Performing CV")
-        characterization(instructions)
+        characterization(instructions, file_tag="type_2")
     finally:
         toolkit.global_logger.info("5. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -317,7 +317,7 @@ def type_2_experiment(
         flush_solution_name="rinse0",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=3,
+        flush_count=1,
     )
 
     toolkit.global_logger.info("8. Rinsing the well 4x with rinse0")
@@ -370,11 +370,11 @@ def type_3_experiment(
     
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "before type 1 experiment")
+    image_well(toolkit, instructions, "before type 3 experiment")
     
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
-    toolkit.global_logger.info("1. Depositing electrolyte into well: ", instructions.well_id)
+    toolkit.global_logger.info("1. Depositing electrolyte into well: %s", instructions.well_id)
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -387,7 +387,7 @@ def type_3_experiment(
         mill=toolkit.mill,
         pumping_rate=instructions.pumping_rate,
     )
-    toolkit.global_logger.info("2. Depositing 10mm_fecn6 into well: ", instructions.well_id)
+    toolkit.global_logger.info("2. Depositing 10mm_fecn6 into well: %s", instructions.well_id)
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -402,7 +402,7 @@ def type_3_experiment(
     )
 
     ## Move the electrode to the well
-    toolkit.global_logger.info("3. Moving electrode to well:", instructions.well_id)
+    toolkit.global_logger.info("3. Moving electrode to well: %s", instructions.well_id)
     try:
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
@@ -411,7 +411,7 @@ def type_3_experiment(
             instrument=Instruments.ELECTRODE,
         )
         toolkit.global_logger.info("4. Performing CV")
-        characterization(instructions)
+        characterization(instructions, file_tag="type_3")
     finally:
         toolkit.global_logger.info("5. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -441,7 +441,7 @@ def type_3_experiment(
         flush_solution_name="rinse0",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=3,
+        flush_count=1,
     )
     toolkit.global_logger.info("6. Rinsing the well 4x with rinse0")
     for _ in range(4):

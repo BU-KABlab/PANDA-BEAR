@@ -22,7 +22,7 @@ TEST = TESTING
 print("TEST MODE: ", TEST)
 # Create experiments
 PROJECT_ID = 15
-EXPERIMENT_NAME = "Mixing assessment (exp D)"
+EXPERIMENT_NAME = "Mixing assessment (exp D2)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
 CAMPAIGN_ID = 1
 PUMPING_RATE = 0.3

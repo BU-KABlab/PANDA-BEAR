@@ -744,7 +744,7 @@ def deposition(
 
 
 def characterization(
-    char_instructions: EchemExperimentBase,
+    char_instructions: EchemExperimentBase, file_tag: str = None
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Characterization of the solutions on the substrate using CV.
@@ -753,9 +753,7 @@ def characterization(
 
     Args:
         char_instructions (Experiment): The experiment instructions
-        char_results (ExperimentResult): The experiment results
-        mill (object): The mill object
-        wellplate (Wells object): The wellplate object
+        
     Returns:
         char_instructions (Experiment): The updated experiment instructions
         char_results (ExperimentResult): The updated experiment results
@@ -772,7 +770,7 @@ def characterization(
         char_instructions.set_status(ExperimentStatus.OCPCHECK)
         char_instructions.results.ocp_char_file = pstat.setfilename(
             char_instructions.id,
-            "OCP_char",
+            "OCP_char_" + file_tag if file_tag else "OCP_char",
             char_instructions.project_id,
             char_instructions.project_campaign_id,
             char_instructions.well_id,
@@ -808,7 +806,7 @@ def characterization(
 
             char_instructions.results.characterization_data_file = pstat.setfilename(
                 char_instructions.id,
-                test_type,
+                test_type + "_" + file_tag if file_tag else test_type,
                 char_instructions.project_id,
                 char_instructions.project_campaign_id,
                 char_instructions.well_id,
