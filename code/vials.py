@@ -268,15 +268,15 @@ class WasteVial(Vial2):
         super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
         self.category = 1
 
-    def update_contents(self, solution_name: str, volume: float) -> None:
+    def update_contents(self, vessel_name: str, volume: float) -> None:
         """Update the contentes of the waste vial"""
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
-        if solution_name in self.contents:
-            self.contents[solution_name] += volume
+        if vessel_name in self.contents:
+            self.contents[vessel_name] += volume
 
         # otherwise, add the solution to the vessel's contents dictionary
         else:
-            self.contents[solution_name] = volume
+            self.contents[vessel_name] = volume
         vial_logger.debug("%s %s: New contents: %s", self.name, self.position, self.contents)
 
         # Update the file

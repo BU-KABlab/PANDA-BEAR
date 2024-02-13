@@ -5,7 +5,7 @@ wellplate and the wells in it.
 """
 
 # pylint: disable=line-too-long
-
+#from decimal import Decimal
 import json
 import logging
 import math
@@ -94,33 +94,66 @@ class Well(Vessel):
         """Returns the contents of the well."""
         return self.contents
 
-    def update_contents(self, solution_name: str, volume: float) -> None:
+    def update_contents(self, vessel_name: str, volume: float) -> None:
         """Updates the contents of the well in the well_status.json file."""
-        # Check if the solution is already in the well
-        logger.debug(
-            "Updating contents of %s with %f %s", self.name, volume, solution_name
-        )
 
-        if solution_name in self.contents.keys():
-            self.contents[solution_name] += volume
-            logger.debug("Updated %s contents: %s", self.name, self.contents)
+        # If we are removing a volume from a well we assume that the contents are equally mixed
+        # and we remove the same proportion of each vessel name AKA solution name
+        logger.debug("Updating well contents...")
+        if volume < 0:
+            try:
+                current_content_ratios = {
+                    key: value / sum(self.get_contents().values())
+                    for key, value in self.get_contents().items()
+                }
+
+                for key, _ in self.get_contents().items():
+                    self.update_contents(
+                        key, round(-(volume * current_content_ratios[key]), 6)
+                    )
+
+            except ZeroDivisionError:
+                logger.error("Well %s is empty", self.name)
+            except Exception as e:
+                logger.error("Error occurred while updating well contents: %s", e)
+                logger.error("Not critical, continuing....")
+
+        elif volume == 0:
+            logger.debug("Volume to add was 0 well %s contents unchanged", self.name)
+
+        # If we are adding a volume to a well then we update the provided vessel name AKA solution name
+        # with the provided volume
         else:
-            self.contents[solution_name] = volume
-            logger.debug("New %s contents: %s", self.name, self.contents)
+            if vessel_name in self.contents.keys():
+                self.contents[vessel_name] += volume
+                logger.debug("Updated %s contents: %s", self.name, self.contents)
+            else:
+                self.contents[vessel_name] = volume
+                logger.debug("New %s contents: %s", self.name, self.contents)
+
         # Update the well status file
-        logger.debug("Updating well status file...")
+        self.update_well_status_file()
+
+    def update_well_status_file(self) -> None:
+        """Updates the well in the well_status.json file."""
+        logger.debug("Updating well file of %s", self.name)
+
+        # Load the well status file
         with open(WELL_STATUS, "r", encoding="utf-8") as f:
             data = json.load(f)
             for well in data["wells"]:
                 if well["well_id"] == self.well_id:
+                    well["status"] = self.status
                     well["contents"] = self.contents
-                    logger.debug(
-                        "Well %s contents updated to %s", self.name, self.contents
-                    )
+                    well["volume"] = self.volume
+                    well["status_date"] = self.status_date
+                    logger.debug("Well %s file updated")
                     break
 
+        # Update the well status file
         with open(WELL_STATUS, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
+
         logger.debug("Well status file updated")
 
 
