@@ -24,6 +24,7 @@ Returns:
 # Standard library imports
 import logging
 import math
+
 # import decimal
 
 # Third party or custom imports
@@ -66,6 +67,13 @@ formatter = logging.Formatter(
 system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
+
+# Add a testing logger
+testing_logger = logging.getLogger("testing")
+testing_logger.setLevel(logging.DEBUG)
+testing_handler = logging.FileHandler(PATH_TO_LOGS / "testing.log")
+testing_handler.setFormatter(formatter)
+testing_logger.addHandler(testing_handler)
 
 
 def forward_pipette_v2(
@@ -185,25 +193,6 @@ def forward_pipette_v2(
             )  # pipette now has air gap + repetition vol
 
             if isinstance(from_vessel, Well):
-                from_vessel: Well = from_vessel
-                try:
-                    logger.info("Updating well contents...")
-                    current_content_ratios = {
-                        key: value / sum(from_vessel.get_contents().values())
-                        for key, value in from_vessel.get_contents().items()
-                    }
-
-                    for key, value in from_vessel.get_contents().items():
-                        logger.debug("Well contents: %s", from_vessel.get_contents())
-                        from_vessel.update_contents(
-                            key, round(-(repetition_vol * current_content_ratios[key]), 6)
-                        )
-                        logger.debug("Well contents updated: %s", from_vessel.get_contents())
-                except ZeroDivisionError:
-                    logger.error("Well %s is empty", from_vessel.name)
-                except Exception as e:
-                    logger.error("Error occurred while updating well contents: %s", e)
-                    logger.error("Not critical, continuing....")
                 pump.withdraw(
                     volume=20, solution=None, rate=pumping_rate, weigh=False
                 )  # If the from vessel is a well withdraw a little extra to ensure cleared well
@@ -225,59 +214,45 @@ def forward_pipette_v2(
             # Second Half: Deposit to to_vessel
             logger.info("Moving to: %s...", to_vessel.name)
 
-            if isinstance(to_vessel, Well):  # go to solution depth
+            if isinstance(to_vessel, Well):
                 to_vessel: Well = to_vessel
-                mill.safe_move(
-                    to_vessel.coordinates["x"],
-                    to_vessel.coordinates["y"],
-                    to_vessel.height,
-                    Instruments.PIPETTE,
-                )
-            else:  # go to safe height above waste vial
+            else:
                 to_vessel: WasteVial = to_vessel
-                mill.safe_move(
-                    to_vessel.coordinates["x"],
-                    to_vessel.coordinates["y"],
-                    to_vessel.height,
-                    Instruments.PIPETTE,
-                )
 
-            # Infuse into the to_vessel and receive the updated vessel object
+            mill.safe_move(
+                to_vessel.coordinates["x"],
+                to_vessel.coordinates["y"],
+                to_vessel.height,
+                Instruments.PIPETTE,
+            )
+
             weigh = bool(isinstance(to_vessel, Well))
+
+            # Infuse into the
+            ## Testing
+            blow_out = (
+                AIR_GAP + DRIP_STOP + 20
+                if isinstance(from_vessel, Well)
+                else AIR_GAP + DRIP_STOP
+            )
+            is_pipette_volume_equal = pump.pipette_volume_ul >= blow_out
+            testing_logger.debug(
+                "TESTING: Is pipette volume greater than or equal to blowout? %s",
+                is_pipette_volume_equal,
+            )
 
             pump.infuse(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,
                 infused_into=to_vessel,
                 rate=pumping_rate,
-                blowout_ul=AIR_GAP + DRIP_STOP + 20 if isinstance(from_vessel, Well) else AIR_GAP + DRIP_STOP,
+                blowout_ul=(
+                    AIR_GAP + DRIP_STOP + 20
+                    if isinstance(from_vessel, Well)
+                    else AIR_GAP + DRIP_STOP
+                ),
                 weigh=weigh,
             )
-
-            # Update the contents of the to_vessel
-            try:
-                if isinstance(from_vessel, StockVial):
-                    if isinstance(to_vessel, Well):
-                        to_vessel: Well = to_vessel
-                        to_vessel.update_contents(from_vessel.name, repetition_vol)
-                    elif isinstance(to_vessel, WasteVial):
-                        to_vessel: WasteVial = to_vessel
-                        to_vessel.update_contents(from_vessel.name, repetition_vol)
-                elif isinstance(to_vessel, WasteVial):
-                    to_vessel: WasteVial = to_vessel
-                    contents = from_vessel.get_contents().items()
-                    for key, _ in contents:
-                        to_vessel.update_contents(key, repetition_vol)
-
-                logger.info(
-                    "Vessel %s volume: %f depth: %f",
-                    to_vessel.name,
-                    to_vessel.volume,
-                    to_vessel.depth,
-                )
-            except Exception as e:
-                logger.error("Error occurred while updating vessel contents: %s", e)
-                logger.error("Not critical, continuing....")
 
             mill.move_to_safe_position()
 
@@ -759,7 +734,7 @@ def characterization(
 
     Args:
         char_instructions (Experiment): The experiment instructions
-        
+
     Returns:
         char_instructions (Experiment): The updated experiment instructions
         char_results (ExperimentResult): The updated experiment results
@@ -889,7 +864,7 @@ def image_well(
         toolkit (Toolkit): The toolkit object
         instructions (Experiment): The experiment instructions
         step_description (str): The description of the step
-        
+
     Returns:
         None (void function) since the objects are passed by reference
     """
@@ -908,8 +883,8 @@ def image_well(
             file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
         else:
             file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
-        file_name = file_name.replace(" ", "_") #clean up the file name
-        file_name_start = file_name + "_0" # enumerate the file name
+        file_name = file_name.replace(" ", "_")  # clean up the file name
+        file_name_start = file_name + "_0"  # enumerate the file name
         filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".png")
         i = 1
         while filepath.exists():
@@ -928,7 +903,7 @@ def image_well(
             )
         else:
             pass
-        
+
         if TESTING:
             Path(filepath).touch()
         else:
