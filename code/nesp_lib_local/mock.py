@@ -42,7 +42,7 @@ class Pump(RealPump):
 
     def __init__(
         self,
-        port : Port,
+        port : str = 'COM1',
         address : int = ADDRESS_DEFAULT,
         model_number : int = MODEL_NUMBER_IGNORE,
         safe_mode_timeout : int = SAFE_MODE_TIMEOUT_DISABLED
@@ -70,14 +70,7 @@ class Pump(RealPump):
         """
         if address < 0 or address > Pump.ADDRESS_LIMIT :
             raise ValueError('Address invalid: Value negative or exceeds limit.')
-        self.__port = port
-        self.__port_lock = threading.Lock()
         self.__address = address
-        self.__safe_mode = False
-        self.__heartbeat_thread : typing.Optional[threading.Thread] = None
-        self.__heartbeat_event : typing.Optional[threading.Event] = None
-        self.__heartbeat_event_timeout = 0.0
-        self.__safe_mode_timeout_set(safe_mode_timeout, True)
         model_number_port, firmware_version_port, firmware_upgrade_port = (
             self.__firmware_version_get()
         )
@@ -86,6 +79,16 @@ class Pump(RealPump):
         self.__model_number = model_number_port
         self.__firmware_version = firmware_version_port
         self.__firmware_upgrade = firmware_upgrade_port
+
+        # Default values
+        self.__safe_mode_timeout = Pump.SAFE_MODE_TIMEOUT_DISABLED
+        self.__syringe_diameter = Pump.SYRINGE_DIAMETER_MINIMUM
+        self.__pumping_direction = Pump.__PumpingDirectionInfuse
+        self.__pumping_volume = (0.0, 'ML')
+        self.__pump_rate = [0.0, 'MM']
+        self.__volume_infused = 0.0
+        self.__volume_withdrawn = 0.0
+
 
     @property
     def address(self) -> int :
@@ -126,10 +129,7 @@ class Pump(RealPump):
 
         Values: [`0`, `SAFE_MODE_TIMEOUT_LIMIT`]
         """
-        _, match = self.__command_transceive(
-            Pump.__CommandName.SAFE_MODE_TIMEOUT, [], Pump.__RE_PATTERN_SAFE_MODE_TIMEOUT
-        )
-        return int(match[1])
+        return 0
 
     @safe_mode_timeout.setter
     def safe_mode_timeout(self, safe_mode_timeout : int) -> None :
@@ -149,7 +149,7 @@ class Pump(RealPump):
     @property
     def status(self) -> Status :
         """Gets the status of the pump."""
-        status, _ = self.__command_transceive(Pump.__CommandName.STATUS)
+        status = Status.STOPPED
         return status
 
     @property
@@ -164,10 +164,8 @@ class Pump(RealPump):
 
         Values: [`SYRINGE_DIAMETER_MINIMUM`, `SYRINGE_DIAMETER_MAXIMUM`]
         """
-        _, match = self.__command_transceive(
-            Pump.__CommandName.SYRINGE_DIAMETER, [], Pump.__RE_PATTERN_SYRINGE_DIAMETER
-        )
-        return float(match[1])
+        match = self.__syringe_diameter
+        return float(match)
 
     @syringe_diameter.setter
     def syringe_diameter(self, syringe_diameter : float) -> None :
@@ -188,14 +186,13 @@ class Pump(RealPump):
             syringe_diameter > Pump.SYRINGE_DIAMETER_MAXIMUM
         ) :
             raise ValueError('Syringe diameter invalid: Value exceeds limit.')
-        self.__command_transceive(Pump.__CommandName.SYRINGE_DIAMETER, [syringe_diameter])
+        self.__syringe_diameter = syringe_diameter
 
     @property
     def pumping_direction(self) -> PumpingDirection :
         """Gets the pumping direction of the pump."""
-        _, pumping_direction_string = self.__command_transceive(
-            Pump.__CommandName.PUMPING_DIRECTION
-        )
+        pumping_direction_string = self.__pumping_direction
+
         pumping_direction = Pump.__PUMPING_DIRECTION_EXTERNAL.get(pumping_direction_string)
         if pumping_direction is None :
             raise InternalException()
@@ -207,16 +204,14 @@ class Pump(RealPump):
         pumping_direction_string = Pump.__PUMPING_DIRECTION_INTERNAL.get(pumping_direction)
         if pumping_direction_string is None :
             raise ValueError('Pumping direction invalid: Value unknown.')
-        self.__command_transceive(Pump.__CommandName.PUMPING_DIRECTION, [pumping_direction_string])
+        self.__pumping_direction = pumping_direction_string
 
     @property
     def pumping_volume(self) -> float :
         """Gets the pumping volume of the pump in units of milliliters."""
-        _, match = self.__command_transceive(
-            Pump.__CommandName.PUMPING_VOLUME, [], Pump.__RE_PATTERN_PUMPING_VOLUME
-        )
-        value = float(match[1])
-        units = match[2]
+        match = self.__pumping_volume
+        value = float(match[0])
+        units = match[1]
         value_milliliters = Pump.__VOLUME_MILLILITERS.get(units)
         if value_milliliters is None :
             raise InternalException()
@@ -239,20 +234,18 @@ class Pump(RealPump):
         else :
             pumping_volume *= 1_000.0
             units = 'UL'
-        self.__command_transceive(Pump.__CommandName.PUMPING_VOLUME, [units])
+        self.__pumping_volume = (pumping_volume, units)
         try :
-            self.__command_transceive(Pump.__CommandName.PUMPING_VOLUME, [pumping_volume])
+            self.__pumping_volume = (pumping_volume, units)
         except ValueError :
             raise ValueError('Pumping volume invalid: Value exceeds limit.')
 
     @property
     def pumping_rate(self) -> float :
         """Gets the pumping rate of the pump in units of milliliters per minute."""
-        _, match = self.__command_transceive(
-            Pump.__CommandName.PUMPING_RATE, [], Pump.__RE_PATTERN_PUMPING_RATE
-        )
-        value = float(match[1])
-        units = match[2]
+        match = self.__pump_rate
+        value = float(match[0])
+        units = match[1]
         value_milliliters_per_minute = Pump.__PUMPING_RATE_MILLILITERS_PER_MINUTE.get(units)
         if value_milliliters_per_minute is None :
             raise InternalException()
@@ -284,31 +277,33 @@ class Pump(RealPump):
             pumping_rate *= 60_000.0
             units = 'UH'
         try :
-            self.__command_transceive(Pump.__CommandName.PUMPING_RATE, [pumping_rate, units])
+            self.__pump_rate = (pumping_rate, units)
         except ValueError :
             raise ValueError('Pumping rate invalid: Value exceeds limit.')
 
     @property
     def volume_infused(self) -> float :
         """Gets the volume infused of the pump in units of milliliters."""
-        return self.__dispensation_get(False)
+        # convert to mililiters
+        if self.__pumping_volume[1] == 'UL' :
+            return self.__volume_infused / 1_000.0
+        return self.__volume_infused
 
     def volume_infused_clear(self) -> None :
         """Sets the volume infused of the pump to zero."""
-        self.__command_transceive(
-            Pump.__CommandName.DISPENSATION_CLEAR, [Pump.__PumpingDirectionInfuse]
-        )
+        self.__volume_infused = 0.0
 
     @property
     def volume_withdrawn(self) -> float :
         """Gets the volume withdrawn of the pump in units of milliliters."""
-        return self.__dispensation_get(True)
+        # convert to mililiters
+        if self.__pumping_volume[1] == 'UL' :
+            return self.__volume_withdrawn / 1_000.0
+        return self.__volume_withdrawn
 
     def volume_withdrawn_clear(self) -> None :
         """Sets the volume withdrawn of the pump to zero."""
-        self.__command_transceive(
-            Pump.__CommandName.DISPENSATION_CLEAR, [Pump.__PumpingDirectionWithdraw]
-        )
+        self.__volume_withdrawn = 0.0
 
     def run(self, wait_while_running : bool = True) -> None :
         """
@@ -317,17 +312,30 @@ class Pump(RealPump):
         :param wait_while_running:
             If the function waits while the pump is running.
         """
-        self.__command_transceive(Pump.__CommandName.RUN)
-        if wait_while_running :
-            self.wait_while_running()
-
+        if self.__pumping_volume[0] == 0.0 :
+            return
+        if self.__pump_rate[0] == 0.0 :
+            return
+        # get units
+        units = self.__pumping_volume[1]
+        # get volume
+        volume = self.__pumping_volume[0]
+        # convert to mililiters
+        if units == 'UL' :
+            volume = volume / 1_000.0
+        # set volume 
+        if self.__pumping_direction == Pump.__PumpingDirectionInfuse :
+            self.__volume_infused += self.__pumping_volume[0]
+        else :
+            self.__volume_withdrawn += self.__pumping_volume[0]
+            
     def run_purge(self) -> None :
         """
         Runs the pump considering the direction set at maximum rate.
 
         Running will continue until stopped.
         """
-        self.__command_transceive(Pump.__CommandName.RUN_PURGE)
+        pass
 
     def stop(self, wait_while_running : bool = True) -> None :
         """
@@ -336,14 +344,11 @@ class Pump(RealPump):
         :param wait_while_running:
             If the function waits while the pump is running.
         """
-        self.__command_transceive(Pump.__CommandName.STOP)
-        if wait_while_running :
-            self.wait_while_running()
+        pass
 
     def wait_while_running(self) -> None :
         """Waits while the pump is running."""
-        while self.running :
-            time.sleep(Pump.PUMPING_POLL_DELAY)
+        pass
 
     # Start transmission
     __STX = 0x02
@@ -444,16 +449,16 @@ class Pump(RealPump):
         'UL' : lambda value : value * 1_000.0,
     }
 
-    def __error_handle_not_applicable() -> None :
+    def __error_handle_not_applicable(self) -> None :
         raise StateException()
 
-    def __error_handle_out_of_range() -> None :
+    def __error_handle_out_of_range(self) -> None :
         raise ValueError()
 
-    def __error_handle_communication() -> None :
+    def __error_handle_communication(self) -> None :
         raise ChecksumRequestException()
 
-    def __error_handle_ignored() -> None :
+    def __error_handle_ignored(self) -> None :
         pass
 
     __ERROR = {
@@ -467,13 +472,13 @@ class Pump(RealPump):
         'IGN' : __error_handle_ignored
     }
 
-    def __argument_str(value : str) -> str :
+    def __argument_str(self, value : str) -> str :
         return value
 
-    def __argument_int(value : int) -> str :
+    def __argument_int(self, value : int) -> str :
         return str(value)
 
-    def __argument_float(value : float) -> str :
+    def __argument_float(self, value : float) -> str :
         # From the docs: Maximum of 4 digits plus 1 decimal point. Maximum of 3 digits to the right
         # of the decimal point.
         if value.is_integer() :
@@ -489,234 +494,19 @@ class Pump(RealPump):
         float : __argument_float
     }
 
-    @staticmethod
-    def __command_checksum_calculate(data : bytes) -> int :
-        """Gets the CCITT-CRC of the given data."""
-        return binascii.crc_hqx(data, 0x0000)
-
-    @staticmethod
-    def __command_request_format(
-        address : int,
-        name : __CommandName,
-        arguments : typing.Iterable[typing.Union[str, int, float]] = []
-    ) -> str :
-        return str(address) + name.value + ''.join(
-            Pump.__ARGUMENT[type(argument)](argument)
-            for argument in arguments
-        )
-
-    @classmethod
-    def __command_reply_parse(
-        cls,
-        address : int,
-        data_string : str
-    ) -> typing.Tuple[Status, typing.Optional[AlarmStatus], str] :
-        data_length = len(data_string)
-        if data_length < 3 :
-            raise InternalException()
-        address_string = data_string[0 : 2]
-        address_ = int(address_string)
-        if address_ != address :
-            raise AddressException()
-        status_string = data_string[2]
-        if status_string == cls.__STATUS_ALARM :
-            if data_string[3] != '?' :
-                raise InternalException()
-            alarm_status_string = data_string[4]
-            alarm_status = cls.__ALARM_STATUS.get(alarm_status_string)
-            if alarm_status is None :
-                raise InternalException()
-            return Status.STOPPED, alarm_status, ''
-        status = cls.__STATUS.get(status_string)
-        if status is None :
-            raise InternalException()
-        result = data_string[3 : data_length]
-        if result and result[0] == '?' :
-            error_string = result[1 :]
-            error = cls.__ERROR.get(error_string)
-            if error is None :
-                raise InternalException()
-            error()
-        return status, None, result
-
-    @classmethod
-    def __command_request_encode_basic(
-        cls,
-        request : str
-    ) -> bytes :
-        request += '\r'
-        return request.encode()
-
-    @classmethod
-    def __command_request_encode_safe(
-        cls,
-        request : str
-    ) -> bytes :
-        request_bytes = request.encode()
-        checksum = cls.__command_checksum_calculate(request_bytes)
-        return bytes([
-            cls.__STX,
-            # Length (1 byte) + Checksum (2 bytes) + ETX (1 byte) = 4 bytes
-            len(request_bytes) + 4,
-            *request_bytes,
-            *checksum.to_bytes(2, byteorder = 'big', signed = False),
-            cls.__ETX
-        ])
-
-    @classmethod
-    def __command_reply_receive_port_basic(cls, port : Port) -> str :
-        data = port._receive(1)
-        if data[0] != cls.__STX :
-            raise InternalException()
-        data = bytearray()
-        while True :
-            data_length = max(1, port._waiting_receive)
-            data.extend(port._receive(data_length))
-            if data[-1] == cls.__ETX :
-                del data[-1]
-                break
-        data_string = data.decode()
-        return data_string
-
-    @classmethod
-    def __command_reply_receive_port_safe(cls, port : Port) -> str :
-        data_header = port._receive(2)
-        if data_header[0] != cls.__STX :
-            raise InternalException()
-        data_length = data_header[1]
-        if data_length <= 2 :
-            raise InternalException()
-        data = port._receive(data_length - 1)
-        if data[-1] != cls.__ETX :
-            raise InternalException()
-        checksum = int.from_bytes(data[-3 : -1], byteorder = 'big', signed = False)
-        data = data[0 : -3]
-        if checksum != cls.__command_checksum_calculate(data) :
-            raise ChecksumReplyException()
-        data_string = data.decode()
-        return data_string
-
-    @classmethod
-    def __command_transceive_port(
-        cls,
-        port : Port,
-        safe_mode_transmit : bool,
-        safe_mode_receive : bool,
-        address : int,
-        name : __CommandName,
-        arguments : typing.Iterable[typing.Union[str, int, float]] = [],
-        re_pattern_result : typing.Optional[re.Pattern] = None,
-        alarm_ignore : bool = False
-    ) -> typing.Tuple[Status, typing.Union[str, re.Match]] :
-        while True :
-            request = cls.__command_request_format(address, name, arguments)
-            if safe_mode_transmit :
-                request_bytes = cls.__command_request_encode_safe(request)
-            else :
-                request_bytes = cls.__command_request_encode_basic(request)
-            port._transmit(request_bytes)
-            if safe_mode_receive :
-                reply = cls.__command_reply_receive_port_safe(port)
-            else :
-                reply = cls.__command_reply_receive_port_basic(port)
-            status, alarm, result = cls.__command_reply_parse(address, reply)
-            if alarm is not None and alarm_ignore :
-                alarm_ignore = False
-            else :
-                break
-        if alarm is not None :
-            raise StatusAlarmException(alarm)
-        if re_pattern_result is None :
-            return status, result
-        match = re_pattern_result.fullmatch(result)
-        if match is None :
-            raise InternalException()
-        return status, match
-
-    def __command_transceive(
-        self,
-        name : __CommandName,
-        arguments : typing.Iterable[typing.Union[str, int, float]] = [],
-        re_pattern_result : typing.Optional[re.Pattern] = None,
-        safe_mode_transmit : typing.Optional[bool] = None,
-        safe_mode_receive : typing.Optional[bool] = None,
-        alarm_ignore : bool = False
-    ) -> typing.Tuple[Status, typing.Union[str, re.Match]] :
-        if safe_mode_transmit is None :
-            safe_mode_transmit = self.__safe_mode
-        if safe_mode_receive is None :
-            safe_mode_receive = safe_mode_transmit
-        with self.__port_lock :
-            reply = Pump.__command_transceive_port(
-                self.__port,
-                safe_mode_transmit,
-                safe_mode_receive,
-                self.__address,
-                name,
-                arguments,
-                re_pattern_result,
-                alarm_ignore
-            )
-        if self.__heartbeat_event is not None :
-            self.__heartbeat_event.set()
-        return reply
-
     def __safe_mode_timeout_set(self, safe_mode_timeout : int, initial : bool = False) -> None :
-        if safe_mode_timeout < 0 or safe_mode_timeout > Pump.SAFE_MODE_TIMEOUT_LIMIT :
-            raise ValueError('Safe mode timeout invalid: Value negative or exceeds limit.')
-        safe_mode = safe_mode_timeout != 0
-        self.__command_transceive(
-            Pump.__CommandName.SAFE_MODE_TIMEOUT, [safe_mode_timeout],
-            safe_mode_transmit = True, safe_mode_receive = safe_mode, alarm_ignore = initial
-        )
-        self.__safe_mode = safe_mode
-        self.__heartbeat_setup(float(safe_mode_timeout))
-
-    def __heartbeat_setup(self, timeout_seconds : float) -> None :
-        activate = timeout_seconds != 0
-        active = self.__heartbeat_thread is not None
-        self.__heartbeat_event_timeout = timeout_seconds / 2
-        if activate == active :
-            if activate :
-                self.__heartbeat_event.set()
-            return
-        if activate :
-            self.__heartbeat_thread = threading.Thread(
-                target = self.__heartbeat,
-                daemon = True
-            )
-            self.__heartbeat_event = threading.Event()
-            self.__heartbeat_thread.start()
-        else :
-            self.__heartbeat_event.set()
-            self.__heartbeat_thread.join()
-            self.__heartbeat_event = None
-            self.__heartbeat_thread = None
-
-    def __heartbeat(self) -> None :
-        while self.__heartbeat_event_timeout != 0.0 :
-            if self.__heartbeat_event.wait(self.__heartbeat_event_timeout) :
-                self.__heartbeat_event.clear()
-            else :
-                self.__command_transceive(Pump.__CommandName.STATUS)
+        pass
 
     def __firmware_version_get(self) -> typing.Tuple[int, typing.Tuple[int, int], int] :
-        _, match = self.__command_transceive(
-            Pump.__CommandName.FIRMWARE_VERSION, [], Pump.__RE_PATTERN_FIRMWARE_VERSION
-        )
-        model_number = int(match[1])
-        upgrade = 0 if match[2] is None else 1 if match[3] is None else int(match[3])
-        version_major = int(match[4])
-        version_minor = int(match[5])
-        return model_number, (version_major, version_minor), upgrade
+        return 9999, (9999, 9999), 9999
 
     def __dispensation_get(self, withdrawn : bool) -> float :
-        _, match = self.__command_transceive(
-            Pump.__CommandName.DISPENSATION, [], Pump.__RE_PATTERN_DISPENSATION
-        )
-        value = float(match[1 + withdrawn])
-        units = match[3]
-        value_milliliters = Pump.__VOLUME_MILLILITERS.get(units)
-        if value_milliliters is None :
-            raise InternalException()
-        return value_milliliters(value)
+        if withdrawn :
+            # convert to mililiters
+            if self.pumping_volume[1] == 'UL' :
+                return self.__volume_withdrawn / 1_000.0
+            return self.__volume_withdrawn
+        # convert to mililiters
+        if self.pumping_volume[1] == 'UL' :
+            return self.__volume_infused / 1_000.0
+        return self.__volume_infused
