@@ -142,27 +142,22 @@ def forward_pipette_v2(
             pumping_rate = pump.max_pump_rate
 
         repetitions = math.ceil(volume / (pump.pipette_capacity_ul - DRIP_STOP))
-        repetition_vol = round(volume / repetitions,6)
+        repetition_vol = round(volume / repetitions, 6)
 
         for j in range(repetitions):
             logger.info("Repetition %d of %d", j + 1, repetitions)
             # First half: pick up solution
             logger.debug("Withdrawing %f of air gap...", AIR_GAP)
 
-            # withdraw a little to engange screw receive nothing
+            # withdraw a little to engage screw receive nothing
             pump.withdraw(
                 volume=AIR_GAP, solution=None, rate=pumping_rate
             )  # withdraw air gap to engage screw
+
             if isinstance(from_vessel, Well):
                 logger.info(
                     "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
                 )
-            else:
-                logger.info(
-                    "Moving to %s at %s...", from_vessel.name, from_vessel.position
-                )
-            # if from vessel is a well, go to well depth
-            if isinstance(from_vessel, Well):
                 from_vessel: Well = from_vessel
                 mill.safe_move(
                     from_vessel.coordinates["x"],
@@ -170,29 +165,32 @@ def forward_pipette_v2(
                     from_vessel.depth,
                     Instruments.PIPETTE,
                 )
-            else:  # go to safe height above vial
+            else:
+                logger.info(
+                    "Moving to %s at %s...", from_vessel.name, from_vessel.position
+                )
                 mill.safe_move(
                     from_vessel.coordinates["x"],
                     from_vessel.coordinates["y"],
                     from_vessel.depth,
                     Instruments.PIPETTE,
                 )  # go to solution depth
+
             # Withdraw the solution from the source and receive the updated vessel object
             pump.withdraw(
                 volume=repetition_vol,
                 solution=from_vessel,
                 rate=pumping_rate,
                 weigh=False,
-            )  # pipette now has air gap + repitition vol
-            if isinstance(from_vessel, Well): # We only update well contents since stock has fixed contents
+            )  # pipette now has air gap + repetition vol
+
+            if isinstance(from_vessel, Well):
                 from_vessel: Well = from_vessel
-                # We are removing solution from a well and assume an even mixture of all contents
-                # The repetition volume removes each content proportional to its ratio
                 try:
                     logger.info("Updating well contents...")
                     current_content_ratios = {
-                    key: value / sum(from_vessel.get_contents().values())
-                    for key, value in from_vessel.get_contents().items()
+                        key: value / sum(from_vessel.get_contents().values())
+                        for key, value in from_vessel.get_contents().items()
                     }
 
                     for key, value in from_vessel.get_contents().items():
@@ -203,26 +201,30 @@ def forward_pipette_v2(
                         logger.debug("Well contents updated: %s", from_vessel.get_contents())
                 except ZeroDivisionError:
                     logger.error("Well %s is empty", from_vessel.name)
-
                 except Exception as e:
                     logger.error("Error occurred while updating well contents: %s", e)
                     logger.error("Not critical, continuing....")
-                pump.withdraw(                    volume=20, solution=None, rate=pumping_rate, weigh=False                ) # If the from vessel is a well withdraw a little extra to ensure cleared well
+                pump.withdraw(
+                    volume=20, solution=None, rate=pumping_rate, weigh=False
+                )  # If the from vessel is a well withdraw a little extra to ensure cleared well
+
             mill.move_to_safe_position()
 
             # Withdraw an air gap to prevent dripping, receive nothing
             pump.withdraw(
                 volume=DRIP_STOP, solution=None, rate=pumping_rate, weigh=False
             )
+
             logger.debug(
                 "From Vessel %s volume: %f depth: %f",
                 from_vessel.name,
                 from_vessel.volume,
                 from_vessel.depth,
             )
+
             # Second Half: Deposit to to_vessel
             logger.info("Moving to: %s...", to_vessel.name)
-            # determine if the destination is a well or a waste vial
+
             if isinstance(to_vessel, Well):  # go to solution depth
                 to_vessel: Well = to_vessel
                 mill.safe_move(
@@ -252,7 +254,7 @@ def forward_pipette_v2(
                 weigh=weigh,
             )
 
-            # Update the contentes of the to_vessel
+            # Update the contents of the to_vessel
             try:
                 if isinstance(from_vessel, StockVial):
                     if isinstance(to_vessel, Well):
@@ -261,7 +263,6 @@ def forward_pipette_v2(
                     elif isinstance(to_vessel, WasteVial):
                         to_vessel: WasteVial = to_vessel
                         to_vessel.update_contents(from_vessel.name, repetition_vol)
-
                 elif isinstance(to_vessel, WasteVial):
                     to_vessel: WasteVial = to_vessel
                     contents = from_vessel.get_contents().items()
