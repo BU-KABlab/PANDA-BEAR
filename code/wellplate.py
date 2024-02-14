@@ -12,6 +12,7 @@ import math
 import os
 from pathlib import Path
 from typing import Dict, Optional
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -94,7 +95,7 @@ class Well(Vessel):
         """Returns the contents of the well."""
         return self.contents
 
-    def update_contents(self, vessel_name: str, volume: float) -> None:
+    def update_contents(self, from_vessel: dict, volume: float) -> None:
         """Updates the contents of the well in the well_status.json file."""
 
         # If we are removing a volume from a well we assume that the contents are equally mixed
@@ -107,12 +108,9 @@ class Well(Vessel):
                     for key, value in self.get_contents().items()
                 }
 
-                for key, _ in self.get_contents().items():
-                    self.update_contents(
-                        key, round(-(volume * current_content_ratios[key]), 6)
-                    )
+                for key, value in self.get_contents().items():
+                    self.contents[key] = value + round((volume * current_content_ratios[key]), 6)
 
-            except ZeroDivisionError:
                 logger.error("Well %s is empty", self.name)
             except Exception as e:
                 logger.error("Error occurred while updating well contents: %s", e)
@@ -124,15 +122,17 @@ class Well(Vessel):
         # If we are adding a volume to a well then we update the provided vessel name AKA solution name
         # with the provided volume
         else:
-            if vessel_name in self.contents.keys():
-                self.contents[vessel_name] += volume
-                logger.debug("Updated %s contents: %s", self.name, self.contents)
-            else:
-                self.contents[vessel_name] = volume
-                logger.debug("New %s contents: %s", self.name, self.contents)
+            for key in from_vessel.keys():
+                if key in self.contents.keys():
+                    self.contents[key] += from_vessel[key]
+                    logger.debug("Updated %s contents: %s", self.name, self.contents)
+                else:
+                    self.contents[key] = from_vessel[key]
+                    logger.debug("New %s contents: %s", self.name, self.contents)
 
         # Update the well status file
         self.update_well_status_file()
+        self.log_contents()
 
     def update_well_status_file(self) -> None:
         """Updates the well in the well_status.json file."""
@@ -146,7 +146,6 @@ class Well(Vessel):
                     well["status"] = self.status
                     well["contents"] = self.contents
                     well["volume"] = self.volume
-                    well["status_date"] = self.status_date
                     logger.debug("Well %s file updated")
                     break
 

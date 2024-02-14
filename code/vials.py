@@ -137,17 +137,10 @@ class Vial2(Vessel):
         added_volume : float
             The volume to be added to the vial.
         """
-        if self.volume + added_volume > self.capacity:
-            raise OverFillException(self.name, self.volume, added_volume, self.capacity)
-        elif self.volume + added_volume < 0:
-            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
-        else:
-            self.volume += added_volume
-            self.depth = self.calculate_depth()
-            self.contamination += 1
-            vial_logger.debug("%s: New volume: %s | New depth: %s", self.name, self.volume, self.depth)
-            self.write_volume_to_disk()
-            return self
+        super().update_volume(added_volume)
+        self.depth = self.calculate_depth()
+        self.write_volume_to_disk()
+        return self
 
     def write_volume_to_disk(self) -> None:
         """
@@ -223,8 +216,9 @@ class StockVial(Vial2):
         """
         super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
         self.category = 0
-    def update_contents(self, solution_name: str, volume: float) -> None:
+    def update_contents(self, from_vessel: str, volume: float) -> None:
         "Stock vial contents don't change"
+        self.log_contents()
         return self
 
     def get_contents(self) -> dict:
@@ -268,19 +262,36 @@ class WasteVial(Vial2):
         super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
         self.category = 1
 
-    def update_contents(self, vessel_name: str, volume: float) -> None:
+    def update_contents(self, from_vessel: Union[str,dict], volume: float) -> None:
         """Update the contentes of the waste vial"""
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
-        if vessel_name in self.contents:
-            self.contents[vessel_name] += volume
 
-        # otherwise, add the solution to the vessel's contents dictionary
-        else:
-            self.contents[vessel_name] = volume
+        if isinstance(from_vessel, dict):
+            try:
+                # incoming_content_ratios = {
+                #     key: value / sum(from_vessel.values()) for key, value in from_vessel.items()
+                # }
+
+                for key, value in from_vessel.items():
+                    if key in self.contents:
+                        self.contents[key] += round((value), 6)
+                    else:
+                        self.contents[key] = round((value), 6)
+
+            except Exception as e:
+                vial_logger.error("Error occurred while updating well contents: %s", e)
+                vial_logger.error("Not critical, continuing....")
+
+        else: # from_vessel is a string
+            if from_vessel in self.contents:
+                self.contents[from_vessel] += volume
+            else:
+                self.contents[from_vessel] = volume
         vial_logger.debug("%s %s: New contents: %s", self.name, self.position, self.contents)
 
         # Update the file
         update_vial_state_file([self], WASTE_STATUS)
+        self.log_contents()
         
         return self
 

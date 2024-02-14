@@ -174,12 +174,12 @@ def type_1_experiment(
     toolkit.global_logger.info("4. Clearing well contents into waste")
     instructions.set_status(ExperimentStatus.CLEARING)
     forward_pipette_v2(
-        volume=correction_factor(120),
+        volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
             waste_vials,
             "waste",
-            correction_factor(120),
+            toolkit.wellplate.wells[instructions.well_id].volume,
         ),
         pump=toolkit.pump,
         mill=toolkit.mill,
@@ -300,12 +300,12 @@ def type_2_experiment(
     instructions.set_status(ExperimentStatus.CLEARING)
 
     forward_pipette_v2(
-        volume=correction_factor(120),
+        volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
             waste_vials,
             "waste",
-            correction_factor(120),
+            toolkit.wellplate.wells[instructions.well_id].volume,
         ),
         pump=toolkit.pump,
         mill=toolkit.mill,
@@ -424,12 +424,12 @@ def type_3_experiment(
     instructions.set_status(ExperimentStatus.CLEARING)
 
     forward_pipette_v2(
-        volume=correction_factor(120),
+        volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
             waste_vials,
             "waste",
-            correction_factor(120),
+            toolkit.wellplate.wells[instructions.well_id].volume,
         ),
         pump=toolkit.pump,
         mill=toolkit.mill,

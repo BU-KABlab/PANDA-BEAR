@@ -1,13 +1,15 @@
 """
 Vessel module.
 """
+
 import logging
 from config.config import PATH_TO_LOGS
+
 # Set up logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-file_handler = logging.FileHandler(PATH_TO_LOGS / 'vessel.log')
+formatter = logging.Formatter("%(asctime)s&%(name)s&%(message)s")
+file_handler = logging.FileHandler(PATH_TO_LOGS / "vessel.log")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
@@ -21,7 +23,7 @@ class Vessel:
         volume (float): The current volume of the vessel.
         capacity (float): The maximum capacity of the vessel.
         density (float): The density of the solution in the vessel.
-        coordinates (dict): The coordinates of the vessel. 
+        coordinates (dict): The coordinates of the vessel.
         contents (dict): The contents of the vessel.
         depth (float): The current depth of the solution in the vessel.
 
@@ -41,8 +43,19 @@ class Vessel:
         Updates the contents of the vessel.
 
     """
-    def __init__(self, name: str, volume: float, capacity: float, density: float, coordinates: dict, contents, depth: float = 0) -> None:
-        self.name = name
+
+    def __init__(
+        self,
+        name: str,
+        volume: float,
+        capacity: float,
+        density: float,
+        coordinates: dict,
+        contents,
+        depth: float = 0,
+    ) -> None:
+        self.name = name.lower()
+        self.position = None
         self.volume = volume
         self.capacity = capacity
         self.density = density
@@ -59,10 +72,16 @@ class Vessel:
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         if self.volume + added_volume < 0:
-            raise OverDraftException(self.name, self.volume, added_volume, self.capacity)
-        
+            raise OverDraftException(
+                self.name, self.volume, added_volume, self.capacity
+            )
+
         self.volume += added_volume
-        logger.info("%s:%s", self.name, self.volume)
+        logger.info(
+            "%s&%s",
+            self.name + "_" + self.position if self.position is not None else self.name,
+            self.volume,
+        )
 
         return self
 
@@ -81,9 +100,13 @@ class Vessel:
             bool: True if the volume to be added is within the vessel's capacity, False otherwise.
         """
         if self.volume + volume_to_add > self.capacity:
-            raise OverFillException(self.name, self.volume, volume_to_add, self.capacity)
+            raise OverFillException(
+                self.name, self.volume, volume_to_add, self.capacity
+            )
         if self.volume + volume_to_add < 0:
-            raise OverDraftException(self.name, self.volume, volume_to_add, self.capacity)
+            raise OverDraftException(
+                self.name, self.volume, volume_to_add, self.capacity
+            )
         return True
 
     def write_volume_to_disk(self) -> None:
@@ -100,7 +123,7 @@ class Vessel:
         new_contamination (int, optional): The new contamination count of the vessel.
         """
 
-    def update_contents(self, vessel_name: str, volume: float) -> None:
+    def update_contents(self, from_vessel: str, volume: float) -> None:
         """
         Updates the contents of the vessel.
 
@@ -121,6 +144,15 @@ class Vessel:
         dict: The contents of the vessel.
         """
         return self.contents
+
+    def log_contents(self) -> None:
+        """Logs the contents of the vessel."""
+        logger.info(
+            "%s&%s&%s",
+            self.name + "_" + self.position if self.position is not None else self.name,
+            self.volume,
+            self.contents,
+        )
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""

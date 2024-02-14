@@ -19,13 +19,13 @@ from sartorius_local.mock import Scale as MockScale
 
 # from slack_functions2 import SlackBot
 from vials import StockVial, Vial2, WasteVial
+from vessel import Vessel
 from wellplate import Well, Wellplate
 
 # from config.config import PATH_TO_LOGS
 
 pump_control_logger = logging.getLogger("e_panda")
 scale_logger = logging.getLogger("e_panda")
-
 
 class Pump:
     """
@@ -65,6 +65,7 @@ class Pump:
         self.pipette_capacity_ul = 200  # uL
         self.pipette_volume_ul = 0.0  # uL
         self.pipette_volume_ml = 0.0  # mL
+        self.pipette_contents:dict = {}
         self.mill = mill
         if scale is not None:
             self.scale = scale
@@ -137,8 +138,21 @@ class Pump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if isinstance(solution, (Vial2, Well)):
+                if isinstance(solution.contents ,dict):
+                    # Calculate the ratio of the solution being withdrawn
+                    content_ratio = {
+                        key: value / sum(solution.contents.values())
+                        for key, value in solution.contents.items()
+                    }
+                    # Update the pipette contents
+                    for key, ratio in content_ratio.items():
+                        self.pipette_contents[key] = self.pipette_contents.get(key, 0) + ratio * volume_ul
+                else:
+                    self.pipette_contents[solution.name] = self.pipette_contents.get(solution.name, 0) + volume_ul
+                # Update the solution volume and contents
                 solution.update_volume(-volume_ul)
                 solution.update_contents(solution.name,-volume_ul)
+
                 return None
         else:
             return None
@@ -208,8 +222,13 @@ class Pump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
             if infused_into is not None:
+                # Update the to_vessel volume and contents
                 infused_into.update_volume(volume_ul)
-                infused_into.update_contents(being_infused.name, volume_ul)
+                infused_into.update_contents(self.pipette_contents, volume_ul)
+
+                # Update the pipette contents
+                self.pipette_contents = {} # FIXME This assumes we always infuse the entire volume of the pipette
+
                 return 0
             return 0
         else:
@@ -260,7 +279,7 @@ class Pump:
             pass
         pump_control_logger.debug("Done %s", action)
 
-        time.sleep(3)  # let the scale settle
+        #time.sleep(3)  # let the scale settle
 
         ## Get scale value after pump action
         if density is not None and density != 0 and weigh:
