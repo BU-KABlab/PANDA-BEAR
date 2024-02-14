@@ -557,15 +557,31 @@ class Mill:
             #  - the fixed_z flag is not set (i.e. fixed_z = False) or it is set (i.e. fixed_z = True)
             # Additionally, current_z should be below the safe height.
             if current_z < self.config["safe_height_floor"]:
-                print("Testing - Would be moving to Z = 0")
-                print(f"Reason:\n\tcurrent_z is below self.config['safe_height_floor'] {current_z < self.config['safe_height_floor']}")
+                logger.debug("Testing - Would be moving to Z = 0")
+                logger.debug(
+                    "Reason:\n\tcurrent_z is below self.config['safe_height_floor'] %s",
+                    current_z < self.config['safe_height_floor']
+                )
                 # self.execute_command("G01 Z0")
+                return True
             else:
-                print("Testing - Would not be moving to Z = 0")
-                print(f"Reason:\n\tcurrent_z is at or above self.config['safe_height_floor'] {current_z >= self.config['safe_height_floor']}")
+                logger.debug("Testing - Would not be moving to Z = 0")
+                logger.debug(
+                    "Reason:\n\tcurrent_z is at or above self.config['safe_height_floor'] %s",
+                    current_z >= self.config['safe_height_floor']
+                )
+                return False
         else:
-            print("Testing - Would not be moving to Z = 0")
-            print(f"Reason:\n\tConditions not met.")
+            logger.debug("Testing - Would not be moving to Z = 0")
+            if current_z == 0:
+                logger.debug("Reason:\n\tcurrent_z is zero")
+            elif current_z == z_coord:
+                logger.debug("Reason:\n\tcurrent_z is equal to the target Z coordinate %s", current_z == z_coord)
+            elif fixed_z:
+                logger.debug("Reason:\n\tfixed_z is set to True")
+            else:
+                logger.debug("Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s", current_z, z_coord, fixed_z)
+            return False
 
 
         if current_z != 0:
