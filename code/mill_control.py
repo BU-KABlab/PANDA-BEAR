@@ -563,14 +563,12 @@ class Mill:
                     current_z < self.config['safe_height_floor']
                 )
                 # self.execute_command("G01 Z0")
-                return True
             else:
                 logger.debug("Testing - Would not be moving to Z = 0")
                 logger.debug(
                     "Reason:\n\tcurrent_z is at or above self.config['safe_height_floor'] %s",
                     current_z >= self.config['safe_height_floor']
-                )
-                return False
+                )  
         else:
             logger.debug("Testing - Would not be moving to Z = 0")
             if current_z == 0:
@@ -580,8 +578,7 @@ class Mill:
             elif fixed_z:
                 logger.debug("Reason:\n\tfixed_z is set to True")
             else:
-                logger.debug("Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s", current_z, z_coord, fixed_z)
-            return False
+                logger.debug("Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s", current_z, z_coord, fixed_z) 
 
 
         if current_z != 0:
