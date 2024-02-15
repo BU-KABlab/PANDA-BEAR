@@ -866,6 +866,7 @@ def load_new_wellplate(
                                     if (current_line.split("&")[4]) in ["", "None"]
                                     else int(current_line.split("&")[4])
                                 ),
+                                # FIXME: "volume": 0.0 if current_line.split("&")[8] == "" else 0.0,
                             }
                             for current_line in wells
                         ],
@@ -892,6 +893,7 @@ def load_new_wellplate(
                 "contents": {},
                 "experiment_id": "",
                 "project_id": "",
+                "volume": 0.0,
             }
             for i in range(96)
         ],
