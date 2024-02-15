@@ -309,10 +309,10 @@ class SlackBot:
         plt.bar(stock_vials["position"], stock_vials["volume"], align="center", alpha=0.5, color="blue")
         # label each bar with the volume
         for i, v in enumerate(stock_vials["volume"]):
-            plt.text(i, v, str(v/1000), color="black", ha="center")
+            plt.text(i, v, str(round(v,4)), color="black", ha="center")
 
         # Draw a horizontal line at 4000
-        plt.axhline(y=4000, color="red", linestyle="-")
+        plt.axhline(y=2000, color="red", linestyle="-")
         # Write the name of the vial vertically in the bar
         for i, v in enumerate(stock_vials["name"]):
             plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
@@ -335,7 +335,7 @@ class SlackBot:
         waste_vials["volume"] = waste_vials["volume"].astype(float)
         plt.bar(waste_vials["position"], waste_vials["volume"], align="center", alpha=0.5, color="blue")
         for i, v in enumerate(waste_vials["volume"]):
-            plt.text(i, v, str(v), color="black", ha="center")
+            plt.text(i, v, str(round(v,4)), color="black", ha="center")
         plt.axhline(y=20000, color="red", linestyle="-")
         for i, v in enumerate(waste_vials["name"]):
             plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
