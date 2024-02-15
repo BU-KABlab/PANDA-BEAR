@@ -165,20 +165,26 @@ def type_1_experiment(
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
     try:
+        ## Move the electrode to the well
+        # Move the electrode to above the well
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=0,
             instrument=Instruments.ELECTRODE,
         )
-        toolkit.mill.set_feed_rate(1000) # Set the feed rate to 1000 to avoid splashing
+        # Set the feed rate to 1000 to avoid splashing
+        toolkit.mill.set_feed_rate(500)
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
+        # Set the feed rate back to 2000
         toolkit.mill.set_feed_rate(2000)
+
+
         toolkit.global_logger.info("2. Performing CV")
         characterization(instructions, file_tag="type_1")
     finally:
@@ -298,12 +304,26 @@ def type_2_experiment(
     ## Move the electrode to the well
     toolkit.global_logger.info("3. Moving electrode to well: %s", instructions.well_id)
     try:
+        ## Move the electrode to the well
+        # Move the electrode to above the well
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            z_coord=0,
+            instrument=Instruments.ELECTRODE,
+        )
+        # Set the feed rate to 1000 to avoid splashing
+        toolkit.mill.set_feed_rate(1000)
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
+        # Set the feed rate back to 2000
+        toolkit.mill.set_feed_rate(2000)
+
+
         toolkit.global_logger.info("4. Performing CV")
         characterization(instructions, file_tag="type_2")
     finally:
@@ -422,12 +442,26 @@ def type_3_experiment(
     ## Move the electrode to the well
     toolkit.global_logger.info("3. Moving electrode to well: %s", instructions.well_id)
     try:
+        ## Move the electrode to the well
+        # Move the electrode to above the well
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            z_coord=0,
+            instrument=Instruments.ELECTRODE,
+        )
+        # Set the feed rate to 1000 to avoid splashing
+        toolkit.mill.set_feed_rate(1000)
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
+        # Set the feed rate back to 2000
+        toolkit.mill.set_feed_rate(2000)
+
+
         toolkit.global_logger.info("4. Performing CV")
         characterization(instructions, file_tag="type_3")
     finally:
