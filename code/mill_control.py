@@ -578,12 +578,19 @@ class Mill:
             elif fixed_z:
                 logger.debug("Reason:\n\tfixed_z is set to True")
             else:
-                logger.debug("Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s", current_z, z_coord, fixed_z) 
+                logger.debug("Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s", current_z, z_coord, fixed_z)
 
 
         if current_z != 0:
-            self.execute_command("G01 Z0")
-
+            if current_x != x_coord and current_y != y_coord:
+                self.execute_command(f"G01 X{x_coord}")
+            else:
+                logger.debug("Current Z coordinate is not zero, but current X and Y coordinates are equal to the target coordinates so moving to Z = 0 is not necessary")
+                pass
+        else:
+            # If the current Z coordinate is zero, move to the target coordinates
+            logger.debug("Current Z coordinate is zero, moving to the target coordinates without moving to Z = 0")
+            pass
         # Fetch offsets for the specified instrument
         offsets = self.config["instrument_offsets"][instrument.value]
         # updated target coordinates with offsets so the center of the mill moves to the right spot

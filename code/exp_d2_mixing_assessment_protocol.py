@@ -1,6 +1,7 @@
 """
 Protocol for testing the mixing of the ferrocyanide solution cyclic voltammetry
 """
+
 from typing import Sequence
 from experiment_class import ExperimentBase, ExperimentStatus
 from controller import Toolkit
@@ -117,11 +118,11 @@ def mixing_assessment(
                 waste_vials,
             )
         if i == 0:
-            user_choice = input("Do you want to continue with the next experiment? (y/n): ")
+            user_choice = input(
+                "Do you want to continue with the next experiment? (y/n): "
+            )
             if user_choice.lower() == "n":
                 break
-            else:
-                continue
         else:
             continue
 
@@ -141,14 +142,16 @@ def type_1_experiment(
         5. Flush the pipette tip
         6. Rinse the well 4x with rinse
     """
-    
+
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 1 experiment")
-    
+
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
-    toolkit.global_logger.info("1. Depositing 5mm_fecn6 into well: %s", instructions.well_id)
+    toolkit.global_logger.info(
+        "1. Depositing 5mm_fecn6 into well: %s", instructions.well_id
+    )
     forward_pipette_v2(
         volume=instructions.solutions_corrected["5mm_fecn6"],
         from_vessel=solution_selector(
@@ -170,11 +173,11 @@ def type_1_experiment(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=0,
+            z_coord=toolkit.wellplate.height,
             instrument=Instruments.ELECTRODE,
         )
         # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(500)
+        toolkit.mill.set_feed_rate(100)
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
@@ -183,7 +186,6 @@ def type_1_experiment(
         )
         # Set the feed rate back to 2000
         toolkit.mill.set_feed_rate(2000)
-
 
         toolkit.global_logger.info("2. Performing CV")
         characterization(instructions, file_tag="type_1")
@@ -246,7 +248,6 @@ def type_1_experiment(
             mill=toolkit.mill,
         )
 
-
     toolkit.global_logger.info("Experiment complete\n\n")
 
 
@@ -267,14 +268,16 @@ def type_2_experiment(
         7. Flush the pipette tip
         8. Rinse the well 4x with rinse
     """
-    
+
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 2 experiment")
-    
+
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
-    toolkit.global_logger.info("1. Depositing 10mm_fecn6 into well: %s", instructions.well_id)
+    toolkit.global_logger.info(
+        "1. Depositing 10mm_fecn6 into well: %s", instructions.well_id
+    )
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -287,7 +290,9 @@ def type_2_experiment(
         mill=toolkit.mill,
         pumping_rate=instructions.pumping_rate,
     )
-    toolkit.global_logger.info("2. Depositing electrolyte into well: %s", instructions.well_id)
+    toolkit.global_logger.info(
+        "2. Depositing electrolyte into well: %s", instructions.well_id
+    )
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -309,11 +314,11 @@ def type_2_experiment(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=0,
+            z_coord=toolkit.wellplate.height,
             instrument=Instruments.ELECTRODE,
         )
         # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(1000)
+        toolkit.mill.set_feed_rate(100)
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
@@ -322,7 +327,6 @@ def type_2_experiment(
         )
         # Set the feed rate back to 2000
         toolkit.mill.set_feed_rate(2000)
-
 
         toolkit.global_logger.info("4. Performing CV")
         characterization(instructions, file_tag="type_2")
@@ -409,10 +413,12 @@ def type_3_experiment(
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before type 3 experiment")
-    
+
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
-    toolkit.global_logger.info("1. Depositing electrolyte into well: %s", instructions.well_id)
+    toolkit.global_logger.info(
+        "1. Depositing electrolyte into well: %s", instructions.well_id
+    )
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -425,7 +431,9 @@ def type_3_experiment(
         mill=toolkit.mill,
         pumping_rate=instructions.pumping_rate,
     )
-    toolkit.global_logger.info("2. Depositing 10mm_fecn6 into well: %s", instructions.well_id)
+    toolkit.global_logger.info(
+        "2. Depositing 10mm_fecn6 into well: %s", instructions.well_id
+    )
     forward_pipette_v2(
         volume=correction_factor(60),
         from_vessel=solution_selector(
@@ -447,11 +455,11 @@ def type_3_experiment(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=0,
+            z_coord=toolkit.wellplate.height,
             instrument=Instruments.ELECTRODE,
         )
         # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(1000)
+        toolkit.mill.set_feed_rate(100)
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
@@ -460,7 +468,6 @@ def type_3_experiment(
         )
         # Set the feed rate back to 2000
         toolkit.mill.set_feed_rate(2000)
-
 
         toolkit.global_logger.info("4. Performing CV")
         characterization(instructions, file_tag="type_3")
