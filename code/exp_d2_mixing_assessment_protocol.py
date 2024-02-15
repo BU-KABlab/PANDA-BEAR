@@ -116,6 +116,14 @@ def mixing_assessment(
                 stock_vials,
                 waste_vials,
             )
+        if i == 0:
+            user_choice = input("Do you want to continue with the next experiment? (y/n): ")
+            if user_choice.lower() == "n":
+                break
+            else:
+                continue
+        else:
+            continue
 
 
 def type_1_experiment(
@@ -160,9 +168,17 @@ def type_1_experiment(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            z_coord=0,
+            instrument=Instruments.ELECTRODE,
+        )
+        toolkit.mill.set_feed_rate(1000) # Set the feed rate to 1000 to avoid splashing
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.echem_height,
             instrument=Instruments.ELECTRODE,
         )
+        toolkit.mill.set_feed_rate(2000)
         toolkit.global_logger.info("2. Performing CV")
         characterization(instructions, file_tag="type_1")
     finally:

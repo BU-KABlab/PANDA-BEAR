@@ -678,7 +678,7 @@ class MockPump(Pump):
 
 if __name__ == "__main__":
     # test_mixing()
-    mock_pump_testing_routine()
-    #pump = Pump(mill=MockMill(), scale=MockScale())
+    #mock_pump_testing_routine()
+    pump = Pump(mill=MockMill(), scale=MockScale())
     # pump.withdraw(160, rate=0.64)
-    #pump.infuse(20, rate=0.64, blowout_ul=0)
+    pump.infuse(167.43, rate=0.64, blowout_ul=0)

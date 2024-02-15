@@ -61,7 +61,7 @@ experiments: list[experiment_class.EchemExperimentBase] = []
 WELL_NUMBER = 1
 
 experiment_wells = [
-    "G5","G6","G7",
+    "D2","D3","D4"
 ]
 
 for col in COLUMNS:

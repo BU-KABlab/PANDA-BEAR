@@ -218,8 +218,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             #     waste_vials=waste_vials,
             # )
             #import exp_edot_bleaching_protocol as edot
-            import exp_d2_mixing_assessment_protocol as exp_d2
-            exp_d2.mixing_assessment(
+            import exp_a_2_ferrocyanide_assessment_protocol as exp_a2
+            exp_a2.cv_repeatability(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,

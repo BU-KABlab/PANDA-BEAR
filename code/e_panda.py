@@ -85,7 +85,7 @@ def forward_pipette_v2(
     pumping_rate: Optional[float] = None,
 ):
     """
-    Pipette a volume from one vessel to another. This depreciates the clear_well function.
+    Pipette a volume from one vessel to another
 
     Depending on the supplied vessels, this function will perform one of the following:
     1. Pipette from a stock vial to a well
@@ -122,8 +122,6 @@ def forward_pipette_v2(
         pump (object): The pump object
         mill (object): The mill object
         wellplate (Wells object): The wellplate object
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
 
     Returns:
         None (void function) since the objects are passed by reference
@@ -138,7 +136,7 @@ def forward_pipette_v2(
         )
         # Check to ensure that the from_vessel and to_vessel are an allowed combination
         if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
-            raise ValueError("Cannot pipette from a well to a vial")
+            raise ValueError("Cannot pipette from a well to a stock vial")
         elif isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
             raise ValueError("Cannot pipette from a waste vial to a well")
         elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
@@ -267,7 +265,7 @@ def reverse_pipette_v2(
     pumping_rate: Optional[float] = None,
 ):
     """
-    Reverse Pipette a volume from one vessel to another. This depreciates the clear_well function.
+    Reverse Pipette a volume from one vessel to another.
 
     Depending on the supplied vessels, this function will perform one of the following:
     1. Pipette from a stock vial to a well
@@ -305,8 +303,6 @@ def reverse_pipette_v2(
         pump (object): The pump object
         mill (object): The mill object
         wellplate (Wells object): The wellplate object
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
 
     Returns:
         None (void function) since the objects are passed by reference
@@ -515,6 +511,165 @@ def rinse_v2(
         )
     return 0
 
+def clear_well(
+    volume: float,
+    from_vessel: Well,
+    to_vessel: WasteVial,
+    pump: Union[Pump, MockPump],
+    mill: Union[Mill, MockMill],
+    pumping_rate: Optional[float] = None,
+):
+    """
+    Pipette a volume from a well to waste vessel. This is used to clear the well of any remaining solution.
+
+    This fuction will only allow pipetting from a well to a waste vial.
+
+    The volume to be cleared is given, and the function will calculate the number of repetitions based on the pipette capacity and drip stop.
+    During a repetition, the function will:
+    1. Withdraw the solution from the well
+        a. Withdraw an air gap to engage the screw
+        b. Move the pipette to 1.5mm to the left of center of the well
+        c. Withdraw the 1/2 of the repetition volume
+        d. Move the pipette to 1.5mm to the right of center of the well
+        e. Withdraw the 1/2 of the repetition volume
+        f. Withdraw an air gap to prevent dripping
+    2. Deposit the solution into the destination vessel
+        a. Move to the destination
+        b. Deposit the solution and blow out
+        c. Move back to safe height
+    3. Repeat 1-2 until all repetitions are complete
+
+    Args:
+        volume (float): The volume to be pipetted in microliters
+        from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
+        to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
+        pumping_rate (float): The pumping rate in ml/min
+        pump (object): The pump object
+        mill (object): The mill object
+        wellplate (Wells object): The wellplate object
+        
+    Returns:
+        None (void function) since the objects are passed by reference
+
+    """
+    if volume > 0.00:
+        logger.info(
+            "Forward pipetting %f ul from %s to %s",
+            volume,
+            from_vessel.name,
+            to_vessel.name,
+        )
+        # Check to ensure that the from_vessel and to_vessel are an allowed combination
+        if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
+            raise ValueError("Cannot pipette from a well to a stock vial")
+        elif isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
+            raise ValueError("Cannot pipette from a waste vial to a well")
+        elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
+            raise ValueError("Cannot pipette from a stock vial to a stock vial")
+        elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, WasteVial):
+            raise ValueError("Clear_well function may not pipette from a stock vial to a waste vial")
+
+        # Calculate the number of repetitions
+        # based on pipette capacity and drip stop
+        if pumping_rate is None:
+            pumping_rate = pump.max_pump_rate
+
+        repetitions = math.ceil(volume / (pump.pipette_capacity_ul - DRIP_STOP))
+        repetition_vol = round(volume / repetitions, 6)
+
+        for j in range(repetitions):
+            logger.info("Repetition %d of %d", j + 1, repetitions)
+            # First half: pick up solution
+            logger.debug("Withdrawing %f of air gap...", AIR_GAP)
+
+            # withdraw a little to engage screw receive nothing
+            pump.withdraw(
+                volume=AIR_GAP, solution=None, rate=pumping_rate
+            )  # withdraw air gap to engage screw
+
+
+            logger.info(
+                "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
+            )
+            mill.safe_move(
+                from_vessel.coordinates["x"],
+                from_vessel.coordinates["y"],
+                from_vessel.depth,
+                Instruments.PIPETTE,
+            )
+
+
+            # Withdraw the solution from the source and receive the updated vessel object
+            pump.withdraw(
+                volume=repetition_vol,
+                solution=from_vessel,
+                rate=pumping_rate,
+                weigh=False,
+            )  # pipette now has air gap + repetition vol
+
+            if isinstance(from_vessel, Well):
+                pump.withdraw(
+                    volume=20, solution=None, rate=pumping_rate, weigh=False
+                )  # If the from vessel is a well withdraw a little extra to ensure cleared well
+
+            mill.move_to_safe_position()
+
+            # Withdraw an air gap to prevent dripping, receive nothing
+            pump.withdraw(
+                volume=DRIP_STOP, solution=None, rate=pumping_rate, weigh=False
+            )
+
+            logger.debug(
+                "From Vessel %s volume: %f depth: %f",
+                from_vessel.name,
+                from_vessel.volume,
+                from_vessel.depth,
+            )
+
+            # Second Half: Deposit to to_vessel
+            logger.info("Moving to: %s...", to_vessel.name)
+
+            if isinstance(to_vessel, Well):
+                to_vessel: Well = to_vessel
+            else:
+                to_vessel: WasteVial = to_vessel
+
+            mill.safe_move(
+                to_vessel.coordinates["x"],
+                to_vessel.coordinates["y"],
+                to_vessel.height,
+                Instruments.PIPETTE,
+            )
+
+            weigh = bool(isinstance(to_vessel, Well))
+
+            # Infuse into the
+            ## Testing
+            blow_out = (
+                AIR_GAP + DRIP_STOP + 20
+                if isinstance(from_vessel, Well)
+                else AIR_GAP + DRIP_STOP
+            )
+            is_pipette_volume_equal = pump.pipette_volume_ul >= blow_out
+            testing_logger.debug(
+                "TESTING: Is pipette volume greater than or equal to blowout? %s",
+                is_pipette_volume_equal,
+            )
+
+            pump.infuse(
+                volume_to_infuse=repetition_vol,
+                being_infused=from_vessel,
+                infused_into=to_vessel,
+                rate=pumping_rate,
+                blowout_ul=(
+                    AIR_GAP + DRIP_STOP + 20
+                    if isinstance(from_vessel, Well)
+                    else AIR_GAP + DRIP_STOP
+                ),
+                weigh=weigh,
+            )
+
+            mill.move_to_safe_position()
 
 def flush_v2(
     waste_vials: Sequence[WasteVial],
