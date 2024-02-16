@@ -173,7 +173,7 @@ def type_1_experiment(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.height,
+            z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
         )
         # Set the feed rate to 1000 to avoid splashing
@@ -314,7 +314,7 @@ def type_2_experiment(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.height,
+            z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
         )
         # Set the feed rate to 1000 to avoid splashing
@@ -455,7 +455,7 @@ def type_3_experiment(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.height,
+            z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
         )
         # Set the feed rate to 1000 to avoid splashing

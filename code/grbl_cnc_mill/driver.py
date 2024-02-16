@@ -19,6 +19,7 @@ of the mill.
 import dataclasses
 import json
 import logging
+from os import error
 import re
 import time
 from datetime import datetime
@@ -27,6 +28,7 @@ from pathlib import Path
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
+
 import serial
 from config.config import (
     MILL_CONFIG,
@@ -36,75 +38,22 @@ from config.config import (
     WASTE_STATUS,
 )
 
-# Configure the logger
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
-# formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-# system_handler = logging.FileHandler("code/logs/ePANDA.log")
-# system_handler.setFormatter(formatter)
-# logger.addHandler(system_handler)
-logger = logging.getLogger("e_panda")
-if not logger.hasHandlers():
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
-    )
-    system_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control.log")
-    system_handler.setFormatter(formatter)
-    logger.addHandler(system_handler)
+# local libraries
+from .logger import set_up_mill_logger
+from .exceptions import (
+    CommandExecutionError,
+    LocationNotFound,
+    MillConfigError,
+    MillConfigNotFound,
+    MillConnectionError,
+    StatusReturnError,
+    CNCMillException,
+)
+from .states_codes import Status, AlarmStatus, ErrorCodes
+from .instruments import Instruments
 
-
-@dataclasses.dataclass
-class Instruments(Enum):
-    """Class for naming of the mill instruments"""
-
-    CENTER = "center"
-    PIPETTE = "pipette"
-    ELECTRODE = "electrode"
-    LENS = "lens"  # Fixed the typo here
-
-
-# @dataclass
-# class MillConfiguration():
-#     """Class for the mill configuration"""
-
-#     instrument_offsets: dict
-#     working_volume: dict
-#     electrode_bath: dict
-#     safe_height_floor: float
-
-# @dataclass
-# class coordinates():
-#     """Class for the coordinates of the mill"""
-
-#     x: float
-#     y: float
-#     z: float
-
-# @dataclass
-# class electrode_offsets(coordinates):
-#     """Class for the electrode coordinates"""
-
-# @dataclass
-# class pipette_offsets(coordinates):
-#     """Class for the pipette coordinates"""
-
-# @dataclass
-# class lens_offsets(coordinates):
-#     """Class for the lens coordinates"""
-
-# @dataclass
-# class center_offsets(coordinates):
-#     """Class for the center coordinates"""
-
-# @dataclass
-# class working_volume(coordinates):
-#     """Class for the working volume of the mill"""
-
-# @dataclass
-# class electrode_bath(coordinates):
-#     """Class for the electrode bath coordinates"""
+# Set up the logger
+logger = set_up_mill_logger(PATH_TO_LOGS)
 
 
 class Mill:
@@ -112,10 +61,11 @@ class Mill:
     Set up the mill connection and pass commands, including special commands
     """
 
-    def __init__(self, config_file="mill_config.json"):
+    def __init__(self, config_file="configuration.json"):
         self.config_file = config_file
+        self.active_connection = False
         self.config = self.read_json_config()
-        self.ser_mill = self.connect_to_mill()
+        self.ser_mill: serial.Serial = self.connect_to_mill()
 
     def homing_sequence(self):
         """Home the mill, set the feed rate, and clear the buffers"""
@@ -137,13 +87,19 @@ class Mill:
             )
             time.sleep(2)
 
-            if not ser_mill.isOpen():
+            if not ser_mill.is_open:
                 logger.info("Opening serial connection to mill...")
                 ser_mill.open()
                 time.sleep(2)
+                if ser_mill.is_open:
+                    logger.info("Serial connection to mill opened successfully")
+                    self.active_connection = True
+                else:
+                    logger.error("Serial connection to mill failed to open")
+                    raise MillConnectionError("Error opening serial connection to mill")
 
-            logger.info("Mill connected: %s", ser_mill.isOpen())
-            print("Mill connected: ", ser_mill.isOpen())
+            logger.info("Mill connected: %s", ser_mill.is_open)
+            print("Mill connected: ", ser_mill.is_open)
             return ser_mill
         except Exception as exep:
             logger.error("Error connecting to the mill: %s", str(exep))
@@ -165,8 +121,8 @@ class Mill:
         logger.info("Disconnecting from the mill")
         self.ser_mill.close()
         time.sleep(15)
-        logger.info("Mill connected: %s", self.ser_mill.isOpen())
-        print("Mill connected: ", self.ser_mill.isOpen())
+        logger.info("Mill connected: %s", self.ser_mill.is_open)
+        print("Mill connected: ", self.ser_mill.is_open)
 
     def read_json_config(self):
         """Read the config file"""
@@ -197,7 +153,7 @@ class Mill:
                 logger.debug("Returned %s", mill_response)
 
             elif command == "?":
-                logger.debug("eturned %s", mill_response)
+                logger.debug("Returned %s", mill_response)
 
             elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
                 logger.debug("Initially %s", mill_response)
@@ -208,15 +164,48 @@ class Mill:
                 logger.debug("Returned %s", mill_response)
 
             if mill_response.lower() in ["error", "alarm"]:
-                if "error:22" in mill_response.lower():
-                    # This is a GRBL error that occurs when the feed rate isn't set before moving with G01 command
-                    logger.error("Error in status: %s", mill_response)
-                    # Try setting the feed rate and executing the command again
-                    self.set_feed_rate(2000)
-                    mill_response = self.execute_command(command)
+                # Parse the response for errors or alarms and match to the corresponding error or alarm codes
+                # translate the error in the form of error:## to error## and alarm:## to alarm##
+                error_code = re.search(r"error:?\d+", mill_response, re.IGNORECASE)
+                alarm_code = re.search(r"alarm:?\d+", mill_response, re.IGNORECASE)
+
+                if error_code:
+                    error_code = error_code.group().lower().replace("error", "error")
+                    if error_code in ErrorCodes.__members__:
+                        logger.error("%s: %s", error_code, ErrorCodes[error_code].value)
+                        if error_code == "error22":
+                            # This is a GRBL error that occurs when the feed rate isn't set before moving with G01 command
+                            logger.error(
+                                "%s: %s", error_code, ErrorCodes[error_code].value
+                            )
+                            # Try setting the feed rate and executing the command again
+                            self.set_feed_rate(2000)
+                            mill_response = self.execute_command(command)
+                        else:
+                            raise StatusReturnError(f"Error in status: {mill_response}")
+                    else:
+                        logger.error("Unknown Error in Status: %s", mill_response)
+                        raise StatusReturnError(
+                            f"Unknown Error in Status: {mill_response}"
+                        )
+
+                if alarm_code:
+                    alarm_code = alarm_code.group().lower().replace("alarm", "alarm")
+                    if alarm_code in AlarmStatus.__members__:
+                        logger.error("%s: %s", alarm_code, AlarmStatus[alarm_code].value)
+                        raise StatusReturnError(f"Alarm in status: {mill_response}")
+                    else:
+                        logger.error("Alarm in status: %s", mill_response)
+                        raise StatusReturnError(f"Unkown Alarm in status: {mill_response}")
                 else:
                     logger.error("current_status: Error in status: %s", mill_response)
                     raise StatusReturnError(f"Error in status: {mill_response}")
+
+        except CNCMillException as exep:
+            logger.error("Error executing command %s: %s", command, str(exep))
+            raise CommandExecutionError(
+                f"Error executing command {command}: {str(exep)}"
+            ) from exep
 
         except Exception as exep:
             logger.error("Error executing command %s: %s", command, str(exep))
@@ -438,8 +427,7 @@ class Mill:
         #     initial_x, initial_y, 0
         # )
 
-        mill_response = self.execute_command("G01 Z0")
-        return mill_response
+        return self.execute_command("G01 Z0")
 
     def move_pipette_to_position(
         self,
@@ -560,35 +548,46 @@ class Mill:
                 logger.debug("Testing - Would be moving to Z = 0")
                 logger.debug(
                     "Reason:\n\tcurrent_z is below self.config['safe_height_floor'] %s",
-                    current_z < self.config['safe_height_floor']
+                    current_z < self.config["safe_height_floor"],
                 )
                 # self.execute_command("G01 Z0")
             else:
                 logger.debug("Testing - Would not be moving to Z = 0")
                 logger.debug(
                     "Reason:\n\tcurrent_z is at or above self.config['safe_height_floor'] %s",
-                    current_z >= self.config['safe_height_floor']
-                )  
+                    current_z >= self.config["safe_height_floor"],
+                )
         else:
             logger.debug("Testing - Would not be moving to Z = 0")
             if current_z == 0:
                 logger.debug("Reason:\n\tcurrent_z is zero")
             elif current_z == z_coord:
-                logger.debug("Reason:\n\tcurrent_z is equal to the target Z coordinate %s", current_z == z_coord)
+                logger.debug(
+                    "Reason:\n\tcurrent_z is equal to the target Z coordinate %s",
+                    current_z == z_coord,
+                )
             elif fixed_z:
                 logger.debug("Reason:\n\tfixed_z is set to True")
             else:
-                logger.debug("Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s", current_z, z_coord, fixed_z)
-
+                logger.debug(
+                    "Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s",
+                    current_z,
+                    z_coord,
+                    fixed_z,
+                )
 
         if current_z != 0:
             if current_x != x_coord and current_y != y_coord:
                 self.execute_command(f"G01 X{x_coord}")
             else:
-                logger.warning("Current Z coordinate is not zero, but current X and Y coordinates are equal to the target coordinates so moving to Z = 0 is not necessary")
+                logger.warning(
+                    "Current Z coordinate is not zero, but current X and Y coordinates are equal to the target coordinates so moving to Z = 0 is not necessary"
+                )
         else:
             # If the current Z coordinate is zero, move to the target coordinates
-            logger.warning("Current Z coordinate is zero, moving to the target coordinates without moving to Z = 0")
+            logger.warning(
+                "Current Z coordinate is zero, moving to the target coordinates without moving to Z = 0"
+            )
         # Fetch offsets for the specified instrument
         offsets = self.config["instrument_offsets"][instrument.value]
         # updated target coordinates with offsets so the center of the mill moves to the right spot
@@ -629,429 +628,3 @@ class Mill:
             self.execute_command(command)
 
         return 0
-
-
-class StatusReturnError(Exception):
-    """Raised when the mill returns an error in the status"""
-
-
-class MillConfigNotFound(Exception):
-    """Raised when the mill config file is not found"""
-
-
-class MillConfigError(Exception):
-    """Raised when there is an error reading the mill config file"""
-
-
-class MillConnectionError(Exception):
-    """Raised when there is an error connecting to the mill"""
-
-
-class CommandExecutionError(Exception):
-    """Raised when there is an error executing a command"""
-
-
-class LocationNotFound(Exception):
-    """Raised when the mill cannot find its location"""
-
-
-class MockMill:
-    """A class that simulates a mill for testing purposes.
-
-    Attributes:
-    config_file (str): The path to the configuration file.
-    config (dict): The configuration dictionary.
-    ser_mill (None): The serial connection to the mill.
-    current_x (float): The current x-coordinate.
-    current_y (float): The current y-coordinate.
-    current_z (float): The current z-coordinate.
-
-    Methods:
-    homing_sequence(): Simulate homing, setting feed rate, and clearing buffers.
-    disconnect(): Simulate disconnecting from the mill.
-    execute_command(command): Simulate executing a command.
-    stop(): Simulate stopping the mill.
-    reset(): Simulate resetting the mill.
-    home(timeout): Simulate homing the mill.
-    wait_for_completion(incoming_status, timeout): Simulate waiting for completion.
-    current_status(): Simulate getting the current status.
-    set_feed_rate(rate): Simulate setting the feed rate.
-    clear_buffers(): Simulate clearing buffers.
-    gcode_mode(): Simulate getting the G-code mode.
-    gcode_parameters(): Simulate getting G-code parameters.
-    gcode_parser_state(): Simulate getting G-code parser state.
-    rinse_electrode(): Simulate rinsing the electrode.
-    move_to_safe_position(): Simulate moving to a safe position.
-    move_center_to_position(x_coord, y_coord, z_coord): Simulate moving to a specified position.
-    current_coordinates(instrument): Return the tracked current coordinates.
-    move_pipette_to_position(x_coord, y_coord, z_coord): Simulate moving the pipette to a specified position.
-    move_electrode_to_position(x_coord, y_coord, z_coord): Simulate moving the electrode to a specified position.
-    update_offset(offset_type, offset_x, offset_y, offset_z): Simulate updating offsets in the config.
-    safe_move(x_coord, y_coord, z_coord, instrument): Simulate a safe move with horizontal and vertical movements.
-    """
-
-    def __init__(self, config_file="mill_config.json"):
-        self.config_file = config_file
-        self.config = {}  # Initialize an empty config for testing
-        self.ser_mill = None  # No serial connection in mock
-        self.current_x = 0.0
-        self.current_y = 0.0
-        self.current_z = 0.0
-        self.logger = logger
-
-    def homing_sequence(self):
-        """Simulate homing, setting feed rate, and clearing buffers"""
-        self.home()
-        self.set_feed_rate(2000)  # Set feed rate to 2000
-        self.clear_buffers()
-
-    def __enter__(self):
-        """Enter the context manager"""
-        self.homing_sequence()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Exit the context manager"""
-        self.home()
-        self.disconnect()
-
-    def disconnect(self):
-        """Simulate disconnecting from the mill"""
-        self.logger.info("Disconnecting from the mill")
-
-    def execute_command(self, command):
-        """Simulate executing a command"""
-        self.logger.info("Executing command: %s", command)
-
-    def stop(self):
-        """Simulate stopping the mill"""
-        self.logger.info("Stopping the mill")
-
-    def reset(self):
-        """Simulate resetting the mill"""
-        self.logger.info("Resetting the mill")
-
-    def home(self, timeout=90):
-        """Simulate homing the mill"""
-        self.current_x = 0.0
-        self.current_y = 0.0
-        self.current_z = 0.0
-        self.logger.debug("timeout for homing is %s", str(timeout))
-        self.logger.info("Homing the mill")
-
-    def wait_for_completion(self, incoming_status, timeout=90):
-        """Simulate waiting for completion"""
-        self.logger.info("Waiting for completion with status: %s", incoming_status)
-        self.logger.debug("timeout for waiting is %s", str(timeout))
-
-    def current_status(self) -> str:
-        """Simulate getting the current status"""
-        self.logger.info("Getting current status")
-        return "Idle"  # Mock status for testing
-
-    def set_feed_rate(self, rate):
-        """Simulate setting the feed rate"""
-        self.logger.info("Setting feed rate to %s", rate)
-
-    def clear_buffers(self):
-        """Simulate clearing buffers"""
-        self.logger.info("Clearing buffers")
-
-    def gcode_mode(self):
-        """Simulate getting the G-code mode"""
-        self.logger.info("Getting G-code mode")
-
-    def gcode_parameters(self):
-        """Simulate getting G-code parameters"""
-        self.logger.info("Getting G-code parameters")
-
-    def gcode_parser_state(self):
-        """Simulate getting G-code parser state"""
-        self.logger.info("Getting G-code parser state")
-
-    def rinse_electrode(self, rinses: int = 3):
-        """Simulate rinsing the electrode"""
-        self.logger.info("Rinsing the electrode")
-        for _ in range(rinses):
-            time.sleep(1)
-
-    def rest_electrode(self):
-        """
-        Rinse the electrode by moving it to the rinse position and back to the
-        center position.
-        Args:
-            None
-        Returns:
-            None
-        """
-
-    def move_to_safe_position(self):
-        """Simulate moving to a safe position"""
-        self.logger.info("Moving to a safe position")
-
-    def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
-        """Simulate moving to a specified position"""
-        self.current_x = x_coord
-        self.current_y = y_coord
-        self.current_z = z_coord
-        self.logger.info("Moving to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
-        return 0
-
-    def current_coordinates(self, instrument=Instruments.CENTER) -> list:
-        """Return the tracked current coordinates"""
-        self.logger.info("Getting current coordinates of %s", instrument.value)
-        return [self.current_x, self.current_y, self.current_z]
-
-    def move_pipette_to_position(
-        self,
-        x_coord: float = 0,
-        y_coord: float = 0,
-        z_coord=0.00,
-    ):
-        """Simulate moving the pipette to a specified position"""
-        self.current_x = x_coord
-        self.current_y = y_coord
-        self.current_z = z_coord
-        self.logger.info(
-            "Moving pipette to position: (%s, %s, %s)", x_coord, y_coord, z_coord
-        )
-
-    def move_electrode_to_position(
-        self, x_coord: float, y_coord: float, z_coord: float = 0.00
-    ):
-        """Simulate moving the electrode to a specified position"""
-        self.current_x = x_coord
-        self.current_y = y_coord
-        self.current_z = z_coord
-        self.logger.info(
-            "Moving electrode to position: (%s, %s, %s)", x_coord, y_coord, z_coord
-        )
-
-    def update_offset(self, offset_type, offset_x, offset_y, offset_z):
-        """Simulate updating offsets in the config"""
-        self.logger.info(
-            "Updating offset: %s (%s, %s, %s)",
-            offset_type,
-            offset_x,
-            offset_y,
-            offset_z,
-        )
-
-    def safe_move(
-        self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER
-    ) -> int:
-        """Simulate a safe move with horizontal and vertical movements"""
-        self.current_x = x_coord
-        self.current_y = y_coord
-        self.current_z = z_coord
-        self.logger.info(
-            "Safe move %s to position: (%s, %s, %s)",
-            instrument.value,
-            x_coord,
-            y_coord,
-            z_coord,
-        )
-        return 0
-
-
-def wellplate_scan(mill_arg: Mill = None, capture_images=False):
-    """Scan the wellplate"""
-    # Perform image scan of each well of the wellplate
-    from camera_call_camera import capture_new_image
-    from wellplate import Well, Wellplate
-
-    wellplate = Wellplate()
-    if mill_arg is None:
-        mill = Mill()
-    else:
-        mill = mill_arg
-    with mill:
-        for well in wellplate.wells.values():
-            well: Well = well
-            print("Currently imaging: {well.name}", end="\r")
-            well_coordinates = well.coordinates
-            mill.safe_move(
-                well_coordinates["x"],
-                well_coordinates["y"],
-                wellplate.image_height,
-                instrument=Instruments.LENS,
-                fixed_z=True,
-            )
-            if capture_images:
-                # create a folder in data folder with the wellplate id
-                folder = Path(f"{PATH_TO_DATA}/{wellplate.plate_id}")
-                folder.mkdir(parents=True, exist_ok=True)
-
-                # capture each image with file name as the date and the well name
-                file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{well.name}.png"
-                capture_new_image(file_name=folder / file_name)
-        if mill_arg is None:
-            mill.rest_electrode()
-
-
-def move_pipette_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top):
-    mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(h1["x"], h1["y"], z_top, instrument=Instruments.PIPETTE)
-
-
-def move_electrode_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top, echem_height):
-    mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(h1["x"], h1["y"], z_top, instrument=Instruments.ELECTRODE)
-
-    repsonse = input("Move the electrode to the echem height? y/n: ")
-    if repsonse.lower() == "y":
-        mill.safe_move(a1["x"], a1["y"], echem_height, instrument=Instruments.ELECTRODE)
-        mill.safe_move(
-            a12["x"], a12["y"], echem_height, instrument=Instruments.ELECTRODE
-        )
-        mill.safe_move(
-            h12["x"], h12["y"], echem_height, instrument=Instruments.ELECTRODE
-        )
-        mill.safe_move(h1["x"], h1["y"], echem_height, instrument=Instruments.ELECTRODE)
-
-
-def move_lens_to_each_corner(mill: Mill, image_height, a1, a12, h12, h1):
-    mill.safe_move(a1["x"], a1["y"], image_height, instrument=Instruments.LENS)
-    mill.safe_move(a12["x"], a12["y"], image_height, instrument=Instruments.LENS)
-    mill.safe_move(h12["x"], h12["y"], image_height, instrument=Instruments.LENS)
-    mill.safe_move(h1["x"], h1["y"], image_height, instrument=Instruments.LENS)
-
-
-def move_to_vials(mill: Mill, stock_vials, waste_vials):
-    from vials import StockVial, WasteVial
-
-    if len(stock_vials) != 0:
-        for _, stock_vial in enumerate(stock_vials):
-            stock_vial: StockVial
-            if stock_vial.position == "e1":
-                continue
-            mill.safe_move(
-                stock_vial.coordinates["x"],
-                stock_vial.coordinates["y"],
-                stock_vial.height,
-                instrument=Instruments.PIPETTE,
-            )
-        mill.move_to_safe_position()
-
-    if len(waste_vials) != 0:
-        for _, waste_vial in enumerate(waste_vials):
-            waste_vial: WasteVial
-            mill.safe_move(
-                waste_vial.coordinates["x"],
-                waste_vial.coordinates["y"],
-                waste_vial.height,
-                instrument=Instruments.PIPETTE,
-            )
-        mill.move_to_safe_position()
-
-
-def movement_test():
-    """Test the mill movement with a wellplate"""
-    import wellplate as Wells
-    from vials import StockVial, WasteVial, read_vials
-
-    wellplate = Wells.Wellplate()
-
-    # Configure the logger for testing
-    test_logger = logging.getLogger(__name__)
-    test_logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
-    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-    testing_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control_testing.log")
-    testing_handler.setFormatter(formatter)
-    test_logger.addHandler(testing_handler)
-
-    try:
-        with Mill() as mill:
-            a1 = wellplate.get_coordinates("A1")
-            a12 = wellplate.get_coordinates("A12")
-            h1 = wellplate.get_coordinates("H1")
-            h12 = wellplate.get_coordinates("H12")
-            print(a1)
-            print(a12)
-            print(h1)
-            print(h12)
-            ## Load the vials
-
-            stock_vials: StockVial = read_vials(STOCK_STATUS)
-            waste_vials: WasteVial = read_vials(WASTE_STATUS)
-            input(
-                "Begin the movement test to each corner of the wellplate. Press enter to continue..."
-            )
-
-            if (
-                input("Do you want to move the pipette to each corner? (y/n): ").lower()
-                == "y"
-            ):
-                move_pipette_to_each_corner(mill, a1, a12, h12, h1, wellplate.z_top)
-
-            if (
-                input(
-                    "Do you want to move the electrode to each corner? (y/n): "
-                ).lower()
-                == "y"
-            ):
-                move_electrode_to_each_corner(
-                    mill, a1, a12, h12, h1, wellplate.z_top, wellplate.echem_height
-                )
-
-            if (
-                input("Do you want to move the lens to each corner? (y/n): ").lower()
-                == "y"
-            ):
-                move_lens_to_each_corner(mill, wellplate.image_height, a1, a12, h12, h1)
-
-            if input("Do you want to move to the vials? (y/n): ").lower() == "y":
-                move_to_vials(mill, stock_vials, waste_vials)
-
-            mill.move_to_safe_position()
-            mill.rest_electrode()
-
-    except (
-        MillConnectionError,
-        MillConfigNotFound,
-        MillConfigError,
-        CommandExecutionError,
-        StatusReturnError,
-        LocationNotFound,
-    ) as error:
-        logger.error("Error occurred: %s", error)
-        # Handle the error gracefully, e.g., print a message or perform cleanup
-
-    finally:
-        logger.info("Exiting program.")
-
-
-if __name__ == "__main__":
-
-    def menu():
-        print("Welcome to the Mill Control Menu!")
-        print("1. Run movement test")
-        print("2. Run wellplate scan")
-        print("3. Move to safe position and rest electrode")
-        print("0. Exit")
-
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            movement_test()
-        elif choice == "2":
-            wellplate_scan(capture_images=True)
-        elif choice == "3":
-            with Mill() as mill:
-                mill.move_to_safe_position()
-                mill.rest_electrode()
-        elif choice == "0":
-            print("Exiting...")
-            return
-        else:
-            print("Invalid choice. Please try again.")
-
-        # Recursive call to keep the menu running
-        menu()
-
-    if __name__ == "__main__":
-        menu()
