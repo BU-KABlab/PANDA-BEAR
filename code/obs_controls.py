@@ -27,10 +27,13 @@ class OBSController:
     """This class is used simplify the control the OBS software for our needs"""
 
     def __init__(self):
-        self.client = obsws.ReqClient(
-            host="localhost", port=4455, password="PandaBear!", timeout=3
-        )
-        self.logger = logging.getLogger(__name__)
+        if TESTING:
+            self.client = MockOBSController()
+        else:
+            self.client = obsws.ReqClient(
+                host="localhost", port=4455, password="PandaBear!", timeout=3
+            )
+            self.logger = logging.getLogger(__name__)
 
     def place_experiment_on_screen(self, instructions: ExperimentBase):
         try:

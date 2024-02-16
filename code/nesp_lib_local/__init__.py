@@ -1,4 +1,4 @@
-"""NESP-Lib – New Era Syringe Pump Library for Python"""
+"""NESP-Lib - New Era Syringe Pump Library for Python"""
 
 VERSION = '1.0.2'
 """Version of NESP-Lib."""

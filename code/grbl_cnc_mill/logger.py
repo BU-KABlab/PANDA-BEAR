@@ -1,0 +1,22 @@
+"""Logger for the grbl_cnc_mill package."""
+import logging
+from pathlib import Path
+# Create a logger
+def set_up_mill_logger(path_to_logs:Path) -> logging.Logger:
+    """Set up the mill logger.
+
+    Args:
+    path_to_logs (Path): The path to the logs directory.
+    """
+    logger = logging.getLogger("e_panda")
+    if not logger.hasHandlers():
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
+        )
+        system_handler = logging.FileHandler(path_to_logs / "mill_control.log")
+        system_handler.setFormatter(formatter)
+        logger.addHandler(system_handler)
+
+    return logger
