@@ -5,7 +5,7 @@ wellplate and the wells in it.
 """
 
 # pylint: disable=line-too-long
-#from decimal import Decimal
+# from decimal import Decimal
 import json
 import logging
 import math
@@ -109,7 +109,9 @@ class Well(Vessel):
                 }
 
                 for key, value in self.get_contents().items():
-                    self.contents[key] = value + round((volume * current_content_ratios[key]), 6)
+                    self.contents[key] = value + round(
+                        (volume * current_content_ratios[key]), 6
+                    )
 
                 logger.error("Well %s is empty", self.name)
             except Exception as e:
