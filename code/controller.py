@@ -442,6 +442,7 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
     if use_mock_instruments:
         logger.info("Using mock instruments")
         mill = MockMill()
+        mill.connect_to_mill()
         scale = MockScale()
         pump = MockPump(mill=mill, scale=scale)
         # pstat = echem_mock.GamryPotentiostat.connect()
@@ -457,6 +458,7 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
 
     logger.info("Connecting to instruments:")
     mill = Mill()
+    mill.connect_to_mill()
     mill.homing_sequence()
     scale = Scale(address="COM6")
     pump = Pump(mill=mill, scale=scale)
