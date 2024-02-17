@@ -112,7 +112,7 @@ class SlackBot:
             # conversations.history returns the first 100 messages by default
             # These results are paginated, see:
             # https://api.slack.com/methods/conversations.history$pagination
-            result = client.conversations_history(channel=channel_id)
+            result = client.conversations_history(channel=channel_id, limit=5, inclusive=True, latest=datetime.now().timestamp())
 
             conversation_history = result["messages"]
 

@@ -24,6 +24,8 @@ import time
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
+from typing import Sequence
+import sys
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
@@ -33,6 +35,7 @@ from config.config import (
     PATH_TO_DATA,
     PATH_TO_LOGS,
     STOCK_STATUS,
+    TESTING,
     WASTE_STATUS,
 )
 
@@ -63,6 +66,15 @@ class Instruments(Enum):
     PIPETTE = "pipette"
     ELECTRODE = "electrode"
     LENS = "lens"
+
+
+@dataclasses.dataclass
+class Coordinates:
+    """Class for storing coordinates"""
+
+    x: float
+    y: float
+    z: float
 
 
 class Mill:
@@ -312,34 +324,78 @@ class Mill:
         """
 
         status = self.current_status()
-        # Regular expression to extract MPos coordinates
-        pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 
-        match = pattern.search(status)  # Decoding the bytes to string
-        max_attempts = 3
-        for _ in range(max_attempts):
-            try:
-                if match:
-                    x_coord = float(match.group(1)) + 3
-                    y_coord = float(match.group(2)) + 3
-                    z_coord = float(match.group(3)) + 3
-                    log_message = (
-                        f"MPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
-                    )
-                    logger.info(log_message)
-                    break
-                else:
-                    logger.warning(
-                        "MPos coordinates not found in the line. Trying again..."
-                    )
-                    raise LocationNotFound
-            except LocationNotFound as e:
-                logger.error(
-                    "Error occurred while getting MPos coordinates: %s", str(e)
-                )
-                if _ == max_attempts - 1:
-                    raise
+        # Get the current mode of the mill
+        # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
+        status_mode = self.config["status_report"]
 
+        if status_mode not in [0, 1, 2, 3]:
+            logger.error("Invalid status mode")
+            # default to 3
+            status_mode = 3
+
+        if status_mode in [0, 2]:
+            # Regular expression to extract WPox coordinates
+            wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
+            # Look for WPos coordinates
+            match = wpos_pattern.search(status)
+            max_attempts = 3
+            for _ in range(max_attempts):
+                try:
+                    if match:
+                        x_coord = float(match.group(1))
+                        y_coord = float(match.group(2))
+                        z_coord = float(match.group(3))
+                        log_message = f"WPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
+                        logger.info(log_message)
+                        break
+                    else:
+                        logger.warning(
+                            "WPos coordinates not found in the line. Trying again..."
+                        )
+                        raise LocationNotFound
+                except LocationNotFound as e:
+                    logger.error(
+                        "Error occurred while getting WPos coordinates: %s", str(e)
+                    )
+                    if _ == max_attempts - 1:
+                        raise
+        elif status_mode in [1, 3]:
+            # Regular expression to extract MPos coordinates
+            mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
+            match = mpos_pattern.search(status)
+            max_attempts = 3
+            for _ in range(max_attempts):
+                try:
+                    if (
+                        match
+                    ):  # Add 3 to the coordinates to account for the machine offset
+                        homing_pull_off = self.config["homing_pull_off"]
+                        x_coord = float(match.group(1)) + homing_pull_off
+                        y_coord = float(match.group(2)) + homing_pull_off
+                        z_coord = float(match.group(3)) + homing_pull_off
+                        log_message = f"MPos coordinates: X = {x_coord - homing_pull_off}, Y = {y_coord- homing_pull_off}, Z = {z_coord- homing_pull_off}"
+                        logger.info(log_message)
+                        log_message = f"WPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
+                        logger.info(log_message)
+                        break
+                    else:
+                        logger.warning(
+                            "MPos coordinates not found in the line. Trying again..."
+                        )
+                        raise LocationNotFound
+                except LocationNotFound as e:
+                    logger.error(
+                        "Error occurred while getting MPos coordinates: %s", str(e)
+                    )
+                    if _ == max_attempts - 1:
+                        raise
+        else:
+            logger.critical("Failed to obtain coordinates from the mill")
+            sys.exit()
+
+        # So far we have obtain the mill's coordinates
+        # Now we need to adjust them based on the instrument to communicate where the current instrument is
         if instrument in [Instruments.CENTER, Instruments.LENS]:
             current_coordinates = [x_coord, y_coord, z_coord]
         elif instrument == Instruments.PIPETTE:
@@ -360,7 +416,7 @@ class Mill:
         else:
             raise ValueError("Invalid instrument")
 
-        logger.debug("current_coordinates: %s", current_coordinates)
+        logger.debug("Current_coordinates: %s", current_coordinates)
         return current_coordinates
 
     def rinse_electrode(self, rinses: int = 3):
@@ -497,7 +553,6 @@ class Mill:
         y_coord,
         z_coord,
         instrument: Instruments = Instruments.CENTER,
-        fixed_z=False,
     ) -> int:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
@@ -505,100 +560,121 @@ class Mill:
             x_coord (float): X coordinate.
             y_coord (float): Y coordinate.
             z_coord (float): Z coordinate.
+            instrument (Instruments): The instrument to move to the specified coordinates.
         Returns:
             str: Response from the mill after executing the commands.
         """
         # Get the current coordinates
-        current_x, current_y, current_z = self.current_coordinates()
-        logger.debug("Current coordinates: %s, %s, %s", current_x, current_y, current_z)
+        current_coordinates = Coordinates(*self.current_coordinates(instrument))
 
-        offsets = self.config["instrument_offsets"][instrument.value]
-        # updated target coordinates with offsets so the center of the mill moves to the right spot
-        offset_x_coord = x_coord + offsets["x"]
-        offset_y_coord = y_coord + offsets["y"]
-        offset_z_coord = z_coord + offsets["z"]
-        logger.debug(
-            "Target coordinates: %s, %s, %s",
-            offset_x_coord,
-            offset_y_coord,
-            offset_z_coord,
-        )
-        # if current_z != 0 and current_z != z_coord and (not fixed_z or fixed_z):
-        #     # This condition is true if:
-        #     #  - the current Z coordinate is not zero
-        #     #  - it is not equal to the target Z coordinate
-        #     #  - the fixed_z flag is not set (i.e. fixed_z = False) or it is set (i.e. fixed_z = True)
-        #     # Additionally, current_z should be below the safe height.
-        #     if current_z < self.config["safe_height_floor"]:
-        #         logger.debug("Testing - Would be moving to Z = 0")
-        #         logger.debug(
-        #             "Reason:\n\tcurrent_z is below self.config['safe_height_floor'] %s",
-        #             current_z < self.config['safe_height_floor']
-        #         )
-        #         # self.execute_command("G01 Z0")
-        #     else:
-        #         logger.debug("Testing - Would not be moving to Z = 0")
-        #         logger.debug(
-        #             "Reason:\n\tcurrent_z is at or above self.config['safe_height_floor'] %s",
-        #             current_z >= self.config['safe_height_floor']
-        #         )
-        # else:
-        #     logger.debug("Testing - Would not be moving to Z = 0")
-        #     if current_z == 0:
-        #         logger.debug("Reason:\n\tcurrent_z is zero")
-        #     elif current_z == z_coord:
-        #         logger.debug("Reason:\n\tcurrent_z is equal to the target Z coordinate %s", current_z == z_coord)
-        #     elif fixed_z:
-        #         logger.debug("Reason:\n\tfixed_z is set to True")
-        #     else:
-        #         logger.debug("Reason:\n\tMultiple Conditions not met: current_z = %s, z_coord = %s, fixed_z = %s", current_z, z_coord, fixed_z)
-        if current_z != 0:
-            if current_x != offset_x_coord and current_y != offset_y_coord:
-                self.execute_command(f"G01 X{x_coord}")
-            else:
-                logger.warning(
-                    "Z-coords unequal, X and Y coordinates equal. moving to Z = 0 is not necessary"
-                )
-        else:
-            # If the current Z coordinate is zero, move to the target coordinates
-            logger.warning(
-                "Current Z coordinate is ALREADY zero, moving to the target coordinates without moving to Z = 0"
-            )
         # Fetch offsets for the specified instrument
+        offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
+        # updated target coordinates with offsets so the center of the mill moves to the right spot
+        offset_coordinates = Coordinates(
+            x=x_coord + offsets.x,
+            y=y_coord + offsets.y,
+            z=z_coord + offsets.z,
+        )
+        logger.debug(
+            "Target coordinates: [%s, %s, %s]",
+            offset_coordinates.x,
+            offset_coordinates.y,
+            offset_coordinates.z,
+        )
+
+        move_to_zero_first = self.should_move_to_zero_first(
+            current_coordinates,
+            offset_coordinates,
+            self.config["safe_height_floor"],
+        )
+
+        if move_to_zero_first:
+            logger.debug("Moving to Z=0 first")
+            self.execute_command("G01 Z0")
+        else:
+            logger.warning("Not moving to Z=0 first")
 
         # Double check that the target coordinates are within the working volume
-        working_volume = self.config["working_volume"]
-        if offset_x_coord > 0 or offset_x_coord < working_volume["x"]:
+        working_volume = Coordinates(**self.config["working_volume"])
+        if offset_coordinates.x > 0 or offset_coordinates.x < working_volume.x:
             logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if offset_y_coord > 0 or offset_y_coord < working_volume["y"]:
+        if offset_coordinates.y > 0 or offset_coordinates.y < working_volume.y:
             logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if offset_z_coord > 0 or offset_z_coord < working_volume["z"]:
+        if offset_coordinates.z > 0 or offset_coordinates.z < working_volume.z:
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
         # Calculate the differences between the current and target coordinates
-        dx = offset_x_coord - current_x
-        dy = offset_y_coord - current_y
+        # dx = offset_coordinates.x - current_coordinates.x
+        # dy = offset_coordinates.y - current_coordinates.y
         # Initialize a list to store the movement commands
         commands = []
 
         # Generate horizontal movements
-        if dx != 0:
-            commands.append(f"G01 X{offset_x_coord}")
+        if offset_coordinates.x != current_coordinates.x:
+            commands.append(f"G01 X{offset_coordinates.x}")
 
-        if dy != 0:
-            commands.append(f"G01 Y{offset_y_coord}")
+        if offset_coordinates.y != current_coordinates.y:
+            commands.append(f"G01 Y{offset_coordinates.y}")
 
         # Generate vertical movements
-        commands.append(f"G01 Z{offset_z_coord}")
+        if offset_coordinates.z != current_coordinates.z:
+            commands.append(f"G01 Z{offset_coordinates.z}")
 
         # Execute the commands one by one
         for command in commands:
             self.execute_command(command)
 
         return 0
+
+    def should_move_to_zero_first(
+        self,
+        current: Coordinates,
+        offset: Coordinates,
+        safe_height_floor,
+    ):
+        """
+        Determine if the mill should move to Z=0 before moving to the specified coordinates.
+        Args:
+            current (Coordinates): Current coordinates.
+            offset (Coordinates): Target coordinates.
+            safe_height_floor (float): Safe floor height.
+        Returns:
+            bool: True if the mill should move to Z=0 first, False otherwise.
+        """
+        # Extract the current coordinates
+
+        if offset.z not in (0, current.z):
+            if current.z == 0:
+                # Expecting False because Z is already at 0
+                move_to_zero_first = False
+            elif current.x != offset.x and current.y != offset.y:
+                # Expecting True because Z is changing, X and Y are changing
+                move_to_zero_first = current.z < safe_height_floor
+            elif current.x == offset.x and current.y == offset.y:
+                # Expecting False because Z is changing, but X and Y are not changing
+                move_to_zero_first = False
+            else:
+                # Default to True
+                move_to_zero_first = True
+        else:  # offset_z_coord is 0 or current.z
+            # If Z is already at 0, expect False
+            if current.z == 0:
+                move_to_zero_first = False
+            # If Z is at or above the safe floor height, expect False
+            elif current.z >= safe_height_floor:
+                move_to_zero_first = False
+            # If Z is below the safe floor height, expect True if X and Y are changing
+            elif current.z < safe_height_floor:
+                move_to_zero_first = current.x != offset.x and current.y != offset.y
+
+            else:
+                # Default to True
+                move_to_zero_first = True
+
+        return move_to_zero_first
 
 
 class StatusReturnError(Exception):
@@ -669,6 +745,7 @@ class MockMill(Mill):
         self.current_y = 0.0
         self.current_z = 0.0
         self.feed_rate = 2000
+        self.status_mode = self.config["status_report"]
 
     def connect_to_mill(self):
         """Connect to the mill"""
@@ -737,7 +814,17 @@ class MockMill(Mill):
 
     def current_status(self) -> str:
         """Simulate getting the current status of the mill"""
-        return f"<Idle|MPos:{self.current_x-3.000},{self.current_y-3.000},{self.current_z-3.000}|Bf:15,127|FS:0,0>"
+        homing_pull_off = self.config["homing_pull_off"]
+        if self.status_mode == 0:
+            return f"<Idle|WPos:{self.current_x},{self.current_y},{self.current_z}>"
+        elif self.status_mode == 1:
+            return f"<Idle|MPos:{self.current_x-homing_pull_off},{self.current_y-homing_pull_off},{self.current_z-homing_pull_off}>"
+
+        elif self.status_mode == 2:
+            return f"<Idle|WPos:{self.current_x},{self.current_y},{self.current_z}|Bf:15,127|FS:0,0>"
+
+        elif self.status_mode == 3:
+            return f"<Idle|MPos:{self.current_x-homing_pull_off},{self.current_y-homing_pull_off},{self.current_z-homing_pull_off}|Bf:15,127|FS:0,0>"
 
     def mock_write(self, command):
         """Simulate writing to the mill"""
@@ -765,274 +852,10 @@ class MockMill(Mill):
             else:
                 logger.warning("Could not extract coordinates from the command")
 
-        #     # Regular expression to extract the coordinates
-        #     pattern1 = re.compile(r"G01 X([\d.-]+)? Y([\d.-]+)? Z([\d.-]+)?")
-        #     pattern2 = re.compile(r"G01 X([\d.-]+)? Y([\d.-]+)?")
-        #     pattern3 = re.compile(r"G01 Y([\d.-]+)? Z([\d.-]+)?")
-        #     pattern4 = re.compile(r"G01 X([\d.-]+)? Z([\d.-]+)?")
-        #     pattern5 = re.compile(r"G01 X([\d.-]+)?")
-        #     pattern6 = re.compile(r"G01 Y([\d.-]+)?")
-        #     pattern7 = re.compile(r"G01 Z([\d.-]+)?")
-
-        #     if pattern1.match(command):
-        #         match = pattern1.search(command)
-
-        #         if match.group(1):
-        #             self.current_x = float(match.group(1))
-        #         if match.group(2):
-        #             self.current_y = float(match.group(2))
-        #         if match.group(3):
-        #             self.current_z = float(match.group(3))
-
-        #     elif pattern2.match(command):
-        #         match = pattern2.search(command)
-
-        #         if match.group(1):
-        #             self.current_x = float(match.group(1))
-        #         if match.group(2):
-        #             self.current_y = float(match.group(2))
-
-        #     elif pattern3.match(command):
-        #         match = pattern3.search(command)
-
-        #         if match.group(1):
-        #             self.current_y = float(match.group(1))
-        #         if match.group(2):
-        #             self.current_z = float(match.group(2))
-
-        #     elif pattern4.match(command):
-        #         match = pattern4.search(command)
-
-        #         if match.group(1):
-        #             self.current_x = float(match.group(1))
-        #         if match.group(2):
-        #             self.current_z = float(match.group(2))
-
-        #     elif pattern5.match(command):
-        #         match = pattern5.search(command)
-
-        #         if match.group(1):
-        #             self.current_x = float(match.group(1))
-
-        #     elif pattern6.match(command):
-        #         match = pattern6.search(command)
-
-        #         if match.group(1):
-        #             self.current_y = float(match.group(1))
-        #     elif pattern7.match(command):
-        #         match = pattern7.search(command)
-
-        #         if match.group(1):
-        #             self.current_z = float(match.group(1))
-        #     else:
-        #         match = None
-        #         logger.warning("Could not extract coordinates from the command")
-        # else:
-        #     pass
-
     def mock_readline(self):
         """Simulate reading from the mill"""
         return self.current_status()
         ## End of mock mill specific code
-
-
-# class MockMill:
-#     """A class that simulates a mill for testing purposes.
-
-#     Attributes:
-#     config_file (str): The path to the configuration file.
-#     config (dict): The configuration dictionary.
-#     ser_mill (None): The serial connection to the mill.
-#     current_x (float): The current x-coordinate.
-#     current_y (float): The current y-coordinate.
-#     current_z (float): The current z-coordinate.
-
-#     Methods:
-#     homing_sequence(): Simulate homing, setting feed rate, and clearing buffers.
-#     disconnect(): Simulate disconnecting from the mill.
-#     execute_command(command): Simulate executing a command.
-#     stop(): Simulate stopping the mill.
-#     reset(): Simulate resetting the mill.
-#     home(timeout): Simulate homing the mill.
-#     wait_for_completion(incoming_status, timeout): Simulate waiting for completion.
-#     current_status(): Simulate getting the current status.
-#     set_feed_rate(rate): Simulate setting the feed rate.
-#     clear_buffers(): Simulate clearing buffers.
-#     gcode_mode(): Simulate getting the G-code mode.
-#     gcode_parameters(): Simulate getting G-code parameters.
-#     gcode_parser_state(): Simulate getting G-code parser state.
-#     rinse_electrode(): Simulate rinsing the electrode.
-#     move_to_safe_position(): Simulate moving to a safe position.
-#     move_center_to_position(x_coord, y_coord, z_coord): Simulate moving to a specified position.
-#     current_coordinates(instrument): Return the tracked current coordinates.
-#     move_pipette_to_position(x_coord, y_coord, z_coord): Simulate moving the pipette to a specified position.
-#     move_electrode_to_position(x_coord, y_coord, z_coord): Simulate moving the electrode to a specified position.
-#     update_offset(offset_type, offset_x, offset_y, offset_z): Simulate updating offsets in the config.
-#     safe_move(x_coord, y_coord, z_coord, instrument): Simulate a safe move with horizontal and vertical movements.
-#     """
-
-#     def __init__(self, config_file="mill_config.json"):
-#         self.config_file = config_file
-#         self.config = {}  # Initialize an empty config for testing
-#         self.ser_mill = None  # No serial connection in mock
-#         self.current_x = 0.0
-#         self.current_y = 0.0
-#         self.current_z = 0.0
-#         self.logger = logger
-
-#     def homing_sequence(self):
-#         """Simulate homing, setting feed rate, and clearing buffers"""
-#         self.home()
-#         self.set_feed_rate(2000)  # Set feed rate to 2000
-#         self.clear_buffers()
-
-#     def __enter__(self):
-#         """Enter the context manager"""
-#         self.homing_sequence()
-#         return self
-
-#     def __exit__(self, exc_type, exc_value, traceback):
-#         """Exit the context manager"""
-#         self.home()
-#         self.disconnect()
-
-#     def disconnect(self):
-#         """Simulate disconnecting from the mill"""
-#         self.logger.info("Disconnecting from the mill")
-
-#     def execute_command(self, command):
-#         """Simulate executing a command"""
-#         self.logger.info("Executing command: %s", command)
-
-#     def stop(self):
-#         """Simulate stopping the mill"""
-#         self.logger.info("Stopping the mill")
-
-#     def reset(self):
-#         """Simulate resetting the mill"""
-#         self.logger.info("Resetting the mill")
-
-#     def home(self, timeout=90):
-#         """Simulate homing the mill"""
-#         self.current_x = 0.0
-#         self.current_y = 0.0
-#         self.current_z = 0.0
-#         self.logger.debug("timeout for homing is %s", str(timeout))
-#         self.logger.info("Homing the mill")
-
-#     def wait_for_completion(self, incoming_status, timeout=90):
-#         """Simulate waiting for completion"""
-#         self.logger.info("Waiting for completion with status: %s", incoming_status)
-#         self.logger.debug("timeout for waiting is %s", str(timeout))
-
-#     def current_status(self) -> str:
-#         """Simulate getting the current status"""
-#         self.logger.info("Getting current status")
-#         return "Idle"  # Mock status for testing
-
-#     def set_feed_rate(self, rate):
-#         """Simulate setting the feed rate"""
-#         self.logger.info("Setting feed rate to %s", rate)
-
-#     def clear_buffers(self):
-#         """Simulate clearing buffers"""
-#         self.logger.info("Clearing buffers")
-
-#     def gcode_mode(self):
-#         """Simulate getting the G-code mode"""
-#         self.logger.info("Getting G-code mode")
-
-#     def gcode_parameters(self):
-#         """Simulate getting G-code parameters"""
-#         self.logger.info("Getting G-code parameters")
-
-#     def gcode_parser_state(self):
-#         """Simulate getting G-code parser state"""
-#         self.logger.info("Getting G-code parser state")
-
-#     def rinse_electrode(self, rinses: int = 3):
-#         """Simulate rinsing the electrode"""
-#         self.logger.info("Rinsing the electrode")
-#         for _ in range(rinses):
-#             time.sleep(1)
-
-#     def rest_electrode(self):
-#         """
-#         Rinse the electrode by moving it to the rinse position and back to the
-#         center position.
-#         Args:
-#             None
-#         Returns:
-#             None
-#         """
-
-#     def move_to_safe_position(self):
-#         """Simulate moving to a safe position"""
-#         self.logger.info("Moving to a safe position")
-
-#     def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
-#         """Simulate moving to a specified position"""
-#         self.current_x = x_coord
-#         self.current_y = y_coord
-#         self.current_z = z_coord
-#         self.logger.info("Moving to position: (%s, %s, %s)", x_coord, y_coord, z_coord)
-#         return 0
-
-#     def current_coordinates(self, instrument=Instruments.CENTER) -> list:
-#         """Return the tracked current coordinates"""
-#         self.logger.info("Getting current coordinates of %s", instrument.value)
-#         return [self.current_x, self.current_y, self.current_z]
-
-#     def move_pipette_to_position(
-#         self,
-#         x_coord: float = 0,
-#         y_coord: float = 0,
-#         z_coord=0.00,
-#     ):
-#         """Simulate moving the pipette to a specified position"""
-#         self.current_x = x_coord
-#         self.current_y = y_coord
-#         self.current_z = z_coord
-#         self.logger.info(
-#             "Moving pipette to position: (%s, %s, %s)", x_coord, y_coord, z_coord
-#         )
-
-#     def move_electrode_to_position(
-#         self, x_coord: float, y_coord: float, z_coord: float = 0.00
-#     ):
-#         """Simulate moving the electrode to a specified position"""
-#         self.current_x = x_coord
-#         self.current_y = y_coord
-#         self.current_z = z_coord
-#         self.logger.info(
-#             "Moving electrode to position: (%s, %s, %s)", x_coord, y_coord, z_coord
-#         )
-
-#     def update_offset(self, offset_type, offset_x, offset_y, offset_z):
-#         """Simulate updating offsets in the config"""
-#         self.logger.info(
-#             "Updating offset: %s (%s, %s, %s)",
-#             offset_type,
-#             offset_x,
-#             offset_y,
-#             offset_z,
-#         )
-
-#     def safe_move(
-#         self, x_coord, y_coord, z_coord, instrument: Instruments = Instruments.CENTER
-#     ) -> int:
-#         """Simulate a safe move with horizontal and vertical movements"""
-#         self.current_x = x_coord
-#         self.current_y = y_coord
-#         self.current_z = z_coord
-#         self.logger.info(
-#             "Safe move %s to position: (%s, %s, %s)",
-#             instrument.value,
-#             x_coord,
-#             y_coord,
-#             z_coord,
-#         )
-#         return 0
 
 
 def wellplate_scan(mill_arg: Mill = None, capture_images=False):
@@ -1056,7 +879,6 @@ def wellplate_scan(mill_arg: Mill = None, capture_images=False):
                 well_coordinates["y"],
                 wellplate.image_height,
                 instrument=Instruments.LENS,
-                fixed_z=True,
             )
             if capture_images:
                 # create a folder in data folder with the wellplate id
@@ -1130,7 +952,7 @@ def move_to_vials(mill: Mill, stock_vials, waste_vials):
         mill.move_to_safe_position()
 
 
-def movement_test():
+def movement_test(mill: Mill):
     """Test the mill movement with a wellplate"""
     import wellplate as Wells
     from vials import StockVial, WasteVial, read_vials
@@ -1146,7 +968,7 @@ def movement_test():
     test_logger.addHandler(testing_handler)
 
     try:
-        with MockMill() as mill:
+        with mill:
             a1 = wellplate.get_coordinates("A1")
             a12 = wellplate.get_coordinates("A12")
             h1 = wellplate.get_coordinates("H1")
@@ -1157,8 +979,8 @@ def movement_test():
             print(h12)
             ## Load the vials
 
-            stock_vials: StockVial = read_vials(STOCK_STATUS)
-            waste_vials: WasteVial = read_vials(WASTE_STATUS)
+            stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
+            waste_vials: Sequence[WasteVial] = read_vials(WASTE_STATUS)
             input(
                 "Begin the movement test to each corner of the wellplate. Press enter to continue..."
             )
@@ -1205,7 +1027,8 @@ def movement_test():
     finally:
         logger.info("Exiting program.")
 
-def only_z_move_test():
+
+def only_z_move_test(mill: Mill):
     import wellplate as Wells
     from vials import StockVial, WasteVial, read_vials
 
@@ -1214,13 +1037,13 @@ def only_z_move_test():
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)
     test_logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
-    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+    test_formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
     testing_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control_testing.log")
-    testing_handler.setFormatter(formatter)
+    testing_handler.setFormatter(test_formatter)
     test_logger.addHandler(testing_handler)
 
     try:
-        with MockMill() as mill:
+        with mill:
             a1 = wellplate.get_coordinates("A1")
             a12 = wellplate.get_coordinates("A12")
             h1 = wellplate.get_coordinates("H1")
@@ -1231,12 +1054,27 @@ def only_z_move_test():
             print(h12)
             ## Load the vials
 
-            #stock_vials: StockVial = read_vials(STOCK_STATUS)
-            #waste_vials: WasteVial = read_vials(WASTE_STATUS)
+            stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
+            waste_vials: Sequence[WasteVial] = read_vials(WASTE_STATUS)
 
             mill.safe_move(a1["x"], a1["y"], -40, instrument=Instruments.PIPETTE)
             mill.safe_move(
                 a1["x"], a1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+            )
+
+            mill.safe_move(a12["x"], a12["y"], -40, instrument=Instruments.PIPETTE)
+            mill.safe_move(
+                stock_vials[0].coordinates["x"],
+                stock_vials[0].coordinates["y"],
+                stock_vials[0].height,
+                instrument=Instruments.PIPETTE,
+            )
+
+            mill.safe_move(
+                waste_vials[0].coordinates["x"],
+                waste_vials[0].coordinates["y"],
+                waste_vials[0].height,
+                instrument=Instruments.PIPETTE,
             )
 
     except (
@@ -1255,28 +1093,39 @@ def only_z_move_test():
 
 
 if __name__ == "__main__":
+    TESTING = True
+    if TESTING:
+        mill_to_use = MockMill()
+    else:
+        mill_to_use = Mill()
 
     def menu():
         """A menu for the mill testing functions."""
         print("Welcome to the Mill Control Menu!")
         print("1. Run movement test")
         print("2. Run wellplate scan")
-        print("3. Start mill and use debugger via breakpoint. Move to safe position and rest electrode after testing.")
+        print(
+            "3. Start mill and use debugger via breakpoint. Move to safe position and rest electrode after testing."
+        )
         print("4. Only Z move test")
         print("0. Exit")
 
         choice = input("Enter your choice: ")
 
         if choice == "1":
-            movement_test()
+            movement_test(mill_to_use)
         elif choice == "2":
-            wellplate_scan(capture_images=True)
+            take_picture = input("Do you want to take pictures? (y/n): ")
+            if take_picture.lower() == "y":
+                wellplate_scan(mill_to_use, capture_images=True)
+            else:
+                wellplate_scan(mill_to_use, capture_images=False)
         elif choice == "3":
-            with MockMill() as mill:
-                mill.move_to_safe_position()
-                mill.rest_electrode()
+            with mill_to_use:
+                mill_to_use.move_to_safe_position()
+                mill_to_use.rest_electrode()
         elif choice == "4":
-            only_z_move_test()
+            only_z_move_test(mill_to_use)
         elif choice == "0":
             print("Exiting...")
             return
