@@ -20,16 +20,19 @@ import dataclasses
 import json
 import logging
 import re
+import sys
 import time
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Sequence
-import sys
+from unittest.mock import MagicMock
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
+import wellplate as Wells
+from camera_call_camera import capture_new_image
 from config.config import (
     MILL_CONFIG,
     PATH_TO_DATA,
@@ -38,6 +41,8 @@ from config.config import (
     TESTING,
     WASTE_STATUS,
 )
+from vials import StockVial, WasteVial, read_vials
+from wellplate import Well, Wellplate
 
 logger = logging.getLogger("e_panda")
 if not logger.hasHandlers():
@@ -141,7 +146,7 @@ class Mill:
         """Close the serial connection to the mill"""
         logger.info("Disconnecting from the mill")
         self.ser_mill.close()
-        time.sleep(15)
+        time.sleep(10)
         logger.info("Mill connected: %s", self.ser_mill.is_open)
 
     def read_json_config(self):
@@ -736,8 +741,6 @@ class MockMill(Mill):
     safe_move(x_coord, y_coord, z_coord, instrument): Simulate a safe move with horizontal and vertical movements.
     """
 
-    from unittest import mock
-
     def __init__(self, config_file="mill_config.json"):
         super().__init__(config_file)
         self.ser_mill: serial.Serial = None
@@ -750,7 +753,7 @@ class MockMill(Mill):
     def connect_to_mill(self):
         """Connect to the mill"""
         logger.info("Connecting to the mill")
-        ser_mill = self.mock.MagicMock(spec=serial.Serial)
+        ser_mill = MagicMock(spec=serial.Serial)
         self.active_connection = True
         return ser_mill
 
@@ -861,9 +864,6 @@ class MockMill(Mill):
 def wellplate_scan(mill_arg: Mill = None, capture_images=False):
     """Scan the wellplate"""
     # Perform image scan of each well of the wellplate
-    from camera_call_camera import capture_new_image
-    from wellplate import Well, Wellplate
-
     wellplate = Wellplate()
     if mill_arg is None:
         mill = Mill()
@@ -893,6 +893,7 @@ def wellplate_scan(mill_arg: Mill = None, capture_images=False):
 
 
 def move_pipette_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top):
+    """Move the pipette to each corner of the wellplate"""
     mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.PIPETTE)
     mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.PIPETTE)
     mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.PIPETTE)
@@ -900,6 +901,7 @@ def move_pipette_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top):
 
 
 def move_electrode_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top, echem_height):
+    """Move the electrode to each corner of the wellplate"""
     mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.ELECTRODE)
     mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.ELECTRODE)
     mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.ELECTRODE)
@@ -918,6 +920,7 @@ def move_electrode_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top, echem_hei
 
 
 def move_lens_to_each_corner(mill: Mill, image_height, a1, a12, h12, h1):
+    """Move the lens to each corner of the wellplate"""
     mill.safe_move(a1["x"], a1["y"], image_height, instrument=Instruments.LENS)
     mill.safe_move(a12["x"], a12["y"], image_height, instrument=Instruments.LENS)
     mill.safe_move(h12["x"], h12["y"], image_height, instrument=Instruments.LENS)
@@ -925,8 +928,7 @@ def move_lens_to_each_corner(mill: Mill, image_height, a1, a12, h12, h1):
 
 
 def move_to_vials(mill: Mill, stock_vials, waste_vials):
-    from vials import StockVial, WasteVial
-
+    """Move the mill to the stock and waste vials"""
     if len(stock_vials) != 0:
         for _, stock_vial in enumerate(stock_vials):
             stock_vial: StockVial
@@ -954,17 +956,16 @@ def move_to_vials(mill: Mill, stock_vials, waste_vials):
 
 def movement_test(mill: Mill):
     """Test the mill movement with a wellplate"""
-    import wellplate as Wells
-    from vials import StockVial, WasteVial, read_vials
-
     wellplate = Wells.Wellplate()
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)
     test_logger.setLevel(logging.DEBUG)  # Change to INFO to reduce verbosity
-    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+    testing_formatter = logging.Formatter(
+        "%(asctime)s:%(name)s:%(levelname)s:%(message)s"
+    )
     testing_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control_testing.log")
-    testing_handler.setFormatter(formatter)
+    testing_handler.setFormatter(testing_formatter)
     test_logger.addHandler(testing_handler)
 
     try:
@@ -973,12 +974,8 @@ def movement_test(mill: Mill):
             a12 = wellplate.get_coordinates("A12")
             h1 = wellplate.get_coordinates("H1")
             h12 = wellplate.get_coordinates("H12")
-            print(a1)
-            print(a12)
-            print(h1)
-            print(h12)
-            ## Load the vials
 
+            ## Load the vials
             stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
             waste_vials: Sequence[WasteVial] = read_vials(WASTE_STATUS)
             input(
@@ -1029,9 +1026,7 @@ def movement_test(mill: Mill):
 
 
 def only_z_move_test(mill: Mill):
-    import wellplate as Wells
-    from vials import StockVial, WasteVial, read_vials
-
+    """Test the mill movement concerning the z axis with a wellplate"""
     wellplate = Wells.Wellplate()
 
     # Configure the logger for testing
@@ -1046,12 +1041,6 @@ def only_z_move_test(mill: Mill):
         with mill:
             a1 = wellplate.get_coordinates("A1")
             a12 = wellplate.get_coordinates("A12")
-            h1 = wellplate.get_coordinates("H1")
-            h12 = wellplate.get_coordinates("H12")
-            print(a1)
-            print(a12)
-            print(h1)
-            print(h12)
             ## Load the vials
 
             stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)

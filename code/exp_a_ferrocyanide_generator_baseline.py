@@ -53,15 +53,15 @@ EXPERIMENT_NAME = "Repeatability assessment (exp A-2)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
 CAMPAIGN_ID = 4
 PUMPING_RATE = 0.3
-INTENDED_PLATE = 108
+INTENDED_PLATE = 107
 
-load_new_wellplate(False,INTENDED_PLATE,3)
+load_new_wellplate(False,INTENDED_PLATE)
 experiment_id = determine_next_experiment_id()
 experiments: list[experiment_class.EchemExperimentBase] = []
 WELL_NUMBER = 1
 
 experiment_wells = [
-    "D2","D3","D4"
+    "D12","D11","D10"
 ]
 
 for col in COLUMNS:
@@ -82,7 +82,7 @@ for col in COLUMNS:
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + "_" + str(experiment_id),
                 plate_id=INTENDED_PLATE,
-                override_well_selection= 1,
+                override_well_selection= 0,
                 # Echem specific
                 ocp=1,
                 baseline=0,
