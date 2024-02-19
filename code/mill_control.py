@@ -117,23 +117,58 @@ class Mill:
                 logger.info("Opening serial connection to mill...")
                 ser_mill.open()
                 time.sleep(2)
-                if ser_mill.is_open:
-                    logger.info("Serial connection to mill opened successfully")
-                    self.active_connection = True
-                else:
-                    logger.error("Serial connection to mill failed to open")
-                    raise MillConnectionError("Error opening serial connection to mill")
+            if ser_mill.is_open:
+                logger.info("Serial connection to mill opened successfully")
+                self.active_connection = True
+            else:
+                logger.error("Serial connection to mill failed to open")
+                raise MillConnectionError("Error opening serial connection to mill")
 
             logger.info("Mill connected: %s", ser_mill.is_open)
             print("Mill connected: ", ser_mill.is_open)
-            return ser_mill
+            self.ser_mill = ser_mill
         except Exception as exep:
             logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
 
+
+        # Check if the mill is currently in alarm state
+        # If it is, reset the mill
+        status = self.current_status()
+        if "alarm" in status.lower():
+            logger.warning("Mill is in alarm state")
+            reset_alarm = input("Reset the mill? (y/n): ")
+            if reset_alarm.lower() == "y":
+                self.reset()
+            else:
+                logger.error("Mill is in alarm state, user chose not to reset the mill")
+                raise MillConnectionError("Mill is in alarm state")
+        if "error" in status.lower():
+            logger.error("Error in status: %s", status)
+            raise MillConnectionError(f"Error in status: {status}")
+
+        # We only check that the mill is indeed lock upon connection because we will home before any movement
+        if 'unlock' not in status.lower():
+            logger.error("Mill is not locked")
+            proceed = input("Proceed? (y/n): ")
+            if proceed.lower() == "n":
+                raise MillConnectionError("Mill is not locked")
+            else:
+                logger.warning("Proceeding despite mill not being locked")
+                logger.warning("Current status: %s", status)
+                logger.warning("Homing is reccomended before any movement")
+                home_now = input("Home now? (y/n): ")
+                if home_now.lower() == "y":
+                    self.homing_sequence()
+                else:
+                    logger.warning("User chose not to home the mill")
+        
+        self.clear_buffers()
+        return self.ser_mill
+
     def __enter__(self):
         """Enter the context manager"""
-        self.ser_mill = self.connect_to_mill()
+        self.connect_to_mill()
         self.homing_sequence()
         return self
 
@@ -146,8 +181,16 @@ class Mill:
         """Close the serial connection to the mill"""
         logger.info("Disconnecting from the mill")
         self.ser_mill.close()
-        time.sleep(10)
+        time.sleep(2)
         logger.info("Mill connected: %s", self.ser_mill.is_open)
+        if self.ser_mill.is_open:
+            logger.error("Failed to close the serial connection to the mill")
+            raise MillConnectionError("Error closing serial connection to mill")
+        else:
+            logger.info("Serial connection to mill closed successfully")
+            print("Serial connection to mill closed successfully")
+            self.active_connection = False
+            self.ser_mill = None
 
     def read_json_config(self):
         """Read the config file"""
@@ -174,13 +217,24 @@ class Mill:
             time.sleep(2)
             mill_response = self.ser_mill.readline().decode().rstrip()
 
-            if command == "F2000":
-                logger.debug("Returned %s", mill_response)
+            if command == '$$':
+                full_mill_response = []
+                full_mill_response.append(mill_response)
+                while full_mill_response[-1] != "ok":
+                    full_mill_response.append(self.ser_mill.readline().decode().rstrip())
+                full_mill_response = full_mill_response[:-1]
+                logger.debug("Returned %s", full_mill_response)
 
-            elif command == "?":
-                logger.debug("Returned %s", mill_response)
+                # parse the settings into a dictionary
+                settings_dict = {}
+                for setting in full_mill_response:
+                    setting:str
+                    key, value = setting.split("=")
+                    settings_dict[key] = value
 
-            elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
+                return settings_dict
+
+            elif command not in ["$H", "$X", "0x18", "$C", "$#", "$G"]:
                 # logger.debug("Initially %s", mill_response)
                 self.wait_for_completion(mill_response)
                 mill_response = self.current_status()
@@ -188,8 +242,8 @@ class Mill:
             else:
                 logger.debug("Returned %s", mill_response)
 
-            if mill_response.lower() in ["error", "alarm"]:
-                if "error:22" in mill_response.lower():
+            if re.search(r"\b(error|alarm)\b", mill_response.lower()):
+                if re.search(r"\berror:22\b", mill_response.lower()):
                     # This is a GRBL error that occurs when the feed rate isn't set before moving with G01 command
                     logger.error("Error in status: %s", mill_response)
                     # Try setting the feed rate and executing the command again
@@ -209,10 +263,14 @@ class Mill:
 
     def stop(self):
         """Stop the mill"""
-        self.execute_command("$X")
+        self.execute_command("!")
 
     def reset(self):
         """Reset the mill"""
+        self.execute_command("$X")
+
+    def soft_reset(self):
+        """Soft reset the mill"""
         self.execute_command("0x18")
 
     def home(self, timeout=90):
@@ -251,12 +309,8 @@ class Mill:
         status = ""
         while status == "":
             self.ser_mill.write(command_bytes + b"\n")
-            # time.sleep(2)
+            time.sleep(0.25)
             status = self.ser_mill.readline().decode().rstrip()
-        # Check for errors
-        if "error" in status.lower() or "alarm" in status.lower():
-            logger.error("current_status: Error in status: %s", status)
-            raise StatusReturnError(f"Error in status: {status}")
         # Check for busy
         while status == "ok":
             status = self.ser_mill.readline().decode().rstrip()
@@ -273,7 +327,7 @@ class Mill:
 
     def gcode_mode(self):
         """Ask the mill for its gcode mode"""
-        self.execute_command("$C")
+        return self.execute_command("$C")
 
     def gcode_parameters(self):
         """Ask the mill for its gcode parameters"""
@@ -282,6 +336,16 @@ class Mill:
     def gcode_parser_state(self):
         """Ask the mill for its gcode parser state"""
         return self.execute_command("$G")
+
+    def grbl_settings(self) -> dict:
+        """Ask the mill for its grbl settings"""
+        return self.execute_command("$$")
+        
+    def set_grbl_setting(self, setting:str, value:str):
+        """Set a grbl setting"""
+        command = f"${setting}={value}"
+        return self.execute_command(command)
+
 
     def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
         """
@@ -332,7 +396,7 @@ class Mill:
 
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
-        status_mode = self.config["status_report"]
+        status_mode = self.config['settings']['$10']
 
         if status_mode not in [0, 1, 2, 3]:
             logger.error("Invalid status mode")
@@ -397,6 +461,8 @@ class Mill:
                         raise
         else:
             logger.critical("Failed to obtain coordinates from the mill")
+            self.stop()
+            self.disconnect()
             sys.exit()
 
         # So far we have obtain the mill's coordinates
@@ -1082,7 +1148,7 @@ def only_z_move_test(mill: Mill):
 
 
 if __name__ == "__main__":
-    TESTING = True
+    TESTING = False
     if TESTING:
         mill_to_use = MockMill()
     else:
