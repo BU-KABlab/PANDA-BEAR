@@ -306,7 +306,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
     list_of_solutions = []
     for items in vial_parameters:
         if items["name"] is not None:
-            if items["category"] == 0:
+            if items["category"] == 0: # Stock vial
                 read_vial = StockVial(
                     name=str(items["name"]).lower(),
                     position=str(items["position"]).lower(),
@@ -322,7 +322,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
                     viscosity_cp=items["viscosity_cp"],
                 )
                 list_of_solutions.append(read_vial)
-            elif items["category"] == 1:
+            elif items["category"] == 1: # Waste vial
                 read_vial = WasteVial(
                     name=str(items["name"]).lower(),
                     position=str(items["position"]).lower(),
