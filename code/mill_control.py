@@ -129,7 +129,6 @@ class Mill:
             logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
 
-
         # Check if the mill is currently in alarm state
         # If it is, reset the mill
         status = self.current_status()
@@ -146,7 +145,7 @@ class Mill:
             raise MillConnectionError(f"Error in status: {status}")
 
         # We only check that the mill is indeed lock upon connection because we will home before any movement
-        if 'unlock' not in status.lower():
+        if "unlock" not in status.lower():
             logger.error("Mill is not locked")
             proceed = input("Proceed? (y/n): ")
             if proceed.lower() == "n":
@@ -160,7 +159,7 @@ class Mill:
                     self.homing_sequence()
                 else:
                     logger.warning("User chose not to home the mill")
-        
+
         self.clear_buffers()
         return self.ser_mill
 
@@ -215,18 +214,20 @@ class Mill:
             time.sleep(2)
             mill_response = self.ser_mill.readline().decode().rstrip()
 
-            if command == '$$':
+            if command == "$$":
                 full_mill_response = []
                 full_mill_response.append(mill_response)
                 while full_mill_response[-1] != "ok":
-                    full_mill_response.append(self.ser_mill.readline().decode().rstrip())
+                    full_mill_response.append(
+                        self.ser_mill.readline().decode().rstrip()
+                    )
                 full_mill_response = full_mill_response[:-1]
                 logger.debug("Returned %s", full_mill_response)
 
                 # parse the settings into a dictionary
                 settings_dict = {}
                 for setting in full_mill_response:
-                    setting:str
+                    setting: str
                     key, value = setting.split("=")
                     settings_dict[key] = value
 
@@ -338,12 +339,11 @@ class Mill:
     def grbl_settings(self) -> dict:
         """Ask the mill for its grbl settings"""
         return self.execute_command("$$")
-        
-    def set_grbl_setting(self, setting:str, value:str):
+
+    def set_grbl_setting(self, setting: str, value: str):
         """Set a grbl setting"""
         command = f"${setting}={value}"
         return self.execute_command(command)
-
 
     def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
         """
@@ -394,7 +394,7 @@ class Mill:
 
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
-        status_mode = self.config['settings']['$10']
+        status_mode = self.config["settings"]["$10"]
 
         if status_mode not in [0, 1, 2, 3]:
             logger.error("Invalid status mode")
@@ -893,7 +893,7 @@ class MockMill(Mill):
         elif self.status_mode == 3:
             return f"<Idle|MPos:{self.current_x-homing_pull_off},{self.current_y-homing_pull_off},{self.current_z-homing_pull_off}|Bf:15,127|FS:0,0>"
 
-    def mock_write(self, command:str):
+    def mock_write(self, command: str):
         """Simulate writing to the mill"""
         logger.debug("Writing to the mill: %s", command)
         ## For mock mill
