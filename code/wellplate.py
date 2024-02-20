@@ -360,7 +360,7 @@ class Wellplate:
                         logger.debug("Well %s updated from file", well.name)
                         break
 
-    def get_coordinates(self, well_id, axis: str = None) -> dict:
+    def get_coordinates(self, well_id:str, axis: str = None) -> dict:
         """
         Return the coordinate of a specific well
         Args:
@@ -369,6 +369,7 @@ class Wellplate:
             dict: The coordinates of the well in the form
             {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
         """
+        well_id = well_id.upper()
         if axis in ["x", "y", "z"]:
             return self.wells[well_id].coordinates[axis]
 
