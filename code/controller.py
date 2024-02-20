@@ -23,7 +23,6 @@ from typing import Sequence
 import e_panda
 import wellplate as wellplate_module
 from config.config import (
-    EPANDA_LOG,
     RANDOM_FLAG,
     STOCK_STATUS,
     TESTING,
