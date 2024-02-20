@@ -917,11 +917,10 @@ def characterization(
             OCPrate=potentiostat_ocp_parameters.OCPrate,
         )  # OCP
         pstat.activecheck()
-        char_instructions.results.ocp_char_pass = pstat.check_vf_range( #TODO: Have check_vf_range return the final voltage value
+        char_instructions.results.ocp_char_pass, char_instructions.cv_initial_voltage = pstat.check_vf_range(
             char_instructions.results.ocp_char_file.with_suffix(".txt")
         )
         # plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
-        # TODO: Update instructions cv_initial_voltage and final voltage with the returned final voltage value
     except Exception as e:
         logger.error("Exception occurred during OCP: %s", e)
         pstat.pstatdisconnect()
