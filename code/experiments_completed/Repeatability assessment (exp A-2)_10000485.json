@@ -1,29 +1,27 @@
 {
-    "id": 10000409,
-    "experiment_name": "Repeatability assessment (exp A)",
+    "id": 10000485,
+    "experiment_name": "Repeatability assessment (exp A-2)",
     "priority": 1,
-    "well_id": "H9",
+    "well_id": "D9",
     "pin": 2001001001,
-    "project_id": 13,
+    "project_id": 12,
     "solutions": {
-        "5mm_fecn6": 120,
-        "electrolyte": 0,
-        "rinse0": 0
+        "5mm_fecn6": 120
     },
     "solutions_corrected": {
-        "5mm_fecn6": 120,
-        "electrolyte": 0,
-        "rinse0": 0
+        "5mm_fecn6": 120
     },
     "well_type_number": 1,
     "pumping_rate": 0.3,
-    "status": "new",
-    "status_date": "2024-01-25T14:34:24.720754",
-    "filename": "Repeatability assessment (exp A)_10000409",
+    "status": "complete",
+    "status_date": "2024-02-20T13:12:31",
+    "filename": "Repeatability assessment (exp A-2)_10000485",
     "results": null,
-    "project_campaign_id": 0,
+    "project_campaign_id": 4,
     "protocol_type": 1,
-    "plate_id": 108,
+    "plate_id": 107,
+    "override_well_selection": 0,
+    "process_type": 1,
     "ocp": 1,
     "ca": 0,
     "cv": 1,
@@ -48,10 +46,10 @@
     "cv_initial_voltage": 0.0,
     "cv_first_anodic_peak": 0.58,
     "cv_second_anodic_peak": -0.2,
-    "cv_final_voltage": 0.0,
-    "cv_step_size": 0.02,
-    "cv_scan_rate_cycle_1": 0.05,
+    "cv_final_voltage": 0.5,
+    "cv_step_size": 0.002,
     "cv_cycle_count": 3,
+    "cv_scan_rate_cycle_1": 0.05,
     "cv_scan_rate_cycle_2": 0.05,
     "cv_scan_rate_cycle_3": 0.05
 }

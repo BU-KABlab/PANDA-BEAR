@@ -920,7 +920,7 @@ def characterization(
         char_instructions.results.ocp_char_pass, char_instructions.cv_initial_voltage = pstat.check_vf_range(
             char_instructions.results.ocp_char_file.with_suffix(".txt")
         )
-        # plotdata("OCP", char_results.ocp_char_file.with_suffix(".txt"))
+        logger.info("OCP of well %s passed: %s", char_instructions.well_id, char_instructions.results.ocp_char_pass)
     except Exception as e:
         logger.error("Exception occurred during OCP: %s", e)
         pstat.pstatdisconnect()

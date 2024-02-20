@@ -10,10 +10,8 @@ import obsws_python as obsws
 from obsws_python import error as OBSerror
 from config.config import PATH_TO_LOGS, TESTING
 from experiment_class import ExperimentBase, ExperimentStatus
-
+from log_tools import e_panda_logger as logger
 ## set up logging to log to both the obs_control.log file and the ePANDA.log file
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
 file_handler = logging.FileHandler(PATH_TO_LOGS / "obs_control.log")
 # system_handler = logging.FileHandler("ePANDA.log")
@@ -27,13 +25,13 @@ class OBSController:
     """This class is used simplify the control the OBS software for our needs"""
 
     def __init__(self):
-        if TESTING:
-            self.client = MockOBSController()
-        else:
-            self.client = obsws.ReqClient(
-                host="localhost", port=4455, password="PandaBear!", timeout=3
-            )
-            self.logger = logging.getLogger(__name__)
+        # if TESTING:
+        #     self.client = MockOBSController()
+        # else:
+        self.client = obsws.ReqClient(
+            host="localhost", port=4455, password="PandaBear!", timeout=3
+        )
+        self.logger = logging.getLogger(__name__)
 
     def place_experiment_on_screen(self, instructions: ExperimentBase):
         try:

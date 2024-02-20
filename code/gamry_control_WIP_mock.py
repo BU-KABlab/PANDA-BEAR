@@ -1,6 +1,7 @@
 """a virtual pstat for testing main code logic"""
 import logging
 import pathlib
+from typing import Tuple
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict
 import numpy as np
@@ -31,9 +32,9 @@ class GamryPotentiostat:
     def activecheck(self):
         return self.OPEN_CONNECTION
 
-    def check_vf_range(self, file):
+    def check_vf_range(self, file) -> Tuple[bool, float]:
         self.OPEN_CONNECTION = True
-        return True
+        return True, 0.0
 
     def setfilename(self,
         experiment_id,

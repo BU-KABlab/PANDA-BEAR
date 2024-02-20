@@ -44,17 +44,7 @@ from vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_fil
 from wellplate import save_current_wellplate
 from obs_controls import OBSController
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter(
-    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
-)
-system_handler = logging.FileHandler(EPANDA_LOG)
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
-console_logger = logging.StreamHandler()
-console_logger.setLevel(logging.INFO)
-logger.addHandler(console_logger)
+from log_tools import e_panda_logger as logger
 
 # set up slack globally so that it can be used in the main function and others
 slack = SlackBot()
@@ -109,7 +99,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         update_vial_state_file(stock_vials, STOCK_STATUS)
         update_vial_state_file(waste_vials, WASTE_STATUS)
 
-        ## Begin outer loop
+        ## Begin experiemnt loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
             obs.place_text_on_screen("")
@@ -210,21 +200,21 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             new_experiment.plate_id = wellplate.plate_id
 
             logger.info("Beginning experiment %d", new_experiment.id)
-            # import exp_a_2_ferrocyanide_assessment_protocol as exp_a
-            # exp_a.cv_repeatability(
-            #     instructions=new_experiment,
-            #     toolkit=toolkit,
-            #     stock_vials=stock_vials,
-            #     waste_vials=waste_vials,
-            # )
-            #import exp_edot_bleaching_protocol as edot
-            import exp_d2_mixing_assessment_protocol as exp_d2
-            exp_d2.mixing_assessment(
+            import exp_a_2_ferrocyanide_assessment_protocol as exp_a
+            exp_a.cv_repeatability(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
             )
+            #import exp_edot_bleaching_protocol as edot
+            # import exp_d2_mixing_assessment_protocol as exp_d2
+            # exp_d2.mixing_assessment(
+            #     instructions=new_experiment,
+            #     toolkit=toolkit,
+            #     stock_vials=stock_vials,
+            #     waste_vials=waste_vials,
+            # )
             ## Update the experiment status to complete
             new_experiment.set_status(ExperimentStatus.COMPLETE)
 
