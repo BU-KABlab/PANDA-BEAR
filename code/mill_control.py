@@ -123,7 +123,7 @@ class Mill:
                 raise MillConnectionError("Error opening serial connection to mill")
 
             logger.info("Mill connected: %s", ser_mill.is_open)
-            print("Mill connected: ", ser_mill.is_open)
+            #print("Mill connected: ", ser_mill.is_open)
             self.ser_mill = ser_mill
         except Exception as exep:
             logger.error("Error connecting to the mill: %s", str(exep))
@@ -131,7 +131,7 @@ class Mill:
 
         # Check if the mill is currently in alarm state
         # If it is, reset the mill
-        status = self.current_status()
+        status = self.ser_mill.readlines()[-1].decode().rstrip()
         if "alarm" in status.lower():
             logger.warning("Mill is in alarm state")
             reset_alarm = input("Reset the mill? (y/n): ")
@@ -185,7 +185,7 @@ class Mill:
             raise MillConnectionError("Error closing serial connection to mill")
         else:
             logger.info("Serial connection to mill closed successfully")
-            print("Serial connection to mill closed successfully")
+            #print("Serial connection to mill closed successfully")
             self.active_connection = False
             self.ser_mill = None
 
@@ -689,6 +689,7 @@ class Mill:
             commands.append(f"G01 Y{offset_coordinates.y}")
 
         # Generate vertical movements
+        current_coordinates = Coordinates(*self.current_coordinates(instrument))
         if offset_coordinates.z != current_coordinates.z:
             commands.append(f"G01 Z{offset_coordinates.z}")
 
@@ -721,6 +722,7 @@ class Mill:
                 move_to_zero_first = False
             elif current.x != offset.x and current.y != offset.y:
                 # Expecting True because Z is changing, X and Y are changing
+                # But if Z is below the safe floor height, expect False
                 move_to_zero_first = current.z < safe_height_floor
             elif current.x == offset.x and current.y == offset.y:
                 # Expecting False because Z is changing, but X and Y are not changing
@@ -737,7 +739,8 @@ class Mill:
                 move_to_zero_first = False
             # If Z is below the safe floor height, expect True if X and Y are changing
             elif current.z < safe_height_floor:
-                move_to_zero_first = current.x != offset.x and current.y != offset.y
+                # If X and Y are changing, expect True
+                move_to_zero_first = not (current.x == offset.x and current.y == offset.y)
 
             else:
                 # Default to True
@@ -1034,9 +1037,9 @@ def movement_test(mill: Mill):
 
     try:
         with mill:
-            a1 = wellplate.get_coordinates("A1")
-            a12 = wellplate.get_coordinates("A12")
-            h1 = wellplate.get_coordinates("H1")
+            d11 = wellplate.get_coordinates("D11")
+            d10 = wellplate.get_coordinates("D10")
+            d9 = wellplate.get_coordinates("D9")
             h12 = wellplate.get_coordinates("H12")
 
             ## Load the vials
@@ -1050,7 +1053,7 @@ def movement_test(mill: Mill):
                 input("Do you want to move the pipette to each corner? (y/n): ").lower()
                 == "y"
             ):
-                move_pipette_to_each_corner(mill, a1, a12, h12, h1, wellplate.z_top)
+                move_pipette_to_each_corner(mill, d11, d10, d9, h12, wellplate.z_top)
 
             if (
                 input(
@@ -1059,14 +1062,14 @@ def movement_test(mill: Mill):
                 == "y"
             ):
                 move_electrode_to_each_corner(
-                    mill, a1, a12, h12, h1, wellplate.z_top, wellplate.echem_height
+                    mill, d11, d10, d9, h12, wellplate.z_top, wellplate.echem_height
                 )
 
             if (
                 input("Do you want to move the lens to each corner? (y/n): ").lower()
                 == "y"
             ):
-                move_lens_to_each_corner(mill, wellplate.image_height, a1, a12, h12, h1)
+                move_lens_to_each_corner(mill, wellplate.image_height, d11, d10, d9, h12,)
 
             if input("Do you want to move to the vials? (y/n): ").lower() == "y":
                 move_to_vials(mill, stock_vials, waste_vials)
