@@ -439,7 +439,7 @@ class Mill:
                     if (
                         match
                     ):  # Add 3 to the coordinates to account for the machine offset
-                        homing_pull_off = self.config["homing_pull_off"]
+                        homing_pull_off = self.config["settings"]["$27"]
                         x_coord = float(match.group(1)) + homing_pull_off
                         y_coord = float(match.group(2)) + homing_pull_off
                         z_coord = float(match.group(3)) + homing_pull_off
@@ -814,7 +814,7 @@ class MockMill(Mill):
         self.current_y = 0.0
         self.current_z = 0.0
         self.feed_rate = 2000
-        self.status_mode = self.config["status_report"]
+        self.status_mode = self.config["settings"]["$10"]
 
     def connect_to_mill(self):
         """Connect to the mill"""
@@ -883,7 +883,7 @@ class MockMill(Mill):
 
     def current_status(self) -> str:
         """Simulate getting the current status of the mill"""
-        homing_pull_off = self.config["homing_pull_off"]
+        homing_pull_off = self.config["settings"]["$27"]
         if self.status_mode == 0:
             return f"<Idle|WPos:{self.current_x},{self.current_y},{self.current_z}>"
         elif self.status_mode == 1:
@@ -895,7 +895,7 @@ class MockMill(Mill):
         elif self.status_mode == 3:
             return f"<Idle|MPos:{self.current_x-homing_pull_off},{self.current_y-homing_pull_off},{self.current_z-homing_pull_off}|Bf:15,127|FS:0,0>"
 
-    def mock_write(self, command):
+    def mock_write(self, command:str):
         """Simulate writing to the mill"""
         logger.debug("Writing to the mill: %s", command)
         ## For mock mill
