@@ -1,198 +1,175 @@
 {
-    "plate_id": 108,
-    "type_number": 3,
+    "plate_id": 107,
+    "type_number": 4,
     "wells": [
         {
             "well_id": "A1",
-            "status": "complete",
-            "status_date": "2024-02-06T17:31:32",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000455,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A2",
-            "status": "complete",
-            "status_date": "2024-02-06T17:38:34",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000456,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A3",
-            "status": "complete",
-            "status_date": "2024-01-31T20:13:10",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000413,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A4",
-            "status": "complete",
-            "status_date": "2024-01-31T20:23:42",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000414,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A5",
-            "status": "complete",
-            "status_date": "2024-01-31T20:34:12",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000415,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A6",
-            "status": "complete",
-            "status_date": "2024-01-31T20:45:54",
-            "contents": {
-                "10mm_fecn6": 0.0,
-                "electrolyte": 0.0
-            },
-            "experiment_id": 10000416,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A7",
-            "status": "complete",
-            "status_date": "2024-01-31T20:57:36",
-            "contents": {
-                "10mm_fecn6": 0.0,
-                "electrolyte": 0.0
-            },
-            "experiment_id": 10000417,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A8",
-            "status": "complete",
-            "status_date": "2024-01-31T21:09:22",
-            "contents": {
-                "10mm_fecn6": 0.0,
-                "electrolyte": 0.0
-            },
-            "experiment_id": 10000418,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A9",
-            "status": "complete",
-            "status_date": "2024-01-31T21:21:07",
-            "contents": {
-                "electrolyte": 0.0,
-                "10mm_fecn6": 0.0
-            },
-            "experiment_id": 10000419,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A10",
-            "status": "complete",
-            "status_date": "2024-01-31T21:32:54",
-            "contents": {
-                "electrolyte": 0.0,
-                "10mm_fecn6": 0.0
-            },
-            "experiment_id": 10000420,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A11",
-            "status": "complete",
-            "status_date": "2024-01-31T21:44:44",
-            "contents": {
-                "electrolyte": 0.0,
-                "10mm_fecn6": 0.0
-            },
-            "experiment_id": 10000421,
-            "project_id": 15
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "A12",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "B1",
-            "status": "complete",
-            "status_date": "2024-02-06T17:45:23",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000457,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "B2",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-01-22T17:54:43",
+            "contents": {
+                "edot": 127.43,
+                "rinse0": 509.72
+            },
+            "experiment_id": 10000382,
+            "project_id": 16
         },
         {
             "well_id": "B3",
             "status": "complete",
-            "status_date": "2024-02-06T17:52:41",
+            "status_date": "2024-01-22T17:48:45",
             "contents": {
-                "5mm_fecn6": 0.0
+                "edot": 127.43,
+                "rinse0": 509.72
             },
-            "experiment_id": 10000458,
-            "project_id": 12
+            "experiment_id": null,
+            "project_id": null
         },
         {
             "well_id": "B4",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
+            "status": "complete",
+            "status_date": "2024-01-22T17:48:45",
+            "contents": {
+                "edot": 127.43,
+                "rinse0": 509.72
+            },
             "experiment_id": null,
             "project_id": null
         },
         {
             "well_id": "B5",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "B6",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "B7",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "B8",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "B9",
@@ -204,11 +181,11 @@
         },
         {
             "well_id": "B10",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "B11",
@@ -220,81 +197,75 @@
         },
         {
             "well_id": "B12",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "C1",
-            "status": "complete",
-            "status_date": "2024-02-06T17:59:31",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000459,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "C2",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "C3",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "C4",
-            "status": "complete",
-            "status_date": "2024-02-06T18:06:33",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000460,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "C5",
-            "status": "complete",
-            "status_date": "2024-02-06T18:18:22",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000461,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "C6",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "C7",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "C8",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "C9",
@@ -322,29 +293,27 @@
         },
         {
             "well_id": "C12",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "D1",
-            "status": "complete",
-            "status_date": "2024-02-06T18:25:25",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000462,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "D2",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "D3",
@@ -372,31 +341,27 @@
         },
         {
             "well_id": "D6",
-            "status": "complete",
-            "status_date": "2024-02-06T18:32:38",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000463,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "D7",
-            "status": "complete",
-            "status_date": "2024-02-06T18:40:05",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000464,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "D8",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "D9",
@@ -424,21 +389,19 @@
         },
         {
             "well_id": "D12",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "E1",
-            "status": "complete",
-            "status_date": "2024-02-06T18:47:48",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000465,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "E2",
@@ -490,23 +453,19 @@
         },
         {
             "well_id": "E8",
-            "status": "complete",
-            "status_date": "2024-02-06T18:55:05",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000466,
-            "project_id": 12
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": null
         },
         {
             "well_id": "E9",
-            "status": "complete",
-            "status_date": "2024-02-06T19:02:53",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000467,
-            "project_id": 12
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": null
         },
         {
             "well_id": "E10",
@@ -526,21 +485,19 @@
         },
         {
             "well_id": "E12",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "F1",
-            "status": "complete",
-            "status_date": "2024-02-06T19:10:13",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000468,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "F2",
@@ -584,50 +541,62 @@
         },
         {
             "well_id": "F7",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "F8",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "F9",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "F10",
-            "status": "complete",
-            "status_date": "2024-02-06T19:17:14",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000469,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "F11",
-            "status": "complete",
-            "status_date": "2024-02-06T19:24:23",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000470,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "F12",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
+        },
+        {
+            "well_id": "G1",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
+        },
+        {
+            "well_id": "G2",
             "status": "new",
             "status_date": "",
             "contents": {},
@@ -635,44 +604,20 @@
             "project_id": null
         },
         {
-            "well_id": "G1",
-            "status": "complete",
-            "status_date": "2024-02-06T19:31:27",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000471,
-            "project_id": 12
-        },
-        {
-            "well_id": "G2",
-            "status": "complete",
-            "status_date": "2024-02-05T11:06:36",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000452,
-            "project_id": 12
-        },
-        {
             "well_id": "G3",
-            "status": "complete",
-            "status_date": "2024-02-05T11:13:22",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000453,
-            "project_id": 12
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": null
         },
         {
             "well_id": "G4",
-            "status": "complete",
-            "status_date": "2024-02-05T11:20:13",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000454,
-            "project_id": 12
+            "status": "new",
+            "status_date": "",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": null
         },
         {
             "well_id": "G5",
@@ -700,19 +645,19 @@
         },
         {
             "well_id": "G8",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "G9",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "G10",
@@ -724,141 +669,115 @@
         },
         {
             "well_id": "G11",
-            "status": "new",
-            "status_date": "",
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
             "contents": {},
             "experiment_id": null,
-            "project_id": null
+            "project_id": 16
         },
         {
             "well_id": "G12",
-            "status": "complete",
-            "status_date": "2024-02-06T19:39:30",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000472,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H1",
-            "status": "complete",
-            "status_date": "2024-02-06T19:47:07",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000473,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H2",
-            "status": "complete",
-            "status_date": "2024-02-06T19:55:05",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000474,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H3",
-            "status": "complete",
-            "status_date": "2024-02-06T20:02:31",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000475,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H4",
-            "status": "complete",
-            "status_date": "2024-02-06T20:11:11",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000476,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H5",
-            "status": "complete",
-            "status_date": "2024-02-06T20:18:52",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000477,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H6",
-            "status": "complete",
-            "status_date": "2024-02-06T20:26:24",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000478,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H7",
-            "status": "complete",
-            "status_date": "2024-02-06T20:35:13",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000479,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H8",
-            "status": "complete",
-            "status_date": "2024-02-06T20:42:26",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000480,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H9",
-            "status": "complete",
-            "status_date": "2024-02-06T20:49:36",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000481,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H10",
-            "status": "complete",
-            "status_date": "2024-02-06T20:57:46",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000482,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H11",
-            "status": "complete",
-            "status_date": "2024-02-06T21:08:11",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000483,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         },
         {
             "well_id": "H12",
-            "status": "complete",
-            "status_date": "2024-02-06T21:15:21",
-            "contents": {
-                "5mm_fecn6": 0.0
-            },
-            "experiment_id": 10000484,
-            "project_id": 12
+            "status": "error",
+            "status_date": "2024-02-16T13:11:00",
+            "contents": {},
+            "experiment_id": null,
+            "project_id": 16
         }
     ]
 }

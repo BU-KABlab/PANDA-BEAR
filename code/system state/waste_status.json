@@ -28,7 +28,7 @@
         "name": "waste",
         "volume": 1000,
         "capacity": 20000,
-        "contamination": 10,
+        "contamination": 0,
         "density": 0,
         "category": 1,
         "viscosity_cp": 0.0
@@ -43,9 +43,9 @@
         "height": -20,
         "depth": 0,
         "name": "waste",
-        "volume": 9000,
+        "volume": 1000,
         "capacity": 20000,
-        "contamination": 149,
+        "contamination": 0,
         "density": 0,
         "category": 1,
         "viscosity_cp": 0.0
