@@ -16,17 +16,16 @@ of the mill.
 # pylint: disable=line-too-long
 
 # standard libraries
-import dataclasses
 import json
 import logging
 import re
 import sys
 import time
 from datetime import datetime
-from enum import Enum
 from pathlib import Path
 from typing import Sequence
 from unittest.mock import MagicMock
+from utilities import Coordinates, Instruments
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
@@ -61,26 +60,6 @@ if not logger.hasHandlers():
     )
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
-
-
-@dataclasses.dataclass
-class Instruments(Enum):
-    """Class for naming of the mill instruments"""
-
-    CENTER = "center"
-    PIPETTE = "pipette"
-    ELECTRODE = "electrode"
-    LENS = "lens"
-
-
-@dataclasses.dataclass
-class Coordinates:
-    """Class for storing coordinates"""
-
-    x: float
-    y: float
-    z: float
-
 
 class Mill:
     """
@@ -131,10 +110,9 @@ class Mill:
             logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
 
-
         # Check if the mill is currently in alarm state
         # If it is, reset the mill
-        status = self.current_status()
+        status = self.ser_mill.readlines()[-1].decode().rstrip()
         if "alarm" in status.lower():
             logger.warning("Mill is in alarm state")
             reset_alarm = input("Reset the mill? (y/n): ")
@@ -148,7 +126,7 @@ class Mill:
             raise MillConnectionError(f"Error in status: {status}")
 
         # We only check that the mill is indeed lock upon connection because we will home before any movement
-        if 'unlock' not in status.lower():
+        if "unlock" not in status.lower():
             logger.error("Mill is not locked")
             proceed = input("Proceed? (y/n): ")
             if proceed.lower() == "n":
@@ -162,7 +140,7 @@ class Mill:
                     self.homing_sequence()
                 else:
                     logger.warning("User chose not to home the mill")
-        
+
         self.clear_buffers()
         return self.ser_mill
 
@@ -217,18 +195,20 @@ class Mill:
             time.sleep(2)
             mill_response = self.ser_mill.readline().decode().rstrip()
 
-            if command == '$$':
+            if command == "$$":
                 full_mill_response = []
                 full_mill_response.append(mill_response)
                 while full_mill_response[-1] != "ok":
-                    full_mill_response.append(self.ser_mill.readline().decode().rstrip())
+                    full_mill_response.append(
+                        self.ser_mill.readline().decode().rstrip()
+                    )
                 full_mill_response = full_mill_response[:-1]
                 logger.debug("Returned %s", full_mill_response)
 
                 # parse the settings into a dictionary
                 settings_dict = {}
                 for setting in full_mill_response:
-                    setting:str
+                    setting: str
                     key, value = setting.split("=")
                     settings_dict[key] = value
 
@@ -236,7 +216,7 @@ class Mill:
 
             elif command not in ["$H", "$X", "0x18", "$C", "$#", "$G"]:
                 # logger.debug("Initially %s", mill_response)
-                self.wait_for_completion(mill_response)
+                self.__wait_for_completion(mill_response)
                 mill_response = self.current_status()
                 logger.debug("Returned %s", mill_response)
             else:
@@ -266,7 +246,7 @@ class Mill:
         self.execute_command("!")
 
     def reset(self):
-        """Reset the mill"""
+        """Reset or unlock the mill"""
         self.execute_command("$X")
 
     def soft_reset(self):
@@ -291,7 +271,7 @@ class Mill:
 
             time.sleep(2)  # Adjust the sleep interval as needed
 
-    def wait_for_completion(self, incoming_status, timeout=90):
+    def __wait_for_completion(self, incoming_status, timeout=90):
         """Wait for the mill to complete the previous command"""
         status = incoming_status
         start_time = time.time()
@@ -340,48 +320,11 @@ class Mill:
     def grbl_settings(self) -> dict:
         """Ask the mill for its grbl settings"""
         return self.execute_command("$$")
-        
-    def set_grbl_setting(self, setting:str, value:str):
+
+    def set_grbl_setting(self, setting: str, value: str):
         """Set a grbl setting"""
         command = f"${setting}={value}"
         return self.execute_command(command)
-
-
-    def move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
-        """
-        Move the mill to the specified coordinates.
-        Args:
-            x_coord (float): X coordinate.
-            y_coord (float): Y coordinate.
-            z_coord (float): Z coordinate.
-        Returns:
-            str: Response from the mill after executing the command.
-        """
-        offsets = self.config["instrument_offsets"]["center"]
-        working_volume = self.config["working_volume"]
-
-        mill_move = "G01 X{} Y{} Z{}"  # Move to specified coordinates
-
-        command_coordinates = [
-            x_coord + offsets["x"],
-            y_coord + offsets["y"],
-            z_coord + offsets["z"],
-        ]
-
-        # check that command coordinates are within working volume
-        if command_coordinates[0] > 0 or command_coordinates[0] < working_volume["x"]:
-            logger.error("x coordinate out of range")
-            raise ValueError("x coordinate out of range")
-        if command_coordinates[1] > 0 or command_coordinates[1] < working_volume["y"]:
-            logger.error("y coordinate out of range")
-            raise ValueError("y coordinate out of range")
-        if command_coordinates[2] > 0 or command_coordinates[2] < working_volume["z"]:
-            logger.error("z coordinate out of range")
-            raise ValueError("z coordinate out of range")
-
-        command = mill_move.format(*command_coordinates)
-        self.execute_command(command)
-        return 0
 
     def current_coordinates(self, instrument=Instruments.CENTER) -> list:
         """
@@ -396,7 +339,7 @@ class Mill:
 
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
-        status_mode = self.config['settings']['$10']
+        status_mode = self.config["settings"]["$10"]
 
         if status_mode not in [0, 1, 2, 3]:
             logger.error("Invalid status mode")
@@ -502,8 +445,8 @@ class Mill:
         coords = self.config["electrode_bath"]
         self.safe_move(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
         for _ in range(rinses):
-            self.move_electrode_to_position(coords["x"], coords["y"], coords["z"])
-            self.move_electrode_to_position(coords["x"], coords["y"], 0)
+            self._move_electrode_to_position(coords["x"], coords["y"], coords["z"])
+            self._move_electrode_to_position(coords["x"], coords["y"], 0)
         return 0
 
     def rest_electrode(self):
@@ -531,13 +474,51 @@ class Mill:
 
         return self.execute_command("G01 Z0")
 
-    def move_pipette_to_position(
+    def _move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
+        """
+        WARNING: Will move diagonally
+        Move the mill to the specified coordinates.
+        Args:
+            x_coord (float): X coordinate.
+            y_coord (float): Y coordinate.
+            z_coord (float): Z coordinate.
+        Returns:
+            str: Response from the mill after executing the command.
+        """
+        offsets = self.config["instrument_offsets"]["center"]
+        working_volume = self.config["working_volume"]
+
+        mill_move = "G01 X{} Y{} Z{}"  # Move to specified coordinates
+
+        command_coordinates = [
+            x_coord + offsets["x"],
+            y_coord + offsets["y"],
+            z_coord + offsets["z"],
+        ]
+
+        # check that command coordinates are within working volume
+        if command_coordinates[0] > 0 or command_coordinates[0] < working_volume["x"]:
+            logger.error("x coordinate out of range")
+            raise ValueError("x coordinate out of range")
+        if command_coordinates[1] > 0 or command_coordinates[1] < working_volume["y"]:
+            logger.error("y coordinate out of range")
+            raise ValueError("y coordinate out of range")
+        if command_coordinates[2] > 0 or command_coordinates[2] < working_volume["z"]:
+            logger.error("z coordinate out of range")
+            raise ValueError("z coordinate out of range")
+
+        command = mill_move.format(*command_coordinates)
+        self.execute_command(command)
+        return 0
+
+    def _move_pipette_to_position(
         self,
         x_coord: float = 0,
         y_coord: float = 0,
         z_coord=0.00,
     ) -> int:
         """
+        WARNING: Will move diagonally
         Move the pipette to the specified coordinates.
         Args:
             x (float): X coordinate.
@@ -548,24 +529,19 @@ class Mill:
         """
         # offsets = {"x": -88, "y": 0, "z": 0}
         offsets = self.config["instrument_offsets"]["pipette"]
-        # mill_move = "G01 X{} Y{} Z{}"  # move to specified coordinates
-        # command = mill_move.format(
-        #     x_coord + offsets["x"], y_coord +
-        #     offsets["y"], z_coord + offsets["z"]
-        # )
-        # self.execute_command(str(command))
         command_coordinates = [
             x_coord + offsets["x"],
             y_coord + offsets["y"],
             z_coord + offsets["z"],
         ]
-        self.move_center_to_position(*command_coordinates)
+        self._move_center_to_position(*command_coordinates)
         return 0
 
-    def move_electrode_to_position(
+    def _move_electrode_to_position(
         self, x_coord: float, y_coord: float, z_coord: float = 0.00
     ) -> int:
         """
+        WARNING: Will move diagonally
         Move the electrode to the specified coordinates.
         Args:
             coordinates (dict): Dictionary containing x, y, and z coordinates.
@@ -574,20 +550,13 @@ class Mill:
         """
         # offsets = {"x": 36, "y": 30, "z": 0}
         offsets = self.config["instrument_offsets"]["electrode"]
-        # move to specified coordinates
-        # mill_move = "G01 X{} Y{} Z{}"
-        # command = mill_move.format(
-        #     (x_coord + offsets["x"]), (y_coord +
-        #                                offsets["y"]), (z_coord + offsets["z"])
-        # )
-        # self.execute_command(str(command))
 
         command_coordinates = [
             x_coord + offsets["x"],
             y_coord + offsets["y"],
             z_coord + offsets["z"],
         ]
-        self.move_center_to_position(*command_coordinates)
+        self._move_center_to_position(*command_coordinates)
         return 0
 
     def update_offset(self, offset_type, offset_x, offset_y, offset_z):
@@ -653,7 +622,7 @@ class Mill:
             offset_coordinates.z,
         )
 
-        move_to_zero_first = self.should_move_to_zero_first(
+        move_to_zero_first = self.__should_move_to_zero_first(
             current_coordinates,
             offset_coordinates,
             self.config["safe_height_floor"],
@@ -700,7 +669,7 @@ class Mill:
 
         return 0
 
-    def should_move_to_zero_first(
+    def __should_move_to_zero_first(
         self,
         current: Coordinates,
         offset: Coordinates,
@@ -723,6 +692,7 @@ class Mill:
                 move_to_zero_first = False
             elif current.x != offset.x and current.y != offset.y:
                 # Expecting True because Z is changing, X and Y are changing
+                # But if Z is below the safe floor height, expect False
                 move_to_zero_first = current.z < safe_height_floor
             elif current.x == offset.x and current.y == offset.y:
                 # Expecting False because Z is changing, but X and Y are not changing
@@ -739,7 +709,8 @@ class Mill:
                 move_to_zero_first = False
             # If Z is below the safe floor height, expect True if X and Y are changing
             elif current.z < safe_height_floor:
-                move_to_zero_first = current.x != offset.x and current.y != offset.y
+                # If X and Y are changing, expect True
+                move_to_zero_first = not (current.x == offset.x and current.y == offset.y)
 
             else:
                 # Default to True
@@ -847,7 +818,7 @@ class MockMill(Mill):
 
             elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
                 # logger.debug("Initially %s", mill_response)
-                self.wait_for_completion(mill_response)
+                self.__wait_for_completion(mill_response)
                 mill_response = self.current_status()
                 logger.debug("Returned %s", mill_response)
             else:

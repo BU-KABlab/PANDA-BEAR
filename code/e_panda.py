@@ -233,7 +233,7 @@ def forward_pipette_v2(
                 if isinstance(from_vessel, Well)
                 else AIR_GAP + DRIP_STOP
             )
-            is_pipette_volume_equal = pump.pipette_volume_ul >= blow_out
+            is_pipette_volume_equal = pump.pipette.volume_ul >= blow_out
             testing_logger.debug(
                 "TESTING: Is pipette volume greater than or equal to blowout? %s",
                 is_pipette_volume_equal,

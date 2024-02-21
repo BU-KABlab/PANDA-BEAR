@@ -1,0 +1,70 @@
+2024-02-20 11:03:22,698&pipette&pump_control&log_contents&101&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:03:22,702&pipette&pump_control&log_contents&101&pipette&100.0&{}
+2024-02-20 11:03:22,702&pipette&pump_control&log_contents&101&pipette&100.0&{}
+2024-02-20 11:03:22,703&pipette&pump_control&log_contents&101&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:03:22,703&pipette&pump_control&log_contents&101&pipette&0&{}
+2024-02-20 11:03:22,723&pipette&pump_control&log_contents&101&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:21:20,017&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:21:20,021&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:21:20,022&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:21:20,023&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:21:20,023&pipette&pump_control&log_contents&108&pipette&0&{}
+2024-02-20 11:21:20,029&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:21:20,030&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:21:20,044&pipette&pump_control&log_contents&108&pipette&0.0&{'solution1': 100.0}
+2024-02-20 11:22:53,373&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:22:53,375&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:22:53,375&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:22:53,376&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:22:53,376&pipette&pump_control&log_contents&108&pipette&0&{}
+2024-02-20 11:22:53,387&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:22:53,387&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:22:53,411&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:22:53,411&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:22:53,417&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:25:57,290&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:25:57,291&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:25:57,292&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:25:57,292&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:25:57,292&pipette&pump_control&log_contents&108&pipette&0&{}
+2024-02-20 11:25:57,300&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:25:57,300&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:25:57,317&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:25:57,317&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:25:57,320&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:27:25,701&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:27:25,702&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:27:25,703&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:27:25,703&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:27:25,704&pipette&pump_control&log_contents&108&pipette&0&{}
+2024-02-20 11:27:25,711&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:27:25,712&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:29:02,219&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:29:02,221&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:29:02,222&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:29:02,223&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:29:02,224&pipette&pump_control&log_contents&108&pipette&0&{}
+2024-02-20 11:29:02,229&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:29:02,230&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:29:10,634&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:29:12,933&pipette&pump_control&log_contents&108&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:29:24,933&pipette&pump_control&log_contents&108&pipette&100.0&{}
+2024-02-20 11:30:58,282&pipette&pump_control&log_contents&109&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:30:58,284&pipette&pump_control&log_contents&109&pipette&100.0&{}
+2024-02-20 11:30:58,285&pipette&pump_control&log_contents&109&pipette&100.0&{}
+2024-02-20 11:30:58,286&pipette&pump_control&log_contents&109&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:30:58,287&pipette&pump_control&log_contents&109&pipette&0&{}
+2024-02-20 11:30:58,291&pipette&pump_control&log_contents&109&pipette&100.0&{}
+2024-02-20 11:34:26,372&pipette&pump_control&log_contents&110&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:34:26,374&pipette&pump_control&log_contents&110&pipette&100.0&{}
+2024-02-20 11:34:26,376&pipette&pump_control&log_contents&110&pipette&100.0&{}
+2024-02-20 11:34:26,377&pipette&pump_control&log_contents&110&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:34:26,378&pipette&pump_control&log_contents&110&pipette&0&{}
+2024-02-20 11:34:26,384&pipette&pump_control&log_contents&110&pipette&100.0&{}
+2024-02-20 11:37:03,476&pipette&pump_control&log_contents&110&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:37:03,492&pipette&pump_control&log_contents&110&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:37:03,499&pipette&pump_control&log_contents&110&pipette&100.0&{'solution1': 100.0}
+2024-02-20 11:37:03,503&pipette&pump_control&log_contents&110&pipette&200.0&{'solution1': 200.0}
+2024-02-20 11:37:03,504&pipette&pump_control&log_contents&110&pipette&0&{}
+2024-02-20 11:37:03,517&pipette&pump_control&log_contents&110&pipette&100.0&{}
+2024-02-20 11:39:40,578&pipette&pump_control&log_contents&110&pipette&200.0&{'water': 100}
