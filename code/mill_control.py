@@ -640,9 +640,9 @@ class Mill:
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
         # updated target coordinates with offsets so the center of the mill moves to the right spot
         offset_coordinates = Coordinates(
-            x=x_coord + offsets.x,
-            y=y_coord + offsets.y,
-            z=z_coord + offsets.z,
+            x=round(x_coord + offsets.x,3),
+            y=round(y_coord + offsets.y,3),
+            z=round(z_coord + offsets.z,3),
         )
         logger.debug(
             "Target coordinates: [%s, %s, %s]",
@@ -1037,14 +1037,16 @@ def movement_test(mill: Mill):
 
     try:
         with mill:
-            d11 = wellplate.get_coordinates("D11")
-            d10 = wellplate.get_coordinates("D10")
-            d9 = wellplate.get_coordinates("D9")
-            h12 = wellplate.get_coordinates("H12")
+            well1 = wellplate.get_coordinates("c9")
+            well2 = wellplate.get_coordinates("c10")
+            well3 = wellplate.get_coordinates("c11")
+            well4 = wellplate.get_coordinates("b11")
 
             ## Load the vials
             stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
             waste_vials: Sequence[WasteVial] = read_vials(WASTE_STATUS)
+
+            # mill.safe_move(well1["x"], well1["y"], wellplate.z_top, instrument=Instruments.PIPETTE)
             input(
                 "Begin the movement test to each corner of the wellplate. Press enter to continue..."
             )
@@ -1053,7 +1055,7 @@ def movement_test(mill: Mill):
                 input("Do you want to move the pipette to each corner? (y/n): ").lower()
                 == "y"
             ):
-                move_pipette_to_each_corner(mill, d11, d10, d9, h12, wellplate.z_top)
+                move_pipette_to_each_corner(mill, well1, well2, well3, well4, wellplate.z_top)
 
             if (
                 input(
@@ -1062,14 +1064,14 @@ def movement_test(mill: Mill):
                 == "y"
             ):
                 move_electrode_to_each_corner(
-                    mill, d11, d10, d9, h12, wellplate.z_top, wellplate.echem_height
+                    mill, well1, well2, well3, well4, wellplate.z_top, wellplate.echem_height
                 )
 
             if (
                 input("Do you want to move the lens to each corner? (y/n): ").lower()
                 == "y"
             ):
-                move_lens_to_each_corner(mill, wellplate.image_height, d11, d10, d9, h12,)
+                move_lens_to_each_corner(mill, wellplate.image_height, well1, well2, well3, well4)
 
             if input("Do you want to move to the vials? (y/n): ").lower() == "y":
                 move_to_vials(mill, stock_vials, waste_vials)
