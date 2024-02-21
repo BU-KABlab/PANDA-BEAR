@@ -185,7 +185,7 @@ class Mill:
             logger.error("Error reading config file: %s", str(err))
             raise MillConfigError("Error reading config file") from err
 
-    def execute_command(self, command):
+    def execute_command(self, command:str):
         """Encodes and sends commands to the mill and returns the response"""
         try:
             logger.debug("Command sent: %s", command)
@@ -214,7 +214,7 @@ class Mill:
 
                 return settings_dict
 
-            elif command not in ["$H", "$X", "0x18", "$C", "$#", "$G"]:
+            elif not command.startswith("$"):
                 # logger.debug("Initially %s", mill_response)
                 self.__wait_for_completion(mill_response)
                 mill_response = self.current_status()

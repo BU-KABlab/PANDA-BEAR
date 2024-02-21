@@ -729,7 +729,39 @@ def flush_v2(
         logger.info("No flushing required. Flush volume is 0. Continuing...")
     return 0
 
+def purge_pipette(
+    waste_vials: Sequence[WasteVial],
+    mill: Union[Mill, MockMill],
+    pump: Union[Pump, MockPump],
+):
+    """
+    Move the pipette over an available waste vessel and purge its contents
 
+    Args:
+        waste_vials (Sequence[WasteVial]): _description_
+        mill (Union[Mill, MockMill]): _description_
+        pump (Union[Pump, MockPump]): _description_
+    """
+    liquid_volume = pump.pipette.liquid_volume
+    total_volume = pump.pipette.volume
+    purge_vial = solution_selector(waste_vials, "waste", liquid_volume)
+
+    # Move to the purge vial
+    mill.safe_move(
+        purge_vial.coordinates["x"],
+        purge_vial.coordinates["y"],
+        purge_vial.height,
+        Instruments.PIPETTE,
+    )
+
+    # Purge the pipette
+    pump.infuse(
+        volume_to_infuse=total_volume,
+        being_infused=None,
+        infused_into=purge_vial,
+    )
+
+    
 def solution_selector(
     solutions: Sequence[StockVial], solution_name: str, volume: float
 ) -> StockVial:

@@ -378,6 +378,11 @@ class Wellplate:
         coordinates_dict["image_height"] = self.image_height
         return coordinates_dict
 
+    def set_coordinates(self, well_id, new_coordinates: dict) -> None:
+        """Set the coordinates of a specific well"""
+        for key, value in new_coordinates.items():
+            self.wells[well_id].coordinates[key] = value
+
     def get_contents(self, well_id) -> dict:
         """Return the contents of a specific well"""
         return self.wells[well_id].contents

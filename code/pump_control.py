@@ -26,7 +26,9 @@ from utilities import Coordinates, Instruments
 pump_control_logger = logging.getLogger("e_panda")
 if not pump_control_logger.hasHandlers():
     pump_control_logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
+    )
     file_handler = logging.FileHandler("pump_control.log")
     file_handler.setFormatter(formatter)
     pump_control_logger.addHandler(file_handler)
@@ -34,12 +36,15 @@ if not pump_control_logger.hasHandlers():
 scale_logger = logging.getLogger("e_panda")
 if not scale_logger.hasHandlers():
     scale_logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
+    )
     file_handler = logging.FileHandler("scale.log")
     file_handler.setFormatter(formatter)
     scale_logger.addHandler(file_handler)
 
-vessel_logger = VesselLogger('pipette').logger
+vessel_logger = VesselLogger("pipette").logger
+
 
 class Pipette:
     """Class for storing pipette information"""
@@ -97,6 +102,16 @@ class Pipette:
         self._volume_ul = volume * 1000.0
         self.log_contents()
 
+    def liquid_volume(self) -> float:
+        """Get the volume of liquid in the pipette in ul
+
+        Sum the volume of the pipette contents
+
+        Returns:
+            float: The volume of liquid in the pipette in ul
+        """
+        return sum(self.contents.values())
+
     def reset_contents(self) -> None:
         """Reset the contents of the pipette"""
         self.contents = {}
@@ -108,17 +123,16 @@ class Pipette:
         """Log the contents of the pipette"""
         vessel_logger.info(
             "%s&%s&%s",
-            'pipette',
+            "pipette",
             self._volume_ul,
             self.contents,
         )
         self.update_state_file()
 
     def update_state_file(self) -> None:
-        """Update the state file for the pipette
-        """
+        """Update the state file for the pipette"""
         file_name = self.state_file
-        with open(file_name, "w", encoding='utf-8') as file:
+        with open(file_name, "w", encoding="utf-8") as file:
             file.write(f"capacity_ul,{self.capacity_ul}\n")
             file.write(f"capacity_ml,{self.capacity_ml}\n")
             file.write(f"volume_ul,{self._volume_ul}\n")
@@ -134,7 +148,7 @@ class Pipette:
         """
         file_name = self.state_file
         if file_name.exists():
-            with open(file_name, "r", encoding='utf-8') as file:
+            with open(file_name, "r", encoding="utf-8") as file:
                 lines = file.readlines()
                 if len(lines) > 0:
                     for line in lines:
@@ -150,10 +164,9 @@ class Pipette:
                         else:
                             solution, volume = line.split(",")
                             self.contents[solution] = float(volume)
-                            
+
         else:
             self.reset_contents()
-
 
     def __str__(self):
         return f"Pipette has {self._volume_ul} ul of liquid"
@@ -193,10 +206,7 @@ class Pump:
         self.pump = self.set_up_pump()
         self.max_pump_rate = 0.640  # ml/min
         self.syringe_capacity = 1.0  # mL
-        self.pipette = Pipette(
-            capacity_ul=200.0
-
-        )
+        self.pipette = Pipette(capacity_ul=200.0)
         self.mill = mill
         if scale is not None:
             self.scale = scale
@@ -278,15 +288,9 @@ class Pump:
                     }
                     # Update the pipette contents
                     for key, ratio in content_ratio.items():
-                        self.pipette.update_contents(
-                            key,
-                            ratio*volume_ul
-                        )
+                        self.pipette.update_contents(key, ratio * volume_ul)
                 else:
-                    self.pipette.update_contents(
-                        solution.name,
-                        volume_ul
-                    )
+                    self.pipette.update_contents(solution.name, volume_ul)
                 # Update the solution volume and contents
                 solution.update_volume(-volume_ul)
                 solution.update_contents(solution.name, -volume_ul)
@@ -365,7 +369,9 @@ class Pump:
                 infused_into.update_contents(self.pipette.contents, volume_ul)
 
                 # Update the pipette contents
-                self.pipette.contents = {}  # FIXME This assumes we always infuse the entire volume of the pipette
+                self.pipette.contents = (
+                    {}
+                )  # FIXME This assumes we always infuse the entire volume of the pipette
 
                 return 0
             return 0
@@ -551,6 +557,7 @@ class Pump:
         else:
             self.pipette.volume -= volume_ml * 1000
 
+
 class MockPump(Pump):
     """Mock pump class for testing"""
 
@@ -598,15 +605,15 @@ def _mock_pump_testing_routine():
         mock_pump.infuse(100)
         assert mock_pump.pipette.volume == 0
         assert mock_pump.pipette.volume_ml == 0
-        #mock_pump.mix()
+        # mock_pump.mix()
 
 
 if __name__ == "__main__":
     # test_mixing()
-    #_mock_pump_testing_routine()
-    #pump = Pump(mill=MockMill(), scale=MockScale())
+    # _mock_pump_testing_routine()
+    # pump = Pump(mill=MockMill(), scale=MockScale())
     # pump.withdraw(160, rate=0.64)
-    #pump.infuse(167.43, rate=0.64, blowout_ul=0)
+    # pump.infuse(167.43, rate=0.64, blowout_ul=0)
 
     pipette = Pipette()
     pipette.update_contents("water", 100)
