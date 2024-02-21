@@ -199,21 +199,21 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             new_experiment.plate_id = wellplate.plate_id
 
             logger.info("Beginning experiment %d", new_experiment.id)
-            import exp_a_2_ferrocyanide_assessment_protocol as exp_a
-            exp_a.cv_repeatability(
-                instructions=new_experiment,
-                toolkit=toolkit,
-                stock_vials=stock_vials,
-                waste_vials=waste_vials,
-            )
-            #import exp_edot_bleaching_protocol as edot
-            # import exp_d2_mixing_assessment_protocol as exp_d2
-            # exp_d2.mixing_assessment(
+            # import exp_a_2_ferrocyanide_assessment_protocol as exp_a
+            # exp_a.cv_repeatability(
             #     instructions=new_experiment,
             #     toolkit=toolkit,
             #     stock_vials=stock_vials,
             #     waste_vials=waste_vials,
             # )
+            #import exp_edot_bleaching_protocol as edot
+            import exp_d2_mixing_assessment_protocol as exp_d2
+            exp_d2.mixing_assessment(
+                instructions=new_experiment,
+                toolkit=toolkit,
+                stock_vials=stock_vials,
+                waste_vials=waste_vials,
+            )
             ## Update the experiment status to complete
             new_experiment.set_status(ExperimentStatus.COMPLETE)
 
