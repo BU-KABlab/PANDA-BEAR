@@ -14,6 +14,7 @@ To synthesize polymer thin films, evaluate and compare their electrical properti
 * [PDMS gasket](https://cad.onshape.com/documents/8f40aa9641f7f1039e816474/w/adf97a8228dac96fc46992ed/e/9cba4213e4509f8c1b8e8175)
 * [Gold-coated Glass Substrate]()
 * [Septum Vials](https://www.fishersci.com/shop/products/clear-voa-glass-vials-0-125in-septa/12-100-112?searchHijack=true&searchTerm=clear-voa-glass-vials-0-125in-septa&searchType=Rapid&matchedCatNo=12-100-112)
+* [Anti-Evaporation Balls](https://www.mcmaster.com/1974K2/)
 
 ## Designs
 * [Instrument Holder](https://cad.onshape.com/documents/c75fe6bc68ee2746309c067f/w/80942d9f5953df01d216df22/e/fce6103128a9bdf7b907dcd4)
