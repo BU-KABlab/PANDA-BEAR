@@ -51,7 +51,7 @@ ROWS = 12
 PROJECT_ID = 12
 EXPERIMENT_NAME = "Repeatability assessment (exp A-2)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
-CAMPAIGN_ID = 4
+CAMPAIGN_ID = 5
 PUMPING_RATE = 0.3
 INTENDED_PLATE = 107
 

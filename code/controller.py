@@ -237,7 +237,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
             scheduler.remove_from_queue(new_experiment)
             new_experiment = None # reset new_experiment to None so that we can check the queue again
-            
+
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)
             update_vial_state_file(waste_vials, WASTE_STATUS)
