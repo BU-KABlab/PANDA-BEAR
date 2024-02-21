@@ -24,14 +24,14 @@ print("TEST MODE: ", TEST)
 PROJECT_ID = 15
 EXPERIMENT_NAME = "Mixing assessment (exp D2)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
-CAMPAIGN_ID = 1
+CAMPAIGN_ID = 2
 PUMPING_RATE = 0.3
 
 #controller.load_new_wellplate(new_wellplate_type_number=6)
-wellplate.load_new_wellplate(False,108,3)
+wellplate.load_new_wellplate(False,107,4)
 experiment_id = determine_next_experiment_id()
 experiments : list[experiment_class.EchemExperimentBase]= []
-WELL_NUMBER = 2
+WELL_NUMBER = 9
 
 
 # Create 3 new experiments for the type 1 process
@@ -39,7 +39,7 @@ for i in range(3):
     experiments.append(
         experiment_class.EchemExperimentBase(
             id=experiment_id,
-            well_id='F' + str(WELL_NUMBER),
+            well_id='C' + str(WELL_NUMBER),
             experiment_name=EXPERIMENT_NAME,
             priority=1,
             pin=CURRENT_PIN,
