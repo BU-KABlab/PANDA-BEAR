@@ -273,59 +273,84 @@ class Wellplate:
             self.columns,
             self.echem_height,
         ) = load_wellplate_location(self)
-        a1_coordinates = {
+        self.a1_coordinates = {
             "x": self.a1_x,
             "y": self.a1_y,
             "z": self.z_top,
         }  # coordinates of A1
-        volume = 0.00
-        for col_idx, col in enumerate(columns):
-            for row in range(1, rows):
+        self.initial_volume = 0.00
+        self.calulcate_well_locations()
+
+        # Update the well info from file
+        self.update_well_status_from_json_file()
+
+    def recalculate_well_locations(self: "Wellplate") -> None:
+        """Recalculates the well locations"""
+        (
+            self.a1_x,
+            self.a1_y,
+            self.z_bottom,
+            self.orientation,
+            self.rows,
+            self.columns,
+            self.echem_height,
+        ) = load_wellplate_location(self)
+        self.a1_coordinates = {
+            "x": self.a1_x,
+            "y": self.a1_y,
+            "z": self.z_top,
+        }  # coordinates of A1
+        self.calulcate_well_locations()
+        self.update_well_status_from_json_file()
+
+    def calulcate_well_locations(self: "Wellplate") -> None:
+        for col_idx, col in enumerate(self.columns):
+            for row in range(1, self.rows):
                 well_id = col + str(row)
                 if well_id == "A1":
-                    coordinates = a1_coordinates
+                    coordinates = self.a1_coordinates
                     depth = self.z_bottom
                     if depth < self.z_bottom:
                         depth = self.z_bottom
                 else:
                     x_offset = col_idx * self.well_offset
                     y_offset = (row - 1) * self.well_offset
-                    if orientation == 0:
+                    if self.orientation == 0:
                         coordinates = {
-                            "x": a1_coordinates["x"] - x_offset,
-                            "y": a1_coordinates["y"] - y_offset,
+                            "x": self.a1_coordinates["x"] - x_offset,
+                            "y": self.a1_coordinates["y"] - y_offset,
                             "z": self.z_top,
                         }
-                    elif orientation == 1:
+                    elif self.orientation == 1:
                         coordinates = {
-                            "x": a1_coordinates["x"] + x_offset,
-                            "y": a1_coordinates["y"] + y_offset,
+                            "x": self.a1_coordinates["x"] + x_offset,
+                            "y": self.a1_coordinates["y"] + y_offset,
                             "z": self.z_top,
                         }
-                    elif orientation == 2:
+                    elif self.orientation == 2:
                         coordinates = {
-                            "x": a1_coordinates["x"] - x_offset,
-                            "y": a1_coordinates["y"] - y_offset,
+                            "x": self.a1_coordinates["x"] - x_offset,
+                            "y": self.a1_coordinates["y"] - y_offset,
                             "z": self.z_top,
                         }
-                    elif orientation == 3:
+                    elif self.orientation == 3:
                         coordinates = {
-                            "x": a1_coordinates["x"] + x_offset,
-                            "y": a1_coordinates["y"] + y_offset,
+                            "x": self.a1_coordinates["x"] + x_offset,
+                            "y": self.a1_coordinates["y"] + y_offset,
                             "z": self.z_top,
                         }
                     # the depth is set here for each well instead of the well plate as a whole
                     depth = self.z_bottom
 
                     # Round the coordinates to 2 decimal places
-                    coordinates["x"] = round(coordinates["x"], 2)
-                    coordinates["y"] = round(coordinates["y"], 2)
-                    coordinates["z"] = round(coordinates["z"], 2)
+                    coordinates["x"] = round(coordinates["x"], 3)
+                    coordinates["y"] = round(coordinates["y"], 3)
+                    coordinates["z"] = round(coordinates["z"], 3)
 
                 self.wells[well_id] = Well(
                     well_id=well_id,
                     coordinates=coordinates,
-                    volume=volume,
+                    volume=self.initial_volume,
                     height=self.z_top,
                     depth=depth,
                     status="new",
@@ -333,9 +358,6 @@ class Wellplate:
                     capacity=self.well_capacity,
                     contents={},
                 )
-
-        # Update the well info from file
-        self.update_well_status_from_json_file()
 
     def __getitem__(self, well_id: str) -> Well:
         """Gets a Well object by well ID."""
@@ -360,7 +382,7 @@ class Wellplate:
                         logger.debug("Well %s updated from file", well.name)
                         break
 
-    def get_coordinates(self, well_id:str, axis: str = None) -> dict:
+    def get_coordinates(self, well_id: str, axis: str = None) -> dict:
         """
         Return the coordinate of a specific well
         Args:
@@ -994,5 +1016,13 @@ def determine_next_experiment_id() -> int:
 
 if __name__ == "__main__":
     # test_stage_display()
-    print(load_new_wellplate(False, 106, 3))
+    wellplate = Wellplate()
+
+    print(wellplate["A1"].coordinates)
+    print(wellplate["A12"].coordinates)
+
+    wellplate.recalculate_well_locations()
+    print(wellplate["A1"].coordinates)
+    print(wellplate["A12"].coordinates)
+
     # print(save_current_wellplate())
