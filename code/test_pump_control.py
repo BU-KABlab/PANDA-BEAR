@@ -1,9 +1,13 @@
+"""_summary_
+"""
 import unittest
 from unittest.mock import Mock
+
 import nesp_lib
-from pump_control import Pump, MockPump
 from mill_control import MockMill
+from pump_control import MockPump, Pipette, Pump
 from sartorius_local.mock import Scale as MockScale
+
 
 class TestPump(unittest.TestCase):
     """Test case for the Pump class."""
@@ -48,15 +52,6 @@ class TestPump(unittest.TestCase):
         self.assertEqual(result, 0)
         self.pump.update_pipette_volume.assert_called_once_with(10.0)
 
-    def test_purge(self):
-        """Test the purge method of the Pump class."""
-        purge_vial = Mock()
-        solution_being_purged = Mock()
-        self.pump.infuse = Mock(return_value=purge_vial)
-        result = self.pump.purge(purge_vial, solution_being_purged, purge_volume=20.0, pumping_rate=0.5)
-        self.assertEqual(result, purge_vial)
-        self.pump.infuse.assert_called_once_with(volume_to_infuse=20.0, rate=0.5, being_infused=solution_being_purged, infused_into=purge_vial)
-
     def test_run_pump(self):
         """Test the run_pump method of the Pump class."""
         self.pump.pump = Mock()
@@ -65,7 +60,14 @@ class TestPump(unittest.TestCase):
         self.pump.pump.volume_withdrawn = 5.0
         self.pump.scale = Mock()
         self.pump.scale.read_scale.return_value = 20.0
-        result = self.pump.run_pump(nesp_lib.PumpingDirection.INFUSE, 10.0, rate=0.5, density=1.0, blowout_ml=2.0, weigh=True)
+        result = self.pump.run_pump(
+            nesp_lib.PumpingDirection.INFUSE,
+            10.0,
+            rate=0.5,
+            density=1.0,
+            blowout_ml=2.0,
+            weigh=True,
+        )
         self.assertEqual(result, 10.0)
         self.pump.scale.read_scale.assert_called_once()
         self.assertEqual(self.pump.pump.volume_infused, 0.0)
@@ -99,6 +101,7 @@ class TestPump(unittest.TestCase):
         self.pump.mill.move_pipette_to_position.assert_called_once_with(1.0, 2.0, 0)
         self.assertEqual(self.pump.mill.move_pipette_to_position.call_count, 2)
 
+
 class TestMockPump(unittest.TestCase):
     """
     A test case for the MockPump class.
@@ -124,20 +127,18 @@ class TestMockPump(unittest.TestCase):
         result = self.pump.infuse(100.0)
         self.assertEqual(result, None)
 
-    def test_purge(self):
-        """
-        Test the purge method of MockPump.
-        """
-        purge_vial = Mock()
-        solution_being_purged = Mock()
-        result = self.pump.purge(purge_vial, solution_being_purged, purge_volume=20.0, pumping_rate=0.5)
-        self.assertEqual(result, purge_vial)
-
     def test_run_pump(self):
         """
         Test the run_pump method of MockPump.
         """
-        result = self.pump.run_pump(nesp_lib.PumpingDirection.INFUSE, 10.0, rate=0.5, density=1.0, blowout_ml=2.0, weigh=True)
+        result = self.pump.run_pump(
+            nesp_lib.PumpingDirection.INFUSE,
+            10.0,
+            rate=0.5,
+            density=1.0,
+            blowout_ml=2.0,
+            weigh=True,
+        )
         self.assertIsInstance(result, float)
 
     def test_mix(self):
@@ -146,16 +147,79 @@ class TestMockPump(unittest.TestCase):
         """
         self.pump.mix()
 
-if __name__ == "__main__":
-    #unittest.main()
+class TestPipette(unittest.TestCase):
+    """Test case for the Pipette class."""
 
+    def setUp(self):
+        """Set up the test case."""
+        self.pipette = Pipette()
+
+    def test_set_capacity(self):
+        """Test the set_capacity method of the Pipette class."""
+        self.pipette.set_capacity(1000.0)
+        self.assertEqual(self.pipette.capacity_ul, 1000.0)
+        self.assertEqual(self.pipette.capacity_ml, 1.0)
+
+    def test_update_contents(self):
+        """Test the update_contents method of the Pipette class."""
+        self.pipette.update_contents("solution1", 100.0)
+        self.assertEqual(self.pipette.contents, {"solution1": 100.0})
+        self.assertEqual(self.pipette.volume, 100.0)
+        self.assertEqual(self.pipette.volume_ml, 0.1)
+
+    def test_update_volume(self):
+        """Test the update_volume method of the Pipette class."""
+        self.pipette.volume = 100.0
+        self.assertEqual(self.pipette.volume, 100.0)
+        self.assertEqual(self.pipette.volume_ml, 0.1)
+
+    def test_update_volume_ml(self):
+        """Test the update_volume_ml method of the Pipette class."""
+        self.pipette.volume_ml = 0.1
+        self.assertEqual(self.pipette.volume, 100.0)
+        self.assertEqual(self.pipette.volume_ml, 0.1)
+
+    def test_reset_contents(self):
+        """Test the reset_contents method of the Pipette class."""
+        self.pipette.update_contents("solution1", 100.0)
+        self.pipette.reset_contents()
+        self.assertEqual(self.pipette.contents, {})
+        self.assertEqual(self.pipette.volume, 0.0)
+        self.assertEqual(self.pipette.volume_ml, 0.0)
+
+    def test_update_state_file(self):
+        """Test the update_state_file method of the Pipette class."""
+        self.pipette.update_state_file()
+        self.assertTrue(self.pipette.state_file.exists())
+
+    def test_str(self):
+        """Test the __str__ method of the Pipette class."""
+        self.pipette.volume = 100.0
+        self.assertEqual(str(self.pipette), "Pipette has 100.0 ul of liquid")
+
+def pump_suite():
     # Test just the TestMockPump
     suite = unittest.TestSuite()
-    suite.addTest(TestMockPump('test_withdraw'))
-    suite.addTest(TestMockPump('test_infuse'))
-    suite.addTest(TestMockPump('test_purge'))
-    suite.addTest(TestMockPump('test_run_pump'))
-    suite.addTest(TestMockPump('test_mix'))
+    suite.addTest(TestMockPump("test_withdraw"))
+    suite.addTest(TestMockPump("test_infuse"))
+    suite.addTest(TestMockPump("test_purge"))
+    suite.addTest(TestMockPump("test_run_pump"))
+    suite.addTest(TestMockPump("test_mix"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
-    
+
+def pipette_suite():
+    # Test just the TestPipette
+    suite = unittest.TestSuite()
+    suite.addTest(TestPipette("test_set_capacity"))
+    suite.addTest(TestPipette("test_update_contents"))
+    suite.addTest(TestPipette("test_update_volume"))
+    suite.addTest(TestPipette("test_update_volume_ml"))
+    suite.addTest(TestPipette("test_reset_contents"))
+    suite.addTest(TestPipette("test_str"))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
+if __name__ == "__main__":
+    # unittest.main()
+    #pump_suite()
+    pipette_suite()

@@ -84,6 +84,15 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         ## Establish state of system - we do this each time because each experiment changes the system state
         stock_vials, waste_vials, wellplate = establish_system_state()
 
+        ## Check that the pipette is empty, if not dispose of full volume into waste
+        if toolkit.pump.pipette.volume > 0:
+            obs.place_text_on_screen("Pipette is not empty, purging into waste")
+            e_panda.purge_pipette(
+                waste_vials=waste_vials,
+                mill=toolkit.mill,
+                pump=toolkit.pump,
+            )
+
         # Flush the pipette tip with water before we start
         obs.place_text_on_screen("Initial flushing of pipette tip")
         e_panda.flush_v2(

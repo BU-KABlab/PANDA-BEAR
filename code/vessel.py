@@ -5,13 +5,20 @@ Vessel module.
 import logging
 from config.config import PATH_TO_LOGS
 
-# Set up logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s&%(name)s&%(message)s")
-file_handler = logging.FileHandler(PATH_TO_LOGS / "vessel.log")
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
+class VesselLogger:
+    """
+    A class to create a logger for vessel-like objects.
+    """
+    def __init__(self, name):
+        self.logger = logging.getLogger(name)
+        self.logger.setLevel(logging.DEBUG)
+        formatter = logging.Formatter("%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+        file_handler = logging.FileHandler(PATH_TO_LOGS / f"{name}.log")
+        file_handler.setFormatter(formatter)
+        self.logger.addHandler(file_handler)
+
+# Create an instance of the logger for the vessel module
+logger = VesselLogger('vessel').logger
 
 
 class Vessel:
