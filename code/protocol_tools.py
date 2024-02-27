@@ -19,8 +19,8 @@ from e_panda import (
     NoAvailableSolution,
     OCPFailure,
     apply_log_filter,
-    characterization,
-    deposition,
+    cyclic_volt,
+    chrono_amp,
     flush_v2,
     forward_pipette_v2,
     reverse_pipette_v2,
@@ -278,7 +278,7 @@ def standard_experiment_protocol(
 
         if instructions.ca == 1:
             instructions.status = ExperimentStatus.DEPOSITING
-            instructions, results = deposition(instructions, results, mill, wellplate)
+            instructions, results = chrono_amp(instructions, results, mill, wellplate)
 
             logger.info("Deposition completed for well: %s", instructions.well_id)
 
@@ -335,7 +335,7 @@ def standard_experiment_protocol(
 
             logger.info("Deposited char_sol in well: %s", instructions.well_id)
 
-            instructions, results = characterization(
+            instructions, results = cyclic_volt(
                 instructions, results, mill, wellplate
             )
 
@@ -517,7 +517,7 @@ def peg2p_protocol(
         # Echem CA - deposition
         if instructions.ca == 1:
             instructions.status = ExperimentStatus.DEPOSITING
-            instructions, results = deposition(instructions, results, mill, wellplate)
+            instructions, results = chrono_amp(instructions, results, mill, wellplate)
             logger.info("deposition completed for well: %s", instructions.well_id)
 
             forward_pipette_v2(
@@ -571,7 +571,7 @@ def peg2p_protocol(
 
             logger.info("Deposited char_sol in well: %s", instructions.well_id)
 
-            instructions, results = characterization(
+            instructions, results = cyclic_volt(
                 instructions, results, mill, wellplate
             )
 
@@ -762,7 +762,7 @@ def mixing_test_protocol(
             )
             # Deposit characterization solution into well
 
-            instructions, results = characterization(
+            instructions, results = cyclic_volt(
                 instructions, results, mill, wellplate
             )
 
@@ -1435,7 +1435,7 @@ def ferrocyanide_repeatability(
         instructions.well_id,
     )
     # Initial fluid handeling is done now we can perform the CV
-    characterization(instructions, instructions.results, toolkit.mill, toolkit.wellplate)
+    cyclic_volt(instructions, instructions.results, toolkit.mill, toolkit.wellplate)
     # Clear the well
     forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
@@ -1568,7 +1568,7 @@ def contamination_assessment(
         )
 
         # Perform CV
-        characterization(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
+        cyclic_volt(instructions,instructions.results, toolkit.mill, toolkit.wellplate)
 
         # Rinse the electrode with electrode rinse
         toolkit.mill.rinse_electrode()
@@ -1710,7 +1710,7 @@ def layered_solution_protocol(
         # Echem CA - deposition
         if instruction.ca == 1:
             instruction.status = ExperimentStatus.DEPOSITING
-            instruction, results = deposition(instruction, results, mill, wellplate)
+            instruction, results = chrono_amp(instruction, results, mill, wellplate)
             instruction.results = results
             logger.info("deposition completed for well: %s", instruction.well_id)
 
@@ -1768,7 +1768,7 @@ def layered_solution_protocol(
 
             logger.info("Deposited char_sol in well: %s", instruction.well_id)
 
-            instruction, results = characterization(
+            instruction, results = cyclic_volt(
                 instruction, results, mill, wellplate
             )
             instruction.results = results

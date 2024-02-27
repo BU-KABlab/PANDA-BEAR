@@ -15,7 +15,7 @@ from controller import Toolkit
 from e_panda import (
     forward_pipette_v2,
     solution_selector,
-    characterization,
+    cyclic_volt,
     waste_selector,
     image_well,
 )
@@ -111,7 +111,7 @@ def edot_bleaching_part_1(
     print("\tCVsr1 = ", instructions.cv_scan_rate_cycle_1)
     print("\tCvcycle = ", instructions.cv_cycle_count)
     try:
-        characterization(
+        cyclic_volt(
             char_instructions=instructions,
             char_results=instructions.results,
             wellplate=toolkit.wellplate,
@@ -265,7 +265,7 @@ def edot_bleaching_part_2(
     print("\tCVsr1 = ", instructions.cv_scan_rate_cycle_1)
     print("\tCvcycle = ", instructions.cv_cycle_count)
 
-    characterization(
+    cyclic_volt(
         char_instructions=instructions,
         char_results=instructions.results,
         wellplate=toolkit.wellplate,

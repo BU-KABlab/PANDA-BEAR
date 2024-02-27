@@ -511,6 +511,7 @@ def rinse_v2(
         )
     return 0
 
+
 def clear_well(
     volume: float,
     from_vessel: Well,
@@ -547,7 +548,7 @@ def clear_well(
         pump (object): The pump object
         mill (object): The mill object
         wellplate (Wells object): The wellplate object
-        
+
     Returns:
         None (void function) since the objects are passed by reference
 
@@ -567,7 +568,9 @@ def clear_well(
         elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
             raise ValueError("Cannot pipette from a stock vial to a stock vial")
         elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, WasteVial):
-            raise ValueError("Clear_well function may not pipette from a stock vial to a waste vial")
+            raise ValueError(
+                "Clear_well function may not pipette from a stock vial to a waste vial"
+            )
 
         # Calculate the number of repetitions
         # based on pipette capacity and drip stop
@@ -587,7 +590,6 @@ def clear_well(
                 volume=AIR_GAP, solution=None, rate=pumping_rate
             )  # withdraw air gap to engage screw
 
-
             logger.info(
                 "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
             )
@@ -597,7 +599,6 @@ def clear_well(
                 from_vessel.depth,
                 Instruments.PIPETTE,
             )
-
 
             # Withdraw the solution from the source and receive the updated vessel object
             pump.withdraw(
@@ -671,6 +672,7 @@ def clear_well(
 
             mill.move_to_safe_position()
 
+
 def flush_v2(
     waste_vials: Sequence[WasteVial],
     stock_vials: Sequence[StockVial],
@@ -729,6 +731,7 @@ def flush_v2(
         logger.info("No flushing required. Flush volume is 0. Continuing...")
     return 0
 
+
 def purge_pipette(
     waste_vials: Sequence[WasteVial],
     mill: Union[Mill, MockMill],
@@ -761,7 +764,7 @@ def purge_pipette(
         infused_into=purge_vial,
     )
 
-    
+
 def solution_selector(
     solutions: Sequence[StockVial], solution_name: str, volume: float
 ) -> StockVial:
@@ -816,10 +819,9 @@ def waste_selector(
     raise NoAvailableSolution(solution_name)
 
 
-def deposition(
+def chrono_amp(
     dep_instructions: EchemExperimentBase,
-    dep_results: ExperimentResult,
-    wellplate: Wellplate,
+    file_tag: str = None,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
@@ -851,11 +853,12 @@ def deposition(
 
         base_filename = pstat.setfilename(
             dep_instructions.id,
-            "OCP",
+            "OCP_CA_" + file_tag if file_tag else "OCP_CA",
             dep_instructions.project_id,
             dep_instructions.project_campaign_id,
             dep_instructions.well_id,
         )
+        dep_results = dep_instructions.results
         dep_results.ocp_dep_file = base_filename
         pstat.OCP(
             potentiostat_ocp_parameters.OCPvi,
@@ -863,7 +866,7 @@ def deposition(
             potentiostat_ocp_parameters.OCPrate,
         )  # OCP
         pstat.activecheck()
-        dep_results.ocp_dep_pass = pstat.check_vf_range(
+        dep_results.ocp_dep_pass, dep_results.ocp_char_final_voltage = pstat.check_vf_range(
             dep_results.ocp_dep_file.with_suffix(".txt")
         )
         # plotdata("OCP", dep_results.ocp_dep_file.with_suffix(".txt"))
@@ -877,7 +880,7 @@ def deposition(
                 )
                 dep_results.deposition_data_file = pstat.setfilename(
                     dep_instructions.id,
-                    "CA",
+                    "CA_" + file_tag if file_tag else "CA",
                     dep_instructions.project_id,
                     dep_instructions.project_campaign_id,
                     dep_instructions.well_id,
@@ -911,7 +914,7 @@ def deposition(
     return dep_instructions, dep_results
 
 
-def characterization(
+def cyclic_volt(
     char_instructions: EchemExperimentBase, file_tag: str = None
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
@@ -938,7 +941,7 @@ def characterization(
         char_instructions.set_status(ExperimentStatus.OCPCHECK)
         char_instructions.results.ocp_char_file = pstat.setfilename(
             char_instructions.id,
-            "OCP_char_" + file_tag if file_tag else "OCP_char",
+            "OCP_CV_" + file_tag if file_tag else "OCP_CV",
             char_instructions.project_id,
             char_instructions.project_campaign_id,
             char_instructions.well_id,
@@ -949,10 +952,17 @@ def characterization(
             OCPrate=potentiostat_ocp_parameters.OCPrate,
         )  # OCP
         pstat.activecheck()
-        char_instructions.results.ocp_char_pass, char_instructions.cv_initial_voltage = pstat.check_vf_range(
+        (
+            char_instructions.results.ocp_char_pass,
+            char_instructions.cv_initial_voltage,
+        ) = pstat.check_vf_range(
             char_instructions.results.ocp_char_file.with_suffix(".txt")
         )
-        logger.info("OCP of well %s passed: %s", char_instructions.well_id, char_instructions.results.ocp_char_pass)
+        logger.info(
+            "OCP of well %s passed: %s",
+            char_instructions.well_id,
+            char_instructions.results.ocp_char_pass,
+        )
     except Exception as e:
         logger.error("Exception occurred during OCP: %s", e)
         pstat.pstatdisconnect()

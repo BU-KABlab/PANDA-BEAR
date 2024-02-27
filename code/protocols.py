@@ -19,8 +19,8 @@ from pump_control import Pump, MockPump
 from vials import StockVial, WasteVial
 from wellplate import Wells, Wellplate
 from e_panda import (
-    deposition,
-    characterization,
+    chrono_amp,
+    cyclic_volt,
     apply_log_filter,
     solution_selector,
     waste_selector,
@@ -160,7 +160,7 @@ def standard_experiment_protocol(
 
         if instructions.ca == 1:
             instructions.status = ExperimentStatus.DEPOSITING
-            instructions, results = deposition(instructions, results, mill, wellplate)
+            instructions, results = chrono_amp(instructions, results, mill, wellplate)
 
             logger.info("Deposition completed for well: %s", instructions.well_id)
 
@@ -217,7 +217,7 @@ def standard_experiment_protocol(
 
             logger.info("Deposited char_sol in well: %s", instructions.well_id)
 
-            instructions, results = characterization(
+            instructions, results = cyclic_volt(
                 instructions, results, mill, wellplate
             )
 
@@ -640,7 +640,7 @@ def mixing_test_protocol(
             )
             # Deposit characterization solution into well
 
-            instructions, results = characterization(
+            instructions, results = cyclic_volt(
                 instructions, results, mill, wellplate
             )
 

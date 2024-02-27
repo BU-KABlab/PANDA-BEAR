@@ -486,13 +486,13 @@ class Scheduler:
         experiment.status = ExperimentStatus.QUEUED
         return experiment
 
-    def add_nonfile_experiments(self, experiments: list,override=False) -> str:
+    def add_nonfile_experiments(self, experiments: list[ExperimentBase]) -> str:
         """
         Adds a list of experiments which are not files to the experiment queue directly.
         :param experiments: The experiments to add.
         """
         for experiment in experiments:
-            response = self.add_nonfile_experiment(experiment, override_well_available=override)
+            response = self.add_nonfile_experiment(experiment, override_well_available=experiment.override_well_selection)
             if response != "success":
                 print(response)
                 logger.warning(response)

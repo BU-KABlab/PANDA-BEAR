@@ -8,7 +8,7 @@ from controller import Toolkit
 from vials import StockVial, WasteVial
 from e_panda import (
     forward_pipette_v2,
-    characterization,
+    cyclic_volt,
     solution_selector,
     waste_selector,
     image_well,
@@ -107,7 +107,7 @@ def cv_repeatability(
             print("3. Performing CV")
             logger.info("Performing CV")
             logger.debug("%s", instructions.print_cv_parameters())
-            characterization(instructions)
+            cyclic_volt(instructions)
         finally:
             instructions.set_status(ExperimentStatus.ERINSING)
             toolkit.mill.rinse_electrode(3)

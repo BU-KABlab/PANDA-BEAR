@@ -7,7 +7,7 @@ from instrument_toolkit import Toolkit
 from e_panda import (
     forward_pipette_v2,
     solution_selector,
-    characterization,
+    cyclic_volt,
     waste_selector,
 )
 from experiment_class import ExperimentBase, ExperimentStatus
@@ -135,7 +135,7 @@ def contamination_assessment(
 
     # Perform CV
     print("4. Performing CV")
-    characterization(
+    cyclic_volt(
         char_instructions=instructions,
         char_results=instructions.results,
         mill=toolkit.mill,

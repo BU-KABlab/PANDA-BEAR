@@ -7,7 +7,7 @@ from controller import Toolkit
 from vials import StockVial, WasteVial
 from e_panda import (
     forward_pipette_v2,
-    characterization,
+    cyclic_volt,
     solution_selector,
     waste_selector,
     flush_v2,
@@ -125,7 +125,7 @@ def type_1_experiment(
             instrument=Instruments.ELECTRODE,
         )
         print("2. Performing CV")
-        characterization(
+        cyclic_volt(
             instructions, instructions.results, toolkit.mill, toolkit.wellplate
         )
     finally:
@@ -216,7 +216,7 @@ def type_2_experiment(
             instrument=Instruments.ELECTRODE,
         )
         print("4. Performing CV")
-        characterization(
+        cyclic_volt(
             instructions, instructions.results, toolkit.mill, toolkit.wellplate
         )
     finally:
@@ -309,7 +309,7 @@ def type_3_experiment(
             instrument=Instruments.ELECTRODE,
         )
         print("4. Performing CV")
-        characterization(
+        cyclic_volt(
             instructions, instructions.results, toolkit.mill, toolkit.wellplate
         )
     finally:
