@@ -44,6 +44,7 @@ class ExperimentResult:
     ocp_dep_pass: bool = None
     ocp_char_file: Path = None
     ocp_char_pass: bool = None
+    ocp_char_final_voltage: float = None
     deposition_data_file: Path = None
     deposition_plot_file: Path = None
     deposition_max_value: float = None
