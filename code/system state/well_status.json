@@ -269,27 +269,45 @@
         },
         {
             "well_id": "C9",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-22T13:53:44",
+            "contents": {
+                "5mm_fecn6": 0.0,
+                "rinse": 0.0,
+                "10mm_fecn6": 0.0,
+                "electrolyte": 0.0
+            },
+            "experiment_id": 10000502,
+            "project_id": 15,
+            "volume": 0.0
         },
         {
             "well_id": "C10",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-22T17:48:19",
+            "contents": {
+                "5mm_fecn6": 0.0,
+                "rinse": 0.0,
+                "10mm_fecn6": 0.0,
+                "electrolyte": 0.0
+            },
+            "experiment_id": 10000503,
+            "project_id": 15,
+            "volume": 0.0
         },
         {
             "well_id": "C11",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-22T21:25:17",
+            "contents": {
+                "5mm_fecn6": 0.0,
+                "rinse": 0.0,
+                "10mm_fecn6": 0.0,
+                "electrolyte": 0.0
+            },
+            "experiment_id": 10000504,
+            "project_id": 15,
+            "volume": 0.0
         },
         {
             "well_id": "C12",
@@ -365,27 +383,33 @@
         },
         {
             "well_id": "D9",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-20T20:18:25",
+            "contents": {
+                "5mm_fecn6": 0.0
+            },
+            "experiment_id": 10000499,
+            "project_id": 12
         },
         {
             "well_id": "D10",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-20T21:27:18",
+            "contents": {
+                "5mm_fecn6": 0.0
+            },
+            "experiment_id": 10000500,
+            "project_id": 12
         },
         {
             "well_id": "D11",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-20T22:36:13",
+            "contents": {
+                "5mm_fecn6": 0.0
+            },
+            "experiment_id": 10000501,
+            "project_id": 12
         },
         {
             "well_id": "D12",

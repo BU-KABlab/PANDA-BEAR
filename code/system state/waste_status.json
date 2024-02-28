@@ -1,7 +1,12 @@
 [
     {
         "position": "w0",
-        "contents": {},
+        "contents": {
+            "rinse": 12492.110000000013,
+            "5mm_fecn6": 4842.34,
+            "10mm_fecn6": 801.9600000000002,
+            "electrolyte": 801.9600000000002
+        },
         "x": -50,
         "y": -7,
         "z_bottom": -74,
@@ -9,7 +14,7 @@
         "height": -20,
         "depth": -74,
         "name": "waste",
-        "volume": 1000,
+        "volume": 19938.37000000002,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
@@ -18,7 +23,12 @@
     },
     {
         "position": "w1",
-        "contents": {},
+        "contents": {
+            "5mm_fecn6": 509.72,
+            "rinse": 6679.490000000003,
+            "10mm_fecn6": 400.97999999999996,
+            "electrolyte": 400.97999999999996
+        },
         "x": -50,
         "y": -40,
         "z_bottom": -74,
@@ -26,7 +36,7 @@
         "height": -20,
         "depth": -74,
         "name": "waste",
-        "volume": 1000,
+        "volume": 8991.170000000006,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
