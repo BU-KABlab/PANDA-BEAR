@@ -35,6 +35,7 @@ class FLIRCamera:
 
     def __enter__(self):
         self.connect()
+        self.epanda_camera_profile()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
