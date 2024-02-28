@@ -31,7 +31,7 @@ PUMPING_RATE = 0.3
 wellplate.load_new_wellplate(False, 107, 4)
 experiment_id = determine_next_experiment_id()
 experiments: list[experiment_class.EchemExperimentBase] = []
-WELL_NUMBER = 2
+WELL_NUMBER = 2 # only thing to change wells
 
 
 for i in range(1):

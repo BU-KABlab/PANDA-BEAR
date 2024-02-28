@@ -31,39 +31,39 @@ def wellplate_scan(mill_arg: Mill = None, capture_images=False):
             mill.rest_electrode()
 
 
-def move_pipette_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top):
+def move_pipette_to_each_corner(mill: Mill, well1, well2, well3, well4, z_top):
     """Move the pipette to each corner of the wellplate"""
-    mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.PIPETTE)
-    mill.safe_move(h1["x"], h1["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well1["x"], well1["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well2["x"], well2["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well3["x"], well3["y"], z_top, instrument=Instruments.PIPETTE)
+    mill.safe_move(well4["x"], well4["y"], z_top, instrument=Instruments.PIPETTE)
 
 
-def move_electrode_to_each_corner(mill: Mill, a1, a12, h12, h1, z_top, echem_height):
+def move_electrode_to_each_corner(mill: Mill, well1, well2, well3, well4, z_top, echem_height):
     """Move the electrode to each corner of the wellplate"""
-    mill.safe_move(a1["x"], a1["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(a12["x"], a12["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(h12["x"], h12["y"], z_top, instrument=Instruments.ELECTRODE)
-    mill.safe_move(h1["x"], h1["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well1["x"], well1["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well2["x"], well2["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well3["x"], well3["y"], z_top, instrument=Instruments.ELECTRODE)
+    mill.safe_move(well4["x"], well4["y"], z_top, instrument=Instruments.ELECTRODE)
 
     repsonse = input("Move the electrode to the echem height? y/n: ")
     if repsonse.lower() == "y":
-        mill.safe_move(a1["x"], a1["y"], echem_height, instrument=Instruments.ELECTRODE)
+        mill.safe_move(well1["x"], well1["y"], echem_height, instrument=Instruments.ELECTRODE)
         mill.safe_move(
-            a12["x"], a12["y"], echem_height, instrument=Instruments.ELECTRODE
+            well2["x"], well2["y"], echem_height, instrument=Instruments.ELECTRODE
         )
         mill.safe_move(
-            h12["x"], h12["y"], echem_height, instrument=Instruments.ELECTRODE
+            well3["x"], well3["y"], echem_height, instrument=Instruments.ELECTRODE
         )
-        mill.safe_move(h1["x"], h1["y"], echem_height, instrument=Instruments.ELECTRODE)
+        mill.safe_move(well4["x"], well4["y"], echem_height, instrument=Instruments.ELECTRODE)
 
 
-def move_lens_to_each_corner(mill: Mill, image_height, a1, a12, h12, h1):
+def move_lens_to_each_corner(mill: Mill, image_height, well1, well2, well3, well4):
     """Move the lens to each corner of the wellplate"""
-    mill.safe_move(a1["x"], a1["y"], image_height, instrument=Instruments.LENS)
-    mill.safe_move(a12["x"], a12["y"], image_height, instrument=Instruments.LENS)
-    mill.safe_move(h12["x"], h12["y"], image_height, instrument=Instruments.LENS)
-    mill.safe_move(h1["x"], h1["y"], image_height, instrument=Instruments.LENS)
+    mill.safe_move(well1["x"], well1["y"], image_height, instrument=Instruments.LENS)
+    mill.safe_move(well2["x"], well2["y"], image_height, instrument=Instruments.LENS)
+    mill.safe_move(well3["x"], well3["y"], image_height, instrument=Instruments.LENS)
+    mill.safe_move(well4["x"], well4["y"], image_height, instrument=Instruments.LENS)
 
 
 def move_to_vials(mill: Mill, stock_vials, waste_vials):
@@ -109,10 +109,10 @@ def movement_test(mill: Mill):
 
     try:
         with mill:
-            well1 = wellplate.get_coordinates("c9")
-            well2 = wellplate.get_coordinates("c10")
-            well3 = wellplate.get_coordinates("c11")
-            well4 = wellplate.get_coordinates("b11")
+            well1 = wellplate.get_coordinates("e2")
+            well2 = wellplate.get_coordinates("e3")
+            well3 = wellplate.get_coordinates("e4")
+            well4 = wellplate.get_coordinates("e5")
 
             ## Load the vials
             stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
