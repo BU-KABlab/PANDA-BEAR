@@ -42,6 +42,10 @@ def capture_new_image(save=True, num_images=1, file_name:Path="test.png") -> Non
 if __name__ == "__main__":
     FILE_NAME =  "test image"
     file_path=Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")
+    i=1
+    while file_path.exists():
+        file_path = file_path.with_name(file_path.stem + "_" + str(i) + file_path.suffix)
+        i+=1
     capture_new_image(
         save=True, num_images=1, file_name=file_path
     )

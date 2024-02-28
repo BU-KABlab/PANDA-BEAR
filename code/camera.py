@@ -1,4 +1,5 @@
 import argparse
+from enum import auto
 import logging
 import sys
 from config.config import PATH_TO_LOGS
@@ -134,7 +135,7 @@ class FLIRCamera:
                 save_path = ""
             if save_name is None:
                 save_name = "fc2TestImage.png"
-            self.camera_logger.debug("Saving the last image to {0}".format(save_name))
+            self.camera_logger.debug("Saving the last image to %s", save_name)
             newimg.save(
                 (save_path + "\\" + save_name).encode("utf-8"),
                 PyCapture2.IMAGE_FILE_FORMAT.PNG,
@@ -160,6 +161,8 @@ class FLIRCamera:
             auto_exposure = self.camera.getProperty(prop)
             auto_exposure.autoManualMode = False
             auto_exposure.absControl = True
+            auto_exposure.onOff = True
+            auto_exposure.autoManualMode = False
             auto_exposure.absValue = exposure_time
             self.camera.setProperty(auto_exposure)
             self.camera_logger.debug("Exposure time set to: %d", exposure_time)
@@ -208,6 +211,7 @@ class FLIRCamera:
             prop = PyCapture2.PROPERTY_TYPE.GAMMA
             gamma_property = self.camera.getProperty(prop)
             gamma_property.absControl = True
+            gamma_property.onOff = True
             gamma_property.absValue = gamma
             self.camera.setProperty(gamma_property)
             self.camera_logger.debug("Gamma set to: %d", gamma)
@@ -220,6 +224,8 @@ class FLIRCamera:
             prop = PyCapture2.PROPERTY_TYPE.SHUTTER
             shutter_property = self.camera.getProperty(prop)
             shutter_property.absControl = True
+            shutter_property.onOff = True
+            shutter_property.autoManualMode = False
             shutter_property.absValue = shutter
             self.camera.setProperty(shutter_property)
             self.camera_logger.debug("Shutter set to: %d", shutter)
@@ -232,6 +238,8 @@ class FLIRCamera:
             prop = PyCapture2.PROPERTY_TYPE.GAIN
             gain_property = self.camera.getProperty(prop)
             gain_property.absControl = True
+            gain_property.onOff = True
+            gain_property.autoManualMode = False
             gain_property.absValue = gain
             self.camera.setProperty(gain_property)
             self.camera_logger.debug("Gain set to: %d", gain)
@@ -244,6 +252,8 @@ class FLIRCamera:
             prop = PyCapture2.PROPERTY_TYPE.FRAME_RATE
             framerate_property = self.camera.getProperty(prop)
             framerate_property.absControl = True
+            framerate_property.onOff = True
+            framerate_property.autoManualMode = False
             framerate_property.absValue = framerate
             self.camera.setProperty(framerate_property)
             self.camera_logger.debug("Framerate set to: %d", framerate)
@@ -256,7 +266,8 @@ class FLIRCamera:
             prop = PyCapture2.PROPERTY_TYPE.WHITE_BALANCE
             wb = self.camera.getProperty(prop)
             wb.onOff = True
-            wb.absControl = True
+            wb.absControl = False
+            wb.autoManualMode = False
             wb.valueA = red
             wb.valueB = blue
             self.camera.setProperty(wb)
