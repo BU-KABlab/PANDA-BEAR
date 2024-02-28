@@ -1,13 +1,16 @@
+"""
+Requires the PyCapture2 library to be installed and run in a python 3.6 environment.
+This script is used to capture images from the FLIR camera.
+"""
 import argparse
-from enum import auto
 import logging
 import sys
 from config.config import PATH_TO_LOGS
-from pathlib import Path
 import PyCapture2
 
 
 class FLIRCamera:
+    """Class to control the FLIR camera"""
     def __init__(self, print_to_console: bool = True):
         self.camera = None
         self.bus = None
@@ -112,7 +115,7 @@ class FLIRCamera:
         prev_ts = None
         cam = self.camera
         image: PyCapture2.Image = None
-        for i in range(num_images_to_grab):
+        for _ in range(num_images_to_grab):
             try:
                 image = cam.retrieveBuffer()
             except PyCapture2.Fc2error as fc2_err:
