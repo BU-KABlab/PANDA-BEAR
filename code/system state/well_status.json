@@ -278,8 +278,7 @@
                 "electrolyte": 0.0
             },
             "experiment_id": 10000502,
-            "project_id": 15,
-            "volume": 0.0
+            "project_id": 15
         },
         {
             "well_id": "C10",
@@ -292,8 +291,7 @@
                 "electrolyte": 0.0
             },
             "experiment_id": 10000503,
-            "project_id": 15,
-            "volume": 0.0
+            "project_id": 15
         },
         {
             "well_id": "C11",
@@ -306,8 +304,7 @@
                 "electrolyte": 0.0
             },
             "experiment_id": 10000504,
-            "project_id": 15,
-            "volume": 0.0
+            "project_id": 15
         },
         {
             "well_id": "C12",
@@ -429,11 +426,11 @@
         },
         {
             "well_id": "E2",
-            "status": "new",
-            "status_date": "",
+            "status": "queued",
+            "status_date": "2024-02-28T08:28:34",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "experiment_id": 10000507,
+            "project_id": 16
         },
         {
             "well_id": "E3",

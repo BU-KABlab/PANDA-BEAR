@@ -147,7 +147,7 @@ def forward_pipette_v2(
         if pumping_rate is None:
             pumping_rate = pump.max_pump_rate
 
-        repetitions = math.ceil(volume / (pump.pipette_capacity_ul - DRIP_STOP))
+        repetitions = math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
         repetition_vol = round(volume / repetitions, 6)
 
         for j in range(repetitions):
@@ -233,7 +233,7 @@ def forward_pipette_v2(
                 if isinstance(from_vessel, Well)
                 else AIR_GAP + DRIP_STOP
             )
-            is_pipette_volume_equal = pump.pipette.volume_ul >= blow_out
+            is_pipette_volume_equal = pump.pipette.volume >= blow_out
             testing_logger.debug(
                 "TESTING: Is pipette volume greater than or equal to blowout? %s",
                 is_pipette_volume_equal,
@@ -330,7 +330,7 @@ def reverse_pipette_v2(
             pumping_rate = pump.max_pump_rate
 
         repetitions = math.ceil(
-            volume / (pump.pipette_capacity_ul - DRIP_STOP - purge_volume)
+            volume / (pump.pipette.capacity_ul - DRIP_STOP - purge_volume)
         )
         repetition_vol = volume / repetitions
 
@@ -577,7 +577,7 @@ def clear_well(
         if pumping_rate is None:
             pumping_rate = pump.max_pump_rate
 
-        repetitions = math.ceil(volume / (pump.pipette_capacity_ul - DRIP_STOP))
+        repetitions = math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
         repetition_vol = round(volume / repetitions, 6)
 
         for j in range(repetitions):
@@ -651,7 +651,7 @@ def clear_well(
                 if isinstance(from_vessel, Well)
                 else AIR_GAP + DRIP_STOP
             )
-            is_pipette_volume_equal = pump.pipette_volume_ul >= blow_out
+            is_pipette_volume_equal = pump.pipette.volume >= blow_out
             testing_logger.debug(
                 "TESTING: Is pipette volume greater than or equal to blowout? %s",
                 is_pipette_volume_equal,
@@ -745,9 +745,9 @@ def purge_pipette(
         mill (Union[Mill, MockMill]): _description_
         pump (Union[Pump, MockPump]): _description_
     """
-    liquid_volume = pump.pipette.liquid_volume
+    liquid_volume = pump.pipette.liquid_volume()
     total_volume = pump.pipette.volume
-    purge_vial = solution_selector(waste_vials, "waste", liquid_volume)
+    purge_vial = waste_selector(waste_vials, "waste", liquid_volume)
 
     # Move to the purge vial
     mill.safe_move(
@@ -759,9 +759,10 @@ def purge_pipette(
 
     # Purge the pipette
     pump.infuse(
-        volume_to_infuse=total_volume,
+        volume_to_infuse=liquid_volume,
         being_infused=None,
         infused_into=purge_vial,
+        blowout_ul=total_volume - liquid_volume,
     )
 
 
@@ -853,7 +854,7 @@ def chrono_amp(
 
         base_filename = pstat.setfilename(
             dep_instructions.id,
-            "OCP_CA_" + file_tag if file_tag else "OCP_CA",
+            file_tag + "_OCP_CA" if file_tag else "OCP_CA",
             dep_instructions.project_id,
             dep_instructions.project_campaign_id,
             dep_instructions.well_id,
@@ -880,7 +881,7 @@ def chrono_amp(
                 )
                 dep_results.deposition_data_file = pstat.setfilename(
                     dep_instructions.id,
-                    "CA_" + file_tag if file_tag else "CA",
+                    file_tag + "_CA" if file_tag else "CA",
                     dep_instructions.project_id,
                     dep_instructions.project_campaign_id,
                     dep_instructions.well_id,
@@ -941,7 +942,7 @@ def cyclic_volt(
         char_instructions.set_status(ExperimentStatus.OCPCHECK)
         char_instructions.results.ocp_char_file = pstat.setfilename(
             char_instructions.id,
-            "OCP_CV_" + file_tag if file_tag else "OCP_CV",
+            file_tag + "_OCP_CV" if file_tag else "OCP_CV",
             char_instructions.project_id,
             char_instructions.project_campaign_id,
             char_instructions.well_id,
@@ -984,7 +985,7 @@ def cyclic_volt(
 
             char_instructions.results.characterization_data_file = pstat.setfilename(
                 char_instructions.id,
-                test_type + "_" + file_tag if file_tag else test_type,
+                file_tag + "_CV" if file_tag else test_type,
                 char_instructions.project_id,
                 char_instructions.project_campaign_id,
                 char_instructions.well_id,

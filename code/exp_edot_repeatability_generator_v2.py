@@ -22,8 +22,8 @@ TEST = TESTING
 print("TEST MODE: ", TEST)
 # Create experiments
 PROJECT_ID = 16
-EXPERIMENT_NAME = "EDOT Initial Testing"
-print(f"Experiment name: {EXPERIMENT_NAME}")
+EXPERIMENT_NAME = "edot Initial Testing"
+#print(f"Experiment name: {EXPERIMENT_NAME}")
 CAMPAIGN_ID = 2
 PUMPING_RATE = 0.3
 
@@ -39,7 +39,7 @@ for i in range(1):
         experiment_class.EchemExperimentBase(
             id=experiment_id,
             well_id="E" + str(WELL_NUMBER),
-            experiment_name=EXPERIMENT_NAME,
+            experiment_name=EXPERIMENT_NAME + " " + "Deposition",
             priority=1,
             pin=CURRENT_PIN,
             project_id=PROJECT_ID,
@@ -69,22 +69,18 @@ for i in range(1):
         )
     )
     experiment_id += 1
-    WELL_NUMBER += 1
 
-CAMPAIGN_ID += 1
-
-for i in range(1):
     experiments.append(
         experiment_class.EchemExperimentBase(
             id=experiment_id,
             well_id="E" + str(WELL_NUMBER),
-            experiment_name=EXPERIMENT_NAME,
+            experiment_name=EXPERIMENT_NAME + " " + "Coloring",
             priority=1,
             pin=CURRENT_PIN,
             project_id=PROJECT_ID,
             project_campaign_id=CAMPAIGN_ID,
-            solutions={"EDOT": 0, "liclo4": 120, "rinse": 0},
-            solutions_corrected={"EDOT": 0, "liclo4": 0, "rinse": 0},
+            solutions={"edot": 0, "liclo4": 120, "rinse": 0},
+            solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
             pumping_rate=PUMPING_RATE,
             status=experiment_class.ExperimentStatus.NEW,
             filename=EXPERIMENT_NAME + " " + str(experiment_id),
@@ -106,22 +102,18 @@ for i in range(1):
         )
     )
     experiment_id += 1
-    WELL_NUMBER += 1
 
-CAMPAIGN_ID += 1
-
-for i in range(1):
     experiments.append(
         experiment_class.EchemExperimentBase(
             id=experiment_id,
             well_id="E" + str(WELL_NUMBER),
-            experiment_name=EXPERIMENT_NAME,
+            experiment_name=EXPERIMENT_NAME + " " + "Bleaching",
             priority=1,
             pin=CURRENT_PIN,
             project_id=PROJECT_ID,
             project_campaign_id=CAMPAIGN_ID,
-            solutions={"EDOT": 0, "liclo4": 120, "rinse": 120},
-            solutions_corrected={"EDOT": 0, "liclo4": 0, "rinse": 0},
+            solutions={"edot": 0, "liclo4": 120, "rinse": 120},
+            solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
             pumping_rate=PUMPING_RATE,
             status=experiment_class.ExperimentStatus.NEW,
             filename=EXPERIMENT_NAME + " " + str(experiment_id),
@@ -145,10 +137,9 @@ for i in range(1):
     experiment_id += 1
     WELL_NUMBER += 1
 
-CAMPAIGN_ID += 1
-
 for experiment in experiments:
     ## Print a recipt of the wellplate and its experiments noting the solution and volume
+    print(f"Experiment name: {experiment.experiment_name}")
     print(f"Experiment id: {experiment.id}")
     print(f"Well id: {experiment.well_id}")
     print(f"Solutions: {json.dumps(experiment.solutions)}")
@@ -156,6 +147,8 @@ for experiment in experiments:
     print(
         f"Project campaign id: {experiment.project_id}.{experiment.project_campaign_id}\n"
     )
+    print(f"CA Paramaters: {experiment.print_ca_parameters()}\n")
+    print(f"CV Paramaters: {experiment.print_cv_parameters()}\n")
 
 
 # Add experiments to the queue and run them

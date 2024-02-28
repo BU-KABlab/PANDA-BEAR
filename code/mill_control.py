@@ -789,10 +789,10 @@ class MockMill(Mill):
     def connect_to_mill(self):
         """Connect to the mill"""
         logger.info("Connecting to the mill")
-        ser_mill = MagicMock(spec=serial.Serial)
+        self.ser_mill = MagicMock(spec=serial.Serial)
         self.active_connection = True
-        return ser_mill
-
+        return self.ser_mill
+    
     def disconnect(self):
         """Disconnect from the mill"""
         logger.info("Disconnecting from the mill")
@@ -864,7 +864,16 @@ class MockMill(Mill):
 
         elif self.status_mode == 3:
             return f"<Idle|MPos:{self.current_x-homing_pull_off},{self.current_y-homing_pull_off},{self.current_z-homing_pull_off}|Bf:15,127|FS:0,0>"
-
+    def __wait_for_completion(self, incoming_status, timeout=90):
+        """Wait for the mill to complete the previous command"""
+        status = incoming_status
+        start_time = time.time()
+        while "Idle" not in status:
+            if time.time() - start_time > timeout:
+                logger.warning("wait_for_completion: Command execution timed out")
+                break
+            status = self.current_status()
+            time.sleep(1)
     def mock_write(self, command: str):
         """Simulate writing to the mill"""
         logger.debug("Writing to the mill: %s", command)

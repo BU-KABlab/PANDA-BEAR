@@ -7,7 +7,7 @@ import logging
 import time
 from typing import Optional, Union
 
-from config.config import PATH_TO_SYSTEM_STATE
+from config.config import PATH_TO_SYSTEM_STATE, PATH_TO_LOGS
 
 import nesp_lib_local as nesp_lib
 from nesp_lib_local.mock import Pump as MockNespLibPump
@@ -29,7 +29,7 @@ if not pump_control_logger.hasHandlers():
     formatter = logging.Formatter(
         "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
     )
-    file_handler = logging.FileHandler("pump_control.log")
+    file_handler = logging.FileHandler(PATH_TO_LOGS / "pump_control.log")
     file_handler.setFormatter(formatter)
     pump_control_logger.addHandler(file_handler)
 
@@ -39,7 +39,7 @@ if not scale_logger.hasHandlers():
     formatter = logging.Formatter(
         "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
     )
-    file_handler = logging.FileHandler("scale.log")
+    file_handler = logging.FileHandler(PATH_TO_LOGS / "scale.log")
     file_handler.setFormatter(formatter)
     scale_logger.addHandler(file_handler)
 
@@ -57,6 +57,7 @@ class Pipette:
         self.contents = {}
         self.state_file = PATH_TO_SYSTEM_STATE / "pipette_state.csv"
         self.read_state_file()
+        self.log_contents()
 
     def set_capacity(self, capacity_ul: float) -> None:
         """Set the capacity of the pipette in ul"""
@@ -67,11 +68,8 @@ class Pipette:
 
     def update_contents(self, solution: str, volume: float) -> None:
         """Update the contents of the pipette"""
-        if volume < 0:
-            raise ValueError("Volume must be non-negative.")
-        self.contents[solution] = self.contents.get(solution, 0) + volume
-        self._volume_ul += volume
-        self._volume_ml = self._volume_ul / 1000.0
+
+        self.contents[solution] = round(self.contents.get(solution, 0) + volume,4)
         self.log_contents()
 
     @property
@@ -84,8 +82,8 @@ class Pipette:
         """Set the volume of the pipette in ul"""
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
-        self._volume_ul = volume
-        self._volume_ml = volume / 1000.0
+        self._volume_ul = round(volume,4)
+        self._volume_ml = round(volume / 1000.0,4)
         self.log_contents()
 
     @property
@@ -98,8 +96,8 @@ class Pipette:
         """Set the volume of the pipette in ml"""
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
-        self._volume_ml = volume
-        self._volume_ul = volume * 1000.0
+        self._volume_ml = round(volume,4)
+        self._volume_ul = round(volume * 1000.0,4)
         self.log_contents()
 
     def liquid_volume(self) -> float:
@@ -253,7 +251,7 @@ class Pump:
         # TODO Consider tracking the volume of air in the pipette as blowout and dripstop?
         volume_ul = volume
         if volume > 0:
-            volume_ml = volume / 1000.00  # convert the volume argument from ul to ml
+            volume_ml = round(volume / 1000.00,4)  # convert the volume argument from ul to ml
 
             if solution is not None and isinstance(solution, Vial2):
                 density = solution.density
@@ -347,9 +345,7 @@ class Pump:
                 weigh,
                 viscosity,
             )
-            self.update_pipette_volume(
-                self.pump.volume_infused
-            )  # doesn't need to include blowout because the pump will count that as infused
+            self.update_pipette_volume(self.pump.volume_infused)
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
@@ -369,9 +365,13 @@ class Pump:
                 infused_into.update_contents(self.pipette.contents, volume_ul)
 
                 # Update the pipette contents
-                self.pipette.contents = (
-                    {}
-                )  # FIXME This assumes we always infuse the entire volume of the pipette
+                content_ratio = {
+                    key: value / sum(self.pipette.contents.values())
+                    for key, value in self.pipette.contents.items()
+                }
+
+                for key, ratio in content_ratio.items():
+                    self.pipette.update_contents(key, -volume_ul * ratio)
 
                 return 0
             return 0
@@ -553,9 +553,9 @@ class Pump:
         """Change the volume of the pipette in ml"""
         volume_ml = round(volume_ml, 4)
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
-            self.pipette.volume += volume_ml * 1000
-        else:
             self.pipette.volume -= volume_ml * 1000
+        else:
+            self.pipette.volume += volume_ml * 1000
 
 
 class MockPump(Pump):

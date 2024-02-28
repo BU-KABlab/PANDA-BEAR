@@ -10224,7 +10224,7 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 107&4&D11&10000501&12&complete&2024-02-20T22:36:13&{'5mm_fecn6': 0.0}
 107&4&D12&None&16&error&2024-02-16T13:11:00&{}
 107&4&E1&None&16&error&2024-02-16T13:11:00&{}
-107&4&E2&None&None&new&&{}
+107&4&E2&10000507&16&queued&2024-02-28T08:28:34&{}
 107&4&E3&None&None&new&&{}
 107&4&E4&None&None&new&&{}
 107&4&E5&None&None&new&&{}

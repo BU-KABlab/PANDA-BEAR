@@ -106,7 +106,7 @@ def edot_deposition(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "edot_before_deposition")
+    image_well(toolkit, instructions, "part_1_edot_before_deposition")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -147,7 +147,7 @@ def edot_deposition(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CV")
-        cyclic_volt(instructions, file_tag="type_1")
+        cyclic_volt(instructions, file_tag="part_1")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -212,7 +212,7 @@ def edot_deposition(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="edot_after_deposition",
+        step_description="part_1_edot_after_deposition",
     )
     toolkit.global_logger.info("Edot deposition complete\n\n")
 
@@ -242,7 +242,7 @@ def edot_coloration(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "coloration_before_CA")
+    image_well(toolkit, instructions, "part_2_coloration_before_CA")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -283,7 +283,7 @@ def edot_coloration(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA")
-        chrono_amp(instructions, file_tag="color")
+        chrono_amp(instructions, file_tag="part_2_coloration")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -320,7 +320,7 @@ def edot_coloration(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="coloration_after_CA",
+        step_description="part_2_coloration_after_CA",
     )
 
     toolkit.global_logger.info("Edot coloration complete\n\n")
@@ -353,7 +353,7 @@ def edot_bleaching(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "bleaching_before_CA")
+    image_well(toolkit, instructions, "part_3_bleaching_before_CA")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -396,7 +396,7 @@ def edot_bleaching(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA")
-        cyclic_volt(instructions, file_tag="bleaching")
+        cyclic_volt(instructions, file_tag="part_3_bleaching")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -433,7 +433,7 @@ def edot_bleaching(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="bleaching_after_CA",
+        step_description="part_3_bleaching_after_CA",
     )
     toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
     for _ in range(4):

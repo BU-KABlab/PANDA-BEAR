@@ -1,7 +1,7 @@
 [
     {
         "position": "s0",
-        "contents": "5mm_fecn6",
+        "contents": "edot",
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
@@ -11,8 +11,8 @@
         "radius": 14,
         "height": -20,
         "depth": -74,
-        "name": "5mm_fecn6",
-        "volume": 9647.939999999988,
+        "name": "edot",
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -23,7 +23,7 @@
     },
     {
         "position": "s1",
-        "contents": "10mm_fecn6",
+        "contents": "liclo4",
         "viscosity_cp": 0.9,
         "density": 0.99714,
         "category": 0,
@@ -33,8 +33,8 @@
         "radius": 14,
         "height": -20,
         "depth": -74,
-        "name": "10mm_fecn6",
-        "volume": 13797.060000000001,
+        "name": "liclo4",
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -56,9 +56,9 @@
         "height": -20,
         "depth": -74,
         "name": "electrolyte",
-        "volume": 8797.060000000001,
+        "volume": 20000,
         "capacity": 20000,
-        "contamination": 24,
+        "contamination": 0,
         "coordinates": {
             "x": -4,
             "y": -105,
@@ -78,9 +78,9 @@
         "height": -20,
         "depth": -74,
         "name": "rinse",
-        "volume": 2087.8399999999733,
+        "volume": 20000,
         "capacity": 20000,
-        "contamination": 177,
+        "contamination": 0,
         "coordinates": {
             "x": -4,
             "y": -138,
@@ -100,7 +100,7 @@
         "height": -20,
         "depth": 0,
         "name": "water",
-        "volume": 10000,
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -122,9 +122,9 @@
         "height": -20,
         "depth": -74,
         "name": "rinse",
-        "volume": 18740.559999999998,
+        "volume": 20000,
         "capacity": 20000,
-        "contamination": 9,
+        "contamination": 0,
         "coordinates": {
             "x": -4,
             "y": -204,

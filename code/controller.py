@@ -160,7 +160,11 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                     "An invalid experiment object was passed to the controller",
                 )
                 break  # break out of the while True loop
-
+            ## Initialize a results object
+            new_experiment.results = ExperimentResult(
+                id=new_experiment.id,
+                well_id=new_experiment.well_id,
+            )
             ## Check that there is enough volume in the stock vials to run the experiment
             if not check_stock_vials(new_experiment, stock_vials):
                 error_message = f"Experiment {new_experiment.id} cannot be run because there is not enough volume in the stock vials"
@@ -177,11 +181,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 )
                 break  # break out of the while True loop
 
-            ## Initialize a results object
-            new_experiment.results = ExperimentResult(
-                id=new_experiment.id,
-                well_id=new_experiment.well_id,
-            )
+            
             # Announce the experiment
             pre_experiment_status_msg = f"Running experiment {new_experiment.id}"
             logger.info(pre_experiment_status_msg)
@@ -216,8 +216,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             #     waste_vials=waste_vials,
             # )
             #import exp_edot_bleaching_protocol as edot
-            import exp_d2_mixing_assessment_protocol as exp_d2
-            exp_d2.mixing_assessment(
+            import exp_edot_repeatability_protocol_v2 as exp_edot
+            exp_edot.edot_initial_screening(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,

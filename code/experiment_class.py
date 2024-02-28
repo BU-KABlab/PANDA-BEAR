@@ -258,14 +258,7 @@ class EchemExperimentBase(ExperimentBase):
     """
         else:
             return """
-        CA Parameters
-            Pre-step Voltage: N/A
-            Pre-step Time Delay: N/A
-            Step 1 Voltage: N/A
-            Step 1 Time: N/A
-            Step 2 Voltage: N/A
-            Step 2 Time: N/A
-            CA Sample Rate: N/A
+        CA Not selected
     """
 
 
@@ -290,20 +283,7 @@ class EchemExperimentBase(ExperimentBase):
     """
         else:
             return f"""
-        CV Parameters
-            CV: {bool(self.cv)}
-            CV Baseline: {bool(self.baseline)}
-            Sample Period: N/A
-            Initial Voltage (CVvi): N/A
-            First Anodic Peak (CVap1): N/A
-            Second Anodic Peak (CVap2): N/A
-            Final Voltage (CVvf): N/A
-            Step Size (CVstep): N/A
-            Cycle Count: N/A
-            Scan Rate Cycle 1 (CVsr1): N/A
-            Scan Rate Cycle 2 (CVsr2): N/A
-            Scan Rate Cycle 3 (CVsr3): N/A
-            CV Sample Rate: N/A
+        CV not selected
 """
     def print_all_experiment_parameters(self):
         '''Print the experiment parameters'''
