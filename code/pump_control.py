@@ -127,9 +127,7 @@ class Pump:
         # TODO Consider tracking the volume of air in the pipette as blowout and dripstop?
         volume_ul = volume
         if volume > 0:
-            volume_ml = round(
-                volume / 1000.00, 4
-            )  # convert the volume argument from ul to ml
+            volume_ml = round(volume / 1000.00,4)  # convert the volume argument from ul to ml
 
             if solution is not None and isinstance(solution, Vial2):
                 density = solution.density
@@ -431,9 +429,9 @@ class Pump:
         """Change the volume of the pipette in ml"""
         volume_ml = round(volume_ml, 4)
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
-            self.pipette.volume -= round(volume_ml * 1000, 4)
+            self.pipette.volume -= round(volume_ml * 1000,4)
         else:
-            self.pipette.volume += round(volume_ml * 1000, 4)
+            self.pipette.volume += round(volume_ml * 1000,4)
 
 
 class MockPump(Pump):
@@ -463,7 +461,6 @@ class MockPump(Pump):
 def _test_mixing():
     """Test the mixing function"""
     from wellplate import Wellplate
-
     wellplate = Wellplate()
     a1 = wellplate.get_coordinates("A1")
     with Mill() as mill:
@@ -485,77 +482,78 @@ def _mock_pump_testing_routine():
         assert mock_pump.pipette.volume_ml == 0
         # mock_pump.mix()
 
+from decimal import Decimal, getcontext
+getcontext().prec = 3
 
 class Pipette:
     """Class for storing pipette information"""
 
-    def __init__(self, capacity_ul: float = 0.0, pump: Pump = None):
+    def __init__(self, capacity_ul: Decimal = Decimal(0.0), pump: Pump = None):
         self.capacity_ul = capacity_ul
-        self.capacity_ml = capacity_ul / 1000.0
-        self._volume_ul = 0.0
-        self._volume_ml = 0.0
+        self.capacity_ml = capacity_ul / Decimal(1000.0)
+        self._volume_ul = Decimal(0.0)
+        self._volume_ml = Decimal(0.0)
         self.contents = {}
         self.state_file = PATH_TO_SYSTEM_STATE / "pipette_state.csv"
         self.read_state_file()
         self.log_contents()
         self.pump = pump
 
-    def set_capacity(self, capacity_ul: float) -> None:
+    def set_capacity(self, capacity_ul: Decimal) -> None:
         """Set the capacity of the pipette in ul"""
-        if capacity_ul < 0:
+        if capacity_ul < Decimal(0):
             raise ValueError("Capacity must be non-negative.")
         self.capacity_ul = capacity_ul
-        self.capacity_ml = capacity_ul / 1000.0
+        self.capacity_ml = capacity_ul / Decimal(1000.0)
 
-    def update_contents(self, solution: str, volume: float) -> None:
+    def update_contents(self, solution: str, volume: Decimal) -> None:
         """Update the contents of the pipette"""
-
-        self.contents[solution] = round(self.contents.get(solution, 0) + volume, 4)
+        self.contents[solution] = round(self.contents.get(solution, Decimal(0)) + volume, 3)
         self.log_contents()
 
     @property
-    def volume(self) -> float:
+    def volume(self) -> Decimal:
         """Get the volume of the pipette in ul"""
         return self._volume_ul
 
     @volume.setter
-    def volume(self, volume: float) -> None:
+    def volume(self, volume: Decimal) -> None:
         """Set the volume of the pipette in ul"""
-        if volume < 0:
+        if volume < Decimal(0):
             raise ValueError("Volume must be non-negative.")
-        self._volume_ul = round(volume, 4)
-        self._volume_ml = round(volume / 1000.0, 4)
+        self._volume_ul = round(volume, 3)
+        self._volume_ml = round(volume / Decimal(1000.0), 3)
         self.log_contents()
 
     @property
-    def volume_ml(self) -> float:
+    def volume_ml(self) -> Decimal:
         """Get the volume of the pipette in ml"""
         return self._volume_ml
 
     @volume_ml.setter
-    def volume_ml(self, volume: float) -> None:
+    def volume_ml(self, volume: Decimal) -> None:
         """Set the volume of the pipette in ml"""
-        if volume < 0:
+        if volume < Decimal(0):
             raise ValueError("Volume must be non-negative.")
-        self._volume_ml = round(volume, 4)
-        self._volume_ul = round(volume * 1000.0, 4)
+        self._volume_ml = round(volume, 3)
+        self._volume_ul = round(volume * Decimal(1000.0), 3)
         self.log_contents()
 
-    def liquid_volume(self) -> float:
+    def liquid_volume(self) -> Decimal:
         """Get the volume of liquid in the pipette in ul
 
         Sum the volume of the pipette contents
 
         Returns:
-            float: The volume of liquid in the pipette in ul
+            Decimal: The volume of liquid in the pipette in ul
         """
         return sum(self.contents.values())
 
     def reset_contents(self) -> None:
         """Reset the contents of the pipette"""
         self.contents = {}
-        self._volume_ul = 0
-        self._volume_ml = 0
+        self._volume_ul = Decimal(0)
+        self._volume_ml = Decimal(0)
         self.log_contents()
 
     def log_contents(self) -> None:
@@ -592,17 +590,17 @@ class Pipette:
                 if len(lines) > 0:
                     for line in lines:
                         if "capacity_ul" in line:
-                            self.capacity_ul = float(line.split(",")[1])
-                            self.capacity_ml = self.capacity_ul / 1000.0
+                            self.capacity_ul = Decimal(line.split(",")[1])
+                            self.capacity_ml = self.capacity_ul / Decimal(1000.0)
                         elif "volume_ul" in line:
-                            self._volume_ul = float(line.split(",")[1])
+                            self._volume_ul = Decimal(line.split(",")[1])
                         elif "volume_ml" in line:
-                            self._volume_ml = float(line.split(",")[1])
+                            self._volume_ml = Decimal(line.split(",")[1])
                         elif "contents" in line:
                             self.contents = {}
                         else:
                             solution, volume = line.split(",")
-                            self.contents[solution] = float(volume)
+                            self.contents[solution] = Decimal(volume)
 
         else:
             self.reset_contents()
