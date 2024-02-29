@@ -11,6 +11,7 @@ Additionally controller should be able to:
     - Reset the well statuses
     - Update the vial statuses
 """
+
 # pylint: disable=line-too-long
 import json
 import logging
@@ -42,12 +43,14 @@ from slack_functions2 import SlackBot
 from vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
 from wellplate import save_current_wellplate
 from obs_controls import OBSController
+
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 from log_tools import e_panda_logger as logger
 
 # set up slack globally so that it can be used in the main function and others
 slack = SlackBot()
 obs = OBSController()
+
 
 def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     """
@@ -58,8 +61,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
-    #import exp_b_pipette_contamination_assessment_protocol as exp_b
-    #import protocols
+    # import exp_b_pipette_contamination_assessment_protocol as exp_b
+    # import protocols
 
     ## Reset the logger to log to the ePANDA.log file and format
     e_panda.apply_log_filter()
@@ -117,7 +120,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             stock_vials, waste_vials, wellplate = establish_system_state()
             toolkit.wellplate = wellplate
             ## Check the qeueue for any protocol type 2 experiments
-            #queue = scheduler.get_queue()
+            # queue = scheduler.get_queue()
             # check if any of the experiments in the queue pandas dataframe are type 2
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue(
@@ -181,7 +184,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 )
                 break  # break out of the while True loop
 
-            
             # Announce the experiment
             pre_experiment_status_msg = f"Running experiment {new_experiment.id}"
             logger.info(pre_experiment_status_msg)
@@ -215,8 +217,9 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             #     stock_vials=stock_vials,
             #     waste_vials=waste_vials,
             # )
-            #import exp_edot_bleaching_protocol as edot
+            # import exp_edot_bleaching_protocol as edot
             import exp_edot_repeatability_protocol_v2 as exp_edot
+
             exp_edot.edot_initial_screening(
                 instructions=new_experiment,
                 toolkit=toolkit,
@@ -245,7 +248,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             scheduler.save_results(new_experiment, new_experiment.results)
 
             scheduler.remove_from_queue(new_experiment)
-            new_experiment = None # reset new_experiment to None so that we can check the queue again
+            new_experiment = None  # reset new_experiment to None so that we can check the queue again
 
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)
@@ -256,8 +259,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         if new_experiment is not None:
             new_experiment.set_status(ExperimentStatus.ERROR)
             scheduler.change_well_status_v2(
-                    wellplate.wells[new_experiment.well_id], new_experiment
-                )
+                wellplate.wells[new_experiment.well_id], new_experiment
+            )
 
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
@@ -267,8 +270,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         if new_experiment is not None:
             new_experiment.set_status(ExperimentStatus.ERROR)
             scheduler.change_well_status_v2(
-                    wellplate.wells[new_experiment.well_id], new_experiment
-                )
+                wellplate.wells[new_experiment.well_id], new_experiment
+            )
         logger.info("Keyboard interrupt detected")
         slack.send_slack_message("alert", "ePANDA was interrupted by the user")
         raise KeyboardInterrupt from exc
@@ -281,7 +284,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             scheduler.save_results(new_experiment, new_experiment.results)
 
         # Save the current wellplate
-        save_current_wellplate() #load a "new" wellplate to save and update wells
+        save_current_wellplate()  # load a "new" wellplate to save and update wells
         # close out of serial connections
         toolkit.mill.rest_electrode()
         if toolkit is not None:
@@ -479,8 +482,9 @@ def disconnect_from_instruments(instruments: Toolkit):
 
     logger.info("Disconnected from instruments")
 
+
 if __name__ == "__main__":
-    #wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
+    # wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
     print("TEST MODE: ", TESTING)
     input("Press enter to continue or ctrl+c to exit")
     main(use_mock_instruments=TESTING, one_off=False)
