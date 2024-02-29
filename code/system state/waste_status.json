@@ -1,7 +1,11 @@
 [
     {
         "position": "w0",
-        "contents": {},
+        "contents": {
+            "rinse": 2289.1600000000003,
+            "edot": 127.43,
+            "liclo4": 382.29
+        },
         "x": -50,
         "y": -7,
         "z_bottom": -74,
@@ -9,7 +13,7 @@
         "height": -20,
         "depth": -74,
         "name": "waste",
-        "volume": 1000,
+        "volume": 3798.8799999999987,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
