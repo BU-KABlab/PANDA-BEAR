@@ -46,130 +46,6 @@ if not scale_logger.hasHandlers():
 vessel_logger = VesselLogger("pipette").logger
 
 
-class Pipette:
-    """Class for storing pipette information"""
-
-    def __init__(self, capacity_ul: float = 0.0):
-        self.capacity_ul = capacity_ul
-        self.capacity_ml = capacity_ul / 1000.0
-        self._volume_ul = 0.0
-        self._volume_ml = 0.0
-        self.contents = {}
-        self.state_file = PATH_TO_SYSTEM_STATE / "pipette_state.csv"
-        self.read_state_file()
-        self.log_contents()
-
-    def set_capacity(self, capacity_ul: float) -> None:
-        """Set the capacity of the pipette in ul"""
-        if capacity_ul < 0:
-            raise ValueError("Capacity must be non-negative.")
-        self.capacity_ul = capacity_ul
-        self.capacity_ml = capacity_ul / 1000.0
-
-    def update_contents(self, solution: str, volume: float) -> None:
-        """Update the contents of the pipette"""
-
-        self.contents[solution] = round(self.contents.get(solution, 0) + volume,4)
-        self.log_contents()
-
-    @property
-    def volume(self) -> float:
-        """Get the volume of the pipette in ul"""
-        return self._volume_ul
-
-    @volume.setter
-    def volume(self, volume: float) -> None:
-        """Set the volume of the pipette in ul"""
-        if volume < 0:
-            raise ValueError("Volume must be non-negative.")
-        self._volume_ul = round(volume,4)
-        self._volume_ml = round(volume / 1000.0,4)
-        self.log_contents()
-
-    @property
-    def volume_ml(self) -> float:
-        """Get the volume of the pipette in ml"""
-        return self._volume_ml
-
-    @volume_ml.setter
-    def volume_ml(self, volume: float) -> None:
-        """Set the volume of the pipette in ml"""
-        if volume < 0:
-            raise ValueError("Volume must be non-negative.")
-        self._volume_ml = round(volume,4)
-        self._volume_ul = round(volume * 1000.0,4)
-        self.log_contents()
-
-    def liquid_volume(self) -> float:
-        """Get the volume of liquid in the pipette in ul
-
-        Sum the volume of the pipette contents
-
-        Returns:
-            float: The volume of liquid in the pipette in ul
-        """
-        return sum(self.contents.values())
-
-    def reset_contents(self) -> None:
-        """Reset the contents of the pipette"""
-        self.contents = {}
-        self._volume_ul = 0
-        self._volume_ml = 0
-        self.log_contents()
-
-    def log_contents(self) -> None:
-        """Log the contents of the pipette"""
-        vessel_logger.info(
-            "%s&%s&%s",
-            "pipette",
-            self._volume_ul,
-            self.contents,
-        )
-        self.update_state_file()
-
-    def update_state_file(self) -> None:
-        """Update the state file for the pipette"""
-        file_name = self.state_file
-        with open(file_name, "w", encoding="utf-8") as file:
-            file.write(f"capacity_ul,{self.capacity_ul}\n")
-            file.write(f"capacity_ml,{self.capacity_ml}\n")
-            file.write(f"volume_ul,{self._volume_ul}\n")
-            file.write(f"volume_ml,{self.volume_ml}\n")
-            file.write("contents\n")
-            for solution, volume in self.contents.items():
-                file.write(f"{solution},{volume}\n")
-
-    def read_state_file(self) -> None:
-        """Read the state file for the pipette.
-        If the file does not exist, it will be created, and the pipette will be reset to empty.
-        If the file exists but is empty, the pipette will be reset to empty.
-        """
-        file_name = self.state_file
-        if file_name.exists():
-            with open(file_name, "r", encoding="utf-8") as file:
-                lines = file.readlines()
-                if len(lines) > 0:
-                    for line in lines:
-                        if "capacity_ul" in line:
-                            self.capacity_ul = float(line.split(",")[1])
-                            self.capacity_ml = self.capacity_ul / 1000.0
-                        elif "volume_ul" in line:
-                            self._volume_ul = float(line.split(",")[1])
-                        elif "volume_ml" in line:
-                            self._volume_ml = float(line.split(",")[1])
-                        elif "contents" in line:
-                            self.contents = {}
-                        else:
-                            solution, volume = line.split(",")
-                            self.contents[solution] = float(volume)
-
-        else:
-            self.reset_contents()
-
-    def __str__(self):
-        return f"Pipette has {self._volume_ul} ul of liquid"
-
-
 class Pump:
     """
     Class for controlling a new era A-1000 syringe pump using the nesp-lib library
@@ -251,7 +127,9 @@ class Pump:
         # TODO Consider tracking the volume of air in the pipette as blowout and dripstop?
         volume_ul = volume
         if volume > 0:
-            volume_ml = round(volume / 1000.00,4)  # convert the volume argument from ul to ml
+            volume_ml = round(
+                volume / 1000.00, 4
+            )  # convert the volume argument from ul to ml
 
             if solution is not None and isinstance(solution, Vial2):
                 density = solution.density
@@ -553,9 +431,9 @@ class Pump:
         """Change the volume of the pipette in ml"""
         volume_ml = round(volume_ml, 4)
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
-            self.pipette.volume -= volume_ml * 1000
+            self.pipette.volume -= round(volume_ml * 1000, 4)
         else:
-            self.pipette.volume += volume_ml * 1000
+            self.pipette.volume += round(volume_ml * 1000, 4)
 
 
 class MockPump(Pump):
@@ -606,6 +484,131 @@ def _mock_pump_testing_routine():
         assert mock_pump.pipette.volume == 0
         assert mock_pump.pipette.volume_ml == 0
         # mock_pump.mix()
+
+
+class Pipette:
+    """Class for storing pipette information"""
+
+    def __init__(self, capacity_ul: float = 0.0, pump: Pump = None):
+        self.capacity_ul = capacity_ul
+        self.capacity_ml = capacity_ul / 1000.0
+        self._volume_ul = 0.0
+        self._volume_ml = 0.0
+        self.contents = {}
+        self.state_file = PATH_TO_SYSTEM_STATE / "pipette_state.csv"
+        self.read_state_file()
+        self.log_contents()
+        self.pump = pump
+
+    def set_capacity(self, capacity_ul: float) -> None:
+        """Set the capacity of the pipette in ul"""
+        if capacity_ul < 0:
+            raise ValueError("Capacity must be non-negative.")
+        self.capacity_ul = capacity_ul
+        self.capacity_ml = capacity_ul / 1000.0
+
+    def update_contents(self, solution: str, volume: float) -> None:
+        """Update the contents of the pipette"""
+
+        self.contents[solution] = round(self.contents.get(solution, 0) + volume, 4)
+        self.log_contents()
+
+    @property
+    def volume(self) -> float:
+        """Get the volume of the pipette in ul"""
+        return self._volume_ul
+
+    @volume.setter
+    def volume(self, volume: float) -> None:
+        """Set the volume of the pipette in ul"""
+        if volume < 0:
+            raise ValueError("Volume must be non-negative.")
+        self._volume_ul = round(volume, 4)
+        self._volume_ml = round(volume / 1000.0, 4)
+        self.log_contents()
+
+    @property
+    def volume_ml(self) -> float:
+        """Get the volume of the pipette in ml"""
+        return self._volume_ml
+
+    @volume_ml.setter
+    def volume_ml(self, volume: float) -> None:
+        """Set the volume of the pipette in ml"""
+        if volume < 0:
+            raise ValueError("Volume must be non-negative.")
+        self._volume_ml = round(volume, 4)
+        self._volume_ul = round(volume * 1000.0, 4)
+        self.log_contents()
+
+    def liquid_volume(self) -> float:
+        """Get the volume of liquid in the pipette in ul
+
+        Sum the volume of the pipette contents
+
+        Returns:
+            float: The volume of liquid in the pipette in ul
+        """
+        return sum(self.contents.values())
+
+    def reset_contents(self) -> None:
+        """Reset the contents of the pipette"""
+        self.contents = {}
+        self._volume_ul = 0
+        self._volume_ml = 0
+        self.log_contents()
+
+    def log_contents(self) -> None:
+        """Log the contents of the pipette"""
+        vessel_logger.info(
+            "%s&%s&%s",
+            "pipette",
+            self._volume_ul,
+            self.contents,
+        )
+        self.update_state_file()
+
+    def update_state_file(self) -> None:
+        """Update the state file for the pipette"""
+        file_name = self.state_file
+        with open(file_name, "w", encoding="utf-8") as file:
+            file.write(f"capacity_ul,{self.capacity_ul}\n")
+            file.write(f"capacity_ml,{self.capacity_ml}\n")
+            file.write(f"volume_ul,{self._volume_ul}\n")
+            file.write(f"volume_ml,{self.volume_ml}\n")
+            file.write("contents\n")
+            for solution, volume in self.contents.items():
+                file.write(f"{solution},{volume}\n")
+
+    def read_state_file(self) -> None:
+        """Read the state file for the pipette.
+        If the file does not exist, it will be created, and the pipette will be reset to empty.
+        If the file exists but is empty, the pipette will be reset to empty.
+        """
+        file_name = self.state_file
+        if file_name.exists():
+            with open(file_name, "r", encoding="utf-8") as file:
+                lines = file.readlines()
+                if len(lines) > 0:
+                    for line in lines:
+                        if "capacity_ul" in line:
+                            self.capacity_ul = float(line.split(",")[1])
+                            self.capacity_ml = self.capacity_ul / 1000.0
+                        elif "volume_ul" in line:
+                            self._volume_ul = float(line.split(",")[1])
+                        elif "volume_ml" in line:
+                            self._volume_ml = float(line.split(",")[1])
+                        elif "contents" in line:
+                            self.contents = {}
+                        else:
+                            solution, volume = line.split(",")
+                            self.contents[solution] = float(volume)
+
+        else:
+            self.reset_contents()
+
+    def __str__(self):
+        return f"Pipette has {self._volume_ul} ul of liquid"
 
 
 if __name__ == "__main__":
