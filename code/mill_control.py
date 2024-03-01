@@ -807,7 +807,10 @@ class MockMill(Mill):
             # command_bytes = str(command).encode()
             self.mock_write(command)
             time.sleep(2)
-            mill_response = self.mock_readline()
+            if command == "$$":
+                return self.mock_readline(settings=True)
+            else:
+                mill_response = self.mock_readline()
 
             if command == "F2000":
                 logger.debug("Returned %s", mill_response)
@@ -900,7 +903,10 @@ class MockMill(Mill):
             else:
                 logger.warning("Could not extract coordinates from the command")
 
-    def mock_readline(self):
+    def mock_readline(self,settings:bool = False):
         """Simulate reading from the mill"""
-        return self.current_status()
+        if settings:
+            return self.config["settings"]
+        else:
+            return self.current_status()
         ## End of mock mill specific code
