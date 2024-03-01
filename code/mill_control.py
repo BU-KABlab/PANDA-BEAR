@@ -21,28 +21,14 @@ import logging
 import re
 import sys
 import time
-from datetime import datetime
-from pathlib import Path
-from typing import Sequence
 from unittest.mock import MagicMock
-from utilities import Coordinates, Instruments
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
-import wellplate as Wells
-from camera_call_camera import capture_new_image
-from config.config import (
-    MILL_CONFIG,
-    PATH_TO_DATA,
-    PATH_TO_LOGS,
-    STOCK_STATUS,
-    TESTING,
-    WASTE_STATUS,
-)
-from vials import StockVial, WasteVial, read_vials
-from wellplate import Well, Wellplate
+from config.config import MILL_CONFIG, PATH_TO_LOGS
 from log_tools import e_panda_logger as logger
+from utilities import Coordinates, Instruments
 
 # add the mill_control logger
 formatter = logging.Formatter(
@@ -58,6 +44,7 @@ console_formatter = logging.Formatter(
 )
 console_handler.setFormatter(console_formatter)
 logger.addHandler(console_handler)
+
 
 class Mill:
     """
@@ -102,7 +89,7 @@ class Mill:
                 raise MillConnectionError("Error opening serial connection to mill")
 
             logger.info("Mill connected: %s", ser_mill.is_open)
-            #print("Mill connected: ", ser_mill.is_open)
+            # print("Mill connected: ", ser_mill.is_open)
             self.ser_mill = ser_mill
         except Exception as exep:
             logger.error("Error connecting to the mill: %s", str(exep))
@@ -164,7 +151,7 @@ class Mill:
             raise MillConnectionError("Error closing serial connection to mill")
         else:
             logger.info("Serial connection to mill closed successfully")
-            #print("Serial connection to mill closed successfully")
+            # print("Serial connection to mill closed successfully")
             self.active_connection = False
             self.ser_mill = None
 
@@ -183,7 +170,7 @@ class Mill:
             logger.error("Error reading config file: %s", str(err))
             raise MillConfigError("Error reading config file") from err
 
-    def execute_command(self, command:str):
+    def execute_command(self, command: str):
         """Encodes and sends commands to the mill and returns the response"""
         try:
             logger.debug("Command sent: %s", command)
@@ -214,8 +201,7 @@ class Mill:
 
             elif not command.startswith("$"):
                 # logger.debug("Initially %s", mill_response)
-                self.__wait_for_completion(mill_response)
-                mill_response = self.current_status()
+                mill_response = self.__wait_for_completion(mill_response)
                 logger.debug("Returned %s", mill_response)
             else:
                 logger.debug("Returned %s", mill_response)
@@ -276,9 +262,10 @@ class Mill:
         while "Idle" not in status:
             if time.time() - start_time > timeout:
                 logger.warning("wait_for_completion: Command execution timed out")
-                break
+                return status
             status = self.current_status()
             time.sleep(1)
+        return status
 
     def current_status(self) -> str:
         """Get the current status of the mill"""
@@ -609,9 +596,9 @@ class Mill:
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
         # updated target coordinates with offsets so the center of the mill moves to the right spot
         offset_coordinates = Coordinates(
-            x=round(x_coord + offsets.x,3),
-            y=round(y_coord + offsets.y,3),
-            z=round(z_coord + offsets.z,3),
+            x=round(x_coord + offsets.x, 3),
+            y=round(y_coord + offsets.y, 3),
+            z=round(z_coord + offsets.z, 3),
         )
         logger.debug(
             "Target coordinates: [%s, %s, %s]",
@@ -709,7 +696,9 @@ class Mill:
             # If Z is below the safe floor height, expect True if X and Y are changing
             elif current.z < safe_height_floor:
                 # If X and Y are changing, expect True
-                move_to_zero_first = not (current.x == offset.x and current.y == offset.y)
+                move_to_zero_first = not (
+                    current.x == offset.x and current.y == offset.y
+                )
 
             else:
                 # Default to True
@@ -792,7 +781,7 @@ class MockMill(Mill):
         self.ser_mill = MagicMock(spec=serial.Serial)
         self.active_connection = True
         return self.ser_mill
-    
+
     def disconnect(self):
         """Disconnect from the mill"""
         logger.info("Disconnecting from the mill")
@@ -867,6 +856,7 @@ class MockMill(Mill):
 
         elif self.status_mode == 3:
             return f"<Idle|MPos:{self.current_x-homing_pull_off},{self.current_y-homing_pull_off},{self.current_z-homing_pull_off}|Bf:15,127|FS:0,0>"
+
     def __wait_for_completion(self, incoming_status, timeout=90):
         """Wait for the mill to complete the previous command"""
         status = incoming_status
@@ -877,6 +867,7 @@ class MockMill(Mill):
                 break
             status = self.current_status()
             time.sleep(1)
+
     def mock_write(self, command: str):
         """Simulate writing to the mill"""
         logger.debug("Writing to the mill: %s", command)
@@ -903,7 +894,7 @@ class MockMill(Mill):
             else:
                 logger.warning("Could not extract coordinates from the command")
 
-    def mock_readline(self,settings:bool = False):
+    def mock_readline(self, settings: bool = False):
         """Simulate reading from the mill"""
         if settings:
             return self.config["settings"]
