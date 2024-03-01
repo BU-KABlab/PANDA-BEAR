@@ -306,9 +306,9 @@ class Scheduler:
             #     .model_validate_json(json.dumps(experiment))
             #     .root
             # )
-            experiment = experiment_class.parse_experiment(experiment_file.read())
+            experiment:ExperimentBase = experiment_class.parse_experiment(experiment_file.read())
         # Remove the selected experiment from the queue
-        self.remove_from_queue(experiment)
+        #self.remove_from_queue(experiment)
         logger.info("Experiment %s read from queue", experiment.id)
 
         return experiment, experiment_file_path
