@@ -1,11 +1,15 @@
-from mill_control import Mill, MockMill, Wellplate, Well, StockVial, WasteVial
-from typing import Sequence
 import json
-from pathlib import Path
-from utilities import Instruments, Coordinates
+from typing import Sequence
+from mill_control import Mill, MockMill, StockVial, WasteVial, Wellplate
+from utilities import Coordinates, Instruments
 
 
-def check_mill_settings(mill: Mill):
+def check_mill_settings(
+    mill: Mill,
+    wellplate: Wellplate,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
     """
     Fetch the settings list from the grbl controller and compare to the settings file.
     If there are differences, ask the user if they would like to change the settings.
@@ -14,10 +18,6 @@ def check_mill_settings(mill: Mill):
     Confirm the setting has been applied and save the settings file.
     Repeat until the user is satisfied.
     """
-    if not mill.ser_mill.is_open:
-        mill.connect_to_mill()  # Connect without homing
-        if not mill.ser_mill.is_open:
-            raise ValueError("Mill is not connected")
 
     while True:
         response = mill.execute_command("$$")  # Get settings
@@ -30,10 +30,10 @@ def check_mill_settings(mill: Mill):
         for setting in settings:
             if settings[setting] != response[setting]:
                 print(
-                    f"Setting {setting} | Current: {response[setting]}, Config: {settings[setting]}"
+                    f"Setting {setting:<4} | Current: {response[setting]:<5}, Config: {settings[setting]:<5}"
                 )
             else:
-                print(f"Setting {setting} | Current: {response[setting]}")
+                print(f"Setting {setting:<4} | Current: {response[setting]:<5}")
 
         # Ask if user wants to change settings
         change_settings = input("Would you like to change any settings? (y/n): ")
@@ -65,16 +65,19 @@ def check_mill_settings(mill: Mill):
         if response == settings:
             print("Settings have been applied")
             # Save the settings file
-            with open(mill.config_file, "w", encoding='utf-8') as f:
+            with open(mill.config_file, "w", encoding="utf-8") as f:
                 json.dump(mill.config, f)
             break
         else:
             print("Settings have not been applied")
 
-    mill.disconnect()  # Disconnect without moving
 
-
-def calibrate_wellplate(wellplate: Wellplate, mill: Mill):
+def calibrate_wellplate(
+    mill: Mill,
+    wellplate: Wellplate,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
     """Calibrate the wellplate to the mill
 
     Args:
@@ -83,7 +86,7 @@ def calibrate_wellplate(wellplate: Wellplate, mill: Mill):
     """
     # Enter well choice loop
     while True:
-        well_id = input("Enter the well ID to test (e.g., A1) or done to end: ")
+        well_id = input("Enter the well ID to test (e.g., A1) or done to end: ").lower()
         if well_id == "done":
             break
 
@@ -125,25 +128,31 @@ def calibrate_wellplate(wellplate: Wellplate, mill: Mill):
             )
 
         coord_diff = Coordinates(
-                        new_coordinates.x - original_coordinates['x'],
-                        new_coordinates.y - original_coordinates['y'],
-                        z=0,
-                    )
+            new_coordinates.x - original_coordinates["x"],
+            new_coordinates.y - original_coordinates["y"],
+            z=0,
+        )
 
         # Save the new coordinates to the wellplate object for that well
-        #wellplate.set_coordinates(well_id, new_coordinates)
+        # wellplate.set_coordinates(well_id, new_coordinates)
         # For now we will not be setting individual well coordinates
         # Instead we will set the coordinates for the entire wellplate, specifically A1 and then recalculate the rest
         a1_coordinates = wellplate.get_coordinates("A1")
-        a1_coordinates['x'] += coord_diff.x
-        a1_coordinates['y'] += coord_diff.y
+        a1_coordinates["x"] += coord_diff.x
+        a1_coordinates["y"] += coord_diff.y
 
-        wellplate.set_coordinates("A1", a1_coordinates)
+        wellplate.a1_x = a1_coordinates["x"]
+        wellplate.a1_y = a1_coordinates["y"]
         wellplate.write_wellplate_location()
         wellplate.recalculate_well_locations()
 
 
-def calibrate_z_bottom_of_wellplate(wellplate: Wellplate, mill: Mill):
+def calibrate_z_bottom_of_wellplate(
+    mill: Mill,
+    wellplate: Wellplate,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
     """Calibrate the z_bottom of the wellplate to the mill"""
     # Enter confirmation loop
     # Ask the user to enter a well id to check the z_bottom or to enter "done" to finish
@@ -190,7 +199,12 @@ def calibrate_z_bottom_of_wellplate(wellplate: Wellplate, mill: Mill):
         wellplate.z_bottom = new_z_bottom
 
 
-def calibrate_vials(vials: Sequence[StockVial, WasteVial], mill: Mill):
+def calibrate_vials(
+    mill: Mill,
+    wellplate: Wellplate,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
     """Calibrate the vials to the mill"""
     # Enter vial choice loop
     # ask the user for the vial position they would like to test, must be in the form of [vV][1-16]
@@ -218,6 +232,27 @@ def calibrate_vials(vials: Sequence[StockVial, WasteVial], mill: Mill):
     # Same process as the stock vials
     pass
 
+
+def home_mill(
+    mill: Mill,
+    wellplate: Wellplate,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
+    """Home the mill"""
+    mill.home()
+    print("Mill has been homed")
+
+
+options = {
+    "0": check_mill_settings,
+    "1": home_mill,
+    "2": calibrate_wellplate,
+    "3": calibrate_z_bottom_of_wellplate,
+    "4": calibrate_vials,
+}
+
+
 def calibrate_mill(
     mill: Mill,
     wellplate: Wellplate,
@@ -226,22 +261,39 @@ def calibrate_mill(
 ):
     """Calibrate the mill to the wellplate and stock vials"""
     # Connect to the mill
-    mill.connect_to_mill()
-    if not mill.ser_mill.is_open:
-        raise ValueError("Mill is not connected")
+    with mill:
+        while True:
+            print(
+                """"Welcome to the mill calibration and positioning menu:
+Menu:
+0. Check mill settings
+1. Home mill
+2. Calibrate wellplate
+3. Calibrate z_bottom of wellplate
+4. Calibrate vials
+q Exit
+              """
+            )
+            option = input("Which operation would you like: ")
+            if option == "q":
+                break
+            options[option](mill, wellplate, stock_vials, waste_vials)
 
-    # Home the mill
-    mill.homing_sequence()
 
-    ## Calibrate the wellplate
-    calibrate_wellplate(wellplate, mill)
+if __name__ == "__main__":
+    # Load the configuration file
+    from vials import read_vials, STOCK_STATUS, WASTE_STATUS
+    from config.config import TESTING
+    print("Testing mode:", TESTING)
+    input("Press enter to continue")
+    # Create the mill object
+    mill_to_use = MockMill()
 
-    ## Check the z_bottom of the wellplate
-    calibrate_z_bottom_of_wellplate(wellplate, mill)
+    # Create the wellplate object
+    wellplate_to_use = Wellplate()
 
-    ## Calibrate the stock vials including the electrode bath
-    calibrate_vials(stock_vials, mill)
-    calibrate_vials(waste_vials, mill)
+    # Create the stock vial objects
+    stock_vials_to_use: Sequence[StockVial] = read_vials(STOCK_STATUS)
+    waste_vials_to_use: Sequence[WasteVial] = read_vials(WASTE_STATUS)
 
-    # Disconnect from the mill
-    mill.disconnect()
+    calibrate_mill(mill_to_use, wellplate_to_use, stock_vials_to_use, waste_vials_to_use)
