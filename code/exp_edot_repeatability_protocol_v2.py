@@ -192,7 +192,7 @@ def edot_deposition(
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
             pump=toolkit.pump,
             mill=toolkit.mill,
-            pumping_rate=instructions.pumping_rate,
+            pumping_rate=toolkit.pump.max_pump_rate,
         )
         # Clear the well
         forward_pipette_v2(
@@ -448,7 +448,7 @@ def edot_bleaching(
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
             pump=toolkit.pump,
             mill=toolkit.mill,
-            pumping_rate=instructions.pumping_rate,
+            pumping_rate=toolkit.pump.max_pump_rate,
         )
         # Clear the well
         forward_pipette_v2(

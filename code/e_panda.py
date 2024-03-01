@@ -860,31 +860,35 @@ def chrono_amp(
             dep_instructions.well_id,
         )
         dep_results = dep_instructions.results
-        dep_results.ocp_dep_file = base_filename
+        dep_results.ocp_dep_files.append(base_filename)
         pstat.OCP(
             potentiostat_ocp_parameters.OCPvi,
             potentiostat_ocp_parameters.OCPti,
             potentiostat_ocp_parameters.OCPrate,
         )  # OCP
         pstat.activecheck()
-        dep_results.ocp_dep_pass, dep_results.ocp_char_final_voltage = pstat.check_vf_range(
-            dep_results.ocp_dep_file.with_suffix(".txt")
+        ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(
+            dep_results.ocp_dep_files[-1].with_suffix(".txt")
         )
+        dep_results.ocp_dep_passes.append(ocp_dep_pass)
+        dep_results.ocp_char_final_voltages.append(ocp_char_final_voltage)
         # plotdata("OCP", dep_results.ocp_dep_file.with_suffix(".txt"))
 
         # echem CA - deposition
-        if dep_results.ocp_dep_pass:
+        if dep_results.ocp_dep_passes[-1]:
             try:
                 dep_instructions.set_status(ExperimentStatus.EDEPOSITING)
                 logger.info(
                     "Beginning eChem deposition of well: %s", dep_instructions.well_id
                 )
-                dep_results.deposition_data_file = pstat.setfilename(
-                    dep_instructions.id,
-                    file_tag + "_CA" if file_tag else "CA",
-                    dep_instructions.project_id,
-                    dep_instructions.project_campaign_id,
-                    dep_instructions.well_id,
+                dep_results.deposition_data_files.append(
+                    pstat.setfilename(
+                        dep_instructions.id,
+                        file_tag + "_CA" if file_tag else "CA",
+                        dep_instructions.project_id,
+                        dep_instructions.project_campaign_id,
+                        dep_instructions.well_id,
+                    )
                 )
 
                 # FEATURE have chrono return the max and min values for the deposition
@@ -940,12 +944,14 @@ def cyclic_volt(
             pstat = echem
         pstat.pstatconnect()
         char_instructions.set_status(ExperimentStatus.OCPCHECK)
-        char_instructions.results.ocp_char_file = pstat.setfilename(
-            char_instructions.id,
-            file_tag + "_OCP_CV" if file_tag else "OCP_CV",
-            char_instructions.project_id,
-            char_instructions.project_campaign_id,
-            char_instructions.well_id,
+        char_instructions.results.ocp_char_files.append(
+            pstat.setfilename(
+                char_instructions.id,
+                file_tag + "_OCP_CV" if file_tag else "OCP_CV",
+                char_instructions.project_id,
+                char_instructions.project_campaign_id,
+                char_instructions.well_id,
+            )
         )
         pstat.OCP(
             OCPvi=potentiostat_ocp_parameters.OCPvi,
@@ -954,22 +960,23 @@ def cyclic_volt(
         )  # OCP
         pstat.activecheck()
         (
-            char_instructions.results.ocp_char_pass,
+            ocp_char_pass,
             char_instructions.cv_initial_voltage,
         ) = pstat.check_vf_range(
-            char_instructions.results.ocp_char_file.with_suffix(".txt")
+            char_instructions.results.ocp_char_files[-1].with_suffix(".txt")
         )
+        char_instructions.results.ocp_char_passes.append(ocp_char_pass)
         logger.info(
             "OCP of well %s passed: %s",
             char_instructions.well_id,
-            char_instructions.results.ocp_char_pass,
+            char_instructions.results.ocp_char_passes[-1],
         )
     except Exception as e:
         logger.error("Exception occurred during OCP: %s", e)
         pstat.pstatdisconnect()
         raise OCPFailure("characterization") from e
 
-    if char_instructions.results.ocp_char_pass:
+    if char_instructions.results.ocp_char_passes[-1]:
         try:
             # echem CV - characterization
             if char_instructions.baseline == 1:
@@ -983,12 +990,14 @@ def cyclic_volt(
                 "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
             )
 
-            char_instructions.results.characterization_data_file = pstat.setfilename(
-                char_instructions.id,
-                file_tag + "_CV" if file_tag else test_type,
-                char_instructions.project_id,
-                char_instructions.project_campaign_id,
-                char_instructions.well_id,
+            char_instructions.results.characterization_data_files.append(
+                pstat.setfilename(
+                    char_instructions.id,
+                    file_tag + "_CV" if file_tag else test_type,
+                    char_instructions.project_id,
+                    char_instructions.project_campaign_id,
+                    char_instructions.well_id,
+                )
             )
 
             # FEATURE have cyclic return the max and min values for the characterization
@@ -1109,7 +1118,7 @@ def image_well(
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
         # logger.info("Uploading image of well %s to OBS", instructions.well_id)
-        instructions.results.image_file = filepath
+        instructions.results.image_files.append(filepath)
     except Exception as e:
         logger.exception(
             "Failed to image well %s. Error %s occured", instructions.well_id, e
