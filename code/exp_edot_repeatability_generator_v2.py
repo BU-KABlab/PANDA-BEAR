@@ -20,6 +20,7 @@ def determine_next_experiment_id() -> int:
 
 TEST = TESTING
 print("TEST MODE: ", TEST)
+input("Press enter to continue")
 # Create experiments
 PROJECT_ID = 16
 EXPERIMENT_NAME = "edot Initial Testing"
