@@ -51,7 +51,7 @@ ROWS = 12
 PROJECT_ID = 12
 EXPERIMENT_NAME = "Repeatability assessment (exp A-2)"
 print(f"Experiment name: {EXPERIMENT_NAME}")
-CAMPAIGN_ID = 4
+CAMPAIGN_ID = 5
 PUMPING_RATE = 0.3
 INTENDED_PLATE = 107
 
@@ -61,7 +61,7 @@ experiments: list[experiment_class.EchemExperimentBase] = []
 WELL_NUMBER = 1
 
 experiment_wells = [
-    "D12","D11","D10"
+    "D11","D10","D9"
 ]
 
 for col in COLUMNS:

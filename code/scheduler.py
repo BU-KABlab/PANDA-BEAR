@@ -306,9 +306,9 @@ class Scheduler:
             #     .model_validate_json(json.dumps(experiment))
             #     .root
             # )
-            experiment = experiment_class.parse_experiment(experiment_file.read())
+            experiment:ExperimentBase = experiment_class.parse_experiment(experiment_file.read())
         # Remove the selected experiment from the queue
-        self.remove_from_queue(experiment)
+        #self.remove_from_queue(experiment)
         logger.info("Experiment %s read from queue", experiment.id)
 
         return experiment, experiment_file_path
@@ -486,13 +486,13 @@ class Scheduler:
         experiment.status = ExperimentStatus.QUEUED
         return experiment
 
-    def add_nonfile_experiments(self, experiments: list,override=False) -> str:
+    def add_nonfile_experiments(self, experiments: list[ExperimentBase]) -> str:
         """
         Adds a list of experiments which are not files to the experiment queue directly.
         :param experiments: The experiments to add.
         """
         for experiment in experiments:
-            response = self.add_nonfile_experiment(experiment, override_well_available=override)
+            response = self.add_nonfile_experiment(experiment, override_well_available=experiment.override_well_selection)
             if response != "success":
                 print(response)
                 logger.warning(response)

@@ -31,9 +31,7 @@
       "y": -34.4,
       "z": -50
     },
-    "safe_height_floor": -30,
-    "status_report": 3,
-    "homing_pull_off": 3.00,
+    "safe_height_floor": -20,
     "settings": {
       "$0": 10,
       "$1": 255,

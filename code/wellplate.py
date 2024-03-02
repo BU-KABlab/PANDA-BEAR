@@ -263,7 +263,7 @@ class Wellplate:
             self.height,
             self.shape,
             self.z_top,
-        ) = read_well_type_characteristics(self.type_number, self)
+        ) = self.read_well_type_characteristics(self.type_number)
         (
             self.a1_x,
             self.a1_y,
@@ -272,60 +272,85 @@ class Wellplate:
             self.rows,
             self.columns,
             self.echem_height,
-        ) = load_wellplate_location(self)
-        a1_coordinates = {
+        ) = self.load_wellplate_location()
+        self.a1_coordinates = {
             "x": self.a1_x,
             "y": self.a1_y,
             "z": self.z_top,
         }  # coordinates of A1
-        volume = 0.00
-        for col_idx, col in enumerate(columns):
-            for row in range(1, rows):
+        self.initial_volume = 0.00
+        self.calulcate_well_locations()
+
+        # Update the well info from file
+        self.update_well_status_from_json_file()
+
+    def recalculate_well_locations(self: "Wellplate") -> None:
+        """Recalculates the well locations"""
+        (
+            self.a1_x,
+            self.a1_y,
+            self.z_bottom,
+            self.orientation,
+            self.rows,
+            self.columns,
+            self.echem_height,
+        ) = self.load_wellplate_location()
+        self.a1_coordinates = {
+            "x": self.a1_x,
+            "y": self.a1_y,
+            "z": self.z_top,
+        }  # coordinates of A1
+        self.calulcate_well_locations()
+        self.update_well_status_from_json_file()
+
+    def calulcate_well_locations(self: "Wellplate") -> None:
+        for col_idx, col in enumerate(self.columns):
+            for row in range(1, self.rows):
                 well_id = col + str(row)
                 if well_id == "A1":
-                    coordinates = a1_coordinates
+                    coordinates = self.a1_coordinates
                     depth = self.z_bottom
                     if depth < self.z_bottom:
                         depth = self.z_bottom
                 else:
                     x_offset = col_idx * self.well_offset
                     y_offset = (row - 1) * self.well_offset
-                    if orientation == 0:
+                    if self.orientation == 0:
                         coordinates = {
-                            "x": a1_coordinates["x"] - x_offset,
-                            "y": a1_coordinates["y"] - y_offset,
+                            "x": self.a1_coordinates["x"] - x_offset,
+                            "y": self.a1_coordinates["y"] - y_offset,
                             "z": self.z_top,
                         }
-                    elif orientation == 1:
+                    elif self.orientation == 1:
                         coordinates = {
-                            "x": a1_coordinates["x"] + x_offset,
-                            "y": a1_coordinates["y"] + y_offset,
+                            "x": self.a1_coordinates["x"] + x_offset,
+                            "y": self.a1_coordinates["y"] + y_offset,
                             "z": self.z_top,
                         }
-                    elif orientation == 2:
+                    elif self.orientation == 2:
                         coordinates = {
-                            "x": a1_coordinates["x"] - x_offset,
-                            "y": a1_coordinates["y"] - y_offset,
+                            "x": self.a1_coordinates["x"] - x_offset,
+                            "y": self.a1_coordinates["y"] - y_offset,
                             "z": self.z_top,
                         }
-                    elif orientation == 3:
+                    elif self.orientation == 3:
                         coordinates = {
-                            "x": a1_coordinates["x"] + x_offset,
-                            "y": a1_coordinates["y"] + y_offset,
+                            "x": self.a1_coordinates["x"] + x_offset,
+                            "y": self.a1_coordinates["y"] + y_offset,
                             "z": self.z_top,
                         }
                     # the depth is set here for each well instead of the well plate as a whole
                     depth = self.z_bottom
 
                     # Round the coordinates to 2 decimal places
-                    coordinates["x"] = round(coordinates["x"], 2)
-                    coordinates["y"] = round(coordinates["y"], 2)
-                    coordinates["z"] = round(coordinates["z"], 2)
+                    coordinates["x"] = round(coordinates["x"], 3)
+                    coordinates["y"] = round(coordinates["y"], 3)
+                    coordinates["z"] = round(coordinates["z"], 3)
 
                 self.wells[well_id] = Well(
                     well_id=well_id,
                     coordinates=coordinates,
-                    volume=volume,
+                    volume=self.initial_volume,
                     height=self.z_top,
                     depth=depth,
                     status="new",
@@ -333,9 +358,6 @@ class Wellplate:
                     capacity=self.well_capacity,
                     contents={},
                 )
-
-        # Update the well info from file
-        self.update_well_status_from_json_file()
 
     def __getitem__(self, well_id: str) -> Well:
         """Gets a Well object by well ID."""
@@ -360,7 +382,7 @@ class Wellplate:
                         logger.debug("Well %s updated from file", well.name)
                         break
 
-    def get_coordinates(self, well_id, axis: str = None) -> dict:
+    def get_coordinates(self, well_id: str, axis: str = None) -> dict:
         """
         Return the coordinate of a specific well
         Args:
@@ -369,6 +391,7 @@ class Wellplate:
             dict: The coordinates of the well in the form
             {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
         """
+        well_id = well_id.upper()
         if axis in ["x", "y", "z"]:
             return self.wells[well_id].coordinates[axis]
 
@@ -481,7 +504,103 @@ class Wellplate:
             color.append(self._get_well_color(well_data.status))
 
         return x_coordinates, y_coordinates, color
+    
+    def read_well_type_characteristics(
+        self, type_number: int
+    ) -> tuple[float, float, float, float]:
+        """Read the well type characteristics from the well_type.csv config file"""
 
+        file_path = WELL_TYPE
+
+        # check it exists
+        if not os.path.exists(file_path):
+            logger.warning("Well type file not found at %s. Returning defaults", file_path)
+            return (
+                self.radius,
+                self.well_offset,
+                self.well_capacity,
+                self.height,
+                self.shape,
+                self.z_top,
+            )
+
+        with open(WELL_TYPE, "r", encoding="UTF-8") as f:
+            next(f)
+            for line in f:
+                line = line.strip().split(",")
+                if int(line[0]) == int(type_number):
+                    shape = str(line[4]).strip()
+                    radius = float(line[5])
+                    well_offset = float(line[6])
+                    well_capacity = float(line[9])
+                    height = float(line[7])
+                    break
+        return (
+            radius,
+            well_offset,
+            well_capacity,
+            height,
+            shape,
+            self.z_bottom + height,
+        )
+
+
+    def load_wellplate_location(
+        self,
+    ) -> tuple[float, float, float, int, int, str, float]:
+        """Load the location of the well plate from the well_location.csv file"""
+
+        # check it exists
+        if not os.path.exists(WELLPLATE_LOCATION):
+            logger.warning(
+                "Well location file not found at %s. Returning defaults", WELLPLATE_LOCATION
+            )
+            return (
+                self.a1_x,
+                self.a1_y,
+                self.z_bottom,
+                self.orientation,
+                self.rows,
+                self.columns,
+                self.echem_height,
+            )
+        # Looks like this:
+        # {
+        # "x": -233,
+        # "y": -35,
+        # "orientation": 0,
+        # "rows": 13,
+        # "cols": "ABCDEFGH",
+        # "z-bottom": -77
+        # }
+        with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as f:
+            data = json.load(f)
+            x = data["x"]
+            y = data["y"]
+            z_bottom = data["z-bottom"]
+            orientation = data["orientation"]
+            rows = data["rows"]
+            cols = data["cols"]
+            echem_height = data["echem_height"]
+
+        return (x, y, z_bottom, orientation, rows, cols, echem_height)
+
+    def write_wellplate_location(
+        self
+    ) -> None:
+        """Write the location of the well plate to the well_location.csv file"""
+        data_to_write = {
+            "x": self.a1_x,
+            "y": self.a1_y,
+            "orientation": self.orientation,
+            "rows": self.rows,
+            "cols": self.columns,
+            "z-bottom": self.z_bottom,
+            "echem_height": self.echem_height,
+        }
+        with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
+            json.dump(data_to_write, f, indent=4)
+        logger.debug("Well plate location written to file")
 
 class GraceBioLabsWellPlate(Wellplate):
     """
@@ -511,7 +630,7 @@ class GraceBioLabsWellPlate(Wellplate):
             self.height,
             self.shape,
             self.z_top,
-        ) = read_well_type_characteristics(self.type_number, self)
+        ) = self.read_well_type_characteristics(self.type_number)
 
 
 class CircularWellPlate(Wellplate):
@@ -537,90 +656,11 @@ class CircularWellPlate(Wellplate):
             self.height,
             self.shape,
             self.z_top,
-        ) = read_well_type_characteristics(self.type_number, self)
+        ) = self.read_well_type_characteristics(self.type_number)
         self.echem_height = -73  # for every well
         self.z_top = self.z_bottom + self.height
 
 
-def read_well_type_characteristics(
-    type_number: int, current_well: Wellplate
-) -> tuple[float, float, float, float]:
-    """Read the well type characteristics from the well_type.csv config file"""
-
-    file_path = WELL_TYPE
-
-    # check it exists
-    if not os.path.exists(file_path):
-        logger.warning("Well type file not found at %s. Returning defaults", file_path)
-        return (
-            current_well.radius,
-            current_well.well_offset,
-            current_well.well_capacity,
-            current_well.height,
-            current_well.shape,
-            current_well.z_top,
-        )
-
-    with open(WELL_TYPE, "r", encoding="UTF-8") as f:
-        next(f)
-        for line in f:
-            line = line.strip().split(",")
-            if int(line[0]) == int(type_number):
-                shape = str(line[4]).strip()
-                radius = float(line[5])
-                well_offset = float(line[6])
-                well_capacity = float(line[9])
-                height = float(line[7])
-                break
-    return (
-        radius,
-        well_offset,
-        well_capacity,
-        height,
-        shape,
-        current_well.z_bottom + height,
-    )
-
-
-def load_wellplate_location(
-    current_wellplate: Wellplate,
-) -> tuple[float, float, float, int, int, str, float]:
-    """Load the location of the well plate from the well_location.csv file"""
-
-    # check it exists
-    if not os.path.exists(WELLPLATE_LOCATION):
-        logger.warning(
-            "Well location file not found at %s. Returning defaults", WELLPLATE_LOCATION
-        )
-        return (
-            current_wellplate.a1_x,
-            current_wellplate.a1_y,
-            current_wellplate.z_bottom,
-            current_wellplate.orientation,
-            current_wellplate.rows,
-            current_wellplate.columns,
-            current_wellplate.echem_height,
-        )
-    # Looks like this:
-    # {
-    # "x": -233,
-    # "y": -35,
-    # "orientation": 0,
-    # "rows": 13,
-    # "cols": "ABCDEFGH",
-    # "z-bottom": -77
-    # }
-    with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as f:
-        data = json.load(f)
-        x = data["x"]
-        y = data["y"]
-        z_bottom = data["z-bottom"]
-        orientation = data["orientation"]
-        rows = data["rows"]
-        cols = data["cols"]
-        echem_height = data["echem_height"]
-
-    return (x, y, z_bottom, orientation, rows, cols, echem_height)
 
 
 class OverFillException(Exception):
@@ -998,5 +1038,13 @@ def determine_next_experiment_id() -> int:
 
 if __name__ == "__main__":
     # test_stage_display()
-    print(load_new_wellplate(False, 106, 3))
+    wellplate = Wellplate()
+
+    print(wellplate["A1"].coordinates)
+    print(wellplate["A12"].coordinates)
+
+    wellplate.recalculate_well_locations()
+    print(wellplate["A1"].coordinates)
+    print(wellplate["A12"].coordinates)
+
     # print(save_current_wellplate())

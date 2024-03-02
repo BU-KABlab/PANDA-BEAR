@@ -1,4 +1,5 @@
 """Module to inferface with Gamry Potentiostat"""
+from typing import Tuple
 import comtypes
 import comtypes.client as client
 import datetime
@@ -311,7 +312,7 @@ def activecheck():
         time.sleep(0.5)
 
 
-def check_vf_range(filename):
+def check_vf_range(filename) -> Tuple[bool, float]:
     try:
         ocp_data = pd.read_csv(
             filename,
@@ -326,13 +327,13 @@ def check_vf_range(filename):
 
         if -1 < vf_last_row_decimal and vf_last_row_decimal < 1:
             logger.debug("Vf in valid range (-1 to 1). Proceeding to echem experiment")
-            return True
+            return True, vf_last_row_decimal
         else:
             logger.error("Vf not in valid range. Aborting echem experiment")
-            return False
+            return False, 0.0
     except Exception as error:
         logger.error("Error occurred while checking Vf: %s", error)
-        return False
+        return False, 0.0
 
 
 def mock_CA(MCAvi, MCAti, MCArate):

@@ -23,7 +23,7 @@ from controller import Toolkit
 from e_panda import (
     forward_pipette_v2,
     solution_selector,
-    characterization,
+    cyclic_volt,
     waste_selector,
     image_well,
 )
@@ -91,7 +91,7 @@ def rinsing_assessment(
 
     # Perform CV
     print("2. Performing CV")
-    characterization(
+    cyclic_volt(
         char_instructions=instructions,
         char_results=instructions.results,
         mill=toolkit.mill,
@@ -155,7 +155,7 @@ def rinsing_assessment(
 
         # Perform CV
         print(f"7.{i} Performing CV")
-        characterization(
+        cyclic_volt(
             char_instructions=instructions,
             char_results=instructions.results,
             mill=toolkit.mill,

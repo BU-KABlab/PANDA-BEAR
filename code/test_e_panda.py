@@ -7,7 +7,7 @@ from e_panda import (
     NoAvailableSolution,
     flush_v2,
     rinse_v2,
-    deposition
+    chrono_amp
 )
 from vials import Vessel, StockVial, WasteVial
 from mill_control import MockMill
