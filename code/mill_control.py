@@ -57,6 +57,7 @@ console_formatter = logging.Formatter(
     "%(levelname)-10s & %(funcName)-20s & %(lineno)5d & %(message)s"
 )
 console_handler.setFormatter(console_formatter)
+console_handler.setLevel(logging.WARNING)
 logger.addHandler(console_handler)
 
 class Mill:

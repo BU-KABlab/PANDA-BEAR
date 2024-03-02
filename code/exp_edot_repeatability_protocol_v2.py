@@ -188,6 +188,7 @@ def edot_deposition(
     )
 
     toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
+    instructions.set_status(ExperimentStatus.RINSING)
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
@@ -433,7 +434,7 @@ def edot_bleaching(
         flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=1,
+        flush_count=3,
     )
 
     toolkit.global_logger.info("7. Take image of well")
@@ -444,6 +445,7 @@ def edot_bleaching(
         step_description="part_3_bleaching_after_CA",
     )
     toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
+    instructions.set_status(ExperimentStatus.RINSING)
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
