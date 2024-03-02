@@ -14,38 +14,25 @@ Additionally controller should be able to:
 
 # pylint: disable=line-too-long
 import json
-import logging
-
-# import standard libraries
-
-# import third-party libraries
 from typing import Sequence
 
 import e_panda
 import wellplate as wellplate_module
-from config.config import (
-    RANDOM_FLAG,
-    STOCK_STATUS,
-    TESTING,
-    WASTE_STATUS,
-    WELL_STATUS,
-)
+from config.config import (RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS,
+                           WELL_STATUS)
 from experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
+from instrument_toolkit import Toolkit
+from log_tools import e_panda_logger as logger
 from mill_control import Mill, MockMill
+from obs_controls import OBSController
 from pump_control import MockPump, Pump
 from sartorius_local import Scale
 from sartorius_local.mock import Scale as MockScale
 from scheduler import Scheduler
-from instrument_toolkit import Toolkit
-
-# import obs_controls as obs
 from slack_functions2 import SlackBot
-from vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
+from vials import (StockVial, Vial2, WasteVial, read_vials,
+                   update_vial_state_file)
 from wellplate import save_current_wellplate
-from obs_controls import OBSController
-
-# set up logging to log to both the pump_control.log file and the ePANDA.log file
-from log_tools import e_panda_logger as logger
 
 # set up slack globally so that it can be used in the main function and others
 slack = SlackBot()
