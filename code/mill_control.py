@@ -37,12 +37,12 @@ formatter = logging.Formatter(
 system_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
-# print the logs to the console as well
 console_handler = logging.StreamHandler()
 console_formatter = logging.Formatter(
     "%(levelname)-10s & %(funcName)-20s & %(lineno)5d & %(message)s"
 )
 console_handler.setFormatter(console_formatter)
+console_handler.setLevel(logging.WARNING)
 logger.addHandler(console_handler)
 
 
@@ -89,7 +89,6 @@ class Mill:
                 raise MillConnectionError("Error opening serial connection to mill")
 
             logger.info("Mill connected: %s", ser_mill.is_open)
-            # print("Mill connected: ", ser_mill.is_open)
             self.ser_mill = ser_mill
         except Exception as exep:
             logger.error("Error connecting to the mill: %s", str(exep))
@@ -151,7 +150,6 @@ class Mill:
             raise MillConnectionError("Error closing serial connection to mill")
         else:
             logger.info("Serial connection to mill closed successfully")
-            # print("Serial connection to mill closed successfully")
             self.active_connection = False
             self.ser_mill = None
 
@@ -372,9 +370,9 @@ class Mill:
                         y_coord = float(match.group(2)) + homing_pull_off
                         z_coord = float(match.group(3)) + homing_pull_off
                         log_message = f"MPos coordinates: X = {x_coord - homing_pull_off}, Y = {y_coord- homing_pull_off}, Z = {z_coord- homing_pull_off}"
-                        logger.info(log_message)
+                        logger.debug(log_message)
                         log_message = f"WPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
-                        logger.info(log_message)
+                        logger.debug(log_message)
                         break
                     else:
                         logger.warning(
@@ -617,7 +615,7 @@ class Mill:
             logger.debug("Moving to Z=0 first")
             self.execute_command("G01 Z0")
         else:
-            logger.warning("Not moving to Z=0 first")
+            logger.debug("Not moving to Z=0 first")
 
         # Double check that the target coordinates are within the working volume
         working_volume = Coordinates(**self.config["working_volume"])
