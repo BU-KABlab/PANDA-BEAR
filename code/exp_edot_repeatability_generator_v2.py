@@ -31,10 +31,11 @@ PUMPING_RATE = 0.3
 wellplate.load_new_wellplate(False, 107, 4)
 experiment_id = determine_next_experiment_id()
 experiments: list[experiment_class.EchemExperimentBase] = []
-WELL_NUMBER = 2 # only thing to change wells
+WELL_NUMBER = 11 # only thing to change wells
 
 
 for i in range(1):
+
     experiments.append(
         experiment_class.EchemExperimentBase(
             id=experiment_id,
@@ -135,7 +136,42 @@ for i in range(1):
         )
     )
     experiment_id += 1
-    WELL_NUMBER += 1
+
+    # experiments.append(
+    #     experiment_class.EchemExperimentBase(
+    #         id=experiment_id,
+    #         well_id="E" + str(WELL_NUMBER),
+    #         experiment_name=EXPERIMENT_NAME + " " + "CV",
+    #         priority=1,
+    #         pin=CURRENT_PIN,
+    #         project_id=PROJECT_ID,
+    #         project_campaign_id=CAMPAIGN_ID,
+    #         solutions={"edot": 0, "liclo4": 120, "rinse": 120},
+    #         solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
+    #         pumping_rate=PUMPING_RATE,
+    #         status=experiment_class.ExperimentStatus.NEW,
+    #         filename=EXPERIMENT_NAME + " " + str(experiment_id),
+    #         override_well_selection=1,
+    #         process_type=4,
+    #         # Echem specific
+    #         ocp=1,
+    #         baseline=0,
+    #         cv=1,
+    #         ca=0,
+    #         cv_step_size=0.002,
+    #         cv_second_anodic_peak=1.0,
+    #         cv_first_anodic_peak=-2.0,
+    #         cv_scan_rate_cycle_1=0.1,
+    #         cv_scan_rate_cycle_2=0.1,
+    #         cv_scan_rate_cycle_3=0.1,
+    #         cv_cycle_count=2,
+    #         cv_initial_voltage=0.0,
+    #         cv_final_voltage=-2.0,
+    #         cv_sample_period=0.1,
+    #     )
+    # )
+    # experiment_id += 1
+    # WELL_NUMBER += 1
 
 for experiment in experiments:
     ## Print a recipt of the wellplate and its experiments noting the solution and volume
