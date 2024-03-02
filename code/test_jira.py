@@ -9,11 +9,16 @@ jira = Jira(
     password=PASSWORD,
     cloud=True)
 
-issue_to_update = "EP-59"
-issue = jira.issue(issue_to_update)
-# for field in issue["fields"]:
-#     print(f'{field} : {issue["fields"][field]}')
+# issue_to_update = "EP-59"
+# issue = jira.issue(issue_to_update)
+# # for field in issue["fields"]:
+# #     print(f'{field} : {issue["fields"][field]}')
 
-# Update the status of the issue
-response = jira.set_issue_status(issue_to_update, EPANDA_JIRA.statuses.done.name)
-print(response)
+# # Update the status of the issue
+# response = jira.set_issue_status(issue_to_update, EPANDA_JIRA.statuses.done.name)
+# print(response)
+
+# Get the users of a project
+users = jira.users_get_all()
+for user in users:
+    print(f"{user['displayName']} : {user['accountId']}")
