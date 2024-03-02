@@ -84,6 +84,7 @@ class ExperimentBase:
     process_type: Optional[int] = (
         1  # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
     )
+    jira_issue_key: Optional[str] = None
 
     def set_status(self, new_status: ExperimentStatus):
         """Set the status and status date of the experiment"""
