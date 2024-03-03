@@ -25,8 +25,6 @@ from experiment_class import EchemExperimentBase, ExperimentStatus
 from vials import StockVial, WasteVial
 from correction_factors import correction_factor
 from mill_control import Instruments
-from obs_controls import OBSController
-
 
 def edot_initial_screening(
     instructions: EchemExperimentBase,
