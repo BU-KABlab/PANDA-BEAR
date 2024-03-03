@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-import slack_credentials as slack_cred
+from config.secrets import Slack as slack_cred
 from config.config import SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS, QUEUE, WELL_STATUS, WELL_TYPE
 from wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wellplate
 
@@ -62,6 +62,8 @@ class SlackBot:
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
         elif channel == "alert":
             channel_id = slack_cred.ALERT_CHANNEL_ID
+        elif channel == 'data':
+            channel_id = slack_cred.DATA_CHANNEL_ID
         elif channel in [slack_cred.CONVERSATION_CHANNEL_ID, slack_cred.ALERT_CHANNEL_ID]:
             channel_id = channel
         else:
