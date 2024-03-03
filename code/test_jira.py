@@ -1,24 +1,10 @@
 
-from atlassian_tools.secrets import URL, USERNAME, PASSWORD
-from atlassian import Jira
+from atlassian_tools.jira_connection import epanda_jira, Issue
 from atlassian_tools.kablab_projects import EPANDA_JIRA
 
-jira = Jira(
-    url=URL,
-    username=USERNAME,
-    password=PASSWORD,
-    cloud=True)
-
-# issue_to_update = "EP-59"
-# issue = jira.issue(issue_to_update)
-# # for field in issue["fields"]:
-# #     print(f'{field} : {issue["fields"][field]}')
-
-# # Update the status of the issue
-# response = jira.set_issue_status(issue_to_update, EPANDA_JIRA.statuses.done.name)
-# print(response)
-
-# Get the users of a project
-users = jira.users_get_all()
-for user in users:
-    print(f"{user['displayName']} : {user['accountId']}")
+issue:dict = epanda_jira.issue('EP-59')
+for key, value in issue.items():
+    print(f"{key}: {value}")
+    if key == "fields":
+        for field, field_value in value.items():
+            print(f"\t{field}: {field_value}")
