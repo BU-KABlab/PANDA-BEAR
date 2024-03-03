@@ -203,6 +203,12 @@ def edot_deposition(
             mill=toolkit.mill,
             pumping_rate=toolkit.pump.max_pump_rate,
         )
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            z_coord=toolkit.wellplate.z_top,
+            instrument=Instruments.PIPETTE,
+        )
         # Clear the well
         forward_pipette_v2(
             volume=correction_factor(120),
