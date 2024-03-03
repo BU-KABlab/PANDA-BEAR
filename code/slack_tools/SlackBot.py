@@ -298,11 +298,11 @@ class SlackBot:
             "well status - displays the status of the wells and the rest of the deck\n"
             "queue length - displays the length of the queue\n"
             "status - displays the status of the vials, wells, and queue\n"
-            # "pause - pauses the current experiment\n"
-            # "resume - resumes the current experiment\n"
-            # "start - starts a new experiment\n"
-            # "stop - stops the current experiment\n"
-            "exit - exits the program\n"
+            # "pause - pauses the experiment loop\n"
+            # "resume - resumes the experiment loop\n"
+            # "start - starts the experiment loop\n"
+            # "stop - stops the experiment loop\n"
+            "exit - closes the slackbot\n"
         )
         self.send_slack_message(channel_id, message)
         return 1
