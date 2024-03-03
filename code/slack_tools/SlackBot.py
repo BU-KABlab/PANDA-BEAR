@@ -1,23 +1,28 @@
 """sendSlackMessages.py"""
+
 # pylint: disable=line-too-long
 
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 import csv
-from datetime import datetime
 import json
 import logging
 import time
+from datetime import datetime
 from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
+from config.config import (QUEUE, SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS,
+                           WELL_STATUS, WELL_TYPE)
+from config.secrets import Slack as slack_cred
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from config.secrets import Slack as slack_cred
-from config.config import SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS, QUEUE, WELL_STATUS, WELL_TYPE
 from wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wellplate
+
 
 class SlackBot:
     """Class for sending messages to Slack."""
+
     def __init__(self, test: bool = False):
         # Set up logging
         # logger = logging.getLogger(__name__)
@@ -62,9 +67,12 @@ class SlackBot:
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
         elif channel == "alert":
             channel_id = slack_cred.ALERT_CHANNEL_ID
-        elif channel == 'data':
+        elif channel == "data":
             channel_id = slack_cred.DATA_CHANNEL_ID
-        elif channel in [slack_cred.CONVERSATION_CHANNEL_ID, slack_cred.ALERT_CHANNEL_ID]:
+        elif channel in [
+            slack_cred.CONVERSATION_CHANNEL_ID,
+            slack_cred.ALERT_CHANNEL_ID,
+        ]:
             channel_id = channel
         else:
             return 0
@@ -114,7 +122,12 @@ class SlackBot:
             # conversations.history returns the first 100 messages by default
             # These results are paginated, see:
             # https://api.slack.com/methods/conversations.history$pagination
-            result = client.conversations_history(channel=channel_id, limit=5, inclusive=True, latest=datetime.now().timestamp())
+            result = client.conversations_history(
+                channel=channel_id,
+                limit=5,
+                inclusive=True,
+                latest=datetime.now().timestamp(),
+            )
 
             conversation_history = result["messages"]
 
@@ -132,7 +145,9 @@ class SlackBot:
                 if lookup_tickets is False:
                     # Send message to Slack
                     logging.info("New message found: %s", msg_text)
-                    response = self.parse_slack_message(msg_text[8:].rstrip(), channel_id)
+                    response = self.parse_slack_message(
+                        msg_text[8:].rstrip(), channel_id
+                    )
                     # Add message to csv file
                     with open(
                         SLACK_TICKETS,
@@ -164,7 +179,7 @@ class SlackBot:
                     if response == 0:
                         return 0
                     else:
-                        print(f'responded to {msg_id}')
+                        print(f"responded to {msg_id}")
                         return 1
                 else:
                     continue
@@ -177,7 +192,6 @@ class SlackBot:
             error_msg = f"Error creating conversation: {format(error)}"
             self.logger.error(error_msg)
             return 0
-
 
     def find_id(self, experiment_id):
         """Find the message ID in the slack ticket tracker csv file."""
@@ -202,7 +216,6 @@ class SlackBot:
                     return row
         return False
 
-
     def parse_slack_message(self, text: str, channel_id) -> int:
         """
         Parse the Slack message for commands.
@@ -226,12 +239,12 @@ class SlackBot:
 
         elif text[0:15] == "data experiment":
             # Get experiment number.
-            #experiment_number = text[7:]
+            # experiment_number = text[7:]
             return 1
 
         elif text[0:17] == "status experiment":
             # Get experiment number
-            #experiment_number = text[7:]
+            # experiment_number = text[7:]
             # Get status
             return 1
 
@@ -276,21 +289,21 @@ class SlackBot:
     def __help_menu(self, channel_id):
         """Sends the help menu to the user."""
         message = (
-                "Here is a list of commands I understand:\n"
-                "help - displays this message\n"
-                #"plot experiment # - plots plots the CV data for experiment #\n"
-                #"data experiment # - sends the data files for experiment #\n"
-                #"status experiment # - displays the status of experiment #\n"
-                "vial status - displays the status of the vials\n"
-                "well status - displays the status of the wells and the rest of the deck\n"
-                "queue length - displays the length of the queue\n"
-                "status - displays the status of the vials, wells, and queue\n"
-                #"pause - pauses the current experiment\n"
-                #"resume - resumes the current experiment\n"
-                #"start - starts a new experiment\n"
-                #"stop - stops the current experiment\n"
-                "exit - exits the program\n"
-            )
+            "Here is a list of commands I understand:\n"
+            "help - displays this message\n"
+            # "plot experiment # - plots plots the CV data for experiment #\n"
+            # "data experiment # - sends the data files for experiment #\n"
+            # "status experiment # - displays the status of experiment #\n"
+            "vial status - displays the status of the vials\n"
+            "well status - displays the status of the wells and the rest of the deck\n"
+            "queue length - displays the length of the queue\n"
+            "status - displays the status of the vials, wells, and queue\n"
+            # "pause - pauses the current experiment\n"
+            # "resume - resumes the current experiment\n"
+            # "start - starts a new experiment\n"
+            # "stop - stops the current experiment\n"
+            "exit - exits the program\n"
+        )
         self.send_slack_message(channel_id, message)
         return 1
 
@@ -308,10 +321,16 @@ class SlackBot:
         stock_vials["volume"] = stock_vials["volume"].astype(float)
         ## Create a bar graph with volume on the x-axis and position on the y-axis
         ## Send the graph to slack
-        plt.bar(stock_vials["position"], stock_vials["volume"], align="center", alpha=0.5, color="blue")
+        plt.bar(
+            stock_vials["position"],
+            stock_vials["volume"],
+            align="center",
+            alpha=0.5,
+            color="blue",
+        )
         # label each bar with the volume
         for i, v in enumerate(stock_vials["volume"]):
-            plt.text(i, v, str(round(v,4)), color="black", ha="center")
+            plt.text(i, v, str(round(v, 4)), color="black", ha="center")
 
         # Draw a horizontal line at 4000
         plt.axhline(y=2000, color="red", linestyle="-")
@@ -335,9 +354,15 @@ class SlackBot:
         waste_vials = waste_vials.dropna()
         waste_vials["position"] = waste_vials["position"].astype(str)
         waste_vials["volume"] = waste_vials["volume"].astype(float)
-        plt.bar(waste_vials["position"], waste_vials["volume"], align="center", alpha=0.5, color="blue")
+        plt.bar(
+            waste_vials["position"],
+            waste_vials["volume"],
+            align="center",
+            alpha=0.5,
+            color="blue",
+        )
         for i, v in enumerate(waste_vials["volume"]):
-            plt.text(i, v, str(round(v,4)), color="black", ha="center")
+            plt.text(i, v, str(round(v, 4)), color="black", ha="center")
         plt.axhline(y=20000, color="red", linestyle="-")
         for i, v in enumerate(waste_vials["name"]):
             plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
@@ -352,10 +377,10 @@ class SlackBot:
     def __well_status(self, channel_id):
         """Sends the well status to the user."""
         # Check current wellplate type
-        with open (WELL_STATUS, "r", encoding="utf-8") as well:
+        with open(WELL_STATUS, "r", encoding="utf-8") as well:
             data = json.load(well)
             type_number = data["type_number"]
-        with open (WELL_TYPE, "r", encoding="utf-8") as well:
+        with open(WELL_TYPE, "r", encoding="utf-8") as well:
             data = csv.reader(well)
             for row in data:
                 if str(row[0]) == str(type_number):
@@ -366,15 +391,27 @@ class SlackBot:
         wellplate: Wellplate = None
         if wellplate_type == "circular":
             wellplate = CircularWellPlate(
-                a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=type_number
+                a1_x=-218,
+                a1_y=-74,
+                orientation=0,
+                columns="ABCDEFGH",
+                rows=13,
+                type_number=type_number,
             )
         elif wellplate_type == "square":
             wellplate = GraceBioLabsWellPlate(
-                a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=type_number
+                a1_x=-218,
+                a1_y=-74,
+                orientation=0,
+                columns="ABCDEFGH",
+                rows=13,
+                type_number=type_number,
             )
 
         ## Well coordinate
-        x_coordinates, y_coordinates, color = wellplate.well_coordinates_and_status_color()
+        x_coordinates, y_coordinates, color = (
+            wellplate.well_coordinates_and_status_color()
+        )
         if wellplate.shape == "circular":
             marker = "o"
         else:
@@ -382,12 +419,14 @@ class SlackBot:
 
         ## Label the wellplate with the plate id below the bottom row and centered to the wellplate
         # get the coordinates of wells H12 and A12
-        h12:dict = wellplate.get_coordinates("H12")
-        a12:dict = wellplate.get_coordinates("A12")
+        h12: dict = wellplate.get_coordinates("H12")
+        a12: dict = wellplate.get_coordinates("A12")
         # calculate the center of the wellplate
         center = h12["x"] + (a12["x"] - h12["x"]) / 2
         # plot the plate id
-        plt.text(center, h12['y']-20, str(wellplate.plate_id), color="black", ha="center")
+        plt.text(
+            center, h12["y"] - 20, str(wellplate.plate_id), color="black", ha="center"
+        )
 
         ## Vial coordinates
         vial_x = []
@@ -444,7 +483,9 @@ class SlackBot:
         # color.extend(vial_color)
 
         # Plot the well plate
-        plt.scatter(x_coordinates, y_coordinates, marker=marker, c=color, s=75, alpha=0.5)
+        plt.scatter(
+            x_coordinates, y_coordinates, marker=marker, c=color, s=75, alpha=0.5
+        )
         plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=200, alpha=1)
         plt.xlabel("X")
         plt.ylabel("Y")
@@ -452,7 +493,7 @@ class SlackBot:
         plt.grid(True, "both")
         plt.xlim(-420, 10)
         plt.ylim(-310, 10)
-        plt.savefig("well_status.png", format='png')
+        plt.savefig("well_status.png", format="png")
         plt.close()
         # Send the plot to Slack
         self.send_slack_file(channel_id, "well_status.png")
@@ -462,16 +503,22 @@ class SlackBot:
     def __queue_length(self, channel_id):
         # Get queue length
         queue_length = 0
-        queue_file = pd.read_csv(QUEUE, skipinitialspace=True, header=None, names=['id', 'priority', 'filename', 'protocol_type'])
+        queue_file = pd.read_csv(
+            QUEUE,
+            skipinitialspace=True,
+            header=None,
+            names=["id", "priority", "filename", "protocol_type"],
+        )
         # the columsn to id,priority,filename,protocol_type
-        queue_length = len(queue_file)-1
+        queue_length = len(queue_file) - 1
         message = f"The queue length is {queue_length}."
         self.send_slack_message(channel_id, message)
         return 1
 
+
 if __name__ == "__main__":
-    slack_bot = SlackBot(test = False)
+    slack_bot = SlackBot(test=False)
     TEST_MESSAGE = "This is a test message."
     EPANDA_HELLO = """Hello ePANDA team! I am ePANDA..."""
-    #slack_bot.check_slack_messages("alert")
+    # slack_bot.check_slack_messages("alert")
     slack_bot.send_slack_message("alert", TEST_MESSAGE)
