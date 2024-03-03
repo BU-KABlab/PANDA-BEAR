@@ -6,4 +6,6 @@ code\experiment_queue\**
 #Untracked files
 *.pyc
 code/misc_code_testing/ePANDA_pro_pic.jpeg
-code/slack_credentials.py
+*slack_credentials.py
+*secrets.py
+code/atlassian_tools/kablab_projects.py

@@ -157,7 +157,7 @@ def forward_pipette_v2(
 
             # withdraw a little to engage screw receive nothing
             pump.withdraw(
-                volume=AIR_GAP, solution=None, rate=pumping_rate
+                volume=AIR_GAP, solution=None, rate=pump.max_pump_rate
             )  # withdraw air gap to engage screw
 
             if isinstance(from_vessel, Well):
@@ -192,14 +192,14 @@ def forward_pipette_v2(
 
             if isinstance(from_vessel, Well):
                 pump.withdraw(
-                    volume=20, solution=None, rate=pumping_rate, weigh=False
+                    volume=20, solution=None, rate=pump.max_pump_rate, weigh=False
                 )  # If the from vessel is a well withdraw a little extra to ensure cleared well
 
             mill.move_to_safe_position()
 
             # Withdraw an air gap to prevent dripping, receive nothing
             pump.withdraw(
-                volume=DRIP_STOP, solution=None, rate=pumping_rate, weigh=False
+                volume=DRIP_STOP, solution=None, rate=pump.max_pump_rate, weigh=False
             )
 
             logger.debug(
@@ -243,7 +243,7 @@ def forward_pipette_v2(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,
                 infused_into=to_vessel,
-                rate=pumping_rate,
+                rate=pump.max_pump_rate,
                 blowout_ul=(
                     AIR_GAP + DRIP_STOP + 20
                     if isinstance(from_vessel, Well)
@@ -252,7 +252,7 @@ def forward_pipette_v2(
                 weigh=weigh,
             )
 
-            mill.move_to_safe_position()
+            #mill.move_to_safe_position()
 
 
 def reverse_pipette_v2(
