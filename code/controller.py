@@ -29,7 +29,7 @@ from pump_control import MockPump, Pump
 from sartorius_local import Scale
 from sartorius_local.mock import Scale as MockScale
 from scheduler import Scheduler
-from slack_functions2 import SlackBot
+from slack_tools.SlackBot import SlackBot
 from vials import (StockVial, Vial2, WasteVial, read_vials,
                    update_vial_state_file)
 from wellplate import save_current_wellplate

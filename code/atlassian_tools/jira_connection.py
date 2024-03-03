@@ -4,16 +4,17 @@ from dataclasses import dataclass
 from re import sub
 
 from atlassian import Jira
-from atlassian_tools.secrets import PASSWORD, URL, USERNAME
+from config.secrets import Jira_Secrets
 
 epanda_jira = Jira(
-    url=URL,
-    username=USERNAME,
-    password=PASSWORD,
+    url=Jira_Secrets.URL,
+    username=Jira_Secrets.USERNAME,
+    password=Jira_Secrets.PASSWORD,
     cloud=True)
 
 @dataclass
 class Issue:
+    """This class is used to store the information from a Jira issue"""
     expand: str
     id: str
     self: str

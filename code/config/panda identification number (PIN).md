@@ -33,9 +33,16 @@ working electrode 001 = gold\
 working electrode 002 = ITO
 
 wells 001 = 96 silicon 9mm x 9mm square wells
+wells 002 = 96 pdms circular wells
 
 pipette adapter 001 = barbed fitting\
 pipette adapter 002 = male leur-lock part of adapter\
 pipette adapter 003 = female leur-lock part of adapter\
 pipette adapter 004 = cut off end\
 pipette adapter 005 = remodeled short adapter with female leur-lock
+
+optics 000 = no optics
+
+scale 000 = no scale
+scale 001 = wellplate ontop of scale
+scale 002 = scale below decking with access port
