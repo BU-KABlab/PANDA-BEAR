@@ -1,8 +1,16 @@
+from atlassian import Jira
+from atlassian_tools.utilities import Issue
+from config.secrets import JiraSecrets
 
-from atlassian_tools.jira_connection import epanda_jira, Issue
-from atlassian_tools.kablab_projects import EPANDA_JIRA
+epanda_jira = Jira(
+    url=JiraSecrets.URL,
+    username=JiraSecrets.USERNAME,
+    password=JiraSecrets.PASSWORD,
+    cloud=True,
+)
 
-issue:dict = epanda_jira.issue('EP-59')
+
+issue: dict = epanda_jira.issue("EP-59")
 for key, value in issue.items():
     print(f"{key}: {value}")
     if key == "fields":

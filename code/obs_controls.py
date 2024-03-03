@@ -9,7 +9,7 @@ import time
 import obsws_python as obsws
 from obsws_python import error as OBSerror
 from config.config import PATH_TO_LOGS, TESTING
-from config.secrets import OBS_Secrets
+from config.secrets import OBSSecrets
 from experiment_class import ExperimentBase, ExperimentStatus
 from log_tools import e_panda_logger as logger
 
@@ -28,9 +28,9 @@ class OBSController:
 
     def __init__(
         self,
-        client_host=OBS_Secrets.HOST,
-        client_password=OBS_Secrets.PASSWORD,
-        client_port=OBS_Secrets.PORT,
+        client_host=OBSSecrets.HOST,
+        client_password=OBSSecrets.PASSWORD,
+        client_port=OBSSecrets.PORT,
         client_timeout=3,
     ):
         if TESTING:
