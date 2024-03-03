@@ -80,7 +80,7 @@ def edot_initial_screening(
         )
 
     elif instructions.process_type == 4:
-        edot_CV(
+        edot_cv(
             instructions=instructions,
             toolkit=toolkit,
             stock_vials=stock_vials,
@@ -484,7 +484,7 @@ def edot_bleaching(
     toolkit.global_logger.info("Edot bleaching complete\n\n")
 
 
-def edot_CV(
+def edot_cv(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
