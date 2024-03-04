@@ -196,7 +196,7 @@ def scale_variance_check(mock: bool = False):
 
     scale_logger.info("Starting 10s loop")
     for i in tqdm(range(60)):
-        ten_sec_array[i] = scale.value()
+        ten_sec_array[i] = scale.value()[0]
         time.sleep(10)
     scale_logger.info("10s loop complete")
 
@@ -204,7 +204,7 @@ def scale_variance_check(mock: bool = False):
 
     scale_logger.info("Starting 5s loop")
     for i in tqdm(range(120)):
-        five_sec_array[i] = scale.value()
+        five_sec_array[i] = scale.value()[0]
         time.sleep(5)
     scale_logger.info("5s loop complete")
 
@@ -212,7 +212,7 @@ def scale_variance_check(mock: bool = False):
 
     scale_logger.info("Starting 3s loop")
     for i in tqdm(range(200)):
-        three_sec_array[i] = scale.value()
+        three_sec_array[i] = scale.value()[0]
         time.sleep(3)
     scale_logger.info("3s loop complete")
 
@@ -280,6 +280,6 @@ def function_test(mock: bool = False):
     sartorius_scale.close()
 
 if __name__ == '__main__':
-    #scale_variance_check(mock=False)
-    scale = Sartorius('COM6')
-    print(scale.value())
+    scale_variance_check(mock=False)
+    # scale = Sartorius('COM6')
+    # print(scale.value())
