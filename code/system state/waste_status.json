@@ -2,9 +2,9 @@
     {
         "position": "w0",
         "contents": {
-            "rinse": 2289.1600000000003,
-            "edot": 127.43,
-            "liclo4": 382.29
+            "rinse": 15324.680000000015,
+            "edot": 1146.8700000000003,
+            "liclo4": 2421.1700000000005
         },
         "x": -50,
         "y": -7,
@@ -13,7 +13,7 @@
         "height": -20,
         "depth": -74,
         "name": "waste",
-        "volume": 3798.8799999999987,
+        "volume": 19892.720000000023,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
@@ -22,7 +22,11 @@
     },
     {
         "position": "w1",
-        "contents": {},
+        "contents": {
+            "rinse": 1619.4400000000003,
+            "edot": 127.43,
+            "liclo4": 254.86
+        },
         "x": -50,
         "y": -40,
         "z_bottom": -74,
@@ -30,7 +34,7 @@
         "height": -20,
         "depth": -74,
         "name": "waste",
-        "volume": 1000,
+        "volume": 3001.7299999999996,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
