@@ -18,9 +18,8 @@ import experiment_class
 import pandas as pd
 from config.config import (EPANDA_LOG, PATH_TO_COMPLETED_EXPERIMENTS,
                            PATH_TO_DATA, PATH_TO_ERRORED_EXPERIMENTS,
-                           PATH_TO_EXPERIMENT_INBOX, PATH_TO_EXPERIMENT_QUEUE)
+                           PATH_TO_EXPERIMENT_INBOX, PATH_TO_EXPERIMENT_QUEUE, WELL_HX, WELL_STATUS)
 from config.config import QUEUE as PATH_TO_QUEUE
-from config.config import WELL_STATUS
 from experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
 from wellplate import Well
 
@@ -648,6 +647,15 @@ class Scheduler:
         queue = pd.read_csv(queue_file_path, header=0, names=["id", "priority", "filename","protocol_type"], dtype={"id": int, "priority": int, "filename": str, "protocol_type":int}, skipinitialspace=True)
         return queue
 
+def determine_next_experiment_id() -> int:
+    """Load well history to get last experiment id and increment by 1"""
+    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True, sep="&")
+    well_hx = well_hx.dropna(subset=["experiment id"])
+    well_hx = well_hx.drop_duplicates(subset=["experiment id"])
+    well_hx = well_hx[well_hx["experiment id"] != "None"]
+    well_hx["experiment id"] = well_hx["experiment id"].astype(int)
+    last_experiment_id = well_hx["experiment id"].max()
+    return int(last_experiment_id + 1)
 ####################################################################################################
 def test_well_status_update():
     """
