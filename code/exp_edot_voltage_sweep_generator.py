@@ -8,23 +8,23 @@ from config.config import TESTING
 from config.pin import CURRENT_PIN
 from scheduler import Scheduler, determine_next_experiment_id
 
-TEST:bool = TESTING
+TEST: bool = TESTING
 print("TEST MODE: ", TEST)
 input("Press enter to continue")
 # Create experiments
-PROJECT_ID:int = 16
+PROJECT_ID: int = 16
 EXPERIMENT_NAME = "edot potential screening"
 # print(f"Experiment name: {EXPERIMENT_NAME}")
-CAMPAIGN_ID:int = 2
-PUMPING_RATE:float = 0.3
+CAMPAIGN_ID: int = 2
+PUMPING_RATE: float = 0.3
 
 # controller.load_new_wellplate(new_wellplate_type_number=6)
 wellplate.load_new_wellplate(False, 107, 4)
 experiment_id = determine_next_experiment_id()
 experiments: list[experiment_class.EchemExperimentBase] = []
-WELL_NUMBER:int = 2
-WELL_LETTER:str = "F"
-REPITITIONS:int = 3
+WELL_NUMBER: int = 2
+WELL_LETTER: str = "F"
+REPITITIONS: int = 3
 ca_step_1_voltages = [0.8, 1.0, 1.2, 1.4, 1.6]
 
 for i in range(REPITITIONS):
@@ -34,7 +34,7 @@ for i in range(REPITITIONS):
             experiment_class.EchemExperimentBase(
                 id=experiment_id,
                 well_id=str(WELL_LETTER) + str(WELL_NUMBER),
-                experiment_name=EXPERIMENT_NAME + " " + "Deposition",
+                experiment_name=EXPERIMENT_NAME + " " + "deposition",
                 priority=1,
                 pin=CURRENT_PIN,
                 project_id=PROJECT_ID,
@@ -67,7 +67,7 @@ for i in range(REPITITIONS):
             experiment_class.EchemExperimentBase(
                 id=experiment_id,
                 well_id=str(WELL_LETTER) + str(WELL_NUMBER),
-                experiment_name=EXPERIMENT_NAME + " " + "Coloring",
+                experiment_name=EXPERIMENT_NAME + " " + "bleaching",
                 priority=1,
                 pin=CURRENT_PIN,
                 project_id=PROJECT_ID,
@@ -100,7 +100,7 @@ for i in range(REPITITIONS):
             experiment_class.EchemExperimentBase(
                 id=experiment_id,
                 well_id=str(WELL_LETTER) + str(WELL_NUMBER),
-                experiment_name=EXPERIMENT_NAME + " " + "Bleaching",
+                experiment_name=EXPERIMENT_NAME + " " + "coloring",
                 priority=1,
                 pin=CURRENT_PIN,
                 project_id=PROJECT_ID,
@@ -146,7 +146,6 @@ for experiment in experiments:
 
 
 # Add experiments to the queue and run them
-print(f"{len(experiments)/3} experiments created")
 input("Press enter to add the experiments")
 scheduler = Scheduler()
 scheduler.add_nonfile_experiments(experiments)

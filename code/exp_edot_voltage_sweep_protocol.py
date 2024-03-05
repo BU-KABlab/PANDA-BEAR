@@ -21,9 +21,10 @@ from experiment_class import EchemExperimentBase, ExperimentStatus
 from vials import StockVial, WasteVial
 from correction_factors import correction_factor
 from mill_control import Instruments
+from obs_controls import OBSController
 
 
-def edot_initial_screening(
+def pedotinitial_screening(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
@@ -33,9 +34,9 @@ def edot_initial_screening(
     The initial screening of the edot solution
     Per experiment:
     0. Apply correction factor to the programmed volumes
-    1. edot_deposition
-    2. edot_coloration
-    3. edot_bleaching
+    1. pedotdeposition
+    2. pedotbleaching
+    3. pedotcoloring
 
     """
     # Apply correction factor to the programmed volumes
@@ -52,14 +53,14 @@ def edot_initial_screening(
 
     # Run the experiment based on its experiment type
     if instructions.process_type == 1:
-        edot_deposition(
+        pedotdeposition(
             instructions=instructions,
             toolkit=toolkit,
             stock_vials=stock_vials,
             waste_vials=waste_vials,
         )
     elif instructions.process_type == 2:
-        edot_coloration(
+        pedotbleaching(
             instructions=instructions,
             toolkit=toolkit,
             stock_vials=stock_vials,
@@ -67,7 +68,7 @@ def edot_initial_screening(
         )
 
     elif instructions.process_type == 3:
-        edot_bleaching(
+        pedotcoloring(
             instructions=instructions,
             toolkit=toolkit,
             stock_vials=stock_vials,
@@ -75,7 +76,7 @@ def edot_initial_screening(
         )
 
 
-def edot_deposition(
+def pedotdeposition(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
@@ -101,7 +102,7 @@ def edot_deposition(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "part_1_edot_before_deposition")
+    image_well(toolkit, instructions, "before_deposition")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -141,7 +142,7 @@ def edot_deposition(
         # Set the feed rate back to 2000
         toolkit.mill.set_feed_rate(2000)
 
-        toolkit.global_logger.info("3. Performing CV")
+        toolkit.global_logger.info("3. Performing CA deposition")
         chrono_amp(instructions, file_tag="part_1")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
@@ -214,12 +215,12 @@ def edot_deposition(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="part_1_edot_after_deposition",
+        step_description="after_deposition",
     )
     toolkit.global_logger.info("PEDOT deposition complete\n\n")
 
 
-def edot_coloration(
+def pedotbleaching(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
@@ -244,7 +245,7 @@ def edot_coloration(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "part_2_coloration_before_CA")
+    image_well(toolkit, instructions, "bleaching_before_CA")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -285,7 +286,7 @@ def edot_coloration(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA")
-        chrono_amp(instructions, file_tag="part_2_coloration")
+        chrono_amp(instructions, file_tag="bleaching")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -322,13 +323,13 @@ def edot_coloration(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="part_2_coloration_after_CA",
+        step_description="bleaching_after_CA",
     )
 
-    toolkit.global_logger.info("PEDOT coloration complete\n\n")
+    toolkit.global_logger.info("PEDOT bleaching complete\n\n")
 
 
-def edot_bleaching(
+def pedotcoloring(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
@@ -355,7 +356,7 @@ def edot_bleaching(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "part_3_bleaching_before_CA")
+    image_well(toolkit, instructions, "coloring_before_CA")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -398,7 +399,7 @@ def edot_bleaching(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA")
-        chrono_amp(instructions, file_tag="part_3_bleaching")
+        chrono_amp(instructions, file_tag="coloring")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -435,7 +436,7 @@ def edot_bleaching(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="part_3_bleaching_after_CA",
+        step_description="coloring_after_CA",
     )
     toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
     instructions.set_status(ExperimentStatus.RINSING)
@@ -471,7 +472,7 @@ def edot_bleaching(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="bleaching_after_rinse",
+        step_description="coloring_after_rinse",
     )
 
-    toolkit.global_logger.info("PEDOT bleaching complete\n\n")
+    toolkit.global_logger.info("PEDOT coloring complete\n\n")
