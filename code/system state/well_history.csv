@@ -10225,15 +10225,15 @@ plate id& type number& well id& experiment id& project id& status& status date& 
 107&4&D12&None&16&error&2024-02-16T13:11:00&{}
 107&4&E1&None&16&error&2024-02-16T13:11:00&{}
 107&4&E2&10000508&16&complete&2024-02-29T11:46:22&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
-107&4&E3&None&None&new&&{}
-107&4&E4&None&None&new&&{}
-107&4&E5&None&None&new&&{}
-107&4&E6&None&None&new&&{}
-107&4&E7&None&None&new&&{}
-107&4&E8&None&None&new&&{}
-107&4&E9&None&None&new&&{}
-107&4&E10&None&None&new&&{}
-107&4&E11&None&None&new&&{}
+107&4&E3&10000511&16&complete&2024-02-29T15:48:19&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E4&10000514&16&complete&2024-02-29T18:42:39&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E5&10000517&16&complete&2024-03-01T14:22:45&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E6&10000520&16&complete&2024-03-01T15:23:51&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E7&10000523&16&complete&2024-03-01T16:18:49&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E8&10000526&16&complete&2024-03-01T17:08:58&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E9&10000529&16&complete&2024-03-01T17:59:07&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E10&10000532&16&complete&2024-03-01T18:49:39&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+107&4&E11&10000535&16&complete&2024-03-01T19:40:02&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
 107&4&E12&None&16&error&2024-02-16T13:11:00&{}
 107&4&F1&None&16&error&2024-02-16T13:11:00&{}
 107&4&F2&None&None&new&&{}

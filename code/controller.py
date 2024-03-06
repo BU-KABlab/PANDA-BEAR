@@ -210,9 +210,9 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             #     waste_vials=waste_vials,
             # )
             # import exp_edot_bleaching_protocol as edot
-            import exp_edot_repeatability_protocol_v2 as exp_edot
+            import exp_edot_voltage_sweep_protocol as exp_edot
 
-            exp_edot.edot_initial_screening(
+            exp_edot.pedotinitial_screening(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,

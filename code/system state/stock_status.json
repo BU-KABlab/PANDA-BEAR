@@ -1,7 +1,7 @@
 [
     {
         "position": "s0",
-        "contents": "edot",
+        "contents": "none",
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
@@ -11,8 +11,8 @@
         "radius": 14,
         "height": -20,
         "depth": -74,
-        "name": "edot",
-        "volume": 5872.57,
+        "name": null,
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -34,7 +34,7 @@
         "height": -20,
         "depth": -74,
         "name": "liclo4",
-        "volume": 14617.71,
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -56,7 +56,7 @@
         "height": -20,
         "depth": -74,
         "name": "rinse",
-        "volume": 12710.839999999997,
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "coordinates": {
@@ -67,7 +67,7 @@
     },
     {
         "position": "s3",
-        "contents": "none",
+        "contents": "edot",
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
@@ -77,7 +77,7 @@
         "radius": 14,
         "height": -20,
         "depth": -74,
-        "name": null,
+        "name": "edot",
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
