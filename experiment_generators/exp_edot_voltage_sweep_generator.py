@@ -1,0 +1,157 @@
+"""Generate the experiments for the edot voltage sweep"""
+
+import json
+
+from epanda_lib import experiment_class
+from epanda_lib import wellplate
+from epanda_lib.config.config import TESTING
+from epanda_lib.config.pin import CURRENT_PIN
+from epanda_lib.scheduler import Scheduler, determine_next_experiment_id
+
+TEST: bool = TESTING
+
+# Create experiments
+PROJECT_ID: int = 16
+EXPERIMENT_NAME = "edot potential screening"
+CAMPAIGN_ID: int = 2
+PUMPING_RATE: float = 0.3
+REPITITIONS: int = 3
+
+
+def main(starting_well: str = "F2"):
+    """
+    Generate the experiments for the edot voltage sweep
+    """
+    print("TEST MODE: ", TEST)
+    input("Press enter to continue")
+    ca_step_1_voltages = [0.8, 1.0, 1.2, 1.4, 1.6]
+    wellplate.load_new_wellplate(False, 107, 4)
+    experiment_id = determine_next_experiment_id()
+    experiments: list[experiment_class.EchemExperimentBase] = []
+    well_number: int = int(starting_well[1:])
+    well_letter: str = starting_well[0]
+
+    for _ in range(REPITITIONS):
+
+        for dep_v in ca_step_1_voltages:
+            experiments.append(
+                experiment_class.EchemExperimentBase(
+                    id=experiment_id,
+                    well_id=str(well_letter) + str(well_number),
+                    experiment_name=EXPERIMENT_NAME + " " + "deposition",
+                    priority=1,
+                    pin=CURRENT_PIN,
+                    project_id=PROJECT_ID,
+                    project_campaign_id=CAMPAIGN_ID,
+                    solutions={"edot": 120, "liclo4": 0, "rinse": 120},
+                    solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
+                    pumping_rate=PUMPING_RATE,
+                    status=experiment_class.ExperimentStatus.NEW,
+                    filename=EXPERIMENT_NAME + " " + str(experiment_id),
+                    override_well_selection=0,  # 0 to use new wells only, 1 to reuse a well
+                    process_type=1,
+                    # Echem specific
+                    ocp=1,
+                    baseline=0,
+                    cv=0,
+                    ca=1,
+                    ca_sample_period=0.1,
+                    ca_prestep_voltage=0.0,
+                    ca_prestep_time_delay=0.0,
+                    ca_step_1_voltage=dep_v,
+                    ca_step_1_time=30.0,
+                    ca_step_2_voltage=0.0,
+                    ca_step_2_time=0.0,
+                    ca_sample_rate=0.5,
+                )
+            )
+            experiment_id += 1
+
+            experiments.append(
+                experiment_class.EchemExperimentBase(
+                    id=experiment_id,
+                    well_id=str(well_letter) + str(well_number),
+                    experiment_name=EXPERIMENT_NAME + " " + "bleaching",
+                    priority=1,
+                    pin=CURRENT_PIN,
+                    project_id=PROJECT_ID,
+                    project_campaign_id=CAMPAIGN_ID,
+                    solutions={"edot": 0, "liclo4": 120, "rinse": 0},
+                    solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
+                    pumping_rate=PUMPING_RATE,
+                    status=experiment_class.ExperimentStatus.NEW,
+                    filename=EXPERIMENT_NAME + " " + str(experiment_id),
+                    override_well_selection=1,
+                    process_type=2,
+                    # Echem specific
+                    ocp=1,
+                    baseline=0,
+                    cv=0,
+                    ca=1,
+                    ca_sample_period=0.1,
+                    ca_prestep_voltage=0.0,
+                    ca_prestep_time_delay=0.0,
+                    ca_step_1_voltage=-0.6,
+                    ca_step_1_time=60.0,
+                    ca_step_2_voltage=0.0,
+                    ca_step_2_time=0.0,
+                    ca_sample_rate=0.5,
+                )
+            )
+            experiment_id += 1
+
+            experiments.append(
+                experiment_class.EchemExperimentBase(
+                    id=experiment_id,
+                    well_id=str(well_letter) + str(well_number),
+                    experiment_name=EXPERIMENT_NAME + " " + "coloring",
+                    priority=1,
+                    pin=CURRENT_PIN,
+                    project_id=PROJECT_ID,
+                    project_campaign_id=CAMPAIGN_ID,
+                    solutions={"edot": 0, "liclo4": 120, "rinse": 120},
+                    solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
+                    pumping_rate=PUMPING_RATE,
+                    status=experiment_class.ExperimentStatus.NEW,
+                    filename=EXPERIMENT_NAME + " " + str(experiment_id),
+                    override_well_selection=1,
+                    process_type=3,
+                    # Echem specific
+                    ocp=1,
+                    baseline=0,
+                    cv=0,
+                    ca=1,
+                    ca_sample_period=0.1,
+                    ca_prestep_voltage=0.0,
+                    ca_prestep_time_delay=0.0,
+                    ca_step_1_voltage=0.5,
+                    ca_step_1_time=60.0,
+                    ca_step_2_voltage=0.0,
+                    ca_step_2_time=0.0,
+                    ca_sample_rate=0.5,
+                )
+            )
+            experiment_id += 1
+            well_number += 1
+
+    for experiment in experiments:
+        ## Print a recipt of the wellplate and its experiments noting the solution and volume
+        print(f"Experiment name: {experiment.experiment_name}")
+        print(f"Experiment id: {experiment.id}")
+        print(f"Well id: {experiment.well_id}")
+        print(f"Solutions: {json.dumps(experiment.solutions)}")
+        print(f"Pumping rate: {PUMPING_RATE}")
+        print(
+            f"Project campaign id: {experiment.project_id}.{experiment.project_campaign_id}\n"
+        )
+        print(f"CA Paramaters: {experiment.print_ca_parameters()}\n")
+        print(f"CV Paramaters: {experiment.print_cv_parameters()}\n")
+
+    # Add experiments to the queue and run them
+    input("Press enter to add the experiments")
+    scheduler = Scheduler()
+    scheduler.add_nonfile_experiments(experiments)
+
+
+if __name__ == "__main__":
+    main()
