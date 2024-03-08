@@ -434,80 +434,115 @@
                 "liclo4": 0.0
             },
             "experiment_id": 10000508,
-            "project_id": 16,
-            "volume": 0.0
+            "project_id": 16
         },
         {
             "well_id": "E3",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-29T15:48:19",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000511,
+            "project_id": 16
         },
         {
             "well_id": "E4",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-02-29T18:42:39",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000514,
+            "project_id": 16
         },
         {
             "well_id": "E5",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-03-01T14:22:45",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000517,
+            "project_id": 16
         },
         {
             "well_id": "E6",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-03-01T15:23:51",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000520,
+            "project_id": 16
         },
         {
             "well_id": "E7",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-03-01T16:18:49",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000523,
+            "project_id": 16
         },
         {
             "well_id": "E8",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-03-01T17:08:58",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000526,
+            "project_id": 16
         },
         {
             "well_id": "E9",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-03-01T17:59:07",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000529,
+            "project_id": 16
         },
         {
             "well_id": "E10",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-03-01T18:49:39",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000532,
+            "project_id": 16
         },
         {
             "well_id": "E11",
-            "status": "new",
-            "status_date": "",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null
+            "status": "complete",
+            "status_date": "2024-03-01T19:40:02",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000535,
+            "project_id": 16
         },
         {
             "well_id": "E12",
