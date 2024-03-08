@@ -338,9 +338,9 @@ class Mill:
             for _ in range(max_attempts):
                 try:
                     if match:
-                        x_coord = float(match.group(1))
-                        y_coord = float(match.group(2))
-                        z_coord = float(match.group(3))
+                        x_coord = round(float(match.group(1)),3)
+                        y_coord = round(float(match.group(2)),3)
+                        z_coord = round(float(match.group(3)),3)
                         log_message = f"WPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
                         logger.info(log_message)
                         break
