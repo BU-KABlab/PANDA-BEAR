@@ -13,6 +13,7 @@ Additionally controller should be able to:
 """
 
 # pylint: disable=line-too-long
+import importlib
 import json
 from pathlib import Path
 from typing import Sequence
@@ -27,6 +28,7 @@ from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
 from .obs_controls import OBSController
 from .pump_control import MockPump, Pump
+from .protocol_utilities import get_protocol_by_id, ProtocolEntry
 from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
@@ -208,10 +210,19 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             #     stock_vials=stock_vials,
             #     waste_vials=waste_vials,
             # )
-            # import exp_edot_bleaching_protocol as edot
-            from protocols import exp_edot_voltage_sweep_protocol as exp_edot
 
-            exp_edot.pedotinitial_screening(
+            # Get the protocol entry
+            protocol_entry: ProtocolEntry = get_protocol_by_id(new_experiment.protocol_id)
+
+            # Convert the file path to a module name
+            module_name = ('protocols.' + protocol_entry.filepath).replace('/', '.').rstrip('.py')
+
+            # Import the module
+            protocol_module = importlib.import_module(module_name)
+
+            # Get the main function from the module
+            protocol_function = getattr(protocol_module, "main")
+            protocol_function(
                 instructions=new_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,
@@ -311,7 +322,7 @@ def establish_system_state() -> (
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = Wellplate()
-    logger.info("System state established")
+    logger.info("System state reestablished")
 
     ## read through the stock vials and log their name, contents, and volume
     for vial in stock_vials_only:
