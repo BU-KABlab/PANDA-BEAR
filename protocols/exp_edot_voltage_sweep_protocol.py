@@ -16,6 +16,19 @@ from epanda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
 from epanda_lib.mill_control import Instruments
 from epanda_lib.vials import StockVial, WasteVial
 
+def main(
+    instructions: EchemExperimentBase,
+    toolkit: Toolkit,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],):
+    """Common wrapper for all protocols to have for easy access to the protocol"""
+
+    pedotinitial_screening(
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
 
 def pedotinitial_screening(
     instructions: EchemExperimentBase,
