@@ -6,9 +6,12 @@ Or starting the ePANDA either with or without mock instruments.
 """
 import os
 import sys
-from epanda_lib import controller, wellplate, vials
-from epanda_lib.config.config_tools import read_testing_config, write_testing_config
-TESTING = read_testing_config()
+
+from epanda_lib import (controller, generator_utilities, scheduler, vials,
+                        wellplate)
+from epanda_lib.config.config_tools import (read_testing_config,
+                                            write_testing_config)
+
 
 def run_epanda():
     """Runs ePANDA."""
@@ -38,14 +41,28 @@ def change_wellplate_location():
     """Changes the location of the current wellplate."""
     wellplate.change_wellplate_location()
 
-def edot_voltage_sweep_generator():
+def run_experiment_generator():
     """Runs the edot voltage sweep experiment."""
-    from experiment_generators import exp_edot_voltage_sweep_generator
-    exp_edot_voltage_sweep_generator.main()
+    available_generators = generator_utilities.get_generators()
+    os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal
+    if not available_generators:
+        print("No generators available.")
+        return
+    print("Available generators:")
+    for generator in available_generators:
+        print(generator)
+
+    generator_id = input("Enter the id of the generator you would like to run: ")
+    generator_id = int(generator_id)
+    generator = generator_utilities.get_generator_name(generator_id)
+    generator_utilities.run_generator(generator_id)
 
 def toggle_testing_mode():
     """Sets the testing mode."""
-    write_testing_config(not TESTING)
+    mode = read_testing_config()
+    write_testing_config(not mode)
+    print("To complete the switch, please restart the program.")
+    sys.exit()
 
 def exit_program():
     """Exits the program."""
@@ -61,22 +78,25 @@ options = {
     '5': input_new_vial_values_stock,
     '6': input_new_vial_values_waste,
     '7': change_wellplate_location,
-    '8': edot_voltage_sweep_generator,
+    '8': run_experiment_generator,
     '9': toggle_testing_mode,
     'q': exit_program
 }
 
 if __name__ == "__main__":
+
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal
         print("Welcome to ePANDA!")
-        print("The current wellplate is", wellplate.save_current_wellplate()[0])
-        print("TESTING MODE IS CURRENTLY", "ON" if read_testing_config() else "OFF")
+        print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
+        current_wellplate = wellplate.read_current_wellplate()
+        print(f"The current wellplate is #{current_wellplate[0]} - Type: {current_wellplate[1]} - Available Wells: {current_wellplate[2]}")
+        print(f"The queue has {scheduler.get_queue_length()} experiments.")
         print("What would you like to do?")
         for key, value in options.items():
             print(f"{key}. {value.__name__.replace('_', ' ').title()}")
 
-        user_choice = input("Enter the number of your choice: ")
+        user_choice = input("Enter the number of your choice: ").strip().lower()
         if user_choice in options:
             options[user_choice]()
         else:
