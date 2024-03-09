@@ -66,6 +66,7 @@ class ExperimentBase:
 
     id: int = None
     experiment_name: str = None
+    protocol_id: int = None
     priority: int = None
     well_id: Optional[str] = None
     pin: int = None
