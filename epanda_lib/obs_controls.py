@@ -33,16 +33,13 @@ class OBSController:
         client_port=OBSSecrets.PORT,
         client_timeout=3,
     ):
-        if TESTING:
-            self.client = MockOBSController()
-        else:
-            self.client = obsws.ReqClient(
-                host=client_host,
-                port=client_port,
-                password=client_password,
-                timeout=client_timeout,
-            )
-            self.logger = logging.getLogger(__name__)
+        self.client = obsws.ReqClient(
+            host=client_host,
+            port=client_port,
+            password=client_password,
+            timeout=client_timeout,
+        )
+        self.logger = logging.getLogger(__name__)
 
     def place_experiment_on_screen(self, instructions: ExperimentBase):
         """Place the experiment information on the screen"""
