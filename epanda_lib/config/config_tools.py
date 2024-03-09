@@ -1,6 +1,7 @@
 """Utilities for setting and reading the configuration files"""
 from pathlib import Path
-
+import importlib
+from epanda_lib.config import config
 
 def get_repo_path():
     """Returns the path of the repository."""
@@ -8,6 +9,14 @@ def get_repo_path():
     repo_path = current_file.parent.parent
     return repo_path
 
+def reload_config(func):
+    """Decorator to reload the configuration file."""
+    def wrapper(*args, **kwargs):
+        importlib.reload(config)
+        return func(*args, **kwargs)
+    return wrapper
+
+@reload_config
 def read_testing_config():
     """Reads the testing configuration file."""
     repo_path = get_repo_path()
@@ -15,6 +24,7 @@ def read_testing_config():
     with open(config_path, "r", encoding="utf-8") as f:
         return f.read().strip() == "True"
 
+@reload_config
 def write_testing_config(value: bool):
     """Writes the testing configuration file."""
     repo_path = get_repo_path()
