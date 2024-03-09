@@ -136,10 +136,21 @@ def movement_test(mill: Mill):
 
     try:
         with mill:
-            well1 = wellplate.get_coordinates("e2")
-            well2 = wellplate.get_coordinates("e3")
-            well3 = wellplate.get_coordinates("e4")
-            well4 = wellplate.get_coordinates("e5")
+            well1 = wellplate.get_coordinates("g2")
+            well2 = wellplate.get_coordinates("g3")
+            well3 = wellplate.get_coordinates("g4")
+            well4 = wellplate.get_coordinates("g5")
+            well5 = wellplate.get_coordinates("g6")
+            well6 = wellplate.get_coordinates("g10")
+            well7 = wellplate.get_coordinates("f2")
+            well8 = wellplate.get_coordinates("f3")
+            well9 = wellplate.get_coordinates("f4")
+            well10 = wellplate.get_coordinates("f5")
+            well11 = wellplate.get_coordinates("f6")
+            well12 = wellplate.get_coordinates("d3")
+            well13 = wellplate.get_coordinates("d4")
+            well14 = wellplate.get_coordinates("d5")
+            well15 = wellplate.get_coordinates("b9")
 
             ## Load the vials
             stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
