@@ -62,7 +62,7 @@ class SlackBot:
     def send_slack_file(self, channel: str, file, message=None) -> int:
         """Send a file to Slack."""
         client = WebClient(slack_cred.TOKEN)
-        filename_to_post = file.split("\\")[-1]
+        filename_to_post = file.name
 
         if channel == "conversation":
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
