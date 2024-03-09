@@ -11,7 +11,7 @@ import logging
 import math
 import os
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -503,7 +503,7 @@ class Wellplate:
             color.append(self._get_well_color(well_data.status))
 
         return x_coordinates, y_coordinates, color
-    
+
     def read_well_type_characteristics(
         self, type_number: int
     ) -> tuple[float, float, float, float]:
@@ -513,7 +513,9 @@ class Wellplate:
 
         # check it exists
         if not os.path.exists(file_path):
-            logger.warning("Well type file not found at %s. Returning defaults", file_path)
+            logger.warning(
+                "Well type file not found at %s. Returning defaults", file_path
+            )
             return (
                 self.radius,
                 self.well_offset,
@@ -543,7 +545,6 @@ class Wellplate:
             self.z_bottom + height,
         )
 
-
     def load_wellplate_location(
         self,
     ) -> tuple[float, float, float, int, int, str, float]:
@@ -552,7 +553,8 @@ class Wellplate:
         # check it exists
         if not os.path.exists(WELLPLATE_LOCATION):
             logger.warning(
-                "Well location file not found at %s. Returning defaults", WELLPLATE_LOCATION
+                "Well location file not found at %s. Returning defaults",
+                WELLPLATE_LOCATION,
             )
             return (
                 self.a1_x,
@@ -584,9 +586,7 @@ class Wellplate:
 
         return (x, y, z_bottom, orientation, rows, cols, echem_height)
 
-    def write_wellplate_location(
-        self
-    ) -> None:
+    def write_wellplate_location(self) -> None:
         """Write the location of the well plate to the well_location.csv file"""
         data_to_write = {
             "x": self.a1_x,
@@ -600,6 +600,7 @@ class Wellplate:
         with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
             json.dump(data_to_write, f, indent=4)
         logger.debug("Well plate location written to file")
+
 
 class GraceBioLabsWellPlate(Wellplate):
     """
@@ -658,8 +659,6 @@ class CircularWellPlate(Wellplate):
         ) = self.read_well_type_characteristics(self.type_number)
         self.echem_height = -73  # for every well
         self.z_top = self.z_bottom + self.height
-
-
 
 
 class OverFillException(Exception):
@@ -957,7 +956,27 @@ def load_new_wellplate(
     return new_plate_id
 
 
-def save_current_wellplate():
+def read_current_wellplate() -> Tuple[int, int, int]:
+    """
+    Read the current wellplate
+
+    Returns:
+        int: The current wellplate id
+        int: The current wellplate type number
+        bool: Number of new wells
+    """
+    with open(WELL_STATUS, "r", encoding="UTF-8") as file:
+        current_wellplate = json.load(file)
+    current_plate_id = current_wellplate["plate_id"]
+    current_type_number = current_wellplate["type_number"]
+    new_wells = 0
+    for well in current_wellplate["wells"]:
+        if well["status"] == "new":
+            new_wells += 1
+    return int(current_plate_id), int(current_type_number), new_wells
+
+
+def save_current_wellplate() -> Tuple[int, int, bool]:
     """
     Save the current wellplate
 
