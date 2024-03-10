@@ -57,6 +57,8 @@ def main(
                     filename=experiment_name + " " + str(experiment_id),
                     override_well_selection=0,  # 0 to use new wells only, 1 to reuse a well
                     process_type=1,
+                    rinse_count=4,
+                    rinse_vol=120,
                     # Echem specific
                     ocp=1,
                     baseline=0,
@@ -125,6 +127,8 @@ def main(
                     filename=experiment_name + " " + str(experiment_id),
                     override_well_selection=1,
                     process_type=3,
+                    rinse_count=4,
+                    rinse_vol=120,
                     # Echem specific
                     ocp=1,
                     baseline=0,

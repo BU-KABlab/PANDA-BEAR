@@ -408,16 +408,16 @@ class Scheduler:
             logger.error("experiment file not found")
             raise FileNotFoundError("experiment file")
 
-        # Update the status of the experiment
-        with open(file_path, "r", encoding="UTF-8") as file:
-            data = json.load(file)
-            data = json.dumps(data)
-            parsed_data = experiment_class.parse_experiment(data)
-            parsed_data.status = str(experiment.status.value)
-            parsed_data.status_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        # # Update the status of the experiment
+        # with open(file_path, "r", encoding="UTF-8") as file:
+        #     data = json.load(file)
+        #     data = json.dumps(data)
+        #     parsed_data = experiment_class.parse_experiment(data)
+        #     parsed_data.status = str(experiment.status.value)
+        #     parsed_data.status_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
         # Save the updated file
-        serialized_data = experiment_class.serialize_experiment(parsed_data)
+        serialized_data = experiment_class.serialize_experiment(experiment)
         with open(file_path, "w", encoding="UTF-8") as file:
             file.write(serialized_data)
 

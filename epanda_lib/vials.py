@@ -1,6 +1,7 @@
 """
 Vial class for creating vial objects with their position and contents
 """
+
 # pylint: disable=line-too-long
 import json
 import logging
@@ -8,7 +9,12 @@ import math
 from typing import Sequence, Union
 from pathlib import Path
 from .config.config import STOCK_STATUS, WASTE_STATUS
-from .vessel import Vessel, OverDraftException, OverFillException
+from .vessel import (
+    Vessel,
+    OverDraftException,
+    OverFillException,
+    Vessel_Coordinates,
+)
 
 # set up A logger for the vials module
 # logger = logging.getLogger(__name__)
@@ -18,6 +24,7 @@ from .vessel import Vessel, OverDraftException, OverFillException
 # system_handler.setFormatter(formatter)
 # logger.addHandler(system_handler)
 vial_logger = logging.getLogger("e_panda")
+
 
 class Vial2(Vessel):
     """
@@ -30,7 +37,7 @@ class Vial2(Vessel):
         volume (float): The current volume of the vial.
         capacity (float): The maximum capacity of the vial.
         density (float): The density of the solution in the vial.
-        coordinates (dict): The coordinates of the vial.
+        coordinates (Vessel_Coordinates): The coordinates of the vial.
         radius (float): The radius of the vial.
         height (float): The height of the vial.
         z_bottom (float): The z-coordinate of the bottom of the vial.
@@ -57,8 +64,22 @@ class Vial2(Vessel):
 
     """
 
-    def __init__(self, name: str, category: int, position: str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents, viscosity_cp: float = 0.0, x: float = 0, y: float = 0, depth: float = 0) -> None:
+    def __init__(
+        self,
+        name: str,
+        category: int,
+        position: str,
+        volume: float,
+        capacity: float,
+        density: float,
+        vial_coordinates: Union[Vessel_Coordinates],
+        radius: float,
+        height: float,
+        contamination: int,
+        contents,
+        viscosity_cp: float = 0.0,
+        depth: float = 0,
+    ) -> None:
         """
         Initializes a new instance of the Vial2 class.
 
@@ -69,7 +90,7 @@ class Vial2(Vessel):
             volume (float): The current volume of the vial.
             capacity (float): The maximum capacity of the vial.
             density (float): The density of the solution in the vial.
-            coordinates (dict): The coordinates of the vial.
+            coordinates (Vessel_Coordinates): The coordinates of the vial.
             radius (float): The radius of the vial.
             height (float): The height of the vial.
             z_bottom (float): The z-coordinate of the bottom of the vial.
@@ -79,18 +100,18 @@ class Vial2(Vessel):
             x (float, optional): The x-coordinate of the vial. Defaults to 0.
             y (float, optional): The y-coordinate of the vial. Defaults to 0.
         """
-        super().__init__(name, volume, capacity, density, coordinates, contents=contents)
+        super().__init__(
+            name, volume, capacity, density, vial_coordinates, contents=contents
+        )
         self.position = position
         self.radius = radius
         self.height = height
-        self.z_bottom = z_bottom
+        self.coordinates.z_top = self.coordinates.z_bottom + height
         self.base = round(math.pi * math.pow(self.radius, 2.0), 6)
         self.depth = self.calculate_depth()
         self.contamination = contamination
         self.category = category
         self.viscosity_cp = viscosity_cp
-        self.x = x
-        self.y = y
 
     def calculate_depth(self) -> float:
         """
@@ -101,14 +122,14 @@ class Vial2(Vessel):
             float: The current depth of the solution in the vial.
         """
         radius_mm = self.radius
-        area_mm2 = math.pi * radius_mm ** 2
+        area_mm2 = math.pi * radius_mm**2
         volume_mm3 = self.volume
         height = round(volume_mm3 / area_mm2, 4)
-        depth = height + self.z_bottom - 2
-        if depth < self.z_bottom + 1:
-            depth = self.z_bottom + 1
+        depth = height + self.coordinates.z_bottom - 2
+        if depth < self.coordinates.z_bottom + 1:
+            depth = self.coordinates.z_bottom + 1
         # FIXME return depth
-        return self.z_bottom
+        return self.coordinates.z_bottom
 
     def check_volume(self, volume_to_add: float) -> bool:
         """
@@ -122,9 +143,13 @@ class Vial2(Vessel):
             bool: True if the volume to be added is within the vial's capacity, False otherwise.
         """
         if self.volume + volume_to_add > self.capacity:
-            raise OverFillException(self.name, self.volume, volume_to_add, self.capacity)
+            raise OverFillException(
+                self.name, self.volume, volume_to_add, self.capacity
+            )
         elif self.volume + volume_to_add < 0:
-            raise OverDraftException(self.name, self.volume, volume_to_add, self.capacity)
+            raise OverDraftException(
+                self.name, self.volume, volume_to_add, self.capacity
+            )
         else:
             return True
 
@@ -157,7 +182,7 @@ class Vial2(Vessel):
                 solution["volume"] = self.volume
                 solution["contamination"] = self.contamination
                 solution["depth"] = self.depth
-                #solution["contents"] = self.contents
+                # solution["contents"] = self.contents
                 break
 
         with open(vial_file_path, "w", encoding="UTF-8") as file:
@@ -180,6 +205,7 @@ class Vial2(Vessel):
     def __str__(self) -> str:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
 
+
 class StockVial(Vial2):
     """
     Represents a stock vial object that inherits from the Vial2 class.
@@ -199,8 +225,22 @@ class StockVial(Vial2):
         category (int): The category of the stock vial (0 for stock, 1 for waste).
     """
 
-    def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents:str, viscosity_cp:float = 0.0) -> None:
+    def __init__(
+        self,
+        name: str,
+        position: str,
+        volume: float,
+        capacity: float,
+        density: float,
+        vial_coordinates: Union[Vessel_Coordinates, dict],
+        radius: float,
+        height: float,
+        contamination: int,
+        contents: str,
+        viscosity_cp: float = 0.0,
+        category: int = 0,
+        depth: float = 0,
+    ) -> None:
         """
         Initializes a new instance of the StockVial class.
 
@@ -214,8 +254,22 @@ class StockVial(Vial2):
         height (float): The height of the stock vial.
         z_bottom (float): The z-coordinate of the bottom of the stock vial.
         """
-        super().__init__(name, 0, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
+        super().__init__(
+            name,
+            0,
+            position,
+            volume,
+            capacity,
+            density,
+            vial_coordinates,
+            radius,
+            height,
+            contamination,
+            contents=contents,
+            viscosity_cp=viscosity_cp,
+        )
         self.category = 0
+
     def update_contents(self, from_vessel: str, volume: float) -> None:
         "Stock vial contents don't change"
         self.log_contents()
@@ -224,6 +278,7 @@ class StockVial(Vial2):
     def get_contents(self) -> dict:
         """Return the contents of the stock vial as a dictionary"""
         return {self.name: self.volume}
+
 
 class WasteVial(Vial2):
     """
@@ -244,8 +299,22 @@ class WasteVial(Vial2):
         category (int): The category of the waste vial (0 for stock, 1 for waste).
     """
 
-    def __init__(self, name: str, position:str, volume: float, capacity: float, density: float,
-                 coordinates: dict, radius: float, height: float, z_bottom: float, contamination: int, contents: dict = {}, viscosity_cp:float = 0.0) -> None:
+    def __init__(
+        self,
+        name: str,
+        position: str,
+        volume: float,
+        capacity: float,
+        density: float,
+        vial_coordinates: Union[Vessel_Coordinates, dict],
+        radius: float,
+        height: float,
+        contamination: int,
+        contents: dict = {},
+        viscosity_cp: float = 0.0,
+        category: int = 1,
+        depth: float = 0,
+    ) -> None:
         """
         Initializes a new instance of the WasteVial class.
 
@@ -259,10 +328,23 @@ class WasteVial(Vial2):
         height (float): The height of the waste vial.
         z_bottom (float): The z-coordinate of the bottom of the waste vial.
         """
-        super().__init__(name, 1, position, volume, capacity, density, coordinates, radius, height, z_bottom, contamination, contents=contents, viscosity_cp=viscosity_cp)
+        super().__init__(
+            name,
+            1,
+            position,
+            volume,
+            capacity,
+            density,
+            vial_coordinates,
+            radius,
+            height,
+            contamination,
+            contents=contents,
+            viscosity_cp=viscosity_cp,
+        )
         self.category = 1
 
-    def update_contents(self, from_vessel: Union[str,dict], volume: float) -> None:
+    def update_contents(self, from_vessel: Union[str, dict], volume: float) -> None:
         """Update the contentes of the waste vial"""
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
 
@@ -282,18 +364,21 @@ class WasteVial(Vial2):
                 vial_logger.error("Error occurred while updating well contents: %s", e)
                 vial_logger.error("Not critical, continuing....")
 
-        else: # from_vessel is a string
+        else:  # from_vessel is a string
             if from_vessel in self.contents:
                 self.contents[from_vessel] += volume
             else:
                 self.contents[from_vessel] = volume
-        vial_logger.debug("%s %s: New contents: %s", self.name, self.position, self.contents)
+        vial_logger.debug(
+            "%s %s: New contents: %s", self.name, self.position, self.contents
+        )
 
         # Update the file
         update_vial_state_file([self], WASTE_STATUS)
         self.log_contents()
-        
+
         return self
+
 
 def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
     """
@@ -306,36 +391,38 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
     list_of_solutions = []
     for items in vial_parameters:
         if items["name"] is not None:
-            if items["category"] == 0: # Stock vial
+            if items["category"] == 0:  # Stock vial
                 read_vial = StockVial(
-                    name=str(items["name"]).lower(),
-                    position=str(items["position"]).lower(),
-                    volume=items["volume"],
-                    capacity=items["capacity"],
-                    density=items["density"],
-                    coordinates={"x": items["x"], "y": items["y"]},
-                    z_bottom=items["z_bottom"],
-                    radius=items["radius"],
-                    height=items["height"],
-                    contamination=items["contamination"],
-                    contents=items["contents"],
-                    viscosity_cp=items["viscosity_cp"],
+                #     name=str(items["name"]).lower(),
+                #     position=str(items["position"]).lower(),
+                #     volume=items["volume"],
+                #     capacity=items["capacity"],
+                #     density=items["density"],
+                #     coordinates=Vessel_Coordinates(**items["vial_coordinates"]),
+                #     radius=items["radius"],
+                #     height=items["height"],
+                #     contamination=items["contamination"],
+                #     contents=items["contents"],
+                #     viscosity_cp=items["viscosity_cp"],
+                # )
+                    **items
                 )
                 list_of_solutions.append(read_vial)
-            elif items["category"] == 1: # Waste vial
+            elif items["category"] == 1:  # Waste vial
                 read_vial = WasteVial(
-                    name=str(items["name"]).lower(),
-                    position=str(items["position"]).lower(),
-                    volume=items["volume"],
-                    capacity=items["capacity"],
-                    density=items["density"],
-                    coordinates={"x": items["x"], "y": items["y"]},
-                    z_bottom=items["z_bottom"],
-                    radius=items["radius"],
-                    height=items["height"],
-                    contamination=items["contamination"],
-                    contents=items["contents"],
-                    viscosity_cp=items["viscosity_cp"],
+                #     name=str(items["name"]).lower(),
+                #     position=str(items["position"]).lower(),
+                #     volume=items["volume"],
+                #     capacity=items["capacity"],
+                #     density=items["density"],
+                #     coordinates=Vessel_Coordinates(**items["vial_coordinates"]),
+                #     radius=items["radius"],
+                #     height=items["height"],
+                #     contamination=items["contamination"],
+                #     contents=items["contents"],
+                #     viscosity_cp=items["viscosity_cp"],
+                # )
+                    **items
                 )
                 list_of_solutions.append(read_vial)
     return list_of_solutions
@@ -397,7 +484,7 @@ def input_new_vial_values(vialgroup: str):
             vial.contamination = ""
 
         print(
-            f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
+            f"{vial.position:<10} {vial.name:<20} {vial.contents.__str__():<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
         )
         # for key, value in vial.items():
         #     if value is None:

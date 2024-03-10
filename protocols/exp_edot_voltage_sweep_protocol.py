@@ -10,17 +10,26 @@ from typing import Sequence
 # Non-standard imports
 from epanda_lib.instrument_toolkit import Toolkit
 from epanda_lib.correction_factors import correction_factor
-from epanda_lib.e_panda import (chrono_amp, flush_v2, forward_pipette_v2,
-                                image_well, solution_selector, waste_selector)
+from epanda_lib.e_panda import (
+    chrono_amp,
+    flush_v2,
+    forward_pipette_v2,
+    image_well,
+    solution_selector,
+    waste_selector,
+    rinse_v2,
+)
 from epanda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
 from epanda_lib.mill_control import Instruments
 from epanda_lib.vials import StockVial, WasteVial
+
 
 def main(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],):
+    waste_vials: Sequence[WasteVial],
+):
     """Common wrapper for all protocols to have for easy access to the protocol"""
 
     pedotinitial_screening(
@@ -29,6 +38,7 @@ def main(
         stock_vials=stock_vials,
         waste_vials=waste_vials,
     )
+
 
 def pedotinitial_screening(
     instructions: EchemExperimentBase,
@@ -171,7 +181,6 @@ def pedotdeposition(
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
-    instructions.set_status(ExperimentStatus.FLUSHING)
     flush_v2(
         waste_vials=waste_vials,
         stock_vials=stock_vials,
@@ -179,45 +188,22 @@ def pedotdeposition(
         mill=toolkit.mill,
         pump=toolkit.pump,
         flush_count=1,
+        instructions=instructions,
     )
 
-    toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
-    instructions.set_status(ExperimentStatus.RINSING)
-    for _ in range(4):
-        # Pipette the rinse solution into the well
-        forward_pipette_v2(
-            volume=correction_factor(120),
-            from_vessel=solution_selector(
-                stock_vials,
-                "rinse",
-                correction_factor(120),
-            ),
-            to_vessel=toolkit.wellplate.wells[instructions.well_id],
-            pump=toolkit.pump,
-            mill=toolkit.mill,
-            pumping_rate=toolkit.pump.max_pump_rate,
-        )
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.PIPETTE,
-        )
-        # Clear the well
-        forward_pipette_v2(
-            volume=correction_factor(120),
-            from_vessel=toolkit.wellplate.wells[instructions.well_id],
-            to_vessel=waste_selector(
-                waste_vials,
-                "waste",
-                correction_factor(120),
-            ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
-        )
+    toolkit.global_logger.info(
+        "7. Rinsing the well %dx with %ful rinse",
+        instructions.rinse_count,
+        instructions.rinse_vol,
+    )
+    rinse_v2(
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
 
     toolkit.global_logger.info("8. Take after image")
-    instructions.set_status(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
@@ -250,7 +236,6 @@ def pedotbleaching(
     """
 
     toolkit.global_logger.info("0. Imaging the well")
-    instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "bleaching_before_CA")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
@@ -325,7 +310,6 @@ def pedotbleaching(
     )
 
     toolkit.global_logger.info("7. Take after image")
-    instructions.set_status(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
@@ -361,7 +345,6 @@ def pedotcoloring(
     """
 
     toolkit.global_logger.info("0. Imaging the well")
-    instructions.set_status(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "coloring_before_CA")
 
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
@@ -427,7 +410,6 @@ def pedotcoloring(
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
-    instructions.set_status(ExperimentStatus.FLUSHING)
     flush_v2(
         waste_vials=waste_vials,
         stock_vials=stock_vials,
@@ -435,46 +417,28 @@ def pedotcoloring(
         mill=toolkit.mill,
         pump=toolkit.pump,
         flush_count=3,
+        instructions=instructions,
     )
 
     toolkit.global_logger.info("7. Take image of well")
-    instructions.set_status(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
         step_description="coloring_after_CA",
     )
-    toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
-    instructions.set_status(ExperimentStatus.RINSING)
-    for _ in range(4):
-        # Pipette the rinse solution into the well
-        forward_pipette_v2(
-            volume=correction_factor(120),
-            from_vessel=solution_selector(
-                stock_vials,
-                "rinse",
-                correction_factor(120),
-            ),
-            to_vessel=toolkit.wellplate.wells[instructions.well_id],
-            pump=toolkit.pump,
-            mill=toolkit.mill,
-            pumping_rate=toolkit.pump.max_pump_rate,
-        )
-        # Clear the well
-        forward_pipette_v2(
-            volume=correction_factor(120),
-            from_vessel=toolkit.wellplate.wells[instructions.well_id],
-            to_vessel=waste_selector(
-                waste_vials,
-                "waste",
-                correction_factor(120),
-            ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
-        )
+    toolkit.global_logger.info(
+        "8. Rinsing the well %dx with %ful of rinse",
+        instructions.rinse_count,
+        instructions.rinse_vol,
+    )
+    rinse_v2(
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
 
     toolkit.global_logger.info("9. Take end image")
-    instructions.set_status(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,

@@ -6,12 +6,14 @@ wellplate and the wells in it.
 
 # pylint: disable=line-too-long
 # from decimal import Decimal
+from dataclasses import dataclass
 import json
 import logging
 import math
 import os
 from pathlib import Path
 from typing import Dict, Optional, Tuple
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -37,6 +39,77 @@ logger = logging.getLogger("e_panda")
 # logger.addHandler(system_handler)
 
 
+class Coordinates:
+    """
+    Represents the coordinates of a well.
+
+    Args:
+    -----
+        x (float): The x-coordinate of the well.
+        y (float): The y-coordinate of the well.
+        z_top (float): The z-coordinate of top the well.
+        z_bottom (float): The z-coordinate of the bottom of the well.
+    """
+
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        z_top: float = 0,  # z_bottom: float = None
+    ) -> None:
+        """Initializes a new instance of the Coordinates class."""
+        self.x = x
+        self.y = y
+        self.z_top = z_top
+        # self.z_bottom = z_bottom
+
+    def __str__(self) -> str:
+        """Returns a string representation of the coordinates."""
+        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}'  # , "z_bottom"={self.z_bottom}'
+
+    def __repr__(self) -> str:
+        """Returns a string representation of the coordinates."""
+        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}'  # , "z_bottom"={self.z_bottom}'
+
+    def __dict__(self) -> dict:
+        """Returns a dictionary representation of the coordinates."""
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z_top": self.z_top,
+            # "z_bottom": self.z_bottom,
+        }
+
+    def __getitem__(self, key: str) -> float:
+        """Returns the value of the specified key."""
+        return getattr(self, key)
+
+    def __setitem__(self, key: str, value: float) -> None:
+        """Sets the value of the specified key."""
+        setattr(self, key, value)
+
+    def __iter__(self):
+        return iter([self.x, self.y, self.z_top])  # , self.z_bottom])
+
+    def __len__(self):
+        return 4
+
+    def __eq__(self, other: "Coordinates") -> bool:
+        """Returns True if the coordinates are equal, False otherwise."""
+        return all(
+            [
+                self.x == other.x,
+                self.y == other.y,
+                self.z_top == other.z_top,
+                # self.z_bottom == other.z_bottom,
+            ]
+        )
+
+    def __ne__(self, other: "Coordinates") -> bool:
+        """Returns True if the coordinates are not equal, False otherwise."""
+        return not self.__eq__(other)
+
+
 class Well(Vessel):
     """
     Represents a well object. Inherits from the Vessel class.
@@ -57,7 +130,7 @@ class Well(Vessel):
     def __init__(
         self,
         well_id: str,
-        coordinates: dict,
+        coordinates: Coordinates,
         volume: float,
         height: float,
         depth: float,
@@ -68,14 +141,19 @@ class Well(Vessel):
     ):
         """ """
         self.well_id: str = well_id
-        self.experiment_id: int = None
-        self.project_id: int = None
         self.status: str = status
         self.status_date: str = None
+        self.contents: dict = contents
+        self.experiment_id: int = None
+        self.project_id: int = None
+        self.volume: float = volume
+        self.coordinates: Coordinates = coordinates
         self.height: float = height
         self.depth: float = depth
+        self.density: float = density
+        self.capacity: float = capacity
         self.name: str = well_id
-        self.contents: dict = contents
+
         super().__init__(
             name=self.well_id,
             coordinates=coordinates,
@@ -139,20 +217,23 @@ class Well(Vessel):
         """Updates the well in the well_status.json file."""
         logger.debug("Updating well file of %s", self.name)
 
-        # Load the well status file
+        # Load the well status file and update the well
         with open(WELL_STATUS, "r", encoding="utf-8") as f:
             data = json.load(f)
             for well in data["wells"]:
                 if well["well_id"] == self.well_id:
                     well["status"] = self.status
                     well["contents"] = self.contents
-                    well["volume"] = self.volume
+                    well["experiment_id"] = self.experiment_id
+                    well["project_id"] = self.project_id
                     well["status_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    well["coordinates"] = self.coordinates
+                    well["volume"] = self.volume
+                    well["coordinates"] = self.coordinates.__dict__()
+
                     logger.debug("Well %s file updated")
                     break
 
-        # Update the well status file
+        # Update the well status file with the new well status
         with open(WELL_STATUS, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
@@ -280,11 +361,11 @@ class Wellplate:
             "z": self.z_top,
         }  # coordinates of A1
         self.initial_volume = 0.00
-        self.establish_new_wells() # we need to establish the wells before we can update their status from file
-        self.calulcate_well_locations() # now we can calculate the well locations
+        self.establish_new_wells()  # we need to establish the wells before we can update their status from file
+        self.calulcate_well_locations()  # now we can calculate the well locations
 
         # Update the well info from file
-        self.update_well_status_from_json_file() # if there are any differences from the defaults we change them now
+        self.update_well_status_from_json_file()  # if there are any differences from the defaults we change them now
 
     def recalculate_well_locations(self: "Wellplate") -> None:
         """Recalculates the well locations"""
@@ -357,7 +438,7 @@ class Wellplate:
                 well_id = col + str(row)
                 self.wells[well_id] = Well(
                     well_id=well_id,
-                    coordinates={},
+                    coordinates = Coordinates(x=0, y=0, z_top=0),
                     volume=self.initial_volume,
                     height=self.height,
                     depth=self.z_bottom,
@@ -381,12 +462,12 @@ class Wellplate:
                 for well_id, well in self.wells.items():
                     if saved_well["well_id"] == well_id:
                         well.status = saved_well["status"]
+                        well.status_date = saved_well["status_date"]
                         well.contents = saved_well["contents"]
                         well.experiment_id = saved_well["experiment_id"]
                         well.project_id = saved_well["project_id"]
-                        well.status_date = saved_well["status_date"]
                         well.volume = saved_well["volume"]
-                        well.coordinates = saved_well["coordinates"]
+                        well.coordinates = Coordinates(**saved_well["coordinates"])
                         self.type_number = data["type_number"]
                         self.plate_id = data["plate_id"]
                         logger.debug("Well %s updated from file", well.name)
@@ -553,7 +634,7 @@ class Wellplate:
             well_capacity,
             height,
             shape,
-            self.z_bottom + height,
+            self.z_bottom + height,  # z_top
         )
 
     def load_wellplate_location(
@@ -606,6 +687,7 @@ class Wellplate:
             "rows": self.rows,
             "cols": self.columns,
             "z-bottom": self.z_bottom,
+            "z-top": self.z_top,
             "echem_height": self.echem_height,
         }
         with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
@@ -700,14 +782,16 @@ class OverDraftException(Exception):
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
 
 
-def test_stage_display():
+def __test_stage_display():
     """Test the well plate"""
-    wellplate = CircularWellPlate(
+    test_wellplate = CircularWellPlate(
         a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=3
     )
     ## Well coordinate
-    x_coordinates, y_coordinates, color = wellplate.well_coordinates_and_status_color()
-    if wellplate.shape == "circular":
+    x_coordinates, y_coordinates, color = (
+        test_wellplate.well_coordinates_and_status_color()
+    )
+    if test_wellplate.shape == "circular":
         marker = "o"
     else:
         marker = "s"
@@ -829,6 +913,8 @@ def change_wellplate_location():
         "rows": current_location["rows"],
         "cols": current_location["cols"],
         "z-bottom": current_location["z-bottom"],
+        "z-top": current_location["z-top"],
+        "echem_height": current_location["echem_height"],
     }
     ## Write the new location to the wellplate_location.txt file
     with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as file:
@@ -925,18 +1011,27 @@ def load_new_wellplate(
                                 "status_date": current_line.split("&")[6],
                                 "contents": json.loads(current_line.split("&")[7]),
                                 # "contents": json.loads(str(current_line.split("&")[7]).replace("'",'"')),
-                                "experiment_id": None if (current_line.split("&")[3]) == "None" else int(current_line.split("&")[3]),
-                                "project_id": None if (current_line.split("&")[4]) == "None" else int(current_line.split("&")[4]),
+                                "experiment_id": (
+                                    None
+                                    if (current_line.split("&")[3]) == "None"
+                                    else int(current_line.split("&")[3])
+                                ),
+                                "project_id": (
+                                    None
+                                    if (current_line.split("&")[4]) == "None"
+                                    else int(current_line.split("&")[4])
+                                ),
                                 "volume": float(current_line.split("&")[8]),
-                                # "coordinates": {
-                                #     "x": float(json.loads(str(current_line.split("&")[9]).replace("'",'"'))["x"]),
-                                #     "y": float(json.loads(str(current_line.split("&")[9]).replace("'",'"'))["y"]),
-                                #     "z": float(json.loads(str(current_line.split("&")[9]).replace("'",'"'))["z"]),
-                                # },
                                 "coordinates": {
-                                    "x": float(json.loads(current_line.split("&")[9])["x"]),
-                                    "y": float(json.loads(current_line.split("&")[9])["y"]),
-                                    "z": float(json.loads(current_line.split("&")[9])["z"]),
+                                    "x": float(
+                                        json.loads(current_line.split("&")[9])["x"]
+                                    ),
+                                    "y": float(
+                                        json.loads(current_line.split("&")[9])["y"]
+                                    ),
+                                    "z_top": float(
+                                        json.loads(current_line.split("&")[9])["z_top"]
+                                    ),
                                 },
                             }
                             for current_line in wells
@@ -965,7 +1060,7 @@ def load_new_wellplate(
                 "experiment_id": None,
                 "project_id": None,
                 "volume": 0.0,
-                "coordinates": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "coordinates": {"x": 0.0, "y": 0.0, "z_top": 0.0},
             }
             for i in range(96)
         ],

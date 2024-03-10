@@ -23,8 +23,8 @@ import re
 import time
 import serial
 
-import wellplate as Wells
-from config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS
+from .wellplate import Wellplate
+from .config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS
 
 # Configure the logger
 # logger = logging.getLogger(__name__)
@@ -808,7 +808,7 @@ class MockMill:
 
 def movement_test():
     """Test the mill movement with a wellplate"""
-    wellplate = Wells.Wellplate(-230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
+    wellplate = Wellplate(-230, -35, 0, columns="ABCDEFGH", rows=13, type_number=5)
 
     # Configure the logger for testing
     test_logger = logging.getLogger(__name__)
@@ -826,7 +826,7 @@ def movement_test():
             h12 = wellplate.get_coordinates("H12")
 
             ## Load the vials
-            from controller import read_vials
+            from .controller import read_vials
 
             stock_vials = read_vials(STOCK_STATUS)
             waste_vials = read_vials(WASTE_STATUS)
@@ -849,7 +849,7 @@ def movement_test():
                     mill.safe_move(
                         vial.coordinates["x"],
                         vial.coordinates["y"],
-                        vial.height,
+                        vial.z_top,
                         instrument=Instruments.PIPETTE,
                     )
                 mill.move_to_safe_position()
@@ -860,7 +860,7 @@ def movement_test():
                     mill.safe_move(
                         vial.coordinates["x"],
                         vial.coordinates["y"],
-                        vial.height,
+                        vial.z_top,
                         instrument=Instruments.PIPETTE,
                     )
                 mill.move_to_safe_position()

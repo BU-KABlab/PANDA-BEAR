@@ -5,20 +5,17 @@
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
-        "x": -4,
-        "y": -39,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": -74,
         "name": null,
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -39,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -27,20 +24,17 @@
         "viscosity_cp": 0.9,
         "density": 0.99714,
         "category": 0,
-        "x": -4,
-        "y": -72,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": -74,
         "name": "liclo4",
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -72,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -49,20 +43,17 @@
         "viscosity_cp": 0.9,
         "density": 0.99714,
         "category": 0,
-        "x": -4,
-        "y": -105,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": -74,
         "name": "rinse",
-        "volume": 20000,
+        "volume": 19860.0,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -105,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -71,20 +62,17 @@
         "viscosity_cp": 0.91,
         "density": 0.99714,
         "category": 0,
-        "x": -4,
-        "y": -138,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": -74,
         "name": "edot",
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -138,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -93,20 +81,17 @@
         "viscosity_cp": 0.91,
         "density": 1.1545,
         "category": 0,
-        "x": -4,
-        "y": -171,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -171,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -115,20 +100,17 @@
         "viscosity_cp": 0.91,
         "density": 1.1545,
         "category": 0,
-        "x": -4,
-        "y": -204,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": -74,
         "name": null,
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -204,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -137,20 +119,17 @@
         "viscosity_cp": 0.91,
         "density": 1.1945,
         "category": 0,
-        "x": -4,
-        "y": -237,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -237,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -159,20 +138,17 @@
         "viscosity_cp": 31.882,
         "density": 1.1945,
         "category": 0,
-        "x": -4,
-        "y": -270,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -4,
             "y": -270,
-            "z": -74
+            "z_bottom": -74
         }
     },
     {
@@ -181,20 +157,17 @@
         "viscosity_cp": 0.9,
         "density": 0.99714,
         "category": 0,
-        "x": -409,
-        "y": -34.4,
-        "z_bottom": -50,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": "electrode_bath",
         "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
-        "coordinates": {
+        "vial_coordinates": {
             "x": -409,
             "y": -34.4,
-            "z": -50
+            "z_bottom": -50
         }
     }
 ]

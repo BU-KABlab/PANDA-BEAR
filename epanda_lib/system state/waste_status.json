@@ -2,53 +2,50 @@
     {
         "position": "w0",
         "contents": {
-            "rinse": 15324.680000000015,
-            "edot": 1146.8700000000003,
-            "liclo4": 2421.1700000000005
+            "rinse": 140.0,
+            "edot": 0.0,
+            "liclo4": 0.0
         },
-        "x": -50,
-        "y": -7,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": -74,
         "name": "waste",
-        "volume": 19892.720000000023,
+        "volume": 1140.0,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -7,
+            "z_bottom": -74
+        }
     },
     {
         "position": "w1",
-        "contents": {
-            "rinse": 1619.4400000000003,
-            "edot": 127.43,
-            "liclo4": 254.86
-        },
-        "x": -50,
-        "y": -40,
-        "z_bottom": -74,
+        "contents": {},
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": -74,
         "name": "waste",
-        "volume": 3001.7299999999996,
+        "volume": 1000,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -40,
+            "z_bottom": -74
+        }
     },
     {
         "position": "w2",
         "contents": {},
-        "x": -50,
-        "y": -73,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": "waste",
         "volume": 1000,
@@ -56,16 +53,18 @@
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -73,
+            "z_bottom": -74
+        }
     },
     {
         "position": "w3",
         "contents": {},
-        "x": -50,
-        "y": -106,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 1000,
@@ -73,16 +72,18 @@
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -106,
+            "z_bottom": -74
+        }
     },
     {
         "position": "w4",
         "contents": {},
-        "x": -50,
-        "y": -139,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 1000,
@@ -90,16 +91,18 @@
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -139,
+            "z_bottom": -74
+        }
     },
     {
         "position": "w5",
         "contents": {},
-        "x": -50,
-        "y": -172,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 1000,
@@ -107,16 +110,18 @@
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -172,
+            "z_bottom": -74
+        }
     },
     {
         "position": "w6",
         "contents": {},
-        "x": -50,
-        "y": -205,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 1000,
@@ -124,16 +129,18 @@
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -205,
+            "z_bottom": -74
+        }
     },
     {
         "position": "w7",
         "contents": {},
-        "x": -50,
-        "y": -238,
-        "z_bottom": -74,
         "radius": 14,
-        "height": -20,
+        "height": 57,
         "depth": 0,
         "name": null,
         "volume": 1000,
@@ -141,6 +148,11 @@
         "contamination": 0,
         "density": 0,
         "category": 1,
-        "viscosity_cp": 0.0
+        "viscosity_cp": 0.0,
+        "vial_coordinates": {
+            "x": -50,
+            "y": -238,
+            "z_bottom": -74
+        }
     }
 ]

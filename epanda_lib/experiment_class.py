@@ -210,7 +210,7 @@ class EchemExperimentBase(ExperimentBase):
     mix_count: int = 0  # Number of times to mix
     mix_volume: int = 0  # Volume to mix
     rinse_count: int = 4  # Default rinse count
-    rinse_vol: int = 0  # Default rinse volume
+    rinse_vol: int = 120  # Default rinse volume
 
     ca_sample_period: float = 0.1  # Deposition sample period
     ca_prestep_voltage: float = 0.0  # Pre-step voltage (V)
@@ -329,62 +329,16 @@ class EchemExperimentBase(ExperimentBase):
         {self.print_cv_parameters()}
     """
 
+@dataclass(config=ConfigDict(validate_assignment=True))
+class EdotExperiment(EchemExperimentBase):
+    """Define the data that is used to run an edot experiment"""
+    project_id: int = 16
 
-# @dataclass(config=ConfigDict(validate_assignment=True))
-# class Experiment:
-#     '''Define the data that is used to run an experiment'''
-#     id: int
-#     priority: int # 0 is baseline 1 is high priority 2 is normal priority 3 is end baseline
-#     pin: int
-#     target_well: str
-#     dmf: float
-#     peg: float
-#     acrylate: float
-#     ferrocene: float
-#     custom: float
-#     ocp: int #Open Circuit Potential
-#     ca: int #Cyclic Amperometry
-#     cv: int #Cyclic Voltammetry
-#     baseline: int #Baseline
-#     dep_duration: int #Deposition duration
-#     dep_pot: float #Deposition potential
-#     char_sol_name: str #Characterization solution name
-#     char_vol: int   #Characterization solution volume
-#     flush_sol_name: str #Flush solution name
-#     flush_vol: int #Flush solution volume
-#     ca_sample_period: float = 0.01 #Deposition sample period
-#     cv_sample_period: float = 0.01 #Characterization sample period
-#     cv_scan_rate: float = 0.05 #Scan rate
-#     pumping_rate: float = 0.5 #Default pumping rate 0.1 - 0.6 mL/min
-#     rinse_count: int = 3 #Default rinse count
-#     rinse_vol: int = 150 #Default rinse volume
-#     mix: int = 1 #Binary mix or dont mix
-#     mix_count: int = 3 #Number of times to mix
-#     mix_vol: int = 200 #Volume to mix
-#     mix_rate: float = 0.62 #Rate for pump to mix at
-#     # To restrict this to one of a few values you can use an enum
-#     status: ExperimentStatus = ExperimentStatus.NEW
-#     status_date: datetime = field(default_factory=datetime.now)
-#     filename: str = None #Optional[FilePath] = None
-#     # The optional fields seemed to be that way because they were experiment results
-#     results: Optional[ExperimentResult] = None
-#     protocol_type: int = 1 # 1 is 1 experiment at a time, 2 is layered
+    #pdot deposition - parameters for the deposition part of the experiment
 
-#     def is_replicate(self, other):
-#         '''Check if two experiments have the same parameters but different ids'''
-#         if isinstance(other, Experiment):
-#             return (self.dmf == other.dmf
-#                     and self.peg == other.peg
-#                     and self.acrylate == other.acrylate
-#                     and self.ferrocene == other.ferrocene
-#             )
-#         return False
+    #pdot bleaching
 
-#     def is_same_id(self, other):
-#         '''Check if two experiments have the same id'''
-#         if isinstance(other, Experiment):
-#             return self.id == other.id
-#         return False
+    #pdot coloring
 
 
 def make_test_base_value() -> ExperimentBase:
@@ -500,7 +454,7 @@ def make_test_value() -> ExperimentBase:
     )
 
 
-def parse_experiment(json_string: str) -> (ExperimentBase, EchemExperimentBase):
+def parse_experiment(json_string: str) -> ExperimentBase:
     """Parse an experiment from a json string"""
     if isinstance(json_string, str):
         parsed_json = json.loads(json_string)

@@ -41,12 +41,14 @@ from epanda_lib.config.config import (
     PURGE_VOLUME,
     TESTING,
 )
-from epanda_lib.experiment_class import EchemExperimentBase, ExperimentResult, ExperimentStatus
+from epanda_lib.experiment_class import ExperimentBase,EchemExperimentBase, ExperimentResult, ExperimentStatus
 from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
 from epanda_lib.pump_control import MockPump, Pump
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well, Wellplate
+from epanda_lib.correction_factors import correction_factor
+from epanda_lib.instrument_toolkit import Toolkit
 
 # import gamry_control_WIP as echem
 # from gamry_control_WIP import (potentiostat_ocp_parameters)
@@ -218,9 +220,9 @@ def forward_pipette_v2(
                 to_vessel: WasteVial = to_vessel
 
             mill.safe_move(
-                to_vessel.coordinates["x"],
-                to_vessel.coordinates["y"],
-                to_vessel.height,
+                to_vessel.coordinates.x,
+                to_vessel.coordinates.y,
+                to_vessel.coordinates.z_top,
                 Instruments.PIPETTE,
             )
 
@@ -346,9 +348,9 @@ def reverse_pipette_v2(
 
             logger.info("Moving to %s...", from_vessel.name)
             mill.safe_move(
-                from_vessel.coordinates["x"],
-                from_vessel.coordinates["y"],
-                from_vessel.z_bottom,  # from_vessel.depth,
+                from_vessel.coordinates.x,
+                from_vessel.coordinates.y,
+                from_vessel.coordinates.z_bottom,  # from_vessel.depth,
                 Instruments.PIPETTE,
             )  # go to solution depth (depth replaced with height)
 
@@ -382,9 +384,9 @@ def reverse_pipette_v2(
             else:  # go to safe height above vial
                 logger.debug("%s is a Vial", to_vessel.name)
                 mill.safe_move(
-                    to_vessel.coordinates["x"],
-                    to_vessel.coordinates["y"],
-                    from_vessel.z_bottom,  # to_vessel.depth + 5 ,
+                    to_vessel.coordinates.x,
+                    to_vessel.coordinates.y,
+                    from_vessel.coordinates.z_bottom,  # to_vessel.depth + 5 ,
                     Instruments.PIPETTE,
                 )
                 logger.info("Moved to vial %s", to_vessel.name)
@@ -421,9 +423,9 @@ def reverse_pipette_v2(
             )  # pipette now has purge volume + air gap + drip stop
             logger.info("Moving to purge vial %s...", purge_vessel.name)
             mill.safe_move(
-                purge_vessel.coordinates["x"],
-                purge_vessel.coordinates["y"],
-                purge_vessel.height,
+                purge_vessel.coordinates.x,
+                purge_vessel.coordinates.y,
+                purge_vessel.coordinates.z_top,
                 Instruments.PIPETTE,
             )
             logger.info("Purging the purge volume")
@@ -446,10 +448,8 @@ def reverse_pipette_v2(
 
 
 def rinse_v2(
-    wellplate: Wellplate,
     instructions: EchemExperimentBase,
-    pump: Pump,
-    mill: Mill,
+    toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
 ):
@@ -458,14 +458,10 @@ def rinse_v2(
     Involves pipetteing and then clearing the well with no purging steps
 
     Args:
-        wellplate (Wells object): The wellplate object
-        target_well (str): The alphanumeric name of the well you would like to rinse
-        pumping_rate (float): The pumping rate in ml/min
-        pump (object): The pump object
+        instructions (Experiment): The experiment instructions
+        toolkit (Toolkit): The toolkit object
+        stock_vials (list): The list of stock vials
         waste_vials (list): The list of waste vials
-        mill (object): The mill object
-        rinse_repititions (int): The number of times to rinse
-        rinse_vol (float): The volume to rinse with in microliters
     Returns:
         None (void function) since the objects are passed by reference
     """
@@ -473,41 +469,38 @@ def rinse_v2(
     logger.info(
         "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
     )
-    for rep in range(instructions.rinse_count):  # 0, 1, 2...
-        rinse_solution_name = "rinse" + str(rep)
-        # purge_vial = waste_selector(rinse_solution_name, rinse_vol)
-        # rinse_solution = solution_selector(stock_vials, rinse_solution_name, rinse_vol)
-        logger.info("Rinse %d of %d", rep + 1, instructions.rinse_count)
-
-        # Withdraw the rinse volume from the rinse solution into the well
-        rinse_solution = solution_selector(
-            stock_vials, rinse_solution_name, instructions.rinse_vol
-        )
+    instructions.set_status(ExperimentStatus.RINSING)
+    for _ in range(instructions.rinse_count):
+        # Pipette the rinse solution into the well
         forward_pipette_v2(
-            instructions.rinse_vol,
-            from_vessel=rinse_solution,
-            to_vessel=wellplate[instructions.well_id],
-            pump=pump,
-            mill=mill,
-            pumping_rate=None,
+            volume=correction_factor(instructions.rinse_vol),
+            from_vessel=solution_selector(
+                stock_vials,
+                "rinse",
+                correction_factor(instructions.rinse_vol),
+            ),
+            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+            pumping_rate=toolkit.pump.max_pump_rate,
         )
-        # Remove the rinse volume from the well to a waste vial
-        rinse_waste = waste_selector(
-            waste_vials, rinse_solution_name, instructions.rinse_vol
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            z_coord=toolkit.wellplate.z_top,
+            instrument=Instruments.PIPETTE,
         )
+        # Clear the well
         forward_pipette_v2(
-            instructions.rinse_vol,
-            from_vessel=wellplate[instructions.well_id],
-            to_vessel=rinse_waste,
-            pump=pump,
-            mill=mill,
-            pumping_rate=None,
-        )
-
-        logger.info("Rinse %d of %d complete", rep + 1, instructions.rinse_count)
-        logger.debug(
-            "Remaining volume in well: %f",
-            wellplate.get_volume(instructions.well_id),
+            volume=correction_factor(instructions.rinse_vol),
+            from_vessel=toolkit.wellplate.wells[instructions.well_id],
+            to_vessel=waste_selector(
+                waste_vials,
+                "waste",
+                correction_factor(instructions.rinse_vol),
+            ),
+            pump=toolkit.pump,
+            mill=toolkit.mill,
         )
     return 0
 
@@ -636,9 +629,9 @@ def clear_well(
                 to_vessel: WasteVial = to_vessel
 
             mill.safe_move(
-                to_vessel.coordinates["x"],
-                to_vessel.coordinates["y"],
-                to_vessel.height,
+                to_vessel.coordinates.x,
+                to_vessel.coordinates.y,
+                to_vessel.coordinates.z_top,
                 Instruments.PIPETTE,
             )
 
@@ -682,6 +675,7 @@ def flush_v2(
     pumping_rate=0.5,
     flush_volume=120,
     flush_count=1,
+    instructions: Optional[ExperimentBase] = None,
 ):
     """
     Flush the pipette tip with the designated flush_volume ul of DMF to remove any residue
@@ -701,6 +695,8 @@ def flush_v2(
     """
 
     if flush_volume > 0.000:
+        if instructions is not None:
+            instructions.set_status(ExperimentStatus.FLUSHING)
         logger.info(
             "Flushing pipette tip with %f ul of %s...",
             flush_volume,
@@ -751,9 +747,9 @@ def purge_pipette(
 
     # Move to the purge vial
     mill.safe_move(
-        purge_vial.coordinates["x"],
-        purge_vial.coordinates["y"],
-        purge_vial.height,
+        purge_vial.coordinates.x,
+        purge_vial.coordinates.y,
+        purge_vial.coordinates.z_top,
         Instruments.PIPETTE,
     )
 
@@ -1076,6 +1072,7 @@ def image_well(
         None (void function) since the objects are passed by reference
     """
     try:
+        instructions.set_status(ExperimentStatus.IMAGING)
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)

@@ -105,8 +105,9 @@ Well: {well_id}"""
 
     def start_recording(self):
         """Start the recording"""
+        if TESTING:
+            return
         try:
-
             self.client.start_record()
             self.logger.info("Recording started.")
         except Exception as e:
@@ -114,6 +115,8 @@ Well: {well_id}"""
 
     def stop_recording(self):
         """Stop the recording"""
+        if TESTING:
+            return
         try:
             self.client.stop_record()
             self.logger.info("Recording stopped.")

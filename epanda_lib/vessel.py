@@ -3,22 +3,96 @@ Vessel module.
 """
 
 import logging
+from typing import Union
 from .config.config import PATH_TO_LOGS
+
 
 class VesselLogger:
     """
     A class to create a logger for vessel-like objects.
     """
+
     def __init__(self, name):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
-        formatter = logging.Formatter("%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
+        )
         file_handler = logging.FileHandler(PATH_TO_LOGS / f"{name}.log")
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
 
+
 # Create an instance of the logger for the vessel module
-logger = VesselLogger('vessel').logger
+logger = VesselLogger("vessel").logger
+
+
+class Vessel_Coordinates:
+    """
+    Represents the coordinates of a vessel.
+
+    Args:
+    -----
+        x (float): The x-coordinate of the vessel.
+        y (float): The y-coordinate of the vessel.
+        z_top (float): The z-coordinate of top the vessel.
+        z_bottom (float): The z-coordinate of the bottom of the vessel.
+    """
+
+    def __init__(
+        self, x: float, y: float, z_top: float = 0, z_bottom: float = None
+    ) -> None:
+        """Initializes a new instance of the Coordinates class."""
+        self.x = x
+        self.y = y
+        self.z_top = z_top
+        self.z_bottom = z_bottom
+
+    def __str__(self) -> str:
+        """Returns a string representation of the coordinates."""
+        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}, "z_bottom"={self.z_bottom}'
+
+    def __repr__(self) -> str:
+        """Returns a string representation of the coordinates."""
+        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}, "z_bottom"={self.z_bottom}'
+
+    def __dict__(self) -> dict:
+        """Returns a dictionary representation of the coordinates."""
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z_top": self.z_top,
+            "z_bottom": self.z_bottom,
+        }
+
+    def __getitem__(self, key: str) -> float:
+        """Returns the value of the specified key."""
+        return getattr(self, key)
+
+    def __setitem__(self, key: str, value: float) -> None:
+        """Sets the value of the specified key."""
+        setattr(self, key, value)
+
+    def __iter__(self):
+        return iter([self.x, self.y, self.z_top, self.z_bottom])
+
+    def __len__(self):
+        return 4
+
+    def __eq__(self, other: "Vessel_Coordinates") -> bool:
+        """Returns True if the coordinates are equal, False otherwise."""
+        return all(
+            [
+                self.x == other.x,
+                self.y == other.y,
+                self.z_top == other.z_top,
+                self.z_bottom == other.z_bottom,
+            ]
+        )
+
+    def __ne__(self, other: "Vessel_Coordinates") -> bool:
+        """Returns True if the coordinates are not equal, False otherwise."""
+        return not self.__eq__(other)
 
 
 class Vessel:
@@ -57,17 +131,21 @@ class Vessel:
         volume: float,
         capacity: float,
         density: float,
-        coordinates: dict,
-        contents,
+        coordinates: Union[Vessel_Coordinates, dict],
+        contents={},
         depth: float = 0,
     ) -> None:
-        self.name = name.lower()
+        self.name = name.lower() if name is not None else ""
         self.position = None
         self.volume = volume
         self.capacity = capacity
         self.density = density
         self.viscosity_cp = 0.0
-        self.coordinates = coordinates
+        if isinstance(coordinates, dict):
+            self.coordinates = Vessel_Coordinates(**coordinates)
+        else:
+            self.coordinates = coordinates
+
         self.contents = contents
         self.depth = depth
 
@@ -160,6 +238,7 @@ class Vessel:
             self.volume,
             self.contents,
         )
+
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""

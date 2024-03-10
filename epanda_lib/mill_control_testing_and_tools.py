@@ -3,22 +3,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
-from config.config import PATH_TO_DATA, PATH_TO_LOGS, STOCK_STATUS, WASTE_STATUS
-from e_panda import capture_new_image
-from mill_control import (
-    Instruments,
-    Mill,
-    MockMill,
-    MillConfigError,
-    MillConfigNotFound,
-    MillConnectionError,
-    CommandExecutionError,
-    StatusReturnError,
-    LocationNotFound,
-    logger,
-)
-from vials import StockVial, WasteVial, read_vials
-from wellplate import Well, Wellplate
+from .config.config import (PATH_TO_DATA, PATH_TO_LOGS, STOCK_STATUS,
+                            WASTE_STATUS)
+from .e_panda import capture_new_image
+from .mill_control import (CommandExecutionError, Instruments,
+                           LocationNotFound, Mill, MillConfigError,
+                           MillConfigNotFound, MillConnectionError, MockMill,
+                           StatusReturnError, logger)
+from .vials import StockVial, WasteVial, read_vials
+from .wellplate import Well, Wellplate
 
 
 def wellplate_scan(mill_arg: Mill = None, capture_images=False):
@@ -103,7 +96,7 @@ def move_to_vials(mill: Mill, stock_vials, waste_vials):
             mill.safe_move(
                 stock_vial.coordinates["x"],
                 stock_vial.coordinates["y"],
-                stock_vial.height,
+                stock_vial.z_top,
                 instrument=Instruments.PIPETTE,
             )
         mill.move_to_safe_position()
@@ -114,7 +107,7 @@ def move_to_vials(mill: Mill, stock_vials, waste_vials):
             mill.safe_move(
                 waste_vial.coordinates["x"],
                 waste_vial.coordinates["y"],
-                waste_vial.height,
+                waste_vial.z_top,
                 instrument=Instruments.PIPETTE,
             )
         mill.move_to_safe_position()
@@ -244,14 +237,14 @@ def only_z_move_test(mill: Mill):
             mill.safe_move(
                 stock_vials[0].coordinates["x"],
                 stock_vials[0].coordinates["y"],
-                stock_vials[0].height,
+                stock_vials[0].z_top,
                 instrument=Instruments.PIPETTE,
             )
 
             mill.safe_move(
                 waste_vials[0].coordinates["x"],
                 waste_vials[0].coordinates["y"],
-                waste_vials[0].height,
+                waste_vials[0].z_top,
                 instrument=Instruments.PIPETTE,
             )
 

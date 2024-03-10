@@ -39,7 +39,7 @@ system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 console_handler = logging.StreamHandler()
 console_formatter = logging.Formatter(
-    "%(levelname)-10s & %(funcName)-20s & %(lineno)5d & %(message)s"
+    "%(levelname)-10s &%(module)s& %(funcName)-20s & %(lineno)5d & %(message)s"
 )
 console_handler.setFormatter(console_formatter)
 console_handler.setLevel(logging.WARNING)
