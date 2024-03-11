@@ -11,18 +11,18 @@ Notes:
 from typing import Sequence
 
 # Non-standard imports
-from controller import Toolkit
-from e_panda import (
+from epanda_lib.controller import Toolkit
+from epanda_lib.e_panda import (
     forward_pipette_v2,
     solution_selector,
     cyclic_volt,
     waste_selector,
     image_well,
 )
-from experiment_class import EchemExperimentBase, ExperimentStatus
-from vials import StockVial, WasteVial
-from correction_factors import correction_factor
-from mill_control import Instruments
+from epanda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
+from epanda_lib.vials import StockVial, WasteVial
+from epanda_lib.correction_factors import correction_factor
+from epanda_lib.mill_control import Instruments
 
 
 def edot_bleaching_part_1(

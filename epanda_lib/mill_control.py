@@ -153,7 +153,7 @@ class Mill:
             self.active_connection = False
             self.ser_mill = None
 
-    def read_json_config(self):
+    def read_json_config(self) -> dict:
         """Read the config file"""
         try:
             config_file_path = MILL_CONFIG

@@ -39,7 +39,7 @@ logger = logging.getLogger("e_panda")
 # logger.addHandler(system_handler)
 
 
-class Coordinates:
+class Well_Coordinates:
     """
     Represents the coordinates of a well.
 
@@ -94,7 +94,7 @@ class Coordinates:
     def __len__(self):
         return 4
 
-    def __eq__(self, other: "Coordinates") -> bool:
+    def __eq__(self, other: "Well_Coordinates") -> bool:
         """Returns True if the coordinates are equal, False otherwise."""
         return all(
             [
@@ -105,7 +105,7 @@ class Coordinates:
             ]
         )
 
-    def __ne__(self, other: "Coordinates") -> bool:
+    def __ne__(self, other: "Well_Coordinates") -> bool:
         """Returns True if the coordinates are not equal, False otherwise."""
         return not self.__eq__(other)
 
@@ -130,7 +130,7 @@ class Well(Vessel):
     def __init__(
         self,
         well_id: str,
-        coordinates: Coordinates,
+        coordinates: Well_Coordinates,
         volume: float,
         height: float,
         depth: float,
@@ -147,7 +147,7 @@ class Well(Vessel):
         self.experiment_id: int = None
         self.project_id: int = None
         self.volume: float = volume
-        self.coordinates: Coordinates = coordinates
+        self.coordinates: Well_Coordinates = coordinates
         self.height: float = height
         self.depth: float = depth
         self.density: float = density
@@ -167,6 +167,19 @@ class Well(Vessel):
     def __str__(self) -> str:
         """Returns a string representation of the well."""
         return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
+    
+    def __dict__(self) -> dict:
+        """Returns a dictionary representation of the well."""
+        return {
+            "well_id": self.well_id,
+            "status": self.status,
+            "status_date": self.status_date,
+            "contents": self.contents,
+            "experiment_id": self.experiment_id,
+            "project_id": self.project_id,
+            "volume": self.volume,
+            "coordinates": self.coordinates.__dict__(),
+        }
 
     def get_contents(self) -> dict:
         """Returns the contents of the well."""
@@ -438,7 +451,7 @@ class Wellplate:
                 well_id = col + str(row)
                 self.wells[well_id] = Well(
                     well_id=well_id,
-                    coordinates = Coordinates(x=0, y=0, z_top=0),
+                    coordinates = Well_Coordinates(x=0, y=0, z_top=0),
                     volume=self.initial_volume,
                     height=self.height,
                     depth=self.z_bottom,
@@ -467,35 +480,33 @@ class Wellplate:
                         well.experiment_id = saved_well["experiment_id"]
                         well.project_id = saved_well["project_id"]
                         well.volume = saved_well["volume"]
-                        well.coordinates = Coordinates(**saved_well["coordinates"])
+                        well.coordinates = Well_Coordinates(**saved_well["coordinates"])
                         self.type_number = data["type_number"]
                         self.plate_id = data["plate_id"]
                         logger.debug("Well %s updated from file", well.name)
                         break
 
-    def get_coordinates(self, well_id: str, axis: str = None) -> dict:
+    def get_coordinates(self, well_id: str, axis: str = None) -> Well_Coordinates:
         """
         Return the coordinate of a specific well
         Args:
             well_id (str): The well ID
         Returns:
-            dict: The coordinates of the well in the form
-            {"x": x, "y": y, "z": z, "depth": depth, "echem_height": echem_height}
+            Coordinates: The coordinates of the well
         """
         well_id = well_id.upper()
-        if axis in ["x", "y", "z"]:
-            return self.wells[well_id].coordinates[axis]
+        if well_id in self.wells:
+            if axis:
+                return self.wells[well_id].coordinates[axis]
+            return self.wells[well_id].coordinates
+        else:
+            raise KeyError(f"Well {well_id} not found")
+        
 
-        coordinates_dict = self.wells[well_id].coordinates
-        coordinates_dict["depth"] = self.wells[well_id].depth
-        coordinates_dict["echem_height"] = self.echem_height
-        coordinates_dict["image_height"] = self.image_height
-        return coordinates_dict
-
-    def set_coordinates(self, well_id, new_coordinates: dict) -> None:
-        """Set the coordinates of a specific well"""
-        for key, value in new_coordinates.items():
-            self.wells[well_id].coordinates[key] = value
+    def set_coordinates(self, well_id, new_coordinates: Well_Coordinates) -> None:
+        """Sets the coordinates of a specific well in memory and writes to the status file"""
+        self.wells[well_id].coordinates = new_coordinates
+        #self.write_well_status_to_file()
 
     def get_contents(self, well_id) -> dict:
         """Return the contents of a specific well"""
@@ -693,6 +704,17 @@ class Wellplate:
         with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
             json.dump(data_to_write, f, indent=4)
         logger.debug("Well plate location written to file")
+
+    def write_well_status_to_file(self) -> None:
+        """Write the well status to the well_status.json file"""
+        data_to_write = {
+            "type_number": self.type_number,
+            "plate_id": self.plate_id,
+            "wells": [well.__dict__() for well in self.wells.values()],
+        }
+        with open(WELL_STATUS, "w", encoding="UTF-8") as f:
+            json.dump(data_to_write, f, indent=4)
+        logger.debug("Well status written to file")
 
 
 class GraceBioLabsWellPlate(Wellplate):

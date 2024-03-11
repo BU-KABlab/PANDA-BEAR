@@ -1,0 +1,215 @@
+2024-03-10 22:43:00,443:ePANDA:Mill config loaded
+2024-03-10 22:43:00,444:ePANDA:Connecting to the mill
+2024-03-10 22:43:00,446:ePANDA:Command sent: $H
+2024-03-10 22:43:00,446:ePANDA:Writing to the mill: $H
+2024-03-10 22:43:02,447:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:43:17,447:ePANDA:Homing completed
+2024-03-10 22:43:17,448:ePANDA:Setting feed rate to 2000
+2024-03-10 22:43:17,448:ePANDA:Clearing buffers
+2024-03-10 22:43:17,450:ePANDA:Disconnecting from the mill
+2024-03-10 22:43:17,451:ePANDA:Exiting the mill context manager
+2024-03-10 22:44:56,262:ePANDA:Mill config loaded
+2024-03-10 22:44:56,264:ePANDA:Connecting to the mill
+2024-03-10 22:44:56,265:ePANDA:Command sent: $H
+2024-03-10 22:44:56,266:ePANDA:Writing to the mill: $H
+2024-03-10 22:44:58,266:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:45:13,267:ePANDA:Homing completed
+2024-03-10 22:45:13,267:ePANDA:Setting feed rate to 2000
+2024-03-10 22:45:13,267:ePANDA:Clearing buffers
+2024-03-10 22:45:13,269:ePANDA:Disconnecting from the mill
+2024-03-10 22:45:13,270:ePANDA:Exiting the mill context manager
+2024-03-10 22:52:53,626:ePANDA:Mill config loaded
+2024-03-10 22:52:53,627:ePANDA:Connecting to the mill
+2024-03-10 22:52:53,629:ePANDA:Command sent: $H
+2024-03-10 22:52:53,629:ePANDA:Writing to the mill: $H
+2024-03-10 22:52:55,630:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:53:10,630:ePANDA:Homing completed
+2024-03-10 22:53:10,631:ePANDA:Setting feed rate to 2000
+2024-03-10 22:53:10,631:ePANDA:Clearing buffers
+2024-03-10 22:53:10,651:ePANDA:Connecting to the mill
+2024-03-10 22:53:10,653:ePANDA:Command sent: $H
+2024-03-10 22:53:10,653:ePANDA:Writing to the mill: $H
+2024-03-10 22:53:12,654:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:53:27,654:ePANDA:Homing completed
+2024-03-10 22:53:27,655:ePANDA:Setting feed rate to 2000
+2024-03-10 22:53:27,655:ePANDA:Clearing buffers
+2024-03-10 22:54:53,976:ePANDA:Mill config loaded
+2024-03-10 22:54:53,976:ePANDA:Connecting to the mill
+2024-03-10 22:54:53,978:ePANDA:Command sent: $H
+2024-03-10 22:54:53,978:ePANDA:Writing to the mill: $H
+2024-03-10 22:54:55,979:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:55:10,980:ePANDA:Homing completed
+2024-03-10 22:55:10,980:ePANDA:Setting feed rate to 2000
+2024-03-10 22:55:10,980:ePANDA:Clearing buffers
+2024-03-10 22:55:10,996:ePANDA:Connecting to the mill
+2024-03-10 22:55:10,997:ePANDA:Command sent: $H
+2024-03-10 22:55:10,998:ePANDA:Writing to the mill: $H
+2024-03-10 22:55:12,998:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:55:27,999:ePANDA:Homing completed
+2024-03-10 22:55:27,999:ePANDA:Setting feed rate to 2000
+2024-03-10 22:55:28,000:ePANDA:Clearing buffers
+2024-03-10 23:00:25,601:ePANDA:Mill config loaded
+2024-03-10 23:00:25,602:ePANDA:Connecting to the mill
+2024-03-10 23:00:25,603:ePANDA:Command sent: $H
+2024-03-10 23:00:25,604:ePANDA:Writing to the mill: $H
+2024-03-10 23:00:27,604:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:00:42,605:ePANDA:Homing completed
+2024-03-10 23:00:42,605:ePANDA:Setting feed rate to 2000
+2024-03-10 23:00:42,605:ePANDA:Clearing buffers
+2024-03-10 23:00:42,621:ePANDA:Connecting to the mill
+2024-03-10 23:00:42,623:ePANDA:Command sent: $H
+2024-03-10 23:00:42,623:ePANDA:Writing to the mill: $H
+2024-03-10 23:00:44,624:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:00:59,624:ePANDA:Homing completed
+2024-03-10 23:00:59,624:ePANDA:Setting feed rate to 2000
+2024-03-10 23:00:59,625:ePANDA:Clearing buffers
+2024-03-10 23:01:41,400:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:01:41,401:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:01:41,401:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:01:41,401:ePANDA:Target coordinates: [-349.75, -90.1, -66.0]
+2024-03-10 23:01:41,401:ePANDA:Not moving to Z=0 first
+2024-03-10 23:01:41,401:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:01:41,401:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:01:41,402:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:01:41,402:ePANDA:Command sent: G01 X-349.75
+2024-03-10 23:01:41,402:ePANDA:Writing to the mill: G01 X-349.75
+2024-03-10 23:01:43,403:ePANDA:Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:01:43,403:ePANDA:Command sent: G01 Y-90.1
+2024-03-10 23:01:43,404:ePANDA:Writing to the mill: G01 Y-90.1
+2024-03-10 23:01:45,404:ePANDA:Returned <Idle|MPos:-352.75,-93.1,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:01:45,404:ePANDA:Command sent: G01 Z-66.0
+2024-03-10 23:01:45,405:ePANDA:Writing to the mill: G01 Z-66.0
+2024-03-10 23:01:47,405:ePANDA:Returned <Idle|MPos:-352.75,-93.1,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:02:05,481:ePANDA:Disconnecting from the mill
+2024-03-10 23:02:05,483:ePANDA:Exiting the mill context manager
+2024-03-10 23:02:05,483:ePANDA:Disconnecting from the mill
+2024-03-10 23:02:05,483:ePANDA:Exiting the mill context manager
+2024-03-10 23:03:13,478:ePANDA:Mill config loaded
+2024-03-10 23:03:13,494:ePANDA:Connecting to the mill
+2024-03-10 23:03:13,496:ePANDA:Command sent: $H
+2024-03-10 23:03:13,496:ePANDA:Writing to the mill: $H
+2024-03-10 23:03:15,497:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:03:30,497:ePANDA:Homing completed
+2024-03-10 23:03:30,498:ePANDA:Setting feed rate to 2000
+2024-03-10 23:03:30,498:ePANDA:Clearing buffers
+2024-03-10 23:04:53,945:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:04:53,945:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:04:53,945:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:04:53,946:ePANDA:Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:04:53,946:ePANDA:Not moving to Z=0 first
+2024-03-10 23:04:53,946:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:04:53,946:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:04:53,946:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:04:53,946:ePANDA:Command sent: G01 X-349.75
+2024-03-10 23:04:53,946:ePANDA:Writing to the mill: G01 X-349.75
+2024-03-10 23:04:55,948:ePANDA:Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:04:55,948:ePANDA:Command sent: G01 Y-99.0
+2024-03-10 23:04:55,948:ePANDA:Writing to the mill: G01 Y-99.0
+2024-03-10 23:04:57,949:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:04:57,949:ePANDA:Command sent: G01 Z-66.0
+2024-03-10 23:04:57,949:ePANDA:Writing to the mill: G01 Z-66.0
+2024-03-10 23:04:59,950:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:12:16,851:ePANDA:Mill config loaded
+2024-03-10 23:12:16,852:ePANDA:Connecting to the mill
+2024-03-10 23:12:16,854:ePANDA:Command sent: $H
+2024-03-10 23:12:16,854:ePANDA:Writing to the mill: $H
+2024-03-10 23:12:18,854:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:12:33,855:ePANDA:Homing completed
+2024-03-10 23:12:33,855:ePANDA:Setting feed rate to 2000
+2024-03-10 23:12:33,855:ePANDA:Clearing buffers
+2024-03-10 23:13:09,415:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:13:09,415:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:13:09,415:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:13:09,415:ePANDA:Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:13:09,416:ePANDA:Not moving to Z=0 first
+2024-03-10 23:13:09,416:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:13:09,416:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:13:09,416:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:13:09,416:ePANDA:Command sent: G01 X-349.75
+2024-03-10 23:13:09,416:ePANDA:Writing to the mill: G01 X-349.75
+2024-03-10 23:13:11,417:ePANDA:Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:11,417:ePANDA:Command sent: G01 Y-99.0
+2024-03-10 23:13:11,418:ePANDA:Writing to the mill: G01 Y-99.0
+2024-03-10 23:13:13,418:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:13,418:ePANDA:Command sent: G01 Z-66.0
+2024-03-10 23:13:13,419:ePANDA:Writing to the mill: G01 Z-66.0
+2024-03-10 23:13:15,419:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:32,043:ePANDA:MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0
+2024-03-10 23:13:32,044:ePANDA:WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0
+2024-03-10 23:13:32,044:ePANDA:Current_coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:13:32,044:ePANDA:Target coordinates: [-349.75, -116.8, -66.0]
+2024-03-10 23:13:32,044:ePANDA:Moving to Z=0 first
+2024-03-10 23:13:32,044:ePANDA:Command sent: G01 Z0
+2024-03-10 23:13:32,044:ePANDA:Writing to the mill: G01 Z0
+2024-03-10 23:13:34,045:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:34,045:ePANDA:MPos coordinates: X = -352.75, Y = -102.0, Z = -3.0
+2024-03-10 23:13:34,046:ePANDA:WPos coordinates: X = -349.75, Y = -99.0, Z = 0.0
+2024-03-10 23:13:34,046:ePANDA:Current_coordinates: [-349.75, -99.0, 0.0]
+2024-03-10 23:13:34,046:ePANDA:Command sent: G01 Y-116.8
+2024-03-10 23:13:34,046:ePANDA:Writing to the mill: G01 Y-116.8
+2024-03-10 23:13:36,047:ePANDA:Returned <Idle|MPos:-352.75,-119.8,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:36,047:ePANDA:Command sent: G01 Z-66.0
+2024-03-10 23:13:36,047:ePANDA:Writing to the mill: G01 Z-66.0
+2024-03-10 23:13:38,048:ePANDA:Returned <Idle|MPos:-352.75,-119.8,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:14:09,770:ePANDA:Disconnecting from the mill
+2024-03-10 23:14:09,772:ePANDA:Exiting the mill context manager
+2024-03-10 23:22:05,334:ePANDA:Mill config loaded
+2024-03-10 23:22:05,334:ePANDA:Connecting to the mill
+2024-03-10 23:22:05,336:ePANDA:Command sent: $H
+2024-03-10 23:22:05,336:ePANDA:Writing to the mill: $H
+2024-03-10 23:22:07,337:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:22:22,337:ePANDA:Homing completed
+2024-03-10 23:22:22,338:ePANDA:Setting feed rate to 2000
+2024-03-10 23:22:22,338:ePANDA:Clearing buffers
+2024-03-10 23:22:38,786:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:22:38,787:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:22:38,787:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:22:38,787:ePANDA:Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:22:38,787:ePANDA:Not moving to Z=0 first
+2024-03-10 23:22:38,788:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:22:38,788:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:22:38,788:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:22:38,788:ePANDA:Command sent: G01 X-349.75
+2024-03-10 23:22:38,788:ePANDA:Writing to the mill: G01 X-349.75
+2024-03-10 23:22:40,789:ePANDA:Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:22:40,789:ePANDA:Command sent: G01 Y-99.0
+2024-03-10 23:22:40,790:ePANDA:Writing to the mill: G01 Y-99.0
+2024-03-10 23:22:42,790:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:22:42,790:ePANDA:Command sent: G01 Z-66.0
+2024-03-10 23:22:42,791:ePANDA:Writing to the mill: G01 Z-66.0
+2024-03-10 23:22:44,791:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:27:08,359:ePANDA:Mill config loaded
+2024-03-10 23:27:08,360:ePANDA:Connecting to the mill
+2024-03-10 23:27:08,361:ePANDA:Command sent: $H
+2024-03-10 23:27:08,362:ePANDA:Writing to the mill: $H
+2024-03-10 23:27:10,362:ePANDA:Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:27:25,363:ePANDA:Homing completed
+2024-03-10 23:27:25,363:ePANDA:Setting feed rate to 2000
+2024-03-10 23:27:25,363:ePANDA:Clearing buffers
+2024-03-10 23:31:13,431:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:31:13,431:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:31:13,431:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:31:13,432:ePANDA:Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:31:13,432:ePANDA:Not moving to Z=0 first
+2024-03-10 23:31:13,432:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:31:13,432:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:31:13,432:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:31:13,433:ePANDA:Command sent: G01 X-349.75
+2024-03-10 23:31:13,433:ePANDA:Writing to the mill: G01 X-349.75
+2024-03-10 23:31:15,434:ePANDA:Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:31:15,434:ePANDA:Command sent: G01 Y-99.0
+2024-03-10 23:31:15,434:ePANDA:Writing to the mill: G01 Y-99.0
+2024-03-10 23:31:17,435:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:31:17,435:ePANDA:Command sent: G01 Z-66.0
+2024-03-10 23:31:17,435:ePANDA:Writing to the mill: G01 Z-66.0
+2024-03-10 23:31:19,436:ePANDA:Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:31:35,849:ePANDA:MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0
+2024-03-10 23:31:35,849:ePANDA:WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0
+2024-03-10 23:31:35,849:ePANDA:Current_coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:31:35,850:ePANDA:Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:31:35,850:ePANDA:Not moving to Z=0 first
+2024-03-10 23:31:35,850:ePANDA:MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0
+2024-03-10 23:31:35,850:ePANDA:WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0
+2024-03-10 23:31:35,850:ePANDA:Current_coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:33:23,358:ePANDA:Disconnecting from the mill
+2024-03-10 23:33:23,359:ePANDA:Exiting the mill context manager

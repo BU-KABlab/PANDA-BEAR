@@ -3,15 +3,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
-from .config.config import (PATH_TO_DATA, PATH_TO_LOGS, STOCK_STATUS,
+from epanda_lib.config.config import (PATH_TO_DATA, PATH_TO_LOGS, STOCK_STATUS,
                             WASTE_STATUS)
-from .e_panda import capture_new_image
-from .mill_control import (CommandExecutionError, Instruments,
+from epanda_lib.e_panda import capture_new_image
+from epanda_lib.mill_control import (CommandExecutionError, Instruments,
                            LocationNotFound, Mill, MillConfigError,
                            MillConfigNotFound, MillConnectionError, MockMill,
                            StatusReturnError, logger)
-from .vials import StockVial, WasteVial, read_vials
-from .wellplate import Well, Wellplate
+from epanda_lib.vials import StockVial, WasteVial, read_vials
+from epanda_lib.wellplate import Well, Wellplate
 
 
 def wellplate_scan(mill_arg: Mill = None, capture_images=False):

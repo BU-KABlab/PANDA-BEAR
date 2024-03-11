@@ -1,0 +1,215 @@
+2024-03-10 22:43:00,443&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 22:43:00,444&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 22:43:00,446&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 22:43:00,446&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 22:43:02,447&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:43:17,447&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 22:43:17,448&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 22:43:17,448&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 22:43:17,450&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
+2024-03-10 22:43:17,451&ePANDA&INFO&mill_control&__exit__&140&Exiting the mill context manager
+2024-03-10 22:44:56,262&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 22:44:56,264&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 22:44:56,265&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 22:44:56,266&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 22:44:58,266&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:45:13,267&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 22:45:13,267&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 22:45:13,267&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 22:45:13,269&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
+2024-03-10 22:45:13,270&ePANDA&INFO&mill_control&__exit__&140&Exiting the mill context manager
+2024-03-10 22:52:53,626&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 22:52:53,627&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 22:52:53,629&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 22:52:53,629&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 22:52:55,630&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:53:10,630&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 22:53:10,631&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 22:53:10,631&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 22:53:10,651&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 22:53:10,653&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 22:53:10,653&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 22:53:12,654&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:53:27,654&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 22:53:27,655&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 22:53:27,655&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 22:54:53,976&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 22:54:53,976&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 22:54:53,978&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 22:54:53,978&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 22:54:55,979&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:55:10,980&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 22:55:10,980&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 22:55:10,980&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 22:55:10,996&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 22:55:10,997&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 22:55:10,998&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 22:55:12,998&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 22:55:27,999&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 22:55:27,999&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 22:55:28,000&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 23:00:25,601&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 23:00:25,602&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 23:00:25,603&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 23:00:25,604&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 23:00:27,604&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:00:42,605&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 23:00:42,605&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 23:00:42,605&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 23:00:42,621&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 23:00:42,623&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 23:00:42,623&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 23:00:44,624&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:00:59,624&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 23:00:59,624&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 23:00:59,625&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 23:01:41,400&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-349.75, -90.1, -66.0]
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:01:41,402&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:01:41,402&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-349.75
+2024-03-10 23:01:41,402&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-349.75
+2024-03-10 23:01:43,403&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:01:43,403&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-90.1
+2024-03-10 23:01:43,404&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-90.1
+2024-03-10 23:01:45,404&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-93.1,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:01:45,404&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-66.0
+2024-03-10 23:01:45,405&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-66.0
+2024-03-10 23:01:47,405&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-93.1,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:02:05,481&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
+2024-03-10 23:02:05,483&ePANDA&INFO&mill_control&__exit__&140&Exiting the mill context manager
+2024-03-10 23:02:05,483&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
+2024-03-10 23:02:05,483&ePANDA&INFO&mill_control&__exit__&140&Exiting the mill context manager
+2024-03-10 23:03:13,478&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 23:03:13,494&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 23:03:13,496&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 23:03:13,496&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 23:03:15,497&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:03:30,497&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 23:03:30,498&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 23:03:30,498&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 23:04:53,945&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:04:53,945&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:04:53,945&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-349.75
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-349.75
+2024-03-10 23:04:55,948&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:04:55,948&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-99.0
+2024-03-10 23:04:55,948&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-99.0
+2024-03-10 23:04:57,949&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:04:57,949&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-66.0
+2024-03-10 23:04:57,949&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-66.0
+2024-03-10 23:04:59,950&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:12:16,851&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 23:12:16,852&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 23:12:16,854&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 23:12:16,854&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 23:12:18,854&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:12:33,855&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 23:12:33,855&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 23:12:33,855&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-349.75
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-349.75
+2024-03-10 23:13:11,417&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:11,417&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-99.0
+2024-03-10 23:13:11,418&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-99.0
+2024-03-10 23:13:13,418&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:13,418&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-66.0
+2024-03-10 23:13:13,419&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-66.0
+2024-03-10 23:13:15,419&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:32,043&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-349.75, -116.8, -66.0]
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&safe_move&615&Moving to Z=0 first
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z0
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z0
+2024-03-10 23:13:34,045&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:34,045&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -352.75, Y = -102.0, Z = -3.0
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -349.75, Y = -99.0, Z = 0.0
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-349.75, -99.0, 0.0]
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-116.8
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-116.8
+2024-03-10 23:13:36,047&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-119.8,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:13:36,047&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-66.0
+2024-03-10 23:13:36,047&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-66.0
+2024-03-10 23:13:38,048&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-119.8,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:14:09,770&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
+2024-03-10 23:14:09,772&ePANDA&INFO&mill_control&__exit__&140&Exiting the mill context manager
+2024-03-10 23:22:05,334&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 23:22:05,334&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 23:22:05,336&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 23:22:05,336&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 23:22:07,337&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:22:22,337&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 23:22:22,338&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 23:22:22,338&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 23:22:38,786&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-349.75
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-349.75
+2024-03-10 23:22:40,789&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:22:40,789&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-99.0
+2024-03-10 23:22:40,790&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-99.0
+2024-03-10 23:22:42,790&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:22:42,790&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-66.0
+2024-03-10 23:22:42,791&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-66.0
+2024-03-10 23:22:44,791&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:27:08,359&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-10 23:27:08,360&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-10 23:27:08,361&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: $H
+2024-03-10 23:27:08,362&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: $H
+2024-03-10 23:27:10,362&ePANDA&DEBUG&mill_control&execute_command&790&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:27:25,363&ePANDA&INFO&mill_control&home&251&Homing completed
+2024-03-10 23:27:25,363&ePANDA&INFO&mill_control&set_feed_rate&814&Setting feed rate to 2000
+2024-03-10 23:27:25,363&ePANDA&INFO&mill_control&clear_buffers&818&Clearing buffers
+2024-03-10 23:31:13,431&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:31:13,431&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:31:13,431&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-10 23:31:13,433&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-349.75
+2024-03-10 23:31:13,433&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-349.75
+2024-03-10 23:31:15,434&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:31:15,434&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-99.0
+2024-03-10 23:31:15,434&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-99.0
+2024-03-10 23:31:17,435&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-10 23:31:17,435&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-66.0
+2024-03-10 23:31:17,435&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-66.0
+2024-03-10 23:31:19,436&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>
+2024-03-10 23:31:35,849&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0
+2024-03-10 23:31:35,849&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0
+2024-03-10 23:31:35,849&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-349.75, -99.0, -66.0]
+2024-03-10 23:33:23,358&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
+2024-03-10 23:33:23,359&ePANDA&INFO&mill_control&__exit__&140&Exiting the mill context manager

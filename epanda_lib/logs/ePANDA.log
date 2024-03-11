@@ -6,3 +6,994 @@
 2024-03-06 17:24:13,898&e_panda&DEBUG&wellplate&save_current_wellplate&984&Saving well statuses to well_history.csv
 2024-03-06 17:24:13,919&e_panda&DEBUG&wellplate&save_current_wellplate&1021&Wellplate saved
 2024-03-06 17:24:13,920&e_panda&INFO&wellplate&save_current_wellplate&1022&Wellplate 107 saved
+2024-03-10 22:43:00,443&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 22:43:00,444&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 22:43:00,446&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 22:43:00,446&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 22:43:02,447&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 22:43:17,447&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 22:43:17,448&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 22:43:17,448&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 22:43:17,450&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-10 22:43:17,451&ePANDA&INFO&mill_control&__exit__&140&&&&Exiting the mill context manager&
+2024-03-10 22:44:56,262&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 22:44:56,264&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 22:44:56,265&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 22:44:56,266&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 22:44:58,266&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 22:45:13,267&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 22:45:13,267&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 22:45:13,267&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 22:45:13,269&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-10 22:45:13,270&ePANDA&INFO&mill_control&__exit__&140&&&&Exiting the mill context manager&
+2024-03-10 22:52:53,626&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 22:52:53,627&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 22:52:53,629&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 22:52:53,629&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 22:52:55,630&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 22:53:10,630&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 22:53:10,631&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 22:53:10,631&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 22:53:10,633&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 22:53:10,634&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 22:53:10,635&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 22:53:10,635&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 22:53:10,635&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 22:53:10,635&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 22:53:10,635&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 22:53:10,635&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 22:53:10,635&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 22:53:10,636&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 22:53:10,637&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 22:53:10,637&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 22:53:10,637&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 22:53:10,637&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 22:53:10,637&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 22:53:10,637&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 22:53:10,638&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 22:53:10,639&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 22:53:10,640&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 22:53:10,641&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 22:53:10,642&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 22:53:10,643&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 22:53:10,644&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 22:53:10,645&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 22:53:10,645&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 22:53:10,645&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 22:53:10,645&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 22:53:10,645&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 22:53:10,645&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 22:53:10,645&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 22:53:10,651&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 22:53:10,653&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 22:53:10,653&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 22:53:12,654&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 22:53:27,654&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 22:53:27,655&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 22:53:27,655&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 22:54:53,976&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 22:54:53,976&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 22:54:53,978&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 22:54:53,978&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 22:54:55,979&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 22:55:10,980&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 22:55:10,980&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 22:55:10,980&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 22:55:10,982&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 22:55:10,983&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 22:55:10,983&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 22:55:10,983&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 22:55:10,983&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 22:55:10,983&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 22:55:10,984&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 22:55:10,985&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 22:55:10,986&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 22:55:10,986&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 22:55:10,986&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 22:55:10,986&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 22:55:10,986&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 22:55:10,986&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 22:55:10,986&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 22:55:10,987&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 22:55:10,988&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 22:55:10,988&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 22:55:10,988&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 22:55:10,988&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 22:55:10,988&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 22:55:10,988&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 22:55:10,988&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 22:55:10,989&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 22:55:10,990&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 22:55:10,990&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 22:55:10,990&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 22:55:10,990&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 22:55:10,990&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 22:55:10,990&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 22:55:10,990&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 22:55:10,991&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 22:55:10,992&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 22:55:10,993&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 22:55:10,994&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 22:55:10,995&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 22:55:10,995&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 22:55:10,996&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 22:55:10,997&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 22:55:10,998&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 22:55:12,998&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 22:55:27,999&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 22:55:27,999&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 22:55:28,000&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 23:00:25,601&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 23:00:25,602&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 23:00:25,603&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 23:00:25,604&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 23:00:27,604&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:00:42,605&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 23:00:42,605&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 23:00:42,605&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 23:00:42,607&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 23:00:42,608&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 23:00:42,608&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 23:00:42,608&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 23:00:42,609&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 23:00:42,610&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 23:00:42,611&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 23:00:42,612&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 23:00:42,613&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 23:00:42,614&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 23:00:42,615&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 23:00:42,616&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 23:00:42,616&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 23:00:42,616&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 23:00:42,616&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 23:00:42,616&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 23:00:42,616&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 23:00:42,616&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 23:00:42,617&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 23:00:42,618&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 23:00:42,619&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 23:00:42,620&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 23:00:42,620&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 23:00:42,620&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 23:00:42,621&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 23:00:42,623&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 23:00:42,623&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 23:00:44,624&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:00:59,624&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 23:00:59,624&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 23:00:59,625&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 23:01:41,400&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-349.75, -90.1, -66.0]&
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:01:41,401&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:01:41,402&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:01:41,402&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-349.75&
+2024-03-10 23:01:41,402&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-349.75&
+2024-03-10 23:01:43,403&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:01:43,403&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-90.1&
+2024-03-10 23:01:43,404&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-90.1&
+2024-03-10 23:01:45,404&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-93.1,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:01:45,404&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-03-10 23:01:45,405&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-03-10 23:01:47,405&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-93.1,-69.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:02:05,481&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-10 23:02:05,483&ePANDA&INFO&mill_control&__exit__&140&&&&Exiting the mill context manager&
+2024-03-10 23:02:05,483&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-10 23:02:05,483&ePANDA&INFO&mill_control&__exit__&140&&&&Exiting the mill context manager&
+2024-03-10 23:03:13,478&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 23:03:13,481&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 23:03:13,481&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 23:03:13,481&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 23:03:13,482&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 23:03:13,483&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 23:03:13,484&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 23:03:13,485&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 23:03:13,486&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 23:03:13,487&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 23:03:13,488&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 23:03:13,489&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 23:03:13,490&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 23:03:13,491&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 23:03:13,492&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 23:03:13,493&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 23:03:13,493&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 23:03:13,493&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 23:03:13,494&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 23:03:13,496&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 23:03:13,496&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 23:03:15,497&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:03:30,497&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 23:03:30,498&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 23:03:30,498&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 23:04:53,945&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:04:53,945&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:04:53,945&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-349.75&
+2024-03-10 23:04:53,946&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-349.75&
+2024-03-10 23:04:55,948&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:04:55,948&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-99.0&
+2024-03-10 23:04:55,948&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-99.0&
+2024-03-10 23:04:57,949&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:04:57,949&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-03-10 23:04:57,949&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-03-10 23:04:59,950&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:11:37,769&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 23:11:37,770&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 23:11:37,770&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 23:11:37,771&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 23:11:37,772&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 23:11:37,772&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 23:11:37,772&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 23:11:37,772&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 23:11:37,772&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 23:11:37,772&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 23:11:37,772&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 23:11:37,773&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 23:11:37,774&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 23:11:37,775&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 23:11:37,776&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 23:11:37,777&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 23:11:37,778&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 23:11:37,778&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 23:11:37,778&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 23:11:37,778&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 23:11:37,778&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 23:11:37,778&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 23:11:37,778&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 23:11:37,779&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 23:11:37,780&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 23:11:37,781&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 23:11:37,782&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 23:11:37,782&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 23:11:37,782&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 23:11:37,782&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 23:11:37,782&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 23:11:37,782&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 23:12:16,837&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 23:12:16,838&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 23:12:16,839&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 23:12:16,840&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 23:12:16,841&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 23:12:16,842&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 23:12:16,843&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 23:12:16,844&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 23:12:16,845&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 23:12:16,846&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 23:12:16,847&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 23:12:16,848&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 23:12:16,848&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 23:12:16,848&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 23:12:16,848&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 23:12:16,848&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 23:12:16,848&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 23:12:16,848&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 23:12:16,849&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 23:12:16,849&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 23:12:16,849&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 23:12:16,849&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 23:12:16,849&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 23:12:16,849&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 23:12:16,849&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 23:12:16,850&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 23:12:16,850&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 23:12:16,850&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 23:12:16,850&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 23:12:16,851&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 23:12:16,852&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 23:12:16,854&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 23:12:16,854&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 23:12:18,854&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:12:33,855&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 23:12:33,855&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 23:12:33,855&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:13:09,415&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-349.75&
+2024-03-10 23:13:09,416&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-349.75&
+2024-03-10 23:13:11,417&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:13:11,417&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-99.0&
+2024-03-10 23:13:11,418&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-99.0&
+2024-03-10 23:13:13,418&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:13:13,418&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-03-10 23:13:13,419&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-03-10 23:13:15,419&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:13:32,043&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0&
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0&
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-349.75, -116.8, -66.0]&
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&safe_move&615&&&&Moving to Z=0 first&
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-03-10 23:13:32,044&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-03-10 23:13:34,045&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:13:34,045&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -352.75, Y = -102.0, Z = -3.0&
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -349.75, Y = -99.0, Z = 0.0&
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-349.75, -99.0, 0.0]&
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-116.8&
+2024-03-10 23:13:34,046&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-116.8&
+2024-03-10 23:13:36,047&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-119.8,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:13:36,047&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-03-10 23:13:36,047&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-03-10 23:13:38,048&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-119.8,-69.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:14:09,770&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-10 23:14:09,772&ePANDA&INFO&mill_control&__exit__&140&&&&Exiting the mill context manager&
+2024-03-10 23:22:05,320&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 23:22:05,321&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 23:22:05,321&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 23:22:05,321&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 23:22:05,321&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 23:22:05,322&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 23:22:05,323&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 23:22:05,324&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 23:22:05,325&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 23:22:05,326&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 23:22:05,327&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 23:22:05,328&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 23:22:05,329&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 23:22:05,330&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 23:22:05,331&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 23:22:05,332&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 23:22:05,334&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 23:22:05,334&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 23:22:05,336&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 23:22:05,336&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 23:22:07,337&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:22:22,337&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 23:22:22,338&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 23:22:22,338&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 23:22:38,786&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:22:38,787&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-349.75&
+2024-03-10 23:22:38,788&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-349.75&
+2024-03-10 23:22:40,789&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:22:40,789&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-99.0&
+2024-03-10 23:22:40,790&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-99.0&
+2024-03-10 23:22:42,790&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:22:42,790&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-03-10 23:22:42,791&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-03-10 23:22:44,791&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:27:08,346&e_panda&DEBUG&wellplate&update_well_status_from_json_file&471&Updating well status's from file...
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a1 updated from file
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a2 updated from file
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a3 updated from file
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a4 updated from file
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a5 updated from file
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a6 updated from file
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a7 updated from file
+2024-03-10 23:27:08,347&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a8 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a9 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a10 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a11 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well a12 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b1 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b2 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b3 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b4 updated from file
+2024-03-10 23:27:08,348&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b5 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b6 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b7 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b8 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b9 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b10 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b11 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well b12 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c1 updated from file
+2024-03-10 23:27:08,349&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c2 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c3 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c4 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c5 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c6 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c7 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c8 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c9 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c10 updated from file
+2024-03-10 23:27:08,350&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c11 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well c12 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d1 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d2 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d3 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d4 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d5 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d6 updated from file
+2024-03-10 23:27:08,351&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d7 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d8 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d9 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d10 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d11 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well d12 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e1 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e2 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e3 updated from file
+2024-03-10 23:27:08,352&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e4 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e5 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e6 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e7 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e8 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e9 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e10 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e11 updated from file
+2024-03-10 23:27:08,353&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well e12 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f1 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f2 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f3 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f4 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f5 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f6 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f7 updated from file
+2024-03-10 23:27:08,354&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f8 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f9 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f10 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f11 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well f12 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g1 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g2 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g3 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g4 updated from file
+2024-03-10 23:27:08,355&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g5 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g6 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g7 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g8 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g9 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g10 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g11 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well g12 updated from file
+2024-03-10 23:27:08,356&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h1 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h2 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h3 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h4 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h5 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h6 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h7 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h8 updated from file
+2024-03-10 23:27:08,357&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h9 updated from file
+2024-03-10 23:27:08,358&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
+2024-03-10 23:27:08,358&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
+2024-03-10 23:27:08,358&e_panda&DEBUG&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-10 23:27:08,359&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-10 23:27:08,360&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-10 23:27:08,361&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: $H&
+2024-03-10 23:27:08,362&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: $H&
+2024-03-10 23:27:10,362&ePANDA&DEBUG&mill_control&execute_command&790&&&&Returned <Idle|MPos:-3.0,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:27:25,363&ePANDA&INFO&mill_control&home&251&&&&Homing completed&
+2024-03-10 23:27:25,363&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-03-10 23:27:25,363&ePANDA&INFO&mill_control&clear_buffers&818&&&&Clearing buffers&
+2024-03-10 23:31:13,431&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:31:13,431&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:31:13,431&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-10 23:31:13,432&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-10 23:31:13,433&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-349.75&
+2024-03-10 23:31:13,433&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-349.75&
+2024-03-10 23:31:15,434&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:31:15,434&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-99.0&
+2024-03-10 23:31:15,434&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-99.0&
+2024-03-10 23:31:17,435&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:31:17,435&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-03-10 23:31:17,435&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-03-10 23:31:19,436&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-352.75,-102.0,-69.0|Bf:15,127|FS:0,0>&
+2024-03-10 23:31:35,849&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0&
+2024-03-10 23:31:35,849&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0&
+2024-03-10 23:31:35,849&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -352.75, Y = -102.0, Z = -69.0&
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -349.75, Y = -99.0, Z = -66.0&
+2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-349.75, -99.0, -66.0]&
+2024-03-10 23:33:23,358&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-10 23:33:23,359&ePANDA&INFO&mill_control&__exit__&140&&&&Exiting the mill context manager&

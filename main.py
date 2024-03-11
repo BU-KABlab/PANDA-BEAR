@@ -7,8 +7,9 @@ Or starting the ePANDA either with or without mock instruments.
 import os
 import sys
 
-from epanda_lib import (controller, generator_utilities, scheduler, vials,
-                        wellplate)
+from epanda_lib import (controller, generator_utilities, mill_control, scheduler, vials,
+                        wellplate, mill_calibration_and_positioning)
+from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import (read_testing_config,
                                             write_testing_config)
 
@@ -64,6 +65,22 @@ def toggle_testing_mode():
     print("To complete the switch, please restart the program.")
     sys.exit()
 
+def calibrate_mill():
+    """Calibrates the mill."""
+    if read_testing_config():
+        # print("Cannot calibrate the mill in testing mode.")
+        # return
+        mill = mill_control.MockMill
+    else:
+        mill = mill_control.Mill
+
+    mill_calibration_and_positioning.calibrate_mill(
+        mill,
+        wellplate.Wellplate(),
+        vials.read_vials(STOCK_STATUS),
+        vials.read_vials(WASTE_STATUS)
+    )
+
 def exit_program():
     """Exits the program."""
     print("Exiting ePANDA. Goodbye!")
@@ -80,6 +97,7 @@ options = {
     '7': change_wellplate_location,
     '8': run_experiment_generator,
     '9': toggle_testing_mode,
+    '10': calibrate_mill,
     'q': exit_program
 }
 

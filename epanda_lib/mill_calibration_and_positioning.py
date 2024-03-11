@@ -1,7 +1,12 @@
+from hmac import new
 import json
 from typing import Sequence
-from mill_control import Mill, MockMill, StockVial, WasteVial, Wellplate
-from utilities import Coordinates, Instruments
+import os
+
+from .mill_control import Mill, MockMill
+from .utilities import Coordinates, Instruments
+from .vials import StockVial, WasteVial
+from .wellplate import Well_Coordinates, Wellplate
 
 
 def check_mill_settings(
@@ -147,6 +152,100 @@ def calibrate_wellplate(
         wellplate.recalculate_well_locations()
 
 
+def calibrate_wells(
+    mill: Mill,
+    wellplate: Wellplate,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
+    """Calibrate the locations of the individual wells in the wellplate"""
+    # Enter well choice loop
+    instrument = Instruments.PIPETTE
+    while True:
+        well_id = input(
+            "Enter the well ID to test (e.g., A1) toggle to switch to electrode or done to end: "
+        ).lower()
+        if well_id == "done":
+            break
+
+        if well_id == "toggle":
+            instrument = (
+                Instruments.ELECTRODE
+                if instrument == Instruments.PIPETTE
+                else Instruments.PIPETTE
+            )
+            print(f"Instrument has been toggled to {instrument}")
+            well_id = input("Enter the well ID to test (e.g., A1): ").lower()
+
+        # Provide the current coordinates of the well
+        original_coordinates = wellplate.get_coordinates(well_id)
+        print(f"Current coordinates of {well_id}: {original_coordinates}")
+
+        # Move the pipette to the top of the well
+        mill.safe_move(
+            original_coordinates["x"],
+            original_coordinates["y"],
+            wellplate.z_top,
+            Instruments.PIPETTE,
+        )
+
+        # Enter confirmation loop
+        while True:
+            current_coorinates = Well_Coordinates(
+                original_coordinates["x"],
+                original_coordinates["y"],
+                z_top=wellplate.z_top,
+            )
+            confirm = input("Is the pipette in the correct position? (yes/no): ")
+            if confirm.lower() == "yes" or confirm.lower() == "y" or confirm == "":
+                break
+            print(f"Current coordinates of {well_id}: {current_coorinates}")
+
+            # gather new coordinates and test them for validity before trying to set them
+            # enter validation loop
+            while True:
+                new_x = input(f"Enter the new x coordinate for {well_id}: ")
+                new_y = input(f"Enter the new y coordinate for {well_id}: ")
+                try:
+                    new_x = float(new_x)
+                    new_y = float(new_y)
+                except ValueError:
+                    print("Invalid input, please try again")
+                    continue
+
+                working_volume = mill.config["working_volume"]
+                if new_x > 0 or new_x < working_volume["x"]:
+                    print(
+                        f"Invalid x coordinate, must be between 0 and {working_volume['x']}"
+                    )
+                    continue
+                if new_y > 0 or new_y < working_volume["y"]:
+                    print(
+                        f"Invalid y coordinate, must be between 0 and {working_volume['y']}"
+                    )
+                    continue
+                break # exit validation loop
+
+            new_coordinates = Well_Coordinates(
+                new_x,
+                new_y,
+                z_top=wellplate.z_top,
+            )
+
+            # Safe move to the new coordinates
+            mill.safe_move(
+                new_coordinates.x,
+                new_coordinates.y,
+                wellplate.z_top,
+                Instruments.PIPETTE,
+            )
+
+        if new_coordinates != original_coordinates:
+            # Update the well status file with the new well coordinates
+            wellplate.set_coordinates(well_id, new_coordinates)
+            wellplate.write_well_status_to_file()
+
+
 def calibrate_z_bottom_of_wellplate(
     mill: Mill,
     wellplate: Wellplate,
@@ -197,6 +296,8 @@ def calibrate_z_bottom_of_wellplate(
             )
 
         wellplate.z_bottom = new_z_bottom
+        wellplate.write_wellplate_location()
+        wellplate.write_well_status_to_file()
 
 
 def calibrate_vials(
@@ -248,8 +349,9 @@ options = {
     "0": check_mill_settings,
     "1": home_mill,
     "2": calibrate_wellplate,
-    "3": calibrate_z_bottom_of_wellplate,
-    "4": calibrate_vials,
+    "3": calibrate_wells,
+    "4": calibrate_z_bottom_of_wellplate,
+    "5": calibrate_vials,
 }
 
 
@@ -261,19 +363,12 @@ def calibrate_mill(
 ):
     """Calibrate the mill to the wellplate and stock vials"""
     # Connect to the mill
-    with mill:
+    with mill() as mill:
         while True:
-            print(
-                """"Welcome to the mill calibration and positioning menu:
-Menu:
-0. Check mill settings
-1. Home mill
-2. Calibrate wellplate
-3. Calibrate z_bottom of wellplate
-4. Calibrate vials
-q Exit
-              """
-            )
+            os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+            print("""Welcome to the mill calibration and positioning menu:""")
+            for key, value in options.items():
+                print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
             if option == "q":
                 break
@@ -282,8 +377,9 @@ q Exit
 
 if __name__ == "__main__":
     # Load the configuration file
-    from vials import read_vials, STOCK_STATUS, WASTE_STATUS
-    from config.config import TESTING
+    from .config.config import TESTING
+    from .vials import STOCK_STATUS, WASTE_STATUS, read_vials
+
     print("Testing mode:", TESTING)
     input("Press enter to continue")
     # Create the mill object
@@ -296,4 +392,6 @@ if __name__ == "__main__":
     stock_vials_to_use: Sequence[StockVial] = read_vials(STOCK_STATUS)
     waste_vials_to_use: Sequence[WasteVial] = read_vials(WASTE_STATUS)
 
-    calibrate_mill(mill_to_use, wellplate_to_use, stock_vials_to_use, waste_vials_to_use)
+    calibrate_mill(
+        mill_to_use, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
+    )
