@@ -412,7 +412,7 @@ class Mill:
 
         else:
             raise ValueError("Invalid instrument")
-
+        current_coordinates = [round(coord, 3) for coord in current_coordinates]
         logger.debug("Current_coordinates: %s", current_coordinates)
         return current_coordinates
 

@@ -5,9 +5,10 @@ This script is used to capture images from the FLIR camera.
 import argparse
 import logging
 import sys
-from config.config import PATH_TO_LOGS
+from pathlib import Path
+#from epanda_lib.config.config import PATH_TO_LOGS
 import PyCapture2
-
+PATH_TO_LOGS = Path("epanda_lib/logs")
 
 class FLIRCamera:
     """Class to control the FLIR camera"""

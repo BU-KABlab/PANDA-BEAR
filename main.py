@@ -7,7 +7,7 @@ Or starting the ePANDA either with or without mock instruments.
 import os
 import sys
 
-from epanda_lib import (controller, generator_utilities, mill_control, scheduler, vials,
+from epanda_lib import (camera_call_camera, controller, generator_utilities, mill_control,scheduler, vials,
                         wellplate, mill_calibration_and_positioning)
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import (read_testing_config,
@@ -81,6 +81,10 @@ def calibrate_mill():
         vials.read_vials(WASTE_STATUS)
     )
 
+def test_camera():
+    """Runs the mill control in testing mode."""
+    camera_call_camera.capture_new_image()
+
 def exit_program():
     """Exits the program."""
     print("Exiting ePANDA. Goodbye!")
@@ -98,13 +102,14 @@ options = {
     '8': run_experiment_generator,
     '9': toggle_testing_mode,
     '10': calibrate_mill,
+    '11': test_camera,
     'q': exit_program
 }
 
 if __name__ == "__main__":
 
     while True:
-        os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal
+        # os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal
         print("Welcome to ePANDA!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
         current_wellplate = wellplate.read_current_wellplate()

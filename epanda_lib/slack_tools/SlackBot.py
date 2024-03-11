@@ -45,6 +45,8 @@ class SlackBot:
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
         elif channel_id == "alert":
             channel_id = slack_cred.ALERT_CHANNEL_ID
+        elif channel_id == "data":
+            channel_id = slack_cred.DATA_CHANNEL_ID
 
         try:
             if not self.test:
@@ -83,8 +85,8 @@ class SlackBot:
             if not self.test:
                 result = client.files_upload_v2(
                     channel=channel_id,
-                    file=filename_to_post,
-                    filename=file.__str__(),
+                    file=file.open("rb"),
+                    filename=filename_to_post,
                     initial_comment=message,
                 )
             else:

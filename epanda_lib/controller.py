@@ -232,13 +232,21 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             new_experiment.set_status(ExperimentStatus.COMPLETE)
 
             # Share any results images with the slack data channel
-            slack.send_slack_message(
-                "data",
-                f"Experiment {new_experiment.id} has completed. Photos taken:",
-            )
-            for image in new_experiment.results.image_files:
-                image:Path
-                slack.send_slack_file("data", image, image.name)
+            try:
+                slack.send_slack_message(
+                    "data",
+                    f"Experiment {new_experiment.id} has completed. Photos taken:",
+                )
+                for image in new_experiment.results.image_files:
+                    image:Path
+                    slack.send_slack_file("data", image, image.name)
+            except Exception as error:
+                logger.error(
+                    "Error sharing images from experiment %d with slack: %s",
+                    new_experiment.id,
+                    error,
+                )
+                # continue with the rest of the program
 
             ## Reset the logger to log to the ePANDA.log file and format
             e_panda.apply_log_filter()

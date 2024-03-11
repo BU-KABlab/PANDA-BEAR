@@ -15,7 +15,7 @@ USE_LOCAL_PATHS = TESTING
 
 ## FLIR Camera related
 PYTHON_360_PATH = Path("C:\\Users\\Kab Lab\\anaconda3\\envs\\python360\\python.exe")
-CAMERA_SCRIPT_PATH = Path("code/camera.py")
+CAMERA_SCRIPT_PATH = Path("camera.py")
 ## Define local repository path
 LOCAL_REPO_PATH = Path(__file__).parents[2]
 
