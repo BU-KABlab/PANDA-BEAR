@@ -62,6 +62,7 @@ class SlackBot:
     def send_slack_file(self, channel: str, file, message=None) -> int:
         """Send a file to Slack."""
         client = WebClient(slack_cred.TOKEN)
+        file = Path(file)
         filename_to_post = file.name
 
         if channel == "conversation":
@@ -83,7 +84,7 @@ class SlackBot:
                 result = client.files_upload_v2(
                     channel=channel_id,
                     file=filename_to_post,
-                    filename=file,
+                    filename=file.__str__(),
                     initial_comment=message,
                 )
             else:
@@ -438,8 +439,8 @@ class SlackBot:
         with open(WASTE_STATUS, "r", encoding="utf-8") as stock:
             data = json.load(stock)
             for vial in data:
-                vial_x.append(vial["x"])
-                vial_y.append(vial["y"])
+                vial_x.append(vial["vial_coordinates"]["x"])
+                vial_y.append(vial["vial_coordinates"]["y"])
                 volume = vial["volume"]
                 capacity = vial["capacity"]
                 if vial["name"] is None or vial["name"] == "":
@@ -457,8 +458,8 @@ class SlackBot:
         with open(STOCK_STATUS, "r", encoding="utf-8") as stock:
             data = json.load(stock)
             for vial in data:
-                vial_x.append(vial["x"])
-                vial_y.append(vial["y"])
+                vial_x.append(vial["vial_coordinates"]["x"])
+                vial_y.append(vial["vial_coordinates"]["y"])
                 volume = vial["volume"]
                 capacity = vial["capacity"]
                 if vial["name"] is None or vial["name"] == "":

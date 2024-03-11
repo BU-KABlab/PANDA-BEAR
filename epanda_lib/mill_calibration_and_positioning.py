@@ -162,6 +162,7 @@ def calibrate_wells(
     # Enter well choice loop
     instrument = Instruments.PIPETTE
     while True:
+        coordinates_changed = False
         well_id = input(
             "Enter the well ID to test (e.g., A1) toggle to switch to electrode or done to end: "
         ).lower()
@@ -186,7 +187,7 @@ def calibrate_wells(
             original_coordinates["x"],
             original_coordinates["y"],
             wellplate.z_top,
-            Instruments.PIPETTE,
+            instrument,
         )
 
         # Enter confirmation loop
@@ -199,13 +200,18 @@ def calibrate_wells(
             confirm = input("Is the pipette in the correct position? (yes/no): ")
             if confirm.lower() == "yes" or confirm.lower() == "y" or confirm == "":
                 break
-            print(f"Current coordinates of {well_id}: {current_coorinates}")
-
+            print(f"Current coordinates of {well_id}: {current_coorinates}") #change to be the corrected coordinates if they have been changed
+            coordinates_changed = True
             # gather new coordinates and test them for validity before trying to set them
             # enter validation loop
             while True:
-                new_x = input(f"Enter the new x coordinate for {well_id}: ")
-                new_y = input(f"Enter the new y coordinate for {well_id}: ")
+                new_x = input(f"Enter the new x coordinate for {well_id} or enter for no change: ")
+                new_y = input(f"Enter the new y coordinate for {well_id} or enter for no change: ")
+
+                if new_x == "":
+                    new_x = original_coordinates["x"]
+                if new_y == "":
+                    new_y = original_coordinates["y"]
                 try:
                     new_x = float(new_x)
                     new_y = float(new_y)
@@ -237,10 +243,10 @@ def calibrate_wells(
                 new_coordinates.x,
                 new_coordinates.y,
                 wellplate.z_top,
-                Instruments.PIPETTE,
+                instrument,
             )
 
-        if new_coordinates != original_coordinates:
+        if coordinates_changed:
             # Update the well status file with the new well coordinates
             wellplate.set_coordinates(well_id, new_coordinates)
             wellplate.write_well_status_to_file()
@@ -371,6 +377,7 @@ def calibrate_mill(
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
             if option == "q":
+                mill.rest_electrode()
                 break
             options[option](mill, wellplate, stock_vials, waste_vials)
 

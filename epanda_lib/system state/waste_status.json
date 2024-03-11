@@ -2,15 +2,15 @@
     {
         "position": "w0",
         "contents": {
-            "rinse": 140.0,
-            "edot": 0.0,
-            "liclo4": 0.0
+            "rinse": 2259.44,
+            "edot": 127.43,
+            "liclo4": 382.29
         },
         "radius": 14,
         "height": 57,
         "depth": -74,
         "name": "waste",
-        "volume": 1140.0,
+        "volume": 8629.160000000003,
         "capacity": 20000,
         "contamination": 0,
         "density": 0,
@@ -66,7 +66,7 @@
         "radius": 14,
         "height": 57,
         "depth": 0,
-        "name": null,
+        "name": "waste",
         "volume": 1000,
         "capacity": 20000,
         "contamination": 0,

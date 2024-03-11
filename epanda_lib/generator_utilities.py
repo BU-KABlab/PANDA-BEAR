@@ -156,6 +156,10 @@ def read_in_generators():
 
     # Remove any __ files from the list
     generators = [generator for generator in generators if "__" not in generator]
+
+    # remove any non-python files from the list
+    generators = [generator for generator in generators if ".py" in generator]
+    
     # Get the current generators from the database
     current_generators = get_generators()
 

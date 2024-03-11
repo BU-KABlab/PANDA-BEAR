@@ -560,43 +560,43 @@
         },
         {
             "well_id": "D3",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:15",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000587,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
-                "x": -249.45,
+                "x": -249.15,
                 "y": -96.5,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "D4",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:15",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000591,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
-                "x": -249.45,
-                "y": -105.4,
+                "x": -249.15,
+                "y": -105.7,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "D5",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:15",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000595,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
-                "x": -249.45,
-                "y": -114.3,
+                "x": -249.15,
+                "y": -114.6,
                 "z_top": -66.0
             }
         },
@@ -928,11 +928,11 @@
         },
         {
             "well_id": "F2",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000567,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -267.25,
@@ -942,11 +942,11 @@
         },
         {
             "well_id": "F3",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000571,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -267.25,
@@ -956,43 +956,43 @@
         },
         {
             "well_id": "F4",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000575,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
-                "x": -267.25,
+                "x": -266.95,
                 "y": -105.4,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "F5",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000579,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -267.25,
-                "y": -114.3,
+                "y": -114.6,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "F6",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000583,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -267.25,
-                "y": -123.2,
+                "y": -123.5,
                 "z_top": -66.0
             }
         },
@@ -1096,11 +1096,15 @@
         },
         {
             "well_id": "G2",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
-            "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "status": "complete",
+            "status_date": "2024-03-11T12:19:54",
+            "contents": {
+                "rinse": 0.0,
+                "edot": 0.0,
+                "liclo4": 0.0
+            },
+            "experiment_id": 10000539,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
@@ -1110,11 +1114,11 @@
         },
         {
             "well_id": "G3",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000543,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
@@ -1124,11 +1128,11 @@
         },
         {
             "well_id": "G4",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000547,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
@@ -1138,11 +1142,11 @@
         },
         {
             "well_id": "G5",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000551,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
@@ -1152,49 +1156,49 @@
         },
         {
             "well_id": "G6",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000555,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
-                "y": -123.2,
+                "y": -123.6,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "G7",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000559,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
-                "y": -132.1,
+                "y": -132.5,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "G8",
-            "status": "error",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
+            "experiment_id": 10000599,
             "project_id": 16,
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
-                "y": -141.0,
+                "y": -141.4,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "G9",
-            "status": "error",
+            "status": "new",
             "status_date": "2024-03-08 13:45:16",
             "contents": {},
             "experiment_id": null,
@@ -1202,21 +1206,21 @@
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
-                "y": -149.9,
+                "y": -150.5,
                 "z_top": -66.0
             }
         },
         {
             "well_id": "G10",
-            "status": "new",
-            "status_date": "2024-03-08 13:45:16",
+            "status": "queued",
+            "status_date": "2024-03-11T11:41:18",
             "contents": {},
-            "experiment_id": null,
-            "project_id": null,
+            "experiment_id": 10000563,
+            "project_id": 16,
             "volume": 0.0,
             "coordinates": {
-                "x": -276.15,
-                "y": -158.8,
+                "x": -275.85,
+                "y": -159.4,
                 "z_top": -66.0
             }
         },
@@ -1230,7 +1234,7 @@
             "volume": 0.0,
             "coordinates": {
                 "x": -276.15,
-                "y": -167.7,
+                "y": -168.3,
                 "z_top": -66.0
             }
         },

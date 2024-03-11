@@ -1,6 +1,6 @@
 """Script to starting and stopping the ePANDA Slack Bot"""
 import time
-from .slack_tools.SlackBot import SlackBot
+from epanda_lib.slack_tools.SlackBot import SlackBot
 
 bot = SlackBot(test = False)
 print("Starting Slack Bot")

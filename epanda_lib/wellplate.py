@@ -203,7 +203,7 @@ class Well(Vessel):
                         (volume * current_content_ratios[key]), 6
                     )
 
-                logger.error("Well %s is empty", self.name)
+                #logger.debug("Well %s is empty", self.name)
             except Exception as e:
                 logger.error("Error occurred while updating well contents: %s", e)
                 logger.error("Not critical, continuing....")
@@ -463,7 +463,7 @@ class Wellplate:
 
     def __getitem__(self, well_id: str) -> Well:
         """Gets a Well object by well ID."""
-        return self.wells[well_id]
+        return self.wells[well_id.upper()]
 
     def update_well_status_from_json_file(self: "Wellplate") -> None:
         """Update the well status from a file"""
@@ -503,32 +503,32 @@ class Wellplate:
             raise KeyError(f"Well {well_id} not found")
         
 
-    def set_coordinates(self, well_id, new_coordinates: Well_Coordinates) -> None:
+    def set_coordinates(self, well_id:str, new_coordinates: Well_Coordinates) -> None:
         """Sets the coordinates of a specific well in memory and writes to the status file"""
-        self.wells[well_id].coordinates = new_coordinates
+        self.wells[well_id.upper()].coordinates = new_coordinates
         #self.write_well_status_to_file()
 
-    def get_contents(self, well_id) -> dict:
+    def get_contents(self, well_id:str) -> dict:
         """Return the contents of a specific well"""
-        return self.wells[well_id].contents
+        return self.wells[well_id.upper()].contents
 
-    def get_volume(self, well_id) -> float:
+    def get_volume(self, well_id:str) -> float:
         """Return the volume of a specific well"""
-        return self.wells[well_id].volume
+        return self.wells[well_id.upper()].volume
 
-    def get_depth(self, well_id) -> float:
+    def get_depth(self, well_id:str) -> float:
         """Return the depth of a specific well"""
-        return self.wells[well_id].depth
+        return self.wells[well_id.upper()].depth
 
     def get_density(self, well_id) -> float:
         """Return the density of a specific well"""
-        return self.wells[well_id].density
+        return self.wells[well_id.upper()].density
 
     def check_volume(self, well_id, added_volume: float) -> bool:
         """Check if a volume can fit in a specific well"""
         info_message = f"Checking if {added_volume} can fit in {well_id} ..."
         logger.info(info_message)
-        if self.wells[well_id].volume + added_volume >= self.well_capacity:
+        if self.wells[well_id.upper()].volume + added_volume >= self.well_capacity:
             raise OverFillException(
                 well_id, self.get_volume, added_volume, self.well_capacity
             )
@@ -538,8 +538,9 @@ class Wellplate:
             logger.info(info_message)
             return True
 
-    def update_volume(self, well_id, added_volume: float):
+    def update_volume(self, well_id:str, added_volume: float):
         """Update the volume of a specific well"""
+        well_id = well_id.upper()
         if self.wells[well_id].volume + added_volume > self.well_capacity:
             raise OverFillException(
                 well_id,
@@ -572,11 +573,11 @@ class Wellplate:
 
     def check_well_status(self, well_id: str) -> str:
         """Check the status of a specific well."""
-        return self.wells[well_id].status
+        return self.wells[well_id.upper()].status
 
     def set_well_status(self, well_id: str, status: str) -> None:
         """Update the status of a specific well."""
-        self.wells[well_id].status = status
+        self.wells[well_id.upper()].status = status
 
     def check_all_wells_status(self):
         """Check the status of all wells"""

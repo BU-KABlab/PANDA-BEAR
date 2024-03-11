@@ -151,7 +151,6 @@ def read_in_protocols():
     # Get all files in the protocols folder
     protocols = os.listdir("protocols")
     # Remove this file from the list
-    protocols.remove("protocol_utilities.py")
     # Get the current protocols from the database
     current_protocols = get_protocols()
 
@@ -166,18 +165,19 @@ def read_in_protocols():
 
     # Get the filenames of the current protocols
     current_protocol_filenames = [protocol.name for protocol in current_protocols]
-
+    # get filepaths of current protocols
+    current_protocol_filepaths = [protocol.filepath for protocol in current_protocols]
     # Iterate through the protocols
     for protocol in protocols:
         # If the protocol is not already in the database
-        if protocol not in current_protocol_filenames:
+        if protocol not in current_protocol_filepaths:
             # Insert the protocol into the database
             insert_protocol(next_protocol_id, "", protocol[:-3], protocol)
             next_protocol_id += 1
         else:
             # Get the id of the protocol
             protocol_id = current_protocols[
-                current_protocol_filenames.index(protocol)
+                current_protocol_filepaths.index(protocol)
             ].protocol_id
 
             # Update the protocol in the database
@@ -185,7 +185,7 @@ def read_in_protocols():
 
     # Delete any protocols that are no longer in the protocols folder
     for protocol in current_protocols:
-        if protocol.name not in protocols:
+        if protocol.filepath not in protocols:
             delete_protocol(protocol.protocol_id)
 
 
