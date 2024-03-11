@@ -20,8 +20,7 @@ from typing import Sequence
 
 from . import e_panda
 from .wellplate import Wellplate
-from .config.config import (RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS,
-                           WELL_STATUS)
+from .config.config import RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS, WELL_STATUS
 from .experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
 from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
@@ -33,12 +32,10 @@ from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
-from .vials import (StockVial, Vial2, WasteVial, read_vials,
-                   update_vial_state_file)
+from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
 from .wellplate import save_current_wellplate
 
 # set up slack globally so that it can be used in the main function and others
-
 
 
 def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
@@ -212,10 +209,14 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             # )
 
             # Get the protocol entry
-            protocol_entry: ProtocolEntry = get_protocol_by_id(new_experiment.protocol_id)
+            protocol_entry: ProtocolEntry = get_protocol_by_id(
+                new_experiment.protocol_id
+            )
 
             # Convert the file path to a module name
-            module_name = ('protocols.' + protocol_entry.filepath).replace('/', '.').rstrip('.py')
+            module_name = (
+                ("protocols." + protocol_entry.filepath).replace("/", ".").rstrip(".py")
+            )
 
             # Import the module
             protocol_module = importlib.import_module(module_name)
@@ -238,7 +239,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                     f"Experiment {new_experiment.id} has completed. Photos taken:",
                 )
                 for image in new_experiment.results.image_files:
-                    image:Path
+                    image: Path
                     slack.send_slack_file("data", image, image.name)
             except Exception as error:
                 logger.error(
@@ -272,6 +273,9 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             ## Update the system state with new vial and wellplate information
             update_vial_state_file(stock_vials, STOCK_STATUS)
             update_vial_state_file(waste_vials, WASTE_STATUS)
+            if toolkit.pump.pipette.volume > 0:
+                # assume unreal volume, not actually solution, set to 0
+                toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume_ml)
             if one_off:
                 break  # break out of the while True loop
     except Exception as error:

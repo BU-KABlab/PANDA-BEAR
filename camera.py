@@ -142,7 +142,7 @@ class FLIRCamera:
             self.camera_logger.debug("Saving the last image to %s", save_name)
             newimg.save(
                 (save_path + "\\" + save_name).encode("utf-8"),
-                PyCapture2.IMAGE_FILE_FORMAT.PNG,
+                PyCapture2.IMAGE_FILE_FORMAT.TIFF,
             )
         return newimg
 

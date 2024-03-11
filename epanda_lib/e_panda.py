@@ -502,6 +502,18 @@ def rinse_v2(
             pump=toolkit.pump,
             mill=toolkit.mill,
         )
+
+        # check that the pipette is empty
+        if toolkit.pump.pipette.volume > 0:
+            # toolkit.pump.infuse(
+            #     volume_to_infuse=toolkit.pump.pipette.volume,
+            #     being_infused=None,
+            #     infused_into=waste_selector(waste_vials, "waste", 0),
+            #     rate=toolkit.pump.max_pump_rate,
+            #     blowout_ul=0,
+            # )
+            # FIXME: This is a temporary fix to ensure that the pipette is empty
+            toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume)
     return 0
 
 
@@ -1089,11 +1101,11 @@ def image_well(
             file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
         file_name = file_name.replace(" ", "_")  # clean up the file name
         file_name_start = file_name + "_0"  # enumerate the file name
-        filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".png")
+        filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".tiff")
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
-            filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".png")
+            filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
             i += 1
 
         # position lens above the well
