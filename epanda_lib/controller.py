@@ -278,6 +278,22 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume_ml)
             if one_off:
                 break  # break out of the while True loop
+
+    except (
+        e_panda.OCPFailure,
+        e_panda.DepositionFailure,
+        e_panda.CVFailure,
+        e_panda.CAFailure,
+    ) as error:
+        if new_experiment is not None:
+            new_experiment.set_status(ExperimentStatus.ERROR)
+            scheduler.change_well_status_v2(
+                wellplate.wells[new_experiment.well_id], new_experiment
+            )
+        logger.error(error)
+        slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
+        raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
+
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status(ExperimentStatus.ERROR)
@@ -287,7 +303,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
-        raise error
+        raise error # raise error to go to finally. If we don't know what caused an error we don't want to continue
 
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
@@ -297,7 +313,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             )
         logger.info("Keyboard interrupt detected")
         slack.send_slack_message("alert", "ePANDA was interrupted by the user")
-        raise KeyboardInterrupt from exc
+        raise KeyboardInterrupt from exc # raise error to to go finally. This was triggered by the user to indicate they want to stop the program
 
     finally:
         if new_experiment is not None:
