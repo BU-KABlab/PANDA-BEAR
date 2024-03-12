@@ -163,7 +163,11 @@ def pedotdeposition(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA deposition")
-        chrono_amp(instructions, file_tag="part_1")
+        try:
+            chrono_amp(instructions, file_tag="part_1")
+        except Exception as e:
+            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+            return
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -306,7 +310,11 @@ def pedotbleaching(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA")
-        chrono_amp(instructions, file_tag="bleaching")
+        try:
+            chrono_amp(instructions, file_tag="bleaching")
+        except Exception as e:
+            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+            return
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -417,7 +425,11 @@ def pedotcoloring(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA")
-        chrono_amp(instructions, file_tag="coloring")
+        try:
+            chrono_amp(instructions, file_tag="coloring")
+        except Exception as e:
+            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+            return
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
@@ -531,7 +543,11 @@ def pedotcv(
         toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CV")
-        cyclic_volt(instructions, file_tag="characterizing")
+        try:
+            cyclic_volt(instructions, file_tag="characterizing")
+        except Exception as e:
+            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+            return
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status(new_status=ExperimentStatus.ERINSING)
