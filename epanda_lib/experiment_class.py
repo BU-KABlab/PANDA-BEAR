@@ -98,6 +98,7 @@ class ExperimentBase:
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
             print(f"Error setting status: {e}")
+            # don't raise the error, just log it
 
     # @property
     # def solutions_corrected(self):
