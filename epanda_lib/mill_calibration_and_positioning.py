@@ -6,7 +6,7 @@ import os
 from .mill_control import Mill, MockMill
 from .utilities import Coordinates, Instruments
 from .vials import StockVial, WasteVial
-from .wellplate import Well_Coordinates, Wellplate
+from .wellplate import WellCoordinates, Wellplate
 
 
 def check_mill_settings(
@@ -192,7 +192,7 @@ def calibrate_wells(
 
         # Enter confirmation loop
         while True:
-            current_coorinates = Well_Coordinates(
+            current_coorinates = WellCoordinates(
                 original_coordinates["x"],
                 original_coordinates["y"],
                 z_top=wellplate.z_top,
@@ -232,7 +232,7 @@ def calibrate_wells(
                     continue
                 break # exit validation loop
 
-            new_coordinates = Well_Coordinates(
+            new_coordinates = WellCoordinates(
                 new_x,
                 new_y,
                 z_top=wellplate.z_top,

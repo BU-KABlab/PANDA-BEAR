@@ -6,7 +6,6 @@ wellplate and the wells in it.
 
 # pylint: disable=line-too-long
 # from decimal import Decimal
-from dataclasses import dataclass
 import json
 import logging
 import math
@@ -39,7 +38,7 @@ logger = logging.getLogger("e_panda")
 # logger.addHandler(system_handler)
 
 
-class Well_Coordinates:
+class WellCoordinates:
     """
     Represents the coordinates of a well.
 
@@ -94,7 +93,7 @@ class Well_Coordinates:
     def __len__(self):
         return 4
 
-    def __eq__(self, other: "Well_Coordinates") -> bool:
+    def __eq__(self, other: "WellCoordinates") -> bool:
         """Returns True if the coordinates are equal, False otherwise."""
         return all(
             [
@@ -105,9 +104,23 @@ class Well_Coordinates:
             ]
         )
 
-    def __ne__(self, other: "Well_Coordinates") -> bool:
+    def __ne__(self, other: "WellCoordinates") -> bool:
         """Returns True if the coordinates are not equal, False otherwise."""
         return not self.__eq__(other)
+
+
+class WellCoordinatesEncoder(json.JSONEncoder):
+    """Custom JSON encoder for the WellCoordinates class."""
+
+    def default(self, obj):
+        """Returns a dictionary representation of the WellCoordinates object."""
+        if isinstance(obj, WellCoordinates):
+            return obj.__dict__()
+        return super().default(obj)
+
+    def encode(self, obj):
+        """Returns a JSON representation of the WellCoordinates object."""
+        return json.dumps(obj, cls=WellCoordinatesEncoder)
 
 
 class Well(Vessel):
@@ -130,7 +143,7 @@ class Well(Vessel):
     def __init__(
         self,
         well_id: str,
-        coordinates: Well_Coordinates,
+        coordinates: WellCoordinates,
         volume: float,
         height: float,
         depth: float,
@@ -147,7 +160,7 @@ class Well(Vessel):
         self.experiment_id: int = None
         self.project_id: int = None
         self.volume: float = volume
-        self.coordinates: Well_Coordinates = coordinates
+        self.coordinates: WellCoordinates = coordinates
         self.height: float = height
         self.depth: float = depth
         self.density: float = density
@@ -167,7 +180,7 @@ class Well(Vessel):
     def __str__(self) -> str:
         """Returns a string representation of the well."""
         return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
-    
+
     def __dict__(self) -> dict:
         """Returns a dictionary representation of the well."""
         return {
@@ -178,7 +191,7 @@ class Well(Vessel):
             "experiment_id": self.experiment_id,
             "project_id": self.project_id,
             "volume": self.volume,
-            "coordinates": self.coordinates.__dict__(),
+            "coordinates": self.coordinates,  # Remove the .__dict__ attribute access
         }
 
     def get_contents(self) -> dict:
@@ -203,7 +216,7 @@ class Well(Vessel):
                         (volume * current_content_ratios[key]), 6
                     )
 
-                #logger.debug("Well %s is empty", self.name)
+                # logger.debug("Well %s is empty", self.name)
             except Exception as e:
                 logger.error("Error occurred while updating well contents: %s", e)
                 logger.error("Not critical, continuing....")
@@ -320,6 +333,7 @@ class Wellplate:
         columns: str = "ABCDEFGH",
         rows: int = 13,
         type_number: int = 3,
+        new_well_plate: bool = False,
     ) -> None:
         """
         Initializes a new instance of the Wells2 class.
@@ -371,14 +385,17 @@ class Wellplate:
         self.a1_coordinates = {
             "x": self.a1_x,
             "y": self.a1_y,
-            "z": self.z_top,
+            "z_top": self.z_top,
         }  # coordinates of A1
         self.initial_volume = 0.00
         self.establish_new_wells()  # we need to establish the wells before we can update their status from file
         self.calulcate_well_locations()  # now we can calculate the well locations
-
+        self.update_well_status_from_json_file()
         # Update the well info from file
-        self.update_well_status_from_json_file()  # if there are any differences from the defaults we change them now
+        # if not new_well_plate:
+        #     self.update_well_status_from_json_file()  # if there are any differences from the defaults we change them now
+        # else:
+        #     self.write_well_status_to_file()
 
     def recalculate_well_locations(self: "Wellplate") -> None:
         """Recalculates the well locations"""
@@ -394,10 +411,10 @@ class Wellplate:
         self.a1_coordinates = {
             "x": self.a1_x,
             "y": self.a1_y,
-            "z": self.z_top,
+            "z_top": self.z_top,
         }  # coordinates of A1
         self.calulcate_well_locations()
-        self.update_well_status_from_json_file()
+        # self.update_well_status_from_json_file()
 
     def calulcate_well_locations(self: "Wellplate") -> None:
         """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
@@ -416,31 +433,31 @@ class Wellplate:
                         coordinates = {
                             "x": self.a1_coordinates["x"] - x_offset,
                             "y": self.a1_coordinates["y"] - y_offset,
-                            "z": self.z_top,
+                            "z_top": self.z_top,
                         }
                     elif self.orientation == 1:
                         coordinates = {
                             "x": self.a1_coordinates["x"] + x_offset,
                             "y": self.a1_coordinates["y"] + y_offset,
-                            "z": self.z_top,
+                            "z_top": self.z_top,
                         }
                     elif self.orientation == 2:
                         coordinates = {
                             "x": self.a1_coordinates["x"] - x_offset,
                             "y": self.a1_coordinates["y"] - y_offset,
-                            "z": self.z_top,
+                            "z_top": self.z_top,
                         }
                     elif self.orientation == 3:
                         coordinates = {
                             "x": self.a1_coordinates["x"] + x_offset,
                             "y": self.a1_coordinates["y"] + y_offset,
-                            "z": self.z_top,
+                            "z_top": self.z_top,
                         }
 
                     # Round the coordinates to 2 decimal places
                     coordinates["x"] = round(coordinates["x"], 3)
                     coordinates["y"] = round(coordinates["y"], 3)
-                    coordinates["z"] = round(coordinates["z"], 3)
+                    coordinates["z_top"] = round(coordinates["z_top"], 3)
 
                 self.set_coordinates(well_id, coordinates)
 
@@ -451,7 +468,7 @@ class Wellplate:
                 well_id = col + str(row)
                 self.wells[well_id] = Well(
                     well_id=well_id,
-                    coordinates = Well_Coordinates(x=0, y=0, z_top=0),
+                    coordinates=WellCoordinates(x=0, y=0, z_top=0),
                     volume=self.initial_volume,
                     height=self.height,
                     depth=self.z_bottom,
@@ -480,13 +497,13 @@ class Wellplate:
                         well.experiment_id = saved_well["experiment_id"]
                         well.project_id = saved_well["project_id"]
                         well.volume = saved_well["volume"]
-                        well.coordinates = Well_Coordinates(**saved_well["coordinates"])
+                        well.coordinates = WellCoordinates(**saved_well["coordinates"])
                         self.type_number = data["type_number"]
                         self.plate_id = data["plate_id"]
                         logger.debug("Well %s updated from file", well.name)
                         break
 
-    def get_coordinates(self, well_id: str, axis: str = None) -> Well_Coordinates:
+    def get_coordinates(self, well_id: str, axis: str = None) -> WellCoordinates:
         """
         Return the coordinate of a specific well
         Args:
@@ -501,22 +518,21 @@ class Wellplate:
             return self.wells[well_id].coordinates
         else:
             raise KeyError(f"Well {well_id} not found")
-        
 
-    def set_coordinates(self, well_id:str, new_coordinates: Well_Coordinates) -> None:
+    def set_coordinates(self, well_id: str, new_coordinates: WellCoordinates) -> None:
         """Sets the coordinates of a specific well in memory and writes to the status file"""
         self.wells[well_id.upper()].coordinates = new_coordinates
-        #self.write_well_status_to_file()
+        # self.write_well_status_to_file()
 
-    def get_contents(self, well_id:str) -> dict:
+    def get_contents(self, well_id: str) -> dict:
         """Return the contents of a specific well"""
         return self.wells[well_id.upper()].contents
 
-    def get_volume(self, well_id:str) -> float:
+    def get_volume(self, well_id: str) -> float:
         """Return the volume of a specific well"""
         return self.wells[well_id.upper()].volume
 
-    def get_depth(self, well_id:str) -> float:
+    def get_depth(self, well_id: str) -> float:
         """Return the depth of a specific well"""
         return self.wells[well_id.upper()].depth
 
@@ -538,7 +554,7 @@ class Wellplate:
             logger.info(info_message)
             return True
 
-    def update_volume(self, well_id:str, added_volume: float):
+    def update_volume(self, well_id: str, added_volume: float):
         """Update the volume of a specific well"""
         well_id = well_id.upper()
         if self.wells[well_id].volume + added_volume > self.well_capacity:
@@ -709,12 +725,12 @@ class Wellplate:
     def write_well_status_to_file(self) -> None:
         """Write the well status to the well_status.json file"""
         data_to_write = {
-            "type_number": self.type_number,
             "plate_id": self.plate_id,
+            "type_number": self.type_number,
             "wells": [well.__dict__() for well in self.wells.values()],
         }
         with open(WELL_STATUS, "w", encoding="UTF-8") as f:
-            json.dump(data_to_write, f, indent=4)
+            json.dump(data_to_write, f, indent=4, cls=WellCoordinatesEncoder)
         logger.debug("Well status written to file")
 
 
@@ -995,82 +1011,78 @@ def load_new_wellplate(
     else:
         new_wellplate_type_number = int(new_wellplate_type_number)
 
-    if Path(WELL_HX).exists():
-        with open(WELL_HX, "r", encoding="UTF-8") as file:
-            well_hx = file.readlines()
-        wells = []
-        for line in well_hx:
-            if line.split("&")[0] == str(new_plate_id):
-                wells.append(line.strip())
-        if len(wells) > 0:
-            ## If the wellplate exists in the well hx, then load it
-            ## A well entry looks like this:
-            # {
-            # "well_id": "B2",
-            # "status": "complete",
-            # "status_date": "2024-03-08 13:45:15",
-            # "contents": {
-            #     "edot": 127.43,
-            #     "rinse0": 509.72
-            # },
-            # "experiment_id": 10000382,
-            # "project_id": 16,
-            # "volume": 0.0,
-            # "coordinates": {
-            #     "x": -231.65,
-            #     "y": -87.6,
-            #     "z": -66.0
-            # }
-            logger.debug("Loading wellplate")
-            with open(WELL_STATUS, "w", encoding="UTF-8") as file:
-                json.dump(
-                    {
-                        "plate_id": int(new_plate_id),
-                        "type_number": int(new_wellplate_type_number),
-                        "wells": [
-                            {
-                                "well_id": current_line.split("&")[2],
-                                "status": current_line.split("&")[5],
-                                "status_date": current_line.split("&")[6],
-                                "contents": json.loads(current_line.split("&")[7]),
-                                # "contents": json.loads(str(current_line.split("&")[7]).replace("'",'"')),
-                                "experiment_id": (
-                                    None
-                                    if (current_line.split("&")[3]) == "None"
-                                    else int(current_line.split("&")[3])
+    ## If the wellplate exists in the well hx, then load it
+    with open(WELL_HX, "r", encoding="UTF-8") as file:
+        well_hx = file.readlines()
+    wells = []
+    for line in well_hx:
+        if line.split("&")[0] == str(new_plate_id):
+            wells.append(line.strip())
+    if len(wells) > 0:
+
+        ## A well entry looks like this:
+        # {
+        # "well_id": "B2",
+        # "status": "complete",
+        # "status_date": "2024-03-08 13:45:15",
+        # "contents": {
+        #     "edot": 127.43,
+        #     "rinse0": 509.72
+        # },
+        # "experiment_id": 10000382,
+        # "project_id": 16,
+        # "volume": 0.0,
+        # "coordinates": {
+        #     "x": -231.65,
+        #     "y": -87.6,
+        #     "z_top": -66.0
+        # }
+        logger.debug("Loading wellplate")
+        with open(WELL_STATUS, "w", encoding="UTF-8") as file:
+            json.dump(
+                {
+                    "plate_id": int(new_plate_id),
+                    "type_number": int(new_wellplate_type_number),
+                    "wells": [
+                        {
+                            "well_id": current_line.split("&")[2],
+                            "status": current_line.split("&")[5],
+                            "status_date": current_line.split("&")[6],
+                            "contents": json.loads(current_line.split("&")[7]),
+                            # "contents": json.loads(str(current_line.split("&")[7]).replace("'",'"')),
+                            "experiment_id": (
+                                None
+                                if (current_line.split("&")[3]) == "None"
+                                else int(current_line.split("&")[3])
+                            ),
+                            "project_id": (
+                                None
+                                if (current_line.split("&")[4]) == "None"
+                                else int(current_line.split("&")[4])
+                            ),
+                            "volume": float(current_line.split("&")[8]),
+                            "coordinates": {
+                                "x": float(json.loads(current_line.split("&")[9])["x"]),
+                                "y": float(json.loads(current_line.split("&")[9])["y"]),
+                                "z_top": float(
+                                    json.loads(current_line.split("&")[9])["z_top"]
                                 ),
-                                "project_id": (
-                                    None
-                                    if (current_line.split("&")[4]) == "None"
-                                    else int(current_line.split("&")[4])
-                                ),
-                                "volume": float(current_line.split("&")[8]),
-                                "coordinates": {
-                                    "x": float(
-                                        json.loads(current_line.split("&")[9])["x"]
-                                    ),
-                                    "y": float(
-                                        json.loads(current_line.split("&")[9])["y"]
-                                    ),
-                                    "z_top": float(
-                                        json.loads(current_line.split("&")[9])["z_top"]
-                                    ),
-                                },
-                            }
-                            for current_line in wells
-                        ],
-                    },
-                    file,
-                    indent=4,
-                )
-            logger.debug("Wellplate loaded")
-            logger.info("Wellplate %d loaded", int(new_plate_id))
-            return new_plate_id
+                            },
+                        }
+                        for current_line in wells
+                    ],
+                },
+                file,
+                indent=4,
+            )
+        logger.debug("Wellplate loaded")
+        logger.info("Wellplate %d loaded", int(new_plate_id))
+        return new_plate_id
 
     ## If the wellplate does not exist in the well hx, then create a new wellplate
     ## Go through a reset all fields and apply new plate id
     logger.debug("Creating new wellplate: %d", new_plate_id)
-    logger.debug("Resetting well statuses to new")
+    logger.debug("Resetting well status file to new")
     new_wellplate = {
         "plate_id": new_plate_id,
         "type_number": new_wellplate_type_number,
@@ -1092,12 +1104,20 @@ def load_new_wellplate(
     with open(WELL_STATUS, "w", encoding="UTF-8") as file:
         json.dump(new_wellplate, file, indent=4)
 
+    new_wellplate = Wellplate(
+        type_number=new_wellplate_type_number, new_well_plate=True
+    )
+    new_wellplate.plate_id = new_plate_id
+    new_wellplate.recalculate_well_locations()
+    new_wellplate.write_well_status_to_file()
+
     logger.debug("Well statuses reset to new")
     logger.info(
         "Wellplate %d saved and wellplate %d loaded",
         int(current_wellplate_id),
         int(new_plate_id),
     )
+
     return new_plate_id
 
 
