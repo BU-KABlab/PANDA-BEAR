@@ -290,8 +290,8 @@ class FLIRCamera:
         self.set_gamma(1.250)
         self.set_shutter(50.023)
         self.set_gain(0.0)
-        self.set_framerate(1)
-        self.set_white_balance(540, 840)
+        self.set_framerate(5)
+        self.set_white_balance(762, 813)
 
 
 if __name__ == "__main__":

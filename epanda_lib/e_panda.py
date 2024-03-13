@@ -47,12 +47,11 @@ from epanda_lib.experiment_class import (
     ExperimentResult,
     ExperimentStatus,
 )
-from epanda_lib.gamry_control import OCP
 from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
 from epanda_lib.pump_control import MockPump, Pump
 from epanda_lib.vials import StockVial, WasteVial
-from epanda_lib.wellplate import Well, Wellplate
+from epanda_lib.wellplate import Well
 from epanda_lib.correction_factors import correction_factor
 from epanda_lib.instrument_toolkit import Toolkit
 

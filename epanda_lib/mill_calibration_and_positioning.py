@@ -247,9 +247,17 @@ def calibrate_wells(
             )
 
         if coordinates_changed:
-            # Update the well status file with the new well coordinates
-            wellplate.set_coordinates(well_id, new_coordinates)
-            wellplate.write_well_status_to_file()
+            if well_id.upper() == "A1":
+                recalc = input("Would you like to recalculate all well locations? (y/n): ")
+                if recalc.lower() == "y":
+                    wellplate.a1_x = new_coordinates.x
+                    wellplate.a1_y = new_coordinates.y
+                    wellplate.write_wellplate_location()
+                    wellplate.recalculate_well_locations()
+                    wellplate.write_well_status_to_file()
+            else: # Update the well status file with the new well coordinates
+                wellplate.set_coordinates(well_id, new_coordinates)
+                wellplate.write_well_status_to_file()
 
 
 def calibrate_z_bottom_of_wellplate(
