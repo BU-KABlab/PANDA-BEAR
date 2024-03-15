@@ -8,7 +8,7 @@ from epanda_lib.config.pin import CURRENT_PIN
 from epanda_lib.scheduler import Scheduler
 
 params_df = pd.read_csv(
-    r"C:\Users\Kab Lab\Documents\GitHub\PANDA\experiment_generators\exp_edot_screening_generator_v1_LHS_0,1.csv"
+    r"C:\Users\Kab Lab\Documents\GitHub\PANDA\experiment_generators\exp_edot_screening_generator_v1_LHS_0,01.csv"
 )  # Update path with location on PANDA computer
 
 
@@ -28,7 +28,7 @@ def main():
     input("Press enter to continue")
 
     PROJECT_ID = 16
-    EXPERIMENT_NAME = "pedotLHSv1_screening_repeat"
+    EXPERIMENT_NAME = "pedotLHSv1_screening_0,01"
     CAMPAIGN_ID = 2
     PUMPING_RATE = 0.3
 

@@ -115,6 +115,8 @@ class SlackBot:
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
         elif channel == "alert":
             channel_id = slack_cred.ALERT_CHANNEL_ID
+        elif channel == "data":
+            channel_id = slack_cred.DATA_CHANNEL_ID
         else:
             return 0
 
