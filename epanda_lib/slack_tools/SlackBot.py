@@ -291,7 +291,11 @@ class SlackBot:
                 file_name = "tmp_screenshot.png"
                 obs = OBSController()
                 # verify that the camera is an active source
-                sources = obs.client.get_source_active(camera)
+                try:
+                    sources = obs.client.get_source_active(camera)
+                except Exception as e:
+                    self.send_slack_message(channel_id, f"Could not find a camera source named {camera}")
+                    return 1
                 if not sources:
                     self.send_slack_message(
                         channel_id, f"Camera {camera} is not active"
