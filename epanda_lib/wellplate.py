@@ -191,7 +191,7 @@ class Well(Vessel):
             "experiment_id": self.experiment_id,
             "project_id": self.project_id,
             "volume": self.volume,
-            "coordinates": self.coordinates,  # Remove the .__dict__ attribute access
+            "coordinates": self.coordinates,
         }
 
     def get_contents(self) -> dict:
@@ -389,7 +389,7 @@ class Wellplate:
         }  # coordinates of A1
         self.initial_volume = 0.00
         self.establish_new_wells()  # we need to establish the wells before we can update their status from file
-        self.calulcate_well_locations()  # now we can calculate the well locations
+        self.calculate_well_locations()  # now we can calculate the well locations
         self.update_well_status_from_json_file()
         # Update the well info from file
         # if not new_well_plate:
@@ -413,10 +413,10 @@ class Wellplate:
             "y": self.a1_y,
             "z_top": self.z_top,
         }  # coordinates of A1
-        self.calulcate_well_locations()
+        self.calculate_well_locations()
         # self.update_well_status_from_json_file()
 
-    def calulcate_well_locations(self: "Wellplate") -> None:
+    def calculate_well_locations(self: "Wellplate") -> None:
         """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
         for col_idx, col in enumerate(self.columns):
             for row in range(1, self.rows):
@@ -452,11 +452,13 @@ class Wellplate:
                             "x": self.a1_coordinates["x"] + x_offset,
                             "y": self.a1_coordinates["y"] + y_offset,
                             "z_top": self.z_top,
+                            "z_top": self.z_top,
                         }
 
                     # Round the coordinates to 2 decimal places
                     coordinates["x"] = round(coordinates["x"], 3)
                     coordinates["y"] = round(coordinates["y"], 3)
+                    coordinates["z_top"] = round(coordinates["z_top"], 3)
                     coordinates["z_top"] = round(coordinates["z_top"], 3)
 
                 self.set_coordinates(well_id, coordinates)
@@ -1117,7 +1119,6 @@ def load_new_wellplate(
         int(current_wellplate_id),
         int(new_plate_id),
     )
-
     return new_plate_id
 
 
@@ -1227,7 +1228,7 @@ def determine_next_experiment_id() -> int:
 if __name__ == "__main__":
     # test_stage_display()
     wellplate = Wellplate()
-    load_new_wellplate(ask=False, new_plate_id=107, new_wellplate_type_number=4)
+    load_new_wellplate(ask=False, new_plate_id=109, new_wellplate_type_number=4)
     save_current_wellplate()
     # print(wellplate["A1"].coordinates)
     # print(wellplate["A12"].coordinates)

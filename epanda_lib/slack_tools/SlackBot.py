@@ -4,21 +4,32 @@
 
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 import csv
+import base64
+from io import BytesIO
 import json
 import logging
 import time
 from datetime import datetime
 from pathlib import Path
+from PIL import Image
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from epanda_lib.config.config import (QUEUE, SLACK_TICKETS, STOCK_STATUS, WASTE_STATUS,
-                            WELL_STATUS, WELL_TYPE)
+from epanda_lib.config.config import (
+    QUEUE,
+    SLACK_TICKETS,
+    STOCK_STATUS,
+    WASTE_STATUS,
+    WELL_STATUS,
+    WELL_TYPE,
+)
 from epanda_lib.config.secrets import Slack as slack_cred
 from epanda_lib.wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wellplate
+from epanda_lib.obs_controls import OBSController
+from epanda_lib.image_tools import add_data_zone
 
 
 class SlackBot:
@@ -115,6 +126,8 @@ class SlackBot:
             channel_id = slack_cred.CONVERSATION_CHANNEL_ID
         elif channel == "alert":
             channel_id = slack_cred.ALERT_CHANNEL_ID
+        elif channel == "data":
+            channel_id = slack_cred.DATA_CHANNEL_ID
         else:
             return 0
 
@@ -270,6 +283,43 @@ class SlackBot:
             time.sleep(1)
             self.__vial_status(channel_id=channel_id)
             return 1
+
+        elif text[0:10] == "screenshot":
+            parts = text.split("-")
+            camera = parts[1].strip().lower()
+            try:
+                file_name = "tmp_screenshot.png"
+                obs = OBSController()
+                # verify that the camera is an active source
+                try:
+                    sources = obs.client.get_source_active(camera)
+                except Exception as e:
+                    self.send_slack_message(channel_id, f"Could not find a camera source named {camera}")
+                    return 1
+                if not sources:
+                    self.send_slack_message(
+                        channel_id, f"Camera {camera} is not active"
+                    )
+                    return 1
+                screenshot = obs.client.get_source_screenshot(
+                    camera, "png", 1920, 1080, -1
+                )
+                img = Image.open(
+                    BytesIO(base64.b64decode(screenshot.image_data.split(",")[1]))
+                )
+                img = add_data_zone(img, context=f"{camera.capitalize()} Screenshot")
+                img.save(file_name, "png")
+                self.send_slack_file(
+                    channel_id, file_name, f"{camera.capitalize()} Screenshot"
+                )
+                Path(file_name).unlink()
+                return 1
+
+            except Exception as e:
+                self.send_slack_message(channel_id, "Error taking screenshot")
+                self.send_slack_message(channel_id, str(e))
+                return 1
+
         elif text[0:5] == "pause":
             return 1
 
@@ -292,22 +342,42 @@ class SlackBot:
 
     def __help_menu(self, channel_id):
         """Sends the help menu to the user."""
-        message = (
-            "Here is a list of commands I understand:\n"
-            "help - displays this message\n"
-            # "plot experiment # - plots plots the CV data for experiment #\n"
-            # "data experiment # - sends the data files for experiment #\n"
-            # "status experiment # - displays the status of experiment #\n"
-            "vial status - displays the status of the vials\n"
-            "well status - displays the status of the wells and the rest of the deck\n"
-            "queue length - displays the length of the queue\n"
-            "status - displays the status of the vials, wells, and queue\n"
-            # "pause - pauses the experiment loop\n"
-            # "resume - resumes the experiment loop\n"
-            # "start - starts the experiment loop\n"
-            # "stop - stops the experiment loop\n"
-            "exit - closes the slackbot\n"
-        )
+
+        if channel_id != slack_cred.DATA_CHANNEL_ID:
+            message = (
+                "Here is a list of commands I understand:\n"
+                "help -> displays this message\n"
+                # "plot experiment # - plots plots the CV data for experiment #\n"
+                # "data experiment # - sends the data files for experiment #\n"
+                # "status experiment # - displays the status of experiment #\n"
+                "vial status -> displays the status of the vials\n"
+                "well status -> displays the status of the wells and the rest of the deck\n"
+                "queue length -> displays the length of the queue\n"
+                "status -> displays the status of the vials, wells, and queue\n"
+                "screenshot-{camera name} -> takes a screenshot of the specified camera\n"
+                # "pause - pauses the experiment loop\n"
+                # "resume - resumes the experiment loop\n"
+                # "start - starts the experiment loop\n"
+                # "stop - stops the experiment loop\n"
+                "exit -> closes the slackbot\n"
+            )
+        else:
+            message = (
+                "Here is a list of commands I understand:\n"
+                "help -> displays this message\n"
+                # "plot experiment # - plots plots the CV data for experiment #\n"
+                # "data experiment # - sends the data files for experiment #\n"
+                # "status experiment # - displays the status of experiment #\n"
+                "vial status -> displays the status of the vials\n"
+                "well status -> displays the status of the wells and the rest of the deck\n"
+                "queue length -> displays the length of the queue\n"
+                "status -> displays the status of the vials, wells, and queue\n"
+                "screenshot-{camera name} -> takes a screenshot of the specified camera\n"
+                # "pause - pauses the experiment loop\n"
+                # "resume - resumes the experiment loop\n"
+                # "start - starts the experiment loop\n"
+                # "stop - stops the experiment loop\n"
+            )
         self.send_slack_message(channel_id, message)
         return 1
 

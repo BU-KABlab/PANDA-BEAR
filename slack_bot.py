@@ -8,4 +8,5 @@ STATUS = bot.check_slack_messages(channel="alert")
 while STATUS == 1:
     time.sleep(5)
     STATUS = bot.check_slack_messages(channel="alert")
+    bot.check_slack_messages(channel="data")
 print("Stopping Slack Bot")

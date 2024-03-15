@@ -110,6 +110,7 @@ if __name__ == "__main__":
 
     while True:
         # os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal
+        print("\n" * 10)
         print("Welcome to ePANDA!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
         current_wellplate = wellplate.read_current_wellplate()

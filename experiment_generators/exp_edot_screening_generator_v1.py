@@ -8,7 +8,7 @@ from epanda_lib.config.pin import CURRENT_PIN
 from epanda_lib.scheduler import Scheduler
 
 params_df = pd.read_csv(
-    r"experiment_generators\exp_edot_screening_generator_v1_LHS_0,1.csv"
+    r"C:\Users\Kab Lab\Documents\GitHub\PANDA\experiment_generators\exp_edot_screening_generator_v1_LHS_0,01.csv"
 )  # Update path with location on PANDA computer
 
 
@@ -28,12 +28,12 @@ def main():
     input("Press enter to continue")
 
     PROJECT_ID = 16
-    EXPERIMENT_NAME = "pedotLHSv1_screening"
+    EXPERIMENT_NAME = "pedotLHSv1_screening_0,01"
     CAMPAIGN_ID = 2
     PUMPING_RATE = 0.3
 
     # controller.load_new_wellplate(new_wellplate_type_number=6)
-    wellplate.load_new_wellplate(False, 107, 4)
+    wellplate.load_new_wellplate(False, 110, 4)
     experiment_id = determine_next_experiment_id()
     experiments: list[experiment_class.EchemExperimentBase] = []
 
@@ -42,41 +42,41 @@ def main():
         WELL_NUMBER = row["well_number"]
         dep_V = row["dep_V"]  # dep_V is used for deposition voltage
         dep_T = row["dep_T"]  # dep_T is used for deposition time
-
-        experiments.append(
-            experiment_class.EchemExperimentBase(
-                id=experiment_id,
-                protocol_id=10,
-                well_id=str(WELL_LETTER) + str(WELL_NUMBER),
-                experiment_name=EXPERIMENT_NAME + " " + "Deposition",
-                priority=1,
-                pin=CURRENT_PIN,
-                project_id=PROJECT_ID,
-                project_campaign_id=CAMPAIGN_ID,
-                solutions={"edot": 120, "liclo4": 0, "rinse": 120},
-                solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
-                pumping_rate=PUMPING_RATE,
-                status=experiment_class.ExperimentStatus.NEW,
-                filename=EXPERIMENT_NAME + " " + str(experiment_id),
-                override_well_selection=0,  # 0 to use new wells only, 1 to reuse a well
-                process_type=1,
-                # Echem specific
-                ocp=1,
-                baseline=0,
-                cv=0,
-                ca=1,
-                ca_sample_period=0.1,
-                ca_prestep_voltage=0.0,
-                ca_prestep_time_delay=0.0,
-                ca_step_1_voltage=dep_V,
-                ca_step_1_time=dep_T,
-                ca_step_2_voltage=0.0,
-                ca_step_2_time=0.0,
-                ca_sample_rate=0.5,
-            )
-        )
-        experiment_id += 1
-
+        
+        # experiments.append(
+        #     experiment_class.EchemExperimentBase(
+        #         id=experiment_id,
+        #         protocol_id=10,
+        #         well_id=str(WELL_LETTER) + str(WELL_NUMBER),
+        #         experiment_name=EXPERIMENT_NAME + " " + "Deposition",
+        #         priority=1,
+        #         pin=CURRENT_PIN,
+        #         project_id=PROJECT_ID,
+        #         project_campaign_id=CAMPAIGN_ID,
+        #         solutions={"edot": 120, "liclo4": 0, "rinse": 120},
+        #         solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
+        #         pumping_rate=PUMPING_RATE,
+        #         status=experiment_class.ExperimentStatus.NEW,
+        #         filename=EXPERIMENT_NAME + " " + str(experiment_id),
+        #         override_well_selection=0,  # 0 to use new wells only, 1 to reuse a well
+        #         process_type=1,
+        #         # Echem specific
+        #         ocp=1,
+        #         baseline=0,
+        #         cv=0,
+        #         ca=1,
+        #         ca_sample_period=0.1,
+        #         ca_prestep_voltage=0.0,
+        #         ca_prestep_time_delay=0.0,
+        #         ca_step_1_voltage=dep_V,
+        #         ca_step_1_time=dep_T,
+        #         ca_step_2_voltage=0.0,
+        #         ca_step_2_time=0.0,
+        #         ca_sample_rate=0.5,
+        #     )
+        # )
+        # experiment_id += 1
+        
         experiments.append(
             experiment_class.EchemExperimentBase(
                 id=experiment_id,
@@ -173,13 +173,14 @@ def main():
                 cv_scan_rate_cycle_1=0.04,
                 cv_scan_rate_cycle_2=0.04,
                 cv_scan_rate_cycle_3=0.04,
-                cv_cycle_count=2,
+                cv_cycle_count=3,
                 cv_initial_voltage=0.0,  # this should be the OCP final value
                 cv_final_voltage=-0.8,
                 cv_sample_period=0.1,
             )
         )
         experiment_id += 1
+        
         WELL_NUMBER += 1
 
 
