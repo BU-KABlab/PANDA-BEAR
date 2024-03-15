@@ -25,6 +25,7 @@ from .utilities import Coordinates, Instruments
 
 pump_control_logger = logging.getLogger("e_panda")
 if not pump_control_logger.hasHandlers():
+    pump_control_logger = logging.getLogger("pump_control")
     pump_control_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
@@ -35,6 +36,7 @@ if not pump_control_logger.hasHandlers():
 
 scale_logger = logging.getLogger("e_panda")
 if not scale_logger.hasHandlers():
+    scale_logger = logging.getLogger("scale")
     scale_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
