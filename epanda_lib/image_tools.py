@@ -8,9 +8,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 from epanda_lib.experiment_class import ExperimentBase
 
-def add_data_zone(
-    experiment: ExperimentBase, image: Image, context: str
-) -> Image:
+
+def add_data_zone(experiment: ExperimentBase, image: Image, context: str) -> Image:
     """Adds a data zone to the bottom of the image."""
     # determin the size of the image
     # Get the date and time from the image metadata
@@ -225,7 +224,6 @@ if __name__ == "__main__":
     # well_id = "G8"
     # context = "before deposition"
     # substrate = "ITO"
-
 
     new_image = add_data_zone(
         experiment=None, image=test_image, context="before deposition"

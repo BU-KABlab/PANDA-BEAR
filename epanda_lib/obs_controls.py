@@ -40,7 +40,18 @@ class OBSController:
             timeout=client_timeout,
         )
         self.logger = logging.getLogger(__name__)
+        self.sources = {
+            "PSTAT": 0,
+            "Webcam": 0,
+            "Vials": 0,
+            "text": 0,
+        }
 
+        for source in self.sources.keys():
+            try:
+                self.sources[source] = self.client.get_source_active(source)
+            except OBSerror.OBSSDKRequestError as e:
+                self.sources[source] = -1
     def place_experiment_on_screen(self, instructions: ExperimentBase):
         """Place the experiment information on the screen"""
         try:
@@ -129,6 +140,19 @@ Well: {well_id}"""
         return record_directory.record_directory
         # record_name = self.client.get_recor
 
+    # def take_preview_snapshot(self):
+    #     """Take a preview snapshot"""
+    #     return self.client.get_source_screenshot("Preview", "png")
+
+    def take_snapshot(self, source: str = "Webcam"):
+        """Takes a snapshot of the given source and returns a base64 encoded string of the image"""
+        try:
+            screenshot = self.client.get_source_screenshot(source, "png", 1920, 1080, -1)
+            return screenshot
+        except OBSerror.OBSSDKRequestError as e:
+            self.logger.error("Failed to take snapshot: %s", e)
+            return None
+
 
 class MockOBSController:
     """This class is used to mock the OBS software for testing"""
@@ -171,12 +195,3 @@ class MockOBSController:
     def set_recording_file_name(self, file_name: str):
         """Set the recording file name"""
         pass
-
-
-if __name__ == "__main__":
-    exp = ExperimentBase(id=1, status=ExperimentStatus.QUEUED, well_id="A1")
-    obs = OBSController()
-    obs.place_experiment_on_screen(exp)
-    obs.start_recording()
-    time.sleep(15)
-    obs.stop_recording()

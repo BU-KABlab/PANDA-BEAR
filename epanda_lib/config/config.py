@@ -13,6 +13,9 @@ TESTING = read_testing_config()  # Set to True to run in testing mode -- THIS IS
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 
+# SQL Database related
+SQL_DB_PATH = Path("data/epanda_db.db")
+
 ## FLIR Camera related
 PYTHON_360_PATH = Path("C:\\Users\\Kab Lab\\anaconda3\\envs\\python360\\python.exe")
 CAMERA_SCRIPT_PATH = Path("camera.py")
@@ -76,6 +79,9 @@ if USE_LOCAL_PATHS:
     SLACK_TICKETS = PATH_TO_SYSTEM_STATE / __SLACK_TICKETS_FILE_NAME
     EPANDA_LOG = PATH_TO_LOGS / "ePANDA.log"
 
+    # DB
+    SQL_DB_PATH = NETWORK_PATH /"epanda_dev.db"
+
     ## Validate that all paths exist and create them if they don't
     for path in [
         PATH_TO_CODE,
@@ -124,6 +130,9 @@ else:  # Use network paths
     WELL_TYPE = PATH_TO_CONFIG / __WELL_TYPE_FILE_NAME
     SLACK_TICKETS = PATH_TO_LOGS / __SLACK_TICKETS_FILE_NAME
     EPANDA_LOG = PATH_TO_LOGS / "ePANDA.log"
+
+    # DB
+    SQL_DB_PATH = NETWORK_PATH /"epanda_prod.db"
 
     ## Validate that all paths exist and create them if they don't
     for path in [

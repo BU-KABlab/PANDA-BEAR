@@ -10,8 +10,9 @@ from typing import Optional
 from pydantic import ConfigDict, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
 
+from .config.config import SQL_DB_PATH
 from .config.pin import CURRENT_PIN
-
+from . import sql_utilities
 
 class ExperimentStatus(str, Enum):
     """Define the possible statuses of an experiment"""
@@ -58,6 +59,50 @@ class ExperimentResult:
     characterization_min_values: list[float] = field(default_factory=list)
     pumping_record: list = None
     image_files: list[Path] = field(default_factory=list)
+
+    def set_ocp_dep_file(self, file: Path, passed: bool, final_voltage: float):
+        
+        # Set the file, the pass/fail status, and the final voltage
+        self.ocp_dep_files.append(file)
+        self.ocp_dep_passes.append(passed)
+        self.ocp_char_final_voltages.append(final_voltage)
+
+        # results_to_insert = []
+        # results_to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_file", str(file)))
+        # results_to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_pass", str(passed)))
+        # results_to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_final_voltage", str(final_voltage)))
+        # sql_utilities.insert_result_table_entry
+
+
+    def set_ocp_char_file(self, file: Path, passed: bool, final_voltage: float):
+        self.ocp_char_files.append(file)
+        self.ocp_char_passes.append(passed)
+        self.ocp_char_final_voltages.append(final_voltage)
+
+    def set_deposition_data_file(self, file: Path, plot_file: Path = None, max_value: float = None, min_value: float = None):
+        self.deposition_data_files.append(file)
+        if plot_file is not None:
+            self.deposition_plot_files.append(plot_file)
+        if max_value is not None:
+            self.deposition_max_values.append(max_value)
+        if min_value is not None:
+            self.depsotion_min_values.append(min_value)
+
+    def set_characterization_data_file(self, file: Path, plot_file: Path = None, max_value: float = None, min_value: float = None):
+        self.characterization_data_files.append(file)
+        if plot_file is not None:
+            self.characterization_plot_files.append(plot_file)
+        if max_value is not None:
+            self.characterization_max_values.append(max_value)
+        if min_value is not None:
+            self.characterization_min_values.append(min_value)
+
+    def set_pumping_record(self, record: list):
+        self.pumping_record = record
+
+    def set_image_file(self, file: Path):
+        self.image_files.append(file)
+    
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -295,7 +340,7 @@ class EchemExperimentBase(ExperimentBase):
             CV Sample Rate: {self.cv_sample_rate}
     """
         else:
-            return f"""
+            return """
         CV not selected
 """
 
@@ -470,7 +515,7 @@ def parse_experiment(json_string: str) -> ExperimentBase:
 #         return RootModel[Experiment](experiment).model_dump_json(indent=4)
 
 
-def serialize_experiment(experiment: (ExperimentBase, EchemExperimentBase)) -> str:
+def serialize_experiment(experiment: tuple[ExperimentBase, EchemExperimentBase]) -> str:
     """Given an experiment, determine the type and then pass back the serialized json form"""
 
     if isinstance(experiment, EchemExperimentBase):

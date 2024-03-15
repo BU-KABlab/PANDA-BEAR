@@ -2,16 +2,21 @@
 Requires the PyCapture2 library to be installed and run in a python 3.6 environment.
 This script is used to capture images from the FLIR camera.
 """
+
 import argparse
 import logging
 import sys
 from pathlib import Path
-#from epanda_lib.config.config import PATH_TO_LOGS
+
+# from epanda_lib.config.config import PATH_TO_LOGS
 import PyCapture2
+
 PATH_TO_LOGS = Path("epanda_lib/logs")
+
 
 class FLIRCamera:
     """Class to control the FLIR camera"""
+
     def __init__(self, print_to_console: bool = True):
         self.camera = None
         self.bus = None
@@ -292,6 +297,35 @@ class FLIRCamera:
         self.set_gain(0.0)
         self.set_framerate(1)
         self.set_white_balance(540, 840)
+
+    def set_save_metadata(self):
+        """Sets the metadata to save with the image"""
+
+    def get_camera_temperature(self):
+        """Get the temperature of the camera"""
+        temp_reg =  # Register address for the internal temperature sensor (check your camera's documentation)
+        temp_value = self.camera.readRegister(temp_reg)
+        # The temperature value might need to be converted to degrees Celsius.
+        # This conversion will depend on your camera's specifications.
+        temperature_celsius = temp_value / 10.0 - 273.15  # Example conversion
+        self.camera_logger.info(
+            "Camera temperature: {:.2f} °C".format(temperature_celsius)
+        )
+        return temperature_celsius
+
+    def get_camera_power(self):
+        """Get the power state of the camera"""
+        power_reg = 
+        power_value = self.camera.readRegister(power_reg)
+        self.camera_logger.info("Camera power: {:.2f} W".format(power_value))
+        return power_value
+
+    def enable_embedded_image_info(self):
+        """Enable embedding of various camera settings"""
+        embedded_info = self.camera.getEmbeddedImageInfo()
+        for setting in embedded_info:
+            if embedded_info[setting]:
+                self.camera.setEmbeddedImageInfo(**{setting: True})
 
 
 if __name__ == "__main__":

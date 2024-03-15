@@ -197,7 +197,7 @@ def calibrate_wells(
                 original_coordinates["y"],
                 z_top=wellplate.z_top,
             )
-            confirm = input("Is the pipette in the correct position? (yes/no): ")
+            confirm = input(f"Is the {str(instrument)}  in the correct position? (yes/no): ")
             if confirm.lower() == "yes" or confirm.lower() == "y" or confirm == "":
                 break
             print(f"Current coordinates of {well_id}: {current_coorinates}") #change to be the corrected coordinates if they have been changed
