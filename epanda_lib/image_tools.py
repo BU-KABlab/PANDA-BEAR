@@ -9,27 +9,39 @@ from PIL import Image, ImageDraw, ImageFont
 from epanda_lib.experiment_class import ExperimentBase
 
 def add_data_zone(
-    experiment: ExperimentBase, image: Image, context: str
+    image: Image, experiment: ExperimentBase = None, context: str = None
 ) -> Image:
     """Adds a data zone to the bottom of the image."""
     # determin the size of the image
     # Get the date and time from the image metadata
-    pin = experiment.pin
-    date_time = experiment.status_date
-    project_id = experiment.project_id
-    campaign_id = experiment.project_campaign_id
-    experiment_id = experiment.id
-    wellplate_id = experiment.plate_id
-    well_id = experiment.well_id
+    if experiment is None:
+        pin = ""
+        date_time = datetime.now()
+        project_id = ""
+        campaign_id = ""
+        experiment_id = ""
+        wellplate_id = ""
+        well_id = ""
+        substrate = ""
+    else:
+        pin = experiment.pin
+        date_time = experiment.status_date
+        project_id = experiment.project_id
+        campaign_id = experiment.project_campaign_id
+        experiment_id = experiment.id
+        wellplate_id = experiment.plate_id
+        well_id = experiment.well_id
 
-    # Get the substrate from the database
-    conn = sqlite3.connect("epanda.db")
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT substrate FROM substrates WHERE id = ?", (experiment.substrate_id,)
-    )
-    conn.close()
-    substrate = cursor.fetchone()[0]
+        #FIXME: This is not working there is no substrate table yet, consider using the well_types table
+        # # Get the substrate from the database
+        # conn = sqlite3.connect("epanda.db")
+        # cursor = conn.cursor()
+        # cursor.execute(
+        #     "SELECT substrate FROM substrates WHERE id = ?", (experiment.substrate_id,)
+        # )
+        # conn.close()
+        # substrate = cursor.fetchone()[0]
+        substrate = "ITO"
 
     try:
         # Check the image file type
@@ -46,10 +58,13 @@ def add_data_zone(
                 date_time = file_creation_time
         else:
             # Fallback on file creation date if unable to get from metadata
-            file_creation_time = datetime.fromtimestamp(
-                Path(image.filename).stat().st_ctime
-            )
-            date_time = file_creation_time
+            if experiment is None:
+                date_time = datetime.now()
+            else:
+                file_creation_time = datetime.fromtimestamp(
+                    Path(image.filename).stat().st_ctime
+                )
+                date_time = file_creation_time
     except:
         # Fallback on current time if all else fails
         date_time = datetime.now()
@@ -75,7 +90,7 @@ def add_data_zone(
 
     # ePANDA logo
     epanda_logo_x = text_starts[0]
-    logo = Image.open(r"images\bw_panda_logo.png")
+    logo = Image.open(Path("C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\images\\bw_panda_logo.png"))
     logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
     banner.paste(logo, (epanda_logo_x, 0))
     # ePANDA version

@@ -29,6 +29,7 @@ from epanda_lib.config.config import (
 from epanda_lib.config.secrets import Slack as slack_cred
 from epanda_lib.wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wellplate
 from epanda_lib.obs_controls import OBSController
+from epanda_lib.image_tools import add_data_zone
 
 
 class SlackBot:
@@ -302,6 +303,7 @@ class SlackBot:
                 img = Image.open(
                     BytesIO(base64.b64decode(screenshot.image_data.split(",")[1]))
                 )
+                img = add_data_zone(img, context=f"{camera.capitalize()} Screenshot")
                 img.save(file_name, "png")
                 self.send_slack_file(
                     channel_id, file_name, f"{camera.capitalize()} Screenshot"
@@ -309,8 +311,9 @@ class SlackBot:
                 Path(file_name).unlink()
                 return 1
 
-            except:
+            except Exception as e:
                 self.send_slack_message(channel_id, "Error taking screenshot")
+                self.send_slack_message(channel_id, str(e))
                 return 1
 
         elif text[0:5] == "pause":
