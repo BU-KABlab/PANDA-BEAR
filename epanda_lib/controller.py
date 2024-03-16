@@ -18,22 +18,30 @@ import json
 from pathlib import Path
 from typing import Sequence
 
+from slack_sdk.errors import (BotUserAccessError, SlackApiError,
+                              SlackClientConfigurationError, SlackClientError,
+                              SlackClientNotConnectedError,
+                              SlackObjectFormationError, SlackRequestError,
+                              SlackTokenRotationError)
+
 from . import e_panda
-from .wellplate import Wellplate
-from .config.config import RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS, WELL_STATUS
-from .experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
+from .config.config import (RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS,
+                            WELL_STATUS)
+from .experiment_class import (ExperimentBase, ExperimentResult,
+                               ExperimentStatus)
 from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
 from .obs_controls import OBSController
+from .protocol_utilities import ProtocolEntry, get_protocol_by_id
 from .pump_control import MockPump, Pump
-from .protocol_utilities import get_protocol_by_id, ProtocolEntry
 from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
-from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_file
-from .wellplate import save_current_wellplate
+from .vials import (StockVial, Vial2, WasteVial, read_vials,
+                    update_vial_state_file)
+from .wellplate import Wellplate, save_current_wellplate
 
 # set up slack globally so that it can be used in the main function and others
 
@@ -240,10 +248,28 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 )
                 for image in new_experiment.results.image_files:
                     image: Path
-                    slack.send_slack_file("data", image, image.name)
+                    if image.name.endswith("dz.tiff"):
+                        slack.send_slack_file("data", image, image.name)
+            except (
+                SlackApiError,
+                SlackClientError,
+                SlackRequestError,
+                BotUserAccessError,
+                SlackTokenRotationError,
+                SlackObjectFormationError,
+                SlackClientNotConnectedError,
+                SlackClientConfigurationError,
+            ) as error:
+                logger.error(
+                    "A Slack specific error occured while sharing images from experiment %d with slack: %s",
+                    new_experiment.id,
+                    error,
+                )
+                # continue with the rest of the program
+
             except Exception as error:
                 logger.error(
-                    "Error sharing images from experiment %d with slack: %s",
+                    "An unanticipated error occured while sharing images from experiment %d with slack: %s",
                     new_experiment.id,
                     error,
                 )
@@ -303,7 +329,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
-        raise error # raise error to go to finally. If we don't know what caused an error we don't want to continue
+        raise error  # raise error to go to finally. If we don't know what caused an error we don't want to continue
 
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
@@ -313,7 +339,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             )
         logger.info("Keyboard interrupt detected")
         slack.send_slack_message("alert", "ePANDA was interrupted by the user")
-        raise KeyboardInterrupt from exc # raise error to to go finally. This was triggered by the user to indicate they want to stop the program
+        raise KeyboardInterrupt from exc  # raise error to to go finally. This was triggered by the user to indicate they want to stop the program
 
     finally:
         if new_experiment is not None:

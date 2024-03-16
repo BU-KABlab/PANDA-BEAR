@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from slack_sdk import errors
 
 from epanda_lib.config.config import (
     QUEUE,
@@ -312,7 +313,7 @@ class SlackBot:
                 self.send_slack_file(
                     channel_id, file_name, f"{camera.capitalize()} Screenshot"
                 )
-                Path(file_name).unlink()
+                Path(file_name).unlink() # delete the file
                 return 1
 
             except Exception as e:

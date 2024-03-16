@@ -1155,13 +1155,15 @@ def image_well(
             Path(filepath).touch()
         else:
             capture_new_image(save=True, num_images=1, file_name=filepath)
-            img: Image = add_data_zone(instructions, filepath, step_description)
+            dz_filename = filepath.stem + "_dz" + filepath.suffix
+            dz_filepath = filepath.with_name(dz_filename)
+            img: Image = add_data_zone(instructions, dz_filepath, step_description)
             img.save(filepath)
 
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
-        # logger.info("Uploading image of well %s to OBS", instructions.well_id)
         instructions.results.set_image_file(filepath)
+        instructions.results.set_image_file(dz_filepath)
     except Exception as e:
         logger.exception(
             "Failed to image well %s. Error %s occured", instructions.well_id, e

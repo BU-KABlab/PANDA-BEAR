@@ -11,7 +11,7 @@ import subprocess
 from pathlib import Path
 from epanda_lib.config.config import PATH_TO_DATA, PYTHON_360_PATH, CAMERA_SCRIPT_PATH
 
-def capture_new_image(save=True, num_images=1, file_name:Path=Path("C:\\Users\\Kab Lab\\Pictures\\FLIR\\test.tiff")) -> None:
+def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.tiff")) -> None:
     """Capture a new image from the camera"""
     # Path to the Python interpreter
     python_360_path = PYTHON_360_PATH

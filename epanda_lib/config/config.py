@@ -13,9 +13,6 @@ TESTING = read_testing_config()  # Set to True to run in testing mode -- THIS IS
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 
-# SQL Database related
-SQL_DB_PATH = Path("data/epanda_db.db")
-
 ## FLIR Camera related
 PYTHON_360_PATH = Path("C:\\Users\\Kab Lab\\anaconda3\\envs\\python360\\python.exe")
 CAMERA_SCRIPT_PATH = Path("camera.py")
