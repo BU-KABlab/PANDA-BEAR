@@ -14,6 +14,7 @@ from .config.config import SQL_DB_PATH
 from .config.pin import CURRENT_PIN
 from . import sql_utilities
 
+
 class ExperimentStatus(str, Enum):
     """Define the possible statuses of an experiment"""
 
@@ -61,7 +62,7 @@ class ExperimentResult:
     image_files: list[Path] = field(default_factory=list)
 
     def set_ocp_dep_file(self, file: Path, passed: bool, final_voltage: float):
-        
+
         # Set the file, the pass/fail status, and the final voltage
         self.ocp_dep_files.append(file)
         self.ocp_dep_passes.append(passed)
@@ -73,13 +74,18 @@ class ExperimentResult:
         # results_to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_final_voltage", str(final_voltage)))
         # sql_utilities.insert_result_table_entry
 
-
     def set_ocp_char_file(self, file: Path, passed: bool, final_voltage: float):
         self.ocp_char_files.append(file)
         self.ocp_char_passes.append(passed)
         self.ocp_char_final_voltages.append(final_voltage)
 
-    def set_deposition_data_file(self, file: Path, plot_file: Path = None, max_value: float = None, min_value: float = None):
+    def set_deposition_data_file(
+        self,
+        file: Path,
+        plot_file: Path = None,
+        max_value: float = None,
+        min_value: float = None,
+    ):
         self.deposition_data_files.append(file)
         if plot_file is not None:
             self.deposition_plot_files.append(plot_file)
@@ -88,7 +94,13 @@ class ExperimentResult:
         if min_value is not None:
             self.depsotion_min_values.append(min_value)
 
-    def set_characterization_data_file(self, file: Path, plot_file: Path = None, max_value: float = None, min_value: float = None):
+    def set_characterization_data_file(
+        self,
+        file: Path,
+        plot_file: Path = None,
+        max_value: float = None,
+        min_value: float = None,
+    ):
         self.characterization_data_files.append(file)
         if plot_file is not None:
             self.characterization_plot_files.append(plot_file)
@@ -102,7 +114,6 @@ class ExperimentResult:
 
     def set_image_file(self, file: Path):
         self.image_files.append(file)
-    
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -118,14 +129,16 @@ class ExperimentBase:
     project_id: int = None
     solutions: dict = None
     solutions_corrected: dict = None
-    well_type_number: int = 1
+    well_type_number: int = (
+        None  # is used to indicate the type of well the experiment should run in
+    )
     pumping_rate: float = 0.3
     status: ExperimentStatus = ExperimentStatus.NEW
-    status_date: datetime = field(default_factory=datetime.now)
+    status_date: datetime = field(default_factory=(datetime.now().isoformat(timespec="seconds")))
     filename: str = None  # Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
-    protocol_type: int = 1  # 1 is 1 experiment at a time, 2 is layered
+    protocol_type: int = 1  # depreciated
     plate_id: Optional[int] = None
     override_well_selection: int = 0  # 0 is normal, 1 is override
     process_type: Optional[int] = (
@@ -136,24 +149,14 @@ class ExperimentBase:
     def set_status(self, new_status: ExperimentStatus):
         """Set the status and status date of the experiment"""
         self.status = new_status
-        self.status_date = datetime.now()
+        self.status_date = datetime.now().isoformat(timespec="seconds")
         try:
             from .obs_controls import OBSController
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
             print(f"Error setting status: {e}")
-            # don't raise the error, just log it
-
-    # @property
-    # def solutions_corrected(self):
-    #     '''Calculate the corrected volume for each solution'''
-    #     if self.solutions is not None:
-    #         return {
-    #             key: correction_factor(value, viscosity=None)
-    #             for key, value in self.solutions.items()
-    #         }
-    #     return None
+            # don't raise the error, just print it
 
     def is_same_id(self, other):
         """Check if two experiments have the same id"""
@@ -375,16 +378,296 @@ class EchemExperimentBase(ExperimentBase):
         {self.print_cv_parameters()}
     """
 
+
 @dataclass(config=ConfigDict(validate_assignment=True))
-class EdotExperiment(EchemExperimentBase):
+class EchemExperimentParameters:
+    """
+    Define the data that is used to run an experiment
+
+    This is the base class for all echem experiments
+    Attributes:
+    ------------
+    ocp: int
+        Open Circuit Potential
+    ca: int
+        Cyclic Amperometry
+    cv: int
+        Cyclic Voltammetry
+    baseline: int
+        Baseline
+    flush_sol_name: str
+        Flush solution name
+    flush_vol: int
+        Flush solution volume
+    mix = 1
+        Binary mix or dont mix
+    mix_count: int
+        Number of times to mix
+    mix_volume: int
+        Volume to mix
+    rinse_count: int
+        Default rinse count
+    rinse_vol: int
+        Default rinse volume
+    ca_sample_period: float
+        Deposition sample period
+    CAvi: float
+        Pre-step voltage (V)
+    CAti: float
+        Pre-step delay time (s)
+    CAv1: float
+        Step 1 voltage (V), deposition potential (V)
+    CAt1: float
+        run time 300 seconds, deposition duration (s)
+    CAv2: float
+        Step 2 voltage (V)
+    CAt2: float
+        Step 2 time (s)
+    CAsamplerate: float
+        sample period (s)
+    char_sol_name: str
+        Characterization solution name
+    char_vol: int
+        Characterization solution volume
+    cv_sample_period: float
+        Characterization sample period
+    cv_scan_rate: float
+        Scan rate
+    CVvi: float
+        initial voltage
+    CVap1: float
+        first anodic peak
+    CVap2: float
+        second anodic peak
+    CVvf: float
+        final voltage
+    CVstep: float
+        step size
+    CVsr1: float
+        scan rate 1
+    CVcycle: int
+        number of cycles
+    CVsr2: float
+        CVsr1
+    CVsr3: float
+        CVsr1
+    CVsamplerate: float
+        CVstep / CVsr1
+
+    """
+
+    ocp: int = 1  # Open Circuit Potential
+    ca: int = 1  # Cyclic Amperometry
+    cv: int = 1  # Cyclic Voltammetry
+    baseline: int = 0  # Baseline
+
+    flush_sol_name: str = ""  # Flush solution name
+    flush_vol: int = 0  # Flush solution volume
+
+    mix = 0  # Binary mix or dont mix
+    mix_count: int = 0  # Number of times to mix
+    mix_volume: int = 0  # Volume to mix
+    rinse_count: int = 4  # Default rinse count
+    rinse_vol: int = 120  # Default rinse volume
+
+    ca_sample_period: float = 0.1  # Deposition sample period
+    ca_prestep_voltage: float = 0.0  # Pre-step voltage (V)
+    # CAvi = ca_prestep_voltage
+    ca_prestep_time_delay: float = 0.0  # Pre-step delay time (s)
+    # CAti = ca_prestep_time_delay
+    ca_step_1_voltage: float = -1.7  # Step 1 voltage (V), deposition potential (V)
+    # CAv1 = ca_step_1_voltage
+    ca_step_1_time: float = 300.0  # run time 300 seconds, deposition duration (s)
+    # CAt1 = ca_step_1_time
+    ca_step_2_voltage: float = 0.0  # Step 2 voltage (V)
+    # CAv2 = ca_step_2_voltage
+    ca_step_2_time: float = 0.0  # Step 2 time (s)
+    # CAt2 = ca_step_2_time
+    ca_sample_rate: float = 0.5  # sample period (s)
+    # CAsamplerate = ca_sample_rate
+
+    char_sol_name: str = ""  # Characterization solution name
+    char_vol: int = 0  # Characterization solution volume
+    cv_sample_period: float = 0.1  # Characterization sample period
+    cv_initial_voltage: float = 0.0  # initial voltage
+    cv_first_anodic_peak: float = 0.5  # first anodic peak
+    cv_second_anodic_peak: float = -0.2  # second anodic peak
+    cv_final_voltage: float = 0.0  # final voltage
+    cv_step_size: float = 0.01  # step size
+    cv_cycle_count: int = 3  # number of cycles
+    cv_scan_rate_cycle_1: float = 0.1
+    cv_scan_rate_cycle_2: float = 0.1
+    cv_scan_rate_cycle_3: float = 0.1
+
+    # The below properies and setters are to allow for legacy ways of referencing the properties
+    @property
+    def CVvi(self):
+        return self.cv_initial_voltage
+
+    @CVvi.setter
+    def CVvi(self, value):
+        self.cv_initial_voltage = value
+
+    @property
+    def CVap1(self):
+        return self.cv_first_anodic_peak
+
+    @CVap1.setter
+    def CVap1(self, value):
+        self.cv_first_anodic_peak = value
+
+    @property
+    def CVap2(self):
+        return self.cv_second_anodic_peak
+
+    @CVap2.setter
+    def CVap2(self, value):
+        self.cv_second_anodic_peak = value
+
+    @property
+    def CVvf(self):
+        return self.cv_final_voltage
+
+    @CVvf.setter
+    def CVvf(self, value):
+        self.cv_final_voltage = value
+
+    @property
+    def CVstep(self):
+        return self.cv_step_size
+
+    @CVstep.setter
+    def CVstep(self, value):
+        self.cv_step_size = value
+
+    @property
+    def CVsr1(self):
+        return self.cv_scan_rate_cycle_1
+
+    @CVsr1.setter
+    def CVsr1(self, value):
+        self.cv_scan_rate_cycle_1 = value
+
+    @property
+    def CVsr2(self):
+        return self.cv_scan_rate_cycle_2
+
+    @CVsr2.setter
+    def CVsr2(self, value):
+        self.cv_scan_rate_cycle_2 = value
+
+    @property
+    def CVsr3(self):
+        return self.cv_scan_rate_cycle_3
+
+    @CVsr3.setter
+    def CVsr3(self, value):
+        self.cv_scan_rate_cycle_3 = value
+
+    # CVvi: float = 0.0  # initial voltage
+    # CVap1: float = 0.5  # first anodic peak
+    # CVap2: float = -0.2 # second anodic peak
+    # CVvf: float = 0.0  # final voltage
+    # CVstep: float = 0.01 # step size
+    # CVsr1: float = 0.1 # scan rate 1
+    # CVcycle: int = 3 # number of cycles
+    # CVsr2: float = CVsr1
+    # CVsr3: float = CVsr1
+
+    @property
+    def cv_sample_rate(self):
+        """CVstep / CVsr1"""
+        return round(self.cv_step_size / self.cv_scan_rate_cycle_1, 4)
+
+    def print_ca_parameters(self):
+        """Print the CA parameters"""
+        if self.ca:
+            return f"""
+        CA Parameters
+            Pre-step Voltage: {self.ca_prestep_voltage}
+            Pre-step Time Delay: {self.ca_prestep_time_delay}
+            Step 1 Voltage: {self.ca_step_1_voltage}
+            Step 1 Time: {self.ca_step_1_time}
+            Step 2 Voltage: {self.ca_step_2_voltage}
+            Step 2 Time: {self.ca_step_2_time}
+            CA Sample Rate: {self.ca_sample_rate}
+    """
+        else:
+            return """
+        CA Not selected
+    """
+
+    def print_cv_parameters(self):
+        """Print the CV parameters"""
+        if self.cv:
+            return f"""
+        CV Parameters
+            CV: {bool(self.cv)}
+            CV Baseline: {bool(self.baseline)}
+            Sample Period: {self.cv_sample_period}
+            Initial Voltage (CVvi): {self.cv_initial_voltage}
+            First Anodic Peak (CVap1): {self.cv_first_anodic_peak}
+            Second Anodic Peak (CVap2): {self.cv_second_anodic_peak}
+            Final Voltage (CVvf): {self.cv_final_voltage}
+            Step Size (CVstep): {self.cv_step_size}
+            Cycle Count: {self.cv_cycle_count}
+            Scan Rate Cycle 1 (CVsr1): {self.cv_scan_rate_cycle_1}
+            Scan Rate Cycle 2 (CVsr2): {self.cv_scan_rate_cycle_2}
+            Scan Rate Cycle 3 (CVsr3): {self.cv_scan_rate_cycle_3}
+            CV Sample Rate: {self.cv_sample_rate}
+    """
+        else:
+            return """
+        CV not selected
+"""
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class EdotExperiment(ExperimentBase):
     """Define the data that is used to run an edot experiment"""
+
     project_id: int = 16
+    well_type_number: int = 4  # ito
 
-    #pdot deposition - parameters for the deposition part of the experiment
+    # pdot deposition - parameters for the deposition part of the experiment
+    pdot_deposition: EchemExperimentParameters = None
+    # pdot bleaching
+    pdot_bleaching: EchemExperimentParameters = None
+    # pdot coloring
+    pdot_coloring: EchemExperimentParameters = None
+    # pdot characterization
+    pdot_characterization: EchemExperimentParameters = None
 
-    #pdot bleaching
+    def print_all_experiment_parameters(self):
+        """Print the experiment parameters"""
+        return f"""
+{self.experiment_name}
+        Plate #: {self.plate_id}
+        Experiment ID: {self.id}
+        Well ID: {self.well_id}
+        Status: {self.status.value}
+        Priority: {self.priority}
+        Solutions: {self.solutions}
+        Corrected Solutions: {self.solutions_corrected}
+        Filename: {self.filename}
 
-    #pdot coloring
+        Deposition Parameters:
+            {self.pdot_deposition.print_ca_parameters()}
+            {self.pdot_deposition.print_cv_parameters()}
+
+        Bleaching Parameters:
+            {self.pdot_bleaching.print_ca_parameters()}
+            {self.pdot_bleaching.print_cv_parameters()}
+
+        Coloring Parameters:
+            {self.pdot_coloring.print_ca_parameters()}
+            {self.pdot_coloring.print_cv_parameters()}
+
+        Characterization Parameters:
+            {self.pdot_characterization.print_ca_parameters()}
+            {self.pdot_characterization.print_cv_parameters()}
+
+    """
 
 
 def make_test_base_value() -> ExperimentBase:
@@ -394,93 +677,15 @@ def make_test_base_value() -> ExperimentBase:
         experiment_name="test",
         priority=2,
         well_id="D5",
-        pin= 100099000999,
+        pin=100099000999,
         project_id=3,
         solutions={"dmf": 0, "peg": 145, "acrylate": 145, "ferrocene": 0, "custom": 0},
         status=ExperimentStatus.QUEUED,
-        status_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        status_date=datetime.now().isoformat(timespec="seconds"),
         filename=f"test_{0}.json",
         results=None,
     )
 
-
-# def make_test_value() -> Experiment:
-#     '''Create a test experiment value for the class'''
-#     return Experiment(
-#         id=0,
-#         priority=2,
-#         pin=1001001001001001,
-#         target_well="D5",
-#         dmf=0,
-#         peg=145,
-#         acrylate=145,
-#         ferrocene=0,
-#         custom=0,
-#         ocp=1,
-#         ca=1,
-#         cv=1,
-#         baseline = 0,
-#         dep_duration=300,
-#         dep_pot=-2.7,
-#         ca_sample_period=0.01,
-#         cv_sample_period=0.01,
-#         cv_scan_rate = 0.05,
-#         status=ExperimentStatus.QUEUED,
-#         status_date=datetime.now(),
-#         pumping_rate=0.5,
-#         char_sol_name="ferrocene",
-#         char_vol=290,
-#         flush_sol_name="dmf",
-#         flush_vol=120,
-#         rinse_count=3,
-#         rinse_vol=150,
-#         mix = 1,
-#         mix_count = 3,
-#         mix_vol = 200,
-#         mix_rate = 0.62,
-#         filename= f"test_{datetime.now}.json",
-#         results=None)
-
-# def make_baseline_value() -> Experiment:
-#     '''Create a test experiment value for the class'''
-#     return Experiment(
-#         id=0,
-#         priority=0,
-#         pin=CURRENT_PIN,
-#         target_well="D5",
-#         dmf=0,
-#         peg=0,
-#         acrylate=0,
-#         ferrocene=0,
-#         custom=0,
-#         ocp=1,
-#         ca=0,
-#         cv=1,
-#         baseline = 1,
-#         dep_duration=300,
-#         dep_pot=-2.7,
-#         ca_sample_period=0.01,
-#         cv_sample_period=0.01,
-#         cv_scan_rate = 0.05,
-#         status=ExperimentStatus.QUEUED,
-#         status_date=datetime.now(),
-#         pumping_rate=0.5,
-#         char_sol_name="ferrocene",
-#         char_vol=290,
-#         flush_sol_name="dmf",
-#         flush_vol=120,
-#         rinse_count=3,
-#         rinse_vol=150,
-#         filename= None, #f"test_{datetime.now}.json",
-#         results=None)
-
-# def parse_experiment(json_string: str) -> ExperimentBase:
-#     '''Parse an experiment from a json string'''
-#     return RootModel[ExperimentBase].model_validate_json(json_string).root
-
-# def parse_experimentbase(json_string: str) -> ExperimentBase:
-#     '''Parse an experiment from a json string'''
-#     return RootModel[ExperimentBase].model_validate_json(json_string).root
 
 
 def make_test_value() -> ExperimentBase:
@@ -494,7 +699,7 @@ def make_test_value() -> ExperimentBase:
         project_id=3,
         solutions={"dmf": 0, "peg": 145, "acrylate": 145, "ferrocene": 0, "custom": 0},
         status=ExperimentStatus.QUEUED,
-        status_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        status_date=datetime.now().isoformat(timespec="seconds"),
         filename=f"test_{0}.json",
         results=None,
     )
