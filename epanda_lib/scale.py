@@ -168,7 +168,7 @@ def scale_variance_check(mock: bool = False):
     scale_logger.info("Python version: %s", sys.version)
     scale_logger.info("Numpy version: %s", np.__version__)
     scale_logger.info("Matplotlib version: %s", matplotlib.__version__)
-    scale_logger.info("Time: %s", datetime.datetime.now())
+    scale_logger.info("Time: %s", datetime.datetime.now().isoformat(timespec="seconds"))
     scale_logger.info("Mock: %s", mock)
     scale_logger.info("Test 05 | Apparent filter = final readout | plate type 5")
 

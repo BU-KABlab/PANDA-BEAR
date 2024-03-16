@@ -39,7 +39,7 @@ def wellplate_scan(mill_arg: Mill = None, capture_images=False):
                 folder.mkdir(parents=True, exist_ok=True)
 
                 # capture each image with file name as the date and the well name
-                file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{well.name}.png"
+                file_name = f"{datetime.now().strftime('%Y %m %d')}-{well.name}.png"
                 capture_new_image(file_name=folder / file_name)
         if mill_arg is None:
             mill.rest_electrode()

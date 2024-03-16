@@ -9,7 +9,6 @@ import random
 from comtypes import client, COMError
 import Analyzer
 import pandas as pd
-from datetime import datetime
 
 
 def pstatconnect() -> bool:

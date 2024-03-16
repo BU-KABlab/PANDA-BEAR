@@ -11,7 +11,6 @@ The scheduler module will be responsible for:
 import json
 import logging
 import random
-from datetime import datetime
 from pathlib import Path
 from typing import Tuple
 

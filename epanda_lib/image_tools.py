@@ -16,7 +16,7 @@ def add_data_zone(
     # Get the date and time from the image metadata
     if experiment is None:
         pin = ""
-        date_time = datetime.now()
+        date_time = datetime.now().isoformat(timespec="seconds")
         project_id = ""
         campaign_id = ""
         experiment_id = ""
@@ -25,7 +25,7 @@ def add_data_zone(
         substrate = ""
     else:
         pin = experiment.pin
-        date_time = experiment.status_date
+        date_time = datetime(experiment.status_date).isoformat(timespec="seconds")
         project_id = experiment.project_id
         campaign_id = experiment.project_campaign_id
         experiment_id = experiment.id
@@ -59,7 +59,7 @@ def add_data_zone(
         else:
             # Fallback on file creation date if unable to get from metadata
             if experiment is None:
-                date_time = datetime.now()
+                date_time = datetime.now().isoformat(timespec="seconds")
             else:
                 file_creation_time = datetime.fromtimestamp(
                     Path(image.filename).stat().st_ctime
@@ -67,7 +67,7 @@ def add_data_zone(
                 date_time = file_creation_time
     except:
         # Fallback on current time if all else fails
-        date_time = datetime.now()
+        date_time = datetime.now().isoformat(timespec="seconds")
 
     font = ImageFont.truetype("arial.ttf", 30)
     banner_height = 100

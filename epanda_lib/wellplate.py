@@ -252,7 +252,7 @@ class Well(Vessel):
                     well["contents"] = self.contents
                     well["experiment_id"] = self.experiment_id
                     well["project_id"] = self.project_id
-                    well["status_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    well["status_date"] = datetime.now().isoformat(timespec="seconds")
                     well["volume"] = self.volume
                     well["coordinates"] = self.coordinates.__dict__()
 
@@ -736,65 +736,6 @@ class Wellplate:
         logger.debug("Well status written to file")
 
 
-class GraceBioLabsWellPlate(Wellplate):
-    """
-    Well type for the Grace BioLabs 96 well plate
-    Type 1 is gold
-    Type 2 is ito
-    """
-
-    def __init__(
-        self,
-        a1_x: float = 0,
-        a1_y: float = 0,
-        orientation: int = 0,
-        columns: str = "ABCDEFGH",
-        rows: int = 13,
-        type_number: int = 1,
-    ):
-        super().__init__(a1_x, a1_y, orientation, columns, rows, type_number)
-
-        self.type_number = type_number
-
-        ## Get the well plate parameters from the well_type.csv file in config
-        (
-            self.radius,
-            self.well_offset,
-            self.well_capacity,
-            self.height,
-            self.shape,
-            self.z_top,
-        ) = self.read_well_type_characteristics(self.type_number)
-
-
-class CircularWellPlate(Wellplate):
-    """
-    A Wells class with different radius and well offset.
-    This also changes capacity, and echem height.
-    """
-
-    def __init__(
-        self,
-        a1_x: float = 0,
-        a1_y: float = 0,
-        orientation: int = 0,
-        columns: str = "ABCDEFGH",
-        rows: int = 13,
-        type_number: int = 3,
-    ):
-        super().__init__(a1_x, a1_y, orientation, columns, rows, type_number)
-        (
-            self.radius,
-            self.well_offset,
-            self.well_capacity,
-            self.height,
-            self.shape,
-            self.z_top,
-        ) = self.read_well_type_characteristics(self.type_number)
-        self.echem_height = -73  # for every well
-        self.z_top = self.z_bottom + self.height
-
-
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
 
@@ -825,9 +766,7 @@ class OverDraftException(Exception):
 
 def __test_stage_display():
     """Test the well plate"""
-    test_wellplate = CircularWellPlate(
-        a1_x=-218, a1_y=-74, orientation=0, columns="ABCDEFGH", rows=13, type_number=3
-    )
+    test_wellplate = Wellplate()
     ## Well coordinate
     x_coordinates, y_coordinates, color = (
         test_wellplate.well_coordinates_and_status_color()
