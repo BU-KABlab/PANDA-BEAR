@@ -7,7 +7,7 @@ Or starting the ePANDA either with or without mock instruments.
 import os
 import sys
 
-from epanda_lib import (camera_call_camera, controller, generator_utilities, mill_control,scheduler, vials,
+from epanda_lib import (camera_call_camera, controller, generator_utilities, protocol_utilities, mill_control,scheduler, vials,
                         wellplate, mill_calibration_and_positioning)
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import (read_testing_config,
@@ -55,6 +55,8 @@ def run_experiment_generator():
 
     generator_id = input("Enter the id of the generator you would like to run: ")
     generator_id = int(generator_id)
+    generator_utilities.read_in_generators()
+    protocol_utilities.read_in_protocols()
     generator = generator_utilities.get_generator_name(generator_id)
     generator_utilities.run_generator(generator_id)
 
