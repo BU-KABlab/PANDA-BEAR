@@ -449,6 +449,41 @@ def update_vial_state_file(vial_objects: Sequence[Vial2], filename):
 
     return 0
 
+def update_vial_state_files(stock_vials: Sequence[StockVial], waste_vials: Sequence[WasteVial], stock_filename: str, waste_filename: str):
+    """
+    Update the vials in the json file. This is used to update the volume, contents, and contamination of the vials
+    """
+    stock_filename_ob = Path.cwd() / stock_filename
+    with open(stock_filename_ob, "r", encoding="UTF-8") as file:
+        stock_vial_parameters = json.load(file)
+
+    for vial in stock_vials:
+        for vial_param in stock_vial_parameters:
+            if str(vial_param["position"]) == vial.position.lower():
+                vial_param["volume"] = vial.volume
+                vial_param["contamination"] = vial.contamination
+                vial_param["contents"] = vial.contents
+                break
+
+    with open(stock_filename_ob, "w", encoding="UTF-8") as file:
+        json.dump(stock_vial_parameters, file, indent=4)
+
+    waste_filename_ob = Path.cwd() / waste_filename
+    with open(waste_filename_ob, "r", encoding="UTF-8") as file:
+        waste_vial_parameters = json.load(file)
+
+    for vial in waste_vials:
+        for vial_param in waste_vial_parameters:
+            if str(vial_param["position"]) == vial.position.lower():
+                vial_param["volume"] = vial.volume
+                vial_param["contamination"] = vial.contamination
+                vial_param["contents"] = vial.contents
+                break
+
+    with open(waste_filename_ob, "w", encoding="UTF-8") as file:
+        json.dump(waste_vial_parameters, file, indent=4)
+
+    return 0
 
 def input_new_vial_values(vialgroup: str):
     """For user inputting the new vial values for the state file"""

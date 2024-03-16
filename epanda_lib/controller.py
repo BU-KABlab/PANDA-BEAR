@@ -40,7 +40,7 @@ from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
 from .vials import (StockVial, Vial2, WasteVial, read_vials,
-                    update_vial_state_file)
+                    update_vial_state_files)
 from .wellplate import Wellplate, save_current_wellplate
 
 # set up slack globally so that it can be used in the main function and others
@@ -102,8 +102,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             mill=toolkit.mill,
         )
         ## Update the system state with new vial and wellplate information
-        update_vial_state_file(stock_vials, STOCK_STATUS)
-        update_vial_state_file(waste_vials, WASTE_STATUS)
+        update_vial_state_files(stock_vials,waste_vials, STOCK_STATUS, WASTE_STATUS)
 
         ## Begin experiemnt loop
         while True:
@@ -241,39 +240,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             new_experiment.set_status(ExperimentStatus.COMPLETE)
 
             # Share any results images with the slack data channel
-            try:
-                slack.send_slack_message(
-                    "data",
-                    f"Experiment {new_experiment.id} has completed. Photos taken:",
-                )
-                for image in new_experiment.results.image_files:
-                    image: Path
-                    if image.name.endswith("dz.tiff"):
-                        slack.send_slack_file("data", image, image.name)
-            except (
-                SlackApiError,
-                SlackClientError,
-                SlackRequestError,
-                BotUserAccessError,
-                SlackTokenRotationError,
-                SlackObjectFormationError,
-                SlackClientNotConnectedError,
-                SlackClientConfigurationError,
-            ) as error:
-                logger.error(
-                    "A Slack specific error occured while sharing images from experiment %d with slack: %s",
-                    new_experiment.id,
-                    error,
-                )
-                # continue with the rest of the program
-
-            except Exception as error:
-                logger.error(
-                    "An unanticipated error occured while sharing images from experiment %d with slack: %s",
-                    new_experiment.id,
-                    error,
-                )
-                # continue with the rest of the program
+            share_to_slack(new_experiment)
 
             ## Reset the logger to log to the ePANDA.log file and format
             e_panda.apply_log_filter()
@@ -297,8 +264,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             new_experiment = None  # reset new_experiment to None so that we can check the queue again
 
             ## Update the system state with new vial and wellplate information
-            update_vial_state_file(stock_vials, STOCK_STATUS)
-            update_vial_state_file(waste_vials, WASTE_STATUS)
+            update_vial_state_files(stock_vials,waste_vials, STOCK_STATUS, WASTE_STATUS)
             if toolkit.pump.pipette.volume > 0:
                 # assume unreal volume, not actually solution, set to 0
                 toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume_ml)
@@ -548,6 +514,48 @@ def disconnect_from_instruments(instruments: Toolkit):
 
     logger.info("Disconnected from instruments")
 
+def share_to_slack(experiment: ExperimentBase):
+    """Share the results of the experiment to the slack data channel"""
+    slack = SlackBot()
+    if experiment.results is None:
+        logger.error("The experiment has no results")
+        return
+    if experiment.results.image_files is None:
+        logger.error("The experiment has no image files")
+        return
+    try:
+        slack.send_slack_message(
+            "data",
+            f"Experiment {experiment.id} has completed. Photos taken:",
+        )
+        for image in experiment.results.image_files:
+            image: Path
+            if image.name.endswith("dz.tiff"):
+                slack.send_slack_file("data", image, image.name)
+    except (
+        SlackApiError,
+        SlackClientError,
+        SlackRequestError,
+        BotUserAccessError,
+        SlackTokenRotationError,
+        SlackObjectFormationError,
+        SlackClientNotConnectedError,
+        SlackClientConfigurationError,
+    ) as error:
+        logger.error(
+            "A Slack specific error occured while sharing images from experiment %d with slack: %s",
+            experiment.id,
+            error,
+        )
+        # continue with the rest of the program
+
+    except Exception as error:
+        logger.error(
+            "An unanticipated error occured while sharing images from experiment %d with slack: %s",
+            experiment.id,
+            error,
+        )
+        # continue with the rest of the program
 
 if __name__ == "__main__":
     # wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)

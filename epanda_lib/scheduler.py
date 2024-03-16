@@ -369,6 +369,7 @@ class Scheduler:
         # Remove the experiment from the queue file
         queue = queue[queue["id"] != experiment.id]
         queue.to_csv(file_path, index=False)
+        # TODO replace with sql table
 
     def update_experiment_queue_priority(self, experiment_id: int, priority: int):
         """Update the priority of experiments in the queue"""
@@ -391,6 +392,7 @@ class Scheduler:
 
         # Rewrite the queue csv file
         queue.to_csv(queue_file_path, index=False)
+        # TODO replace with sql table
 
     def update_experiment_file(self, experiment: ExperimentBase) -> None:
         """
@@ -543,6 +545,7 @@ class Scheduler:
         df.to_csv(queue_file_path, mode="a", index=False, header=False)
         experiment.status = ExperimentStatus.QUEUED
         return experiment
+        # TODO replace with Sql table    
 
     def add_nonfile_experiments(self, experiments: list[ExperimentBase]) -> str:
         """

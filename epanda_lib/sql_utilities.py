@@ -1,8 +1,15 @@
 """A 'driver' for connecting to the project SQL database and executing SQL commands. """
 
+from datetime import datetime
 import sqlite3
 from typing import List
-from epanda_lib.config.config import SQL_DB_PATH
+from pathlib import Path
+import json
+import csv
+
+# from epanda_lib.config.config import SQL_DB_PATH
+
+SQL_DB_PATH = Path("P:/epanda_dev.db")
 
 
 def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
@@ -108,3 +115,76 @@ def add_result_type(result_type: str) -> None:
     execute_sql_command_no_return(
         f"INSERT INTO result_type (result_type) VALUES ('{result_type}')"
     )
+
+
+def process_well_hx_csv_into_table():
+    """
+    Process the well history CSV file into the well_hx table.
+    Matching each column:
+    0 plate id
+    1 type number
+    2 well id
+    3 experiment id
+    4 project id
+    5 status
+    6 status date
+    7 contents
+    8 volume
+    9 coordinates
+    """
+    # Read the well history CSV file
+    with open(
+        r"C:\Users\Gregory Robben\SynologyDrive\Documents\GitHub\PANDA-BEAR\epanda_lib\system state\well_history.csv",
+        "r",
+    ) as file:
+        lines = file.readlines()
+
+    for csv_line in lines:
+        reader = csv.reader([csv_line], delimiter="&")
+        for row in reader:
+            (
+                plate_id,
+                type_number,
+                well_id,
+                experiment_id,
+                project_id,
+                status,
+                status_date,
+                contents,
+                volume,
+                coordinates,
+            ) = map(check_empty, row)
+
+            if contents == "{}":
+                contents = "NULL"
+            if coordinates == "{}":
+                coordinates = "NULL"
+            # Convert the JSON strings to single-quoted JSON strings
+            if contents != "NULL" and not isinstance(contents, dict):
+                try:
+                    contents = json.dumps(json.loads(contents), separators=(",", ":"))
+                    contents = contents.replace("'", '"')
+                except json.decoder.JSONDecodeError:
+                    contents = "NULL"
+
+            if coordinates != "NULL" and not isinstance(coordinates, dict):
+                try:
+                    coordinates = json.dumps(
+                        json.loads(coordinates), separators=(",", ":")
+                    )
+                    coordinates = coordinates.replace("'", '"')
+                except json.decoder.JSONDecodeError:
+                    coordinates = "NULL"
+
+            # Prepare the SQL insert statement
+            sql_command = f"INSERT or IGNORE INTO well_hx (plate_id, well_id, experiment_id, project_id, status, status_date, contents, volume, coordinates) VALUES ({plate_id}, '{well_id}', '{experiment_id}', '{project_id}', '{status}', '{status_date}', '{contents}', {volume}, '{coordinates}')"
+            execute_sql_command_no_return(sql_command)
+
+
+def check_empty(value):
+    return value if value != "" else "NULL"
+
+
+if __name__ == "__main__":
+    # Process the well history CSV file into the well_hx table
+    process_well_hx_csv_into_table()
