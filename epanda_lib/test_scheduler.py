@@ -96,13 +96,13 @@ class TestScheduler(unittest.TestCase):
         Test the choose_alternative_well method of the Scheduler class.
         """
         # Test that the method returns a well that is available
-        well = self.scheduler.choose_alternative_well()
+        well = self.scheduler.choose_next_new_well()
         self.assertIsNotNone(well)
 
         # Test that the method returns None if no wells are available
         for i in range(96):
             self.scheduler.change_well_status(f"A{i+1}", "queued")
-        well = self.scheduler.choose_alternative_well()
+        well = self.scheduler.choose_next_new_well()
         self.assertIsNone(well)
 
     def test_change_well_status(self):
