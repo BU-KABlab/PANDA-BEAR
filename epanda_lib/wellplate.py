@@ -1329,7 +1329,7 @@ def determine_next_experiment_id() -> int:
     # well_hx["experiment id"] = well_hx["experiment id"].astype(int)
     # last_experiment_id = well_hx["experiment id"].max()
     # return int(last_experiment_id + 1)
-    return sql_utilities.determine_next_experiment_id()
+    return sql_utilities.select_next_experiment_id()
 
 
 if __name__ == "__main__":

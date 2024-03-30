@@ -86,7 +86,8 @@ def run_experiment_generator():
     )
     generator_utilities.read_in_generators()
     available_generators = generator_utilities.get_generators()
-    os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+    #os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+    print()
     if not available_generators:
         print("No generators available.")
         return
@@ -169,7 +170,7 @@ if __name__ == "__main__":
     while True:
         set_system_status(SystemState.IDLE, "at main menu", read_testing_config())
         # os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal
-        print("\n" * 10)
+        print()
         print("Welcome to ePANDA!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
         current_wellplate = wellplate.read_current_wellplate_info()

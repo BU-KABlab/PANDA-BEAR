@@ -80,7 +80,7 @@ class Scheduler:
     def check_well_status(self, well_to_check: str) -> str:
         """Checks the status of the well in the well_status view in the SQLite database"""
         try:
-            well_status = sql_utilities.get_well_status(well_to_check)
+            well_status = sql_utilities.select_well_status(well_to_check)
             return well_status
         except sqlite3.Error as e:
             logger.error("Error occured while checking well status: %s", e)
@@ -428,7 +428,7 @@ class Scheduler:
         experiment_filename = experiment_info[2]
 
         # TODO Get the experiment parameters from the database
-
+        experiment_parameters = sql_utilities.get_experiment_parameters(experiment_id)
         # TODO Map the experiment process type to the correct experiment class
 
         # TODO Return the experiment
@@ -788,7 +788,7 @@ class Scheduler:
             # Bulk insert the experiments that had wells available
             sql_utilities.insert_experiments(experiments)
             # Bulk set the status of the experiments that had wells available
-            sql_utilities.set_experiments_statuses(experiments, ExperimentStatus.QUEUED)
+            sql_utilities.update_experiments_statuses(experiments, ExperimentStatus.QUEUED)
 
             ## Bulk add the experiment parameters to the experiment_parameters table
             sql_utilities.insert_experiments_parameters(experiments)
@@ -948,7 +948,7 @@ def determine_next_experiment_id() -> int:
     # well_hx["experiment id"] = well_hx["experiment id"].astype(int)
     # last_experiment_id = well_hx["experiment id"].max()
     # return int(last_experiment_id + 1)
-    return sql_utilities.determine_next_experiment_id()
+    return sql_utilities.select_next_experiment_id()
 
 
 ####################################################################################################

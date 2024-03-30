@@ -29,5 +29,6 @@
             "database": "P:\\epanda_prod.db"
         }
     ],
-    "sqltools.useNodeRuntime": true
+    "sqltools.useNodeRuntime": true,
+    "editor.rulers": [80,120]
 }

@@ -2777,3 +2777,112 @@
 2024-03-29 22:16:19,865&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
 2024-03-29 22:16:19,867&ePANDA&INFO&controller&disconnect_from_instruments&540&&&&Disconnected from instruments&
 2024-03-29 22:16:20,483&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is shutting down...goodbye&True
+2024-03-29 22:38:40,869&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is starting up&True
+2024-03-29 22:38:40,871&ePANDA&INFO&controller&connect_to_instruments&496&&&&Using mock instruments&
+2024-03-29 22:38:40,872&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-29 22:38:40,872&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-29 22:38:42,882&ePANDA&INFO&controller&main&81&&&&Connected to instruments&
+2024-03-29 22:38:42,882&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA has connected to equipment&True
+2024-03-29 22:38:43,109&e_panda&DEBUG&wellplate&update_well_status_from_db&545&None&None&None&Updating well status from database...&True
+2024-03-29 22:38:43,456&e_panda&DEBUG&wellplate&update_well_status_from_db&549&None&None&None&Well status updated from database&True
+2024-03-29 22:38:43,456&ePANDA&INFO&controller&establish_system_state&367&&&&System state reestablished&
+2024-03-29 22:38:43,456&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-03-29 22:38:43,456&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial edot contains edot with volume 20000&
+2024-03-29 22:38:43,457&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 19860&
+2024-03-29 22:38:43,457&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:38:43,457&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-03-29 22:38:43,457&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0} with volume 1140&
+2024-03-29 22:38:43,457&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:38:43,458&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:38:43,458&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:38:43,972&ePANDA&INFO&controller&establish_system_state&440&&&&There are 96 clear wells&
+2024-03-29 22:38:43,974&e_panda&INFO&e_panda&flush_v2&727&None&None&None&Flushing pipette tip with 140.000000 ul of rinse...&True
+2024-03-29 22:38:43,974&e_panda&DEBUG&e_panda&solution_selector&810&None&None&None&Selected stock vial: rinse in position s4&True
+2024-03-29 22:38:43,975&e_panda&DEBUG&e_panda&waste_selector&837&None&None&None&Selected waste vial: waste in position w0&True
+2024-03-29 22:38:43,975&e_panda&INFO&e_panda&forward_pipette_v2&148&None&None&None&Forward pipetting 140.000000 ul from rinse to waste&True
+2024-03-29 22:38:43,975&e_panda&INFO&e_panda&forward_pipette_v2&171&None&None&None&Repetition 1 of 1&True
+2024-03-29 22:38:43,975&e_panda&DEBUG&e_panda&forward_pipette_v2&173&None&None&None&Withdrawing 40.000000 of air gap...&True
+2024-03-29 22:38:44,477&e_panda&INFO&e_panda&forward_pipette_v2&192&None&None&None&Moving to rinse at s4...&True
+2024-03-29 22:38:44,478&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-29 22:38:44,478&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-29 22:38:44,478&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-29 22:38:44,479&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-03-29 22:38:44,479&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-29 22:38:44,479&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-29 22:38:44,479&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-29 22:38:44,479&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-29 22:38:44,479&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-03-29 22:38:44,480&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-03-29 22:38:46,481&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:38:46,481&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-03-29 22:38:46,481&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-03-29 22:38:48,482&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:38:48,482&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-03-29 22:38:48,482&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-03-29 22:38:50,483&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:38:50,985&e_panda&INFO&vials&write_volume_to_disk&174&None&None&None&Writing rinse volume to vial file...&True
+2024-03-29 22:38:50,988&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-03-29 22:38:50,988&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-03-29 22:38:52,989&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:38:53,491&e_panda&DEBUG&e_panda&forward_pipette_v2&222&None&None&None&From Vessel rinse volume: 19720.000000 depth: -74.000000&True
+2024-03-29 22:38:53,491&e_panda&INFO&e_panda&forward_pipette_v2&230&None&None&None&Moving to: waste...&True
+2024-03-29 22:38:53,492&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-03-29 22:38:53,492&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-03-29 22:38:53,492&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-03-29 22:38:53,492&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-03-29 22:38:53,492&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-29 22:38:53,493&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-03-29 22:38:53,493&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-03-29 22:38:53,493&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-03-29 22:38:53,493&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-03-29 22:38:53,493&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-03-29 22:38:55,494&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:38:55,494&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-03-29 22:38:55,494&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-03-29 22:38:57,495&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:38:57,495&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-03-29 22:38:57,495&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-03-29 22:38:59,496&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:38:59,998&e_panda&INFO&vials&write_volume_to_disk&174&None&None&None&Writing waste volume to vial file...&True
+2024-03-29 22:39:00,001&e_panda&DEBUG&vials&update_contents&349&None&None&None&Updating waste w0 contents...&True
+2024-03-29 22:39:00,001&e_panda&DEBUG&vials&update_contents&372&None&None&None&waste w0: New contents: {'rinse': 280.0, 'edot': 0.0, 'liclo4': 0.0}&True
+2024-03-29 22:39:00,012&e_panda&INFO&e_panda&flush_v2&747&None&None&None&Flushed pipette tip with 140.000000 ul of rinse 1x times...&True
+2024-03-29 22:39:00,860&e_panda&DEBUG&wellplate&update_well_status_from_db&545&None&None&None&Updating well status from database...&True
+2024-03-29 22:39:01,060&e_panda&DEBUG&wellplate&update_well_status_from_db&549&None&None&None&Well status updated from database&True
+2024-03-29 22:39:01,060&ePANDA&INFO&controller&establish_system_state&367&&&&System state reestablished&
+2024-03-29 22:39:01,060&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-03-29 22:39:01,060&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial edot contains edot with volume 20000&
+2024-03-29 22:39:01,061&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 19720&
+2024-03-29 22:39:01,061&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:39:01,061&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-03-29 22:39:01,061&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {'rinse': 280.0, 'edot': 0.0, 'liclo4': 0.0} with volume 1280&
+2024-03-29 22:39:01,061&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:39:01,062&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:39:01,062&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:39:01,531&ePANDA&INFO&controller&establish_system_state&440&&&&There are 96 clear wells&
+2024-03-29 22:39:01,911&ePANDA&ERROR&controller&main&315&&&&cannot unpack non-iterable NoneType object&
+2024-03-29 22:39:01,912&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA encountered an error: cannot unpack non-iterable NoneType object&True
+2024-03-29 22:39:02,623&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-03-29 22:39:02,623&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-03-29 22:39:04,624&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:39:04,624&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0&
+2024-03-29 22:39:04,624&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0&
+2024-03-29 22:39:04,625&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, 0.0]&
+2024-03-29 22:39:04,625&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-369.4, -8.2, -50]&
+2024-03-29 22:39:04,625&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-29 22:39:04,625&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0&
+2024-03-29 22:39:04,625&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0&
+2024-03-29 22:39:04,626&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, 0.0]&
+2024-03-29 22:39:04,626&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.4&
+2024-03-29 22:39:04,626&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.4&
+2024-03-29 22:39:06,626&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:39:06,626&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-8.2&
+2024-03-29 22:39:06,627&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-8.2&
+2024-03-29 22:39:08,627&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:39:08,628&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-50&
+2024-03-29 22:39:08,628&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-50&
+2024-03-29 22:39:10,628&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-11.2,-53.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:39:10,628&ePANDA&INFO&controller&disconnect_from_instruments&532&&&&Disconnecting from instruments:&
+2024-03-29 22:39:10,629&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-29 22:39:10,631&ePANDA&INFO&controller&disconnect_from_instruments&535&&&&Disconnected from instruments&
+2024-03-29 22:39:11,126&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is shutting down...goodbye&True

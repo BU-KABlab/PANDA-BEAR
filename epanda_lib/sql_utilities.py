@@ -7,10 +7,9 @@ from pathlib import Path
 import json
 import csv
 import dataclasses
-import time
 from enum import Enum
+import time
 
-from epanda_lib.nesp_lib_local import status
 from epanda_lib.wellplate import Well
 from epanda_lib.experiment_class import (
     ExperimentStatus,
@@ -19,12 +18,12 @@ from epanda_lib.experiment_class import (
     ExperimentParameterRecord,
 )
 
-# from epanda_lib.config.config import SQL_DB_PATH
 from epanda_lib.config.config_tools import read_testing_config
 
 SQL_DB_PATH = Path("P:/epanda_dev.db")
 
 
+# Utility Functions
 def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
     """
     Execute an SQL command on the database.
@@ -36,30 +35,30 @@ def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
     Returns:
         List: The result of the SQL command.
     """
-    conn = sqlite3.connect(SQL_DB_PATH)
-    conn.isolation_level = None  # Manually control transactions
-    cursor = conn.cursor()
+    with sqlite3.connect(SQL_DB_PATH) as conn:
+        conn.isolation_level = None  # Manually control transactions
+        cursor = conn.cursor()
 
-    cursor.execute("BEGIN TRANSACTION")  # Start a new transaction
+        cursor.execute("BEGIN TRANSACTION")  # Start a new transaction
 
-    try:
-        # Execute the SQL command
-        if parameters:
-            if isinstance(parameters[0], tuple):
-                cursor.executemany(sql_command, parameters)
+        try:
+            # Execute the SQL command
+            if parameters:
+                if isinstance(parameters[0], tuple):
+                    cursor.executemany(sql_command, parameters)
+                else:
+                    cursor.execute(sql_command, parameters)
             else:
-                cursor.execute(sql_command, parameters)
-        else:
-            cursor.execute(sql_command)
-        result = cursor.fetchall()
+                cursor.execute(sql_command)
+            result = cursor.fetchall()
 
-        cursor.execute("COMMIT")  # Commit the transaction
-    except sqlite3.Error as e:
-        print(f"An error occurred: {e}")
-        cursor.execute("ROLLBACK")  # Rollback the transaction in case of error
-        raise e
-    finally:
-        conn.close()
+            cursor.execute("COMMIT")  # Commit the transaction
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            cursor.execute("ROLLBACK")  # Rollback the transaction in case of error
+            raise e
+        finally:
+            conn.close()
 
     return result
 
@@ -74,32 +73,42 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None) ->
     """
     if sql_command is None:
         return
-    conn = sqlite3.connect(SQL_DB_PATH)
-    conn.isolation_level = None  # Manually control transactions
-    cursor = conn.cursor()
+    with sqlite3.connect(SQL_DB_PATH) as conn:
+        conn.isolation_level = None  # Manually control transactions
+        cursor = conn.cursor()
 
-    # Start a new transaction
-    cursor.execute("BEGIN TRANSACTION")
+        # Start a new transaction
+        cursor.execute("BEGIN TRANSACTION")
 
-    try:
-        # Execute the SQL command
-        if parameters:
-            if isinstance(parameters[0], tuple):
-                cursor.executemany(sql_command, parameters)
+        try:
+            # Execute the SQL command
+            if parameters:
+                if isinstance(parameters[0], tuple):
+                    cursor.executemany(sql_command, parameters)
+                else:
+                    cursor.execute(sql_command, parameters)
             else:
-                cursor.execute(sql_command, parameters)
-        else:
-            cursor.execute(sql_command)
+                cursor.execute(sql_command)
 
-        # Commit the transaction
-        conn.commit()
-    except Exception as e:
-        # Rollback the transaction on error
-        conn.rollback()
-        raise e
-    finally:
-        # Close the connection
-        conn.close()
+            # Commit the transaction
+            conn.commit()
+        except Exception as e:
+            # Rollback the transaction on error
+            conn.rollback()
+            raise e
+        finally:
+            # Close the connection
+            conn.close()
+
+
+def check_empty(value):
+    """
+    Check if a value is empty and return NULL if it is.
+    """
+    return value if value != "" else "NULL"
+
+
+# Wellplate Functions
 
 
 def check_if_wellplate_exists(plate_id: int) -> bool:
@@ -115,7 +124,8 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
 
 
 def update_current_wellplate(new_plate_id: int) -> None:
-    """Changes the current wellplate's current value to 0 and sets the new wellplate's current value to 1"""
+    """Changes the current wellplate's current value to 0 and sets the new 
+    wellplate's current value to 1"""
     execute_sql_command_no_return(
         """
         UPDATE wellplates SET current = 0
@@ -161,24 +171,93 @@ def check_if_current_wellplate_is_new() -> bool:
     return True
 
 
-def determine_next_experiment_id() -> int:
-    """Determines the next experiment id by checking the experiment table"""
+def get_number_of_wells(plate_id: int = None) -> int:
+    """
+    Get the number of wells in the well_hx table.
+
+    Args:
+        plate_id (int): The plate ID.
+
+    Returns:
+        int: The number of wells.
+    """
+    if plate_id is None:
+        result = execute_sql_command(
+            """
+            SELECT COUNT(*) FROM well_hx
+            WHERE plate_id = (SELECT id FROM wellplates WHERE current = 1)
+            """
+        )
+    else:
+        result = execute_sql_command(
+            """
+            SELECT COUNT(*) FROM well_hx
+            WHERE plate_id = ?
+            """,
+            (plate_id,),
+        )
+    return int(result[0][0])
+
+
+def get_number_of_clear_wells(plate_id: int = None) -> int:
+    """
+    Query the well_hx table and count the number of wells with status in 
+    'new', 'clear','queued' for the current wellplate.
+    
+    If plate_id is provided, count the wells of the specified wellplate in 
+    well_hx instead of the current wellplate.
+
+    Args:
+        plate_id (int): The plate ID.
+
+    Returns:
+        int: The number of wells with status in 'new', 'clear','queued'.
+    """
+    if plate_id is None:
+        result = execute_sql_command(
+            """
+            SELECT COUNT(*) FROM well_hx
+            WHERE status IN ('new', 'clear','queued')
+            AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
+            """
+        )
+    else:
+        result = execute_sql_command(
+            """
+            SELECT COUNT(*) FROM well_hx
+            WHERE status IN ('new', 'clear','queued')
+            AND plate_id = ?
+            """,
+            (plate_id,),
+        )
+    return int(result[0][0])
+
+
+def get_current_wellplate_info() -> tuple[int, int, bool]:
+    """
+    Get the current wellplate information from the wellplates table.
+
+    Returns:
+        tuple[int, int, bool]: The wellplate ID, the wellplate type ID, and 
+        whether the wellplate is new.
+    """
     result = execute_sql_command(
         """
-        SELECT experiment_id FROM experiments
-        ORDER BY experiment_id DESC
-        LIMIT 1
+        SELECT id, type_id FROM wellplates
+        WHERE current = 1
         """
     )
     if result == []:
-        return 10000000
-    return result[0][0] + 1
+        return 0, 0, False
+    is_new = check_if_current_wellplate_is_new()
+    return result[0][0], result[0][1], is_new
 
 
 def select_wellplate_wells(plate_id: int = None) -> list[Well]:
     """
     Selects all wells from the well_hx table for a specific wellplate.
-    Or if no plate_id is provided, all wells of the current wellplate are selected.
+    Or if no plate_id is provided, all wells of the current wellplate are 
+    selected.
 
     The table has columns:
     plate_id,
@@ -230,7 +309,7 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
     return wells
 
 
-def get_well_status(well_id: str) -> str:
+def select_well_status(well_id: str) -> str:
     """
     Get the status of a well from the well_hx table.
 
@@ -294,6 +373,15 @@ def select_next_available_well() -> str:
     return result[0][0]
 
 
+# Queue Functions
+# Note the queue is a view and not a table, so it cannot be updated directly.
+# Instead the well_hx table is updated with the experiment_id and status.
+# If the status is 'queued' then the experiment is in the queue.
+# Otherwise the experiment is not in the queue.
+# TODO in the future experiments in the experiments table that are not matched to a well
+# in the well_hx table should be added to the queue in some manner but this is not implemented yet.
+
+
 def select_queue() -> list:
     """
     Selects all the entries from the queue table.
@@ -309,9 +397,11 @@ def select_queue() -> list:
 
 def get_next_experiment_from_queue(random_pick: bool = False) -> tuple[int, int, str]:
     """
-    Reads the next experiment from the queue table, the experiment with the highest priority (lowest number).
-        If random_pick is True, then a random experiment with the highest priority is selected.
-        Otherwise, the lowest experiment id in the queue with the highest priority is selected.
+    Reads the next experiment from the queue table, the experiment with the 
+    highest priority (lowest number).
+    
+    If random_pick, a random experiment with highest priority is selected.
+    Else, the lowest experiment id with the highest priority is selected.
 
     Args:
         random_pick (bool): Whether to pick a random experiment from the queue.
@@ -343,6 +433,23 @@ def get_next_experiment_from_queue(random_pick: bool = False) -> tuple[int, int,
     return result[0][0], result[0][1], result[0][2]
 
 
+# Experiment Functions
+
+
+def select_next_experiment_id() -> int:
+    """Determines the next experiment id by checking the experiment table"""
+    result = execute_sql_command(
+        """
+        SELECT experiment_id FROM experiments
+        ORDER BY experiment_id DESC
+        LIMIT 1
+        """
+    )
+    if result == []:
+        return 10000000
+    return result[0][0] + 1
+
+
 def select_experiment_paramaters(experiment_id: int) -> ExperimentBase:
     """
     Selects the experiment parameters from the experiment_parameters table.
@@ -366,118 +473,6 @@ def select_experiment_paramaters(experiment_id: int) -> ExperimentBase:
     return values  # FIXME - needs validation
 
 
-def update_experiment_status(
-    experiment: Union[ExperimentBase, int],
-    status: ExperimentStatus = None,
-    status_date: datetime = None,
-) -> None:
-    """
-    Update the status of an experiment in the experiments table.
-
-    Args:
-        experiment_id (int): The experiment ID.
-        status (ExperimentStatus): The status to update to.
-    """
-    if isinstance(experiment, int):
-        experiment_id = experiment
-    else:
-        experiment_id = experiment.id
-
-    if status is None:
-        status = experiment.status
-    if status_date is None:
-        status_date = experiment.status_date
-
-    execute_sql_command_no_return(
-        """
-        UPDATE well_hx SET status = ?, status_date = ?
-        WHERE experiment_id = ?
-        AND well_id = ?
-        AND plate_id = ?
-        """,
-        (
-            status.value,
-            experiment_id,
-            experiment.well_id,
-            experiment.plate_id,
-            status_date,
-        ),
-    )
-def get_number_of_wells(plate_id: int = None) -> int:
-    """
-    Get the number of wells in the well_hx table.
-
-    Args:
-        plate_id (int): The plate ID.
-
-    Returns:
-        int: The number of wells.
-    """
-    if plate_id is None:
-        result = execute_sql_command(
-            """
-            SELECT COUNT(*) FROM well_hx
-            WHERE plate_id = (SELECT id FROM wellplates WHERE current = 1)
-            """
-        )
-    else:
-        result = execute_sql_command(
-            """
-            SELECT COUNT(*) FROM well_hx
-            WHERE plate_id = ?
-            """,
-            (plate_id,),
-        )
-    return int(result[0][0])
-
-def get_number_of_clear_wells(plate_id: int = None) -> int:
-    """Query the well_hx table and count the number of wells with status in 'new', 'clear','queued' for the current wellplate.
-    If plate_id is provided, count the wells of the specified wellplate in well_hx instead of the current wellplate.
-
-    Args:
-        plate_id (int): The plate ID.
-
-    Returns:
-        int: The number of wells with status in 'new', 'clear','queued'.
-    """
-    if plate_id is None:
-        result = execute_sql_command(
-            """
-            SELECT COUNT(*) FROM well_hx
-            WHERE status IN ('new', 'clear','queued')
-            AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
-            """
-        )
-    else:
-        result = execute_sql_command(
-            """
-            SELECT COUNT(*) FROM well_hx
-            WHERE status IN ('new', 'clear','queued')
-            AND plate_id = ?
-            """,
-            (plate_id,),
-        )
-    return int(result[0][0])
-
-def get_current_wellplate_info() -> tuple[int, int, bool]:
-    """
-    Get the current wellplate information from the wellplates table.
-
-    Returns:
-        tuple[int, int, bool]: The wellplate ID, the wellplate type ID, and whether the wellplate is new.
-    """
-    result = execute_sql_command(
-        """
-        SELECT id, type_id FROM wellplates
-        WHERE current = 1
-        """
-    )
-    if result == []:
-        return 0, 0, False
-    is_new = check_if_current_wellplate_is_new()
-    return result[0][0], result[0][1], is_new
-
-
 def insert_experiment(experiment: ExperimentBase) -> None:
     """
     Insert an experiment into the experiments table.
@@ -487,7 +482,19 @@ def insert_experiment(experiment: ExperimentBase) -> None:
     """
     execute_sql_command_no_return(
         """
-        INSERT INTO experiments (experiment_id, project_id, project_campaign_id, well_type, protocol_id, pin, experiment_type, jira_issue_key, priority, process_type, filename)
+        INSERT INTO experiments (
+            experiment_id,
+            project_id,
+            project_campaign_id,
+            well_type,
+            protocol_id,
+            pin,
+            experiment_type,
+            jira_issue_key,
+            priority,
+            process_type,
+            filename
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
@@ -533,12 +540,95 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
         )
     execute_sql_command_no_return(
         """
-        INSERT INTO experiments (experiment_id, project_id, project_campaign_id, well_type, protocol_id, pin, experiment_type, jira_issue_key, priority, process_type, filename, created)
+        INSERT INTO experiments (
+            experiment_id,
+            project_id,
+            project_campaign_id,
+            well_type,
+            protocol_id,
+            pin,
+            experiment_type,
+            jira_issue_key,
+            priority,
+            process_type,
+            filename,
+            created
+            )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         parameters,
     )
 
+
+
+def insert_experiment_parameters(experiment: ExperimentBase) -> None:
+    """
+    Insert the experiment parameters into the experiment_parameters table.
+
+    Args:
+        experiment (ExperimentBase): The experiment to insert.
+    """
+    experiment_parameters: list[ExperimentParameterRecord] = experiment.get_parameters()
+    parameters = [
+        (
+            experiment.id,
+            parameter.parameter_type,
+            parameter.parameter_value,
+            datetime.now().isoformat(timespec="seconds"),
+        )
+        for parameter in experiment_parameters
+    ]
+    execute_sql_command_no_return(
+        """
+        INSERT INTO experiment_parameters (
+            experiment_id,
+            parameter_name,
+            parameter_value,
+            created
+            )
+        VALUES (?, ?, ?, ?)
+        """,
+        parameters,
+    )
+
+
+def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
+    """
+    Insert the experiment parameters into the experiment_parameters table.
+
+    Args:
+        experiments (List[ExperimentBase]): The experiments to insert.
+    """
+    parameters = []
+    for experiment in experiments:
+        experiment_parameters: list[ExperimentParameterRecord] = (
+            experiment.get_parameters()
+        )
+        for parameter in experiment_parameters:
+            parameters.append(
+                (
+                    experiment.id,
+                    parameter.parameter_type,
+                    (
+                        json.dumps(parameter.parameter_value)
+                        if isinstance(parameter.parameter_value, dict)
+                        else parameter.parameter_value
+                    ),
+                    datetime.now().isoformat(timespec="seconds"),
+                )
+            )
+    execute_sql_command_no_return(
+        """
+        INSERT INTO experiment_parameters (
+            experiment_id,
+            parameter_name,
+            parameter_value,
+            created
+            )
+        VALUES (?, ?, ?,?)
+        """,
+        parameters,
+    )
 
 def update_experiment(experiment: ExperimentBase) -> None:
     """
@@ -549,7 +639,17 @@ def update_experiment(experiment: ExperimentBase) -> None:
     """
     execute_sql_command_no_return(
         """
-        UPDATE experiments SET project_id = ?, project_campaign_id = ?, well_type = ?, protocol_id = ?, pin = ?, experiment_type = ?, jira_issue_key = ?, priority = ?, process_type = ?, filename = ?
+        UPDATE experiments
+        SET project_id = ?,
+            project_campaign_id = ?,
+            well_type = ?,
+            protocol_id = ?,
+            pin = ?,
+            experiment_type = ?,
+            jira_issue_key = ?,
+            priority = ?,
+            process_type = ?,
+            filename = ?
         WHERE experiment_id = ?
         """,
         (
@@ -594,74 +694,63 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
         )
     execute_sql_command_no_return(
         """
-        UPDATE experiments SET project_id = ?, project_campaign_id = ?, well_type = ?, protocol_id = ?, pin = ?, experiment_type = ?, jira_issue_key = ?, priority = ?, process_type = ?, filename = ?
+        UPDATE experiments
+        SET project_id = ?,
+            project_campaign_id = ?,
+            well_type = ?,
+            protocol_id = ?,
+            pin = ?,
+            experiment_type = ?,
+            jira_issue_key = ?,
+            priority = ?,
+            process_type = ?,
+            filename = ?
         WHERE experiment_id = ?
         """,
         parameters,
     )
 
 
-def insert_experiment_parameters(experiment: ExperimentBase) -> None:
+def update_experiment_status(
+    experiment: Union[ExperimentBase, int],
+    status: ExperimentStatus = None,
+    status_date: datetime = None,
+) -> None:
     """
-    Insert the experiment parameters into the experiment_parameters table.
+    Update the status of an experiment in the experiments table.
 
     Args:
-        experiment (ExperimentBase): The experiment to insert.
+        experiment_id (int): The experiment ID.
+        status (ExperimentStatus): The status to update to.
     """
-    experiment_parameters: list[ExperimentParameterRecord] = experiment.get_parameters()
-    parameters = [
+    if isinstance(experiment, int):
+        experiment_id = experiment
+    else:
+        experiment_id = experiment.id
+
+    if status is None:
+        status = experiment.status
+    if status_date is None:
+        status_date = experiment.status_date
+
+    execute_sql_command_no_return(
+        """
+        UPDATE well_hx SET status = ?, status_date = ?
+        WHERE experiment_id = ?
+        AND well_id = ?
+        AND plate_id = ?
+        """,
         (
-            experiment.id,
-            parameter.parameter_type,
-            parameter.parameter_value,
-            datetime.now().isoformat(timespec="seconds"),
-        )
-        for parameter in experiment_parameters
-    ]
-    execute_sql_command_no_return(
-        """
-        INSERT INTO experiment_parameters (experiment_id, parameter_name, parameter_value, created)
-        VALUES (?, ?, ?, ?)
-        """,
-        parameters,
+            status.value,
+            experiment_id,
+            experiment.well_id,
+            experiment.plate_id,
+            status_date,
+        ),
     )
 
 
-def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
-    """
-    Insert the experiment parameters into the experiment_parameters table.
-
-    Args:
-        experiments (List[ExperimentBase]): The experiments to insert.
-    """
-    parameters = []
-    for experiment in experiments:
-        experiment_parameters: list[ExperimentParameterRecord] = (
-            experiment.get_parameters()
-        )
-        for parameter in experiment_parameters:
-            parameters.append(
-                (
-                    experiment.id,
-                    parameter.parameter_type,
-                    (
-                        json.dumps(parameter.parameter_value)
-                        if isinstance(parameter.parameter_value, dict)
-                        else parameter.parameter_value
-                    ),
-                    datetime.now().isoformat(timespec="seconds"),
-                )
-            )
-    execute_sql_command_no_return(
-        """
-        INSERT INTO experiment_parameters (experiment_id, parameter_name, parameter_value, created)
-        VALUES (?, ?, ?,?)
-        """,
-        parameters,
-    )
-
-
-def set_experiments_statuses(
+def update_experiments_statuses(
     experiments: List[ExperimentBase],
     exp_status: ExperimentStatus,
     status_date: datetime = None,
@@ -681,19 +770,236 @@ def set_experiments_statuses(
         experiment.set_status(exp_status)
 
     parameters = [
-        (exp_status.value, status_date, experiment.id, experiment.project_id, experiment.well_id)
+        (
+            exp_status.value,
+            status_date,
+            experiment.id,
+            experiment.project_id,
+            experiment.well_id,
+        )
         for experiment in experiments
     ]
     execute_sql_command_no_return(
         """
-        UPDATE well_hx SET status = ?, status_date = ?, experiment_id = ?, project_id = ?
-        WHERE well_id = ? AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
+        UPDATE well_hx
+        SET status = ?, status_date = ?, experiment_id = ?, project_id = ?
+        WHERE well_id = ?
+        AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
         """,
         parameters,
     )
 
 
+# Result Functions
 
+
+def insert_experiment_results(entry: ExperimentResultsRecord) -> None:
+    """
+    Insert an entry into the result table.
+
+    Args:
+        entry (ResultTableEntry): The entry to insert.
+    """
+    command = (
+        """
+        INSERT INTO result_table (experiment_id, result_type, result)
+        VALUES (?, ?, ?)
+        """
+    )
+    parameters = (entry.experiment_id, entry.result_type, entry.result_value)
+    execute_sql_command_no_return(command, parameters)
+
+
+def select_results(experiment_id: int) -> List[ExperimentResultsRecord]:
+    """
+    Select the entries from the result table that are associated with an experiment.
+
+    Args:
+        experiment_id (int): The experiment ID.
+
+    Returns:
+        List[ResultTableEntry]: The entries from the result table.
+    """
+    result_parameters = execute_sql_command(
+        """
+        SELECT
+            experiment_id,
+            result_type,
+            result_value
+        FROM result_table
+        WHERE experiment_id = ?
+        """,
+        (experiment_id,),
+    )
+    results = []
+    for row in result_parameters:
+        results.append(ExperimentResultsRecord(*row))
+    return results
+
+
+def select_specific_result(
+    experiment_id: int, result_type: str
+) -> ExperimentResultsRecord:
+    """
+    Select a specific entry from the result table that is associated with an experiment.
+
+    Args:
+        experiment_id (int): The experiment ID.
+        result_type (str): The result type.
+
+    Returns:
+        ResultTableEntry: The entry from the result table.
+    """
+    result = execute_sql_command(
+        """
+        SELECT 
+            experiment_id,
+            result_type,
+            result_value
+        FROM experiment_results
+        WHERE experiment_id = ? AND result_type = ?
+        """,
+        (experiment_id, result_type),
+    )
+    return ExperimentResultsRecord(*result[0])
+
+
+# Data backfilling functions
+# These functions are used to backfill the database with data from CSV files.
+# This is useful when the database is created and the data is not available yet.
+# Otherwise we wil not use them. Hence the double underscore in the function name.
+def __process_well_hx_csv_into_table():
+    """
+    Process the well history CSV file into the well_hx table.
+    Matching each column:
+    0 plate id
+    1 type number
+    2 well id
+    3 experiment id
+    4 project id
+    5 status
+    6 status date
+    7 contents
+    8 volume
+    9 coordinates
+    """
+    # Read the well history CSV file
+    with open(
+        r"C:\Users\Gregory Robben\SynologyDrive\Documents\GitHub\PANDA-BEAR\epanda_lib\system state\well_history.csv",
+        "r",
+    ) as file:
+        lines = file.readlines()
+
+    # Prepare the SQL insert statement and parameters
+    sql_command = """
+        INSERT or IGNORE INTO well_hx 
+        (plate_id, well_id, experiment_id, project_id, status, status_date, contents, volume, coordinates) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+    parameters = []
+
+    for csv_line in lines:
+        reader = csv.reader([csv_line], delimiter="&")
+        for row in reader:
+            (
+                plate_id,
+                _,
+                well_id,
+                experiment_id,
+                project_id,
+                status,
+                status_date,
+                contents,
+                volume,
+                coordinates,
+            ) = map(check_empty, row)
+
+            if contents == "{}":
+                contents = "NULL"
+            if coordinates == "{}":
+                coordinates = "NULL"
+            # Convert the JSON strings to single-quoted JSON strings
+            if contents != "NULL" and not isinstance(contents, dict):
+                try:
+                    contents = json.dumps(json.loads(contents), separators=(",", ":"))
+                    contents = contents.replace("'", '"')
+                except json.decoder.JSONDecodeError:
+                    contents = "NULL"
+
+            if coordinates != "NULL" and not isinstance(coordinates, dict):
+                try:
+                    coordinates = json.dumps(
+                        json.loads(coordinates), separators=(",", ":")
+                    )
+                    coordinates = coordinates.replace("'", '"')
+                except json.decoder.JSONDecodeError:
+                    coordinates = "NULL"
+
+            # Add the parameters to the list
+            parameters.append(
+                (
+                    plate_id,
+                    well_id,
+                    experiment_id,
+                    project_id,
+                    status,
+                    status_date,
+                    contents,
+                    volume,
+                    coordinates,
+                )
+            )
+
+    # Execute the SQL command with the parameters
+    execute_sql_command_no_return(sql_command, parameters)
+
+
+# System State Classes and Functions
+@dataclasses.dataclass
+class SystemState(Enum):
+    """Class for naming of the system states"""
+
+    IDLE = "idle"
+    BUSY = "running"
+    ERROR = "error"
+    OFF = "off"
+
+
+def get_system_status() -> SystemState:
+    """
+    Get the system status from the system_status table.
+
+    Returns:
+        dict: The system status.
+    """
+    result = execute_sql_command(
+        """
+                                 SELECT status FROM system_status
+                                 ORDER BY status_time DESC
+                                 LIMIT 1"""
+    )
+    return SystemState(result[0][0])
+
+
+def set_system_status(
+    system_status: SystemState, comment=None, test_mode=read_testing_config()
+) -> None:
+    """
+    Set the system status in the system_status table.
+
+    Args:
+        status (SystemState): The system status to set.
+    """
+    execute_sql_command_no_return(
+        """
+        INSERT INTO system_status (status, comment, test_mode)
+        VALUES (?, ?, ?)
+        """,
+        (system_status.value, comment, test_mode),
+    )
+
+
+# Well Handler Class
 class WellSQLHandler:
     """
     A class for handling the well history table.
@@ -708,7 +1014,8 @@ class WellSQLHandler:
     volume,
     coordinates
 
-    For the values status, status_date, and project_id, they are stored in the experiments table.
+    For the values status, status_date, and project_id, they are stored in the 
+    experiments table.
 
     """
 
@@ -721,7 +1028,7 @@ class WellSQLHandler:
             self.plate_id, _, _ = get_current_wellplate_info()
             self.well_id = well
 
-            # with the well_id and plate_id set, get the rest of the well information
+            # with the well_id and plate_id set, get the other well information
             well = self.get_well()
             if well is not None:
                 self.experiment_id = well.experiment_id
@@ -752,11 +1059,22 @@ class WellSQLHandler:
 
     def save_to_db(self) -> None:
         """
-        First check if the well is in the table. If so update the well where the values are different.
+        First check if the well is in the table. If so update the well where the
+         values are different.
         Otherwise insert the well into the table.
         """
         statement = """
-            INSERT INTO well_hx (plate_id, well_id, experiment_id, project_id, status, status_date, contents, volume, coordinates)
+            INSERT INTO well_hx (
+                plate_id,
+                well_id,
+                experiment_id,
+                project_id,
+                status,
+                status_date,
+                contents,
+                volume,
+                coordinates
+                )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (plate_id, well_id) DO UPDATE SET
             experiment_id = excluded.experiment_id,
@@ -787,7 +1105,20 @@ class WellSQLHandler:
         Returns:
             str: The SQL statement.
         """
-        statement = "INSERT INTO well_hx (plate_id, well_id, experiment_id, project_id, status, status_date, contents, volume, coordinates) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        statement = """
+        INSERT INTO well_hx (
+            plate_id,
+            well_id,
+            experiment_id,
+            project_id,
+            status,
+            status_date,
+            contents,
+            volume,
+            coordinates
+            ) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
         values = (
             self.plate_id,
             self.well_id,
@@ -808,7 +1139,20 @@ class WellSQLHandler:
         Returns:
             str: The SQL statement.
         """
-        statement = "UPDATE well_hx SET plate_id = ?, well_id = ?, experiment_id = ?, project_id = ?, status = ?, status_date = ?, contents = ?, volume = ?, coordinates = ? WHERE plate_id = ? AND well_id = ?"
+        statement = """
+        UPDATE well_hx 
+        SET plate_id = ?,
+            well_id = ?,
+            experiment_id = ?,
+            project_id = ?,
+            status = ?,
+            status_date = ?,
+            contents = ?,
+            volume = ?,
+            coordinates = ?
+        WHERE plate_id = ?
+        AND well_id = ?
+        """
         values = (
             self.plate_id,
             self.well_id,
@@ -911,175 +1255,6 @@ class WellSQLHandler:
                 )
             )
         return self.wellplate
-
-
-def insert_experiment_results(entry: ExperimentResultsRecord) -> None:
-    """
-    Insert an entry into the result table.
-
-    Args:
-        entry (ResultTableEntry): The entry to insert.
-    """
-    command = (
-        "INSERT INTO result_table (experiment_id, result_type, result) VALUES (?, ?, ?)"
-    )
-    parameters = (entry.experiment_id, entry.result_type, entry.result_value)
-    execute_sql_command_no_return(command, parameters)
-
-
-def select_results(experiment_id: int) -> List[ExperimentResultsRecord]:
-    """
-    Select the entries from the result table that are associated with an experiment.
-
-    Args:
-        experiment_id (int): The experiment ID.
-
-    Returns:
-        List[ResultTableEntry]: The entries from the result table.
-    """
-    result_parameters = execute_sql_command(
-        "SELECT experiment_id, result_type, result_value FROM result_table WHERE experiment_id = ?",
-        (experiment_id,),
-    )
-    results = []
-    for row in result_parameters:
-        results.append(ExperimentResultsRecord(*row))
-    return results
-
-
-def select_specific_result(
-    experiment_id: int, result_type: str
-) -> ExperimentResultsRecord:
-    """
-    Select a specific entry from the result table that is associated with an experiment.
-
-    Args:
-        experiment_id (int): The experiment ID.
-        result_type (str): The result type.
-
-    Returns:
-        ResultTableEntry: The entry from the result table.
-    """
-    result = execute_sql_command(
-        "SELECT experiment_id, result_type, result_value FROM experiment_results WHERE experiment_id = ? AND result_type = ?",
-        (experiment_id, result_type),
-    )
-    return ExperimentResultsRecord(*result[0])
-
-
-def process_well_hx_csv_into_table():
-    """
-    Process the well history CSV file into the well_hx table.
-    Matching each column:
-    0 plate id
-    1 type number
-    2 well id
-    3 experiment id
-    4 project id
-    5 status
-    6 status date
-    7 contents
-    8 volume
-    9 coordinates
-    """
-    # Read the well history CSV file
-    with open(
-        r"C:\Users\Gregory Robben\SynologyDrive\Documents\GitHub\PANDA-BEAR\epanda_lib\system state\well_history.csv",
-        "r",
-    ) as file:
-        lines = file.readlines()
-
-    for csv_line in lines:
-        reader = csv.reader([csv_line], delimiter="&")
-        for row in reader:
-            (
-                plate_id,
-                _,  # This is not used, it is found via the plate_id
-                well_id,
-                experiment_id,
-                project_id,
-                status,
-                status_date,
-                contents,
-                volume,
-                coordinates,
-            ) = map(check_empty, row)
-
-            if contents == "{}":
-                contents = "NULL"
-            if coordinates == "{}":
-                coordinates = "NULL"
-            # Convert the JSON strings to single-quoted JSON strings
-            if contents != "NULL" and not isinstance(contents, dict):
-                try:
-                    contents = json.dumps(json.loads(contents), separators=(",", ":"))
-                    contents = contents.replace("'", '"')
-                except json.decoder.JSONDecodeError:
-                    contents = "NULL"
-
-            if coordinates != "NULL" and not isinstance(coordinates, dict):
-                try:
-                    coordinates = json.dumps(
-                        json.loads(coordinates), separators=(",", ":")
-                    )
-                    coordinates = coordinates.replace("'", '"')
-                except json.decoder.JSONDecodeError:
-                    coordinates = "NULL"
-
-            # Prepare the SQL insert statement
-            sql_command = f"INSERT or IGNORE INTO well_hx (plate_id, well_id, experiment_id, project_id, status, status_date, contents, volume, coordinates) VALUES ({plate_id}, '{well_id}', '{experiment_id}', '{project_id}', '{status}', '{status_date}', '{contents}', {volume}, '{coordinates}')"
-            execute_sql_command_no_return(sql_command)
-
-
-def check_empty(value):
-    """
-    Check if a value is empty and return NULL if it is.
-    """
-    return value if value != "" else "NULL"
-
-
-@dataclasses.dataclass
-class SystemState(Enum):
-    """Class for naming of the system states"""
-
-    IDLE = "idle"
-    BUSY = "running"
-    ERROR = "error"
-    OFF = "off"
-
-
-def get_system_status() -> SystemState:
-    """
-    Get the system status from the system_status table.
-
-    Returns:
-        dict: The system status.
-    """
-    result = execute_sql_command(
-        """
-                                 SELECT status FROM system_status
-                                 ORDER BY status_time DESC
-                                 LIMIT 1"""
-    )
-    return SystemState(result[0][0])
-
-
-def set_system_status(
-    status: SystemState, comment=None, test_mode=read_testing_config()
-) -> None:
-    """
-    Set the system status in the system_status table.
-
-    Args:
-        status (SystemState): The system status to set.
-    """
-    execute_sql_command_no_return(
-        """
-        INSERT INTO system_status (status, comment, test_mode)
-        VALUES (?, ?, ?)
-        """,
-        (status.value, comment, test_mode),
-    )
 
 
 if __name__ == "__main__":

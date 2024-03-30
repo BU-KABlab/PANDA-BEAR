@@ -80,3 +80,12 @@
 2024-03-29 22:15:47,468&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
 2024-03-29 22:15:47,469&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
 2024-03-29 22:15:47,469&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:38:42,881&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:38:44,476&pipette&pump_control&log_contents&566&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:38:50,984&pipette&pump_control&log_contents&566&pipette&180.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:38:50,985&pipette&pump_control&log_contents&566&pipette&180.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:38:53,490&pipette&pump_control&log_contents&566&pipette&185.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:38:59,997&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:39:00,011&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:39:00,011&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:39:00,012&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}

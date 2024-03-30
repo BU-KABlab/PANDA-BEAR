@@ -348,3 +348,90 @@
 2024-03-29 22:16:19,865:ePANDA:Disconnecting from instruments:
 2024-03-29 22:16:19,865:ePANDA:Disconnecting from the mill
 2024-03-29 22:16:19,867:ePANDA:Disconnected from instruments
+2024-03-29 22:38:40,871:ePANDA:Using mock instruments
+2024-03-29 22:38:40,872:ePANDA:Mill config loaded
+2024-03-29 22:38:40,872:ePANDA:Connecting to the mill
+2024-03-29 22:38:42,882:ePANDA:Connected to instruments
+2024-03-29 22:38:43,456:ePANDA:System state reestablished
+2024-03-29 22:38:43,456:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:38:43,456:ePANDA:Stock vial edot contains edot with volume 20000
+2024-03-29 22:38:43,457:ePANDA:Stock vial rinse contains rinse with volume 19860
+2024-03-29 22:38:43,457:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:38:43,457:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:38:43,457:ePANDA:Waste vial waste contains {'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0} with volume 1140
+2024-03-29 22:38:43,457:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:38:43,458:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:38:43,458:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:38:43,972:ePANDA:There are 96 clear wells
+2024-03-29 22:38:44,478:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-29 22:38:44,478:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-29 22:38:44,478:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-29 22:38:44,479:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-03-29 22:38:44,479:ePANDA:Not moving to Z=0 first
+2024-03-29 22:38:44,479:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-29 22:38:44,479:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-29 22:38:44,479:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-29 22:38:44,479:ePANDA:Command sent: G01 X-86.5
+2024-03-29 22:38:44,480:ePANDA:Writing to the mill: G01 X-86.5
+2024-03-29 22:38:46,481:ePANDA:Returned <Idle|MPos:-89.5,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:38:46,481:ePANDA:Command sent: G01 Y-173.5
+2024-03-29 22:38:46,481:ePANDA:Writing to the mill: G01 Y-173.5
+2024-03-29 22:38:48,482:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:38:48,482:ePANDA:Command sent: G01 Z-74
+2024-03-29 22:38:48,482:ePANDA:Writing to the mill: G01 Z-74
+2024-03-29 22:38:50,483:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-03-29 22:38:50,988:ePANDA:Command sent: G01 Z0
+2024-03-29 22:38:50,988:ePANDA:Writing to the mill: G01 Z0
+2024-03-29 22:38:52,989:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:38:53,492:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-03-29 22:38:53,492:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-03-29 22:38:53,492:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-03-29 22:38:53,492:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-03-29 22:38:53,492:ePANDA:Not moving to Z=0 first
+2024-03-29 22:38:53,493:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-03-29 22:38:53,493:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-03-29 22:38:53,493:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-03-29 22:38:53,493:ePANDA:Command sent: G01 X-132.5
+2024-03-29 22:38:53,493:ePANDA:Writing to the mill: G01 X-132.5
+2024-03-29 22:38:55,494:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:38:55,494:ePANDA:Command sent: G01 Y-9.5
+2024-03-29 22:38:55,494:ePANDA:Writing to the mill: G01 Y-9.5
+2024-03-29 22:38:57,495:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:38:57,495:ePANDA:Command sent: G01 Z-17
+2024-03-29 22:38:57,495:ePANDA:Writing to the mill: G01 Z-17
+2024-03-29 22:38:59,496:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-03-29 22:39:01,060:ePANDA:System state reestablished
+2024-03-29 22:39:01,060:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:39:01,060:ePANDA:Stock vial edot contains edot with volume 20000
+2024-03-29 22:39:01,061:ePANDA:Stock vial rinse contains rinse with volume 19720
+2024-03-29 22:39:01,061:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:39:01,061:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:39:01,061:ePANDA:Waste vial waste contains {'rinse': 280.0, 'edot': 0.0, 'liclo4': 0.0} with volume 1280
+2024-03-29 22:39:01,061:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:39:01,062:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:39:01,062:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:39:01,531:ePANDA:There are 96 clear wells
+2024-03-29 22:39:01,911:ePANDA:cannot unpack non-iterable NoneType object
+2024-03-29 22:39:02,623:ePANDA:Command sent: G01 Z0
+2024-03-29 22:39:02,623:ePANDA:Writing to the mill: G01 Z0
+2024-03-29 22:39:04,624:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:39:04,624:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0
+2024-03-29 22:39:04,624:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0
+2024-03-29 22:39:04,625:ePANDA:Current_coordinates: [-132.5, -9.5, 0.0]
+2024-03-29 22:39:04,625:ePANDA:Target coordinates: [-369.4, -8.2, -50]
+2024-03-29 22:39:04,625:ePANDA:Not moving to Z=0 first
+2024-03-29 22:39:04,625:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0
+2024-03-29 22:39:04,625:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0
+2024-03-29 22:39:04,626:ePANDA:Current_coordinates: [-132.5, -9.5, 0.0]
+2024-03-29 22:39:04,626:ePANDA:Command sent: G01 X-369.4
+2024-03-29 22:39:04,626:ePANDA:Writing to the mill: G01 X-369.4
+2024-03-29 22:39:06,626:ePANDA:Returned <Idle|MPos:-372.4,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:39:06,626:ePANDA:Command sent: G01 Y-8.2
+2024-03-29 22:39:06,627:ePANDA:Writing to the mill: G01 Y-8.2
+2024-03-29 22:39:08,627:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:39:08,628:ePANDA:Command sent: G01 Z-50
+2024-03-29 22:39:08,628:ePANDA:Writing to the mill: G01 Z-50
+2024-03-29 22:39:10,628:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-03-29 22:39:10,628:ePANDA:Disconnecting from instruments:
+2024-03-29 22:39:10,629:ePANDA:Disconnecting from the mill
+2024-03-29 22:39:10,631:ePANDA:Disconnected from instruments

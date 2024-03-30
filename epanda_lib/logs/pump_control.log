@@ -806,3 +806,21 @@
 2024-03-29 22:15:47,457&pump_control&pump_control&run_pump&304&Done Infusing
 2024-03-29 22:15:47,457&pump_control&pump_control&run_pump&345&Pump has infused: 0.185 ml
 2024-03-29 22:15:47,458&pump_control&pump_control&infuse&229&Pump has infused: 0.185000 ml (0.140000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-03-29 22:38:40,879&pump_control&pump_control&set_up_pump&454&Setting up pump...
+2024-03-29 22:38:40,879&pump_control&pump_control&set_up_pump&460&Pump found at address 0
+2024-03-29 22:38:43,975&pump_control&pump_control&run_pump&297&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-03-29 22:38:44,476&pump_control&pump_control&run_pump&304&Done Withdrawing
+2024-03-29 22:38:44,476&pump_control&pump_control&run_pump&345&Pump has withdrawn: 0.04 ml
+2024-03-29 22:38:44,477&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-03-29 22:38:50,483&pump_control&pump_control&run_pump&297&Withdrawing 0.140000 ml at 0.500000 mL/min...
+2024-03-29 22:38:50,984&pump_control&pump_control&run_pump&304&Done Withdrawing
+2024-03-29 22:38:50,984&pump_control&pump_control&run_pump&345&Pump has withdrawn: 0.14 ml
+2024-03-29 22:38:50,984&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.140000 ml at 0.500000mL/min  Pipette vol: 180.000 ul
+2024-03-29 22:38:52,990&pump_control&pump_control&run_pump&297&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-03-29 22:38:53,490&pump_control&pump_control&run_pump&304&Done Withdrawing
+2024-03-29 22:38:53,490&pump_control&pump_control&run_pump&345&Pump has withdrawn: 0.005 ml
+2024-03-29 22:38:53,491&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 185.000 ul
+2024-03-29 22:38:59,496&pump_control&pump_control&run_pump&297&Infusing 0.140000 ml at 0.654000 mL/min...
+2024-03-29 22:38:59,997&pump_control&pump_control&run_pump&304&Done Infusing
+2024-03-29 22:38:59,997&pump_control&pump_control&run_pump&345&Pump has infused: 0.185 ml
+2024-03-29 22:38:59,998&pump_control&pump_control&infuse&229&Pump has infused: 0.185000 ml (0.140000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
