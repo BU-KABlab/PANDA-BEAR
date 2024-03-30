@@ -24,6 +24,7 @@ Returns:
 # Standard library imports
 import logging
 import math
+
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
@@ -32,11 +33,21 @@ from PIL import Image
 
 from epanda_lib import instrument_toolkit
 from epanda_lib.camera_call_camera import capture_new_image
-from epanda_lib.config.config import (AIR_GAP, DRIP_STOP, PATH_TO_DATA,
-                                      PATH_TO_LOGS, PURGE_VOLUME, TESTING)
+from epanda_lib.config.config import (
+    AIR_GAP,
+    DRIP_STOP,
+    PATH_TO_DATA,
+    PATH_TO_LOGS,
+    PURGE_VOLUME,
+    TESTING,
+)
 from epanda_lib.correction_factors import correction_factor
-from epanda_lib.experiment_class import (EchemExperimentBase, ExperimentBase,
-                                         ExperimentResult, ExperimentStatus)
+from epanda_lib.experiment_class import (
+    EchemExperimentBase,
+    ExperimentBase,
+    ExperimentResult,
+    ExperimentStatus,
+)
 from epanda_lib.image_tools import add_data_zone
 from epanda_lib.instrument_toolkit import Toolkit
 from epanda_lib.log_tools import CustomLoggingFilter
@@ -51,10 +62,18 @@ from epanda_lib.wellplate import Well
 
 if TESTING:
     from epanda_lib.gamry_control_WIP_mock import GamryPotentiostat as echem
-    from epanda_lib.gamry_control_WIP_mock import potentiostat_ocp_parameters
+    from epanda_lib.gamry_control_WIP_mock import (
+        potentiostat_ocp_parameters,
+        potentiostat_chrono_parameters,
+        potentiostat_cv_parameters,
+    )
 else:
     import epanda_lib.gamry_control_WIP as echem
-    from epanda_lib.gamry_control_WIP import potentiostat_ocp_parameters
+    from epanda_lib.gamry_control_WIP import (
+        potentiostat_ocp_parameters,
+        potentiostat_chrono_parameters,
+        potentiostat_cv_parameters,
+    )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -465,7 +484,7 @@ def rinse_v2(
     logger.info(
         "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
     )
-    instructions.set_status(ExperimentStatus.RINSING)
+    instructions.set_status_and_save(ExperimentStatus.RINSING)
     for _ in range(instructions.rinse_count):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
@@ -704,7 +723,7 @@ def flush_v2(
 
     if flush_volume > 0.000:
         if instructions is not None:
-            instructions.set_status(ExperimentStatus.FLUSHING)
+            instructions.set_status_and_save(ExperimentStatus.FLUSHING)
         logger.info(
             "Flushing pipette tip with %f ul of %s...",
             flush_volume,
@@ -827,6 +846,7 @@ def waste_selector(
 def chrono_amp(
     dep_instructions: EchemExperimentBase,
     file_tag: str = None,
+    custom_parameters: potentiostat_chrono_parameters = None,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
@@ -835,9 +855,7 @@ def chrono_amp(
 
     Args:
         dep_instructions (Experiment): The experiment instructions
-        dep_results (ExperimentResult): The experiment results
-        mill (object): The mill object
-        wellplate (Wells object): The wellplate object
+        file_tag (str): The file tag to be used for the data files
     Returns:
         dep_instructions (Experiment): The updated experiment instructions
         dep_results (ExperimentResult): The updated experiment results
@@ -854,7 +872,7 @@ def chrono_amp(
 
         # echem OCP
         logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
-        dep_instructions.set_status(ExperimentStatus.OCPCHECK)
+        dep_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
 
         base_filename = pstat.setfilename(
             dep_instructions.id,
@@ -882,11 +900,11 @@ def chrono_amp(
 
         # echem CA - deposition
         if not ocp_dep_pass:
-            dep_instructions.set_status(ExperimentStatus.ERROR)
+            dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
             raise OCPFailure("CA")
 
         try:
-            dep_instructions.set_status(ExperimentStatus.EDEPOSITING)
+            dep_instructions.set_status_and_save(ExperimentStatus.EDEPOSITING)
             logger.info(
                 "Beginning eChem deposition of well: %s", dep_instructions.well_id
             )
@@ -900,36 +918,38 @@ def chrono_amp(
 
             # FEATURE have chrono return the max and min values for the deposition
             # and save them to the results
-            # don't have any parameters hardcoded, switch these all to instructions
-            pstat.chrono(
-                CAvi=dep_instructions.ca_prestep_voltage,
-                CAti=dep_instructions.ca_prestep_time_delay,
-                CAv1=dep_instructions.ca_step_1_voltage,
-                CAt1=dep_instructions.ca_step_1_time,
-                CAv2=dep_instructions.ca_step_2_voltage,
-                CAt2=dep_instructions.ca_step_2_time,
-                CAsamplerate=dep_instructions.ca_sample_period,
-            )  # CA
+            if custom_parameters:  # if not none then use the custom parameters
+                pstat.chrono(**custom_parameters)  # unpack the custom parameters
+            else:
+                pstat.chrono(
+                    CAvi=dep_instructions.ca_prestep_voltage,
+                    CAti=dep_instructions.ca_prestep_time_delay,
+                    CAv1=dep_instructions.ca_step_1_voltage,
+                    CAt1=dep_instructions.ca_step_1_time,
+                    CAv2=dep_instructions.ca_step_2_voltage,
+                    CAt2=dep_instructions.ca_step_2_time,
+                    CAsamplerate=dep_instructions.ca_sample_period,
+                )  # CA
 
             pstat.activecheck()
             dep_results.set_deposition_data_file(deposition_data_file)
         except Exception as e:
-            dep_instructions.set_status(ExperimentStatus.ERROR)
+            dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during deposition: %s", e)
             raise CAFailure(dep_instructions.id, dep_instructions.well_id) from e
 
     except OCPFailure as e:
-        dep_instructions.set_status(ExperimentStatus.ERROR)
+        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", dep_instructions.well_id)
         raise e
 
     except CAFailure as e:
-        dep_instructions.set_status(ExperimentStatus.ERROR)
+        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("CA of well %s failed", dep_instructions.well_id)
         raise e
 
     except Exception as e:
-        dep_instructions.set_status(ExperimentStatus.ERROR)
+        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
         raise DepositionFailure(dep_instructions.id, dep_instructions.well_id) from e
 
@@ -940,10 +960,15 @@ def chrono_amp(
 
 
 def cyclic_volt(
-    char_instructions: EchemExperimentBase, file_tag: str = None
+    char_instructions: EchemExperimentBase,
+    file_tag: str = None,
+    overwrite_inital_voltage: bool = True,
+    custom_parameters: potentiostat_cv_parameters = None,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
-    Characterization of the solutions on the substrate using CV.
+    Cyclicvoltamety in a well. This includes the OCP and CV steps.
+    Will perform OCP and then set the initial voltage for the CV based on the final OCP voltage.
+    To not change the instructions object, set overwrite_inital_voltage to False.
     No pipetting is performed in this step.
     Rinse the electrode after characterization.
 
@@ -955,15 +980,20 @@ def cyclic_volt(
         char_results (ExperimentResult): The updated experiment results
     """
     try:
-        logger.info("Characterizing well: %s", char_instructions.well_id)
         # echem OCP
-        logger.info("Beginning eChem OCP of well: %s", char_instructions.well_id)
+        if file_tag:
+            logger.info(
+                "Beginning %s OCP of well: %s", file_tag, char_instructions.well_id
+            )
+        else:
+            logger.info("Beginning OCP of well: %s", char_instructions.well_id)
         if TESTING:
             pstat = echem()
         else:
             pstat = echem
+
         pstat.pstatconnect()
-        char_instructions.set_status(ExperimentStatus.OCPCHECK)
+        char_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
         ocp_char_file = pstat.setfilename(
             char_instructions.id,
             file_tag + "_OCP_CV" if file_tag else "OCP_CV",
@@ -981,15 +1011,15 @@ def cyclic_volt(
             pstat.activecheck()
 
         except Exception as e:
-            char_instructions.set_status(ExperimentStatus.ERROR)
+            char_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during OCP: %s", e)
             raise OCPFailure("CV") from e
         (
             ocp_char_pass,
-            char_instructions.cv_initial_voltage,
+            ocp_final_voltage,
         ) = pstat.check_vf_range(ocp_char_file)
         char_instructions.results.set_ocp_char_file(
-            ocp_char_file, ocp_char_pass, char_instructions.cv_initial_voltage
+            ocp_char_file, ocp_char_pass, ocp_final_voltage
         )
         logger.info(
             "OCP of well %s passed: %s",
@@ -998,17 +1028,17 @@ def cyclic_volt(
         )
 
         if not ocp_char_pass:
-            char_instructions.set_status(ExperimentStatus.ERROR)
+            char_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("OCP of well %s failed", char_instructions.well_id)
             raise OCPFailure("CV")
 
         # echem CV - characterization
         if char_instructions.baseline == 1:
             test_type = "CV_baseline"
-            char_instructions.set_status(ExperimentStatus.BASELINE)
+            char_instructions.set_status_and_save(ExperimentStatus.BASELINE)
         else:
             test_type = "CV"
-            char_instructions.set_status(ExperimentStatus.CHARACTERIZING)
+            char_instructions.set_status_and_save(ExperimentStatus.CHARACTERIZING)
 
         logger.info(
             "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
@@ -1026,35 +1056,42 @@ def cyclic_volt(
         )
         # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
+        if overwrite_inital_voltage:
+            char_instructions.cv_initial_voltage = ocp_final_voltage
+
         try:
-            pstat.cyclic(
-                CVvi=char_instructions.cv_initial_voltage,
-                CVap1=char_instructions.cv_first_anodic_peak,
-                CVap2=char_instructions.cv_second_anodic_peak,
-                CVvf=char_instructions.cv_final_voltage,
-                CVsr1=char_instructions.cv_scan_rate_cycle_1,
-                CVsr2=char_instructions.cv_scan_rate_cycle_2,
-                CVsr3=char_instructions.cv_scan_rate_cycle_3,
-                CVsamplerate=char_instructions.cv_sample_rate,
-                CVcycle=char_instructions.cv_cycle_count,
-            )
+            if custom_parameters:  # if not none then use the custom parameters
+                custom_parameters.CVvi = ocp_final_voltage  # still need to set the initial voltage, not overwriting the original
+                pstat.cyclic(**custom_parameters)  # unpack the custom parameters
+            else:
+                pstat.cyclic(
+                    CVvi=ocp_final_voltage,  # we always start where we left off in the OCP but don't always change the initial voltage
+                    CVap1=char_instructions.cv_first_anodic_peak,
+                    CVap2=char_instructions.cv_second_anodic_peak,
+                    CVvf=char_instructions.cv_final_voltage,
+                    CVsr1=char_instructions.cv_scan_rate_cycle_1,
+                    CVsr2=char_instructions.cv_scan_rate_cycle_2,
+                    CVsr3=char_instructions.cv_scan_rate_cycle_3,
+                    CVsamplerate=char_instructions.cv_sample_rate,
+                    CVcycle=char_instructions.cv_cycle_count,
+                )
             pstat.activecheck()
 
         except Exception as e:
-            char_instructions.set_status(ExperimentStatus.ERROR)
+            char_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during CV: %s", e)
             raise CVFailure(char_instructions.id, char_instructions.well_id) from e
 
     except OCPFailure as e:
-        char_instructions.set_status(ExperimentStatus.ERROR)
+        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", char_instructions.well_id)
         raise e
     except CVFailure as e:
-        char_instructions.set_status(ExperimentStatus.ERROR)
+        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("CV of well %s failed", char_instructions.well_id)
         raise e
     except Exception as e:
-        char_instructions.set_status(ExperimentStatus.ERROR)
+        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("An unknown exception occurred during CV: %s", e)
         raise CVFailure(char_instructions.id, char_instructions.well_id) from e
     finally:
@@ -1115,7 +1152,7 @@ def image_well(
         None (void function) since the objects are passed by reference
     """
     try:
-        instructions.set_status(ExperimentStatus.IMAGING)
+        instructions.set_status_and_save(ExperimentStatus.IMAGING)
         logger.info("Imaging well %s", instructions.well_id)
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
@@ -1162,8 +1199,8 @@ def image_well(
 
         logger.debug("Image of well %s captured", instructions.well_id)
         # upload image to OBS
-        instructions.results.set_image_file(filepath)
-        instructions.results.set_image_file(dz_filepath)
+        instructions.results.append_image_file(filepath)
+        instructions.results.append_image_file(dz_filepath)
     except Exception as e:
         logger.exception(
             "Failed to image well %s. Error %s occured", instructions.well_id, e

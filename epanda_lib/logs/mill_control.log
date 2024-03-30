@@ -213,3 +213,138 @@
 2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-349.75, -99.0, -66.0]
 2024-03-10 23:33:23,358&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
 2024-03-10 23:33:23,359&ePANDA&INFO&mill_control&__exit__&140&Exiting the mill context manager
+2024-03-29 21:55:05,673&ePANDA&INFO&controller&connect_to_instruments&497&Using mock instruments
+2024-03-29 21:55:05,680&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-29 21:55:05,680&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-29 21:55:08,584&ePANDA&INFO&controller&main&81&Connected to instruments
+2024-03-29 21:55:11,202&ePANDA&INFO&controller&establish_system_state&366&System state reestablished
+2024-03-29 21:55:11,202&ePANDA&DEBUG&controller&establish_system_state&370&Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&Stock vial edot contains edot with volume 20000
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&Stock vial rinse contains rinse with volume 20000
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&Stock vial rinse contains rinse with volume 20000
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,213&ePANDA&ERROR&controller&establish_system_state&432&Wellplate status file does not have the correct number of wells. File may be corrupted
+2024-03-29 21:55:17,978&ePANDA&ERROR&controller&main&315&
+2024-03-29 22:04:58,805&ePANDA&INFO&controller&connect_to_instruments&501&Using mock instruments
+2024-03-29 22:04:58,806&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-29 22:04:58,807&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-29 22:05:01,590&ePANDA&INFO&controller&main&81&Connected to instruments
+2024-03-29 22:05:04,301&ePANDA&INFO&controller&establish_system_state&367&System state reestablished
+2024-03-29 22:05:04,301&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial edot contains edot with volume 20000
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,303&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,303&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,303&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,660&ePANDA&ERROR&controller&establish_system_state&436&Wellplate status file does not have the correct number of wells. File may be corrupted
+2024-03-29 22:06:39,758&ePANDA&ERROR&controller&main&315&Wellplate status file does not have the correct number of wells
+2024-03-29 22:08:19,263&ePANDA&INFO&controller&connect_to_instruments&501&Using mock instruments
+2024-03-29 22:08:19,264&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-29 22:08:19,264&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-29 22:08:21,271&ePANDA&INFO&controller&main&81&Connected to instruments
+2024-03-29 22:12:00,339&ePANDA&INFO&controller&establish_system_state&367&System state reestablished
+2024-03-29 22:12:00,339&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial edot contains edot with volume 20000
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,341&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,341&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,923&ePANDA&ERROR&controller&establish_system_state&436&Wellplate status file does not have the correct number of wells. File may be corrupted
+2024-03-29 22:12:00,924&ePANDA&ERROR&controller&main&315&Wellplate status file does not have the correct number of wells
+2024-03-29 22:13:00,260&ePANDA&INFO&controller&connect_to_instruments&501&Using mock instruments
+2024-03-29 22:13:00,261&ePANDA&DEBUG&mill_control&read_json_config&162&Mill config loaded
+2024-03-29 22:13:00,261&ePANDA&INFO&mill_control&connect_to_mill&754&Connecting to the mill
+2024-03-29 22:13:02,269&ePANDA&INFO&controller&main&81&Connected to instruments
+2024-03-29 22:13:27,131&ePANDA&INFO&controller&establish_system_state&367&System state reestablished
+2024-03-29 22:13:30,822&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:13:42,503&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial edot contains edot with volume 20000
+2024-03-29 22:13:43,627&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:13:44,716&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:13:45,987&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:13:48,826&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:13:49,951&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:13:51,338&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:13:52,640&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:14:12,743&ePANDA&INFO&controller&establish_system_state&440&There are 96 clear wells
+2024-03-29 22:15:31,936&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-29 22:15:31,937&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-29 22:15:31,937&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-29 22:15:31,937&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-86.5, -173.5, -74]
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-29 22:15:31,939&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-86.5
+2024-03-29 22:15:31,939&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-86.5
+2024-03-29 22:15:33,940&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-89.5,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:33,940&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-173.5
+2024-03-29 22:15:33,941&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-173.5
+2024-03-29 22:15:35,941&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:35,941&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-74
+2024-03-29 22:15:35,942&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-74
+2024-03-29 22:15:37,942&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:38,448&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z0
+2024-03-29 22:15:38,448&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z0
+2024-03-29 22:15:40,449&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:40,951&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-03-29 22:15:40,951&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-03-29 22:15:40,951&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-86.5, -173.5, 0.0]
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-132.5, -9.5, -17]
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-86.5, -173.5, 0.0]
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-132.5
+2024-03-29 22:15:40,953&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-132.5
+2024-03-29 22:15:42,953&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:42,953&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-9.5
+2024-03-29 22:15:42,954&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-9.5
+2024-03-29 22:15:44,954&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:44,954&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-17
+2024-03-29 22:15:44,955&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-17
+2024-03-29 22:15:46,955&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:55,151&ePANDA&INFO&controller&establish_system_state&367&System state reestablished
+2024-03-29 22:15:55,151&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:15:55,151&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial edot contains edot with volume 20000
+2024-03-29 22:15:55,151&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 19860
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&371&Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0} with volume 1140
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&Waste vial waste contains {} with volume 1000
+2024-03-29 22:15:55,659&ePANDA&INFO&controller&establish_system_state&440&There are 96 clear wells
+2024-03-29 22:16:11,201&ePANDA&ERROR&controller&main&315&no such column: id
+2024-03-29 22:16:11,859&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z0
+2024-03-29 22:16:11,860&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z0
+2024-03-29 22:16:13,860&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:13,860&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-132.5, -9.5, 0.0]
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&safe_move&601&Target coordinates: [-369.4, -8.2, -50]
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&safe_move&618&Not moving to Z=0 first
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&373&MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&375&WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0
+2024-03-29 22:16:13,862&ePANDA&DEBUG&mill_control&current_coordinates&416&Current_coordinates: [-132.5, -9.5, 0.0]
+2024-03-29 22:16:13,862&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 X-369.4
+2024-03-29 22:16:13,862&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 X-369.4
+2024-03-29 22:16:15,863&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-372.4,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:15,863&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Y-8.2
+2024-03-29 22:16:15,863&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Y-8.2
+2024-03-29 22:16:17,864&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:17,864&ePANDA&DEBUG&mill_control&execute_command&768&Command sent: G01 Z-50
+2024-03-29 22:16:17,864&ePANDA&DEBUG&mill_control&mock_write&847&Writing to the mill: G01 Z-50
+2024-03-29 22:16:19,865&ePANDA&DEBUG&mill_control&execute_command&788&Returned <Idle|MPos:-372.4,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:19,865&ePANDA&INFO&controller&disconnect_from_instruments&537&Disconnecting from instruments:
+2024-03-29 22:16:19,865&ePANDA&INFO&mill_control&disconnect&761&Disconnecting from the mill
+2024-03-29 22:16:19,867&ePANDA&INFO&controller&disconnect_from_instruments&540&Disconnected from instruments

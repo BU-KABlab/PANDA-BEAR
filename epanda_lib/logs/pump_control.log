@@ -782,3 +782,27 @@
 2024-03-10 23:27:08,358&e_panda&wellplate&update_well_status_from_json_file&486&Well h10 updated from file
 2024-03-10 23:27:08,358&e_panda&wellplate&update_well_status_from_json_file&486&Well h11 updated from file
 2024-03-10 23:27:08,358&e_panda&wellplate&update_well_status_from_json_file&486&Well h12 updated from file
+2024-03-29 21:55:05,683&pump_control&pump_control&set_up_pump&454&Setting up pump...
+2024-03-29 21:55:05,684&pump_control&pump_control&set_up_pump&460&Pump found at address 0
+2024-03-29 22:04:58,809&pump_control&pump_control&set_up_pump&454&Setting up pump...
+2024-03-29 22:04:58,810&pump_control&pump_control&set_up_pump&460&Pump found at address 0
+2024-03-29 22:08:19,269&pump_control&pump_control&set_up_pump&454&Setting up pump...
+2024-03-29 22:08:19,269&pump_control&pump_control&set_up_pump&460&Pump found at address 0
+2024-03-29 22:13:00,266&pump_control&pump_control&set_up_pump&454&Setting up pump...
+2024-03-29 22:13:00,266&pump_control&pump_control&set_up_pump&460&Pump found at address 0
+2024-03-29 22:15:31,433&pump_control&pump_control&run_pump&297&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-03-29 22:15:31,934&pump_control&pump_control&run_pump&304&Done Withdrawing
+2024-03-29 22:15:31,934&pump_control&pump_control&run_pump&345&Pump has withdrawn: 0.04 ml
+2024-03-29 22:15:31,935&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-03-29 22:15:37,942&pump_control&pump_control&run_pump&297&Withdrawing 0.140000 ml at 0.500000 mL/min...
+2024-03-29 22:15:38,443&pump_control&pump_control&run_pump&304&Done Withdrawing
+2024-03-29 22:15:38,443&pump_control&pump_control&run_pump&345&Pump has withdrawn: 0.14 ml
+2024-03-29 22:15:38,444&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.140000 ml at 0.500000mL/min  Pipette vol: 180.000 ul
+2024-03-29 22:15:40,449&pump_control&pump_control&run_pump&297&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-03-29 22:15:40,950&pump_control&pump_control&run_pump&304&Done Withdrawing
+2024-03-29 22:15:40,950&pump_control&pump_control&run_pump&345&Pump has withdrawn: 0.005 ml
+2024-03-29 22:15:40,951&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 185.000 ul
+2024-03-29 22:15:46,956&pump_control&pump_control&run_pump&297&Infusing 0.140000 ml at 0.654000 mL/min...
+2024-03-29 22:15:47,457&pump_control&pump_control&run_pump&304&Done Infusing
+2024-03-29 22:15:47,457&pump_control&pump_control&run_pump&345&Pump has infused: 0.185 ml
+2024-03-29 22:15:47,458&pump_control&pump_control&infuse&229&Pump has infused: 0.185000 ml (0.140000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul

@@ -2,7 +2,7 @@
 
 import os
 import sqlite3
-
+from epanda_lib.config.config import SQL_DB_PATH
 
 class ProtocolEntry:
     """A class to represent a protocol entry in the database."""
@@ -17,7 +17,7 @@ class ProtocolEntry:
         return f"{self.protocol_id}: {self.name}"
 
 
-def get_protocols() -> list:
+def select_protocols() -> list:
     """
     Get all protocols from the database.
 
@@ -27,7 +27,7 @@ def get_protocols() -> list:
     Returns:
         list: A list of all protocols in the database.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get all protocols from the database
@@ -44,7 +44,7 @@ def get_protocols() -> list:
     return protocol_entries
 
 
-def get_protocol_by_id(protocol_id) -> ProtocolEntry:
+def select_protocol_by_id(protocol_id) -> ProtocolEntry:
     """
     Get a protocol from the database.
 
@@ -54,7 +54,7 @@ def get_protocol_by_id(protocol_id) -> ProtocolEntry:
     Returns:
         ProtocolEntry: The protocol from the database.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get the protocol from the database
@@ -81,7 +81,7 @@ def insert_protocol(protocol_id, project, name, filepath):
         None
     """
 
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Insert the protocol into the database
@@ -105,7 +105,7 @@ def update_protocol(protocol_id, new_name):
     Returns:
         None
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Update the name of the protocol in the database
@@ -127,7 +127,7 @@ def delete_protocol(protocol_id):
     Returns:
         None
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Delete the protocol from the database
@@ -152,7 +152,7 @@ def read_in_protocols():
     protocols = os.listdir("protocols")
     # Remove this file from the list
     # Get the current protocols from the database
-    current_protocols = get_protocols()
+    current_protocols = select_protocols()
 
     # Get the current protocol ids
     current_protocol_ids = [protocol.protocol_id for protocol in current_protocols]
@@ -189,7 +189,7 @@ def read_in_protocols():
             delete_protocol(protocol.protocol_id)
 
 
-def get_protocol_id(protocol_name) -> int:
+def select_protocol_id(protocol_name) -> int:
     """
     Get the id of a protocol from the database.
 
@@ -199,7 +199,7 @@ def get_protocol_id(protocol_name) -> int:
     Returns:
         int: The id of the protocol.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get the id of the protocol from the database
@@ -211,7 +211,7 @@ def get_protocol_id(protocol_name) -> int:
     return protocol_id
 
 
-def get_protocol_name(protocol_id) -> str:
+def select_protocol_name(protocol_id) -> str:
     """
     Get the name of a protocol from the database.
 
@@ -221,7 +221,7 @@ def get_protocol_name(protocol_id) -> str:
     Returns:
         str: The name of the protocol.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get the name of the protocol from the database
@@ -235,6 +235,6 @@ def get_protocol_name(protocol_id) -> str:
 
 if __name__ == "__main__":
     read_in_protocols()
-    protocols_in_db = get_protocols()
+    protocols_in_db = select_protocols()
     for each_protocol in protocols_in_db:
         print(each_protocol)

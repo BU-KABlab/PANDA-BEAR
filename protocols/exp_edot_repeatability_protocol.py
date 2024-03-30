@@ -73,7 +73,7 @@ def edot_bleaching_part_1(
     print(
         f"2. Pipetting  {instructions.solutions_corrected['edot']}ul of edot into well: {instructions.well_id}"
     )
-    instructions.set_status(ExperimentStatus.DEPOSITING)
+    instructions.set_status_and_save(ExperimentStatus.DEPOSITING)
     forward_pipette_v2(
         volume=instructions.solutions_corrected["edot"],
         from_vessel=solution_selector(
@@ -114,12 +114,12 @@ def edot_bleaching_part_1(
         print("Continuing with the rest of the experiment")
 
     finally:
-        instructions.set_status(ExperimentStatus.ERINSING)
+        instructions.set_status_and_save(ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode()
 
     # Clear the well contents into waste
     print("3. Clearing well contents into waste")
-    instructions.set_status(ExperimentStatus.CLEARING)
+    instructions.set_status_and_save(ExperimentStatus.CLEARING)
     forward_pipette_v2(
         volume=instructions.solutions_corrected["edot"],
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -135,7 +135,7 @@ def edot_bleaching_part_1(
 
     # Flush the pipette tip x3 with electrolyte rinse
     print("4. Flushing pipette tip with electrolyte rinse")
-    instructions.set_status(ExperimentStatus.FLUSHING)
+    instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     for _ in range(3):
         forward_pipette_v2(
             volume=instructions.solutions_corrected["electrolyte"],
@@ -156,7 +156,7 @@ def edot_bleaching_part_1(
 
     # Rinse the well 4x with electrolyte rinse
     print("5. Rinsing well 4x with electrolyte well rinse")
-    instructions.set_status(ExperimentStatus.RINSING)
+    instructions.set_status_and_save(ExperimentStatus.RINSING)
     for _ in range(4):
         forward_pipette_v2(
             volume=instructions.solutions_corrected["rinse0"],
@@ -185,7 +185,7 @@ def edot_bleaching_part_1(
         )
 
     print("Taking after image")
-    instructions.set_status(ExperimentStatus.IMAGING)
+    instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
@@ -226,7 +226,7 @@ def edot_bleaching_part_2(
     print(
         "1. Pipetting 120µL of 0.1M LiClO4 in water into well. Press enter to confirm"
     )
-    instructions.set_status(ExperimentStatus.DEPOSITING)
+    instructions.set_status_and_save(ExperimentStatus.DEPOSITING)
     forward_pipette_v2(
         volume=instructions.solutions_corrected["licl04"],
         from_vessel=solution_selector(
@@ -263,7 +263,7 @@ def edot_bleaching_part_2(
     )
 
     print("4. Imaging well")
-    instructions.set_status(ExperimentStatus.IMAGING)
+    instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,

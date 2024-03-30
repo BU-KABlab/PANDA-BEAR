@@ -1,0 +1,4 @@
+2024-03-29 22:15:38,445&vessel&vessel&update_volume&165&rinse_s4&19860.0
+2024-03-29 22:15:38,448&vessel&vessel&log_contents&235&rinse_s4&19860.0&rinse
+2024-03-29 22:15:47,458&vessel&vessel&update_volume&165&waste_w0&1140.0
+2024-03-29 22:15:47,468&vessel&vessel&log_contents&235&waste_w0&1140.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}

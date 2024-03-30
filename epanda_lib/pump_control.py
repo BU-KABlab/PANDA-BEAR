@@ -2,7 +2,7 @@
 A "driver" class for controlling a new era A-1000 syringe pump using the nesp-lib library
 """
 
-# pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals
+# pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
 import logging
 import time
 from typing import Optional, Union

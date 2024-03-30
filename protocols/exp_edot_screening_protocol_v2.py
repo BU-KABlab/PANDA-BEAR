@@ -1,11 +1,6 @@
-"""
-Notes:
--   All depositions are CAs
--   All characterizations are CAs
-"""
+"""The sequence of steps for a pedotLHSv1_screening experiment."""
 
 # Standard imports
-from json import tool
 from typing import Sequence
 
 # Non-standard imports
@@ -14,31 +9,41 @@ from epanda_lib.e_panda import (
     forward_pipette_v2,
     solution_selector,
     chrono_amp,
-    cyclic_volt,
     waste_selector,
     image_well,
     flush_v2,
+)
+from epanda_lib.e_panda_custom import (
+    chrono_amp_edot_bleaching,
+    chrono_amp_edot_coloring,
+    cyclic_volt_edot_characterizing,
 )
 from epanda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.correction_factors import correction_factor
 from epanda_lib.mill_control import Instruments
-from epanda_lib.obs_controls import OBSController
+
 
 def main(
-        instructions: EchemExperimentBase,
-        toolkit: Toolkit,
-        stock_vials: Sequence[StockVial],
-        waste_vials: Sequence[WasteVial],
+    instructions: EchemExperimentBase,
+    toolkit: Toolkit,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
 ):
-    pedotLHSv1_screening(
+    """
+    Wrapper function for the pedotLHSv1_screening function.
+    This function is called by the ePANDA scheduler.
+    It is the main function for the pedotLHSv1_screening protocol.
+    """
+    pedot_lhs_v1_screening(
         instructions=instructions,
         toolkit=toolkit,
         stock_vials=stock_vials,
         waste_vials=waste_vials,
     )
 
-def pedotLHSv1_screening(
+
+def pedot_lhs_v1_screening(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
@@ -95,6 +100,7 @@ def pedotLHSv1_screening(
             stock_vials=stock_vials,
             waste_vials=waste_vials,
         )
+
 
 def pedotdeposition(
     instructions: EchemExperimentBase,
@@ -167,7 +173,7 @@ def pedotdeposition(
             chrono_amp(instructions, file_tag="part_1")
         except Exception as e:
             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-            return
+            raise e
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
@@ -201,8 +207,9 @@ def pedotdeposition(
 
     toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
     instructions.set_status_and_save(ExperimentStatus.RINSING)
-    for _ in range(4):
+    for i in range(4):
         # Pipette the rinse solution into the well
+        toolkit.global_logger.info("Rinse %d of 4", i + 1)
         forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
@@ -241,6 +248,8 @@ def pedotdeposition(
         instructions=instructions,
         step_description="after_deposition",
     )
+    instructions.process_type = 2
+    instructions.priority = 1
     toolkit.global_logger.info("PEDOT deposition complete\n\n")
 
 
@@ -311,10 +320,12 @@ def pedotbleaching(
 
         toolkit.global_logger.info("3. Performing CA")
         try:
-            chrono_amp(instructions, file_tag="bleaching")
+            chrono_amp_edot_bleaching(instructions)
         except Exception as e:
-            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-            return
+            toolkit.global_logger.error(
+                "Error occurred during chrono_amp bleaching: %s", str(e)
+            )
+            raise e
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
@@ -354,6 +365,8 @@ def pedotbleaching(
         step_description="bleaching_after_CA",
     )
 
+    instructions.process_type = 3
+    instructions.priority = 2
     toolkit.global_logger.info("PEDOT bleaching complete\n\n")
 
 
@@ -426,10 +439,12 @@ def pedotcoloring(
 
         toolkit.global_logger.info("3. Performing CA")
         try:
-            chrono_amp(instructions, file_tag="coloring")
+            chrono_amp_edot_coloring(instructions)
         except Exception as e:
-            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-            return
+            toolkit.global_logger.error(
+                "Error occurred during chrono_amp coloring: %s", str(e)
+            )
+            raise e
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
@@ -468,9 +483,9 @@ def pedotcoloring(
         instructions=instructions,
         step_description="coloring_after_CA",
     )
-    
+    instructions.process_type = 4
+    instructions.priority = 3
     toolkit.global_logger.info("PEDOT coloring complete\n\n")
-
 
 
 def pedotcv(
@@ -544,10 +559,10 @@ def pedotcv(
 
         toolkit.global_logger.info("3. Performing CV")
         try:
-            cyclic_volt(instructions, file_tag="characterizing")
+            cyclic_volt_edot_characterizing(instructions)
         except Exception as e:
             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-            return
+            raise e
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
         instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
@@ -588,8 +603,9 @@ def pedotcv(
     )
     toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
     instructions.set_status_and_save(ExperimentStatus.RINSING)
-    for _ in range(4):
+    for i in range(4):
         # Pipette the rinse solution into the well
+        toolkit.global_logger.info("Rinse %d of 4", i + 1)
         forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
@@ -622,6 +638,6 @@ def pedotcv(
         instructions=instructions,
         step_description="characterizing_after_rinse",
     )
-
+    instructions.process_type = None
+    instructions.priority = None
     toolkit.global_logger.info("PEDOT characterizing complete\n\n")
-

@@ -13,7 +13,7 @@ from .vessel import (
     Vessel,
     OverDraftException,
     OverFillException,
-    Vessel_Coordinates,
+    VesselCoordinates,
 )
 
 # set up A logger for the vials module
@@ -72,7 +72,7 @@ class Vial2(Vessel):
         volume: float,
         capacity: float,
         density: float,
-        vial_coordinates: Union[Vessel_Coordinates],
+        vial_coordinates: Union[VesselCoordinates],
         radius: float,
         height: float,
         contamination: int,
@@ -232,7 +232,7 @@ class StockVial(Vial2):
         volume: float,
         capacity: float,
         density: float,
-        vial_coordinates: Union[Vessel_Coordinates, dict],
+        vial_coordinates: Union[VesselCoordinates, dict],
         radius: float,
         height: float,
         contamination: int,
@@ -306,7 +306,7 @@ class WasteVial(Vial2):
         volume: float,
         capacity: float,
         density: float,
-        vial_coordinates: Union[Vessel_Coordinates, dict],
+        vial_coordinates: Union[VesselCoordinates, dict],
         radius: float,
         height: float,
         contamination: int,
@@ -519,7 +519,7 @@ def input_new_vial_values(vialgroup: str):
             vial.contamination = ""
 
         print(
-            f"{vial.position:<10} {vial.name:<20} {vial.contents.__str__():<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
+            f"{vial.position:<10} {vial.name:<20} {str(vial.contents):<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
         )
         # for key, value in vial.items():
         #     if value is None:

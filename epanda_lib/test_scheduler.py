@@ -261,7 +261,7 @@ class TestScheduler(unittest.TestCase):
         queue_df.to_csv(queue_file, index=False)
 
         # Call the add_to_queue_file method
-        result = self.scheduler.add_to_queue_file(experiment)
+        result = self.scheduler.add_to_queue(experiment)
 
         # Check that the experiment was added to the queue file
         expected_queue_data = {"id": [1, 1], "priority": [1, 1], "filename": ["unittests_1", "unittests_1"]}

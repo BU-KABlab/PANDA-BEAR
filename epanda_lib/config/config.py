@@ -7,9 +7,9 @@ AIR_GAP = 40  # ul
 DRIP_STOP = 5  # ul
 PURGE_VOLUME = 20  # ul
 RANDOM_FLAG = False  # Set to True to randomize the order of the experiments
-
+DEFAULT_PUMPING_RATE = 0.3  # ul/s
 ## Testing flag
-TESTING = read_testing_config()  # Set to True to run in testing mode -- THIS IS THE ONLY PLACE TO CHANGE THIS VALUE
+TESTING = read_testing_config()  # testing.txt is the only place to change the mode besides from the main menue
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 

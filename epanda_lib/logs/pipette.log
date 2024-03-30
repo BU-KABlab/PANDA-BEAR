@@ -68,3 +68,15 @@
 2024-02-20 11:37:03,504&pipette&pump_control&log_contents&110&pipette&0&{}
 2024-02-20 11:37:03,517&pipette&pump_control&log_contents&110&pipette&100.0&{}
 2024-02-20 11:39:40,578&pipette&pump_control&log_contents&110&pipette&200.0&{'water': 100}
+2024-03-29 21:55:07,690&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:05:00,811&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:08:21,271&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:13:02,268&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:31,934&pipette&pump_control&log_contents&566&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:38,444&pipette&pump_control&log_contents&566&pipette&180.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:38,444&pipette&pump_control&log_contents&566&pipette&180.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:40,950&pipette&pump_control&log_contents&566&pipette&185.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:47,457&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:47,468&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:47,469&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-03-29 22:15:47,469&pipette&pump_control&log_contents&566&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}

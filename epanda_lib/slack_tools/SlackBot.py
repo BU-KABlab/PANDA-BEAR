@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from slack_sdk import errors
 
 from epanda_lib.config.config import (
     QUEUE,
@@ -28,7 +27,7 @@ from epanda_lib.config.config import (
     WELL_TYPE,
 )
 from epanda_lib.config.secrets import Slack as slack_cred
-from epanda_lib.wellplate import CircularWellPlate, GraceBioLabsWellPlate, Wellplate
+from epanda_lib.wellplate import Wellplate
 from epanda_lib.obs_controls import OBSController
 from epanda_lib.image_tools import add_data_zone
 
@@ -80,11 +79,11 @@ class SlackBot:
         filename_to_post = file.name
 
         if channel == "conversation":
-            channel_id = slack_cred.CONVERSATION_CHANNEL_ID
+            channel_id = slack_cred.CONVERSATION_CHANNEL_ID if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
         elif channel == "alert":
-            channel_id = slack_cred.ALERT_CHANNEL_ID
+            channel_id = slack_cred.ALERT_CHANNEL_ID  if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
         elif channel == "data":
-            channel_id = slack_cred.DATA_CHANNEL_ID
+            channel_id = slack_cred.DATA_CHANNEL_ID  if not self.test else slack_cred.TEST_DATA_CHANNEL_ID
         elif channel in [
             slack_cred.CONVERSATION_CHANNEL_ID,
             slack_cred.ALERT_CHANNEL_ID,
@@ -94,15 +93,13 @@ class SlackBot:
             return 0
 
         try:
-            if not self.test:
-                result = client.files_upload_v2(
-                    channel=channel_id,
-                    file=file.open("rb"),
-                    filename=filename_to_post,
-                    initial_comment=message,
-                )
-            else:
-                result = {"ok": True}
+            result = client.files_upload_v2(
+                channel=channel_id,
+                file=file.open("rb"),
+                filename=filename_to_post,
+                initial_comment=message,
+            )
+
             if result["ok"]:
                 self.logger.info("File sent: %s", file)
                 return 1
@@ -124,11 +121,11 @@ class SlackBot:
         conversation_history = []
         # ID of the channel you want to send the message to
         if channel == "conversation":
-            channel_id = slack_cred.CONVERSATION_CHANNEL_ID
+            channel_id = slack_cred.CONVERSATION_CHANNEL_ID if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
         elif channel == "alert":
-            channel_id = slack_cred.ALERT_CHANNEL_ID
+            channel_id = slack_cred.ALERT_CHANNEL_ID if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
         elif channel == "data":
-            channel_id = slack_cred.DATA_CHANNEL_ID
+            channel_id = slack_cred.DATA_CHANNEL_ID if not self.test else slack_cred.TEST_DATA_CHANNEL_ID
         else:
             return 0
 
@@ -157,7 +154,7 @@ class SlackBot:
 
             for _, payload in enumerate(conversation_history2):
                 msg_id = payload["client_msg_id"]
-                msg_text = payload["text"]
+                msg_text:str = payload["text"]
                 msg_ts = payload["ts"]
                 lookup_tickets = self.find_id(msg_id)
                 if lookup_tickets is False:
@@ -465,21 +462,11 @@ class SlackBot:
         # Choose the correct wellplate object based on the wellplate type
         wellplate: Wellplate = None
         if wellplate_type == "circular":
-            wellplate = CircularWellPlate(
-                a1_x=-218,
-                a1_y=-74,
-                orientation=0,
-                columns="ABCDEFGH",
-                rows=13,
+            wellplate = Wellplate(
                 type_number=type_number,
             )
         elif wellplate_type == "square":
-            wellplate = GraceBioLabsWellPlate(
-                a1_x=-218,
-                a1_y=-74,
-                orientation=0,
-                columns="ABCDEFGH",
-                rows=13,
+            wellplate = Wellplate(
                 type_number=type_number,
             )
 

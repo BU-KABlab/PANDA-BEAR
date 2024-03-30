@@ -381,7 +381,7 @@ class potentiostat_cv_parameters:
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class potentiostat_ca_parameters:
+class potentiostat_chrono_parameters:
     """CA Setup Parameters"""
 
     # CA/CP Setup Parameters

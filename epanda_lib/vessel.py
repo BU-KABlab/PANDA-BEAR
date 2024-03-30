@@ -27,7 +27,7 @@ class VesselLogger:
 logger = VesselLogger("vessel").logger
 
 
-class Vessel_Coordinates:
+class VesselCoordinates:
     """
     Represents the coordinates of a vessel.
 
@@ -79,7 +79,7 @@ class Vessel_Coordinates:
     def __len__(self):
         return 4
 
-    def __eq__(self, other: "Vessel_Coordinates") -> bool:
+    def __eq__(self, other: "VesselCoordinates") -> bool:
         """Returns True if the coordinates are equal, False otherwise."""
         return all(
             [
@@ -90,7 +90,7 @@ class Vessel_Coordinates:
             ]
         )
 
-    def __ne__(self, other: "Vessel_Coordinates") -> bool:
+    def __ne__(self, other: "VesselCoordinates") -> bool:
         """Returns True if the coordinates are not equal, False otherwise."""
         return not self.__eq__(other)
 
@@ -131,7 +131,7 @@ class Vessel:
         volume: float,
         capacity: float,
         density: float,
-        coordinates: Union[Vessel_Coordinates, dict],
+        coordinates: Union[VesselCoordinates, dict],
         contents={},
         depth: float = 0,
     ) -> None:
@@ -142,7 +142,7 @@ class Vessel:
         self.density = density
         self.viscosity_cp = 0.0
         if isinstance(coordinates, dict):
-            self.coordinates = Vessel_Coordinates(**coordinates)
+            self.coordinates = VesselCoordinates(**coordinates)
         else:
             self.coordinates = coordinates
 

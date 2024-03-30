@@ -3,7 +3,7 @@
 import importlib
 import os
 import sqlite3
-
+from epanda_lib.config.config import SQL_DB_PATH
 
 class GeneratorEntry:
     """A class to represent a generator entry in the database."""
@@ -29,7 +29,7 @@ def get_generators() -> list:
     Returns:
         list: A list of all generators in the database.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get all generators from the database
@@ -56,7 +56,7 @@ def get_generator_by_id(generator_id) -> GeneratorEntry:
     Returns:
         GeneratorEntry: The generator from the database.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get the generator from the database
@@ -84,7 +84,7 @@ def insert_generator(generator_id, project_id, protocol_id, name, filepath):
         None
     """
 
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Insert the generator into the database
@@ -108,7 +108,7 @@ def update_generator(generator_id, new_name):
     Returns:
         None
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Update the name of the generator in the database
@@ -130,7 +130,7 @@ def delete_generator(generator_id):
     Returns:
         None
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Delete the generator from the database
@@ -209,7 +209,7 @@ def get_generator_id(generator_name) -> int:
     Returns:
         int: The id of the generator.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get the id of the generator from the database
@@ -231,7 +231,7 @@ def get_generator_name(generator_id) -> str:
     Returns:
         str: The name of the generator.
     """
-    conn = sqlite3.connect("data/epanda_db.db")
+    conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
     # Get the name of the generator from the database

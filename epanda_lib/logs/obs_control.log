@@ -213,3 +213,138 @@
 2024-03-10 23:31:35,850:ePANDA:Current_coordinates: [-349.75, -99.0, -66.0]
 2024-03-10 23:33:23,358:ePANDA:Disconnecting from the mill
 2024-03-10 23:33:23,359:ePANDA:Exiting the mill context manager
+2024-03-29 21:55:05,673:ePANDA:Using mock instruments
+2024-03-29 21:55:05,680:ePANDA:Mill config loaded
+2024-03-29 21:55:05,680:ePANDA:Connecting to the mill
+2024-03-29 21:55:08,584:ePANDA:Connected to instruments
+2024-03-29 21:55:11,202:ePANDA:System state reestablished
+2024-03-29 21:55:11,202:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 21:55:11,203:ePANDA:Stock vial edot contains edot with volume 20000
+2024-03-29 21:55:11,203:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 21:55:11,203:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 21:55:11,203:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 21:55:11,204:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,204:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,204:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,204:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 21:55:11,213:ePANDA:Wellplate status file does not have the correct number of wells. File may be corrupted
+2024-03-29 21:55:17,978:ePANDA:
+2024-03-29 22:04:58,805:ePANDA:Using mock instruments
+2024-03-29 22:04:58,806:ePANDA:Mill config loaded
+2024-03-29 22:04:58,807:ePANDA:Connecting to the mill
+2024-03-29 22:05:01,590:ePANDA:Connected to instruments
+2024-03-29 22:05:04,301:ePANDA:System state reestablished
+2024-03-29 22:05:04,301:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:05:04,302:ePANDA:Stock vial edot contains edot with volume 20000
+2024-03-29 22:05:04,302:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:05:04,302:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:05:04,302:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:05:04,302:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,303:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,303:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,303:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:05:04,660:ePANDA:Wellplate status file does not have the correct number of wells. File may be corrupted
+2024-03-29 22:06:39,758:ePANDA:Wellplate status file does not have the correct number of wells
+2024-03-29 22:08:19,263:ePANDA:Using mock instruments
+2024-03-29 22:08:19,264:ePANDA:Mill config loaded
+2024-03-29 22:08:19,264:ePANDA:Connecting to the mill
+2024-03-29 22:08:21,271:ePANDA:Connected to instruments
+2024-03-29 22:12:00,339:ePANDA:System state reestablished
+2024-03-29 22:12:00,339:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:12:00,340:ePANDA:Stock vial edot contains edot with volume 20000
+2024-03-29 22:12:00,340:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:12:00,340:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:12:00,340:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:12:00,340:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,340:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,341:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,341:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:12:00,923:ePANDA:Wellplate status file does not have the correct number of wells. File may be corrupted
+2024-03-29 22:12:00,924:ePANDA:Wellplate status file does not have the correct number of wells
+2024-03-29 22:13:00,260:ePANDA:Using mock instruments
+2024-03-29 22:13:00,261:ePANDA:Mill config loaded
+2024-03-29 22:13:00,261:ePANDA:Connecting to the mill
+2024-03-29 22:13:02,269:ePANDA:Connected to instruments
+2024-03-29 22:13:27,131:ePANDA:System state reestablished
+2024-03-29 22:13:30,822:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:13:42,503:ePANDA:Stock vial edot contains edot with volume 20000
+2024-03-29 22:13:43,627:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:13:44,716:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:13:45,987:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:13:48,826:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:13:49,951:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:13:51,338:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:13:52,640:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:14:12,743:ePANDA:There are 96 clear wells
+2024-03-29 22:15:31,936:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-29 22:15:31,937:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-29 22:15:31,937:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-29 22:15:31,937:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-03-29 22:15:31,938:ePANDA:Not moving to Z=0 first
+2024-03-29 22:15:31,938:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-03-29 22:15:31,938:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-03-29 22:15:31,938:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-03-29 22:15:31,939:ePANDA:Command sent: G01 X-86.5
+2024-03-29 22:15:31,939:ePANDA:Writing to the mill: G01 X-86.5
+2024-03-29 22:15:33,940:ePANDA:Returned <Idle|MPos:-89.5,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:33,940:ePANDA:Command sent: G01 Y-173.5
+2024-03-29 22:15:33,941:ePANDA:Writing to the mill: G01 Y-173.5
+2024-03-29 22:15:35,941:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:35,941:ePANDA:Command sent: G01 Z-74
+2024-03-29 22:15:35,942:ePANDA:Writing to the mill: G01 Z-74
+2024-03-29 22:15:37,942:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:38,448:ePANDA:Command sent: G01 Z0
+2024-03-29 22:15:38,448:ePANDA:Writing to the mill: G01 Z0
+2024-03-29 22:15:40,449:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:40,951:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-03-29 22:15:40,951:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-03-29 22:15:40,951:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-03-29 22:15:40,952:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-03-29 22:15:40,952:ePANDA:Not moving to Z=0 first
+2024-03-29 22:15:40,952:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-03-29 22:15:40,952:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-03-29 22:15:40,952:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-03-29 22:15:40,952:ePANDA:Command sent: G01 X-132.5
+2024-03-29 22:15:40,953:ePANDA:Writing to the mill: G01 X-132.5
+2024-03-29 22:15:42,953:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:42,953:ePANDA:Command sent: G01 Y-9.5
+2024-03-29 22:15:42,954:ePANDA:Writing to the mill: G01 Y-9.5
+2024-03-29 22:15:44,954:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:44,954:ePANDA:Command sent: G01 Z-17
+2024-03-29 22:15:44,955:ePANDA:Writing to the mill: G01 Z-17
+2024-03-29 22:15:46,955:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-03-29 22:15:55,151:ePANDA:System state reestablished
+2024-03-29 22:15:55,151:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-03-29 22:15:55,151:ePANDA:Stock vial edot contains edot with volume 20000
+2024-03-29 22:15:55,151:ePANDA:Stock vial rinse contains rinse with volume 19860
+2024-03-29 22:15:55,152:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-03-29 22:15:55,152:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-03-29 22:15:55,152:ePANDA:Waste vial waste contains {'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0} with volume 1140
+2024-03-29 22:15:55,152:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:15:55,152:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:15:55,152:ePANDA:Waste vial waste contains {} with volume 1000
+2024-03-29 22:15:55,659:ePANDA:There are 96 clear wells
+2024-03-29 22:16:11,201:ePANDA:no such column: id
+2024-03-29 22:16:11,859:ePANDA:Command sent: G01 Z0
+2024-03-29 22:16:11,860:ePANDA:Writing to the mill: G01 Z0
+2024-03-29 22:16:13,860:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:13,860:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0
+2024-03-29 22:16:13,861:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0
+2024-03-29 22:16:13,861:ePANDA:Current_coordinates: [-132.5, -9.5, 0.0]
+2024-03-29 22:16:13,861:ePANDA:Target coordinates: [-369.4, -8.2, -50]
+2024-03-29 22:16:13,861:ePANDA:Not moving to Z=0 first
+2024-03-29 22:16:13,861:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0
+2024-03-29 22:16:13,861:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0
+2024-03-29 22:16:13,862:ePANDA:Current_coordinates: [-132.5, -9.5, 0.0]
+2024-03-29 22:16:13,862:ePANDA:Command sent: G01 X-369.4
+2024-03-29 22:16:13,862:ePANDA:Writing to the mill: G01 X-369.4
+2024-03-29 22:16:15,863:ePANDA:Returned <Idle|MPos:-372.4,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:15,863:ePANDA:Command sent: G01 Y-8.2
+2024-03-29 22:16:15,863:ePANDA:Writing to the mill: G01 Y-8.2
+2024-03-29 22:16:17,864:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:17,864:ePANDA:Command sent: G01 Z-50
+2024-03-29 22:16:17,864:ePANDA:Writing to the mill: G01 Z-50
+2024-03-29 22:16:19,865:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-03-29 22:16:19,865:ePANDA:Disconnecting from instruments:
+2024-03-29 22:16:19,865:ePANDA:Disconnecting from the mill
+2024-03-29 22:16:19,867:ePANDA:Disconnected from instruments

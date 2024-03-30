@@ -13,6 +13,20 @@
             "driver": "SQLite",
             "name": "epanda",
             "database": "${workspaceFolder:PANDA}/data/epanda_db.db"
+        },
+        {
+            "previewLimit": 100,
+            "driver": "SQLite",
+            "name": "epanda_dev",
+            "group": "ePANDA",
+            "database": "P:\\epanda_dev.db"
+        },
+        {
+            "previewLimit": 100,
+            "driver": "SQLite",
+            "name": "epanda_prod",
+            "group": "ePANDA",
+            "database": "P:\\epanda_prod.db"
         }
     ],
     "sqltools.useNodeRuntime": true

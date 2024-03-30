@@ -997,3 +997,1783 @@
 2024-03-10 23:31:35,850&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-349.75, -99.0, -66.0]&
 2024-03-10 23:33:23,358&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
 2024-03-10 23:33:23,359&ePANDA&INFO&mill_control&__exit__&140&&&&Exiting the mill context manager&
+2024-03-28 21:57:04,158&e_panda&DEBUG&wellplate&update_well_status_from_db&545&Updating well status from database...
+2024-03-28 21:59:09,219&e_panda&DEBUG&wellplate&update_well_status_from_db&545&Updating well status from database...
+2024-03-28 22:02:38,873&e_panda&DEBUG&wellplate&update_well_status_from_db&545&Updating well status from database...
+2024-03-28 22:02:39,068&e_panda&DEBUG&wellplate&update_well_status_from_db&549&Well status updated from database
+2024-03-28 22:02:39,068&e_panda&DEBUG&wellplate&load_new_wellplate&1116&Well statuses reset to new
+2024-03-28 22:02:39,068&e_panda&INFO&wellplate&load_new_wellplate&1117&Wellplate 110 saved and wellplate 111 loaded
+2024-03-28 22:14:29,913&e_panda&DEBUG&wellplate&load_new_wellplate&1118&Wellplate already exists in the database. Setting as current wellplate
+2024-03-28 22:22:09,511&e_panda&DEBUG&wellplate&load_new_wellplate&1118&Wellplate already exists in the database. Setting as current wellplate
+2024-03-28 22:22:40,836&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-28 22:22:41,028&e_panda&ERROR&wellplate&save_to_db&300&Error occurred while saving well to the database: unrecognized token: "x': -221.7, '"
+2024-03-28 22:30:16,756&e_panda&DEBUG&wellplate&load_new_wellplate&1118&Wellplate already exists in the database. Setting as current wellplate
+2024-03-28 22:30:53,824&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-28 22:30:54,098&e_panda&ERROR&wellplate&save_to_db&300&Error occurred while saving well to the database: Error binding parameter 7: type 'dict' is not supported
+2024-03-28 22:33:55,461&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-28 22:33:56,105&e_panda&INFO&wellplate&save_to_db&298&Well a1 saved to the database
+2024-03-28 22:33:56,105&e_panda&INFO&wellplate&save_to_db&295&Saving well a2 to the database
+2024-03-28 22:33:56,833&e_panda&INFO&wellplate&save_to_db&298&Well a2 saved to the database
+2024-03-28 22:33:56,833&e_panda&INFO&wellplate&save_to_db&295&Saving well a3 to the database
+2024-03-28 22:33:57,584&e_panda&INFO&wellplate&save_to_db&298&Well a3 saved to the database
+2024-03-28 22:33:57,584&e_panda&INFO&wellplate&save_to_db&295&Saving well a4 to the database
+2024-03-28 22:33:58,298&e_panda&INFO&wellplate&save_to_db&298&Well a4 saved to the database
+2024-03-28 22:33:58,299&e_panda&INFO&wellplate&save_to_db&295&Saving well a5 to the database
+2024-03-28 22:33:59,250&e_panda&INFO&wellplate&save_to_db&298&Well a5 saved to the database
+2024-03-28 22:33:59,250&e_panda&INFO&wellplate&save_to_db&295&Saving well a6 to the database
+2024-03-28 22:33:59,975&e_panda&INFO&wellplate&save_to_db&298&Well a6 saved to the database
+2024-03-28 22:33:59,975&e_panda&INFO&wellplate&save_to_db&295&Saving well a7 to the database
+2024-03-28 22:34:00,766&e_panda&INFO&wellplate&save_to_db&298&Well a7 saved to the database
+2024-03-28 22:34:00,766&e_panda&INFO&wellplate&save_to_db&295&Saving well a8 to the database
+2024-03-28 22:34:01,453&e_panda&INFO&wellplate&save_to_db&298&Well a8 saved to the database
+2024-03-28 22:34:01,453&e_panda&INFO&wellplate&save_to_db&295&Saving well a9 to the database
+2024-03-28 22:34:02,213&e_panda&INFO&wellplate&save_to_db&298&Well a9 saved to the database
+2024-03-28 22:34:02,213&e_panda&INFO&wellplate&save_to_db&295&Saving well a10 to the database
+2024-03-28 22:34:02,926&e_panda&INFO&wellplate&save_to_db&298&Well a10 saved to the database
+2024-03-28 22:34:02,927&e_panda&INFO&wellplate&save_to_db&295&Saving well a11 to the database
+2024-03-28 22:34:03,777&e_panda&INFO&wellplate&save_to_db&298&Well a11 saved to the database
+2024-03-28 22:34:03,777&e_panda&INFO&wellplate&save_to_db&295&Saving well a12 to the database
+2024-03-28 22:34:04,501&e_panda&INFO&wellplate&save_to_db&298&Well a12 saved to the database
+2024-03-28 22:34:04,501&e_panda&INFO&wellplate&save_to_db&295&Saving well b1 to the database
+2024-03-28 22:34:05,587&e_panda&INFO&wellplate&save_to_db&298&Well b1 saved to the database
+2024-03-28 22:34:05,587&e_panda&INFO&wellplate&save_to_db&295&Saving well b2 to the database
+2024-03-28 22:34:06,479&e_panda&INFO&wellplate&save_to_db&298&Well b2 saved to the database
+2024-03-28 22:34:06,479&e_panda&INFO&wellplate&save_to_db&295&Saving well b3 to the database
+2024-03-28 22:34:07,299&e_panda&INFO&wellplate&save_to_db&298&Well b3 saved to the database
+2024-03-28 22:34:07,299&e_panda&INFO&wellplate&save_to_db&295&Saving well b4 to the database
+2024-03-28 22:34:08,119&e_panda&INFO&wellplate&save_to_db&298&Well b4 saved to the database
+2024-03-28 22:34:08,119&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-28 22:34:08,839&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-28 22:34:08,839&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-28 22:34:09,715&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-28 22:34:09,715&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-28 22:34:10,385&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-28 22:34:10,385&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-28 22:34:11,170&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-28 22:34:11,170&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-28 22:34:11,845&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-28 22:34:11,846&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-28 22:34:12,626&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-28 22:34:12,627&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-28 22:34:13,398&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-28 22:34:13,398&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-28 22:34:14,154&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-28 22:34:14,155&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-28 22:34:14,934&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-28 22:34:14,934&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-28 22:34:15,672&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-28 22:34:15,672&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-28 22:34:16,334&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-28 22:34:16,334&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-28 22:34:17,145&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-28 22:34:17,145&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-28 22:34:17,800&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-28 22:34:17,800&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-28 22:34:18,608&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-28 22:34:18,608&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-28 22:34:19,287&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-28 22:34:19,288&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-28 22:34:20,051&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-28 22:34:20,051&e_panda&INFO&wellplate&save_to_db&295&Saving well c9 to the database
+2024-03-28 22:34:20,802&e_panda&INFO&wellplate&save_to_db&298&Well c9 saved to the database
+2024-03-28 22:34:20,802&e_panda&INFO&wellplate&save_to_db&295&Saving well c10 to the database
+2024-03-28 22:34:21,574&e_panda&INFO&wellplate&save_to_db&298&Well c10 saved to the database
+2024-03-28 22:34:21,575&e_panda&INFO&wellplate&save_to_db&295&Saving well c11 to the database
+2024-03-28 22:34:22,244&e_panda&INFO&wellplate&save_to_db&298&Well c11 saved to the database
+2024-03-28 22:34:22,244&e_panda&INFO&wellplate&save_to_db&295&Saving well c12 to the database
+2024-03-28 22:34:23,011&e_panda&INFO&wellplate&save_to_db&298&Well c12 saved to the database
+2024-03-28 22:34:23,011&e_panda&INFO&wellplate&save_to_db&295&Saving well d1 to the database
+2024-03-28 22:34:23,728&e_panda&INFO&wellplate&save_to_db&298&Well d1 saved to the database
+2024-03-28 22:34:23,728&e_panda&INFO&wellplate&save_to_db&295&Saving well d2 to the database
+2024-03-28 22:34:24,398&e_panda&INFO&wellplate&save_to_db&298&Well d2 saved to the database
+2024-03-28 22:34:24,398&e_panda&INFO&wellplate&save_to_db&295&Saving well d3 to the database
+2024-03-28 22:34:25,088&e_panda&INFO&wellplate&save_to_db&298&Well d3 saved to the database
+2024-03-28 22:34:25,088&e_panda&INFO&wellplate&save_to_db&295&Saving well d4 to the database
+2024-03-28 22:34:25,851&e_panda&INFO&wellplate&save_to_db&298&Well d4 saved to the database
+2024-03-28 22:34:25,851&e_panda&INFO&wellplate&save_to_db&295&Saving well d5 to the database
+2024-03-28 22:34:26,580&e_panda&INFO&wellplate&save_to_db&298&Well d5 saved to the database
+2024-03-28 22:34:26,580&e_panda&INFO&wellplate&save_to_db&295&Saving well d6 to the database
+2024-03-28 22:34:27,406&e_panda&INFO&wellplate&save_to_db&298&Well d6 saved to the database
+2024-03-28 22:34:27,407&e_panda&INFO&wellplate&save_to_db&295&Saving well d7 to the database
+2024-03-28 22:34:28,251&e_panda&INFO&wellplate&save_to_db&298&Well d7 saved to the database
+2024-03-28 22:34:28,251&e_panda&INFO&wellplate&save_to_db&295&Saving well d8 to the database
+2024-03-28 22:34:29,083&e_panda&INFO&wellplate&save_to_db&298&Well d8 saved to the database
+2024-03-28 22:34:29,083&e_panda&INFO&wellplate&save_to_db&295&Saving well d9 to the database
+2024-03-28 22:34:29,797&e_panda&INFO&wellplate&save_to_db&298&Well d9 saved to the database
+2024-03-28 22:34:29,797&e_panda&INFO&wellplate&save_to_db&295&Saving well d10 to the database
+2024-03-28 22:34:30,580&e_panda&INFO&wellplate&save_to_db&298&Well d10 saved to the database
+2024-03-28 22:34:30,580&e_panda&INFO&wellplate&save_to_db&295&Saving well d11 to the database
+2024-03-28 22:34:31,263&e_panda&INFO&wellplate&save_to_db&298&Well d11 saved to the database
+2024-03-28 22:34:31,263&e_panda&INFO&wellplate&save_to_db&295&Saving well d12 to the database
+2024-03-28 22:34:31,967&e_panda&INFO&wellplate&save_to_db&298&Well d12 saved to the database
+2024-03-28 22:34:31,967&e_panda&INFO&wellplate&save_to_db&295&Saving well e1 to the database
+2024-03-28 22:34:32,665&e_panda&INFO&wellplate&save_to_db&298&Well e1 saved to the database
+2024-03-28 22:34:32,665&e_panda&INFO&wellplate&save_to_db&295&Saving well e2 to the database
+2024-03-28 22:34:33,463&e_panda&INFO&wellplate&save_to_db&298&Well e2 saved to the database
+2024-03-28 22:34:33,463&e_panda&INFO&wellplate&save_to_db&295&Saving well e3 to the database
+2024-03-28 22:34:34,236&e_panda&INFO&wellplate&save_to_db&298&Well e3 saved to the database
+2024-03-28 22:34:34,236&e_panda&INFO&wellplate&save_to_db&295&Saving well e4 to the database
+2024-03-28 22:34:35,015&e_panda&INFO&wellplate&save_to_db&298&Well e4 saved to the database
+2024-03-28 22:34:35,015&e_panda&INFO&wellplate&save_to_db&295&Saving well e5 to the database
+2024-03-28 22:34:35,970&e_panda&INFO&wellplate&save_to_db&298&Well e5 saved to the database
+2024-03-28 22:34:35,970&e_panda&INFO&wellplate&save_to_db&295&Saving well e6 to the database
+2024-03-28 22:34:36,665&e_panda&INFO&wellplate&save_to_db&298&Well e6 saved to the database
+2024-03-28 22:34:36,665&e_panda&INFO&wellplate&save_to_db&295&Saving well e7 to the database
+2024-03-28 22:34:37,339&e_panda&INFO&wellplate&save_to_db&298&Well e7 saved to the database
+2024-03-28 22:34:37,340&e_panda&INFO&wellplate&save_to_db&295&Saving well e8 to the database
+2024-03-28 22:34:38,016&e_panda&INFO&wellplate&save_to_db&298&Well e8 saved to the database
+2024-03-28 22:34:38,016&e_panda&INFO&wellplate&save_to_db&295&Saving well e9 to the database
+2024-03-28 22:34:38,679&e_panda&INFO&wellplate&save_to_db&298&Well e9 saved to the database
+2024-03-28 22:34:38,680&e_panda&INFO&wellplate&save_to_db&295&Saving well e10 to the database
+2024-03-28 22:34:39,476&e_panda&INFO&wellplate&save_to_db&298&Well e10 saved to the database
+2024-03-28 22:34:39,477&e_panda&INFO&wellplate&save_to_db&295&Saving well e11 to the database
+2024-03-28 22:34:40,230&e_panda&INFO&wellplate&save_to_db&298&Well e11 saved to the database
+2024-03-28 22:34:40,231&e_panda&INFO&wellplate&save_to_db&295&Saving well e12 to the database
+2024-03-28 22:34:40,954&e_panda&INFO&wellplate&save_to_db&298&Well e12 saved to the database
+2024-03-28 22:34:40,954&e_panda&INFO&wellplate&save_to_db&295&Saving well f1 to the database
+2024-03-28 22:34:41,743&e_panda&INFO&wellplate&save_to_db&298&Well f1 saved to the database
+2024-03-28 22:34:41,743&e_panda&INFO&wellplate&save_to_db&295&Saving well f2 to the database
+2024-03-28 22:34:42,518&e_panda&INFO&wellplate&save_to_db&298&Well f2 saved to the database
+2024-03-28 22:34:42,518&e_panda&INFO&wellplate&save_to_db&295&Saving well f3 to the database
+2024-03-28 22:34:43,295&e_panda&INFO&wellplate&save_to_db&298&Well f3 saved to the database
+2024-03-28 22:34:43,296&e_panda&INFO&wellplate&save_to_db&295&Saving well f4 to the database
+2024-03-28 22:34:43,984&e_panda&INFO&wellplate&save_to_db&298&Well f4 saved to the database
+2024-03-28 22:34:43,985&e_panda&INFO&wellplate&save_to_db&295&Saving well f5 to the database
+2024-03-28 22:34:44,718&e_panda&INFO&wellplate&save_to_db&298&Well f5 saved to the database
+2024-03-28 22:34:44,718&e_panda&INFO&wellplate&save_to_db&295&Saving well f6 to the database
+2024-03-28 22:34:45,542&e_panda&INFO&wellplate&save_to_db&298&Well f6 saved to the database
+2024-03-28 22:34:45,543&e_panda&INFO&wellplate&save_to_db&295&Saving well f7 to the database
+2024-03-28 22:34:46,229&e_panda&INFO&wellplate&save_to_db&298&Well f7 saved to the database
+2024-03-28 22:34:46,229&e_panda&INFO&wellplate&save_to_db&295&Saving well f8 to the database
+2024-03-28 22:34:46,979&e_panda&INFO&wellplate&save_to_db&298&Well f8 saved to the database
+2024-03-28 22:34:46,979&e_panda&INFO&wellplate&save_to_db&295&Saving well f9 to the database
+2024-03-28 22:34:47,808&e_panda&INFO&wellplate&save_to_db&298&Well f9 saved to the database
+2024-03-28 22:34:47,808&e_panda&INFO&wellplate&save_to_db&295&Saving well f10 to the database
+2024-03-28 22:34:48,572&e_panda&INFO&wellplate&save_to_db&298&Well f10 saved to the database
+2024-03-28 22:34:48,572&e_panda&INFO&wellplate&save_to_db&295&Saving well f11 to the database
+2024-03-28 22:34:49,398&e_panda&INFO&wellplate&save_to_db&298&Well f11 saved to the database
+2024-03-28 22:34:49,398&e_panda&INFO&wellplate&save_to_db&295&Saving well f12 to the database
+2024-03-28 22:34:50,078&e_panda&INFO&wellplate&save_to_db&298&Well f12 saved to the database
+2024-03-28 22:34:50,079&e_panda&INFO&wellplate&save_to_db&295&Saving well g1 to the database
+2024-03-28 22:34:50,845&e_panda&INFO&wellplate&save_to_db&298&Well g1 saved to the database
+2024-03-28 22:34:50,845&e_panda&INFO&wellplate&save_to_db&295&Saving well g2 to the database
+2024-03-28 22:34:51,578&e_panda&INFO&wellplate&save_to_db&298&Well g2 saved to the database
+2024-03-28 22:34:51,578&e_panda&INFO&wellplate&save_to_db&295&Saving well g3 to the database
+2024-03-28 22:34:52,370&e_panda&INFO&wellplate&save_to_db&298&Well g3 saved to the database
+2024-03-28 22:34:52,371&e_panda&INFO&wellplate&save_to_db&295&Saving well g4 to the database
+2024-03-28 22:34:53,077&e_panda&INFO&wellplate&save_to_db&298&Well g4 saved to the database
+2024-03-28 22:34:53,078&e_panda&INFO&wellplate&save_to_db&295&Saving well g5 to the database
+2024-03-28 22:34:53,821&e_panda&INFO&wellplate&save_to_db&298&Well g5 saved to the database
+2024-03-28 22:34:53,821&e_panda&INFO&wellplate&save_to_db&295&Saving well g6 to the database
+2024-03-28 22:34:54,728&e_panda&INFO&wellplate&save_to_db&298&Well g6 saved to the database
+2024-03-28 22:34:54,728&e_panda&INFO&wellplate&save_to_db&295&Saving well g7 to the database
+2024-03-28 22:34:55,445&e_panda&INFO&wellplate&save_to_db&298&Well g7 saved to the database
+2024-03-28 22:34:55,445&e_panda&INFO&wellplate&save_to_db&295&Saving well g8 to the database
+2024-03-28 22:34:56,323&e_panda&INFO&wellplate&save_to_db&298&Well g8 saved to the database
+2024-03-28 22:34:56,324&e_panda&INFO&wellplate&save_to_db&295&Saving well g9 to the database
+2024-03-28 22:34:57,193&e_panda&INFO&wellplate&save_to_db&298&Well g9 saved to the database
+2024-03-28 22:34:57,193&e_panda&INFO&wellplate&save_to_db&295&Saving well g10 to the database
+2024-03-28 22:34:57,940&e_panda&INFO&wellplate&save_to_db&298&Well g10 saved to the database
+2024-03-28 22:34:57,940&e_panda&INFO&wellplate&save_to_db&295&Saving well g11 to the database
+2024-03-28 22:34:58,762&e_panda&INFO&wellplate&save_to_db&298&Well g11 saved to the database
+2024-03-28 22:34:58,762&e_panda&INFO&wellplate&save_to_db&295&Saving well g12 to the database
+2024-03-28 22:34:59,613&e_panda&INFO&wellplate&save_to_db&298&Well g12 saved to the database
+2024-03-28 22:34:59,613&e_panda&INFO&wellplate&save_to_db&295&Saving well h1 to the database
+2024-03-28 22:35:00,293&e_panda&INFO&wellplate&save_to_db&298&Well h1 saved to the database
+2024-03-28 22:35:00,293&e_panda&INFO&wellplate&save_to_db&295&Saving well h2 to the database
+2024-03-28 22:35:01,087&e_panda&INFO&wellplate&save_to_db&298&Well h2 saved to the database
+2024-03-28 22:35:01,087&e_panda&INFO&wellplate&save_to_db&295&Saving well h3 to the database
+2024-03-28 22:35:02,216&e_panda&INFO&wellplate&save_to_db&298&Well h3 saved to the database
+2024-03-28 22:35:02,216&e_panda&INFO&wellplate&save_to_db&295&Saving well h4 to the database
+2024-03-28 22:35:03,300&e_panda&INFO&wellplate&save_to_db&298&Well h4 saved to the database
+2024-03-28 22:35:03,300&e_panda&INFO&wellplate&save_to_db&295&Saving well h5 to the database
+2024-03-28 22:35:04,044&e_panda&INFO&wellplate&save_to_db&298&Well h5 saved to the database
+2024-03-28 22:35:04,045&e_panda&INFO&wellplate&save_to_db&295&Saving well h6 to the database
+2024-03-28 22:35:04,837&e_panda&INFO&wellplate&save_to_db&298&Well h6 saved to the database
+2024-03-28 22:35:04,837&e_panda&INFO&wellplate&save_to_db&295&Saving well h7 to the database
+2024-03-28 22:35:05,620&e_panda&INFO&wellplate&save_to_db&298&Well h7 saved to the database
+2024-03-28 22:35:05,620&e_panda&INFO&wellplate&save_to_db&295&Saving well h8 to the database
+2024-03-28 22:35:06,365&e_panda&INFO&wellplate&save_to_db&298&Well h8 saved to the database
+2024-03-28 22:35:06,365&e_panda&INFO&wellplate&save_to_db&295&Saving well h9 to the database
+2024-03-28 22:35:07,178&e_panda&INFO&wellplate&save_to_db&298&Well h9 saved to the database
+2024-03-28 22:35:07,178&e_panda&INFO&wellplate&save_to_db&295&Saving well h10 to the database
+2024-03-28 22:35:07,928&e_panda&INFO&wellplate&save_to_db&298&Well h10 saved to the database
+2024-03-28 22:35:07,929&e_panda&INFO&wellplate&save_to_db&295&Saving well h11 to the database
+2024-03-28 22:35:08,641&e_panda&INFO&wellplate&save_to_db&298&Well h11 saved to the database
+2024-03-28 22:35:08,641&e_panda&INFO&wellplate&save_to_db&295&Saving well h12 to the database
+2024-03-28 22:35:09,321&e_panda&INFO&wellplate&save_to_db&298&Well h12 saved to the database
+2024-03-28 22:35:09,322&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-28 22:35:10,173&e_panda&ERROR&wellplate&save_to_db&300&Error occurred while saving well to the database: execute() argument 1 must be str, not None
+2024-03-28 22:52:15,057&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-28 22:52:15,676&e_panda&INFO&wellplate&save_to_db&298&Well a1 saved to the database
+2024-03-28 22:52:15,676&e_panda&INFO&wellplate&save_to_db&295&Saving well a2 to the database
+2024-03-28 22:52:16,393&e_panda&INFO&wellplate&save_to_db&298&Well a2 saved to the database
+2024-03-28 22:52:16,393&e_panda&INFO&wellplate&save_to_db&295&Saving well a3 to the database
+2024-03-28 22:52:17,165&e_panda&INFO&wellplate&save_to_db&298&Well a3 saved to the database
+2024-03-28 22:52:17,165&e_panda&INFO&wellplate&save_to_db&295&Saving well a4 to the database
+2024-03-28 22:52:17,855&e_panda&INFO&wellplate&save_to_db&298&Well a4 saved to the database
+2024-03-28 22:52:17,855&e_panda&INFO&wellplate&save_to_db&295&Saving well a5 to the database
+2024-03-28 22:52:18,595&e_panda&INFO&wellplate&save_to_db&298&Well a5 saved to the database
+2024-03-28 22:52:18,595&e_panda&INFO&wellplate&save_to_db&295&Saving well a6 to the database
+2024-03-28 22:52:19,264&e_panda&INFO&wellplate&save_to_db&298&Well a6 saved to the database
+2024-03-28 22:52:19,264&e_panda&INFO&wellplate&save_to_db&295&Saving well a7 to the database
+2024-03-28 22:52:20,045&e_panda&INFO&wellplate&save_to_db&298&Well a7 saved to the database
+2024-03-28 22:52:20,045&e_panda&INFO&wellplate&save_to_db&295&Saving well a8 to the database
+2024-03-28 22:52:20,752&e_panda&INFO&wellplate&save_to_db&298&Well a8 saved to the database
+2024-03-28 22:52:20,752&e_panda&INFO&wellplate&save_to_db&295&Saving well a9 to the database
+2024-03-28 22:52:21,511&e_panda&INFO&wellplate&save_to_db&298&Well a9 saved to the database
+2024-03-28 22:52:21,511&e_panda&INFO&wellplate&save_to_db&295&Saving well a10 to the database
+2024-03-28 22:52:22,257&e_panda&INFO&wellplate&save_to_db&298&Well a10 saved to the database
+2024-03-28 22:52:22,257&e_panda&INFO&wellplate&save_to_db&295&Saving well a11 to the database
+2024-03-28 22:52:23,001&e_panda&INFO&wellplate&save_to_db&298&Well a11 saved to the database
+2024-03-28 22:52:23,001&e_panda&INFO&wellplate&save_to_db&295&Saving well a12 to the database
+2024-03-28 22:52:23,761&e_panda&INFO&wellplate&save_to_db&298&Well a12 saved to the database
+2024-03-28 22:52:23,761&e_panda&INFO&wellplate&save_to_db&295&Saving well b1 to the database
+2024-03-28 22:52:24,611&e_panda&INFO&wellplate&save_to_db&298&Well b1 saved to the database
+2024-03-28 22:52:24,611&e_panda&INFO&wellplate&save_to_db&295&Saving well b2 to the database
+2024-03-28 22:52:25,347&e_panda&INFO&wellplate&save_to_db&298&Well b2 saved to the database
+2024-03-28 22:52:25,347&e_panda&INFO&wellplate&save_to_db&295&Saving well b3 to the database
+2024-03-28 22:52:26,040&e_panda&INFO&wellplate&save_to_db&298&Well b3 saved to the database
+2024-03-28 22:52:26,040&e_panda&INFO&wellplate&save_to_db&295&Saving well b4 to the database
+2024-03-28 22:52:26,797&e_panda&INFO&wellplate&save_to_db&298&Well b4 saved to the database
+2024-03-28 22:52:26,797&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-28 22:52:27,619&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-28 22:52:27,619&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-28 22:52:28,368&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-28 22:52:28,368&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-28 22:52:29,134&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-28 22:52:29,134&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-28 22:52:29,874&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-28 22:52:29,874&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-28 22:52:30,564&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-28 22:52:30,564&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-28 22:52:31,254&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-28 22:52:31,254&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-28 22:52:31,949&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-28 22:52:31,949&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-28 22:52:32,637&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-28 22:52:32,637&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-28 22:52:33,307&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-28 22:52:33,307&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-28 22:52:34,043&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-28 22:52:34,043&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-28 22:52:34,754&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-28 22:52:34,754&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-28 22:52:35,461&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-28 22:52:35,461&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-28 22:52:36,233&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-28 22:52:36,233&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-28 22:52:36,936&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-28 22:52:36,936&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-28 22:52:37,668&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-28 22:52:37,668&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-28 22:52:38,400&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-28 22:52:38,400&e_panda&INFO&wellplate&save_to_db&295&Saving well c9 to the database
+2024-03-28 22:52:39,088&e_panda&INFO&wellplate&save_to_db&298&Well c9 saved to the database
+2024-03-28 22:52:39,088&e_panda&INFO&wellplate&save_to_db&295&Saving well c10 to the database
+2024-03-28 22:52:39,880&e_panda&INFO&wellplate&save_to_db&298&Well c10 saved to the database
+2024-03-28 22:52:39,880&e_panda&INFO&wellplate&save_to_db&295&Saving well c11 to the database
+2024-03-28 22:52:40,599&e_panda&INFO&wellplate&save_to_db&298&Well c11 saved to the database
+2024-03-28 22:52:40,599&e_panda&INFO&wellplate&save_to_db&295&Saving well c12 to the database
+2024-03-28 22:52:41,311&e_panda&INFO&wellplate&save_to_db&298&Well c12 saved to the database
+2024-03-28 22:52:41,311&e_panda&INFO&wellplate&save_to_db&295&Saving well d1 to the database
+2024-03-28 22:52:42,269&e_panda&INFO&wellplate&save_to_db&298&Well d1 saved to the database
+2024-03-28 22:52:42,269&e_panda&INFO&wellplate&save_to_db&295&Saving well d2 to the database
+2024-03-28 22:52:42,987&e_panda&INFO&wellplate&save_to_db&298&Well d2 saved to the database
+2024-03-28 22:52:42,987&e_panda&INFO&wellplate&save_to_db&295&Saving well d3 to the database
+2024-03-28 22:52:43,708&e_panda&INFO&wellplate&save_to_db&298&Well d3 saved to the database
+2024-03-28 22:52:43,708&e_panda&INFO&wellplate&save_to_db&295&Saving well d4 to the database
+2024-03-28 22:52:44,466&e_panda&INFO&wellplate&save_to_db&298&Well d4 saved to the database
+2024-03-28 22:52:44,466&e_panda&INFO&wellplate&save_to_db&295&Saving well d5 to the database
+2024-03-28 22:52:45,164&e_panda&INFO&wellplate&save_to_db&298&Well d5 saved to the database
+2024-03-28 22:52:45,165&e_panda&INFO&wellplate&save_to_db&295&Saving well d6 to the database
+2024-03-28 22:52:45,847&e_panda&INFO&wellplate&save_to_db&298&Well d6 saved to the database
+2024-03-28 22:52:45,847&e_panda&INFO&wellplate&save_to_db&295&Saving well d7 to the database
+2024-03-28 22:52:46,584&e_panda&INFO&wellplate&save_to_db&298&Well d7 saved to the database
+2024-03-28 22:52:46,584&e_panda&INFO&wellplate&save_to_db&295&Saving well d8 to the database
+2024-03-28 22:52:47,312&e_panda&INFO&wellplate&save_to_db&298&Well d8 saved to the database
+2024-03-28 22:52:47,312&e_panda&INFO&wellplate&save_to_db&295&Saving well d9 to the database
+2024-03-28 22:52:48,039&e_panda&INFO&wellplate&save_to_db&298&Well d9 saved to the database
+2024-03-28 22:52:48,039&e_panda&INFO&wellplate&save_to_db&295&Saving well d10 to the database
+2024-03-28 22:52:48,855&e_panda&INFO&wellplate&save_to_db&298&Well d10 saved to the database
+2024-03-28 22:52:48,855&e_panda&INFO&wellplate&save_to_db&295&Saving well d11 to the database
+2024-03-28 22:52:49,573&e_panda&INFO&wellplate&save_to_db&298&Well d11 saved to the database
+2024-03-28 22:52:49,573&e_panda&INFO&wellplate&save_to_db&295&Saving well d12 to the database
+2024-03-28 22:52:50,315&e_panda&INFO&wellplate&save_to_db&298&Well d12 saved to the database
+2024-03-28 22:52:50,315&e_panda&INFO&wellplate&save_to_db&295&Saving well e1 to the database
+2024-03-28 22:52:51,065&e_panda&INFO&wellplate&save_to_db&298&Well e1 saved to the database
+2024-03-28 22:52:51,065&e_panda&INFO&wellplate&save_to_db&295&Saving well e2 to the database
+2024-03-28 22:52:51,892&e_panda&INFO&wellplate&save_to_db&298&Well e2 saved to the database
+2024-03-28 22:52:51,892&e_panda&INFO&wellplate&save_to_db&295&Saving well e3 to the database
+2024-03-28 22:52:52,653&e_panda&INFO&wellplate&save_to_db&298&Well e3 saved to the database
+2024-03-28 22:52:52,653&e_panda&INFO&wellplate&save_to_db&295&Saving well e4 to the database
+2024-03-28 22:52:53,429&e_panda&INFO&wellplate&save_to_db&298&Well e4 saved to the database
+2024-03-28 22:52:53,429&e_panda&INFO&wellplate&save_to_db&295&Saving well e5 to the database
+2024-03-28 22:52:54,204&e_panda&INFO&wellplate&save_to_db&298&Well e5 saved to the database
+2024-03-28 22:52:54,204&e_panda&INFO&wellplate&save_to_db&295&Saving well e6 to the database
+2024-03-28 22:52:54,907&e_panda&INFO&wellplate&save_to_db&298&Well e6 saved to the database
+2024-03-28 22:52:54,907&e_panda&INFO&wellplate&save_to_db&295&Saving well e7 to the database
+2024-03-28 22:52:55,687&e_panda&INFO&wellplate&save_to_db&298&Well e7 saved to the database
+2024-03-28 22:52:55,687&e_panda&INFO&wellplate&save_to_db&295&Saving well e8 to the database
+2024-03-28 22:52:56,363&e_panda&INFO&wellplate&save_to_db&298&Well e8 saved to the database
+2024-03-28 22:52:56,363&e_panda&INFO&wellplate&save_to_db&295&Saving well e9 to the database
+2024-03-28 22:52:57,135&e_panda&INFO&wellplate&save_to_db&298&Well e9 saved to the database
+2024-03-28 22:52:57,135&e_panda&INFO&wellplate&save_to_db&295&Saving well e10 to the database
+2024-03-28 22:52:57,835&e_panda&INFO&wellplate&save_to_db&298&Well e10 saved to the database
+2024-03-28 22:52:57,835&e_panda&INFO&wellplate&save_to_db&295&Saving well e11 to the database
+2024-03-28 22:52:58,525&e_panda&INFO&wellplate&save_to_db&298&Well e11 saved to the database
+2024-03-28 22:52:58,525&e_panda&INFO&wellplate&save_to_db&295&Saving well e12 to the database
+2024-03-28 22:52:59,298&e_panda&INFO&wellplate&save_to_db&298&Well e12 saved to the database
+2024-03-28 22:52:59,298&e_panda&INFO&wellplate&save_to_db&295&Saving well f1 to the database
+2024-03-28 22:53:00,016&e_panda&INFO&wellplate&save_to_db&298&Well f1 saved to the database
+2024-03-28 22:53:00,017&e_panda&INFO&wellplate&save_to_db&295&Saving well f2 to the database
+2024-03-28 22:53:01,028&e_panda&INFO&wellplate&save_to_db&298&Well f2 saved to the database
+2024-03-28 22:53:01,029&e_panda&INFO&wellplate&save_to_db&295&Saving well f3 to the database
+2024-03-28 22:53:01,856&e_panda&INFO&wellplate&save_to_db&298&Well f3 saved to the database
+2024-03-28 22:53:01,856&e_panda&INFO&wellplate&save_to_db&295&Saving well f4 to the database
+2024-03-28 22:53:02,868&e_panda&INFO&wellplate&save_to_db&298&Well f4 saved to the database
+2024-03-28 22:53:02,868&e_panda&INFO&wellplate&save_to_db&295&Saving well f5 to the database
+2024-03-28 22:53:03,809&e_panda&INFO&wellplate&save_to_db&298&Well f5 saved to the database
+2024-03-28 22:53:03,809&e_panda&INFO&wellplate&save_to_db&295&Saving well f6 to the database
+2024-03-28 22:53:04,489&e_panda&INFO&wellplate&save_to_db&298&Well f6 saved to the database
+2024-03-28 22:53:04,489&e_panda&INFO&wellplate&save_to_db&295&Saving well f7 to the database
+2024-03-28 22:53:05,196&e_panda&INFO&wellplate&save_to_db&298&Well f7 saved to the database
+2024-03-28 22:53:05,196&e_panda&INFO&wellplate&save_to_db&295&Saving well f8 to the database
+2024-03-28 22:53:06,007&e_panda&INFO&wellplate&save_to_db&298&Well f8 saved to the database
+2024-03-28 22:53:06,007&e_panda&INFO&wellplate&save_to_db&295&Saving well f9 to the database
+2024-03-28 22:53:06,755&e_panda&INFO&wellplate&save_to_db&298&Well f9 saved to the database
+2024-03-28 22:53:06,755&e_panda&INFO&wellplate&save_to_db&295&Saving well f10 to the database
+2024-03-28 22:53:07,523&e_panda&INFO&wellplate&save_to_db&298&Well f10 saved to the database
+2024-03-28 22:53:07,523&e_panda&INFO&wellplate&save_to_db&295&Saving well f11 to the database
+2024-03-28 22:53:08,243&e_panda&INFO&wellplate&save_to_db&298&Well f11 saved to the database
+2024-03-28 22:53:08,243&e_panda&INFO&wellplate&save_to_db&295&Saving well f12 to the database
+2024-03-28 22:53:09,007&e_panda&INFO&wellplate&save_to_db&298&Well f12 saved to the database
+2024-03-28 22:53:09,007&e_panda&INFO&wellplate&save_to_db&295&Saving well g1 to the database
+2024-03-28 22:53:09,799&e_panda&INFO&wellplate&save_to_db&298&Well g1 saved to the database
+2024-03-28 22:53:09,799&e_panda&INFO&wellplate&save_to_db&295&Saving well g2 to the database
+2024-03-28 22:53:10,437&e_panda&INFO&wellplate&save_to_db&298&Well g2 saved to the database
+2024-03-28 22:53:10,437&e_panda&INFO&wellplate&save_to_db&295&Saving well g3 to the database
+2024-03-28 22:53:11,123&e_panda&INFO&wellplate&save_to_db&298&Well g3 saved to the database
+2024-03-28 22:53:11,123&e_panda&INFO&wellplate&save_to_db&295&Saving well g4 to the database
+2024-03-28 22:53:11,919&e_panda&INFO&wellplate&save_to_db&298&Well g4 saved to the database
+2024-03-28 22:53:11,919&e_panda&INFO&wellplate&save_to_db&295&Saving well g5 to the database
+2024-03-28 22:53:12,771&e_panda&INFO&wellplate&save_to_db&298&Well g5 saved to the database
+2024-03-28 22:53:12,771&e_panda&INFO&wellplate&save_to_db&295&Saving well g6 to the database
+2024-03-28 22:53:13,748&e_panda&INFO&wellplate&save_to_db&298&Well g6 saved to the database
+2024-03-28 22:53:13,748&e_panda&INFO&wellplate&save_to_db&295&Saving well g7 to the database
+2024-03-28 22:53:14,532&e_panda&INFO&wellplate&save_to_db&298&Well g7 saved to the database
+2024-03-28 22:53:14,532&e_panda&INFO&wellplate&save_to_db&295&Saving well g8 to the database
+2024-03-28 22:53:15,333&e_panda&INFO&wellplate&save_to_db&298&Well g8 saved to the database
+2024-03-28 22:53:15,333&e_panda&INFO&wellplate&save_to_db&295&Saving well g9 to the database
+2024-03-28 22:53:16,300&e_panda&INFO&wellplate&save_to_db&298&Well g9 saved to the database
+2024-03-28 22:53:16,300&e_panda&INFO&wellplate&save_to_db&295&Saving well g10 to the database
+2024-03-28 22:53:17,129&e_panda&INFO&wellplate&save_to_db&298&Well g10 saved to the database
+2024-03-28 22:53:17,129&e_panda&INFO&wellplate&save_to_db&295&Saving well g11 to the database
+2024-03-28 22:53:17,839&e_panda&INFO&wellplate&save_to_db&298&Well g11 saved to the database
+2024-03-28 22:53:17,839&e_panda&INFO&wellplate&save_to_db&295&Saving well g12 to the database
+2024-03-28 22:53:18,493&e_panda&INFO&wellplate&save_to_db&298&Well g12 saved to the database
+2024-03-28 22:53:18,493&e_panda&INFO&wellplate&save_to_db&295&Saving well h1 to the database
+2024-03-28 22:53:19,148&e_panda&INFO&wellplate&save_to_db&298&Well h1 saved to the database
+2024-03-28 22:53:19,148&e_panda&INFO&wellplate&save_to_db&295&Saving well h2 to the database
+2024-03-28 22:53:19,819&e_panda&INFO&wellplate&save_to_db&298&Well h2 saved to the database
+2024-03-28 22:53:19,819&e_panda&INFO&wellplate&save_to_db&295&Saving well h3 to the database
+2024-03-28 22:53:20,565&e_panda&INFO&wellplate&save_to_db&298&Well h3 saved to the database
+2024-03-28 22:53:20,565&e_panda&INFO&wellplate&save_to_db&295&Saving well h4 to the database
+2024-03-28 22:53:21,235&e_panda&INFO&wellplate&save_to_db&298&Well h4 saved to the database
+2024-03-28 22:53:21,235&e_panda&INFO&wellplate&save_to_db&295&Saving well h5 to the database
+2024-03-28 22:53:21,903&e_panda&INFO&wellplate&save_to_db&298&Well h5 saved to the database
+2024-03-28 22:53:21,903&e_panda&INFO&wellplate&save_to_db&295&Saving well h6 to the database
+2024-03-28 22:53:22,591&e_panda&INFO&wellplate&save_to_db&298&Well h6 saved to the database
+2024-03-28 22:53:22,592&e_panda&INFO&wellplate&save_to_db&295&Saving well h7 to the database
+2024-03-28 22:53:23,287&e_panda&INFO&wellplate&save_to_db&298&Well h7 saved to the database
+2024-03-28 22:53:23,287&e_panda&INFO&wellplate&save_to_db&295&Saving well h8 to the database
+2024-03-28 22:53:24,023&e_panda&INFO&wellplate&save_to_db&298&Well h8 saved to the database
+2024-03-28 22:53:24,023&e_panda&INFO&wellplate&save_to_db&295&Saving well h9 to the database
+2024-03-28 22:53:24,701&e_panda&INFO&wellplate&save_to_db&298&Well h9 saved to the database
+2024-03-28 22:53:24,701&e_panda&INFO&wellplate&save_to_db&295&Saving well h10 to the database
+2024-03-28 22:53:25,433&e_panda&INFO&wellplate&save_to_db&298&Well h10 saved to the database
+2024-03-28 22:53:25,433&e_panda&INFO&wellplate&save_to_db&295&Saving well h11 to the database
+2024-03-28 22:53:26,079&e_panda&INFO&wellplate&save_to_db&298&Well h11 saved to the database
+2024-03-28 22:53:26,079&e_panda&INFO&wellplate&save_to_db&295&Saving well h12 to the database
+2024-03-28 22:53:26,969&e_panda&INFO&wellplate&save_to_db&298&Well h12 saved to the database
+2024-03-28 22:53:26,970&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-28 22:53:27,787&e_panda&INFO&wellplate&save_to_db&298&Well a1 saved to the database
+2024-03-28 22:53:27,787&e_panda&INFO&wellplate&save_to_db&295&Saving well a2 to the database
+2024-03-28 22:53:28,596&e_panda&INFO&wellplate&save_to_db&298&Well a2 saved to the database
+2024-03-28 22:53:28,596&e_panda&INFO&wellplate&save_to_db&295&Saving well a3 to the database
+2024-03-28 22:53:29,349&e_panda&INFO&wellplate&save_to_db&298&Well a3 saved to the database
+2024-03-28 22:53:29,350&e_panda&INFO&wellplate&save_to_db&295&Saving well a4 to the database
+2024-03-28 22:53:30,128&e_panda&INFO&wellplate&save_to_db&298&Well a4 saved to the database
+2024-03-28 22:53:30,128&e_panda&INFO&wellplate&save_to_db&295&Saving well a5 to the database
+2024-03-28 22:53:30,856&e_panda&INFO&wellplate&save_to_db&298&Well a5 saved to the database
+2024-03-28 22:53:30,856&e_panda&INFO&wellplate&save_to_db&295&Saving well a6 to the database
+2024-03-28 22:53:31,711&e_panda&INFO&wellplate&save_to_db&298&Well a6 saved to the database
+2024-03-28 22:53:31,711&e_panda&INFO&wellplate&save_to_db&295&Saving well a7 to the database
+2024-03-28 22:53:32,596&e_panda&INFO&wellplate&save_to_db&298&Well a7 saved to the database
+2024-03-28 22:53:32,596&e_panda&INFO&wellplate&save_to_db&295&Saving well a8 to the database
+2024-03-28 22:53:33,505&e_panda&INFO&wellplate&save_to_db&298&Well a8 saved to the database
+2024-03-28 22:53:33,505&e_panda&INFO&wellplate&save_to_db&295&Saving well a9 to the database
+2024-03-28 22:53:34,180&e_panda&INFO&wellplate&save_to_db&298&Well a9 saved to the database
+2024-03-28 22:53:34,180&e_panda&INFO&wellplate&save_to_db&295&Saving well a10 to the database
+2024-03-28 22:53:34,913&e_panda&INFO&wellplate&save_to_db&298&Well a10 saved to the database
+2024-03-28 22:53:34,913&e_panda&INFO&wellplate&save_to_db&295&Saving well a11 to the database
+2024-03-28 22:53:35,720&e_panda&INFO&wellplate&save_to_db&298&Well a11 saved to the database
+2024-03-28 22:53:35,720&e_panda&INFO&wellplate&save_to_db&295&Saving well a12 to the database
+2024-03-28 22:53:36,488&e_panda&INFO&wellplate&save_to_db&298&Well a12 saved to the database
+2024-03-28 22:53:36,488&e_panda&INFO&wellplate&save_to_db&295&Saving well b1 to the database
+2024-03-28 22:53:37,235&e_panda&INFO&wellplate&save_to_db&298&Well b1 saved to the database
+2024-03-28 22:53:37,235&e_panda&INFO&wellplate&save_to_db&295&Saving well b2 to the database
+2024-03-28 22:53:38,132&e_panda&INFO&wellplate&save_to_db&298&Well b2 saved to the database
+2024-03-28 22:53:38,132&e_panda&INFO&wellplate&save_to_db&295&Saving well b3 to the database
+2024-03-28 22:53:38,963&e_panda&INFO&wellplate&save_to_db&298&Well b3 saved to the database
+2024-03-28 22:53:38,963&e_panda&INFO&wellplate&save_to_db&295&Saving well b4 to the database
+2024-03-28 22:53:39,837&e_panda&INFO&wellplate&save_to_db&298&Well b4 saved to the database
+2024-03-28 22:53:39,837&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-28 22:53:40,541&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-28 22:53:40,541&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-28 22:53:41,296&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-28 22:53:41,296&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-28 22:53:42,000&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-28 22:53:42,000&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-28 22:53:42,803&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-28 22:53:42,803&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-28 22:53:43,483&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-28 22:53:43,483&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-28 22:53:44,211&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-28 22:53:44,211&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-28 22:53:44,965&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-28 22:53:44,965&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-28 22:53:45,699&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-28 22:53:45,699&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-28 22:53:46,387&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-28 22:53:46,387&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-28 22:53:47,128&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-28 22:53:47,128&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-28 22:53:47,887&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-28 22:53:47,887&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-28 22:53:48,667&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-28 22:53:48,667&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-28 22:53:49,571&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-28 22:53:49,571&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-28 22:53:50,253&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-28 22:53:50,253&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-28 22:53:51,465&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-28 22:53:51,465&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-28 22:53:52,280&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-28 22:53:52,280&e_panda&INFO&wellplate&save_to_db&295&Saving well c9 to the database
+2024-03-28 22:53:53,001&e_panda&INFO&wellplate&save_to_db&298&Well c9 saved to the database
+2024-03-28 22:53:53,001&e_panda&INFO&wellplate&save_to_db&295&Saving well c10 to the database
+2024-03-28 22:53:53,716&e_panda&INFO&wellplate&save_to_db&298&Well c10 saved to the database
+2024-03-28 22:53:53,716&e_panda&INFO&wellplate&save_to_db&295&Saving well c11 to the database
+2024-03-28 22:53:54,464&e_panda&INFO&wellplate&save_to_db&298&Well c11 saved to the database
+2024-03-28 22:53:54,464&e_panda&INFO&wellplate&save_to_db&295&Saving well c12 to the database
+2024-03-28 22:53:55,220&e_panda&INFO&wellplate&save_to_db&298&Well c12 saved to the database
+2024-03-28 22:53:55,220&e_panda&INFO&wellplate&save_to_db&295&Saving well d1 to the database
+2024-03-28 22:53:55,911&e_panda&INFO&wellplate&save_to_db&298&Well d1 saved to the database
+2024-03-28 22:53:55,911&e_panda&INFO&wellplate&save_to_db&295&Saving well d2 to the database
+2024-03-28 22:53:56,708&e_panda&INFO&wellplate&save_to_db&298&Well d2 saved to the database
+2024-03-28 22:53:56,708&e_panda&INFO&wellplate&save_to_db&295&Saving well d3 to the database
+2024-03-28 22:53:57,439&e_panda&INFO&wellplate&save_to_db&298&Well d3 saved to the database
+2024-03-28 22:53:57,439&e_panda&INFO&wellplate&save_to_db&295&Saving well d4 to the database
+2024-03-28 22:53:58,244&e_panda&INFO&wellplate&save_to_db&298&Well d4 saved to the database
+2024-03-28 22:53:58,244&e_panda&INFO&wellplate&save_to_db&295&Saving well d5 to the database
+2024-03-28 22:53:59,020&e_panda&INFO&wellplate&save_to_db&298&Well d5 saved to the database
+2024-03-28 22:53:59,020&e_panda&INFO&wellplate&save_to_db&295&Saving well d6 to the database
+2024-03-28 22:53:59,725&e_panda&INFO&wellplate&save_to_db&298&Well d6 saved to the database
+2024-03-28 22:53:59,725&e_panda&INFO&wellplate&save_to_db&295&Saving well d7 to the database
+2024-03-28 22:54:00,599&e_panda&INFO&wellplate&save_to_db&298&Well d7 saved to the database
+2024-03-28 22:54:00,599&e_panda&INFO&wellplate&save_to_db&295&Saving well d8 to the database
+2024-03-28 22:54:01,331&e_panda&INFO&wellplate&save_to_db&298&Well d8 saved to the database
+2024-03-28 22:54:01,331&e_panda&INFO&wellplate&save_to_db&295&Saving well d9 to the database
+2024-03-28 22:54:02,123&e_panda&INFO&wellplate&save_to_db&298&Well d9 saved to the database
+2024-03-28 22:54:02,123&e_panda&INFO&wellplate&save_to_db&295&Saving well d10 to the database
+2024-03-28 22:54:02,904&e_panda&INFO&wellplate&save_to_db&298&Well d10 saved to the database
+2024-03-28 22:54:02,904&e_panda&INFO&wellplate&save_to_db&295&Saving well d11 to the database
+2024-03-28 22:54:03,691&e_panda&INFO&wellplate&save_to_db&298&Well d11 saved to the database
+2024-03-28 22:54:03,691&e_panda&INFO&wellplate&save_to_db&295&Saving well d12 to the database
+2024-03-28 22:54:04,453&e_panda&INFO&wellplate&save_to_db&298&Well d12 saved to the database
+2024-03-28 22:54:04,453&e_panda&INFO&wellplate&save_to_db&295&Saving well e1 to the database
+2024-03-28 22:54:05,135&e_panda&INFO&wellplate&save_to_db&298&Well e1 saved to the database
+2024-03-28 22:54:05,135&e_panda&INFO&wellplate&save_to_db&295&Saving well e2 to the database
+2024-03-28 22:54:05,807&e_panda&INFO&wellplate&save_to_db&298&Well e2 saved to the database
+2024-03-28 22:54:05,807&e_panda&INFO&wellplate&save_to_db&295&Saving well e3 to the database
+2024-03-28 22:54:06,591&e_panda&INFO&wellplate&save_to_db&298&Well e3 saved to the database
+2024-03-28 22:54:06,592&e_panda&INFO&wellplate&save_to_db&295&Saving well e4 to the database
+2024-03-28 22:54:07,281&e_panda&INFO&wellplate&save_to_db&298&Well e4 saved to the database
+2024-03-28 22:54:07,281&e_panda&INFO&wellplate&save_to_db&295&Saving well e5 to the database
+2024-03-28 22:54:08,039&e_panda&INFO&wellplate&save_to_db&298&Well e5 saved to the database
+2024-03-28 22:54:08,040&e_panda&INFO&wellplate&save_to_db&295&Saving well e6 to the database
+2024-03-28 22:54:08,804&e_panda&INFO&wellplate&save_to_db&298&Well e6 saved to the database
+2024-03-28 22:54:08,804&e_panda&INFO&wellplate&save_to_db&295&Saving well e7 to the database
+2024-03-28 22:54:09,555&e_panda&INFO&wellplate&save_to_db&298&Well e7 saved to the database
+2024-03-28 22:54:09,555&e_panda&INFO&wellplate&save_to_db&295&Saving well e8 to the database
+2024-03-28 22:54:10,192&e_panda&INFO&wellplate&save_to_db&298&Well e8 saved to the database
+2024-03-28 22:54:10,192&e_panda&INFO&wellplate&save_to_db&295&Saving well e9 to the database
+2024-03-28 22:54:10,868&e_panda&INFO&wellplate&save_to_db&298&Well e9 saved to the database
+2024-03-28 22:54:10,868&e_panda&INFO&wellplate&save_to_db&295&Saving well e10 to the database
+2024-03-28 22:54:11,544&e_panda&INFO&wellplate&save_to_db&298&Well e10 saved to the database
+2024-03-28 22:54:11,544&e_panda&INFO&wellplate&save_to_db&295&Saving well e11 to the database
+2024-03-28 22:54:12,237&e_panda&INFO&wellplate&save_to_db&298&Well e11 saved to the database
+2024-03-28 22:54:12,237&e_panda&INFO&wellplate&save_to_db&295&Saving well e12 to the database
+2024-03-28 22:54:12,935&e_panda&INFO&wellplate&save_to_db&298&Well e12 saved to the database
+2024-03-28 22:54:12,935&e_panda&INFO&wellplate&save_to_db&295&Saving well f1 to the database
+2024-03-28 22:54:13,655&e_panda&INFO&wellplate&save_to_db&298&Well f1 saved to the database
+2024-03-28 22:54:13,655&e_panda&INFO&wellplate&save_to_db&295&Saving well f2 to the database
+2024-03-28 22:54:14,343&e_panda&INFO&wellplate&save_to_db&298&Well f2 saved to the database
+2024-03-28 22:54:14,343&e_panda&INFO&wellplate&save_to_db&295&Saving well f3 to the database
+2024-03-28 22:54:15,080&e_panda&INFO&wellplate&save_to_db&298&Well f3 saved to the database
+2024-03-28 22:54:15,080&e_panda&INFO&wellplate&save_to_db&295&Saving well f4 to the database
+2024-03-28 22:54:15,804&e_panda&INFO&wellplate&save_to_db&298&Well f4 saved to the database
+2024-03-28 22:54:15,804&e_panda&INFO&wellplate&save_to_db&295&Saving well f5 to the database
+2024-03-28 22:54:16,487&e_panda&INFO&wellplate&save_to_db&298&Well f5 saved to the database
+2024-03-28 22:54:16,487&e_panda&INFO&wellplate&save_to_db&295&Saving well f6 to the database
+2024-03-28 22:54:17,271&e_panda&INFO&wellplate&save_to_db&298&Well f6 saved to the database
+2024-03-28 22:54:17,272&e_panda&INFO&wellplate&save_to_db&295&Saving well f7 to the database
+2024-03-28 22:54:18,033&e_panda&INFO&wellplate&save_to_db&298&Well f7 saved to the database
+2024-03-28 22:54:18,034&e_panda&INFO&wellplate&save_to_db&295&Saving well f8 to the database
+2024-03-28 22:54:18,817&e_panda&INFO&wellplate&save_to_db&298&Well f8 saved to the database
+2024-03-28 22:54:18,817&e_panda&INFO&wellplate&save_to_db&295&Saving well f9 to the database
+2024-03-28 22:54:19,557&e_panda&INFO&wellplate&save_to_db&298&Well f9 saved to the database
+2024-03-28 22:54:19,557&e_panda&INFO&wellplate&save_to_db&295&Saving well f10 to the database
+2024-03-28 22:54:20,228&e_panda&INFO&wellplate&save_to_db&298&Well f10 saved to the database
+2024-03-28 22:54:20,228&e_panda&INFO&wellplate&save_to_db&295&Saving well f11 to the database
+2024-03-28 22:54:20,921&e_panda&INFO&wellplate&save_to_db&298&Well f11 saved to the database
+2024-03-28 22:54:20,921&e_panda&INFO&wellplate&save_to_db&295&Saving well f12 to the database
+2024-03-28 22:54:21,724&e_panda&INFO&wellplate&save_to_db&298&Well f12 saved to the database
+2024-03-28 22:54:21,724&e_panda&INFO&wellplate&save_to_db&295&Saving well g1 to the database
+2024-03-28 22:54:22,487&e_panda&INFO&wellplate&save_to_db&298&Well g1 saved to the database
+2024-03-28 22:54:22,487&e_panda&INFO&wellplate&save_to_db&295&Saving well g2 to the database
+2024-03-28 22:54:23,287&e_panda&INFO&wellplate&save_to_db&298&Well g2 saved to the database
+2024-03-28 22:54:23,287&e_panda&INFO&wellplate&save_to_db&295&Saving well g3 to the database
+2024-03-28 22:54:24,005&e_panda&INFO&wellplate&save_to_db&298&Well g3 saved to the database
+2024-03-28 22:54:24,005&e_panda&INFO&wellplate&save_to_db&295&Saving well g4 to the database
+2024-03-28 22:54:25,107&e_panda&INFO&wellplate&save_to_db&298&Well g4 saved to the database
+2024-03-28 22:54:25,107&e_panda&INFO&wellplate&save_to_db&295&Saving well g5 to the database
+2024-03-28 22:54:25,925&e_panda&INFO&wellplate&save_to_db&298&Well g5 saved to the database
+2024-03-28 22:54:25,925&e_panda&INFO&wellplate&save_to_db&295&Saving well g6 to the database
+2024-03-28 22:54:26,607&e_panda&INFO&wellplate&save_to_db&298&Well g6 saved to the database
+2024-03-28 22:54:26,608&e_panda&INFO&wellplate&save_to_db&295&Saving well g7 to the database
+2024-03-28 22:54:27,340&e_panda&INFO&wellplate&save_to_db&298&Well g7 saved to the database
+2024-03-28 22:54:27,340&e_panda&INFO&wellplate&save_to_db&295&Saving well g8 to the database
+2024-03-28 22:54:28,020&e_panda&INFO&wellplate&save_to_db&298&Well g8 saved to the database
+2024-03-28 22:54:28,020&e_panda&INFO&wellplate&save_to_db&295&Saving well g9 to the database
+2024-03-28 22:54:28,769&e_panda&INFO&wellplate&save_to_db&298&Well g9 saved to the database
+2024-03-28 22:54:28,769&e_panda&INFO&wellplate&save_to_db&295&Saving well g10 to the database
+2024-03-28 22:54:29,399&e_panda&INFO&wellplate&save_to_db&298&Well g10 saved to the database
+2024-03-28 22:54:29,399&e_panda&INFO&wellplate&save_to_db&295&Saving well g11 to the database
+2024-03-28 22:54:30,103&e_panda&INFO&wellplate&save_to_db&298&Well g11 saved to the database
+2024-03-28 22:54:30,103&e_panda&INFO&wellplate&save_to_db&295&Saving well g12 to the database
+2024-03-28 22:54:31,056&e_panda&INFO&wellplate&save_to_db&298&Well g12 saved to the database
+2024-03-28 22:54:31,056&e_panda&INFO&wellplate&save_to_db&295&Saving well h1 to the database
+2024-03-28 22:54:31,800&e_panda&INFO&wellplate&save_to_db&298&Well h1 saved to the database
+2024-03-28 22:54:31,800&e_panda&INFO&wellplate&save_to_db&295&Saving well h2 to the database
+2024-03-28 22:54:32,579&e_panda&INFO&wellplate&save_to_db&298&Well h2 saved to the database
+2024-03-28 22:54:32,579&e_panda&INFO&wellplate&save_to_db&295&Saving well h3 to the database
+2024-03-28 22:54:33,320&e_panda&INFO&wellplate&save_to_db&298&Well h3 saved to the database
+2024-03-28 22:54:33,321&e_panda&INFO&wellplate&save_to_db&295&Saving well h4 to the database
+2024-03-28 22:54:34,007&e_panda&INFO&wellplate&save_to_db&298&Well h4 saved to the database
+2024-03-28 22:54:34,007&e_panda&INFO&wellplate&save_to_db&295&Saving well h5 to the database
+2024-03-28 22:54:34,700&e_panda&INFO&wellplate&save_to_db&298&Well h5 saved to the database
+2024-03-28 22:54:34,700&e_panda&INFO&wellplate&save_to_db&295&Saving well h6 to the database
+2024-03-28 22:54:35,368&e_panda&INFO&wellplate&save_to_db&298&Well h6 saved to the database
+2024-03-28 22:54:35,368&e_panda&INFO&wellplate&save_to_db&295&Saving well h7 to the database
+2024-03-28 22:54:36,000&e_panda&INFO&wellplate&save_to_db&298&Well h7 saved to the database
+2024-03-28 22:54:36,000&e_panda&INFO&wellplate&save_to_db&295&Saving well h8 to the database
+2024-03-28 22:54:36,669&e_panda&INFO&wellplate&save_to_db&298&Well h8 saved to the database
+2024-03-28 22:54:36,669&e_panda&INFO&wellplate&save_to_db&295&Saving well h9 to the database
+2024-03-28 22:54:37,345&e_panda&INFO&wellplate&save_to_db&298&Well h9 saved to the database
+2024-03-28 22:54:37,345&e_panda&INFO&wellplate&save_to_db&295&Saving well h10 to the database
+2024-03-28 22:54:38,115&e_panda&INFO&wellplate&save_to_db&298&Well h10 saved to the database
+2024-03-28 22:54:38,115&e_panda&INFO&wellplate&save_to_db&295&Saving well h11 to the database
+2024-03-28 22:54:38,784&e_panda&INFO&wellplate&save_to_db&298&Well h11 saved to the database
+2024-03-28 22:54:38,784&e_panda&INFO&wellplate&save_to_db&295&Saving well h12 to the database
+2024-03-28 22:54:39,384&e_panda&INFO&wellplate&save_to_db&298&Well h12 saved to the database
+2024-03-28 22:54:39,384&e_panda&INFO&wellplate&load_new_wellplate&1124&Wellplate 110 saved and wellplate 111 loaded
+2024-03-28 22:55:08,344&e_panda&DEBUG&wellplate&load_new_wellplate&1118&Wellplate already exists in the database. Setting as current wellplate
+2024-03-28 22:59:10,535&e_panda&DEBUG&wellplate&load_new_wellplate&1118&Wellplate already exists in the database. Setting as current wellplate
+2024-03-28 23:10:16,226&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&656&&&&No files to save when using database&
+2024-03-28 23:10:16,246&epanda_lib.scheduler&ERROR&scheduler&add_to_queue&690&&&&Error occured while adding the experiment to queue table: near "10000000": syntax error&
+2024-03-28 23:15:51,059&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&657&&&&No files to save when using database&
+2024-03-28 23:15:51,233&epanda_lib.scheduler&ERROR&scheduler&add_to_queue&692&&&&Error occured while adding the experiment to queue table: NOT NULL constraint failed: queue.experiment_id&
+2024-03-28 23:21:12,527&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&657&&&&No files to save when using database&
+2024-03-28 23:31:16,802&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&657&&&&No files to save when using database&
+2024-03-28 23:31:17,132&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B5 status to queued&
+2024-03-28 23:34:54,625&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:34:54,932&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B5 status to queued&
+2024-03-28 23:37:04,899&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:05,192&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B5 status to queued&
+2024-03-28 23:37:05,928&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-28 23:37:06,544&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-28 23:37:06,544&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000000 added to queue&
+2024-03-28 23:37:11,012&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:11,315&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B6 status to queued&
+2024-03-28 23:37:12,032&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-28 23:37:12,796&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-28 23:37:12,796&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000001 added to queue&
+2024-03-28 23:37:17,236&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:17,567&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B7 status to queued&
+2024-03-28 23:37:18,235&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-28 23:37:18,891&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-28 23:37:18,891&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000002 added to queue&
+2024-03-28 23:37:23,322&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:23,623&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B8 status to queued&
+2024-03-28 23:37:24,316&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-28 23:37:24,907&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-28 23:37:24,907&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000003 added to queue&
+2024-03-28 23:37:27,352&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:27,691&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B9 status to queued&
+2024-03-28 23:37:28,403&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-28 23:37:29,083&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-28 23:37:29,083&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000004 added to queue&
+2024-03-28 23:37:29,588&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:29,919&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B10 status to queued&
+2024-03-28 23:37:30,952&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-28 23:37:31,652&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-28 23:37:31,652&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000005 added to queue&
+2024-03-28 23:37:32,170&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:32,528&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B11 status to queued&
+2024-03-28 23:37:33,344&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-28 23:37:34,024&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-28 23:37:34,024&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000006 added to queue&
+2024-03-28 23:37:34,534&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:34,860&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B12 status to queued&
+2024-03-28 23:37:35,659&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-28 23:37:36,328&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-28 23:37:36,328&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000007 added to queue&
+2024-03-28 23:37:36,827&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:37,184&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C1 status to queued&
+2024-03-28 23:37:37,972&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-28 23:37:38,672&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-28 23:37:38,672&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000008 added to queue&
+2024-03-28 23:37:39,191&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:39,539&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C2 status to queued&
+2024-03-28 23:37:40,363&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-28 23:37:41,027&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-28 23:37:41,027&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000009 added to queue&
+2024-03-28 23:37:41,762&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:42,128&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C3 status to queued&
+2024-03-28 23:37:42,975&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-28 23:37:43,698&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-28 23:37:43,699&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000010 added to queue&
+2024-03-28 23:37:44,223&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:44,600&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C4 status to queued&
+2024-03-28 23:37:45,416&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-28 23:37:46,091&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-28 23:37:46,091&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000011 added to queue&
+2024-03-28 23:37:46,566&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:46,933&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C5 status to queued&
+2024-03-28 23:37:47,711&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-28 23:37:48,327&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-28 23:37:48,327&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000012 added to queue&
+2024-03-28 23:37:48,845&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:49,211&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C6 status to queued&
+2024-03-28 23:37:49,967&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-28 23:37:50,614&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-28 23:37:50,614&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000013 added to queue&
+2024-03-28 23:37:51,109&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:51,423&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C7 status to queued&
+2024-03-28 23:37:52,239&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-28 23:37:52,899&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-28 23:37:52,899&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000014 added to queue&
+2024-03-28 23:37:53,359&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-28 23:37:53,687&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C8 status to queued&
+2024-03-28 23:37:54,464&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-28 23:37:55,143&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-28 23:37:55,143&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000015 added to queue&
+2024-03-29 00:04:25,814&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-29 00:04:26,408&e_panda&INFO&wellplate&save_to_db&298&Well a1 saved to the database
+2024-03-29 00:04:26,408&e_panda&INFO&wellplate&save_to_db&295&Saving well a2 to the database
+2024-03-29 00:04:27,048&e_panda&INFO&wellplate&save_to_db&298&Well a2 saved to the database
+2024-03-29 00:04:27,048&e_panda&INFO&wellplate&save_to_db&295&Saving well a3 to the database
+2024-03-29 00:04:27,716&e_panda&INFO&wellplate&save_to_db&298&Well a3 saved to the database
+2024-03-29 00:04:27,716&e_panda&INFO&wellplate&save_to_db&295&Saving well a4 to the database
+2024-03-29 00:04:28,416&e_panda&INFO&wellplate&save_to_db&298&Well a4 saved to the database
+2024-03-29 00:04:28,417&e_panda&INFO&wellplate&save_to_db&295&Saving well a5 to the database
+2024-03-29 00:04:29,124&e_panda&INFO&wellplate&save_to_db&298&Well a5 saved to the database
+2024-03-29 00:04:29,124&e_panda&INFO&wellplate&save_to_db&295&Saving well a6 to the database
+2024-03-29 00:04:29,813&e_panda&INFO&wellplate&save_to_db&298&Well a6 saved to the database
+2024-03-29 00:04:29,813&e_panda&INFO&wellplate&save_to_db&295&Saving well a7 to the database
+2024-03-29 00:04:30,492&e_panda&INFO&wellplate&save_to_db&298&Well a7 saved to the database
+2024-03-29 00:04:30,492&e_panda&INFO&wellplate&save_to_db&295&Saving well a8 to the database
+2024-03-29 00:04:31,125&e_panda&INFO&wellplate&save_to_db&298&Well a8 saved to the database
+2024-03-29 00:04:31,125&e_panda&INFO&wellplate&save_to_db&295&Saving well a9 to the database
+2024-03-29 00:04:31,795&e_panda&INFO&wellplate&save_to_db&298&Well a9 saved to the database
+2024-03-29 00:04:31,796&e_panda&INFO&wellplate&save_to_db&295&Saving well a10 to the database
+2024-03-29 00:04:32,472&e_panda&INFO&wellplate&save_to_db&298&Well a10 saved to the database
+2024-03-29 00:04:32,472&e_panda&INFO&wellplate&save_to_db&295&Saving well a11 to the database
+2024-03-29 00:04:33,116&e_panda&INFO&wellplate&save_to_db&298&Well a11 saved to the database
+2024-03-29 00:04:33,116&e_panda&INFO&wellplate&save_to_db&295&Saving well a12 to the database
+2024-03-29 00:04:33,788&e_panda&INFO&wellplate&save_to_db&298&Well a12 saved to the database
+2024-03-29 00:04:33,788&e_panda&INFO&wellplate&save_to_db&295&Saving well b1 to the database
+2024-03-29 00:04:34,420&e_panda&INFO&wellplate&save_to_db&298&Well b1 saved to the database
+2024-03-29 00:04:34,420&e_panda&INFO&wellplate&save_to_db&295&Saving well b2 to the database
+2024-03-29 00:04:35,088&e_panda&INFO&wellplate&save_to_db&298&Well b2 saved to the database
+2024-03-29 00:04:35,088&e_panda&INFO&wellplate&save_to_db&295&Saving well b3 to the database
+2024-03-29 00:04:35,740&e_panda&INFO&wellplate&save_to_db&298&Well b3 saved to the database
+2024-03-29 00:04:35,741&e_panda&INFO&wellplate&save_to_db&295&Saving well b4 to the database
+2024-03-29 00:04:36,376&e_panda&INFO&wellplate&save_to_db&298&Well b4 saved to the database
+2024-03-29 00:04:36,376&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-29 00:04:37,019&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-29 00:04:37,020&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-29 00:04:37,674&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-29 00:04:37,674&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-29 00:04:38,344&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-29 00:04:38,344&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-29 00:04:38,984&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-29 00:04:38,984&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-29 00:04:39,635&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-29 00:04:39,635&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-29 00:04:40,279&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-29 00:04:40,280&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-29 00:04:40,928&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-29 00:04:40,928&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-29 00:04:41,600&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-29 00:04:41,600&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-29 00:04:42,238&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-29 00:04:42,239&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-29 00:04:42,884&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-29 00:04:42,884&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-29 00:04:43,552&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-29 00:04:43,552&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-29 00:04:44,220&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-29 00:04:44,220&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-29 00:04:44,880&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-29 00:04:44,880&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-29 00:04:45,543&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-29 00:04:45,544&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-29 00:04:46,197&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-29 00:04:46,197&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-29 00:04:46,844&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-29 00:04:46,844&e_panda&INFO&wellplate&save_to_db&295&Saving well c9 to the database
+2024-03-29 00:04:47,512&e_panda&INFO&wellplate&save_to_db&298&Well c9 saved to the database
+2024-03-29 00:04:47,512&e_panda&INFO&wellplate&save_to_db&295&Saving well c10 to the database
+2024-03-29 00:04:48,136&e_panda&INFO&wellplate&save_to_db&298&Well c10 saved to the database
+2024-03-29 00:04:48,136&e_panda&INFO&wellplate&save_to_db&295&Saving well c11 to the database
+2024-03-29 00:04:48,797&e_panda&INFO&wellplate&save_to_db&298&Well c11 saved to the database
+2024-03-29 00:04:48,797&e_panda&INFO&wellplate&save_to_db&295&Saving well c12 to the database
+2024-03-29 00:04:49,440&e_panda&INFO&wellplate&save_to_db&298&Well c12 saved to the database
+2024-03-29 00:04:49,440&e_panda&INFO&wellplate&save_to_db&295&Saving well d1 to the database
+2024-03-29 00:04:50,116&e_panda&INFO&wellplate&save_to_db&298&Well d1 saved to the database
+2024-03-29 00:04:50,116&e_panda&INFO&wellplate&save_to_db&295&Saving well d2 to the database
+2024-03-29 00:04:50,839&e_panda&INFO&wellplate&save_to_db&298&Well d2 saved to the database
+2024-03-29 00:04:50,839&e_panda&INFO&wellplate&save_to_db&295&Saving well d3 to the database
+2024-03-29 00:04:51,499&e_panda&INFO&wellplate&save_to_db&298&Well d3 saved to the database
+2024-03-29 00:04:51,500&e_panda&INFO&wellplate&save_to_db&295&Saving well d4 to the database
+2024-03-29 00:04:52,208&e_panda&INFO&wellplate&save_to_db&298&Well d4 saved to the database
+2024-03-29 00:04:52,208&e_panda&INFO&wellplate&save_to_db&295&Saving well d5 to the database
+2024-03-29 00:04:52,864&e_panda&INFO&wellplate&save_to_db&298&Well d5 saved to the database
+2024-03-29 00:04:52,864&e_panda&INFO&wellplate&save_to_db&295&Saving well d6 to the database
+2024-03-29 00:04:53,519&e_panda&INFO&wellplate&save_to_db&298&Well d6 saved to the database
+2024-03-29 00:04:53,520&e_panda&INFO&wellplate&save_to_db&295&Saving well d7 to the database
+2024-03-29 00:04:54,220&e_panda&INFO&wellplate&save_to_db&298&Well d7 saved to the database
+2024-03-29 00:04:54,220&e_panda&INFO&wellplate&save_to_db&295&Saving well d8 to the database
+2024-03-29 00:04:54,883&e_panda&INFO&wellplate&save_to_db&298&Well d8 saved to the database
+2024-03-29 00:04:54,883&e_panda&INFO&wellplate&save_to_db&295&Saving well d9 to the database
+2024-03-29 00:04:55,583&e_panda&INFO&wellplate&save_to_db&298&Well d9 saved to the database
+2024-03-29 00:04:55,584&e_panda&INFO&wellplate&save_to_db&295&Saving well d10 to the database
+2024-03-29 00:04:56,264&e_panda&INFO&wellplate&save_to_db&298&Well d10 saved to the database
+2024-03-29 00:04:56,264&e_panda&INFO&wellplate&save_to_db&295&Saving well d11 to the database
+2024-03-29 00:04:56,916&e_panda&INFO&wellplate&save_to_db&298&Well d11 saved to the database
+2024-03-29 00:04:56,916&e_panda&INFO&wellplate&save_to_db&295&Saving well d12 to the database
+2024-03-29 00:04:57,583&e_panda&INFO&wellplate&save_to_db&298&Well d12 saved to the database
+2024-03-29 00:04:57,583&e_panda&INFO&wellplate&save_to_db&295&Saving well e1 to the database
+2024-03-29 00:04:58,292&e_panda&INFO&wellplate&save_to_db&298&Well e1 saved to the database
+2024-03-29 00:04:58,292&e_panda&INFO&wellplate&save_to_db&295&Saving well e2 to the database
+2024-03-29 00:04:58,964&e_panda&INFO&wellplate&save_to_db&298&Well e2 saved to the database
+2024-03-29 00:04:58,964&e_panda&INFO&wellplate&save_to_db&295&Saving well e3 to the database
+2024-03-29 00:04:59,704&e_panda&INFO&wellplate&save_to_db&298&Well e3 saved to the database
+2024-03-29 00:04:59,704&e_panda&INFO&wellplate&save_to_db&295&Saving well e4 to the database
+2024-03-29 00:05:00,364&e_panda&INFO&wellplate&save_to_db&298&Well e4 saved to the database
+2024-03-29 00:05:00,364&e_panda&INFO&wellplate&save_to_db&295&Saving well e5 to the database
+2024-03-29 00:05:01,244&e_panda&INFO&wellplate&save_to_db&298&Well e5 saved to the database
+2024-03-29 00:05:01,244&e_panda&INFO&wellplate&save_to_db&295&Saving well e6 to the database
+2024-03-29 00:05:01,952&e_panda&INFO&wellplate&save_to_db&298&Well e6 saved to the database
+2024-03-29 00:05:01,952&e_panda&INFO&wellplate&save_to_db&295&Saving well e7 to the database
+2024-03-29 00:05:02,664&e_panda&INFO&wellplate&save_to_db&298&Well e7 saved to the database
+2024-03-29 00:05:02,664&e_panda&INFO&wellplate&save_to_db&295&Saving well e8 to the database
+2024-03-29 00:05:03,375&e_panda&INFO&wellplate&save_to_db&298&Well e8 saved to the database
+2024-03-29 00:05:03,375&e_panda&INFO&wellplate&save_to_db&295&Saving well e9 to the database
+2024-03-29 00:05:04,064&e_panda&INFO&wellplate&save_to_db&298&Well e9 saved to the database
+2024-03-29 00:05:04,064&e_panda&INFO&wellplate&save_to_db&295&Saving well e10 to the database
+2024-03-29 00:05:04,756&e_panda&INFO&wellplate&save_to_db&298&Well e10 saved to the database
+2024-03-29 00:05:04,756&e_panda&INFO&wellplate&save_to_db&295&Saving well e11 to the database
+2024-03-29 00:05:05,408&e_panda&INFO&wellplate&save_to_db&298&Well e11 saved to the database
+2024-03-29 00:05:05,408&e_panda&INFO&wellplate&save_to_db&295&Saving well e12 to the database
+2024-03-29 00:05:06,100&e_panda&INFO&wellplate&save_to_db&298&Well e12 saved to the database
+2024-03-29 00:05:06,100&e_panda&INFO&wellplate&save_to_db&295&Saving well f1 to the database
+2024-03-29 00:05:06,760&e_panda&INFO&wellplate&save_to_db&298&Well f1 saved to the database
+2024-03-29 00:05:06,760&e_panda&INFO&wellplate&save_to_db&295&Saving well f2 to the database
+2024-03-29 00:05:07,396&e_panda&INFO&wellplate&save_to_db&298&Well f2 saved to the database
+2024-03-29 00:05:07,396&e_panda&INFO&wellplate&save_to_db&295&Saving well f3 to the database
+2024-03-29 00:05:08,036&e_panda&INFO&wellplate&save_to_db&298&Well f3 saved to the database
+2024-03-29 00:05:08,036&e_panda&INFO&wellplate&save_to_db&295&Saving well f4 to the database
+2024-03-29 00:05:08,668&e_panda&INFO&wellplate&save_to_db&298&Well f4 saved to the database
+2024-03-29 00:05:08,668&e_panda&INFO&wellplate&save_to_db&295&Saving well f5 to the database
+2024-03-29 00:05:09,300&e_panda&INFO&wellplate&save_to_db&298&Well f5 saved to the database
+2024-03-29 00:05:09,300&e_panda&INFO&wellplate&save_to_db&295&Saving well f6 to the database
+2024-03-29 00:05:09,960&e_panda&INFO&wellplate&save_to_db&298&Well f6 saved to the database
+2024-03-29 00:05:09,960&e_panda&INFO&wellplate&save_to_db&295&Saving well f7 to the database
+2024-03-29 00:05:10,612&e_panda&INFO&wellplate&save_to_db&298&Well f7 saved to the database
+2024-03-29 00:05:10,612&e_panda&INFO&wellplate&save_to_db&295&Saving well f8 to the database
+2024-03-29 00:05:11,268&e_panda&INFO&wellplate&save_to_db&298&Well f8 saved to the database
+2024-03-29 00:05:11,268&e_panda&INFO&wellplate&save_to_db&295&Saving well f9 to the database
+2024-03-29 00:05:11,900&e_panda&INFO&wellplate&save_to_db&298&Well f9 saved to the database
+2024-03-29 00:05:11,900&e_panda&INFO&wellplate&save_to_db&295&Saving well f10 to the database
+2024-03-29 00:05:12,748&e_panda&INFO&wellplate&save_to_db&298&Well f10 saved to the database
+2024-03-29 00:05:12,748&e_panda&INFO&wellplate&save_to_db&295&Saving well f11 to the database
+2024-03-29 00:05:13,400&e_panda&INFO&wellplate&save_to_db&298&Well f11 saved to the database
+2024-03-29 00:05:13,400&e_panda&INFO&wellplate&save_to_db&295&Saving well f12 to the database
+2024-03-29 00:05:14,092&e_panda&INFO&wellplate&save_to_db&298&Well f12 saved to the database
+2024-03-29 00:05:14,092&e_panda&INFO&wellplate&save_to_db&295&Saving well g1 to the database
+2024-03-29 00:05:14,788&e_panda&INFO&wellplate&save_to_db&298&Well g1 saved to the database
+2024-03-29 00:05:14,788&e_panda&INFO&wellplate&save_to_db&295&Saving well g2 to the database
+2024-03-29 00:05:15,481&e_panda&INFO&wellplate&save_to_db&298&Well g2 saved to the database
+2024-03-29 00:05:15,482&e_panda&INFO&wellplate&save_to_db&295&Saving well g3 to the database
+2024-03-29 00:05:16,100&e_panda&INFO&wellplate&save_to_db&298&Well g3 saved to the database
+2024-03-29 00:05:16,100&e_panda&INFO&wellplate&save_to_db&295&Saving well g4 to the database
+2024-03-29 00:05:16,736&e_panda&INFO&wellplate&save_to_db&298&Well g4 saved to the database
+2024-03-29 00:05:16,736&e_panda&INFO&wellplate&save_to_db&295&Saving well g5 to the database
+2024-03-29 00:05:17,364&e_panda&INFO&wellplate&save_to_db&298&Well g5 saved to the database
+2024-03-29 00:05:17,364&e_panda&INFO&wellplate&save_to_db&295&Saving well g6 to the database
+2024-03-29 00:05:17,999&e_panda&INFO&wellplate&save_to_db&298&Well g6 saved to the database
+2024-03-29 00:05:18,000&e_panda&INFO&wellplate&save_to_db&295&Saving well g7 to the database
+2024-03-29 00:05:18,647&e_panda&INFO&wellplate&save_to_db&298&Well g7 saved to the database
+2024-03-29 00:05:18,648&e_panda&INFO&wellplate&save_to_db&295&Saving well g8 to the database
+2024-03-29 00:05:19,276&e_panda&INFO&wellplate&save_to_db&298&Well g8 saved to the database
+2024-03-29 00:05:19,276&e_panda&INFO&wellplate&save_to_db&295&Saving well g9 to the database
+2024-03-29 00:05:19,930&e_panda&INFO&wellplate&save_to_db&298&Well g9 saved to the database
+2024-03-29 00:05:19,931&e_panda&INFO&wellplate&save_to_db&295&Saving well g10 to the database
+2024-03-29 00:05:20,576&e_panda&INFO&wellplate&save_to_db&298&Well g10 saved to the database
+2024-03-29 00:05:20,576&e_panda&INFO&wellplate&save_to_db&295&Saving well g11 to the database
+2024-03-29 00:05:21,208&e_panda&INFO&wellplate&save_to_db&298&Well g11 saved to the database
+2024-03-29 00:05:21,208&e_panda&INFO&wellplate&save_to_db&295&Saving well g12 to the database
+2024-03-29 00:05:21,852&e_panda&INFO&wellplate&save_to_db&298&Well g12 saved to the database
+2024-03-29 00:05:21,852&e_panda&INFO&wellplate&save_to_db&295&Saving well h1 to the database
+2024-03-29 00:05:22,500&e_panda&INFO&wellplate&save_to_db&298&Well h1 saved to the database
+2024-03-29 00:05:22,500&e_panda&INFO&wellplate&save_to_db&295&Saving well h2 to the database
+2024-03-29 00:05:23,120&e_panda&INFO&wellplate&save_to_db&298&Well h2 saved to the database
+2024-03-29 00:05:23,120&e_panda&INFO&wellplate&save_to_db&295&Saving well h3 to the database
+2024-03-29 00:05:23,755&e_panda&INFO&wellplate&save_to_db&298&Well h3 saved to the database
+2024-03-29 00:05:23,756&e_panda&INFO&wellplate&save_to_db&295&Saving well h4 to the database
+2024-03-29 00:05:24,383&e_panda&INFO&wellplate&save_to_db&298&Well h4 saved to the database
+2024-03-29 00:05:24,383&e_panda&INFO&wellplate&save_to_db&295&Saving well h5 to the database
+2024-03-29 00:05:25,016&e_panda&INFO&wellplate&save_to_db&298&Well h5 saved to the database
+2024-03-29 00:05:25,016&e_panda&INFO&wellplate&save_to_db&295&Saving well h6 to the database
+2024-03-29 00:05:25,643&e_panda&INFO&wellplate&save_to_db&298&Well h6 saved to the database
+2024-03-29 00:05:25,643&e_panda&INFO&wellplate&save_to_db&295&Saving well h7 to the database
+2024-03-29 00:05:26,299&e_panda&INFO&wellplate&save_to_db&298&Well h7 saved to the database
+2024-03-29 00:05:26,299&e_panda&INFO&wellplate&save_to_db&295&Saving well h8 to the database
+2024-03-29 00:05:26,942&e_panda&INFO&wellplate&save_to_db&298&Well h8 saved to the database
+2024-03-29 00:05:26,943&e_panda&INFO&wellplate&save_to_db&295&Saving well h9 to the database
+2024-03-29 00:05:27,584&e_panda&INFO&wellplate&save_to_db&298&Well h9 saved to the database
+2024-03-29 00:05:27,584&e_panda&INFO&wellplate&save_to_db&295&Saving well h10 to the database
+2024-03-29 00:05:28,300&e_panda&INFO&wellplate&save_to_db&298&Well h10 saved to the database
+2024-03-29 00:05:28,300&e_panda&INFO&wellplate&save_to_db&295&Saving well h11 to the database
+2024-03-29 00:05:28,924&e_panda&INFO&wellplate&save_to_db&298&Well h11 saved to the database
+2024-03-29 00:05:28,924&e_panda&INFO&wellplate&save_to_db&295&Saving well h12 to the database
+2024-03-29 00:05:29,584&e_panda&INFO&wellplate&save_to_db&298&Well h12 saved to the database
+2024-03-29 00:05:29,585&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-29 00:05:30,215&e_panda&INFO&wellplate&save_to_db&298&Well a1 saved to the database
+2024-03-29 00:05:30,215&e_panda&INFO&wellplate&save_to_db&295&Saving well a2 to the database
+2024-03-29 00:05:30,847&e_panda&INFO&wellplate&save_to_db&298&Well a2 saved to the database
+2024-03-29 00:05:30,847&e_panda&INFO&wellplate&save_to_db&295&Saving well a3 to the database
+2024-03-29 00:05:31,479&e_panda&INFO&wellplate&save_to_db&298&Well a3 saved to the database
+2024-03-29 00:05:31,479&e_panda&INFO&wellplate&save_to_db&295&Saving well a4 to the database
+2024-03-29 00:05:32,103&e_panda&INFO&wellplate&save_to_db&298&Well a4 saved to the database
+2024-03-29 00:05:32,103&e_panda&INFO&wellplate&save_to_db&295&Saving well a5 to the database
+2024-03-29 00:05:32,727&e_panda&INFO&wellplate&save_to_db&298&Well a5 saved to the database
+2024-03-29 00:05:32,727&e_panda&INFO&wellplate&save_to_db&295&Saving well a6 to the database
+2024-03-29 00:05:33,344&e_panda&INFO&wellplate&save_to_db&298&Well a6 saved to the database
+2024-03-29 00:05:33,344&e_panda&INFO&wellplate&save_to_db&295&Saving well a7 to the database
+2024-03-29 00:05:33,952&e_panda&INFO&wellplate&save_to_db&298&Well a7 saved to the database
+2024-03-29 00:05:33,952&e_panda&INFO&wellplate&save_to_db&295&Saving well a8 to the database
+2024-03-29 00:05:34,555&e_panda&INFO&wellplate&save_to_db&298&Well a8 saved to the database
+2024-03-29 00:05:34,555&e_panda&INFO&wellplate&save_to_db&295&Saving well a9 to the database
+2024-03-29 00:05:35,159&e_panda&INFO&wellplate&save_to_db&298&Well a9 saved to the database
+2024-03-29 00:05:35,159&e_panda&INFO&wellplate&save_to_db&295&Saving well a10 to the database
+2024-03-29 00:05:35,767&e_panda&INFO&wellplate&save_to_db&298&Well a10 saved to the database
+2024-03-29 00:05:35,767&e_panda&INFO&wellplate&save_to_db&295&Saving well a11 to the database
+2024-03-29 00:05:36,371&e_panda&INFO&wellplate&save_to_db&298&Well a11 saved to the database
+2024-03-29 00:05:36,371&e_panda&INFO&wellplate&save_to_db&295&Saving well a12 to the database
+2024-03-29 00:05:36,991&e_panda&INFO&wellplate&save_to_db&298&Well a12 saved to the database
+2024-03-29 00:05:36,991&e_panda&INFO&wellplate&save_to_db&295&Saving well b1 to the database
+2024-03-29 00:05:37,604&e_panda&INFO&wellplate&save_to_db&298&Well b1 saved to the database
+2024-03-29 00:05:37,605&e_panda&INFO&wellplate&save_to_db&295&Saving well b2 to the database
+2024-03-29 00:05:38,232&e_panda&INFO&wellplate&save_to_db&298&Well b2 saved to the database
+2024-03-29 00:05:38,232&e_panda&INFO&wellplate&save_to_db&295&Saving well b3 to the database
+2024-03-29 00:05:38,867&e_panda&INFO&wellplate&save_to_db&298&Well b3 saved to the database
+2024-03-29 00:05:38,867&e_panda&INFO&wellplate&save_to_db&295&Saving well b4 to the database
+2024-03-29 00:05:39,491&e_panda&INFO&wellplate&save_to_db&298&Well b4 saved to the database
+2024-03-29 00:05:39,491&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-29 00:05:40,119&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-29 00:05:40,119&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-29 00:05:40,727&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-29 00:05:40,727&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-29 00:05:41,359&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-29 00:05:41,360&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-29 00:05:41,975&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-29 00:05:41,975&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-29 00:05:42,592&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-29 00:05:42,592&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-29 00:05:43,199&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-29 00:05:43,199&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-29 00:05:43,815&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-29 00:05:43,815&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-29 00:05:44,457&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-29 00:05:44,457&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-29 00:05:45,080&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-29 00:05:45,080&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-29 00:05:45,718&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-29 00:05:45,719&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-29 00:05:46,351&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-29 00:05:46,351&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-29 00:05:46,959&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-29 00:05:46,959&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-29 00:05:47,802&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-29 00:05:47,803&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-29 00:05:48,415&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-29 00:05:48,415&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-29 00:05:49,036&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-29 00:05:49,036&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-29 00:05:49,647&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-29 00:05:49,647&e_panda&INFO&wellplate&save_to_db&295&Saving well c9 to the database
+2024-03-29 00:05:50,267&e_panda&INFO&wellplate&save_to_db&298&Well c9 saved to the database
+2024-03-29 00:05:50,267&e_panda&INFO&wellplate&save_to_db&295&Saving well c10 to the database
+2024-03-29 00:05:50,875&e_panda&INFO&wellplate&save_to_db&298&Well c10 saved to the database
+2024-03-29 00:05:50,875&e_panda&INFO&wellplate&save_to_db&295&Saving well c11 to the database
+2024-03-29 00:05:51,499&e_panda&INFO&wellplate&save_to_db&298&Well c11 saved to the database
+2024-03-29 00:05:51,499&e_panda&INFO&wellplate&save_to_db&295&Saving well c12 to the database
+2024-03-29 00:05:52,104&e_panda&INFO&wellplate&save_to_db&298&Well c12 saved to the database
+2024-03-29 00:05:52,104&e_panda&INFO&wellplate&save_to_db&295&Saving well d1 to the database
+2024-03-29 00:05:52,736&e_panda&INFO&wellplate&save_to_db&298&Well d1 saved to the database
+2024-03-29 00:05:52,736&e_panda&INFO&wellplate&save_to_db&295&Saving well d2 to the database
+2024-03-29 00:05:53,356&e_panda&INFO&wellplate&save_to_db&298&Well d2 saved to the database
+2024-03-29 00:05:53,356&e_panda&INFO&wellplate&save_to_db&295&Saving well d3 to the database
+2024-03-29 00:05:53,967&e_panda&INFO&wellplate&save_to_db&298&Well d3 saved to the database
+2024-03-29 00:05:53,967&e_panda&INFO&wellplate&save_to_db&295&Saving well d4 to the database
+2024-03-29 00:05:54,583&e_panda&INFO&wellplate&save_to_db&298&Well d4 saved to the database
+2024-03-29 00:05:54,583&e_panda&INFO&wellplate&save_to_db&295&Saving well d5 to the database
+2024-03-29 00:05:55,207&e_panda&INFO&wellplate&save_to_db&298&Well d5 saved to the database
+2024-03-29 00:05:55,207&e_panda&INFO&wellplate&save_to_db&295&Saving well d6 to the database
+2024-03-29 00:05:55,811&e_panda&INFO&wellplate&save_to_db&298&Well d6 saved to the database
+2024-03-29 00:05:55,811&e_panda&INFO&wellplate&save_to_db&295&Saving well d7 to the database
+2024-03-29 00:05:56,435&e_panda&INFO&wellplate&save_to_db&298&Well d7 saved to the database
+2024-03-29 00:05:56,435&e_panda&INFO&wellplate&save_to_db&295&Saving well d8 to the database
+2024-03-29 00:05:57,051&e_panda&INFO&wellplate&save_to_db&298&Well d8 saved to the database
+2024-03-29 00:05:57,051&e_panda&INFO&wellplate&save_to_db&295&Saving well d9 to the database
+2024-03-29 00:05:57,900&e_panda&INFO&wellplate&save_to_db&298&Well d9 saved to the database
+2024-03-29 00:05:57,900&e_panda&INFO&wellplate&save_to_db&295&Saving well d10 to the database
+2024-03-29 00:05:58,604&e_panda&INFO&wellplate&save_to_db&298&Well d10 saved to the database
+2024-03-29 00:05:58,604&e_panda&INFO&wellplate&save_to_db&295&Saving well d11 to the database
+2024-03-29 00:05:59,379&e_panda&INFO&wellplate&save_to_db&298&Well d11 saved to the database
+2024-03-29 00:05:59,379&e_panda&INFO&wellplate&save_to_db&295&Saving well d12 to the database
+2024-03-29 00:06:00,004&e_panda&INFO&wellplate&save_to_db&298&Well d12 saved to the database
+2024-03-29 00:06:00,004&e_panda&INFO&wellplate&save_to_db&295&Saving well e1 to the database
+2024-03-29 00:06:00,632&e_panda&INFO&wellplate&save_to_db&298&Well e1 saved to the database
+2024-03-29 00:06:00,632&e_panda&INFO&wellplate&save_to_db&295&Saving well e2 to the database
+2024-03-29 00:06:01,267&e_panda&INFO&wellplate&save_to_db&298&Well e2 saved to the database
+2024-03-29 00:06:01,267&e_panda&INFO&wellplate&save_to_db&295&Saving well e3 to the database
+2024-03-29 00:06:01,911&e_panda&INFO&wellplate&save_to_db&298&Well e3 saved to the database
+2024-03-29 00:06:01,911&e_panda&INFO&wellplate&save_to_db&295&Saving well e4 to the database
+2024-03-29 00:06:02,592&e_panda&INFO&wellplate&save_to_db&298&Well e4 saved to the database
+2024-03-29 00:06:02,592&e_panda&INFO&wellplate&save_to_db&295&Saving well e5 to the database
+2024-03-29 00:06:03,247&e_panda&INFO&wellplate&save_to_db&298&Well e5 saved to the database
+2024-03-29 00:06:03,247&e_panda&INFO&wellplate&save_to_db&295&Saving well e6 to the database
+2024-03-29 00:06:03,864&e_panda&INFO&wellplate&save_to_db&298&Well e6 saved to the database
+2024-03-29 00:06:03,864&e_panda&INFO&wellplate&save_to_db&295&Saving well e7 to the database
+2024-03-29 00:06:04,555&e_panda&INFO&wellplate&save_to_db&298&Well e7 saved to the database
+2024-03-29 00:06:04,555&e_panda&INFO&wellplate&save_to_db&295&Saving well e8 to the database
+2024-03-29 00:06:05,175&e_panda&INFO&wellplate&save_to_db&298&Well e8 saved to the database
+2024-03-29 00:06:05,175&e_panda&INFO&wellplate&save_to_db&295&Saving well e9 to the database
+2024-03-29 00:06:05,787&e_panda&INFO&wellplate&save_to_db&298&Well e9 saved to the database
+2024-03-29 00:06:05,787&e_panda&INFO&wellplate&save_to_db&295&Saving well e10 to the database
+2024-03-29 00:06:06,437&e_panda&INFO&wellplate&save_to_db&298&Well e10 saved to the database
+2024-03-29 00:06:06,437&e_panda&INFO&wellplate&save_to_db&295&Saving well e11 to the database
+2024-03-29 00:06:07,128&e_panda&INFO&wellplate&save_to_db&298&Well e11 saved to the database
+2024-03-29 00:06:07,128&e_panda&INFO&wellplate&save_to_db&295&Saving well e12 to the database
+2024-03-29 00:06:08,011&e_panda&INFO&wellplate&save_to_db&298&Well e12 saved to the database
+2024-03-29 00:06:08,011&e_panda&INFO&wellplate&save_to_db&295&Saving well f1 to the database
+2024-03-29 00:06:08,675&e_panda&INFO&wellplate&save_to_db&298&Well f1 saved to the database
+2024-03-29 00:06:08,675&e_panda&INFO&wellplate&save_to_db&295&Saving well f2 to the database
+2024-03-29 00:06:09,319&e_panda&INFO&wellplate&save_to_db&298&Well f2 saved to the database
+2024-03-29 00:06:09,319&e_panda&INFO&wellplate&save_to_db&295&Saving well f3 to the database
+2024-03-29 00:06:09,931&e_panda&INFO&wellplate&save_to_db&298&Well f3 saved to the database
+2024-03-29 00:06:09,931&e_panda&INFO&wellplate&save_to_db&295&Saving well f4 to the database
+2024-03-29 00:06:10,584&e_panda&INFO&wellplate&save_to_db&298&Well f4 saved to the database
+2024-03-29 00:06:10,584&e_panda&INFO&wellplate&save_to_db&295&Saving well f5 to the database
+2024-03-29 00:06:11,239&e_panda&INFO&wellplate&save_to_db&298&Well f5 saved to the database
+2024-03-29 00:06:11,239&e_panda&INFO&wellplate&save_to_db&295&Saving well f6 to the database
+2024-03-29 00:06:11,887&e_panda&INFO&wellplate&save_to_db&298&Well f6 saved to the database
+2024-03-29 00:06:11,887&e_panda&INFO&wellplate&save_to_db&295&Saving well f7 to the database
+2024-03-29 00:06:12,571&e_panda&INFO&wellplate&save_to_db&298&Well f7 saved to the database
+2024-03-29 00:06:12,571&e_panda&INFO&wellplate&save_to_db&295&Saving well f8 to the database
+2024-03-29 00:06:13,251&e_panda&INFO&wellplate&save_to_db&298&Well f8 saved to the database
+2024-03-29 00:06:13,251&e_panda&INFO&wellplate&save_to_db&295&Saving well f9 to the database
+2024-03-29 00:06:13,876&e_panda&INFO&wellplate&save_to_db&298&Well f9 saved to the database
+2024-03-29 00:06:13,876&e_panda&INFO&wellplate&save_to_db&295&Saving well f10 to the database
+2024-03-29 00:06:14,531&e_panda&INFO&wellplate&save_to_db&298&Well f10 saved to the database
+2024-03-29 00:06:14,531&e_panda&INFO&wellplate&save_to_db&295&Saving well f11 to the database
+2024-03-29 00:06:15,211&e_panda&INFO&wellplate&save_to_db&298&Well f11 saved to the database
+2024-03-29 00:06:15,211&e_panda&INFO&wellplate&save_to_db&295&Saving well f12 to the database
+2024-03-29 00:06:15,892&e_panda&INFO&wellplate&save_to_db&298&Well f12 saved to the database
+2024-03-29 00:06:15,892&e_panda&INFO&wellplate&save_to_db&295&Saving well g1 to the database
+2024-03-29 00:06:16,567&e_panda&INFO&wellplate&save_to_db&298&Well g1 saved to the database
+2024-03-29 00:06:16,567&e_panda&INFO&wellplate&save_to_db&295&Saving well g2 to the database
+2024-03-29 00:06:17,243&e_panda&INFO&wellplate&save_to_db&298&Well g2 saved to the database
+2024-03-29 00:06:17,243&e_panda&INFO&wellplate&save_to_db&295&Saving well g3 to the database
+2024-03-29 00:06:17,871&e_panda&INFO&wellplate&save_to_db&298&Well g3 saved to the database
+2024-03-29 00:06:17,871&e_panda&INFO&wellplate&save_to_db&295&Saving well g4 to the database
+2024-03-29 00:06:18,551&e_panda&INFO&wellplate&save_to_db&298&Well g4 saved to the database
+2024-03-29 00:06:18,551&e_panda&INFO&wellplate&save_to_db&295&Saving well g5 to the database
+2024-03-29 00:06:19,227&e_panda&INFO&wellplate&save_to_db&298&Well g5 saved to the database
+2024-03-29 00:06:19,227&e_panda&INFO&wellplate&save_to_db&295&Saving well g6 to the database
+2024-03-29 00:06:19,927&e_panda&INFO&wellplate&save_to_db&298&Well g6 saved to the database
+2024-03-29 00:06:19,927&e_panda&INFO&wellplate&save_to_db&295&Saving well g7 to the database
+2024-03-29 00:06:20,603&e_panda&INFO&wellplate&save_to_db&298&Well g7 saved to the database
+2024-03-29 00:06:20,603&e_panda&INFO&wellplate&save_to_db&295&Saving well g8 to the database
+2024-03-29 00:06:21,263&e_panda&INFO&wellplate&save_to_db&298&Well g8 saved to the database
+2024-03-29 00:06:21,263&e_panda&INFO&wellplate&save_to_db&295&Saving well g9 to the database
+2024-03-29 00:06:21,944&e_panda&INFO&wellplate&save_to_db&298&Well g9 saved to the database
+2024-03-29 00:06:21,944&e_panda&INFO&wellplate&save_to_db&295&Saving well g10 to the database
+2024-03-29 00:06:22,616&e_panda&INFO&wellplate&save_to_db&298&Well g10 saved to the database
+2024-03-29 00:06:22,616&e_panda&INFO&wellplate&save_to_db&295&Saving well g11 to the database
+2024-03-29 00:06:23,291&e_panda&INFO&wellplate&save_to_db&298&Well g11 saved to the database
+2024-03-29 00:06:23,291&e_panda&INFO&wellplate&save_to_db&295&Saving well g12 to the database
+2024-03-29 00:06:23,964&e_panda&INFO&wellplate&save_to_db&298&Well g12 saved to the database
+2024-03-29 00:06:23,964&e_panda&INFO&wellplate&save_to_db&295&Saving well h1 to the database
+2024-03-29 00:06:24,623&e_panda&INFO&wellplate&save_to_db&298&Well h1 saved to the database
+2024-03-29 00:06:24,623&e_panda&INFO&wellplate&save_to_db&295&Saving well h2 to the database
+2024-03-29 00:06:25,295&e_panda&INFO&wellplate&save_to_db&298&Well h2 saved to the database
+2024-03-29 00:06:25,295&e_panda&INFO&wellplate&save_to_db&295&Saving well h3 to the database
+2024-03-29 00:06:26,000&e_panda&INFO&wellplate&save_to_db&298&Well h3 saved to the database
+2024-03-29 00:06:26,000&e_panda&INFO&wellplate&save_to_db&295&Saving well h4 to the database
+2024-03-29 00:06:26,679&e_panda&INFO&wellplate&save_to_db&298&Well h4 saved to the database
+2024-03-29 00:06:26,679&e_panda&INFO&wellplate&save_to_db&295&Saving well h5 to the database
+2024-03-29 00:06:27,327&e_panda&INFO&wellplate&save_to_db&298&Well h5 saved to the database
+2024-03-29 00:06:27,327&e_panda&INFO&wellplate&save_to_db&295&Saving well h6 to the database
+2024-03-29 00:06:28,040&e_panda&INFO&wellplate&save_to_db&298&Well h6 saved to the database
+2024-03-29 00:06:28,040&e_panda&INFO&wellplate&save_to_db&295&Saving well h7 to the database
+2024-03-29 00:06:28,799&e_panda&INFO&wellplate&save_to_db&298&Well h7 saved to the database
+2024-03-29 00:06:28,799&e_panda&INFO&wellplate&save_to_db&295&Saving well h8 to the database
+2024-03-29 00:06:29,479&e_panda&INFO&wellplate&save_to_db&298&Well h8 saved to the database
+2024-03-29 00:06:29,479&e_panda&INFO&wellplate&save_to_db&295&Saving well h9 to the database
+2024-03-29 00:06:30,142&e_panda&INFO&wellplate&save_to_db&298&Well h9 saved to the database
+2024-03-29 00:06:30,142&e_panda&INFO&wellplate&save_to_db&295&Saving well h10 to the database
+2024-03-29 00:06:30,831&e_panda&INFO&wellplate&save_to_db&298&Well h10 saved to the database
+2024-03-29 00:06:30,831&e_panda&INFO&wellplate&save_to_db&295&Saving well h11 to the database
+2024-03-29 00:06:31,487&e_panda&INFO&wellplate&save_to_db&298&Well h11 saved to the database
+2024-03-29 00:06:31,487&e_panda&INFO&wellplate&save_to_db&295&Saving well h12 to the database
+2024-03-29 00:06:32,163&e_panda&INFO&wellplate&save_to_db&298&Well h12 saved to the database
+2024-03-29 00:06:32,163&e_panda&INFO&wellplate&load_new_wellplate&1124&Wellplate 110 saved and wellplate 111 loaded
+2024-03-29 00:06:51,696&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:06:51,696&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:06:51,696&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B5 status to queued&
+2024-03-29 00:06:52,416&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-29 00:06:53,099&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-29 00:06:53,099&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000000 added to queue&
+2024-03-29 00:06:53,569&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:06:53,569&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:06:53,569&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B6 status to queued&
+2024-03-29 00:06:54,291&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-29 00:06:54,979&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-29 00:06:54,979&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000001 added to queue&
+2024-03-29 00:06:55,450&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:06:55,450&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:06:55,450&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B7 status to queued&
+2024-03-29 00:06:56,183&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-29 00:06:56,807&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-29 00:06:56,807&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000002 added to queue&
+2024-03-29 00:06:57,274&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:06:57,274&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:06:57,274&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B8 status to queued&
+2024-03-29 00:06:58,007&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-29 00:06:58,916&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-29 00:06:58,916&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000003 added to queue&
+2024-03-29 00:06:59,388&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:06:59,388&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:06:59,388&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B9 status to queued&
+2024-03-29 00:07:00,111&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-29 00:07:00,727&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-29 00:07:00,727&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000004 added to queue&
+2024-03-29 00:07:01,187&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:01,187&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:01,187&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B10 status to queued&
+2024-03-29 00:07:01,919&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-29 00:07:02,547&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-29 00:07:02,547&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000005 added to queue&
+2024-03-29 00:07:03,033&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:03,033&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:03,033&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B11 status to queued&
+2024-03-29 00:07:03,783&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-29 00:07:04,507&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-29 00:07:04,507&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000006 added to queue&
+2024-03-29 00:07:04,978&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:04,978&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:04,978&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing B12 status to queued&
+2024-03-29 00:07:05,747&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-29 00:07:06,400&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-29 00:07:06,400&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000007 added to queue&
+2024-03-29 00:07:06,858&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:06,858&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:06,858&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C1 status to queued&
+2024-03-29 00:07:07,633&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-29 00:07:08,271&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-29 00:07:08,271&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000008 added to queue&
+2024-03-29 00:07:08,718&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:08,718&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:08,718&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C2 status to queued&
+2024-03-29 00:07:09,503&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-29 00:07:10,207&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-29 00:07:10,207&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000009 added to queue&
+2024-03-29 00:07:10,680&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:10,680&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:10,680&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C3 status to queued&
+2024-03-29 00:07:11,452&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-29 00:07:12,138&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-29 00:07:12,138&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000010 added to queue&
+2024-03-29 00:07:12,642&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:12,642&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:12,642&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C4 status to queued&
+2024-03-29 00:07:13,386&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-29 00:07:14,058&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-29 00:07:14,058&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000011 added to queue&
+2024-03-29 00:07:14,582&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:14,582&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:14,582&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C5 status to queued&
+2024-03-29 00:07:15,333&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-29 00:07:15,962&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-29 00:07:15,962&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000012 added to queue&
+2024-03-29 00:07:16,572&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:16,572&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:16,572&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C6 status to queued&
+2024-03-29 00:07:17,270&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-29 00:07:17,902&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-29 00:07:17,902&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000013 added to queue&
+2024-03-29 00:07:18,412&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:18,412&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:18,412&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C7 status to queued&
+2024-03-29 00:07:19,143&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-29 00:07:19,802&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-29 00:07:19,802&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000014 added to queue&
+2024-03-29 00:07:20,277&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&660&&&&No files to save when using database&
+2024-03-29 00:07:20,277&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&693&&&&No queue to add to when using database, will be in a view&
+2024-03-29 00:07:20,277&epanda_lib.scheduler&DEBUG&scheduler&change_well_status&189&&&&Changing C8 status to queued&
+2024-03-29 00:07:20,982&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-29 00:07:21,618&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-29 00:07:21,618&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiment&650&&&&Experiment 10000015 added to queue&
+2024-03-29 18:12:19,994&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-29 18:12:20,691&e_panda&INFO&wellplate&save_to_db&298&Well a1 saved to the database
+2024-03-29 18:12:20,691&e_panda&INFO&wellplate&save_to_db&295&Saving well a2 to the database
+2024-03-29 18:12:21,407&e_panda&INFO&wellplate&save_to_db&298&Well a2 saved to the database
+2024-03-29 18:12:21,407&e_panda&INFO&wellplate&save_to_db&295&Saving well a3 to the database
+2024-03-29 18:12:22,057&e_panda&INFO&wellplate&save_to_db&298&Well a3 saved to the database
+2024-03-29 18:12:22,057&e_panda&INFO&wellplate&save_to_db&295&Saving well a4 to the database
+2024-03-29 18:12:22,751&e_panda&INFO&wellplate&save_to_db&298&Well a4 saved to the database
+2024-03-29 18:12:22,751&e_panda&INFO&wellplate&save_to_db&295&Saving well a5 to the database
+2024-03-29 18:12:23,405&e_panda&INFO&wellplate&save_to_db&298&Well a5 saved to the database
+2024-03-29 18:12:23,405&e_panda&INFO&wellplate&save_to_db&295&Saving well a6 to the database
+2024-03-29 18:12:24,067&e_panda&INFO&wellplate&save_to_db&298&Well a6 saved to the database
+2024-03-29 18:12:24,067&e_panda&INFO&wellplate&save_to_db&295&Saving well a7 to the database
+2024-03-29 18:12:24,720&e_panda&INFO&wellplate&save_to_db&298&Well a7 saved to the database
+2024-03-29 18:12:24,720&e_panda&INFO&wellplate&save_to_db&295&Saving well a8 to the database
+2024-03-29 18:12:25,392&e_panda&INFO&wellplate&save_to_db&298&Well a8 saved to the database
+2024-03-29 18:12:25,392&e_panda&INFO&wellplate&save_to_db&295&Saving well a9 to the database
+2024-03-29 18:12:26,056&e_panda&INFO&wellplate&save_to_db&298&Well a9 saved to the database
+2024-03-29 18:12:26,056&e_panda&INFO&wellplate&save_to_db&295&Saving well a10 to the database
+2024-03-29 18:12:26,781&e_panda&INFO&wellplate&save_to_db&298&Well a10 saved to the database
+2024-03-29 18:12:26,781&e_panda&INFO&wellplate&save_to_db&295&Saving well a11 to the database
+2024-03-29 18:12:27,532&e_panda&INFO&wellplate&save_to_db&298&Well a11 saved to the database
+2024-03-29 18:12:27,532&e_panda&INFO&wellplate&save_to_db&295&Saving well a12 to the database
+2024-03-29 18:12:28,204&e_panda&INFO&wellplate&save_to_db&298&Well a12 saved to the database
+2024-03-29 18:12:28,204&e_panda&INFO&wellplate&save_to_db&295&Saving well b1 to the database
+2024-03-29 18:12:28,880&e_panda&INFO&wellplate&save_to_db&298&Well b1 saved to the database
+2024-03-29 18:12:28,880&e_panda&INFO&wellplate&save_to_db&295&Saving well b2 to the database
+2024-03-29 18:12:29,580&e_panda&INFO&wellplate&save_to_db&298&Well b2 saved to the database
+2024-03-29 18:12:29,580&e_panda&INFO&wellplate&save_to_db&295&Saving well b3 to the database
+2024-03-29 18:12:30,277&e_panda&INFO&wellplate&save_to_db&298&Well b3 saved to the database
+2024-03-29 18:12:30,277&e_panda&INFO&wellplate&save_to_db&295&Saving well b4 to the database
+2024-03-29 18:12:30,967&e_panda&INFO&wellplate&save_to_db&298&Well b4 saved to the database
+2024-03-29 18:12:30,967&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-29 18:12:31,644&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-29 18:12:31,644&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-29 18:12:32,316&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-29 18:12:32,316&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-29 18:12:33,005&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-29 18:12:33,005&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-29 18:12:33,708&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-29 18:12:33,708&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-29 18:12:34,393&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-29 18:12:34,393&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-29 18:12:35,064&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-29 18:12:35,064&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-29 18:12:35,764&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-29 18:12:35,764&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-29 18:12:36,540&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-29 18:12:36,540&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-29 18:12:37,230&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-29 18:12:37,230&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-29 18:12:37,916&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-29 18:12:37,916&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-29 18:12:38,608&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-29 18:12:38,608&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-29 18:12:39,300&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-29 18:12:39,300&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-29 18:12:39,996&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-29 18:12:39,996&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-29 18:12:40,704&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-29 18:12:40,704&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-29 18:12:41,388&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-29 18:12:41,389&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-29 18:12:42,040&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-29 18:12:42,040&e_panda&INFO&wellplate&save_to_db&295&Saving well c9 to the database
+2024-03-29 18:12:42,733&e_panda&INFO&wellplate&save_to_db&298&Well c9 saved to the database
+2024-03-29 18:12:42,733&e_panda&INFO&wellplate&save_to_db&295&Saving well c10 to the database
+2024-03-29 18:12:43,400&e_panda&INFO&wellplate&save_to_db&298&Well c10 saved to the database
+2024-03-29 18:12:43,400&e_panda&INFO&wellplate&save_to_db&295&Saving well c11 to the database
+2024-03-29 18:12:44,076&e_panda&INFO&wellplate&save_to_db&298&Well c11 saved to the database
+2024-03-29 18:12:44,077&e_panda&INFO&wellplate&save_to_db&295&Saving well c12 to the database
+2024-03-29 18:12:44,752&e_panda&INFO&wellplate&save_to_db&298&Well c12 saved to the database
+2024-03-29 18:12:44,752&e_panda&INFO&wellplate&save_to_db&295&Saving well d1 to the database
+2024-03-29 18:12:45,448&e_panda&INFO&wellplate&save_to_db&298&Well d1 saved to the database
+2024-03-29 18:12:45,448&e_panda&INFO&wellplate&save_to_db&295&Saving well d2 to the database
+2024-03-29 18:12:46,096&e_panda&INFO&wellplate&save_to_db&298&Well d2 saved to the database
+2024-03-29 18:12:46,096&e_panda&INFO&wellplate&save_to_db&295&Saving well d3 to the database
+2024-03-29 18:12:46,780&e_panda&INFO&wellplate&save_to_db&298&Well d3 saved to the database
+2024-03-29 18:12:46,780&e_panda&INFO&wellplate&save_to_db&295&Saving well d4 to the database
+2024-03-29 18:12:47,480&e_panda&INFO&wellplate&save_to_db&298&Well d4 saved to the database
+2024-03-29 18:12:47,480&e_panda&INFO&wellplate&save_to_db&295&Saving well d5 to the database
+2024-03-29 18:12:48,128&e_panda&INFO&wellplate&save_to_db&298&Well d5 saved to the database
+2024-03-29 18:12:48,128&e_panda&INFO&wellplate&save_to_db&295&Saving well d6 to the database
+2024-03-29 18:12:48,817&e_panda&INFO&wellplate&save_to_db&298&Well d6 saved to the database
+2024-03-29 18:12:48,817&e_panda&INFO&wellplate&save_to_db&295&Saving well d7 to the database
+2024-03-29 18:12:49,525&e_panda&INFO&wellplate&save_to_db&298&Well d7 saved to the database
+2024-03-29 18:12:49,525&e_panda&INFO&wellplate&save_to_db&295&Saving well d8 to the database
+2024-03-29 18:12:50,205&e_panda&INFO&wellplate&save_to_db&298&Well d8 saved to the database
+2024-03-29 18:12:50,205&e_panda&INFO&wellplate&save_to_db&295&Saving well d9 to the database
+2024-03-29 18:12:50,908&e_panda&INFO&wellplate&save_to_db&298&Well d9 saved to the database
+2024-03-29 18:12:50,908&e_panda&INFO&wellplate&save_to_db&295&Saving well d10 to the database
+2024-03-29 18:12:51,687&e_panda&INFO&wellplate&save_to_db&298&Well d10 saved to the database
+2024-03-29 18:12:51,687&e_panda&INFO&wellplate&save_to_db&295&Saving well d11 to the database
+2024-03-29 18:12:52,401&e_panda&INFO&wellplate&save_to_db&298&Well d11 saved to the database
+2024-03-29 18:12:52,401&e_panda&INFO&wellplate&save_to_db&295&Saving well d12 to the database
+2024-03-29 18:12:53,388&e_panda&INFO&wellplate&save_to_db&298&Well d12 saved to the database
+2024-03-29 18:12:53,388&e_panda&INFO&wellplate&save_to_db&295&Saving well e1 to the database
+2024-03-29 18:12:54,085&e_panda&INFO&wellplate&save_to_db&298&Well e1 saved to the database
+2024-03-29 18:12:54,085&e_panda&INFO&wellplate&save_to_db&295&Saving well e2 to the database
+2024-03-29 18:12:54,804&e_panda&INFO&wellplate&save_to_db&298&Well e2 saved to the database
+2024-03-29 18:12:54,804&e_panda&INFO&wellplate&save_to_db&295&Saving well e3 to the database
+2024-03-29 18:12:55,524&e_panda&INFO&wellplate&save_to_db&298&Well e3 saved to the database
+2024-03-29 18:12:55,524&e_panda&INFO&wellplate&save_to_db&295&Saving well e4 to the database
+2024-03-29 18:12:56,192&e_panda&INFO&wellplate&save_to_db&298&Well e4 saved to the database
+2024-03-29 18:12:56,192&e_panda&INFO&wellplate&save_to_db&295&Saving well e5 to the database
+2024-03-29 18:12:56,856&e_panda&INFO&wellplate&save_to_db&298&Well e5 saved to the database
+2024-03-29 18:12:56,856&e_panda&INFO&wellplate&save_to_db&295&Saving well e6 to the database
+2024-03-29 18:12:57,520&e_panda&INFO&wellplate&save_to_db&298&Well e6 saved to the database
+2024-03-29 18:12:57,520&e_panda&INFO&wellplate&save_to_db&295&Saving well e7 to the database
+2024-03-29 18:12:58,168&e_panda&INFO&wellplate&save_to_db&298&Well e7 saved to the database
+2024-03-29 18:12:58,168&e_panda&INFO&wellplate&save_to_db&295&Saving well e8 to the database
+2024-03-29 18:12:58,808&e_panda&INFO&wellplate&save_to_db&298&Well e8 saved to the database
+2024-03-29 18:12:58,808&e_panda&INFO&wellplate&save_to_db&295&Saving well e9 to the database
+2024-03-29 18:12:59,532&e_panda&INFO&wellplate&save_to_db&298&Well e9 saved to the database
+2024-03-29 18:12:59,532&e_panda&INFO&wellplate&save_to_db&295&Saving well e10 to the database
+2024-03-29 18:13:00,192&e_panda&INFO&wellplate&save_to_db&298&Well e10 saved to the database
+2024-03-29 18:13:00,192&e_panda&INFO&wellplate&save_to_db&295&Saving well e11 to the database
+2024-03-29 18:13:00,841&e_panda&INFO&wellplate&save_to_db&298&Well e11 saved to the database
+2024-03-29 18:13:00,841&e_panda&INFO&wellplate&save_to_db&295&Saving well e12 to the database
+2024-03-29 18:13:01,528&e_panda&INFO&wellplate&save_to_db&298&Well e12 saved to the database
+2024-03-29 18:13:01,528&e_panda&INFO&wellplate&save_to_db&295&Saving well f1 to the database
+2024-03-29 18:13:02,176&e_panda&INFO&wellplate&save_to_db&298&Well f1 saved to the database
+2024-03-29 18:13:02,176&e_panda&INFO&wellplate&save_to_db&295&Saving well f2 to the database
+2024-03-29 18:13:02,850&e_panda&INFO&wellplate&save_to_db&298&Well f2 saved to the database
+2024-03-29 18:13:02,850&e_panda&INFO&wellplate&save_to_db&295&Saving well f3 to the database
+2024-03-29 18:13:03,536&e_panda&INFO&wellplate&save_to_db&298&Well f3 saved to the database
+2024-03-29 18:13:03,536&e_panda&INFO&wellplate&save_to_db&295&Saving well f4 to the database
+2024-03-29 18:13:04,180&e_panda&INFO&wellplate&save_to_db&298&Well f4 saved to the database
+2024-03-29 18:13:04,180&e_panda&INFO&wellplate&save_to_db&295&Saving well f5 to the database
+2024-03-29 18:13:04,876&e_panda&INFO&wellplate&save_to_db&298&Well f5 saved to the database
+2024-03-29 18:13:04,876&e_panda&INFO&wellplate&save_to_db&295&Saving well f6 to the database
+2024-03-29 18:13:05,584&e_panda&INFO&wellplate&save_to_db&298&Well f6 saved to the database
+2024-03-29 18:13:05,584&e_panda&INFO&wellplate&save_to_db&295&Saving well f7 to the database
+2024-03-29 18:13:06,215&e_panda&INFO&wellplate&save_to_db&298&Well f7 saved to the database
+2024-03-29 18:13:06,215&e_panda&INFO&wellplate&save_to_db&295&Saving well f8 to the database
+2024-03-29 18:13:06,868&e_panda&INFO&wellplate&save_to_db&298&Well f8 saved to the database
+2024-03-29 18:13:06,868&e_panda&INFO&wellplate&save_to_db&295&Saving well f9 to the database
+2024-03-29 18:13:07,560&e_panda&INFO&wellplate&save_to_db&298&Well f9 saved to the database
+2024-03-29 18:13:07,560&e_panda&INFO&wellplate&save_to_db&295&Saving well f10 to the database
+2024-03-29 18:13:08,219&e_panda&INFO&wellplate&save_to_db&298&Well f10 saved to the database
+2024-03-29 18:13:08,219&e_panda&INFO&wellplate&save_to_db&295&Saving well f11 to the database
+2024-03-29 18:13:08,864&e_panda&INFO&wellplate&save_to_db&298&Well f11 saved to the database
+2024-03-29 18:13:08,864&e_panda&INFO&wellplate&save_to_db&295&Saving well f12 to the database
+2024-03-29 18:13:09,540&e_panda&INFO&wellplate&save_to_db&298&Well f12 saved to the database
+2024-03-29 18:13:09,540&e_panda&INFO&wellplate&save_to_db&295&Saving well g1 to the database
+2024-03-29 18:13:10,428&e_panda&INFO&wellplate&save_to_db&298&Well g1 saved to the database
+2024-03-29 18:13:10,429&e_panda&INFO&wellplate&save_to_db&295&Saving well g2 to the database
+2024-03-29 18:13:11,136&e_panda&INFO&wellplate&save_to_db&298&Well g2 saved to the database
+2024-03-29 18:13:11,136&e_panda&INFO&wellplate&save_to_db&295&Saving well g3 to the database
+2024-03-29 18:13:11,844&e_panda&INFO&wellplate&save_to_db&298&Well g3 saved to the database
+2024-03-29 18:13:11,845&e_panda&INFO&wellplate&save_to_db&295&Saving well g4 to the database
+2024-03-29 18:13:12,638&e_panda&INFO&wellplate&save_to_db&298&Well g4 saved to the database
+2024-03-29 18:13:12,638&e_panda&INFO&wellplate&save_to_db&295&Saving well g5 to the database
+2024-03-29 18:13:13,357&e_panda&INFO&wellplate&save_to_db&298&Well g5 saved to the database
+2024-03-29 18:13:13,357&e_panda&INFO&wellplate&save_to_db&295&Saving well g6 to the database
+2024-03-29 18:13:14,065&e_panda&INFO&wellplate&save_to_db&298&Well g6 saved to the database
+2024-03-29 18:13:14,065&e_panda&INFO&wellplate&save_to_db&295&Saving well g7 to the database
+2024-03-29 18:13:14,756&e_panda&INFO&wellplate&save_to_db&298&Well g7 saved to the database
+2024-03-29 18:13:14,756&e_panda&INFO&wellplate&save_to_db&295&Saving well g8 to the database
+2024-03-29 18:13:15,492&e_panda&INFO&wellplate&save_to_db&298&Well g8 saved to the database
+2024-03-29 18:13:15,492&e_panda&INFO&wellplate&save_to_db&295&Saving well g9 to the database
+2024-03-29 18:13:16,181&e_panda&INFO&wellplate&save_to_db&298&Well g9 saved to the database
+2024-03-29 18:13:16,181&e_panda&INFO&wellplate&save_to_db&295&Saving well g10 to the database
+2024-03-29 18:13:16,907&e_panda&INFO&wellplate&save_to_db&298&Well g10 saved to the database
+2024-03-29 18:13:16,907&e_panda&INFO&wellplate&save_to_db&295&Saving well g11 to the database
+2024-03-29 18:13:17,609&e_panda&INFO&wellplate&save_to_db&298&Well g11 saved to the database
+2024-03-29 18:13:17,609&e_panda&INFO&wellplate&save_to_db&295&Saving well g12 to the database
+2024-03-29 18:13:18,340&e_panda&INFO&wellplate&save_to_db&298&Well g12 saved to the database
+2024-03-29 18:13:18,340&e_panda&INFO&wellplate&save_to_db&295&Saving well h1 to the database
+2024-03-29 18:13:19,017&e_panda&INFO&wellplate&save_to_db&298&Well h1 saved to the database
+2024-03-29 18:13:19,017&e_panda&INFO&wellplate&save_to_db&295&Saving well h2 to the database
+2024-03-29 18:13:19,724&e_panda&INFO&wellplate&save_to_db&298&Well h2 saved to the database
+2024-03-29 18:13:19,724&e_panda&INFO&wellplate&save_to_db&295&Saving well h3 to the database
+2024-03-29 18:13:20,405&e_panda&INFO&wellplate&save_to_db&298&Well h3 saved to the database
+2024-03-29 18:13:20,405&e_panda&INFO&wellplate&save_to_db&295&Saving well h4 to the database
+2024-03-29 18:13:21,075&e_panda&INFO&wellplate&save_to_db&298&Well h4 saved to the database
+2024-03-29 18:13:21,075&e_panda&INFO&wellplate&save_to_db&295&Saving well h5 to the database
+2024-03-29 18:13:21,780&e_panda&INFO&wellplate&save_to_db&298&Well h5 saved to the database
+2024-03-29 18:13:21,780&e_panda&INFO&wellplate&save_to_db&295&Saving well h6 to the database
+2024-03-29 18:13:22,483&e_panda&INFO&wellplate&save_to_db&298&Well h6 saved to the database
+2024-03-29 18:13:22,483&e_panda&INFO&wellplate&save_to_db&295&Saving well h7 to the database
+2024-03-29 18:13:23,154&e_panda&INFO&wellplate&save_to_db&298&Well h7 saved to the database
+2024-03-29 18:13:23,154&e_panda&INFO&wellplate&save_to_db&295&Saving well h8 to the database
+2024-03-29 18:13:23,872&e_panda&INFO&wellplate&save_to_db&298&Well h8 saved to the database
+2024-03-29 18:13:23,872&e_panda&INFO&wellplate&save_to_db&295&Saving well h9 to the database
+2024-03-29 18:13:24,620&e_panda&INFO&wellplate&save_to_db&298&Well h9 saved to the database
+2024-03-29 18:13:24,620&e_panda&INFO&wellplate&save_to_db&295&Saving well h10 to the database
+2024-03-29 18:13:25,348&e_panda&INFO&wellplate&save_to_db&298&Well h10 saved to the database
+2024-03-29 18:13:25,348&e_panda&INFO&wellplate&save_to_db&295&Saving well h11 to the database
+2024-03-29 18:13:26,068&e_panda&INFO&wellplate&save_to_db&298&Well h11 saved to the database
+2024-03-29 18:13:26,068&e_panda&INFO&wellplate&save_to_db&295&Saving well h12 to the database
+2024-03-29 18:13:26,757&e_panda&INFO&wellplate&save_to_db&298&Well h12 saved to the database
+2024-03-29 18:13:26,758&e_panda&INFO&wellplate&save_to_db&295&Saving well a1 to the database
+2024-03-29 18:13:27,485&e_panda&INFO&wellplate&save_to_db&298&Well a1 saved to the database
+2024-03-29 18:13:27,485&e_panda&INFO&wellplate&save_to_db&295&Saving well a2 to the database
+2024-03-29 18:13:28,216&e_panda&INFO&wellplate&save_to_db&298&Well a2 saved to the database
+2024-03-29 18:13:28,216&e_panda&INFO&wellplate&save_to_db&295&Saving well a3 to the database
+2024-03-29 18:13:28,913&e_panda&INFO&wellplate&save_to_db&298&Well a3 saved to the database
+2024-03-29 18:13:28,913&e_panda&INFO&wellplate&save_to_db&295&Saving well a4 to the database
+2024-03-29 18:13:29,612&e_panda&INFO&wellplate&save_to_db&298&Well a4 saved to the database
+2024-03-29 18:13:29,612&e_panda&INFO&wellplate&save_to_db&295&Saving well a5 to the database
+2024-03-29 18:13:30,268&e_panda&INFO&wellplate&save_to_db&298&Well a5 saved to the database
+2024-03-29 18:13:30,268&e_panda&INFO&wellplate&save_to_db&295&Saving well a6 to the database
+2024-03-29 18:13:30,895&e_panda&INFO&wellplate&save_to_db&298&Well a6 saved to the database
+2024-03-29 18:13:30,895&e_panda&INFO&wellplate&save_to_db&295&Saving well a7 to the database
+2024-03-29 18:13:31,549&e_panda&INFO&wellplate&save_to_db&298&Well a7 saved to the database
+2024-03-29 18:13:31,549&e_panda&INFO&wellplate&save_to_db&295&Saving well a8 to the database
+2024-03-29 18:13:32,221&e_panda&INFO&wellplate&save_to_db&298&Well a8 saved to the database
+2024-03-29 18:13:32,221&e_panda&INFO&wellplate&save_to_db&295&Saving well a9 to the database
+2024-03-29 18:13:32,852&e_panda&INFO&wellplate&save_to_db&298&Well a9 saved to the database
+2024-03-29 18:13:32,852&e_panda&INFO&wellplate&save_to_db&295&Saving well a10 to the database
+2024-03-29 18:13:33,568&e_panda&INFO&wellplate&save_to_db&298&Well a10 saved to the database
+2024-03-29 18:13:33,568&e_panda&INFO&wellplate&save_to_db&295&Saving well a11 to the database
+2024-03-29 18:13:34,241&e_panda&INFO&wellplate&save_to_db&298&Well a11 saved to the database
+2024-03-29 18:13:34,241&e_panda&INFO&wellplate&save_to_db&295&Saving well a12 to the database
+2024-03-29 18:13:34,880&e_panda&INFO&wellplate&save_to_db&298&Well a12 saved to the database
+2024-03-29 18:13:34,880&e_panda&INFO&wellplate&save_to_db&295&Saving well b1 to the database
+2024-03-29 18:13:35,564&e_panda&INFO&wellplate&save_to_db&298&Well b1 saved to the database
+2024-03-29 18:13:35,564&e_panda&INFO&wellplate&save_to_db&295&Saving well b2 to the database
+2024-03-29 18:13:36,201&e_panda&INFO&wellplate&save_to_db&298&Well b2 saved to the database
+2024-03-29 18:13:36,201&e_panda&INFO&wellplate&save_to_db&295&Saving well b3 to the database
+2024-03-29 18:13:36,852&e_panda&INFO&wellplate&save_to_db&298&Well b3 saved to the database
+2024-03-29 18:13:36,852&e_panda&INFO&wellplate&save_to_db&295&Saving well b4 to the database
+2024-03-29 18:13:37,573&e_panda&INFO&wellplate&save_to_db&298&Well b4 saved to the database
+2024-03-29 18:13:37,574&e_panda&INFO&wellplate&save_to_db&295&Saving well b5 to the database
+2024-03-29 18:13:38,240&e_panda&INFO&wellplate&save_to_db&298&Well b5 saved to the database
+2024-03-29 18:13:38,240&e_panda&INFO&wellplate&save_to_db&295&Saving well b6 to the database
+2024-03-29 18:13:38,904&e_panda&INFO&wellplate&save_to_db&298&Well b6 saved to the database
+2024-03-29 18:13:38,904&e_panda&INFO&wellplate&save_to_db&295&Saving well b7 to the database
+2024-03-29 18:13:39,812&e_panda&INFO&wellplate&save_to_db&298&Well b7 saved to the database
+2024-03-29 18:13:39,812&e_panda&INFO&wellplate&save_to_db&295&Saving well b8 to the database
+2024-03-29 18:13:40,440&e_panda&INFO&wellplate&save_to_db&298&Well b8 saved to the database
+2024-03-29 18:13:40,440&e_panda&INFO&wellplate&save_to_db&295&Saving well b9 to the database
+2024-03-29 18:13:41,052&e_panda&INFO&wellplate&save_to_db&298&Well b9 saved to the database
+2024-03-29 18:13:41,052&e_panda&INFO&wellplate&save_to_db&295&Saving well b10 to the database
+2024-03-29 18:13:41,672&e_panda&INFO&wellplate&save_to_db&298&Well b10 saved to the database
+2024-03-29 18:13:41,672&e_panda&INFO&wellplate&save_to_db&295&Saving well b11 to the database
+2024-03-29 18:13:42,336&e_panda&INFO&wellplate&save_to_db&298&Well b11 saved to the database
+2024-03-29 18:13:42,336&e_panda&INFO&wellplate&save_to_db&295&Saving well b12 to the database
+2024-03-29 18:13:42,952&e_panda&INFO&wellplate&save_to_db&298&Well b12 saved to the database
+2024-03-29 18:13:42,952&e_panda&INFO&wellplate&save_to_db&295&Saving well c1 to the database
+2024-03-29 18:13:43,612&e_panda&INFO&wellplate&save_to_db&298&Well c1 saved to the database
+2024-03-29 18:13:43,612&e_panda&INFO&wellplate&save_to_db&295&Saving well c2 to the database
+2024-03-29 18:13:44,257&e_panda&INFO&wellplate&save_to_db&298&Well c2 saved to the database
+2024-03-29 18:13:44,257&e_panda&INFO&wellplate&save_to_db&295&Saving well c3 to the database
+2024-03-29 18:13:44,960&e_panda&INFO&wellplate&save_to_db&298&Well c3 saved to the database
+2024-03-29 18:13:44,960&e_panda&INFO&wellplate&save_to_db&295&Saving well c4 to the database
+2024-03-29 18:13:45,628&e_panda&INFO&wellplate&save_to_db&298&Well c4 saved to the database
+2024-03-29 18:13:45,628&e_panda&INFO&wellplate&save_to_db&295&Saving well c5 to the database
+2024-03-29 18:13:46,344&e_panda&INFO&wellplate&save_to_db&298&Well c5 saved to the database
+2024-03-29 18:13:46,344&e_panda&INFO&wellplate&save_to_db&295&Saving well c6 to the database
+2024-03-29 18:13:46,984&e_panda&INFO&wellplate&save_to_db&298&Well c6 saved to the database
+2024-03-29 18:13:46,984&e_panda&INFO&wellplate&save_to_db&295&Saving well c7 to the database
+2024-03-29 18:13:47,632&e_panda&INFO&wellplate&save_to_db&298&Well c7 saved to the database
+2024-03-29 18:13:47,632&e_panda&INFO&wellplate&save_to_db&295&Saving well c8 to the database
+2024-03-29 18:13:48,288&e_panda&INFO&wellplate&save_to_db&298&Well c8 saved to the database
+2024-03-29 18:13:48,288&e_panda&INFO&wellplate&save_to_db&295&Saving well c9 to the database
+2024-03-29 18:13:48,928&e_panda&INFO&wellplate&save_to_db&298&Well c9 saved to the database
+2024-03-29 18:13:48,928&e_panda&INFO&wellplate&save_to_db&295&Saving well c10 to the database
+2024-03-29 18:13:49,580&e_panda&INFO&wellplate&save_to_db&298&Well c10 saved to the database
+2024-03-29 18:13:49,580&e_panda&INFO&wellplate&save_to_db&295&Saving well c11 to the database
+2024-03-29 18:13:50,209&e_panda&INFO&wellplate&save_to_db&298&Well c11 saved to the database
+2024-03-29 18:13:50,209&e_panda&INFO&wellplate&save_to_db&295&Saving well c12 to the database
+2024-03-29 18:13:50,840&e_panda&INFO&wellplate&save_to_db&298&Well c12 saved to the database
+2024-03-29 18:13:50,840&e_panda&INFO&wellplate&save_to_db&295&Saving well d1 to the database
+2024-03-29 18:13:51,472&e_panda&INFO&wellplate&save_to_db&298&Well d1 saved to the database
+2024-03-29 18:13:51,472&e_panda&INFO&wellplate&save_to_db&295&Saving well d2 to the database
+2024-03-29 18:13:52,352&e_panda&INFO&wellplate&save_to_db&298&Well d2 saved to the database
+2024-03-29 18:13:52,352&e_panda&INFO&wellplate&save_to_db&295&Saving well d3 to the database
+2024-03-29 18:13:52,992&e_panda&INFO&wellplate&save_to_db&298&Well d3 saved to the database
+2024-03-29 18:13:52,992&e_panda&INFO&wellplate&save_to_db&295&Saving well d4 to the database
+2024-03-29 18:13:53,672&e_panda&INFO&wellplate&save_to_db&298&Well d4 saved to the database
+2024-03-29 18:13:53,672&e_panda&INFO&wellplate&save_to_db&295&Saving well d5 to the database
+2024-03-29 18:13:54,350&e_panda&INFO&wellplate&save_to_db&298&Well d5 saved to the database
+2024-03-29 18:13:54,350&e_panda&INFO&wellplate&save_to_db&295&Saving well d6 to the database
+2024-03-29 18:13:54,988&e_panda&INFO&wellplate&save_to_db&298&Well d6 saved to the database
+2024-03-29 18:13:54,988&e_panda&INFO&wellplate&save_to_db&295&Saving well d7 to the database
+2024-03-29 18:13:55,652&e_panda&INFO&wellplate&save_to_db&298&Well d7 saved to the database
+2024-03-29 18:13:55,653&e_panda&INFO&wellplate&save_to_db&295&Saving well d8 to the database
+2024-03-29 18:13:56,304&e_panda&INFO&wellplate&save_to_db&298&Well d8 saved to the database
+2024-03-29 18:13:56,305&e_panda&INFO&wellplate&save_to_db&295&Saving well d9 to the database
+2024-03-29 18:13:57,005&e_panda&INFO&wellplate&save_to_db&298&Well d9 saved to the database
+2024-03-29 18:13:57,005&e_panda&INFO&wellplate&save_to_db&295&Saving well d10 to the database
+2024-03-29 18:13:57,683&e_panda&INFO&wellplate&save_to_db&298&Well d10 saved to the database
+2024-03-29 18:13:57,683&e_panda&INFO&wellplate&save_to_db&295&Saving well d11 to the database
+2024-03-29 18:13:58,353&e_panda&INFO&wellplate&save_to_db&298&Well d11 saved to the database
+2024-03-29 18:13:58,353&e_panda&INFO&wellplate&save_to_db&295&Saving well d12 to the database
+2024-03-29 18:13:58,989&e_panda&INFO&wellplate&save_to_db&298&Well d12 saved to the database
+2024-03-29 18:13:58,989&e_panda&INFO&wellplate&save_to_db&295&Saving well e1 to the database
+2024-03-29 18:13:59,645&e_panda&INFO&wellplate&save_to_db&298&Well e1 saved to the database
+2024-03-29 18:13:59,645&e_panda&INFO&wellplate&save_to_db&295&Saving well e2 to the database
+2024-03-29 18:14:00,320&e_panda&INFO&wellplate&save_to_db&298&Well e2 saved to the database
+2024-03-29 18:14:00,320&e_panda&INFO&wellplate&save_to_db&295&Saving well e3 to the database
+2024-03-29 18:14:00,974&e_panda&INFO&wellplate&save_to_db&298&Well e3 saved to the database
+2024-03-29 18:14:00,974&e_panda&INFO&wellplate&save_to_db&295&Saving well e4 to the database
+2024-03-29 18:14:01,629&e_panda&INFO&wellplate&save_to_db&298&Well e4 saved to the database
+2024-03-29 18:14:01,629&e_panda&INFO&wellplate&save_to_db&295&Saving well e5 to the database
+2024-03-29 18:14:02,323&e_panda&INFO&wellplate&save_to_db&298&Well e5 saved to the database
+2024-03-29 18:14:02,324&e_panda&INFO&wellplate&save_to_db&295&Saving well e6 to the database
+2024-03-29 18:14:03,191&e_panda&INFO&wellplate&save_to_db&298&Well e6 saved to the database
+2024-03-29 18:14:03,191&e_panda&INFO&wellplate&save_to_db&295&Saving well e7 to the database
+2024-03-29 18:14:03,805&e_panda&INFO&wellplate&save_to_db&298&Well e7 saved to the database
+2024-03-29 18:14:03,805&e_panda&INFO&wellplate&save_to_db&295&Saving well e8 to the database
+2024-03-29 18:14:04,461&e_panda&INFO&wellplate&save_to_db&298&Well e8 saved to the database
+2024-03-29 18:14:04,462&e_panda&INFO&wellplate&save_to_db&295&Saving well e9 to the database
+2024-03-29 18:14:05,109&e_panda&INFO&wellplate&save_to_db&298&Well e9 saved to the database
+2024-03-29 18:14:05,109&e_panda&INFO&wellplate&save_to_db&295&Saving well e10 to the database
+2024-03-29 18:14:05,737&e_panda&INFO&wellplate&save_to_db&298&Well e10 saved to the database
+2024-03-29 18:14:05,737&e_panda&INFO&wellplate&save_to_db&295&Saving well e11 to the database
+2024-03-29 18:14:06,353&e_panda&INFO&wellplate&save_to_db&298&Well e11 saved to the database
+2024-03-29 18:14:06,353&e_panda&INFO&wellplate&save_to_db&295&Saving well e12 to the database
+2024-03-29 18:14:06,973&e_panda&INFO&wellplate&save_to_db&298&Well e12 saved to the database
+2024-03-29 18:14:06,973&e_panda&INFO&wellplate&save_to_db&295&Saving well f1 to the database
+2024-03-29 18:14:07,609&e_panda&INFO&wellplate&save_to_db&298&Well f1 saved to the database
+2024-03-29 18:14:07,609&e_panda&INFO&wellplate&save_to_db&295&Saving well f2 to the database
+2024-03-29 18:14:08,217&e_panda&INFO&wellplate&save_to_db&298&Well f2 saved to the database
+2024-03-29 18:14:08,217&e_panda&INFO&wellplate&save_to_db&295&Saving well f3 to the database
+2024-03-29 18:14:08,849&e_panda&INFO&wellplate&save_to_db&298&Well f3 saved to the database
+2024-03-29 18:14:08,849&e_panda&INFO&wellplate&save_to_db&295&Saving well f4 to the database
+2024-03-29 18:14:10,065&e_panda&INFO&wellplate&save_to_db&298&Well f4 saved to the database
+2024-03-29 18:14:10,065&e_panda&INFO&wellplate&save_to_db&295&Saving well f5 to the database
+2024-03-29 18:14:10,705&e_panda&INFO&wellplate&save_to_db&298&Well f5 saved to the database
+2024-03-29 18:14:10,705&e_panda&INFO&wellplate&save_to_db&295&Saving well f6 to the database
+2024-03-29 18:14:11,342&e_panda&INFO&wellplate&save_to_db&298&Well f6 saved to the database
+2024-03-29 18:14:11,342&e_panda&INFO&wellplate&save_to_db&295&Saving well f7 to the database
+2024-03-29 18:14:11,957&e_panda&INFO&wellplate&save_to_db&298&Well f7 saved to the database
+2024-03-29 18:14:11,957&e_panda&INFO&wellplate&save_to_db&295&Saving well f8 to the database
+2024-03-29 18:14:12,601&e_panda&INFO&wellplate&save_to_db&298&Well f8 saved to the database
+2024-03-29 18:14:12,601&e_panda&INFO&wellplate&save_to_db&295&Saving well f9 to the database
+2024-03-29 18:14:13,230&e_panda&INFO&wellplate&save_to_db&298&Well f9 saved to the database
+2024-03-29 18:14:13,230&e_panda&INFO&wellplate&save_to_db&295&Saving well f10 to the database
+2024-03-29 18:14:13,861&e_panda&INFO&wellplate&save_to_db&298&Well f10 saved to the database
+2024-03-29 18:14:13,861&e_panda&INFO&wellplate&save_to_db&295&Saving well f11 to the database
+2024-03-29 18:14:14,509&e_panda&INFO&wellplate&save_to_db&298&Well f11 saved to the database
+2024-03-29 18:14:14,509&e_panda&INFO&wellplate&save_to_db&295&Saving well f12 to the database
+2024-03-29 18:14:15,109&e_panda&INFO&wellplate&save_to_db&298&Well f12 saved to the database
+2024-03-29 18:14:15,109&e_panda&INFO&wellplate&save_to_db&295&Saving well g1 to the database
+2024-03-29 18:14:15,821&e_panda&INFO&wellplate&save_to_db&298&Well g1 saved to the database
+2024-03-29 18:14:15,821&e_panda&INFO&wellplate&save_to_db&295&Saving well g2 to the database
+2024-03-29 18:14:16,481&e_panda&INFO&wellplate&save_to_db&298&Well g2 saved to the database
+2024-03-29 18:14:16,481&e_panda&INFO&wellplate&save_to_db&295&Saving well g3 to the database
+2024-03-29 18:14:17,109&e_panda&INFO&wellplate&save_to_db&298&Well g3 saved to the database
+2024-03-29 18:14:17,109&e_panda&INFO&wellplate&save_to_db&295&Saving well g4 to the database
+2024-03-29 18:14:17,785&e_panda&INFO&wellplate&save_to_db&298&Well g4 saved to the database
+2024-03-29 18:14:17,785&e_panda&INFO&wellplate&save_to_db&295&Saving well g5 to the database
+2024-03-29 18:14:18,440&e_panda&INFO&wellplate&save_to_db&298&Well g5 saved to the database
+2024-03-29 18:14:18,440&e_panda&INFO&wellplate&save_to_db&295&Saving well g6 to the database
+2024-03-29 18:14:19,093&e_panda&INFO&wellplate&save_to_db&298&Well g6 saved to the database
+2024-03-29 18:14:19,093&e_panda&INFO&wellplate&save_to_db&295&Saving well g7 to the database
+2024-03-29 18:14:19,729&e_panda&INFO&wellplate&save_to_db&298&Well g7 saved to the database
+2024-03-29 18:14:19,729&e_panda&INFO&wellplate&save_to_db&295&Saving well g8 to the database
+2024-03-29 18:14:20,361&e_panda&INFO&wellplate&save_to_db&298&Well g8 saved to the database
+2024-03-29 18:14:20,361&e_panda&INFO&wellplate&save_to_db&295&Saving well g9 to the database
+2024-03-29 18:14:20,977&e_panda&INFO&wellplate&save_to_db&298&Well g9 saved to the database
+2024-03-29 18:14:20,977&e_panda&INFO&wellplate&save_to_db&295&Saving well g10 to the database
+2024-03-29 18:14:21,605&e_panda&INFO&wellplate&save_to_db&298&Well g10 saved to the database
+2024-03-29 18:14:21,605&e_panda&INFO&wellplate&save_to_db&295&Saving well g11 to the database
+2024-03-29 18:14:22,214&e_panda&INFO&wellplate&save_to_db&298&Well g11 saved to the database
+2024-03-29 18:14:22,214&e_panda&INFO&wellplate&save_to_db&295&Saving well g12 to the database
+2024-03-29 18:14:22,861&e_panda&INFO&wellplate&save_to_db&298&Well g12 saved to the database
+2024-03-29 18:14:22,861&e_panda&INFO&wellplate&save_to_db&295&Saving well h1 to the database
+2024-03-29 18:14:23,501&e_panda&INFO&wellplate&save_to_db&298&Well h1 saved to the database
+2024-03-29 18:14:23,501&e_panda&INFO&wellplate&save_to_db&295&Saving well h2 to the database
+2024-03-29 18:14:24,121&e_panda&INFO&wellplate&save_to_db&298&Well h2 saved to the database
+2024-03-29 18:14:24,121&e_panda&INFO&wellplate&save_to_db&295&Saving well h3 to the database
+2024-03-29 18:14:24,825&e_panda&INFO&wellplate&save_to_db&298&Well h3 saved to the database
+2024-03-29 18:14:24,825&e_panda&INFO&wellplate&save_to_db&295&Saving well h4 to the database
+2024-03-29 18:14:25,445&e_panda&INFO&wellplate&save_to_db&298&Well h4 saved to the database
+2024-03-29 18:14:25,445&e_panda&INFO&wellplate&save_to_db&295&Saving well h5 to the database
+2024-03-29 18:14:26,077&e_panda&INFO&wellplate&save_to_db&298&Well h5 saved to the database
+2024-03-29 18:14:26,077&e_panda&INFO&wellplate&save_to_db&295&Saving well h6 to the database
+2024-03-29 18:14:26,769&e_panda&INFO&wellplate&save_to_db&298&Well h6 saved to the database
+2024-03-29 18:14:26,769&e_panda&INFO&wellplate&save_to_db&295&Saving well h7 to the database
+2024-03-29 18:14:27,638&e_panda&INFO&wellplate&save_to_db&298&Well h7 saved to the database
+2024-03-29 18:14:27,638&e_panda&INFO&wellplate&save_to_db&295&Saving well h8 to the database
+2024-03-29 18:14:28,368&e_panda&INFO&wellplate&save_to_db&298&Well h8 saved to the database
+2024-03-29 18:14:28,369&e_panda&INFO&wellplate&save_to_db&295&Saving well h9 to the database
+2024-03-29 18:14:29,071&e_panda&INFO&wellplate&save_to_db&298&Well h9 saved to the database
+2024-03-29 18:14:29,071&e_panda&INFO&wellplate&save_to_db&295&Saving well h10 to the database
+2024-03-29 18:14:29,786&e_panda&INFO&wellplate&save_to_db&298&Well h10 saved to the database
+2024-03-29 18:14:29,786&e_panda&INFO&wellplate&save_to_db&295&Saving well h11 to the database
+2024-03-29 18:14:30,436&e_panda&INFO&wellplate&save_to_db&298&Well h11 saved to the database
+2024-03-29 18:14:30,436&e_panda&INFO&wellplate&save_to_db&295&Saving well h12 to the database
+2024-03-29 18:14:31,066&e_panda&INFO&wellplate&save_to_db&298&Well h12 saved to the database
+2024-03-29 18:14:31,066&e_panda&INFO&wellplate&load_new_wellplate&1124&Wellplate 110 saved and wellplate 111 loaded
+2024-03-29 18:42:24,360&e_panda&DEBUG&wellplate&load_new_wellplate&1140&Wellplate already exists in the database. Setting as current wellplate
+2024-03-29 18:44:28,602&epanda_lib.scheduler&WARNING&scheduler&add_to_queue_folder&680&&&&No files to save when using database&
+2024-03-29 18:44:28,705&epanda_lib.scheduler&ERROR&scheduler&add_nonfile_experiment&648&&&&Error occured while adding the experiment to experiments table: 9 values for 11 columns&
+2024-03-29 20:00:13,052&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 110 saved and wellplate 111 loaded
+2024-03-29 20:06:33,055&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 110 saved and wellplate 111 loaded
+2024-03-29 20:15:50,258&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 110 saved and wellplate 111 loaded
+2024-03-29 20:21:18,605&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 111 saved and wellplate 112 loaded
+2024-03-29 20:33:44,686&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 110 saved and wellplate 111 loaded
+2024-03-29 20:43:05,453&epanda_lib.scheduler&ERROR&scheduler&add_nonfile_experiments&797&&&&Error occured while adding the experiment parameters to experiment_parameters table: Error binding parameter 3: type 'dict' is not supported&
+2024-03-29 20:43:05,453&epanda_lib.scheduler&ERROR&scheduler&add_nonfile_experiments&801&&&&The statements have been rolled back and nothing has been added to the tables.&
+2024-03-29 20:52:42,007&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,008&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:52:42,009&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiments&816&&&&Experiments loaded and added to queue&
+2024-03-29 20:59:48,115&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,115&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,115&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,115&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,115&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,116&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,117&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,117&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&716&&&&No queue to add to when using database, will be in a view&
+2024-03-29 20:59:48,117&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiments&816&&&&Experiments loaded and added to queue&
+2024-03-29 21:09:05,777&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiments&816&&&&Experiments loaded and added to queue&
+2024-03-29 21:13:53,243&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiments&816&&&&Experiments loaded and added to queue&
+2024-03-29 21:22:36,892&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiments&816&&&&Experiments loaded and added to queue&
+2024-03-29 21:24:58,117&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 0 saved and wellplate 112 loaded
+2024-03-29 21:25:35,851&epanda_lib.scheduler&ERROR&scheduler&add_nonfile_experiments&797&&&&Error occured while adding the experiment parameters to experiment_parameters table: near "project_id": syntax error&
+2024-03-29 21:25:35,851&epanda_lib.scheduler&ERROR&scheduler&add_nonfile_experiments&801&&&&The statements have been rolled back and nothing has been added to the tables.&
+2024-03-29 21:42:20,042&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 0 saved and wellplate 113 loaded
+2024-03-29 21:43:08,627&epanda_lib.scheduler&ERROR&scheduler&add_nonfile_experiments&797&&&&Error occured while adding the experiment parameters to experiment_parameters table: near "project_id": syntax error&
+2024-03-29 21:43:08,627&epanda_lib.scheduler&ERROR&scheduler&add_nonfile_experiments&801&&&&The statements have been rolled back and nothing has been added to the tables.&
+2024-03-29 21:45:42,561&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 0 saved and wellplate 111 loaded
+2024-03-29 21:46:08,700&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiments&816&&&&Experiments loaded and added to queue&
+2024-03-29 21:48:38,661&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 0 saved and wellplate 111 loaded
+2024-03-29 21:51:12,926&e_panda&INFO&wellplate&load_new_wellplate&1146&Wellplate 0 saved and wellplate 122 loaded
+2024-03-29 21:52:20,820&epanda_lib.scheduler&INFO&scheduler&add_nonfile_experiments&816&&&&Experiments loaded and added to queue&
+2024-03-29 21:55:01,103&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is starting up&True
+2024-03-29 21:55:05,673&ePANDA&INFO&controller&connect_to_instruments&497&&&&Using mock instruments&
+2024-03-29 21:55:05,680&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-29 21:55:05,680&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-29 21:55:08,584&ePANDA&INFO&controller&main&81&&&&Connected to instruments&
+2024-03-29 21:55:09,111&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA has connected to equipment&True
+2024-03-29 21:55:10,995&e_panda&DEBUG&wellplate&update_well_status_from_db&545&None&None&None&Updating well status from database...&True
+2024-03-29 21:55:11,202&e_panda&DEBUG&wellplate&update_well_status_from_db&549&None&None&None&Well status updated from database&True
+2024-03-29 21:55:11,202&ePANDA&INFO&controller&establish_system_state&366&&&&System state reestablished&
+2024-03-29 21:55:11,202&ePANDA&DEBUG&controller&establish_system_state&370&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&&&&Stock vial edot contains edot with volume 20000&
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 21:55:11,203&ePANDA&DEBUG&controller&establish_system_state&370&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 21:55:11,204&ePANDA&DEBUG&controller&establish_system_state&396&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 21:55:11,213&ePANDA&ERROR&controller&establish_system_state&432&&&&Wellplate status file does not have the correct number of wells. File may be corrupted&
+2024-03-29 21:55:17,978&ePANDA&ERROR&controller&main&315&&&&&
+2024-03-29 21:55:18,904&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA encountered an error: &True
+2024-03-29 22:04:55,106&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is starting up&True
+2024-03-29 22:04:58,805&ePANDA&INFO&controller&connect_to_instruments&501&&&&Using mock instruments&
+2024-03-29 22:04:58,806&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-29 22:04:58,807&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-29 22:05:01,590&ePANDA&INFO&controller&main&81&&&&Connected to instruments&
+2024-03-29 22:05:01,811&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA has connected to equipment&True
+2024-03-29 22:05:04,037&e_panda&DEBUG&wellplate&update_well_status_from_db&545&None&None&None&Updating well status from database...&True
+2024-03-29 22:05:04,301&e_panda&DEBUG&wellplate&update_well_status_from_db&549&None&None&None&Well status updated from database&True
+2024-03-29 22:05:04,301&ePANDA&INFO&controller&establish_system_state&367&&&&System state reestablished&
+2024-03-29 22:05:04,301&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial edot contains edot with volume 20000&
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-03-29 22:05:04,302&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:05:04,303&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:05:04,303&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:05:04,303&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:05:04,660&ePANDA&ERROR&controller&establish_system_state&436&&&&Wellplate status file does not have the correct number of wells. File may be corrupted&
+2024-03-29 22:06:39,758&ePANDA&ERROR&controller&main&315&&&&Wellplate status file does not have the correct number of wells&
+2024-03-29 22:06:40,306&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA encountered an error: Wellplate status file does not have the correct number of wells&True
+2024-03-29 22:08:19,261&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is starting up&True
+2024-03-29 22:08:19,263&ePANDA&INFO&controller&connect_to_instruments&501&&&&Using mock instruments&
+2024-03-29 22:08:19,264&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-29 22:08:19,264&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-29 22:08:21,271&ePANDA&INFO&controller&main&81&&&&Connected to instruments&
+2024-03-29 22:08:21,272&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA has connected to equipment&True
+2024-03-29 22:08:21,475&e_panda&DEBUG&wellplate&update_well_status_from_db&545&None&None&None&Updating well status from database...&True
+2024-03-29 22:08:21,746&e_panda&DEBUG&wellplate&update_well_status_from_db&549&None&None&None&Well status updated from database&True
+2024-03-29 22:12:00,339&ePANDA&INFO&controller&establish_system_state&367&&&&System state reestablished&
+2024-03-29 22:12:00,339&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial edot contains edot with volume 20000&
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:12:00,340&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:12:00,341&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:12:00,341&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:12:00,923&ePANDA&ERROR&controller&establish_system_state&436&&&&Wellplate status file does not have the correct number of wells. File may be corrupted&
+2024-03-29 22:12:00,924&ePANDA&ERROR&controller&main&315&&&&Wellplate status file does not have the correct number of wells&
+2024-03-29 22:12:00,925&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA encountered an error: Wellplate status file does not have the correct number of wells&True
+2024-03-29 22:13:00,259&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is starting up&True
+2024-03-29 22:13:00,260&ePANDA&INFO&controller&connect_to_instruments&501&&&&Using mock instruments&
+2024-03-29 22:13:00,261&ePANDA&DEBUG&mill_control&read_json_config&162&&&&Mill config loaded&
+2024-03-29 22:13:00,261&ePANDA&INFO&mill_control&connect_to_mill&754&&&&Connecting to the mill&
+2024-03-29 22:13:02,269&ePANDA&INFO&controller&main&81&&&&Connected to instruments&
+2024-03-29 22:13:02,269&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA has connected to equipment&True
+2024-03-29 22:13:02,455&e_panda&DEBUG&wellplate&update_well_status_from_db&545&None&None&None&Updating well status from database...&True
+2024-03-29 22:13:02,721&e_panda&DEBUG&wellplate&update_well_status_from_db&549&None&None&None&Well status updated from database&True
+2024-03-29 22:13:27,131&ePANDA&INFO&controller&establish_system_state&367&&&&System state reestablished&
+2024-03-29 22:13:30,822&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-03-29 22:13:42,503&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial edot contains edot with volume 20000&
+2024-03-29 22:13:43,627&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:13:44,716&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:13:45,987&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-03-29 22:13:48,826&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:13:49,951&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:13:51,338&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:13:52,640&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:14:12,743&ePANDA&INFO&controller&establish_system_state&440&&&&There are 96 clear wells&
+2024-03-29 22:15:31,432&e_panda&INFO&e_panda&flush_v2&727&None&None&None&Flushing pipette tip with 140.000000 ul of rinse...&True
+2024-03-29 22:15:31,433&e_panda&DEBUG&e_panda&solution_selector&810&None&None&None&Selected stock vial: rinse in position s4&True
+2024-03-29 22:15:31,433&e_panda&DEBUG&e_panda&waste_selector&837&None&None&None&Selected waste vial: waste in position w0&True
+2024-03-29 22:15:31,433&e_panda&INFO&e_panda&forward_pipette_v2&148&None&None&None&Forward pipetting 140.000000 ul from rinse to waste&True
+2024-03-29 22:15:31,433&e_panda&INFO&e_panda&forward_pipette_v2&171&None&None&None&Repetition 1 of 1&True
+2024-03-29 22:15:31,433&e_panda&DEBUG&e_panda&forward_pipette_v2&173&None&None&None&Withdrawing 40.000000 of air gap...&True
+2024-03-29 22:15:31,935&e_panda&INFO&e_panda&forward_pipette_v2&192&None&None&None&Moving to rinse at s4...&True
+2024-03-29 22:15:31,936&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-29 22:15:31,937&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-29 22:15:31,937&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-29 22:15:31,937&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0&
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0&
+2024-03-29 22:15:31,938&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [0.0, 0.0, 0.0]&
+2024-03-29 22:15:31,939&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-03-29 22:15:31,939&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-03-29 22:15:33,940&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-3.0,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:15:33,940&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-03-29 22:15:33,941&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-03-29 22:15:35,941&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:15:35,941&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-03-29 22:15:35,942&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-03-29 22:15:37,942&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:15:38,445&e_panda&INFO&vials&write_volume_to_disk&174&None&None&None&Writing rinse volume to vial file...&True
+2024-03-29 22:15:38,448&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-03-29 22:15:38,448&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-03-29 22:15:40,449&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:15:40,951&e_panda&DEBUG&e_panda&forward_pipette_v2&222&None&None&None&From Vessel rinse volume: 19860.000000 depth: -74.000000&True
+2024-03-29 22:15:40,951&e_panda&INFO&e_panda&forward_pipette_v2&230&None&None&None&Moving to: waste...&True
+2024-03-29 22:15:40,951&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-03-29 22:15:40,951&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-03-29 22:15:40,951&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-03-29 22:15:40,952&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-03-29 22:15:40,953&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-03-29 22:15:42,953&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:15:42,953&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-03-29 22:15:42,954&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-03-29 22:15:44,954&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:15:44,954&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-03-29 22:15:44,955&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-03-29 22:15:46,955&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:15:47,458&e_panda&INFO&vials&write_volume_to_disk&174&None&None&None&Writing waste volume to vial file...&True
+2024-03-29 22:15:47,460&e_panda&DEBUG&vials&update_contents&349&None&None&None&Updating waste w0 contents...&True
+2024-03-29 22:15:47,461&e_panda&DEBUG&vials&update_contents&372&None&None&None&waste w0: New contents: {'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}&True
+2024-03-29 22:15:47,470&e_panda&INFO&e_panda&flush_v2&747&None&None&None&Flushed pipette tip with 140.000000 ul of rinse 1x times...&True
+2024-03-29 22:15:54,946&e_panda&DEBUG&wellplate&update_well_status_from_db&545&None&None&None&Updating well status from database...&True
+2024-03-29 22:15:55,150&e_panda&DEBUG&wellplate&update_well_status_from_db&549&None&None&None&Well status updated from database&True
+2024-03-29 22:15:55,151&ePANDA&INFO&controller&establish_system_state&367&&&&System state reestablished&
+2024-03-29 22:15:55,151&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-03-29 22:15:55,151&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial edot contains edot with volume 20000&
+2024-03-29 22:15:55,151&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 19860&
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial rinse contains rinse with volume 20000&
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&371&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0} with volume 1140&
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:15:55,152&ePANDA&DEBUG&controller&establish_system_state&397&&&&Waste vial waste contains {} with volume 1000&
+2024-03-29 22:15:55,659&ePANDA&INFO&controller&establish_system_state&440&&&&There are 96 clear wells&
+2024-03-29 22:16:00,891&epanda_lib.scheduler&ERROR&scheduler&read_next_experiment_from_queue&417&&&&Error occured while reading next experiment from queue: no such column: id&
+2024-03-29 22:16:11,201&ePANDA&ERROR&controller&main&315&&&&no such column: id&
+2024-03-29 22:16:11,202&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA encountered an error: no such column: id&True
+2024-03-29 22:16:11,859&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-03-29 22:16:11,860&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-03-29 22:16:13,860&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:16:13,860&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0&
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0&
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, 0.0]&
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-369.4, -8.2, -50]&
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -3.0&
+2024-03-29 22:16:13,861&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = 0.0&
+2024-03-29 22:16:13,862&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, 0.0]&
+2024-03-29 22:16:13,862&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.4&
+2024-03-29 22:16:13,862&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.4&
+2024-03-29 22:16:15,863&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:16:15,863&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-8.2&
+2024-03-29 22:16:15,863&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-8.2&
+2024-03-29 22:16:17,864&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:16:17,864&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-50&
+2024-03-29 22:16:17,864&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-50&
+2024-03-29 22:16:19,865&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-11.2,-53.0|Bf:15,127|FS:0,0>&
+2024-03-29 22:16:19,865&ePANDA&INFO&controller&disconnect_from_instruments&537&&&&Disconnecting from instruments:&
+2024-03-29 22:16:19,865&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-03-29 22:16:19,867&ePANDA&INFO&controller&disconnect_from_instruments&540&&&&Disconnected from instruments&
+2024-03-29 22:16:20,483&e_panda&INFO&SlackBot&send_slack_message&69&None&None&None&Message sent:ePANDA is shutting down...goodbye&True

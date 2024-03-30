@@ -2,11 +2,12 @@
 
 from datetime import datetime
 from pathlib import Path
-import sqlite3
 
 from PIL import Image, ImageDraw, ImageFont
 
+from epanda_lib import sql_utilities
 from epanda_lib.experiment_class import ExperimentBase
+
 
 def add_data_zone(
     image: Image, experiment: ExperimentBase = None, context: str = None
@@ -32,16 +33,15 @@ def add_data_zone(
         wellplate_id = experiment.plate_id
         well_id = experiment.well_id
 
-        #FIXME: This is not working there is no substrate table yet, consider using the well_types table
-        # # Get the substrate from the database
-        # conn = sqlite3.connect("epanda.db")
-        # cursor = conn.cursor()
-        # cursor.execute(
-        #     "SELECT substrate FROM substrates WHERE id = ?", (experiment.substrate_id,)
-        # )
-        # conn.close()
-        # substrate = cursor.fetchone()[0]
-        substrate = "ITO"
+        try:
+            substrate = str(
+                sql_utilities.execute_sql_command(
+                    "SELECT substrate FROM well_types WHERE id = (SELECT well_type_id FROM wellplates WHERE id = ?)",
+                    (wellplate_id,),
+                )[0][0]
+            )
+        except:
+            substrate = "ITO"
 
     try:
         # Check the image file type
@@ -90,7 +90,7 @@ def add_data_zone(
 
     # ePANDA logo
     epanda_logo_x = text_starts[0]
-    logo = Image.open(Path(__file__).parent.parent / "images" / "bw_panda_logo.png")
+    logo = Image.open(Path(__file__).parent.parent / "images" / "data_zone_logo.png")
     logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
     banner.paste(logo, (epanda_logo_x, 0))
     # ePANDA version

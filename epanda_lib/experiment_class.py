@@ -1,5 +1,7 @@
 """ Experiment data class"""
 
+# pylint: disable=invalid-name, line-too-long, import-outside-toplevel
+import dataclasses
 import json
 from dataclasses import field
 from datetime import datetime
@@ -10,9 +12,97 @@ from typing import Optional
 from pydantic import ConfigDict, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
 
+from epanda_lib.wellplate import Well
+
 from .config.config import SQL_DB_PATH
 from .config.pin import CURRENT_PIN
 from . import sql_utilities
+
+
+class ExperimentResultsRecord:
+    """
+    A class for representing a single entry in a result table.
+    The table has columns:
+    id,
+    experiment_id,
+    result_type,
+    result_value
+    """
+
+    def __init__(self, experiment_id: int, result_type: str, result_value: str):
+        self.experiment_id = experiment_id
+        self.result_type = result_type
+        self.result_value = result_value
+
+    def __str__(self):
+        return f"Experiment ID: {self.experiment_id}, Result Type: {self.result_type}, Result Value: {self.result_value}"
+
+    def __repr__(self):
+        return f"ResultTableRecord({self.experiment_id}, {self.result_type}, {self.result_value})"
+
+    def __eq__(self, other):
+        return (
+            self.experiment_id == other.experiment_id
+            and self.result_type == other.result_type
+            and self.result_value == other.result_value
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self.experiment_id, self.result_type, self.result_value))
+
+    def __iter__(self):
+        yield self.experiment_id
+        yield self.result_type
+        yield self.result_value
+
+    def __list__(self):
+        return [self.experiment_id, self.result_type, self.result_value]
+
+
+class ExperimentParameterRecord:
+    """
+    A class for representing a single entry in an experiment parameter table.
+    The table has columns:
+    id,
+    experiment_id,
+    parameter_type,
+    parameter_value
+    """
+
+    def __init__(self, experiment_id: int, parameter_type: str, parameter_value: str):
+        self.experiment_id = experiment_id
+        self.parameter_type = parameter_type
+        self.parameter_value = parameter_value
+
+    def __str__(self):
+        return f"Experiment ID: {self.experiment_id}, Parameter Type: {self.parameter_type}, Parameter Value: {self.parameter_value}"
+
+    def __repr__(self):
+        return f"ExperimentParameterRecord({self.experiment_id}, {self.parameter_type}, {self.parameter_value})"
+
+    def __eq__(self, other):
+        return (
+            self.experiment_id == other.experiment_id
+            and self.parameter_type == other.parameter_type
+            and self.parameter_value == other.parameter_value
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self.experiment_id, self.parameter_type, self.parameter_value))
+
+    def __iter__(self):
+        yield self.experiment_id
+        yield self.parameter_type
+        yield self.parameter_value
+
+    def __list__(self):
+        return [self.experiment_id, self.parameter_type, self.parameter_value]
 
 
 class ExperimentStatus(str, Enum):
@@ -37,6 +127,7 @@ class ExperimentStatus(str, Enum):
     IMAGING = "imaging"
     CLEARING = "clearing"
     FLUSHING = "flushing"
+    PAUSED = "paused"
 
 
 @dataclass(config=ConfigDict(validate_assignment=False))
@@ -62,19 +153,21 @@ class ExperimentResult:
     image_files: list[Path] = field(default_factory=list)
 
     def set_ocp_dep_file(self, file: Path, passed: bool, final_voltage: float):
+        """Set the file, the pass/fail status, and the final voltage"""
 
         # Set the file, the pass/fail status, and the final voltage
         self.ocp_dep_files.append(file)
         self.ocp_dep_passes.append(passed)
         self.ocp_char_final_voltages.append(final_voltage)
 
-        # results_to_insert = []
-        # results_to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_file", str(file)))
-        # results_to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_pass", str(passed)))
-        # results_to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_final_voltage", str(final_voltage)))
+        # to_insert = []
+        # to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_file", str(file)))
+        # to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_pass", str(passed)))
+        # to_insert.append(sql_utilities.ResultTableEntry(self.id, "ocp_dep_final_voltage", str(final_voltage)))
         # sql_utilities.insert_result_table_entry
 
     def set_ocp_char_file(self, file: Path, passed: bool, final_voltage: float):
+        """Set the file, the pass/fail status, and the final voltage"""
         self.ocp_char_files.append(file)
         self.ocp_char_passes.append(passed)
         self.ocp_char_final_voltages.append(final_voltage)
@@ -86,6 +179,7 @@ class ExperimentResult:
         max_value: float = None,
         min_value: float = None,
     ):
+        """Set the file, the plot file, the max value, and the min value"""
         self.deposition_data_files.append(file)
         if plot_file is not None:
             self.deposition_plot_files.append(plot_file)
@@ -101,6 +195,7 @@ class ExperimentResult:
         max_value: float = None,
         min_value: float = None,
     ):
+        """Set the file, the plot file, the max value, and the min value"""
         self.characterization_data_files.append(file)
         if plot_file is not None:
             self.characterization_plot_files.append(plot_file)
@@ -110,10 +205,38 @@ class ExperimentResult:
             self.characterization_min_values.append(min_value)
 
     def set_pumping_record(self, record: list):
+        """Set the pumping record"""
         self.pumping_record = record
 
-    def set_image_file(self, file: Path):
+    def append_image_file(self, file: Path):
+        """Append the image file"""
         self.image_files.append(file)
+
+    def __list__(self):
+        """Return a list of key value pairs, this is not a dictionary because there are duplicate keys for some values"""
+        return [
+            ("ocp_dep_files", *self.ocp_dep_files),
+            ("ocp_dep_passes", *self.ocp_dep_passes),
+            ("ocp_char_files", *self.ocp_char_files),
+            ("ocp_char_passes", *self.ocp_char_passes),
+            ("ocp_char_final_voltages", *self.ocp_char_final_voltages),
+            ("deposition_data_files", *self.deposition_data_files),
+            ("deposition_plot_files", *self.deposition_plot_files),
+            ("deposition_max_values", *self.deposition_max_values),
+            ("depsotion_min_values", *self.depsotion_min_values),
+            ("characterization_data_files", *self.characterization_data_files),
+            ("characterization_plot_files", *self.characterization_plot_files),
+            ("characterization_max_values", *self.characterization_max_values),
+            ("characterization_min_values", *self.characterization_min_values),
+            ("image_files", *self.image_files),
+        ]
+
+    def one_to_many(self):
+        """Turn the results object into individual result table records"""
+        return [
+            ExperimentResultsRecord(self.id, key, value)
+            for key, value in self.__list__()
+        ]
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -123,18 +246,18 @@ class ExperimentBase:
     id: int = None
     experiment_name: str = None
     protocol_id: int = None
-    priority: int = None
+    priority: int = 0
     well_id: Optional[str] = None
-    pin: int = None
+    pin: str = None
     project_id: int = None
     solutions: dict = None
-    solutions_corrected: dict = None
+    solutions_corrected: dict = solutions
     well_type_number: int = (
         None  # is used to indicate the type of well the experiment should run in
     )
     pumping_rate: float = 0.3
     status: ExperimentStatus = ExperimentStatus.NEW
-    status_date: datetime = field(default_factory=(datetime.now().isoformat(timespec="seconds")))
+    status_date: datetime = field(default_factory=datetime.now)
     filename: str = None  # Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
@@ -145,9 +268,11 @@ class ExperimentBase:
         1  # 1 is 5mm_FeCN, 2 is 10mm_FeCN first, 3 is 10mm_FeCN second
     )
     jira_issue_key: Optional[str] = None
+    experiment_type: int = 0
+    well = None
 
-    def set_status(self, new_status: ExperimentStatus):
-        """Set the status and status date of the experiment"""
+    def set_status(self, new_status: ExperimentStatus) -> None:
+        """Set the status of the experiment"""
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
         try:
@@ -155,12 +280,70 @@ class ExperimentBase:
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
-            print(f"Error setting status: {e}")
+            print(f"Error sending status to OBS: {e}")
+            # don't raise the error, just print it
+    
+    def set_status_and_save(self, new_status: ExperimentStatus) -> None:
+        """Set the status and status date of the experiment"""
+        self.status = new_status
+        self.status_date = datetime.now().isoformat(timespec="seconds")
+        if self.well:
+            self.well.save_to_db()
+
+        else:
+            print("Well object not set. Saving to db via alternative method")
+            sql_utilities.update_experiment_status(self)
+        try:
+            from .obs_controls import OBSController
+
+            OBSController().place_experiment_on_screen(self)
+        except Exception as e:
+            print(f"Error sending status to OBS: {e}")
             # don't raise the error, just print it
 
-    def is_same_id(self, other):
+    def is_same_id(self, other) -> bool:
         """Check if two experiments have the same id"""
 
+        return self.id == other.id
+    
+    def is_same_well_id(self, other) -> bool:
+        """Check if two experiments have the same well id"""
+
+        return self.well_id == other.well_id
+    
+    ## other check if same methods
+
+    def get_parameters(self) -> list[ExperimentParameterRecord]:
+        """Turn the experiment object into a list of individual experiment parameter table records"""
+        all_parameters = [
+            ExperimentParameterRecord(self.id, parameter_type, parameter_value)
+            for parameter_type, parameter_value in self.__dict__.items()
+        ]
+
+        # Remove project_id, project_campaign_id, well_type,protocol_id, pin, experiment_type, jira_issue_key, priority, process_type, filename, status, status_date, results, well
+        all_parameters = [
+            parameter
+            for parameter in all_parameters
+            if parameter.parameter_type
+            not in [
+                "project_id",
+                "project_campaign_id",
+                "well_type",
+                "protocol_id",
+                "pin",
+                "experiment_type",
+                "jira_issue_key",
+                "priority",
+                "process_type",
+                "filename",
+                "status",
+                "status_date",
+                "results",
+                "well",
+            ]
+        ]
+
+        return all_parameters
 
 @dataclass(config=ConfigDict(validate_assignment=True))
 class CorrectionFactorExperiment(ExperimentBase):
@@ -247,6 +430,7 @@ class EchemExperimentBase(ExperimentBase):
 
     """
 
+    experiment_type: int = 1  # echem generic
     ocp: int = 1  # Open Circuit Potential
     ca: int = 1  # Cyclic Amperometry
     cv: int = 1  # Cyclic Voltammetry
@@ -305,7 +489,7 @@ class EchemExperimentBase(ExperimentBase):
         """CVstep / CVsr1"""
         return round(self.cv_step_size / self.cv_scan_rate_cycle_1, 4)
 
-    def print_ca_parameters(self):
+    def print_ca_parameters(self) -> str:
         """Print the CA parameters"""
         if self.ca:
             return f"""
@@ -323,7 +507,7 @@ class EchemExperimentBase(ExperimentBase):
         CA Not selected
     """
 
-    def print_cv_parameters(self):
+    def print_cv_parameters(self) -> str:
         """Print the CV parameters"""
         if self.cv:
             return f"""
@@ -347,7 +531,7 @@ class EchemExperimentBase(ExperimentBase):
         CV not selected
 """
 
-    def print_all_experiment_parameters(self):
+    def print_all_experiment_parameters(self) -> str:
         """Print the experiment parameters"""
         return f"""
 {self.experiment_name} 
@@ -502,66 +686,82 @@ class EchemExperimentParameters:
     # The below properies and setters are to allow for legacy ways of referencing the properties
     @property
     def CVvi(self):
+        """Alias for cv_initial_voltage"""
         return self.cv_initial_voltage
 
     @CVvi.setter
     def CVvi(self, value):
+        """Alias for cv_initial_voltage"""
         self.cv_initial_voltage = value
 
     @property
     def CVap1(self):
+        """Alias for cv_first_anodic_peak"""
         return self.cv_first_anodic_peak
 
     @CVap1.setter
     def CVap1(self, value):
+        """Alias for cv_first_anodic_peak"""
         self.cv_first_anodic_peak = value
 
     @property
     def CVap2(self):
+        """Alias for cv_second_anodic_peak"""
         return self.cv_second_anodic_peak
 
     @CVap2.setter
     def CVap2(self, value):
+        """Alias for cv_second_anodic_peak"""
         self.cv_second_anodic_peak = value
 
     @property
     def CVvf(self):
+        """Alias for cv_final_voltage"""
         return self.cv_final_voltage
 
     @CVvf.setter
     def CVvf(self, value):
+        """Alias for cv_final_voltage"""
         self.cv_final_voltage = value
 
     @property
     def CVstep(self):
+        """Alias for cv_step_size"""
         return self.cv_step_size
 
     @CVstep.setter
     def CVstep(self, value):
+        """Alias for cv_step_size"""
         self.cv_step_size = value
 
     @property
     def CVsr1(self):
+        """Alias for cv_scan_rate_cycle_1"""
         return self.cv_scan_rate_cycle_1
 
     @CVsr1.setter
     def CVsr1(self, value):
+        """Alias for cv_scan_rate_cycle_1"""
         self.cv_scan_rate_cycle_1 = value
 
     @property
     def CVsr2(self):
+        """Alias for cv_scan_rate_cycle_2"""
         return self.cv_scan_rate_cycle_2
 
     @CVsr2.setter
     def CVsr2(self, value):
+        """Alias for cv_scan_rate_cycle_2"""
         self.cv_scan_rate_cycle_2 = value
 
     @property
     def CVsr3(self):
+        """Alias for cv_scan_rate_cycle_3"""
         return self.cv_scan_rate_cycle_3
 
     @CVsr3.setter
     def CVsr3(self, value):
+        """Alias for cv_scan_rate_cycle_3"""
         self.cv_scan_rate_cycle_3 = value
 
     # CVvi: float = 0.0  # initial voltage
@@ -622,52 +822,53 @@ class EchemExperimentParameters:
 """
 
 
-@dataclass(config=ConfigDict(validate_assignment=True))
-class EdotExperiment(ExperimentBase):
-    """Define the data that is used to run an edot experiment"""
+# @dataclass(config=ConfigDict(validate_assignment=True))
+# class EdotExperiment(ExperimentBase):
+#     """Define the data that is used to run an edot experiment"""
 
-    project_id: int = 16
-    well_type_number: int = 4  # ito
+#     project_id: int = 16
+#     well_type_number: int = 4  # ito
+#     experiment_type: int = 2  # edot
 
-    # pdot deposition - parameters for the deposition part of the experiment
-    pdot_deposition: EchemExperimentParameters = None
-    # pdot bleaching
-    pdot_bleaching: EchemExperimentParameters = None
-    # pdot coloring
-    pdot_coloring: EchemExperimentParameters = None
-    # pdot characterization
-    pdot_characterization: EchemExperimentParameters = None
+#     # pdot deposition - parameters for the deposition part of the experiment
+#     pdot_deposition: EchemExperimentParameters = None
+#     # pdot bleaching
+#     pdot_bleaching: EchemExperimentParameters = None
+#     # pdot coloring
+#     pdot_coloring: EchemExperimentParameters = None
+#     # pdot characterization
+#     pdot_characterization: EchemExperimentParameters = None
 
-    def print_all_experiment_parameters(self):
-        """Print the experiment parameters"""
-        return f"""
-{self.experiment_name}
-        Plate #: {self.plate_id}
-        Experiment ID: {self.id}
-        Well ID: {self.well_id}
-        Status: {self.status.value}
-        Priority: {self.priority}
-        Solutions: {self.solutions}
-        Corrected Solutions: {self.solutions_corrected}
-        Filename: {self.filename}
+#     def print_all_experiment_parameters(self):
+#         """Print the experiment parameters"""
+#         return f"""
+# {self.experiment_name}
+#         Plate #: {self.plate_id}
+#         Experiment ID: {self.id}
+#         Well ID: {self.well_id}
+#         Status: {self.status.value}
+#         Priority: {self.priority}
+#         Solutions: {self.solutions}
+#         Corrected Solutions: {self.solutions_corrected}
+#         Filename: {self.filename}
 
-        Deposition Parameters:
-            {self.pdot_deposition.print_ca_parameters()}
-            {self.pdot_deposition.print_cv_parameters()}
+#         Deposition Parameters:
+#             {self.pdot_deposition.print_ca_parameters()}
+#             {self.pdot_deposition.print_cv_parameters()}
 
-        Bleaching Parameters:
-            {self.pdot_bleaching.print_ca_parameters()}
-            {self.pdot_bleaching.print_cv_parameters()}
+#         Bleaching Parameters:
+#             {self.pdot_bleaching.print_ca_parameters()}
+#             {self.pdot_bleaching.print_cv_parameters()}
 
-        Coloring Parameters:
-            {self.pdot_coloring.print_ca_parameters()}
-            {self.pdot_coloring.print_cv_parameters()}
+#         Coloring Parameters:
+#             {self.pdot_coloring.print_ca_parameters()}
+#             {self.pdot_coloring.print_cv_parameters()}
 
-        Characterization Parameters:
-            {self.pdot_characterization.print_ca_parameters()}
-            {self.pdot_characterization.print_cv_parameters()}
+#         Characterization Parameters:
+#             {self.pdot_characterization.print_ca_parameters()}
+#             {self.pdot_characterization.print_cv_parameters()}
 
-    """
+#     """
 
 
 def make_test_base_value() -> ExperimentBase:
@@ -685,7 +886,6 @@ def make_test_base_value() -> ExperimentBase:
         filename=f"test_{0}.json",
         results=None,
     )
-
 
 
 def make_test_value() -> ExperimentBase:
@@ -805,6 +1005,17 @@ def test_schema():
     """Test that the class can generate a json schema"""
     # Useful if you have tools that validate your json externally
     print(json.dumps(TypeAdapter(ExperimentBase).json_schema(), indent=4))
+
+
+experiment_classes = {
+    1: EchemExperimentBase,
+    2: CorrectionFactorExperiment,
+    # Add more mappings as needed
+}
+
+
+def get_experiment_class_by_id(experiment_id: int):
+    return experiment_classes.get(experiment_id, ExperimentBase)
 
 
 if __name__ == "__main__":

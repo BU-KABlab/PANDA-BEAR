@@ -117,10 +117,10 @@ def pedotdeposition(
     """
 
     toolkit.global_logger.info("0. Imaging the well")
-    instructions.set_status(ExperimentStatus.IMAGING)
+    instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "before_deposition")
 
-    instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
+    instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
     toolkit.global_logger.info("1. Depositing EDOT into well: %s", instructions.well_id)
     forward_pipette_v2(
@@ -162,12 +162,12 @@ def pedotdeposition(
         chrono_amp(instructions, file_tag="part_1")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status(new_status=ExperimentStatus.ERINSING)
+        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
-    instructions.set_status(ExperimentStatus.CLEARING)
+    instructions.set_status_and_save(ExperimentStatus.CLEARING)
     forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -238,7 +238,7 @@ def pedotbleaching(
     toolkit.global_logger.info("0. Imaging the well")
     image_well(toolkit, instructions, "bleaching_before_CA")
 
-    instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
+    instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
     toolkit.global_logger.info("1. Depositing EDOT into well: %s", instructions.well_id)
     forward_pipette_v2(
@@ -280,12 +280,12 @@ def pedotbleaching(
         chrono_amp(instructions, file_tag="bleaching")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status(new_status=ExperimentStatus.ERINSING)
+        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
-    instructions.set_status(ExperimentStatus.CLEARING)
+    instructions.set_status_and_save(ExperimentStatus.CLEARING)
     forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -299,7 +299,7 @@ def pedotbleaching(
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
-    instructions.set_status(ExperimentStatus.FLUSHING)
+    instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         waste_vials=waste_vials,
         stock_vials=stock_vials,
@@ -347,7 +347,7 @@ def pedotcoloring(
     toolkit.global_logger.info("0. Imaging the well")
     image_well(toolkit, instructions, "coloring_before_CA")
 
-    instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
+    instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
     toolkit.global_logger.info(
         "1. Depositing liclo4 into well: %s", instructions.well_id
@@ -391,12 +391,12 @@ def pedotcoloring(
         chrono_amp(instructions, file_tag="coloring")
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status(new_status=ExperimentStatus.ERINSING)
+        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
-    instructions.set_status(ExperimentStatus.CLEARING)
+    instructions.set_status_and_save(ExperimentStatus.CLEARING)
     forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
