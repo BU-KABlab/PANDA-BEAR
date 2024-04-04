@@ -166,3 +166,47 @@
 2024-04-04 17:35:05,243&vessel&vessel&log_contents&235&rinse_s4&12531.959999999992&rinse
 2024-04-04 17:35:14,252&vessel&vessel&update_volume&165&waste_w0&8977.760000000004
 2024-04-04 17:35:14,264&vessel&vessel&log_contents&235&waste_w0&8977.760000000004&{'rinse': 7468.040000000004, 'edot': 509.72}
+2024-04-04 17:36:14,321&vessel&vessel&update_volume&165&rinse_s4&12411.959999999992
+2024-04-04 17:36:14,323&vessel&vessel&log_contents&235&rinse_s4&12411.959999999992&rinse
+2024-04-04 17:36:23,332&vessel&vessel&update_volume&165&waste_w0&9097.760000000004
+2024-04-04 17:36:23,342&vessel&vessel&log_contents&235&waste_w0&9097.760000000004&{'rinse': 7588.040000000004, 'edot': 509.72}
+2024-04-04 17:36:30,352&vessel&vessel&update_volume&165&rinse_s4&12291.959999999992
+2024-04-04 17:36:30,358&vessel&vessel&log_contents&235&rinse_s4&12291.959999999992&rinse
+2024-04-04 17:36:39,367&vessel&vessel&update_volume&165&waste_w0&9217.760000000004
+2024-04-04 17:36:39,380&vessel&vessel&log_contents&235&waste_w0&9217.760000000004&{'rinse': 7708.040000000004, 'edot': 509.72}
+2024-04-04 17:36:46,390&vessel&vessel&update_volume&165&rinse_s4&12171.959999999992
+2024-04-04 17:36:46,396&vessel&vessel&log_contents&235&rinse_s4&12171.959999999992&rinse
+2024-04-04 17:36:55,406&vessel&vessel&update_volume&165&waste_w0&9337.760000000004
+2024-04-04 17:36:55,418&vessel&vessel&log_contents&235&waste_w0&9337.760000000004&{'rinse': 7828.040000000004, 'edot': 509.72}
+2024-04-04 17:37:12,512&vessel&vessel&update_volume&165&rinse_s4&12044.529999999992
+2024-04-04 17:37:12,519&vessel&vessel&log_contents&235&rinse_s4&12044.529999999992&rinse
+2024-04-04 17:37:21,529&vessel&vessel&update_volume&165&b8&127.43
+2024-04-04 17:37:21,957&vessel&vessel&log_contents&235&b8&127.43&{'rinse': 127.43}
+2024-04-04 17:37:24,965&vessel&vessel&update_volume&165&b8&0.0
+2024-04-04 17:37:25,437&vessel&vessel&log_contents&235&b8&0.0&{'rinse': 0.0}
+2024-04-04 17:37:34,948&vessel&vessel&update_volume&165&waste_w0&9465.190000000004
+2024-04-04 17:37:34,961&vessel&vessel&log_contents&235&waste_w0&9465.190000000004&{'rinse': 7955.470000000004, 'edot': 509.72}
+2024-04-04 17:37:41,972&vessel&vessel&update_volume&165&rinse_s4&11917.099999999991
+2024-04-04 17:37:41,979&vessel&vessel&log_contents&235&rinse_s4&11917.099999999991&rinse
+2024-04-04 17:37:50,989&vessel&vessel&update_volume&165&b8&127.43
+2024-04-04 17:37:51,489&vessel&vessel&log_contents&235&b8&127.43&{'rinse': 127.43}
+2024-04-04 17:37:54,497&vessel&vessel&update_volume&165&b8&0.0
+2024-04-04 17:37:54,956&vessel&vessel&log_contents&235&b8&0.0&{'rinse': 0.0}
+2024-04-04 17:38:04,466&vessel&vessel&update_volume&165&waste_w0&9592.620000000004
+2024-04-04 17:38:04,478&vessel&vessel&log_contents&235&waste_w0&9592.620000000004&{'rinse': 8082.900000000004, 'edot': 509.72}
+2024-04-04 17:38:11,488&vessel&vessel&update_volume&165&rinse_s4&11789.669999999991
+2024-04-04 17:38:11,494&vessel&vessel&log_contents&235&rinse_s4&11789.669999999991&rinse
+2024-04-04 17:38:20,504&vessel&vessel&update_volume&165&b8&127.43
+2024-04-04 17:38:20,988&vessel&vessel&log_contents&235&b8&127.43&{'rinse': 127.43}
+2024-04-04 17:38:23,996&vessel&vessel&update_volume&165&b8&0.0
+2024-04-04 17:38:24,421&vessel&vessel&log_contents&235&b8&0.0&{'rinse': 0.0}
+2024-04-04 17:38:33,932&vessel&vessel&update_volume&165&waste_w0&9720.050000000005
+2024-04-04 17:38:33,945&vessel&vessel&log_contents&235&waste_w0&9720.050000000005&{'rinse': 8210.330000000004, 'edot': 509.72}
+2024-04-04 17:38:40,955&vessel&vessel&update_volume&165&rinse_s4&11662.23999999999
+2024-04-04 17:38:40,962&vessel&vessel&log_contents&235&rinse_s4&11662.23999999999&rinse
+2024-04-04 17:38:49,973&vessel&vessel&update_volume&165&b8&127.43
+2024-04-04 17:38:50,444&vessel&vessel&log_contents&235&b8&127.43&{'rinse': 127.43}
+2024-04-04 17:38:53,452&vessel&vessel&update_volume&165&b8&0.0
+2024-04-04 17:38:53,892&vessel&vessel&log_contents&235&b8&0.0&{'rinse': 0.0}
+2024-04-04 17:39:03,402&vessel&vessel&update_volume&165&waste_w0&9847.480000000005
+2024-04-04 17:39:03,414&vessel&vessel&log_contents&235&waste_w0&9847.480000000005&{'rinse': 8337.760000000004, 'edot': 509.72}

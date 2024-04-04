@@ -2,7 +2,7 @@
 import time
 from epanda_lib.slack_tools.SlackBot import SlackBot
 
-bot = SlackBot(test = False)
+bot = SlackBot(test = True)
 print("Starting Slack Bot")
 STATUS = bot.check_slack_messages(channel="alert")
 while STATUS == 1:

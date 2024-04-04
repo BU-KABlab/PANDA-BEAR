@@ -3204,3 +3204,741 @@
 2024-04-04 17:35:24,669&e_panda&INFO&SlackBot&send_slack_message&65&16.2&10000003&B8&Message sent:Experiment 10000003 part 3 has completed, and is back in the queue&True
 2024-04-04 17:35:24,669&epanda_lib.scheduler&WARNING&scheduler&add_to_queue&243&&&&No queue to add to when using database, will be in a view&
 2024-04-04 17:35:24,669&ePANDA&INFO&controller&main&289&&&&Experiment 10000003 ended with status queued&
+2024-04-04 17:35:29,118&e_panda&DEBUG&wellplate&update_well_status_from_db&515&None&None&None&Updating well status from database...&True
+2024-04-04 17:35:29,634&e_panda&DEBUG&wellplate&update_well_status_from_db&527&None&None&None&Well status updated from database&True
+2024-04-04 17:35:29,634&ePANDA&INFO&controller&establish_system_state&421&&&&System state reestablished&
+2024-04-04 17:35:29,634&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-04-04 17:35:29,635&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial edot contains edot with volume 19490&
+2024-04-04 17:35:29,635&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial rinse contains rinse with volume 12531&
+2024-04-04 17:35:29,635&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial rinse contains rinse with volume 20000&
+2024-04-04 17:35:29,635&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-04-04 17:35:29,635&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {'rinse': 7468.040000000004, 'edot': 509.72} with volume 8977&
+2024-04-04 17:35:29,635&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {} with volume 1000&
+2024-04-04 17:35:29,636&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {} with volume 1000&
+2024-04-04 17:35:29,636&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {} with volume 1000&
+2024-04-04 17:35:29,978&ePANDA&INFO&controller&establish_system_state&494&&&&There are 81 clear wells&
+2024-04-04 17:35:30,551&ePANDA&INFO&controller&main&209&&&&Running experiment 10000003 part 4&
+2024-04-04 17:35:30,956&e_panda&INFO&SlackBot&send_slack_message&65&None&None&None&Message sent:Running experiment 10000003 part 4&True
+2024-04-04 17:35:31,608&ePANDA&INFO&controller&main&237&&&&Beginning experiment 10000003&
+2024-04-04 17:35:31,759&ePANDA&INFO&exp_edot_screening_protocol_v2&pedot_lhs_v1_screening&64&&&&Applying correction factor to the programmed volumes&
+2024-04-04 17:35:31,759&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: edot in position s3&True
+2024-04-04 17:35:31,760&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: liclo4 in position s2&True
+2024-04-04 17:35:31,760&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: rinse in position s4&True
+2024-04-04 17:35:31,760&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&559&&&&0. Imaging the well&
+2024-04-04 17:35:33,173&e_panda&INFO&e_panda&image_well&802&16.2&10000003&B8&Imaging well B8&True
+2024-04-04 17:35:33,173&e_panda&DEBUG&e_panda&image_well&804&16.2&10000003&B8&Capturing image of well B8&True
+2024-04-04 17:35:33,174&e_panda&INFO&e_panda&image_well&826&16.2&10000003&B8&Moving camera above well B8&True
+2024-04-04 17:35:33,174&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:35:33,174&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:35:33,174&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:35:33,175&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-230.6, -140.8, -35]&
+2024-04-04 17:35:33,175&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:35:33,175&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:35:33,175&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:35:33,175&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:35:33,175&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-35&
+2024-04-04 17:35:33,176&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-35&
+2024-04-04 17:35:35,176&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-38.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:35,177&e_panda&DEBUG&e_panda&image_well&852&16.2&10000003&B8&Image of well B8 captured&True
+2024-04-04 17:35:35,177&e_panda&INFO&e_panda&image_well&865&16.2&10000003&B8&Moving camera to safe position&True
+2024-04-04 17:35:35,177&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:35:35,177&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:35:37,178&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:37,847&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&565&&&&1. Depositing liclo4 into well: B8&
+2024-04-04 17:35:37,847&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: liclo4 in position s2&True
+2024-04-04 17:35:37,847&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&582&&&&2. Moving electrode to well: B8&
+2024-04-04 17:35:37,848&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:35:37,848&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:35:37,848&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:35:37,848&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-190.4, -114.6, -66.0]&
+2024-04-04 17:35:37,848&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:35:37,848&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:35:37,849&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:35:37,849&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:35:37,849&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-190.4&
+2024-04-04 17:35:37,849&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-190.4&
+2024-04-04 17:35:39,850&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-193.4,-143.8,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:39,850&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-114.6&
+2024-04-04 17:35:39,850&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-114.6&
+2024-04-04 17:35:41,851&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-193.4,-117.6,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:41,851&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-04-04 17:35:41,851&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-04-04 17:35:43,852&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-193.4,-117.6,-69.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:43,852&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 100&
+2024-04-04 17:35:43,852&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -193.4, Y = -117.6, Z = -69.0&
+2024-04-04 17:35:43,853&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -190.4, Y = -114.6, Z = -66.0&
+2024-04-04 17:35:43,853&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-190.4, -114.6, -66.0]&
+2024-04-04 17:35:43,853&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-190.4, -114.6, -70]&
+2024-04-04 17:35:43,853&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:35:43,853&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -193.4, Y = -117.6, Z = -69.0&
+2024-04-04 17:35:43,853&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -190.4, Y = -114.6, Z = -66.0&
+2024-04-04 17:35:43,854&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-190.4, -114.6, -66.0]&
+2024-04-04 17:35:43,854&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-70&
+2024-04-04 17:35:43,854&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-70&
+2024-04-04 17:35:45,854&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-193.4,-117.6,-73.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:45,854&ePANDA&INFO&mill_control&set_feed_rate&814&&&&Setting feed rate to 2000&
+2024-04-04 17:35:45,855&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&603&&&&3. Performing CV&
+2024-04-04 17:35:45,855&e_panda&INFO&e_panda_custom&cyclic_volt_edot_characterizing&140&16.2&10000003&B8&Characterizing well: B8&True
+2024-04-04 17:35:45,855&e_panda&INFO&e_panda&cyclic_volt&621&16.2&10000003&B8&Beginning CV_characterization OCP of well: B8&True
+2024-04-04 17:35:46,541&e_panda&INFO&e_panda&cyclic_volt&660&16.2&10000003&B8&OCP of well B8 passed: True&True
+2024-04-04 17:35:47,208&e_panda&INFO&e_panda&cyclic_volt&679&16.2&10000003&B8&Beginning eChem CV of well: B8&True
+2024-04-04 17:35:47,209&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&610&&&&4. Rinsing electrode&
+2024-04-04 17:35:47,897&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -193.4, Y = -117.6, Z = -73.0&
+2024-04-04 17:35:47,898&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -190.4, Y = -114.6, Z = -70.0&
+2024-04-04 17:35:47,898&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-190.4, -114.6, -70.0]&
+2024-04-04 17:35:47,898&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-369.4, -8.2, 0]&
+2024-04-04 17:35:47,898&ePANDA&DEBUG&mill_control&safe_move&615&&&&Moving to Z=0 first&
+2024-04-04 17:35:47,898&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:35:47,898&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:35:49,899&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-193.4,-117.6,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:49,899&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -193.4, Y = -117.6, Z = -3.0&
+2024-04-04 17:35:49,899&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -190.4, Y = -114.6, Z = 0.0&
+2024-04-04 17:35:49,899&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-190.4, -114.6, 0.0]&
+2024-04-04 17:35:49,900&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.4&
+2024-04-04 17:35:49,900&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.4&
+2024-04-04 17:35:51,901&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-117.6,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:51,901&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-8.2&
+2024-04-04 17:35:51,901&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-8.2&
+2024-04-04 17:35:53,902&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:53,902&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.40000000000003 Y-8.2 Z-50&
+2024-04-04 17:35:53,902&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50&
+2024-04-04 17:35:55,903&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:55,903&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.40000000000003 Y-8.2 Z0&
+2024-04-04 17:35:55,904&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0&
+2024-04-04 17:35:57,904&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:57,904&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.40000000000003 Y-8.2 Z-50&
+2024-04-04 17:35:57,905&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50&
+2024-04-04 17:35:59,905&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:35:59,905&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.40000000000003 Y-8.2 Z0&
+2024-04-04 17:35:59,906&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0&
+2024-04-04 17:36:01,906&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:01,906&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.40000000000003 Y-8.2 Z-50&
+2024-04-04 17:36:01,907&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50&
+2024-04-04 17:36:03,907&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:03,907&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.40000000000003 Y-8.2 Z0&
+2024-04-04 17:36:03,908&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0&
+2024-04-04 17:36:05,908&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:05,908&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&615&&&&5. Clearing well contents into waste&
+2024-04-04 17:36:06,620&e_panda&DEBUG&e_panda&waste_selector&465&16.2&10000003&B8&Selected waste vial: waste in position w0&True
+2024-04-04 17:36:06,621&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&629&&&&6. Flushing the pipette tip&
+2024-04-04 17:36:07,311&e_panda&INFO&e_panda&flush_v2&355&16.2&10000003&B8&Flushing pipette tip with 120.000000 ul of rinse...&True
+2024-04-04 17:36:07,311&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: rinse in position s4&True
+2024-04-04 17:36:07,312&e_panda&DEBUG&e_panda&waste_selector&465&16.2&10000003&B8&Selected waste vial: waste in position w0&True
+2024-04-04 17:36:07,312&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 120.000000 ul from rinse to waste&True
+2024-04-04 17:36:07,312&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:36:07,312&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:36:07,814&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to rinse at s4...&True
+2024-04-04 17:36:07,814&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0&
+2024-04-04 17:36:07,815&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0&
+2024-04-04 17:36:07,815&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-369.4, -8.2, 0.0]&
+2024-04-04 17:36:07,815&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-04-04 17:36:07,815&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:36:07,815&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0&
+2024-04-04 17:36:07,815&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0&
+2024-04-04 17:36:07,816&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-369.4, -8.2, 0.0]&
+2024-04-04 17:36:07,816&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-04-04 17:36:07,816&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-04-04 17:36:09,816&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:09,816&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-04-04 17:36:09,817&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-04-04 17:36:11,817&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:11,817&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-04-04 17:36:11,818&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-04-04 17:36:13,818&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:14,321&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing rinse volume to vial file...&True
+2024-04-04 17:36:14,323&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:36:14,323&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:36:16,324&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:16,826&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel rinse volume: 12411.960000 depth: -74.000000&True
+2024-04-04 17:36:16,826&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: waste...&True
+2024-04-04 17:36:16,826&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:36:16,827&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:36:16,827&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:36:16,827&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-04-04 17:36:16,827&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:36:16,827&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:36:16,827&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:36:16,828&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:36:16,828&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-04-04 17:36:16,828&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-04-04 17:36:18,829&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:18,829&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-04-04 17:36:18,829&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-04-04 17:36:20,830&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:20,830&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-04-04 17:36:20,830&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-04-04 17:36:22,831&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:23,332&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing waste volume to vial file...&True
+2024-04-04 17:36:23,335&e_panda&DEBUG&vials&update_contents&355&16.2&10000003&B8&Updating waste w0 contents...&True
+2024-04-04 17:36:23,335&e_panda&DEBUG&vials&update_contents&378&16.2&10000003&B8&waste w0: New contents: {'rinse': 7588.040000000004, 'edot': 509.72}&True
+2024-04-04 17:36:23,343&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 120.000000 ul from rinse to waste&True
+2024-04-04 17:36:23,343&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:36:23,343&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:36:23,845&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to rinse at s4...&True
+2024-04-04 17:36:23,845&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:36:23,845&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:36:23,845&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:36:23,846&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-04-04 17:36:23,846&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:36:23,846&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:36:23,846&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:36:23,846&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:36:23,846&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-04-04 17:36:23,847&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-04-04 17:36:25,847&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:25,847&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-04-04 17:36:25,848&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-04-04 17:36:27,848&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:27,848&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-04-04 17:36:27,849&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-04-04 17:36:29,849&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:30,352&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing rinse volume to vial file...&True
+2024-04-04 17:36:30,358&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:36:30,358&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:36:32,359&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:32,861&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel rinse volume: 12291.960000 depth: -74.000000&True
+2024-04-04 17:36:32,861&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: waste...&True
+2024-04-04 17:36:32,861&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:36:32,861&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:36:32,861&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:36:32,862&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-04-04 17:36:32,862&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:36:32,862&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:36:32,862&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:36:32,862&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:36:32,862&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-04-04 17:36:32,862&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-04-04 17:36:34,863&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:34,863&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-04-04 17:36:34,863&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-04-04 17:36:36,864&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:36,864&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-04-04 17:36:36,864&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-04-04 17:36:38,865&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:39,367&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing waste volume to vial file...&True
+2024-04-04 17:36:39,375&e_panda&DEBUG&vials&update_contents&355&16.2&10000003&B8&Updating waste w0 contents...&True
+2024-04-04 17:36:39,375&e_panda&DEBUG&vials&update_contents&378&16.2&10000003&B8&waste w0: New contents: {'rinse': 7708.040000000004, 'edot': 509.72}&True
+2024-04-04 17:36:39,381&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 120.000000 ul from rinse to waste&True
+2024-04-04 17:36:39,381&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:36:39,381&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:36:39,883&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to rinse at s4...&True
+2024-04-04 17:36:39,883&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:36:39,884&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:36:39,884&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:36:39,884&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-04-04 17:36:39,884&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:36:39,884&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:36:39,884&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:36:39,885&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:36:39,885&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-04-04 17:36:39,885&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-04-04 17:36:41,885&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:41,885&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-04-04 17:36:41,886&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-04-04 17:36:43,886&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:43,886&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-04-04 17:36:43,887&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-04-04 17:36:45,887&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:46,390&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing rinse volume to vial file...&True
+2024-04-04 17:36:46,396&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:36:46,397&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:36:48,397&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:48,900&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel rinse volume: 12171.960000 depth: -74.000000&True
+2024-04-04 17:36:48,900&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: waste...&True
+2024-04-04 17:36:48,900&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:36:48,900&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:36:48,900&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:36:48,901&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-04-04 17:36:48,901&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:36:48,901&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:36:48,901&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:36:48,901&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:36:48,901&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-04-04 17:36:48,902&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-04-04 17:36:50,902&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:50,902&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-04-04 17:36:50,903&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-04-04 17:36:52,903&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:52,903&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-04-04 17:36:52,904&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-04-04 17:36:54,904&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:55,406&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing waste volume to vial file...&True
+2024-04-04 17:36:55,413&e_panda&DEBUG&vials&update_contents&355&16.2&10000003&B8&Updating waste w0 contents...&True
+2024-04-04 17:36:55,413&e_panda&DEBUG&vials&update_contents&378&16.2&10000003&B8&waste w0: New contents: {'rinse': 7828.040000000004, 'edot': 509.72}&True
+2024-04-04 17:36:55,419&e_panda&INFO&e_panda&flush_v2&375&16.2&10000003&B8&Flushed pipette tip with 120.000000 ul of rinse 3x times...&True
+2024-04-04 17:36:55,419&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&640&&&&7. Take image of well&
+2024-04-04 17:36:56,832&e_panda&INFO&e_panda&image_well&802&16.2&10000003&B8&Imaging well B8&True
+2024-04-04 17:36:56,832&e_panda&DEBUG&e_panda&image_well&804&16.2&10000003&B8&Capturing image of well B8&True
+2024-04-04 17:36:56,833&e_panda&INFO&e_panda&image_well&826&16.2&10000003&B8&Moving camera above well B8&True
+2024-04-04 17:36:56,833&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:36:56,833&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:36:56,833&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:36:56,833&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-230.6, -140.8, -35]&
+2024-04-04 17:36:56,833&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:36:56,834&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:36:56,834&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:36:56,834&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:36:56,834&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-230.6&
+2024-04-04 17:36:56,834&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-230.6&
+2024-04-04 17:36:58,835&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:36:58,835&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-140.8&
+2024-04-04 17:36:58,835&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-140.8&
+2024-04-04 17:37:00,836&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:00,836&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-35&
+2024-04-04 17:37:00,836&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-35&
+2024-04-04 17:37:02,837&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-38.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:02,838&e_panda&DEBUG&e_panda&image_well&852&16.2&10000003&B8&Image of well B8 captured&True
+2024-04-04 17:37:02,838&e_panda&INFO&e_panda&image_well&865&16.2&10000003&B8&Moving camera to safe position&True
+2024-04-04 17:37:02,838&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:37:02,839&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:37:04,839&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:04,839&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&647&&&&8. Rinsing the well 4x with rinse&
+2024-04-04 17:37:05,503&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&651&&&&Rinse 1 of 4&
+2024-04-04 17:37:05,503&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: rinse in position s4&True
+2024-04-04 17:37:05,504&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from rinse to b8&True
+2024-04-04 17:37:05,504&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:37:05,504&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:37:06,006&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to rinse at s4...&True
+2024-04-04 17:37:06,006&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:37:06,006&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:37:06,006&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:37:06,007&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-04-04 17:37:06,007&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:06,007&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:37:06,007&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:37:06,007&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:37:06,007&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-04-04 17:37:06,008&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-04-04 17:37:08,008&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-143.8,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:08,008&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-04-04 17:37:08,009&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-04-04 17:37:10,009&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:10,009&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-04-04 17:37:10,010&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-04-04 17:37:12,010&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:12,512&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing rinse volume to vial file...&True
+2024-04-04 17:37:12,519&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:37:12,519&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:37:14,520&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:15,022&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel rinse volume: 12044.530000 depth: -74.000000&True
+2024-04-04 17:37:15,022&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: b8...&True
+2024-04-04 17:37:15,022&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:37:15,022&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:37:15,022&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:37:15,023&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:37:15,023&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:15,023&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:37:15,023&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:37:15,023&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:37:15,023&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-313.1&
+2024-04-04 17:37:15,023&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-313.1&
+2024-04-04 17:37:17,024&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:17,024&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-143.3&
+2024-04-04 17:37:17,025&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-143.3&
+2024-04-04 17:37:19,025&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:19,026&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-04-04 17:37:19,026&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-04-04 17:37:21,026&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-69.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:21,529&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:37:21,529&e_panda&DEBUG&wellplate&update_contents&253&16.2&10000003&B8&New b8 contents: {'rinse': 127.43}&True
+2024-04-04 17:37:21,530&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:37:21,957&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:37:21,958&e_panda&DEBUG&e_panda&waste_selector&465&16.2&10000003&B8&Selected waste vial: waste in position w0&True
+2024-04-04 17:37:21,958&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from b8 to waste&True
+2024-04-04 17:37:21,958&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:37:21,958&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:37:22,460&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to b8 at None...&True
+2024-04-04 17:37:22,460&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:37:22,460&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:37:22,461&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:37:22,461&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -71.75]&
+2024-04-04 17:37:22,461&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:22,461&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:37:22,461&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:37:22,461&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:37:22,462&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-71.75&
+2024-04-04 17:37:22,462&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-71.75&
+2024-04-04 17:37:24,462&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-74.75|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:24,965&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:37:24,965&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:37:25,437&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:37:25,939&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:37:25,939&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:37:27,940&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:28,442&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel b8 volume: 0.000000 depth: -71.750000&True
+2024-04-04 17:37:28,442&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: waste...&True
+2024-04-04 17:37:28,442&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:37:28,442&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:37:28,443&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:37:28,443&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-04-04 17:37:28,443&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:28,443&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:37:28,443&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:37:28,443&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:37:28,443&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-04-04 17:37:28,444&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-04-04 17:37:30,444&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:30,444&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-04-04 17:37:30,445&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-04-04 17:37:32,445&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:32,445&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-04-04 17:37:32,446&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-04-04 17:37:34,446&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:34,948&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing waste volume to vial file...&True
+2024-04-04 17:37:34,956&e_panda&DEBUG&vials&update_contents&355&16.2&10000003&B8&Updating waste w0 contents...&True
+2024-04-04 17:37:34,956&e_panda&DEBUG&vials&update_contents&378&16.2&10000003&B8&waste w0: New contents: {'rinse': 7955.470000000004, 'edot': 509.72}&True
+2024-04-04 17:37:34,962&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&651&&&&Rinse 2 of 4&
+2024-04-04 17:37:34,962&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: rinse in position s4&True
+2024-04-04 17:37:34,962&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from rinse to b8&True
+2024-04-04 17:37:34,962&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:37:34,963&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:37:35,465&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to rinse at s4...&True
+2024-04-04 17:37:35,465&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:37:35,465&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:37:35,465&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:37:35,465&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-04-04 17:37:35,466&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:35,466&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:37:35,466&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:37:35,466&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:37:35,466&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-04-04 17:37:35,467&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-04-04 17:37:37,467&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:37,467&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-04-04 17:37:37,468&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-04-04 17:37:39,469&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:39,469&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-04-04 17:37:39,469&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-04-04 17:37:41,470&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:41,972&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing rinse volume to vial file...&True
+2024-04-04 17:37:41,979&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:37:41,979&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:37:43,979&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:44,482&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel rinse volume: 11917.100000 depth: -74.000000&True
+2024-04-04 17:37:44,482&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: b8...&True
+2024-04-04 17:37:44,482&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:37:44,482&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:37:44,482&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:37:44,482&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:37:44,483&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:44,483&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:37:44,483&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:37:44,483&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:37:44,483&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-313.1&
+2024-04-04 17:37:44,483&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-313.1&
+2024-04-04 17:37:46,484&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:46,484&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-143.3&
+2024-04-04 17:37:46,484&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-143.3&
+2024-04-04 17:37:48,485&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:48,485&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-04-04 17:37:48,486&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-04-04 17:37:50,486&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-69.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:50,989&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:37:50,990&e_panda&DEBUG&wellplate&update_contents&250&16.2&10000003&B8&Updated b8 contents: {'rinse': 127.43}&True
+2024-04-04 17:37:50,990&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:37:51,489&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:37:51,490&e_panda&DEBUG&e_panda&waste_selector&465&16.2&10000003&B8&Selected waste vial: waste in position w0&True
+2024-04-04 17:37:51,490&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from b8 to waste&True
+2024-04-04 17:37:51,490&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:37:51,491&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:37:51,993&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to b8 at None...&True
+2024-04-04 17:37:51,993&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:37:51,993&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:37:51,993&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:37:51,993&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -71.75]&
+2024-04-04 17:37:51,993&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:51,994&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:37:51,994&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:37:51,994&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:37:51,994&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-71.75&
+2024-04-04 17:37:51,994&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-71.75&
+2024-04-04 17:37:53,995&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-74.75|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:54,497&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:37:54,498&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:37:54,955&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:37:55,457&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:37:55,457&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:37:57,458&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:57,959&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel b8 volume: 0.000000 depth: -71.750000&True
+2024-04-04 17:37:57,959&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: waste...&True
+2024-04-04 17:37:57,960&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:37:57,960&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:37:57,960&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:37:57,960&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-04-04 17:37:57,960&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:37:57,960&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:37:57,960&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:37:57,961&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:37:57,961&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-04-04 17:37:57,961&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-04-04 17:37:59,962&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:37:59,962&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-04-04 17:37:59,962&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-04-04 17:38:01,963&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:01,963&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-04-04 17:38:01,963&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-04-04 17:38:03,964&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:04,466&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing waste volume to vial file...&True
+2024-04-04 17:38:04,472&e_panda&DEBUG&vials&update_contents&355&16.2&10000003&B8&Updating waste w0 contents...&True
+2024-04-04 17:38:04,472&e_panda&DEBUG&vials&update_contents&378&16.2&10000003&B8&waste w0: New contents: {'rinse': 8082.900000000004, 'edot': 509.72}&True
+2024-04-04 17:38:04,478&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&651&&&&Rinse 3 of 4&
+2024-04-04 17:38:04,479&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: rinse in position s4&True
+2024-04-04 17:38:04,479&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from rinse to b8&True
+2024-04-04 17:38:04,479&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:38:04,479&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:38:04,981&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to rinse at s4...&True
+2024-04-04 17:38:04,981&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:38:04,981&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:38:04,981&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:38:04,981&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-04-04 17:38:04,982&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:04,982&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:38:04,982&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:38:04,982&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:38:04,982&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-04-04 17:38:04,982&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-04-04 17:38:06,983&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:06,983&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-04-04 17:38:06,984&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-04-04 17:38:08,984&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:08,984&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-04-04 17:38:08,985&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-04-04 17:38:10,985&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:11,488&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing rinse volume to vial file...&True
+2024-04-04 17:38:11,495&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:38:11,495&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:38:13,495&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:13,997&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel rinse volume: 11789.670000 depth: -74.000000&True
+2024-04-04 17:38:13,997&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: b8...&True
+2024-04-04 17:38:13,998&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:38:13,998&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:38:13,998&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:38:13,998&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:38:13,998&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:13,999&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:38:13,999&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:38:13,999&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:38:13,999&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-313.1&
+2024-04-04 17:38:13,999&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-313.1&
+2024-04-04 17:38:16,000&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:16,000&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-143.3&
+2024-04-04 17:38:16,001&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-143.3&
+2024-04-04 17:38:18,001&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:18,001&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-04-04 17:38:18,002&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-04-04 17:38:20,002&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-69.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:20,504&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:38:20,505&e_panda&DEBUG&wellplate&update_contents&250&16.2&10000003&B8&Updated b8 contents: {'rinse': 127.43}&True
+2024-04-04 17:38:20,505&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:38:20,988&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:38:20,989&e_panda&DEBUG&e_panda&waste_selector&465&16.2&10000003&B8&Selected waste vial: waste in position w0&True
+2024-04-04 17:38:20,989&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from b8 to waste&True
+2024-04-04 17:38:20,990&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:38:20,990&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:38:21,492&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to b8 at None...&True
+2024-04-04 17:38:21,492&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:38:21,492&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:38:21,492&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:38:21,492&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -71.75]&
+2024-04-04 17:38:21,492&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:21,493&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:38:21,493&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:38:21,493&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:38:21,493&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-71.75&
+2024-04-04 17:38:21,493&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-71.75&
+2024-04-04 17:38:23,494&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-74.75|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:23,996&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:38:23,997&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:38:24,420&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:38:24,922&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:38:24,922&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:38:26,923&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:27,425&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel b8 volume: 0.000000 depth: -71.750000&True
+2024-04-04 17:38:27,425&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: waste...&True
+2024-04-04 17:38:27,425&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:38:27,425&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:38:27,425&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:38:27,426&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-04-04 17:38:27,426&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:27,426&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:38:27,426&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:38:27,426&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:38:27,426&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-04-04 17:38:27,426&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-04-04 17:38:29,427&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:29,427&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-04-04 17:38:29,428&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-04-04 17:38:31,428&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:31,428&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-04-04 17:38:31,429&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-04-04 17:38:33,430&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:33,932&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing waste volume to vial file...&True
+2024-04-04 17:38:33,939&e_panda&DEBUG&vials&update_contents&355&16.2&10000003&B8&Updating waste w0 contents...&True
+2024-04-04 17:38:33,939&e_panda&DEBUG&vials&update_contents&378&16.2&10000003&B8&waste w0: New contents: {'rinse': 8210.330000000004, 'edot': 509.72}&True
+2024-04-04 17:38:33,945&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&651&&&&Rinse 4 of 4&
+2024-04-04 17:38:33,946&e_panda&DEBUG&e_panda&solution_selector&438&16.2&10000003&B8&Selected stock vial: rinse in position s4&True
+2024-04-04 17:38:33,946&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from rinse to b8&True
+2024-04-04 17:38:33,946&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:38:33,946&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:38:34,448&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to rinse at s4...&True
+2024-04-04 17:38:34,448&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:38:34,448&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:38:34,449&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:38:34,449&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-86.5, -173.5, -74]&
+2024-04-04 17:38:34,449&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:34,449&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:38:34,449&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:38:34,449&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:38:34,450&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-86.5&
+2024-04-04 17:38:34,450&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-86.5&
+2024-04-04 17:38:36,450&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:36,450&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-173.5&
+2024-04-04 17:38:36,451&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-173.5&
+2024-04-04 17:38:38,451&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:38,451&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-74&
+2024-04-04 17:38:38,452&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-74&
+2024-04-04 17:38:40,452&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:40,955&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing rinse volume to vial file...&True
+2024-04-04 17:38:40,962&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:38:40,962&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:38:42,963&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:43,465&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel rinse volume: 11662.240000 depth: -74.000000&True
+2024-04-04 17:38:43,465&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: b8...&True
+2024-04-04 17:38:43,465&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:38:43,465&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:38:43,465&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:38:43,466&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:38:43,466&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:43,466&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0&
+2024-04-04 17:38:43,466&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0&
+2024-04-04 17:38:43,466&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-86.5, -173.5, 0.0]&
+2024-04-04 17:38:43,466&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-313.1&
+2024-04-04 17:38:43,467&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-313.1&
+2024-04-04 17:38:45,467&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-176.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:45,467&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-143.3&
+2024-04-04 17:38:45,468&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-143.3&
+2024-04-04 17:38:47,468&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:47,468&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-66.0&
+2024-04-04 17:38:47,469&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-66.0&
+2024-04-04 17:38:49,470&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-69.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:49,973&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:38:49,973&e_panda&DEBUG&wellplate&update_contents&250&16.2&10000003&B8&Updated b8 contents: {'rinse': 127.43}&True
+2024-04-04 17:38:49,973&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:38:50,443&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:38:50,444&e_panda&DEBUG&e_panda&waste_selector&465&16.2&10000003&B8&Selected waste vial: waste in position w0&True
+2024-04-04 17:38:50,445&e_panda&INFO&e_panda&forward_pipette_v2&131&16.2&10000003&B8&Forward pipetting 127.430000 ul from b8 to waste&True
+2024-04-04 17:38:50,445&e_panda&INFO&e_panda&forward_pipette_v2&154&16.2&10000003&B8&Repetition 1 of 1&True
+2024-04-04 17:38:50,445&e_panda&DEBUG&e_panda&forward_pipette_v2&156&16.2&10000003&B8&Withdrawing 40.000000 of air gap...&True
+2024-04-04 17:38:50,947&e_panda&INFO&e_panda&forward_pipette_v2&175&16.2&10000003&B8&Moving to b8 at None...&True
+2024-04-04 17:38:50,947&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:38:50,947&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:38:50,947&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:38:50,947&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-313.1, -143.3, -71.75]&
+2024-04-04 17:38:50,948&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:50,948&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -69.0&
+2024-04-04 17:38:50,948&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = -66.0&
+2024-04-04 17:38:50,948&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, -66.0]&
+2024-04-04 17:38:50,948&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-71.75&
+2024-04-04 17:38:50,948&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-71.75&
+2024-04-04 17:38:52,949&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-74.75|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:53,452&e_panda&DEBUG&wellplate&update_contents&220&16.2&10000003&B8&Updating well contents...&True
+2024-04-04 17:38:53,452&e_panda&INFO&wellplate&save_to_db&260&16.2&10000003&B8&Saving well b8 to the database&True
+2024-04-04 17:38:53,891&e_panda&INFO&wellplate&save_to_db&297&16.2&10000003&B8&Well b8 saved to the database&True
+2024-04-04 17:38:54,393&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:38:54,393&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:38:56,394&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-316.1,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:56,896&e_panda&DEBUG&e_panda&forward_pipette_v2&203&16.2&10000003&B8&From Vessel b8 volume: 0.000000 depth: -71.750000&True
+2024-04-04 17:38:56,896&e_panda&INFO&e_panda&forward_pipette_v2&211&16.2&10000003&B8&Moving to: waste...&True
+2024-04-04 17:38:56,896&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:38:56,896&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:38:56,896&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:38:56,897&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-132.5, -9.5, -17]&
+2024-04-04 17:38:56,897&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:38:56,897&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -316.1, Y = -146.3, Z = -3.0&
+2024-04-04 17:38:56,897&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -313.1, Y = -143.3, Z = 0.0&
+2024-04-04 17:38:56,897&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-313.1, -143.3, 0.0]&
+2024-04-04 17:38:56,897&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-132.5&
+2024-04-04 17:38:56,897&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-132.5&
+2024-04-04 17:38:58,898&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-146.3,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:38:58,898&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-9.5&
+2024-04-04 17:38:58,899&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-9.5&
+2024-04-04 17:39:00,900&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:39:00,900&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-17&
+2024-04-04 17:39:00,900&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-17&
+2024-04-04 17:39:02,900&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:39:03,402&e_panda&INFO&vials&write_volume_to_disk&176&16.2&10000003&B8&Writing waste volume to vial file...&True
+2024-04-04 17:39:03,409&e_panda&DEBUG&vials&update_contents&355&16.2&10000003&B8&Updating waste w0 contents...&True
+2024-04-04 17:39:03,409&e_panda&DEBUG&vials&update_contents&378&16.2&10000003&B8&waste w0: New contents: {'rinse': 8337.760000000004, 'edot': 509.72}&True
+2024-04-04 17:39:03,415&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&677&&&&9. Take end image&
+2024-04-04 17:39:05,202&e_panda&INFO&e_panda&image_well&802&16.2&10000003&B8&Imaging well B8&True
+2024-04-04 17:39:05,202&e_panda&DEBUG&e_panda&image_well&804&16.2&10000003&B8&Capturing image of well B8&True
+2024-04-04 17:39:05,203&e_panda&INFO&e_panda&image_well&826&16.2&10000003&B8&Moving camera above well B8&True
+2024-04-04 17:39:05,203&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:39:05,203&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:39:05,203&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:39:05,204&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-230.6, -140.8, -35]&
+2024-04-04 17:39:05,204&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:39:05,204&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0&
+2024-04-04 17:39:05,204&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0&
+2024-04-04 17:39:05,204&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-132.5, -9.5, -17.0]&
+2024-04-04 17:39:05,204&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-230.6&
+2024-04-04 17:39:05,205&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-230.6&
+2024-04-04 17:39:07,205&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-12.5,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:39:07,205&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-140.8&
+2024-04-04 17:39:07,205&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-140.8&
+2024-04-04 17:39:09,206&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-20.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:39:09,206&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-35&
+2024-04-04 17:39:09,206&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-35&
+2024-04-04 17:39:11,207&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-38.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:39:11,207&e_panda&DEBUG&e_panda&image_well&852&16.2&10000003&B8&Image of well B8 captured&True
+2024-04-04 17:39:11,208&e_panda&INFO&e_panda&image_well&865&16.2&10000003&B8&Moving camera to safe position&True
+2024-04-04 17:39:11,208&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:39:11,208&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:39:13,209&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:39:13,209&ePANDA&INFO&exp_edot_screening_protocol_v2&pedotcv&686&&&&PEDOT characterizing complete
+
+&
+2024-04-04 17:39:14,070&ePANDA&ERROR&controller&share_to_slack&604&&&&The experiment has no dz.tiff image files&
+2024-04-04 17:39:14,071&ePANDA&INFO&controller&main&289&&&&Experiment 10000003 ended with status complete&
+2024-04-04 17:39:18,444&e_panda&DEBUG&wellplate&update_well_status_from_db&515&None&None&None&Updating well status from database...&True
+2024-04-04 17:39:18,975&e_panda&DEBUG&wellplate&update_well_status_from_db&527&None&None&None&Well status updated from database&True
+2024-04-04 17:39:18,975&ePANDA&INFO&controller&establish_system_state&421&&&&System state reestablished&
+2024-04-04 17:39:18,976&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial liclo4 contains liclo4 with volume 20000&
+2024-04-04 17:39:18,976&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial edot contains edot with volume 19490&
+2024-04-04 17:39:18,976&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial rinse contains rinse with volume 11662&
+2024-04-04 17:39:18,976&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial rinse contains rinse with volume 20000&
+2024-04-04 17:39:18,976&ePANDA&DEBUG&controller&establish_system_state&425&&&&Stock vial electrode_bath contains electrolyte with volume 20000&
+2024-04-04 17:39:18,977&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {'rinse': 8337.760000000004, 'edot': 509.72} with volume 9847&
+2024-04-04 17:39:18,977&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {} with volume 1000&
+2024-04-04 17:39:18,977&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {} with volume 1000&
+2024-04-04 17:39:18,977&ePANDA&DEBUG&controller&establish_system_state&451&&&&Waste vial waste contains {} with volume 1000&
+2024-04-04 17:39:19,295&ePANDA&INFO&controller&establish_system_state&494&&&&There are 80 clear wells&
+2024-04-04 17:39:19,480&epanda_lib.scheduler&INFO&scheduler&read_next_experiment_from_queue&116&&&&No experiments in queue&
+2024-04-04 17:39:20,115&epanda_lib.scheduler&INFO&scheduler&read_next_experiment_from_queue&116&&&&No experiments in queue&
+2024-04-04 17:39:20,116&ePANDA&INFO&controller&main&150&&&&No new experiments to run...waiting a minute for new experiments&
+2024-04-04 17:40:20,862&e_panda&INFO&SlackBot&send_slack_message&65&None&None&None&Message sent:ePANDA is shutting down&True
+2024-04-04 17:40:21,275&ePANDA&INFO&controller&main&357&&&&User commanded shutting down of ePANDA&
+2024-04-04 17:40:21,276&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z0&
+2024-04-04 17:40:21,276&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z0&
+2024-04-04 17:40:23,277&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-233.6,-143.8,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:40:23,277&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:40:23,278&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:40:23,278&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:40:23,278&ePANDA&DEBUG&mill_control&safe_move&601&&&&Target coordinates: [-369.4, -8.2, -50]&
+2024-04-04 17:40:23,278&ePANDA&DEBUG&mill_control&safe_move&618&&&&Not moving to Z=0 first&
+2024-04-04 17:40:23,278&ePANDA&DEBUG&mill_control&current_coordinates&373&&&&MPos coordinates: X = -233.6, Y = -143.8, Z = -3.0&
+2024-04-04 17:40:23,278&ePANDA&DEBUG&mill_control&current_coordinates&375&&&&WPos coordinates: X = -230.6, Y = -140.8, Z = 0.0&
+2024-04-04 17:40:23,279&ePANDA&DEBUG&mill_control&current_coordinates&416&&&&Current_coordinates: [-230.6, -140.8, 0.0]&
+2024-04-04 17:40:23,279&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 X-369.4&
+2024-04-04 17:40:23,279&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 X-369.4&
+2024-04-04 17:40:25,279&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-143.8,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:40:25,279&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Y-8.2&
+2024-04-04 17:40:25,280&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Y-8.2&
+2024-04-04 17:40:27,280&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:40:27,280&ePANDA&DEBUG&mill_control&execute_command&768&&&&Command sent: G01 Z-50&
+2024-04-04 17:40:27,281&ePANDA&DEBUG&mill_control&mock_write&847&&&&Writing to the mill: G01 Z-50&
+2024-04-04 17:40:29,281&ePANDA&DEBUG&mill_control&execute_command&788&&&&Returned <Idle|MPos:-372.4,-11.2,-53.0|Bf:15,127|FS:0,0>&
+2024-04-04 17:40:29,281&ePANDA&INFO&controller&disconnect_from_instruments&586&&&&Disconnecting from instruments:&
+2024-04-04 17:40:29,282&ePANDA&INFO&mill_control&disconnect&761&&&&Disconnecting from the mill&
+2024-04-04 17:40:29,283&ePANDA&INFO&controller&disconnect_from_instruments&589&&&&Disconnected from instruments&
+2024-04-04 17:40:30,175&e_panda&INFO&SlackBot&send_slack_message&65&None&None&None&Message sent:ePANDA is shutting down...goodbye&True

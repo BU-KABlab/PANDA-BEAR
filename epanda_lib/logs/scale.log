@@ -1,0 +1,144 @@
+2024-04-04 17:17:51,470&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.127066
+2024-04-04 17:17:51,470&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:17:51,971&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:17:51,971&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:17:51,971&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,0.997140,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:17:51,971&scale&pump_control&run_pump&395&Expected difference: 0.127066
+2024-04-04 17:17:51,971&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:17:51,972&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:19:13,282&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:19:13,282&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:19:13,783&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:19:13,783&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:19:13,784&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:19:13,784&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:19:13,784&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:19:13,784&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:19:42,772&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:19:42,772&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:19:43,272&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:19:43,272&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:19:43,273&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:19:43,273&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:19:43,273&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:19:43,273&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:20:12,230&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:20:12,230&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:20:12,731&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:20:12,731&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:20:12,731&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:20:12,731&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:20:12,731&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:20:12,731&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:20:41,758&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:20:41,758&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:20:42,259&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:20:42,259&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:20:42,259&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:20:42,260&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:20:42,260&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:20:42,260&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:22:38,578&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.127066
+2024-04-04 17:22:38,578&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:22:39,079&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:22:39,079&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:22:39,079&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,0.997140,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:22:39,079&scale&pump_control&run_pump&395&Expected difference: 0.127066
+2024-04-04 17:22:39,079&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:22:39,080&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:24:00,189&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:24:00,189&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:24:00,689&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:24:00,689&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:24:00,689&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:24:00,690&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:24:00,690&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:24:00,690&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:24:29,627&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:24:29,627&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:24:30,127&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:24:30,127&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:24:30,128&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:24:30,128&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:24:30,128&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:24:30,128&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:24:59,107&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:24:59,107&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:24:59,608&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:24:59,608&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:24:59,608&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:24:59,608&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:24:59,608&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:24:59,608&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:25:28,611&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:25:28,611&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:25:29,111&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:25:29,111&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:25:29,112&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:25:29,112&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:25:29,112&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:25:29,113&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:30:40,011&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:30:40,011&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:30:40,512&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:30:40,512&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:30:40,512&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:30:40,512&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:30:40,512&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:30:40,512&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:31:09,488&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:31:09,488&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:31:09,989&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:31:09,989&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:31:09,989&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:31:09,989&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:31:09,989&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:31:09,989&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:31:39,042&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:31:39,042&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:31:39,542&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:31:39,542&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:31:39,542&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:31:39,543&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:31:39,543&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:31:39,543&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:32:08,457&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:32:08,457&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:32:08,957&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:32:08,957&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:32:08,958&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:32:08,958&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:32:08,958&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:32:08,958&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:37:21,027&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:37:21,027&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:37:21,528&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:37:21,528&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:37:21,528&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:37:21,528&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:37:21,528&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:37:21,528&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:37:50,487&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:37:50,487&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:37:50,988&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:37:50,988&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:37:50,988&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:37:50,988&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:37:50,988&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:37:50,988&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:38:20,002&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:38:20,002&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:38:20,503&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:38:20,503&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:38:20,503&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:38:20,503&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:38:20,503&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:38:20,503&scale&pump_control&run_pump&401&Percent error is above 50%
+2024-04-04 17:38:49,470&scale&pump_control&run_pump&338&Expected difference in scale reading: 0.147118
+2024-04-04 17:38:49,470&scale&pump_control&run_pump&341&Scale reading before Infusing: 0.000000
+2024-04-04 17:38:49,971&scale&pump_control&run_pump&358&Scale reading after Infusing: 0.000000
+2024-04-04 17:38:49,971&scale&pump_control&run_pump&359&Scale reading difference: 0.000000
+2024-04-04 17:38:49,971&scale&pump_control&run_pump&360&Data,Infusing,0.127430,0.120000,1.154500,0.000000,0.000000,0.654000,0.910000
+2024-04-04 17:38:49,972&scale&pump_control&run_pump&395&Expected difference: 0.147118
+2024-04-04 17:38:49,972&scale&pump_control&run_pump&396&Actual difference: 0.000000
+2024-04-04 17:38:49,972&scale&pump_control&run_pump&401&Percent error is above 50%
