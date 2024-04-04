@@ -41,7 +41,7 @@ def  remove_wellplate_from_database():
     """Removes the current wellplate from the database."""
     plate_to_remove = int(input("Enter the wellplate number to remove: ").strip().lower())
     set_system_status(SystemState.BUSY, "removing wellplate from database", read_testing_config())
-    wellplate.remove_wellplate_from_db(plate_to_remove)
+    wellplate._remove_wellplate_from_db(plate_to_remove)
 
 def reset_vials_stock():
     """Resets the stock vials."""
@@ -144,6 +144,8 @@ def exit_program():
     print("Exiting ePANDA. Goodbye!")
     sys.exit()
 
+def refresh():
+    pass
 
 options = {
     # '0': run_epanda,
@@ -159,6 +161,7 @@ options = {
     "9": toggle_testing_mode,
     "10": calibrate_mill,
     "11": test_camera,
+    "r": refresh,
     "q": exit_program,
 }
 
@@ -183,8 +186,14 @@ if __name__ == "__main__":
             print(f"{key}. {value.__name__.replace('_', ' ').title()}")
 
         user_choice = input("Enter the number of your choice: ").strip().lower()
-        if user_choice in options:
-            options[user_choice]()
-        else:
-            print("Invalid choice. Please try again.")
-            continue
+        try:
+            if user_choice in options:
+                options[user_choice]()
+            else:
+                print("Invalid choice. Please try again.")
+                continue
+        except controller.ShutDownCommand:
+            pass # The epanda loop has been stopped but we don't want to exit the program
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            break # Exit the program if an unknown error occurs

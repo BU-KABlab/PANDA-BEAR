@@ -37,7 +37,7 @@ def main():
 
         experiments.append(
             experiment_class.EchemExperimentBase(
-                id=experiment_id,
+                experiment_id=experiment_id,
                 protocol_id=10,
                 well_id=str(well_letter) + str(well_number),
                 experiment_name=EXPERIMENT_NAME + " " + "Deposition",
@@ -72,7 +72,7 @@ def main():
     for experiment in experiments:
         ## Print a recipt of the wellplate and its experiments noting the solution and volume
         print(f"Experiment name: {experiment.experiment_name}")
-        print(f"Experiment id: {experiment.id}")
+        print(f"Experiment id: {experiment.experiment_id}")
         print(f"Well id: {experiment.well_id}")
         print(f"Solutions: {json.dumps(experiment.solutions)}")
         print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")
@@ -100,7 +100,7 @@ def main():
 
         experiments.append(
             experiment_class.EchemExperimentBase(
-                id=experiment_id,
+                experiment_id=experiment_id,
                 protocol_id=10,
                 well_id=str(well_letter) + str(well_number),
                 experiment_name=EXPERIMENT_NAME + " " + "bleaching",
@@ -121,7 +121,7 @@ def main():
 
         experiments.append(
             experiment_class.EchemExperimentBase(
-                id=experiment_id,
+                experiment_id=experiment_id,
                 protocol_id=10,
                 well_id=str(well_letter) + str(well_number),
                 experiment_name=EXPERIMENT_NAME + " " + "coloring",
@@ -141,7 +141,7 @@ def main():
 
         experiments.append(
             experiment_class.EchemExperimentBase(
-                id=experiment_id,
+                experiment_id=experiment_id,
                 protocol_id=10,
                 well_id=str(well_letter) + str(well_number),
                 experiment_name=EXPERIMENT_NAME + " " + "char",
@@ -163,7 +163,7 @@ def main():
     for experiment in experiments:
         ## Print a recipt of the wellplate and its experiments noting the solution and volume
         print(f"Experiment name: {experiment.experiment_name}")
-        print(f"Experiment id: {experiment.id}")
+        print(f"Experiment id: {experiment.experiment_id}")
         print(f"Well id: {experiment.well_id}")
         print(f"Solutions: {json.dumps(experiment.solutions)}")
         print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")

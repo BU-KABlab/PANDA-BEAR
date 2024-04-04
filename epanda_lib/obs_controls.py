@@ -33,19 +33,24 @@ class OBSController:
         client_port=OBSSecrets.PORT,
         client_timeout=3,
     ):
-        self.client = obsws.ReqClient(
+        try:
+            self.client = obsws.ReqClient(
             host=client_host,
             port=client_port,
             password=client_password,
             timeout=client_timeout,
         )
-        self.logger = logging.getLogger(__name__)
-        self.sources = {
-            "PSTAT": 0,
-            "Webcam": 0,
-            "Vials": 0,
-            "text": 0,
-        }
+            self.logger = logging.getLogger(__name__)
+            self.sources = {
+                "PSTAT": 0,
+                "Webcam": 0,
+                "Vials": 0,
+                "text": 0,
+            }
+        except OBSerror.OBSSDKRequestError as e:
+            self.logger.error("Error connecting to OBS: %s", e)
+            self.client = None
+            
 
         for source in self.sources.keys():
             try:
@@ -55,7 +60,7 @@ class OBSController:
     def place_experiment_on_screen(self, instructions: ExperimentBase):
         """Place the experiment information on the screen"""
         try:
-            exp_id = instructions.id if instructions.id else "None"
+            exp_id = instructions.experiment_id if instructions.experiment_id else "None"
             project_id = instructions.project_id if instructions.project_id else "None"
             well_id = instructions.well_id if instructions.well_id else "None"
             status = instructions.status if instructions.status else "None"

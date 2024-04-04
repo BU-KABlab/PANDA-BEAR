@@ -18,8 +18,8 @@ from epanda_lib.e_panda import (
 
 
 def chrono_amp_edot_bleaching(
-    dep_instructions: EchemExperimentBase,
-    file_tag: str = "bleaching",
+    ca_instructions: EchemExperimentBase,
+    file_tag: str = "CA_bleaching",
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Bleaching of an edot film already on ITO. This wraps the chrono_amp function.
@@ -44,33 +44,33 @@ def chrono_amp_edot_bleaching(
             CAsamplerate=0.1,
         )
 
-        dep_instructions, dep_results = chrono_amp(
-            dep_instructions=dep_instructions,
+        ca_instructions, dep_results = chrono_amp(
+            ca_instructions=ca_instructions,
             file_tag=file_tag,
             custom_parameters=bleaching_params,
         )
 
     except OCPFailure as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("OCP of well %s failed", dep_instructions.well_id)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", ca_instructions.well_id)
         raise e
 
     except CAFailure as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("CA of well %s failed", dep_instructions.well_id)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CA of well %s failed", ca_instructions.well_id)
         raise e
 
     except Exception as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
-        raise DepositionFailure(dep_instructions.id, dep_instructions.well_id) from e
+        raise DepositionFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
 
-    return dep_instructions, dep_results
+    return ca_instructions, dep_results
 
 
 def chrono_amp_edot_coloring(
-    dep_instructions: EchemExperimentBase,
-    file_tag: str = "coloring",
+    ca_instructions: EchemExperimentBase,
+    file_tag: str = "CA_coloring",
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Coloring of an edot film already on ITO. This wraps the chrono_amp function.
@@ -96,32 +96,32 @@ def chrono_amp_edot_coloring(
             CAsamplerate=0.1,
         )
 
-        dep_instructions, dep_results = chrono_amp(
-            dep_instructions=dep_instructions,
+        ca_instructions, dep_results = chrono_amp(
+            ca_instructions=ca_instructions,
             file_tag=file_tag,
             custom_parameters=coloring_params,
         )
 
     except OCPFailure as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("OCP of well %s failed", dep_instructions.well_id)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", ca_instructions.well_id)
         raise e
 
     except CAFailure as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("CA of well %s failed", dep_instructions.well_id)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CA of well %s failed", ca_instructions.well_id)
         raise e
 
     except Exception as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
-        raise DepositionFailure(dep_instructions.id, dep_instructions.well_id) from e
+        raise DepositionFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
 
-    return dep_instructions, dep_results
+    return ca_instructions, dep_results
 
 
 def cyclic_volt_edot_characterizing(
-    char_instructions: EchemExperimentBase, file_tag: str = "characterizing"
+    cv_instructions: EchemExperimentBase, file_tag: str = "CV_characterization"
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Characterization of the solutions on the substrate using CV.
@@ -137,7 +137,7 @@ def cyclic_volt_edot_characterizing(
         char_results (ExperimentResult): The updated experiment results
     """
     try:
-        logger.info("Characterizing well: %s", char_instructions.well_id)
+        logger.info("Characterizing well: %s", cv_instructions.well_id)
 
         characterizing_cyclic_volt_params = potentiostat_cv_parameters(
             CVvi=0.0,
@@ -151,8 +151,8 @@ def cyclic_volt_edot_characterizing(
             CVcycle=3,
         )
 
-        char_instructions, char_results = cyclic_volt(
-            char_instructions=char_instructions,
+        cv_instructions, char_results = cyclic_volt(
+            cv_instructions=cv_instructions,
             file_tag=file_tag,
             # Do not change the instructions initial voltage during custom CV
             # We only change this for the deposition step which is the only step that
@@ -162,18 +162,18 @@ def cyclic_volt_edot_characterizing(
         )
 
     except OCPFailure as e:
-        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("OCP of well %s failed", char_instructions.well_id)
+        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", cv_instructions.well_id)
         raise e
 
     except CVFailure as e:
-        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("CV %s of well %s failed", file_tag, char_instructions.well_id)
+        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CV %s of well %s failed", file_tag, cv_instructions.well_id)
         raise e
 
     except Exception as e:
-        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("An unknown exception occurred during %s CV: %s", file_tag, e)
-        raise CVFailure(char_instructions.id, char_instructions.well_id) from e
+        raise CVFailure(cv_instructions.experiment_id, cv_instructions.well_id) from e
 
-    return char_instructions, char_results
+    return cv_instructions, char_results

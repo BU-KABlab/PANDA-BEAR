@@ -4,7 +4,7 @@ import json
 
 import pandas as pd
 
-from epanda_lib import experiment_class, wellplate
+from epanda_lib import experiment_class
 from epanda_lib.config.config import TESTING, DEFAULT_PUMPING_RATE
 from epanda_lib.config.pin import CURRENT_PIN
 from epanda_lib.scheduler import Scheduler, determine_next_experiment_id
@@ -26,7 +26,7 @@ def main():
     # controller.load_new_wellplate(new_wellplate_type_number=6)
     starting_experiment_id = determine_next_experiment_id()
     experiment_id = starting_experiment_id
-    experiments: list[experiment_class.EchemExperimentBase] = []
+    experiments: list[experiment_class.EdotExperiment] = []
 
     for _, row in params_df.iterrows():
         well_letter = row["well_letter"]
@@ -35,9 +35,9 @@ def main():
         dep_t = row["dep_T"]  # dep_T is used for deposition time
 
         experiments.append(
-            experiment_class.EchemExperimentBase(
-                id=experiment_id,
-                protocol_id=10,
+            experiment_class.EdotExperiment(
+                experiment_id=experiment_id,
+                protocol_id=12,
                 well_id=str(well_letter) + str(well_number),
                 well_type_number=4,
                 experiment_name=EXPERIMENT_NAME + " " + "Deposition",
@@ -65,6 +65,7 @@ def main():
                 ca_step_2_voltage=0.0,
                 ca_step_2_time=0.0,
                 ca_sample_rate=0.5,
+                edot_concentration=0.01,
             )
         )
         experiment_id += 1
@@ -72,7 +73,7 @@ def main():
     for experiment in experiments:
         ## Print a recipt of the wellplate and its experiments noting the solution and volume
         print(f"Experiment name: {experiment.experiment_name}")
-        print(f"Experiment id: {experiment.id}")
+        print(f"Experiment id: {experiment.experiment_id}")
         print(f"Well id: {experiment.well_id}")
         print(f"Solutions: {json.dumps(experiment.solutions)}")
         print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")

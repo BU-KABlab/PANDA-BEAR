@@ -62,7 +62,7 @@ def edot_bleaching_part_1(
     print(instructions.solutions_corrected)
 
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 1 started"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 1 started"
     )
     print("Deposition using CV")
     # Pipette 120ul of edot solution into well
@@ -100,7 +100,7 @@ def edot_bleaching_part_1(
     print("\tCvcycle = ", instructions.cv_cycle_count)
     try:
         cyclic_volt(
-            char_instructions=instructions,
+            cv_instructions=instructions,
             char_results=instructions.results,
             wellplate=toolkit.wellplate,
         )
@@ -180,7 +180,7 @@ def edot_bleaching_part_1(
  
     toolkit.mill.rest_electrode()
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 1 complete"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 1 complete"
     )
     print("*" * 80, end="\n\n")
 
@@ -207,7 +207,7 @@ def edot_bleaching_part_2(
 
     """
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 started"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 2 started"
     )
 
     # Move lens over well
@@ -239,7 +239,7 @@ def edot_bleaching_part_2(
     print("\tCVsr1 = 0.025")
     print("\tCvcycle = 3")
     cyclic_volt(
-        char_instructions=instructions,
+        cv_instructions=instructions,
         char_results=instructions.results,
         wellplate=toolkit.wellplate,
     )
@@ -249,6 +249,6 @@ def edot_bleaching_part_2(
     input("Stop recording using the OBS software. Press enter to continue")
 
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 complete"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 2 complete"
     )
     print("*" * 80, end="\n\n")

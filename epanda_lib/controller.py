@@ -14,27 +14,24 @@ Additionally controller should be able to:
 
 # pylint: disable=line-too-long
 import importlib
-import json
-from pathlib import Path
+import sys
 import time
+from pathlib import Path
 from typing import Sequence
 
-from slack_sdk.errors import (
-    BotUserAccessError,
-    SlackApiError,
-    SlackClientConfigurationError,
-    SlackClientError,
-    SlackClientNotConnectedError,
-    SlackObjectFormationError,
-    SlackRequestError,
-    SlackTokenRotationError,
-)
+from slack_sdk.errors import (BotUserAccessError, SlackApiError,
+                              SlackClientConfigurationError, SlackClientError,
+                              SlackClientNotConnectedError,
+                              SlackObjectFormationError, SlackRequestError,
+                              SlackTokenRotationError)
 
 from epanda_lib import sql_utilities
 
 from . import e_panda
-from .config.config import RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS, WELL_STATUS
-from .experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
+from .config.config import (RANDOM_FLAG, STOCK_STATUS,
+                            TESTING, WASTE_STATUS)
+from .experiment_class import (ExperimentBase, ExperimentResult,
+                               ExperimentStatus)
 from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
@@ -45,8 +42,9 @@ from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
-from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_files
-from .wellplate import Well, Wellplate
+from .vials import (StockVial, Vial2, WasteVial, read_vials,
+                    update_vial_state_files)
+from .wellplate import Wellplate
 
 # set up slack globally so that it can be used in the main function and others
 
@@ -85,7 +83,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         scheduler = Scheduler()
 
         ## Establish state of system - we do this each time because each experiment changes the system state
-        stock_vials, waste_vials, wellplate = establish_system_state()
+        stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
 
         ## Check that the pipette is empty, if not dispose of full volume into waste
         if toolkit.pump.pipette.volume > 0:
@@ -95,9 +93,9 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 mill=toolkit.mill,
                 pump=toolkit.pump,
             )
-
         # Flush the pipette tip with water before we start
         obs.place_text_on_screen("Initial flushing of pipette tip")
+        logger.info("Flushing pipette tip")
         e_panda.flush_v2(
             stock_vials=stock_vials,
             waste_vials=waste_vials,
@@ -109,15 +107,15 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         ## Update the system state with new vial and wellplate information
         update_vial_state_files(stock_vials, waste_vials, STOCK_STATUS, WASTE_STATUS)
 
-        ## Begin experiemnt loop
+        # experiemnt loop
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
             obs.place_text_on_screen("")
             e_panda.apply_log_filter()
             sql_utilities.set_system_status(sql_utilities.SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
-            stock_vials, waste_vials, wellplate = establish_system_state()
-            toolkit.wellplate = wellplate
+            stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
+
             ## Check the qeueue for any protocol type 2 experiments
             # queue = scheduler.get_queue()
             # check if any of the experiments in the queue pandas dataframe are type 2
@@ -125,11 +123,11 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             new_experiment, _ = scheduler.read_next_experiment_from_queue(
                 random_pick=RANDOM_FLAG
             )
-            if new_experiment is None:
-                slack.send_slack_message(
-                    "alert",
-                    "No new experiments to run...monitoring inbox for new experiments",
-                )
+            # if new_experiment is None:
+            #     slack.send_slack_message(
+            #         "alert",
+            #         "No new experiments to run...monitoring inbox for new experiments",
+            #     )
             # if new_experiment is None:
             #     # e_panda.flush_pipette_tip(pump=toolkit.pump,
             #     #                           mill=toolkit.mill,
@@ -146,15 +144,30 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 new_experiment, _ = scheduler.read_next_experiment_from_queue()
                 if new_experiment is not None:
                     slack.send_slack_message(
-                        "alert", f"New experiment {new_experiment.id} found"
+                        "alert", f"New experiment {new_experiment.experiment_id} found"
                     )
-                    break # break out of the while new experiment is None loop
+                    break  # break out of the while new experiment is None loop
                 logger.info(
-                    "No new experiments to run...waiting 5 minutes for new experiments"
+                    "No new experiments to run...waiting a minute for new experiments"
                 )
-                time.sleep(600)
-                # Replace with slack alert and wait for response from user
-
+                for remaining in range(60, 0, -1):
+                    sys.stdout.write("\r")
+                    sys.stdout.write(
+                        f"Waiting for new experiments: {remaining} seconds remaining"
+                    )
+                    sys.stdout.flush()
+                    time.sleep(1)
+                sys.stdout.write("\r")
+                sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
+                sys.stdout.flush()
+                sys.stdout.write("\n")
+                # TODO: Check the last two system states for a shutdown command
+                if (
+                    sql_utilities.SystemState.SHUTDOWN
+                    in sql_utilities.get_system_status(2)
+                ):
+                    slack.send_slack_message("alert", "ePANDA is shutting down")
+                    raise ShutDownCommand
             ## confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, ExperimentBase):
                 logger.error("The experiment object is not valid")
@@ -165,42 +178,55 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 break  # break out of the while True loop
             ## Initialize a results object
             new_experiment.results = ExperimentResult(
-                id=new_experiment.id,
+                experiment_id=new_experiment.experiment_id,
                 well_id=new_experiment.well_id,
             )
             ## Check that there is enough volume in the stock vials to run the experiment
             if not check_stock_vials(new_experiment, stock_vials):
-                error_message = f"Experiment {new_experiment.id} cannot be run because there is not enough volume in the stock vials"
+                error_message = f"Experiment {new_experiment.experiment_id} cannot be run because there is not enough volume in the stock vials"
                 slack.send_slack_message(
                     "alert",
                     error_message,
                 )
                 logger.error(error_message)
-                new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+
                 new_experiment.priority = 999
-                scheduler.update_experiment_info(new_experiment,"priority") # update the experiment file with the new status and priority
+                scheduler.update_experiment_info(
+                    new_experiment, "priority"
+                )  # update the experiment file with the new status and priority
                 scheduler.update_experiment_queue_priority(
-                    new_experiment.id, new_experiment.priority
+                    new_experiment.experiment_id, new_experiment.priority
                 )
+                new_experiment.set_status_and_save(ExperimentStatus.ERROR)
                 break  # break out of the while True loop
 
             # Announce the experiment
-            pre_experiment_status_msg = f"Running experiment {new_experiment.id}"
+            pre_experiment_status_msg = (
+                f"Running experiment {new_experiment.experiment_id}"
+            )
+            if new_experiment.process_type:
+                pre_experiment_status_msg += f" part {new_experiment.process_type}"
             logger.info(pre_experiment_status_msg)
             slack.send_slack_message("alert", pre_experiment_status_msg)
 
             ## Update the experiment status to running
+            new_experiment.plate_id = toolkit.wellplate.plate_id
+            new_experiment.well = toolkit.wellplate.wells[new_experiment.well_id]
+            new_experiment.plate_id = toolkit.wellplate.plate_id
+            new_experiment.well.plate_id = toolkit.wellplate.plate_id
+            new_experiment.well.experiment_id = new_experiment.experiment_id
+            new_experiment.well.project_id = new_experiment.project_id
             new_experiment.set_status_and_save(ExperimentStatus.RUNNING)
-            scheduler.change_well_status(
-                wellplate.wells[new_experiment.well_id], new_experiment
-            )
+            # scheduler.change_well_status(
+            #     wellplate.wells[new_experiment.well_id], new_experiment
+            # )
             # With the experiment now running, remove it from the queue
             # Any errors that occur after this point will be caught and the experiment will be marked as errored
-            #scheduler.remove_from_queue(new_experiment)
+            # scheduler.remove_from_queue(new_experiment)
 
             ## Run the experiment
             e_panda.apply_log_filter(
-                new_experiment.id,
+                new_experiment.experiment_id,
                 new_experiment.well_id,
                 str(new_experiment.project_id)
                 + "."
@@ -208,18 +234,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 test=use_mock_instruments,
             )
 
-            ## Now that we know we are about to run the experiment
-            ## Add the plate id to the experiment
-            new_experiment.plate_id = wellplate.plate_id
-
-            logger.info("Beginning experiment %d", new_experiment.id)
-            # import exp_a_2_ferrocyanide_assessment_protocol as exp_a
-            # exp_a.cv_repeatability(
-            #     instructions=new_experiment,
-            #     toolkit=toolkit,
-            #     stock_vials=stock_vials,
-            #     waste_vials=waste_vials,
-            # )
+            logger.info("Beginning experiment %d", new_experiment.experiment_id)
 
             # Get the protocol entry
             protocol_entry: ProtocolEntry = select_protocol_by_id(
@@ -246,9 +261,13 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             ## FIXME: This is a temporary fix to allow the program to run for the broken up edot experiments
             ## This will be removed once the experiment steps are performed in series
             if new_experiment.process_type in [1, 2, 3, 4]:
-                new_experiment.set_status_and_save(ExperimentStatus.PAUSED)
-                scheduler.change_well_status(
-                    wellplate.wells[new_experiment.well_id], new_experiment
+                new_experiment.set_status_and_save(ExperimentStatus.QUEUED)
+                # scheduler.change_well_status(
+                #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+                # )
+                slack.send_slack_message(
+                    "alert",
+                    f"Experiment {new_experiment.experiment_id} part {new_experiment.process_type-1} has completed, and is back in the queue",
                 )
                 scheduler.add_to_queue(new_experiment)
             else:
@@ -256,18 +275,17 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 ## Update the experiment status to complete
                 new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
                 ## Update the system state with new vial and wellplate information
-                scheduler.change_well_status(
-                    wellplate.wells[new_experiment.well_id], new_experiment
-                )
+                # scheduler.change_well_status(
+                #     wellplate.wells[new_experiment.well_id], new_experiment
+                # )
                 # Share any results images with the slack data channel
                 share_to_slack(new_experiment)
-                scheduler.remove_from_queue(new_experiment)
 
             ## Reset the logger to log to the ePANDA.log file and format after the experiment is complete
             e_panda.apply_log_filter()
 
             ## With returned experiment and results, update the experiment status and post the final status
-            post_experiment_status_msg = f"Experiment {new_experiment.id} ended with status {new_experiment.status.value}"
+            post_experiment_status_msg = f"Experiment {new_experiment.experiment_id} ended with status {new_experiment.status.value}"
             logger.info(post_experiment_status_msg)
             # slack.send_slack_message("alert", post_experiment_status_msg)
 
@@ -279,6 +297,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             new_experiment = None  # reset new_experiment to None so that we can check the queue again
 
             ## Update the system state with new vial and wellplate information
+            toolkit.pump.pipette.reset_contents()
             update_vial_state_files(
                 stock_vials, waste_vials, STOCK_STATUS, WASTE_STATUS
             )
@@ -288,6 +307,30 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             if one_off:
                 break  # break out of the while True loop
 
+            if sql_utilities.SystemState.SHUTDOWN in sql_utilities.get_system_status(2):
+                slack.send_slack_message("alert", "ePANDA is shutting down")
+                raise ShutDownCommand
+
+            # check for paused status and hold until status changes to resume
+            while sql_utilities.SystemState.PAUSE == sql_utilities.get_system_status(1):
+                logger.info("System is paused, waiting for resume status")
+                slack.send_slack_message(
+                    "alert", "ePANDA is paused, waiting for status change"
+                )
+                time.sleep(60)
+                if (
+                    sql_utilities.SystemState.SHUTDOWN
+                    in sql_utilities.get_system_status(2)
+                ):
+                    slack.send_slack_message("alert", "ePANDA is shutting down")
+                    raise ShutDownCommand
+
+                if sql_utilities.SystemState.RESUME in sql_utilities.get_system_status(
+                    2
+                ):
+                    slack.send_slack_message("alert", "ePANDA is resuming")
+                    break
+
     except (
         e_panda.OCPFailure,
         e_panda.DepositionFailure,
@@ -296,21 +339,32 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     ) as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
-            scheduler.change_well_status(
-                wellplate.wells[new_experiment.well_id], new_experiment
-            )
+        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+            # scheduler.change_well_status(
+            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+            # )
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
 
+    except ShutDownCommand as error:
+        if new_experiment is not None:
+            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+        sql_utilities.set_system_status(sql_utilities.SystemState.OFF)
+            # scheduler.change_well_status(
+            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+            # )
+        logger.info("User commanded shutting down of ePANDA")
+        raise ShutDownCommand from error  # raise error to go to finally.
+        # This was triggered by the user to indicate they want to stop the program
+
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
-            scheduler.change_well_status(
-                wellplate.wells[new_experiment.well_id], new_experiment
-            )
+        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+            # scheduler.change_well_status(
+            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+            # )
 
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
@@ -319,10 +373,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
-            scheduler.change_well_status(
-                wellplate.wells[new_experiment.well_id], new_experiment
-            )
+        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+            # scheduler.change_well_status(
+            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+            # )
         logger.info("Keyboard interrupt detected")
         slack.send_slack_message("alert", "ePANDA was interrupted by the user")
         raise KeyboardInterrupt from exc  # raise error to to go finally. This was triggered by the user to indicate they want to stop the program
@@ -335,8 +389,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             scheduler.save_results(new_experiment)
 
         # Save the current wellplate
-        if wellplate:
-            toolkit.wellplate.save_wells_to_db()  # load a "new" wellplate to save and update wells
+        # if toolkit.wellplate:
+        #     toolkit.wellplate.save_wells_to_db()  # load a "new" wellplate to save and update wells
         # close out of serial connections
         toolkit.mill.rest_electrode()
         if toolkit is not None:
@@ -537,20 +591,26 @@ def disconnect_from_instruments(instruments: Toolkit):
 
 def share_to_slack(experiment: ExperimentBase):
     """Share the results of the experiment to the slack data channel"""
-    slack = SlackBot()
+    slack = SlackBot(test = TESTING)
     if experiment.results is None:
         logger.error("The experiment has no results")
         return
-    if experiment.results.image_files is None:
+    if experiment.results.image is None:
         logger.error("The experiment has no image files")
         return
     try:
+        images_with_dz = [image for image in experiment.results.image if image[0].name.endswith("dz.tiff")]
+        if len(images_with_dz) == 0:
+            logger.error("The experiment has no dz.tiff image files")
+            msg = f"Experiment {experiment.experiment_id} has completed but has no datazoned image files to share"
+            slack.send_slack_message("data", msg)
+            return
         slack.send_slack_message(
             "data",
-            f"Experiment {experiment.id} has completed. Photos taken:",
+            f"Experiment {experiment.experiment_id} has completed. Photos taken:",
         )
-        for image in experiment.results.image_files:
-            image: Path
+        for image in experiment.results.image:
+            image: Path = image[0]
             if image.name.endswith("dz.tiff"):
                 slack.send_slack_file("data", image, image.name)
     except (
@@ -565,7 +625,7 @@ def share_to_slack(experiment: ExperimentBase):
     ) as error:
         logger.error(
             "A Slack specific error occured while sharing images from experiment %d with slack: %s",
-            experiment.id,
+            experiment.experiment_id,
             error,
         )
         # continue with the rest of the program
@@ -573,17 +633,29 @@ def share_to_slack(experiment: ExperimentBase):
     except Exception as error:
         logger.error(
             "An unanticipated error occured while sharing images from experiment %d with slack: %s",
-            experiment.id,
+            experiment.experiment_id,
             error,
         )
         # continue with the rest of the program
 
+
 class WellImportError(Exception):
     """Raised when the wellplate status file does not have the correct number of wells"""
 
-    def __init__(self, message="Wellplate status file does not have the correct number of wells"):
+    def __init__(
+        self, message="Wellplate status file does not have the correct number of wells"
+    ):
         self.message = message
         super().__init__(self.message)
+
+
+class ShutDownCommand(Exception):
+    """Raised when the system is commanded to shut down"""
+
+    def __init__(self, message="The system has been commanded to shut down"):
+        self.message = message
+        super().__init__(self.message)
+
 
 if __name__ == "__main__":
     # wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)

@@ -177,6 +177,28 @@ class Pump:
         else:
             return None
 
+    def withdraw_air(self, volume: float):
+        """Withdraw the given ul of air with the pipette"""
+        if volume > 0:
+            volume_ml = round(
+                volume / 1000.00, 4
+            )
+            _, _ = self.run_pump(
+                nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.max_pump_rate
+            )
+            self.update_pipette_volume(self.pump.volume_withdrawn)
+            pump_control_logger.info(
+                "Pump has withdrawn: %0.6f ml of air at %fmL/min  Pipette vol: %0.3f ul",
+                self.pump.volume_withdrawn,
+                self.pump.pumping_rate,
+                self.pipette.volume,
+            )
+            self.pump.volume_infused_clear()
+            self.pump.volume_withdrawn_clear()
+            return None
+        else:
+            return None
+
     def infuse(
         self,
         volume_to_infuse: float,
@@ -237,10 +259,13 @@ class Pump:
                 pumprecord["solution"] = being_infused.name
             if results is not None:
                 results.pumping_record.append(pumprecord)
+
+            # Clear the pump's memory so that future operations are fresh
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
-            if infused_into is not None:
-                # Update the to_vessel volume and contents
+
+            if infused_into is not None: # The we need to update the volume and contents of the vessel
+                
                 infused_into.update_volume(volume_ul)
                 infused_into.update_contents(self.pipette.contents, volume_ul)
 
@@ -258,6 +283,27 @@ class Pump:
         else:
             return 0
 
+    def infuse_air(self, volume: float):
+        """Infuse the given ul of air with the pipette"""
+        volume_ul = volume
+        if volume_ul > 0:
+            volume_ml = volume_ul / 1000.000
+            _, pumprecord = self.run_pump(
+                nesp_lib.PumpingDirection.INFUSE, volume_ml, self.max_pump_rate
+            )
+            self.update_pipette_volume(self.pump.volume_infused)
+            pump_control_logger.info(
+                "Pump has infused: %0.6f ml of air at %fmL/min Pipette volume: %0.3f ul",
+                self.pump.volume_infused,
+                self.pump.pumping_rate,
+                self.pipette.volume,
+            )
+            self.pump.volume_infused_clear()
+            self.pump.volume_withdrawn_clear()
+            return 0
+        else:
+            return 0
+    
     def run_pump(
         self,
         direction,

@@ -18,19 +18,18 @@ import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
+from epanda_lib import sql_utilities
 from epanda_lib.config.config import (
-    QUEUE,
     SLACK_TICKETS,
     STOCK_STATUS,
     WASTE_STATUS,
-    WELL_STATUS,
-    WELL_TYPE,
 )
 from epanda_lib.config.secrets import Slack as slack_cred
 from epanda_lib.wellplate import Wellplate
 from epanda_lib.obs_controls import OBSController
 from epanda_lib.image_tools import add_data_zone
-
+from epanda_lib.sql_utilities import SystemState, set_system_status
+from epanda_lib.experiment_class import ExperimentStatus
 
 class SlackBot:
     """Class for sending messages to Slack."""
@@ -52,19 +51,16 @@ class SlackBot:
     def send_slack_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
         client = WebClient(slack_cred.TOKEN)
-        if channel_id == "conversation":
-            channel_id = slack_cred.CONVERSATION_CHANNEL_ID
-        elif channel_id == "alert":
-            channel_id = slack_cred.ALERT_CHANNEL_ID
-        elif channel_id == "data":
-            channel_id = slack_cred.DATA_CHANNEL_ID
+        channel_mapping = {
+            "conversation": slack_cred.TEST_CONVERSATION_CHANNEL_ID if self.test else slack_cred.CONVERSATION_CHANNEL_ID,
+            "alert": slack_cred.TEST_ALERT_CHANNEL_ID if self.test else slack_cred.ALERT_CHANNEL_ID,
+            "data": slack_cred.TEST_DATA_CHANNEL_ID if self.test else slack_cred.DATA_CHANNEL_ID
+        }
+        channel_id = channel_mapping.get(channel_id, channel_id)
 
         try:
-            if not self.test:
-                result = client.chat_postMessage(channel=channel_id, text=message)
-            else:
-                result = {"ok": True}
-                print("Slack:", message)
+            result = client.chat_postMessage(channel=channel_id, text=message)
+            print("Slack:", message)
             if result["ok"]:
                 self.logger.info("Message sent:%s", message)
             else:
@@ -87,6 +83,11 @@ class SlackBot:
         elif channel in [
             slack_cred.CONVERSATION_CHANNEL_ID,
             slack_cred.ALERT_CHANNEL_ID,
+            slack_cred.DATA_CHANNEL_ID,
+            slack_cred.TEST_ALERT_CHANNEL_ID,
+            slack_cred.TEST_DATA_CHANNEL_ID,
+            slack_cred.TEST_CONVERSATION_CHANNEL_ID,
+
         ]:
             channel_id = channel
         else:
@@ -257,10 +258,17 @@ class SlackBot:
             # experiment_number = text[7:]
             return 1
 
-        elif text[0:17] == "status experiment":
+        elif text[0:17] == "status-experiment":
             # Get experiment number
-            # experiment_number = text[7:]
-            # Get status
+            try:
+                experiment_number = int(text[17:].strip())
+                # Get status
+                status = sql_utilities.select_experiment_status(experiment_number)
+                message = f"The status of experiment {experiment_number} is {status}."
+                self.send_slack_message(channel_id, message)
+            except ValueError:
+                message = "Please enter a valid experiment number."
+                self.send_slack_message(channel_id, message)
             return 1
 
         elif text[0:11] == "vial status":
@@ -275,7 +283,7 @@ class SlackBot:
         elif text[0:12] == "queue length":
             self.__queue_length(channel_id=channel_id)
             return 1
-        elif text[0:6] == "status":
+        elif text[0:13] == "system status":
             self.__queue_length(channel_id=channel_id)
             self.__well_status(channel_id=channel_id)
             time.sleep(1)
@@ -291,7 +299,7 @@ class SlackBot:
                 # verify that the camera is an active source
                 try:
                     sources = obs.client.get_source_active(camera)
-                except Exception as e:
+                except Exception:
                     self.send_slack_message(channel_id, f"Could not find a camera source named {camera}")
                     return 1
                 if not sources:
@@ -319,15 +327,22 @@ class SlackBot:
                 return 1
 
         elif text[0:5] == "pause":
+            set_system_status(SystemState.PAUSE, "pausing ePANDA", self.test)
             return 1
 
         elif text[0:6] == "resume":
+            set_system_status(SystemState.RESUME, "resuming ePANDA", self.test)
             return 1
 
         elif text[0:5] == "start":
+            #set_system_status(SystemState.ON, "starting ePANDA", self.test)
+            # start the experiment loop
+            #controller.main()
+            self.send_slack_message(channel_id, "Sorry starting the ePANDA is not something I can do yet")
             return 1
 
         elif text[0:4] == "stop":
+            set_system_status(SystemState.SHUTDOWN, "stopping ePANDA", self.test)
             return 1
 
         elif text[0:4] == "exit":
@@ -347,16 +362,16 @@ class SlackBot:
                 "help -> displays this message\n"
                 # "plot experiment # - plots plots the CV data for experiment #\n"
                 # "data experiment # - sends the data files for experiment #\n"
-                # "status experiment # - displays the status of experiment #\n"
+                "status experiment # - displays the status of experiment #\n"
                 "vial status -> displays the status of the vials\n"
                 "well status -> displays the status of the wells and the rest of the deck\n"
                 "queue length -> displays the length of the queue\n"
                 "status -> displays the status of the vials, wells, and queue\n"
                 "screenshot-{camera name} -> takes a screenshot of the specified camera\n"
-                # "pause - pauses the experiment loop\n"
-                # "resume - resumes the experiment loop\n"
+                "pause - pauses the experiment loop\n"
+                "resume - resumes the experiment loop\n"
                 # "start - starts the experiment loop\n"
-                # "stop - stops the experiment loop\n"
+                "stop - stops the experiment loop\n"
                 "exit -> closes the slackbot\n"
             )
         else:
@@ -365,16 +380,16 @@ class SlackBot:
                 "help -> displays this message\n"
                 # "plot experiment # - plots plots the CV data for experiment #\n"
                 # "data experiment # - sends the data files for experiment #\n"
-                # "status experiment # - displays the status of experiment #\n"
+                "status experiment # - displays the status of experiment #\n"
                 "vial status -> displays the status of the vials\n"
                 "well status -> displays the status of the wells and the rest of the deck\n"
                 "queue length -> displays the length of the queue\n"
                 "status -> displays the status of the vials, wells, and queue\n"
                 "screenshot-{camera name} -> takes a screenshot of the specified camera\n"
-                # "pause - pauses the experiment loop\n"
-                # "resume - resumes the experiment loop\n"
+                "pause - pauses the experiment loop\n"
+                "resume - resumes the experiment loop\n"
                 # "start - starts the experiment loop\n"
-                # "stop - stops the experiment loop\n"
+                "stop - stops the experiment loop\n"
             )
         self.send_slack_message(channel_id, message)
         return 1
@@ -449,16 +464,8 @@ class SlackBot:
     def __well_status(self, channel_id):
         """Sends the well status to the user."""
         # Check current wellplate type
-        with open(WELL_STATUS, "r", encoding="utf-8") as well:
-            data = json.load(well)
-            type_number = data["type_number"]
-        with open(WELL_TYPE, "r", encoding="utf-8") as well:
-            data = csv.reader(well)
-            for row in data:
-                if str(row[0]) == str(type_number):
-                    wellplate_type = str(row[4]).strip()
-                    break
-
+        _, type_number, _ = sql_utilities.select_current_wellplate_info()
+        _, _, _, _, wellplate_type = sql_utilities.select_well_characteristics(type_number)
         # Choose the correct wellplate object based on the wellplate type
         wellplate: Wellplate = None
         if wellplate_type == "circular":
@@ -470,10 +477,18 @@ class SlackBot:
                 type_number=type_number,
             )
 
-        ## Well coordinate
-        x_coordinates, y_coordinates, color = (
-            wellplate.well_coordinates_and_status_color()
-        )
+        ## Well coordinates and colors
+        """Plot the well plate on a coordinate plane."""
+        x_coordinates = []
+        y_coordinates = []
+        color = []
+
+        current_wells = sql_utilities.select_wellplate_wells()
+        for well in current_wells:
+            x_coordinates.append(well.coordinates["x"])
+            y_coordinates.append(well.coordinates["y"])
+            color.append(self._get_well_color(well.status))
+
         if wellplate.shape == "circular":
             marker = "o"
         else:
@@ -565,19 +580,24 @@ class SlackBot:
     def __queue_length(self, channel_id):
         # Get queue length
         queue_length = 0
-        queue_file = pd.read_csv(
-            QUEUE,
-            skipinitialspace=True,
-            header=None,
-            names=["id", "priority", "filename", "protocol_type"],
-        )
-        # the columsn to id,priority,filename,protocol_type
-        queue_length = len(queue_file) - 1
+        queue_length = sql_utilities.count_queue_length()
         message = f"The queue length is {queue_length}."
         self.send_slack_message(channel_id, message)
         return 1
 
-
+    def _get_well_color(self, status: str) -> str:
+        """Get the color of a well based on its status."""
+        if status is None:
+            return "black"
+        color_mapping = {
+            "empty": "black",
+            "new": "grey",
+            "queued": "orange",
+            "complete": "green",
+            "error": "red",
+            "paused": "blue",
+        }
+        return color_mapping.get(status, "gold")
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)
     TEST_MESSAGE = "This is a test message."

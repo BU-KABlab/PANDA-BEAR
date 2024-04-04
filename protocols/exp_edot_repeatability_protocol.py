@@ -46,7 +46,7 @@ def edot_bleaching_part_1(
     """
     # Apply correction factor to the programmed volumes
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 1 started"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 1 started"
     )
 
     print("0. Applying correction factor to the programmed volumes")
@@ -105,7 +105,7 @@ def edot_bleaching_part_1(
     print("\tCvcycle = ", instructions.cv_cycle_count)
     try:
         cyclic_volt(
-            char_instructions=instructions,
+            cv_instructions=instructions,
             file_tag="part_1",
         )
     except Exception as e:
@@ -194,7 +194,7 @@ def edot_bleaching_part_1(
 
     toolkit.mill.rest_electrode()
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 1 complete"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 1 complete"
     )
     print("*" * 80, end="\n\n")
 
@@ -220,7 +220,7 @@ def edot_bleaching_part_2(
 
     """
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 started"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 2 started"
     )
 
     print(
@@ -258,7 +258,7 @@ def edot_bleaching_part_2(
     print("\tCvcycle = ", instructions.cv_cycle_count)
 
     cyclic_volt(
-        char_instructions=instructions,
+        cv_instructions=instructions,
         file_tag="part_2",
     )
 
@@ -271,6 +271,6 @@ def edot_bleaching_part_2(
     )
 
     print(
-        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.id} part 2 complete"
+        f"Experiment {instructions.project_id}.{instructions.project_campaign_id}.{instructions.experiment_id} part 2 complete"
     )
     print("*" * 80, end="\n\n")

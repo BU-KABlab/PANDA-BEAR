@@ -26,17 +26,17 @@ def add_data_zone(
         substrate = ""
     else:
         pin = experiment.pin
-        date_time = datetime(experiment.status_date).isoformat(timespec="seconds")
+        date_time = experiment.status_date.isoformat(timespec="seconds")
         project_id = experiment.project_id
         campaign_id = experiment.project_campaign_id
-        experiment_id = experiment.id
+        experiment_id = experiment.experiment_id
         wellplate_id = experiment.plate_id
         well_id = experiment.well_id
 
         try:
             substrate = str(
                 sql_utilities.execute_sql_command(
-                    "SELECT substrate FROM well_types WHERE id = (SELECT well_type_id FROM wellplates WHERE id = ?)",
+                    "SELECT substrate FROM well_types WHERE id = (SELECT type_id FROM wellplates WHERE id = ?)",
                     (wellplate_id,),
                 )[0][0]
             )

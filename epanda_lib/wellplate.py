@@ -13,14 +13,15 @@ import os
 from typing import Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
+#from numpy import save
 from .config.config import (
     MILL_CONFIG,
-#    PATH_TO_DATA,
+    #    PATH_TO_DATA,
     STOCK_STATUS,
     WASTE_STATUS,
-#    WELL_HX,
-#    WELL_STATUS,
-#    WELL_TYPE,
+    #    WELL_HX,
+    #    WELL_STATUS,
+    #    WELL_TYPE,
     WELLPLATE_LOCATION,
 )
 from .vessel import Vessel
@@ -68,7 +69,7 @@ class WellCoordinates:
         """Returns a string representation of the coordinates."""
         return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}'  # , "z_bottom"={self.z_bottom}'
 
-    def __dict__(self) -> dict:
+    def to_dict(self) -> dict:
         """Returns a dictionary representation of the coordinates."""
         return {
             "x": self.x,
@@ -106,6 +107,10 @@ class WellCoordinates:
         """Returns True if the coordinates are not equal, False otherwise."""
         return not self.__eq__(other)
 
+    def to_json_string(self) -> str:
+        """Returns a JSON string representation of the coordinates."""
+        return json.dumps(self.to_dict())
+
 
 class WellCoordinatesEncoder(json.JSONEncoder):
     """Custom JSON encoder for the WellCoordinates class."""
@@ -113,10 +118,10 @@ class WellCoordinatesEncoder(json.JSONEncoder):
     def default(self, o) -> dict:
         """Returns a dictionary representation of the WellCoordinates object."""
         if isinstance(o, WellCoordinates):
-            return o.__dict__()
+            return o.to_dict()
         return super().default(o)
 
-    def encode(self, o):
+    def encode(self, o) -> str:
         """Returns a JSON representation of the WellCoordinates object."""
         return json.dumps(o, cls=WellCoordinatesEncoder)
 
@@ -153,6 +158,8 @@ class Well(Vessel):
         experiment_id: int = None,
         project_id: int = None,
         density: float = None,
+        campaign_id: int = None,
+        well_type_number: int = None,
     ):
         """ """
         self.plate_id: int = plate_id
@@ -161,9 +168,8 @@ class Well(Vessel):
         self.status: str = status
         self.status_date: str = status_date
         self.contents: dict = contents
-        self.experiment_id: int = None
         self.project_id: int = project_id
-        self.campaign_id: int = None
+        self.campaign_id: int = campaign_id
         self.volume: float = volume
         self.coordinates: WellCoordinates = coordinates
         self.density: float = density
@@ -174,12 +180,12 @@ class Well(Vessel):
 
         super().__init__(
             name=self.well_id,
-            coordinates=coordinates,
             volume=volume,
-            capacity=None,
+            capacity=capacity,
             density=density,
-            contents={},
-            depth=None,
+            coordinates=coordinates,
+            contents=contents,
+            depth=depth,
         )
 
     def __str__(self) -> str:
@@ -192,13 +198,16 @@ class Well(Vessel):
             "well_id": self.well_id,
             "status": self.status,
             "status_date": self.status_date,
-            "contents": self.contents,
+            "contents": json.dumps(self.contents),
             "experiment_id": self.experiment_id,
             "project_id": self.project_id,
             "volume": self.volume,
-            "coordinates": self.coordinates,
+            "coordinates": self.coordinates.to_json_string(),
         }
 
+    def __repr__(self) -> str:
+        """Returns a string representation of the well."""
+        return f"Well({self.well_id}, {self.status}, {self.status_date}, {self.contents}, {self.experiment_id}, {self.project_id}, {self.volume}, {self.coordinates})"
     def get_contents(self) -> dict:
         """Returns the contents of the well."""
         return self.contents
@@ -209,6 +218,9 @@ class Well(Vessel):
         # If we are removing a volume from a well we assume that the contents are equally mixed
         # and we remove the same proportion of each vessel name AKA solution name
         logger.debug("Updating well contents...")
+
+        # If we are removing a volume from a well then we update the Self contents accordingly
+        # We are assuming a well is equally mixed and we remove the same proportion of each vessel name AKA solution name
         if volume < 0:
             try:
                 current_content_ratios = {
@@ -230,7 +242,7 @@ class Well(Vessel):
             logger.debug("Volume to add was 0 well %s contents unchanged", self.name)
 
         # If we are adding a volume to a well then we update the provided vessel name AKA solution name
-        # with the provided volume
+        # in the well contents with the provided volume
         else:
             for key in from_vessel.keys():
                 if key in self.contents.keys():
@@ -239,62 +251,49 @@ class Well(Vessel):
                 else:
                     self.contents[key] = from_vessel[key]
                     logger.debug("New %s contents: %s", self.name, self.contents)
-
-        # Update the well status file
-        #self.update_well_status_file()
+        # Update the well in the db and log its new contents
         self.save_to_db()
         self.log_contents()
-
-    # def update_well_status_file(self) -> None:
-    #     """Updates the well in the well_status.json file."""
-    #     logger.debug("Updating well file of %s", self.name)
-
-    #     # Load the well status file and update the well
-    #     with open(WELL_STATUS, "r", encoding="utf-8") as f:
-    #         data = json.load(f)
-    #         for well in data["wells"]:
-    #             if well["well_id"] == self.well_id:
-    #                 well["status"] = self.status
-    #                 well["contents"] = self.contents
-    #                 well["experiment_id"] = self.experiment_id
-    #                 well["project_id"] = self.project_id
-    #                 well["status_date"] = datetime.now().isoformat(timespec="seconds")
-    #                 well["volume"] = self.volume
-    #                 well["coordinates"] = self.coordinates.__dict__()
-
-    #                 logger.debug("Well %s file updated")
-    #                 break
-
-    #     # Update the well status file with the new well status
-    #     with open(WELL_STATUS, "w", encoding="utf-8") as f:
-    #         json.dump(data, f, indent=4)
-
-    #     logger.debug("Well status file updated")
-
-    # def lookup_plate_characteristics(self) -> Tuple[float, float]:
-    #     """Lookup the plate characteristics from the well_type.csv file"""
-    #     # Get the plate type from the well_history.csv file
-    #     well_hx = pd.read_csv(WELL_HX)
-    #     well_hx = well_hx[well_hx["plate_id"] == self.plate_id]
-    #     well_type = well_hx["type_number"].values[0]
-
-    #     well_type = int(well_type)
-    #     # Get the well characteristics from the well_type.csv file
-    #     with open(WELL_TYPE, "r", encoding="UTF-8") as f:
-    #         next(f)
-    #         for line in f:
-    #             line = line.strip().split(",")
-    #             if int(line[0]) == int(well_type):
-    #                 well_capacity = float(line[9])
-    #                 height = float(line[7])
-    #                 break
-    #     return height, well_capacity
 
     def save_to_db(self) -> None:
         """Inserts or Updates the well in the database"""
         logger.info("Saving well %s to the database", self.name)
         try:
-            sql_utilities.WellSQLHandler(self).save_to_db()
+        #     statement = """
+        #     INSERT INTO well_hx (
+        #     plate_id,
+        #     well_id,
+        #     experiment_id,
+        #     project_id,
+        #     status,
+        #     status_date,
+        #     contents,
+        #     volume,
+        #     coordinates
+        #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        #     ON CONFLICT (plate_id, well_id) DO UPDATE SET
+        #     experiment_id = excluded.experiment_id,
+        #     project_id = excluded.project_id,
+        #     status = excluded.status,
+        #     status_date = excluded.status_date,
+        #     contents = excluded.contents,
+        #     volume = excluded.volume,
+        #     coordinates = excluded.coordinates
+        # """
+
+        #     values = (
+        #         self.plate_id,
+        #         self.well_id,
+        #         self.experiment_id,
+        #         self.project_id,
+        #         self.status,
+        #         self.status_date,
+        #         json.dumps(self.contents),
+        #         self.volume,
+        #         json.dumps(self.coordinates.to_dict()),
+        #     )
+        #     sql_utilities.execute_sql_command_no_return(statement, values)
+            sql_utilities.save_well_to_db(self)
             logger.info("Well %s saved to the database", self.name)
         except Exception as e:
             logger.error("Error occurred while saving well to the database: %s", e)
@@ -308,56 +307,18 @@ class Wellplate:
     Ex. to get the volume of well A1, use well_plate["A1"].volume
 
     Attributes:
-        a1_x (float): X-coordinate of well A1.
-        a1_y (float): Y-coordinate of well A1.
-        orientation (int): Orientation of the well plate (0-3).
-        columns (str): String representation of well plate columns.
-        rows (int): Number of rows in the well plate.
-        type_number (int): Type of well plate.
+    -----------
+        wells (Dict[str, Well]): A dictionary of well objects.
+        a1_x (float): The x-coordinate of well A1.
+        a1_y (float): The y-coordinate of well A1.
+        orientation (int): The orientation of the well plate (0-3).
+        columns (str): The string representation of well plate columns.
+        rows (int): The number of rows in the well plate.
+        type_number (int): The type of well plate.
+        new_well_plate (bool): A flag to indicate if the well plate is new.
+        plate_id (int): The ID of the well plate.
 
-    Methods:
-        __init__(self, a1_x: float = 0, a1_y: float = 0, orientation: int = 0,
-                 columns: str = "ABCDEFGH", rows: int = 13, type_number: int = 1) -> None:
-            Initializes a new instance of the Wells2 class.
 
-        __getitem__(self, well_id: str) -> Well:
-            Gets a Well object by well ID.
-
-        update_well_status_from_json_file(self) -> None:
-            Updates well status from a JSON file.
-
-        get_coordinates(self, well_id: str) -> Dict[str, float]:
-            Returns the coordinates of a specific well.
-
-        contents(self, well_id: str) -> List[Optional[str]]:
-            Returns the contents of a specific well.
-
-        volume(self, well_id: str) -> float:
-            Returns the volume of a specific well.
-
-        depth(self, well_id: str) -> float:
-            Returns the depth of a specific well.
-
-        density(self, well_id: str) -> float:
-            Returns the density of a specific well.
-
-        check_volume(self, well_id: str, added_volume: float) -> bool:
-            Checks if a volume can fit in a specific well.
-
-        update_volume(self, well_id: str, added_volume: float) -> None:
-            Updates the volume of a specific well.
-
-        check_well_status(self, well_id: str) -> str:
-            Checks the status of a specific well.
-
-        set_well_status(self, well_id: str, status: str) -> None:
-            Updates the status of a specific well.
-
-        check_all_wells_status(self) -> None:
-            Checks the status of all wells.
-
-        well_coordinates_and_status_color(self) -> Tuple[List[float], List[float], List[str]]:
-            Plots the well plate on a coordinate plane.
     """
 
     def __init__(
@@ -369,7 +330,7 @@ class Wellplate:
         rows: int = 13,
         type_number: int = 3,
         new_well_plate: bool = False,
-        plate_id: int = 0,
+        plate_id: int = None,
     ) -> None:
         """
         Initializes a new instance of the Wells2 class.
@@ -392,7 +353,7 @@ class Wellplate:
         self.echem_height = -70  # for every well
         self.image_height = -35  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
-        self.plate_id = plate_id  # The id of the well plate
+        self.plate_id = 0 if plate_id is None else plate_id  # The id of the well plate
 
         # From the well_type.csv file in config but has defaults
         self.z_top = 0
@@ -426,12 +387,19 @@ class Wellplate:
         self.initial_volume = 0.00
         self.establish_new_wells()  # we need to establish the wells before we can update their status from file
         self.calculate_well_locations()  # now we can calculate the well locations
+        current_wellplate_id, current_wellplate_type, _ = (
+            sql_utilities.select_current_wellplate_info()
+        )
         if not new_well_plate:
-            #self.update_well_status_from_json_file()
+            # self.update_well_status_from_json_file()
+            self.plate_id = current_wellplate_id
+            self.type_number = current_wellplate_type
             self.update_well_status_from_db()
 
         else:
-            self.save_wells_to_db() # save the new wells to the database
+            if plate_id is None:
+                self.plate_id = plate_id + 1
+            self.save_wells_to_db()  # save the new wells to the database
 
     def recalculate_well_locations(self: "Wellplate") -> None:
         """Recalculates the well locations"""
@@ -490,12 +458,14 @@ class Wellplate:
                             "z_top": self.z_top,
                         }
 
-                    # Round the coordinates to 2 decimal places
-                    coordinates["x"] = round(coordinates["x"], 3)
-                    coordinates["y"] = round(coordinates["y"], 3)
-                    coordinates["z_top"] = round(coordinates["z_top"], 3)
-
-                self.set_coordinates(well_id, coordinates)
+                # Round the coordinates to 2 decimal places
+                coordinates["x"] = round(coordinates["x"], 3)
+                coordinates["y"] = round(coordinates["y"], 3)
+                coordinates["z_top"] = round(coordinates["z_top"], 3)
+                new_coordinates = WellCoordinates(
+                    coordinates["x"], coordinates["y"], coordinates["z_top"]
+                )
+                self.set_coordinates(well_id, new_coordinates)
 
     def establish_new_wells(self: "Wellplate") -> None:
         """Establish new wells in the well plate"""
@@ -543,9 +513,17 @@ class Wellplate:
     def update_well_status_from_db(self: "Wellplate") -> None:
         """Update the well status from the database"""
         logger.debug("Updating well status from database...")
-        wells = sql_utilities.select_wellplate_wells()
-        for well in wells:
-            self.wells[well.name.upper()] = well
+        incoming_wells = sql_utilities.select_wellplate_wells()
+        for saved_well in incoming_wells:
+            well = self.wells[saved_well.name.upper()]
+            well = saved_well
+            well.plate_id = self.plate_id
+            well.depth = self.z_bottom
+            #well.height = self.height
+            #well.capacity = self.well_capacity
+            well.name = well.well_id.upper()
+
+            # TODO this might be redundant
         logger.debug("Well status updated from database")
 
     def get_coordinates(self, well_id: str, axis: str = None) -> WellCoordinates:
@@ -566,6 +544,9 @@ class Wellplate:
 
     def set_coordinates(self, well_id: str, new_coordinates: WellCoordinates) -> None:
         """Sets the coordinates of a specific well in memory and writes to the status file"""
+        # validate the coordinates
+        if not isinstance(new_coordinates, WellCoordinates):
+            raise TypeError("Coordinates must be a WellCoordinates object")
         self.wells[well_id.upper()].coordinates = new_coordinates
         # self.write_well_status_to_file()
 
@@ -645,30 +626,30 @@ class Wellplate:
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s", well_id, well_data["status"])
 
-    def _get_well_color(self, status: str) -> str:
-        """Get the color of a well based on its status."""
-        color_mapping = {
-            "empty": "black",
-            "new": "grey",
-            "queued": "orange",
-            "complete": "green",
-            "error": "red",
-            "running": "gold",
-            "paused": "blue",
-        }
-        return color_mapping.get(status, "black")
+    # def _get_well_color(self, status: str) -> str:
+    #     """Get the color of a well based on its status."""
+    #     color_mapping = {
+    #         "empty": "black",
+    #         "new": "grey",
+    #         "queued": "orange",
+    #         "complete": "green",
+    #         "error": "red",
+    #         "running": "gold",
+    #         "paused": "blue",
+    #     }
+    #     return color_mapping.get(status, "black")
 
-    def well_coordinates_and_status_color(self):
-        """Plot the well plate on a coordinate plane."""
-        x_coordinates = []
-        y_coordinates = []
-        color = []
-        for _, well_data in self.wells.items():
-            x_coordinates.append(well_data.coordinates["x"])
-            y_coordinates.append(well_data.coordinates["y"])
-            color.append(self._get_well_color(well_data.status))
+    # def get_well_coordinates_and_status_color(self):
+    #     """Plot the well plate on a coordinate plane."""
+    #     x_coordinates = []
+    #     y_coordinates = []
+    #     color = []
+    #     for _, well_data in self.wells.items():
+    #         x_coordinates.append(well_data.coordinates["x"])
+    #         y_coordinates.append(well_data.coordinates["y"])
+    #         color.append(self._get_well_color(well_data.status))
 
-        return x_coordinates, y_coordinates, color
+    #     return x_coordinates, y_coordinates, color
 
     def read_well_type_characteristics(
         self, type_number: int
@@ -705,10 +686,7 @@ class Wellplate:
 
         # Select the well type characteristics from the well_types sql table given the type_number
         radius, well_offset, well_capacity, height, shape = (
-            sql_utilities.execute_sql_command(
-                "SELECT radius_mm, offset_mm, capacity_ul, height_mm, shape FROM well_types WHERE id = ?",
-                (type_number,),
-            )[0]
+            sql_utilities.select_well_characteristics(type_number)
         )
 
         return (
@@ -791,21 +769,57 @@ class Wellplate:
 
     def save_wells_to_db(self) -> None:
         """Save the wells to the well_hx table. Replaces the write_well_status_to_file method"""
-        wells_data = [well.__dict__() for well in self.wells.values()]
-        values = [(self.plate_id, well["well_id"], well["experiment_id"], well["project_id"], well["status"], well["status_date"], json.dumps(well["contents"]), well["volume"], json.dumps(well["coordinates"])) for well in wells_data]
-        sql_statement = """
-            INSERT INTO well_hx (
-            plate_id,
-            well_id,
-            experiment_id,
-            project_id,
-            status,
-            status_date,
-            contents,
-            volume,
-            coordinates
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-        sql_utilities.execute_sql_command(sql_statement, values)  # Pass values as a single argument
+        # wells_data = [well.__dict__() for well in self.wells.values()]
+        # # if isinstance(wells_data[0]["coordinates"], WellCoordinates):
+        # #     for well in wells_data:
+        # #         well["coordinates"] = well["coordinates"].to_json_string()
+        # # elif isinstance(wells_data[0]["coordinates"], dict):
+        # #     for well in wells_data:
+        # #         well["coordinates"] = json.dumps(well["coordinates"])
+        # values = [
+        #     (
+        #         self.plate_id,
+        #         well["well_id"],
+        #         well["experiment_id"],
+        #         well["project_id"],
+        #         well["status"],
+        #         well["status_date"],
+        #         json.dumps(
+        #             well["contents"]
+        #         ),  # Contents is a dictionary and needs to turn into a string
+        #         well["volume"],
+        #         well[
+        #             "coordinates"
+        #         ],  # Coordinates are a WellCoordinate object and need to be encoded into a json string
+        #     )
+        #     for well in wells_data
+        # ]
+        # sql_statement = """
+        #     INSERT INTO well_hx (
+        #     plate_id,
+        #     well_id,
+        #     experiment_id,
+        #     project_id,
+        #     status,
+        #     status_date,
+        #     contents,
+        #     volume,
+        #     coordinates
+        #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        #     ON CONFLICT (plate_id, well_id) DO UPDATE SET
+        #     experiment_id = excluded.experiment_id,
+        #     project_id = excluded.project_id,
+        #     status = excluded.status,
+        #     status_date = excluded.status_date,
+        #     contents = excluded.contents,
+        #     volume = excluded.volume,
+        #     coordinates = excluded.coordinates
+        # """
+        # sql_utilities.execute_sql_command(
+        #     sql_statement, values
+        # )  # Pass values as a single argument
+        list_of_wells = [well for well in self.wells.values()]
+        sql_utilities.save_wells_to_db(list_of_wells)
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
@@ -834,9 +848,16 @@ class OverDraftException(Exception):
     def __str__(self) -> str:
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
 
-def remove_wellplate_from_db(plate_id: int) -> None:
+# FIXME: This function should be hidden once in production
+def _remove_wellplate_from_db(plate_id: int) -> None:
     """Removed all wells for the given plate id in well_hx, removes the plate id from the wellplate table"""
-    user_choicec = input("Are you sure you want to remove the wellplate and all its wells from the database? This is irreversible. (y/n): ").lower().strip()[0]
+    user_choicec = (
+        input(
+            "Are you sure you want to remove the wellplate and all its wells from the database? This is irreversible. (y/n): "
+        )
+        .lower()
+        .strip()[0]
+    )
     if user_choicec != "y":
         return
     sql_utilities.execute_sql_command(
@@ -845,76 +866,6 @@ def remove_wellplate_from_db(plate_id: int) -> None:
     sql_utilities.execute_sql_command(
         "DELETE FROM wellplates WHERE id = ?", (plate_id,)
     )
-def __test_stage_display():
-    """Test the well plate"""
-    test_wellplate = Wellplate()
-    ## Well coordinate
-    x_coordinates, y_coordinates, color = (
-        test_wellplate.well_coordinates_and_status_color()
-    )
-    if test_wellplate.shape == "circular":
-        marker = "o"
-    else:
-        marker = "s"
-
-    ## Vial coordinates
-    vial_x = []
-    vial_y = []
-    vial_color = []
-    vial_marker = []  # a circle for these circular vials
-    ## Vials
-    stock_vial_path = STOCK_STATUS
-    waste_vial_path = WASTE_STATUS
-    with open(stock_vial_path, "r", encoding="utf-8") as stock:
-        data = json.load(stock)
-        for vial in data:
-            vial_x.append(vial["x"])
-            vial_y.append(vial["y"])
-            volume = vial["volume"]
-            capacity = vial["capacity"]
-            if volume / capacity > 0.5:
-                vial_color.append("green")
-            elif volume / capacity > 0.25:
-                vial_color.append("yellow")
-            else:
-                vial_color.append("red")
-            vial_marker.append("o")
-
-    with open(waste_vial_path, "r", encoding="utf-8") as stock:
-        data = json.load(stock)
-        for vial in data:
-            vial_x.append(vial["x"])
-            vial_y.append(vial["y"])
-            volume = vial["volume"]
-            capacity = vial["capacity"]
-            if volume / capacity > 0.75:
-                vial_color.append("red")
-            elif volume / capacity > 0.50:
-                vial_color.append("yellow")
-            else:
-                vial_color.append("green")
-            vial_marker.append("o")
-
-    rinse_vial = {"x": -411, "y": -30}
-    vial_x.append(rinse_vial["x"])
-    vial_y.append(rinse_vial["y"])
-    vial_color.append("blue")
-    ## combine the well and vial coordinates
-    # x_coordinates.extend(stock_vial_x)
-    # y_coordinates.extend(stock_vial_y)
-    # color.extend(vial_color)
-
-    # Plot the well plate
-    plt.scatter(x_coordinates, y_coordinates, marker=marker, c=color, s=75, alpha=0.5)
-    plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=200, alpha=1)
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.title("Status of Stage Items")
-    plt.grid(True, "both")
-    plt.xlim(-420, 0)
-    plt.ylim(-310, 0)
-    plt.show()
-
 
 def change_wellplate_location():
     """Change the location of the wellplate"""
@@ -1002,7 +953,7 @@ def load_new_wellplate(
         current_wellplate_id,
         current_type_number,
         current_wellplate_is_new,
-    ) = sql_utilities.get_current_wellplate_info()
+    ) = sql_utilities.select_current_wellplate_info()
 
     if ask:
         new_plate_id = input(
@@ -1033,115 +984,24 @@ def load_new_wellplate(
     else:
         new_wellplate_type_number = int(new_wellplate_type_number)
 
-    ## If the wellplate exists in the well hx, then load it
-    # with open(WELL_HX, "r", encoding="UTF-8") as file:
-    #     well_hx = file.readlines()
-    # wells = []
-    # for line in well_hx:
-    #     if line.split("&")[0] == str(new_plate_id):
-    #         wells.append(line.strip())
-    # if len(wells) > 0:
-
-    #     ## A well entry looks like this:
-    #     # {
-    #     # "well_id": "B2",
-    #     # "status": "complete",
-    #     # "status_date": "2024-03-08 13:45:15",
-    #     # "contents": {
-    #     #     "edot": 127.43,
-    #     #     "rinse0": 509.72
-    #     # },
-    #     # "experiment_id": 10000382,
-    #     # "project_id": 16,
-    #     # "volume": 0.0,
-    #     # "coordinates": {
-    #     #     "x": -231.65,
-    #     #     "y": -87.6,
-    #     #     "z_top": -66.0
-    #     # }
-    #     logger.debug("Loading wellplate")
-    #     with open(WELL_STATUS, "w", encoding="UTF-8") as file:
-    #         json.dump(
-    #             {
-    #                 "plate_id": int(new_plate_id),
-    #                 "type_number": int(new_wellplate_type_number),
-    #                 "wells": [
-    #                     {
-    #                         "well_id": current_line.split("&")[2],
-    #                         "status": current_line.split("&")[5],
-    #                         "status_date": current_line.split("&")[6],
-    #                         "contents": json.loads(current_line.split("&")[7]),
-    #                         # "contents": json.loads(str(current_line.split("&")[7]).replace("'",'"')),
-    #                         "experiment_id": (
-    #                             None
-    #                             if (current_line.split("&")[3]) == "None"
-    #                             else int(current_line.split("&")[3])
-    #                         ),
-    #                         "project_id": (
-    #                             None
-    #                             if (current_line.split("&")[4]) == "None"
-    #                             else int(current_line.split("&")[4])
-    #                         ),
-    #                         "volume": float(current_line.split("&")[8]),
-    #                         "coordinates": {
-    #                             "x": float(json.loads(current_line.split("&")[9])["x"]),
-    #                             "y": float(json.loads(current_line.split("&")[9])["y"]),
-    #                             "z_top": float(
-    #                                 json.loads(current_line.split("&")[9])["z_top"]
-    #                             ),
-    #                         },
-    #                     }
-    #                     for current_line in wells
-    #                 ],
-    #             },
-    #             file,
-    #             indent=4,
-    #         )
-    #     logger.debug("Wellplate loaded")
-    #     logger.info("Wellplate %d loaded", int(new_plate_id))
-    #     return new_plate_id
-
-    # ## If the wellplate does not exist in the well hx, then create a new wellplate
-    # ## Go through a reset all fields and apply new plate id
-    # logger.debug("Creating new wellplate: %d", new_plate_id)
-    # logger.debug("Resetting well status file to new")
-    # new_wellplate = {
-    #     "plate_id": new_plate_id,
-    #     "type_number": new_wellplate_type_number,
-    #     "wells": [
-    #         {
-    #             "well_id": chr(65 + (i // 12)) + str(i % 12 + 1),
-    #             "status": "new",
-    #             "status_date": None,
-    #             "contents": {},
-    #             "experiment_id": None,
-    #             "project_id": None,
-    #             "volume": 0.0,
-    #             "coordinates": {"x": 0.0, "y": 0.0, "z_top": 0.0},
-    #         }
-    #         for i in range(96)
-    #     ],
-    # }
-
-    # with open(WELL_STATUS, "w", encoding="UTF-8") as file:
-    #     json.dump(new_wellplate, file, indent=4)
-        
     ## Check if the wellplate exists in the well_hx table
     already_exists = sql_utilities.check_if_wellplate_exists(new_plate_id)
     if not already_exists:
         sql_utilities.add_wellplate_to_table(new_plate_id, new_wellplate_type_number)
         sql_utilities.update_current_wellplate(new_plate_id)
         new_wellplate = Wellplate(
-            type_number=new_wellplate_type_number, new_well_plate= True, plate_id=new_plate_id
+            type_number=new_wellplate_type_number,
+            new_well_plate=True,
+            plate_id=new_plate_id,
         )
-        new_wellplate.recalculate_well_locations()
-        #new_wellplate.save_wells_to_db()
+
     else:
-        logger.debug("Wellplate already exists in the database. Setting as current wellplate")
+        logger.debug(
+            "Wellplate already exists in the database. Setting as current wellplate"
+        )
         sql_utilities.update_current_wellplate(new_plate_id)
+        # TODO: Possibly run recaclulate well locations here
         return new_plate_id
-    # new_wellplate.recalculate_well_locations()
-    # new_wellplate.write_well_status_to_file()
 
     logger.info(
         "Wellplate %d saved and wellplate %d loaded",
@@ -1169,7 +1029,7 @@ def load_new_wellplate_sql(
     """
     # Get the current wellpate from the wellplates table
     current_wellplate_id, current_type_number, current_wellplate_is_new = (
-        sql_utilities.get_current_wellplate_info()
+        sql_utilities.select_current_wellplate_info()
     )
 
     if ask:
@@ -1202,12 +1062,11 @@ def load_new_wellplate_sql(
         new_wellplate_type_number = int(new_wellplate_type_number)
 
     ## If the wellplate exists in the well hx, then load it
-    new_wellplate = sql_utilities.WellSQLHandler().select_provided_wellplate_wells(
-        new_plate_id
-    )
-    if new_wellplate is not None:
+    wellplate_exists = sql_utilities.check_if_wellplate_exists(new_plate_id)
+    if wellplate_exists:
         logger.debug("Wellplate already exists in the database. Returning new_plate_id")
-        return new_plate_id
+        logger.debug("Loading wellplate")
+        sql_utilities.update_current_wellplate(new_plate_id)
     else:
         logger.debug("Creating new wellplate: %d", new_plate_id)
         new_wellplate = Wellplate(
@@ -1222,7 +1081,7 @@ def load_new_wellplate_sql(
             int(current_wellplate_id),
             int(new_plate_id),
         )
-        return new_plate_id
+    return new_plate_id
 
 
 def read_current_wellplate_info() -> Tuple[int, int, int]:
@@ -1234,114 +1093,11 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
         int: The current wellplate type number
         bool: Number of new wells
     """
-    # with open(WELL_STATUS, "r", encoding="UTF-8") as file:
-    #     current_wellplate = json.load(file)
-    # current_plate_id = current_wellplate["plate_id"]
-    # current_type_number = current_wellplate["type_number"]
-    # new_wells = 0
-    # for well in current_wellplate["wells"]:
-    #     if well["status"] == "new":
-    #         new_wells += 1
-    current_plate_id, current_type_number, new_wells = (
-        sql_utilities.get_current_wellplate_info()
+    current_plate_id, current_type_number, _ = (
+        sql_utilities.select_current_wellplate_info()
     )
     new_wells = sql_utilities.count_wells_with_new_status()
     return int(current_plate_id), int(current_type_number), new_wells
 
-# def save_current_wellplate() -> Tuple[int, int, bool]:
-#     """
-#     Save the current wellplate
-
-#     Returns:
-#         int: The current wellplate id
-#         int: The current wellplate type number
-#         bool: Whether the wellplate is new
-#     """
-#     wellplate_is_new = True
-#     ## Go through a reset all fields and apply new plate id
-#     logger.debug("Saving wellplate")
-#     ## Open the current status file for the plate id , type number, and wells
-#     with open(WELL_STATUS, "r", encoding="UTF-8") as file:
-#         current_wellplate = json.load(file)
-#     current_plate_id = current_wellplate["plate_id"]
-#     current_type_number = current_wellplate["type_number"]
-#     ## Check if the wellplate is new still or not
-#     for well in current_wellplate["wells"]:
-#         if well["status"] != "new":
-#             wellplate_is_new = False
-
-#     ## Save each well to the well_history.csv file in the data folder even if it is empty
-#     ## plate id, type number, well id, experiment id, project id, status, status date, contents
-#     logger.debug("Saving well statuses to well_history.csv")
-
-#     # if the plate has been partially used before then there will be entries in the well_history.csv file
-#     # these entries will have the same plate id as the current wellplate
-#     # we want to write over these entries with the current well statuses
-
-#     # write back all lines that are not the same plate id as the current wellplate
-
-#     with open(WELL_HX, "r", encoding="UTF-8") as input_file:
-#         with open(
-#             PATH_TO_DATA / "new_well_history.csv", "w", encoding="UTF-8"
-#         ) as output_file:
-#             for line in input_file:
-#                 # Check if the line has the same plate ID as the current_plate_id
-#                 if line.split("&")[0] == str(current_plate_id):
-#                     continue  # Skip this line
-#                 # If the plate ID is different, write the line to the output file
-#                 output_file.write(line)
-#     ## delete the old well_history.csv file
-#     Path(WELL_HX).unlink()
-
-#     ## rename the new_well_history.csv file to well_history.csv
-#     Path(PATH_TO_DATA / "new_well_history.csv").rename(WELL_HX)
-
-#     # write the current well statuses to the well_history.csv file
-#     with open(WELL_HX, "a", encoding="UTF-8") as file:
-#         for well in current_wellplate["wells"]:
-#             file.write(
-#                 "{}&{}&{}&{}&{}&{}&{}&{}&{}&{}\n".format(
-#                     current_plate_id,
-#                     current_type_number,
-#                     well["well_id"],
-#                     well["experiment_id"],
-#                     well["project_id"],
-#                     well["status"],
-#                     well["status_date"],
-#                     json.dumps(well["contents"]),
-#                     well["volume"],
-#                     json.dumps(well["coordinates"]),
-#                 )
-#             )
-
-#     logger.debug("Wellplate saved")
-#     logger.info("Wellplate %d saved", int(current_plate_id))
-
-#     return int(current_plate_id), int(current_type_number), wellplate_is_new
-
-
-def determine_next_experiment_id() -> int:
-    """Load well history to get last experiment id and increment by 1"""
-    # well_hx = pd.read_csv(WELL_HX, skipinitialspace=True, sep="&")
-    # well_hx = well_hx.dropna(subset=["experiment id"])
-    # well_hx = well_hx.drop_duplicates(subset=["experiment id"])
-    # well_hx = well_hx[well_hx["experiment id"] != "None"]
-    # well_hx["experiment id"] = well_hx["experiment id"].astype(int)
-    # last_experiment_id = well_hx["experiment id"].max()
-    # return int(last_experiment_id + 1)
-    return sql_utilities.select_next_experiment_id()
-
-
 if __name__ == "__main__":
-    # test_stage_display()
-    wellplate = Wellplate()
-    load_new_wellplate(ask=False, new_plate_id=109, new_wellplate_type_number=4)
-    wellplate.save_wells_to_db()
-    # print(wellplate["A1"].coordinates)
-    # print(wellplate["A12"].coordinates)
-
-    # wellplate.recalculate_well_locations()
-    # print(wellplate["A1"].coordinates)
-    # print(wellplate["A12"].coordinates)
-
-    # print(save_current_wellplate())
+    pass

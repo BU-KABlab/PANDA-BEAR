@@ -24,56 +24,39 @@ Returns:
 # Standard library imports
 import logging
 import math
-
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
 
 from PIL import Image
 
+# Local application imports
 from epanda_lib import instrument_toolkit
 from epanda_lib.camera_call_camera import capture_new_image
-from epanda_lib.config.config import (
-    AIR_GAP,
-    DRIP_STOP,
-    PATH_TO_DATA,
-    PATH_TO_LOGS,
-    PURGE_VOLUME,
-    TESTING,
-)
+from epanda_lib.config.config import (AIR_GAP, DRIP_STOP, PATH_TO_DATA,
+                                      PATH_TO_LOGS, TESTING)
 from epanda_lib.correction_factors import correction_factor
-from epanda_lib.experiment_class import (
-    EchemExperimentBase,
-    ExperimentBase,
-    ExperimentResult,
-    ExperimentStatus,
-)
+from epanda_lib.experiment_class import (EchemExperimentBase, ExperimentBase,
+                                         ExperimentResult, ExperimentStatus)
 from epanda_lib.image_tools import add_data_zone
 from epanda_lib.instrument_toolkit import Toolkit
 from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
+from epanda_lib.obs_controls import OBSController
 from epanda_lib.pump_control import MockPump, Pump
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well
 
-# import decimal
-# import gamry_control_WIP as echem
-# from gamry_control_WIP import (potentiostat_ocp_parameters)
-
 if TESTING:
     from epanda_lib.gamry_control_WIP_mock import GamryPotentiostat as echem
     from epanda_lib.gamry_control_WIP_mock import (
-        potentiostat_ocp_parameters,
-        potentiostat_chrono_parameters,
-        potentiostat_cv_parameters,
-    )
+        potentiostat_chrono_parameters, potentiostat_cv_parameters,
+        potentiostat_ocp_parameters)
 else:
     import epanda_lib.gamry_control_WIP as echem
-    from epanda_lib.gamry_control_WIP import (
-        potentiostat_ocp_parameters,
-        potentiostat_chrono_parameters,
-        potentiostat_cv_parameters,
-    )
+    from epanda_lib.gamry_control_WIP import (potentiostat_chrono_parameters,
+                                              potentiostat_cv_parameters,
+                                              potentiostat_ocp_parameters)
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -154,9 +137,9 @@ def forward_pipette_v2(
         # Check to ensure that the from_vessel and to_vessel are an allowed combination
         if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
             raise ValueError("Cannot pipette from a well to a stock vial")
-        elif isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
+        if isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
             raise ValueError("Cannot pipette from a waste vial to a well")
-        elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
+        if isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
             raise ValueError("Cannot pipette from a stock vial to a stock vial")
 
         # Calculate the number of repetitions
@@ -169,7 +152,7 @@ def forward_pipette_v2(
 
         for j in range(repetitions):
             logger.info("Repetition %d of %d", j + 1, repetitions)
-            # First half: pick up solution
+            # region First half: pick up solution
             logger.debug("Withdrawing %f of air gap...", AIR_GAP)
 
             # withdraw a little to engage screw receive nothing
@@ -177,27 +160,25 @@ def forward_pipette_v2(
                 volume=AIR_GAP, solution=None, rate=pump.max_pump_rate
             )  # withdraw air gap to engage screw
 
-            if isinstance(from_vessel, Well):
-                logger.info(
-                    "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
-                )
-                from_vessel: Well = from_vessel
-                mill.safe_move(
-                    from_vessel.coordinates["x"],
-                    from_vessel.coordinates["y"],
-                    from_vessel.depth,
-                    Instruments.PIPETTE,
-                )
-            else:
-                logger.info(
-                    "Moving to %s at %s...", from_vessel.name, from_vessel.position
-                )
-                mill.safe_move(
-                    from_vessel.coordinates["x"],
-                    from_vessel.coordinates["y"],
-                    from_vessel.depth,
-                    Instruments.PIPETTE,
-                )  # go to solution depth
+            # if isinstance(from_vessel, Well):
+            #     logger.info(
+            #         "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
+            #     )
+            #     from_vessel: Well = from_vessel
+            #     mill.safe_move(
+            #         from_vessel.coordinates["x"],
+            #         from_vessel.coordinates["y"],
+            #         from_vessel.depth,
+            #         Instruments.PIPETTE,
+            #     )
+            # else:
+            logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
+            mill.safe_move(
+                from_vessel.coordinates["x"],
+                from_vessel.coordinates["y"],
+                from_vessel.depth,
+                Instruments.PIPETTE,
+            )  # go to solution depth
 
             # Withdraw the solution from the source and receive the updated vessel object
             pump.withdraw(
@@ -225,8 +206,8 @@ def forward_pipette_v2(
                 from_vessel.volume,
                 from_vessel.depth,
             )
-
-            # Second Half: Deposit to to_vessel
+            # endregion
+            # region Second Half: Deposit to to_vessel
             logger.info("Moving to: %s...", to_vessel.name)
 
             if isinstance(to_vessel, Well):
@@ -243,7 +224,6 @@ def forward_pipette_v2(
 
             weigh = bool(isinstance(to_vessel, Well))
 
-            # Infuse into the
             ## Testing
             blow_out = (
                 AIR_GAP + DRIP_STOP + 20
@@ -255,7 +235,7 @@ def forward_pipette_v2(
                 "TESTING: Is pipette volume greater than or equal to blowout? %s",
                 is_pipette_volume_equal,
             )
-
+            # Infuse into the to_vessel
             pump.infuse(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,
@@ -268,198 +248,7 @@ def forward_pipette_v2(
                 ),
                 weigh=weigh,
             )
-
-            # mill.move_to_safe_position()
-
-
-def reverse_pipette_v2(
-    volume: float,
-    from_vessel: Union[Well, StockVial, WasteVial],
-    to_vessel: Union[Well, WasteVial],
-    purge_vessel: WasteVial,
-    pump: Union[Pump, MockPump],
-    mill: Union[Mill, MockMill],
-    pumping_rate: Optional[float] = None,
-):
-    """
-    Reverse Pipette a volume from one vessel to another.
-
-    Depending on the supplied vessels, this function will perform one of the following:
-    1. Pipette from a stock vial to a well
-    2. Pipette from a well to a waste vial*
-    3. Pipette from a stock vial to a waste vial*
-        * When pipetting to a waste vial the dispesnsing height will be above the solution depth to avoid contamination
-
-    It will not allow:
-    1. Pipetting from a waste vial to a well
-    2. Pipetting from a well to a stock vial
-    3. Pipetting from a stock vial toa  stock vial
-
-    The steps that this function will perform:
-    1. Determine the number of repetitions
-    2. Withdraw the solution from the source
-        a. Withdraw an air gap to engage the screw
-        b. Move to the source
-        c. Withdraw the solution volume + purge volume
-        d. Move back to safe height
-        e. Withdraw an air gap to prevent dripping
-    3. Deposit the solution into the destination vessel
-        a. Move to the destination
-        b. Deposit the solution and blow out
-        c. Move to the purge vessel
-        d. Purge the purge volume
-        If depositing stock solution into a well, the recorded weight change will be saved to the target well
-        in the wellplate object and the stock vial object will be updated with a corrected new volume based on the density of the solution.
-    4. Repeat 2-3 until all repetitions are complete
-
-    Args:
-        volume (float): The volume to be pipetted in microliters
-        from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
-        to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
-        pumping_rate (float): The pumping rate in ml/min
-        pump (object): The pump object
-        mill (object): The mill object
-        wellplate (Wells object): The wellplate object
-
-    Returns:
-        None (void function) since the objects are passed by reference
-
-    """
-    purge_volume = PURGE_VOLUME
-    if volume > 0.00:
-        logger.info(
-            "Reverse pipetting %f ul from %s to %s",
-            volume,
-            from_vessel.name,
-            to_vessel.name,
-        )
-        # Check to ensure that the from_vessel and to_vessel are an allowed combination
-        if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
-            raise ValueError("Cannot pipette from a well to a vial")
-        elif isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
-            raise ValueError("Cannot pipette from a waste vial to a well")
-        elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
-            raise ValueError("Cannot pipette from a stock vial to a stock vial")
-
-        # Calculate the number of repetitions
-        # based on pipette capacity and drip stop
-        if pumping_rate is None:
-            pumping_rate = pump.max_pump_rate
-
-        repetitions = math.ceil(
-            volume / (pump.pipette.capacity_ul - DRIP_STOP - purge_volume)
-        )
-        repetition_vol = volume / repetitions
-
-        for j in range(repetitions):
-            logger.info("Repetition %d of %d", j + 1, repetitions)
-            # First half: pick up solution
-            logger.debug("Withdrawing %f of air gap...", AIR_GAP)
-
-            # withdraw a little to engange screw receive nothing
-            pump.withdraw(
-                volume=AIR_GAP, solution=None, rate=pumping_rate
-            )  # withdraw air gap to engage screw
-
-            logger.info("Moving to %s...", from_vessel.name)
-            mill.safe_move(
-                from_vessel.coordinates.x,
-                from_vessel.coordinates.y,
-                from_vessel.coordinates.z_bottom,  # from_vessel.depth,
-                Instruments.PIPETTE,
-            )  # go to solution depth (depth replaced with height)
-
-            # Withdraw the solution from the source and receive the updated vessel object
-            pump.withdraw(
-                volume=repetition_vol + purge_volume,
-                solution=from_vessel,
-                rate=pumping_rate,
-                weigh=False,
-            )  # pipette now has air gap + repitition vol + purge volume
-
-            mill.move_to_safe_position()
-
-            # Withdraw an air gap to prevent dripping, receive nothing
-            pump.withdraw(
-                volume=DRIP_STOP, solution=None, rate=pumping_rate, weigh=False
-            )  # pipette now has air gap + repitition vol + purge volume + drip stop
-
-            # Second Half: Deposit to to_vessel
-            logger.info("Moving to: %s...", to_vessel.name)
-            # determine if the destination is a well or a waste vial
-            if isinstance(to_vessel, Well):  # go to solution depth
-                logger.debug("%s is a Well", to_vessel.name)
-                mill.safe_move(
-                    to_vessel.coordinates["x"],
-                    to_vessel.coordinates["y"],
-                    0,
-                    Instruments.PIPETTE,
-                )
-                logger.info("Moved to well %s", to_vessel.name)
-            else:  # go to safe height above vial
-                logger.debug("%s is a Vial", to_vessel.name)
-                mill.safe_move(
-                    to_vessel.coordinates.x,
-                    to_vessel.coordinates.y,
-                    from_vessel.coordinates.z_bottom,  # to_vessel.depth + 5 ,
-                    Instruments.PIPETTE,
-                )
-                logger.info("Moved to vial %s", to_vessel.name)
-
-            # Infuse into the to_vessel and receive the updated vessel object
-            logger.info("Infusing %s into %s", from_vessel.name, to_vessel.name)
-            pump.infuse(
-                volume_to_infuse=repetition_vol,
-                being_infused=from_vessel,
-                infused_into=to_vessel,
-                rate=pumping_rate,
-                blowout_ul=DRIP_STOP,
-                weigh=True,
-            )  # pipette now has purge volume
-            logger.info(
-                "Infused %s into %s. Moving to safe position",
-                from_vessel.name,
-                to_vessel.name,
-            )
-            mill.move_to_safe_position()
-            logger.info("Moved to safe position")
-            # Update the contentes of the to_vessel
-            logger.debug("Updating contents of %s", to_vessel.name)
-            to_vessel.update_contents(from_vessel.name, repetition_vol)
-
-            logger.info(
-                "Vessel %s volume: %f",
-                to_vessel.name,
-                to_vessel.volume,
-            )
-            logger.info("Withdrawing the drip stop...")
-            pump.withdraw(
-                volume=DRIP_STOP, solution=None, rate=pumping_rate, weigh=False
-            )  # pipette now has purge volume + air gap + drip stop
-            logger.info("Moving to purge vial %s...", purge_vessel.name)
-            mill.safe_move(
-                purge_vessel.coordinates.x,
-                purge_vessel.coordinates.y,
-                purge_vessel.coordinates.z_top,
-                Instruments.PIPETTE,
-            )
-            logger.info("Purging the purge volume")
-            pump.infuse(
-                volume_to_infuse=purge_volume,
-                being_infused=from_vessel,
-                infused_into=purge_vessel,
-                rate=pumping_rate,
-                blowout_ul=DRIP_STOP + AIR_GAP,
-                weigh=False,  # Vials are not on the scale
-            )  # Pipette should be empty after this
-            logger.info(
-                "Purged the purge volume, updating contents of %s - %s",
-                purge_vessel.position,
-                purge_vessel.name,
-            )
-            purge_vessel.update_contents(from_vessel.name, purge_volume)
-
-            mill.move_to_safe_position()
+            # endregion
 
 
 def rinse_v2(
@@ -530,167 +319,6 @@ def rinse_v2(
             # FIXME: This is a temporary fix to ensure that the pipette is empty
             toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume)
     return 0
-
-
-def clear_well(
-    volume: float,
-    from_vessel: Well,
-    to_vessel: WasteVial,
-    pump: Union[Pump, MockPump],
-    mill: Union[Mill, MockMill],
-    pumping_rate: Optional[float] = None,
-):
-    """
-    Pipette a volume from a well to waste vessel. This is used to clear the well of any remaining solution.
-
-    This fuction will only allow pipetting from a well to a waste vial.
-
-    The volume to be cleared is given, and the function will calculate the number of repetitions based on the pipette capacity and drip stop.
-    During a repetition, the function will:
-    1. Withdraw the solution from the well
-        a. Withdraw an air gap to engage the screw
-        b. Move the pipette to 1.5mm to the left of center of the well
-        c. Withdraw the 1/2 of the repetition volume
-        d. Move the pipette to 1.5mm to the right of center of the well
-        e. Withdraw the 1/2 of the repetition volume
-        f. Withdraw an air gap to prevent dripping
-    2. Deposit the solution into the destination vessel
-        a. Move to the destination
-        b. Deposit the solution and blow out
-        c. Move back to safe height
-    3. Repeat 1-2 until all repetitions are complete
-
-    Args:
-        volume (float): The volume to be pipetted in microliters
-        from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
-        to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
-        pumping_rate (float): The pumping rate in ml/min
-        pump (object): The pump object
-        mill (object): The mill object
-        wellplate (Wells object): The wellplate object
-
-    Returns:
-        None (void function) since the objects are passed by reference
-
-    """
-    if volume > 0.00:
-        logger.info(
-            "Forward pipetting %f ul from %s to %s",
-            volume,
-            from_vessel.name,
-            to_vessel.name,
-        )
-        # Check to ensure that the from_vessel and to_vessel are an allowed combination
-        if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
-            raise ValueError("Cannot pipette from a well to a stock vial")
-        elif isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
-            raise ValueError("Cannot pipette from a waste vial to a well")
-        elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
-            raise ValueError("Cannot pipette from a stock vial to a stock vial")
-        elif isinstance(from_vessel, StockVial) and isinstance(to_vessel, WasteVial):
-            raise ValueError(
-                "Clear_well function may not pipette from a stock vial to a waste vial"
-            )
-
-        # Calculate the number of repetitions
-        # based on pipette capacity and drip stop
-        if pumping_rate is None:
-            pumping_rate = pump.max_pump_rate
-
-        repetitions = math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
-        repetition_vol = round(volume / repetitions, 6)
-
-        for j in range(repetitions):
-            logger.info("Repetition %d of %d", j + 1, repetitions)
-            # First half: pick up solution
-            logger.debug("Withdrawing %f of air gap...", AIR_GAP)
-
-            # withdraw a little to engage screw receive nothing
-            pump.withdraw(
-                volume=AIR_GAP, solution=None, rate=pumping_rate
-            )  # withdraw air gap to engage screw
-
-            logger.info(
-                "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
-            )
-            mill.safe_move(
-                from_vessel.coordinates["x"],
-                from_vessel.coordinates["y"],
-                from_vessel.depth,
-                Instruments.PIPETTE,
-            )
-
-            # Withdraw the solution from the source and receive the updated vessel object
-            pump.withdraw(
-                volume=repetition_vol,
-                solution=from_vessel,
-                rate=pumping_rate,
-                weigh=False,
-            )  # pipette now has air gap + repetition vol
-
-            if isinstance(from_vessel, Well):
-                pump.withdraw(
-                    volume=20, solution=None, rate=pumping_rate, weigh=False
-                )  # If the from vessel is a well withdraw a little extra to ensure cleared well
-
-            mill.move_to_safe_position()
-
-            # Withdraw an air gap to prevent dripping, receive nothing
-            pump.withdraw(
-                volume=DRIP_STOP, solution=None, rate=pumping_rate, weigh=False
-            )
-
-            logger.debug(
-                "From Vessel %s volume: %f depth: %f",
-                from_vessel.name,
-                from_vessel.volume,
-                from_vessel.depth,
-            )
-
-            # Second Half: Deposit to to_vessel
-            logger.info("Moving to: %s...", to_vessel.name)
-
-            if isinstance(to_vessel, Well):
-                to_vessel: Well = to_vessel
-            else:
-                to_vessel: WasteVial = to_vessel
-
-            mill.safe_move(
-                to_vessel.coordinates.x,
-                to_vessel.coordinates.y,
-                to_vessel.coordinates.z_top,
-                Instruments.PIPETTE,
-            )
-
-            weigh = bool(isinstance(to_vessel, Well))
-
-            # Infuse into the
-            ## Testing
-            blow_out = (
-                AIR_GAP + DRIP_STOP + 20
-                if isinstance(from_vessel, Well)
-                else AIR_GAP + DRIP_STOP
-            )
-            is_pipette_volume_equal = pump.pipette.volume >= blow_out
-            testing_logger.debug(
-                "TESTING: Is pipette volume greater than or equal to blowout? %s",
-                is_pipette_volume_equal,
-            )
-
-            pump.infuse(
-                volume_to_infuse=repetition_vol,
-                being_infused=from_vessel,
-                infused_into=to_vessel,
-                rate=pumping_rate,
-                blowout_ul=(
-                    AIR_GAP + DRIP_STOP + 20
-                    if isinstance(from_vessel, Well)
-                    else AIR_GAP + DRIP_STOP
-                ),
-                weigh=weigh,
-            )
-
-            mill.move_to_safe_position()
 
 
 def flush_v2(
@@ -844,7 +472,7 @@ def waste_selector(
 
 
 def chrono_amp(
-    dep_instructions: EchemExperimentBase,
+    ca_instructions: EchemExperimentBase,
     file_tag: str = None,
     custom_parameters: potentiostat_chrono_parameters = None,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
@@ -871,17 +499,17 @@ def chrono_amp(
         pstat.pstatconnect()
 
         # echem OCP
-        logger.info("Beginning eChem OCP of well: %s", dep_instructions.well_id)
-        dep_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
+        logger.info("Beginning eChem OCP of well: %s", ca_instructions.well_id)
+        ca_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
 
         base_filename = pstat.setfilename(
-            dep_instructions.id,
+            ca_instructions.experiment_id,
             file_tag + "_OCP_CA" if file_tag else "OCP_CA",
-            dep_instructions.project_id,
-            dep_instructions.project_campaign_id,
-            dep_instructions.well_id,
+            ca_instructions.project_id,
+            ca_instructions.project_campaign_id,
+            ca_instructions.well_id,
         )
-        dep_results = dep_instructions.results
+        ca_results = ca_instructions.results
         pstat.OCP(
             potentiostat_ocp_parameters.OCPvi,
             potentiostat_ocp_parameters.OCPti,
@@ -889,78 +517,86 @@ def chrono_amp(
         )  # OCP
         pstat.activecheck()
         ocp_dep_pass, ocp_char_final_voltage = pstat.check_vf_range(base_filename)
-        dep_results.set_ocp_dep_file(
-            base_filename, ocp_dep_pass, ocp_char_final_voltage
+        ca_results.set_ocp_ca_file(
+            base_filename, ocp_dep_pass, ocp_char_final_voltage, file_tag
         )
         logger.info(
             "OCP of well %s passed: %s",
-            dep_instructions.well_id,
+            ca_instructions.well_id,
             ocp_dep_pass,
         )
 
         # echem CA - deposition
         if not ocp_dep_pass:
-            dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
             raise OCPFailure("CA")
 
         try:
-            dep_instructions.set_status_and_save(ExperimentStatus.EDEPOSITING)
+            ca_instructions.set_status_and_save(ExperimentStatus.EDEPOSITING)
             logger.info(
-                "Beginning eChem deposition of well: %s", dep_instructions.well_id
+                "Beginning eChem deposition of well: %s", ca_instructions.well_id
             )
             deposition_data_file = pstat.setfilename(
-                dep_instructions.id,
+                ca_instructions.experiment_id,
                 file_tag + "_CA" if file_tag else "CA",
-                dep_instructions.project_id,
-                dep_instructions.project_campaign_id,
-                dep_instructions.well_id,
+                ca_instructions.project_id,
+                ca_instructions.project_campaign_id,
+                ca_instructions.well_id,
             )
 
             # FEATURE have chrono return the max and min values for the deposition
             # and save them to the results
             if custom_parameters:  # if not none then use the custom parameters
-                pstat.chrono(**custom_parameters)  # unpack the custom parameters
+                pstat.chrono(
+                    CAvi=custom_parameters.CAvi,
+                    CAti=custom_parameters.CAti,
+                    CAv1=custom_parameters.CAv1,
+                    CAt1=custom_parameters.CAt1,
+                    CAv2=custom_parameters.CAv2,
+                    CAt2=custom_parameters.CAt2,
+                    CAsamplerate=custom_parameters.CAsamplerate,
+                )  # unpack the custom parameters
             else:
                 pstat.chrono(
-                    CAvi=dep_instructions.ca_prestep_voltage,
-                    CAti=dep_instructions.ca_prestep_time_delay,
-                    CAv1=dep_instructions.ca_step_1_voltage,
-                    CAt1=dep_instructions.ca_step_1_time,
-                    CAv2=dep_instructions.ca_step_2_voltage,
-                    CAt2=dep_instructions.ca_step_2_time,
-                    CAsamplerate=dep_instructions.ca_sample_period,
+                    CAvi=ca_instructions.ca_prestep_voltage,
+                    CAti=ca_instructions.ca_prestep_time_delay,
+                    CAv1=ca_instructions.ca_step_1_voltage,
+                    CAt1=ca_instructions.ca_step_1_time,
+                    CAv2=ca_instructions.ca_step_2_voltage,
+                    CAt2=ca_instructions.ca_step_2_time,
+                    CAsamplerate=ca_instructions.ca_sample_period,
                 )  # CA
 
             pstat.activecheck()
-            dep_results.set_deposition_data_file(deposition_data_file)
+            ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
         except Exception as e:
-            dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during deposition: %s", e)
-            raise CAFailure(dep_instructions.id, dep_instructions.well_id) from e
+            raise CAFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
 
     except OCPFailure as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("OCP of well %s failed", dep_instructions.well_id)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", ca_instructions.well_id)
         raise e
 
     except CAFailure as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("CA of well %s failed", dep_instructions.well_id)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CA of well %s failed", ca_instructions.well_id)
         raise e
 
     except Exception as e:
-        dep_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
-        raise DepositionFailure(dep_instructions.id, dep_instructions.well_id) from e
+        raise DepositionFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
 
     finally:
         pstat.pstatdisconnect()
 
-    return dep_instructions, dep_results
+    return ca_instructions, ca_results
 
 
 def cyclic_volt(
-    char_instructions: EchemExperimentBase,
+    cv_instructions: EchemExperimentBase,
     file_tag: str = None,
     overwrite_inital_voltage: bool = True,
     custom_parameters: potentiostat_cv_parameters = None,
@@ -983,23 +619,23 @@ def cyclic_volt(
         # echem OCP
         if file_tag:
             logger.info(
-                "Beginning %s OCP of well: %s", file_tag, char_instructions.well_id
+                "Beginning %s OCP of well: %s", file_tag, cv_instructions.well_id
             )
         else:
-            logger.info("Beginning OCP of well: %s", char_instructions.well_id)
+            logger.info("Beginning OCP of well: %s", cv_instructions.well_id)
         if TESTING:
             pstat = echem()
         else:
             pstat = echem
 
         pstat.pstatconnect()
-        char_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
+        cv_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
         ocp_char_file = pstat.setfilename(
-            char_instructions.id,
+            cv_instructions.experiment_id,
             file_tag + "_OCP_CV" if file_tag else "OCP_CV",
-            char_instructions.project_id,
-            char_instructions.project_campaign_id,
-            char_instructions.well_id,
+            cv_instructions.project_id,
+            cv_instructions.project_campaign_id,
+            cv_instructions.well_id,
         )
 
         try:
@@ -1011,93 +647,103 @@ def cyclic_volt(
             pstat.activecheck()
 
         except Exception as e:
-            char_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during OCP: %s", e)
             raise OCPFailure("CV") from e
         (
             ocp_char_pass,
             ocp_final_voltage,
         ) = pstat.check_vf_range(ocp_char_file)
-        char_instructions.results.set_ocp_char_file(
-            ocp_char_file, ocp_char_pass, ocp_final_voltage
+        cv_instructions.results.set_ocp_cv_file(
+            ocp_char_file, ocp_char_pass, ocp_final_voltage, file_tag
         )
         logger.info(
             "OCP of well %s passed: %s",
-            char_instructions.well_id,
+            cv_instructions.well_id,
             ocp_char_pass,
         )
 
         if not ocp_char_pass:
-            char_instructions.set_status_and_save(ExperimentStatus.ERROR)
-            logger.error("OCP of well %s failed", char_instructions.well_id)
+            cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            logger.error("OCP of well %s failed", cv_instructions.well_id)
             raise OCPFailure("CV")
 
         # echem CV - characterization
-        if char_instructions.baseline == 1:
+        if cv_instructions.baseline == 1:
             test_type = "CV_baseline"
-            char_instructions.set_status_and_save(ExperimentStatus.BASELINE)
+            cv_instructions.set_status_and_save(ExperimentStatus.BASELINE)
         else:
             test_type = "CV"
-            char_instructions.set_status_and_save(ExperimentStatus.CHARACTERIZING)
+            cv_instructions.set_status_and_save(ExperimentStatus.CHARACTERIZING)
 
         logger.info(
-            "Beginning eChem %s of well: %s", test_type, char_instructions.well_id
+            "Beginning eChem %s of well: %s", test_type, cv_instructions.well_id
         )
 
         characterization_data_file = pstat.setfilename(
-            char_instructions.id,
+            cv_instructions.experiment_id,
             file_tag + "_CV" if file_tag else test_type,
-            char_instructions.project_id,
-            char_instructions.project_campaign_id,
-            char_instructions.well_id,
+            cv_instructions.project_id,
+            cv_instructions.project_campaign_id,
+            cv_instructions.well_id,
         )
-        char_instructions.results.set_characterization_data_file(
-            characterization_data_file
+        cv_instructions.results.set_cv_data_file(
+            characterization_data_file, file_tag
         )
         # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
         if overwrite_inital_voltage:
-            char_instructions.cv_initial_voltage = ocp_final_voltage
+            cv_instructions.cv_initial_voltage = ocp_final_voltage
 
         try:
             if custom_parameters:  # if not none then use the custom parameters
                 custom_parameters.CVvi = ocp_final_voltage  # still need to set the initial voltage, not overwriting the original
-                pstat.cyclic(**custom_parameters)  # unpack the custom parameters
+                pstat.cyclic(
+                    CVvi=custom_parameters.CVvi,
+                    CVap1=custom_parameters.CVap1,
+                    CVap2=custom_parameters.CVap2,
+                    CVvf=custom_parameters.CVvf,
+                    CVsr1=custom_parameters.CVsr1,
+                    CVsr2=custom_parameters.CVsr2,
+                    CVsr3=custom_parameters.CVsr3,
+                    CVsamplerate=custom_parameters.CVsamplerate,
+                    CVcycle=custom_parameters.CVcycle,
+                )  # unpack the custom parameters
             else:
                 pstat.cyclic(
                     CVvi=ocp_final_voltage,  # we always start where we left off in the OCP but don't always change the initial voltage
-                    CVap1=char_instructions.cv_first_anodic_peak,
-                    CVap2=char_instructions.cv_second_anodic_peak,
-                    CVvf=char_instructions.cv_final_voltage,
-                    CVsr1=char_instructions.cv_scan_rate_cycle_1,
-                    CVsr2=char_instructions.cv_scan_rate_cycle_2,
-                    CVsr3=char_instructions.cv_scan_rate_cycle_3,
-                    CVsamplerate=char_instructions.cv_sample_rate,
-                    CVcycle=char_instructions.cv_cycle_count,
+                    CVap1=cv_instructions.cv_first_anodic_peak,
+                    CVap2=cv_instructions.cv_second_anodic_peak,
+                    CVvf=cv_instructions.cv_final_voltage,
+                    CVsr1=cv_instructions.cv_scan_rate_cycle_1,
+                    CVsr2=cv_instructions.cv_scan_rate_cycle_2,
+                    CVsr3=cv_instructions.cv_scan_rate_cycle_3,
+                    CVsamplerate=cv_instructions.cv_sample_rate,
+                    CVcycle=cv_instructions.cv_cycle_count,
                 )
             pstat.activecheck()
 
         except Exception as e:
-            char_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during CV: %s", e)
-            raise CVFailure(char_instructions.id, char_instructions.well_id) from e
+            raise CVFailure(cv_instructions.experiment_id, cv_instructions.well_id) from e
 
     except OCPFailure as e:
-        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("OCP of well %s failed", char_instructions.well_id)
+        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", cv_instructions.well_id)
         raise e
     except CVFailure as e:
-        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("CV of well %s failed", char_instructions.well_id)
+        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CV of well %s failed", cv_instructions.well_id)
         raise e
     except Exception as e:
-        char_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("An unknown exception occurred during CV: %s", e)
-        raise CVFailure(char_instructions.id, char_instructions.well_id) from e
+        raise CVFailure(cv_instructions.experiment_id, cv_instructions.well_id) from e
     finally:
         pstat.pstatdisconnect()
 
-    return char_instructions, char_instructions.results
+    return cv_instructions, cv_instructions.results
 
 
 def apply_log_filter(
@@ -1160,7 +806,7 @@ def image_well(
         # create file name
         project_campaign_id = instructions.project_campaign_id or "test"
         project_id = instructions.project_id or "test"
-        exp_id = instructions.id or "test"
+        exp_id = instructions.experiment_id or "test"
         well_id = instructions.well_id or "test"
 
         if step_description is not None:
@@ -1192,15 +838,21 @@ def image_well(
             Path(filepath).touch()
         else:
             capture_new_image(save=True, num_images=1, file_name=filepath)
+
             dz_filename = filepath.stem + "_dz" + filepath.suffix
             dz_filepath = filepath.with_name(dz_filename)
-            img: Image = add_data_zone(instructions, dz_filepath, step_description)
-            img.save(filepath)
 
+            img: Image = add_data_zone(
+                experiment=instructions,
+                image=Image.open(filepath),
+                context=step_description,
+            )
+            img.save(dz_filepath)
+            instructions.results.append_image_file(dz_filepath, context=step_description)
         logger.debug("Image of well %s captured", instructions.well_id)
-        # upload image to OBS
-        instructions.results.append_image_file(filepath)
-        instructions.results.append_image_file(dz_filepath)
+
+        instructions.results.append_image_file(filepath, context=step_description)
+
     except Exception as e:
         logger.exception(
             "Failed to image well %s. Error %s occured", instructions.well_id, e

@@ -79,6 +79,7 @@ class Vial2(Vessel):
         contents,
         viscosity_cp: float = 0.0,
         depth: float = 0,
+        concentration: float = 0.0,
     ) -> None:
         """
         Initializes a new instance of the Vial2 class.
@@ -112,6 +113,7 @@ class Vial2(Vessel):
         self.contamination = contamination
         self.category = category
         self.viscosity_cp = viscosity_cp
+        self.concentration = concentration
 
     def calculate_depth(self) -> float:
         """
@@ -240,6 +242,7 @@ class StockVial(Vial2):
         viscosity_cp: float = 0.0,
         category: int = 0,
         depth: float = 0,
+        concentration: float = 0.0,
     ) -> None:
         """
         Initializes a new instance of the StockVial class.
@@ -267,6 +270,7 @@ class StockVial(Vial2):
             contamination,
             contents=contents,
             viscosity_cp=viscosity_cp,
+            concentration=concentration,
         )
         self.category = 0
 
@@ -314,6 +318,7 @@ class WasteVial(Vial2):
         viscosity_cp: float = 0.0,
         category: int = 1,
         depth: float = 0,
+        concentration: float = 0.0,
     ) -> None:
         """
         Initializes a new instance of the WasteVial class.
@@ -341,6 +346,7 @@ class WasteVial(Vial2):
             contamination,
             contents=contents,
             viscosity_cp=viscosity_cp,
+            concentration=concentration,
         )
         self.category = 1
 

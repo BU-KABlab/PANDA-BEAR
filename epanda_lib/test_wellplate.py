@@ -110,7 +110,7 @@ class TestWells2(unittest.TestCase):
             x_coordinates,
             y_coordinates,
             color,
-        ) = self.wells.well_coordinates_and_status_color()
+        ) = self.wells.get_well_coordinates_and_status_color()
         self.assertIsInstance(x_coordinates, list)
         self.assertIsInstance(y_coordinates, list)
         self.assertIsInstance(color, list)

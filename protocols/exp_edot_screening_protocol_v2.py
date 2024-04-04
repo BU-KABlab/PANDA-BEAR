@@ -1,6 +1,7 @@
 """The sequence of steps for a pedotLHSv1_screening experiment."""
 
 # Standard imports
+from json import tool
 from typing import Sequence
 
 # Non-standard imports
@@ -18,14 +19,15 @@ from epanda_lib.e_panda_custom import (
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,
 )
-from epanda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
+from epanda_lib.experiment_class import EdotExperiment, ExperimentStatus
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.correction_factors import correction_factor
 from epanda_lib.mill_control import Instruments
+from epanda_lib.utilities import solve_vials_ilp
 
 
 def main(
-    instructions: EchemExperimentBase,
+    instructions: EdotExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -44,7 +46,7 @@ def main(
 
 
 def pedot_lhs_v1_screening(
-    instructions: EchemExperimentBase,
+    instructions: EdotExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -103,7 +105,7 @@ def pedot_lhs_v1_screening(
 
 
 def pedotdeposition(
-    instructions: EchemExperimentBase,
+    instructions: EdotExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -128,23 +130,64 @@ def pedotdeposition(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "before_deposition")
+    image_well(toolkit, instructions, "BeforeDeposition")
 
     instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
     toolkit.global_logger.info("1. Depositing EDOT into well: %s", instructions.well_id)
-    forward_pipette_v2(
-        volume=instructions.solutions_corrected["edot"],
-        from_vessel=solution_selector(
-            stock_vials,
-            "edot",
-            instructions.solutions_corrected["edot"],
-        ),
-        to_vessel=toolkit.wellplate.wells[instructions.well_id],
-        pump=toolkit.pump,
-        mill=toolkit.mill,
-        pumping_rate=instructions.pumping_rate,
+
+    # Determine the available edot stock vials and their concentrations
+    # Calculate the combination of the available edot vials that will give the
+    # desired concentration at the desired volume. Calculations are done using units of 20 ul
+    # as that is our minimum pipetting volume. However once the calculations are done, the
+    # actual volume to be pipetted is calculated using the correction factor.
+
+    edot_vials = [
+        vial
+        for vial in stock_vials
+        if vial.name == "edot" and vial.volume > 0
+    ]
+
+    # If there are no edot vials, raise an error
+    if not edot_vials:
+        toolkit.global_logger.error("No edot vials available")
+        raise ValueError("No edot vials available")
+
+    # There are one or more vials, let's calculate the volume to be pipetted from each
+    # vial to get the desired volume and concentration
+    edot_vial_volumes, deviation = solve_vials_ilp(
+
+        # Concentrations of each vial in mM
+        vial_concentrations=[vial.concentration for vial in edot_vials],
+
+        # Total volume to achieve in uL
+        v_total=instructions.solutions["edot"],
+
+        # Target concentration in mM
+        c_target=instructions.edot_concentration,
     )
+
+    # If the volumes are not found, raise an error
+    if edot_vial_volumes is None:
+        raise ValueError("No solution found for edot vial volumes")
+    toolkit.global_logger.info(
+        "Volumes to draw from each edot vial: %s uL", edot_vial_volumes
+    )
+    toolkit.global_logger.info(
+        "Deviation from target concentration: %s mM", deviation
+    )
+
+    # Pipette the calculated volumes from the edot vials into the well
+    for vial, volume in zip(edot_vials, edot_vial_volumes):
+        volume = correction_factor(volume, vial.viscosity_cp)
+        forward_pipette_v2(
+            volume=volume,
+            from_vessel=vial,
+            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            pump=toolkit.pump,
+            mill=toolkit.mill,
+            pumping_rate=instructions.pumping_rate,
+        )
 
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
@@ -170,7 +213,7 @@ def pedotdeposition(
 
         toolkit.global_logger.info("3. Performing CA deposition")
         try:
-            chrono_amp(instructions, file_tag="part_1")
+            chrono_amp(instructions, file_tag="CA_deposition")
         except Exception as e:
             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
             raise e
@@ -246,7 +289,7 @@ def pedotdeposition(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="after_deposition",
+        step_description="AfterDeposition",
     )
     instructions.process_type = 2
     instructions.priority = 1
@@ -254,7 +297,7 @@ def pedotdeposition(
 
 
 def pedotbleaching(
-    instructions: EchemExperimentBase,
+    instructions: EdotExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -278,7 +321,7 @@ def pedotbleaching(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "bleaching_before_CA")
+    image_well(toolkit, instructions, "BeforeBleaching")
 
     instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -362,16 +405,16 @@ def pedotbleaching(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="bleaching_after_CA",
+        step_description="AfterBleaching",
     )
 
     instructions.process_type = 3
-    instructions.priority = 2
+    instructions.priority = 0
     toolkit.global_logger.info("PEDOT bleaching complete\n\n")
 
 
 def pedotcoloring(
-    instructions: EchemExperimentBase,
+    instructions: EdotExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -395,7 +438,7 @@ def pedotcoloring(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "coloring_before_CA")
+    image_well(toolkit, instructions, "BeforeColoring")
 
     instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -481,15 +524,15 @@ def pedotcoloring(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="coloring_after_CA",
+        step_description="AfterColoring",
     )
     instructions.process_type = 4
-    instructions.priority = 3
+    instructions.priority = 0
     toolkit.global_logger.info("PEDOT coloring complete\n\n")
 
 
 def pedotcv(
-    instructions: EchemExperimentBase,
+    instructions: EdotExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -515,7 +558,7 @@ def pedotcv(
 
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "characterizing_before_CV")
+    image_well(toolkit, instructions, "BeforeCharacterizing")
 
     instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -599,7 +642,7 @@ def pedotcv(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="characterizing_after_CV",
+        step_description="AfterCharacterizing",
     )
     toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
     instructions.set_status_and_save(ExperimentStatus.RINSING)
@@ -636,8 +679,8 @@ def pedotcv(
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="characterizing_after_rinse",
+        step_description="EndImage",
     )
-    instructions.process_type = None
-    instructions.priority = None
+    instructions.process_type = 99
+    instructions.priority = 99
     toolkit.global_logger.info("PEDOT characterizing complete\n\n")
