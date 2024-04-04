@@ -9,10 +9,16 @@
     ],
     "sqltools.connections": [
         {
-            "previewLimit": 50,
+            "previewLimit": 100,
             "driver": "SQLite",
-            "name": "epanda",
-            "database": "${workspaceFolder:PANDA}/data/epanda_db.db"
+            "name": "epanda_dev",
+            "database": "P:\\epanda_dev.db"
+        },
+        {
+            "previewLimit": 100,
+            "driver": "SQLite",
+            "name": "epanda_prod",
+            "database": "P:\\epanda_prod.db"
         }
     ],
     "sqltools.useNodeRuntime": true
