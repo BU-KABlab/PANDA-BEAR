@@ -90,7 +90,7 @@ def add_data_zone(
 
     # ePANDA logo
     epanda_logo_x = text_starts[0]
-    logo = Image.open(Path("C:\\Users\\Kab Lab\\Documents\\GitHub\\PANDA\\images\\bw_panda_logo.png"))
+    logo = Image.open(Path(".\\images\\bw_panda_logo.png"))
     logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
     banner.paste(logo, (epanda_logo_x, 0))
     # ePANDA version
