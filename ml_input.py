@@ -34,11 +34,11 @@ def populate_required_information(experiment_id: int):
         name, result_type, context = row
         value = sql_utilities.select_specific_result(
             experiment_id, result_type, context
-        ).result_value
+        )
         # if result_type == 'image':
         #     value = Image.open(value)
         if value is not None:
-            df.loc[(df['name'] == name), 'value'] = value
+            df.loc[(df['name'] == name), 'value'] = value.result_value
 
     sql_utilities.set_system_status(
         sql_utilities.SystemState.IDLE, "ready", read_testing_config()
@@ -46,7 +46,7 @@ def populate_required_information(experiment_id: int):
     return df
 
 if __name__ == "__main__":
-    info = populate_required_information(10000000)
+    info = populate_required_information(10000004)
     # Print the required information
     print(info)
     # info.at[7, 'value'].show()
