@@ -1,7 +1,5 @@
 """Experiment parameters for the edot screening experiments"""
 
-import json
-
 import pandas as pd
 
 from epanda_lib import experiment_class
@@ -41,7 +39,6 @@ def main():
                 well_id=str(well_letter) + str(well_number),
                 well_type_number=4,
                 experiment_name=EXPERIMENT_NAME + " " + "Deposition",
-                priority=0,
                 pin=CURRENT_PIN,
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,
@@ -50,8 +47,6 @@ def main():
                 pumping_rate=DEFAULT_PUMPING_RATE,
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + " " + str(experiment_id),
-                override_well_selection=0,  # 0 to use new wells only, 1 to reuse a well
-                process_type=1,
                 # Echem specific
                 ocp=1,
                 baseline=0,
@@ -70,20 +65,20 @@ def main():
         )
         experiment_id += 1
 
-    for experiment in experiments:
+    # for experiment in experiments:
         ## Print a recipt of the wellplate and its experiments noting the solution and volume
-        print(f"Experiment name: {experiment.experiment_name}")
-        print(f"Experiment id: {experiment.experiment_id}")
-        print(f"Well id: {experiment.well_id}")
-        print(f"Solutions: {json.dumps(experiment.solutions)}")
-        print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")
-        print(
-            f"Project campaign id: {experiment.project_id}.{experiment.project_campaign_id}\n"
-        )
-        print(f"CA Paramaters: {experiment.print_ca_parameters()}\n")
-        print(f"CV Paramaters: {experiment.print_cv_parameters()}\n")
+        # print(f"Experiment name: {experiment.experiment_name}")
+        # print(f"Experiment id: {experiment.experiment_id}")
+        # print(f"Well id: {experiment.well_id}")
+        # print(f"Solutions: {json.dumps(experiment.solutions)}")
+        # print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")
+        # print(
+        #     f"Project campaign id: {experiment.project_id}.{experiment.project_campaign_id}\n"
+        # )
+        # print(f"CA Paramaters: {experiment.print_ca_parameters()}\n")
+        # print(f"CV Paramaters: {experiment.print_cv_parameters()}\n")
 
     # Add experiments to the queue
-    input("Press enter to add the experiments")
+    # input("Press enter to add the experiments")
     scheduler = Scheduler()
     scheduler.add_nonfile_experiments(experiments)

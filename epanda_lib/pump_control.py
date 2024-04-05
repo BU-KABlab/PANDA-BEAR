@@ -265,7 +265,7 @@ class Pump:
             self.pump.volume_withdrawn_clear()
 
             if infused_into is not None: # The we need to update the volume and contents of the vessel
-                
+
                 infused_into.update_volume(volume_ul)
                 infused_into.update_contents(self.pipette.contents, volume_ul)
 
@@ -288,7 +288,7 @@ class Pump:
         volume_ul = volume
         if volume_ul > 0:
             volume_ml = volume_ul / 1000.000
-            _, pumprecord = self.run_pump(
+            _, _ = self.run_pump(
                 nesp_lib.PumpingDirection.INFUSE, volume_ml, self.max_pump_rate
             )
             self.update_pipette_volume(self.pump.volume_infused)
@@ -300,10 +300,8 @@ class Pump:
             )
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
-            return 0
-        else:
-            return 0
-    
+        return 0
+
     def run_pump(
         self,
         direction,

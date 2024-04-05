@@ -3,14 +3,15 @@ This file simplifies controlling the OBS software in the ways that we need.
 It is used to place the experiment information on the screen and to turn on and off the webcam.
 """
 
+# pylint: disable=unnecessary-pass
 import logging
-import time
 
 import obsws_python as obsws
 from obsws_python import error as OBSerror
+
 from .config.config import PATH_TO_LOGS, TESTING
 from .config.secrets import OBSSecrets
-from .experiment_class import ExperimentBase, ExperimentStatus
+from .experiment_class import ExperimentBase
 from .log_tools import e_panda_logger as logger
 
 ## set up logging to log to both the obs_control.log file and the ePANDA.log file
@@ -35,11 +36,11 @@ class OBSController:
     ):
         try:
             self.client = obsws.ReqClient(
-            host=client_host,
-            port=client_port,
-            password=client_password,
-            timeout=client_timeout,
-        )
+                host=client_host,
+                port=client_port,
+                password=client_password,
+                timeout=client_timeout,
+            )
             self.logger = logging.getLogger(__name__)
             self.sources = {
                 "PSTAT": 0,
@@ -50,17 +51,19 @@ class OBSController:
         except OBSerror.OBSSDKRequestError as e:
             self.logger.error("Error connecting to OBS: %s", e)
             self.client = None
-            
 
         for source in self.sources.keys():
             try:
                 self.sources[source] = self.client.get_source_active(source)
-            except OBSerror.OBSSDKRequestError as e:
+            except OBSerror.OBSSDKRequestError:
                 self.sources[source] = -1
+
     def place_experiment_on_screen(self, instructions: ExperimentBase):
         """Place the experiment information on the screen"""
         try:
-            exp_id = instructions.experiment_id if instructions.experiment_id else "None"
+            exp_id = (
+                instructions.experiment_id if instructions.experiment_id else "None"
+            )
             project_id = instructions.project_id if instructions.project_id else "None"
             well_id = instructions.well_id if instructions.well_id else "None"
             status = instructions.status if instructions.status else "None"
@@ -152,7 +155,9 @@ Well: {well_id}"""
     def take_snapshot(self, source: str = "Webcam"):
         """Takes a snapshot of the given source and returns a base64 encoded string of the image"""
         try:
-            screenshot = self.client.get_source_screenshot(source, "png", 1920, 1080, -1)
+            screenshot = self.client.get_source_screenshot(
+                source, "png", 1920, 1080, -1
+            )
             return screenshot
         except OBSerror.OBSSDKRequestError as e:
             self.logger.error("Failed to take snapshot: %s", e)

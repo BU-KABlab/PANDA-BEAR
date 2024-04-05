@@ -348,7 +348,7 @@ class WasteVial(Vial2):
             viscosity_cp=viscosity_cp,
             concentration=concentration,
         )
-        self.category = 1
+        self.category = category
 
     def update_contents(self, from_vessel: Union[str, dict], volume: float) -> None:
         """Update the contentes of the waste vial"""

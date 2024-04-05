@@ -4,6 +4,7 @@ The main menue of ePANDA.
 Useful for one-off tasks that don't require the full ePANDA program to run.
 Or starting the ePANDA either with or without mock instruments.
 """
+# pylint: disable=broad-exception-caught, protected-access
 
 import os
 import sys
@@ -19,6 +20,7 @@ from epanda_lib import (
     scheduler,
     vials,
     wellplate,
+    print_panda
 )
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import read_testing_config, write_testing_config
@@ -37,11 +39,20 @@ def change_wellplate():
     set_system_status(SystemState.BUSY, "changing wellplate", read_testing_config())
     wellplate.load_new_wellplate(ask=True)
 
-def  remove_wellplate_from_database():
+
+def remove_wellplate_from_database():
     """Removes the current wellplate from the database."""
-    plate_to_remove = int(input("Enter the wellplate number to remove: ").strip().lower())
-    set_system_status(SystemState.BUSY, "removing wellplate from database", read_testing_config())
+    if not read_testing_config():
+        print("Cannot remove the wellplate from the database in non-testing mode.")
+        return
+    plate_to_remove = int(
+        input("Enter the wellplate number to remove: ").strip().lower()
+    )
+    set_system_status(
+        SystemState.BUSY, "removing wellplate from database", read_testing_config()
+    )
     wellplate._remove_wellplate_from_db(plate_to_remove)
+
 
 def reset_vials_stock():
     """Resets the stock vials."""
@@ -86,7 +97,7 @@ def run_experiment_generator():
     )
     generator_utilities.read_in_generators()
     available_generators = generator_utilities.get_generators()
-    #os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+    # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
     print()
     if not available_generators:
         print("No generators available.")
@@ -95,7 +106,11 @@ def run_experiment_generator():
     for generator in available_generators:
         print(generator)
 
-    generator_id = input("Enter the id of the generator you would like to run or 'q' to go back: ").strip().lower()
+    generator_id = (
+        input("Enter the id of the generator you would like to run or 'q' to go back: ")
+        .strip()
+        .lower()
+    )
     if generator_id == "q":
         return
     generator_id = int(generator_id)
@@ -144,8 +159,11 @@ def exit_program():
     print("Exiting ePANDA. Goodbye!")
     sys.exit()
 
+
 def refresh():
-    pass
+    """
+    Refreshes the main menue. Re-read the current wellplate info, and queue."""
+
 
 options = {
     # '0': run_epanda,
@@ -172,13 +190,15 @@ if __name__ == "__main__":
 
     while True:
         set_system_status(SystemState.IDLE, "at main menu", read_testing_config())
-        # os.system('cls' if os.name == 'nt' else 'clear')  # Clear the terminal
+        os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+        print()
+        print(print_panda.print_panda())
         print()
         print("Welcome to ePANDA!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
-        current_wellplate = wellplate.read_current_wellplate_info()
+        num, p_type, free_wells = wellplate.read_current_wellplate_info()
         print(
-            f"The current wellplate is #{current_wellplate[0]} - Type: {current_wellplate[1]} - Available Wells: {current_wellplate[2]}"
+            f"The current wellplate is #{num} - Type: {p_type} - Available Wells: {free_wells}"
         )
         print(f"The queue has {scheduler.get_queue_length()} experiments.")
         print("What would you like to do?")
@@ -193,7 +213,9 @@ if __name__ == "__main__":
                 print("Invalid choice. Please try again.")
                 continue
         except controller.ShutDownCommand:
-            pass # The epanda loop has been stopped but we don't want to exit the program
+            pass  # The epanda loop has been stopped but we don't want to exit the program
         except Exception as e:
             print(f"An error occurred: {e}")
-            break # Exit the program if an unknown error occurs
+            break  # Exit the program if an unknown error occurs
+
+    set_system_status(SystemState.OFF, "exiting ePANDA", read_testing_config())

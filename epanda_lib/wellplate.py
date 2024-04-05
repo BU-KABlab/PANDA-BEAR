@@ -12,16 +12,8 @@ import math
 import os
 from typing import Dict, Optional, Tuple
 
-import matplotlib.pyplot as plt
-#from numpy import save
 from .config.config import (
     MILL_CONFIG,
-    #    PATH_TO_DATA,
-    STOCK_STATUS,
-    WASTE_STATUS,
-    #    WELL_HX,
-    #    WELL_STATUS,
-    #    WELL_TYPE,
     WELLPLATE_LOCATION,
 )
 from .vessel import Vessel
@@ -177,6 +169,7 @@ class Well(Vessel):
         self.height: float = height
         self.depth: float = depth
         self.capacity: float = capacity
+        self.type_number: int = well_type_number
 
         super().__init__(
             name=self.well_id,
@@ -848,7 +841,6 @@ class OverDraftException(Exception):
     def __str__(self) -> str:
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
 
-# FIXME: This function should be hidden once in production
 def _remove_wellplate_from_db(plate_id: int) -> None:
     """Removed all wells for the given plate id in well_hx, removes the plate id from the wellplate table"""
     user_choicec = (

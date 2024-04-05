@@ -1,4 +1,6 @@
-def printpanda():
+"""Prints the ePANDA panda."""
+def print_panda():
+    """Prints the ePANDA panda."""
     image = r"""
     
                                                                                         

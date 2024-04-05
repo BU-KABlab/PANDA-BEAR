@@ -1,6 +1,6 @@
 """ Experiment data class"""
 
-# pylint: disable=invalid-name, line-too-long, import-outside-toplevel
+# pylint: disable=invalid-name, line-too-long, import-outside-toplevel, broad-exception-caught, protected-access
 import json
 from dataclasses import field
 from datetime import datetime
@@ -374,14 +374,14 @@ class ExperimentBase:
             parameter = ExperimentParameterRecord(*parameter)
             try:
                 attribute_type = get_all_type_hints(type(self))[parameter.parameter_type]
-            except KeyError:
+            except KeyError as exc:
                 # The attribute is not in ExperimentBase, check in the class hierarchy
                 cls = find_attribute_in_hierarchy(self.__class__, parameter.parameter_type)
                 if cls is not None:
                     attribute_type = get_all_type_hints(cls)[parameter.parameter_type]
                 else:
                     print(f"Attribute {parameter.parameter_type} not found in class hierarchy")
-                    raise AttributeError(f"Attribute {parameter.parameter_type} not found in class hierarchy")
+                    raise AttributeError(f"Attribute {parameter.parameter_type} not found in class hierarchy") from exc
 
             if isinstance(
                 attribute_type, type(Union)
@@ -450,76 +450,7 @@ class EchemExperimentBase(ExperimentBase):
     Define the data that is used to run an experiment
 
     This is the base class for all echem experiments
-    Attributes:
-    ------------
-    ocp: int
-        Open Circuit Potential
-    ca: int
-        Cyclic Amperometry
-    cv: int
-        Cyclic Voltammetry
-    baseline: int
-        Baseline
-    flush_sol_name: str
-        Flush solution name
-    flush_vol: int
-        Flush solution volume
-    mix = 1
-        Binary mix or dont mix
-    mix_count: int
-        Number of times to mix
-    mix_volume: int
-        Volume to mix
-    rinse_count: int
-        Default rinse count
-    rinse_vol: int
-        Default rinse volume
-    ca_sample_period: float
-        Deposition sample period
-    CAvi: float
-        Pre-step voltage (V)
-    CAti: float
-        Pre-step delay time (s)
-    CAv1: float
-        Step 1 voltage (V), deposition potential (V)
-    CAt1: float
-        run time 300 seconds, deposition duration (s)
-    CAv2: float
-        Step 2 voltage (V)
-    CAt2: float
-        Step 2 time (s)
-    CAsamplerate: float
-        sample period (s)
-    char_sol_name: str
-        Characterization solution name
-    char_vol: int
-        Characterization solution volume
-    cv_sample_period: float
-        Characterization sample period
-    cv_scan_rate: float
-        Scan rate
-    CVvi: float
-        initial voltage
-    CVap1: float
-        first anodic peak
-    CVap2: float
-        second anodic peak
-    CVvf: float
-        final voltage
-    CVstep: float
-        step size
-    CVsr1: float
-        scan rate 1
-    CVcycle: int
-        number of cycles
-    CVsr2: float
-        CVsr1
-    CVsr3: float
-        CVsr1
-    CVsamplerate: float
-        CVstep / CVsr1
-
-    """
+        """
 
     experiment_type: int = 1  # echem generic
     ocp: int = 1  # Open Circuit Potential
@@ -654,263 +585,195 @@ class EchemExperimentBase(ExperimentBase):
     """
 
 
-@dataclass(config=ConfigDict(validate_assignment=True))
-class EchemExperimentParameters:
-    """
-    Define the data that is used to run an experiment
+# @dataclass(config=ConfigDict(validate_assignment=True))
+# class EchemExperimentParameters:
+#     """
+#     Define the data that is used to run an experiment
 
-    This is the base class for all echem experiments
-    Attributes:
-    ------------
-    ocp: int
-        Open Circuit Potential
-    ca: int
-        Cyclic Amperometry
-    cv: int
-        Cyclic Voltammetry
-    baseline: int
-        Baseline
-    flush_sol_name: str
-        Flush solution name
-    flush_vol: int
-        Flush solution volume
-    mix = 1
-        Binary mix or dont mix
-    mix_count: int
-        Number of times to mix
-    mix_volume: int
-        Volume to mix
-    rinse_count: int
-        Default rinse count
-    rinse_vol: int
-        Default rinse volume
-    ca_sample_period: float
-        Deposition sample period
-    CAvi: float
-        Pre-step voltage (V)
-    CAti: float
-        Pre-step delay time (s)
-    CAv1: float
-        Step 1 voltage (V), deposition potential (V)
-    CAt1: float
-        run time 300 seconds, deposition duration (s)
-    CAv2: float
-        Step 2 voltage (V)
-    CAt2: float
-        Step 2 time (s)
-    CAsamplerate: float
-        sample period (s)
-    char_sol_name: str
-        Characterization solution name
-    char_vol: int
-        Characterization solution volume
-    cv_sample_period: float
-        Characterization sample period
-    cv_scan_rate: float
-        Scan rate
-    CVvi: float
-        initial voltage
-    CVap1: float
-        first anodic peak
-    CVap2: float
-        second anodic peak
-    CVvf: float
-        final voltage
-    CVstep: float
-        step size
-    CVsr1: float
-        scan rate 1
-    CVcycle: int
-        number of cycles
-    CVsr2: float
-        CVsr1
-    CVsr3: float
-        CVsr1
-    CVsamplerate: float
-        CVstep / CVsr1
+#     This is the base class for all echem experiments
 
-    """
+#     """
 
-    ocp: int = 1  # Open Circuit Potential
-    ca: int = 1  # Cyclic Amperometry
-    cv: int = 1  # Cyclic Voltammetry
-    baseline: int = 0  # Baseline
+#     ocp: int = 1  # Open Circuit Potential
+#     ca: int = 1  # Cyclic Amperometry
+#     cv: int = 1  # Cyclic Voltammetry
+#     baseline: int = 0  # Baseline
 
-    flush_sol_name: str = ""  # Flush solution name
-    flush_vol: int = 0  # Flush solution volume
+#     flush_sol_name: str = ""  # Flush solution name
+#     flush_vol: int = 0  # Flush solution volume
 
-    mix = 0  # Binary mix or dont mix
-    mix_count: int = 0  # Number of times to mix
-    mix_volume: int = 0  # Volume to mix
-    rinse_count: int = 4  # Default rinse count
-    rinse_vol: int = 120  # Default rinse volume
+#     mix = 0  # Binary mix or dont mix
+#     mix_count: int = 0  # Number of times to mix
+#     mix_volume: int = 0  # Volume to mix
+#     rinse_count: int = 4  # Default rinse count
+#     rinse_vol: int = 120  # Default rinse volume
 
-    ca_sample_period: float = 0.1  # Deposition sample period
-    ca_prestep_voltage: float = 0.0  # Pre-step voltage (V)
-    # CAvi = ca_prestep_voltage
-    ca_prestep_time_delay: float = 0.0  # Pre-step delay time (s)
-    # CAti = ca_prestep_time_delay
-    ca_step_1_voltage: float = -1.7  # Step 1 voltage (V), deposition potential (V)
-    # CAv1 = ca_step_1_voltage
-    ca_step_1_time: float = 300.0  # run time 300 seconds, deposition duration (s)
-    # CAt1 = ca_step_1_time
-    ca_step_2_voltage: float = 0.0  # Step 2 voltage (V)
-    # CAv2 = ca_step_2_voltage
-    ca_step_2_time: float = 0.0  # Step 2 time (s)
-    # CAt2 = ca_step_2_time
-    ca_sample_rate: float = 0.5  # sample period (s)
-    # CAsamplerate = ca_sample_rate
+#     ca_sample_period: float = 0.1  # Deposition sample period
+#     ca_prestep_voltage: float = 0.0  # Pre-step voltage (V)
+#     # CAvi = ca_prestep_voltage
+#     ca_prestep_time_delay: float = 0.0  # Pre-step delay time (s)
+#     # CAti = ca_prestep_time_delay
+#     ca_step_1_voltage: float = -1.7  # Step 1 voltage (V), deposition potential (V)
+#     # CAv1 = ca_step_1_voltage
+#     ca_step_1_time: float = 300.0  # run time 300 seconds, deposition duration (s)
+#     # CAt1 = ca_step_1_time
+#     ca_step_2_voltage: float = 0.0  # Step 2 voltage (V)
+#     # CAv2 = ca_step_2_voltage
+#     ca_step_2_time: float = 0.0  # Step 2 time (s)
+#     # CAt2 = ca_step_2_time
+#     ca_sample_rate: float = 0.5  # sample period (s)
+#     # CAsamplerate = ca_sample_rate
 
-    char_sol_name: str = ""  # Characterization solution name
-    char_vol: int = 0  # Characterization solution volume
-    cv_sample_period: float = 0.1  # Characterization sample period
-    cv_initial_voltage: float = 0.0  # initial voltage
-    cv_first_anodic_peak: float = 0.5  # first anodic peak
-    cv_second_anodic_peak: float = -0.2  # second anodic peak
-    cv_final_voltage: float = 0.0  # final voltage
-    cv_step_size: float = 0.01  # step size
-    cv_cycle_count: int = 3  # number of cycles
-    cv_scan_rate_cycle_1: float = 0.1
-    cv_scan_rate_cycle_2: float = 0.1
-    cv_scan_rate_cycle_3: float = 0.1
+#     char_sol_name: str = ""  # Characterization solution name
+#     char_vol: int = 0  # Characterization solution volume
+#     cv_sample_period: float = 0.1  # Characterization sample period
+#     cv_initial_voltage: float = 0.0  # initial voltage
+#     cv_first_anodic_peak: float = 0.5  # first anodic peak
+#     cv_second_anodic_peak: float = -0.2  # second anodic peak
+#     cv_final_voltage: float = 0.0  # final voltage
+#     cv_step_size: float = 0.01  # step size
+#     cv_cycle_count: int = 3  # number of cycles
+#     cv_scan_rate_cycle_1: float = 0.1
+#     cv_scan_rate_cycle_2: float = 0.1
+#     cv_scan_rate_cycle_3: float = 0.1
 
-    # The below properies and setters are to allow for legacy ways of referencing the properties
-    @property
-    def CVvi(self):
-        """Alias for cv_initial_voltage"""
-        return self.cv_initial_voltage
+#     # The below properies and setters are to allow for legacy ways of referencing the properties
+#     @property
+#     def CVvi(self):
+#         """Alias for cv_initial_voltage"""
+#         return self.cv_initial_voltage
 
-    @CVvi.setter
-    def CVvi(self, value):
-        """Alias for cv_initial_voltage"""
-        self.cv_initial_voltage = value
+#     @CVvi.setter
+#     def CVvi(self, value):
+#         """Alias for cv_initial_voltage"""
+#         self.cv_initial_voltage = value
 
-    @property
-    def CVap1(self):
-        """Alias for cv_first_anodic_peak"""
-        return self.cv_first_anodic_peak
+#     @property
+#     def CVap1(self):
+#         """Alias for cv_first_anodic_peak"""
+#         return self.cv_first_anodic_peak
 
-    @CVap1.setter
-    def CVap1(self, value):
-        """Alias for cv_first_anodic_peak"""
-        self.cv_first_anodic_peak = value
+#     @CVap1.setter
+#     def CVap1(self, value):
+#         """Alias for cv_first_anodic_peak"""
+#         self.cv_first_anodic_peak = value
 
-    @property
-    def CVap2(self):
-        """Alias for cv_second_anodic_peak"""
-        return self.cv_second_anodic_peak
+#     @property
+#     def CVap2(self):
+#         """Alias for cv_second_anodic_peak"""
+#         return self.cv_second_anodic_peak
 
-    @CVap2.setter
-    def CVap2(self, value):
-        """Alias for cv_second_anodic_peak"""
-        self.cv_second_anodic_peak = value
+#     @CVap2.setter
+#     def CVap2(self, value):
+#         """Alias for cv_second_anodic_peak"""
+#         self.cv_second_anodic_peak = value
 
-    @property
-    def CVvf(self):
-        """Alias for cv_final_voltage"""
-        return self.cv_final_voltage
+#     @property
+#     def CVvf(self):
+#         """Alias for cv_final_voltage"""
+#         return self.cv_final_voltage
 
-    @CVvf.setter
-    def CVvf(self, value):
-        """Alias for cv_final_voltage"""
-        self.cv_final_voltage = value
+#     @CVvf.setter
+#     def CVvf(self, value):
+#         """Alias for cv_final_voltage"""
+#         self.cv_final_voltage = value
 
-    @property
-    def CVstep(self):
-        """Alias for cv_step_size"""
-        return self.cv_step_size
+#     @property
+#     def CVstep(self):
+#         """Alias for cv_step_size"""
+#         return self.cv_step_size
 
-    @CVstep.setter
-    def CVstep(self, value):
-        """Alias for cv_step_size"""
-        self.cv_step_size = value
+#     @CVstep.setter
+#     def CVstep(self, value):
+#         """Alias for cv_step_size"""
+#         self.cv_step_size = value
 
-    @property
-    def CVsr1(self):
-        """Alias for cv_scan_rate_cycle_1"""
-        return self.cv_scan_rate_cycle_1
+#     @property
+#     def CVsr1(self):
+#         """Alias for cv_scan_rate_cycle_1"""
+#         return self.cv_scan_rate_cycle_1
 
-    @CVsr1.setter
-    def CVsr1(self, value):
-        """Alias for cv_scan_rate_cycle_1"""
-        self.cv_scan_rate_cycle_1 = value
+#     @CVsr1.setter
+#     def CVsr1(self, value):
+#         """Alias for cv_scan_rate_cycle_1"""
+#         self.cv_scan_rate_cycle_1 = value
 
-    @property
-    def CVsr2(self):
-        """Alias for cv_scan_rate_cycle_2"""
-        return self.cv_scan_rate_cycle_2
+#     @property
+#     def CVsr2(self):
+#         """Alias for cv_scan_rate_cycle_2"""
+#         return self.cv_scan_rate_cycle_2
 
-    @CVsr2.setter
-    def CVsr2(self, value):
-        """Alias for cv_scan_rate_cycle_2"""
-        self.cv_scan_rate_cycle_2 = value
+#     @CVsr2.setter
+#     def CVsr2(self, value):
+#         """Alias for cv_scan_rate_cycle_2"""
+#         self.cv_scan_rate_cycle_2 = value
 
-    @property
-    def CVsr3(self):
-        """Alias for cv_scan_rate_cycle_3"""
-        return self.cv_scan_rate_cycle_3
+#     @property
+#     def CVsr3(self):
+#         """Alias for cv_scan_rate_cycle_3"""
+#         return self.cv_scan_rate_cycle_3
 
-    @CVsr3.setter
-    def CVsr3(self, value):
-        """Alias for cv_scan_rate_cycle_3"""
-        self.cv_scan_rate_cycle_3 = value
+#     @CVsr3.setter
+#     def CVsr3(self, value):
+#         """Alias for cv_scan_rate_cycle_3"""
+#         self.cv_scan_rate_cycle_3 = value
 
-    # CVvi: float = 0.0  # initial voltage
-    # CVap1: float = 0.5  # first anodic peak
-    # CVap2: float = -0.2 # second anodic peak
-    # CVvf: float = 0.0  # final voltage
-    # CVstep: float = 0.01 # step size
-    # CVsr1: float = 0.1 # scan rate 1
-    # CVcycle: int = 3 # number of cycles
-    # CVsr2: float = CVsr1
-    # CVsr3: float = CVsr1
+#     # CVvi: float = 0.0  # initial voltage
+#     # CVap1: float = 0.5  # first anodic peak
+#     # CVap2: float = -0.2 # second anodic peak
+#     # CVvf: float = 0.0  # final voltage
+#     # CVstep: float = 0.01 # step size
+#     # CVsr1: float = 0.1 # scan rate 1
+#     # CVcycle: int = 3 # number of cycles
+#     # CVsr2: float = CVsr1
+#     # CVsr3: float = CVsr1
 
-    @property
-    def cv_sample_rate(self):
-        """CVstep / CVsr1"""
-        return round(self.cv_step_size / self.cv_scan_rate_cycle_1, 4)
+#     @property
+#     def cv_sample_rate(self):
+#         """CVstep / CVsr1"""
+#         return round(self.cv_step_size / self.cv_scan_rate_cycle_1, 4)
 
-    def print_ca_parameters(self):
-        """Print the CA parameters"""
-        if self.ca:
-            return f"""
-        CA Parameters
-            Pre-step Voltage: {self.ca_prestep_voltage}
-            Pre-step Time Delay: {self.ca_prestep_time_delay}
-            Step 1 Voltage: {self.ca_step_1_voltage}
-            Step 1 Time: {self.ca_step_1_time}
-            Step 2 Voltage: {self.ca_step_2_voltage}
-            Step 2 Time: {self.ca_step_2_time}
-            CA Sample Rate: {self.ca_sample_rate}
-    """
-        else:
-            return """
-        CA Not selected
-    """
+#     def print_ca_parameters(self):
+#         """Print the CA parameters"""
+#         if self.ca:
+#             return f"""
+#         CA Parameters
+#             Pre-step Voltage: {self.ca_prestep_voltage}
+#             Pre-step Time Delay: {self.ca_prestep_time_delay}
+#             Step 1 Voltage: {self.ca_step_1_voltage}
+#             Step 1 Time: {self.ca_step_1_time}
+#             Step 2 Voltage: {self.ca_step_2_voltage}
+#             Step 2 Time: {self.ca_step_2_time}
+#             CA Sample Rate: {self.ca_sample_rate}
+#     """
+#         else:
+#             return """
+#         CA Not selected
+#     """
 
-    def print_cv_parameters(self):
-        """Print the CV parameters"""
-        if self.cv:
-            return f"""
-        CV Parameters
-            CV: {bool(self.cv)}
-            CV Baseline: {bool(self.baseline)}
-            Sample Period: {self.cv_sample_period}
-            Initial Voltage (CVvi): {self.cv_initial_voltage}
-            First Anodic Peak (CVap1): {self.cv_first_anodic_peak}
-            Second Anodic Peak (CVap2): {self.cv_second_anodic_peak}
-            Final Voltage (CVvf): {self.cv_final_voltage}
-            Step Size (CVstep): {self.cv_step_size}
-            Cycle Count: {self.cv_cycle_count}
-            Scan Rate Cycle 1 (CVsr1): {self.cv_scan_rate_cycle_1}
-            Scan Rate Cycle 2 (CVsr2): {self.cv_scan_rate_cycle_2}
-            Scan Rate Cycle 3 (CVsr3): {self.cv_scan_rate_cycle_3}
-            CV Sample Rate: {self.cv_sample_rate}
-    """
-        else:
-            return """
-        CV not selected
-"""
+#     def print_cv_parameters(self):
+#         """Print the CV parameters"""
+#         if self.cv:
+#             return f"""
+#         CV Parameters
+#             CV: {bool(self.cv)}
+#             CV Baseline: {bool(self.baseline)}
+#             Sample Period: {self.cv_sample_period}
+#             Initial Voltage (CVvi): {self.cv_initial_voltage}
+#             First Anodic Peak (CVap1): {self.cv_first_anodic_peak}
+#             Second Anodic Peak (CVap2): {self.cv_second_anodic_peak}
+#             Final Voltage (CVvf): {self.cv_final_voltage}
+#             Step Size (CVstep): {self.cv_step_size}
+#             Cycle Count: {self.cv_cycle_count}
+#             Scan Rate Cycle 1 (CVsr1): {self.cv_scan_rate_cycle_1}
+#             Scan Rate Cycle 2 (CVsr2): {self.cv_scan_rate_cycle_2}
+#             Scan Rate Cycle 3 (CVsr3): {self.cv_scan_rate_cycle_3}
+#             CV Sample Rate: {self.cv_sample_rate}
+#     """
+#         else:
+#             return """
+#         CV not selected
+# """
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
@@ -1113,10 +976,12 @@ experiment_classes = {
 
 
 def get_experiment_class_by_id(experiment_id: int):
+    """Get the experiment class by the experiment id"""
     return experiment_classes.get(experiment_id, ExperimentBase)
 
 
 def get_all_type_hints(cls):
+    """Get all type hints for a class"""
     hints = {}
     for base in reversed(cls.__mro__):
         hints.update(get_type_hints(base))

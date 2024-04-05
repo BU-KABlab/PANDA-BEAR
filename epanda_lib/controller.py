@@ -12,7 +12,7 @@ Additionally controller should be able to:
     - Update the vial statuses
 """
 
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, broad-exception-caught
 import importlib
 import sys
 import time
@@ -161,7 +161,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
                 sys.stdout.flush()
                 sys.stdout.write("\n")
-                # TODO: Check the last two system states for a shutdown command
                 if (
                     sql_utilities.SystemState.SHUTDOWN
                     in sql_utilities.get_system_status(2)
