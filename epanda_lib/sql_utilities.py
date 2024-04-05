@@ -1,13 +1,11 @@
 """A 'driver' for ePANDA SQL db. """
 
-from datetime import date, datetime
-import select
+from datetime import datetime
 import sqlite3
 from typing import List, Union
 from pathlib import Path
 import json
 import csv
-import dataclasses
 from enum import Enum
 
 # import time
@@ -1506,7 +1504,7 @@ class SystemState(Enum):
     PAUSE = "pause"
 
 
-def get_system_status(look_back:int = 1) -> SystemState:
+def select_system_status(look_back:int = 1) -> SystemState:
     """
     Get the system status from the system_status table.
 

@@ -163,7 +163,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 sys.stdout.write("\n")
                 if (
                     sql_utilities.SystemState.SHUTDOWN
-                    in sql_utilities.get_system_status(2)
+                    in sql_utilities.select_system_status(2)
                 ):
                     slack.send_slack_message("alert", "ePANDA is shutting down")
                     raise ShutDownCommand
@@ -306,12 +306,12 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             if one_off:
                 break  # break out of the while True loop
 
-            if sql_utilities.SystemState.SHUTDOWN in sql_utilities.get_system_status(2):
+            if sql_utilities.SystemState.SHUTDOWN in sql_utilities.select_system_status(2):
                 slack.send_slack_message("alert", "ePANDA is shutting down")
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
-            while sql_utilities.SystemState.PAUSE == sql_utilities.get_system_status(1):
+            while sql_utilities.SystemState.PAUSE == sql_utilities.select_system_status(1):
                 logger.info("System is paused, waiting for resume status")
                 slack.send_slack_message(
                     "alert", "ePANDA is paused, waiting for status change"
@@ -319,12 +319,12 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 time.sleep(60)
                 if (
                     sql_utilities.SystemState.SHUTDOWN
-                    in sql_utilities.get_system_status(2)
+                    in sql_utilities.select_system_status(2)
                 ):
                     slack.send_slack_message("alert", "ePANDA is shutting down")
                     raise ShutDownCommand
 
-                if sql_utilities.SystemState.RESUME in sql_utilities.get_system_status(
+                if sql_utilities.SystemState.RESUME in sql_utilities.select_system_status(
                     2
                 ):
                     slack.send_slack_message("alert", "ePANDA is resuming")

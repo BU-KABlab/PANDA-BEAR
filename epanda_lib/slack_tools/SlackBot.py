@@ -325,7 +325,8 @@ class SlackBot:
                 self.send_slack_message(channel_id, "Error taking screenshot")
                 self.send_slack_message(channel_id, str(e))
                 return 1
-
+        elif text[0:7] == "status":
+            sql_utilities.select_system_status()
         elif text[0:5] == "pause":
             set_system_status(SystemState.PAUSE, "pausing ePANDA", self.test)
             return 1

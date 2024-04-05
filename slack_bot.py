@@ -2,8 +2,12 @@
 
 import time
 from epanda_lib.slack_tools.SlackBot import SlackBot
-
-bot = SlackBot(test=False)
+choose_testing_mode = input("Enter 't' for testing mode or 'n' for non-testing mode: ").strip().lower()
+if choose_testing_mode == "t":
+    test = True
+else:
+    test = False
+bot = SlackBot(test=True)
 print("Starting Slack Bot")
 STATUS = bot.check_slack_messages(channel="alert")
 while STATUS == 1:

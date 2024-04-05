@@ -1,4 +1,3 @@
-from hmac import new
 import json
 from typing import Sequence
 import os
@@ -6,7 +5,7 @@ import os
 from .mill_control import Mill, MockMill
 from .utilities import Coordinates, Instruments
 from .vials import StockVial, WasteVial
-from .wellplate import WellCoordinates, Wellplate
+from .wellplate import WellCoordinates, Wellplate, Well
 
 
 def check_mill_settings(
@@ -26,19 +25,19 @@ def check_mill_settings(
 
     while True:
         response = mill.execute_command("$$")  # Get settings
-        print(response)
+        #print(response)
 
         ## Check settings
         # Load settings from config and compare to current settings
         settings: dict = mill.config["settings"]
         # List out settings and note any differences.
         for setting in settings:
-            if settings[setting] != response[setting]:
+            if settings[setting] != int(response[setting]):
                 print(
-                    f"Setting {setting:<4} | Current: {response[setting]:<5}, Config: {settings[setting]:<5}"
+                    f"Setting {setting:<4} | Current: {response[setting]:<10}, Config: {settings[setting]:<5}"
                 )
             else:
-                print(f"Setting {setting:<4} | Current: {response[setting]:<5}")
+                print(f"Setting {setting:<4} | Current: {response[setting]:<10}")
 
         # Ask if user wants to change settings
         change_settings = input("Would you like to change any settings? (y/n): ")
@@ -114,8 +113,8 @@ def calibrate_wellplate(
                 original_coordinates["y"],
                 z=wellplate.z_top,
             )
-            confirm = input("Is the pipette in the correct position? (yes/no): ")
-            if confirm.lower() == "yes":
+            confirm = input("Is the pipette in the correct position? (yes/no): ").lower().strip()[0]
+            if confirm.lower() == "y":
                 break
             print(f"Current coordinates of {well_id}: {current_coorinates}")
             new_coordinates = Coordinates(
@@ -197,8 +196,9 @@ def calibrate_wells(
                 original_coordinates["y"],
                 z_top=wellplate.z_top,
             )
-            confirm = input(f"Is the {str(instrument)}  in the correct position? (yes/no): ")
-            if confirm.lower() == "yes" or confirm.lower() == "y" or confirm == "":
+            instrument: Instruments
+            confirm = input(f"Is the {(instrument.value)}  in the correct position? (yes/no): ").lower().strip()[0]
+            if confirm in ["y",""]:
                 break
             print(f"Current coordinates of {well_id}: {current_coorinates}") #change to be the corrected coordinates if they have been changed
             coordinates_changed = True
@@ -257,7 +257,8 @@ def calibrate_wells(
                     wellplate.write_well_status_to_file()
             else: # Update the well status file with the new well coordinates
                 wellplate.set_coordinates(well_id, new_coordinates)
-                wellplate.write_well_status_to_file()
+                #wellplate.write_well_status_to_file()
+                wellplate.wells[well_id].save_to_db()
 
 
 def calibrate_z_bottom_of_wellplate(
@@ -277,8 +278,8 @@ def calibrate_z_bottom_of_wellplate(
     # Save the new z_bottom to the wellplate object
     # Repeat until the user enters "done"
     while True:
-        well_id = input("Enter a well ID to check the z_bottom or 'done' to finish: ")
-        if well_id == "done":
+        well_id = input("Enter a well ID to check the z_bottom or 'done' to finish: ").upper().strip()
+        if well_id == "DONE":
             break
 
         current_z_bottom = wellplate.z_bottom
@@ -292,8 +293,8 @@ def calibrate_z_bottom_of_wellplate(
         )
 
         while True:
-            confirm = input("Is the pipette in the correct position? (yes/no): ")
-            if confirm.lower() == "yes":
+            confirm = input("Is the pipette in the correct position? (yes/no): ").lower().strip()[0]
+            if confirm.lower() in ["y",""]:
                 break
 
             new_z_bottom = float(
@@ -310,8 +311,13 @@ def calibrate_z_bottom_of_wellplate(
             )
 
         wellplate.z_bottom = new_z_bottom
+        for well in wellplate.wells:
+            well: Well
+            well.depth = new_z_bottom
+            # We do this instead of recalculating every well location incase
+            # they are uniquely set
         wellplate.write_wellplate_location()
-        wellplate.write_well_status_to_file()
+        wellplate.write_well_status_to_file() # but then we bulk save all wells to the db
 
 
 def calibrate_vials(
@@ -362,10 +368,11 @@ def home_mill(
 options = {
     "0": check_mill_settings,
     "1": home_mill,
-    "2": calibrate_wellplate,
+    # "2": calibrate_wellplate,
     "3": calibrate_wells,
     "4": calibrate_z_bottom_of_wellplate,
-    "5": calibrate_vials,
+    # "5": calibrate_vials,
+    "q": 'quit',
 }
 
 
@@ -380,7 +387,7 @@ def calibrate_mill(
     with mill() as mill:
         while True:
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
-            print("""Welcome to the mill calibration and positioning menu:""")
+            print("""\nWelcome to the mill calibration and positioning menu:""")
             for key, value in options.items():
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
