@@ -75,7 +75,7 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
     # Create a problem instance
     prob = pulp.LpProblem("VialMixing", pulp.LpMinimize)
 
-    # Define variables: 
+    # Define variables:
     # volumes for each vial (integer), binary variables, and deviation (continuous)
     v_vars = [
         pulp.LpVariable(f"V{i}", lowBound=0, upBound=200, cat="Continuous")
@@ -127,13 +127,35 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
 
 
 if __name__ == "__main__":
-    C = [10, 20]  # Concentrations of each vial in mM
+    C = [0.01, 0.03, 0.10]  # Concentrations of each vial in mM
     V_total = 120  # Total volume to achieve in uL
-    C_target = 15  # Target concentration in mM
+    C_target = [
+        0.027,
+        0.023,
+        0.020,
+        0.017,
+        0.013,
+        0.010,
+        0.085,
+        0.070,
+        0.055,
+        0.040,
+        0.025,
+        0.030,
+        0.100,
+        0.088,
+        0.077,
+        0.065,
+        0.053,
+        0.042,
+    ]  # Target concentration in mM
 
-    volumes, deviation = solve_vials_ilp(C, V_total, C_target)
-    if volumes is not None:
-        print(f"Volumes to draw from each vial: {volumes} uL")
-        print(f"Deviation from target concentration: {deviation} mM")
-    else:
-        print("No solution found")
+    for c in C_target:
+        print(f"Target concentration: {c} mM")
+        volumes, deviation = solve_vials_ilp(C, V_total, c)
+        if volumes is not None:
+            print(f"Volumes to draw from each vial: {volumes} uL")
+            print(f"Deviation from target concentration: {deviation} mM")
+        else:
+            print("No solution found")
+        print()

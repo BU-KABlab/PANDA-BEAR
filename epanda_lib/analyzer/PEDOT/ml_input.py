@@ -46,7 +46,7 @@ def populate_required_information(experiment_id: int):
     return df
 
 if __name__ == "__main__":
-    info = populate_required_information(10000001)
+    info = populate_required_information(10000004)
     # Print the required information
     print(info)
     # info.at[7, 'value'].show()
