@@ -65,6 +65,8 @@ def add_data_zone(
                     Path(image.filename).stat().st_ctime
                 )
                 date_time = file_creation_time
+        if isinstance(date_time, str):
+            date_time = datetime.fromisoformat(date_time)
     except:
         # Fallback on current time if all else fails
         date_time = datetime.now().isoformat(timespec="seconds")
@@ -100,7 +102,7 @@ def add_data_zone(
     )
     draw_banner.text(
         (version_x, 30),
-        f"{pin[:10]}\n{pin[-10:]}",
+        f"{pin[:10]}\n{pin[-11:]}",
         font=ImageFont.truetype("arial.ttf", 20),
         fill="white",
         align="center",

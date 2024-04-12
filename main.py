@@ -7,6 +7,7 @@ Or starting the ePANDA either with or without mock instruments.
 # pylint: disable=broad-exception-caught, protected-access
 
 import os
+from pdb import run
 import sys
 import time
 
@@ -214,6 +215,26 @@ if __name__ == "__main__":
                 continue
         except controller.ShutDownCommand:
             pass  # The epanda loop has been stopped but we don't want to exit the program
+
+        except controller.OCPFailure:
+            slack = controller.SlackBot()
+            slack.send_slack_message('alert',"OCP Failure has occured. Please check the system.")
+            channel_id = slack.channel_id("alert")
+            slack._take_screenshot(channel_id,'webcam')
+            slack._take_screenshot(channel_id,'vials')
+            time.sleep(5)
+            slack.send_slack_message('alert',"Would you like to continue? (y/n): ")
+            while True:
+                usr_choice = slack.check_latest_message(channel_id)[0].strip().lower()
+                if usr_choice == "y":
+                    break
+                if usr_choice == "n":
+                    break
+            if usr_choice == "n":
+                continue
+            if usr_choice == "y":
+                run_epanda()
+
         except Exception as e:
             print(f"An error occurred: {e}")
             break  # Exit the program if an unknown error occurs

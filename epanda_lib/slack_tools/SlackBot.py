@@ -29,34 +29,22 @@ from epanda_lib.wellplate import Wellplate
 from epanda_lib.obs_controls import OBSController
 from epanda_lib.image_tools import add_data_zone
 from epanda_lib.sql_utilities import SystemState, set_system_status
-from epanda_lib.experiment_class import ExperimentStatus
+from epanda_lib.experiment_class import ExperimentResultsRecord#, ExperimentStatus
+
 
 class SlackBot:
     """Class for sending messages to Slack."""
 
     def __init__(self, test: bool = False):
-        # Set up logging
-        # logger = logging.getLogger(__name__)
-        # logger.setLevel(logging.DEBUG)
-        # formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-        # file_handler = logging.FileHandler("code/logs/slack_bot.log")
-        # system_handler = logging.FileHandler("code/logs/ePANDA.log")
-        # file_handler.setFormatter(formatter)
-        # system_handler.setFormatter(formatter)
-        # logger.addHandler(file_handler)
-        # logger.addHandler(system_handler)
         self.logger = logging.getLogger("e_panda")
         self.test = test
 
     def send_slack_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
         client = WebClient(slack_cred.TOKEN)
-        channel_mapping = {
-            "conversation": slack_cred.TEST_CONVERSATION_CHANNEL_ID if self.test else slack_cred.CONVERSATION_CHANNEL_ID,
-            "alert": slack_cred.TEST_ALERT_CHANNEL_ID if self.test else slack_cred.ALERT_CHANNEL_ID,
-            "data": slack_cred.TEST_DATA_CHANNEL_ID if self.test else slack_cred.DATA_CHANNEL_ID
-        }
-        channel_id = channel_mapping.get(channel_id, channel_id)
+        channel_id = self.channel_id(channel_id)
+        if channel_id == 0:
+            return
 
         try:
             result = client.chat_postMessage(channel=channel_id, text=message)
@@ -74,44 +62,49 @@ class SlackBot:
         file = Path(file)
         filename_to_post = file.name
 
-        if channel == "conversation":
-            channel_id = slack_cred.CONVERSATION_CHANNEL_ID if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
-        elif channel == "alert":
-            channel_id = slack_cred.ALERT_CHANNEL_ID  if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
-        elif channel == "data":
-            channel_id = slack_cred.DATA_CHANNEL_ID  if not self.test else slack_cred.TEST_DATA_CHANNEL_ID
-        elif channel in [
-            slack_cred.CONVERSATION_CHANNEL_ID,
-            slack_cred.ALERT_CHANNEL_ID,
-            slack_cred.DATA_CHANNEL_ID,
-            slack_cred.TEST_ALERT_CHANNEL_ID,
-            slack_cred.TEST_DATA_CHANNEL_ID,
-            slack_cred.TEST_CONVERSATION_CHANNEL_ID,
-
-        ]:
-            channel_id = channel
-        else:
+        channel_id = self.channel_id(channel)
+        if channel_id == 0:
             return 0
 
         try:
-            result = client.files_upload_v2(
-                channel=channel_id,
-                file=file.open("rb"),
-                filename=filename_to_post,
-                initial_comment=message,
-            )
+            result = None
+            with open(file, "rb") as f:
+                result = client.files_upload_v2(
+                    channel=channel_id,
+                    file=f,
+                    filename=filename_to_post,
+                    initial_comment=message,
+                )
 
             if result["ok"]:
                 self.logger.info("File sent: %s", file)
                 return 1
-            else:
-                self.logger.error("Error sending file: %s", file)
-                return 0
+            self.logger.error("Error sending file: %s", file)
+            return 0
         except SlackApiError as exception:
             log_msg = f"Error uploading file: {format(exception)}"
             self.logger.error(log_msg)
             return 0
+    def check_latest_message(self, channel: str) -> str:
+        """Check Slack for the latest message."""
+        client = WebClient(token=slack_cred.TOKEN)
+        channel_id = self.channel_id(channel)
+        if channel_id == 0:
+            return 0
 
+        try:
+            result = client.conversations_history(
+                channel=channel_id,
+                limit=1,
+                inclusive=True,
+                #latest=datetime.now().timestamp(),
+            )
+            conversation_history = result["messages"][0]['text']
+            return conversation_history
+        except SlackApiError as error:
+            error_msg = f"Error creating conversation: {format(error)}"
+            self.logger.error(error_msg)
+            return 0
     def check_slack_messages(self, channel: str) -> int:
         """Check Slack for messages."""
 
@@ -121,13 +114,8 @@ class SlackBot:
         # Store conversation history
         conversation_history = []
         # ID of the channel you want to send the message to
-        if channel == "conversation":
-            channel_id = slack_cred.CONVERSATION_CHANNEL_ID if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
-        elif channel == "alert":
-            channel_id = slack_cred.ALERT_CHANNEL_ID if not self.test else slack_cred.TEST_ALERT_CHANNEL_ID
-        elif channel == "data":
-            channel_id = slack_cred.DATA_CHANNEL_ID if not self.test else slack_cred.TEST_DATA_CHANNEL_ID
-        else:
+        channel_id = self.channel_id(channel)
+        if channel_id == 0:
             return 0
 
         # latestTS = datetime.now().timestamp()
@@ -155,7 +143,7 @@ class SlackBot:
 
             for _, payload in enumerate(conversation_history2):
                 msg_id = payload["client_msg_id"]
-                msg_text:str = payload["text"]
+                msg_text: str = payload["text"]
                 msg_ts = payload["ts"]
                 lookup_tickets = self.find_id(msg_id)
                 if lookup_tickets is False:
@@ -258,7 +246,11 @@ class SlackBot:
             # experiment_number = text[7:]
             return 1
 
-        elif text[0:17] == "status-experiment":
+        elif (
+            text[0:17] == "status-experiment"
+            or text[0:17] == "status experiment"
+            or text[0:17] == "experiment status"
+        ):
             # Get experiment number
             try:
                 experiment_number = int(text[17:].strip())
@@ -271,6 +263,22 @@ class SlackBot:
                 self.send_slack_message(channel_id, message)
             return 1
 
+        elif text[0:17] == "images experiment":
+            # Get experiment number
+            try:
+                experiment_number = int(text[17:].strip())
+                # Get the results
+                results = sql_utilities.select_results(experiment_number)
+                # filter to images with dz in the name
+                for result in results:
+                    result: ExperimentResultsRecord
+                    if "dz" in result.result_value:
+                        self.send_slack_file(channel_id, result.result_value)
+
+            except ValueError:
+                message = "Please enter a valid experiment number."
+                self.send_slack_message(channel_id, message)
+            return 1
         elif text[0:11] == "vial status":
             self.__vial_status(channel_id=channel_id)
             return 1
@@ -293,38 +301,9 @@ class SlackBot:
         elif text[0:10] == "screenshot":
             parts = text.split("-")
             camera = parts[1].strip().lower()
-            try:
-                file_name = "tmp_screenshot.png"
-                obs = OBSController()
-                # verify that the camera is an active source
-                try:
-                    sources = obs.client.get_source_active(camera)
-                except Exception:
-                    self.send_slack_message(channel_id, f"Could not find a camera source named {camera}")
-                    return 1
-                if not sources:
-                    self.send_slack_message(
-                        channel_id, f"Camera {camera} is not active"
-                    )
-                    return 1
-                screenshot = obs.client.get_source_screenshot(
-                    camera, "png", 1920, 1080, -1
-                )
-                img = Image.open(
-                    BytesIO(base64.b64decode(screenshot.image_data.split(",")[1]))
-                )
-                img = add_data_zone(img, context=f"{camera.capitalize()} Screenshot")
-                img.save(file_name, "png")
-                self.send_slack_file(
-                    channel_id, file_name, f"{camera.capitalize()} Screenshot"
-                )
-                Path(file_name).unlink() # delete the file
-                return 1
+            self._take_screenshot(channel_id, camera)
+            return 1
 
-            except Exception as e:
-                self.send_slack_message(channel_id, "Error taking screenshot")
-                self.send_slack_message(channel_id, str(e))
-                return 1
         elif text[0:7] == "status":
             sql_utilities.select_system_status()
         elif text[0:5] == "pause":
@@ -336,10 +315,12 @@ class SlackBot:
             return 1
 
         elif text[0:5] == "start":
-            #set_system_status(SystemState.ON, "starting ePANDA", self.test)
+            # set_system_status(SystemState.ON, "starting ePANDA", self.test)
             # start the experiment loop
-            #controller.main()
-            self.send_slack_message(channel_id, "Sorry starting the ePANDA is not something I can do yet")
+            # controller.main()
+            self.send_slack_message(
+                channel_id, "Sorry starting the ePANDA is not something I can do yet"
+            )
             return 1
 
         elif text[0:4] == "stop":
@@ -466,7 +447,9 @@ class SlackBot:
         """Sends the well status to the user."""
         # Check current wellplate type
         _, type_number, _ = sql_utilities.select_current_wellplate_info()
-        _, _, _, _, wellplate_type = sql_utilities.select_well_characteristics(type_number)
+        _, _, _, _, wellplate_type = sql_utilities.select_well_characteristics(
+            type_number
+        )
         # Choose the correct wellplate object based on the wellplate type
         wellplate: Wellplate = None
         if wellplate_type == "circular":
@@ -479,7 +462,7 @@ class SlackBot:
             )
 
         ## Well coordinates and colors
-        """Plot the well plate on a coordinate plane."""
+        # Plot the well plate on a coordinate plane.
         x_coordinates = []
         y_coordinates = []
         color = []
@@ -599,6 +582,78 @@ class SlackBot:
             "paused": "blue",
         }
         return color_mapping.get(status, "gold")
+
+    def _take_screenshot(self, channel_id, camera_name:str):
+        """Take a screenshot of the camera."""
+        try:
+            file_name = "tmp_screenshot.png"
+            obs = OBSController()
+            # verify that the camera is an active source
+            try:
+                sources = obs.client.get_source_active(camera_name)
+            except Exception:
+                self.send_slack_message(
+                    channel_id, f"Could not find a camera source named {camera_name}"
+                )
+                return 1
+            if not sources:
+                self.send_slack_message(
+                    channel_id, f"Camera {camera_name} is not active"
+                )
+                return 1
+            screenshot = obs.client.get_source_screenshot(
+                camera_name, "png", 1920, 1080, -1
+            )
+            img = Image.open(
+                BytesIO(base64.b64decode(screenshot.image_data.split(",")[1]))
+            )
+            img = add_data_zone(img, context=f"{camera_name.capitalize()} Screenshot")
+            img.save(file_name, "png")
+            self.send_slack_file(
+                channel_id, file_name, f"{camera_name.capitalize()} Screenshot"
+            )
+            Path(file_name).unlink()  # delete the file
+            return 1
+
+        except Exception as e:
+            self.send_slack_message(channel_id, "Error taking screenshot")
+            self.send_slack_message(channel_id, str(e))
+            return 1
+
+    def channel_id(self, channel: str) -> str:
+        """Return the channel ID based on the channel name."""
+        if channel == "conversation":
+            channel_id = (
+                slack_cred.CONVERSATION_CHANNEL_ID
+                if not self.test
+                else slack_cred.TEST_ALERT_CHANNEL_ID
+            )
+        elif channel == "alert":
+            channel_id = (
+                slack_cred.ALERT_CHANNEL_ID
+                if not self.test
+                else slack_cred.TEST_ALERT_CHANNEL_ID
+            )
+        elif channel == "data":
+            channel_id = (
+                slack_cred.DATA_CHANNEL_ID
+                if not self.test
+                else slack_cred.TEST_DATA_CHANNEL_ID
+            )
+        elif channel in [
+            slack_cred.CONVERSATION_CHANNEL_ID,
+            slack_cred.ALERT_CHANNEL_ID,
+            slack_cred.DATA_CHANNEL_ID,
+            slack_cred.TEST_ALERT_CHANNEL_ID,
+            slack_cred.TEST_DATA_CHANNEL_ID,
+            slack_cred.TEST_CONVERSATION_CHANNEL_ID,
+        ]:
+            channel_id = channel
+        else:
+            return 0
+        return channel_id
+
+
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)
     TEST_MESSAGE = "This is a test message."

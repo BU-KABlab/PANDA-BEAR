@@ -28,6 +28,7 @@ from slack_sdk.errors import (BotUserAccessError, SlackApiError,
 from epanda_lib import sql_utilities
 
 from . import e_panda
+from .e_panda import OCPFailure, DepositionFailure, CVFailure, CAFailure
 from .config.config import (RANDOM_FLAG, STOCK_STATUS,
                             TESTING, WASTE_STATUS)
 from .experiment_class import (ExperimentBase, ExperimentResult,
@@ -332,13 +333,14 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                     break
 
     except (
-        e_panda.OCPFailure,
-        e_panda.DepositionFailure,
-        e_panda.CVFailure,
-        e_panda.CAFailure,
+        OCPFailure,
+        DepositionFailure,
+        CVFailure,
+        CAFailure,
     ) as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+            share_to_slack(new_experiment)
         sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -353,12 +355,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
-        share_to_slack(new_experiment)
         raise error
     except ShutDownCommand as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            share_to_slack(new_experiment)
         sql_utilities.set_system_status(sql_utilities.SystemState.OFF)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -370,7 +370,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            share_to_slack(new_experiment)
         sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -383,7 +382,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            share_to_slack(new_experiment)
         sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -614,12 +612,12 @@ def share_to_slack(experiment: ExperimentBase):
         images_with_dz = [image for image in experiment.results.image if image[0].name.endswith("dz.tiff")]
         if len(images_with_dz) == 0:
             logger.error("The experiment has no dz.tiff image files")
-            msg = f"Experiment {experiment.experiment_id} has completed but has no datazoned image files to share"
+            msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value} but has no datazoned image files to share"
             slack.send_slack_message("data", msg)
             return
         slack.send_slack_message(
             "data",
-            f"Experiment {experiment.experiment_id} has completed. Photos taken:",
+            f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value}. Photos taken:",
         )
         for image in experiment.results.image:
             image: Path = image[0]
