@@ -129,8 +129,8 @@ else:  # Use network paths
     EPANDA_LOG = PATH_TO_LOGS / "ePANDA.log"
 
     # DB
-    SQL_DB_PATH = NETWORK_PATH /"epanda_prod.db"
-
+    #SQL_DB_PATH = NETWORK_PATH /"epanda_prod.db"
+    SQL_DB_PATH = NETWORK_PATH /"epanda_dev.db"
     ## Validate that all paths exist and create them if they don't
     for path in [
         PATH_TO_CODE,

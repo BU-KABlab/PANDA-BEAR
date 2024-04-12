@@ -13,6 +13,10 @@ from epanda_lib.e_panda import (
     waste_selector,
     image_well,
     flush_v2,
+    OCPFailure,
+    CAFailure,
+    CVFailure,
+    DepositionFailure
 )
 from epanda_lib.e_panda_custom import (
     chrono_amp_edot_bleaching,
@@ -214,8 +218,12 @@ def pedotdeposition(
         toolkit.global_logger.info("3. Performing CA deposition")
         try:
             chrono_amp(instructions, file_tag="CA_deposition")
-        except Exception as e:
+
+        except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+            raise e
+        except Exception as e:
+            toolkit.global_logger.error("Unknown error occurred during chrono_amp: %s", str(e))
             raise e
     finally:
         toolkit.global_logger.info("4. Rinsing electrode")

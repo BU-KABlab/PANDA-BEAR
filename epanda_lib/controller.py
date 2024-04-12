@@ -45,6 +45,7 @@ from .slack_tools.SlackBot import SlackBot
 from .vials import (StockVial, Vial2, WasteVial, read_vials,
                     update_vial_state_files)
 from .wellplate import Wellplate
+from .errors import ProtocolNotFoundError
 
 # set up slack globally so that it can be used in the main function and others
 
@@ -346,9 +347,18 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
 
+    except ProtocolNotFoundError as error:
+        if new_experiment is not None:
+            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+        logger.error(error)
+        slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
+        share_to_slack(new_experiment)
+        raise error
     except ShutDownCommand as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+            share_to_slack(new_experiment)
         sql_utilities.set_system_status(sql_utilities.SystemState.OFF)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -360,6 +370,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+            share_to_slack(new_experiment)
         sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -372,6 +383,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+            share_to_slack(new_experiment)
         sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -386,6 +398,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             # scheduler.update_experiment_file(new_experiment)
             # scheduler.update_experiment_location(new_experiment)
             scheduler.save_results(new_experiment)
+            share_to_slack(new_experiment)
 
         # Save the current wellplate
         # if toolkit.wellplate:

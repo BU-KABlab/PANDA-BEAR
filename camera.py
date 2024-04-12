@@ -1,3 +1,4 @@
+#!/c:/Users/Kab Lab/anaconda3/envs/python360/python.exe
 """
 Requires the PyCapture2 library to be installed and run in a python 3.6 environment.
 This script is used to capture images from the FLIR camera.
@@ -8,7 +9,9 @@ import logging
 import sys
 from pathlib import Path
 
+
 import PyCapture2
+
 
 PATH_TO_LOGS = Path("epanda_lib/logs")
 
@@ -301,12 +304,45 @@ class FLIRCamera:
     def enable_embedded_image_info(self):
         """Enable embedding of various camera settings"""
         embedded_info = self.camera.getEmbeddedImageInfo()
-        for setting in embedded_info:
-            if embedded_info[setting]:
-                self.camera.setEmbeddedImageInfo(**{setting: True})
-                self.camera_logger.info("%s is enabled.", setting)
-            else:
-                self.camera_logger.info("%s is not available.", setting)
+        if embedded_info.available.timestamp:
+            self.camera.setEmbeddedImageInfo(timestamp=True)
+        else:
+            print("Timestamp is not available.")
+
+        if embedded_info.available.frameCounter:
+            self.camera.setEmbeddedImageInfo(frameCounter=True)
+        else:
+            print("Frame counter is not available.")
+
+        if embedded_info.available.gain:
+            self.camera.setEmbeddedImageInfo(gain=True)
+        else:
+            print("Gain is not available.")
+
+        if embedded_info.available.shutter:
+            self.camera.setEmbeddedImageInfo(shutter=True)
+        else:
+            print("Shutter is not available.")
+
+        if embedded_info.available.brightness:
+            self.camera.setEmbeddedImageInfo(brightness=True)
+        else:
+            print("Brightness is not available.")
+
+        if embedded_info.available.exposure:
+            self.camera.setEmbeddedImageInfo(exposure=True)
+        else:
+            print("Exposure is not available.")
+
+        if embedded_info.available.whiteBalance:
+            self.camera.setEmbeddedImageInfo(whiteBalance=True)
+        else:
+            print("White balance is not available.")
+
+        if embedded_info.available.ROIPosition:
+            self.camera.setEmbeddedImageInfo(ROIPosition=True)
+        else:
+            print("ROI position is not available.")
 
     def get_stats(self) -> dict:
         """camera.getStats() -> cameraStats"""
@@ -327,7 +363,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--file_name", type=str, default="", help="Name of the file to save"
+        "--file_name", type=str, default="test.tiff", help="Name of the file to save"
     )
 
     parser.add_argument(

@@ -2,7 +2,9 @@
 
 import os
 import sqlite3
+from typing import Protocol
 from epanda_lib.config.config import SQL_DB_PATH
+from epanda_lib.errors import ProtocolNotFoundError
 
 class ProtocolEntry:
     """A class to represent a protocol entry in the database."""
@@ -54,18 +56,20 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
     Returns:
         ProtocolEntry: The protocol from the database.
     """
-    conn = sqlite3.connect(SQL_DB_PATH)
-    cursor = conn.cursor()
+    try:
+        conn = sqlite3.connect(SQL_DB_PATH)
+        cursor = conn.cursor()
 
-    # Get the protocol from the database
-    cursor.execute("SELECT * FROM protocols WHERE id = ?", (protocol_id,))
-    protocol = cursor.fetchone()
+        # Get the protocol from the database
+        cursor.execute("SELECT * FROM protocols WHERE id = ?", (protocol_id,))
+        protocol = cursor.fetchone()
 
-    conn.close()
+        conn.close()
 
-    protocol_entry = ProtocolEntry(*protocol)
-    return protocol_entry
-
+        protocol_entry = ProtocolEntry(*protocol)
+        return protocol_entry
+    except TypeError:
+        raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.")
 
 def insert_protocol(protocol_id, project, name, filepath):
     """
