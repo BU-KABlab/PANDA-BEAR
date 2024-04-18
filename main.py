@@ -193,7 +193,7 @@ def stop_epanda():
 
 def pause_epanda():
     """Pauses the ePANDA loop."""
-    sql_utilities.set_system_status(SystemState.PAUSED, "stopping ePANDA", read_testing_config())
+    sql_utilities.set_system_status(SystemState.PAUSE, "stopping ePANDA", read_testing_config())
 
 def resume_epanda():
     """Resumes the ePANDA loop."""
@@ -214,10 +214,10 @@ options = {
     "4": reset_vials_waste,
     "5": input_new_vial_values_stock,
     "6": input_new_vial_values_waste,
-    "7": change_wellplate_location,
-    "8": run_experiment_generator,
-    "9": toggle_testing_mode,
-    "10": calibrate_mill,
+    "7": run_experiment_generator,
+    "8": toggle_testing_mode,
+    "9": calibrate_mill,
+    "9.1": change_wellplate_location,
     "11": test_camera,
     "r": refresh,
     "q": exit_program,

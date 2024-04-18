@@ -432,8 +432,7 @@ def calibrate_mill(
                 break
             options[option](mill, wellplate, stock_vials, waste_vials)
 
-
-if __name__ == "__main__":
+def main():
     # Load the configuration file
     from .config.config import TESTING
     from .vials import STOCK_STATUS, WASTE_STATUS, read_vials
@@ -453,3 +452,6 @@ if __name__ == "__main__":
     calibrate_mill(
         mill_to_use, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
     )
+
+if __name__ == "__main__":
+    main()
