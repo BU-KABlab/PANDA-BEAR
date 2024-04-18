@@ -47,6 +47,7 @@ from .vials import (StockVial, Vial2, WasteVial, read_vials,
                     update_vial_state_files)
 from .wellplate import Wellplate
 from .errors import ProtocolNotFoundError
+from .utilities import SystemState
 
 # set up slack globally so that it can be used in the main function and others
 
@@ -114,7 +115,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             ## Reset the logger to log to the ePANDA.log file and format
             obs.place_text_on_screen("")
             e_panda.apply_log_filter()
-            sql_utilities.set_system_status(sql_utilities.SystemState.BUSY)
+            sql_utilities.set_system_status(SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
 
@@ -141,7 +142,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             #     break  # break out of the while True loop
 
             while new_experiment is None:
-                sql_utilities.set_system_status(sql_utilities.SystemState.IDLE)
+                sql_utilities.set_system_status(SystemState.IDLE)
                 # scheduler.check_inbox()
                 new_experiment, _ = scheduler.read_next_experiment_from_queue()
                 if new_experiment is not None:
@@ -164,7 +165,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
                 sys.stdout.flush()
                 sys.stdout.write("\n")
                 if (
-                    sql_utilities.SystemState.SHUTDOWN
+                    SystemState.SHUTDOWN
                     in sql_utilities.select_system_status(2)
                 ):
                     slack.send_slack_message("alert", "ePANDA is shutting down")
@@ -273,10 +274,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
             ## Update the experiment status to complete
             new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
-            ## Update the system state with new vial and wellplate information
-            # scheduler.change_well_status(
-            #     wellplate.wells[new_experiment.well_id], new_experiment
-            # )
+
             # Share any results images with the slack data channel
             share_to_slack(new_experiment)
 
@@ -306,25 +304,25 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             if one_off:
                 break  # break out of the while True loop
 
-            if sql_utilities.SystemState.SHUTDOWN in sql_utilities.select_system_status(2):
+            if SystemState.SHUTDOWN in sql_utilities.select_system_status(2):
                 slack.send_slack_message("alert", "ePANDA is shutting down")
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
-            while sql_utilities.SystemState.PAUSE == sql_utilities.select_system_status(1):
+            while SystemState.PAUSE == sql_utilities.select_system_status(1):
                 logger.info("System is paused, waiting for resume status")
                 slack.send_slack_message(
                     "alert", "ePANDA is paused, waiting for status change"
                 )
                 time.sleep(60)
                 if (
-                    sql_utilities.SystemState.SHUTDOWN
+                    SystemState.SHUTDOWN
                     in sql_utilities.select_system_status(2)
                 ):
                     slack.send_slack_message("alert", "ePANDA is shutting down")
                     raise ShutDownCommand
 
-                if sql_utilities.SystemState.RESUME in sql_utilities.select_system_status(
+                if SystemState.RESUME in sql_utilities.select_system_status(
                     2
                 ):
                     slack.send_slack_message("alert", "ePANDA is resuming")
@@ -339,7 +337,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
             share_to_slack(new_experiment)
-        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+        sql_utilities.set_system_status(SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
             # )
@@ -350,14 +348,14 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except ProtocolNotFoundError as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+        sql_utilities.set_system_status(SystemState.ERROR)
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error
     except ShutDownCommand as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(sql_utilities.SystemState.OFF)
+        sql_utilities.set_system_status(SystemState.OFF)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
             # )
@@ -368,7 +366,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+        sql_utilities.set_system_status(SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
             # )
@@ -380,7 +378,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(sql_utilities.SystemState.ERROR)
+        sql_utilities.set_system_status(SystemState.ERROR)
             # scheduler.change_well_status(
             #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
             # )
@@ -405,7 +403,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             disconnect_from_instruments(toolkit)
         obs.place_text_on_screen("")
         obs.stop_recording()
-        sql_utilities.set_system_status(sql_utilities.SystemState.IDLE)
+        sql_utilities.set_system_status(SystemState.IDLE)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
         print("ePANDA is shutting down...goodbye")
 
