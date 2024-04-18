@@ -9,7 +9,6 @@ Or starting the ePANDA either with or without mock instruments.
 import os
 import sys
 import time
-from tracemalloc import stop
 
 from epanda_lib import (
     camera_call_camera,
@@ -29,8 +28,13 @@ from epanda_lib.config.config_tools import read_testing_config, write_testing_co
 from epanda_lib.sql_utilities import set_system_status
 from epanda_lib.utilities import SystemState
 
+def run_epanda_with_ml():
+    """Runs ePANDA."""
+    set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
+    controller.main(al_campaign_length=10)
 
-def run_epanda():
+
+def run_epanda_without_ml():
     """Runs ePANDA."""
     set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
     controller.main()
@@ -200,8 +204,8 @@ def resume_epanda():
     sql_utilities.set_system_status(SystemState.RESUME, "stopping ePANDA", read_testing_config())
 
 options = {
-    
-    "1": run_epanda,
+    "0": run_epanda_with_ml,
+    "1": run_epanda_without_ml,
     "1.1": stop_epanda,
     "1.2": pause_epanda,
     "1.3": resume_epanda,
@@ -273,7 +277,7 @@ if __name__ == "__main__":
             if usr_choice == "n":
                 continue
             if usr_choice == "y":
-                run_epanda()
+                run_epanda_without_ml()
 
         except Exception as e:
             print(f"An error occurred: {e}")

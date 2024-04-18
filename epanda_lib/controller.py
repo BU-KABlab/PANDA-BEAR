@@ -48,11 +48,12 @@ from .vials import (StockVial, Vial2, WasteVial, read_vials,
 from .wellplate import Wellplate
 from .errors import ProtocolNotFoundError
 from .utilities import SystemState
+from .analyzer.pedot import main as pedot_ml_analysis
 
 # set up slack globally so that it can be used in the main function and others
 
 
-def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
+def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaign_length: int = None):
     """
     Main function
 
@@ -72,6 +73,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "ePANDA is starting up")
     toolkit = None
+    al_campaign_iteration = 0
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
         obs.place_text_on_screen("ePANDA is starting up")
@@ -289,6 +291,11 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             # scheduler.update_experiment_file(new_experiment)
             # scheduler.update_experiment_location(new_experiment)
             scheduler.save_results(new_experiment)
+
+            # If the AL campaign length is set, run the ML analysis
+            if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
+                pedot_ml_analysis(new_experiment.experiment_id)
+                al_campaign_iteration += 1
 
             new_experiment = None  # reset new_experiment to None so that we can check the queue again
 

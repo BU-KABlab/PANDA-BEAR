@@ -54,9 +54,8 @@ def pedot_analyzer(experiment_id: int) -> PlottingValues:
     return pv
 
 
-def main():
+def main(experiment_id:int = 1):
     """Main function for the PEDOT analyzer."""
-    experiment_id = 1
     plotting_values = pedot_analyzer(experiment_id)
     # ML model goes here and accepts plotting_values as input, then outputs the ML output
     pedot_generator(ml_output, experiment_name="PEDOT_Analysis", campaign_id=0)
