@@ -10,6 +10,9 @@ RANDOM_FLAG = False  # Set to True to randomize the order of the experiments
 DEFAULT_PUMPING_RATE = 0.3  # ul/s
 ## Testing flag
 TESTING = read_testing_config()  # testing.txt is the only place to change the mode besides from the main menue
+# This should no be put into a db since depending on its setting a different db is used.
+# TODO: instead of seperate dbs what about seperate schemas?
+# TODO this is more of an environment variable file than config file, look into python-dotenv
 ## Flag to use only local paths
 USE_LOCAL_PATHS = TESTING
 
