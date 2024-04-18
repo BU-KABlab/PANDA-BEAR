@@ -28,9 +28,10 @@ from slack_sdk.errors import (BotUserAccessError, SlackApiError,
 from epanda_lib import sql_utilities
 
 from . import e_panda
-from .e_panda import OCPFailure, DepositionFailure, CVFailure, CAFailure
-from .config.config import (RANDOM_FLAG, STOCK_STATUS,
-                            TESTING, WASTE_STATUS)
+from .analyzer.pedot import main as pedot_ml_analysis
+from .config.config import RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS
+from .e_panda import CAFailure, CVFailure, DepositionFailure, OCPFailure
+from .errors import ProtocolNotFoundError
 from .experiment_class import (ExperimentBase, ExperimentResult,
                                ExperimentStatus)
 from .instrument_toolkit import Toolkit
@@ -43,12 +44,10 @@ from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
+from .utilities import SystemState
 from .vials import (StockVial, Vial2, WasteVial, read_vials,
                     update_vial_state_files)
 from .wellplate import Wellplate
-from .errors import ProtocolNotFoundError
-from .utilities import SystemState
-from .analyzer.pedot import main as pedot_ml_analysis
 
 # set up slack globally so that it can be used in the main function and others
 
