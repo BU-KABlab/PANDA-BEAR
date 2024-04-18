@@ -39,7 +39,7 @@ class SystemState(Enum):
     TESTING = "testing"
     CALIBRATING = "calibrating"
     SHUTDOWN = "shutdown"
-    PAUSED = "paused"
+    PAUSE = "pause"
     RESUME = "resume"
 
 
