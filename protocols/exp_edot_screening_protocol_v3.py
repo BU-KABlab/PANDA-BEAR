@@ -1,7 +1,6 @@
 """The sequence of steps for a pedotLHSv1_screening experiment."""
 
 # Standard imports
-from json import tool
 from typing import Sequence
 
 # Non-standard imports
