@@ -7,7 +7,6 @@ Or starting the ePANDA either with or without mock instruments.
 # pylint: disable=broad-exception-caught, protected-access
 
 import os
-from pdb import run
 import sys
 import time
 
@@ -54,6 +53,15 @@ def remove_wellplate_from_database():
     )
     wellplate._remove_wellplate_from_db(plate_to_remove)
 
+def remove_experiment_from_database():
+    """Removes a user provided experiment from the database."""
+    experiment_to_remove = int(
+        input("Enter the experiment number to remove: ").strip().lower()
+    )
+    set_system_status(
+        SystemState.BUSY, "removing experiment from database", read_testing_config()
+    )
+    wellplate._remove_experiment_from_db(experiment_to_remove)   
 
 def reset_vials_stock():
     """Resets the stock vials."""
@@ -171,6 +179,7 @@ options = {
     "1": run_epanda,
     "2": change_wellplate,
     "2.1": remove_wellplate_from_database,
+    "2.2": remove_experiment_from_database,
     "3": reset_vials_stock,
     "4": reset_vials_waste,
     "5": input_new_vial_values_stock,
@@ -188,6 +197,7 @@ if __name__ == "__main__":
 
     set_system_status(SystemState.ON, "at main menu", read_testing_config())
     time.sleep(1)
+    protocol_utilities.read_in_protocols()
 
     while True:
         set_system_status(SystemState.IDLE, "at main menu", read_testing_config())

@@ -295,14 +295,33 @@ class Scheduler:
                     )
                     experiment.well_id = target_well
 
+            # Individually insert the experiment and update the status
+            # We do this so that the wellchecker is checking as the wells are allocated
+            # The parameters are quite lengthly, so we will save those for a bulk entry
+            try:
+                sql_utilities.insert_experiment(experiment)
+                sql_utilities.update_experiment_status(experiment, ExperimentStatus.QUEUED)
+            except sqlite3.Error as e:
+                logger.error(
+                    "Error occured while adding the experiment to experiments table: %s",
+                    e,
+                )
+                logger.error(
+                    "The statements have been rolled back and nothing has been added to the tables."
+                )
+                print(
+                    "The statements have been rolled back and nothing has been added to the tables."
+                )
+                raise e
+
         ## Add the experiment to experiments table
         try:
             # Bulk insert the experiments that had wells available
-            sql_utilities.insert_experiments(experiments)
+            #sql_utilities.insert_experiments(experiments)
             # Bulk set the status of the experiments that had wells available
-            sql_utilities.update_experiments_statuses(
-                experiments, ExperimentStatus.QUEUED
-            )
+            # sql_utilities.update_experiments_statuses(
+            #     experiments, ExperimentStatus.QUEUED
+            # )
 
             ## Bulk add the experiment parameters to the experiment_parameters table
             sql_utilities.insert_experiments_parameters(experiments)

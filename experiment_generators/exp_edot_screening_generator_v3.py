@@ -27,18 +27,16 @@ def main():
     experiments: list[experiment_class.EdotExperiment] = []
 
     for _, row in params_df.iterrows():
-        well_letter = row["well_letter"]
-        well_number = row["well_number"]
         dep_v = row["dep_V"]  # dep_V is used for deposition voltage
         dep_t = row["dep_T"]  # dep_T is used for deposition time
 
         experiments.append(
             experiment_class.EdotExperiment(
                 experiment_id=experiment_id,
-                protocol_id=12,
-                well_id=str(well_letter) + str(well_number),
+                protocol_id=13,
+                well_id='A1',
                 well_type_number=4,
-                experiment_name=EXPERIMENT_NAME + " " + "Deposition",
+                experiment_name=EXPERIMENT_NAME,
                 pin=CURRENT_PIN,
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,

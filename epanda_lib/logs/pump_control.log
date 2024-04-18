@@ -920,3 +920,473 @@
 2024-04-04 17:39:03,401&pump_control&pump_control&run_pump&350&Done Infusing
 2024-04-04 17:39:03,401&pump_control&pump_control&run_pump&391&Pump has infused: 0.19243000000000002 ml
 2024-04-04 17:39:03,402&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:44:51,107&pump_control&pump_control&set_up_pump&498&Setting up pump...
+2024-04-17 20:44:51,108&pump_control&pump_control&set_up_pump&504&Pump found at address 0
+2024-04-17 20:45:15,960&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:45:16,461&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:45:16,462&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:45:16,463&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:45:22,481&pump_control&pump_control&run_pump&341&Withdrawing 0.140000 ml at 0.500000 mL/min...
+2024-04-17 20:45:22,981&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:45:22,981&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.14 ml
+2024-04-17 20:45:22,984&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.140000 ml at 0.500000mL/min  Pipette vol: 180.000 ul
+2024-04-17 20:45:25,000&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:45:25,501&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:45:25,501&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:45:25,503&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 185.000 ul
+2024-04-17 20:45:31,516&pump_control&pump_control&run_pump&341&Infusing 0.140000 ml at 0.654000 mL/min...
+2024-04-17 20:45:32,017&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:45:32,017&pump_control&pump_control&run_pump&389&Pump has infused: 0.185 ml
+2024-04-17 20:45:32,018&pump_control&pump_control&infuse&251&Pump has infused: 0.185000 ml (0.140000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:46:37,596&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:46:38,097&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:46:38,097&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:46:38,098&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:46:44,105&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.300000 mL/min...
+2024-04-17 20:46:44,608&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:46:44,608&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:46:44,610&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.300000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:46:46,620&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:46:47,122&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:46:47,122&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:46:47,124&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:46:53,139&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:46:53,641&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:46:53,642&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:46:53,645&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:47:22,202&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:47:22,703&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:22,703&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:47:22,705&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:47:28,712&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:47:29,213&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:29,213&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:47:29,216&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:47:29,269&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:47:29,770&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:29,770&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:47:29,771&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:47:31,774&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:47:32,276&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:32,276&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:47:32,277&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:47:38,288&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:47:38,789&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:47:38,789&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:47:38,790&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:47:38,925&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:47:39,427&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:39,427&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:47:39,428&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:47:45,437&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:47:45,938&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:45,938&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:47:45,939&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:47:47,951&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:47:48,453&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:48,453&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:47:48,454&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:47:54,463&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:47:54,964&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:47:54,964&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:47:54,966&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:47:55,108&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:47:55,609&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:47:55,609&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:47:55,610&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:48:01,623&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:48:02,124&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:02,124&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:48:02,126&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:48:04,139&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:48:04,641&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:04,641&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:48:04,642&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:48:10,655&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:48:11,157&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:48:11,158&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:48:11,160&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:48:11,213&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:48:11,715&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:11,715&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:48:11,717&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:48:13,722&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:48:14,223&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:14,223&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:48:14,224&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:48:14,275&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:48:14,776&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:14,776&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:48:14,777&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:48:16,782&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:48:17,284&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:17,284&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:48:17,284&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:48:23,296&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:48:23,797&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:48:23,797&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:48:23,799&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:48:23,828&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:48:24,329&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:24,329&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:48:24,330&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:48:30,339&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:48:30,840&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:30,840&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:48:30,842&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:48:32,853&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:48:33,353&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:33,353&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:48:33,355&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:48:39,367&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:48:39,867&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:48:39,868&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:48:39,871&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:48:39,972&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:48:40,472&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:40,472&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:48:40,473&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:48:42,477&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:48:42,979&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:42,979&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:48:42,983&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:48:43,030&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:48:43,532&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:43,532&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:48:43,533&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:48:45,535&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:48:46,036&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:46,036&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:48:46,037&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:48:52,047&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:48:52,549&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:48:52,549&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:48:52,551&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:48:52,576&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:48:53,078&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:53,078&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:48:53,078&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:48:59,089&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:48:59,590&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:48:59,590&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:48:59,592&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:49:01,601&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:49:02,102&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:02,103&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:49:02,104&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:49:08,117&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:49:08,618&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:49:08,618&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:49:08,620&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:49:08,678&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:49:09,178&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:09,178&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:49:09,179&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:49:11,189&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:49:11,690&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:11,691&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:49:11,691&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:49:11,740&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:49:12,241&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:12,241&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:49:12,242&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:49:14,244&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:49:14,745&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:14,745&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:49:14,748&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:49:20,759&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:49:21,260&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:49:21,260&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:49:21,261&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:49:21,281&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:49:21,783&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:21,783&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:49:21,785&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:49:27,793&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:49:28,294&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:28,294&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:49:28,295&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:49:30,302&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:49:30,803&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:30,803&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:49:30,805&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:49:36,817&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:49:37,319&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:49:37,320&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:49:37,321&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:49:37,377&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:49:37,878&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:37,878&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:49:37,879&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:49:39,885&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:49:40,386&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:40,386&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:49:40,387&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:49:40,470&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:49:40,972&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:40,972&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:49:40,973&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:49:42,975&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:49:43,476&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:49:43,476&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:49:43,477&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:49:49,490&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:49:49,990&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:49:49,990&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:49:49,991&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:50:29,155&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:50:29,656&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:50:29,656&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:50:29,658&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:50:35,666&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:50:36,167&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:50:36,167&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:50:36,168&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:50:38,179&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:50:38,680&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:50:38,680&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:50:38,682&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:50:44,697&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:50:45,197&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:50:45,197&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:50:45,198&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:51:24,449&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:51:24,950&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:51:24,950&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:51:24,952&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:51:30,963&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:51:31,463&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:51:31,463&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:51:31,464&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:51:33,476&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:51:33,978&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:51:33,978&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:51:33,979&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:51:39,990&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:51:40,492&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:51:40,492&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:51:40,492&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:51:40,509&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:51:41,011&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:51:41,011&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:51:41,013&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:51:47,096&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:51:47,607&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:51:47,609&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:51:47,615&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:51:49,643&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:51:50,144&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:51:50,144&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:51:50,145&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:51:56,162&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:51:56,662&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:51:56,662&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:51:56,664&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:51:56,693&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:51:57,194&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:51:57,194&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:51:57,196&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:52:03,219&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:52:03,720&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:52:03,720&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:52:03,721&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:52:05,731&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:52:06,233&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:52:06,233&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:52:06,234&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:52:12,243&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:52:12,744&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:52:12,744&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:52:12,745&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:52:56,130&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:52:56,632&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:52:56,632&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:52:56,633&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:53:02,646&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:53:03,147&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:03,147&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:53:03,149&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:53:05,160&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:53:05,661&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:05,661&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:53:05,662&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:53:11,671&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:53:12,171&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:53:12,171&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:53:12,172&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:53:12,205&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:53:12,706&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:12,706&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:53:12,707&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:53:18,717&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:53:19,219&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:19,219&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:53:19,219&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:53:21,228&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:53:21,729&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:21,729&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:53:21,729&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:53:27,739&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:53:28,240&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:53:28,240&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:53:28,241&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:53:28,267&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:53:28,769&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:28,769&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:53:28,770&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:53:34,783&pump_control&pump_control&run_pump&341&Withdrawing 0.120000 ml at 0.500000 mL/min...
+2024-04-17 20:53:35,285&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:35,285&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.12 ml
+2024-04-17 20:53:35,286&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.120000 ml at 0.500000mL/min  Pipette vol: 160.000 ul
+2024-04-17 20:53:37,295&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:53:37,796&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:37,796&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:53:37,797&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 165.000 ul
+2024-04-17 20:53:43,808&pump_control&pump_control&run_pump&341&Infusing 0.120000 ml at 0.654000 mL/min...
+2024-04-17 20:53:44,310&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:53:44,310&pump_control&pump_control&run_pump&389&Pump has infused: 0.16499999999999998 ml
+2024-04-17 20:53:44,312&pump_control&pump_control&infuse&251&Pump has infused: 0.165000 ml (0.120000 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:53:52,730&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:53:53,230&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:53,230&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:53:53,231&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:53:59,239&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:53:59,740&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:53:59,740&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:53:59,741&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:54:01,752&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:54:02,254&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:02,254&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:54:02,255&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:54:08,276&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:54:08,777&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:54:08,777&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:54:08,779&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:54:08,843&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:54:09,344&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:09,344&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:54:09,345&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:54:11,354&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:54:11,855&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:11,855&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:54:11,857&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:54:12,013&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:54:12,515&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:12,515&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:54:12,517&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:54:14,518&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:54:15,020&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:15,020&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:54:15,021&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:54:21,032&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:54:21,533&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:54:21,533&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:54:21,534&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:54:21,556&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:54:22,057&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:22,057&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:54:22,060&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:54:28,071&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:54:28,572&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:28,572&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:54:28,573&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:54:30,586&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:54:31,087&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:31,087&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:54:31,088&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:54:37,101&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:54:37,602&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:54:37,602&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:54:37,604&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:54:37,660&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:54:38,161&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:38,161&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:54:38,162&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:54:40,171&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:54:40,672&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:40,672&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:54:40,673&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:54:40,730&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:54:41,231&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:41,231&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:54:41,232&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:54:43,234&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:54:43,735&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:43,735&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:54:43,736&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:54:49,747&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:54:50,248&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:54:50,248&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:54:50,250&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:54:50,274&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:54:50,775&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:50,775&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:54:50,776&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:54:56,788&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:54:57,289&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:57,289&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:54:57,290&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:54:59,302&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:54:59,803&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:54:59,803&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:54:59,805&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:55:05,817&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:55:06,318&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:55:06,319&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:55:06,322&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:55:06,385&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:55:06,886&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:06,886&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:55:06,887&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:55:08,891&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:55:09,392&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:09,392&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:55:09,393&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:55:09,448&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:55:09,948&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:09,948&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:55:09,950&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:55:11,952&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:55:12,453&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:12,453&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:55:12,454&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:55:18,464&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:55:18,965&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:55:18,965&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:55:18,967&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:55:18,989&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:55:19,490&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:19,490&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:55:19,491&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:55:25,501&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:55:26,002&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:26,002&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:55:26,003&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:55:28,015&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:55:28,517&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:28,517&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:55:28,518&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 172.400 ul
+2024-04-17 20:55:34,527&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:55:35,028&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:55:35,029&pump_control&pump_control&run_pump&389&Pump has infused: 0.17243000000000003 ml
+2024-04-17 20:55:35,031&pump_control&pump_control&infuse&251&Pump has infused: 0.172430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul
+2024-04-17 20:55:35,104&pump_control&pump_control&run_pump&341&Withdrawing 0.040000 ml at 0.654000 mL/min...
+2024-04-17 20:55:35,604&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:35,604&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.04 ml
+2024-04-17 20:55:35,605&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.040000 ml at 0.654000mL/min  Pipette vol: 40.000 ul
+2024-04-17 20:55:37,610&pump_control&pump_control&run_pump&341&Withdrawing 0.127400 ml at 0.654000 mL/min...
+2024-04-17 20:55:38,111&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:38,111&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.1274 ml
+2024-04-17 20:55:38,112&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.127400 ml at 0.654000mL/min  Pipette vol: 167.400 ul
+2024-04-17 20:55:38,191&pump_control&pump_control&run_pump&341&Withdrawing 0.020000 ml at 0.654000 mL/min...
+2024-04-17 20:55:38,692&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:38,692&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.02 ml
+2024-04-17 20:55:38,694&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.020000 ml at 0.654000mL/min  Pipette vol: 187.400 ul
+2024-04-17 20:55:40,698&pump_control&pump_control&run_pump&341&Withdrawing 0.005000 ml at 0.654000 mL/min...
+2024-04-17 20:55:41,199&pump_control&pump_control&run_pump&348&Done Withdrawing
+2024-04-17 20:55:41,199&pump_control&pump_control&run_pump&389&Pump has withdrawn: 0.005 ml
+2024-04-17 20:55:41,200&pump_control&pump_control&withdraw&148&Pump has withdrawn: 0.005000 ml at 0.654000mL/min  Pipette vol: 192.400 ul
+2024-04-17 20:55:47,208&pump_control&pump_control&run_pump&341&Infusing 0.127430 ml at 0.654000 mL/min...
+2024-04-17 20:55:47,710&pump_control&pump_control&run_pump&348&Done Infusing
+2024-04-17 20:55:47,710&pump_control&pump_control&run_pump&389&Pump has infused: 0.19243000000000002 ml
+2024-04-17 20:55:47,711&pump_control&pump_control&infuse&251&Pump has infused: 0.192430 ml (0.127430 of solution) at 0.654000mL/min Pipette volume: 0.000 ul

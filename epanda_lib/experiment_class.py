@@ -338,6 +338,7 @@ class ExperimentBase:
                 "project_campaign_id",
                 "well_type",
                 "protocol_id",
+                "protocol_type", # depreciated
                 "pin",
                 "experiment_type",
                 "jira_issue_key",
@@ -348,6 +349,7 @@ class ExperimentBase:
                 "status_date",
                 "results",
                 "well",
+                "well_id",
                 "experiment_id",
             ]
         ]

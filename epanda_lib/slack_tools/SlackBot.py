@@ -23,6 +23,7 @@ from epanda_lib.config.config import (
     SLACK_TICKETS,
     STOCK_STATUS,
     WASTE_STATUS,
+    read_testing_config
 )
 from epanda_lib.config.secrets import Slack as slack_cred
 from epanda_lib.wellplate import Wellplate
@@ -35,7 +36,7 @@ from epanda_lib.experiment_class import ExperimentResultsRecord#, ExperimentStat
 class SlackBot:
     """Class for sending messages to Slack."""
 
-    def __init__(self, test: bool = False):
+    def __init__(self, test: bool = read_testing_config()) -> None:
         self.logger = logging.getLogger("e_panda")
         self.test = test
 

@@ -1,9 +1,12 @@
-import numpy as np
+"""For PEDOT films calculates the Delta E00 values between the coloring and bleaching images."""
 import os
+
+import numpy as np
 from PIL import Image, ImageDraw
 from skimage import color
 from skimage.color.delta_e import deltaE_ciede2000
-from . import MLInput, RawMetrics
+
+from .pedot_classes import MLInput, RawMetrics
 
 
 def extract_circular_region(image_path, radius=300, show_region=True) -> np.ndarray:
@@ -79,22 +82,14 @@ def rgbtolab(inputs: MLInput) -> RawMetrics:
             lab_values_dict[experiment_id][image_type] = lab_values
             lab_values_dict[experiment_id][f"{image_type}_original_rgb"] = original_rgb
 
-    metrics: RawMetrics = RawMetrics()
+    metrics: RawMetrics = None
     metrics.experiment_id = experiment_id
     for experiment_id, labs in lab_values_dict.items():
         if "coloring" in labs and "bleaching" in labs:
-            metrics.Delta_E00 = deltaE_ciede2000(labs["coloring"], labs["bleaching"])
-            metrics.L_c = labs["coloring"][0]
-            metrics.A_c = labs["coloring"][1]
-            metrics.B_c = labs["coloring"][2]
-            metrics.L_b = labs["bleaching"][0]
-            metrics.A_b = labs["bleaching"][1]
-            metrics.B_b = labs["bleaching"][2]
-            metrics.R_c = labs["coloring_original_rgb"][0]
-            metrics.G_c = labs["coloring_original_rgb"][1]
-            metrics.B_c = labs["coloring_original_rgb"][2]
-            metrics.R_b = labs["bleaching_original_rgb"][0]
-            metrics.G_b = labs["bleaching_original_rgb"][1]
-            metrics.B_b = labs["bleaching_original_rgb"][2]
+            metrics.l_c, metrics.a_c, metrics.b_c = labs["coloring"]
+            metrics.b_b, metrics.a_b, metrics.b_b = labs["bleaching"]
+            metrics.delta_e00 = deltaE_ciede2000(labs["coloring"], labs["bleaching"])
+            metrics.r_c_o, metrics.g_c_o, metrics.b_c_o = labs["coloring_original_rgb"]
+            metrics.r_b_o, metrics.g_b_o, metrics.b_b_o = labs["bleaching_original_rgb"]
 
     return metrics

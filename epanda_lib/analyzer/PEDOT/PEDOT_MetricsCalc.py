@@ -1,22 +1,26 @@
-""""""
+"""For PEDOT films calculates the charge passed during deposition, the capacitance, the deposition efficiency, and the electrochromic efficiency."""
+
+# pylint: disable=broad-exception-caught
+import math
+import re
 
 import pandas as pd
 from scipy.integrate import trapezoid
-import re
-import math
 
-from . import RawMetrics, MLInput, PEDOTMetrics
+from .pedot_classes import MLInput, PEDOTMetrics, RawMetrics
 
 
 def modify_function(value):
-    # circular wells
-    return (
-        value * 100000 / (math.pi * 3.25 * 3.25)
-    )  # converts the current from amps to milliamps and changes the current column to current density
+    """
+    converts the current from amps to milliamps and changes the current column
+    to current density for circular wells
+    """
+
+    return value * 100000 / (math.pi * 3.25 * 3.25)
 
 
-# Calculate charge passed using text file for deposition
 def calc_charge(deposition_file):
+    """Calculate charge passed using text file for deposition"""
     # Read in the text file
     df = pd.read_csv(
         deposition_file,
@@ -43,10 +47,10 @@ def calc_charge(deposition_file):
     return charge
 
 
-# Calculate metric for capacitance using CV by finding the area enclosed by the CV curve
-def calc_capacitance(CV_file):
+def calc_capacitance(cv_file):
+    """Calculate metric for capacitance using CV by finding the area enclosed by the CV curve."""
     df = pd.read_csv(
-        CV_file,
+        cv_file,
         sep=" ",
         header=None,
         names=[
@@ -89,6 +93,7 @@ def calc_capacitance(CV_file):
 
 
 def calc_bleach_charge(bleach_file):
+    """Calculate the charge passed during bleaching using text file for bleaching"""
     df = pd.read_csv(
         bleach_file,
         sep=" ",
@@ -113,16 +118,25 @@ def calc_bleach_charge(bleach_file):
 
 
 def calc_dep_eff(charge, capacitance):
+    """
+    Calculate the deposition efficiency using the charge passed and the
+    capacitance of the film.
+    """
     dep_eff = charge / capacitance
     return dep_eff
 
 
-def calc_echromic_eff(bleach_charge, deltaE00):
-    echromic_eff = deltaE00 / bleach_charge
+def calc_echromic_eff(bleach_charge, delta_e00):
+    """
+    Calculate the electrochromic efficiency using the charge passed during
+    bleaching and the color change.
+    """
+    echromic_eff = delta_e00 / bleach_charge
     return echromic_eff
 
 
-def get_expID(filename):
+def get_exp_id(filename):
+    """Extract the experiment ID from the filename"""
     match = re.search(r"_([0-9]{8})_", filename)
     if match:
         return match.group(1)
@@ -130,13 +144,15 @@ def get_expID(filename):
         return None
 
 
-def process_metrics(metrics_df: RawMetrics, input_df: MLInput) -> PEDOTMetrics:
-    deltaE00 = metrics_df.Delta_E00
-    files_by_experiment_ID = {}
-    results = []
+def process_metrics(metrics: RawMetrics, input_df: MLInput) -> PEDOTMetrics:
+    """
+    Process the metrics to calculate the deposition efficiency and
+    electrochromic efficiency.
+    """
+    delta_e00 = metrics.delta_e00
 
     deposition_file = input_df.CA_deposition
-    CV_file = input_df.CV_characterization
+    cv_file = input_df.CV_characterization
     bleach_file = input_df.CA_bleaching
 
     try:
@@ -152,7 +168,7 @@ def process_metrics(metrics_df: RawMetrics, input_df: MLInput) -> PEDOTMetrics:
             )
 
         try:
-            capacitance = calc_capacitance(CV_file)
+            capacitance = calc_capacitance(cv_file)
         except Exception as e:
             print(
                 f"Error calculating capacitance for experiment_ID {input_df.experiment_id}: {e}"
@@ -167,7 +183,7 @@ def process_metrics(metrics_df: RawMetrics, input_df: MLInput) -> PEDOTMetrics:
 
         if charge is not None and capacitance is not None and bleach_charge is not None:
             dep_eff = calc_dep_eff(charge, capacitance)
-            echromic_eff = calc_echromic_eff(bleach_charge, deltaE00)
+            echromic_eff = calc_echromic_eff(bleach_charge, delta_e00)
 
             calculated_metrics = PEDOTMetrics(
                 experiment_id=input_df.experiment_id,
@@ -176,16 +192,6 @@ def process_metrics(metrics_df: RawMetrics, input_df: MLInput) -> PEDOTMetrics:
                 Capacitance=capacitance,
                 DepositionEfficiency=dep_eff,
                 ElectrochromicEfficiency=echromic_eff,
-            )
-            results.append(
-                {
-                    "experiment_ID": input_df.experiment_id,
-                    "DepositionChargePassed": charge,
-                    "BleachChargePassed": bleach_charge,
-                    "Capacitance": capacitance,
-                    "DepositionEfficiency": dep_eff,
-                    "ElectrochromicEfficiency": echromic_eff,
-                }
             )
             print(f"Processed experiment_ID: {input_df.experiment_id}")
         else:
@@ -196,6 +202,4 @@ def process_metrics(metrics_df: RawMetrics, input_df: MLInput) -> PEDOTMetrics:
     except Exception as e:
         print(f"Unexpected error for experiment_ID {input_df.experiment_id}: {e}")
 
-    # Convert results to a dataframe and save to a csv
-    results_df = pd.DataFrame(results)
     return calculated_metrics

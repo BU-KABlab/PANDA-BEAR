@@ -205,8 +205,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             pre_experiment_status_msg = (
                 f"Running experiment {new_experiment.experiment_id}"
             )
-            if new_experiment.process_type:
-                pre_experiment_status_msg += f" part {new_experiment.process_type}"
             logger.info(pre_experiment_status_msg)
             slack.send_slack_message("alert", pre_experiment_status_msg)
 
@@ -261,26 +259,26 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
 
             ## FIXME: This is a temporary fix to allow the program to run for the broken up edot experiments
             ## This will be removed once the experiment steps are performed in series
-            if new_experiment.process_type in [1, 2, 3, 4]:
-                new_experiment.set_status_and_save(ExperimentStatus.QUEUED)
-                # scheduler.change_well_status(
-                #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-                # )
-                slack.send_slack_message(
-                    "alert",
-                    f"Experiment {new_experiment.experiment_id} part {new_experiment.process_type-1} has completed, and is back in the queue",
-                )
-                scheduler.add_to_queue(new_experiment)
-            else:
+            # if new_experiment.process_type in [1, 2, 3, 4]:
+            #     new_experiment.set_status_and_save(ExperimentStatus.QUEUED)
+            #     # scheduler.change_well_status(
+            #     #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+            #     # )
+            #     slack.send_slack_message(
+            #         "alert",
+            #         f"Experiment {new_experiment.experiment_id} part {new_experiment.process_type-1} has completed, and is back in the queue",
+            #     )
+            #     scheduler.add_to_queue(new_experiment)
+            # else:
 
-                ## Update the experiment status to complete
-                new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
-                ## Update the system state with new vial and wellplate information
-                # scheduler.change_well_status(
-                #     wellplate.wells[new_experiment.well_id], new_experiment
-                # )
-                # Share any results images with the slack data channel
-                share_to_slack(new_experiment)
+            ## Update the experiment status to complete
+            new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            ## Update the system state with new vial and wellplate information
+            # scheduler.change_well_status(
+            #     wellplate.wells[new_experiment.well_id], new_experiment
+            # )
+            # Share any results images with the slack data channel
+            share_to_slack(new_experiment)
 
             ## Reset the logger to log to the ePANDA.log file and format after the experiment is complete
             e_panda.apply_log_filter()

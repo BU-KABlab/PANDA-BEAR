@@ -1,6 +1,7 @@
 from epanda_lib import sql_utilities
 from epanda_lib.config.config_tools import read_testing_config
 import pandas as pd
+from .pedot_classes import MLInput
 
 # pylint: disable=invalid-name
 
@@ -14,7 +15,7 @@ data = {
 
 df = pd.DataFrame(data)
 
-def populate_required_information(experiment_id: int):
+def populate_required_information(experiment_id: int) -> MLInput:
     """Populates the required information for the machine learning input."""
     sql_utilities.set_system_status(
         sql_utilities.SystemState.BUSY, "analyzing data", read_testing_config()
@@ -43,7 +44,22 @@ def populate_required_information(experiment_id: int):
     sql_utilities.set_system_status(
         sql_utilities.SystemState.IDLE, "ready", read_testing_config()
     )
-    return df
+
+    # Convert the df into a MLInput object
+    results = MLInput(
+        experiment_id=df.loc[df['name'] == 'experiment_id', 'value'].values[0],
+        ca_step_1_voltage=df.loc[df['name'] == 'ca_step_1_voltage', 'value'].values[0],
+        ca_step_1_time=df.loc[df['name'] == 'ca_step_1_time', 'value'].values[0],
+        edot_concentration=df.loc[df['name'] == 'edot_concentration', 'value'].values[0],
+        CA_deposition=df.loc[df['name'] == 'CA_deposition', 'value'].values[0],
+        CV_characterization=df.loc[df['name'] == 'CV_characterization', 'value'].values[0],
+        CA_bleaching=df.loc[df['name'] == 'CA_bleaching', 'value'].values[0],
+        BeforeDeposition=df.loc[df['name'] == 'BeforeDeposition', 'value'].values[0],
+        AfterBleaching=df.loc[df['name'] == 'AfterBleaching', 'value'].values[0],
+        AfterColoring=df.loc[df['name'] == 'AfterColoring', 'value'].values[0],
+    )
+
+    return results
 
 if __name__ == "__main__":
     info = populate_required_information(10000004)

@@ -843,20 +843,60 @@ class OverDraftException(Exception):
 
 def _remove_wellplate_from_db(plate_id: int) -> None:
     """Removed all wells for the given plate id in well_hx, removes the plate id from the wellplate table"""
-    user_choicec = (
+    user_choice = (
         input(
             "Are you sure you want to remove the wellplate and all its wells from the database? This is irreversible. (y/n): "
         )
-        .lower()
-        .strip()[0]
     )
-    if user_choicec != "y":
+    if not user_choice:
+        print("No action taken")
+        return
+    if user_choice.strip().lower()[0] != "y":
+        print("No action taken")
         return
     sql_utilities.execute_sql_command(
         "DELETE FROM well_hx WHERE plate_id = ?", (plate_id,)
     )
     sql_utilities.execute_sql_command(
         "DELETE FROM wellplates WHERE id = ?", (plate_id,)
+    )
+
+def _remove_experiment_from_db(experiment_id: int) -> None:
+    """Removes the experiment from the database"""
+
+    # Check that no experiment_results exist for this experiment
+    results = sql_utilities.select_results(experiment_id)
+    if results:
+        print(
+            """
+            This experiment has associated results. If you really want to delete the experiment,
+            please delete the results before deleting the experiment."""
+        )
+        return
+
+    user_choice = (
+        input(
+            "Are you sure you want to remove the experiment and all its data from the database? This is irreversible. (y/n): "
+        )
+    )
+    if not user_choice:
+        print("No action taken")
+        return
+    if user_choice.strip().lower()[0] != "y":
+        print("No action taken")
+        return
+    # Delete the experiment and all its data from the experiment tables
+    sql_utilities.execute_sql_command(
+        "DELETE FROM experiments WHERE experiment_id = ?", (experiment_id,)
+    )
+    sql_utilities.execute_sql_command(
+        "DELETE FROM experiment_parameters WHERE id = ?", (experiment_id,)
+    )
+
+    # Update the well in the well_hx table with the experiment id to NULL
+    sql_utilities.execute_sql_command(
+        "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new' WHERE experiment_id = ?",
+        (experiment_id,),
     )
 
 def change_wellplate_location():

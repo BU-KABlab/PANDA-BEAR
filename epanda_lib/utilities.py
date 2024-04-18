@@ -128,7 +128,7 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
 
 if __name__ == "__main__":
     C = [0.01, 0.03, 0.10]  # Concentrations of each vial in mM
-    V_total = 120  # Total volume to achieve in uL
+    VOL_TOTAL = 120  # Total volume to achieve in uL
     C_target = [
         0.027,
         0.023,
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     for c in C_target:
         print(f"Target concentration: {c} mM")
-        volumes, deviation = solve_vials_ilp(C, V_total, c)
+        volumes, deviation = solve_vials_ilp(C, VOL_TOTAL, c)
         if volumes is not None:
             print(f"Volumes to draw from each vial: {volumes} uL")
             print(f"Deviation from target concentration: {deviation} mM")

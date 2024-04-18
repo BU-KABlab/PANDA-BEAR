@@ -1007,9 +1007,10 @@ def insert_experiment(experiment: ExperimentBase) -> None:
             jira_issue_key,
             priority,
             process_type,
-            filename
+            filename,
+            created
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             experiment.experiment_id,
@@ -1023,6 +1024,7 @@ def insert_experiment(experiment: ExperimentBase) -> None:
             experiment.priority,
             experiment.process_type,
             experiment.filename,
+            datetime.now().isoformat(timespec="seconds"),
         ),
     )
 
@@ -1251,17 +1253,17 @@ def update_experiment_status(
 
     execute_sql_command(
         """
-        UPDATE well_hx SET status = ?, status_date = ?
-        WHERE experiment_id = ?
-        AND well_id = ?
-        AND plate_id = ?
+        UPDATE well_hx
+        SET status = ?, status_date = ?, experiment_id = ?, project_id = ?
+        WHERE well_id = ?
+        AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
         """,
         (
             status.value,
             status_date,
             experiment_id,
+            experiment.project_id,
             experiment.well_id,
-            experiment.plate_id,
         ),
     )
 
@@ -1520,7 +1522,7 @@ def select_system_status(look_back:int = 1) -> SystemState:
     )
     if result == []:
         return SystemState("off")
-    
+
     if look_back == 1:
         return SystemState(result[0][0])
     else:

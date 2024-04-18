@@ -3069,3 +3069,1544 @@
 2024-04-04 17:40:29,281:ePANDA:Disconnecting from instruments:
 2024-04-04 17:40:29,282:ePANDA:Disconnecting from the mill
 2024-04-04 17:40:29,283:ePANDA:Disconnected from instruments
+2024-04-17 20:44:51,089:ePANDA:Using mock instruments
+2024-04-17 20:44:51,101:ePANDA:Mill config loaded
+2024-04-17 20:44:51,102:ePANDA:Connecting to the mill
+2024-04-17 20:44:54,150:ePANDA:Connected to instruments
+2024-04-17 20:45:00,944:ePANDA:System state reestablished
+2024-04-17 20:45:00,946:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-04-17 20:45:00,946:ePANDA:Stock vial edot contains edot with volume 19490
+2024-04-17 20:45:00,947:ePANDA:Stock vial rinse contains rinse with volume 11662
+2024-04-17 20:45:00,948:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-04-17 20:45:00,949:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-04-17 20:45:00,949:ePANDA:Waste vial waste contains {'rinse': 8337.760000000004, 'edot': 509.72} with volume 9847
+2024-04-17 20:45:00,950:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:45:00,950:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:45:00,951:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:45:01,095:ePANDA:There are 81 clear wells
+2024-04-17 20:45:15,957:ePANDA:Flushing pipette tip
+2024-04-17 20:45:16,466:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-04-17 20:45:16,467:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-04-17 20:45:16,468:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-04-17 20:45:16,470:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:45:16,470:ePANDA:Not moving to Z=0 first
+2024-04-17 20:45:16,471:ePANDA:MPos coordinates: X = -3.0, Y = -3.0, Z = -3.0
+2024-04-17 20:45:16,471:ePANDA:WPos coordinates: X = 0.0, Y = 0.0, Z = 0.0
+2024-04-17 20:45:16,472:ePANDA:Current_coordinates: [0.0, 0.0, 0.0]
+2024-04-17 20:45:16,472:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:45:16,473:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:45:18,475:ePANDA:Returned <Idle|MPos:-89.5,-3.0,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:45:18,476:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:45:18,477:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:45:20,478:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:45:20,478:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:45:20,479:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:45:22,480:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:45:22,996:ePANDA:Command sent: G01 Z0
+2024-04-17 20:45:22,997:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:45:25,000:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:45:25,504:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:45:25,506:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:45:25,506:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:45:25,507:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:45:25,507:ePANDA:Not moving to Z=0 first
+2024-04-17 20:45:25,507:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:45:25,507:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:45:25,508:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:45:25,509:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:45:25,509:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:45:27,511:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:45:27,511:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:45:27,511:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:45:29,512:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:45:29,512:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:45:29,512:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:45:31,514:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:45:32,301:ePANDA:System state reestablished
+2024-04-17 20:45:32,302:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-04-17 20:45:32,302:ePANDA:Stock vial edot contains edot with volume 19490
+2024-04-17 20:45:32,302:ePANDA:Stock vial rinse contains rinse with volume 11522
+2024-04-17 20:45:32,302:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-04-17 20:45:32,303:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-04-17 20:45:32,303:ePANDA:Waste vial waste contains {'rinse': 8477.760000000004, 'edot': 509.72} with volume 9987
+2024-04-17 20:45:32,303:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:45:32,303:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:45:32,304:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:45:32,370:ePANDA:There are 81 clear wells
+2024-04-17 20:45:32,525:ePANDA:Running experiment 10000009 part 1
+2024-04-17 20:45:32,835:ePANDA:Beginning experiment 10000009
+2024-04-17 20:46:29,047:ePANDA:Applying correction factor to the programmed volumes
+2024-04-17 20:46:29,051:ePANDA:0. Imaging the well
+2024-04-17 20:46:29,262:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:46:29,262:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:46:29,263:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:46:29,263:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:46:29,263:ePANDA:Not moving to Z=0 first
+2024-04-17 20:46:29,263:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:46:29,264:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:46:29,264:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:46:29,264:ePANDA:Command sent: G01 X-239.5
+2024-04-17 20:46:29,265:ePANDA:Writing to the mill: G01 X-239.5
+2024-04-17 20:46:31,265:ePANDA:Returned <Idle|MPos:-242.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:31,265:ePANDA:Command sent: G01 Y-87.4
+2024-04-17 20:46:31,266:ePANDA:Writing to the mill: G01 Y-87.4
+2024-04-17 20:46:33,268:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:33,268:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:46:33,268:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:46:35,270:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:35,272:ePANDA:Command sent: G01 Z0
+2024-04-17 20:46:35,272:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:46:37,274:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:37,410:ePANDA:1. Depositing EDOT into well: C2
+2024-04-17 20:46:37,594:ePANDA:Volumes to draw from each edot vial: [120.0] uL
+2024-04-17 20:46:37,595:ePANDA:Deviation from target concentration: 0.0 mM
+2024-04-17 20:46:38,099:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:46:38,099:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:46:38,100:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:46:38,100:ePANDA:Target coordinates: [-86.5, -140.5, -74]
+2024-04-17 20:46:38,100:ePANDA:Not moving to Z=0 first
+2024-04-17 20:46:38,100:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:46:38,101:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:46:38,101:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:46:38,101:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:46:38,102:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:46:40,103:ePANDA:Returned <Idle|MPos:-89.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:40,103:ePANDA:Command sent: G01 Y-140.5
+2024-04-17 20:46:40,103:ePANDA:Writing to the mill: G01 Y-140.5
+2024-04-17 20:46:42,104:ePANDA:Returned <Idle|MPos:-89.5,-143.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:42,104:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:46:42,104:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:46:44,105:ePANDA:Returned <Idle|MPos:-89.5,-143.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:44,619:ePANDA:Command sent: G01 Z0
+2024-04-17 20:46:44,620:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:46:46,620:ePANDA:Returned <Idle|MPos:-89.5,-143.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:47,126:ePANDA:MPos coordinates: X = -89.5, Y = -143.5, Z = -3.0
+2024-04-17 20:46:47,126:ePANDA:WPos coordinates: X = -86.5, Y = -140.5, Z = 0.0
+2024-04-17 20:46:47,127:ePANDA:Current_coordinates: [-86.5, -140.5, 0.0]
+2024-04-17 20:46:47,127:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:46:47,128:ePANDA:Not moving to Z=0 first
+2024-04-17 20:46:47,129:ePANDA:MPos coordinates: X = -89.5, Y = -143.5, Z = -3.0
+2024-04-17 20:46:47,130:ePANDA:WPos coordinates: X = -86.5, Y = -140.5, Z = 0.0
+2024-04-17 20:46:47,130:ePANDA:Current_coordinates: [-86.5, -140.5, 0.0]
+2024-04-17 20:46:47,131:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:46:47,131:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:46:49,132:ePANDA:Returned <Idle|MPos:-325.0,-143.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:49,132:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:46:49,133:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:46:51,134:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:51,134:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:46:51,134:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:46:53,136:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:53,708:ePANDA:2. Moving electrode to well: C2
+2024-04-17 20:46:53,710:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:46:53,710:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:46:53,711:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:46:53,711:ePANDA:Target coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:46:53,712:ePANDA:Moving to Z=0 first
+2024-04-17 20:46:53,713:ePANDA:Command sent: G01 Z0
+2024-04-17 20:46:53,713:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:46:55,715:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:55,715:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:46:55,716:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:46:55,716:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:46:55,717:ePANDA:Command sent: G01 X-199.3
+2024-04-17 20:46:55,717:ePANDA:Writing to the mill: G01 X-199.3
+2024-04-17 20:46:57,718:ePANDA:Returned <Idle|MPos:-202.3,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:57,719:ePANDA:Command sent: G01 Y-61.2
+2024-04-17 20:46:57,720:ePANDA:Writing to the mill: G01 Y-61.2
+2024-04-17 20:46:59,722:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:46:59,722:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:46:59,723:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:47:01,724:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:01,724:ePANDA:Setting feed rate to 100
+2024-04-17 20:47:01,725:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:47:01,725:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:47:01,726:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:47:01,726:ePANDA:Target coordinates: [-199.3, -61.2, -70]
+2024-04-17 20:47:01,726:ePANDA:Not moving to Z=0 first
+2024-04-17 20:47:01,727:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:47:01,727:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:47:01,727:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:47:01,728:ePANDA:Command sent: G01 Z-70
+2024-04-17 20:47:01,728:ePANDA:Writing to the mill: G01 Z-70
+2024-04-17 20:47:03,729:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-73.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:03,729:ePANDA:Setting feed rate to 2000
+2024-04-17 20:47:03,730:ePANDA:3. Performing CA deposition
+2024-04-17 20:47:03,932:ePANDA:4. Rinsing electrode
+2024-04-17 20:47:04,070:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -73.0
+2024-04-17 20:47:04,070:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -70.0
+2024-04-17 20:47:04,071:ePANDA:Current_coordinates: [-199.3, -61.2, -70.0]
+2024-04-17 20:47:04,071:ePANDA:Target coordinates: [-369.4, -8.2, 0]
+2024-04-17 20:47:04,071:ePANDA:Moving to Z=0 first
+2024-04-17 20:47:04,071:ePANDA:Command sent: G01 Z0
+2024-04-17 20:47:04,072:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:47:06,073:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:06,073:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -3.0
+2024-04-17 20:47:06,074:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = 0.0
+2024-04-17 20:47:06,074:ePANDA:Current_coordinates: [-199.3, -61.2, 0.0]
+2024-04-17 20:47:06,074:ePANDA:Command sent: G01 X-369.4
+2024-04-17 20:47:06,074:ePANDA:Writing to the mill: G01 X-369.4
+2024-04-17 20:47:08,075:ePANDA:Returned <Idle|MPos:-372.4,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:08,075:ePANDA:Command sent: G01 Y-8.2
+2024-04-17 20:47:08,076:ePANDA:Writing to the mill: G01 Y-8.2
+2024-04-17 20:47:10,077:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:10,077:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:47:10,077:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:47:12,079:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:12,080:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:47:12,080:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:47:14,081:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:14,081:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:47:14,082:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:47:16,083:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:16,083:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:47:16,084:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:47:18,085:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:18,085:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:47:18,086:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:47:20,087:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:20,087:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:47:20,088:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:47:22,088:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:22,088:ePANDA:5. Clearing well contents into waste
+2024-04-17 20:47:22,705:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:47:22,705:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:47:22,706:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:47:22,706:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:47:22,706:ePANDA:Not moving to Z=0 first
+2024-04-17 20:47:22,706:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:47:22,707:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:47:22,707:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:47:22,707:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:47:22,708:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:47:24,709:ePANDA:Returned <Idle|MPos:-325.0,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:24,709:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:47:24,709:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:47:26,710:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:26,710:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:47:26,711:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:47:28,712:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:47:29,772:ePANDA:Command sent: G01 Z0
+2024-04-17 20:47:29,772:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:47:31,773:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:32,278:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:47:32,278:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:47:32,278:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:47:32,279:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:47:32,279:ePANDA:Not moving to Z=0 first
+2024-04-17 20:47:32,279:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:47:32,280:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:47:32,282:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:47:32,282:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:47:32,283:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:47:34,284:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:34,284:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:47:34,285:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:47:36,286:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:36,286:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:47:36,286:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:47:38,287:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:38,811:ePANDA:6. Flushing the pipette tip
+2024-04-17 20:47:39,428:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:47:39,429:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:47:39,429:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:47:39,429:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:47:39,430:ePANDA:Not moving to Z=0 first
+2024-04-17 20:47:39,430:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:47:39,430:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:47:39,431:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:47:39,431:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:47:39,431:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:47:41,433:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:41,433:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:47:41,433:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:47:43,434:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:43,434:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:47:43,435:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:47:45,437:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:45,949:ePANDA:Command sent: G01 Z0
+2024-04-17 20:47:45,950:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:47:47,951:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:48,455:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:47:48,455:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:47:48,456:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:47:48,456:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:47:48,456:ePANDA:Not moving to Z=0 first
+2024-04-17 20:47:48,456:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:47:48,457:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:47:48,457:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:47:48,457:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:47:48,458:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:47:50,459:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:50,459:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:47:50,460:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:47:52,461:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:52,461:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:47:52,461:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:47:54,462:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:54,986:ePANDA:7. Rinsing the well 4x with rinse
+2024-04-17 20:47:55,105:ePANDA:Rinse 1 of 4
+2024-04-17 20:47:55,611:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:47:55,612:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:47:55,612:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:47:55,613:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:47:55,614:ePANDA:Not moving to Z=0 first
+2024-04-17 20:47:55,615:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:47:55,616:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:47:55,616:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:47:55,617:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:47:55,618:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:47:57,619:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:57,619:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:47:57,619:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:47:59,621:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:47:59,621:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:47:59,621:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:48:01,622:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:02,137:ePANDA:Command sent: G01 Z0
+2024-04-17 20:48:02,138:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:48:04,139:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:04,644:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:48:04,644:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:48:04,645:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:48:04,646:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:04,646:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:04,647:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:48:04,648:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:48:04,649:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:48:04,649:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:48:04,649:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:48:06,650:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:06,650:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:48:06,651:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:48:08,652:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:08,652:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:48:08,653:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:48:10,654:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:11,210:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:11,210:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:11,211:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:11,211:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:11,211:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:11,211:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:11,212:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:11,212:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:11,718:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:11,718:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:11,718:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:11,718:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:48:11,719:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:11,719:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:11,719:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:11,720:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:11,720:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:48:11,720:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:48:13,721:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:48:14,778:ePANDA:Command sent: G01 Z0
+2024-04-17 20:48:14,779:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:48:16,782:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:17,285:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:48:17,285:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:48:17,286:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:48:17,286:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:48:17,287:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:17,287:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:48:17,287:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:48:17,288:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:48:17,288:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:48:17,288:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:48:19,290:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:19,291:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:48:19,291:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:48:21,293:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:21,293:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:48:21,294:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:48:23,295:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:23,826:ePANDA:Rinse 2 of 4
+2024-04-17 20:48:24,331:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:48:24,331:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:48:24,332:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:48:24,332:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:48:24,332:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:24,333:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:48:24,333:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:48:24,333:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:48:24,333:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:48:24,334:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:48:26,335:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:26,335:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:48:26,336:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:48:28,337:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:28,337:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:48:28,338:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:48:30,339:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:30,851:ePANDA:Command sent: G01 Z0
+2024-04-17 20:48:30,851:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:48:32,853:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:33,357:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:48:33,358:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:48:33,358:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:48:33,359:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:33,360:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:33,360:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:48:33,360:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:48:33,360:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:48:33,361:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:48:33,361:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:48:35,362:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:35,362:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:48:35,362:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:48:37,363:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:37,363:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:48:37,364:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:48:39,365:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:39,968:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:39,968:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:39,969:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:39,969:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:39,969:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:39,969:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:39,970:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:39,970:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:40,474:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:40,474:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:40,474:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:40,475:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:48:40,475:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:40,476:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:48:40,476:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:48:40,476:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:48:40,477:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:48:40,477:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:48:42,477:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:48:43,533:ePANDA:Command sent: G01 Z0
+2024-04-17 20:48:43,534:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:48:45,535:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:46,038:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:48:46,038:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:48:46,038:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:48:46,038:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:48:46,039:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:46,039:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:48:46,039:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:48:46,040:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:48:46,040:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:48:46,040:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:48:48,042:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:48,042:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:48:48,042:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:48:50,044:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:50,044:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:48:50,045:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:48:52,045:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:52,573:ePANDA:Rinse 3 of 4
+2024-04-17 20:48:53,079:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:48:53,079:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:48:53,080:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:48:53,080:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:48:53,081:ePANDA:Not moving to Z=0 first
+2024-04-17 20:48:53,081:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:48:53,082:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:48:53,083:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:48:53,083:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:48:53,084:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:48:55,085:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:55,085:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:48:55,085:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:48:57,087:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:57,087:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:48:57,088:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:48:59,089:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:48:59,599:ePANDA:Command sent: G01 Z0
+2024-04-17 20:48:59,600:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:49:01,601:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:02,105:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:49:02,105:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:49:02,105:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:49:02,106:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:02,106:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:02,106:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:49:02,107:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:49:02,108:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:49:02,108:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:49:02,109:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:49:04,111:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:04,111:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:49:04,111:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:49:06,113:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:06,113:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:49:06,113:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:49:08,115:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:08,675:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:08,676:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:08,676:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:08,676:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:08,677:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:08,677:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:08,677:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:08,677:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:09,181:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:09,182:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:09,183:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:09,184:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:49:09,185:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:09,185:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:09,186:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:09,188:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:09,188:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:49:09,188:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:49:11,189:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:49:12,242:ePANDA:Command sent: G01 Z0
+2024-04-17 20:49:12,243:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:49:14,244:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:14,749:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:49:14,750:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:49:14,750:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:49:14,750:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:49:14,751:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:14,752:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:49:14,753:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:49:14,754:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:49:14,754:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:49:14,754:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:49:16,755:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:16,755:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:49:16,755:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:49:18,757:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:18,757:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:49:18,757:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:49:20,758:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:21,279:ePANDA:Rinse 4 of 4
+2024-04-17 20:49:21,785:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:49:21,785:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:49:21,786:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:49:21,786:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:49:21,786:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:21,787:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:49:21,787:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:49:21,788:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:49:21,788:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:49:21,788:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:49:23,789:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:23,789:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:49:23,790:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:49:25,791:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:25,791:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:49:25,791:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:49:27,793:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:28,301:ePANDA:Command sent: G01 Z0
+2024-04-17 20:49:28,301:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:49:30,302:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:30,806:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:49:30,806:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:49:30,807:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:49:30,808:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:30,808:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:30,809:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:49:30,810:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:49:30,811:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:49:30,811:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:49:30,812:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:49:32,813:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:32,813:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:49:32,814:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:49:34,815:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:34,815:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:49:34,816:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:49:36,816:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:37,373:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:37,374:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:37,374:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:37,374:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:37,375:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:37,375:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:37,375:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:37,376:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:37,881:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:37,881:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:37,881:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:37,882:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:49:37,882:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:37,883:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:49:37,883:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:49:37,883:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:49:37,884:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:49:37,884:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:49:39,885:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:49:40,973:ePANDA:Command sent: G01 Z0
+2024-04-17 20:49:40,973:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:49:42,975:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:43,478:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:49:43,478:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:49:43,479:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:49:43,479:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:49:43,479:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:43,481:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:49:43,482:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:49:43,482:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:49:43,483:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:49:43,483:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:49:45,485:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:45,485:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:49:45,485:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:49:47,487:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:47,487:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:49:47,488:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:49:49,489:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:50,015:ePANDA:8. Take after image
+2024-04-17 20:49:50,234:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:49:50,235:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:49:50,235:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:49:50,236:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:49:50,236:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:50,237:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:49:50,238:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:49:50,239:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:49:50,239:ePANDA:Command sent: G01 X-239.5
+2024-04-17 20:49:50,240:ePANDA:Writing to the mill: G01 X-239.5
+2024-04-17 20:49:52,241:ePANDA:Returned <Idle|MPos:-242.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:52,241:ePANDA:Command sent: G01 Y-87.4
+2024-04-17 20:49:52,241:ePANDA:Writing to the mill: G01 Y-87.4
+2024-04-17 20:49:54,243:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:54,243:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:49:54,244:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:49:56,245:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:56,248:ePANDA:Command sent: G01 Z0
+2024-04-17 20:49:56,248:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:49:58,249:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:49:58,250:ePANDA:PEDOT deposition complete
+
+
+2024-04-17 20:49:58,252:ePANDA:0. Imaging the well
+2024-04-17 20:49:58,487:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:49:58,487:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:49:58,487:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:49:58,488:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:49:58,488:ePANDA:Not moving to Z=0 first
+2024-04-17 20:49:58,488:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:49:58,488:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:49:58,489:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:49:58,489:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:49:58,489:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:50:00,490:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:00,492:ePANDA:Command sent: G01 Z0
+2024-04-17 20:50:00,493:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:50:02,494:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:02,591:ePANDA:1. Depositing EDOT into well: C2
+2024-04-17 20:50:02,592:ePANDA:2. Moving electrode to well: C2
+2024-04-17 20:50:02,593:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:50:02,594:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:50:02,594:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:50:02,596:ePANDA:Target coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:50:02,596:ePANDA:Not moving to Z=0 first
+2024-04-17 20:50:02,596:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:50:02,596:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:50:02,597:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:50:02,597:ePANDA:Command sent: G01 X-199.3
+2024-04-17 20:50:02,597:ePANDA:Writing to the mill: G01 X-199.3
+2024-04-17 20:50:04,599:ePANDA:Returned <Idle|MPos:-202.3,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:04,599:ePANDA:Command sent: G01 Y-61.2
+2024-04-17 20:50:04,600:ePANDA:Writing to the mill: G01 Y-61.2
+2024-04-17 20:50:06,600:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:06,600:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:50:06,600:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:50:08,602:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:08,602:ePANDA:Setting feed rate to 100
+2024-04-17 20:50:08,603:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:50:08,603:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:50:08,604:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:50:08,604:ePANDA:Target coordinates: [-199.3, -61.2, -70]
+2024-04-17 20:50:08,605:ePANDA:Not moving to Z=0 first
+2024-04-17 20:50:08,605:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:50:08,605:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:50:08,605:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:50:08,606:ePANDA:Command sent: G01 Z-70
+2024-04-17 20:50:08,606:ePANDA:Writing to the mill: G01 Z-70
+2024-04-17 20:50:10,607:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-73.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:10,607:ePANDA:Setting feed rate to 2000
+2024-04-17 20:50:10,608:ePANDA:3. Performing CA
+2024-04-17 20:50:10,801:ePANDA:4. Rinsing electrode
+2024-04-17 20:50:10,924:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -73.0
+2024-04-17 20:50:10,925:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -70.0
+2024-04-17 20:50:10,925:ePANDA:Current_coordinates: [-199.3, -61.2, -70.0]
+2024-04-17 20:50:10,925:ePANDA:Target coordinates: [-369.4, -8.2, 0]
+2024-04-17 20:50:10,925:ePANDA:Moving to Z=0 first
+2024-04-17 20:50:10,926:ePANDA:Command sent: G01 Z0
+2024-04-17 20:50:10,926:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:50:12,926:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:12,926:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -3.0
+2024-04-17 20:50:12,926:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = 0.0
+2024-04-17 20:50:12,927:ePANDA:Current_coordinates: [-199.3, -61.2, 0.0]
+2024-04-17 20:50:12,927:ePANDA:Command sent: G01 X-369.4
+2024-04-17 20:50:12,927:ePANDA:Writing to the mill: G01 X-369.4
+2024-04-17 20:50:14,929:ePANDA:Returned <Idle|MPos:-372.4,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:14,929:ePANDA:Command sent: G01 Y-8.2
+2024-04-17 20:50:14,929:ePANDA:Writing to the mill: G01 Y-8.2
+2024-04-17 20:50:16,931:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:16,931:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:50:16,931:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:50:18,932:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:18,933:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:50:18,933:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:50:20,934:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:20,935:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:50:20,935:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:50:22,936:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:22,936:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:50:22,937:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:50:24,939:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:24,940:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:50:24,940:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:50:26,941:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:26,941:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:50:26,941:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:50:28,942:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:28,942:ePANDA:5. Clearing well contents into waste
+2024-04-17 20:50:29,052:ePANDA:6. Flushing the pipette tip
+2024-04-17 20:50:29,659:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:50:29,659:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:50:29,659:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:50:29,660:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:50:29,660:ePANDA:Not moving to Z=0 first
+2024-04-17 20:50:29,660:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:50:29,661:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:50:29,661:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:50:29,661:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:50:29,662:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:50:31,663:ePANDA:Returned <Idle|MPos:-89.5,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:31,663:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:50:31,664:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:50:33,664:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:33,664:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:50:33,664:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:50:35,666:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:36,178:ePANDA:Command sent: G01 Z0
+2024-04-17 20:50:36,178:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:50:38,179:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:38,684:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:50:38,685:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:50:38,685:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:50:38,686:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:50:38,686:ePANDA:Not moving to Z=0 first
+2024-04-17 20:50:38,687:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:50:38,688:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:50:38,689:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:50:38,690:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:50:38,690:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:50:40,692:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:40,692:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:50:40,693:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:50:42,694:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:42,694:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:50:42,695:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:50:44,696:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:45,219:ePANDA:7. Take after image
+2024-04-17 20:50:45,433:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:50:45,433:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:50:45,434:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:50:45,434:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:50:45,434:ePANDA:Not moving to Z=0 first
+2024-04-17 20:50:45,435:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:50:45,435:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:50:45,436:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:50:45,437:ePANDA:Command sent: G01 X-239.5
+2024-04-17 20:50:45,437:ePANDA:Writing to the mill: G01 X-239.5
+2024-04-17 20:50:47,438:ePANDA:Returned <Idle|MPos:-242.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:47,438:ePANDA:Command sent: G01 Y-87.4
+2024-04-17 20:50:47,438:ePANDA:Writing to the mill: G01 Y-87.4
+2024-04-17 20:50:49,439:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:49,439:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:50:49,439:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:50:51,441:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:51,443:ePANDA:Command sent: G01 Z0
+2024-04-17 20:50:51,444:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:50:53,444:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:53,445:ePANDA:PEDOT bleaching complete
+
+
+2024-04-17 20:50:53,446:ePANDA:0. Imaging the well
+2024-04-17 20:50:53,702:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:50:53,702:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:50:53,702:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:50:53,702:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:50:53,702:ePANDA:Not moving to Z=0 first
+2024-04-17 20:50:53,703:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:50:53,703:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:50:53,703:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:50:53,703:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:50:53,705:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:50:55,705:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:55,707:ePANDA:Command sent: G01 Z0
+2024-04-17 20:50:55,707:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:50:57,708:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:57,819:ePANDA:1. Depositing liclo4 into well: C2
+2024-04-17 20:50:57,822:ePANDA:2. Moving electrode to well: C2
+2024-04-17 20:50:57,823:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:50:57,824:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:50:57,824:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:50:57,824:ePANDA:Target coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:50:57,825:ePANDA:Not moving to Z=0 first
+2024-04-17 20:50:57,825:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:50:57,825:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:50:57,825:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:50:57,825:ePANDA:Command sent: G01 X-199.3
+2024-04-17 20:50:57,826:ePANDA:Writing to the mill: G01 X-199.3
+2024-04-17 20:50:59,827:ePANDA:Returned <Idle|MPos:-202.3,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:50:59,827:ePANDA:Command sent: G01 Y-61.2
+2024-04-17 20:50:59,827:ePANDA:Writing to the mill: G01 Y-61.2
+2024-04-17 20:51:01,828:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:01,828:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:51:01,828:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:51:03,830:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:03,831:ePANDA:Setting feed rate to 100
+2024-04-17 20:51:03,832:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:51:03,832:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:51:03,833:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:51:03,834:ePANDA:Target coordinates: [-199.3, -61.2, -70]
+2024-04-17 20:51:03,834:ePANDA:Not moving to Z=0 first
+2024-04-17 20:51:03,835:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:51:03,836:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:51:03,836:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:51:03,837:ePANDA:Command sent: G01 Z-70
+2024-04-17 20:51:03,837:ePANDA:Writing to the mill: G01 Z-70
+2024-04-17 20:51:05,839:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-73.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:05,839:ePANDA:Setting feed rate to 2000
+2024-04-17 20:51:05,840:ePANDA:3. Performing CA
+2024-04-17 20:51:06,089:ePANDA:4. Rinsing electrode
+2024-04-17 20:51:06,198:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -73.0
+2024-04-17 20:51:06,199:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -70.0
+2024-04-17 20:51:06,199:ePANDA:Current_coordinates: [-199.3, -61.2, -70.0]
+2024-04-17 20:51:06,199:ePANDA:Target coordinates: [-369.4, -8.2, 0]
+2024-04-17 20:51:06,200:ePANDA:Moving to Z=0 first
+2024-04-17 20:51:06,200:ePANDA:Command sent: G01 Z0
+2024-04-17 20:51:06,200:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:51:08,209:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:08,209:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -3.0
+2024-04-17 20:51:08,210:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = 0.0
+2024-04-17 20:51:08,210:ePANDA:Current_coordinates: [-199.3, -61.2, 0.0]
+2024-04-17 20:51:08,211:ePANDA:Command sent: G01 X-369.4
+2024-04-17 20:51:08,211:ePANDA:Writing to the mill: G01 X-369.4
+2024-04-17 20:51:10,213:ePANDA:Returned <Idle|MPos:-372.4,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:10,213:ePANDA:Command sent: G01 Y-8.2
+2024-04-17 20:51:10,214:ePANDA:Writing to the mill: G01 Y-8.2
+2024-04-17 20:51:12,215:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:12,216:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:51:12,217:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:51:14,219:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:14,219:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:51:14,219:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:51:16,220:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:16,221:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:51:16,221:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:51:18,222:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:18,222:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:51:18,222:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:51:20,224:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:20,224:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:51:20,224:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:51:22,225:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:22,226:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:51:22,226:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:51:24,227:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:24,228:ePANDA:5. Clearing well contents into waste
+2024-04-17 20:51:24,361:ePANDA:6. Flushing the pipette tip
+2024-04-17 20:51:24,953:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:51:24,953:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:51:24,954:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:51:24,955:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:51:24,956:ePANDA:Not moving to Z=0 first
+2024-04-17 20:51:24,957:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:51:24,957:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:51:24,958:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:51:24,958:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:51:24,958:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:51:26,959:ePANDA:Returned <Idle|MPos:-89.5,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:26,959:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:51:26,960:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:51:28,960:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:28,960:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:51:28,961:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:51:30,962:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:31,476:ePANDA:Command sent: G01 Z0
+2024-04-17 20:51:31,476:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:51:33,476:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:33,980:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:51:33,981:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:51:33,981:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:51:33,981:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:51:33,982:ePANDA:Not moving to Z=0 first
+2024-04-17 20:51:33,983:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:51:33,983:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:51:33,984:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:51:33,984:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:51:33,984:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:51:35,985:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:35,985:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:51:35,986:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:51:37,987:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:37,987:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:51:37,988:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:51:39,989:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:41,015:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:51:41,016:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:51:41,016:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:51:41,017:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:51:41,018:ePANDA:Not moving to Z=0 first
+2024-04-17 20:51:41,018:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:51:41,018:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:51:41,019:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:51:41,019:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:51:41,019:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:51:43,020:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:43,020:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:51:43,020:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:51:45,042:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:45,043:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:51:45,044:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:51:47,090:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:47,640:ePANDA:Command sent: G01 Z0
+2024-04-17 20:51:47,641:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:51:49,642:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:50,147:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:51:50,147:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:51:50,149:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:51:50,150:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:51:50,151:ePANDA:Not moving to Z=0 first
+2024-04-17 20:51:50,152:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:51:50,153:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:51:50,155:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:51:50,156:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:51:50,156:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:51:52,157:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:52,157:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:51:52,158:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:51:54,159:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:54,159:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:51:54,159:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:51:56,161:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:57,197:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:51:57,198:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:51:57,199:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:51:57,202:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:51:57,204:ePANDA:Not moving to Z=0 first
+2024-04-17 20:51:57,207:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:51:57,208:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:51:57,210:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:51:57,211:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:51:57,212:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:51:59,215:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:51:59,215:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:51:59,216:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:52:01,217:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:01,217:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:52:01,217:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:52:03,219:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:03,729:ePANDA:Command sent: G01 Z0
+2024-04-17 20:52:03,730:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:52:05,731:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:06,235:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:52:06,235:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:52:06,236:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:52:06,236:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:52:06,236:ePANDA:Not moving to Z=0 first
+2024-04-17 20:52:06,237:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:52:06,237:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:52:06,238:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:52:06,238:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:52:06,239:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:52:08,239:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:08,240:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:52:08,240:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:52:10,241:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:10,241:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:52:10,241:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:52:12,242:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:12,766:ePANDA:7. Take image of well
+2024-04-17 20:52:17,027:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:52:17,027:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:52:17,027:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:52:17,028:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:52:17,028:ePANDA:Not moving to Z=0 first
+2024-04-17 20:52:17,028:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:52:17,028:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:52:17,029:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:52:17,029:ePANDA:Command sent: G01 X-239.5
+2024-04-17 20:52:17,029:ePANDA:Writing to the mill: G01 X-239.5
+2024-04-17 20:52:19,031:ePANDA:Returned <Idle|MPos:-242.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:19,031:ePANDA:Command sent: G01 Y-87.4
+2024-04-17 20:52:19,031:ePANDA:Writing to the mill: G01 Y-87.4
+2024-04-17 20:52:21,033:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:21,033:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:52:21,033:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:52:23,035:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:23,037:ePANDA:Command sent: G01 Z0
+2024-04-17 20:52:23,038:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:52:25,039:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:25,039:ePANDA:PEDOT coloring complete
+
+
+2024-04-17 20:52:25,041:ePANDA:0. Imaging the well
+2024-04-17 20:52:25,237:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:52:25,238:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:52:25,238:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:52:25,238:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:52:25,238:ePANDA:Not moving to Z=0 first
+2024-04-17 20:52:25,239:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:52:25,240:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:52:25,240:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:52:25,241:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:52:25,241:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:52:27,242:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:27,244:ePANDA:Command sent: G01 Z0
+2024-04-17 20:52:27,244:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:52:29,246:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:29,458:ePANDA:1. Depositing liclo4 into well: C2
+2024-04-17 20:52:29,460:ePANDA:2. Moving electrode to well: C2
+2024-04-17 20:52:29,461:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:52:29,462:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:52:29,462:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:52:29,463:ePANDA:Target coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:52:29,463:ePANDA:Not moving to Z=0 first
+2024-04-17 20:52:29,464:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:52:29,464:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:52:29,465:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:52:29,465:ePANDA:Command sent: G01 X-199.3
+2024-04-17 20:52:29,466:ePANDA:Writing to the mill: G01 X-199.3
+2024-04-17 20:52:31,468:ePANDA:Returned <Idle|MPos:-202.3,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:31,468:ePANDA:Command sent: G01 Y-61.2
+2024-04-17 20:52:31,468:ePANDA:Writing to the mill: G01 Y-61.2
+2024-04-17 20:52:33,469:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:33,469:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:52:33,470:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:52:35,471:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:35,471:ePANDA:Setting feed rate to 100
+2024-04-17 20:52:35,472:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:52:35,472:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:52:35,472:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:52:35,473:ePANDA:Target coordinates: [-199.3, -61.2, -70]
+2024-04-17 20:52:35,474:ePANDA:Not moving to Z=0 first
+2024-04-17 20:52:35,474:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -69.0
+2024-04-17 20:52:35,475:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -66.0
+2024-04-17 20:52:35,475:ePANDA:Current_coordinates: [-199.3, -61.2, -66.0]
+2024-04-17 20:52:35,475:ePANDA:Command sent: G01 Z-70
+2024-04-17 20:52:35,476:ePANDA:Writing to the mill: G01 Z-70
+2024-04-17 20:52:37,477:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-73.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:37,477:ePANDA:Setting feed rate to 2000
+2024-04-17 20:52:37,478:ePANDA:3. Performing CV
+2024-04-17 20:52:37,713:ePANDA:4. Rinsing electrode
+2024-04-17 20:52:37,859:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -73.0
+2024-04-17 20:52:37,860:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = -70.0
+2024-04-17 20:52:37,860:ePANDA:Current_coordinates: [-199.3, -61.2, -70.0]
+2024-04-17 20:52:37,860:ePANDA:Target coordinates: [-369.4, -8.2, 0]
+2024-04-17 20:52:37,861:ePANDA:Moving to Z=0 first
+2024-04-17 20:52:37,862:ePANDA:Command sent: G01 Z0
+2024-04-17 20:52:37,862:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:52:39,864:ePANDA:Returned <Idle|MPos:-202.3,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:39,865:ePANDA:MPos coordinates: X = -202.3, Y = -64.2, Z = -3.0
+2024-04-17 20:52:39,865:ePANDA:WPos coordinates: X = -199.3, Y = -61.2, Z = 0.0
+2024-04-17 20:52:39,866:ePANDA:Current_coordinates: [-199.3, -61.2, 0.0]
+2024-04-17 20:52:39,866:ePANDA:Command sent: G01 X-369.4
+2024-04-17 20:52:39,866:ePANDA:Writing to the mill: G01 X-369.4
+2024-04-17 20:52:41,868:ePANDA:Returned <Idle|MPos:-372.4,-64.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:41,868:ePANDA:Command sent: G01 Y-8.2
+2024-04-17 20:52:41,868:ePANDA:Writing to the mill: G01 Y-8.2
+2024-04-17 20:52:43,870:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:43,870:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:52:43,870:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:52:45,871:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:45,871:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:52:45,872:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:52:47,875:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:47,875:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:52:47,875:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:52:49,876:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:49,877:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:52:49,877:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:52:51,878:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:51,879:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:52:51,879:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z-50
+2024-04-17 20:52:53,881:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:53,882:ePANDA:Command sent: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:52:53,882:ePANDA:Writing to the mill: G01 X-369.40000000000003 Y-8.2 Z0
+2024-04-17 20:52:55,883:ePANDA:Returned <Idle|MPos:-372.40000000000003,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:55,883:ePANDA:5. Clearing well contents into waste
+2024-04-17 20:52:56,016:ePANDA:6. Flushing the pipette tip
+2024-04-17 20:52:56,634:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:52:56,635:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:52:56,635:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:52:56,636:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:52:56,637:ePANDA:Not moving to Z=0 first
+2024-04-17 20:52:56,638:ePANDA:MPos coordinates: X = -372.40000000000003, Y = -11.2, Z = -3.0
+2024-04-17 20:52:56,638:ePANDA:WPos coordinates: X = -369.40000000000003, Y = -8.2, Z = 0.0
+2024-04-17 20:52:56,639:ePANDA:Current_coordinates: [-369.4, -8.2, 0.0]
+2024-04-17 20:52:56,639:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:52:56,639:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:52:58,640:ePANDA:Returned <Idle|MPos:-89.5,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:52:58,640:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:52:58,641:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:53:00,643:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:00,643:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:53:00,644:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:53:02,645:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:03,158:ePANDA:Command sent: G01 Z0
+2024-04-17 20:53:03,159:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:53:05,160:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:05,663:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:53:05,663:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:53:05,664:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:53:05,664:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:53:05,664:ePANDA:Not moving to Z=0 first
+2024-04-17 20:53:05,665:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:53:05,665:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:53:05,665:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:53:05,666:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:53:05,666:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:53:07,667:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:07,667:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:53:07,667:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:53:09,668:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:09,669:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:53:09,669:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:53:11,670:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:12,708:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:53:12,708:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:53:12,709:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:53:12,709:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:53:12,709:ePANDA:Not moving to Z=0 first
+2024-04-17 20:53:12,709:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:53:12,710:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:53:12,711:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:53:12,711:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:53:12,712:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:53:14,714:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:14,714:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:53:14,714:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:53:16,715:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:16,716:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:53:16,716:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:53:18,717:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:19,225:ePANDA:Command sent: G01 Z0
+2024-04-17 20:53:19,225:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:53:21,227:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:21,730:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:53:21,730:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:53:21,730:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:53:21,732:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:53:21,732:ePANDA:Not moving to Z=0 first
+2024-04-17 20:53:21,733:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:53:21,733:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:53:21,734:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:53:21,734:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:53:21,735:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:53:23,736:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:23,736:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:53:23,736:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:53:25,738:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:25,738:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:53:25,738:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:53:27,739:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:28,771:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:53:28,772:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:53:28,772:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:53:28,773:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:53:28,773:ePANDA:Not moving to Z=0 first
+2024-04-17 20:53:28,774:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:53:28,775:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:53:28,775:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:53:28,776:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:53:28,777:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:53:30,778:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:30,778:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:53:30,778:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:53:32,780:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:32,781:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:53:32,781:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:53:34,782:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:35,293:ePANDA:Command sent: G01 Z0
+2024-04-17 20:53:35,294:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:53:37,295:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:37,798:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:53:37,798:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:53:37,798:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:53:37,799:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:53:37,799:ePANDA:Not moving to Z=0 first
+2024-04-17 20:53:37,799:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:53:37,800:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:53:37,801:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:53:37,801:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:53:37,802:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:53:39,804:ePANDA:Returned <Idle|MPos:-135.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:39,805:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:53:39,805:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:53:41,806:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:41,806:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:53:41,806:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:53:43,807:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:44,347:ePANDA:7. Take image of well
+2024-04-17 20:53:44,586:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:53:44,587:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:53:44,587:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:53:44,587:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:53:44,587:ePANDA:Not moving to Z=0 first
+2024-04-17 20:53:44,588:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:53:44,588:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:53:44,588:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:53:44,588:ePANDA:Command sent: G01 X-239.5
+2024-04-17 20:53:44,589:ePANDA:Writing to the mill: G01 X-239.5
+2024-04-17 20:53:46,590:ePANDA:Returned <Idle|MPos:-242.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:46,590:ePANDA:Command sent: G01 Y-87.4
+2024-04-17 20:53:46,590:ePANDA:Writing to the mill: G01 Y-87.4
+2024-04-17 20:53:48,592:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:48,592:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:53:48,593:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:53:50,594:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:50,596:ePANDA:Command sent: G01 Z0
+2024-04-17 20:53:50,596:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:53:52,597:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:52,598:ePANDA:8. Rinsing the well 4x with rinse
+2024-04-17 20:53:52,728:ePANDA:Rinse 1 of 4
+2024-04-17 20:53:53,232:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:53:53,232:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:53:53,232:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:53:53,233:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:53:53,233:ePANDA:Not moving to Z=0 first
+2024-04-17 20:53:53,233:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 20:53:53,234:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 20:53:53,234:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 20:53:53,235:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:53:53,235:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:53:55,236:ePANDA:Returned <Idle|MPos:-89.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:55,236:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:53:55,236:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:53:57,238:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:57,238:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:53:57,239:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:53:59,239:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:53:59,750:ePANDA:Command sent: G01 Z0
+2024-04-17 20:53:59,751:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:54:01,752:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:02,256:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:54:02,257:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:54:02,257:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:54:02,257:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:54:02,257:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:02,258:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:54:02,258:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:54:02,258:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:54:02,259:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:54:02,259:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:54:04,260:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:04,260:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:54:04,261:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:54:06,263:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:06,263:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:54:06,264:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:54:08,265:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:09,346:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:54:09,347:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:54:09,348:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:54:09,349:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:54:09,350:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:09,351:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:54:09,351:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:54:09,352:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:54:09,352:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:54:09,352:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:54:11,353:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:54:12,518:ePANDA:Command sent: G01 Z0
+2024-04-17 20:54:12,518:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:54:14,518:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:15,022:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:54:15,023:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:54:15,023:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:54:15,023:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:54:15,023:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:15,024:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:54:15,024:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:54:15,025:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:54:15,025:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:54:15,025:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:54:17,027:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:17,027:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:54:17,027:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:54:19,029:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:19,029:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:54:19,030:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:54:21,032:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:21,554:ePANDA:Rinse 2 of 4
+2024-04-17 20:54:22,062:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:54:22,063:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:54:22,064:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:54:22,064:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:54:22,065:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:22,065:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:54:22,065:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:54:22,065:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:54:22,066:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:54:22,067:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:54:24,068:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:24,068:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:54:24,068:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:54:26,070:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:26,070:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:54:26,070:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:54:28,071:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:28,583:ePANDA:Command sent: G01 Z0
+2024-04-17 20:54:28,584:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:54:30,586:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:31,090:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:54:31,091:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:54:31,091:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:54:31,092:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:54:31,092:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:31,092:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:54:31,093:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:54:31,094:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:54:31,094:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:54:31,095:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:54:33,096:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:33,096:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:54:33,097:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:54:35,098:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:35,099:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:54:35,099:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:54:37,100:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:38,163:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:54:38,164:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:54:38,165:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:54:38,165:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:54:38,166:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:38,167:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:54:38,168:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:54:38,168:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:54:38,168:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:54:38,169:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:54:40,171:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:54:41,232:ePANDA:Command sent: G01 Z0
+2024-04-17 20:54:41,233:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:54:43,234:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:43,737:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:54:43,737:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:54:43,737:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:54:43,738:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:54:43,738:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:43,739:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:54:43,739:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:54:43,739:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:54:43,740:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:54:43,740:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:54:45,741:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:45,741:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:54:45,742:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:54:47,744:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:47,744:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:54:47,745:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:54:49,746:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:50,272:ePANDA:Rinse 3 of 4
+2024-04-17 20:54:50,777:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:54:50,777:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:54:50,778:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:54:50,778:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:54:50,778:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:50,779:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:54:50,779:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:54:50,780:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:54:50,781:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:54:50,781:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:54:52,783:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:52,783:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:54:52,784:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:54:54,784:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:54,786:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:54:54,787:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:54:56,788:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:57,300:ePANDA:Command sent: G01 Z0
+2024-04-17 20:54:57,300:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:54:59,302:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:54:59,806:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:54:59,807:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:54:59,808:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:54:59,809:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:54:59,810:ePANDA:Not moving to Z=0 first
+2024-04-17 20:54:59,810:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:54:59,810:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:54:59,810:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:54:59,811:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:54:59,811:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:55:01,812:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:01,812:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:55:01,812:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:55:03,814:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:03,814:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:55:03,815:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:55:05,816:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:06,887:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:55:06,887:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:55:06,887:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:55:06,887:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:55:06,889:ePANDA:Not moving to Z=0 first
+2024-04-17 20:55:06,889:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:55:06,889:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:55:06,889:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:55:06,889:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:55:06,889:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:55:08,891:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:55:09,950:ePANDA:Command sent: G01 Z0
+2024-04-17 20:55:09,950:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:55:11,951:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:12,455:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:55:12,455:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:55:12,456:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:55:12,456:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:55:12,456:ePANDA:Not moving to Z=0 first
+2024-04-17 20:55:12,457:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:55:12,457:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:55:12,457:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:55:12,458:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:55:12,458:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:55:14,459:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:14,459:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:55:14,460:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:55:16,461:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:16,461:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:55:16,461:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:55:18,463:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:18,985:ePANDA:Rinse 4 of 4
+2024-04-17 20:55:19,492:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:55:19,492:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:55:19,492:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:55:19,492:ePANDA:Target coordinates: [-86.5, -173.5, -74]
+2024-04-17 20:55:19,493:ePANDA:Not moving to Z=0 first
+2024-04-17 20:55:19,493:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:55:19,493:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:55:19,494:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:55:19,494:ePANDA:Command sent: G01 X-86.5
+2024-04-17 20:55:19,494:ePANDA:Writing to the mill: G01 X-86.5
+2024-04-17 20:55:21,496:ePANDA:Returned <Idle|MPos:-89.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:21,496:ePANDA:Command sent: G01 Y-173.5
+2024-04-17 20:55:21,496:ePANDA:Writing to the mill: G01 Y-173.5
+2024-04-17 20:55:23,497:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:23,497:ePANDA:Command sent: G01 Z-74
+2024-04-17 20:55:23,499:ePANDA:Writing to the mill: G01 Z-74
+2024-04-17 20:55:25,500:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-77.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:26,012:ePANDA:Command sent: G01 Z0
+2024-04-17 20:55:26,013:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:55:28,015:ePANDA:Returned <Idle|MPos:-89.5,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:28,519:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:55:28,519:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:55:28,520:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:55:28,520:ePANDA:Target coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:55:28,520:ePANDA:Not moving to Z=0 first
+2024-04-17 20:55:28,520:ePANDA:MPos coordinates: X = -89.5, Y = -176.5, Z = -3.0
+2024-04-17 20:55:28,521:ePANDA:WPos coordinates: X = -86.5, Y = -173.5, Z = 0.0
+2024-04-17 20:55:28,521:ePANDA:Current_coordinates: [-86.5, -173.5, 0.0]
+2024-04-17 20:55:28,521:ePANDA:Command sent: G01 X-322.0
+2024-04-17 20:55:28,522:ePANDA:Writing to the mill: G01 X-322.0
+2024-04-17 20:55:30,523:ePANDA:Returned <Idle|MPos:-325.0,-176.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:30,523:ePANDA:Command sent: G01 Y-89.9
+2024-04-17 20:55:30,524:ePANDA:Writing to the mill: G01 Y-89.9
+2024-04-17 20:55:32,525:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:32,525:ePANDA:Command sent: G01 Z-66.0
+2024-04-17 20:55:32,525:ePANDA:Writing to the mill: G01 Z-66.0
+2024-04-17 20:55:34,526:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-69.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:35,606:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:55:35,606:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:55:35,606:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:55:35,607:ePANDA:Target coordinates: [-322.0, -89.9, -71.75]
+2024-04-17 20:55:35,607:ePANDA:Not moving to Z=0 first
+2024-04-17 20:55:35,607:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -69.0
+2024-04-17 20:55:35,608:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = -66.0
+2024-04-17 20:55:35,608:ePANDA:Current_coordinates: [-322.0, -89.9, -66.0]
+2024-04-17 20:55:35,608:ePANDA:Command sent: G01 Z-71.75
+2024-04-17 20:55:35,608:ePANDA:Writing to the mill: G01 Z-71.75
+2024-04-17 20:55:37,610:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-74.75|Bf:15,127|FS:0,0>
+2024-04-17 20:55:38,694:ePANDA:Command sent: G01 Z0
+2024-04-17 20:55:38,695:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:55:40,697:ePANDA:Returned <Idle|MPos:-325.0,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:41,201:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:55:41,201:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:55:41,201:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:55:41,201:ePANDA:Target coordinates: [-132.5, -9.5, -17]
+2024-04-17 20:55:41,202:ePANDA:Not moving to Z=0 first
+2024-04-17 20:55:41,202:ePANDA:MPos coordinates: X = -325.0, Y = -92.9, Z = -3.0
+2024-04-17 20:55:41,202:ePANDA:WPos coordinates: X = -322.0, Y = -89.9, Z = 0.0
+2024-04-17 20:55:41,203:ePANDA:Current_coordinates: [-322.0, -89.9, 0.0]
+2024-04-17 20:55:41,204:ePANDA:Command sent: G01 X-132.5
+2024-04-17 20:55:41,204:ePANDA:Writing to the mill: G01 X-132.5
+2024-04-17 20:55:43,205:ePANDA:Returned <Idle|MPos:-135.5,-92.9,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:43,205:ePANDA:Command sent: G01 Y-9.5
+2024-04-17 20:55:43,205:ePANDA:Writing to the mill: G01 Y-9.5
+2024-04-17 20:55:45,207:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:45,207:ePANDA:Command sent: G01 Z-17
+2024-04-17 20:55:45,207:ePANDA:Writing to the mill: G01 Z-17
+2024-04-17 20:55:47,208:ePANDA:Returned <Idle|MPos:-135.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:47,738:ePANDA:9. Take end image
+2024-04-17 20:55:47,943:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:55:47,944:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:55:47,944:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:55:47,945:ePANDA:Target coordinates: [-239.5, -87.4, -35]
+2024-04-17 20:55:47,945:ePANDA:Not moving to Z=0 first
+2024-04-17 20:55:47,945:ePANDA:MPos coordinates: X = -135.5, Y = -12.5, Z = -20.0
+2024-04-17 20:55:47,945:ePANDA:WPos coordinates: X = -132.5, Y = -9.5, Z = -17.0
+2024-04-17 20:55:47,946:ePANDA:Current_coordinates: [-132.5, -9.5, -17.0]
+2024-04-17 20:55:47,946:ePANDA:Command sent: G01 X-239.5
+2024-04-17 20:55:47,946:ePANDA:Writing to the mill: G01 X-239.5
+2024-04-17 20:55:49,947:ePANDA:Returned <Idle|MPos:-242.5,-12.5,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:49,947:ePANDA:Command sent: G01 Y-87.4
+2024-04-17 20:55:49,948:ePANDA:Writing to the mill: G01 Y-87.4
+2024-04-17 20:55:51,950:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-20.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:51,950:ePANDA:Command sent: G01 Z-35
+2024-04-17 20:55:51,951:ePANDA:Writing to the mill: G01 Z-35
+2024-04-17 20:55:53,952:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-38.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:53,954:ePANDA:Command sent: G01 Z0
+2024-04-17 20:55:53,954:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 20:55:55,955:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 20:55:55,955:ePANDA:PEDOT characterizing complete
+
+
+2024-04-17 20:55:56,114:ePANDA:The experiment has no dz.tiff image files
+2024-04-17 20:55:56,324:ePANDA:Experiment 10000009 ended with status complete
+2024-04-17 20:55:58,096:ePANDA:System state reestablished
+2024-04-17 20:55:58,097:ePANDA:Stock vial liclo4 contains liclo4 with volume 20000
+2024-04-17 20:55:58,097:ePANDA:Stock vial edot contains edot with volume 19362
+2024-04-17 20:55:58,098:ePANDA:Stock vial rinse contains rinse with volume 9542
+2024-04-17 20:55:58,098:ePANDA:Stock vial rinse contains rinse with volume 20000
+2024-04-17 20:55:58,098:ePANDA:Stock vial electrode_bath contains electrolyte with volume 20000
+2024-04-17 20:55:58,099:ePANDA:Waste vial waste contains {'rinse': 10457.200000000006, 'edot': 637.1500000000001} with volume 12094
+2024-04-17 20:55:58,099:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:55:58,099:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:55:58,099:ePANDA:Waste vial waste contains {} with volume 1000
+2024-04-17 20:55:58,146:ePANDA:There are 80 clear wells
+2024-04-17 20:55:58,244:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 20:56:58,504:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 20:57:58,668:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 20:58:58,875:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 20:59:59,068:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 21:00:59,252:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 21:01:59,430:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 21:02:59,627:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 21:03:59,849:ePANDA:No new experiments to run...waiting a minute for new experiments
+2024-04-17 21:05:04,261:ePANDA:User commanded shutting down of ePANDA
+2024-04-17 21:05:05,298:ePANDA:Command sent: G01 Z0
+2024-04-17 21:05:05,298:ePANDA:Writing to the mill: G01 Z0
+2024-04-17 21:05:07,299:ePANDA:Returned <Idle|MPos:-242.5,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 21:05:07,299:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 21:05:07,300:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 21:05:07,300:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 21:05:07,300:ePANDA:Target coordinates: [-369.4, -8.2, -50]
+2024-04-17 21:05:07,300:ePANDA:Not moving to Z=0 first
+2024-04-17 21:05:07,301:ePANDA:MPos coordinates: X = -242.5, Y = -90.4, Z = -3.0
+2024-04-17 21:05:07,301:ePANDA:WPos coordinates: X = -239.5, Y = -87.4, Z = 0.0
+2024-04-17 21:05:07,301:ePANDA:Current_coordinates: [-239.5, -87.4, 0.0]
+2024-04-17 21:05:07,302:ePANDA:Command sent: G01 X-369.4
+2024-04-17 21:05:07,302:ePANDA:Writing to the mill: G01 X-369.4
+2024-04-17 21:05:09,318:ePANDA:Returned <Idle|MPos:-372.4,-90.4,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 21:05:09,319:ePANDA:Command sent: G01 Y-8.2
+2024-04-17 21:05:09,320:ePANDA:Writing to the mill: G01 Y-8.2
+2024-04-17 21:05:11,321:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-3.0|Bf:15,127|FS:0,0>
+2024-04-17 21:05:11,321:ePANDA:Command sent: G01 Z-50
+2024-04-17 21:05:11,322:ePANDA:Writing to the mill: G01 Z-50
+2024-04-17 21:05:13,323:ePANDA:Returned <Idle|MPos:-372.4,-11.2,-53.0|Bf:15,127|FS:0,0>
+2024-04-17 21:05:13,323:ePANDA:Disconnecting from instruments:
+2024-04-17 21:05:13,324:ePANDA:Disconnecting from the mill
+2024-04-17 21:05:13,326:ePANDA:Disconnected from instruments
