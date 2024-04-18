@@ -21,9 +21,7 @@ from epanda_lib.experiment_class import (
 )
 
 from epanda_lib.config.config_tools import read_testing_config
-
-SQL_DB_PATH = Path("P:/epanda_dev.db")
-
+from epanda_lib.config.config import SQL_DB_PATH
 
 # region Utility Functions
 def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
@@ -727,6 +725,7 @@ def select_well_characteristics(type_id: int) -> tuple[int, int, int, int, str]:
 # endregion
 
 # region Queue Functions
+
 # Note the queue is a view and not a table, so it cannot be updated directly.
 # Instead the well_hx table is updated with the experiment_id and status.
 # If the status is 'queued' then the experiment is in the queue.
@@ -994,39 +993,7 @@ def insert_experiment(experiment: ExperimentBase) -> None:
     Args:
         experiment (ExperimentBase): The experiment to insert.
     """
-    execute_sql_command_no_return(
-        """
-        INSERT INTO experiments (
-            experiment_id,
-            project_id,
-            project_campaign_id,
-            well_type,
-            protocol_id,
-            pin,
-            experiment_type,
-            jira_issue_key,
-            priority,
-            process_type,
-            filename,
-            created
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            experiment.experiment_id,
-            experiment.project_id,
-            experiment.project_campaign_id,
-            experiment.well_type_number,
-            experiment.protocol_id,
-            experiment.pin,
-            experiment.experiment_type,
-            experiment.jira_issue_key,
-            experiment.priority,
-            experiment.process_type,
-            experiment.filename,
-            datetime.now().isoformat(timespec="seconds"),
-        ),
-    )
+    insert_experiments([experiment])
 
 
 def insert_experiments(experiments: List[ExperimentBase]) -> None:
@@ -1083,30 +1050,31 @@ def insert_experiment_parameters(experiment: ExperimentBase) -> None:
     Args:
         experiment (ExperimentBase): The experiment to insert.
     """
-    experiment_parameters: list[ExperimentParameterRecord] = (
-        experiment.generate_parameter_list()
-    )
-    parameters = [
-        (
-            experiment.experiment_id,
-            parameter.parameter_type,
-            parameter.parameter_value,
-            datetime.now().isoformat(timespec="seconds"),
-        )
-        for parameter in experiment_parameters
-    ]
-    execute_sql_command_no_return(
-        """
-        INSERT INTO experiment_parameters (
-            experiment_id,
-            parameter_name,
-            parameter_value,
-            created
-            )
-        VALUES (?, ?, ?, ?)
-        """,
-        parameters,
-    )
+    # experiment_parameters: list[ExperimentParameterRecord] = (
+    #     experiment.generate_parameter_list()
+    # )
+    # parameters = [
+    #     (
+    #         experiment.experiment_id,
+    #         parameter.parameter_type,
+    #         parameter.parameter_value,
+    #         datetime.now().isoformat(timespec="seconds"),
+    #     )
+    #     for parameter in experiment_parameters
+    # ]
+    # execute_sql_command_no_return(
+    #     """
+    #     INSERT INTO experiment_parameters (
+    #         experiment_id,
+    #         parameter_name,
+    #         parameter_value,
+    #         created
+    #         )
+    #     VALUES (?, ?, ?, ?)
+    #     """,
+    #     parameters,
+    # )
+    insert_experiments_parameters([experiment])
 
 
 def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
@@ -1116,13 +1084,13 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
     Args:
         experiments (List[ExperimentBase]): The experiments to insert.
     """
-    parameters = []
+    parameters_to_insert = [] # this will be a list of tuples of the parameters to insert
     for experiment in experiments:
         experiment_parameters: list[ExperimentParameterRecord] = (
             experiment.generate_parameter_list()
         )
         for parameter in experiment_parameters:
-            parameters.append(
+            parameters_to_insert.append(
                 (
                     experiment.experiment_id,
                     parameter.parameter_type,
@@ -1142,9 +1110,9 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
             parameter_value,
             created
             )
-        VALUES (?, ?, ?,?)
+        VALUES (?, ?, ?, ?)
         """,
-        parameters,
+        parameters_to_insert,
     )
 
 
@@ -1155,35 +1123,36 @@ def update_experiment(experiment: ExperimentBase) -> None:
     Args:
         experiment (ExperimentBase): The experiment to update.
     """
-    execute_sql_command_no_return(
-        """
-        UPDATE experiments
-        SET project_id = ?,
-            project_campaign_id = ?,
-            well_type = ?,
-            protocol_id = ?,
-            pin = ?,
-            experiment_type = ?,
-            jira_issue_key = ?,
-            priority = ?,
-            process_type = ?,
-            filename = ?
-        WHERE experiment_id = ?
-        """,
-        (
-            experiment.project_id,
-            experiment.project_campaign_id,
-            experiment.well_type_number,
-            experiment.protocol_id,
-            experiment.pin,
-            experiment.experiment_type,
-            experiment.jira_issue_key,
-            experiment.priority,
-            experiment.process_type,
-            experiment.filename,
-            experiment.experiment_id,
-        ),
-    )
+    # execute_sql_command_no_return(
+    #     """
+    #     UPDATE experiments
+    #     SET project_id = ?,
+    #         project_campaign_id = ?,
+    #         well_type = ?,
+    #         protocol_id = ?,
+    #         pin = ?,
+    #         experiment_type = ?,
+    #         jira_issue_key = ?,
+    #         priority = ?,
+    #         process_type = ?,
+    #         filename = ?
+    #     WHERE experiment_id = ?
+    #     """,
+    #     (
+    #         experiment.project_id,
+    #         experiment.project_campaign_id,
+    #         experiment.well_type_number,
+    #         experiment.protocol_id,
+    #         experiment.pin,
+    #         experiment.experiment_type,
+    #         experiment.jira_issue_key,
+    #         experiment.priority,
+    #         experiment.process_type,
+    #         experiment.filename,
+    #         experiment.experiment_id,
+    #     ),
+    # )
+    update_experiments([experiment])
 
 
 def update_experiments(experiments: List[ExperimentBase]) -> None:
@@ -1237,19 +1206,43 @@ def update_experiment_status(
     """
     Update the status of an experiment in the experiments table.
 
+    When provided with an int, the experiment_id is the int, and the status and status_date are the other two arguments.
+    If no status is provided, the function will not make assumptions and will do nothing.
+
+    When provided with an ExperimentBase object, the object's attributes will be used to update the status.
+    If an object is provided along with a status and status date, the object's attributes will be updated with the status and status date.
+
     Args:
         experiment_id (int): The experiment ID.
         status (ExperimentStatus): The status to update to.
     """
+    # Handel the case where the experiment is passed as an object or an int
+    # If it is an int, then the experiment_id is the int, and the status and the
+    # status_date are the other two arguments
+    # If it is an object, then use the experimentbase object for the data
     if isinstance(experiment, int):
         experiment_id = experiment
+        if status is None:
+            return
+        if status_date is None:
+            status_date = datetime.now().isoformat(timespec="seconds")
+
+        experiment_info = select_experiment_information(experiment_id)
+        project_id = experiment_info.project_id
+        well_id = experiment_info.well_id
+
     else:
         experiment_id = experiment.experiment_id
-
-    if status is None:
-        status = experiment.status
-    if status_date is None:
-        status_date = experiment.status_date
+        if status is not None:
+            experiment.set_status(status)
+        else:
+            status = experiment.status
+        if status_date is not None:
+            experiment.status_date = status_date
+        else:
+            status_date = experiment.status_date
+        project_id = experiment.project_id
+        well_id = experiment.well_id
 
     execute_sql_command(
         """
@@ -1262,8 +1255,8 @@ def update_experiment_status(
             status.value,
             status_date,
             experiment_id,
-            experiment.project_id,
-            experiment.well_id,
+            project_id,
+            well_id,
         ),
     )
 
@@ -1311,7 +1304,6 @@ def update_experiments_statuses(
 # endregion
 
 # region Result Functions
-
 
 def insert_experiment_results(entry: ExperimentResultsRecord) -> None:
     """
