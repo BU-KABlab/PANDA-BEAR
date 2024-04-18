@@ -258,17 +258,7 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
     Or if no plate_id is provided, all wells of the current wellplate are
     selected.
 
-    The table has columns:
-    plate_id,
-    type_number,
-    well_id,
-    status,
-    status_date,
-    contents,
-    experiment_id,
-    project_id,
-    volume,
-    coordinates
+
     """
     if plate_id is None:
         result = execute_sql_command(
@@ -298,11 +288,11 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
             a.plate_id,
             b.type_id as type_number,
             a.well_id,
-            a.status,
-            a.status_date,
+            d.status,
+            d.status_date,
             a.contents,
             a.experiment_id,
-            a.project_id,
+            d.project_id,
             a.volume,
             a.coordinates,
             c.capacity_ul as capacity,
@@ -312,6 +302,8 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
         ON a.plate_id = b.id
         JOIN well_types as c
         ON b.type_id = c.id
+        JOIN experiments as d
+        ON a.experiment_id = d.experiment_id
         WHERE a.plate_id = ?
             """,
             (plate_id),
@@ -435,23 +427,26 @@ def save_well_to_db(well_to_save: Well) -> None:
         values are different.
     Otherwise insert the well into the table.
     """
+
+    # Update the well_hx table with the well information
     statement = """
         INSERT INTO well_hx (
         plate_id,
         well_id,
         experiment_id,
         project_id,
-        status,
-        status_date,
         contents,
         volume,
         coordinates
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT (plate_id, well_id) DO UPDATE SET
+        ) 
+        
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        
+        ON CONFLICT (plate_id, well_id) 
+        
+        DO UPDATE SET
         experiment_id = excluded.experiment_id,
         project_id = excluded.project_id,
-        status = excluded.status,
-        status_date = excluded.status_date,
         contents = excluded.contents,
         volume = excluded.volume,
         coordinates = excluded.coordinates
@@ -466,11 +461,22 @@ def save_well_to_db(well_to_save: Well) -> None:
         well_to_save.well_id,
         well_to_save.experiment_id,
         well_to_save.project_id,
-        well_to_save.status,
-        well_to_save.status_date,
         json.dumps(well_to_save.contents),
         well_to_save.volume,
         json.dumps(well_to_save.coordinates.to_dict()),
+    )
+    execute_sql_command_no_return(statement, values)
+
+    # Update the experiment with the status and satus date
+    statement = """
+        UPDATE experiments
+        SET status = ?,
+        status_date = ?
+        WHERE experiment_id = ?
+    """
+    values = (
+        well_to_save.status,
+        well_to_save.status_date,
     )
     execute_sql_command_no_return(statement, values)
 
@@ -487,8 +493,6 @@ def save_wells_to_db(wells_to_save: List[Well]) -> None:
         well_id,
         experiment_id,
         project_id,
-        status,
-        status_date,
         contents,
         volume,
         coordinates
@@ -522,6 +526,16 @@ def save_wells_to_db(wells_to_save: List[Well]) -> None:
                 json.dumps(well.coordinates.to_dict()),
             )
         )
+    execute_sql_command_no_return(statement, values)
+
+    # Update the experiment with the status and satus date
+    statement = """
+        UPDATE experiments
+        SET status = ?,
+        status_date = ?
+        WHERE experiment_id = ?
+    """
+    values = [(well.status, well.status_date, well.experiment_id) for well in wells_to_save]
     execute_sql_command_no_return(statement, values)
 
 
@@ -769,7 +783,7 @@ def get_next_experiment_from_queue(random_pick: bool = False) -> tuple[int, int,
     if random_pick:
         result = execute_sql_command(
             """
-            SELECT experiment_id, process_type, filename, project_id, well_id FROM queue
+            SELECT experiment_id, process_type, filename, project_id FROM queue
             WHERE priority = (SELECT MIN(priority) FROM queue)
             AND status = 'queued'
             ORDER BY RANDOM()
@@ -779,7 +793,7 @@ def get_next_experiment_from_queue(random_pick: bool = False) -> tuple[int, int,
     else:
         result = execute_sql_command(
             """
-            SELECT experiment_id, process_type, filename, project_id, well_id FROM queue
+            SELECT experiment_id, process_type, filename, project_id FROM queue
             WHERE priority = (SELECT MIN(priority) FROM queue)
             AND status = 'queued'
             ORDER BY experiment_id ASC
@@ -789,7 +803,7 @@ def get_next_experiment_from_queue(random_pick: bool = False) -> tuple[int, int,
 
     if result == []:
         return None
-    return result[0][0], result[0][1], result[0][2], result[0][3], result[0][4]
+    return result[0][0], result[0][1], result[0][2], result[0][3]
 
 
 def clear_queue() -> None:

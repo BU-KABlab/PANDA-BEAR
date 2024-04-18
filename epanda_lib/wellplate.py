@@ -287,7 +287,7 @@ class Wellplate:
         orientation: int = 0,
         columns: str = "ABCDEFGH",
         rows: int = 13,
-        type_number: int = 3,
+        type_number: int = 4,
         new_well_plate: bool = False,
         plate_id: int = None,
     ) -> None:
@@ -507,7 +507,6 @@ class Wellplate:
         if not isinstance(new_coordinates, WellCoordinates):
             raise TypeError("Coordinates must be a WellCoordinates object")
         self.wells[well_id.upper()].coordinates = new_coordinates
-        self.wells[well_id.upper()].save_to_db()
 
     def get_contents(self, well_id: str) -> dict:
         """Return the contents of a specific well"""

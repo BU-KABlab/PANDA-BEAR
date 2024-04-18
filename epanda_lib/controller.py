@@ -212,7 +212,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False):
             ## Update the experiment status to running
             new_experiment.plate_id = toolkit.wellplate.plate_id
             new_experiment.well = toolkit.wellplate.wells[new_experiment.well_id]
-            new_experiment.plate_id = toolkit.wellplate.plate_id
             new_experiment.well.plate_id = toolkit.wellplate.plate_id
             new_experiment.well.experiment_id = new_experiment.experiment_id
             new_experiment.well.project_id = new_experiment.project_id

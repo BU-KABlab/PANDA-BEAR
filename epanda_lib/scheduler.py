@@ -104,6 +104,7 @@ class Scheduler:
             Tuple[ExperimentBase]: The next experiment.
         """
         # Get the next experiment from the queue
+        
         try:
             queue_info = sql_utilities.get_next_experiment_from_queue(random_pick)
         except sqlite3.Error as e:
@@ -117,12 +118,16 @@ class Scheduler:
             return None, None
 
         else:
-            experiment_id, _, filename, _ = queue_info
+            experiment_id, _, filename, _, well_id = queue_info
         # Get the experiment information from the experiment table
         experiment_base = sql_utilities.select_experiment_information(experiment_id)
         echem_experiment_base = sql_utilities.select_experiment_paramaters(
             experiment_base
         )
+
+        # Finally get the well id and plate id for the experiment based on the well_status view
+        echem_experiment_base.well_id = well_id
+
         return echem_experiment_base, filename
 
     def update_experiment_queue_priority(self, experiment_id: int, priority: int):

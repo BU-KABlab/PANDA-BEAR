@@ -270,6 +270,7 @@ def calibrate_wells(
                     wellplate.save_wells_to_db() #FIXME: this might be redundant
             else: # Update the well with new well coordinates
                 wellplate.set_coordinates(well_id, new_coordinates)
+                wellplate.save_wells_to_db() #FIXME: this might be redundant
 
 
 def calibrate_z_bottom_of_wellplate(
