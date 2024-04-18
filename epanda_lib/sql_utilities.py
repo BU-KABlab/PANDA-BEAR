@@ -6,9 +6,6 @@ from typing import List, Union
 from pathlib import Path
 import json
 import csv
-from enum import Enum
-
-# import time
 
 from epanda_lib.wellplate import Well, WellCoordinates  # , WellCoordinatesEncoder
 from epanda_lib.experiment_class import (
@@ -22,7 +19,7 @@ from epanda_lib.experiment_class import (
 
 from epanda_lib.config.config_tools import read_testing_config
 from epanda_lib.config.config import SQL_DB_PATH
-
+from epanda_lib.utilities import SystemState
 # region Utility Functions
 def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
     """
@@ -1484,18 +1481,18 @@ def __process_well_hx_csv_into_table():
 # endregion
 
 
-# region System State Classes and Functions
-class SystemState(Enum):
-    """Class for naming of the system states"""
+# # region System State Classes and Functions
+# class SystemState(Enum):
+#     """Class for naming of the system states"""
 
-    IDLE = "idle"
-    BUSY = "running"
-    ERROR = "error"
-    ON = "on"
-    OFF = "off"
-    SHUTDOWN = "shutdown"
-    RESUME = "resume"
-    PAUSE = "pause"
+#     IDLE = "idle"
+#     BUSY = "running"
+#     ERROR = "error"
+#     ON = "on"
+#     OFF = "off"
+#     SHUTDOWN = "shutdown"
+#     RESUME = "resume"
+#     PAUSE = "pause"
 
 
 def select_system_status(look_back:int = 1) -> SystemState:

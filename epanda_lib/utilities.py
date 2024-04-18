@@ -28,7 +28,6 @@ class Instruments(Enum):
     LENS = "lens"
 
 
-@dataclasses.dataclass
 class SystemState(Enum):
     """Class for naming of the system states"""
 
@@ -40,6 +39,8 @@ class SystemState(Enum):
     TESTING = "testing"
     CALIBRATING = "calibrating"
     SHUTDOWN = "shutdown"
+    PAUSED = "paused"
+    RESUME = "resume"
 
 
 @dataclasses.dataclass
