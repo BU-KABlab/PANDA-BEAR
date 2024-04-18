@@ -22,6 +22,7 @@ from epanda_lib import (
     wellplate,
     print_panda
 )
+from epanda_lib import sql_utilities
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import read_testing_config, write_testing_config
 from epanda_lib.sql_utilities import set_system_status
@@ -61,7 +62,19 @@ def remove_experiment_from_database():
     set_system_status(
         SystemState.BUSY, "removing experiment from database", read_testing_config()
     )
-    wellplate._remove_experiment_from_db(experiment_to_remove)   
+    wellplate._remove_experiment_from_db(experiment_to_remove)
+
+def print_wellplate_info():
+    """Prints a summary of the current wellplate."""
+
+def print_queue_info():
+    """Prints a summary of the current queue."""
+    current_queue = sql_utilities.select_queue()
+    print("Current Queue:")
+    for experiment in current_queue:
+        print(experiment)
+
+    input("Press Enter to continue...")
 
 def reset_vials_stock():
     """Resets the stock vials."""
@@ -180,6 +193,8 @@ options = {
     "2": change_wellplate,
     "2.1": remove_wellplate_from_database,
     "2.2": remove_experiment_from_database,
+    "2.3": print_wellplate_info,
+    "2.4": print_queue_info,
     "3": reset_vials_stock,
     "4": reset_vials_waste,
     "5": input_new_vial_values_stock,
