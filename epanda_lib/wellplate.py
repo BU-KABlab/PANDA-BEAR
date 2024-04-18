@@ -536,12 +536,12 @@ class Wellplate:
             raise KeyError(f"Well {well_id} not found")
 
     def set_coordinates(self, well_id: str, new_coordinates: WellCoordinates) -> None:
-        """Sets the coordinates of a specific well in memory and writes to the status file"""
+        """Sets the coordinates of a specific well in memory and in the db"""
         # validate the coordinates
         if not isinstance(new_coordinates, WellCoordinates):
             raise TypeError("Coordinates must be a WellCoordinates object")
         self.wells[well_id.upper()].coordinates = new_coordinates
-        # self.write_well_status_to_file()
+        self.wells[well_id.upper()].save_to_db()
 
     def get_contents(self, well_id: str) -> dict:
         """Return the contents of a specific well"""

@@ -3,7 +3,7 @@ from typing import Sequence
 import os
 
 from .mill_control import Mill, MockMill
-from .utilities import Coordinates, Instruments
+from .utilities import Instruments
 from .vials import StockVial, WasteVial
 from .wellplate import WellCoordinates, Wellplate, Well
 
@@ -76,79 +76,81 @@ def check_mill_settings(
             print("Settings have not been applied")
 
 
-def calibrate_wellplate(
-    mill: Mill,
-    wellplate: Wellplate,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
-):
-    """Calibrate the wellplate to the mill
+# def calibrate_wellplate(
+#     mill: Mill,
+#     wellplate: Wellplate,
+#     stock_vials: Sequence[StockVial],
+#     waste_vials: Sequence[WasteVial],
+# ):
+#     """
+#     Calibrate the wellplate to the mill, this will set the x and y coordinates
+#     of all well locations in the wellplate object based on the user input.
 
-    Args:
-        wellplate (Wellplate): _description_
-        mill (Mill): _description_
-    """
-    # Enter well choice loop
-    while True:
-        well_id = input("Enter the well ID to test (e.g., A1) or done to end: ").lower()
-        if well_id == "done":
-            break
+#     Args:
+#         wellplate (Wellplate)
+#         mill (Mill)
+#     """
+#     # Enter well choice loop
+#     while True:
+#         well_id = input("Enter the well ID to test (e.g., A1) or done to end: ").lower()
+#         if well_id == "done":
+#             break
 
-        # Provide the current coordinates of the well
-        original_coordinates = wellplate.get_coordinates(well_id)
-        print(f"Current coordinates of {well_id}: {original_coordinates}")
+#         # Provide the current coordinates of the well
+#         original_coordinates = wellplate.get_coordinates(well_id)
+#         print(f"Current coordinates of {well_id}: {original_coordinates}")
 
-        # Move the pipette to the top of the well
-        mill.safe_move(
-            original_coordinates["x"],
-            original_coordinates["y"],
-            wellplate.z_top,
-            Instruments.PIPETTE,
-        )
+#         # Move the pipette to the top of the well
+#         mill.safe_move(
+#             original_coordinates["x"],
+#             original_coordinates["y"],
+#             wellplate.z_top,
+#             Instruments.PIPETTE,
+#         )
 
-        # Enter confirmation loop
-        while True:
-            current_coorinates = Coordinates(
-                original_coordinates["x"],
-                original_coordinates["y"],
-                z=wellplate.z_top,
-            )
-            confirm = input("Is the pipette in the correct position? (yes/no): ").lower().strip()[0]
-            if confirm.lower() == "y":
-                break
-            print(f"Current coordinates of {well_id}: {current_coorinates}")
-            new_coordinates = Coordinates(
-                float(input(f"Enter the new x coordinate for {well_id}: ")),
-                float(input(f"Enter the new y coordinate for {well_id}: ")),
-                z=wellplate.z_top,
-            )
+#         # Enter confirmation loop
+#         while True:
+#             current_coorinates = Coordinates(
+#                 original_coordinates["x"],
+#                 original_coordinates["y"],
+#                 z=wellplate.z_top,
+#             )
+#             confirm = input("Is the pipette in the correct position? (yes/no): ").lower().strip()[0]
+#             if confirm.lower() == "y":
+#                 break
+#             print(f"Current coordinates of {well_id}: {current_coorinates}")
+#             new_coordinates = Coordinates(
+#                 float(input(f"Enter the new x coordinate for {well_id}: ")),
+#                 float(input(f"Enter the new y coordinate for {well_id}: ")),
+#                 z=wellplate.z_top,
+#             )
 
-            # Safe move to the new coordinates
-            mill.safe_move(
-                new_coordinates.x,
-                new_coordinates.y,
-                wellplate.z_top,
-                Instruments.PIPETTE,
-            )
+#             # Safe move to the new coordinates
+#             mill.safe_move(
+#                 new_coordinates.x,
+#                 new_coordinates.y,
+#                 wellplate.z_top,
+#                 Instruments.PIPETTE,
+#             )
 
-        coord_diff = Coordinates(
-            new_coordinates.x - original_coordinates["x"],
-            new_coordinates.y - original_coordinates["y"],
-            z=0,
-        )
+#         coord_diff = Coordinates(
+#             new_coordinates.x - original_coordinates["x"],
+#             new_coordinates.y - original_coordinates["y"],
+#             z=0,
+#         )
 
-        # Save the new coordinates to the wellplate object for that well
-        # wellplate.set_coordinates(well_id, new_coordinates)
-        # For now we will not be setting individual well coordinates
-        # Instead we will set the coordinates for the entire wellplate, specifically A1 and then recalculate the rest
-        a1_coordinates = wellplate.get_coordinates("A1")
-        a1_coordinates["x"] += coord_diff.x
-        a1_coordinates["y"] += coord_diff.y
+#         # Save the new coordinates to the wellplate object for that well
+#         # wellplate.set_coordinates(well_id, new_coordinates)
+#         # For now we will not be setting individual well coordinates
+#         # Instead we will set the coordinates for the entire wellplate, specifically A1 and then recalculate the rest
+#         a1_coordinates = wellplate.get_coordinates("A1")
+#         a1_coordinates["x"] += coord_diff.x
+#         a1_coordinates["y"] += coord_diff.y
 
-        wellplate.a1_x = a1_coordinates["x"]
-        wellplate.a1_y = a1_coordinates["y"]
-        wellplate.write_wellplate_location()
-        wellplate.recalculate_well_locations()
+#         wellplate.a1_x = a1_coordinates["x"]
+#         wellplate.a1_y = a1_coordinates["y"]
+#         wellplate.write_wellplate_location()
+#         wellplate.recalculate_well_locations()
 
 
 def calibrate_wells(
@@ -157,7 +159,18 @@ def calibrate_wells(
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
 ):
-    """Calibrate the locations of the individual wells in the wellplate"""
+    """
+    Calibrate the locations of the individual wells in the wellplate using either
+    the pipette or the electrode.
+    This will set the x and y coordinates of ONLY the selected wells, leaving
+    the rest unchanged, unless the user chooses to recalculate all well locations.
+    This is useful for when a single well is off and needs to be corrected.
+
+    Args:
+        mill (Mill)
+        wellplate (Wellplate)
+
+    """
     # Enter well choice loop
     instrument = Instruments.PIPETTE
     while True:
@@ -197,16 +210,16 @@ def calibrate_wells(
                 z_top=wellplate.z_top,
             )
             instrument: Instruments
-            confirm = input(f"Is the {(instrument.value)}  in the correct position? (yes/no): ").lower().strip()[0]
-            if confirm in ["y",""]:
+            confirm = input(f"Is the {(instrument.value)}  in the correct position? (yes/no): ")
+            if confirm is None or confirm.lower().strip()[0] in ["y",""]:
                 break
             print(f"Current coordinates of {well_id}: {current_coorinates}") #change to be the corrected coordinates if they have been changed
             coordinates_changed = True
             # gather new coordinates and test them for validity before trying to set them
             # enter validation loop
             while True:
-                new_x = input(f"Enter the new x coordinate for {well_id} or enter for no change: ")
-                new_y = input(f"Enter the new y coordinate for {well_id} or enter for no change: ")
+                new_x = input(f"Enter the new X coordinate for {well_id} or enter for no change: ")
+                new_y = input(f"Enter the new Y coordinate for {well_id} or enter for no change: ")
 
                 if new_x == "":
                     new_x = original_coordinates["x"]
@@ -249,16 +262,14 @@ def calibrate_wells(
         if coordinates_changed:
             if well_id.upper() == "A1":
                 recalc = input("Would you like to recalculate all well locations? (y/n): ")
-                if recalc.lower() == "y":
+                if recalc[0].lower() == "y":
                     wellplate.a1_x = new_coordinates.x
                     wellplate.a1_y = new_coordinates.y
                     wellplate.write_wellplate_location()
                     wellplate.recalculate_well_locations()
-                    wellplate.write_well_status_to_file()
-            else: # Update the well status file with the new well coordinates
+                    wellplate.save_wells_to_db() #FIXME: this might be redundant
+            else: # Update the well with new well coordinates
                 wellplate.set_coordinates(well_id, new_coordinates)
-                #wellplate.write_well_status_to_file()
-                wellplate.wells[well_id].save_to_db()
 
 
 def calibrate_z_bottom_of_wellplate(
@@ -353,12 +364,37 @@ def calibrate_vials(
     # Same process as the stock vials
     pass
 
+def calibrate_camera_focus(
+    mill: Mill,
+    wellplate: Wellplate,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+):
+    """Calibrate the camera focus"""
+    # Move the camera to the top of the wellplate
+    mill.safe_move(
+        wellplate.get_coordinates("A1", "x"),
+        wellplate.get_coordinates("A1", "y"),
+        wellplate.z_top,
+        Instruments.LENS,
+    )
+
+    # lower to the wellplate's image height
+    mill.safe_move(
+        wellplate.get_coordinates("A1", "x"),
+        wellplate.get_coordinates("A1", "y"),
+        wellplate.image_height,
+        Instruments.LENS,
+    )
+    # pause for the user to focus the camera
+    input("Focus the camera using FlyCapture2 and press enter to continue")
+
 
 def home_mill(
     mill: Mill,
     wellplate: Wellplate,
     stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
+    waste_vials: Sequence[WasteVial]
 ):
     """Home the mill"""
     mill.home()
@@ -368,10 +404,10 @@ def home_mill(
 options = {
     "0": check_mill_settings,
     "1": home_mill,
-    # "2": calibrate_wellplate,
     "3": calibrate_wells,
     "4": calibrate_z_bottom_of_wellplate,
     # "5": calibrate_vials,
+    "6": calibrate_camera_focus,
     "q": 'quit',
 }
 
