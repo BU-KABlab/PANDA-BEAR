@@ -252,40 +252,6 @@ class Well(Vessel):
         """Inserts or Updates the well in the database"""
         logger.info("Saving well %s to the database", self.name)
         try:
-        #     statement = """
-        #     INSERT INTO well_hx (
-        #     plate_id,
-        #     well_id,
-        #     experiment_id,
-        #     project_id,
-        #     status,
-        #     status_date,
-        #     contents,
-        #     volume,
-        #     coordinates
-        #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        #     ON CONFLICT (plate_id, well_id) DO UPDATE SET
-        #     experiment_id = excluded.experiment_id,
-        #     project_id = excluded.project_id,
-        #     status = excluded.status,
-        #     status_date = excluded.status_date,
-        #     contents = excluded.contents,
-        #     volume = excluded.volume,
-        #     coordinates = excluded.coordinates
-        # """
-
-        #     values = (
-        #         self.plate_id,
-        #         self.well_id,
-        #         self.experiment_id,
-        #         self.project_id,
-        #         self.status,
-        #         self.status_date,
-        #         json.dumps(self.contents),
-        #         self.volume,
-        #         json.dumps(self.coordinates.to_dict()),
-        #     )
-        #     sql_utilities.execute_sql_command_no_return(statement, values)
             sql_utilities.save_well_to_db(self)
             logger.info("Well %s saved to the database", self.name)
         except Exception as e:
@@ -1018,6 +984,7 @@ def load_new_wellplate(
 
     ## Check if the wellplate exists in the well_hx table
     already_exists = sql_utilities.check_if_wellplate_exists(new_plate_id)
+    logger.debug("Wellplate exists: %s", already_exists)
     if not already_exists:
         sql_utilities.add_wellplate_to_table(new_plate_id, new_wellplate_type_number)
         sql_utilities.update_current_wellplate(new_plate_id)
