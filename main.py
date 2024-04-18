@@ -9,6 +9,7 @@ Or starting the ePANDA either with or without mock instruments.
 import os
 import sys
 import time
+from tracemalloc import stop
 
 from epanda_lib import (
     camera_call_camera,
@@ -186,10 +187,24 @@ def refresh():
     """
     Refreshes the main menue. Re-read the current wellplate info, and queue."""
 
+def stop_epanda():
+    """Stops the ePANDA loop."""
+    sql_utilities.set_system_status(SystemState.SHUTDOWN, "stopping ePANDA", read_testing_config())
+
+def pause_epanda():
+    """Pauses the ePANDA loop."""
+    sql_utilities.set_system_status(SystemState.PAUSED, "stopping ePANDA", read_testing_config())
+
+def resume_epanda():
+    """Resumes the ePANDA loop."""
+    sql_utilities.set_system_status(SystemState.RESUME, "stopping ePANDA", read_testing_config())
 
 options = {
-    # '0': run_epanda,
+    
     "1": run_epanda,
+    "1.1": stop_epanda,
+    "1.2": pause_epanda,
+    "1.3": resume_epanda,
     "2": change_wellplate,
     "2.1": remove_wellplate_from_database,
     "2.2": remove_experiment_from_database,
