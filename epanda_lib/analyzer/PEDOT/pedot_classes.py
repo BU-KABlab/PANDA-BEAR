@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 @dataclass
-class MLInput:
+class RequiredData:
     """Input data for the PEDOT analysis and ML model"""
     experiment_id: int
     ca_step_1_voltage: float
@@ -45,7 +45,7 @@ class PEDOTMetrics:
     ElectrochromicEfficiency: float
 
 @dataclass
-class PlottingValues:
+class MLInput:
     """Input data for the ML model"""
     experiment_id: int
     ca_step_1_voltage: float

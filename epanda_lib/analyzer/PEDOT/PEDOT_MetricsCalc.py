@@ -7,7 +7,7 @@ import re
 import pandas as pd
 from scipy.integrate import trapezoid
 
-from .pedot_classes import MLInput, PEDOTMetrics, RawMetrics
+from .pedot_classes import RequiredData, PEDOTMetrics, RawMetrics
 
 
 def modify_function(value):
@@ -144,7 +144,7 @@ def get_exp_id(filename):
         return None
 
 
-def process_metrics(metrics: RawMetrics, input_df: MLInput) -> PEDOTMetrics:
+def process_metrics(metrics: RawMetrics, input_df: RequiredData) -> PEDOTMetrics:
     """
     Process the metrics to calculate the deposition efficiency and
     electrochromic efficiency.

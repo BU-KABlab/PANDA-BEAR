@@ -6,13 +6,13 @@ from . import PEDOT_FindLAB as lab
 from . import PEDOT_MetricsCalc as met
 from .experiment_generator import pedot_generator
 from .ml_input import populate_required_information as analysis_input
-from .pedot_classes import MLInput, PEDOTMetrics, PlottingValues, RawMetrics
+from .pedot_classes import RequiredData, PEDOTMetrics, MLInput, RawMetrics
 
 
-def pedot_analyzer(experiment_id: int) -> PlottingValues:
+def pedot_analyzer(experiment_id: int) -> MLInput:
     """Analyzes the PEDOT experiment."""
 
-    input_data:MLInput = analysis_input(experiment_id)
+    input_data:RequiredData = analysis_input(experiment_id)
     metrics = lab.rgbtolab(input_data)
     results = met.process_metrics(input_data, metrics)
 
@@ -41,7 +41,7 @@ def pedot_analyzer(experiment_id: int) -> PlottingValues:
     for metric in list_of_pedot_metrics:
         insert_experiment_results(metric)
 
-    pv = PlottingValues(
+    ml_input = MLInput(
         experiment_id=results.experiment_id,
         ca_step_1_voltage=input_data.ca_step_1_voltage,
         ca_step_1_time=input_data.ca_step_1_time,
@@ -51,11 +51,11 @@ def pedot_analyzer(experiment_id: int) -> PlottingValues:
         DepositionEfficiency=results.DepositionEfficiency,
         ElectrochromicEfficiency=results.ElectrochromicEfficiency,
     )
-    return pv
+    return ml_input
 
 
 def main(experiment_id:int = 1):
     """Main function for the PEDOT analyzer."""
-    plotting_values = pedot_analyzer(experiment_id)
+    ml_input = pedot_analyzer(experiment_id)
     # ML model goes here and accepts plotting_values as input, then outputs the ML output
     pedot_generator(ml_output, experiment_name="PEDOT_Analysis", campaign_id=0)

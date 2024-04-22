@@ -1,7 +1,7 @@
 from epanda_lib import sql_utilities
 from epanda_lib.config.config_tools import read_testing_config
 import pandas as pd
-from .pedot_classes import MLInput
+from .pedot_classes import RequiredData
 
 # pylint: disable=invalid-name
 
@@ -15,7 +15,7 @@ data = {
 
 df = pd.DataFrame(data)
 
-def populate_required_information(experiment_id: int) -> MLInput:
+def populate_required_information(experiment_id: int) -> RequiredData:
     """Populates the required information for the machine learning input."""
     sql_utilities.set_system_status(
         sql_utilities.SystemState.BUSY, "analyzing data", read_testing_config()
@@ -46,7 +46,7 @@ def populate_required_information(experiment_id: int) -> MLInput:
     )
 
     # Convert the df into a MLInput object
-    results = MLInput(
+    results = RequiredData(
         experiment_id=df.loc[df['name'] == 'experiment_id', 'value'].values[0],
         ca_step_1_voltage=df.loc[df['name'] == 'ca_step_1_voltage', 'value'].values[0],
         ca_step_1_time=df.loc[df['name'] == 'ca_step_1_time', 'value'].values[0],

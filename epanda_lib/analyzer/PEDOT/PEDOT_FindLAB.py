@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 from skimage import color
 from skimage.color.delta_e import deltaE_ciede2000
 
-from .pedot_classes import MLInput, RawMetrics
+from .pedot_classes import RequiredData, RawMetrics
 
 
 def extract_circular_region(image_path, radius=300, show_region=True) -> np.ndarray:
@@ -50,7 +50,7 @@ def extract_circular_region(image_path, radius=300, show_region=True) -> np.ndar
     return np.mean(masked_pixels, axis=0)
 
 
-def rgbtolab(inputs: MLInput) -> RawMetrics:
+def rgbtolab(inputs: RequiredData) -> RawMetrics:
     """Converts RGB images to LAB color space and calculates Delta E00 values."""
     experiment_id: int = inputs.experiment_id
     images_by_exp_id: dict = {}.setdefault(
