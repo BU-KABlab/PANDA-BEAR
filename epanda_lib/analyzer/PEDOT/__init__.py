@@ -3,7 +3,8 @@
 from pathlib import Path
 import pandas as pd
 from epanda_lib.sql_utilities import (ExperimentResultsRecord,
-                                      insert_experiment_result)
+                                      insert_experiment_result,
+                                      read_testing_config)
 
 from . import PEDOT_FindLAB as lab
 from . import PEDOT_MetricsCalc as met
@@ -68,28 +69,33 @@ def pedot_analyzer(experiment_id: int) -> MLTrainingData:
 
 def main(experiment_id:int = None):
     """Main function for the PEDOT analyzer."""
-    # Get the experiment ID
-    if experiment_id is None:
-        experiment_id = determine_next_experiment_id() - 1
+    testing = read_testing_config()
 
-    # Analyze the experiment
-    ml_training_data = pedot_analyzer(experiment_id)
+    if not testing:
+        # Get the experiment ID
+        if experiment_id is None:
+            experiment_id = determine_next_experiment_id() - 1
 
-    # Add the new training data to the training file
-    df_new_training_data = pd.DataFrame({
-        'deltaE': [ml_training_data.deltaE00],
-        'voltage': [ml_training_data.ca_step_1_voltage],
-        'time': [ml_training_data.ca_step_1_time],
-        'bleachCP': [ml_training_data.BleachChargePassed],
-        'concentration': [ml_training_data.edot_concentration],
-    }
-    )
-    df_new_training_data.to_csv(
-        ml_file_paths.training_file_path,
-        mode='a',
-        header=False,
-        index=False
-    )
+        # Analyze the experiment
+        ml_training_data = pedot_analyzer(experiment_id)
+
+        # Add the new training data to the training file
+        df_new_training_data = pd.DataFrame({
+            'deltaE': [ml_training_data.deltaE00],
+            'voltage': [ml_training_data.ca_step_1_voltage],
+            'time': [ml_training_data.ca_step_1_time],
+            'bleachCP': [ml_training_data.BleachChargePassed],
+            'concentration': [ml_training_data.edot_concentration],
+        }
+        )
+        # Add to the training data file
+        df_new_training_data.to_csv(
+            ml_file_paths.training_file_path,
+            mode='a',
+            header=False,
+            index=False
+        )
+    
 
     # Run the ML model
     results = pedot_model(
