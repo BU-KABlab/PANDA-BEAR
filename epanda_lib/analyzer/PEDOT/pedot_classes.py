@@ -45,7 +45,7 @@ class PEDOTMetrics:
     ElectrochromicEfficiency: float
 
 @dataclass
-class MLInput:
+class MLTrainingData:
     """Input data for the ML model"""
     experiment_id: int
     ca_step_1_voltage: float
@@ -57,9 +57,28 @@ class MLInput:
     ElectrochromicEfficiency: float
 
 @dataclass
+class MLInput:
+    """The filepaths for the ML model's data and supporting files"""
+    training_file_path: Path
+    model_base_path: Path
+    counter_file_path: Path
+    BestTestPointsCSV: Path
+    contourplots_path: Path
+
+@dataclass
+class MLOutput:
+    """Output of the ML model"""
+    v_dep: float
+    t_dep: float
+    edot_concentration: float
+    predicted_mean: float
+    predicted_stddev: float
+
+@dataclass
 class PEDOTParams:
     """Parameters for PEDOT experiments"""
-    well_letter: str = None
-    well_number: int = None
     dep_v: float
     dep_t: float
+    well_letter: str = None
+    well_number: int = None
+    concentration: float = 0.1

@@ -4,6 +4,7 @@ The main menue of ePANDA.
 Useful for one-off tasks that don't require the full ePANDA program to run.
 Or starting the ePANDA either with or without mock instruments.
 """
+
 # pylint: disable=broad-exception-caught, protected-access
 
 import os
@@ -20,13 +21,16 @@ from epanda_lib import (
     scheduler,
     vials,
     wellplate,
-    print_panda
+    print_panda,
 )
 from epanda_lib import sql_utilities
+from epanda_lib.analyzer.pedot.pedot_classes import MLOutput
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import read_testing_config, write_testing_config
 from epanda_lib.sql_utilities import set_system_status
 from epanda_lib.utilities import SystemState
+import epanda_lib.analyzer.pedot as pedot_analysis
+
 
 def run_epanda_with_ml():
     """Runs ePANDA."""
@@ -59,6 +63,7 @@ def remove_wellplate_from_database():
     )
     wellplate._remove_wellplate_from_db(plate_to_remove)
 
+
 def remove_experiment_from_database():
     """Removes a user provided experiment from the database."""
     experiment_to_remove = int(
@@ -69,8 +74,10 @@ def remove_experiment_from_database():
     )
     wellplate._remove_experiment_from_db(experiment_to_remove)
 
+
 def print_wellplate_info():
     """Prints a summary of the current wellplate."""
+
 
 def print_queue_info():
     """Prints a summary of the current queue."""
@@ -80,6 +87,7 @@ def print_queue_info():
         print(experiment)
 
     input("Press Enter to continue...")
+
 
 def reset_vials_stock():
     """Resets the stock vials."""
@@ -180,6 +188,35 @@ def test_camera():
     camera_call_camera.capture_new_image()
 
 
+def generate_experiment_from_existing_data():
+    """Generates an experiment from existing data using the ML model."""
+    set_system_status(SystemState.BUSY, "generating experiment", read_testing_config())
+    output = pedot_analysis.pedot_model(
+        pedot_analysis.ml_file_paths.training_file_path,
+        pedot_analysis.ml_file_paths.model_base_path,
+        pedot_analysis.ml_file_paths.counter_file_path,
+        pedot_analysis.ml_file_paths.BestTestPointsCSV,
+        pedot_analysis.ml_file_paths.contourplots_path,
+    )
+    output = MLOutput(*output)
+
+    print(
+        f"V_dep: {output.v_dep}, T_dep: {output.t_dep}, EDOT Concentration: {output.edot_concentration}"
+    )
+    usr_choice = (
+        input("Would you like to add an experiment with these values? (y/n): ")
+        .strip()
+        .lower()
+    )
+    if usr_choice[0] == "y":
+        pedot_analysis.pedot_generator(
+            output.v_dep, output.t_dep, output.edot_concentration
+        )
+    else:
+        print("Experiment not added.")
+        return
+
+
 def exit_program():
     """Exits the program."""
     set_system_status(SystemState.OFF, "exiting ePANDA", read_testing_config())
@@ -191,17 +228,27 @@ def refresh():
     """
     Refreshes the main menue. Re-read the current wellplate info, and queue."""
 
+
 def stop_epanda():
     """Stops the ePANDA loop."""
-    sql_utilities.set_system_status(SystemState.SHUTDOWN, "stopping ePANDA", read_testing_config())
+    sql_utilities.set_system_status(
+        SystemState.SHUTDOWN, "stopping ePANDA", read_testing_config()
+    )
+
 
 def pause_epanda():
     """Pauses the ePANDA loop."""
-    sql_utilities.set_system_status(SystemState.PAUSE, "stopping ePANDA", read_testing_config())
+    sql_utilities.set_system_status(
+        SystemState.PAUSE, "stopping ePANDA", read_testing_config()
+    )
+
 
 def resume_epanda():
     """Resumes the ePANDA loop."""
-    sql_utilities.set_system_status(SystemState.RESUME, "stopping ePANDA", read_testing_config())
+    sql_utilities.set_system_status(
+        SystemState.RESUME, "stopping ePANDA", read_testing_config()
+    )
+
 
 options = {
     "0": run_epanda_with_ml,
@@ -223,6 +270,7 @@ options = {
     "9": calibrate_mill,
     "9.1": change_wellplate_location,
     "11": test_camera,
+    "12": generate_experiment_from_existing_data,
     "r": refresh,
     "q": exit_program,
 }
@@ -262,12 +310,14 @@ if __name__ == "__main__":
 
         except controller.OCPFailure:
             slack = controller.SlackBot()
-            slack.send_slack_message('alert',"OCP Failure has occured. Please check the system.")
+            slack.send_slack_message(
+                "alert", "OCP Failure has occured. Please check the system."
+            )
             channel_id = slack.channel_id("alert")
-            slack._take_screenshot(channel_id,'webcam')
-            slack._take_screenshot(channel_id,'vials')
+            slack._take_screenshot(channel_id, "webcam")
+            slack._take_screenshot(channel_id, "vials")
             time.sleep(5)
-            slack.send_slack_message('alert',"Would you like to continue? (y/n): ")
+            slack.send_slack_message("alert", "Would you like to continue? (y/n): ")
             while True:
                 usr_choice = slack.check_latest_message(channel_id)[0].strip().lower()
                 if usr_choice == "y":

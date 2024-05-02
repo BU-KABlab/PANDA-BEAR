@@ -7,14 +7,14 @@ from .pedot_classes import PEDOTParams
 
 PROJECT_ID = 16
 
-def pedot_generator(params: PEDOTParams, experiment_name = "PEDOT_Analysis", campaign_id = 0):
+def pedot_generator(params: PEDOTParams, experiment_name = "PEDOT_Optimization", campaign_id = 0):
     """Generates a PEDOT experiment."""
     experiment_id = determine_next_experiment_id()
     experiments: list[experiment_class.EdotExperiment] = []
     experiments.append(
         experiment_class.EdotExperiment(
             experiment_id=experiment_id,
-            protocol_id=13, #PEDOT protocol
+            protocol_id=15, #PEDOT protocol v4
             well_id="A1", #Default to A1, let the program decide where else to put it
             well_type_number=4,
             experiment_name=experiment_name,
@@ -39,7 +39,7 @@ def pedot_generator(params: PEDOTParams, experiment_name = "PEDOT_Analysis", cam
             ca_step_2_voltage=0.0,
             ca_step_2_time=0.0,
             ca_sample_rate=0.5,
-            edot_concentration=0.01,
+            edot_concentration=params.concentration,
         )
     )
 

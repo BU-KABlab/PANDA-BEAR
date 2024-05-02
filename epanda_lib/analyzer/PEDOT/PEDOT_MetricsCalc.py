@@ -185,7 +185,14 @@ def process_metrics(metrics: RawMetrics, input_df: RequiredData) -> PEDOTMetrics
             dep_eff = calc_dep_eff(charge, capacitance)
             echromic_eff = calc_echromic_eff(bleach_charge, delta_e00)
 
-            calculated_metrics = PEDOTMetrics(
+        else:
+            print(
+                f"Processing incomplete for experiment_ID {input_df.experiment_id} due to earlier errors."
+            )
+            dep_eff = None
+            echromic_eff = None
+
+        calculated_metrics = PEDOTMetrics(
                 experiment_id=input_df.experiment_id,
                 DepositionChargePassed=charge,
                 BleachChargePassed=bleach_charge,
@@ -193,11 +200,7 @@ def process_metrics(metrics: RawMetrics, input_df: RequiredData) -> PEDOTMetrics
                 DepositionEfficiency=dep_eff,
                 ElectrochromicEfficiency=echromic_eff,
             )
-            print(f"Processed experiment_ID: {input_df.experiment_id}")
-        else:
-            print(
-                f"Processing incomplete for experiment_ID {input_df.experiment_id} due to earlier errors."
-            )
+        print(f"Processed experiment_ID: {input_df.experiment_id}")
 
     except Exception as e:
         print(f"Unexpected error for experiment_ID {input_df.experiment_id}: {e}")
