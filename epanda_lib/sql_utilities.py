@@ -314,7 +314,7 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
         ON b.type_id = c.id
         WHERE a.plate_id = ?
             """,
-            (plate_id),
+            (plate_id,),
         )
     if result == []:
         return None
@@ -1302,7 +1302,7 @@ def update_experiments_statuses(
 
 # region Result Functions
 
-def insert_experiment_results(entry: ExperimentResultsRecord) -> None:
+def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
     """
     Insert an entry into the result table.
 
@@ -1324,6 +1324,16 @@ def insert_experiment_results(entry: ExperimentResultsRecord) -> None:
         entry.result_value = str(entry.result_value)
     parameters = (entry.experiment_id, entry.result_type, entry.result_value, entry.context)
     execute_sql_command_no_return(command, parameters)
+
+def insert_experiment_results(entries: List[ExperimentResultsRecord]) -> None:
+    """
+    Insert a list of entries into the result table.
+
+    Args:
+        entries (List[ResultTableEntry]): The entries to insert.
+    """
+    for entry in entries:
+        insert_experiment_result(entry)
 
 
 def select_results(experiment_id: int) -> List[ExperimentResultsRecord]:

@@ -373,7 +373,7 @@ class Scheduler:
 
         for result in results_lists:
             # Save the results to the database
-            sql_utilities.insert_experiment_results(result)
+            sql_utilities.insert_experiment_result(result)
 
     def count_available_wells(self) -> int:
         """Return the number of wells available for experiments"""
