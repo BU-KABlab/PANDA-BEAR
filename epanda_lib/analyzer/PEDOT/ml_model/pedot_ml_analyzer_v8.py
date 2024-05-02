@@ -309,10 +309,16 @@ def main(training_file_path, model_base_path, counter_file_path, BestTestPointsC
     rounded_best_test_point_original = [round(value, precision) for value in best_test_point_original]
     print("Best Test Point in Original Values:", rounded_best_test_point_original)
 
+    # Unpack values
+    v_dep, t_dep, edot_concentration = rounded_best_test_point_original
+
     df = pd.DataFrame({
         'Best Test Point Scalar': [best_test_point],
         'Best Test Point Original': [best_test_point_original],
         'Best Test Point': [rounded_best_test_point_original],
+        'v_dep': [v_dep],
+        't_dep': [t_dep],
+        'edot_concentration': [edot_concentration],
         'Predicted Response': [predicted_mean],
         'Standard Deviation': [predicted_stddev],
         'Models current RMSE': [rmse]
@@ -320,10 +326,6 @@ def main(training_file_path, model_base_path, counter_file_path, BestTestPointsC
 
     file_exists = os.path.isfile(BestTestPointsCSV)
     df.to_csv(BestTestPointsCSV, mode='a', header=not file_exists, index=False)
-    v_dep_scaled, t_dep_scaled, edot_concentration_scaled = best_test_point_original
-    # Unpack values
-    v_dep, t_dep, edot_concentration = rounded_best_test_point_original
-
     mask = np.isclose(test_points_scaled[:, 2], test_points_scaled[best_point_index, 2], rtol=1e-3)
 
     voltage_values = test_points_scaled[mask, 0]
@@ -376,8 +378,6 @@ def main(training_file_path, model_base_path, counter_file_path, BestTestPointsC
     plt.savefig(f'{contourplots_filename}.png')
 
     return v_dep, t_dep, edot_concentration, predicted_mean, predicted_stddev
-
-
 
 
 if __name__ == "__main__":
