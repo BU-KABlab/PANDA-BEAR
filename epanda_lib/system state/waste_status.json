@@ -2,14 +2,14 @@
     {
         "position": "w0",
         "contents": {
-            "rinse": 4718.88,
-            "edot": 509.72
+            "rinse": 2499.4400000000005,
+            "edot": 254.86
         },
         "radius": 14,
         "height": 57,
         "depth": -74,
         "name": "waste",
-        "volume": 6228.600000000002,
+        "volume": 3754.2999999999997,
         "capacity": 20000,
         "contamination": 0,
         "concentration": null,

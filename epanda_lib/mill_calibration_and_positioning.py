@@ -376,7 +376,7 @@ def calibrate_camera_focus(
     mill.safe_move(
         wellplate.get_coordinates("A1", "x"),
         wellplate.get_coordinates("A1", "y"),
-        wellplate.z_top,
+        0,
         Instruments.LENS,
     )
 
@@ -401,6 +401,8 @@ def home_mill(
     mill.home()
     print("Mill has been homed")
 
+def quit():
+    pass
 
 options = {
     "0": check_mill_settings,
@@ -409,7 +411,7 @@ options = {
     "4": calibrate_z_bottom_of_wellplate,
     # "5": calibrate_vials,
     "6": calibrate_camera_focus,
-    "q": 'quit',
+    "q": quit,
 }
 
 

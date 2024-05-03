@@ -148,7 +148,7 @@ class Scheduler:
         try:
             execute_sql_command(
                 "UPDATE experiments SET ? = ? WHERE id = ?",
-                (column, experiment[column], experiment.experiment_id),
+                (column, getattr(experiment,column), experiment.experiment_id),
             )
         except sqlite3.Error as e:
             logger.error("Error occured while updating experiment information: %s", e)
