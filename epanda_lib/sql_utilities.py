@@ -1377,18 +1377,32 @@ def select_specific_result(
     Returns:
         ResultTableEntry: The entry from the result table.
     """
-    result = execute_sql_command(
-        """
-        SELECT 
-            experiment_id,
-            result_type,
-            result_value,
-            context
-        FROM experiment_results
-        WHERE experiment_id = ? AND result_type = ? AND context = ?
-        """,
-        (experiment_id, result_type, context),
-    )
+    if context is None:
+        result = execute_sql_command(
+            """
+            SELECT 
+                experiment_id,
+                result_type,
+                result_value,
+                context
+            FROM experiment_results
+            WHERE experiment_id = ? AND result_type = ?
+            """,
+            (experiment_id, result_type),
+        )
+    else:
+        result = execute_sql_command(
+            """
+            SELECT 
+                experiment_id,
+                result_type,
+                result_value,
+                context
+            FROM experiment_results
+            WHERE experiment_id = ? AND result_type = ? AND context = ?
+            """,
+            (experiment_id, result_type, context),
+        )
     if result == []:
         return None
     return ExperimentResultsRecord(*result[0])

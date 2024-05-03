@@ -1,31 +1,46 @@
 """PEDOT Experiments Analyzer."""
-#pylint: disable=line-too-long
+
+# pylint: disable=line-too-long
 from pathlib import Path
 import pandas as pd
-from epanda_lib.sql_utilities import (ExperimentResultsRecord,
-                                      insert_experiment_result,
-                                      read_testing_config)
+from epanda_lib.sql_utilities import (
+    ExperimentResultsRecord,
+    insert_experiment_result,
+    insert_experiment_results,
+    read_testing_config,
+)
 
 from . import PEDOT_FindLAB as lab
 from . import PEDOT_MetricsCalc as met
 from .experiment_generator import pedot_generator, determine_next_experiment_id
 from .ml_input import populate_required_information as analysis_input
-from .pedot_classes import MLInput, MLOutput, PEDOTParams, RequiredData, PEDOTMetrics, MLTrainingData, RawMetrics
+from .pedot_classes import (
+    MLInput,
+    MLOutput,
+    PEDOTParams,
+    RequiredData,
+    PEDOTMetrics,
+    MLTrainingData,
+    RawMetrics,
+)
 from .ml_model import pedot_model
 
 # Set up the ML filepaths, for this project this is hardcoded only here
 ml_file_paths = MLInput(
-    training_file_path = Path("epanda_lib/analyzer/pedot/ml_model/training_data/MLTrainingData_PEDOT.csv"),
-    model_base_path = Path("epanda_lib/analyzer/pedot/ml_model/pedot_gp_model_v8_0.pth"),
-    counter_file_path = Path("epanda_lib/analyzer/pedot/ml_model/model_counter.txt"),
-    BestTestPointsCSV = Path("epanda_lib/analyzer/pedot/ml_model/BestTestPoints.csv"),
-    contourplots_path = Path("epanda_lib/analyzer/pedot/ml_model/contourplots"),
+    training_file_path=Path(
+        "epanda_lib/analyzer/pedot/ml_model/training_data/MLTrainingData_PEDOT.csv"
+    ),
+    model_base_path=Path("epanda_lib/analyzer/pedot/ml_model/pedot_gp_model_v8"),
+    counter_file_path=Path("epanda_lib/analyzer/pedot/ml_model/model_counter.txt"),
+    BestTestPointsCSV=Path("epanda_lib/analyzer/pedot/ml_model/BestTestPoints.csv"),
+    contourplots_path=Path("epanda_lib/analyzer/pedot/ml_model/contourplots/"),
 )
+
 
 def pedot_analyzer(experiment_id: int) -> MLTrainingData:
     """Analyzes the PEDOT experiment."""
 
-    input_data:RequiredData = analysis_input(experiment_id)
+    input_data: RequiredData = analysis_input(experiment_id)
     metrics = lab.rgbtolab(input_data)
     results = met.process_metrics(input_data, metrics)
 
@@ -34,7 +49,8 @@ def pedot_analyzer(experiment_id: int) -> MLTrainingData:
         ExperimentResultsRecord(
             experiment_id=results.experiment_id,
             result_type=metric_name,
-            result_value=getattr(results, metric_name),
+            result_value=getattr(metrics, metric_name),
+            context="PEDOT Raw Metrics",
         )
         for metric_name in RawMetrics.__annotations__.keys()
     ]
@@ -47,12 +63,13 @@ def pedot_analyzer(experiment_id: int) -> MLTrainingData:
             experiment_id=results.experiment_id,
             result_type=metric_name,
             result_value=getattr(results, metric_name),
+            context="PEDOT Metrics",
         )
         for metric_name in PEDOTMetrics.__annotations__.keys()
     ]
 
-    for metric in list_of_pedot_metrics:
-        insert_experiment_result(metric)
+    for result in list_of_pedot_metrics:
+        insert_experiment_result(result)
 
     ml_training_data = MLTrainingData(
         experiment_id=results.experiment_id,
@@ -67,7 +84,7 @@ def pedot_analyzer(experiment_id: int) -> MLTrainingData:
     return ml_training_data
 
 
-def main(experiment_id:int = None):
+def main(experiment_id: int = None):
     """Main function for the PEDOT analyzer."""
     testing = read_testing_config()
 
@@ -80,22 +97,19 @@ def main(experiment_id:int = None):
         ml_training_data = pedot_analyzer(experiment_id)
 
         # Add the new training data to the training file
-        df_new_training_data = pd.DataFrame({
-            'deltaE': [ml_training_data.deltaE00],
-            'voltage': [ml_training_data.ca_step_1_voltage],
-            'time': [ml_training_data.ca_step_1_time],
-            'bleachCP': [ml_training_data.BleachChargePassed],
-            'concentration': [ml_training_data.edot_concentration],
-        }
+        df_new_training_data = pd.DataFrame(
+            {
+                "deltaE": [ml_training_data.deltaE00],
+                "voltage": [ml_training_data.ca_step_1_voltage],
+                "time": [ml_training_data.ca_step_1_time],
+                "bleachCP": [ml_training_data.BleachChargePassed],
+                "concentration": [ml_training_data.edot_concentration],
+            }
         )
         # Add to the training data file
         df_new_training_data.to_csv(
-            ml_file_paths.training_file_path,
-            mode='a',
-            header=False,
-            index=False
+            ml_file_paths.training_file_path, mode="a", header=False, index=False
         )
-    
 
     # Run the ML model
     results = pedot_model(
@@ -103,12 +117,11 @@ def main(experiment_id:int = None):
         ml_file_paths.model_base_path,
         ml_file_paths.counter_file_path,
         ml_file_paths.BestTestPointsCSV,
-        ml_file_paths.contourplots_path
+        ml_file_paths.contourplots_path,
+        experiment_id=experiment_id + 1,
     )
 
-    ml_output = MLOutput(
-        *results
-    )
+    ml_output = MLOutput(*results)
 
     params = PEDOTParams(
         dep_v=ml_output.v_dep,

@@ -45,9 +45,10 @@ def extract_circular_region(image_path, radius=300, show_region=True) -> np.ndar
         # Split the path from the extension
         file_path, _ = os.path.splitext(image_path)
         # Save using the modified path
-        display_img.save(f"{file_path}_ROI.png")
+        roi_file_name = f"{file_path}_ROI.png"
+        display_img.save(roi_file_name)
         # display_img.show()
-    return np.mean(masked_pixels, axis=0)
+    return np.mean(masked_pixels, axis=0), roi_file_name
 
 
 def rgbtolab(inputs: RequiredData) -> RawMetrics:
@@ -62,11 +63,11 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
 
     lab_values_dict = {}
     white_standard_path = inputs.BeforeDeposition
-    white_standard_rgb = extract_circular_region(white_standard_path)
+    white_standard_rgb, _ = extract_circular_region(white_standard_path)
     for image_type in ["bleaching", "coloring"]:
         image_path = images_by_exp_id[experiment_id][image_type]
         if image_path:
-            average_rgb = extract_circular_region(image_path)
+            average_rgb, roi_path = extract_circular_region(image_path)
             original_rgb = np.round(average_rgb).astype(int)
 
             white_standard_rgb_safe = np.where(
@@ -78,9 +79,10 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
 
             lab_values = color.rgb2lab((corrected_rgb / 255).reshape(1, 1, 3)).flatten()
 
-            lab_values_dict[experiment_id] = lab_values_dict.get(experiment_id, {})
+            #lab_values_dict[experiment_id] = lab_values_dict.get(experiment_id, {})
             lab_values_dict[experiment_id][image_type] = lab_values
             lab_values_dict[experiment_id][f"{image_type}_original_rgb"] = original_rgb
+            lab_values_dict[experiment_id][f"{image_type}_roi_path"] = roi_path
 
     metrics: RawMetrics = None
     metrics.experiment_id = experiment_id
@@ -91,5 +93,6 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
             metrics.delta_e00 = deltaE_ciede2000(labs["coloring"], labs["bleaching"])
             metrics.r_c_o, metrics.g_c_o, metrics.b_c_o = labs["coloring_original_rgb"]
             metrics.r_b_o, metrics.g_b_o, metrics.b_b_o = labs["bleaching_original_rgb"]
+            metrics.roi_path = labs["coloring_roi_path"]
 
     return metrics

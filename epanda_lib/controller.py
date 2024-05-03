@@ -120,9 +120,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
 
-            ## Check the qeueue for any protocol type 2 experiments
-            # queue = scheduler.get_queue()
-            # check if any of the experiments in the queue pandas dataframe are type 2
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue(
                 random_pick=RANDOM_FLAG
@@ -293,7 +290,52 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
 
             # If the AL campaign length is set, run the ML analysis
             if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
+                # We do the analysis on the experiment that just finished
                 pedot_ml_analysis(new_experiment.experiment_id)
+
+                # Share to slack the analysis and ml information
+                roi_path = Path(
+                    sql_utilities.select_specific_result(new_experiment.experiment_id, "roi_path").result_value
+                )
+
+                # The ML Model will then make a prediction for the next experiment
+                # First fetch and send the contour plot
+                contour_plot = Path(
+                    sql_utilities.select_specific_result(new_experiment.experiment_id, "PEDOT_Contour_Plots").result_value
+                )
+
+                # Then fetch the ML results
+                results_to_find = [
+                    "PEDOT_Deposition_Voltage",
+                    "PEDOT_Deposition_Time",
+                    "PEDOT_Concentration",
+                    "PEDOT_Predicted_Mean",
+                    "PEDOT_Predicted_Uncertainty",
+                ]
+                ml_results = []
+                for result_type in results_to_find:
+                    ml_results.append(
+                        sql_utilities.select_specific_result(new_experiment.experiment_id, result_type).result_value
+                    )
+                # Compose message
+                ml_results_msg = f"""
+                Experiment {new_experiment.experiment_id+1} Parameters and Predictions:\n
+                Deposition Voltage: {ml_results[0]}\n
+                Deposition Time: {ml_results[1]}\n
+                Concentration: {ml_results[2]}\n
+                Predicted Mean: {ml_results[3]}\n
+                Predicted StdDev: {ml_results[4]}\n
+                """
+                slack.send_slack_message("data", ml_results_msg)
+                slack.send_slack_file("data",
+                                        roi_path,
+                                        f'ROI for Experiment {new_experiment.experiment_id}:',
+                                        )
+                slack.send_slack_file("data",
+                                      contour_plot,
+                                      contour_plot.name,
+                                    )
+                
                 al_campaign_iteration += 1
 
             new_experiment = None  # reset new_experiment to None so that we can check the queue again

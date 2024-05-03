@@ -33,6 +33,7 @@ class RawMetrics:
     r_b_o: float
     g_b_o: float
     b_b_o: float
+    roi_path: Path
 
 @dataclass
 class PEDOTMetrics:
@@ -73,6 +74,7 @@ class MLOutput:
     edot_concentration: float
     predicted_mean: float
     predicted_stddev: float
+    contour_plot: Path = None
 
 @dataclass
 class PEDOTParams:
