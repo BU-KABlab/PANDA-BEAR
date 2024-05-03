@@ -10,6 +10,7 @@ Or starting the ePANDA either with or without mock instruments.
 import os
 import sys
 import time
+from pathlib import Path
 
 from epanda_lib import (
     camera_call_camera,
@@ -24,10 +25,10 @@ from epanda_lib import (
     print_panda,
 )
 from epanda_lib import sql_utilities
-from epanda_lib.analyzer.pedot.pedot_classes import MLOutput
+from epanda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import read_testing_config, write_testing_config
-from epanda_lib.sql_utilities import set_system_status
+from epanda_lib.sql_utilities import set_system_status, select_specific_result
 from epanda_lib.utilities import SystemState
 import epanda_lib.analyzer.pedot as pedot_analysis
 
@@ -191,14 +192,56 @@ def test_camera():
 def generate_experiment_from_existing_data():
     """Generates an experiment from existing data using the ML model."""
     set_system_status(SystemState.BUSY, "generating experiment", read_testing_config())
+    next_experiment = scheduler.determine_next_experiment_id()
     output = pedot_analysis.pedot_model(
         pedot_analysis.ml_file_paths.training_file_path,
         pedot_analysis.ml_file_paths.model_base_path,
         pedot_analysis.ml_file_paths.counter_file_path,
         pedot_analysis.ml_file_paths.BestTestPointsCSV,
         pedot_analysis.ml_file_paths.contourplots_path,
+        next_experiment,
     )
     output = MLOutput(*output)
+    params_for_next_experiment = PEDOTParams(
+        dep_v=output.v_dep,
+        dep_t=output.t_dep,
+        concentration=output.edot_concentration,
+    )
+    # The ML Model will then make a prediction for the next experiment
+    # First fetch and send the contour plot
+    contour_plot = Path(
+        select_specific_result(next_experiment, "PEDOT_Contour_Plots").result_value
+    )
+    
+    # Then fetch the ML results
+    results_to_find = [
+        "PEDOT_Deposition_Voltage",
+        "PEDOT_Deposition_Time",
+        "PEDOT_Concentration",
+        "PEDOT_Predicted_Mean",
+        "PEDOT_Predicted_Uncertainty",
+    ]
+    ml_results = []
+    for result_type in results_to_find:
+        ml_results.append(
+            select_specific_result(next_experiment, result_type).result_value
+        )
+    # Compose message
+    ml_results_msg = f"""
+    Experiment {next_experiment} Parameters and Predictions:\n
+    Deposition Voltage: {ml_results[0]}\n
+    Deposition Time: {ml_results[1]}\n
+    Concentration: {ml_results[2]}\n
+    Predicted Mean: {ml_results[3]}\n
+    Predicted StdDev: {ml_results[4]}\n
+    """
+    print(ml_results_msg)
+    import matplotlib.pyplot as plt
+    import matplotlib.image as mpimg
+
+    img = mpimg.imread(contour_plot)
+    plt.imshow(img)
+    plt.show()
 
     print(
         f"V_dep: {output.v_dep}, T_dep: {output.t_dep}, EDOT Concentration: {output.edot_concentration}"
@@ -210,7 +253,7 @@ def generate_experiment_from_existing_data():
     )
     if usr_choice[0] == "y":
         pedot_analysis.pedot_generator(
-            output.v_dep, output.t_dep, output.edot_concentration
+            params_for_next_experiment, experiment_name="PEDOT_Optimization", campaign_id=0
         )
     else:
         print("Experiment not added.")
