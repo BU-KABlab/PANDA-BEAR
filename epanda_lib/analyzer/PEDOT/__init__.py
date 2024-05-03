@@ -33,7 +33,7 @@ ml_file_paths = MLInput(
     model_base_path=Path("epanda_lib/analyzer/pedot/ml_model/pedot_gp_model_v8"),
     counter_file_path=Path("epanda_lib/analyzer/pedot/ml_model/model_counter.txt"),
     BestTestPointsCSV=Path("epanda_lib/analyzer/pedot/ml_model/BestTestPoints.csv"),
-    contourplots_path="epanda_lib\\analyzer\\pedot\\ml_model\\contourplots\\",
+    contourplots_path="epanda_lib\\analyzer\\pedot\\ml_model\\contourplots\\contourplot",
 )
 
 

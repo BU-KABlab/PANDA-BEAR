@@ -11,6 +11,8 @@ import os
 import sys
 import time
 from pathlib import Path
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 from epanda_lib import (
     camera_call_camera,
@@ -234,8 +236,6 @@ def generate_experiment_from_existing_data():
     Predicted StdDev: {ml_results[4]}\n
     """
     print(ml_results_msg)
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
 
     img = mpimg.imread(contour_plot)
     plt.imshow(img)

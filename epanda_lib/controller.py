@@ -300,11 +300,11 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
 
                 try:
                     roi_path = Path(sql_utilities.select_specific_result(new_experiment.experiment_id, "roi_path").result_value)
-                except AttributeError as e:
+                except AttributeError:
                     pass
                 try:
                     delta_e00 = sql_utilities.select_specific_result(new_experiment.experiment_id, "delta_e00").result_value
-                except AttributeError as e:
+                except AttributeError:
                     pass
                 # The ML Model will then make a prediction for the next experiment
                 # First fetch and send the contour plot
@@ -338,9 +338,9 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                         f"ROI for Experiment {new_experiment.experiment_id}:",
                     )
                 if delta_e00 is not None:
-                    slack.send_slack_message("data", f"Difference in color for Experiment {next_exp_id}: {delta_e00}")
+                    slack.send_slack_message("data", f"Delta E for Experiment {next_exp_id}: {delta_e00}")
 
-                slack.send_slack_message("data", ml_results_msg)    
+                slack.send_slack_message("data", ml_results_msg)
                 if contour_plot is not None:
                     slack.send_slack_file(
                         "data",

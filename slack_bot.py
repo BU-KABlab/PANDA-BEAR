@@ -7,7 +7,7 @@ if choose_testing_mode == "t":
     test = True
 else:
     test = False
-bot = SlackBot(test=True)
+bot = SlackBot(test=test)
 print("Starting Slack Bot")
 STATUS = bot.check_slack_messages(channel="alert")
 while STATUS == 1:
