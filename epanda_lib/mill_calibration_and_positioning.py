@@ -265,12 +265,12 @@ def calibrate_wells(
                 if recalc[0].lower() == "y":
                     wellplate.a1_x = new_coordinates.x
                     wellplate.a1_y = new_coordinates.y
-                    wellplate.write_wellplate_location()
-                    wellplate.recalculate_well_locations()
-                    wellplate.save_wells_to_db() #FIXME: this might be redundant
+                    wellplate.write_wellplate_location() # This is the json file that holds the wellplate location
+                    wellplate.recalculate_well_locations() # This updates the well objects and db entries with the new coordinates
+                    #wellplate.save_wells_to_db() #FIXME: this might be redundant
             else: # Update the well with new well coordinates
-                wellplate.set_coordinates(well_id, new_coordinates)
-                wellplate.save_wells_to_db() #FIXME: this might be redundant
+                wellplate.set_coordinates(well_id, new_coordinates) # This updates the well object and db entry with the new coordinates
+                #wellplate.save_wells_to_db() #FIXME: this might be redundant
 
 
 def calibrate_z_bottom_of_wellplate(
