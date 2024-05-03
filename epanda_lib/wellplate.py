@@ -837,6 +837,7 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
             This experiment has associated results. If you really want to delete the experiment,
             please delete the results before deleting the experiment."""
         )
+        input("Press enter to continue...")
         return
 
     user_choice = (
@@ -863,6 +864,8 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
         "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new' WHERE experiment_id = ?",
         (experiment_id,),
     )
+
+    input("Experiment deleted. Press enter to continue...")
 
 def change_wellplate_location():
     """Change the location of the wellplate"""

@@ -291,18 +291,24 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             # If the AL campaign length is set, run the ML analysis
             if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
                 # We do the analysis on the experiment that just finished
-                pedot_ml_analysis(new_experiment.experiment_id)
+                next_exp_id = pedot_ml_analysis(new_experiment.experiment_id)
 
                 # Share to slack the analysis and ml information
-                roi_path = Path(
-                    sql_utilities.select_specific_result(new_experiment.experiment_id, "roi_path").result_value
-                )
+                # Share to slack the analysis and ml information
+                roi_path = None
+                delta_e00 = None
 
+                try:
+                    roi_path = Path(sql_utilities.select_specific_result(new_experiment.experiment_id, "roi_path").result_value)
+                except AttributeError as e:
+                    pass
+                try:
+                    delta_e00 = sql_utilities.select_specific_result(new_experiment.experiment_id, "delta_e00").result_value
+                except AttributeError as e:
+                    pass
                 # The ML Model will then make a prediction for the next experiment
                 # First fetch and send the contour plot
-                contour_plot = Path(
-                    sql_utilities.select_specific_result(new_experiment.experiment_id, "PEDOT_Contour_Plots").result_value
-                )
+                contour_plot = Path(sql_utilities.select_specific_result(new_experiment.experiment_id+1, "PEDOT_Contour_Plots").result_value)
 
                 # Then fetch the ML results
                 results_to_find = [
@@ -314,28 +320,34 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 ]
                 ml_results = []
                 for result_type in results_to_find:
-                    ml_results.append(
-                        sql_utilities.select_specific_result(new_experiment.experiment_id, result_type).result_value
-                    )
+                    ml_results.append(sql_utilities.select_specific_result(next_exp_id, result_type).result_value)
                 # Compose message
                 ml_results_msg = f"""
-                Experiment {new_experiment.experiment_id+1} Parameters and Predictions:\n
+                Experiment {new_experiment.experiment_id} Parameters and Predictions:\n
                 Deposition Voltage: {ml_results[0]}\n
                 Deposition Time: {ml_results[1]}\n
                 Concentration: {ml_results[2]}\n
                 Predicted Mean: {ml_results[3]}\n
                 Predicted StdDev: {ml_results[4]}\n
                 """
-                slack.send_slack_message("data", ml_results_msg)
-                slack.send_slack_file("data",
-                                        roi_path,
-                                        f'ROI for Experiment {new_experiment.experiment_id}:',
-                                        )
-                slack.send_slack_file("data",
-                                      contour_plot,
-                                      contour_plot.name,
-                                    )
-                
+
+                if roi_path is not None:
+                    slack.send_slack_file(
+                        "data",
+                        roi_path,
+                        f"ROI for Experiment {new_experiment.experiment_id}:",
+                    )
+                if delta_e00 is not None:
+                    slack.send_slack_message("data", f"Difference in color for Experiment {next_exp_id}: {delta_e00}")
+
+                slack.send_slack_message("data", ml_results_msg)    
+                if contour_plot is not None:
+                    slack.send_slack_file(
+                        "data",
+                        contour_plot,
+                        f'contour_plot_{next_exp_id}',
+                    )
+
                 al_campaign_iteration += 1
 
             new_experiment = None  # reset new_experiment to None so that we can check the queue again

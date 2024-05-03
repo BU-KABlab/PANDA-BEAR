@@ -33,7 +33,7 @@ ml_file_paths = MLInput(
     model_base_path=Path("epanda_lib/analyzer/pedot/ml_model/pedot_gp_model_v8"),
     counter_file_path=Path("epanda_lib/analyzer/pedot/ml_model/model_counter.txt"),
     BestTestPointsCSV=Path("epanda_lib/analyzer/pedot/ml_model/BestTestPoints.csv"),
-    contourplots_path=Path("epanda_lib/analyzer/pedot/ml_model/contourplots/"),
+    contourplots_path="epanda_lib\\analyzer\\pedot\\ml_model\\contourplots\\",
 )
 
 
@@ -130,4 +130,5 @@ def main(experiment_id: int = None):
     )
 
     # Generate the next experiment
-    pedot_generator(params, experiment_name="PEDOT_Optimization", campaign_id=0)
+    exp_id = pedot_generator(params, experiment_name="PEDOT_Optimization", campaign_id=0)
+    return exp_id

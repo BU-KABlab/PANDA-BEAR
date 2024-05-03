@@ -90,7 +90,7 @@
         "height": 57,
         "depth": -74,
         "name": "rinse",
-        "volume": 13061.679999999993,
+        "volume": 15281.119999999995,
         "capacity": 20000,
         "contamination": 0,
         "vial_coordinates": {
@@ -150,7 +150,7 @@
         "height": 57,
         "depth": -74,
         "name": "edot",
-        "volume": 19235.42,
+        "volume": 19490.28,
         "capacity": 20000,
         "contamination": 0,
         "vial_coordinates": {

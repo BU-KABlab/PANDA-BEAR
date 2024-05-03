@@ -88,9 +88,6 @@ def print_queue_info():
     for experiment in current_queue:
         print(experiment)
 
-    input("Press Enter to continue...")
-
-
 def reset_vials_stock():
     """Resets the stock vials."""
     set_system_status(SystemState.BUSY, "resetting stock vials", read_testing_config())

@@ -7,7 +7,7 @@ from .pedot_classes import PEDOTParams
 
 PROJECT_ID = 16
 
-def pedot_generator(params: PEDOTParams, experiment_name = "PEDOT_Optimization", campaign_id = 0):
+def pedot_generator(params: PEDOTParams, experiment_name = "PEDOT_Optimization", campaign_id = 0) -> int:
     """Generates a PEDOT experiment."""
     experiment_id = determine_next_experiment_id()
     experiments: list[experiment_class.EdotExperiment] = []
@@ -45,3 +45,4 @@ def pedot_generator(params: PEDOTParams, experiment_name = "PEDOT_Optimization",
 
     scheduler = Scheduler()
     scheduler.add_nonfile_experiments(experiments)
+    return experiment_id

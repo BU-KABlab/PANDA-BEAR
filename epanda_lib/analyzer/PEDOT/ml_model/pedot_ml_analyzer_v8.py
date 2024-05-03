@@ -9,6 +9,7 @@ import math
 
 # pylint: disable=line-too-long
 import os
+from pathlib import Path
 
 import gpytorch
 import matplotlib.pyplot as plt
@@ -532,8 +533,10 @@ def main(
     contourplots_filename = get_next_filename(
         contourplots_path, extensions=["svg", "png"]
     )
-    plt.savefig(f"{contourplots_filename}.svg")
-    plt.savefig(f"{contourplots_filename}.png")
+    sv_path = Path(f"{contourplots_filename}.svg")
+    png_path = Path(f"{contourplots_filename}.png")
+    plt.savefig(sv_path)
+    plt.savefig(png_path)
 
     # Save the results to results
     to_be_inserted = [
@@ -593,7 +596,7 @@ if __name__ == "__main__":
     TEST_MODEL_BASE_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\pedot_gp_model_v8"
     TEST_COUNTER_FILE_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\model_counter.txt"
     TEST_BESTTESTPOINTSCSV = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\BestTestPoints.csv"  # file to save best test points, adds to the file doesn't overwrite
-    TEST_CONTOURPLOTS_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\contourplots"  # file to save contour plots, without extension
+    TEST_CONTOURPLOTS_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\contourplots\\"  # file to save contour plots, without extension
 
     main(
         TEST_TRAINING_FILE_PATH,
