@@ -161,7 +161,7 @@ def result_backfill_from_training_data():
 
     # Load the MLtraining data
     training_data = pd.read_csv(
-        Path("epanda_lib/analyzer/pedot/training_data/MLTrainingData.csv"
+        Path("epanda_lib/analyzer/edot/ml_model/training_data/MLTrainingData.csv"
     ))
     # well_id,L*_c,A*_c,B*_c,L*_b,A*_b,B*_b,deltaE,voltage,time,Charge Passed,Capacitance,Deposition Efficiency,bleachCP,Contrast Efficiency,Echromic Efficiency,concentration
     # Each column is a result type, and each row is the value for that result type for that well
@@ -299,6 +299,6 @@ def result_backfill_from_training_data():
         sql_utilities.insert_experiment_results(results)
 
 if __name__ == "__main__":
-    #wellplate_backfill(plate_id=110)
-    result_backfill_from_training_data()
+    wellplate_backfill(plate_id=110)
+    #result_backfill_from_training_data()
     # result_backfill(plate_id=110)
