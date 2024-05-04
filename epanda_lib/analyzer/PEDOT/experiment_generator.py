@@ -1,4 +1,5 @@
 """Generates a PEDOT experiment."""
+
 from epanda_lib import experiment_class
 from epanda_lib.config.config import DEFAULT_PUMPING_RATE
 from epanda_lib.config.pin import CURRENT_PIN
@@ -7,15 +8,18 @@ from .pedot_classes import PEDOTParams
 
 PROJECT_ID = 16
 
-def pedot_generator(params: PEDOTParams, experiment_name = "PEDOT_Optimization", campaign_id = 0) -> int:
+
+def pedot_generator(
+    params: PEDOTParams, experiment_name="PEDOT_Optimization", campaign_id=0
+) -> int:
     """Generates a PEDOT experiment."""
     experiment_id = determine_next_experiment_id()
     experiments: list[experiment_class.EdotExperiment] = []
     experiments.append(
         experiment_class.EdotExperiment(
             experiment_id=experiment_id,
-            protocol_id=15, #PEDOT protocol v4
-            well_id="A1", #Default to A1, let the program decide where else to put it
+            protocol_id=15,  # PEDOT protocol v4
+            well_id="A1",  # Default to A1, let the program decide where else to put it
             well_type_number=4,
             experiment_name=experiment_name,
             pin=CURRENT_PIN,

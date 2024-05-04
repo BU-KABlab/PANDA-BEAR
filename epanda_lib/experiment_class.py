@@ -580,9 +580,19 @@ class EchemExperimentBase(ExperimentBase):
         {self.print_cv_parameters()}
     """
 
+@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
+class EdotExperiment(EchemExperimentBase):
+    """Define the data that is used to run an edot experiment"""
+
+    project_id: int = 16
+    well_type_number: int = 4  # ito
+    experiment_type: int = 2  # edot
+    edot_concentration: float = 0.1 # mM
+
 experiment_types_by_project_id = {
     0: ExperimentBase,
     1: EchemExperimentBase,
+    16: EdotExperiment,
     11: CorrectionFactorExperiment,
 }
 
