@@ -21,13 +21,6 @@ from . import sql_utilities
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-# formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(module)s:%(funcName)s:%(lineno)d:%(message)s")
-# system_handler = logging.FileHandler(PATH_TO_LOGS + "/ePANDA.log")
-# system_handler.setFormatter(formatter)
-# logger.addHandler(system_handler)
-
 
 class WellCoordinates:
     """
@@ -448,27 +441,6 @@ class Wellplate:
         """Gets a Well object by well ID."""
         return self.wells[well_id.upper()]
 
-    # def update_well_status_from_json_file(self: "Wellplate") -> None:
-    #     """Update the well status from a file"""
-
-    #     logger.debug("Updating well status's from file...")
-    #     with open(WELL_STATUS, "r", encoding="utf-8") as f:
-    #         data = json.load(f)
-    #         for saved_well in data["wells"]:
-    #             for well_id, well in self.wells.items():
-    #                 if saved_well["well_id"] == well_id:
-    #                     well.status = saved_well["status"]
-    #                     well.status_date = saved_well["status_date"]
-    #                     well.contents = saved_well["contents"]
-    #                     well.experiment_id = saved_well["experiment_id"]
-    #                     well.project_id = saved_well["project_id"]
-    #                     well.volume = saved_well["volume"]
-    #                     well.coordinates = WellCoordinates(**saved_well["coordinates"])
-    #                     self.type_number = data["type_number"]
-    #                     self.plate_id = data["plate_id"]
-    #                     logger.debug("Well %s updated from file", well.name)
-    #                     break
-
     def update_well_status_from_db(self: "Wellplate") -> None:
         """Update the well status from the database"""
         logger.debug("Updating well status from database...")
@@ -585,63 +557,10 @@ class Wellplate:
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s", well_id, well_data["status"])
 
-    # def _get_well_color(self, status: str) -> str:
-    #     """Get the color of a well based on its status."""
-    #     color_mapping = {
-    #         "empty": "black",
-    #         "new": "grey",
-    #         "queued": "orange",
-    #         "complete": "green",
-    #         "error": "red",
-    #         "running": "gold",
-    #         "paused": "blue",
-    #     }
-    #     return color_mapping.get(status, "black")
-
-    # def get_well_coordinates_and_status_color(self):
-    #     """Plot the well plate on a coordinate plane."""
-    #     x_coordinates = []
-    #     y_coordinates = []
-    #     color = []
-    #     for _, well_data in self.wells.items():
-    #         x_coordinates.append(well_data.coordinates["x"])
-    #         y_coordinates.append(well_data.coordinates["y"])
-    #         color.append(self._get_well_color(well_data.status))
-
-    #     return x_coordinates, y_coordinates, color
-
     def read_well_type_characteristics(
         self, type_number: int
     ) -> tuple[float, float, float, float]:
         """Read the well type characteristics from the well_type.csv config file"""
-
-        # file_path = WELL_TYPE
-
-        # # check it exists
-        # if not os.path.exists(file_path):
-        #     logger.warning(
-        #         "Well type file not found at %s. Returning defaults", file_path
-        #     )
-        #     return (
-        #         self.radius,
-        #         self.well_offset,
-        #         self.well_capacity,
-        #         self.height,
-        #         self.shape,
-        #         self.z_top,
-        #     )
-
-        # with open(WELL_TYPE, "r", encoding="UTF-8") as f:
-        #     next(f)
-        #     for line in f:
-        #         line = line.strip().split(",")
-        #         if int(line[0]) == int(type_number):
-        #             shape = str(line[4]).strip()
-        #             radius = float(line[5])
-        #             well_offset = float(line[6])
-        #             well_capacity = float(line[9])
-        #             height = float(line[7])
-        #             break
 
         # Select the well type characteristics from the well_types sql table given the type_number
         radius, well_offset, well_capacity, height, shape = (
@@ -728,55 +647,6 @@ class Wellplate:
 
     def save_wells_to_db(self) -> None:
         """Save the wells to the well_hx table. Replaces the write_well_status_to_file method"""
-        # wells_data = [well.__dict__() for well in self.wells.values()]
-        # # if isinstance(wells_data[0]["coordinates"], WellCoordinates):
-        # #     for well in wells_data:
-        # #         well["coordinates"] = well["coordinates"].to_json_string()
-        # # elif isinstance(wells_data[0]["coordinates"], dict):
-        # #     for well in wells_data:
-        # #         well["coordinates"] = json.dumps(well["coordinates"])
-        # values = [
-        #     (
-        #         self.plate_id,
-        #         well["well_id"],
-        #         well["experiment_id"],
-        #         well["project_id"],
-        #         well["status"],
-        #         well["status_date"],
-        #         json.dumps(
-        #             well["contents"]
-        #         ),  # Contents is a dictionary and needs to turn into a string
-        #         well["volume"],
-        #         well[
-        #             "coordinates"
-        #         ],  # Coordinates are a WellCoordinate object and need to be encoded into a json string
-        #     )
-        #     for well in wells_data
-        # ]
-        # sql_statement = """
-        #     INSERT INTO well_hx (
-        #     plate_id,
-        #     well_id,
-        #     experiment_id,
-        #     project_id,
-        #     status,
-        #     status_date,
-        #     contents,
-        #     volume,
-        #     coordinates
-        #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        #     ON CONFLICT (plate_id, well_id) DO UPDATE SET
-        #     experiment_id = excluded.experiment_id,
-        #     project_id = excluded.project_id,
-        #     status = excluded.status,
-        #     status_date = excluded.status_date,
-        #     contents = excluded.contents,
-        #     volume = excluded.volume,
-        #     coordinates = excluded.coordinates
-        # """
-        # sql_utilities.execute_sql_command(
-        #     sql_statement, values
-        # )  # Pass values as a single argument
         list_of_wells = [well for well in self.wells.values()]
         sql_utilities.save_wells_to_db(list_of_wells)
 
