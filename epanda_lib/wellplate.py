@@ -507,6 +507,7 @@ class Wellplate:
         if not isinstance(new_coordinates, WellCoordinates):
             raise TypeError("Coordinates must be a WellCoordinates object")
         self.wells[well_id.upper()].coordinates = new_coordinates
+        sql_utilities.update_well_coordinates(well_id, self.plate_id, new_coordinates)
 
     def get_contents(self, well_id: str) -> dict:
         """Return the contents of a specific well"""

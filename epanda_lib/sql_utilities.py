@@ -718,6 +718,29 @@ def select_well_characteristics(type_id: int) -> tuple[int, int, int, int, str]:
         (type_id,),
     )[0]
 
+def update_well_coordinates(well_id: str, plate_id: int, coordinates: WellCoordinates) -> None:
+    """
+    Update the coordinates of a well in the well_hx table.
+
+    Args:
+        well_id (str): The well ID.
+        plate_id (int): The plate ID.
+        coordinates (WellCoordinates): The coordinates.
+    """
+    if plate_id is None:
+        plate_id = execute_sql_command(
+            "SELECT id FROM wellplates WHERE current = 1"
+        )[0][0]
+    
+    execute_sql_command_no_return(
+        """
+        UPDATE well_hx
+        SET coordinates = ?
+        WHERE well_id = ?
+        AND plate_id = ?
+        """,
+        (json.dumps(coordinates.to_dict()), well_id, plate_id),
+    )
 
 # endregion
 
