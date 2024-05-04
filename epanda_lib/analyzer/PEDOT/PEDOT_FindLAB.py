@@ -54,9 +54,8 @@ def extract_circular_region(image_path, radius=300, show_region=True) -> np.ndar
 def rgbtolab(inputs: RequiredData) -> RawMetrics:
     """Converts RGB images to LAB color space and calculates Delta E00 values."""
     experiment_id: int = inputs.experiment_id
-    images_by_exp_id: dict = {}.setdefault(
-        experiment_id, {"deposition": None, "bleaching": None, "coloring": None}
-    )
+    images_by_exp_id: dict = {
+    experiment_id: {"deposition": None, "bleaching": None, "coloring": None}}
     images_by_exp_id[experiment_id]["deposition"] = inputs.BeforeDeposition
     images_by_exp_id[experiment_id]["bleaching"] = inputs.AfterBleaching
     images_by_exp_id[experiment_id]["coloring"] = inputs.AfterColoring
@@ -79,12 +78,28 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
 
             lab_values = color.rgb2lab((corrected_rgb / 255).reshape(1, 1, 3)).flatten()
 
-            #lab_values_dict[experiment_id] = lab_values_dict.get(experiment_id, {})
+            lab_values_dict[experiment_id] = lab_values_dict.get(experiment_id, {})
             lab_values_dict[experiment_id][image_type] = lab_values
             lab_values_dict[experiment_id][f"{image_type}_original_rgb"] = original_rgb
             lab_values_dict[experiment_id][f"{image_type}_roi_path"] = roi_path
 
-    metrics: RawMetrics = None
+    metrics: RawMetrics = RawMetrics(
+        experiment_id=experiment_id,
+        l_c=0,
+        a_c=0,
+        b_c=0,
+        l_b=0,
+        a_b=0,
+        b_b=0,
+        delta_e00=0,
+        r_c_o=0,
+        g_c_o=0,
+        b_c_o=0,
+        r_b_o=0,
+        g_b_o=0,
+        b_b_o=0,
+        roi_path="",  # This is a path to the image with the ROI highlighted
+    )
     metrics.experiment_id = experiment_id
     for experiment_id, labs in lab_values_dict.items():
         if "coloring" in labs and "bleaching" in labs:

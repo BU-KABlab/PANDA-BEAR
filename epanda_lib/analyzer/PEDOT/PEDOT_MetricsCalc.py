@@ -22,6 +22,8 @@ def modify_function(value):
 def calc_charge(deposition_file):
     """Calculate charge passed using text file for deposition"""
     # Read in the text file
+    if deposition_file is None:
+        return None
     df = pd.read_csv(
         deposition_file,
         sep=" ",
@@ -49,6 +51,8 @@ def calc_charge(deposition_file):
 
 def calc_capacitance(cv_file):
     """Calculate metric for capacitance using CV by finding the area enclosed by the CV curve."""
+    if cv_file is None:
+        return None
     df = pd.read_csv(
         cv_file,
         sep=" ",
@@ -94,6 +98,8 @@ def calc_capacitance(cv_file):
 
 def calc_bleach_charge(bleach_file):
     """Calculate the charge passed during bleaching using text file for bleaching"""
+    if bleach_file is None:
+        return None
     df = pd.read_csv(
         bleach_file,
         sep=" ",
