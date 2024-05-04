@@ -1,3 +1,20 @@
+"""
+This module contains functions for calibrating and positioning a mill, wellplate, and vials.
+
+The functions in this module allow the user to:
+ - check and change mill settings
+ - calibrate the locations of individual wells in a wellplate
+ - calibrate the z_bottom of the wellplate to the mill
+ 
+The module relies on other modules such as `mill_control`, `utilities`, `vials`, and `wellplate` to perform these operations.
+
+The main functions in this module are:
+- `check_mill_settings`: Fetches the settings list from the grbl controller, compares it to the settings file, allows the user to change settings if desired, and applies the new settings to the mill.
+- `calibrate_wells`: Calibrates the locations of individual wells in a wellplate using either a pipette or an electrode.
+- `calibrate_z_bottom_of_wellplate`: Calibrates the z_bottom of the wellplate to the mill.
+- `calibrate_vials`: Calibrates the vials to the mill.
+"""
+
 import json
 from typing import Sequence
 import os
@@ -74,83 +91,6 @@ def check_mill_settings(
             break
         else:
             print("Settings have not been applied")
-
-
-# def calibrate_wellplate(
-#     mill: Mill,
-#     wellplate: Wellplate,
-#     stock_vials: Sequence[StockVial],
-#     waste_vials: Sequence[WasteVial],
-# ):
-#     """
-#     Calibrate the wellplate to the mill, this will set the x and y coordinates
-#     of all well locations in the wellplate object based on the user input.
-
-#     Args:
-#         wellplate (Wellplate)
-#         mill (Mill)
-#     """
-#     # Enter well choice loop
-#     while True:
-#         well_id = input("Enter the well ID to test (e.g., A1) or done to end: ").lower()
-#         if well_id == "done":
-#             break
-
-#         # Provide the current coordinates of the well
-#         original_coordinates = wellplate.get_coordinates(well_id)
-#         print(f"Current coordinates of {well_id}: {original_coordinates}")
-
-#         # Move the pipette to the top of the well
-#         mill.safe_move(
-#             original_coordinates["x"],
-#             original_coordinates["y"],
-#             wellplate.z_top,
-#             Instruments.PIPETTE,
-#         )
-
-#         # Enter confirmation loop
-#         while True:
-#             current_coorinates = Coordinates(
-#                 original_coordinates["x"],
-#                 original_coordinates["y"],
-#                 z=wellplate.z_top,
-#             )
-#             confirm = input("Is the pipette in the correct position? (yes/no): ").lower().strip()[0]
-#             if confirm.lower() == "y":
-#                 break
-#             print(f"Current coordinates of {well_id}: {current_coorinates}")
-#             new_coordinates = Coordinates(
-#                 float(input(f"Enter the new x coordinate for {well_id}: ")),
-#                 float(input(f"Enter the new y coordinate for {well_id}: ")),
-#                 z=wellplate.z_top,
-#             )
-
-#             # Safe move to the new coordinates
-#             mill.safe_move(
-#                 new_coordinates.x,
-#                 new_coordinates.y,
-#                 wellplate.z_top,
-#                 Instruments.PIPETTE,
-#             )
-
-#         coord_diff = Coordinates(
-#             new_coordinates.x - original_coordinates["x"],
-#             new_coordinates.y - original_coordinates["y"],
-#             z=0,
-#         )
-
-#         # Save the new coordinates to the wellplate object for that well
-#         # wellplate.set_coordinates(well_id, new_coordinates)
-#         # For now we will not be setting individual well coordinates
-#         # Instead we will set the coordinates for the entire wellplate, specifically A1 and then recalculate the rest
-#         a1_coordinates = wellplate.get_coordinates("A1")
-#         a1_coordinates["x"] += coord_diff.x
-#         a1_coordinates["y"] += coord_diff.y
-
-#         wellplate.a1_x = a1_coordinates["x"]
-#         wellplate.a1_y = a1_coordinates["y"]
-#         wellplate.write_wellplate_location()
-#         wellplate.recalculate_well_locations()
 
 
 def calibrate_wells(
@@ -267,10 +207,8 @@ def calibrate_wells(
                     wellplate.a1_y = new_coordinates.y
                     wellplate.write_wellplate_location() # This is the json file that holds the wellplate location
                     wellplate.recalculate_well_locations() # This updates the well objects and db entries with the new coordinates
-                    #wellplate.save_wells_to_db() #FIXME: this might be redundant
             else: # Update the well with new well coordinates
-                wellplate.set_coordinates(well_id, new_coordinates) # This updates the well object and db entry with the new coordinates
-                #wellplate.save_wells_to_db() #FIXME: this might be redundant
+                wellplate.set_coordinates(well_id, new_coordinates)
 
 
 def calibrate_z_bottom_of_wellplate(
