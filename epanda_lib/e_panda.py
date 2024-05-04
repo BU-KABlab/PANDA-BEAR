@@ -804,8 +804,13 @@ def image_well(
         logger.debug("Capturing image of well %s", instructions.well_id)
 
         # create file name
-        project_campaign_id = instructions.project_campaign_id or "test"
         project_id = instructions.project_id or "test"
+        if isinstance(instructions.project_campaign_id,int):
+            project_campaign_id = instructions.project_campaign_id
+        elif instructions.project_campaign_id is None:
+            project_campaign_id = "test"
+        else:
+            project_campaign_id = "test"
         exp_id = instructions.experiment_id or "test"
         well_id = instructions.well_id or "test"
 
@@ -848,7 +853,7 @@ def image_well(
                 context=step_description,
             )
             img.save(dz_filepath)
-            instructions.results.append_image_file(dz_filepath, context=step_description)
+            instructions.results.append_image_file(dz_filepath, context=(step_description + "_dz"))
         logger.debug("Image of well %s captured", instructions.well_id)
 
         instructions.results.append_image_file(filepath, context=step_description)
