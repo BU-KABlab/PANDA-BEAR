@@ -41,8 +41,8 @@ def pedot_analyzer(experiment_id: int) -> MLTrainingData:
     """Analyzes the PEDOT experiment."""
 
     input_data: RequiredData = analysis_input(experiment_id)
-    metrics = lab.rgbtolab(input_data)
-    results = met.process_metrics(input_data, metrics)
+    metrics:RawMetrics = lab.rgbtolab(input_data)
+    results = met.process_metrics(metrics, input_data)
 
     # insert the metrics as experiment results
     list_of_raw_metrics = [
