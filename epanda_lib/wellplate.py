@@ -453,8 +453,6 @@ class Wellplate:
             #well.height = self.height
             #well.capacity = self.well_capacity
             well.name = well.well_id.upper()
-
-            # TODO this might be redundant
         logger.debug("Well status updated from database")
 
     def get_coordinates(self, well_id: str, axis: str = None) -> WellCoordinates:
