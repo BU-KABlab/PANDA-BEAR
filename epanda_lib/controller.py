@@ -124,20 +124,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             new_experiment, _ = scheduler.read_next_experiment_from_queue(
                 random_pick=RANDOM_FLAG
             )
-            # if new_experiment is None:
-            #     slack.send_slack_message(
-            #         "alert",
-            #         "No new experiments to run...monitoring inbox for new experiments",
-            #     )
-            # if new_experiment is None:
-            #     # e_panda.flush_pipette_tip(pump=toolkit.pump,
-            #     #                           mill=toolkit.mill,
-            #     #                           stock_vials=stock_vials,
-            #     #                           waste_vials=waste_vials,
-            #     #                           flush_solution_name='water',
-            #     #                           flush_volume=120,
-            #     #                           )
-            #     break  # break out of the while True loop
 
             while new_experiment is None:
                 sql_utilities.set_system_status(SystemState.IDLE)
@@ -148,6 +134,18 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                         "alert", f"New experiment {new_experiment.experiment_id} found"
                     )
                     break  # break out of the while new experiment is None loop
+
+                # If the AL campaign length is set, and we have not reached the end of the campaign, run the ML analysis
+                if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
+                    # We do the analysis on the experiments that have already been run
+                    next_exp_id = pedot_ml_analysis()
+                    new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                    if new_experiment is not None:
+                        slack.send_slack_message(
+                            "alert", f"New experiment generated from existing data {new_experiment.experiment_id}"
+                        )
+                        al_campaign_iteration += 1
+                        continue  # continue to the next iteration of the while new experiment is None loop
                 logger.info(
                     "No new experiments to run...waiting a minute for new experiments"
                 )
@@ -255,20 +253,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 waste_vials=waste_vials,
             )
 
-            ## FIXME: This is a temporary fix to allow the program to run for the broken up edot experiments
-            ## This will be removed once the experiment steps are performed in series
-            # if new_experiment.process_type in [1, 2, 3, 4]:
-            #     new_experiment.set_status_and_save(ExperimentStatus.QUEUED)
-            #     # scheduler.change_well_status(
-            #     #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-            #     # )
-            #     slack.send_slack_message(
-            #         "alert",
-            #         f"Experiment {new_experiment.experiment_id} part {new_experiment.process_type-1} has completed, and is back in the queue",
-            #     )
-            #     scheduler.add_to_queue(new_experiment)
-            # else:
-
             ## Update the experiment status to complete
             new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
 
@@ -283,9 +267,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             logger.info(post_experiment_status_msg)
             # slack.send_slack_message("alert", post_experiment_status_msg)
 
-            ## Update location of experiment instructions and save results
-            # scheduler.update_experiment_file(new_experiment)
-            # scheduler.update_experiment_location(new_experiment)
             scheduler.save_results(new_experiment)
 
             # If the AL campaign length is set, run the ML analysis
@@ -293,8 +274,6 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 # We do the analysis on the experiment that just finished
                 next_exp_id = pedot_ml_analysis(new_experiment.experiment_id)
 
-                # Share to slack the analysis and ml information
-                # Share to slack the analysis and ml information
                 roi_path = None
                 delta_e00 = None
 
@@ -306,6 +285,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                     delta_e00 = sql_utilities.select_specific_result(new_experiment.experiment_id, "delta_e00").result_value
                 except AttributeError:
                     pass
+
                 # The ML Model will then make a prediction for the next experiment
                 # First fetch and send the contour plot
                 contour_plot = Path(sql_utilities.select_specific_result(new_experiment.experiment_id+1, "PEDOT_Contour_Plots").result_value)
@@ -540,12 +520,6 @@ def establish_system_state() -> (
     ## read the wellplate json and log the status of each well in a grid
     number_of_clear_wells = 0
     number_of_wells = 0
-    # with open(WELL_STATUS, "r", encoding="UTF-8") as file:
-    #     wellplate_status = json.load(file)
-    # for well in wellplate_status["wells"]:
-    #     number_of_wells += 1
-    #     if well["status"] in ["clear", "new", "queued"]:
-    #         number_of_clear_wells += 1
 
     # Query the number of clear wells in well_status
     number_of_clear_wells = sql_utilities.get_number_of_clear_wells()
@@ -723,7 +697,6 @@ class ShutDownCommand(Exception):
 
 
 if __name__ == "__main__":
-    # wellplate_module.load_new_wellplate(False,new_plate_id=107,new_wellplate_type_number=3)
     print("TEST MODE: ", TESTING)
     input("Press enter to continue or ctrl+c to exit")
     main(use_mock_instruments=TESTING, one_off=False)
