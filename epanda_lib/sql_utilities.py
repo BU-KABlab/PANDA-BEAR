@@ -361,7 +361,7 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
     return wells
 
 
-def select_well_status(well_id: str) -> str:
+def select_well_status(well_id: str, plate_id:int = None) -> str:
     """
     Get the status of a well from the well_hx table.
 
@@ -371,8 +371,10 @@ def select_well_status(well_id: str) -> str:
     Returns:
         str: The status of the well.
     """
+    if plate_id is None:
+        plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
     result = execute_sql_command(
-        f"SELECT status FROM well_status WHERE well_id = '{well_id}'"
+        f"SELECT status FROM well_status WHERE well_hx = '{well_id} AND plate_id = '{plate_id}"
     )
     return result[0][0]
 
@@ -404,17 +406,21 @@ def count_wells_with_new_status(plate_id: int = None) -> int:
     return int(result[0][0])
 
 
-def select_next_available_well() -> str:
+def select_next_available_well(plate_id:int = None) -> str:
     """
     Choose the next available well in the well_hx table.
 
     Returns:
         str: The well ID of the next available well.
     """
+    if plate_id is None:
+        plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
+
     result = execute_sql_command(
-        """
-        SELECT well_id FROM well_status
+        f"""
+        SELECT well_id FROM well_hx
         WHERE status = 'new'
+        AND plate_id = '{plate_id}'
         ORDER BY well_id ASC
         LIMIT 1
         """
@@ -562,7 +568,7 @@ def insert_well(well_to_insert: Well) -> None:
 
 def update_well(well_to_update: Well) -> None:
     """
-    Get the SQL statement for updating the entry in the well_hx table.
+    Updating the entry in the well_hx table that matches the well and plate ids.
 
     Returns:
         str: The SQL statement.

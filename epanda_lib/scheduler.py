@@ -44,19 +44,19 @@ class Scheduler:
         """
         self.experiment_queue = []
 
-    def check_well_status(self, well_to_check: str) -> str:
+    def check_well_status(self, well_to_check: str, plate_id:int = None) -> str:
         """Checks the status of the well in the well_status view in the SQLite database"""
         try:
-            well_status = sql_utilities.select_well_status(well_to_check)
+            well_status = sql_utilities.select_well_status(well_to_check, plate_id)
             return well_status
         except sqlite3.Error as e:
             logger.error("Error occured while checking well status: %s", e)
             raise e
 
-    def choose_next_new_well(self) -> str:
+    def choose_next_new_well(self, plate_id: int = None) -> str:
         """Choose the next available well for an experiment"""
         try:
-            next_well = sql_utilities.select_next_available_well()
+            next_well = sql_utilities.select_next_available_well(plate_id)
             return next_well
         except sqlite3.Error as e:
             logger.error("Error occured while choosing next well: %s", e)
@@ -74,7 +74,7 @@ class Scheduler:
         # If the well is a string, get a well object
         if isinstance(well, str):
             well_id = well
-            well = sql_utilities.get_well(well_id=well_id)
+            well:Well = sql_utilities.get_well(well_id=well_id)
             if well is None:
                 logger.error("Well %s not found", well_id)
                 raise ValueError(f"Well {well_id} not found")
@@ -82,6 +82,11 @@ class Scheduler:
         # Update the well status
         well.status = experiment.status.value
         well.status_date = experiment.status_date
+
+        # Verify that the well has a plate id
+        if well.plate_id is None:
+            logger.error("Well %s does not have a plate id", well)
+            raise ValueError(f"Well {well} does not have a plate id")
 
         try:
             sql_utilities.update_well(well)
@@ -278,10 +283,13 @@ class Scheduler:
                     print(message)
                     experiments.remove(experiment)
 
+                ## Check if the experiment is for a specific plate, if not choose the current plate
+                if experiment.plate_id is None:
+                    experiment.plate_id, _, _ = sql_utilities.select_current_wellplate_info()
                 ## Check if the well is available
-                if self.check_well_status(experiment.well_id) != "new":
+                if self.check_well_status(experiment.well_id, experiment.plate_id) != "new":
                     # Find the next available well
-                    target_well = self.choose_next_new_well()
+                    target_well = self.choose_next_new_well(experiment.plate_id)
                     if target_well is None:
                         logger.info(
                             "No wells available for experiment originally for well %s.",
