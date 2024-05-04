@@ -582,7 +582,7 @@ class EchemExperimentBase(ExperimentBase):
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class EdotExperiment(EchemExperimentBase):
-    """Define the data that is used to run an edot experiment"""
+    """Define the default data that is used to run an edot experiment"""
 
     project_id: int = 16
     well_type_number: int = 4  # ito
