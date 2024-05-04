@@ -1070,30 +1070,6 @@ def insert_experiment_parameters(experiment: ExperimentBase) -> None:
     Args:
         experiment (ExperimentBase): The experiment to insert.
     """
-    # experiment_parameters: list[ExperimentParameterRecord] = (
-    #     experiment.generate_parameter_list()
-    # )
-    # parameters = [
-    #     (
-    #         experiment.experiment_id,
-    #         parameter.parameter_type,
-    #         parameter.parameter_value,
-    #         datetime.now().isoformat(timespec="seconds"),
-    #     )
-    #     for parameter in experiment_parameters
-    # ]
-    # execute_sql_command_no_return(
-    #     """
-    #     INSERT INTO experiment_parameters (
-    #         experiment_id,
-    #         parameter_name,
-    #         parameter_value,
-    #         created
-    #         )
-    #     VALUES (?, ?, ?, ?)
-    #     """,
-    #     parameters,
-    # )
     insert_experiments_parameters([experiment])
 
 
@@ -1143,35 +1119,6 @@ def update_experiment(experiment: ExperimentBase) -> None:
     Args:
         experiment (ExperimentBase): The experiment to update.
     """
-    # execute_sql_command_no_return(
-    #     """
-    #     UPDATE experiments
-    #     SET project_id = ?,
-    #         project_campaign_id = ?,
-    #         well_type = ?,
-    #         protocol_id = ?,
-    #         pin = ?,
-    #         experiment_type = ?,
-    #         jira_issue_key = ?,
-    #         priority = ?,
-    #         process_type = ?,
-    #         filename = ?
-    #     WHERE experiment_id = ?
-    #     """,
-    #     (
-    #         experiment.project_id,
-    #         experiment.project_campaign_id,
-    #         experiment.well_type_number,
-    #         experiment.protocol_id,
-    #         experiment.pin,
-    #         experiment.experiment_type,
-    #         experiment.jira_issue_key,
-    #         experiment.priority,
-    #         experiment.process_type,
-    #         experiment.filename,
-    #         experiment.experiment_id,
-    #     ),
-    # )
     update_experiments([experiment])
 
 
@@ -1211,7 +1158,8 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
             jira_issue_key = ?,
             priority = ?,
             process_type = ?,
-            filename = ?
+            filename = ?,
+            updated = datetime('now', 'localtime')
         WHERE experiment_id = ?
         """,
         parameters,
@@ -1267,7 +1215,11 @@ def update_experiment_status(
     execute_sql_command(
         """
         UPDATE well_hx
-        SET status = ?, status_date = ?, experiment_id = ?, project_id = ?
+        SET status = ?,
+            status_date = ?,
+            experiment_id = ?,
+            project_id = ?,
+            updated = datetime('now', 'localtime')
         WHERE well_id = ?
         AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
         """,
@@ -1313,7 +1265,11 @@ def update_experiments_statuses(
     execute_sql_command_no_return(
         """
         UPDATE well_hx
-        SET status = ?, status_date = ?, experiment_id = ?, project_id = ?
+        SET status = ?,
+        status_date = ?,
+        experiment_id = ?,
+        project_id = ?,
+        updated = datetime('now', 'localtime')
         WHERE well_id = ?
         AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
         """,
@@ -1337,9 +1293,10 @@ def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
             experiment_id,
             result_type,
             result_value,
-            context
+            context,
+            created
             )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
         """
     if isinstance(entry.result_value, dict):
         entry.result_value = json.dumps(entry.result_value)
