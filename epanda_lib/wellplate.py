@@ -11,7 +11,6 @@ import logging
 import math
 import os
 from typing import Dict, Optional, Tuple
-
 from .config.config import (
     MILL_CONFIG,
     WELLPLATE_LOCATION,
@@ -241,6 +240,12 @@ class Well(Vessel):
         self.save_to_db()
         self.log_contents()
 
+    def update_status(self, new_status: str) -> None:
+        """Updates the status of the well in the well_hx table."""
+        self.status = new_status
+        sql_utilities.update_well_status(self.well_id, self.plate_id, new_status)
+        logger.debug("Well %s status updated to %s", self.name, self.status)
+
     def save_to_db(self) -> None:
         """Inserts or Updates the well in the database"""
         logger.info("Saving well %s to the database", self.name)
@@ -331,7 +336,7 @@ class Wellplate:
             self.rows,
             self.columns,
             self.echem_height,
-        ) = self.load_wellplate_location()
+        ) = self.load_wellplate_location() # from the json file
         self.a1_coordinates = {
             "x": self.a1_x,
             "y": self.a1_y,
@@ -344,7 +349,6 @@ class Wellplate:
             sql_utilities.select_current_wellplate_info()
         )
         if not new_well_plate:
-            # self.update_well_status_from_json_file()
             self.plate_id = current_wellplate_id
             self.type_number = current_wellplate_type
             self.update_well_status_from_db()
@@ -371,7 +375,9 @@ class Wellplate:
             "z_top": self.z_top,
         }  # coordinates of A1
         self.calculate_well_locations()
-        # self.update_well_status_from_json_file()
+        for well in self.wells:
+            well:Well
+            self.update_well_coordinates(well, well.coordinates)
 
     def calculate_well_locations(self: "Wellplate") -> None:
         """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
@@ -447,13 +453,14 @@ class Wellplate:
         logger.debug("Updating well status from database...")
         incoming_wells = sql_utilities.select_wellplate_wells()
         for saved_well in incoming_wells:
-            well = self.wells[saved_well.name.upper()]
+            #well = self.wells[saved_well.name.upper()]
             well = saved_well
             well.plate_id = self.plate_id
             well.depth = self.z_bottom
             #well.height = self.height
             #well.capacity = self.well_capacity
             well.name = well.well_id.upper()
+        self.wells = {well.well_id: well for well in incoming_wells}
         logger.debug("Well status updated from database")
 
     def get_coordinates(self, well_id: str, axis: str = None) -> WellCoordinates:
@@ -473,11 +480,16 @@ class Wellplate:
             raise KeyError(f"Well {well_id} not found")
 
     def set_coordinates(self, well_id: str, new_coordinates: WellCoordinates) -> None:
-        """Sets the coordinates of a specific well in memory and in the db"""
+        """Sets the coordinates of a specific well in memory only"""
         # validate the coordinates
         if not isinstance(new_coordinates, WellCoordinates):
             raise TypeError("Coordinates must be a WellCoordinates object")
         self.wells[well_id.upper()].coordinates = new_coordinates
+
+    def update_well_coordinates(self, well_id: str, new_coordinates: WellCoordinates) -> None:
+        """Update the coordinates of a specific well"""
+        well_id = well_id.upper()
+        self.wells[well_id].coordinates = new_coordinates
         sql_utilities.update_well_coordinates(well_id, self.plate_id, new_coordinates)
 
     def get_contents(self, well_id: str) -> dict:
@@ -549,7 +561,15 @@ class Wellplate:
 
     def set_well_status(self, well_id: str, status: str) -> None:
         """Update the status of a specific well."""
-        self.wells[well_id.upper()].status = status
+        self.wells[well_id.upper()].update_status(status)
+    
+    def update_well_status(self, well, status):
+        """Update the status of a specific well in memory and in the database"""
+        if isinstance(well, str):
+            well = well.upper()
+            self.wells[well].update_status(status)
+        elif isinstance(well, Well):
+            well.update_status(status)
 
     def check_all_wells_status(self):
         """Check the status of all wells"""
@@ -648,6 +668,11 @@ class Wellplate:
         """Save the wells to the well_hx table. Replaces the write_well_status_to_file method"""
         list_of_wells = [well for well in self.wells.values()]
         sql_utilities.save_wells_to_db(list_of_wells)
+
+    def print(self) -> None:
+        """Print the well plate"""
+        for well in self.wells.values():
+            print(well)
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""

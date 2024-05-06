@@ -324,7 +324,7 @@ if __name__ == "__main__":
 
     while True:
         set_system_status(SystemState.IDLE, "at main menu", read_testing_config())
-        os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+        #os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
         print()
         print(print_panda.print_panda())
         print()

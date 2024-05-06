@@ -152,7 +152,7 @@ def calibrate_wells(
             instrument: Instruments
             confirm = input(f"Is the {(instrument.value)}  in the correct position? (yes/no): ")
             if confirm is None or confirm.lower().strip()[0] in ["y",""]:
-                break
+                break # exit confirmation loop go to updating coordinates if changed
             print(f"Current coordinates of {well_id}: {current_coorinates}") #change to be the corrected coordinates if they have been changed
             coordinates_changed = True
             # gather new coordinates and test them for validity before trying to set them
@@ -208,7 +208,7 @@ def calibrate_wells(
                     wellplate.write_wellplate_location() # This is the json file that holds the wellplate location
                     wellplate.recalculate_well_locations() # This updates the well objects and db entries with the new coordinates
             else: # Update the well with new well coordinates
-                wellplate.set_coordinates(well_id, new_coordinates)
+                wellplate.update_well_coordinates(well_id, new_coordinates)
 
 
 def calibrate_z_bottom_of_wellplate(
@@ -363,7 +363,8 @@ def calibrate_mill(
     # Connect to the mill
     with mill() as mill:
         while True:
-            os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+            #os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+            print("\n\n")
             print("""\nWelcome to the mill calibration and positioning menu:""")
             for key, value in options.items():
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")

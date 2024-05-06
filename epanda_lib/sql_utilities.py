@@ -6,6 +6,7 @@ from typing import List, Union
 from pathlib import Path
 import json
 import csv
+import logging
 
 from epanda_lib.wellplate import Well, WellCoordinates  # , WellCoordinatesEncoder
 from epanda_lib.experiment_class import (
@@ -18,8 +19,21 @@ from epanda_lib.experiment_class import (
 )
 
 from epanda_lib.config.config_tools import read_testing_config
-from epanda_lib.config.config import SQL_DB_PATH
+from epanda_lib.config.config import SQL_DB_PATH, PATH_TO_LOGS
 from epanda_lib.utilities import SystemState
+
+# Set up logging
+# set up logging to log to both the pump_control.log file and the ePANDA.log file
+logger = logging.getLogger("sql_utilities")
+logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
+formatter = logging.Formatter(
+    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
+)
+system_handler = logging.FileHandler(PATH_TO_LOGS / "sql_utilities.log")
+system_handler.setFormatter(formatter)
+logger.addHandler(system_handler)
+
+
 # region Utility Functions
 def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
     """
@@ -39,6 +53,9 @@ def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
     cursor.execute("BEGIN TRANSACTION")  # Start a new transaction
 
     try:
+        # Log the SQL command
+        logger.debug("Executing SQL command: %s",sql_command)
+        logger.debug("Parameters: %s", parameters)
         # Execute the SQL command
         if parameters:
             if isinstance(parameters[0], tuple):
@@ -50,8 +67,13 @@ def execute_sql_command(sql_command: str, parameters: tuple = None) -> List:
         result = cursor.fetchall()
 
         conn.commit()
+
+        # Log the result
+        logger.debug("SQL command executed successfully. Result: %s",result)
     except sqlite3.Error as e:
-        print(f"An error occurred: {e}")
+        logger.error("An error occurred: %s",e)
+        logger.error("SQL command: %s",sql_command)
+        logger.error("Parameters: %s",parameters)
         conn.rollback()  # Rollback the transaction if error
         raise e
     finally:
@@ -79,6 +101,11 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None) ->
 
     try:
         # Execute the SQL command
+
+        # Log the SQL command
+        logger.debug("Executing SQL command: %s", sql_command)
+        logger.debug("Parameters: %s", parameters)
+
         if parameters:
             if isinstance(parameters[0], tuple):
                 cursor.executemany(sql_command, parameters)
@@ -86,10 +113,17 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None) ->
                 cursor.execute(sql_command, parameters)
         else:
             cursor.execute(sql_command)
-
+        result = cursor.fetchall()
         # Commit the transaction
         conn.commit()
+
+        # Log the result
+        logger.debug("SQL command executed successfully.")
+        logger.debug("Result: %s", result)
     except Exception as e:
+        logger.error("An error occurred: %s", e)
+        logger.error("SQL command: %s", sql_command)
+        logger.error("Parameters: %s", parameters)
         # Rollback the transaction on error
         conn.rollback()
         raise e
@@ -422,7 +456,8 @@ def select_next_available_well(plate_id:int = None) -> str:
         SELECT well_id FROM well_hx
         WHERE status = 'new'
         AND plate_id = ?
-        ORDER BY well_id ASC
+        ORDER ORDER BY SUBSTRING(well_id, 1, 1),
+              CAST (SUBSTRING(well_id, 2) AS UNSIGNED) ASC
         LIMIT 1
         """,
         (plate_id,)
@@ -453,7 +488,8 @@ def save_well_to_db(well_to_save: Well) -> None:
         status_date,
         contents,
         volume,
-        coordinates
+        coordinates,
+        updated = datetime('now', 'localtime')
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (plate_id, well_id) DO UPDATE SET
         experiment_id = excluded.experiment_id,
@@ -462,7 +498,9 @@ def save_well_to_db(well_to_save: Well) -> None:
         status_date = excluded.status_date,
         contents = excluded.contents,
         volume = excluded.volume,
-        coordinates = excluded.coordinates
+        coordinates = excluded.coordinates,
+        updated = datetime('now', 'localtime')
+
     """
     if well_to_save.plate_id in [None, 0]:
         well_to_save.plate_id = execute_sql_command(
@@ -499,7 +537,8 @@ def save_wells_to_db(wells_to_save: List[Well]) -> None:
         status_date,
         contents,
         volume,
-        coordinates
+        coordinates,
+        updated = datetime('now', 'localtime')
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (plate_id, well_id) DO UPDATE SET
         experiment_id = excluded.experiment_id,
@@ -508,7 +547,8 @@ def save_wells_to_db(wells_to_save: List[Well]) -> None:
         status_date = excluded.status_date,
         contents = excluded.contents,
         volume = excluded.volume,
-        coordinates = excluded.coordinates
+        coordinates = excluded.coordinates,
+        updated = datetime('now', 'localtime')
     """
     values = []
     for well in wells_to_save:
@@ -550,7 +590,9 @@ def insert_well(well_to_insert: Well) -> None:
         status_date,
         contents,
         volume,
-        coordinates
+        coordinates,
+        updated = datetime('now', 'localtime')
+
         ) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
@@ -586,7 +628,8 @@ def update_well(well_to_update: Well) -> None:
         status_date = ?,
         contents = ?,
         volume = ?,
-        coordinates = ?
+        coordinates = ?,
+        updated = datetime('now', 'localtime')
     WHERE plate_id = ?
     AND well_id = ?
     """
@@ -675,6 +718,8 @@ def complete_well_information(sql_command: str, values: tuple) -> Well:
         contents,
         volume,
         coordinates,
+        _,
+
     ) = result[0]
 
     if result == []:
@@ -694,7 +739,6 @@ def complete_well_information(sql_command: str, values: tuple) -> Well:
         )[0]
     except IndexError:
         capacity, height = 300, 6
-
     return Well(
         plate_id=plate_id,
         well_id=well_id,
@@ -704,7 +748,7 @@ def complete_well_information(sql_command: str, values: tuple) -> Well:
         status_date=status_date,
         contents=contents,
         volume=volume,
-        coordinates=coordinates,
+        coordinates=WellCoordinates(**(json.loads(coordinates))),
         capacity=capacity,
         height=height,
     )
@@ -739,11 +783,12 @@ def update_well_coordinates(well_id: str, plate_id: int, coordinates: WellCoordi
         plate_id = execute_sql_command(
             "SELECT id FROM wellplates WHERE current = 1"
         )[0][0]
-    
-    execute_sql_command_no_return(
+
+    execute_sql_command(
         """
         UPDATE well_hx
-        SET coordinates = ?
+        SET coordinates = ?,
+            updated = datetime('now', 'localtime')
         WHERE well_id = ?
         AND plate_id = ?
         """,
@@ -1013,6 +1058,32 @@ def select_experiment_status(experiment_id: int) -> str:
     if result == []:
         return ValueError("No experiment found with that ID")
     return result[0][0]
+
+def update_well_status(well_id: str, plate_id: int = None,status: str = None) -> None:
+    """
+    Update the status of a well in the well_hx table.
+
+    Args:
+        well_id (str): The well ID.
+        plate_id (int): The plate ID.
+        status (str): The status.
+    """
+    if plate_id is None:
+        plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
+    if status is None:
+        status = select_well_status(well_id, plate_id)
+        
+    execute_sql_command_no_return(
+        """
+        UPDATE well_hx
+        SET status = ?,
+            status_date = datetime('now', 'localtime'),
+            updated = datetime('now', 'localtime')
+        WHERE well_id = ?
+        AND plate_id = ?
+        """,
+        (status, well_id, plate_id),
+    )
 
 def insert_experiment(experiment: ExperimentBase) -> None:
     """
