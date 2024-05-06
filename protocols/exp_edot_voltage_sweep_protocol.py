@@ -242,7 +242,8 @@ def pedotbleaching(
     ## Deposit the experiment solution into the well
     toolkit.global_logger.info("1. Depositing EDOT into well: %s", instructions.well_id)
     forward_pipette_v2(
-        volume=instructions.solutions_corrected["liclo4"],
+        #volume=instructions.solutions_corrected["liclo4"],
+        volume=125,
         from_vessel=solution_selector(
             stock_vials,
             "liclo4",
@@ -353,7 +354,8 @@ def pedotcoloring(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
     forward_pipette_v2(
-        volume=instructions.solutions_corrected["liclo4"],
+        #volume=instructions.solutions_corrected["liclo4"],
+        volume=125,
         from_vessel=solution_selector(
             stock_vials,
             "liclo4",
