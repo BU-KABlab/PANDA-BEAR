@@ -305,7 +305,8 @@ class Wellplate:
         self.echem_height = -70  # for every well
         self.image_height = -35  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
-        self.plate_id = 0 if plate_id is None else plate_id  # The id of the well plate
+        plate_id, _, _ = sql_utilities.select_current_wellplate_info()
+        self.plate_id = plate_id if plate_id is None else plate_id  # The id of the well plate
 
         # From the well_type.csv file in config but has defaults
         self.z_top = 0
