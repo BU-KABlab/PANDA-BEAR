@@ -374,7 +374,7 @@ def select_well_status(well_id: str, plate_id:int = None) -> str:
     if plate_id is None:
         plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
     result = execute_sql_command(
-        f"SELECT status FROM well_status WHERE well_hx = '{well_id} AND plate_id = '{plate_id}"
+        f"SELECT status FROM well_status WHERE well_hx = '{well_id}' AND plate_id = '{plate_id}'"
     )
     return result[0][0]
 
