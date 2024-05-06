@@ -374,7 +374,8 @@ def select_well_status(well_id: str, plate_id:int = None) -> str:
     if plate_id is None:
         plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
     result = execute_sql_command(
-        f"SELECT status FROM well_status WHERE well_hx = '{well_id}' AND plate_id = '{plate_id}'"
+        "SELECT status FROM well_status WHERE well_id = ? AND plate_id = ?",
+        (well_id, plate_id,)
     )
     return result[0][0]
 
@@ -417,13 +418,14 @@ def select_next_available_well(plate_id:int = None) -> str:
         plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
 
     result = execute_sql_command(
-        f"""
+        """
         SELECT well_id FROM well_hx
         WHERE status = 'new'
-        AND plate_id = '{plate_id}'
+        AND plate_id = ?
         ORDER BY well_id ASC
         LIMIT 1
-        """
+        """,
+        (plate_id,)
     )
 
     if result == []:
