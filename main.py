@@ -11,8 +11,6 @@ import os
 import sys
 import time
 from pathlib import Path
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 from PIL import Image
 
 from epanda_lib import (
@@ -240,7 +238,7 @@ def generate_experiment_from_existing_data():
     """
     print(ml_results_msg)
 
-    img = mpimg.imread(contour_plot)
+    #img = mpimg.imread(contour_plot)
     #plt.imshow(img)
     
     img = Image.open(contour_plot)
