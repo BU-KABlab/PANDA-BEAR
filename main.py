@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from PIL import Image
 
 from epanda_lib import (
     camera_call_camera,
@@ -89,6 +90,8 @@ def print_queue_info():
     print("Current Queue:")
     for experiment in current_queue:
         print(experiment)
+    
+    input("Press Enter to continue...")
 
 def reset_vials_stock():
     """Resets the stock vials."""
@@ -238,8 +241,10 @@ def generate_experiment_from_existing_data():
     print(ml_results_msg)
 
     img = mpimg.imread(contour_plot)
-    plt.imshow(img)
-    plt.show()
+    #plt.imshow(img)
+    
+    img = Image.open(contour_plot)
+    img.show()
 
     print(
         f"V_dep: {output.v_dep}, T_dep: {output.t_dep}, EDOT Concentration: {output.edot_concentration}"
