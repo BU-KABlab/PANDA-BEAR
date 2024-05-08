@@ -6,7 +6,7 @@ import pandas as pd
 from epanda_lib.sql_utilities import (
     ExperimentResultsRecord,
     insert_experiment_result,
-    insert_experiment_results,
+    insert_ml_training_data,
     read_testing_config,
 )
 
@@ -110,6 +110,7 @@ def main(experiment_id: int = None):
         df_new_training_data.to_csv(
             ml_file_paths.training_file_path, mode="a", header=False, index=False
         )
+        #insert_ml_training_data(df_new_training_data) #TODO uncomment once tested 
 
     # Run the ML model
     results = pedot_model(

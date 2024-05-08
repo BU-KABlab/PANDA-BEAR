@@ -460,6 +460,7 @@ def main(
 
     file_exists = os.path.isfile(BestTestPointsCSV)
     df.to_csv(BestTestPointsCSV, mode="a", header=not file_exists, index=False)
+    #insert_best_test_point(df) # TODO add model # and experiment id to df
     mask = np.isclose(
         test_points_scaled[:, 2], test_points_scaled[best_point_index, 2], rtol=1e-3
     )

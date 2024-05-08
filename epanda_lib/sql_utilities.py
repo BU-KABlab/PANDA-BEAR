@@ -4,6 +4,7 @@ from datetime import datetime
 import sqlite3
 from typing import List, Union
 from pathlib import Path
+import pandas as pd
 import json
 import csv
 import logging
@@ -1488,6 +1489,151 @@ def select_specific_result(
 
 # endregion
 
+# region ML Functions
+def select_best_test_points() -> pd.DataFrame:
+    """
+    Select the best test points from the ml_pedot_best_test_points table.
+
+    Returns:
+        pd.DataFrame: The best test points.
+    """
+    sql_command = "SELECT * FROM ml_pedot_best_test_points"
+    result = execute_sql_command(sql_command)
+    df = pd.DataFrame(result, columns=[
+        "Model ID",
+        "Experiment ID",
+        "Best Test Point Scalar",
+        "Best Test Point Original",
+        "Best Test Point",
+        "v_dep",
+        "t_dep",
+        "edot_concentration",
+        "Predicted Response",
+        "Standard Deviation",
+        "Models current RMSE"
+    ])
+    return df
+
+def select_best_test_points_by_model_id(model_id: int) -> pd.DataFrame:
+    """
+    Select the best test points from the ml_pedot_best_test_points table by model ID.
+
+    Args:
+        model_id (int): The model ID.
+
+    Returns:
+        pd.DataFrame: The best test points.
+    """
+    sql_command = "SELECT * FROM ml_pedot_best_test_points WHERE model_id = ?"
+    result = execute_sql_command(sql_command, (model_id,))
+    df = pd.DataFrame(result, columns=[
+        "Model ID",
+        "Experiment ID",
+        "Best Test Point Scalar",
+        "Best Test Point Original",
+        "Best Test Point",
+        "v_dep",
+        "t_dep",
+        "edot_concentration",
+        "Predicted Response",
+        "Standard Deviation",
+        "Models current RMSE"
+    ])
+    return df
+
+def select_best_test_points_by_experiment_id(experiment_id: int) -> pd.DataFrame:
+    """
+    Select the best test points from the ml_pedot_best_test_points table by experiment ID.
+
+    Args:
+        experiment_id (int): The experiment ID.
+
+    Returns:
+        pd.DataFrame: The best test points.
+    """
+    sql_command = "SELECT * FROM ml_pedot_best_test_points WHERE experiment_id = ?"
+    result = execute_sql_command(sql_command, (experiment_id,))
+    df = pd.DataFrame(result, columns=[
+        "Model ID",
+        "Experiment ID",
+        "Best Test Point Scalar",
+        "Best Test Point Original",
+        "Best Test Point",
+        "v_dep",
+        "t_dep",
+        "edot_concentration",
+        "Predicted Response",
+        "Standard Deviation",
+        "Models current RMSE"
+    ])
+    return df
+
+def insert_best_test_point(entry: pd.DataFrame) -> None:
+    """
+    Insert an entry into the ml_pedot_best_test_points table.
+
+    Args:
+        entry (pandas Dataframe): The entry to insert.
+    """
+    command = """
+        INSERT INTO ml_pedot_best_test_points (
+            model_id,
+            experiment_id,
+            best_test_point_scalar,
+            best_test_point_original,
+            best_test_point,
+            v_dep,
+            t_dep,
+            edot_concentration,
+            predicted_response,
+            standard_deviation,
+            models_current_rmse,
+            created
+            )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        """
+    parameters = entry.values.tolist()
+    execute_sql_command_no_return(command, parameters)
+
+def select_ml_training_data() -> pd.DataFrame:
+    """
+    Select the training data from the ml_pedot_training_data table.
+
+    Returns:
+        pd.DataFrame: The training data.
+    """
+    sql_command = "SELECT * FROM ml_pedot_training_data"
+    result = execute_sql_command(sql_command)
+    df = pd.DataFrame(result, columns=[
+        "deltaE",
+        "voltage",
+        "time",
+        "bleachCP",
+        'concentration'
+    ])
+    return df
+
+def insert_ml_training_data(entry: pd.DataFrame) -> None:
+    """
+    Insert an entry into the ml_pedot_training_data table.
+
+    Args:
+        entry (pandas Dataframe): The entry to insert.
+    """
+    command = """
+        INSERT INTO ml_pedot_training_data (
+            delta_e,
+            voltage,
+            time,
+            bleach_cp,
+            concentration,
+            created
+            )
+        VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        """
+    parameters = entry.values.tolist()
+    execute_sql_command_no_return(command, parameters)
+# endregion
 
 # region Data backfilling functions
 # These functions are used to backfill the database with data from CSV files.
