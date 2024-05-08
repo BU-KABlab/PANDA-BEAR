@@ -143,7 +143,7 @@ class ExperimentResult:
     experiment_id: int = None
     well_id: str = None
     ocp_ca_file: List[Tuple[Path, str]] = field(default_factory=list)
-    ocp_ca_passe: List[Tuple[bool, str]] = field(default_factory=list)
+    ocp_ca_passed: List[Tuple[bool, str]] = field(default_factory=list)
     ocp_cv_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_cv_passed: List[Tuple[bool, str]] = field(default_factory=list)
     ocp_cv_final_voltage: List[Tuple[float, str]] = field(default_factory=list)
@@ -165,7 +165,7 @@ class ExperimentResult:
 
         # Set the file, the pass/fail status, and the final voltage
         self.ocp_ca_file.append((file,context))
-        self.ocp_ca_passe.append((passed,context))
+        self.ocp_ca_passed.append((passed,context))
         self.ocp_cv_final_voltage.append((final_voltage,context))
 
     def set_ocp_cv_file(
@@ -219,6 +219,23 @@ class ExperimentResult:
         self.image.append((file, context))
 
     def one_to_many(self) -> list[ExperimentResultsRecord]:
+        """Turn the results object into individual result table records"""
+        all_results = []
+        for key, value in self.__dict__.items():
+            if key in ["experiment_id", "well_id", "pumping_record"]:
+                continue
+            if isinstance(value, list):
+                for _, item in enumerate(value):
+                    all_results.append(
+                        ExperimentResultsRecord(self.experiment_id, key, item[0], item[1])
+                    )
+            else:
+                all_results.append(
+                    ExperimentResultsRecord(self.experiment_id, key, value)
+                )
+        return all_results
+    
+    def to_results_records(self) -> list[ExperimentResultsRecord]:
         """Turn the results object into individual result table records"""
         all_results = []
         for key, value in self.__dict__.items():
@@ -708,7 +725,7 @@ def test_serialize_results():
         experiment_id=0,
         well_id="D5",
         ocp_ca_file=["ocp_dep_file"],
-        ocp_ca_passe=[True],
+        ocp_ca_passed=[True],
         ocp_cv_file=["ocp_char_file"],
         ocp_cv_passed=[True],
         ca_data_file=["deposition_data_file"],
