@@ -528,7 +528,10 @@ def system_status_loop(slack: SlackBot):
             sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
             sys.stdout.flush()
             sys.stdout.write("\n")
-            continue
+            if SystemState.PAUSE in system_status:
+                continue
+            elif SystemState.IDLE in system_status:
+                break
         elif SystemState.RESUME in system_status:
             slack.send_slack_message("alert", "ePANDA is resuming")
             sql_utilities.set_system_status(SystemState.BUSY)
