@@ -383,7 +383,7 @@ class SlackBot:
         ## Load the vial status json file
         stock_vials = pd.read_json(STOCK_STATUS)
         ## Filter for just the vial position and volume
-        stock_vials = stock_vials[["position", "volume", "name"]]
+        stock_vials = stock_vials[["position", "volume", "name", "contents"]]
         # Drop any vials that have null values
         stock_vials = stock_vials.dropna()
         ## set position to be a string and volume to be a float
@@ -405,7 +405,7 @@ class SlackBot:
         # Draw a horizontal line at 4000
         plt.axhline(y=2000, color="red", linestyle="-")
         # Write the name of the vial vertically in the bar
-        for i, v in enumerate(stock_vials["name"]):
+        for i, v in enumerate(stock_vials["contents"]):
             plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
         plt.xlabel("Position")
         plt.ylabel("Volume")
