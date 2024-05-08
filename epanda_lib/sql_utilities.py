@@ -360,6 +360,8 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
             incoming_contents = json.loads(row[5])
         except json.JSONDecodeError:
             incoming_contents = {}
+        except TypeError:
+            incoming_contents = {}
 
         try:
             incoming_coordinates = json.loads(row[9])
@@ -456,8 +458,8 @@ def select_next_available_well(plate_id:int = None) -> str:
         SELECT well_id FROM well_hx
         WHERE status = 'new'
         AND plate_id = ?
-        ORDER ORDER BY SUBSTRING(well_id, 1, 1),
-              CAST (SUBSTRING(well_id, 2) AS UNSIGNED) ASC
+        ORDER BY SUBSTR(well_id, 1, 1),
+              CAST(SUBSTR(well_id, 2) AS UNSIGNED) ASC
         LIMIT 1
         """,
         (plate_id,)
@@ -489,8 +491,8 @@ def save_well_to_db(well_to_save: Well) -> None:
         contents,
         volume,
         coordinates,
-        updated = datetime('now', 'localtime')
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        updated
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
         ON CONFLICT (plate_id, well_id) DO UPDATE SET
         experiment_id = excluded.experiment_id,
         project_id = excluded.project_id,
@@ -538,8 +540,8 @@ def save_wells_to_db(wells_to_save: List[Well]) -> None:
         contents,
         volume,
         coordinates,
-        updated = datetime('now', 'localtime')
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        updated
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
         ON CONFLICT (plate_id, well_id) DO UPDATE SET
         experiment_id = excluded.experiment_id,
         project_id = excluded.project_id,
@@ -591,10 +593,10 @@ def insert_well(well_to_insert: Well) -> None:
         contents,
         volume,
         coordinates,
-        updated = datetime('now', 'localtime')
+        updated
 
         ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  datetime('now', 'localtime'))
     """
     values = (
         well_to_insert.plate_id,
@@ -820,6 +822,7 @@ def select_queue() -> list:
             experiment_id,
             process_type,
             priority,
+            well_id,
             filename
         FROM queue 
         ORDER BY experiment_id ASC
