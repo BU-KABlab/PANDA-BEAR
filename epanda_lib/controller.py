@@ -605,7 +605,7 @@ def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:Sla
     delta_e00 = None
 
     try:
-        roi_path = Path(sql_utilities.select_specific_result(experiment_id, "roi_path").result_value)
+        roi_path = Path(sql_utilities.select_specific_result(experiment_id, "coloring_roi_path").result_value)
     except AttributeError:
         pass
     try:
@@ -620,7 +620,7 @@ def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:Sla
             f"ROI for Experiment {experiment_id}:",
         )
     if delta_e00 is not None:
-        slack.send_slack_message("data", f"Delta E for Experiment {next_exp_id}: {delta_e00}")
+        slack.send_slack_message("data", f"Delta E for Experiment {experiment_id}: {delta_e00}")
 
     # Then fetch the ML results and build the message
     # Our list of relevant results

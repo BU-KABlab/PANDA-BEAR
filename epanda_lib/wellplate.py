@@ -751,7 +751,7 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
         "DELETE FROM experiments WHERE experiment_id = ?", (experiment_id,)
     )
     sql_utilities.execute_sql_command(
-        "DELETE FROM experiment_parameters WHERE id = ?", (experiment_id,)
+        "DELETE FROM experiment_parameters WHERE experiment_id = ?", (experiment_id,)
     )
 
     # Update the well in the well_hx table with the experiment id to NULL

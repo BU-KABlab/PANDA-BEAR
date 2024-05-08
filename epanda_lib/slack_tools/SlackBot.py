@@ -300,9 +300,13 @@ class SlackBot:
             return 1
 
         elif text[0:10] == "screenshot":
-            parts = text.split("-")
-            camera = parts[1].strip().lower()
-            self._take_screenshot(channel_id, camera)
+            try:
+                parts = text.split("-")
+                camera = parts[1].strip().lower()
+                self._take_screenshot(channel_id, camera)
+            except IndexError:
+                message = "Please specify which camera to take a screenshot of with a '-'."
+                self.send_slack_message(channel_id, message)
             return 1
 
         elif text[0:7] == "status":

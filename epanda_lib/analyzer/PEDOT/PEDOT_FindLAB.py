@@ -112,6 +112,5 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
             metrics.r_b_o, metrics.g_b_o, metrics.b_b_o = labs["bleaching_original_rgb"]
             metrics.coloring_roi_path = labs["coloring_roi_path"]
             metrics.bleaching_roi_path = labs["bleaching_roi_path"]
-            metrics.deposition_roi_path = labs["deposition_roi_path"]
 
     return metrics

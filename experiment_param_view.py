@@ -5,6 +5,9 @@ from pathlib import Path
 conn = sqlite3.connect(Path("//engnas.bu.edu/research/eng_research_kablab/Shared Resources/PANDA/epanda_dev.db"))
 c = conn.cursor()
 
+# Drop the view if it exists
+c.execute("DROP VIEW IF EXISTS experiment_params")
+
 # Get the distinct parameter types
 c.execute("SELECT DISTINCT parameter_name FROM experiment_parameters")
 parameter_types = c.fetchall()
