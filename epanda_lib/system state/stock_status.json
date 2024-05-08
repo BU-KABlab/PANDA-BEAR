@@ -30,7 +30,7 @@
         "height": 57,
         "depth": -74,
         "name": "liclo4",
-        "volume": 20000,
+        "volume": 18470.839999999997,
         "capacity": 20000,
         "contamination": 0,
         "vial_coordinates": {
@@ -90,7 +90,7 @@
         "height": 57,
         "depth": -74,
         "name": "edot",
-        "volume": 19745.14,
+        "volume": 18853.129999999997,
         "capacity": 20000,
         "contamination": 0,
         "vial_coordinates": {
@@ -110,7 +110,7 @@
         "height": 57,
         "depth": -74,
         "name": "rinse",
-        "volume": 17500.559999999998,
+        "volume": 10002.23999999999,
         "capacity": 20000,
         "contamination": 0,
         "vial_coordinates": {

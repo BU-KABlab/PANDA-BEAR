@@ -76,48 +76,68 @@ def pedot_lhs_v1_screening(
         )
 
     # Run the experiment based on its experiment type
-    if instructions.process_type == 1:
-        pedotdeposition(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotbleaching(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotcoloring(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
+    # if instructions.process_type in [0,1]:
+    #     pedotdeposition(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    #     pedotbleaching(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    #     pedotcoloring(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
         
-    elif instructions.process_type == 2:
-        pedotbleaching(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotcoloring(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
+    # elif instructions.process_type == 2:
+    #     pedotbleaching(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    #     pedotcoloring(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
 
 
-    elif instructions.process_type == 3:
-        pedotcoloring(
+    # elif instructions.process_type == 3:
+    #     pedotcoloring(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    pedotdeposition(
             instructions=instructions,
             toolkit=toolkit,
             stock_vials=stock_vials,
             waste_vials=waste_vials,
         )
+    pedotbleaching(
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
+    pedotcoloring(
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
+
+    instructions.set_status_and_save(ExperimentStatus.COMPLETE)
 
 
 def pedotdeposition(

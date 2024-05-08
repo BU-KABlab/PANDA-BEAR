@@ -28,7 +28,7 @@ from slack_sdk.errors import (BotUserAccessError, SlackApiError,
 from epanda_lib import sql_utilities
 
 from . import e_panda
-from .analyzer.pedot import main as pedot_ml_analysis
+from .analyzer.pedot import pedot_analyzer, run_ml_model as pedot_ml_model
 from .config.config import RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS
 from .e_panda import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .errors import ProtocolNotFoundError
@@ -135,10 +135,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                     )
                     break  # break out of the while new experiment is None loop
 
-                # If the AL campaign length is set, and we have not reached the end of the campaign, run the ML analysis
+                # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
                 if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
-                    # We do the analysis on the experiments that have already been run
-                    next_exp_id = pedot_ml_analysis()
+                    # We run the model on with experiments that have already been run
+                    next_exp_id = pedot_ml_model()
                     new_experiment, _ = scheduler.read_next_experiment_from_queue()
                     if new_experiment is not None:
                         slack.send_slack_message(
@@ -149,23 +149,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 logger.info(
                     "No new experiments to run...waiting a minute for new experiments"
                 )
-                for remaining in range(60, 0, -1):
-                    sys.stdout.write("\r")
-                    sys.stdout.write(
-                        f"Waiting for new experiments: {remaining} seconds remaining"
-                    )
-                    sys.stdout.flush()
-                    time.sleep(1)
-                sys.stdout.write("\r")
-                sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
-                sys.stdout.flush()
-                sys.stdout.write("\n")
-                if (
-                    SystemState.SHUTDOWN
-                    in sql_utilities.select_system_status(2)
-                ):
-                    slack.send_slack_message("alert", "ePANDA is shutting down")
-                    raise ShutDownCommand
+                sql_utilities.set_system_status(SystemState.IDLE)
+                
+                system_status_loop(slack)
+
             ## confirm that the new experiment is a valid experiment object
             if not isinstance(new_experiment, ExperimentBase):
                 logger.error("The experiment object is not valid")
@@ -254,7 +241,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             )
 
             ## Update the experiment status to complete
-            new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            #new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
 
             # Share any results images with the slack data channel
             share_to_slack(new_experiment)
@@ -270,66 +257,19 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             scheduler.save_results(new_experiment)
             experiment_id = new_experiment.experiment_id
             new_experiment = None  # reset new_experiment to None so that we can check the queue again
-            # If the AL campaign length is set, run the ML analysis
+
+            # Analyze the experiment (will handle if in testing)
+            pedot_analyzer(experiment_id)
+
+            next_exp_id = None
+            # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
             if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
-                # We do the analysis on the experiment that just finished
-                next_exp_id = pedot_ml_analysis(experiment_id)
-
-                roi_path = None
-                delta_e00 = None
-
-                try:
-                    roi_path = Path(sql_utilities.select_specific_result(experiment_id, "roi_path").result_value)
-                except AttributeError:
-                    pass
-                try:
-                    delta_e00 = sql_utilities.select_specific_result(experiment_id, "delta_e00").result_value
-                except AttributeError:
-                    pass
-
-                # The ML Model will then make a prediction for the next experiment
-                # First fetch and send the contour plot
-                contour_plot = Path(sql_utilities.select_specific_result(experiment_id+1, "PEDOT_Contour_Plots").result_value)
-
-                # Then fetch the ML results
-                results_to_find = [
-                    "PEDOT_Deposition_Voltage",
-                    "PEDOT_Deposition_Time",
-                    "PEDOT_Concentration",
-                    "PEDOT_Predicted_Mean",
-                    "PEDOT_Predicted_Uncertainty",
-                ]
-                ml_results = []
-                for result_type in results_to_find:
-                    ml_results.append(sql_utilities.select_specific_result(next_exp_id, result_type).result_value)
-                # Compose message
-                ml_results_msg = f"""
-                Experiment {experiment_id} Parameters and Predictions:\n
-                Deposition Voltage: {ml_results[0]}\n
-                Deposition Time: {ml_results[1]}\n
-                Concentration: {ml_results[2]}\n
-                Predicted Mean: {ml_results[3]}\n
-                Predicted StdDev: {ml_results[4]}\n
-                """
-
-                if roi_path is not None:
-                    slack.send_slack_file(
-                        "data",
-                        roi_path,
-                        f"ROI for Experiment {experiment_id}:",
-                    )
-                if delta_e00 is not None:
-                    slack.send_slack_message("data", f"Delta E for Experiment {next_exp_id}: {delta_e00}")
-
-                slack.send_slack_message("data", ml_results_msg)
-                if contour_plot is not None:
-                    slack.send_slack_file(
-                        "data",
-                        contour_plot,
-                        f'contour_plot_{next_exp_id}',
-                    )
-
+                next_exp_id = pedot_ml_model()
                 al_campaign_iteration += 1
+
+            # Share the analysis results with slack
+            share_analysis_to_slack(experiment_id, next_exp_id, slack)
+
 
             ## Update the system state with new vial and wellplate information
             toolkit.pump.pipette.reset_contents()
@@ -347,25 +287,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
-            while SystemState.PAUSE == sql_utilities.select_system_status(1):
-                logger.info("System is paused, waiting for resume status")
-                slack.send_slack_message(
-                    "alert", "ePANDA is paused, waiting for status change"
-                )
-                time.sleep(60)
-                if (
-                    SystemState.SHUTDOWN
-                    in sql_utilities.select_system_status(2)
-                ):
-                    slack.send_slack_message("alert", "ePANDA is shutting down")
-                    raise ShutDownCommand
-
-                if SystemState.RESUME in sql_utilities.select_system_status(
-                    2
-                ):
-                    slack.send_slack_message("alert", "ePANDA is resuming")
-                    break
-
+            system_status_loop(slack)
     except (
         OCPFailure,
         DepositionFailure,
@@ -581,6 +503,40 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
             return False
     return True
 
+def system_status_loop(slack: SlackBot):
+    """
+    Loop to check the system status and update the system status
+    """
+    while True:
+        first_pause = True
+        # Check the system status
+        system_status = sql_utilities.select_system_status(2)
+        if SystemState.SHUTDOWN in system_status:
+            raise ShutDownCommand
+        elif SystemState.PAUSE in system_status or SystemState.IDLE in system_status:
+            if first_pause:
+                slack.send_slack_message("alert", "ePANDA is paused")
+                first_pause = False
+            for remaining in range(60, 0, -1):
+                sys.stdout.write("\r")
+                sys.stdout.write(
+                    f"Waiting for new experiments: {remaining} seconds remaining"
+                )
+                sys.stdout.flush()
+                time.sleep(1)
+            sys.stdout.write("\r")
+            sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
+            sys.stdout.flush()
+            sys.stdout.write("\n")
+            continue
+        elif SystemState.RESUME in system_status:
+            slack.send_slack_message("alert", "ePANDA is resuming")
+            sql_utilities.set_system_status(SystemState.BUSY)
+            break
+        else:
+            break
+        # if SystemState.ERROR in system_status:
+        #     raise ShutDownCommand
 
 def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
     """Connect to the instruments"""
@@ -625,6 +581,79 @@ def disconnect_from_instruments(instruments: Toolkit):
     instruments.mill.disconnect()
 
     logger.info("Disconnected from instruments")
+
+
+def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:SlackBot = None):
+    """
+    Share the analysis results with the slack data channel
+
+    Args:
+        experiment_id (int): The experiment ID to analyze
+        next_exp_id (int, optional): The next experiment ID. Defaults to None.
+        slack (SlackBot, optional): The slack bot. Defaults to None.
+    """
+    # If the AL campaign length is set, run the ML analysis
+    # We do the analysis on the experiment that just finished
+    if slack is None:
+        slack = SlackBot()
+
+    # First built the analysis message about the just completed experiment
+    roi_path = None
+    delta_e00 = None
+
+    try:
+        roi_path = Path(sql_utilities.select_specific_result(experiment_id, "roi_path").result_value)
+    except AttributeError:
+        pass
+    try:
+        delta_e00 = sql_utilities.select_specific_result(experiment_id, "delta_e00").result_value
+    except AttributeError:
+        pass
+
+    if roi_path is not None:
+        slack.send_slack_file(
+            "data",
+            roi_path,
+            f"ROI for Experiment {experiment_id}:",
+        )
+    if delta_e00 is not None:
+        slack.send_slack_message("data", f"Delta E for Experiment {next_exp_id}: {delta_e00}")
+
+    # Then fetch the ML results and build the message
+    # Our list of relevant results
+    results_to_find = [
+        "PEDOT_Deposition_Voltage",
+        "PEDOT_Deposition_Time",
+        "PEDOT_Concentration",
+        "PEDOT_Predicted_Mean",
+        "PEDOT_Predicted_Uncertainty",
+    ]
+    ml_results = []
+    if next_exp_id is not None: # If we have a next experiment ID, we can fetch the results
+        for result_type in results_to_find:
+            ml_results.append(sql_utilities.select_specific_result(next_exp_id, result_type).result_value)
+        # Compose message
+        ml_results_msg = f"""
+        Experiment {next_exp_id} Parameters and Predictions:\n
+        Deposition Voltage: {ml_results[0]}\n
+        Deposition Time: {ml_results[1]}\n
+        Concentration: {ml_results[2]}\n
+        Predicted Mean: {ml_results[3]}\n
+        Predicted StdDev: {ml_results[4]}\n
+        """
+
+        # fetch the contour plot
+        contour_plot = Path(sql_utilities.select_specific_result(next_exp_id, "PEDOT_Contour_Plots").result_value)
+
+        slack.send_slack_message("data", ml_results_msg)
+        if contour_plot is not None:
+            slack.send_slack_file(
+                "data",
+                contour_plot,
+                f'contour_plot_{next_exp_id}',
+        )
+    
+    return
 
 
 def share_to_slack(experiment: ExperimentBase):

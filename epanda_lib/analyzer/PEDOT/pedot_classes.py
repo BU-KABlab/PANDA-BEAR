@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-
+from typing import List, Union
 @dataclass
 class RequiredData:
     """Input data for the PEDOT analysis and ML model"""
@@ -33,7 +33,9 @@ class RawMetrics:
     r_b_o: float
     g_b_o: float
     b_b_o: float
-    roi_path: Path
+    coloring_roi_path: Path
+    bleaching_roi_path: Path
+    deposition_roi_path: Path
 
 @dataclass
 class PEDOTMetrics:

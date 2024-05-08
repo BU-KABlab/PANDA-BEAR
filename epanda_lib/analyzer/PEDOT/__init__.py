@@ -37,8 +37,24 @@ ml_file_paths = MLInput(
 )
 
 
-def pedot_analyzer(experiment_id: int) -> MLTrainingData:
-    """Analyzes the PEDOT experiment."""
+def pedot_analyzer(experiment_id: int, train_in_testing:bool=False) -> MLTrainingData:
+    """
+    Analyzes the PEDOT experiment.
+    
+    Skips the analysis if the system is in testing mode.
+
+    Args:
+        experiment_id (int): The experiment ID to analyze.
+
+    Returns:
+        MLTrainingData: The training data to be used for the ML model.
+    
+    """
+    if read_testing_config() and not train_in_testing:
+        # If the system is in testing mode, nothing to analyze
+        return
+    if experiment_id is None:
+        experiment_id = determine_next_experiment_id() - 1 # Get the last experiment ID
 
     input_data: RequiredData = analysis_input(experiment_id)
     metrics:RawMetrics = lab.rgbtolab(input_data)
@@ -57,6 +73,7 @@ def pedot_analyzer(experiment_id: int) -> MLTrainingData:
 
     for metric in list_of_raw_metrics:
         insert_experiment_result(metric)
+        print("Inserted metric: ", metric.result_type)
 
     list_of_pedot_metrics = [
         ExperimentResultsRecord(
@@ -81,35 +98,33 @@ def pedot_analyzer(experiment_id: int) -> MLTrainingData:
         DepositionEfficiency=results.DepositionEfficiency,
         ElectrochromicEfficiency=results.ElectrochromicEfficiency,
     )
+
+    # Add the new training data to the training file
+    df_new_training_data = pd.DataFrame(
+        {
+            "deltaE": [ml_training_data.deltaE00],
+            "voltage": [ml_training_data.ca_step_1_voltage],
+            "time": [ml_training_data.ca_step_1_time],
+            "bleachCP": [ml_training_data.BleachChargePassed],
+            "concentration": [ml_training_data.edot_concentration],
+        }
+    )
+    # Add to the training data file
+    df_new_training_data.to_csv(
+        ml_file_paths.training_file_path, mode="a", header=False, index=False
+    )
+    # TODO replace with sql table insert
     return ml_training_data
 
+def run_ml_model(generate_experiment_id=None) -> MLOutput:
+    """
+    Runs the ML model for the PEDOT experiment.
 
-def main(experiment_id: int = None):
-    """Main function for the PEDOT analyzer."""
-    testing = read_testing_config()
-
-    if not testing:
-        # Get the experiment ID
-        if experiment_id is None:
-            experiment_id = determine_next_experiment_id() - 1
-
-        # Analyze the experiment
-        ml_training_data = pedot_analyzer(experiment_id)
-
-        # Add the new training data to the training file
-        df_new_training_data = pd.DataFrame(
-            {
-                "deltaE": [ml_training_data.deltaE00],
-                "voltage": [ml_training_data.ca_step_1_voltage],
-                "time": [ml_training_data.ca_step_1_time],
-                "bleachCP": [ml_training_data.BleachChargePassed],
-                "concentration": [ml_training_data.edot_concentration],
-            }
-        )
-        # Add to the training data file
-        df_new_training_data.to_csv(
-            ml_file_paths.training_file_path, mode="a", header=False, index=False
-        )
+    Args:
+        generate_experiment_id ([type], optional): The experiment ID to generate. Defaults to None.
+    """
+    if generate_experiment_id is None:
+        generate_experiment_id = determine_next_experiment_id()
 
     # Run the ML model
     results = pedot_model(
@@ -118,7 +133,7 @@ def main(experiment_id: int = None):
         ml_file_paths.counter_file_path,
         ml_file_paths.BestTestPointsCSV,
         ml_file_paths.contourplots_path,
-        experiment_id=experiment_id + 1,
+        experiment_id=generate_experiment_id,
     )
 
     ml_output = MLOutput(*results)
@@ -132,3 +147,28 @@ def main(experiment_id: int = None):
     # Generate the next experiment
     exp_id = pedot_generator(params, experiment_name="PEDOT_Optimization", campaign_id=0)
     return exp_id
+
+def main(experiment_id: int = None, generate_experiment: bool = True):
+    """
+    Main function for the PEDOT analyzer.
+    
+    If the system is in testing mode, the function will only generate a new experiment.
+    It will not analyze the experiment.
+
+    Args:
+        experiment_id (int, optional): The experiment ID to analyze. Defaults to None.
+        generate_experiment (bool, optional): Whether to generate a new experiment. Defaults to True.
+
+    Returns:
+        int: The ID of the new experiment if generate_experiment is True. Otherwise, None.
+
+    """
+    # Analyze the experiment
+    pedot_analyzer(experiment_id)
+
+    if not generate_experiment:
+        return None
+
+    # Run the ML model
+    new_experiment_id = run_ml_model() # Generate a new experiment
+    return new_experiment_id

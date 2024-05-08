@@ -155,6 +155,7 @@ if __name__ == "__main__":
         print(f"Target concentration: {c} mM")
         volumes, deviation = solve_vials_ilp(C, VOL_TOTAL, c)
         if volumes is not None:
+            print(f"Concentration of each vial: {C}")
             print(f"Volumes to draw from each vial: {volumes} uL")
             print(f"Deviation from target concentration: {deviation} mM")
         else:

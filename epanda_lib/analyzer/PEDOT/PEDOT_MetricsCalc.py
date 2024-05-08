@@ -1,4 +1,5 @@
-"""For PEDOT films calculates the charge passed during deposition, the capacitance, the deposition efficiency, and the electrochromic efficiency."""
+"""For PEDOT films calculates the charge passed during deposition, the capacitance, 
+the deposition efficiency, and the electrochromic efficiency."""
 
 # pylint: disable=broad-exception-caught
 import math
@@ -187,16 +188,20 @@ def process_metrics(metrics: RawMetrics, input_df: RequiredData) -> PEDOTMetrics
                 f"Error calculating bleach charge for experiment_ID {input_df.experiment_id}: {e}"
             )
 
-        if charge is not None and capacitance is not None and bleach_charge is not None:
+        if charge is not None and capacitance:
             dep_eff = calc_dep_eff(charge, capacitance)
-            echromic_eff = calc_echromic_eff(bleach_charge, delta_e00)
-
         else:
-            print(
-                f"Processing incomplete for experiment_ID {input_df.experiment_id} due to earlier errors."
-            )
             dep_eff = None
+            print(
+                f"Deposition efficiency not calculated for experiment_ID {input_df.experiment_id} due to missing data."
+            )
+        if delta_e00 is not None and bleach_charge is not None:
+            echromic_eff = calc_echromic_eff(bleach_charge, delta_e00)
+        else:
             echromic_eff = None
+            print(
+                f"Electrochromic efficiency not calculated for experiment_ID {input_df.experiment_id} due to missing data."
+            )
 
         calculated_metrics = PEDOTMetrics(
                 experiment_id=input_df.experiment_id,

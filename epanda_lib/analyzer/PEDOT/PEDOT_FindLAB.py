@@ -98,7 +98,9 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
         r_b_o=0,
         g_b_o=0,
         b_b_o=0,
-        roi_path="",  # This is a path to the image with the ROI highlighted
+        coloring_roi_path="",  # This is a path to the image with the ROI highlighted
+        bleaching_roi_path="",
+        deposition_roi_path="",
     )
     metrics.experiment_id = experiment_id
     for experiment_id, labs in lab_values_dict.items():
@@ -108,6 +110,8 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
             metrics.delta_e00 = deltaE_ciede2000(labs["coloring"], labs["bleaching"])
             metrics.r_c_o, metrics.g_c_o, metrics.b_c_o = labs["coloring_original_rgb"]
             metrics.r_b_o, metrics.g_b_o, metrics.b_b_o = labs["bleaching_original_rgb"]
-            metrics.roi_path = labs["coloring_roi_path"]
+            metrics.coloring_roi_path = labs["coloring_roi_path"]
+            metrics.bleaching_roi_path = labs["bleaching_roi_path"]
+            metrics.deposition_roi_path = labs["deposition_roi_path"]
 
     return metrics

@@ -580,3 +580,1028 @@
 2024-04-17 20:55:47,735&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
 2024-04-17 20:55:47,736&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
 2024-04-17 20:55:57,639&pipette&pump_control&log_contents&610&pipette&0&{}
+2024-05-08 10:59:42,416&pipette&pump_control&log_contents&610&pipette&0.0&{}
+2024-05-08 10:59:43,274&pipette&pump_control&log_contents&610&pipette&40.0&{}
+2024-05-08 10:59:49,784&pipette&pump_control&log_contents&610&pipette&180.0&{}
+2024-05-08 10:59:49,786&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 140.0}
+2024-05-08 10:59:52,293&pipette&pump_control&log_contents&610&pipette&185.0&{'rinse': 140.0}
+2024-05-08 10:59:58,803&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 140.0}
+2024-05-08 10:59:58,812&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0}
+2024-05-08 11:03:40,430&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0}
+2024-05-08 11:03:41,297&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0}
+2024-05-08 11:03:47,807&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 0.0}
+2024-05-08 11:03:47,809&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 140.0}
+2024-05-08 11:03:50,316&pipette&pump_control&log_contents&610&pipette&185.0&{'rinse': 140.0}
+2024-05-08 11:03:56,827&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 140.0}
+2024-05-08 11:03:56,836&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0}
+2024-05-08 11:04:57,011&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0}
+2024-05-08 11:05:03,519&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0}
+2024-05-08 11:05:03,521&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 11:05:06,028&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 11:05:12,538&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 11:10:50,332&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 11:12:58,201&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 11:13:39,349&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 11:13:45,860&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 11:13:45,862&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 140.0, 'edot': 127.43}
+2024-05-08 11:13:48,369&pipette&pump_control&log_contents&610&pipette&185.0&{'rinse': 140.0, 'edot': 127.43}
+2024-05-08 11:13:54,879&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 140.0, 'edot': 127.43}
+2024-05-08 11:13:54,888&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 66.7098, 'edot': 127.43}
+2024-05-08 11:13:54,889&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 66.7098, 'edot': 60.7202}
+2024-05-08 11:14:27,162&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 66.7098, 'edot': 60.7202}
+2024-05-08 11:14:33,670&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 66.7098, 'edot': 60.7202}
+2024-05-08 11:14:33,672&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 66.7098, 'edot': 188.1502}
+2024-05-08 11:14:36,180&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 66.7098, 'edot': 188.1502}
+2024-05-08 11:14:42,692&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 66.7098, 'edot': 188.1502}
+2024-05-08 11:14:42,741&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 33.3549, 'edot': 188.1502}
+2024-05-08 11:14:42,742&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 33.3549, 'edot': 94.0751}
+2024-05-08 11:15:11,708&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 33.3549, 'edot': 94.0751}
+2024-05-08 11:15:18,217&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 33.3549, 'edot': 94.0751}
+2024-05-08 11:15:18,219&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 66.7098, 'edot': 94.0751}
+2024-05-08 11:15:18,220&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 66.7098, 'edot': 188.1502}
+2024-05-08 11:15:18,766&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 66.7098, 'edot': 188.1502}
+2024-05-08 11:15:21,270&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 66.7098, 'edot': 188.1502}
+2024-05-08 11:15:27,780&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 66.7098, 'edot': 188.1502}
+2024-05-08 11:15:27,789&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 33.3549, 'edot': 188.1502}
+2024-05-08 11:15:27,790&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 33.3549, 'edot': 94.0751}
+2024-05-08 11:15:28,469&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 33.3549, 'edot': 94.0751}
+2024-05-08 11:15:34,978&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 33.3549, 'edot': 94.0751}
+2024-05-08 11:15:34,980&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 153.3549, 'edot': 94.0751}
+2024-05-08 11:15:37,487&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 153.3549, 'edot': 94.0751}
+2024-05-08 11:15:43,996&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 153.3549, 'edot': 94.0751}
+2024-05-08 11:15:44,005&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 78.98, 'edot': 94.0751}
+2024-05-08 11:15:44,006&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 78.98, 'edot': 48.45}
+2024-05-08 11:15:44,608&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 78.98, 'edot': 48.45}
+2024-05-08 11:15:51,118&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 78.98, 'edot': 48.45}
+2024-05-08 11:15:51,119&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 206.41, 'edot': 48.45}
+2024-05-08 11:15:53,626&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 206.41, 'edot': 48.45}
+2024-05-08 11:16:00,138&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 206.41, 'edot': 48.45}
+2024-05-08 11:16:00,185&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 103.205, 'edot': 48.45}
+2024-05-08 11:16:00,186&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 103.205, 'edot': 24.225}
+2024-05-08 11:16:00,691&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 103.205, 'edot': 24.225}
+2024-05-08 11:16:03,197&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 103.205, 'edot': 24.225}
+2024-05-08 11:16:03,199&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 183.1266, 'edot': 24.225}
+2024-05-08 11:16:03,200&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 183.1266, 'edot': 71.7334}
+2024-05-08 11:16:03,750&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 183.1266, 'edot': 71.7334}
+2024-05-08 11:16:06,254&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 183.1266, 'edot': 71.7334}
+2024-05-08 11:16:12,765&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 183.1266, 'edot': 71.7334}
+2024-05-08 11:16:12,774&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 91.5633, 'edot': 71.7334}
+2024-05-08 11:16:12,775&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 91.5633, 'edot': 35.8667}
+2024-05-08 11:16:13,277&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 91.5633, 'edot': 35.8667}
+2024-05-08 11:16:19,787&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 91.5633, 'edot': 35.8667}
+2024-05-08 11:16:19,788&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 218.9933, 'edot': 35.8667}
+2024-05-08 11:16:22,296&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 218.9933, 'edot': 35.8667}
+2024-05-08 11:16:28,806&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 218.9933, 'edot': 35.8667}
+2024-05-08 11:16:28,855&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 109.4967, 'edot': 35.8667}
+2024-05-08 11:16:28,857&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 109.4967, 'edot': 17.9334}
+2024-05-08 11:16:29,361&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 109.4967, 'edot': 17.9334}
+2024-05-08 11:16:31,867&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 109.4967, 'edot': 17.9334}
+2024-05-08 11:16:31,868&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 204.2058, 'edot': 17.9334}
+2024-05-08 11:16:31,869&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 204.2058, 'edot': 50.6543}
+2024-05-08 11:16:32,415&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 204.2058, 'edot': 50.6543}
+2024-05-08 11:16:34,919&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 204.2058, 'edot': 50.6543}
+2024-05-08 11:16:41,430&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 204.2058, 'edot': 50.6543}
+2024-05-08 11:16:41,439&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.1029, 'edot': 50.6543}
+2024-05-08 11:16:41,440&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.1029, 'edot': 25.3272}
+2024-05-08 11:16:41,943&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 102.1029, 'edot': 25.3272}
+2024-05-08 11:16:48,451&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 102.1029, 'edot': 25.3272}
+2024-05-08 11:16:48,453&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 229.5329, 'edot': 25.3272}
+2024-05-08 11:16:50,961&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 229.5329, 'edot': 25.3272}
+2024-05-08 11:16:57,473&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 229.5329, 'edot': 25.3272}
+2024-05-08 11:16:57,558&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.7665, 'edot': 25.3272}
+2024-05-08 11:16:57,559&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.7665, 'edot': 12.6636}
+2024-05-08 11:16:58,063&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 114.7665, 'edot': 12.6636}
+2024-05-08 11:17:00,569&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 114.7665, 'edot': 12.6636}
+2024-05-08 11:17:00,571&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 217.4985, 'edot': 12.6636}
+2024-05-08 11:17:00,572&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 217.4985, 'edot': 37.3616}
+2024-05-08 11:17:01,119&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 217.4985, 'edot': 37.3616}
+2024-05-08 11:17:03,623&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 217.4985, 'edot': 37.3616}
+2024-05-08 11:17:10,131&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 217.4985, 'edot': 37.3616}
+2024-05-08 11:17:10,140&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 108.7493, 'edot': 37.3616}
+2024-05-08 11:17:10,141&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 108.7493, 'edot': 18.6808}
+2024-05-08 11:17:10,644&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 108.7493, 'edot': 18.6808}
+2024-05-08 11:17:17,152&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 108.7493, 'edot': 18.6808}
+2024-05-08 11:17:17,154&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 236.1793, 'edot': 18.6808}
+2024-05-08 11:17:19,661&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 236.1793, 'edot': 18.6808}
+2024-05-08 11:17:26,171&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 236.1793, 'edot': 18.6808}
+2024-05-08 11:17:26,239&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 118.0897, 'edot': 18.6808}
+2024-05-08 11:17:26,240&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 118.0897, 'edot': 9.3404}
+2024-05-08 11:17:26,745&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 118.0897, 'edot': 9.3404}
+2024-05-08 11:17:29,251&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 118.0897, 'edot': 9.3404}
+2024-05-08 11:17:29,252&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 225.9409, 'edot': 9.3404}
+2024-05-08 11:17:29,253&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 225.9409, 'edot': 28.9192}
+2024-05-08 11:17:29,812&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 225.9409, 'edot': 28.9192}
+2024-05-08 11:17:32,317&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 225.9409, 'edot': 28.9192}
+2024-05-08 11:17:38,826&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 225.9409, 'edot': 28.9192}
+2024-05-08 11:17:38,836&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 112.9705, 'edot': 28.9192}
+2024-05-08 11:17:38,836&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 112.9705, 'edot': 14.4596}
+2024-05-08 11:17:51,814&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 112.9705, 'edot': 14.4596}
+2024-05-08 11:17:58,323&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 112.9705, 'edot': 14.4596}
+2024-05-08 11:17:58,325&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 112.9705, 'edot': 14.4596, 'liclo4': 127.43}
+2024-05-08 11:18:00,832&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 112.9705, 'edot': 14.4596, 'liclo4': 127.43}
+2024-05-08 11:18:07,343&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 112.9705, 'edot': 14.4596, 'liclo4': 127.43}
+2024-05-08 11:18:07,394&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 56.4853, 'edot': 14.4596, 'liclo4': 127.43}
+2024-05-08 11:18:07,395&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 56.4853, 'edot': 7.2298, 'liclo4': 127.43}
+2024-05-08 11:18:07,396&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 56.4853, 'edot': 7.2298, 'liclo4': 63.715}
+2024-05-08 11:18:36,287&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 56.4853, 'edot': 7.2298, 'liclo4': 63.715}
+2024-05-08 11:18:42,799&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 56.4853, 'edot': 7.2298, 'liclo4': 63.715}
+2024-05-08 11:18:42,801&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 149.6605, 'edot': 7.2298, 'liclo4': 63.715}
+2024-05-08 11:18:42,802&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 149.6605, 'edot': 23.2803, 'liclo4': 63.715}
+2024-05-08 11:18:42,803&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 149.6605, 'edot': 23.2803, 'liclo4': 81.9193}
+2024-05-08 11:18:43,349&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 149.6605, 'edot': 23.2803, 'liclo4': 81.9193}
+2024-05-08 11:18:45,853&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 149.6605, 'edot': 23.2803, 'liclo4': 81.9193}
+2024-05-08 11:18:52,363&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 149.6605, 'edot': 23.2803, 'liclo4': 81.9193}
+2024-05-08 11:18:52,372&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 74.8303, 'edot': 23.2803, 'liclo4': 81.9193}
+2024-05-08 11:18:52,373&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 74.8303, 'edot': 11.6402, 'liclo4': 81.9193}
+2024-05-08 11:18:52,373&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 74.8303, 'edot': 11.6402, 'liclo4': 40.9597}
+2024-05-08 11:18:52,978&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 74.8303, 'edot': 11.6402, 'liclo4': 40.9597}
+2024-05-08 11:18:59,488&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 74.8303, 'edot': 11.6402, 'liclo4': 40.9597}
+2024-05-08 11:18:59,490&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 194.8303, 'edot': 11.6402, 'liclo4': 40.9597}
+2024-05-08 11:19:01,997&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 194.8303, 'edot': 11.6402, 'liclo4': 40.9597}
+2024-05-08 11:19:08,506&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 194.8303, 'edot': 11.6402, 'liclo4': 40.9597}
+2024-05-08 11:19:08,515&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 100.3405, 'edot': 11.6402, 'liclo4': 40.9597}
+2024-05-08 11:19:08,516&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 100.3405, 'edot': 5.9949, 'liclo4': 40.9597}
+2024-05-08 11:19:08,516&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 100.3405, 'edot': 5.9949, 'liclo4': 21.0948}
+2024-05-08 11:19:21,505&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 100.3405, 'edot': 5.9949, 'liclo4': 21.0948}
+2024-05-08 11:19:28,015&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 100.3405, 'edot': 5.9949, 'liclo4': 21.0948}
+2024-05-08 11:19:28,017&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 100.3405, 'edot': 5.9949, 'liclo4': 148.5248}
+2024-05-08 11:19:30,524&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 100.3405, 'edot': 5.9949, 'liclo4': 148.5248}
+2024-05-08 11:19:37,036&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 100.3405, 'edot': 5.9949, 'liclo4': 148.5248}
+2024-05-08 11:19:37,086&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 50.1703, 'edot': 5.9949, 'liclo4': 148.5248}
+2024-05-08 11:19:37,087&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 50.1703, 'edot': 2.9975, 'liclo4': 148.5248}
+2024-05-08 11:19:37,088&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 50.1703, 'edot': 2.9975, 'liclo4': 74.2625}
+2024-05-08 11:20:06,002&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 50.1703, 'edot': 2.9975, 'liclo4': 74.2625}
+2024-05-08 11:20:12,511&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 50.1703, 'edot': 2.9975, 'liclo4': 74.2625}
+2024-05-08 11:20:12,513&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 132.5943, 'edot': 2.9975, 'liclo4': 74.2625}
+2024-05-08 11:20:12,514&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 132.5943, 'edot': 15.7847, 'liclo4': 74.2625}
+2024-05-08 11:20:12,514&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 132.5943, 'edot': 15.7847, 'liclo4': 106.4813}
+2024-05-08 11:20:13,060&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 132.5943, 'edot': 15.7847, 'liclo4': 106.4813}
+2024-05-08 11:20:15,564&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 132.5943, 'edot': 15.7847, 'liclo4': 106.4813}
+2024-05-08 11:20:22,073&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 132.5943, 'edot': 15.7847, 'liclo4': 106.4813}
+2024-05-08 11:20:22,082&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 66.2972, 'edot': 15.7847, 'liclo4': 106.4813}
+2024-05-08 11:20:22,082&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 66.2972, 'edot': 7.8924, 'liclo4': 106.4813}
+2024-05-08 11:20:22,083&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 66.2972, 'edot': 7.8924, 'liclo4': 53.2407}
+2024-05-08 11:20:22,683&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 66.2972, 'edot': 7.8924, 'liclo4': 53.2407}
+2024-05-08 11:20:29,192&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 66.2972, 'edot': 7.8924, 'liclo4': 53.2407}
+2024-05-08 11:20:29,194&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 186.2972, 'edot': 7.8924, 'liclo4': 53.2407}
+2024-05-08 11:20:31,701&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 186.2972, 'edot': 7.8924, 'liclo4': 53.2407}
+2024-05-08 11:20:38,210&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 186.2972, 'edot': 7.8924, 'liclo4': 53.2407}
+2024-05-08 11:20:38,219&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 95.9458, 'edot': 7.8924, 'liclo4': 53.2407}
+2024-05-08 11:20:38,220&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 95.9458, 'edot': 4.0647, 'liclo4': 53.2407}
+2024-05-08 11:20:38,221&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 95.9458, 'edot': 4.0647, 'liclo4': 27.4198}
+2024-05-08 11:20:38,723&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 95.9458, 'edot': 4.0647, 'liclo4': 27.4198}
+2024-05-08 11:20:45,232&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 95.9458, 'edot': 4.0647, 'liclo4': 27.4198}
+2024-05-08 11:20:45,234&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 215.9458, 'edot': 4.0647, 'liclo4': 27.4198}
+2024-05-08 11:20:47,741&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 215.9458, 'edot': 4.0647, 'liclo4': 27.4198}
+2024-05-08 11:20:54,251&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 215.9458, 'edot': 4.0647, 'liclo4': 27.4198}
+2024-05-08 11:20:54,260&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 111.2153, 'edot': 4.0647, 'liclo4': 27.4198}
+2024-05-08 11:20:54,261&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 111.2153, 'edot': 2.0934, 'liclo4': 27.4198}
+2024-05-08 11:20:54,262&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 111.2153, 'edot': 2.0934, 'liclo4': 14.1216}
+2024-05-08 11:20:54,764&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 111.2153, 'edot': 2.0934, 'liclo4': 14.1216}
+2024-05-08 11:21:01,273&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 111.2153, 'edot': 2.0934, 'liclo4': 14.1216}
+2024-05-08 11:21:01,274&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 231.2153, 'edot': 2.0934, 'liclo4': 14.1216}
+2024-05-08 11:21:03,781&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 231.2153, 'edot': 2.0934, 'liclo4': 14.1216}
+2024-05-08 11:21:10,290&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 231.2153, 'edot': 2.0934, 'liclo4': 14.1216}
+2024-05-08 11:21:10,299&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 119.0793, 'edot': 2.0934, 'liclo4': 14.1216}
+2024-05-08 11:21:10,300&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 119.0793, 'edot': 1.0781, 'liclo4': 14.1216}
+2024-05-08 11:21:10,301&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 119.0793, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:00,536&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 119.0793, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:01,412&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 119.0793, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:07,923&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 119.0793, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:07,925&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 259.0793, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:10,432&pipette&pump_control&log_contents&610&pipette&185.0&{'rinse': 259.0793, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:16,942&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 259.0793, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:16,951&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 123.451, 'edot': 1.0781, 'liclo4': 7.2728}
+2024-05-08 11:59:16,952&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 123.451, 'edot': 0.5137, 'liclo4': 7.2728}
+2024-05-08 11:59:16,952&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 123.451, 'edot': 0.5137, 'liclo4': 3.4655}
+2024-05-08 11:59:26,689&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 123.451, 'edot': 0.5137, 'liclo4': 3.4655}
+2024-05-08 11:59:33,198&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 123.451, 'edot': 0.5137, 'liclo4': 3.4655}
+2024-05-08 11:59:33,200&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 11:59:35,707&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 11:59:42,217&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 11:59:42,266&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 61.7255, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 11:59:42,267&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 3.4655}
+2024-05-08 11:59:42,268&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:11,168&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:17,678&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:17,680&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 123.451, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:17,681&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 1.7328}
+2024-05-08 12:00:17,682&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 12:00:18,227&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 12:00:20,731&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 12:00:27,240&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 123.451, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 12:00:27,249&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 61.7255, 'edot': 127.9437, 'liclo4': 3.4655}
+2024-05-08 12:00:27,250&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 3.4655}
+2024-05-08 12:00:27,250&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:27,852&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:34,362&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 61.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:34,364&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 181.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:36,871&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 181.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:43,380&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 181.7255, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:43,389&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 93.5913, 'edot': 63.9719, 'liclo4': 1.7328}
+2024-05-08 12:00:43,390&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 93.5913, 'edot': 32.9465, 'liclo4': 1.7328}
+2024-05-08 12:00:43,390&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 93.5913, 'edot': 32.9465, 'liclo4': 0.8924}
+2024-05-08 12:00:43,995&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 93.5913, 'edot': 32.9465, 'liclo4': 0.8924}
+2024-05-08 12:00:50,504&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 93.5913, 'edot': 32.9465, 'liclo4': 0.8924}
+2024-05-08 12:00:50,506&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 221.0213, 'edot': 32.9465, 'liclo4': 0.8924}
+2024-05-08 12:00:53,013&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 221.0213, 'edot': 32.9465, 'liclo4': 0.8924}
+2024-05-08 12:00:59,524&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 221.0213, 'edot': 32.9465, 'liclo4': 0.8924}
+2024-05-08 12:00:59,573&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 110.5107, 'edot': 32.9465, 'liclo4': 0.8924}
+2024-05-08 12:00:59,574&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 110.5107, 'edot': 16.4733, 'liclo4': 0.8924}
+2024-05-08 12:00:59,575&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 110.5107, 'edot': 16.4733, 'liclo4': 0.4462}
+2024-05-08 12:01:00,079&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 110.5107, 'edot': 16.4733, 'liclo4': 0.4462}
+2024-05-08 12:01:02,585&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 110.5107, 'edot': 16.4733, 'liclo4': 0.4462}
+2024-05-08 12:01:02,587&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 204.7596, 'edot': 16.4733, 'liclo4': 0.4462}
+2024-05-08 12:01:02,588&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 204.7596, 'edot': 48.7794, 'liclo4': 0.4462}
+2024-05-08 12:01:02,589&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 204.7596, 'edot': 48.7794, 'liclo4': 1.3212}
+2024-05-08 12:01:03,136&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 204.7596, 'edot': 48.7794, 'liclo4': 1.3212}
+2024-05-08 12:01:05,639&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 204.7596, 'edot': 48.7794, 'liclo4': 1.3212}
+2024-05-08 12:01:12,147&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 204.7596, 'edot': 48.7794, 'liclo4': 1.3212}
+2024-05-08 12:01:12,156&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.3799, 'edot': 48.7794, 'liclo4': 1.3212}
+2024-05-08 12:01:12,157&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.3799, 'edot': 24.3897, 'liclo4': 1.3212}
+2024-05-08 12:01:12,157&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.3799, 'edot': 24.3897, 'liclo4': 0.6606}
+2024-05-08 12:01:12,661&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 102.3799, 'edot': 24.3897, 'liclo4': 0.6606}
+2024-05-08 12:01:19,169&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 102.3799, 'edot': 24.3897, 'liclo4': 0.6606}
+2024-05-08 12:01:19,171&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 229.8099, 'edot': 24.3897, 'liclo4': 0.6606}
+2024-05-08 12:01:21,678&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 229.8099, 'edot': 24.3897, 'liclo4': 0.6606}
+2024-05-08 12:01:28,189&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 229.8099, 'edot': 24.3897, 'liclo4': 0.6606}
+2024-05-08 12:01:28,239&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.905, 'edot': 24.3897, 'liclo4': 0.6606}
+2024-05-08 12:01:28,240&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.905, 'edot': 12.1949, 'liclo4': 0.6606}
+2024-05-08 12:01:28,241&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.905, 'edot': 12.1949, 'liclo4': 0.3303}
+2024-05-08 12:01:28,746&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 114.905, 'edot': 12.1949, 'liclo4': 0.3303}
+2024-05-08 12:01:31,252&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 114.905, 'edot': 12.1949, 'liclo4': 0.3303}
+2024-05-08 12:01:31,254&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 219.4819, 'edot': 12.1949, 'liclo4': 0.3303}
+2024-05-08 12:01:31,254&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 219.4819, 'edot': 34.4454, 'liclo4': 0.3303}
+2024-05-08 12:01:31,255&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 219.4819, 'edot': 34.4454, 'liclo4': 0.933}
+2024-05-08 12:01:31,802&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 219.4819, 'edot': 34.4454, 'liclo4': 0.933}
+2024-05-08 12:01:34,306&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 219.4819, 'edot': 34.4454, 'liclo4': 0.933}
+2024-05-08 12:01:40,816&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 219.4819, 'edot': 34.4454, 'liclo4': 0.933}
+2024-05-08 12:01:40,825&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 109.7411, 'edot': 34.4454, 'liclo4': 0.933}
+2024-05-08 12:01:40,826&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 109.7411, 'edot': 17.2227, 'liclo4': 0.933}
+2024-05-08 12:01:40,826&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 109.7411, 'edot': 17.2227, 'liclo4': 0.4665}
+2024-05-08 12:01:41,330&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 109.7411, 'edot': 17.2227, 'liclo4': 0.4665}
+2024-05-08 12:01:47,839&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 109.7411, 'edot': 17.2227, 'liclo4': 0.4665}
+2024-05-08 12:01:47,841&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 237.1711, 'edot': 17.2227, 'liclo4': 0.4665}
+2024-05-08 12:01:50,348&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 237.1711, 'edot': 17.2227, 'liclo4': 0.4665}
+2024-05-08 12:01:56,859&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 237.1711, 'edot': 17.2227, 'liclo4': 0.4665}
+2024-05-08 12:01:56,908&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 118.5857, 'edot': 17.2227, 'liclo4': 0.4665}
+2024-05-08 12:01:56,909&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 118.5857, 'edot': 8.6114, 'liclo4': 0.4665}
+2024-05-08 12:01:56,910&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 118.5857, 'edot': 8.6114, 'liclo4': 0.2333}
+2024-05-08 12:01:57,415&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 118.5857, 'edot': 8.6114, 'liclo4': 0.2333}
+2024-05-08 12:01:59,920&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 118.5857, 'edot': 8.6114, 'liclo4': 0.2333}
+2024-05-08 12:01:59,922&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 228.766, 'edot': 8.6114, 'liclo4': 0.2333}
+2024-05-08 12:01:59,923&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 228.766, 'edot': 25.4062, 'liclo4': 0.2333}
+2024-05-08 12:01:59,923&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 228.766, 'edot': 25.4062, 'liclo4': 0.6882}
+2024-05-08 12:02:00,485&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 228.766, 'edot': 25.4062, 'liclo4': 0.6882}
+2024-05-08 12:02:02,989&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 228.766, 'edot': 25.4062, 'liclo4': 0.6882}
+2024-05-08 12:02:09,498&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 228.766, 'edot': 25.4062, 'liclo4': 0.6882}
+2024-05-08 12:02:09,507&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.3832, 'edot': 25.4062, 'liclo4': 0.6882}
+2024-05-08 12:02:09,508&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.3832, 'edot': 12.7031, 'liclo4': 0.6882}
+2024-05-08 12:02:09,509&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 114.3832, 'edot': 12.7031, 'liclo4': 0.3441}
+2024-05-08 12:02:10,011&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 114.3832, 'edot': 12.7031, 'liclo4': 0.3441}
+2024-05-08 12:02:16,520&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 114.3832, 'edot': 12.7031, 'liclo4': 0.3441}
+2024-05-08 12:02:16,522&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 241.8132, 'edot': 12.7031, 'liclo4': 0.3441}
+2024-05-08 12:02:19,029&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 241.8132, 'edot': 12.7031, 'liclo4': 0.3441}
+2024-05-08 12:02:25,540&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 241.8132, 'edot': 12.7031, 'liclo4': 0.3441}
+2024-05-08 12:02:25,589&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.9068, 'edot': 12.7031, 'liclo4': 0.3441}
+2024-05-08 12:02:25,590&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.9068, 'edot': 6.3516, 'liclo4': 0.3441}
+2024-05-08 12:02:25,591&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.9068, 'edot': 6.3516, 'liclo4': 0.1721}
+2024-05-08 12:02:26,096&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 120.9068, 'edot': 6.3516, 'liclo4': 0.1721}
+2024-05-08 12:02:28,602&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 120.9068, 'edot': 6.3516, 'liclo4': 0.1721}
+2024-05-08 12:02:28,604&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 234.6625, 'edot': 6.3516, 'liclo4': 0.1721}
+2024-05-08 12:02:28,605&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 234.6625, 'edot': 19.6653, 'liclo4': 0.1721}
+2024-05-08 12:02:28,605&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 234.6625, 'edot': 19.6653, 'liclo4': 0.5327}
+2024-05-08 12:02:29,155&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 234.6625, 'edot': 19.6653, 'liclo4': 0.5327}
+2024-05-08 12:02:31,659&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 234.6625, 'edot': 19.6653, 'liclo4': 0.5327}
+2024-05-08 12:02:38,169&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 234.6625, 'edot': 19.6653, 'liclo4': 0.5327}
+2024-05-08 12:02:38,178&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 117.3315, 'edot': 19.6653, 'liclo4': 0.5327}
+2024-05-08 12:02:38,179&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 117.3315, 'edot': 9.8327, 'liclo4': 0.5327}
+2024-05-08 12:02:38,180&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 117.3315, 'edot': 9.8327, 'liclo4': 0.2664}
+2024-05-08 12:02:51,123&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 117.3315, 'edot': 9.8327, 'liclo4': 0.2664}
+2024-05-08 12:02:57,632&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 117.3315, 'edot': 9.8327, 'liclo4': 0.2664}
+2024-05-08 12:02:57,634&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 117.3315, 'edot': 9.8327, 'liclo4': 127.6964}
+2024-05-08 12:03:00,140&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 117.3315, 'edot': 9.8327, 'liclo4': 127.6964}
+2024-05-08 12:03:06,651&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 117.3315, 'edot': 9.8327, 'liclo4': 127.6964}
+2024-05-08 12:03:06,712&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 58.6659, 'edot': 9.8327, 'liclo4': 127.6964}
+2024-05-08 12:03:06,713&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 58.6659, 'edot': 4.9164, 'liclo4': 127.6964}
+2024-05-08 12:03:06,714&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 58.6659, 'edot': 4.9164, 'liclo4': 63.8484}
+2024-05-08 12:03:35,868&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 58.6659, 'edot': 4.9164, 'liclo4': 63.8484}
+2024-05-08 12:03:42,377&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 58.6659, 'edot': 4.9164, 'liclo4': 63.8484}
+2024-05-08 12:03:42,379&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 156.6815, 'edot': 4.9164, 'liclo4': 63.8484}
+2024-05-08 12:03:42,380&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 156.6815, 'edot': 15.8309, 'liclo4': 63.8484}
+2024-05-08 12:03:42,380&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 156.6815, 'edot': 15.8309, 'liclo4': 82.3483}
+2024-05-08 12:03:43,062&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 156.6815, 'edot': 15.8309, 'liclo4': 82.3483}
+2024-05-08 12:03:45,566&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 156.6815, 'edot': 15.8309, 'liclo4': 82.3483}
+2024-05-08 12:03:52,078&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 156.6815, 'edot': 15.8309, 'liclo4': 82.3483}
+2024-05-08 12:03:52,087&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 78.341, 'edot': 15.8309, 'liclo4': 82.3483}
+2024-05-08 12:03:52,088&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 78.341, 'edot': 7.9155, 'liclo4': 82.3483}
+2024-05-08 12:03:52,088&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 78.341, 'edot': 7.9155, 'liclo4': 41.1743}
+2024-05-08 12:03:52,693&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 78.341, 'edot': 7.9155, 'liclo4': 41.1743}
+2024-05-08 12:03:59,202&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 78.341, 'edot': 7.9155, 'liclo4': 41.1743}
+2024-05-08 12:03:59,204&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 198.341, 'edot': 7.9155, 'liclo4': 41.1743}
+2024-05-08 12:04:01,711&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 198.341, 'edot': 7.9155, 'liclo4': 41.1743}
+2024-05-08 12:04:08,219&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 198.341, 'edot': 7.9155, 'liclo4': 41.1743}
+2024-05-08 12:04:08,228&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.1488, 'edot': 7.9155, 'liclo4': 41.1743}
+2024-05-08 12:04:08,229&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.1488, 'edot': 4.0766, 'liclo4': 41.1743}
+2024-05-08 12:04:08,230&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.1488, 'edot': 4.0766, 'liclo4': 21.2054}
+2024-05-08 12:04:21,168&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 102.1488, 'edot': 4.0766, 'liclo4': 21.2054}
+2024-05-08 12:04:27,677&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 102.1488, 'edot': 4.0766, 'liclo4': 21.2054}
+2024-05-08 12:04:27,679&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 102.1488, 'edot': 4.0766, 'liclo4': 148.6354}
+2024-05-08 12:04:30,186&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 102.1488, 'edot': 4.0766, 'liclo4': 148.6354}
+2024-05-08 12:04:36,697&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 102.1488, 'edot': 4.0766, 'liclo4': 148.6354}
+2024-05-08 12:04:36,746&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 51.0746, 'edot': 4.0766, 'liclo4': 148.6354}
+2024-05-08 12:04:36,747&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 51.0746, 'edot': 2.0383, 'liclo4': 148.6354}
+2024-05-08 12:04:36,748&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 51.0746, 'edot': 2.0383, 'liclo4': 74.3179}
+2024-05-08 12:05:05,709&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 51.0746, 'edot': 2.0383, 'liclo4': 74.3179}
+2024-05-08 12:05:12,218&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 51.0746, 'edot': 2.0383, 'liclo4': 74.3179}
+2024-05-08 12:05:12,220&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 137.3549, 'edot': 2.0383, 'liclo4': 74.3179}
+2024-05-08 12:05:12,221&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 137.3549, 'edot': 10.7337, 'liclo4': 74.3179}
+2024-05-08 12:05:12,222&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 137.3549, 'edot': 10.7337, 'liclo4': 106.7722}
+2024-05-08 12:05:12,768&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 137.3549, 'edot': 10.7337, 'liclo4': 106.7722}
+2024-05-08 12:05:15,273&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 137.3549, 'edot': 10.7337, 'liclo4': 106.7722}
+2024-05-08 12:05:21,782&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 137.3549, 'edot': 10.7337, 'liclo4': 106.7722}
+2024-05-08 12:05:21,791&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 68.6777, 'edot': 10.7337, 'liclo4': 106.7722}
+2024-05-08 12:05:21,792&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 68.6777, 'edot': 5.3669, 'liclo4': 106.7722}
+2024-05-08 12:05:21,792&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 68.6777, 'edot': 5.3669, 'liclo4': 53.3863}
+2024-05-08 12:05:22,396&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 68.6777, 'edot': 5.3669, 'liclo4': 53.3863}
+2024-05-08 12:05:28,905&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 68.6777, 'edot': 5.3669, 'liclo4': 53.3863}
+2024-05-08 12:05:28,907&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 188.6777, 'edot': 5.3669, 'liclo4': 53.3863}
+2024-05-08 12:05:31,414&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 188.6777, 'edot': 5.3669, 'liclo4': 53.3863}
+2024-05-08 12:05:37,924&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 188.6777, 'edot': 5.3669, 'liclo4': 53.3863}
+2024-05-08 12:05:37,933&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 97.1721, 'edot': 5.3669, 'liclo4': 53.3863}
+2024-05-08 12:05:37,934&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 97.1721, 'edot': 2.764, 'liclo4': 53.3863}
+2024-05-08 12:05:37,935&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 97.1721, 'edot': 2.764, 'liclo4': 27.4948}
+2024-05-08 12:05:38,437&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 97.1721, 'edot': 2.764, 'liclo4': 27.4948}
+2024-05-08 12:05:44,946&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 97.1721, 'edot': 2.764, 'liclo4': 27.4948}
+2024-05-08 12:05:44,948&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 217.1721, 'edot': 2.764, 'liclo4': 27.4948}
+2024-05-08 12:05:47,455&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 217.1721, 'edot': 2.764, 'liclo4': 27.4948}
+2024-05-08 12:05:53,963&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 217.1721, 'edot': 2.764, 'liclo4': 27.4948}
+2024-05-08 12:05:53,972&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 111.8471, 'edot': 2.764, 'liclo4': 27.4948}
+2024-05-08 12:05:53,973&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 111.8471, 'edot': 1.4235, 'liclo4': 27.4948}
+2024-05-08 12:05:53,973&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 111.8471, 'edot': 1.4235, 'liclo4': 14.1603}
+2024-05-08 12:05:54,476&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 111.8471, 'edot': 1.4235, 'liclo4': 14.1603}
+2024-05-08 12:06:00,986&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 111.8471, 'edot': 1.4235, 'liclo4': 14.1603}
+2024-05-08 12:06:00,988&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 231.8471, 'edot': 1.4235, 'liclo4': 14.1603}
+2024-05-08 12:06:03,495&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 231.8471, 'edot': 1.4235, 'liclo4': 14.1603}
+2024-05-08 12:06:10,003&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 231.8471, 'edot': 1.4235, 'liclo4': 14.1603}
+2024-05-08 12:06:10,012&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 119.405, 'edot': 1.4235, 'liclo4': 14.1603}
+2024-05-08 12:06:10,013&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 119.405, 'edot': 0.7331, 'liclo4': 14.1603}
+2024-05-08 12:06:10,014&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 119.405, 'edot': 0.7331, 'liclo4': 7.2928}
+2024-05-08 12:09:44,085&pipette&pump_control&log_contents&610&pipette&0&{}
+2024-05-08 12:17:53,873&pipette&pump_control&log_contents&610&pipette&40.0&{}
+2024-05-08 12:18:00,382&pipette&pump_control&log_contents&610&pipette&167.4&{}
+2024-05-08 12:18:00,384&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 127.43}
+2024-05-08 12:18:02,892&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 127.43}
+2024-05-08 12:18:09,402&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 127.43}
+2024-05-08 12:18:09,451&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0}
+2024-05-08 12:18:38,446&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0}
+2024-05-08 12:18:44,956&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0}
+2024-05-08 12:18:44,958&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 127.43}
+2024-05-08 12:18:45,580&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 127.43}
+2024-05-08 12:18:48,084&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 127.43}
+2024-05-08 12:18:54,594&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 127.43}
+2024-05-08 12:18:54,603&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0}
+2024-05-08 12:18:55,209&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0}
+2024-05-08 12:19:01,718&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0}
+2024-05-08 12:19:01,720&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 12:19:04,226&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 12:19:10,735&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 12:19:10,744&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 12:19:10,745&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:11,352&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:17,861&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:17,862&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:20,370&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:26,880&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:26,929&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:26,930&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:27,435&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:29,941&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:29,943&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:29,943&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:30,525&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:33,029&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:39,538&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:39,547&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:39,548&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:40,051&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:46,561&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:46,563&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:49,069&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:55,580&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:55,629&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:55,630&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:56,135&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:58,641&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:58,643&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:19:58,644&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:19:59,190&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:01,694&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:08,203&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:08,212&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:08,212&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:08,716&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:15,225&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:15,227&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:17,734&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:24,246&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:24,294&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:24,295&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:24,800&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:27,306&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:27,308&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:27,309&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:27,856&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:30,360&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:36,870&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:36,879&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:36,880&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:37,383&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:43,891&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:43,893&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:46,400&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:52,910&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:52,992&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:52,993&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:53,498&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:56,004&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:56,006&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:20:56,007&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:56,554&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:20:59,058&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:21:05,568&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:21:05,577&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 12:21:05,578&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:21:18,584&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:21:25,093&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 12:21:25,094&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:21:27,602&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:21:34,114&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:21:34,164&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:21:34,165&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:21:34,166&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:03,074&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:09,582&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:09,584&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:09,585&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:09,586&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:22:10,132&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:22:12,636&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:22:19,146&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:22:19,155&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:22:19,156&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:22:19,157&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:19,762&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:26,270&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:26,272&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:22:28,780&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:22:35,289&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:22:35,298&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:22:35,299&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:35,300&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:48,238&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:54,748&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:22:54,750&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:22:57,257&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:03,769&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:03,818&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:03,819&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:03,820&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:32,780&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:39,289&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:39,291&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:39,292&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:39,292&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:39,839&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:42,343&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:48,852&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:48,861&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:48,862&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 12:23:48,862&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:49,502&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:56,011&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:23:56,013&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:23:58,521&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:05,029&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:05,038&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:05,039&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:05,040&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:05,542&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:12,050&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:12,052&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:14,559&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:21,069&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:21,078&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:21,079&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:21,080&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:21,582&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:28,090&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:28,092&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:30,600&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:37,108&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:37,117&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 12:24:37,118&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:37,119&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 12:24:46,357&pipette&pump_control&log_contents&610&pipette&0&{}
+2024-05-08 14:43:52,396&pipette&pump_control&log_contents&610&pipette&0.0&{}
+2024-05-08 14:43:53,273&pipette&pump_control&log_contents&610&pipette&40.0&{}
+2024-05-08 14:43:59,783&pipette&pump_control&log_contents&610&pipette&180.0&{}
+2024-05-08 14:43:59,785&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 140.0}
+2024-05-08 14:44:02,292&pipette&pump_control&log_contents&610&pipette&185.0&{'rinse': 140.0}
+2024-05-08 14:44:08,802&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 140.0}
+2024-05-08 14:44:08,811&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0}
+2024-05-08 14:44:18,691&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0}
+2024-05-08 14:44:25,199&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0}
+2024-05-08 14:44:25,201&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:44:27,708&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:44:34,219&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:44:34,267&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:44:34,268&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:03,170&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:09,679&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:09,681&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:09,682&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:45:10,229&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:45:12,733&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:45:19,243&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:45:19,251&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43}
+2024-05-08 14:45:19,252&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:19,854&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:26,362&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:26,364&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0}
+2024-05-08 14:45:28,871&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0}
+2024-05-08 14:45:35,381&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0}
+2024-05-08 14:45:35,390&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:35,391&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:36,004&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:42,512&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:42,514&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:45:45,021&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:45:51,532&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:45:51,579&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:51,581&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:52,085&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:54,591&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:45:54,593&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:45:54,594&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:45:55,140&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:45:57,644&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:04,153&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:04,162&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:04,163&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:04,666&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:11,174&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:11,176&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:13,684&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:20,194&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:20,243&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:20,244&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:20,749&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:23,254&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:23,256&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:23,257&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:23,803&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:26,307&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:32,817&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:32,826&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:32,827&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:33,330&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:39,839&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:39,841&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:42,347&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:48,859&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:48,920&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:48,921&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:49,426&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:51,933&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:46:51,934&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:51,935&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:52,510&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:46:55,015&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:01,524&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:01,532&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:01,533&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:02,036&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:08,545&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:08,547&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:11,055&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:17,566&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:17,617&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:17,618&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:18,122&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:20,628&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:20,630&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:20,631&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:21,178&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:23,683&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:30,193&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0}
+2024-05-08 14:47:30,202&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:30,202&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:43,211&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:49,719&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0}
+2024-05-08 14:47:49,721&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:47:52,227&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:47:58,738&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:47:58,787&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:47:58,788&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:47:58,789&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:27,761&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:34,269&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:34,271&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:34,272&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:34,272&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:48:34,820&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:48:37,324&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:48:43,833&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:48:43,842&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:48:43,843&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:48:43,844&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:44,447&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:50,955&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:50,957&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:53,464&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:59,973&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:59,982&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:59,983&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:48:59,984&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:49:12,960&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:49:19,468&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:49:19,470&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:49:21,977&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:49:28,488&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:49:28,538&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:49:28,539&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:49:28,540&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:49:57,450&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:03,958&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:03,960&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:03,961&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:03,962&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:50:04,523&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:50:07,027&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:50:13,536&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:50:13,545&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:50:13,546&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 14:50:13,547&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:14,147&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:20,657&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:20,659&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:23,165&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:29,675&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:29,684&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:29,685&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:29,686&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:30,188&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:36,696&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:36,698&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:39,206&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:45,715&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:45,724&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:45,725&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:45,726&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:46,229&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:52,739&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:52,741&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:50:55,247&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:51:01,757&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:51:01,766&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:51:01,767&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 14:51:01,768&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:09:58,119&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:09:58,994&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:05,504&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:05,506&pipette&pump_control&log_contents&610&pipette&180.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:08,013&pipette&pump_control&log_contents&610&pipette&185.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:14,524&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 140.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:14,533&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:14,534&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:14,534&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:24,217&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:30,726&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:30,728&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:10:33,235&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:10:39,746&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:10:39,795&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:10:39,796&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:10:39,797&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:08,771&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:15,279&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:15,281&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:15,281&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:11:15,282&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:11:15,828&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:11:18,332&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:11:24,841&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:11:24,850&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 127.43, 'liclo4': 0.0}
+2024-05-08 15:11:24,850&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:24,851&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:25,456&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:31,965&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:31,967&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:34,473&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:40,982&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:40,991&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:40,992&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:40,993&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:41,598&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:48,107&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:48,109&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:50,616&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:57,126&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:57,176&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:57,177&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:57,178&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:11:57,682&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:00,188&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:00,190&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:00,190&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:00,191&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:00,738&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:03,243&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:09,752&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:09,761&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:09,762&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:09,763&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:10,266&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:16,775&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:16,777&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:19,284&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:25,796&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:25,845&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:25,846&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:25,847&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:26,351&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:28,857&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:28,859&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:28,860&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:28,861&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:29,410&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:31,913&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:38,423&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:38,432&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:38,433&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:38,433&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:38,937&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:45,445&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:45,447&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:47,954&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:54,465&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:54,514&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:54,514&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:54,515&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:55,020&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:57,525&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:57,527&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:57,528&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:57,528&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:12:58,075&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:00,578&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:07,088&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:07,097&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:07,098&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:07,099&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:07,602&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:14,110&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:14,111&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:16,619&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:23,130&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:23,180&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:23,181&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:23,182&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:23,686&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:26,192&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:26,194&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:26,194&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:26,195&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:26,741&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:29,244&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:35,753&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 127.43, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:35,762&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:35,763&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:35,764&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:48,772&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:55,280&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:13:55,282&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:13:57,789&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:04,301&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:04,349&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:04,350&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:04,351&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:33,256&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:39,765&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:39,767&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:39,768&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:39,769&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:40,316&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:42,820&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:49,330&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:49,339&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:49,340&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:14:49,340&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:49,944&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:56,453&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:56,455&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:14:58,961&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:15:05,470&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:15:05,479&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:15:05,480&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:15:05,480&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:15:18,425&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:15:24,933&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:15:24,935&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:15:27,441&pipette&pump_control&log_contents&610&pipette&172.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:15:33,953&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:15:34,004&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:15:34,005&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:15:34,006&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:02,925&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:09,434&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:09,436&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:09,437&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:09,437&pipette&pump_control&log_contents&610&pipette&167.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:16:10,005&pipette&pump_control&log_contents&610&pipette&187.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:16:12,509&pipette&pump_control&log_contents&610&pipette&192.4&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:16:19,018&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:16:19,027&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:16:19,028&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 127.43}
+2024-05-08 15:16:19,029&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:19,630&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:26,139&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:26,141&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:28,648&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:35,158&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:35,167&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:35,167&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:35,168&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:35,671&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:42,179&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:42,181&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:44,687&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:51,196&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:51,205&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:51,206&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:51,207&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:51,710&pipette&pump_control&log_contents&610&pipette&40.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:58,219&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:16:58,221&pipette&pump_control&log_contents&610&pipette&160.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:17:00,728&pipette&pump_control&log_contents&610&pipette&165.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:17:07,237&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 120.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:17:07,246&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:17:07,246&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:17:07,247&pipette&pump_control&log_contents&610&pipette&0.0&{'rinse': 0.0, 'edot': 0.0, 'liclo4': 0.0}
+2024-05-08 15:24:41,362&pipette&pump_control&log_contents&610&pipette&0&{}
+2024-05-08 15:28:31,978&pipette&pump_control&log_contents&610&pipette&40.0&{}
+2024-05-08 15:28:38,487&pipette&pump_control&log_contents&610&pipette&167.4&{}
+2024-05-08 15:28:38,489&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 127.43}
+2024-05-08 15:28:40,997&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 127.43}
+2024-05-08 15:28:47,507&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 127.43}
+2024-05-08 15:28:47,556&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0}
+2024-05-08 15:29:16,515&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0}
+2024-05-08 15:29:23,025&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0}
+2024-05-08 15:29:23,027&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 127.43}
+2024-05-08 15:29:23,573&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 127.43}
+2024-05-08 15:29:26,076&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 127.43}
+2024-05-08 15:29:32,586&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 127.43}
+2024-05-08 15:29:32,595&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0}
+2024-05-08 15:29:33,195&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0}
+2024-05-08 15:29:39,704&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0}
+2024-05-08 15:29:39,706&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 15:29:42,213&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 15:29:48,722&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 15:29:48,731&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0}
+2024-05-08 15:29:48,732&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:29:49,338&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:29:55,847&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:29:55,849&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:29:58,356&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:04,867&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:04,920&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:04,921&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:05,426&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:07,932&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:07,934&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:07,935&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:08,484&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:10,988&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:17,497&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:17,506&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:17,507&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:18,010&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:24,518&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:24,520&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:27,027&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:33,539&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:33,588&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:33,589&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:34,093&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:36,599&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:36,601&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:36,602&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:37,148&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:39,652&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:46,162&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:46,171&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:46,172&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:46,675&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:53,184&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:30:53,186&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:30:55,694&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:02,205&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:02,254&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:02,255&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:02,760&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:05,266&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:05,268&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:05,269&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:05,817&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:08,321&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:14,831&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:14,840&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:14,841&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:15,344&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:21,853&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:21,855&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:24,362&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:30,872&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:30,925&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:30,927&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:31,432&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:33,938&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:33,940&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:33,941&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:34,529&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:37,033&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:43,543&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:43,552&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 127.43}
+2024-05-08 15:31:43,553&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:31:56,522&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:32:03,031&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0}
+2024-05-08 15:32:03,033&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:05,539&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:12,049&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:12,107&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:12,108&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:12,109&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:32:40,996&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:32:47,505&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:32:47,507&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:32:47,508&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:32:47,508&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:48,056&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:50,561&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:57,071&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:57,080&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:57,081&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:32:57,081&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:32:57,684&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:33:04,194&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:33:04,195&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:33:06,703&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:33:13,212&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:33:13,221&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:33:13,222&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:33:13,223&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:33:26,199&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:33:32,708&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:33:32,710&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:33:35,217&pipette&pump_control&log_contents&610&pipette&172.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:33:41,729&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:33:41,804&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:33:41,805&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:33:41,806&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:10,997&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:17,506&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:17,508&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:17,509&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:17,510&pipette&pump_control&log_contents&610&pipette&167.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:34:18,059&pipette&pump_control&log_contents&610&pipette&187.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:34:20,563&pipette&pump_control&log_contents&610&pipette&192.4&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:34:27,073&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:34:27,083&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:34:27,084&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 127.43}
+2024-05-08 15:34:27,085&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:27,704&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:34,215&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:34,217&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:36,724&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:43,233&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:43,242&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:43,243&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:43,244&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:43,746&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:50,254&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:50,256&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:52,764&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:59,275&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:59,284&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:34:59,285&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:59,286&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:34:59,788&pipette&pump_control&log_contents&610&pipette&40.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:35:06,297&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:35:06,299&pipette&pump_control&log_contents&610&pipette&160.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:35:08,808&pipette&pump_control&log_contents&610&pipette&165.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:35:15,317&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:35:15,326&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 120.0, 'liclo4': 0.0}
+2024-05-08 15:35:15,327&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:35:15,328&pipette&pump_control&log_contents&610&pipette&0.0&{'edot': 0.0, 'rinse': 0.0, 'liclo4': 0.0}
+2024-05-08 15:36:28,898&pipette&pump_control&log_contents&610&pipette&0&{}
