@@ -853,7 +853,10 @@ def image_well(
                 context=step_description,
             )
             img.save(dz_filepath)
-            instructions.results.append_image_file(dz_filepath, context=(step_description + "_dz"))
+            instructions.results.append_image_file(
+                dz_filepath,
+                context=step_description + "_dz"
+            )
         logger.debug("Image of well %s captured", instructions.well_id)
 
         instructions.results.append_image_file(filepath, context=step_description)

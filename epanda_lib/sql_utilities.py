@@ -370,7 +370,8 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
         # well_height, well_capacity,
         # TODO currently the wepplate object applies the well_height and well_capacity
         # If we want the wells to be the primary source of this information, we need to
-        # update this script to also pull from well_types and the stop applying the infomation in the wellplate object
+        # update this script to also pull from well_types and the stop applying
+        # the infomation in the wellplate object
         if plate_id is None:
             plate_id = row[0]
             if plate_id is None:
@@ -1072,7 +1073,7 @@ def update_well_status(well_id: str, plate_id: int = None,status: str = None) ->
         plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
     if status is None:
         status = select_well_status(well_id, plate_id)
-        
+
     execute_sql_command_no_return(
         """
         UPDATE well_hx
@@ -1134,9 +1135,23 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
             priority,
             process_type,
             filename,
-            created
+            created,
+            updated
             )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        ON CONFLICT (experiment_id) DO UPDATE SET
+            project_id = excluded.project_id,
+            project_campaign_id = excluded.project_campaign_id,
+            well_type = excluded.well_type,
+            protocol_id = excluded.protocol_id,
+            pin = excluded.pin,
+            experiment_type = excluded.experiment_type,
+            jira_issue_key = excluded.jira_issue_key,
+            priority = excluded.priority,
+            process_type = excluded.process_type,
+            filename = excluded.filename,
+            created = excluded.created,
+            updated = datetime('now', 'localtime')
         """,
         parameters,
     )
@@ -1183,9 +1198,10 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
             experiment_id,
             parameter_name,
             parameter_value,
-            created
+            created,
+            updated
             )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
         """,
         parameters_to_insert,
     )
@@ -1253,11 +1269,14 @@ def update_experiment_status(
     """
     Update the status of an experiment in the experiments table.
 
-    When provided with an int, the experiment_id is the int, and the status and status_date are the other two arguments.
+    When provided with an int, the experiment_id is the int, and the status and
+    status_date are the other two arguments.
     If no status is provided, the function will not make assumptions and will do nothing.
 
-    When provided with an ExperimentBase object, the object's attributes will be used to update the status.
-    If an object is provided along with a status and status date, the object's attributes will be updated with the status and status date.
+    When provided with an ExperimentBase object, the object's attributes will be
+    used to update the status.
+    If an object is provided along with a status and status date, the object's
+    attributes will be updated with the status and status date.
 
     Args:
         experiment_id (int): The experiment ID.
