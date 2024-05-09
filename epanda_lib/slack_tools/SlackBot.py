@@ -86,6 +86,14 @@ class SlackBot:
             log_msg = f"Error uploading file: {format(exception)}"
             self.logger.error(log_msg)
             return 0
+
+    def post_message_with_files(self, channel, message, file_list):
+        client = WebClient(slack_cred.TOKEN)
+        channel_id = self.channel_id(channel)
+        for file in file_list:
+            upload = client.files_upload_v2(file=file, filename=file)
+        client.chat_postMessage(channel=channel_id, text=message, files=[upload["file"]["id"]])
+
     def check_latest_message(self, channel: str) -> str:
         """Check Slack for the latest message."""
         client = WebClient(token=slack_cred.TOKEN)

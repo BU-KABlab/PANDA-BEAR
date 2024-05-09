@@ -2,7 +2,6 @@
 
 import os
 import sqlite3
-from typing import Protocol
 from epanda_lib.config.config import SQL_DB_PATH
 from epanda_lib.errors import ProtocolNotFoundError
 
@@ -61,16 +60,58 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
         cursor = conn.cursor()
 
         # Get the protocol from the database
-        cursor.execute("SELECT * FROM protocols WHERE id = ?", (protocol_id,))
+        cursor.execute(
+            "SELECT id, project, name, filepath FROM protocols WHERE id = ?",
+            (protocol_id,)
+            )
         protocol = cursor.fetchone()
 
         conn.close()
 
         protocol_entry = ProtocolEntry(*protocol)
         return protocol_entry
-    except TypeError:
-        raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.")
+    except TypeError as exc:
+        raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.") from exc
 
+# def select_protocol_by_id(protocol_id) -> ProtocolEntry:
+#     """
+#     Get a protocol from the database.
+
+#     Args:
+#         protocol_id (int): The ID of the protocol to get.
+
+#     Returns:
+#         ProtocolEntry: The protocol from the database.
+#     """
+#     try:
+#         conn = sqlite3.connect(SQL_DB_PATH)
+#         cursor = conn.cursor()
+
+#         # Get the protocol from the database
+#         cursor.execute(
+#             "SELECT id, project, name, filepath FROM protocols WHERE id = ?",
+#             (protocol_id,)
+#             )
+#         protocol:list = cursor.fetchone()
+
+#         conn.close()
+#         if not isinstance(protocol, list) or protocol[0] != protocol_id:    
+#             # Check for new protocols and try again
+#             read_in_protocols()
+#             conn = sqlite3.connect(SQL_DB_PATH)
+#             cursor = conn.cursor()
+#             cursor.execute(
+#                 "SELECT id, project, name, filepath FROM protocols WHERE id = ?",
+#                 (protocol_id,)
+#                 )
+#             protocol:list = cursor.fetchone()
+#             conn.close()
+
+#         protocol_entry = ProtocolEntry(*protocol)
+#         return protocol_entry
+#     except TypeError as exc:
+#         raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.") from exc
+    
 def insert_protocol(protocol_id, project, name, filepath):
     """
     Insert a protocol into the database.
@@ -154,7 +195,8 @@ def read_in_protocols():
 
     # Get all files in the protocols folder
     protocols = os.listdir("protocols")
-    # Remove this file from the list
+    # Remove an non .py files
+    protocols = [protocol for protocol in protocols if protocol.endswith(".py")]
     # Get the current protocols from the database
     current_protocols = select_protocols()
 

@@ -31,7 +31,7 @@ from . import e_panda
 from .analyzer.pedot import pedot_analyzer, run_ml_model as pedot_ml_model
 from .config.config import RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS
 from .e_panda import CAFailure, CVFailure, DepositionFailure, OCPFailure
-from .errors import ProtocolNotFoundError
+from .errors import ProtocolNotFoundError, ShutDownCommand, WellImportError, NoExperimentFromModel
 from .experiment_class import (ExperimentBase, ExperimentResult,
                                ExperimentStatus)
 from .instrument_toolkit import Toolkit
@@ -146,11 +146,15 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                         )
                         al_campaign_iteration += 1
                         continue  # continue to the next iteration of the while new experiment is None loop
+                    else:
+                        slack.send_slack_message(
+                            "alert", "No new experiment generated from existing data"
+                        )
+                        raise NoExperimentFromModel()
                 logger.info(
                     "No new experiments to run...waiting a minute for new experiments"
                 )
-                sql_utilities.set_system_status(SystemState.IDLE)
-                
+                slack.send_slack_message("alert", "No new experiments to run...waiting a minute for new experiments")
                 system_status_loop(slack)
 
             ## confirm that the new experiment is a valid experiment object
@@ -655,7 +659,7 @@ def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:Sla
                 contour_plot,
                 f'contour_plot_{next_exp_id}',
         )
-    
+
     return
 
 
@@ -707,25 +711,6 @@ def share_to_slack(experiment: ExperimentBase):
             error,
         )
         # continue with the rest of the program
-
-
-class WellImportError(Exception):
-    """Raised when the wellplate status file does not have the correct number of wells"""
-
-    def __init__(
-        self, message="Wellplate status file does not have the correct number of wells"
-    ):
-        self.message = message
-        super().__init__(self.message)
-
-
-class ShutDownCommand(Exception):
-    """Raised when the system is commanded to shut down"""
-
-    def __init__(self, message="The system has been commanded to shut down"):
-        self.message = message
-        super().__init__(self.message)
-
 
 if __name__ == "__main__":
     print("TEST MODE: ", TESTING)
