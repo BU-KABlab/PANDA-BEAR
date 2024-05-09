@@ -21,6 +21,7 @@ from . import sql_utilities
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
 
+
 class WellCoordinates:
     """
     Represents the coordinates of a well.
@@ -117,14 +118,20 @@ class Well(Vessel):
     Args:
     -----
         well_id (str): The ID of the well.
-        coordinates (dict): The coordinates of the well.
-        contents (dict): The contents of the well.
+        plate_id (int): The ID of the well plate.
+        coordinates (WellCoordinates): The coordinates of the well.
         volume (float): The volume of the well.
-        height (float): The height of the well.
-        depth (float): The depth of the well.
         status (str): The status of the well.
-        density (float): The density of the well.
-        capacity (float): The capacity of the well.
+        contents (dict): The contents of the well.
+        status_date (str): The date of the well status. (Optional)
+        depth (float): The depth of the well. (Optional)
+        capacity (float): The capacity of the well. (Optional)
+        height (float): The height of the well. (Optional)
+        experiment_id (int): The ID of the experiment. (Optional)
+        project_id (int): The ID of the project. (Optional)
+        density (float): The density of the well. (Optional)
+        campaign_id (int): The ID of the campaign. (Optional)
+        well_type_number (int): The type of well. (Optional)
     """
 
     def __init__(
@@ -255,6 +262,13 @@ class Well(Vessel):
         except Exception as e:
             logger.error("Error occurred while saving well to the database: %s", e)
             raise e
+        
+    def update_well_coordinates(
+        self, new_coordinates: WellCoordinates
+    ) -> None:
+        """Update the coordinates of a specific well"""
+        self.coordinates = new_coordinates
+        sql_utilities.update_well_coordinates(self.well_id, self.plate_id, new_coordinates)
 
 
 class Wellplate:
@@ -311,7 +325,9 @@ class Wellplate:
         self.image_height = -35  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
         plate_id, _, _ = sql_utilities.select_current_wellplate_info()
-        self.plate_id = plate_id if plate_id is None else plate_id  # The id of the well plate
+        self.plate_id = (
+            plate_id if plate_id is None else plate_id
+        )  # The id of the well plate
 
         # From the well_type.csv file in config but has defaults
         self.z_top = 0
@@ -336,7 +352,7 @@ class Wellplate:
             self.rows,
             self.columns,
             self.echem_height,
-        ) = self.load_wellplate_location() # from the json file
+        ) = self.load_wellplate_location()  # from the json file
         self.a1_coordinates = {
             "x": self.a1_x,
             "y": self.a1_y,
@@ -376,7 +392,7 @@ class Wellplate:
         }  # coordinates of A1
         self.calculate_well_locations()
         for well in self.wells:
-            well:Well
+            well: Well
             self.update_well_coordinates(well, well.coordinates)
 
     def calculate_well_locations(self: "Wellplate") -> None:
@@ -453,12 +469,12 @@ class Wellplate:
         logger.debug("Updating well status from database...")
         incoming_wells = sql_utilities.select_wellplate_wells()
         for saved_well in incoming_wells:
-            #well = self.wells[saved_well.name.upper()]
+            # well = self.wells[saved_well.name.upper()]
             well = saved_well
             well.plate_id = self.plate_id
             well.depth = self.z_bottom
-            #well.height = self.height
-            #well.capacity = self.well_capacity
+            # well.height = self.height
+            # well.capacity = self.well_capacity
             well.name = well.well_id.upper()
         self.wells = {well.well_id: well for well in incoming_wells}
         logger.debug("Well status updated from database")
@@ -486,11 +502,13 @@ class Wellplate:
             raise TypeError("Coordinates must be a WellCoordinates object")
         self.wells[well_id.upper()].coordinates = new_coordinates
 
-    def update_well_coordinates(self, well_id: str, new_coordinates: WellCoordinates) -> None:
+    def update_well_coordinates(
+        self, well_id: str, new_coordinates: WellCoordinates
+    ) -> None:
         """Update the coordinates of a specific well"""
         well_id = well_id.upper()
-        self.wells[well_id].coordinates = new_coordinates
-        sql_utilities.update_well_coordinates(well_id, self.plate_id, new_coordinates)
+        self.wells[well_id].update_well_coordinates = new_coordinates
+        #sql_utilities.update_well_coordinates(well_id, self.plate_id, new_coordinates)
 
     def get_contents(self, well_id: str) -> dict:
         """Return the contents of a specific well"""
@@ -562,7 +580,7 @@ class Wellplate:
     def set_well_status(self, well_id: str, status: str) -> None:
         """Update the status of a specific well."""
         self.wells[well_id.upper()].update_status(status)
-    
+
     def update_well_status(self, well, status):
         """Update the status of a specific well in memory and in the database"""
         if isinstance(well, str):
@@ -636,6 +654,24 @@ class Wellplate:
 
         return (x, y, z_bottom, orientation, rows, cols, echem_height)
 
+    def reload_wellplate_location(self) -> None:
+        """Reload the well plate location from the well_location json file"""
+        (
+            self.a1_x,
+            self.a1_y,
+            self.z_bottom,
+            self.orientation,
+            self.rows,
+            self.columns,
+            self.echem_height,
+        ) = self.load_wellplate_location()
+
+        # Update the wells for the z_bottom as the depth
+        if isinstance(self.wells, dict) and isinstance(self.wells.values()[0], Well):
+            for well in self.wells.values():
+                well: Well
+                well.depth = self.z_bottom
+
     def write_wellplate_location(self) -> None:
         """Write the location of the well plate to the well_location json file"""
         data_to_write = {
@@ -651,6 +687,8 @@ class Wellplate:
         with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
             json.dump(data_to_write, f, indent=4)
         logger.debug("Well plate location written to file")
+
+        self.reload_wellplate_location()
 
     def write_well_status_to_file(self) -> None:
         """Write the well status to the well_status.json file"""
@@ -673,6 +711,7 @@ class Wellplate:
         """Print the well plate"""
         for well in self.wells.values():
             print(well)
+
 
 class OverFillException(Exception):
     """Raised when a vessel if over filled"""
@@ -701,12 +740,11 @@ class OverDraftException(Exception):
     def __str__(self) -> str:
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
 
+
 def _remove_wellplate_from_db(plate_id: int) -> None:
     """Removed all wells for the given plate id in well_hx, removes the plate id from the wellplate table"""
-    user_choice = (
-        input(
-            "Are you sure you want to remove the wellplate and all its wells from the database? This is irreversible. (y/n): "
-        )
+    user_choice = input(
+        "Are you sure you want to remove the wellplate and all its wells from the database? This is irreversible. (y/n): "
     )
     if not user_choice:
         print("No action taken")
@@ -720,6 +758,7 @@ def _remove_wellplate_from_db(plate_id: int) -> None:
     sql_utilities.execute_sql_command(
         "DELETE FROM wellplates WHERE id = ?", (plate_id,)
     )
+
 
 def _remove_experiment_from_db(experiment_id: int) -> None:
     """Removes the experiment from the database"""
@@ -735,10 +774,8 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
         input("Press enter to continue...")
         return
 
-    user_choice = (
-        input(
-            "Are you sure you want to remove the experiment and all its data from the database? This is irreversible. (y/n): "
-        )
+    user_choice = input(
+        "Are you sure you want to remove the experiment and all its data from the database? This is irreversible. (y/n): "
     )
     if not user_choice:
         print("No action taken")
@@ -761,6 +798,7 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
     )
 
     input("Experiment deleted. Press enter to continue...")
+
 
 def change_wellplate_location():
     """Change the location of the wellplate"""
@@ -994,6 +1032,7 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
     )
     new_wells = sql_utilities.count_wells_with_new_status()
     return int(current_plate_id), int(current_type_number), new_wells
+
 
 if __name__ == "__main__":
     pass
