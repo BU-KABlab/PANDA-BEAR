@@ -38,7 +38,7 @@ def run_epanda_with_ml():
     """Runs ePANDA."""
     set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
     length = int(input("Enter the campaign length: ").strip().lower())
-
+    controller.main(al_campaign_length=length)
 
 def run_epanda_without_ml():
     """Runs ePANDA."""
