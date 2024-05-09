@@ -195,7 +195,7 @@ def check_if_current_wellplate_is_new() -> bool:
         """
     )
     if result == []:
-        print("No current wellplate found")
+        logger.info("No current wellplate found")
         return False
 
     # If all the results are 'new' then the wellplate is new
@@ -725,8 +725,8 @@ def complete_well_information(sql_command: str, values: tuple) -> Well:
     ) = result[0]
 
     if result == []:
-        print("Error: No well found in the well_hx table.")
-        print("Statment Was: ", sql_command, "Values Were: ", values)
+        logger.error("Error: No well found in the well_hx table.")
+        logger.error("Statment Was: %s, Values Were: %s", sql_command, values)
         return None
 
     # Based on the plate ID, get the well type number, capacity, height
