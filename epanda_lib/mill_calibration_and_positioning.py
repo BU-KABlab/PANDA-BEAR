@@ -267,7 +267,6 @@ def calibrate_z_bottom_of_wellplate(
             # We do this instead of recalculating every well location incase
             # they are uniquely set
         wellplate.write_wellplate_location()
-        wellplate.write_well_status_to_file() # but then we bulk save all wells to the db
 
 
 def calibrate_vials(
@@ -311,6 +310,9 @@ def calibrate_camera_focus(
 ):
     """Calibrate the camera focus"""
     # Move the camera to the top of the wellplate
+    response = input("Camera will move to image_height above A1. Press enter to proceed or 'q' to quit: ")
+    if response.lower() == "q":
+        return
     mill.safe_move(
         wellplate.get_coordinates("A1", "x"),
         wellplate.get_coordinates("A1", "y"),
@@ -335,11 +337,12 @@ def home_mill(
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial]
 ):
-    """Home the mill"""
+    """Homes the mill"""
     mill.home()
     print("Mill has been homed")
 
 def quit():
+    """Quit the calibration menu"""
     pass
 
 options = {
