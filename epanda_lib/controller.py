@@ -126,7 +126,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             )
 
             while new_experiment is None:
-                sql_utilities.set_system_status(SystemState.IDLE)
+                sql_utilities.set_system_status(SystemState.IDLE) #TODO change to waiting
                 # scheduler.check_inbox()
                 new_experiment, _ = scheduler.read_next_experiment_from_queue()
                 if new_experiment is not None:
@@ -518,6 +518,9 @@ def system_status_loop(slack: SlackBot):
         if SystemState.SHUTDOWN in system_status:
             raise ShutDownCommand
         elif SystemState.PAUSE in system_status or SystemState.IDLE in system_status:
+        #elif SystemState.PAUSE in system_status or SystemState.WAITING in system_status:
+            # if SystemState.IDLE in system_status:
+            #     break
             if first_pause:
                 slack.send_slack_message("alert", "ePANDA is paused")
                 first_pause = False

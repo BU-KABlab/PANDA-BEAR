@@ -41,6 +41,7 @@ class SystemState(Enum):
     SHUTDOWN = "shutdown"
     PAUSE = "pause"
     RESUME = "resume"
+    WAITING = "waiting"
 
 
 @dataclasses.dataclass
