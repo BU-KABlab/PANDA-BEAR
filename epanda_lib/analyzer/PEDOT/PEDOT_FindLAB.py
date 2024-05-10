@@ -104,13 +104,15 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
     )
     metrics.experiment_id = experiment_id
     for experiment_id, labs in lab_values_dict.items():
-        if "coloring" in labs and "bleaching" in labs:
+        if "coloring" in labs:
             metrics.l_c, metrics.a_c, metrics.b_c = labs["coloring"]
-            metrics.b_b, metrics.a_b, metrics.b_b = labs["bleaching"]
             metrics.delta_e00 = deltaE_ciede2000(labs["coloring"], labs["bleaching"])
             metrics.r_c_o, metrics.g_c_o, metrics.b_c_o = labs["coloring_original_rgb"]
-            metrics.r_b_o, metrics.g_b_o, metrics.b_b_o = labs["bleaching_original_rgb"]
             metrics.coloring_roi_path = labs["coloring_roi_path"]
+
+        if "bleaching" in labs:
+            metrics.l_b, metrics.a_b, metrics.b_b = labs["bleaching"]
+            metrics.r_b_o, metrics.g_b_o, metrics.b_b_o = labs["bleaching_original_rgb"]
             metrics.bleaching_roi_path = labs["bleaching_roi_path"]
 
     return metrics
