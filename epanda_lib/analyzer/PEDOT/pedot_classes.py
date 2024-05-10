@@ -13,7 +13,7 @@ class RequiredData:
     CA_bleaching: Path
     BeforeDeposition: Path
     AfterBleaching: Path
-    AfterColoring: Path
+    AfterColoring: Path = None
 
 
 @dataclass
