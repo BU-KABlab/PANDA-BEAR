@@ -18,6 +18,9 @@ The main functions in this module are:
 import json
 from typing import Sequence
 import os
+import platform
+from epanda_lib import sql_utilities
+from epanda_lib.experiment_class import ExperimentResultsRecord
 
 from .mill_control import Mill, MockMill
 from .utilities import Instruments
@@ -42,7 +45,7 @@ def check_mill_settings(
 
     while True:
         response = mill.execute_command("$$")  # Get settings
-        #print(response)
+        # print(response)
 
         ## Check settings
         # Load settings from config and compare to current settings
@@ -150,16 +153,24 @@ def calibrate_wells(
                 z_top=wellplate.z_top,
             )
             instrument: Instruments
-            confirm = input(f"Is the {(instrument.value)}  in the correct position? (yes/no): ")
-            if confirm is None or confirm.lower().strip()[0] in ["y",""]:
-                break # exit confirmation loop go to updating coordinates if changed
-            print(f"Current coordinates of {well_id}: {current_coorinates}") #change to be the corrected coordinates if they have been changed
+            confirm = input(
+                f"Is the {(instrument.value)}  in the correct position? (yes/no): "
+            )
+            if confirm is None or confirm.lower().strip()[0] in ["y", ""]:
+                break  # exit confirmation loop go to updating coordinates if changed
+            print(
+                f"Current coordinates of {well_id}: {current_coorinates}"
+            )  # change to be the corrected coordinates if they have been changed
             coordinates_changed = True
             # gather new coordinates and test them for validity before trying to set them
             # enter validation loop
             while True:
-                new_x = input(f"Enter the new X coordinate for {well_id} or enter for no change: ")
-                new_y = input(f"Enter the new Y coordinate for {well_id} or enter for no change: ")
+                new_x = input(
+                    f"Enter the new X coordinate for {well_id} or enter for no change: "
+                )
+                new_y = input(
+                    f"Enter the new Y coordinate for {well_id} or enter for no change: "
+                )
 
                 if new_x == "":
                     new_x = original_coordinates["x"]
@@ -183,7 +194,7 @@ def calibrate_wells(
                         f"Invalid y coordinate, must be between 0 and {working_volume['y']}"
                     )
                     continue
-                break # exit validation loop
+                break  # exit validation loop
 
             new_coordinates = WellCoordinates(
                 new_x,
@@ -201,13 +212,15 @@ def calibrate_wells(
 
         if coordinates_changed:
             if well_id.upper() == "A1":
-                recalc = input("Would you like to recalculate all well locations? (y/n): ")
+                recalc = input(
+                    "Would you like to recalculate all well locations? (y/n): "
+                )
                 if recalc[0].lower() == "y":
                     wellplate.a1_x = new_coordinates.x
                     wellplate.a1_y = new_coordinates.y
-                    wellplate.write_wellplate_location() # This is the json file that holds the wellplate location
-                    wellplate.recalculate_well_locations() # This updates the well objects and db entries with the new coordinates
-            else: # Update the well with new well coordinates
+                    wellplate.write_wellplate_location()  # This is the json file that holds the wellplate location
+                    wellplate.recalculate_well_locations()  # This updates the well objects and db entries with the new coordinates
+            else:  # Update the well with new well coordinates
                 wellplate.update_well_coordinates(well_id, new_coordinates)
 
 
@@ -228,7 +241,11 @@ def calibrate_z_bottom_of_wellplate(
     # Save the new z_bottom to the wellplate object
     # Repeat until the user enters "done"
     while True:
-        well_id = input("Enter a well ID to check the z_bottom or 'done' to finish: ").upper().strip()
+        well_id = (
+            input("Enter a well ID to check the z_bottom or 'done' to finish: ")
+            .upper()
+            .strip()
+        )
         if well_id == "DONE":
             break
 
@@ -243,8 +260,12 @@ def calibrate_z_bottom_of_wellplate(
         )
 
         while True:
-            confirm = input("Is the pipette in the correct position? (yes/no): ").lower().strip()[0]
-            if confirm.lower() in ["y",""]:
+            confirm = (
+                input("Is the pipette in the correct position? (yes/no): ")
+                .lower()
+                .strip()[0]
+            )
+            if confirm.lower() in ["y", ""]:
                 break
 
             new_z_bottom = float(
@@ -267,7 +288,7 @@ def calibrate_z_bottom_of_wellplate(
             # We do this instead of recalculating every well location incase
             # they are uniquely set
         wellplate.write_wellplate_location()
-        wellplate.write_well_status_to_file() # but then we bulk save all wells to the db
+        wellplate.write_well_status_to_file()  # but then we bulk save all wells to the db
 
 
 def calibrate_vials(
@@ -303,6 +324,7 @@ def calibrate_vials(
     # Same process as the stock vials
     pass
 
+
 def calibrate_camera_focus(
     mill: Mill,
     wellplate: Wellplate,
@@ -329,26 +351,115 @@ def calibrate_camera_focus(
     input("Focus the camera using FlyCapture2 and press enter to continue")
 
 
+def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwargs):
+    """
+    Capture a photo of a well manually
+
+    Asks the user to input the well ID to capture a photo of.
+    Also asks for relevant experiment id, project id, campaign id, and context.
+    Experiment id is an integer: 1000000 <= experiment_id <= 9999999
+    Project id and campaign id are integers.
+    Context is one of these strings: 'BeforeDeposition', 'AfterBleaching', 'AfterColoring'
+
+    Future versions will use the experiment id, to look up the project, campaign ids.
+
+    """
+    from .e_panda import image_filepath_generator, capture_new_image
+    while True:
+        well_id = (
+            input("Enter the well ID to capture a photo of (e.g., A1): ").upper().strip()
+        )
+        experiment_id = int(input("Enter the experiment ID: "))
+        project_id = int(input("Enter the project ID: "))
+        campaign_id = int(input("Enter the campaign ID: "))
+        context = input(
+            "Enter the context (BeforeDeposition, AfterBleaching, AfterColoring): "
+        ).strip()
+
+        # Move the camera to the top of the well
+        mill.safe_move(
+            wellplate.get_coordinates(well_id, "x"),
+            wellplate.get_coordinates(well_id, "y"),
+            0,
+            Instruments.LENS,
+        )
+
+        # lower to the wellplate's image height
+        mill.safe_move(
+            wellplate.get_coordinates(well_id, "x"),
+            wellplate.get_coordinates(well_id, "y"),
+            wellplate.image_height,
+            Instruments.LENS,
+        )
+        # pause for the user to focus the camera
+        input("Focus the camera using FlyCapture2 if necessary and press enter to continue")
+
+        # Capture the image
+        image_path = image_filepath_generator(
+            exp_id=experiment_id,
+            project_id=project_id,
+            project_campaign_id=campaign_id,
+            well_id=well_id,
+            step_description=context,
+        )
+
+        capture_new_image(save=True, num_images=1, file_name=image_path)
+
+        view_image = input("Would you like to view the image? (y/n): ")
+        if view_image.lower() == "y":
+            if platform.system() == "Windows":
+                os.system(f"start {image_path}")
+            elif platform.system() == "Darwin":
+                os.system(f"open {image_path}")
+            elif platform.system() == "Linux":
+                os.system(f"xdg-open {image_path}")
+            else:
+                print("Unsupported OS")
+
+        save_to_db = input("Would you like to save the image to the database? (y/n): ")
+        if save_to_db.lower() != "y":
+            return image_path
+
+        # Save the image path to the database
+        sql_utilities.insert_experiment_result(
+            ExperimentResultsRecord(
+                experiment_id=experiment_id,
+                result_type="image",
+                result_value=str(image_path),
+                context=context,
+            )
+        )
+
+        to_continue = input("Would you like to capture another image? (y/n): ")
+        if to_continue.lower() != "y":
+            break # exit the loop
+
+    return None
+
+
 def home_mill(
     mill: Mill,
     wellplate: Wellplate,
     stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial]
+    waste_vials: Sequence[WasteVial],
 ):
     """Home the mill"""
     mill.home()
     print("Mill has been homed")
 
+
 def quit():
     pass
 
-options = {
+
+menu_options = {
     "0": check_mill_settings,
     "1": home_mill,
     "3": calibrate_wells,
     "4": calibrate_z_bottom_of_wellplate,
     # "5": calibrate_vials,
     "6": calibrate_camera_focus,
+    "7": capture_well_photo_manually,
     "q": quit,
 }
 
@@ -363,16 +474,18 @@ def calibrate_mill(
     # Connect to the mill
     with mill() as mill:
         while True:
-            #os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+            # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             print("\n\n")
             print("""\nWelcome to the mill calibration and positioning menu:""")
-            for key, value in options.items():
+            for key, value in menu_options.items():
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
             if option == "q":
                 mill.rest_electrode()
                 break
-            options[option](mill, wellplate, stock_vials, waste_vials)
+            menu_options[option](mill, wellplate, stock_vials, waste_vials)
+            capture_well_photo_manually(mill, wellplate, stock_vials, waste_vials)
+
 
 def main():
     # Load the configuration file
@@ -394,6 +507,7 @@ def main():
     calibrate_mill(
         mill_to_use, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
     )
+
 
 if __name__ == "__main__":
     main()
