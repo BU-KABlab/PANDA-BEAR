@@ -27,7 +27,6 @@ import math
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
-
 from PIL import Image
 
 # Local application imports
@@ -44,6 +43,7 @@ from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
 from epanda_lib.obs_controls import OBSController
 from epanda_lib.pump_control import MockPump, Pump
+from epanda_lib.vessel import OverFillException
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well
 
@@ -230,12 +230,13 @@ def forward_pipette_v2(
                 if isinstance(from_vessel, Well)
                 else AIR_GAP + DRIP_STOP
             )
-            is_pipette_volume_equal = pump.pipette.volume >= blow_out
-            testing_logger.debug(
-                "TESTING: Is pipette volume greater than or equal to blowout? %s",
-                is_pipette_volume_equal,
-            )
+            # is_pipette_volume_equal = pump.pipette.volume >= blow_out
+            # testing_logger.debug(
+            #     "TESTING: Is pipette volume greater than or equal to blowout? %s",
+            #     is_pipette_volume_equal,
+            # )
             # Infuse into the to_vessel
+            # try:
             pump.infuse(
                 volume_to_infuse=repetition_vol,
                 being_infused=from_vessel,
@@ -248,6 +249,11 @@ def forward_pipette_v2(
                 ),
                 weigh=weigh,
             )
+            # except OverFillException as e:
+            #     logger.error(
+            #         "Overfill exception occurred during pipette into %s. %s", to_vessel.name, e
+            #     )
+            #     new_to_vessel = waste_selector(waste_vials, "waste", 0)
             # endregion
 
 
@@ -853,7 +859,10 @@ def image_well(
                 context=step_description,
             )
             img.save(dz_filepath)
-            instructions.results.append_image_file(dz_filepath, context=(step_description + "_dz"))
+            instructions.results.append_image_file(
+                dz_filepath,
+                context=(step_description + "_dz")
+                )
         logger.debug("Image of well %s captured", instructions.well_id)
 
         instructions.results.append_image_file(filepath, context=step_description)

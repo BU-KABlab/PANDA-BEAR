@@ -110,7 +110,7 @@
         "height": 57,
         "depth": -74,
         "name": "rinse",
-        "volume": 10002.23999999999,
+        "volume": 20000,
         "capacity": 20000,
         "contamination": 0,
         "vial_coordinates": {
