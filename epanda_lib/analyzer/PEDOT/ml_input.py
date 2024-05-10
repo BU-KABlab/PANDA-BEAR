@@ -25,22 +25,27 @@ def populate_required_information(experiment_id: int) -> RequiredData:
     # Get the experiment parameters
     parameters = df.loc[df['source'] == 'parameter', 'name']
     for parameter in parameters:
-        df.loc[df['name'] == parameter, 'value'] = sql_utilities.select_specific_parameter(
-            experiment_id, parameter
-        )
+        try:
+            df.loc[df['name'] == parameter, 'value'] = sql_utilities.select_specific_parameter(
+                experiment_id, parameter
+            )
+        except Exception as e:
+            print(f"Error getting parameter {parameter}: {e}")
+            df.loc[df['name'] == parameter, 'value'] = None
 
     # Get the experiment results
     table = df.loc[df['source'] == 'result'][['name', 'type','context']].values
     for row in table:
-        name, result_type, context = row
-        value = sql_utilities.select_specific_result(
-            experiment_id, result_type, context
-        )
-        # if result_type == 'image':
-        #     value = Image.open(value)
-        if value is not None:
-            df.loc[(df['name'] == name), 'value'] = value.result_value
-
+        try:
+            name, result_type, context = row
+            value = sql_utilities.select_specific_result(
+                experiment_id, result_type, context
+            )
+            if value is not None:
+                df.loc[(df['name'] == name), 'value'] = value.result_value
+        except Exception as e:
+            print(f"Error getting result {row}: {e}")
+            df.loc[(df['name'] == name), 'value'] = None
     sql_utilities.set_system_status(
         sql_utilities.SystemState.IDLE, "ready", read_testing_config()
     )
