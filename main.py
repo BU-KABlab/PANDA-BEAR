@@ -33,7 +33,6 @@ from epanda_lib.sql_utilities import set_system_status, select_specific_result
 from epanda_lib.utilities import SystemState
 import epanda_lib.analyzer.pedot as pedot_analysis
 
-
 def run_epanda_with_ml():
     """Runs ePANDA."""
     set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
@@ -45,6 +44,14 @@ def run_epanda_without_ml():
     set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
     controller.main()
 
+def genererate_pedot_experiment():
+    """Generates a PEDOT experiment."""
+    set_system_status(SystemState.BUSY, "generating PEDOT experiment", read_testing_config())
+    dep_v = float(input("Enter the deposition voltage: ").strip().lower())
+    dep_t = float(input("Enter the deposition time: ").strip().lower())
+    concentration = float(input("Enter the concentration: ").strip().lower())
+    params = PEDOTParams(dep_v=dep_v, dep_t=dep_t, concentration=concentration)
+    pedot_analysis.pedot_generator(params=params)
 
 def change_wellplate():
     """Changes the current wellplate."""
@@ -293,7 +300,7 @@ def resume_epanda():
     )
 
 
-options = {
+menu_options = {
     "0": run_epanda_with_ml,
     "1": run_epanda_without_ml,
     "1.1": stop_epanda,
@@ -314,6 +321,7 @@ options = {
     "9.1": change_wellplate_location,
     "11": test_camera,
     "12": generate_experiment_from_existing_data,
+    "13": genererate_pedot_experiment,
     "r": refresh,
     "q": exit_program,
 }
@@ -338,13 +346,13 @@ if __name__ == "__main__":
         )
         print(f"The queue has {scheduler.get_queue_length()} experiments.")
         print("What would you like to do?")
-        for key, value in options.items():
+        for key, value in menu_options.items():
             print(f"{key}. {value.__name__.replace('_', ' ').title()}")
 
         user_choice = input("Enter the number of your choice: ").strip().lower()
         try:
-            if user_choice in options:
-                options[user_choice]()
+            if user_choice in menu_options:
+                menu_options[user_choice]()
             else:
                 print("Invalid choice. Please try again.")
                 continue
