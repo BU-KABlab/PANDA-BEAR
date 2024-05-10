@@ -809,29 +809,12 @@ def image_well(
         # capture image
         logger.debug("Capturing image of well %s", instructions.well_id)
 
-        # create file name
-        project_id = instructions.project_id or "test"
-        if isinstance(instructions.project_campaign_id,int):
-            project_campaign_id = instructions.project_campaign_id
-        elif instructions.project_campaign_id is None:
-            project_campaign_id = "test"
-        else:
-            project_campaign_id = "test"
         exp_id = instructions.experiment_id or "test"
-        well_id = instructions.well_id or "test"
-
-        if step_description is not None:
-            file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
-        else:
-            file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
-        file_name = file_name.replace(" ", "_")  # clean up the file name
-        file_name_start = file_name + "_0"  # enumerate the file name
-        filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".tiff")
-        i = 1
-        while filepath.exists():
-            next_file_name = f"{file_name}_{i}"
-            filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
-            i += 1
+        well_id = well_id = instructions.well_id or "test"
+        # create file path
+        filepath = image_filepath_generator(
+            exp_id, well_id, instructions.project_campaign_id ,step_description
+        )
 
         # position lens above the well
         logger.info("Moving camera above well %s", well_id)
@@ -879,6 +862,24 @@ def image_well(
             logger.info("Moving camera to safe position")
             toolkit.mill.move_to_safe_position()  # move to safe height above target well
 
+def image_filepath_generator(
+    exp_id: int = "test", project_id:int = "test", project_campaign_id:int = "test",well_id: str = "test", step_description: str = None
+) -> Path:
+    """"""
+    # create file name
+    if step_description is not None:
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
+    else:
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
+    file_name = file_name.replace(" ", "_")  # clean up the file name
+    file_name_start = file_name + "_0"  # enumerate the file name
+    filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".tiff")
+    i = 1
+    while filepath.exists():
+        next_file_name = f"{file_name}_{i}"
+        filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
+        i += 1
+    return filepath
 
 class OCPFailure(Exception):
     """Raised when OCP fails"""
