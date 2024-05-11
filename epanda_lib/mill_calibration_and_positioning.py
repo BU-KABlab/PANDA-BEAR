@@ -16,24 +16,21 @@ The main functions in this module are:
 """
 
 import json
-from typing import Sequence
 import os
 import platform
+from typing import Sequence
+
 from epanda_lib import sql_utilities
 from epanda_lib.experiment_class import ExperimentResultsRecord
 
+from .e_panda import capture_new_image, image_filepath_generator
 from .mill_control import Mill, MockMill
 from .utilities import Instruments
 from .vials import StockVial, WasteVial
-from .wellplate import WellCoordinates, Wellplate, Well
+from .wellplate import Well, WellCoordinates, Wellplate
 
 
-def check_mill_settings(
-    mill: Mill,
-    wellplate: Wellplate,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
-):
+def check_mill_settings(mill: Mill, *args, **kwargs):
     """
     Fetch the settings list from the grbl controller and compare to the settings file.
     If there are differences, ask the user if they would like to change the settings.
@@ -96,12 +93,7 @@ def check_mill_settings(
             print("Settings have not been applied")
 
 
-def calibrate_wells(
-    mill: Mill,
-    wellplate: Wellplate,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
-):
+def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     """
     Calibrate the locations of the individual wells in the wellplate using either
     the pipette or the electrode.
@@ -218,18 +210,13 @@ def calibrate_wells(
                 if recalc[0].lower() == "y":
                     wellplate.a1_x = new_coordinates.x
                     wellplate.a1_y = new_coordinates.y
-                    wellplate.write_wellplate_location()  # This is the json file that holds the wellplate location
-                    wellplate.recalculate_well_locations()  # This updates the well objects and db entries with the new coordinates
+                    wellplate.write_wellplate_location()  # json file for wellplate location
+                    wellplate.recalculate_well_locations()  # Update wells with new coords and depth
             else:  # Update the well with new well coordinates
                 wellplate.update_well_coordinates(well_id, new_coordinates)
 
 
-def calibrate_z_bottom_of_wellplate(
-    mill: Mill,
-    wellplate: Wellplate,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
-):
+def calibrate_z_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     """Calibrate the z_bottom of the wellplate to the mill"""
     # Enter confirmation loop
     # Ask the user to enter a well id to check the z_bottom or to enter "done" to finish
@@ -288,7 +275,6 @@ def calibrate_z_bottom_of_wellplate(
             # We do this instead of recalculating every well location incase
             # they are uniquely set
         wellplate.write_wellplate_location()
-        wellplate.write_well_status_to_file()  # but then we bulk save all wells to the db
 
 
 def calibrate_vials(
@@ -325,14 +311,14 @@ def calibrate_vials(
     pass
 
 
-def calibrate_camera_focus(
-    mill: Mill,
-    wellplate: Wellplate,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
-):
+def calibrate_camera_focus(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     """Calibrate the camera focus"""
     # Move the camera to the top of the wellplate
+    response = input(
+        "Camera will move to image_height above A1. Press enter to proceed or 'q' to quit: "
+    )
+    if response.lower() == "q":
+        return
     mill.safe_move(
         wellplate.get_coordinates("A1", "x"),
         wellplate.get_coordinates("A1", "y"),
@@ -364,10 +350,12 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
     Future versions will use the experiment id, to look up the project, campaign ids.
 
     """
-    from .e_panda import image_filepath_generator, capture_new_image
+
     while True:
         well_id = (
-            input("Enter the well ID to capture a photo of (e.g., A1): ").upper().strip()
+            input("Enter the well ID to capture a photo of (e.g., A1): ")
+            .upper()
+            .strip()
         )
         experiment_id = int(input("Enter the experiment ID: "))
         project_id = int(input("Enter the project ID: "))
@@ -392,7 +380,9 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
             Instruments.LENS,
         )
         # pause for the user to focus the camera
-        input("Focus the camera using FlyCapture2 if necessary and press enter to continue")
+        input(
+            "Focus the camera using FlyCapture2 if necessary and press enter to continue"
+        )
 
         # Capture the image
         image_path = image_filepath_generator(
@@ -418,7 +408,7 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
 
         save_to_db = input("Would you like to save the image to the database? (y/n): ")
         if save_to_db.lower() != "y":
-            return image_path
+            return
 
         # Save the image path to the database
         sql_utilities.insert_experiment_result(
@@ -431,24 +421,20 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
         )
 
         to_continue = input("Would you like to capture another image? (y/n): ")
-        if to_continue.lower() != "y":
-            break # exit the loop
+        if to_continue.lower() == "n":
+            return  # exit the loop
 
     return None
 
 
-def home_mill(
-    mill: Mill,
-    wellplate: Wellplate,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
-):
-    """Home the mill"""
+def home_mill(mill: Mill, *args, **kwargs):
+    """Homes the mill"""
     mill.home()
     print("Mill has been homed")
 
 
-def quit():
+def quit_calibration():
+    """Quit the calibration menu"""
     pass
 
 
@@ -460,7 +446,7 @@ menu_options = {
     # "5": calibrate_vials,
     "6": calibrate_camera_focus,
     "7": capture_well_photo_manually,
-    "q": quit,
+    "q": quit_calibration,
 }
 
 
@@ -488,6 +474,7 @@ def calibrate_mill(
 
 
 def main():
+    """Main function for testing the calibration functions"""
     # Load the configuration file
     from .config.config import TESTING
     from .vials import STOCK_STATUS, WASTE_STATUS, read_vials

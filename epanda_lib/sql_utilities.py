@@ -4,6 +4,7 @@ from datetime import datetime
 import sqlite3
 from typing import List, Union
 from pathlib import Path
+import pandas as pd
 import json
 import csv
 import logging
@@ -194,7 +195,7 @@ def check_if_current_wellplate_is_new() -> bool:
         """
     )
     if result == []:
-        print("No current wellplate found")
+        logger.info("No current wellplate found")
         return False
 
     # If all the results are 'new' then the wellplate is new
@@ -372,7 +373,8 @@ def select_wellplate_wells(plate_id: int = None) -> list[Well]:
         # well_height, well_capacity,
         # TODO currently the wepplate object applies the well_height and well_capacity
         # If we want the wells to be the primary source of this information, we need to
-        # update this script to also pull from well_types and the stop applying the infomation in the wellplate object
+        # update this script to also pull from well_types and the stop applying
+        # the infomation in the wellplate object
         if plate_id is None:
             plate_id = row[0]
             if plate_id is None:
@@ -725,8 +727,8 @@ def complete_well_information(sql_command: str, values: tuple) -> Well:
     ) = result[0]
 
     if result == []:
-        print("Error: No well found in the well_hx table.")
-        print("Statment Was: ", sql_command, "Values Were: ", values)
+        logger.error("Error: No well found in the well_hx table.")
+        logger.error("Statment Was: %s, Values Were: %s", sql_command, values)
         return None
 
     # Based on the plate ID, get the well type number, capacity, height
@@ -1075,7 +1077,7 @@ def update_well_status(well_id: str, plate_id: int = None,status: str = None) ->
         plate_id = execute_sql_command("SELECT id FROM wellplates WHERE current = 1")[0][0]
     if status is None:
         status = select_well_status(well_id, plate_id)
-        
+
     execute_sql_command_no_return(
         """
         UPDATE well_hx
@@ -1137,9 +1139,23 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
             priority,
             process_type,
             filename,
-            created
+            created,
+            updated
             )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        ON CONFLICT (experiment_id) DO UPDATE SET
+            project_id = excluded.project_id,
+            project_campaign_id = excluded.project_campaign_id,
+            well_type = excluded.well_type,
+            protocol_id = excluded.protocol_id,
+            pin = excluded.pin,
+            experiment_type = excluded.experiment_type,
+            jira_issue_key = excluded.jira_issue_key,
+            priority = excluded.priority,
+            process_type = excluded.process_type,
+            filename = excluded.filename,
+            created = excluded.created,
+            updated = datetime('now', 'localtime')
         """,
         parameters,
     )
@@ -1186,9 +1202,10 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
             experiment_id,
             parameter_name,
             parameter_value,
-            created
+            created,
+            updated
             )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
         """,
         parameters_to_insert,
     )
@@ -1256,11 +1273,14 @@ def update_experiment_status(
     """
     Update the status of an experiment in the experiments table.
 
-    When provided with an int, the experiment_id is the int, and the status and status_date are the other two arguments.
+    When provided with an int, the experiment_id is the int, and the status and
+    status_date are the other two arguments.
     If no status is provided, the function will not make assumptions and will do nothing.
 
-    When provided with an ExperimentBase object, the object's attributes will be used to update the status.
-    If an object is provided along with a status and status date, the object's attributes will be updated with the status and status date.
+    When provided with an ExperimentBase object, the object's attributes will be
+    used to update the status.
+    If an object is provided along with a status and status date, the object's
+    attributes will be updated with the status and status date.
 
     Args:
         experiment_id (int): The experiment ID.
@@ -1472,6 +1492,151 @@ def select_specific_result(
 
 # endregion
 
+# region ML Functions
+def select_best_test_points() -> pd.DataFrame:
+    """
+    Select the best test points from the ml_pedot_best_test_points table.
+
+    Returns:
+        pd.DataFrame: The best test points.
+    """
+    sql_command = "SELECT * FROM ml_pedot_best_test_points"
+    result = execute_sql_command(sql_command)
+    df = pd.DataFrame(result, columns=[
+        "Model ID",
+        "Experiment ID",
+        "Best Test Point Scalar",
+        "Best Test Point Original",
+        "Best Test Point",
+        "v_dep",
+        "t_dep",
+        "edot_concentration",
+        "Predicted Response",
+        "Standard Deviation",
+        "Models current RMSE"
+    ])
+    return df
+
+def select_best_test_points_by_model_id(model_id: int) -> pd.DataFrame:
+    """
+    Select the best test points from the ml_pedot_best_test_points table by model ID.
+
+    Args:
+        model_id (int): The model ID.
+
+    Returns:
+        pd.DataFrame: The best test points.
+    """
+    sql_command = "SELECT * FROM ml_pedot_best_test_points WHERE model_id = ?"
+    result = execute_sql_command(sql_command, (model_id,))
+    df = pd.DataFrame(result, columns=[
+        "Model ID",
+        "Experiment ID",
+        "Best Test Point Scalar",
+        "Best Test Point Original",
+        "Best Test Point",
+        "v_dep",
+        "t_dep",
+        "edot_concentration",
+        "Predicted Response",
+        "Standard Deviation",
+        "Models current RMSE"
+    ])
+    return df
+
+def select_best_test_points_by_experiment_id(experiment_id: int) -> pd.DataFrame:
+    """
+    Select the best test points from the ml_pedot_best_test_points table by experiment ID.
+
+    Args:
+        experiment_id (int): The experiment ID.
+
+    Returns:
+        pd.DataFrame: The best test points.
+    """
+    sql_command = "SELECT * FROM ml_pedot_best_test_points WHERE experiment_id = ?"
+    result = execute_sql_command(sql_command, (experiment_id,))
+    df = pd.DataFrame(result, columns=[
+        "Model ID",
+        "Experiment ID",
+        "Best Test Point Scalar",
+        "Best Test Point Original",
+        "Best Test Point",
+        "v_dep",
+        "t_dep",
+        "edot_concentration",
+        "Predicted Response",
+        "Standard Deviation",
+        "Models current RMSE"
+    ])
+    return df
+
+def insert_best_test_point(entry: pd.DataFrame) -> None:
+    """
+    Insert an entry into the ml_pedot_best_test_points table.
+
+    Args:
+        entry (pandas Dataframe): The entry to insert.
+    """
+    command = """
+        INSERT INTO ml_pedot_best_test_points (
+            model_id,
+            experiment_id,
+            best_test_point_scalar,
+            best_test_point_original,
+            best_test_point,
+            v_dep,
+            t_dep,
+            edot_concentration,
+            predicted_response,
+            standard_deviation,
+            models_current_rmse,
+            created
+            )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        """
+    parameters = entry.values.tolist()
+    execute_sql_command_no_return(command, parameters)
+
+def select_ml_training_data() -> pd.DataFrame:
+    """
+    Select the training data from the ml_pedot_training_data table.
+
+    Returns:
+        pd.DataFrame: The training data.
+    """
+    sql_command = "SELECT * FROM ml_pedot_training_data"
+    result = execute_sql_command(sql_command)
+    df = pd.DataFrame(result, columns=[
+        "deltaE",
+        "voltage",
+        "time",
+        "bleachCP",
+        'concentration'
+    ])
+    return df
+
+def insert_ml_training_data(entry: pd.DataFrame) -> None:
+    """
+    Insert an entry into the ml_pedot_training_data table.
+
+    Args:
+        entry (pandas Dataframe): The entry to insert.
+    """
+    command = """
+        INSERT INTO ml_pedot_training_data (
+            delta_e,
+            voltage,
+            time,
+            bleach_cp,
+            concentration,
+            created
+            )
+        VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        """
+    parameters = entry.values.tolist()
+    execute_sql_command_no_return(command, parameters)
+# endregion
 
 # region Data backfilling functions
 # These functions are used to backfill the database with data from CSV files.

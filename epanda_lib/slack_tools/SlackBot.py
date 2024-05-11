@@ -78,9 +78,9 @@ class SlackBot:
                 )
 
             if result["ok"]:
-                self.logger.info("File sent: %s", file)
+                self.logger.info("File sent: %s", file.name)
                 return 1
-            self.logger.error("Error sending file: %s", file)
+            self.logger.error("Error sending file: %s", file.name)
             return 0
         except SlackApiError as exception:
             log_msg = f"Error uploading file: {format(exception)}"

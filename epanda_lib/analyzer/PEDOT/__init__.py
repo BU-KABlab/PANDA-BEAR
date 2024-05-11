@@ -6,7 +6,7 @@ import pandas as pd
 from epanda_lib.sql_utilities import (
     ExperimentResultsRecord,
     insert_experiment_result,
-    insert_experiment_results,
+    insert_ml_training_data,
     read_testing_config,
 )
 

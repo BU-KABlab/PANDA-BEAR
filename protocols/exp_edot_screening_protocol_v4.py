@@ -95,7 +95,7 @@ def pedot_lhs_v1_screening(
     #         stock_vials=stock_vials,
     #         waste_vials=waste_vials,
     #     )
-        
+
     # elif instructions.process_type == 2:
     #     pedotbleaching(
     #         instructions=instructions,
