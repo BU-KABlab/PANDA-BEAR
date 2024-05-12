@@ -3,9 +3,12 @@ import json
 import pandas as pd
 
 from epanda_lib import experiment_class, wellplate
-from epanda_lib.config.config import TESTING, WELL_HX
-from epanda_lib.config.pin import CURRENT_PIN
+from epanda_lib.config.config import read_testing_config, WELL_HX
+from epanda_lib.sql_utilities import get_current_pin
 from epanda_lib.scheduler import Scheduler
+
+CURRENT_PIN = get_current_pin()
+
 
 params_df = pd.read_csv(
     r".\experiment_generators\exp_edot_screening_generator_v1_LHS_0,03.csv"
@@ -22,8 +25,9 @@ def determine_next_experiment_id() -> int:
     last_experiment_id = well_hx["experiment id"].max()
     return int(last_experiment_id + 1)
 
+
 def main():
-    TEST = TESTING
+    TEST = read_testing_config()
     print("TEST MODE: ", TEST)
     input("Press enter to continue")
 
@@ -42,7 +46,7 @@ def main():
         WELL_NUMBER = row["well_number"]
         dep_V = row["dep_V"]  # dep_V is used for deposition voltage
         dep_T = row["dep_T"]  # dep_T is used for deposition time
-        
+
         # experiments.append(
         #     experiment_class.EchemExperimentBase(
         #         id=experiment_id,
@@ -76,7 +80,7 @@ def main():
         #     )
         # )
         # experiment_id += 1
-        
+
         experiments.append(
             experiment_class.EchemExperimentBase(
                 experiment_id=experiment_id,
@@ -180,9 +184,8 @@ def main():
             )
         )
         experiment_id += 1
-        
-        WELL_NUMBER += 1
 
+        WELL_NUMBER += 1
 
     for experiment in experiments:
         ## Print a recipt of the wellplate and its experiments noting the solution and volume
@@ -196,7 +199,6 @@ def main():
         )
         print(f"CA Paramaters: {experiment.print_ca_parameters()}\n")
         print(f"CV Paramaters: {experiment.print_cv_parameters()}\n")
-
 
     # Add experiments to the queue and run them
     input("Press enter to add the experiments")

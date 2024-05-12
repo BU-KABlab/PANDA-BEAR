@@ -29,7 +29,7 @@ from epanda_lib import sql_utilities
 
 from . import e_panda
 from .analyzer.pedot import pedot_analyzer, run_ml_model as pedot_ml_model
-from .config.config import RANDOM_FLAG, STOCK_STATUS, TESTING, WASTE_STATUS
+from .config.config import RANDOM_FLAG, STOCK_STATUS, WASTE_STATUS, read_testing_config
 from .e_panda import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .errors import ProtocolNotFoundError, ShutDownCommand, WellImportError, NoExperimentFromModel
 from .experiment_class import (ExperimentBase, ExperimentResult,
@@ -51,7 +51,7 @@ from .wellplate import Wellplate
 
 # set up slack globally so that it can be used in the main function and others
 
-
+TESTING = read_testing_config()
 def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaign_length: int = None):
     """
     Main function

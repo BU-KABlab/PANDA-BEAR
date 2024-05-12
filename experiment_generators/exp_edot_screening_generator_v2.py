@@ -5,10 +5,11 @@ import json
 import pandas as pd
 
 from epanda_lib import experiment_class, wellplate
-from epanda_lib.config.config import TESTING, DEFAULT_PUMPING_RATE
-from epanda_lib.config.pin import CURRENT_PIN
+from epanda_lib.config.config import read_testing_config, DEFAULT_PUMPING_RATE
 from epanda_lib.scheduler import Scheduler, determine_next_experiment_id
+from epanda_lib.sql_utilities import get_current_pin
 
+CURRENT_PIN =  get_current_pin()
 
 PROJECT_ID = 16
 EXPERIMENT_NAME = "pedotLHSv1_screening_0,01"
@@ -20,7 +21,7 @@ params_df = pd.read_csv(
 
 def main():
     """Runs the edot voltage sweep experiment generator."""
-    print("TEST MODE: ", TESTING)
+    print("TEST MODE: ", read_testing_config())
     input("Press enter to continue")
 
     # controller.load_new_wellplate(new_wellplate_type_number=6)

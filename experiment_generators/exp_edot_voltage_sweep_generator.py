@@ -4,12 +4,12 @@ import json
 
 from epanda_lib import experiment_class
 from epanda_lib import wellplate
-from epanda_lib.config.config import TESTING
-from epanda_lib.config.pin import CURRENT_PIN
+from epanda_lib.config.config import read_testing_config
 from epanda_lib.scheduler import Scheduler, determine_next_experiment_id
+from epanda_lib.sql_utilities import get_current_pin
 
-TEST: bool = TESTING
-
+TEST: bool = read_testing_config()
+CURRENT_PIN =  get_current_pin()
 
 def main(
     project_id: int = None,

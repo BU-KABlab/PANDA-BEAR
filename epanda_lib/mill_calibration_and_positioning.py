@@ -23,6 +23,7 @@ from typing import Sequence
 from epanda_lib import sql_utilities
 from epanda_lib.experiment_class import ExperimentResultsRecord
 
+from .config.config import read_testing_config
 from .e_panda import capture_new_image, image_filepath_generator
 from .mill_control import Mill, MockMill
 from .utilities import Instruments
@@ -475,7 +476,7 @@ def calibrate_mill(
 def main():
     """Main function for testing the calibration functions"""
     # Load the configuration file
-    from .config.config import TESTING
+    TESTING = read_testing_config()
     from .vials import STOCK_STATUS, WASTE_STATUS, read_vials
 
     print("Testing mode:", TESTING)

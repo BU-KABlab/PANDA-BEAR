@@ -25,12 +25,12 @@ The wellplate will look like this (x = test, o = no test):
 """
 
 import time
-from epanda_lib.config.config import TESTING, WELL_HX
-from epanda_lib.config.pin import CURRENT_PIN
+from epanda_lib.config.config import read_testing_config, WELL_HX
+from epanda_lib.config.now_in_db.pin import CURRENT_PIN
 from epanda_lib.scheduler import Scheduler
 from epanda_lib.wellplate import load_new_wellplate
 
-import experiment_class
+from epanda_lib import experiment_class
 import pandas as pd
 
 
@@ -45,7 +45,7 @@ def determine_next_experiment_id() -> int:
     return int(last_experiment_id + 1)
 
 
-print("TEST MODE: ", TESTING)
+print("TEST MODE: ", read_testing_config())
 # Create experiments
 COLUMNS = "ABCDEFGH"
 ROWS = 12

@@ -33,7 +33,7 @@ from PIL import Image
 from epanda_lib import instrument_toolkit
 from epanda_lib.camera_call_camera import capture_new_image
 from epanda_lib.config.config import (AIR_GAP, DRIP_STOP, PATH_TO_DATA,
-                                      PATH_TO_LOGS, TESTING)
+                                      PATH_TO_LOGS, read_testing_config)
 from epanda_lib.correction_factors import correction_factor
 from epanda_lib.experiment_class import (EchemExperimentBase, ExperimentBase,
                                          ExperimentResult, ExperimentStatus)
@@ -46,6 +46,8 @@ from epanda_lib.pump_control import MockPump, Pump
 from epanda_lib.vessel import OverFillException
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well
+
+TESTING = read_testing_config()
 
 if TESTING:
     from epanda_lib.gamry_control_WIP_mock import GamryPotentiostat as echem

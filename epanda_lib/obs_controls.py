@@ -9,7 +9,7 @@ import logging
 import obsws_python as obsws
 from obsws_python import error as OBSerror
 
-from .config.config import PATH_TO_LOGS, TESTING
+from .config.config import PATH_TO_LOGS, read_testing_config
 from .config.secrets import OBSSecrets
 from .experiment_class import ExperimentBase
 from .log_tools import e_panda_logger as logger
@@ -124,7 +124,7 @@ Well: {well_id}"""
 
     def start_recording(self):
         """Start the recording"""
-        if TESTING:
+        if read_testing_config():
             return
         try:
             self.client.start_record()
@@ -134,7 +134,7 @@ Well: {well_id}"""
 
     def stop_recording(self):
         """Stop the recording"""
-        if TESTING:
+        if read_testing_config():
             return
         try:
             self.client.stop_record()
