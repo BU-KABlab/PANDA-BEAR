@@ -7,11 +7,12 @@ import unittest
 from unittest.mock import patch
 
 from epanda_lib import scheduler
-from epanda_lib.config.pin import CURRENT_PIN
 from epanda_lib.experiment_class import ExperimentBase, ExperimentStatus, ExperimentResult
 from epanda_lib.scheduler import Scheduler
 from epanda_lib import sql_utilities
+from epanda_lib.sql_utilities import get_current_pin
 
+CURRENT_PIN =  get_current_pin()
 # define constants or globals
 # PATH_TO_CONFIG = "code/config/mill_config.json"
 # PATH_TO_STATUS = "code/system state"

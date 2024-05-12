@@ -25,18 +25,23 @@ The wellplate will look like this (x = test, o = no test):
 """
 
 import time
-from epanda_lib.config.config import read_testing_config, WELL_HX
-from epanda_lib.config.now_in_db.pin import CURRENT_PIN
+
+from epanda_lib.config.config import WELL_HX, read_testing_config
+from epanda_lib.sql_utilities import get_current_pin
+
+
+import pandas as pd
+
+from epanda_lib import experiment_class
 from epanda_lib.scheduler import Scheduler
 from epanda_lib.wellplate import load_new_wellplate
 
-from epanda_lib import experiment_class
-import pandas as pd
+CURRENT_PIN = get_current_pin()
 
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
-    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True,sep='&')
+    well_hx = pd.read_csv(WELL_HX, skipinitialspace=True, sep="&")
     well_hx = well_hx.dropna(subset=["experiment id"])
     well_hx = well_hx.drop_duplicates(subset=["experiment id"])
     well_hx = well_hx[well_hx["experiment id"] != "None"]
@@ -56,21 +61,19 @@ CAMPAIGN_ID = 5
 PUMPING_RATE = 0.3
 INTENDED_PLATE = 107
 
-load_new_wellplate(False,INTENDED_PLATE)
+load_new_wellplate(False, INTENDED_PLATE)
 experiment_id = determine_next_experiment_id()
 experiments: list[experiment_class.EchemExperimentBase] = []
 WELL_NUMBER = 1
 
-experiment_wells = [
-    "D11","D10","D9"
-]
+experiment_wells = ["D11", "D10", "D9"]
 
 for col in COLUMNS:
     for row in range(1, ROWS + 1):
         if col + str(row) in experiment_wells:
             time.sleep(0.25)
             experiment = experiment_class.EchemExperimentBase(
-                id=experiment_id,
+                experiment_id=experiment_id,
                 well_id=col + str(row),
                 experiment_name=EXPERIMENT_NAME,
                 priority=1,
@@ -83,7 +86,7 @@ for col in COLUMNS:
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + "_" + str(experiment_id),
                 plate_id=INTENDED_PLATE,
-                override_well_selection= 0,
+                override_well_selection=0,
                 # Echem specific
                 ocp=1,
                 baseline=0,
@@ -98,7 +101,7 @@ for col in COLUMNS:
                 cv_cycle_count=3,
                 cv_initial_voltage=0.0,
                 cv_final_voltage=0.5,
-                cv_sample_period=0.1
+                cv_sample_period=0.1,
                 # sample_rate = cv_step_size / cv_scan_rate_cycle_1 = 0.001 / 0.050 = 0.020
             )
 

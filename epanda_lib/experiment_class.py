@@ -6,15 +6,15 @@ from dataclasses import field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union, get_type_hints, List, Tuple
+from typing import List, Optional, Tuple, Union, get_type_hints
 
 from pydantic import ConfigDict, RootModel, TypeAdapter
 from pydantic.dataclasses import dataclass
 
 from . import sql_utilities
-from .config.pin import CURRENT_PIN
 from .wellplate import Well
 
+CURRENT_PIN =  sql_utilities.get_current_pin()
 
 class ExperimentResultsRecord:
     """
