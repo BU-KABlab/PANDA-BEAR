@@ -2,7 +2,7 @@
 # You cannot log-in with your regular password to these services.
 
 from atlassian import Jira
-from ..config.secrets import JiraSecrets
+from epanda_lib.config.secrets import JiraSecrets
 
 epanda_jira = Jira(
     url=JiraSecrets.URL,
