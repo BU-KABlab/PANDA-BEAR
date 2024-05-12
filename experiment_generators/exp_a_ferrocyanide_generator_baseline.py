@@ -26,14 +26,12 @@ The wellplate will look like this (x = test, o = no test):
 
 import time
 
-from epanda_lib.config.config import WELL_HX, read_testing_config
-from epanda_lib.sql_utilities import get_current_pin
-
-
 import pandas as pd
 
 from epanda_lib import experiment_class
+from epanda_lib.config.config import WELL_HX, read_testing_config
 from epanda_lib.scheduler import Scheduler
+from epanda_lib.sql_utilities import get_current_pin
 from epanda_lib.wellplate import load_new_wellplate
 
 CURRENT_PIN = get_current_pin()

@@ -14,7 +14,8 @@ from pydantic.dataclasses import dataclass
 from . import sql_utilities
 from .wellplate import Well
 
-CURRENT_PIN =  sql_utilities.get_current_pin()
+CURRENT_PIN = sql_utilities.get_current_pin()
+
 
 class ExperimentResultsRecord:
     """
@@ -164,9 +165,9 @@ class ExperimentResult:
         """Set the file, the pass/fail status, and the final voltage"""
 
         # Set the file, the pass/fail status, and the final voltage
-        self.ocp_ca_file.append((file,context))
-        self.ocp_ca_passed.append((passed,context))
-        self.ocp_cv_final_voltage.append((final_voltage,context))
+        self.ocp_ca_file.append((file, context))
+        self.ocp_ca_passed.append((passed, context))
+        self.ocp_cv_final_voltage.append((final_voltage, context))
 
     def set_ocp_cv_file(
         self, file: Path, passed: bool, final_voltage: float, context: str = None
@@ -227,14 +228,16 @@ class ExperimentResult:
             if isinstance(value, list):
                 for _, item in enumerate(value):
                     all_results.append(
-                        ExperimentResultsRecord(self.experiment_id, key, item[0], item[1])
+                        ExperimentResultsRecord(
+                            self.experiment_id, key, item[0], item[1]
+                        )
                     )
             else:
                 all_results.append(
                     ExperimentResultsRecord(self.experiment_id, key, value)
                 )
         return all_results
-    
+
     def to_results_records(self) -> list[ExperimentResultsRecord]:
         """Turn the results object into individual result table records"""
         all_results = []
@@ -244,7 +247,9 @@ class ExperimentResult:
             if isinstance(value, list):
                 for _, item in enumerate(value):
                     all_results.append(
-                        ExperimentResultsRecord(self.experiment_id, key, item[0], item[1])
+                        ExperimentResultsRecord(
+                            self.experiment_id, key, item[0], item[1]
+                        )
                     )
             else:
                 all_results.append(
@@ -301,7 +306,6 @@ class ExperimentBase:
         self.status_date = datetime.now().isoformat(timespec="seconds")
         self.well.status = new_status
         self.well.status_date = datetime.now().isoformat(timespec="seconds")
-        # TODO make setting the experiment status set the well status, and for status date
         # Save the well to the database
         if self.well:
             sql_utilities.save_well_to_db(self.well)
@@ -335,7 +339,9 @@ class ExperimentBase:
     def generate_parameter_list(self) -> list[ExperimentParameterRecord]:
         """Turn the experiment object into a list of individual experiment parameter table records"""
         all_parameters = [
-            ExperimentParameterRecord(self.experiment_id, parameter_type, parameter_value)
+            ExperimentParameterRecord(
+                self.experiment_id, parameter_type, parameter_value
+            )
             for parameter_type, parameter_value in self.__dict__.items()
         ]
 
@@ -349,7 +355,7 @@ class ExperimentBase:
                 "project_campaign_id",
                 "well_type",
                 "protocol_id",
-                "protocol_type", # depreciated
+                "protocol_type",  # depreciated
                 "pin",
                 "experiment_type",
                 "jira_issue_key",
@@ -373,6 +379,7 @@ class ExperimentBase:
         self, parameter_list: list[ExperimentParameterRecord]
     ):
         """Map the parameter list to the experiment object"""
+
         def find_attribute_in_hierarchy(cls, attr):
             """Recursively search for an attribute in a class and its subclasses"""
             if hasattr(cls, attr):
@@ -386,15 +393,23 @@ class ExperimentBase:
         for parameter in parameter_list:
             parameter = ExperimentParameterRecord(*parameter)
             try:
-                attribute_type = get_all_type_hints(type(self))[parameter.parameter_type]
+                attribute_type = get_all_type_hints(type(self))[
+                    parameter.parameter_type
+                ]
             except KeyError as exc:
                 # The attribute is not in ExperimentBase, check in the class hierarchy
-                cls = find_attribute_in_hierarchy(self.__class__, parameter.parameter_type)
+                cls = find_attribute_in_hierarchy(
+                    self.__class__, parameter.parameter_type
+                )
                 if cls is not None:
                     attribute_type = get_all_type_hints(cls)[parameter.parameter_type]
                 else:
-                    print(f"Attribute {parameter.parameter_type} not found in class hierarchy")
-                    raise AttributeError(f"Attribute {parameter.parameter_type} not found in class hierarchy") from exc
+                    print(
+                        f"Attribute {parameter.parameter_type} not found in class hierarchy"
+                    )
+                    raise AttributeError(
+                        f"Attribute {parameter.parameter_type} not found in class hierarchy"
+                    ) from exc
 
             if isinstance(
                 attribute_type, type(Union)
@@ -440,13 +455,15 @@ class ExperimentBase:
             else:
                 print(f"Unknown attribute type {attribute_type}")
 
-            if hasattr(self, parameter.parameter_type): # Check if the attribute exists
+            if hasattr(self, parameter.parameter_type):  # Check if the attribute exists
                 setattr(self, parameter.parameter_type, parameter.parameter_value)
             else:
                 # If the attribute does not exist, add it to the object, this is
                 # to avoid every experiment needing to have attributes of other experiments
                 # Example: Edot experiments have edot_concentration, but not all experiments have this
-                setattr(self.__class__, parameter.parameter_type, parameter.parameter_value)
+                setattr(
+                    self.__class__, parameter.parameter_type, parameter.parameter_value
+                )
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
@@ -463,7 +480,7 @@ class EchemExperimentBase(ExperimentBase):
     Define the data that is used to run an experiment
 
     This is the base class for all echem experiments
-        """
+    """
 
     experiment_type: int = 1  # echem generic
     ocp: int = 1  # Open Circuit Potential
@@ -597,6 +614,7 @@ class EchemExperimentBase(ExperimentBase):
         {self.print_cv_parameters()}
     """
 
+
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class EdotExperiment(EchemExperimentBase):
     """Define the default data that is used to run an edot experiment"""
@@ -604,7 +622,8 @@ class EdotExperiment(EchemExperimentBase):
     project_id: int = 16
     well_type_number: int = 4  # ito
     experiment_type: int = 2  # edot
-    edot_concentration: float = 0.1 # mM
+    edot_concentration: float = 0.1  # mM
+
 
 experiment_types_by_project_id = {
     0: ExperimentBase,
@@ -612,6 +631,7 @@ experiment_types_by_project_id = {
     16: EdotExperiment,
     11: CorrectionFactorExperiment,
 }
+
 
 def make_test_base_value() -> ExperimentBase:
     """Create a test experiment value for the class"""
