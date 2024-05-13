@@ -409,23 +409,22 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
 
         save_to_db = input("Would you like to save the image to the database? (y/n): ")
         if save_to_db.lower() != "y":
-            return
-
-        # Save the image path to the database
-        sql_utilities.insert_experiment_result(
-            ExperimentResultsRecord(
-                experiment_id=experiment_id,
-                result_type="image",
-                result_value=str(image_path),
-                context=context,
+            pass
+        else:
+            # Save the image path to the database
+            sql_utilities.insert_experiment_result(
+                ExperimentResultsRecord(
+                    experiment_id=experiment_id,
+                    result_type="image",
+                    result_value=str(image_path),
+                    context=context,
+                )
             )
-        )
 
         to_continue = input("Would you like to capture another image? (y/n): ")
         if to_continue.lower() == "n":
             return  # exit the loop
 
-    return None
 
 
 def home_mill(mill: Mill, *args, **kwargs):
@@ -476,7 +475,7 @@ def calibrate_mill(
 def main():
     """Main function for testing the calibration functions"""
     # Load the configuration file
-    TESTING = read_testing_config()
+    TESTING = True
     from .vials import STOCK_STATUS, WASTE_STATUS, read_vials
 
     print("Testing mode:", TESTING)
