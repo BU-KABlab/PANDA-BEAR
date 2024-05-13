@@ -6,15 +6,14 @@ The functions in this module allow the user to:
  - calibrate the locations of individual wells in a wellplate
  - calibrate the z_bottom of the wellplate to the mill
  
-The module relies on other modules such as `mill_control`, `utilities`, `vials`, and `wellplate` to perform these operations.
-
-The main functions in this module are:
-- `check_mill_settings`: Fetches the settings list from the grbl controller, compares it to the settings file, allows the user to change settings if desired, and applies the new settings to the mill.
-- `calibrate_wells`: Calibrates the locations of individual wells in a wellplate using either a pipette or an electrode.
-- `calibrate_z_bottom_of_wellplate`: Calibrates the z_bottom of the wellplate to the mill.
-- `calibrate_vials`: Calibrates the vials to the mill.
+The module relies on other modules such as:
+    - `mill_control`
+    - `utilities`
+    - `vials`
+    - `wellplate`
+    - `config`
 """
-
+#pylint: disable=unused-argument
 import json
 import os
 import platform
@@ -292,7 +291,7 @@ def calibrate_vials(
     # Enter confirmation loop
     # Ask the user to confirm the pipette is in the correct position
     # If the user confirms, do nothing
-    # If the user does not confirm, ask the user to input the new coordinates (display current coordinates)
+    # Else ask the user to input the new coordinates (display current coordinates)
     # Safe Move to the new coordinates
     # Repeat until the user confirms the position
     # Save the new coordinates to the stock vial object
@@ -309,7 +308,6 @@ def calibrate_vials(
 
     ## Calibrate the waste vial
     # Same process as the stock vials
-    pass
 
 
 def calibrate_camera_focus(mill: Mill, wellplate: Wellplate, *args, **kwargs):
@@ -435,8 +433,8 @@ def home_mill(mill: Mill, *args, **kwargs):
 
 def quit_calibration():
     """Quit the calibration menu"""
-    pass
-
+    print("Quitting calibration menu")
+    return
 
 menu_options = {
     "0": check_mill_settings,
@@ -475,10 +473,10 @@ def calibrate_mill(
 def main():
     """Main function for testing the calibration functions"""
     # Load the configuration file
-    TESTING = True
+    testing = True
     from .vials import STOCK_STATUS, WASTE_STATUS, read_vials
 
-    print("Testing mode:", TESTING)
+    print("Testing mode:", testing)
     input("Press enter to continue")
     # Create the mill object
     mill_to_use = MockMill()
