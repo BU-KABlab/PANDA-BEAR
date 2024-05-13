@@ -38,7 +38,7 @@ from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
 from .obs_controls import OBSController
-from .protocol_utilities import ProtocolEntry, select_protocol_by_id
+from .sql_tools.protocol_utilities import ProtocolEntry, select_protocol_by_id
 from .pump_control import MockPump, Pump
 from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale

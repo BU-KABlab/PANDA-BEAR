@@ -16,10 +16,8 @@ from PIL import Image
 from epanda_lib import (
     camera_call_camera,
     controller,
-    generator_utilities,
     mill_calibration_and_positioning,
     mill_control,
-    protocol_utilities,
     scheduler,
     vials,
     wellplate,
@@ -29,6 +27,7 @@ from epanda_lib import sql_utilities
 from epanda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import read_testing_config, write_testing_config
+from epanda_lib.sql_tools import generator_utilities, protocol_utilities
 from epanda_lib.sql_utilities import set_system_status, select_specific_result
 from epanda_lib.utilities import SystemState
 import epanda_lib.analyzer.pedot as pedot_analysis
