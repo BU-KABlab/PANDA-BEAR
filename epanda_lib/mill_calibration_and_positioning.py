@@ -470,7 +470,6 @@ def calibrate_mill(
                 mill.rest_electrode()
                 break
             menu_options[option](mill, wellplate, stock_vials, waste_vials)
-            capture_well_photo_manually(mill, wellplate, stock_vials, waste_vials)
 
 
 def main():
