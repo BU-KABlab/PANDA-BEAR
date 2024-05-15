@@ -28,3 +28,61 @@ class NoExperimentFromModel(Exception):
     def __init__(self, message="The ML model did not generate a new experiment"):
         self.message = message
         super().__init__(self.message)
+
+class OCPFailure(Exception):
+    """Raised when OCP fails"""
+
+    def __init__(self, stage):
+        self.stage = stage
+        self.message = f"OCP failed before {stage}"
+        super().__init__(self.message)
+
+
+class NoAvailableSolution(Exception):
+    """Raised when no available solution is found"""
+
+    def __init__(self, solution_name):
+        self.solution_name = solution_name
+        self.message = f"No available solution of {solution_name} found"
+        super().__init__(self.message)
+
+
+class ImageCaputreFailure(Exception):
+    """Raised when image capture fails"""
+
+    def __init__(self, well_id):
+        self.well_id = well_id
+        self.message = f"Image capture failed for well {well_id}"
+        super().__init__(self.message)
+
+
+class DepositionFailure(Exception):
+    """Raised when deposition fails"""
+
+    def __init__(self, experiment_id, well_id):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        self.message = (
+            f"Deposition failed for experiment {experiment_id} well {well_id}"
+        )
+        super().__init__(self.message)
+
+
+class CAFailure(Exception):
+    """Raised when CA fails"""
+
+    def __init__(self, experiment_id, well_id):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        self.message = f"CA failed for experiment {experiment_id} well {well_id}"
+        super().__init__(self.message)
+
+
+class CVFailure(Exception):
+    """Raised when CV fails"""
+
+    def __init__(self, experiment_id, well_id):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        self.message = f"CV failed for experiment {experiment_id} well {well_id}"
+        super().__init__(self.message)
