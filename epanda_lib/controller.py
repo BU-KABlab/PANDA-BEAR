@@ -126,7 +126,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             )
 
             while new_experiment is None:
-                sql_utilities.set_system_status(SystemState.IDLE) #TODO change to waiting
+                sql_utilities.set_system_status(SystemState.PAUSE, "Waiting for new experiments")
                 # scheduler.check_inbox()
                 new_experiment, _ = scheduler.read_next_experiment_from_queue()
                 if new_experiment is not None:
@@ -138,6 +138,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
                 if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
                     # We run the model on with experiments that have already been run
+                    sql_utilities.set_system_status(SystemState.BUSY, "Running ML model")
                     next_exp_id = pedot_ml_model()
                     new_experiment, _ = scheduler.read_next_experiment_from_queue()
                     if new_experiment is not None:
@@ -155,6 +156,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                     "No new experiments to run...waiting a minute for new experiments"
                 )
                 slack.send_slack_message("alert", "No new experiments to run...waiting a minute for new experiments")
+                sql_utilities.set_system_status(SystemState.PAUSE, "Waiting for new experiments")
                 system_status_loop(slack)
 
             ## confirm that the new experiment is a valid experiment object
@@ -165,6 +167,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                     "An invalid experiment object was passed to the controller",
                 )
                 break  # break out of the while True loop
+
+            sql_utilities.set_system_status(SystemState.BUSY)
             ## Initialize a results object
             new_experiment.results = ExperimentResult(
                 experiment_id=new_experiment.experiment_id,
@@ -517,7 +521,7 @@ def system_status_loop(slack: SlackBot):
         system_status = sql_utilities.select_system_status(2)
         if SystemState.SHUTDOWN in system_status:
             raise ShutDownCommand
-        elif SystemState.PAUSE in system_status or SystemState.IDLE in system_status:
+        elif SystemState.PAUSE in system_status:
         #elif SystemState.PAUSE in system_status or SystemState.WAITING in system_status:
             # if SystemState.IDLE in system_status:
             #     break
