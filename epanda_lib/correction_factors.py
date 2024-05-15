@@ -6,9 +6,9 @@
 '''
 
 from math import isclose
+from decimal import Decimal
 
-
-def correction_factor(x,viscosity=0.91):
+def correction_factor(x,viscosity=0.91) -> Decimal:
     '''
     Calculate the correction factor to applied to the programmed volume
     for the viscosity of the sample.
@@ -20,6 +20,10 @@ def correction_factor(x,viscosity=0.91):
     
     with x = programmed volume
     '''
+    # Start with all floats and then return a Decimal
+    x = float(x)
+    viscosity = float(viscosity)
+
     if viscosity is None or x == 0:
         corrected_volume = x
     elif isclose(viscosity,0.91, abs_tol=0.05):
@@ -33,10 +37,12 @@ def correction_factor(x,viscosity=0.91):
     else:
         corrected_volume = x
 
-    return round(corrected_volume,3)
+    return Decimal(round(corrected_volume,3))
 
-def reverse_correction_factor(x, viscosity):
+def reverse_correction_factor(x, viscosity) -> Decimal:
     """Calculate the original volume based on the given volume x and viscosity."""
+    x = float(x)
+    viscosity = float(viscosity)
     if viscosity is None or x == 0:
         original_volume = x
     elif isclose(viscosity,0.91):
@@ -50,4 +56,4 @@ def reverse_correction_factor(x, viscosity):
     else:
         original_volume = x
 
-    return round(original_volume,3)
+    return Decimal(round(original_volume,3))
