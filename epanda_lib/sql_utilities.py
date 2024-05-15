@@ -9,6 +9,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import List, Union
+from decimal import Decimal
 
 import pandas as pd
 
@@ -23,6 +24,7 @@ from epanda_lib.experiment_class import (EchemExperimentBase, ExperimentBase,
 from epanda_lib.utilities import SystemState
 from epanda_lib.wellplate import (Well,  # , WellCoordinatesEncoder
                                   WellCoordinates)
+from epanda_lib.pump_control import Pipette
 
 # Set up logging
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -2299,5 +2301,74 @@ def set_system_status(
         (system_status.value, comment, test_mode),
     )
 
+
+# endregion
+
+# region Pipette
+
+def select_pipette_status() -> Pipette:
+    """
+    Get the pipette status from the pipette_status table.
+    
+    And return a pipette instance to be applied to the pipette that
+    is in memory.
+
+    Returns:
+        Pipette: The current pipette status.
+    
+    """
+    result = execute_sql_command(
+        """
+        SELECT 
+        capacity_ul,
+        capacity_ml,
+        volume_ul  ,
+        volume_ml  ,
+        contents   
+ 
+        FROM pipette_status
+        ORDER BY updated DESC
+        LIMIT 1
+        """
+    )
+    if result == []:
+        return None
+
+    pipette = Pipette()
+    pipette.capacity_ul = Decimal(result[0][0])
+    pipette.capacity_ml = Decimal(result[0][1])
+    pipette.volume = Decimal(result[0][2])
+    pipette.volume_ml = Decimal(result[0][3])
+    pipette.contents = json.loads(result[0][4])
+
+    return pipette
+
+def insert_pipette_status(pipette: Pipette) -> None:
+    """
+    Insert the pipette status into the pipette_status table.
+
+    Args:
+        pipette (Pipette): The pipette status to insert.
+    """
+    execute_sql_command_no_return(
+        """
+        INSERT INTO pipette_status (
+            capacity_ul,
+            capacity_ml,
+            volume_ul,
+            volume_ml,
+            contents,
+            updated
+            )
+        VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        """,
+        (
+            pipette.capacity_ul,
+            pipette.capacity_ml,
+            pipette.volume,
+            pipette.volume_ml,
+            json.dumps(pipette.contents),
+        ),
+    )
 
 # endregion
