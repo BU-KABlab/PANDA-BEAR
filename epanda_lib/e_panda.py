@@ -24,6 +24,7 @@ Returns:
 # Standard library imports
 import logging
 import math
+from decimal import Decimal
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
@@ -43,9 +44,10 @@ from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
 from epanda_lib.obs_controls import OBSController
 from epanda_lib.pump_control import MockPump, Pump
-from epanda_lib.vessel import OverFillException
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well
+from epanda_lib.errors import (CAFailure, CVFailure, DepositionFailure, NoAvailableSolution,
+                                 OCPFailure)
 
 TESTING = read_testing_config()
 
@@ -79,7 +81,7 @@ testing_logger.addHandler(testing_handler)
 
 
 def forward_pipette_v2(
-    volume: float,
+    volume: Decimal,
     from_vessel: Union[Well, StockVial, WasteVial],
     to_vessel: Union[Well, WasteVial],
     pump: Union[Pump, MockPump],
@@ -117,7 +119,7 @@ def forward_pipette_v2(
     4. Repeat 2-3 until all repetitions are complete
 
     Args:
-        volume (float): The volume to be pipetted in microliters
+        volume (Decimal): The volume to be pipetted in microliters
         from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
         to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
         pumping_rate (float): The pumping rate in ml/min
@@ -129,7 +131,7 @@ def forward_pipette_v2(
         None (void function) since the objects are passed by reference
 
     """
-    if volume > 0.00:
+    if volume > Decimal(0.00):
         logger.info(
             "Forward pipetting %f ul from %s to %s",
             volume,
@@ -149,8 +151,8 @@ def forward_pipette_v2(
         if pumping_rate is None:
             pumping_rate = pump.max_pump_rate
 
-        repetitions = math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
-        repetition_vol = round(volume / repetitions, 6)
+        repetitions = int(math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))) # We first round up, then declare an int
+        repetition_vol = volume / repetitions # Decimal division by an int is allowed and a Decimal
 
         for j in range(repetitions):
             logger.info("Repetition %d of %d", j + 1, repetitions)
@@ -226,17 +228,7 @@ def forward_pipette_v2(
 
             weigh = bool(isinstance(to_vessel, Well))
 
-            ## Testing
-            blow_out = (
-                AIR_GAP + DRIP_STOP + 20
-                if isinstance(from_vessel, Well)
-                else AIR_GAP + DRIP_STOP
-            )
-            # is_pipette_volume_equal = pump.pipette.volume >= blow_out
-            # testing_logger.debug(
-            #     "TESTING: Is pipette volume greater than or equal to blowout? %s",
-            #     is_pipette_volume_equal,
-            # )
+
             # Infuse into the to_vessel
             # try:
             pump.infuse(
@@ -336,7 +328,7 @@ def flush_v2(
     mill: Union[Mill, MockMill],
     pump: Union[Pump, MockPump],
     pumping_rate=0.5,
-    flush_volume=120,
+    flush_volume:Decimal=Decimal(120.0),
     flush_count=1,
     instructions: Optional[ExperimentBase] = None,
 ):
@@ -438,10 +430,10 @@ def solution_selector(
         solution (object): The solution object
     """
     for solution in solutions:
-        # if the solution names match and the requested volume is less than the available volume (volume - 15% of capacity)
+        # if the solution names match and the requested volume is less than the available volume (volume - 10% of capacity)
         if (
             solution.name.lower() == solution_name.lower()
-            and solution.volume - 0.10 * solution.capacity > (volume)
+            and solution.volume - Decimal(0.10) * solution.capacity > (volume)
         ):
             logger.debug(
                 "Selected stock vial: %s in position %s",
@@ -453,7 +445,7 @@ def solution_selector(
 
 
 def waste_selector(
-    solutions: Sequence[WasteVial], solution_name: str, volume: float
+    solutions: Sequence[WasteVial], solution_name: str, volume: Decimal
 ) -> WasteVial:
     """
     Select the solution in which to deposit into from the list of solution objects
@@ -769,7 +761,7 @@ def apply_log_filter(
     logger.addFilter(custom_filter)
 
 
-def volume_correction(volume, density=None, viscosity=None):
+def volume_correction(volume:Decimal, density:Decimal=None, viscosity:Decimal=None):
     """
     Corrects the volume of the solution based on the density and viscosity of the solution
 
@@ -782,10 +774,10 @@ def volume_correction(volume, density=None, viscosity=None):
         corrected_volume (float): The corrected volume
     """
     if density is None:
-        density = 1.0
+        density = Decimal(1.0)
     if viscosity is None:
-        viscosity = 1.0
-    corrected_volume = volume * (1.0 + (1.0 - density) * (1.0 - viscosity))
+        viscosity = Decimal(1.0)
+    corrected_volume = volume * (Decimal(1.0) + (Decimal(1.0) - density) * (Decimal(1.0) - viscosity))
     return corrected_volume
 
 
@@ -867,7 +859,9 @@ def image_well(
 def image_filepath_generator(
     exp_id: int = "test", project_id:int = "test", project_campaign_id:int = "test",well_id: str = "test", step_description: str = None
 ) -> Path:
-    """"""
+    """
+    Generate the file path for the image
+    """
     # create file name
     if step_description is not None:
         file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
@@ -882,64 +876,6 @@ def image_filepath_generator(
         filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
         i += 1
     return filepath
-
-class OCPFailure(Exception):
-    """Raised when OCP fails"""
-
-    def __init__(self, stage):
-        self.stage = stage
-        self.message = f"OCP failed before {stage}"
-        super().__init__(self.message)
-
-
-class NoAvailableSolution(Exception):
-    """Raised when no available solution is found"""
-
-    def __init__(self, solution_name):
-        self.solution_name = solution_name
-        self.message = f"No available solution of {solution_name} found"
-        super().__init__(self.message)
-
-
-class ImageCaputreFailure(Exception):
-    """Raised when image capture fails"""
-
-    def __init__(self, well_id):
-        self.well_id = well_id
-        self.message = f"Image capture failed for well {well_id}"
-        super().__init__(self.message)
-
-
-class DepositionFailure(Exception):
-    """Raised when deposition fails"""
-
-    def __init__(self, experiment_id, well_id):
-        self.experiment_id = experiment_id
-        self.well_id = well_id
-        self.message = (
-            f"Deposition failed for experiment {experiment_id} well {well_id}"
-        )
-        super().__init__(self.message)
-
-
-class CAFailure(Exception):
-    """Raised when CA fails"""
-
-    def __init__(self, experiment_id, well_id):
-        self.experiment_id = experiment_id
-        self.well_id = well_id
-        self.message = f"CA failed for experiment {experiment_id} well {well_id}"
-        super().__init__(self.message)
-
-
-class CVFailure(Exception):
-    """Raised when CV fails"""
-
-    def __init__(self, experiment_id, well_id):
-        self.experiment_id = experiment_id
-        self.well_id = well_id
-        self.message = f"CV failed for experiment {experiment_id} well {well_id}"
-        super().__init__(self.message)
 
 
 if __name__ == "__main__":
