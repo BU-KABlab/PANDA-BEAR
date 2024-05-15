@@ -33,6 +33,7 @@ from epanda_lib.sql_utilities import set_system_status, select_specific_result
 from epanda_lib.utilities import SystemState
 import epanda_lib.analyzer.pedot as pedot_analysis
 
+
 def run_epanda_with_ml():
     """Runs ePANDA."""
     set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
@@ -94,7 +95,7 @@ def print_queue_info():
     print("Current Queue:")
     for experiment in current_queue:
         print(experiment)
-    
+
     input("Press Enter to continue...")
 
 def reset_vials_stock():
@@ -246,10 +247,8 @@ def generate_experiment_from_existing_data():
 
     #img = mpimg.imread(contour_plot)
     #plt.imshow(img)
-    
     img = Image.open(contour_plot)
     img.show()
-
     print(
         f"V_dep: {output.v_dep}, T_dep: {output.t_dep}, EDOT Concentration: {output.edot_concentration}"
     )
