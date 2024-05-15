@@ -115,4 +115,19 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
             metrics.r_b_o, metrics.g_b_o, metrics.b_b_o = labs["bleaching_original_rgb"]
             metrics.bleaching_roi_path = labs["bleaching_roi_path"]
 
+    # make sure all values are floats or ints
+    metrics.l_c = float(metrics.l_c)
+    metrics.a_c = float(metrics.a_c)
+    metrics.b_c = float(metrics.b_c)
+    metrics.l_b = float(metrics.l_b)
+    metrics.a_b = float(metrics.a_b)
+    metrics.b_b = float(metrics.b_b)
+    metrics.delta_e00 = float(metrics.delta_e00)
+    metrics.r_c_o = int(metrics.r_c_o)
+    metrics.g_c_o = int(metrics.g_c_o)
+    metrics.b_c_o = int(metrics.b_c_o)
+    metrics.r_b_o = int(metrics.r_b_o)
+    metrics.g_b_o = int(metrics.g_b_o)
+    metrics.b_b_o = int(metrics.b_b_o)
+    
     return metrics
