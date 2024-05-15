@@ -123,11 +123,11 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
     metrics.a_b = float(metrics.a_b)
     metrics.b_b = float(metrics.b_b)
     metrics.delta_e00 = float(metrics.delta_e00)
-    metrics.r_c_o = int(metrics.r_c_o)
-    metrics.g_c_o = int(metrics.g_c_o)
-    metrics.b_c_o = int(metrics.b_c_o)
-    metrics.r_b_o = int(metrics.r_b_o)
-    metrics.g_b_o = int(metrics.g_b_o)
-    metrics.b_b_o = int(metrics.b_b_o)
-    
+    metrics.r_c_o = float(metrics.r_c_o)
+    metrics.g_c_o = float(metrics.g_c_o)
+    metrics.b_c_o = float(metrics.b_c_o)
+    metrics.r_b_o = float(metrics.r_b_o)
+    metrics.g_b_o = float(metrics.g_b_o)
+    metrics.b_b_o = float(metrics.b_b_o)
+
     return metrics
