@@ -1,13 +1,16 @@
 """The home of all project specific strings and values that are 
 better to be set in one place than to be scattered around the code."""
+from decimal import Decimal, getcontext
 from pathlib import Path
+
 from epanda_lib.config.config_tools import read_testing_config
 ## Project values
-AIR_GAP = 40  # ul
-DRIP_STOP = 5  # ul
-PURGE_VOLUME = 20  # ul
+AIR_GAP = Decimal(40.0)  # ul
+DRIP_STOP = Decimal(5.0)  # ul
+PURGE_VOLUME = Decimal(20)  # ul
 RANDOM_FLAG = False  # Set to True to randomize the order of the experiments
-DEFAULT_PUMPING_RATE = 0.3  # ul/s
+DEFAULT_PUMPING_RATE = Decimal(0.3)  # ul/s
+getcontext().prec = 6  # Set the precision of the decimal module globally
 ## Testing flag
 # testing.txt is the only place to change the mode besides from the main menue
 # This should no be put into a db since depending on its setting a different db is used.
