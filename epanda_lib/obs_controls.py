@@ -5,13 +5,12 @@ It is used to place the experiment information on the screen and to turn on and 
 
 # pylint: disable=unnecessary-pass
 import logging
-
+from pathlib import Path
 import obsws_python as obsws
 from obsws_python import error as OBSerror
 
 from .config.config import PATH_TO_LOGS, read_testing_config
 from .config.secrets import OBSSecrets
-from .experiment_class import ExperimentBase
 from .log_tools import e_panda_logger as logger
 
 ## set up logging to log to both the obs_control.log file and the ePANDA.log file
@@ -47,6 +46,7 @@ class OBSController:
                 "webcam": 0,
                 "vials": 0,
                 "text": 0,
+                "image": 0,
             }
         except OBSerror.OBSSDKRequestError as e:
             self.logger.error("Error connecting to OBS: %s", e)
@@ -56,9 +56,17 @@ class OBSController:
             try:
                 self.sources[source] = self.client.get_source_active(source)
             except OBSerror.OBSSDKRequestError:
+
+                self.logger.error("Error getting source active status: %s", e)
+                # self.logger.error("Trying to make source instead")
+                # self.client.create_input(source, source)
                 self.sources[source] = -1
 
-    def place_experiment_on_screen(self, instructions: ExperimentBase):
+    def disconnect_from_obs(self):
+        """Disconnect from OBS"""
+        pass
+
+    def place_experiment_on_screen(self, instructions):
         """Place the experiment information on the screen"""
         try:
             exp_id = (
@@ -100,14 +108,14 @@ Well: {well_id}"""
 
     def webcam_on(self):
         """Turn on the webcam"""
-        webcam = self.client.get_input_settings("Webcam")
+        webcam = self.client.get_input_settings("webcam")
         webcam.input_settings["sceneItemEnabled"] = True
         self.client.set_input_settings("Webcam", webcam.input_settings, True)
         self.logger.info("Webcam turned on.")
 
     def webcam_off(self):
         """Turn off the webcam"""
-        webcam = self.client.get_input_settings("Webcam")
+        webcam = self.client.get_input_settings("webcam")
         webcam.input_settings["sceneItemEnabled"] = False
         self.client.set_input_settings("Webcam", webcam.input_settings, True)
         self.logger.info("Webcam turned off.")
@@ -163,6 +171,15 @@ Well: {well_id}"""
             self.logger.error("Failed to take snapshot: %s", e)
             return None
 
+    def change_image(self, new_image_path, source_name: str = "image"):
+        try:
+            self.client.get_input_settings(source_name)
+            self.client.set_input_settings(
+                source_name, {"file": str(Path(new_image_path).resolve())}, True
+            )
+        except OBSerror.OBSSDKRequestError as e:
+            self.logger.error("Error changing image: %s", e)
+
 
 class MockOBSController:
     """This class is used to mock the OBS software for testing"""
@@ -170,7 +187,7 @@ class MockOBSController:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def place_experiment_on_screen(self, instructions: ExperimentBase):
+    def place_experiment_on_screen(self, instructions):
         """Place the experiment information on the screen"""
         pass
 
