@@ -495,9 +495,8 @@ def save_well_to_db(well_to_save: Well) -> None:
         status_date,
         contents,
         volume,
-        coordinates,
-        updated
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        coordinates
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (plate_id, well_id) DO UPDATE SET
         experiment_id = excluded.experiment_id,
         project_id = excluded.project_id,
@@ -505,8 +504,7 @@ def save_well_to_db(well_to_save: Well) -> None:
         status_date = excluded.status_date,
         contents = excluded.contents,
         volume = excluded.volume,
-        coordinates = excluded.coordinates,
-        updated = datetime('now', 'localtime')
+        coordinates = excluded.coordinates
 
     """
     if well_to_save.plate_id in [None, 0]:
@@ -544,9 +542,8 @@ def save_wells_to_db(wells_to_save: List[Well]) -> None:
         status_date,
         contents,
         volume,
-        coordinates,
-        updated
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        coordinates
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (plate_id, well_id) DO UPDATE SET
         experiment_id = excluded.experiment_id,
         project_id = excluded.project_id,
@@ -554,8 +551,7 @@ def save_wells_to_db(wells_to_save: List[Well]) -> None:
         status_date = excluded.status_date,
         contents = excluded.contents,
         volume = excluded.volume,
-        coordinates = excluded.coordinates,
-        updated = datetime('now', 'localtime')
+        coordinates = excluded.coordinates
     """
     values = []
     for well in wells_to_save:
@@ -597,11 +593,10 @@ def insert_well(well_to_insert: Well) -> None:
         status_date,
         contents,
         volume,
-        coordinates,
-        updated
+        coordinates
 
         ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  datetime('now', 'localtime'))
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
     values = (
         well_to_insert.plate_id,
@@ -635,8 +630,7 @@ def update_well(well_to_update: Well) -> None:
         status_date = ?,
         contents = ?,
         volume = ?,
-        coordinates = ?,
-        updated = datetime('now', 'localtime')
+        coordinates = ?
     WHERE plate_id = ?
     AND well_id = ?
     """
@@ -794,8 +788,7 @@ def update_well_coordinates(well_id: str, plate_id: int, coordinates: WellCoordi
     execute_sql_command(
         """
         UPDATE well_hx
-        SET coordinates = ?,
-            updated = datetime('now', 'localtime')
+        SET coordinates = ?
         WHERE well_id = ?
         AND plate_id = ?
         """,
@@ -1085,8 +1078,7 @@ def update_well_status(well_id: str, plate_id: int = None,status: str = None) ->
         """
         UPDATE well_hx
         SET status = ?,
-            status_date = datetime('now', 'localtime'),
-            updated = datetime('now', 'localtime')
+            status_date = datetime('now', 'localtime')
         WHERE well_id = ?
         AND plate_id = ?
         """,
@@ -1142,10 +1134,9 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
             priority,
             process_type,
             filename,
-            created,
-            updated
+            created
             )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (experiment_id) DO UPDATE SET
             project_id = excluded.project_id,
             project_campaign_id = excluded.project_campaign_id,
@@ -1157,8 +1148,7 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
             priority = excluded.priority,
             process_type = excluded.process_type,
             filename = excluded.filename,
-            created = excluded.created,
-            updated = datetime('now', 'localtime')
+            created = excluded.created
         """,
         parameters,
     )
@@ -1205,10 +1195,9 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
             experiment_id,
             parameter_name,
             parameter_value,
-            created,
-            updated
+            created
             )
-        VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, ?, ?)
         """,
         parameters_to_insert,
     )
@@ -1260,8 +1249,7 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
             jira_issue_key = ?,
             priority = ?,
             process_type = ?,
-            filename = ?,
-            updated = datetime('now', 'localtime')
+            filename = ?
         WHERE experiment_id = ?
         """,
         parameters,
@@ -1323,8 +1311,7 @@ def update_experiment_status(
         SET status = ?,
             status_date = ?,
             experiment_id = ?,
-            project_id = ?,
-            updated = datetime('now', 'localtime')
+            project_id = ?
         WHERE well_id = ?
         AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
         """,
@@ -1373,8 +1360,7 @@ def update_experiments_statuses(
         SET status = ?,
         status_date = ?,
         experiment_id = ?,
-        project_id = ?,
-        updated = datetime('now', 'localtime')
+        project_id = ?
         WHERE well_id = ?
         AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
         """,
@@ -1398,10 +1384,9 @@ def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
             experiment_id,
             result_type,
             result_value,
-            context,
-            created
+            context
             )
-        VALUES (?, ?, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, ?, ?)
         """
     if isinstance(entry.result_value, dict):
         entry.result_value = json.dumps(entry.result_value)
@@ -1593,10 +1578,9 @@ def insert_best_test_point(entry: pd.DataFrame) -> None:
             edot_concentration,
             predicted_response,
             standard_deviation,
-            models_current_rmse,
-            created
+            models_current_rmse
             )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
     parameters = entry.values.tolist()
     execute_sql_command_no_return(command, parameters)
@@ -1632,10 +1616,9 @@ def insert_ml_training_data(entry: pd.DataFrame) -> None:
             voltage,
             time,
             bleach_cp,
-            concentration,
-            created
+            concentration
             )
-        VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, ?, ?, ?)
         """
     parameters = entry.values.tolist()
     execute_sql_command_no_return(command, parameters)
@@ -2357,10 +2340,9 @@ def insert_pipette_status(pipette: Pipette) -> None:
             capacity_ml,
             volume_ul,
             volume_ml,
-            contents,
-            updated
+            contents
             )
-        VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, ?, ?, ?)
         """,
         (
             pipette.capacity_ul,
@@ -2370,6 +2352,7 @@ def insert_pipette_status(pipette: Pipette) -> None:
             json.dumps(pipette.contents),
         ),
     )
+    
 
 # endregion
 
