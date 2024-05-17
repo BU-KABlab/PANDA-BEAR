@@ -844,6 +844,14 @@ def image_well(
 
         instructions.results.append_image_file(filepath, context=step_description)
 
+        # Post to obs
+        try:
+            obs = OBSController()
+            obs.change_image(new_image_path=filepath)
+        except:
+            # Not critical if the image is not posted to OBS
+            logger.exception("Failed to post image to OBS")
+
     except Exception as e:
         logger.exception(
             "Failed to image well %s. Error %s occured", instructions.well_id, e
