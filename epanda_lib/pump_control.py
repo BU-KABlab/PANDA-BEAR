@@ -554,12 +554,14 @@ class Pipette:
             raise ValueError("Capacity must be non-negative.")
         self.capacity_ul = capacity_ul
         self.capacity_ml = capacity_ul / 1000.0
+        self.update_state_file()
 
     def update_contents(self, solution: str, volume: Decimal) -> None:
         """Update the contents of the pipette"""
 
         self.contents[solution] = self.contents.get(solution, 0) + volume
         self.log_contents()
+        
 
     @property
     def volume(self) -> Decimal:
@@ -605,7 +607,6 @@ class Pipette:
         self.contents = {}
         self._volume_ul = Decimal(0)
         self._volume_ml = Decimal(0)
-        self.update_state_file()
         self.log_contents()
 
     def log_contents(self) -> None:
