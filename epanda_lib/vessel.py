@@ -2,9 +2,11 @@
 Vessel module.
 """
 
+from decimal import Decimal
 import logging
 from typing import Union
 from .config.config import PATH_TO_LOGS
+from .errors import OverFillException, OverDraftException
 
 
 class VesselLogger:
@@ -33,14 +35,18 @@ class VesselCoordinates:
 
     Args:
     -----
-        x (float): The x-coordinate of the vessel.
-        y (float): The y-coordinate of the vessel.
-        z_top (float): The z-coordinate of top the vessel.
-        z_bottom (float): The z-coordinate of the bottom of the vessel.
+        x (Decimal): The x-coordinate of the vessel.
+        y (Decimal): The y-coordinate of the vessel.
+        z_top (Decimal): The z-coordinate of top the vessel.
+        z_bottom (Decimal): The z-coordinate of the bottom of the vessel.
     """
 
     def __init__(
-        self, x: float, y: float, z_top: float = 0, z_bottom: float = None
+        self,
+        x: Decimal,
+        y: Decimal,
+        z_top: Decimal = Decimal(0),
+        z_bottom: Decimal = None,
     ) -> None:
         """Initializes a new instance of the Coordinates class."""
         self.x = x
@@ -65,11 +71,11 @@ class VesselCoordinates:
             "z_bottom": self.z_bottom,
         }
 
-    def __getitem__(self, key: str) -> float:
+    def __getitem__(self, key: str) -> Decimal:
         """Returns the value of the specified key."""
         return getattr(self, key)
 
-    def __setitem__(self, key: str, value: float) -> None:
+    def __setitem__(self, key: str, value: Decimal) -> None:
         """Sets the value of the specified key."""
         setattr(self, key, value)
 
@@ -101,46 +107,50 @@ class Vessel:
 
     Attributes:
         name (str): The name of the vessel.
-        volume (float): The current volume of the vessel.
-        capacity (float): The maximum capacity of the vessel.
-        density (float): The density of the solution in the vessel.
-        coordinates (dict): The coordinates of the vessel.
+        volume (Decimal): The current volume of the vessel.
+        capacity (Decimal): The maximum capacity of the vessel.
+        density (Decimal): The density of the solution in the vessel.
+        coordinates (Union[VesselCoordinates, dict]): The coordinates of the vessel.
         contents (dict): The contents of the vessel.
-        depth (float): The current depth of the solution in the vessel.
+        depth (Decimal): The current depth of the solution in the vessel.
 
     Methods:
     --------
-    update_volume(added_volume: float) -> None
+    update_volume(added_volume: Decimal) -> None
         Updates the volume of the vessel by adding the specified volume.
-    calculate_depth() -> float
+    calculate_depth() -> Decimal
         Calculates the current depth of the solution in the vessel.
-    check_volume(volume_to_add: float) -> bool
+    check_volume(volume_to_add: Decimal) -> bool
         Checks if the volume to be added to the vessel is within the vessel's capacity.
     write_volume_to_disk() -> None
         Writes the current volume of the vessel to the appropriate file.
     update_contamination(new_contamination: int = None) -> None
         Updates the contamination count of the vessel.
-    update_contents(solution: 'Vessel', volume: float) -> None
+    update_contents(from_vessel: str, volume: Decimal) -> None
         Updates the contents of the vessel.
+    get_contents() -> dict
+        Returns the contents of the vessel.
+    log_contents() -> None
+        Logs the contents of the vessel.
 
     """
 
     def __init__(
         self,
         name: str,
-        volume: float,
-        capacity: float,
-        density: float,
+        volume: Decimal,
+        capacity: Decimal,
+        density: Decimal,
         coordinates: Union[VesselCoordinates, dict],
         contents={},
-        depth: float = 0,
+        depth: Decimal = Decimal(0),
     ) -> None:
         self.name = name.lower() if name is not None else ""
         self.position = None
         self.volume = volume
         self.capacity = capacity
         self.density = density
-        self.viscosity_cp = 0.0
+        self.viscosity_cp = Decimal(0.0)
         if isinstance(coordinates, dict):
             self.coordinates = VesselCoordinates(**coordinates)
         else:
@@ -152,11 +162,11 @@ class Vessel:
     def __str__(self) -> str:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
 
-    def update_volume(self, added_volume: float) -> None:
+    def update_volume(self, added_volume: Decimal) -> None:
         """Updates the volume of the vessel by adding the specified volume."""
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
-        if self.volume + added_volume < 0:
+        if self.volume + added_volume < Decimal(0):
             raise OverDraftException(
                 self.name, self.volume, added_volume, self.capacity
             )
@@ -170,16 +180,18 @@ class Vessel:
 
         return self
 
-    def calculate_depth(self) -> float:
+    def calculate_depth(self) -> Decimal:
         """Calculates the current depth of the solution in the vessel."""
+        # Add your implementation here
+        pass
 
-    def check_volume(self, volume_to_add: float) -> bool:
+    def check_volume(self, volume_to_add: Decimal) -> bool:
         """
         Checks if the volume to be added to the vessel is within the vessel's capacity.
 
         Args:
         -----
-        volume_to_add (float): The volume to be added to the vessel.
+        volume_to_add (Decimal): The volume to be added to the vessel.
 
         Returns:
             bool: True if the volume to be added is within the vessel's capacity, False otherwise.
@@ -188,7 +200,7 @@ class Vessel:
             raise OverFillException(
                 self.name, self.volume, volume_to_add, self.capacity
             )
-        if self.volume + volume_to_add < 0:
+        if self.volume + volume_to_add < Decimal(0):
             raise OverDraftException(
                 self.name, self.volume, volume_to_add, self.capacity
             )
@@ -198,6 +210,8 @@ class Vessel:
         """
         Writes the current volume of the vessel to the appropriate file.
         """
+        # Add your implementation here
+        pass
 
     def update_contamination(self, new_contamination: int = None) -> None:
         """
@@ -207,17 +221,19 @@ class Vessel:
         -----------
         new_contamination (int, optional): The new contamination count of the vessel.
         """
+        # Add your implementation here
+        pass
 
-    def update_contents(self, from_vessel: str, volume: float) -> None:
+    def update_contents(self, from_vessel: str, volume: Decimal) -> None:
         """
         Updates the contents of the vessel.
 
         Parameters:
         -----------
-        solution_name (str): The name of the solution to be added to the vessel.
-        volume (float): The volume of the solution to be added to the vessel.
+        from_vessel (str): The name of the vessel from which the solution is being transferred.
+        volume (Decimal): The volume of the solution to be added to the vessel.
         """
-        # check if the solution_name already exists in the vessel's contents dict, if so update the volume by adding the new volume
+        # Add your implementation here
         pass
 
     def get_contents(self) -> dict:
@@ -238,31 +254,3 @@ class Vessel:
             self.volume,
             self.contents,
         )
-
-
-class OverFillException(Exception):
-    """Raised when a vessel if over filled"""
-
-    def __init__(self, name, volume, added_volume, capacity) -> None:
-        super().__init__(self)
-        self.name = name
-        self.volume = volume
-        self.added_volume = added_volume
-        self.capacity = capacity
-
-    def __str__(self) -> str:
-        return f"OverFillException: {self.name} has {self.volume} + {self.added_volume} > {self.capacity}"
-
-
-class OverDraftException(Exception):
-    """Raised when a vessel if over drawn"""
-
-    def __init__(self, name, volume, added_volume, capacity) -> None:
-        super().__init__(self)
-        self.name = name
-        self.volume = volume
-        self.added_volume = added_volume
-        self.capacity = capacity
-
-    def __str__(self) -> str:
-        return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"

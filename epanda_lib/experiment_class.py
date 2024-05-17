@@ -4,6 +4,7 @@
 import json
 from dataclasses import field
 from datetime import datetime
+from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Tuple, Union, get_type_hints
@@ -147,30 +148,28 @@ class ExperimentResult:
     ocp_ca_passed: List[Tuple[bool, str]] = field(default_factory=list)
     ocp_cv_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_cv_passed: List[Tuple[bool, str]] = field(default_factory=list)
-    ocp_cv_final_voltage: List[Tuple[float, str]] = field(default_factory=list)
+    ocp_cv_final_voltage: List[Tuple[Decimal, str]] = field(default_factory=list)
     ca_data_file: List[Tuple[Path, str]] = field(default_factory=list)
     cv_data_file: List[Tuple[Path, str]] = field(default_factory=list)
     image: List[Tuple[Path, str]] = field(default_factory=list)
     # deposition_plot_files: list[Path] = field(default_factory=list)
-    # deposition_max_values: list[float] = field(default_factory=list)
-    # depsotion_min_values: list[float] = field(default_factory=list)
+    # deposition_max_values: list[Decimal] = field(default_factory=list)
+    # depsotion_min_values: list[Decimal] = field(default_factory=list)
     # characterization_plot_files: list[Path] = field(default_factory=list)
-    # characterization_max_values: list[float] = field(default_factory=list)
-    # characterization_min_values: list[float] = field(default_factory=list)
+    # characterization_max_values: list[Decimal] = field(default_factory=list)
+    # characterization_min_values: list[Decimal] = field(default_factory=list)
     pumping_record: list = None
 
     def set_ocp_ca_file(
-        self, file: Path, passed: bool, final_voltage: float, context: str = None
+        self, file: Path, passed: bool, final_voltage: Decimal, context: str = None
     ):
         """Set the file, the pass/fail status, and the final voltage"""
-
-        # Set the file, the pass/fail status, and the final voltage
         self.ocp_ca_file.append((file, context))
         self.ocp_ca_passed.append((passed, context))
         self.ocp_cv_final_voltage.append((final_voltage, context))
 
     def set_ocp_cv_file(
-        self, file: Path, passed: bool, final_voltage: float, context: str = None
+        self, file: Path, passed: bool, final_voltage: Decimal, context: str = None
     ):
         """Set the file, the pass/fail status, and the final voltage"""
         self.ocp_cv_file.append((file, context))
@@ -181,8 +180,8 @@ class ExperimentResult:
         self,
         file: Path,
         # plot_file: Path = None,
-        # max_value: float = None,
-        # min_value: float = None,
+        # max_value: Decimal = None,
+        # min_value: Decimal = None,
         context: str = None,
     ):
         """Set the file, the plot file, the max value, and the min value"""
@@ -198,8 +197,8 @@ class ExperimentResult:
         self,
         file: Path,
         # plot_file: Path = None,
-        # max_value: float = None,
-        # min_value: float = None,
+        # max_value: Decimal = None,
+        # min_value: Decimal = None,
         context: str = None,
     ):
         """Set the file, the plot file, the max value, and the min value"""
@@ -274,7 +273,19 @@ class ExperimentBase:
     well_type_number: int = (
         None  # is used to indicate the type of well the experiment should run in
     )
-    pumping_rate: float = 0.3
+    pumping_rate: Decimal = Decimal("0.3")
+    status: ExperimentStatus = ExperimentStatus.NEW
+    status_date: datetime = field(default_factory=datetime.now)
+    filename: str = None  # Optional[FilePath] = None
+    well_id: Optional[str] = None
+    pin: str = None
+    project_id: int = None
+    solutions: dict = None
+    solutions_corrected: dict = solutions
+    well_type_number: int = (
+        None  # is used to indicate the type of well the experiment should run in
+    )
+    pumping_rate: Decimal = Decimal(0.3)
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None  # Optional[FilePath] = None
@@ -438,8 +449,8 @@ class ExperimentBase:
 
             elif attribute_type == int:
                 parameter.parameter_value = int(parameter.parameter_value)
-            elif attribute_type == float:
-                parameter.parameter_value = float(parameter.parameter_value)
+            elif attribute_type in [Decimal, float]:
+                parameter.parameter_value = Decimal(parameter.parameter_value)
             elif attribute_type == bool:
                 parameter.parameter_value = bool(parameter.parameter_value)
             elif attribute_type == str:
@@ -471,7 +482,7 @@ class CorrectionFactorExperiment(ExperimentBase):
     """Define the data that is used to run an experiment"""
 
     project_id: int = 11
-    correction_factor: float = 1.0
+    correction_factor: Decimal = Decimal(1.0)
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
@@ -497,44 +508,27 @@ class EchemExperimentBase(ExperimentBase):
     rinse_count: int = 4  # Default rinse count
     rinse_vol: int = 120  # Default rinse volume
 
-    ca_sample_period: float = 0.1  # Deposition sample period
-    ca_prestep_voltage: float = 0.0  # Pre-step voltage (V)
-    # CAvi = ca_prestep_voltage
-    ca_prestep_time_delay: float = 0.0  # Pre-step delay time (s)
-    # CAti = ca_prestep_time_delay
-    ca_step_1_voltage: float = -1.7  # Step 1 voltage (V), deposition potential (V)
-    # CAv1 = ca_step_1_voltage
-    ca_step_1_time: float = 300.0  # run time 300 seconds, deposition duration (s)
-    # CAt1 = ca_step_1_time
-    ca_step_2_voltage: float = 0.0  # Step 2 voltage (V)
-    # CAv2 = ca_step_2_voltage
-    ca_step_2_time: float = 0.0  # Step 2 time (s)
-    # CAt2 = ca_step_2_time
-    ca_sample_rate: float = 0.5  # sample period (s)
-    # CAsamplerate = ca_sample_rate
+    ca_sample_period: Decimal = Decimal(0.1)  # Deposition sample period
+    ca_prestep_voltage: Decimal = Decimal(0.0)  # Pre-step voltage (V)
+    ca_prestep_time_delay: Decimal = Decimal(0.0)  # Pre-step delay time (s)
+    ca_step_1_voltage: Decimal = Decimal(-1.7)  # Step 1 voltage (V), deposition potential (V)
+    ca_step_1_time: Decimal = Decimal(300.0)  # run time 300 seconds, deposition duration (s)
+    ca_step_2_voltage: Decimal = Decimal(0.0)  # Step 2 voltage (V)
+    ca_step_2_time: Decimal = Decimal(0.0)  # Step 2 time (s)
+    ca_sample_rate: Decimal = Decimal(0.5)  # sample period (s)
 
     char_sol_name: str = ""  # Characterization solution name
     char_vol: int = 0  # Characterization solution volume
-    cv_sample_period: float = 0.1  # Characterization sample period
-    cv_initial_voltage: float = 0.0  # initial voltage
-    cv_first_anodic_peak: float = 0.5  # first anodic peak
-    cv_second_anodic_peak: float = -0.2  # second anodic peak
-    cv_final_voltage: float = 0.0  # final voltage
-    cv_step_size: float = 0.01  # step size
+    cv_sample_period: Decimal = Decimal(0.1)  # Characterization sample period
+    cv_initial_voltage: Decimal = Decimal(0.0)  # initial voltage
+    cv_first_anodic_peak: Decimal = Decimal(0.5)  # first anodic peak
+    cv_second_anodic_peak: Decimal = Decimal(-0.2)  # second anodic peak
+    cv_final_voltage: Decimal = Decimal(0.0)  # final voltage
+    cv_step_size: Decimal = Decimal(0.01)  # step size
     cv_cycle_count: int = 3  # number of cycles
-    cv_scan_rate_cycle_1: float = 0.1
-    cv_scan_rate_cycle_2: float = 0.1
-    cv_scan_rate_cycle_3: float = 0.1
-
-    # CVvi: float = 0.0  # initial voltage
-    # CVap1: float = 0.5  # first anodic peak
-    # CVap2: float = -0.2 # second anodic peak
-    # CVvf: float = 0.0  # final voltage
-    # CVstep: float = 0.01 # step size
-    # CVsr1: float = 0.1 # scan rate 1
-    # CVcycle: int = 3 # number of cycles
-    # CVsr2: float = CVsr1
-    # CVsr3: float = CVsr1
+    cv_scan_rate_cycle_1: Decimal = Decimal(0.1)
+    cv_scan_rate_cycle_2: Decimal = Decimal(0.1)
+    cv_scan_rate_cycle_3: Decimal = Decimal(0.1)
 
     @property
     def cv_sample_rate(self):
@@ -622,7 +616,7 @@ class EdotExperiment(EchemExperimentBase):
     project_id: int = 16
     well_type_number: int = 4  # ito
     experiment_type: int = 2  # edot
-    edot_concentration: float = 0.1  # mM
+    edot_concentration: Decimal = Decimal(0.1)  # mM
 
 
 experiment_types_by_project_id = {

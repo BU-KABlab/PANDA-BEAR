@@ -15,6 +15,7 @@ from .vessel import (
     OverFillException,
     VesselCoordinates,
 )
+from decimal import Decimal
 
 # set up A logger for the vials module
 # logger = logging.getLogger(__name__)
@@ -25,7 +26,6 @@ from .vessel import (
 # logger.addHandler(system_handler)
 vial_logger = logging.getLogger("e_panda")
 
-
 class Vial2(Vessel):
     """
     Represents a vial object that inherits from the Vessel class.
@@ -34,32 +34,32 @@ class Vial2(Vessel):
         name (str): The name of the vial.
         category (int): The category of the vial (0 for stock, 1 for waste).
         position (str): The position of the vial.
-        volume (float): The current volume of the vial.
-        capacity (float): The maximum capacity of the vial.
-        density (float): The density of the solution in the vial.
-        coordinates (Vessel_Coordinates): The coordinates of the vial.
-        radius (float): The radius of the vial.
-        height (float): The height of the vial.
-        z_bottom (float): The z-coordinate of the bottom of the vial.
+        volume (Decimal): The current volume of the vial.
+        capacity (Decimal): The maximum capacity of the vial.
+        density (Decimal): The density of the solution in the vial.
+        coordinates (VesselCoordinates): The coordinates of the vial.
+        radius (Decimal): The radius of the vial.
+        height (Decimal): The height of the vial.
+        z_bottom (Decimal): The z-coordinate of the bottom of the vial.
         contamination (int): The number of times the vial has been contaminated.
         contents: The contents of the vial.
-        viscosity_cp (float, optional): The viscosity of the vial contents. Defaults to 0.0.
-        x (float, optional): The x-coordinate of the vial. Defaults to 0.
-        y (float, optional): The y-coordinate of the vial. Defaults to 0.
+        viscosity_cp (Decimal, optional): The viscosity of the vial contents. Defaults to Decimal(0.0).
+        x (Decimal, optional): The x-coordinate of the vial. Defaults to Decimal(0).
+        y (Decimal, optional): The y-coordinate of the vial. Defaults to Decimal(0).
 
     Methods:
     --------
-    update_volume(added_volume: float) -> None
+    update_volume(added_volume: Decimal) -> None
         Updates the volume of the vial by adding the specified volume.
-    calculate_depth() -> float
+    calculate_depth() -> Decimal
         Calculates the current depth of the solution in the vial.
-    check_volume(volume_to_add: float) -> bool
+    check_volume(volume_to_add: Decimal) -> bool
         Checks if the volume to be added to the vial is within the vial's capacity.
     write_volume_to_disk() -> None
         Writes the current volume and contamination of the vial to the appropriate file.
     update_contamination(new_contamination: int = None) -> None
         Updates the contamination count of the vial.
-    update_contents(solution: 'Vessel', volume: float) -> None
+    update_contents(solution: 'Vessel', volume: Decimal) -> None
         Updates the contents of the vial.
 
     """
@@ -69,17 +69,17 @@ class Vial2(Vessel):
         name: str,
         category: int,
         position: str,
-        volume: float,
-        capacity: float,
-        density: float,
+        volume: Decimal,
+        capacity: Decimal,
+        density: Decimal,
         vial_coordinates: Union[VesselCoordinates],
-        radius: float,
-        height: float,
+        radius: Decimal,
+        height: Decimal,
         contamination: int,
         contents,
-        viscosity_cp: float = 0.0,
-        depth: float = 0,
-        concentration: float = 0.0,
+        viscosity_cp: Decimal = Decimal(0.0),
+        depth: Decimal = Decimal(0),
+        concentration: Decimal = Decimal(0.0),
     ) -> None:
         """
         Initializes a new instance of the Vial2 class.
@@ -88,18 +88,18 @@ class Vial2(Vessel):
             name (str): The name of the vial.
             category (int): The category of the vial (0 for stock, 1 for waste).
             position (str): The position of the vial.
-            volume (float): The current volume of the vial.
-            capacity (float): The maximum capacity of the vial.
-            density (float): The density of the solution in the vial.
-            coordinates (Vessel_Coordinates): The coordinates of the vial.
-            radius (float): The radius of the vial.
-            height (float): The height of the vial.
-            z_bottom (float): The z-coordinate of the bottom of the vial.
+            volume (Decimal): The current volume of the vial.
+            capacity (Decimal): The maximum capacity of the vial.
+            density (Decimal): The density of the solution in the vial.
+            coordinates (VesselCoordinates): The coordinates of the vial.
+            radius (Decimal): The radius of the vial.
+            height (Decimal): The height of the vial.
+            z_bottom (Decimal): The z-coordinate of the bottom of the vial.
             contamination (int): The number of times the vial has been contaminated.
             contents: The contents of the vial.
-            viscosity_cp (float, optional): The viscosity of the vial contents. Defaults to 0.0.
-            x (float, optional): The x-coordinate of the vial. Defaults to 0.
-            y (float, optional): The y-coordinate of the vial. Defaults to 0.
+            viscosity_cp (Decimal, optional): The viscosity of the vial contents. Defaults to Decimal(0.0).
+            x (Decimal, optional): The x-coordinate of the vial. Defaults to Decimal(0).
+            y (Decimal, optional): The y-coordinate of the vial. Defaults to Decimal(0).
         """
         super().__init__(
             name, volume, capacity, density, vial_coordinates, contents=contents
@@ -115,16 +115,15 @@ class Vial2(Vessel):
         self.viscosity_cp = viscosity_cp
         self.concentration = concentration
 
-    def calculate_depth(self) -> float:
+    def calculate_depth(self) -> Decimal:
         """
         Calculates the current depth of the solution in the vial.
 
         Returns:
-        --------
-            float: The current depth of the solution in the vial.
+            Decimal: The current depth of the solution in the vial.
         """
         radius_mm = self.radius
-        area_mm2 = math.pi * radius_mm**2
+        area_mm2 = Decimal(math.pi) * Decimal(radius_mm)**2
         volume_mm3 = self.volume
         height = round(volume_mm3 / area_mm2, 4)
         depth = height + self.coordinates.z_bottom - 2
@@ -133,13 +132,12 @@ class Vial2(Vessel):
         # FIXME return depth
         return self.coordinates.z_bottom
 
-    def check_volume(self, volume_to_add: float) -> bool:
+    def check_volume(self, volume_to_add: Decimal) -> bool:
         """
         Checks if the volume to be added to the vial is within the vial's capacity.
 
         Args:
-        -----
-        volume_to_add (float): The volume to be added to the vial.
+            volume_to_add (Decimal): The volume to be added to the vial.
 
         Returns:
             bool: True if the volume to be added is within the vial's capacity, False otherwise.
@@ -155,21 +153,19 @@ class Vial2(Vessel):
         else:
             return True
 
-    def update_volume(self, added_volume: float) -> None:
+    def update_volume(self, added_volume: Decimal) -> None:
         """
         Updates the volume of the vial by adding the specified volume.
 
         Parameters:
-        -----------
-        added_volume : float
-            The volume to be added to the vial.
+            added_volume (Decimal): The volume to be added to the vial.
         """
         super().update_volume(added_volume)
         self.depth = self.calculate_depth()
         self.write_volume_to_disk()
         return self
 
-    def write_volume_to_disk(self) -> None:
+    def write_volume_to_disk(self) -> None: #TODO replace with using the db
         """
         Writes the current volume and contamination of the vial to the appropriate file.
         """
@@ -190,13 +186,12 @@ class Vial2(Vessel):
         with open(vial_file_path, "w", encoding="UTF-8") as file:
             json.dump(solutions, file, indent=4)
 
-    def update_contamination(self, new_contamination: int = None) -> None:
+    def update_contamination(self, new_contamination: int = None) -> None: # Update with a db method
         """
         Updates the contamination count of the vial.
 
         Parameters:
-        -----------
-        new_contamination (int, optional): The new contamination count of the vial.
+            new_contamination (int, optional): The new contamination count of the vial.
         """
         if new_contamination is not None:
             self.contamination = new_contamination
@@ -214,15 +209,15 @@ class StockVial(Vial2):
 
     Attributes:
         name (str): The name of the stock vial.
-        volume (float): The current volume of the stock vial.
-        capacity (float): The maximum capacity of the stock vial.
-        density (float): The density of the solution in the stock vial.
+        volume (Decimal): The current volume of the stock vial.
+        capacity (Decimal): The maximum capacity of the stock vial.
+        density (Decimal): The density of the solution in the stock vial.
         coordinates (dict): The coordinates of the stock vial.
-        radius (float): The radius of the stock vial.
-        height (float): The height of the stock vial.
-        z_bottom (float): The z-coordinate of the bottom of the stock vial.
-        base (float): The base area of the stock vial.
-        depth (float): The current depth of the solution in the stock vial.
+        radius (Decimal): The radius of the stock vial.
+        height (Decimal): The height of the stock vial.
+        z_bottom (Decimal): The z-coordinate of the bottom of the stock vial.
+        base (Decimal): The base area of the stock vial.
+        depth (Decimal): The current depth of the solution in the stock vial.
         contamination (int): The number of times the stock vial has been contaminated.
         category (int): The category of the stock vial (0 for stock, 1 for waste).
     """
@@ -231,31 +226,31 @@ class StockVial(Vial2):
         self,
         name: str,
         position: str,
-        volume: float,
-        capacity: float,
-        density: float,
+        volume: Decimal,
+        capacity: Decimal,
+        density: Decimal,
         vial_coordinates: Union[VesselCoordinates, dict],
-        radius: float,
-        height: float,
+        radius: Decimal,
+        height: Decimal,
         contamination: int,
         contents: str,
-        viscosity_cp: float = 0.0,
+        viscosity_cp: Decimal = Decimal(0.0),
         category: int = 0,
-        depth: float = 0,
-        concentration: float = 0.0,
+        depth: Decimal = Decimal(0),
+        concentration: Decimal = Decimal(0.0),
     ) -> None:
         """
         Initializes a new instance of the StockVial class.
 
         Args:
         name (str): The name of the stock vial.
-        volume (float): The current volume of the stock vial.
-        capacity (float): The maximum capacity of the stock vial.
-        density (float): The density of the solution in the stock vial.
+        volume (Decimal): The current volume of the stock vial.
+        capacity (Decimal): The maximum capacity of the stock vial.
+        density (Decimal): The density of the solution in the stock vial.
         coordinates (dict): The coordinates of the stock vial.
-        radius (float): The radius of the stock vial.
-        height (float): The height of the stock vial.
-        z_bottom (float): The z-coordinate of the bottom of the stock vial.
+        radius (Decimal): The radius of the stock vial.
+        height (Decimal): The height of the stock vial.
+        z_bottom (Decimal): The z-coordinate of the bottom of the stock vial.
         """
         super().__init__(
             name,
@@ -274,7 +269,7 @@ class StockVial(Vial2):
         )
         self.category = 0
 
-    def update_contents(self, from_vessel: str, volume: float) -> None:
+    def update_contents(self, from_vessel: str, volume: Decimal) -> None:
         "Stock vial contents don't change"
         self.log_contents()
         return self
@@ -290,15 +285,15 @@ class WasteVial(Vial2):
 
     Attributes:
         name (str): The name of the waste vial.
-        volume (float): The current volume of the waste vial.
-        capacity (float): The maximum capacity of the waste vial.
-        density (float): The density of the solution in the waste vial.
+        volume (Decimal): The current volume of the waste vial.
+        capacity (Decimal): The maximum capacity of the waste vial.
+        density (Decimal): The density of the solution in the waste vial.
         coordinates (dict): The coordinates of the waste vial.
-        radius (float): The radius of the waste vial.
-        height (float): The height of the waste vial.
-        z_bottom (float): The z-coordinate of the bottom of the waste vial.
-        base (float): The base area of the waste vial.
-        depth (float): The current depth of the solution in the waste vial.
+        radius (Decimal): The radius of the waste vial.
+        height (Decimal): The height of the waste vial.
+        z_bottom (Decimal): The z-coordinate of the bottom of the waste vial.
+        base (Decimal): The base area of the waste vial.
+        depth (Decimal): The current depth of the solution in the waste vial.
         contamination (int): The number of times the waste vial has been contaminated.
         category (int): The category of the waste vial (0 for stock, 1 for waste).
     """
@@ -307,31 +302,31 @@ class WasteVial(Vial2):
         self,
         name: str,
         position: str,
-        volume: float,
-        capacity: float,
-        density: float,
+        volume: Decimal,
+        capacity: Decimal,
+        density: Decimal,
         vial_coordinates: Union[VesselCoordinates, dict],
-        radius: float,
-        height: float,
+        radius: Decimal,
+        height: Decimal,
         contamination: int,
         contents: dict = {},
-        viscosity_cp: float = 0.0,
+        viscosity_cp: Decimal = Decimal(0.0),
         category: int = 1,
-        depth: float = 0,
-        concentration: float = 0.0,
+        depth: Decimal = Decimal(0),
+        concentration: Decimal = Decimal(0.0),
     ) -> None:
         """
         Initializes a new instance of the WasteVial class.
 
         Args:
         name (str): The name of the waste vial.
-        volume (float): The current volume of the waste vial.
-        capacity (float): The maximum capacity of the waste vial.
-        density (float): The density of the solution in the waste vial.
+        volume (Decimal): The current volume of the waste vial.
+        capacity (Decimal): The maximum capacity of the waste vial.
+        density (Decimal): The density of the solution in the waste vial.
         coordinates (dict): The coordinates of the waste vial.
-        radius (float): The radius of the waste vial.
-        height (float): The height of the waste vial.
-        z_bottom (float): The z-coordinate of the bottom of the waste vial.
+        radius (Decimal): The radius of the waste vial.
+        height (Decimal): The height of the waste vial.
+        z_bottom (Decimal): The z-coordinate of the bottom of the waste vial.
         """
         super().__init__(
             name,
@@ -350,21 +345,17 @@ class WasteVial(Vial2):
         )
         self.category = category
 
-    def update_contents(self, from_vessel: Union[str, dict], volume: float) -> None:
+    def update_contents(self, from_vessel: Union[str, dict], volume: Decimal) -> None:
         """Update the contentes of the waste vial"""
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
 
         if isinstance(from_vessel, dict):
             try:
-                # incoming_content_ratios = {
-                #     key: value / sum(from_vessel.values()) for key, value in from_vessel.items()
-                # }
-
                 for key, value in from_vessel.items():
                     if key in self.contents:
-                        self.contents[key] += round((value), 6)
+                        self.contents[key] += value
                     else:
-                        self.contents[key] = round((value), 6)
+                        self.contents[key] = value
 
             except Exception as e:
                 vial_logger.error("Error occurred while updating well contents: %s", e)
@@ -434,7 +425,7 @@ def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
     return list_of_solutions
 
 
-def update_vial_state_file(vial_objects: Sequence[Vial2], filename):
+def update_vial_state_file(vial_objects: Sequence[Vial2], filename): # Update with a db method
     """
     Update the vials in the json file. This is used to update the volume, contents, and contamination of the vials
     """
@@ -559,17 +550,17 @@ def input_new_vial_values(vialgroup: str):
                     f"Enter the new density of the vial (Current density is {vial['density']}): "
                 )
                 if new_density != "":
-                    vial["density"] = float(new_density)
+                    vial["density"] = Decimal(new_density)
                 new_volume = input(
                     f"Enter the new volume of the vial (Current volume is {vial['volume']}): "
                 )
                 if new_volume != "":
-                    vial["volume"] = int(new_volume)
+                    vial["volume"] = Decimal(new_volume)
                 new_capacity = input(
                     f"Enter the new capacity of the vial (Current capacity is {vial['capacity']}): "
                 )
                 if new_capacity != "":
-                    vial["capacity"] = int(new_capacity)
+                    vial["capacity"] = Decimal(new_capacity)
                 new_contamination = input(
                     f"Enter the new contamination of the vial (Current contamination is {vial['contamination']}): "
                 )
@@ -631,9 +622,9 @@ def reset_vials(vialgroup: str):
         if vialgroup == "stock":
             vial["volume"] = vial["capacity"]
         elif vialgroup == "waste":
-            vial["volume"] = 1000
+            vial["volume"] = Decimal(1000)
             vial["contents"] = {}
-        vial["contamination"] = 0
+        vial["contamination"] = Decimal(0)
 
     ## Write the new values to the state file
     with open(filename, "w", encoding="UTF-8") as file:
