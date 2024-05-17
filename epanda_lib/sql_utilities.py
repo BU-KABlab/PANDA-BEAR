@@ -2372,3 +2372,21 @@ def insert_pipette_status(pipette: Pipette) -> None:
     )
 
 # endregion
+
+# region TestValues
+
+def delete_test_values() -> None:
+    """
+    Delete all test values from the test_values table.
+
+    Returns:
+        None
+    """
+    pass
+
+    # Test values could be found in any of the db tables, so we need to be careful
+    # A test experiment id is 999999999
+    # If a context column is present, the context will include 'test'
+    # Test wellplates will have plate_id = 999999999 or 999999998
+
+# endregion
