@@ -10,7 +10,7 @@ from epanda_lib import scheduler
 from epanda_lib.experiment_class import ExperimentBase, ExperimentStatus, ExperimentResult
 from epanda_lib.scheduler import Scheduler
 from epanda_lib import sql_utilities
-from epanda_lib.sql_utilities import get_current_pin
+from epanda_lib.sql_tools.sql_system_state import get_current_pin
 
 CURRENT_PIN =  get_current_pin()
 # define constants or globals

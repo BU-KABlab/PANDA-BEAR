@@ -8,7 +8,7 @@ Notes:
 from typing import Sequence
 
 # Non-standard imports
-from epanda_lib.instrument_toolkit import Toolkit
+from epanda_lib.utilities import Toolkit
 from epanda_lib.correction_factors import correction_factor
 from epanda_lib.e_panda import (
     chrono_amp,
