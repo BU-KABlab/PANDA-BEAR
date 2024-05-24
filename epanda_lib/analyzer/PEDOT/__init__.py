@@ -3,12 +3,17 @@
 # pylint: disable=line-too-long
 from pathlib import Path
 import pandas as pd
-from epanda_lib.sql_utilities import (
+from epanda_lib.experiment_class import (
     ExperimentResultsRecord,
     insert_experiment_result,
-    insert_ml_training_data,
+)
+
+from epanda_lib.config.config import (
     read_testing_config,
 )
+
+from epanda_lib.sql_tools.sql_ml_functions import insert_ml_training_data
+
 
 from . import PEDOT_FindLAB as lab
 from . import PEDOT_MetricsCalc as met
@@ -110,10 +115,10 @@ def pedot_analyzer(experiment_id: int, train_in_testing:bool=False) -> MLTrainin
         }
     )
     # Add to the training data file
-    df_new_training_data.to_csv(
-        ml_file_paths.training_file_path, mode="a", header=False, index=False
-    )
-    # TODO replace with sql table insert
+    # df_new_training_data.to_csv(
+    #     ml_file_paths.training_file_path, mode="a", header=False, index=False
+    # )
+    insert_ml_training_data(df_new_training_data)
     return ml_training_data
 
 def run_ml_model(generate_experiment_id=None) -> MLOutput:

@@ -77,6 +77,7 @@ class MLOutput:
     predicted_mean: float
     predicted_stddev: float
     contour_plot: Path = None
+    model_id:int = None
 
 @dataclass
 class PEDOTParams:
