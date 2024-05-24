@@ -19,40 +19,57 @@ import time
 from pathlib import Path
 from typing import Sequence
 
-from slack_sdk.errors import (BotUserAccessError, SlackApiError,
-                              SlackClientConfigurationError, SlackClientError,
-                              SlackClientNotConnectedError,
-                              SlackObjectFormationError, SlackRequestError,
-                              SlackTokenRotationError)
-
-from epanda_lib import sql_utilities
+from slack_sdk.errors import (
+    BotUserAccessError,
+    SlackApiError,
+    SlackClientConfigurationError,
+    SlackClientError,
+    SlackClientNotConnectedError,
+    SlackObjectFormationError,
+    SlackRequestError,
+    SlackTokenRotationError,
+)
 
 from . import e_panda
 from .analyzer.pedot import pedot_analyzer, run_ml_model as pedot_ml_model
 from .config.config import RANDOM_FLAG, STOCK_STATUS, WASTE_STATUS, read_testing_config
 from .e_panda import CAFailure, CVFailure, DepositionFailure, OCPFailure
-from .errors import ProtocolNotFoundError, ShutDownCommand, WellImportError, NoExperimentFromModel
-from .experiment_class import (ExperimentBase, ExperimentResult,
-                               ExperimentStatus)
-from .instrument_toolkit import Toolkit
+from .errors import (
+    ProtocolNotFoundError,
+    ShutDownCommand,
+    WellImportError,
+    NoExperimentFromModel,
+)
+from .experiment_class import (
+    ExperimentBase,
+    ExperimentResult,
+    ExperimentStatus,
+    select_specific_result,
+)
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
 from .obs_controls import OBSController
-from .sql_tools.protocol_utilities import ProtocolEntry, select_protocol_by_id
+from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .pump_control import MockPump, Pump
 from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
 from .utilities import SystemState
-from .vials import (StockVial, Vial2, WasteVial, read_vials,
-                    update_vial_state_files)
+from .instrument_toolkit import Toolkit
+from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_files
 from .wellplate import Wellplate
 
 # set up slack globally so that it can be used in the main function and others
 
 TESTING = read_testing_config()
-def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaign_length: int = None):
+
+
+def main(
+    use_mock_instruments: bool = TESTING,
+    one_off: bool = False,
+    al_campaign_length: int = None,
+):
     """
     Main function
 
@@ -116,7 +133,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             ## Reset the logger to log to the ePANDA.log file and format
             obs.place_text_on_screen("")
             e_panda.apply_log_filter()
-            sql_utilities.set_system_status(SystemState.BUSY)
+            sql_system_state.set_system_status(SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
 
@@ -126,7 +143,9 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             )
 
             while new_experiment is None:
-                sql_utilities.set_system_status(SystemState.PAUSE, "Waiting for new experiments")
+                sql_system_state.set_system_status(
+                    SystemState.PAUSE, "Waiting for new experiments"
+                )
                 # scheduler.check_inbox()
                 new_experiment, _ = scheduler.read_next_experiment_from_queue()
                 if new_experiment is not None:
@@ -136,14 +155,20 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                     break  # break out of the while new experiment is None loop
 
                 # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-                if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
+                if (
+                    al_campaign_length is not None
+                    and al_campaign_iteration < al_campaign_length
+                ):
                     # We run the model on with experiments that have already been run
-                    sql_utilities.set_system_status(SystemState.BUSY, "Running ML model")
+                    sql_system_state.set_system_status(
+                        SystemState.BUSY, "Running ML model"
+                    )
                     next_exp_id = pedot_ml_model()
                     new_experiment, _ = scheduler.read_next_experiment_from_queue()
                     if new_experiment is not None:
                         slack.send_slack_message(
-                            "alert", f"New experiment generated from existing data {new_experiment.experiment_id}"
+                            "alert",
+                            f"New experiment generated from existing data {new_experiment.experiment_id}",
                         )
                         al_campaign_iteration += 1
                         continue  # continue to the next iteration of the while new experiment is None loop
@@ -155,8 +180,13 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 logger.info(
                     "No new experiments to run...waiting a minute for new experiments"
                 )
-                slack.send_slack_message("alert", "No new experiments to run...waiting a minute for new experiments")
-                sql_utilities.set_system_status(SystemState.PAUSE, "Waiting for new experiments")
+                slack.send_slack_message(
+                    "alert",
+                    "No new experiments to run...waiting a minute for new experiments",
+                )
+                sql_system_state.set_system_status(
+                    SystemState.PAUSE, "Waiting for new experiments"
+                )
                 system_status_loop(slack)
 
             ## confirm that the new experiment is a valid experiment object
@@ -168,7 +198,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
                 )
                 break  # break out of the while True loop
 
-            sql_utilities.set_system_status(SystemState.BUSY)
+            sql_system_state.set_system_status(SystemState.BUSY)
             ## Initialize a results object
             new_experiment.results = ExperimentResult(
                 experiment_id=new_experiment.experiment_id,
@@ -227,8 +257,8 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             logger.info("Beginning experiment %d", new_experiment.experiment_id)
 
             # Get the protocol entry
-            protocol_entry: ProtocolEntry = select_protocol_by_id(
-                new_experiment.protocol_id
+            protocol_entry: sql_protocol_utilities.ProtocolEntry = (
+                sql_protocol_utilities.select_protocol_by_id(new_experiment.protocol_id)
             )
 
             # Convert the file path to a module name
@@ -249,7 +279,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             )
 
             ## Update the experiment status to complete
-            #new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            # new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
 
             # Share any results images with the slack data channel
             share_to_slack(new_experiment)
@@ -271,13 +301,15 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
 
             next_exp_id = None
             # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-            if al_campaign_length is not None and al_campaign_iteration < al_campaign_length:
+            if (
+                al_campaign_length is not None
+                and al_campaign_iteration < al_campaign_length
+            ):
                 next_exp_id = pedot_ml_model()
                 al_campaign_iteration += 1
 
             # Share the analysis results with slack
             share_analysis_to_slack(experiment_id, next_exp_id, slack)
-
 
             ## Update the system state with new vial and wellplate information
             toolkit.pump.pipette.reset_contents()
@@ -290,7 +322,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             if one_off:
                 break  # break out of the while True loop
 
-            if SystemState.SHUTDOWN in sql_utilities.select_system_status(2):
+            if SystemState.SHUTDOWN in sql_system_state.select_system_status(2):
                 slack.send_slack_message("alert", "ePANDA is shutting down")
                 raise ShutDownCommand
 
@@ -305,10 +337,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
             share_to_slack(new_experiment)
-        sql_utilities.set_system_status(SystemState.ERROR)
-            # scheduler.change_well_status(
-            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-            # )
+        sql_system_state.set_system_status(SystemState.ERROR)
+        # scheduler.change_well_status(
+        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+        # )
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
@@ -316,17 +348,17 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
     except ProtocolNotFoundError as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(SystemState.ERROR)
+        sql_system_state.set_system_status(SystemState.ERROR)
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error
     except ShutDownCommand as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(SystemState.OFF)
-            # scheduler.change_well_status(
-            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-            # )
+        sql_system_state.set_system_status(SystemState.OFF)
+        # scheduler.change_well_status(
+        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+        # )
         logger.info("User commanded shutting down of ePANDA")
         raise ShutDownCommand from error  # raise error to go to finally.
         # This was triggered by the user to indicate they want to stop the program
@@ -334,10 +366,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
     except Exception as error:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(SystemState.ERROR)
-            # scheduler.change_well_status(
-            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-            # )
+        sql_system_state.set_system_status(SystemState.ERROR)
+        # scheduler.change_well_status(
+        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+        # )
 
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
@@ -346,10 +378,10 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_utilities.set_system_status(SystemState.ERROR)
-            # scheduler.change_well_status(
-            #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-            # )
+        sql_system_state.set_system_status(SystemState.ERROR)
+        # scheduler.change_well_status(
+        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+        # )
         logger.info("Keyboard interrupt detected")
         slack.send_slack_message("alert", "ePANDA was interrupted by the user")
         raise KeyboardInterrupt from exc  # raise error to to go finally. This was triggered by the user to indicate they want to stop the program
@@ -371,7 +403,7 @@ def main(use_mock_instruments: bool = TESTING, one_off: bool = False, al_campaig
             disconnect_from_instruments(toolkit)
         obs.place_text_on_screen("")
         obs.stop_recording()
-        sql_utilities.set_system_status(SystemState.IDLE)
+        sql_system_state.set_system_status(SystemState.IDLE)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
         print("ePANDA is shutting down...goodbye")
 
@@ -451,8 +483,8 @@ def establish_system_state() -> (
     number_of_wells = 0
 
     # Query the number of clear wells in well_status
-    number_of_clear_wells = sql_utilities.get_number_of_clear_wells()
-    number_of_wells = sql_utilities.get_number_of_wells()
+    number_of_clear_wells = sql_wellplate.get_number_of_clear_wells()
+    number_of_wells = sql_wellplate.get_number_of_wells()
     ## check that wellplate has the appropriate number of wells
     if number_of_wells != len(wellplate.wells):
         logger.error(
@@ -511,6 +543,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
             return False
     return True
 
+
 def system_status_loop(slack: SlackBot):
     """
     Loop to check the system status and update the system status
@@ -518,11 +551,11 @@ def system_status_loop(slack: SlackBot):
     while True:
         first_pause = True
         # Check the system status
-        system_status = sql_utilities.select_system_status(2)
+        system_status = sql_system_state.select_system_status(2)
         if SystemState.SHUTDOWN in system_status:
             raise ShutDownCommand
         elif SystemState.PAUSE in system_status:
-        #elif SystemState.PAUSE in system_status or SystemState.WAITING in system_status:
+            # elif SystemState.PAUSE in system_status or SystemState.WAITING in system_status:
             # if SystemState.IDLE in system_status:
             #     break
             if first_pause:
@@ -545,12 +578,13 @@ def system_status_loop(slack: SlackBot):
                 break
         elif SystemState.RESUME in system_status:
             slack.send_slack_message("alert", "ePANDA is resuming")
-            sql_utilities.set_system_status(SystemState.BUSY)
+            sql_system_state.set_system_status(SystemState.BUSY)
             break
         else:
             break
         # if SystemState.ERROR in system_status:
         #     raise ShutDownCommand
+
 
 def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
     """Connect to the instruments"""
@@ -597,7 +631,9 @@ def disconnect_from_instruments(instruments: Toolkit):
     logger.info("Disconnected from instruments")
 
 
-def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:SlackBot = None):
+def share_analysis_to_slack(
+    experiment_id: int, next_exp_id: int = None, slack: SlackBot = None
+):
     """
     Share the analysis results with the slack data channel
 
@@ -616,11 +652,13 @@ def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:Sla
     delta_e00 = None
 
     try:
-        roi_path = Path(sql_utilities.select_specific_result(experiment_id, "coloring_roi_path").result_value)
+        roi_path = Path(
+            select_specific_result(experiment_id, "coloring_roi_path").result_value
+        )
     except AttributeError:
         pass
     try:
-        delta_e00 = sql_utilities.select_specific_result(experiment_id, "delta_e00").result_value
+        delta_e00 = select_specific_result(experiment_id, "delta_e00").result_value
     except AttributeError:
         pass
 
@@ -631,7 +669,9 @@ def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:Sla
             f"ROI for Experiment {experiment_id}:",
         )
     if delta_e00 is not None:
-        slack.send_slack_message("data", f"Delta E for Experiment {experiment_id}: {delta_e00}")
+        slack.send_slack_message(
+            "data", f"Delta E for Experiment {experiment_id}: {delta_e00}"
+        )
 
     # Then fetch the ML results and build the message
     # Our list of relevant results
@@ -643,9 +683,13 @@ def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:Sla
         "PEDOT_Predicted_Uncertainty",
     ]
     ml_results = []
-    if next_exp_id is not None: # If we have a next experiment ID, we can fetch the results
+    if (
+        next_exp_id is not None
+    ):  # If we have a next experiment ID, we can fetch the results
         for result_type in results_to_find:
-            ml_results.append(sql_utilities.select_specific_result(next_exp_id, result_type).result_value)
+            ml_results.append(
+                select_specific_result(next_exp_id, result_type).result_value
+            )
         # Compose message
         ml_results_msg = f"""
         Experiment {next_exp_id} Parameters and Predictions:\n
@@ -657,22 +701,25 @@ def share_analysis_to_slack(experiment_id:int, next_exp_id:int = None, slack:Sla
         """
 
         # fetch the contour plot
-        contour_plot = Path(sql_utilities.select_specific_result(next_exp_id, "PEDOT_Contour_Plots").result_value)
+        contour_plot = Path(
+            select_specific_result(next_exp_id, "PEDOT_Contour_Plots").result_value
+        )
 
         slack.send_slack_message("data", ml_results_msg)
         if contour_plot is not None:
             slack.send_slack_file(
                 "data",
                 contour_plot,
-                f'contour_plot_{next_exp_id}',
-        )
+                f"contour_plot_{next_exp_id}",
+            )
 
     return
 
 
 def share_to_slack(experiment: ExperimentBase):
     """Share the results of the experiment to the slack data channel"""
-    slack = SlackBot(test = TESTING)
+    slack = SlackBot(test=TESTING)
+
     if experiment.results is None:
         logger.error("The experiment has no results")
         return
@@ -680,7 +727,11 @@ def share_to_slack(experiment: ExperimentBase):
         logger.error("The experiment has no image files")
         return
     try:
-        images_with_dz = [image for image in experiment.results.image if image[0].name.endswith("dz.tiff")]
+        images_with_dz = [
+            image
+            for image in experiment.results.image
+            if image[0].name.endswith("dz.tiff")
+        ]
         if len(images_with_dz) == 0:
             logger.error("The experiment has no dz.tiff image files")
             msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value} but has no datazoned image files to share"
@@ -692,8 +743,11 @@ def share_to_slack(experiment: ExperimentBase):
         )
         for image in experiment.results.image:
             image: Path = image[0]
+            images_with_dz = []
             if image.name.endswith("dz.tiff"):
-                slack.send_slack_file("data", image, image.name)
+                images_with_dz.append(image)
+
+            slack.upload_images("data", images_with_dz, "")
     except (
         SlackApiError,
         SlackClientError,
@@ -718,6 +772,7 @@ def share_to_slack(experiment: ExperimentBase):
             error,
         )
         # continue with the rest of the program
+
 
 if __name__ == "__main__":
     print("TEST MODE: ", TESTING)
