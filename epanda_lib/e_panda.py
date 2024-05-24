@@ -28,26 +28,26 @@ from decimal import Decimal
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
+
 from PIL import Image
 
 # Local application imports
-from epanda_lib import instrument_toolkit
 from epanda_lib.camera_call_camera import capture_new_image
 from epanda_lib.config.config import (AIR_GAP, DRIP_STOP, PATH_TO_DATA,
                                       PATH_TO_LOGS, read_testing_config)
 from epanda_lib.correction_factors import correction_factor
+from epanda_lib.errors import (CAFailure, CVFailure, DepositionFailure,
+                               NoAvailableSolution, OCPFailure)
 from epanda_lib.experiment_class import (EchemExperimentBase, ExperimentBase,
                                          ExperimentResult, ExperimentStatus)
 from epanda_lib.image_tools import add_data_zone
-from epanda_lib.instrument_toolkit import Toolkit
 from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
 from epanda_lib.obs_controls import OBSController
 from epanda_lib.pump_control import MockPump, Pump
+from epanda_lib.instrument_toolkit import Toolkit
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well
-from epanda_lib.errors import (CAFailure, CVFailure, DepositionFailure, NoAvailableSolution,
-                                 OCPFailure)
 
 TESTING = read_testing_config()
 
@@ -782,7 +782,7 @@ def volume_correction(volume:Decimal, density:Decimal=None, viscosity:Decimal=No
 
 
 def image_well(
-    toolkit: instrument_toolkit.Toolkit,
+    toolkit: Toolkit,
     instructions: EchemExperimentBase = None,
     step_description: str = None,
 ):
