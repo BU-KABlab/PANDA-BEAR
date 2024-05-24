@@ -27,7 +27,20 @@ from sklearn.metrics import mean_squared_error
 # from tqdm.notebook import tqdm #use in jupyter notebook
 from tqdm import tqdm  # use in vscode
 
-from epanda_lib.sql_utilities import ExperimentResultsRecord, insert_experiment_results
+from epanda_lib.experiment_class import (
+    ExperimentResultsRecord,
+    insert_experiment_results,
+)
+from epanda_lib.sql_tools.sql_ml_functions import (
+    model_iteration,
+    select_best_test_points,
+    select_best_test_points_by_model_id,
+    select_best_test_points_by_experiment_id,
+    insert_best_test_point,
+    select_ml_training_data,
+    insert_ml_training_data,
+    execute_sql_command,
+)
 
 
 def main(
@@ -37,7 +50,7 @@ def main(
     BestTestPointsCSV,
     contourplots_path,
     experiment_id: int = 0,
-) -> tuple[float, float, float, float, float]:
+) -> tuple[float, float, float, float, float, int]:
     """Main function for the PEDOT ML model.
 
     Args:
@@ -50,7 +63,7 @@ def main(
 
     Returns:
     -------
-        tuple(v_dep, t_dep, edot_concentration, predicted_mean, predicted_stddev)
+        tuple(v_dep, t_dep, edot_concentration, predicted_mean, predicted_stddev, model_id)
 
     """
 
@@ -59,6 +72,7 @@ def main(
     # noise = 0.4852273827820476
     # lr = 0.07184898163805888
     # outputscale = 6.444085436313317
+    model_id = None
 
     class GPModel(ExactGP):
         """Gaussian Process model for the PEDOT electrodeposition."""
@@ -84,22 +98,22 @@ def main(
             covar_x = self.covar_module(x)
             return MultivariateNormal(mean_x, covar_x)
 
-    def read_counter(file_path):
-        """Read the counter from the file."""
-        try:
-            with open(file_path, "r") as file:
-                return int(file.read().strip())
-        except FileNotFoundError:
-            return 0
+    # def read_counter(file_path):
+    #     """Read the counter from the file."""
+    #     # try:
+    #     #     with open(file_path, "r") as file:
+    #     #         return int(file.read().strip())
+    #     # except FileNotFoundError:
+    #     #     return 0
 
-    def update_counter(file_path, counter):
-        """Update the counter in the file."""
-        with open(file_path, "w") as file:
-            file.write(str(counter))
+    #def update_counter(file_path, counter):
+        #"""Update the counter in the file."""
+        # with open(file_path, "w") as file:
+        #     file.write(str(counter))
 
     def load_model(base_path, counter_file, train_x, train_y):
         """Load the model from a file."""
-        counter = read_counter(counter_file)
+        counter = model_iteration()
         load_filename = f"{base_path}_{counter}.pth"
         if not os.path.exists(load_filename):
             raise FileNotFoundError(
@@ -119,7 +133,7 @@ def main(
 
     def save_model(model, optimizer, base_path, counter_file):
         """Save the model to a file and increment the counter."""
-        counter = read_counter(counter_file)
+        counter = model_iteration()
         new_counter = counter + 1
         filename = f"{base_path}_{new_counter}.pth"
         torch.save(
@@ -131,8 +145,8 @@ def main(
             },
             filename,
         )
-        update_counter(counter_file, new_counter)
-        return filename
+        #update_counter(counter_file, new_counter)
+        return filename, new_counter
 
     def get_next_filename(base_path, extensions):
         """Functions to increment the filenames"""
@@ -223,7 +237,8 @@ def main(
         return np.array([voltage, time, concentration])
 
     # Import training data and convert to Pytorch tensors
-    data_df = pd.read_csv(training_file_path)
+    data_df = select_ml_training_data()
+    # data_df = pd.read_csv(training_file_path)
     voltage = data_df["voltage"].values
     time = data_df["time"].values
     concentration = data_df["concentration"].values
@@ -334,7 +349,7 @@ def main(
     rmse = np.sqrt(mean_squared_error(actuals, predictions))
     print(f"RMSE: {rmse}")
 
-    save_model(model, optimizer, model_base_path, counter_file_path)
+    _, model_id = save_model(model, optimizer, model_base_path, counter_file_path)
 
     model.eval()
     likelihood.eval()
@@ -344,7 +359,7 @@ def main(
         voltage_target=(0, 1),
         time_target=(0, 1),
         concentration_target=(0, 1),
-        concentrations:list=None,
+        concentrations: list = None,
     ):
         if concentrations is None:
             concentrations = []
@@ -444,8 +459,23 @@ def main(
     # Unpack values
     v_dep, t_dep, edot_concentration = rounded_best_test_point_original
 
+    # df = pd.DataFrame(
+    #     {
+    #         "Best Test Point Scalar": [best_test_point],
+    #         "Best Test Point Original": [best_test_point_original],
+    #         "Best Test Point": [rounded_best_test_point_original],
+    #         "v_dep": [v_dep],
+    #         "t_dep": [t_dep],
+    #         "edot_concentration": [edot_concentration],
+    #         "Predicted Response": [predicted_mean],
+    #         "Standard Deviation": [predicted_stddev],
+    #         "Models current RMSE": [rmse],
+    #     }
+    # )
     df = pd.DataFrame(
         {
+            "Model ID": [model_id],
+            "Experiment ID": [experiment_id],
             "Best Test Point Scalar": [best_test_point],
             "Best Test Point Original": [best_test_point_original],
             "Best Test Point": [rounded_best_test_point_original],
@@ -458,9 +488,9 @@ def main(
         }
     )
 
-    file_exists = os.path.isfile(BestTestPointsCSV)
-    df.to_csv(BestTestPointsCSV, mode="a", header=not file_exists, index=False)
-    #insert_best_test_point(df) # TODO add model # and experiment id to df
+    # file_exists = os.path.isfile(BestTestPointsCSV)
+    # df.to_csv(BestTestPointsCSV, mode="a", header=not file_exists, index=False)
+    insert_best_test_point(df)
     mask = np.isclose(
         test_points_scaled[:, 2], test_points_scaled[best_point_index, 2], rtol=1e-3
     )
@@ -528,7 +558,7 @@ def main(
         voltage_grid, time_grid, mean_grid, levels=50, cmap="viridis"
     )
     fig.colorbar(contour_mean, ax=axes[2])
-    axes[2].set_title(f"$\Delta$ E$_{00}$ {edot_concentration} M")
+    axes[2].set_title(f"$\Delta$ E$_{{00}}$ {edot_concentration} M")  # Modified title
     axes[2].set_xlabel("Voltage (scaled)")
     axes[2].set_ylabel("Time (scaled)")
     contourplots_filename = get_next_filename(
@@ -588,6 +618,7 @@ def main(
         predicted_mean,
         predicted_stddev,
         f"{contourplots_filename}.png",
+        model_id
     )
 
 
