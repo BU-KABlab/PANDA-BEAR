@@ -473,7 +473,12 @@ def calibrate_mill(
 def main():
     """Main function for testing the calibration functions"""
     # Load the configuration file
-    testing = True
+    testing = input("Enter 'y' to use testing configuration: ").lower() == "y"
+    if testing == "y":
+        testing = True
+    else:
+        testing = False
+
     from .vials import STOCK_STATUS, WASTE_STATUS, read_vials
 
     print("Testing mode:", testing)
