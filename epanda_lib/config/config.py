@@ -3,8 +3,26 @@ better to be set in one place than to be scattered around the code."""
 from decimal import Decimal, getcontext
 from pathlib import Path
 
-from epanda_lib.config.config_tools import read_testing_config
-## Project values
+def get_repo_path():
+    """Returns the path of the repository."""
+    current_file = Path(__file__).resolve()
+    repo_path = current_file.parent.parent
+    return repo_path
+
+def read_testing_config():
+    """Reads the testing configuration file."""
+    repo_path = get_repo_path()
+    config_path = repo_path / "config" / "testing.txt"
+    with open(config_path, "r", encoding="utf-8") as f:
+        return f.read().strip() == "True"
+
+def write_testing_config(value: bool):
+    """Writes the testing configuration file."""
+    repo_path = get_repo_path()
+    config_path = repo_path / "config" / "testing.txt"
+    with open(config_path, "w", encoding="utf-8") as f:
+        f.write(str(value))## Project values
+
 AIR_GAP = Decimal(40.0)  # ul
 DRIP_STOP = Decimal(5.0)  # ul
 PURGE_VOLUME = Decimal(20)  # ul
@@ -83,7 +101,7 @@ if USE_LOCAL_PATHS:
     EPANDA_LOG = PATH_TO_LOGS / "ePANDA.log"
 
     # DB
-    SQL_DB_PATH = NETWORK_PATH /"epanda_dev.db"
+    SQL_DB_PATH = LOCAL_REPO_PATH /"epanda_test.db"
 
     ## Validate that all paths exist and create them if they don't
     for path in [
