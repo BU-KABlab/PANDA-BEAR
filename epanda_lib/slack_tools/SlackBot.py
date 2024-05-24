@@ -2,43 +2,124 @@
 
 # pylint: disable=line-too-long
 
-# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
-import csv
 import base64
-from io import BytesIO
+
+# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
+
+import os
 import json
 import logging
 import time
+from dataclasses import dataclass
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
-from PIL import Image
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from epanda_lib import sql_utilities
-from epanda_lib.config.config import (
-    SLACK_TICKETS,
-    STOCK_STATUS,
-    WASTE_STATUS,
-    read_testing_config
-)
+import epanda_lib.config.config as config
+import epanda_lib.experiment_class as exp
 from epanda_lib.config.secrets import Slack as slack_cred
-from epanda_lib.wellplate import Wellplate
-from epanda_lib.obs_controls import OBSController
 from epanda_lib.image_tools import add_data_zone
-from epanda_lib.sql_utilities import SystemState, set_system_status
-from epanda_lib.experiment_class import ExperimentResultsRecord#, ExperimentStatus
+from epanda_lib.obs_controls import OBSController
+from epanda_lib.sql_tools import (
+    sql_queue,
+    sql_slack_tickets,
+    sql_system_state,
+    sql_wellplate,
+    sql_utilities,
+)
+from epanda_lib.wellplate import Well, Wellplate
+
+STOCK_STATUS = config.STOCK_STATUS
+WASTE_STATUS = config.WASTE_STATUS
+
+
+# region Slack Tickets
+@dataclass
+class SlackTicket:
+    """Class for storing slack tickets."""
+
+    msg_id: str
+    channel_id: str
+    msg_text: str
+    valid_cmd: int
+    timestamp: str
+    addressed_timestamp: str
+
+
+def insert_slack_ticket(ticket: SlackTicket, test:bool=False) -> None:
+    """
+    Insert a slack ticket into the slack_tickets table.
+
+    Args:
+        ticket (SlackTicket): The slack ticket to insert.
+    """
+    sql_utilities.execute_sql_command_no_return(
+        """
+        INSERT INTO slack_tickets (
+            msg_id,
+            channel_id,
+            message,
+            response,
+            timestamp,
+            addressed_timestamp
+            )
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (
+            ticket.msg_id,
+            ticket.channel_id,
+            ticket.msg_text,
+            ticket.valid_cmd,
+            ticket.timestamp,
+            ticket.addressed_timestamp,
+        ),
+        test=test,
+    )
+
+
+def select_slack_ticket(msg_id: str, test:bool=False) -> SlackTicket:
+    """
+    Select a slack ticket from the slack_tickets table.
+
+    Args:
+        msg_id (str): The message ID of the slack ticket.
+
+    Returns:
+        SlackTicket: The slack ticket.
+    """
+    result = sql_utilities.execute_sql_command(
+        """
+        SELECT
+            msg_id,
+            channel_id,
+            message,
+            response,
+            timestamp,
+            addressed_timestamp
+        FROM slack_tickets
+        WHERE msg_id = ?
+        """,
+        (msg_id,),
+        test=test,
+    )
+    if result == []:
+        return None
+    return SlackTicket(*result[0])
 
 
 class SlackBot:
     """Class for sending messages to Slack."""
 
-    def __init__(self, test: bool = read_testing_config()) -> None:
+    def __init__(self, test: bool = config.read_testing_config()) -> None:
         self.logger = logging.getLogger("e_panda")
         self.test = test
+        self.client = WebClient(token=slack_cred.TOKEN)
 
     def send_slack_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
@@ -87,12 +168,57 @@ class SlackBot:
             self.logger.error(log_msg)
             return 0
 
-    def post_message_with_files(self, channel, message, file_list):
+    # def post_message_with_files(self, channel, message, file_list):
+    #     """Post a message with files to Slack."""
+    #     client = WebClient(slack_cred.TOKEN)
+    #     channel_id = self.channel_id(channel)
+    #     file_ids = []
+    #     file_urls = []
+    #     for file in file_list:
+    #         file = Path(file)
+    #         upload = client.files_upload_v2(
+    #             channel=channel_id,
+    #             file=str(file.resolve()),
+    #             filename=file.name,
+    #         )
+    #         file_ids.append(upload["file"]["id"])
+    #         file_urls.append(upload["file"]["url_private"])
+    #     # Post a message with the uploaded images
+
+    #     # Post a single message with all the uploaded files
+    #     client.chat_postMessage(
+    #         channel=channel_id,
+    #         text=message,
+    #         attachments=[
+    #             {
+    #                 "title": "Uploaded Image",
+    #                 "image_url": f"{url}",
+    #                 "alt_text": "Uploaded Image",
+    #             }
+    #             for url in file_urls
+    #         ],
+    #     )
+
+    def upload_images(self, channel, images,message):
+        """Upload images to Slack."""
         client = WebClient(slack_cred.TOKEN)
         channel_id = self.channel_id(channel)
-        for file in file_list:
-            upload = client.files_upload_v2(file=file, filename=file)
-        client.chat_postMessage(channel=channel_id, text=message, files=[upload["file"]["id"]])
+        image_paths = [Path(image) for image in images]
+        file_upload_parts = []
+        for image in image_paths:
+            file_upload_parts.append(
+                {
+                    "file": (str(image.resolve())),
+                    "title": image.name,
+                }
+            )
+        response = client.files_upload_v2(
+            file_uploads=file_upload_parts,
+            channel=channel_id,
+            initial_comment=message,
+        )
+
+        print(response)
 
     def check_latest_message(self, channel: str) -> str:
         """Check Slack for the latest message."""
@@ -106,14 +232,15 @@ class SlackBot:
                 channel=channel_id,
                 limit=1,
                 inclusive=True,
-                #latest=datetime.now().timestamp(),
+                # latest=datetime.now().timestamp(),
             )
-            conversation_history = result["messages"][0]['text']
+            conversation_history = result["messages"][0]["text"]
             return conversation_history
         except SlackApiError as error:
             error_msg = f"Error creating conversation: {format(error)}"
             self.logger.error(error_msg)
             return 0
+
     def check_slack_messages(self, channel: str) -> int:
         """Check Slack for messages."""
 
@@ -162,33 +289,45 @@ class SlackBot:
                         msg_text[8:].rstrip(), channel_id
                     )
                     # Add message to csv file
-                    with open(
-                        SLACK_TICKETS,
-                        "a",
-                        newline="",
-                        encoding="utf-8",
-                    ) as csvfile:
-                        writer = csv.DictWriter(
-                            csvfile,
-                            fieldnames=[
-                                "msg_id",
-                                "channel_id",
-                                "msg_txt",
-                                "valid_cmd",
-                                "ts",
-                                "addressed_ts",
-                            ],
-                        )
-                        writer.writerow(
-                            {
-                                "msg_id": msg_id,
-                                "channel_id": channel_id,
-                                "msg_txt": msg_text,
-                                "valid_cmd": response,
-                                "ts": msg_ts,
-                                "addressed_ts": datetime.now().timestamp(),
-                            }
-                        )
+                    # with open(
+                    #     SLACK_TICKETS,
+                    #     "a",
+                    #     newline="",
+                    #     encoding="utf-8",
+                    # ) as csvfile:
+                    #     writer = csv.DictWriter(
+                    #         csvfile,
+                    #         fieldnames=[
+                    #             "msg_id",
+                    #             "channel_id",
+                    #             "msg_txt",
+                    #             "valid_cmd",
+                    #             "ts",
+                    #             "addressed_ts",
+                    #         ],
+                    #     )
+                    #     writer.writerow(
+                    #         {
+                    #             "msg_id": msg_id,
+                    #             "channel_id": channel_id,
+                    #             "msg_txt": msg_text,
+                    #             "valid_cmd": response,
+                    #             "ts": msg_ts,
+                    #             "addressed_ts": datetime.now().timestamp(),
+                    #         }
+                    #     )
+                    insert_slack_ticket(
+                        SlackTicket(
+                            msg_id=msg_id,
+                            channel_id=channel_id,
+                            msg_text=msg_text,
+                            valid_cmd=response,
+                            timestamp=msg_ts,
+                            addressed_timestamp=datetime.now().timestamp(),
+                        ),
+                        test=self.test,
+                    )
+
                     if response == 0:
                         return 0
                     else:
@@ -206,27 +345,31 @@ class SlackBot:
             self.logger.error(error_msg)
             return 0
 
-    def find_id(self, experiment_id):
+    def find_id(self, msg_id):
         """Find the message ID in the slack ticket tracker csv file."""
-        with open(
-            SLACK_TICKETS,
-            newline="",
-            encoding="utf-8",
-        ) as csvfile:
-            reader = csv.DictReader(
-                csvfile,
-                fieldnames=[
-                    "msg_id",
-                    "channel_id",
-                    "msg_txt",
-                    "valid_cmd",
-                    "ts",
-                    "addressed_ts",
-                ],
-            )
-            for row in reader:
-                if row["msg_id"] == experiment_id:
-                    return row
+        # with open(
+        #     SLACK_TICKETS,
+        #     newline="",
+        #     encoding="utf-8",
+        # ) as csvfile:
+        #     reader = csv.DictReader(
+        #         csvfile,
+        #         fieldnames=[
+        #             "msg_id",
+        #             "channel_id",
+        #             "msg_txt",
+        #             "valid_cmd",
+        #             "ts",
+        #             "addressed_ts",
+        #         ],
+        #     )
+        #     for row in reader:
+        #         if row["msg_id"] == msg_id:
+        #             return row
+        # return False
+        ticket = select_slack_ticket(msg_id, test=self.test)
+        if ticket is not None:
+            return ticket
         return False
 
     def parse_slack_message(self, text: str, channel_id) -> int:
@@ -264,7 +407,7 @@ class SlackBot:
             try:
                 experiment_number = int(text[17:].strip())
                 # Get status
-                status = sql_utilities.select_experiment_status(experiment_number)
+                status = exp.select_experiment_status(experiment_number)
                 message = f"The status of experiment {experiment_number} is {status}."
                 self.send_slack_message(channel_id, message)
             except ValueError:
@@ -276,13 +419,7 @@ class SlackBot:
             # Get experiment number
             try:
                 experiment_number = int(text[17:].strip())
-                # Get the results
-                results = sql_utilities.select_results(experiment_number)
-                # filter to images with dz in the name
-                for result in results:
-                    result: ExperimentResultsRecord
-                    if "dz" in result.result_value:
-                        self.send_slack_file(channel_id, result.result_value)
+                self.__share_experiment_images(experiment_number)
 
             except ValueError:
                 message = "Please enter a valid experiment number."
@@ -313,22 +450,28 @@ class SlackBot:
                 camera = parts[1].strip().lower()
                 self._take_screenshot(channel_id, camera)
             except IndexError:
-                message = "Please specify which camera to take a screenshot of with a '-'."
+                message = (
+                    "Please specify which camera to take a screenshot of with a '-'."
+                )
                 self.send_slack_message(channel_id, message)
             return 1
 
         elif text[0:7] == "status":
-            sql_utilities.select_system_status()
+            sql_system_state.select_system_status()
         elif text[0:5] == "pause":
-            set_system_status(SystemState.PAUSE, "pausing ePANDA", self.test)
+            sql_system_state.set_system_status(
+                sql_system_state.SystemState.PAUSE, "pausing ePANDA", self.test
+            )
             return 1
 
         elif text[0:6] == "resume":
-            set_system_status(SystemState.RESUME, "resuming ePANDA", self.test)
+            sql_system_state.set_system_status(
+                sql_system_state.SystemState.RESUME, "resuming ePANDA", self.test
+            )
             return 1
 
         elif text[0:5] == "start":
-            # set_system_status(SystemState.ON, "starting ePANDA", self.test)
+            # system_state.set_system_status(system_state.SystemState.ON, "starting ePANDA", self.test)
             # start the experiment loop
             # controller.main()
             self.send_slack_message(
@@ -337,7 +480,9 @@ class SlackBot:
             return 1
 
         elif text[0:4] == "stop":
-            set_system_status(SystemState.SHUTDOWN, "stopping ePANDA", self.test)
+            sql_system_state.set_system_status(
+                sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.test
+            )
             return 1
 
         elif text[0:4] == "exit":
@@ -369,12 +514,13 @@ class SlackBot:
                 "stop - stops the experiment loop\n"
                 "exit -> closes the slackbot\n"
             )
-        else:
+        else: # data channel
             message = (
                 "Here is a list of commands I understand:\n"
                 "help -> displays this message\n"
                 # "plot experiment # - plots plots the CV data for experiment #\n"
                 # "data experiment # - sends the data files for experiment #\n"
+                "images experiment # - sends the images for experiment #\n"
                 "status experiment # - displays the status of experiment #\n"
                 "vial status -> displays the status of the vials\n"
                 "well status -> displays the status of the wells and the rest of the deck\n"
@@ -459,8 +605,8 @@ class SlackBot:
     def __well_status(self, channel_id):
         """Sends the well status to the user."""
         # Check current wellplate type
-        _, type_number, _ = sql_utilities.select_current_wellplate_info()
-        _, _, _, _, wellplate_type = sql_utilities.select_well_characteristics(
+        _, type_number, _ = sql_wellplate.select_current_wellplate_info()
+        _, _, _, _, wellplate_type = sql_wellplate.select_well_characteristics(
             type_number
         )
         # Choose the correct wellplate object based on the wellplate type
@@ -480,7 +626,10 @@ class SlackBot:
         y_coordinates = []
         color = []
 
-        current_wells = sql_utilities.select_wellplate_wells()
+        current_wells = sql_wellplate.select_wellplate_wells()
+        # turn tuple of well info into a list of well objects
+        current_wells = [Well(*well) for well in current_wells]
+
         for well in current_wells:
             x_coordinates.append(well.coordinates["x"])
             y_coordinates.append(well.coordinates["y"])
@@ -577,7 +726,7 @@ class SlackBot:
     def __queue_length(self, channel_id):
         # Get queue length
         queue_length = 0
-        queue_length = sql_utilities.count_queue_length()
+        queue_length = sql_queue.count_queue_length()
         message = f"The queue length is {queue_length}."
         self.send_slack_message(channel_id, message)
         return 1
@@ -596,7 +745,7 @@ class SlackBot:
         }
         return color_mapping.get(status, "gold")
 
-    def _take_screenshot(self, channel_id, camera_name:str):
+    def _take_screenshot(self, channel_id, camera_name: str):
         """Take a screenshot of the camera."""
         try:
             file_name = "tmp_screenshot.png"
@@ -632,6 +781,28 @@ class SlackBot:
             self.send_slack_message(channel_id, "Error taking screenshot")
             self.send_slack_message(channel_id, str(e))
             return 1
+        
+    def __share_experiment_images(self, experiment_id: int):
+        """Share the images for an experiment."""
+        # Look up there experiment_id in the db and find all results of type image
+        # Then filter the results to only include those with dz in the name
+        # Then send the images to slack
+
+        results = exp.select_specific_result(experiment_id, "image")
+        if results == [] or results is None:
+            message = f"Experiment {experiment_id} does not have any images. Or the experiment {experiment_id} does not exist."
+            self.send_slack_message("data", message)
+            return
+        for result in results:
+            result: exp.ExperimentResultsRecord
+            if "dz" not in result.result_value:
+                results.remove(result)
+        
+        # Now make a list of the image paths
+        image_paths = [result.result_value for result in results]
+
+        # Now send the images to slack
+        self.upload_images("data", image_paths, f"Images for experiment {experiment_id}")
 
     def channel_id(self, channel: str) -> str:
         """Return the channel ID based on the channel name."""
