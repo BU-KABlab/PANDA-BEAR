@@ -6,16 +6,13 @@ Vial class for creating vial objects with their position and contents
 import json
 import logging
 import math
-from typing import Sequence, Union
-from pathlib import Path
-from .config.config import STOCK_STATUS, WASTE_STATUS
-from .vessel import (
-    Vessel,
-    OverDraftException,
-    OverFillException,
-    VesselCoordinates,
-)
 from decimal import Decimal
+from pathlib import Path
+from typing import Sequence, Union
+
+from .config.config import STOCK_STATUS, WASTE_STATUS
+from .vessel import (OverDraftException, OverFillException, Vessel,
+                     VesselCoordinates)
 
 # set up A logger for the vials module
 # logger = logging.getLogger(__name__)

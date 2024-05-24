@@ -8,13 +8,16 @@ import json
 import logging
 import math
 import os
+
 # pylint: disable=line-too-long
 from decimal import Decimal
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
-from . import sql_utilities
+from epanda_lib import experiment_class
+
 from .config.config import MILL_CONFIG, WELLPLATE_LOCATION
 from .errors import OverFillException
+from .sql_tools import sql_utilities, sql_wellplate
 from .vessel import Vessel
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -41,10 +44,10 @@ class WellCoordinates:
         z_bottom: Decimal = None,
     ) -> None:
         """Initializes a new instance of the Coordinates class."""
-        self.x = x
-        self.y = y
-        self.z_top = z_top
-        self.z_bottom = z_bottom
+        self.x = Decimal(x)
+        self.y = Decimal(y)
+        self.z_top = Decimal(z_top)
+        self.z_bottom = Decimal(z_bottom)
 
     def __str__(self) -> str:
         """Returns a string representation of the coordinates."""
@@ -162,7 +165,14 @@ class Well(Vessel):
         self.project_id: int = project_id
         self.campaign_id: int = campaign_id
         self.volume: Decimal = volume
-        self.coordinates: WellCoordinates = coordinates
+        if isinstance(coordinates, WellCoordinates):
+            self.coordinates: WellCoordinates = coordinates
+        else:
+            try:
+                self.coordinates = WellCoordinates(**coordinates)
+            except json.JSONDecodeError:
+                self.coordinates = WellCoordinates(0, 0)
+
         self.density: Decimal = density
         self.name: str = well_id
         self.height: Decimal = height
@@ -253,14 +263,14 @@ class Well(Vessel):
     def update_status(self, new_status: str) -> None:
         """Updates the status of the well in the well_hx table."""
         self.status = new_status
-        sql_utilities.update_well_status(self.well_id, self.plate_id, new_status)
+        sql_wellplate.update_well_status(self.well_id, self.plate_id, new_status)
         logger.debug("Well %s status updated to %s", self.name, self.status)
 
     def save_to_db(self) -> None:
         """Inserts or Updates the well in the database"""
         logger.info("Saving well %s to the database", self.name)
         try:
-            sql_utilities.save_well_to_db(self)
+            sql_wellplate.save_well_to_db(self)
             logger.info("Well %s saved to the database", self.name)
         except Exception as e:
             logger.error("Error occurred while saving well to the database: %s", e)
@@ -269,7 +279,7 @@ class Well(Vessel):
     def update_well_coordinates(self, new_coordinates: WellCoordinates) -> None:
         """Update the coordinates of a specific well"""
         self.coordinates = new_coordinates
-        sql_utilities.update_well_coordinates(
+        sql_wellplate.update_well_coordinates(
             self.well_id, self.plate_id, new_coordinates
         )
 
@@ -307,13 +317,6 @@ class Wellplate:
         """
         Initializes a new instance of the Wells2 class.
 
-        Args:
-            a1_x (Decimal): X-coordinate of well A1.
-            a1_y (Decimal): Y-coordinate of well A1.
-            orientation (int): Orientation of the well plate (0-3).
-            columns (str): String representation of well plate columns.
-            rows (int): Number of rows in the well plate.
-            type_number (int): Type of well plate.
         """
         self.wells = {}
         self.a1_x = x_a1
@@ -327,7 +330,7 @@ class Wellplate:
             -35
         )  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
-        plate_id, _, _ = sql_utilities.select_current_wellplate_info()
+        plate_id, _, _ = sql_wellplate.select_current_wellplate_info()
         self.plate_id = (
             plate_id if plate_id is None else plate_id
         )  # The id of the well plate
@@ -365,7 +368,7 @@ class Wellplate:
         self.establish_new_wells()  # we need to establish the wells before we can update their status from file
         self.calculate_well_locations()  # now we can calculate the well locations
         current_wellplate_id, current_wellplate_type, _ = (
-            sql_utilities.select_current_wellplate_info()
+            sql_wellplate.select_current_wellplate_info()
         )
         if not new_well_plate:
             self.plate_id = current_wellplate_id
@@ -473,7 +476,7 @@ class Wellplate:
     def update_well_status_from_db(self) -> None:
         """Update the well status from the database"""
         logger.debug("Updating well status from database...")
-        incoming_wells = sql_utilities.select_wellplate_wells()
+        incoming_wells = sql_wellplate.select_wellplate_wells()
         for saved_well in incoming_wells:
             well = saved_well
             well.plate_id = self.plate_id
@@ -594,7 +597,7 @@ class Wellplate:
 
         # Select the well type characteristics from the well_types sql table given the type_number
         radius, well_offset, well_capacity, height, shape = (
-            sql_utilities.select_well_characteristics(type_number)
+            sql_wellplate.select_well_characteristics(type_number)
         )
 
         return (
@@ -698,7 +701,7 @@ class Wellplate:
     def save_wells_to_db(self) -> None:
         """Save the wells to the well_hx table. Replaces the write_well_status_to_file method"""
         list_of_wells = [well for well in self.wells.values()]
-        sql_utilities.save_wells_to_db(list_of_wells)
+        sql_wellplate.save_wells_to_db(list_of_wells)
 
     def print(self) -> None:
         """Print the well plate"""
@@ -729,7 +732,7 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
     """Removes the experiment from the database"""
 
     # Check that no experiment_results exist for this experiment
-    results = sql_utilities.select_results(experiment_id)
+    results = experiment_class.select_results(experiment_id)
     if results:
         print(
             """
@@ -851,7 +854,7 @@ def load_new_wellplate(
         current_wellplate_id,
         current_type_number,
         current_wellplate_is_new,
-    ) = sql_utilities.select_current_wellplate_info()
+    ) = sql_wellplate.select_current_wellplate_info()
 
     if ask:
         new_plate_id = input(
@@ -883,11 +886,11 @@ def load_new_wellplate(
         new_wellplate_type_number = int(new_wellplate_type_number)
 
     ## Check if the wellplate exists in the well_hx table
-    already_exists = sql_utilities.check_if_wellplate_exists(new_plate_id)
+    already_exists = sql_wellplate.check_if_wellplate_exists(new_plate_id)
     logger.debug("Wellplate exists: %s", already_exists)
     if not already_exists:
-        sql_utilities.add_wellplate_to_table(new_plate_id, new_wellplate_type_number)
-        sql_utilities.update_current_wellplate(new_plate_id)
+        sql_wellplate.add_wellplate_to_table(new_plate_id, new_wellplate_type_number)
+        sql_wellplate.update_current_wellplate(new_plate_id)
         new_wellplate = Wellplate(
             type_number=new_wellplate_type_number,
             new_well_plate=True,
@@ -898,7 +901,7 @@ def load_new_wellplate(
         logger.debug(
             "Wellplate already exists in the database. Setting as current wellplate"
         )
-        sql_utilities.update_current_wellplate(new_plate_id)
+        sql_wellplate.update_current_wellplate(new_plate_id)
         # TODO: Possibly run recaclulate well locations here
         return new_plate_id
 
@@ -928,7 +931,7 @@ def load_new_wellplate_sql(
     """
     # Get the current wellpate from the wellplates table
     current_wellplate_id, current_type_number, current_wellplate_is_new = (
-        sql_utilities.select_current_wellplate_info()
+        sql_wellplate.select_current_wellplate_info()
     )
 
     if ask:
@@ -961,11 +964,11 @@ def load_new_wellplate_sql(
         new_wellplate_type_number = int(new_wellplate_type_number)
 
     ## If the wellplate exists in the well hx, then load it
-    wellplate_exists = sql_utilities.check_if_wellplate_exists(new_plate_id)
+    wellplate_exists = sql_wellplate.check_if_wellplate_exists(new_plate_id)
     if wellplate_exists:
         logger.debug("Wellplate already exists in the database. Returning new_plate_id")
         logger.debug("Loading wellplate")
-        sql_utilities.update_current_wellplate(new_plate_id)
+        sql_wellplate.update_current_wellplate(new_plate_id)
     else:
         logger.debug("Creating new wellplate: %d", new_plate_id)
         new_wellplate = Wellplate(
@@ -993,9 +996,9 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
         bool: Number of new wells
     """
     current_plate_id, current_type_number, _ = (
-        sql_utilities.select_current_wellplate_info()
+        sql_wellplate.select_current_wellplate_info()
     )
-    new_wells = sql_utilities.count_wells_with_new_status()
+    new_wells = sql_wellplate.count_wells_with_new_status()
     return int(current_plate_id), int(current_type_number), new_wells
 
 
