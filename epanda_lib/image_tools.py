@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from epanda_lib import sql_utilities
+from epanda_lib.sql_tools import sql_utilities
 from epanda_lib.experiment_class import ExperimentBase
 
 # def add_data_zone(image: Image, experiment: ExperimentBase = None, context: str = None) -> Image:
