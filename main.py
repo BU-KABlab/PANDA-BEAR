@@ -11,51 +11,68 @@ import os
 import sys
 import time
 from pathlib import Path
+
 from PIL import Image
 
+import epanda_lib.analyzer.pedot as pedot_analysis
 from epanda_lib import (
     camera_call_camera,
     controller,
+    experiment_class,
     mill_calibration_and_positioning,
     mill_control,
+    print_panda,
     scheduler,
+    utilities,
     vials,
     wellplate,
-    print_panda,
 )
-from epanda_lib import sql_utilities
 from epanda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
 from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import read_testing_config, write_testing_config
-from epanda_lib.sql_tools import generator_utilities, protocol_utilities
-from epanda_lib.sql_utilities import set_system_status, select_specific_result
-from epanda_lib.utilities import SystemState
-import epanda_lib.analyzer.pedot as pedot_analysis
+from epanda_lib.sql_tools import (
+    sql_generator_utilities,
+    sql_protocol_utilities,
+    sql_queue,
+    sql_system_state,
+)
+from epanda_lib.sql_tools import sql_ml_functions
 
 
 def run_epanda_with_ml():
     """Runs ePANDA."""
-    set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "running ePANDA", read_testing_config()
+    )
     length = int(input("Enter the campaign length: ").strip().lower())
     controller.main(al_campaign_length=length)
 
+
 def run_epanda_without_ml():
     """Runs ePANDA."""
-    set_system_status(SystemState.BUSY, "running ePANDA", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "running ePANDA", read_testing_config()
+    )
     controller.main()
+
 
 def genererate_pedot_experiment():
     """Generates a PEDOT experiment."""
-    set_system_status(SystemState.BUSY, "generating PEDOT experiment", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "generating PEDOT experiment", read_testing_config()
+    )
     dep_v = float(input("Enter the deposition voltage: ").strip().lower())
     dep_t = float(input("Enter the deposition time: ").strip().lower())
     concentration = float(input("Enter the concentration: ").strip().lower())
     params = PEDOTParams(dep_v=dep_v, dep_t=dep_t, concentration=concentration)
     pedot_analysis.pedot_generator(params=params)
 
+
 def change_wellplate():
     """Changes the current wellplate."""
-    set_system_status(SystemState.BUSY, "changing wellplate", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "changing wellplate", read_testing_config()
+    )
     wellplate.load_new_wellplate(ask=True)
 
 
@@ -67,8 +84,10 @@ def remove_wellplate_from_database():
     plate_to_remove = int(
         input("Enter the wellplate number to remove: ").strip().lower()
     )
-    set_system_status(
-        SystemState.BUSY, "removing wellplate from database", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY,
+        "removing wellplate from database",
+        read_testing_config(),
     )
     wellplate._remove_wellplate_from_db(plate_to_remove)
 
@@ -78,8 +97,10 @@ def remove_experiment_from_database():
     experiment_to_remove = int(
         input("Enter the experiment number to remove: ").strip().lower()
     )
-    set_system_status(
-        SystemState.BUSY, "removing experiment from database", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY,
+        "removing experiment from database",
+        read_testing_config(),
     )
     wellplate._remove_experiment_from_db(experiment_to_remove)
 
@@ -90,56 +111,61 @@ def print_wellplate_info():
 
 def print_queue_info():
     """Prints a summary of the current queue."""
-    current_queue = sql_utilities.select_queue()
+    current_queue = sql_queue.select_queue()
     print("Current Queue:")
     for experiment in current_queue:
         print(experiment)
 
     input("Press Enter to continue...")
 
+
 def reset_vials_stock():
     """Resets the stock vials."""
-    set_system_status(SystemState.BUSY, "resetting stock vials", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "resetting stock vials", read_testing_config()
+    )
     vials.reset_vials("stock")
 
 
 def reset_vials_waste():
     """Resets the waste vials."""
-    set_system_status(SystemState.BUSY, "resetting waste vials", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "resetting waste vials", read_testing_config()
+    )
     vials.reset_vials("waste")
 
 
 def input_new_vial_values_stock():
     """Inputs new values for the stock vials."""
-    set_system_status(
-        SystemState.BUSY, "inputting new vial values", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "inputting new vial values", read_testing_config()
     )
     vials.input_new_vial_values("stock")
 
 
 def input_new_vial_values_waste():
     """Inputs new values for the waste vials."""
-    set_system_status(
-        SystemState.BUSY, "inputting new vial values", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "inputting new vial values", read_testing_config()
     )
     vials.input_new_vial_values("waste")
 
 
 def change_wellplate_location():
     """Changes the location of the current wellplate."""
-    set_system_status(
-        SystemState.BUSY, "changing wellplate location", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "changing wellplate location", read_testing_config()
     )
     wellplate.change_wellplate_location()
 
 
 def run_experiment_generator():
     """Runs the edot voltage sweep experiment."""
-    set_system_status(
-        SystemState.BUSY, "generating experiment files", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "generating experiment files", read_testing_config()
     )
-    generator_utilities.read_in_generators()
-    available_generators = generator_utilities.get_generators()
+    sql_generator_utilities.read_in_generators()
+    available_generators = sql_generator_utilities.get_generators()
     # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
     print()
     if not available_generators:
@@ -157,9 +183,9 @@ def run_experiment_generator():
     if generator_id == "q":
         return
     generator_id = int(generator_id)
-    protocol_utilities.read_in_protocols()
-    generator = generator_utilities.get_generator_name(generator_id)
-    generator_utilities.run_generator(generator_id)
+    sql_protocol_utilities.read_in_protocols()
+    generator = sql_generator_utilities.get_generator_name(generator_id)
+    sql_generator_utilities.run_generator(generator_id)
 
 
 def toggle_testing_mode():
@@ -179,8 +205,8 @@ def calibrate_mill():
     else:
         mill = mill_control.Mill
 
-    set_system_status(
-        SystemState.CALIBRATING, "calibrating the mill", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.CALIBRATING, "calibrating the mill", read_testing_config()
     )
 
     mill_calibration_and_positioning.calibrate_mill(
@@ -198,7 +224,9 @@ def test_camera():
 
 def generate_experiment_from_existing_data():
     """Generates an experiment from existing data using the ML model."""
-    set_system_status(SystemState.BUSY, "generating experiment", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "generating experiment", read_testing_config()
+    )
     next_experiment = scheduler.determine_next_experiment_id()
     output = pedot_analysis.pedot_model(
         pedot_analysis.ml_file_paths.training_file_path,
@@ -217,9 +245,10 @@ def generate_experiment_from_existing_data():
     # The ML Model will then make a prediction for the next experiment
     # First fetch and send the contour plot
     contour_plot = Path(
-        select_specific_result(next_experiment, "PEDOT_Contour_Plots").result_value
+        experiment_class.select_specific_result(
+            next_experiment, "PEDOT_Contour_Plots"
+        ).result_value  # should only return one value
     )
-    
     # Then fetch the ML results
     results_to_find = [
         "PEDOT_Deposition_Voltage",
@@ -231,10 +260,13 @@ def generate_experiment_from_existing_data():
     ml_results = []
     for result_type in results_to_find:
         ml_results.append(
-            select_specific_result(next_experiment, result_type).result_value
+            experiment_class.select_specific_result(
+                next_experiment, result_type
+            ).result_value  # should only return one value
         )
     # Compose message
     ml_results_msg = f"""
+    Model #: {output.model_id}\n
     Experiment {next_experiment} Parameters and Predictions:\n
     Deposition Voltage: {ml_results[0]}\n
     Deposition Time: {ml_results[1]}\n
@@ -244,30 +276,45 @@ def generate_experiment_from_existing_data():
     """
     print(ml_results_msg)
 
-    #img = mpimg.imread(contour_plot)
-    #plt.imshow(img)
+    # img = mpimg.imread(contour_plot)
+    # plt.imshow(img)
     img = Image.open(contour_plot)
     img.show()
     print(
         f"V_dep: {output.v_dep}, T_dep: {output.t_dep}, EDOT Concentration: {output.edot_concentration}"
     )
-    usr_choice = (
+    keep_exp = (
         input("Would you like to add an experiment with these values? (y/n): ")
         .strip()
         .lower()
     )
-    if usr_choice[0] == "y":
+    if keep_exp[0] == "y":
         pedot_analysis.pedot_generator(
-            params_for_next_experiment, experiment_name="PEDOT_Optimization", campaign_id=0
+            params_for_next_experiment,
+            experiment_name="PEDOT_Optimization",
+            campaign_id=0,
         )
     else:
         print("Experiment not added.")
+
+        # Delete the contour plot files, and the model based on the model ID
+        contour_plot.with_suffix(".png").unlink()
+        contour_plot.with_suffix(".svg").unlink()
+        model_name = Path(
+            pedot_analysis.ml_file_paths.model_base_path).name + f"_{output.model_id}"
+        model_path = Path(pedot_analysis.ml_file_paths.model_base_path)
+        model_path = model_path.with_name(model_name).with_suffix(".pth")
+        model_path.unlink()
+        sql_ml_functions.delete_model(output.model_id)
+
         return
 
 
 def exit_program():
     """Exits the program."""
-    set_system_status(SystemState.OFF, "exiting ePANDA", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.OFF, "exiting ePANDA", read_testing_config()
+    )
     print("Exiting ePANDA. Goodbye!")
     sys.exit()
 
@@ -279,22 +326,22 @@ def refresh():
 
 def stop_epanda():
     """Stops the ePANDA loop."""
-    sql_utilities.set_system_status(
-        SystemState.SHUTDOWN, "stopping ePANDA", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.SHUTDOWN, "stopping ePANDA", read_testing_config()
     )
 
 
 def pause_epanda():
     """Pauses the ePANDA loop."""
-    sql_utilities.set_system_status(
-        SystemState.PAUSE, "stopping ePANDA", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.PAUSE, "stopping ePANDA", read_testing_config()
     )
 
 
 def resume_epanda():
     """Resumes the ePANDA loop."""
-    sql_utilities.set_system_status(
-        SystemState.RESUME, "stopping ePANDA", read_testing_config()
+    sql_system_state.set_system_status(
+        utilities.SystemState.RESUME, "stopping ePANDA", read_testing_config()
     )
 
 
@@ -326,13 +373,17 @@ menu_options = {
 
 if __name__ == "__main__":
 
-    set_system_status(SystemState.ON, "at main menu", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.ON, "at main menu", read_testing_config()
+    )
     time.sleep(1)
-    protocol_utilities.read_in_protocols()
+    sql_protocol_utilities.read_in_protocols()
 
     while True:
-        set_system_status(SystemState.IDLE, "at main menu", read_testing_config())
-        #os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+        sql_system_state.set_system_status(
+            utilities.SystemState.IDLE, "at main menu", read_testing_config()
+        )
+        # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
         print()
         print(print_panda.print_panda())
         print()
@@ -382,4 +433,6 @@ if __name__ == "__main__":
             print(f"An error occurred: {e}")
             break  # Exit the program if an unknown error occurs
 
-    set_system_status(SystemState.OFF, "exiting ePANDA", read_testing_config())
+    sql_system_state.set_system_status(
+        utilities.SystemState.OFF, "exiting ePANDA", read_testing_config()
+    )
