@@ -15,11 +15,33 @@ from typing import Tuple, Union
 
 import pandas as pd
 
-from epanda_lib import sql_utilities
-
 from .config.config import EPANDA_LOG
-from .experiment_class import ExperimentBase, ExperimentStatus
-from .sql_utilities import execute_sql_command
+from .experiment_class import (
+    ExperimentBase,
+    ExperimentStatus,
+    select_experiment_information,
+    select_experiment_paramaters,
+    insert_experiment,
+    insert_experiment_parameters,
+    select_next_experiment_id,
+    update_experiment_status,
+    insert_experiment_result,
+    insert_experiments_parameters,
+)
+from .sql_tools.sql_utilities import execute_sql_command
+from .sql_tools.sql_wellplate import (
+    select_well_status,
+    select_next_available_well,
+    get_well,
+    select_current_wellplate_info,
+    update_well,
+    count_wells_with_new_status,
+)
+from .sql_tools.sql_queue import (
+    get_next_experiment_from_queue,
+    count_queue_length,
+    select_queue,
+)
 from .wellplate import Well
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -44,10 +66,10 @@ class Scheduler:
         """
         self.experiment_queue = []
 
-    def check_well_status(self, well_to_check: str, plate_id:int = None) -> str:
+    def check_well_status(self, well_to_check: str, plate_id: int = None) -> str:
         """Checks the status of the well in the well_status view in the SQLite database"""
         try:
-            well_status = sql_utilities.select_well_status(well_to_check, plate_id)
+            well_status = select_well_status(well_to_check, plate_id)
             return well_status
         except sqlite3.Error as e:
             logger.error("Error occured while checking well status: %s", e)
@@ -56,7 +78,7 @@ class Scheduler:
     def choose_next_new_well(self, plate_id: int = None) -> str:
         """Choose the next available well for an experiment"""
         try:
-            next_well = sql_utilities.select_next_available_well(plate_id)
+            next_well = select_next_available_well(plate_id)
             return next_well
         except sqlite3.Error as e:
             logger.error("Error occured while choosing next well: %s", e)
@@ -74,7 +96,7 @@ class Scheduler:
         # If the well is a string, get a well object
         if isinstance(well, str):
             well_id = well
-            well:Well = sql_utilities.get_well(well_id=well_id)
+            well: Well = get_well(well_id=well_id)
             if well is None:
                 logger.error("Well %s not found", well_id)
                 raise ValueError(f"Well {well_id} not found")
@@ -89,7 +111,7 @@ class Scheduler:
             raise ValueError(f"Well {well} does not have a plate id")
 
         try:
-            sql_utilities.update_well(well)
+            update_well(well)
         except sqlite3.Error as e:
             logger.error("Error occured while changing well status: %s", e)
             raise e
@@ -109,9 +131,9 @@ class Scheduler:
             Tuple[ExperimentBase]: The next experiment.
         """
         # Get the next experiment from the queue
-        
+
         try:
-            queue_info = sql_utilities.get_next_experiment_from_queue(random_pick)
+            queue_info = get_next_experiment_from_queue(random_pick)
         except sqlite3.Error as e:
             logger.error(
                 "Error occured while reading next experiment from queue: %s", e
@@ -125,10 +147,8 @@ class Scheduler:
         else:
             experiment_id, _, filename, _, well_id = queue_info
         # Get the experiment information from the experiment table
-        experiment_base = sql_utilities.select_experiment_information(experiment_id)
-        echem_experiment_base = sql_utilities.select_experiment_paramaters(
-            experiment_base
-        )
+        experiment_base = select_experiment_information(experiment_id)
+        echem_experiment_base = select_experiment_paramaters(experiment_base)
 
         # Finally get the well id and plate id for the experiment based on the well_status view
         echem_experiment_base.well_id = well_id
@@ -153,7 +173,7 @@ class Scheduler:
         try:
             execute_sql_command(
                 "UPDATE experiments SET ? = ? WHERE id = ?",
-                (column, getattr(experiment,column), experiment.experiment_id),
+                (column, getattr(experiment, column), experiment.experiment_id),
             )
         except sqlite3.Error as e:
             logger.error("Error occured while updating experiment information: %s", e)
@@ -213,7 +233,7 @@ class Scheduler:
 
         ## Add the experiment to experiments table
         try:
-            sql_utilities.insert_experiment(experiment)
+            insert_experiment(experiment)
         except sqlite3.Error as e:
             logger.error(
                 "Error occured while adding the experiment to experiments table: %s", e
@@ -223,7 +243,7 @@ class Scheduler:
 
         ## Add the experiment parameters to the experiment_parameters table
         try:
-            sql_utilities.insert_experiment_parameters(experiment)
+            insert_experiment_parameters(experiment)
         except sqlite3.Error as e:
             logger.error(
                 "Error occured while adding the experiment parameters to experiment_parameters table: %s",
@@ -285,9 +305,12 @@ class Scheduler:
 
                 ## Check if the experiment is for a specific plate, if not choose the current plate
                 if experiment.plate_id is None:
-                    experiment.plate_id, _, _ = sql_utilities.select_current_wellplate_info()
+                    experiment.plate_id, _, _ = select_current_wellplate_info()
                 ## Check if the well is available
-                if self.check_well_status(experiment.well_id, experiment.plate_id) != "new":
+                if (
+                    self.check_well_status(experiment.well_id, experiment.plate_id)
+                    != "new"
+                ):
                     # Find the next available well
                     target_well = self.choose_next_new_well(experiment.plate_id)
                     if target_well is None:
@@ -312,8 +335,8 @@ class Scheduler:
             # We do this so that the wellchecker is checking as the wells are allocated
             # The parameters are quite lengthly, so we will save those for a bulk entry
             try:
-                sql_utilities.insert_experiment(experiment)
-                sql_utilities.update_experiment_status(experiment, ExperimentStatus.QUEUED)
+                insert_experiment(experiment)
+                update_experiment_status(experiment, ExperimentStatus.QUEUED)
             except sqlite3.Error as e:
                 logger.error(
                     "Error occured while adding the experiment to experiments table: %s",
@@ -330,14 +353,14 @@ class Scheduler:
         ## Add the experiment to experiments table
         try:
             # Bulk insert the experiments that had wells available
-            #sql_utilities.insert_experiments(experiments)
+            # sql_utilities.insert_experiments(experiments)
             # Bulk set the status of the experiments that had wells available
             # sql_utilities.update_experiments_statuses(
             #     experiments, ExperimentStatus.QUEUED
             # )
 
             ## Bulk add the experiment parameters to the experiment_parameters table
-            sql_utilities.insert_experiments_parameters(experiments)
+            insert_experiments_parameters(experiments)
 
         except sqlite3.Error as e:
             logger.error(
@@ -381,12 +404,12 @@ class Scheduler:
 
         for result in results_lists:
             # Save the results to the database
-            sql_utilities.insert_experiment_result(result)
+            insert_experiment_result(result)
 
     def count_available_wells(self) -> int:
         """Return the number of wells available for experiments"""
         try:
-            available_wells = sql_utilities.count_wells_with_new_status()
+            available_wells = count_wells_with_new_status()
             return available_wells
         except sqlite3.Error as e:
             logger.error("Error occured while counting available wells: %s", e)
@@ -395,7 +418,7 @@ class Scheduler:
     def get_queue(self) -> pd.DataFrame:
         """Return the queue as a DataFrame"""
         try:
-            queue = sql_utilities.select_queue()
+            queue = select_queue()
             queue = pd.DataFrame(
                 queue, columns=["id", "priority", "process_type", "filename"]
             )
@@ -407,12 +430,12 @@ class Scheduler:
 
 def get_queue_length() -> int:
     """Get queue length"""
-    return sql_utilities.count_queue_length()
+    return count_queue_length()
 
 
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
-    return sql_utilities.select_next_experiment_id()
+    return select_next_experiment_id()
 
 
 ####################################################################################################
