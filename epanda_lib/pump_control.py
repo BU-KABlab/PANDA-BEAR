@@ -5,24 +5,24 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
 import logging
 import time
-from typing import Optional, Union
 from decimal import Decimal
-from .config.config import PATH_TO_SYSTEM_STATE, PATH_TO_LOGS
+from typing import Optional, Union
 
-from . import nesp_lib_local as nesp_lib
-from .nesp_lib_local.mock import Pump as MockNespLibPump
-from .correction_factors import reverse_correction_factor
-from .experiment_class import ExperimentResult
-from .mill_control import Mill, MockMill
-from .sartorius_local.driver import Scale
-from .sartorius_local.mock import Scale as MockScale
-from .sql_utilities import select_pipette_status, insert_pipette_status
 
+from epanda_lib import nesp_lib_local as nesp_lib
+from epanda_lib.config.config import PATH_TO_LOGS
+from epanda_lib.correction_factors import reverse_correction_factor
+from epanda_lib.experiment_class import ExperimentResult
+from epanda_lib.mill_control import Mill, MockMill
+from epanda_lib.nesp_lib_local.mock import Pump as MockNespLibPump
+from epanda_lib.pipette import Pipette
+from epanda_lib.sartorius_local.driver import Scale
+from epanda_lib.sartorius_local.mock import Scale as MockScale
+from epanda_lib.utilities import Coordinates, Instruments
+from epanda_lib.vessel import VesselLogger
+import epanda_lib.wellplate as wp
 # from slack_functions2 import SlackBot
 from .vials import StockVial, Vial2, WasteVial
-from .vessel import VesselLogger
-from .wellplate import Well
-from .utilities import Coordinates, Instruments
 
 pump_control_logger = logging.getLogger("e_panda")
 if not pump_control_logger.hasHandlers():
@@ -110,7 +110,7 @@ class Pump:
     def withdraw(
         self,
         volume: Decimal,
-        solution: Optional[Union[Well, StockVial, WasteVial]] = None,
+        solution: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
         rate: Decimal = None,
         weigh: bool = False,
         results: ExperimentResult = None,
@@ -158,7 +158,7 @@ class Pump:
                 results.pumping_record.append(pumprecord)
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
-            if isinstance(solution, (Vial2, Well)):
+            if isinstance(solution, (Vial2, wp.Well)):
                 if isinstance(solution.contents, dict):
                     # Calculate the ratio of the solution being withdrawn
                     content_ratio = {
@@ -201,8 +201,8 @@ class Pump:
     def infuse(
         self,
         volume_to_infuse: Decimal,
-        being_infused: Optional[Union[Well, StockVial, WasteVial]] = None,
-        infused_into: Optional[Union[Well, StockVial, WasteVial]] = None,
+        being_infused: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
+        infused_into: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
         rate: Decimal = Decimal(0.5),
         blowout_ul: Decimal = Decimal(0.0),
         weigh: bool = False,
@@ -531,153 +531,6 @@ def _mock_pump_testing_routine():
         assert mock_pump.pipette.volume_ml == 0
         # mock_pump.mix()
 
-
-class Pipette:
-    """Class for storing pipette information"""
-
-    def __init__(self, capacity_ul: Decimal = Decimal(0.0), pump: Pump = None):
-        self.capacity_ul: Decimal = capacity_ul
-        self.capacity_ml: Decimal = (
-            capacity_ul / 1000
-        )  # convert capacity to ml, Decimal division by int is OK
-        self._volume_ul: Decimal = Decimal(0.0)
-        self._volume_ml: Decimal = Decimal(0.0)
-        self.contents = {}
-        self.state_file = PATH_TO_SYSTEM_STATE / "pipette_state.csv"
-        self.read_state_file()
-        self.log_contents()
-        self.pump = pump
-
-    def set_capacity(self, capacity_ul: Decimal) -> None:
-        """Set the capacity of the pipette in ul"""
-        if capacity_ul < 0:
-            raise ValueError("Capacity must be non-negative.")
-        self.capacity_ul = capacity_ul
-        self.capacity_ml = capacity_ul / 1000.0
-        self.update_state_file()
-
-    def update_contents(self, solution: str, volume: Decimal) -> None:
-        """Update the contents of the pipette"""
-
-        self.contents[solution] = self.contents.get(solution, 0) + volume
-        self.log_contents()
-        
-
-    @property
-    def volume(self) -> Decimal:
-        """Get the volume of the pipette in ul"""
-        return self._volume_ul
-
-    @volume.setter
-    def volume(self, volume: Decimal) -> None:
-        """Set the volume of the pipette in ul"""
-        if volume < 0:
-            raise ValueError("Volume must be non-negative.")
-        self._volume_ul = round(volume, 4)
-        self._volume_ml = round(volume / 1000.0, 4)
-        self.log_contents()
-
-    @property
-    def volume_ml(self) -> Decimal:
-        """Get the volume of the pipette in ml"""
-        return self._volume_ml
-
-    @volume_ml.setter
-    def volume_ml(self, volume: Decimal) -> None:
-        """Set the volume of the pipette in ml"""
-        if volume < 0:
-            raise ValueError("Volume must be non-negative.")
-        self._volume_ml = volume
-        self._volume_ul = volume * 1000.0
-
-        self.log_contents()
-
-    def liquid_volume(self) -> Decimal:
-        """Get the volume of liquid in the pipette in ul
-
-        Sum the volume of the pipette contents
-
-        Returns:
-            float: The volume of liquid in the pipette in ul
-        """
-        return sum(self.contents.values())
-
-    def reset_contents(self) -> None:
-        """Reset the contents of the pipette"""
-        self.contents = {}
-        self._volume_ul = Decimal(0)
-        self._volume_ml = Decimal(0)
-        self.log_contents()
-
-    def log_contents(self) -> None:
-        """Log the contents of the pipette"""
-        vessel_logger.info(
-            "%s&%s&%s",
-            "pipette",
-            self._volume_ul,
-            self.contents,
-        )
-        self.update_state_file()
-
-    # def update_state_file(self) -> None:
-    #     """Update the state file for the pipette"""
-    #     file_name = self.state_file
-    #     with open(file_name, "w", encoding="utf-8") as file:
-    #         file.write(f"capacity_ul,{self.capacity_ul}\n")
-    #         file.write(f"capacity_ml,{self.capacity_ml}\n")
-    #         file.write(f"volume_ul,{self._volume_ul}\n")
-    #         file.write(f"volume_ml,{self.volume_ml}\n")
-    #         file.write("contents\n")
-    #         for solution, volume in self.contents.items():
-    #             file.write(f"{solution},{volume}\n")
-
-    def update_state_file(self) -> None:
-        """Update the state file for the pipette"""
-        insert_pipette_status(self)
-
-    # def read_state_file(self) -> None:
-    #     """Read the state file for the pipette.
-    #     If the file does not exist, it will be created, and the pipette will be reset to empty.
-    #     If the file exists but is empty, the pipette will be reset to empty.
-    #     """
-    #     file_name = self.state_file
-    #     if file_name.exists():
-    #         with open(file_name, "r", encoding="utf-8") as file:
-    #             lines = file.readlines()
-    #             if len(lines) > 0:
-    #                 for line in lines:
-    #                     if "capacity_ul" in line:
-    #                         self.capacity_ul = Decimal(line.split(",")[1])
-    #                         self.capacity_ml = self.capacity_ul / 1000.0
-    #                     elif "volume_ul" in line:
-    #                         self._volume_ul = Decimal(line.split(",")[1])
-    #                     elif "volume_ml" in line:
-    #                         self._volume_ml = Decimal(line.split(",")[1])
-    #                     elif "contents" in line:
-    #                         self.contents = {}
-    #                     else:
-    #                         solution, volume = line.split(",")
-    #                         self.contents[solution] = Decimal(volume)
-
-    #     else:
-    #         self.reset_contents()
-
-    def read_state_file(self) -> None:
-        """
-        Select the current state of the pipette from the db
-        """
-        pipette_status:Pipette = select_pipette_status()
-        if pipette_status is not None:
-            self.capacity_ul = pipette_status.capacity_ul
-            self.capacity_ml = self.capacity_ml
-            self._volume_ul = pipette_status.volume
-            self._volume_ml = pipette_status.volume_ml
-            self.contents = pipette_status.contents
-        else:
-            self.reset_contents()
-
-    def __str__(self):
-        return f"Pipette has {self._volume_ul} ul of liquid"
 
 
 if __name__ == "__main__":
