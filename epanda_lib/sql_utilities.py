@@ -2243,7 +2243,8 @@ def get_current_pin() -> int:
         )
     if result == []:
         return None
-    return int(result[0][0])
+    result = str(result[0][0]).replace(" ", "")
+    return int(result)
 
 def select_system_status(look_back:int = 1) -> SystemState:
     """

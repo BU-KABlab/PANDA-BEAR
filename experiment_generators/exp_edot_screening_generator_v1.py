@@ -4,7 +4,7 @@ import pandas as pd
 
 from epanda_lib import experiment_class, wellplate
 from epanda_lib.config.config import read_testing_config, WELL_HX
-from epanda_lib.sql_utilities import get_current_pin
+from epanda_lib.sql_tools.sql_system_state import get_current_pin
 from epanda_lib.scheduler import Scheduler
 
 CURRENT_PIN = get_current_pin()
