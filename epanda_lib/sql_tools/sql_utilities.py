@@ -1,6 +1,6 @@
 import logging
 import sqlite3
-
+from decimal import Decimal
 from epanda_lib.config.config import PATH_TO_LOGS, SQL_DB_PATH, LOCAL_REPO_PATH
 
 
@@ -43,8 +43,10 @@ def execute_sql_command(sql_command: str, parameters: tuple = None, test:bool = 
         # Execute the SQL command
         if parameters:
             if isinstance(parameters[0], tuple):
+                parameters = convert_decimals(parameters)
                 cursor.executemany(sql_command, parameters)
             else:
+                parameters = convert_decimals(parameters)
                 cursor.execute(sql_command, parameters)
         else:
             cursor.execute(sql_command)
@@ -81,8 +83,13 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None, te
         conn = sqlite3.connect(LOCAL_REPO_PATH / "epanda_test.db")
     else:
         conn = sqlite3.connect(SQL_DB_PATH)
+    
+    # Convert Decimal to float
+    parameters = convert_decimals(parameters)
 
-    conn.isolation_level = None  # Manually control transactions
+    # Manually control transactions
+    conn.isolation_level = None  
+    
     cursor = conn.cursor()
 
     # Start a new transaction
@@ -119,4 +126,22 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None, te
     finally:
         # Close the connection
         conn.close()
-# endregion
+
+def convert_decimals(parameters):
+    new_parameters = []
+    if isinstance(parameters[0], tuple):
+        for parameter in parameters:
+            new_parameter = []
+            for item in parameter:
+                if isinstance(item, Decimal):
+                    new_parameter.append(float(item))
+                else:
+                    new_parameter.append(item)
+            new_parameters.append(tuple(new_parameter))
+    else:
+        for item in parameters:
+            if isinstance(item, Decimal):
+                new_parameters.append(float(item))
+            else:
+                new_parameters.append(item)
+    return new_parameters
