@@ -160,6 +160,16 @@ def insert_ml_training_data(entry: pd.DataFrame) -> None:
     parameters = entry.values.tolist()
     execute_sql_command_no_return(command, parameters)
 
+def delete_training_data(experiment_id: int) -> None:
+    """
+    Delete training data from the ml_pedot_training_data table.
+
+    Args:
+        experiment_id (int): The experiment ID.
+    """
+    command = "DELETE FROM ml_pedot_training_data WHERE experiment_id = ?"
+    execute_sql_command_no_return(command, (experiment_id,))
+
 def model_iteration() -> int:
     """
     Get the current model iteration.
