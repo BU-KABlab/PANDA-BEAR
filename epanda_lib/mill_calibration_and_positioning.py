@@ -19,8 +19,7 @@ import os
 import platform
 from typing import Sequence
 
-from epanda_lib import sql_utilities
-from epanda_lib.experiment_class import ExperimentResultsRecord
+from epanda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_result
 
 from .config.config import read_testing_config
 from .e_panda import capture_new_image, image_filepath_generator
@@ -410,7 +409,7 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
             pass
         else:
             # Save the image path to the database
-            sql_utilities.insert_experiment_result(
+            insert_experiment_result(
                 ExperimentResultsRecord(
                     experiment_id=experiment_id,
                     result_type="image",
