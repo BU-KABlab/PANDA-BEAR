@@ -54,7 +54,7 @@ def insert_pipette_status(
     """
     execute_sql_command_no_return(
         """
-        INSERT INTO pipette_status (
+        INSERT INTO pipette (
             capacity_ul,
             capacity_ml,
             volume_ul,
