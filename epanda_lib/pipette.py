@@ -1,39 +1,45 @@
-
-from decimal import Decimal
+from decimal import Decimal, getcontext
 import json
 
 from epanda_lib.vessel import logger as vessel_logger
-from epanda_lib.sql_tools.sql_pipette import insert_pipette_status, select_pipette_status
+from epanda_lib.sql_tools.sql_pipette import (
+    insert_pipette_status,
+    select_pipette_status,
+)
+
+getcontext().prec = 6
+
 
 class Pipette:
     """Class for storing pipette information"""
 
     def __init__(self, capacity_ul: Decimal = Decimal(0.0)):
-        self.capacity_ul: Decimal = capacity_ul
-        self.capacity_ml: Decimal = (
-            capacity_ul / 1000
-        )  # convert capacity to ml, Decimal division by int is OK
-        self._volume_ul: Decimal = Decimal(0.0)
-        self._volume_ml: Decimal = Decimal(0.0)
-        self.contents = {}
+        """Initialize the pipette"""
+        if capacity_ul is not None and capacity_ul > 0:
+            self.capacity_ul: Decimal = capacity_ul
+            self.capacity_ml: Decimal = capacity_ul / Decimal(
+                1000
+            )  # convert capacity to ml, Decimal division by int is OK
+            self._volume_ul: Decimal = Decimal(0.0)
+            self._volume_ml: Decimal = Decimal(0.0)
+            self.contents = {}
         # self.state_file = PATH_TO_SYSTEM_STATE / "pipette_state.csv"
-        self.read_state_file()
+        else:
+            self.read_state_file()
         self.log_contents()
 
     def set_capacity(self, capacity_ul: Decimal) -> None:
         """Set the capacity of the pipette in ul"""
         if capacity_ul < 0:
             raise ValueError("Capacity must be non-negative.")
-        self.capacity_ul = capacity_ul
-        self.capacity_ml = capacity_ul / 1000.0
+        self.capacity_ul = Decimal(capacity_ul)
+        self.capacity_ml = capacity_ul / Decimal(1000)
         self.update_state_file()
 
-    def update_contents(self, solution: str, volume: Decimal) -> None:
+    def update_contents(self, solution: str, volume_change: Decimal) -> None:
         """Update the contents of the pipette"""
-
-        self.contents[solution] = self.contents.get(solution, 0) + volume
+        self.contents[solution] = self.contents.get(solution, 0) + volume_change
         self.log_contents()
-        
 
     @property
     def volume(self) -> Decimal:
@@ -45,8 +51,8 @@ class Pipette:
         """Set the volume of the pipette in ul"""
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
-        self._volume_ul = round(volume, 4)
-        self._volume_ml = round(volume / 1000.0, 4)
+        self._volume_ul = volume
+        self._volume_ml = volume / Decimal(1000)
         self.log_contents()
 
     @property
@@ -60,7 +66,7 @@ class Pipette:
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
         self._volume_ml = volume
-        self._volume_ul = volume * 1000.0
+        self._volume_ul = volume * Decimal(1000)
 
         self.log_contents()
 
@@ -110,7 +116,7 @@ class Pipette:
             self.capacity_ml,
             self._volume_ul,
             self._volume_ml,
-            json.dumps(self.contents),
+            json.dumps(self.contents, default=decimal_default),
         )
 
     # def read_state_file(self) -> None:
@@ -159,12 +165,36 @@ class Pipette:
 
 
 def get_pieptte_status() -> Pipette:
-    """Get the status of the pipette"""  
+    """Get the status of the pipette"""
     result = select_pipette_status()
-    pipette_status = Pipette()
+    if result is None:
+        return None
+    pipette_status = PipetteStatus(Decimal(0), Decimal(0), Decimal(0), Decimal(0), {})
     pipette_status.capacity_ul = Decimal(result[0])
     pipette_status.capacity_ml = Decimal(result[1])
     pipette_status.volume = Decimal(result[2])
     pipette_status.volume_ml = Decimal(result[3])
-    pipette_status.contents = json.loads(result[4])
+    pipette_status.contents = json.loads(result[4]) if result[4] is not None else {}
     return pipette_status
+
+
+class PipetteStatus:
+    def __init__(
+        self,
+        capacity_ul: Decimal,
+        capacity_ml: Decimal,
+        volume: Decimal,
+        volume_ml: Decimal,
+        contents: dict,
+    ):
+        self.capacity_ul = capacity_ul
+        self.capacity_ml = capacity_ml
+        self.volume = volume
+        self.volume_ml = volume_ml
+        self.contents = contents
+
+
+def decimal_default(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError
