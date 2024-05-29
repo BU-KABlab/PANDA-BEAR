@@ -24,7 +24,7 @@ def pedot_generator(
             well_id="A1",  # Default to A1, let the program decide where else to put it
             well_type_number=4,
             experiment_name=experiment_name,
-            pin=CURRENT_PIN,
+            pin=str(CURRENT_PIN),
             project_id=PROJECT_ID,
             project_campaign_id=campaign_id,
             solutions={"edot": 120, "liclo4": 0, "rinse": 120},
