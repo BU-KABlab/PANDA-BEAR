@@ -49,10 +49,10 @@ class VesselCoordinates:
         z_bottom: Decimal = None,
     ) -> None:
         """Initializes a new instance of the Coordinates class."""
-        self.x = x
-        self.y = y
-        self.z_top = z_top
-        self.z_bottom = z_bottom
+        self.x = Decimal(x)
+        self.y = Decimal(y)
+        self.z_top = Decimal(z_top)
+        self.z_bottom = Decimal(z_bottom) if z_bottom is not None else Decimal(0)
 
     def __str__(self) -> str:
         """Returns a string representation of the coordinates."""
@@ -69,6 +69,15 @@ class VesselCoordinates:
             "y": self.y,
             "z_top": self.z_top,
             "z_bottom": self.z_bottom,
+        }
+
+    def standard_dict(self) -> dict:
+        """Returns a dictionary representation of the coordinates with only integers and floats."""
+        return {
+            "x": round(float(self.x),6),
+            "y": round(float(self.y),6),
+            "z_top": round(float(self.z_top),6),
+            "z_bottom": round(float(self.z_bottom),6),
         }
 
     def __getitem__(self, key: str) -> Decimal:
@@ -164,6 +173,7 @@ class Vessel:
 
     def update_volume(self, added_volume: Decimal) -> None:
         """Updates the volume of the vessel by adding the specified volume."""
+        added_volume = Decimal(str(added_volume))
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         if self.volume + added_volume < Decimal(0):
