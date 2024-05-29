@@ -6,7 +6,7 @@ Or starting the ePANDA either with or without mock instruments.
 """
 
 # pylint: disable=broad-exception-caught, protected-access
-
+import decimal
 import os
 import sys
 import time
@@ -28,7 +28,6 @@ from epanda_lib import (
     wellplate,
 )
 from epanda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
-from epanda_lib.config.config import STOCK_STATUS, WASTE_STATUS
 from epanda_lib.config.config_tools import read_testing_config, write_testing_config
 from epanda_lib.sql_tools import (
     sql_generator_utilities,
@@ -38,6 +37,7 @@ from epanda_lib.sql_tools import (
 )
 from epanda_lib.sql_tools import sql_ml_functions
 
+decimal.getcontext().prec = 6
 
 def run_epanda_with_ml():
     """Runs ePANDA."""
@@ -212,8 +212,8 @@ def calibrate_mill():
     mill_calibration_and_positioning.calibrate_mill(
         mill,
         wellplate.Wellplate(),
-        vials.read_vials(STOCK_STATUS),
-        vials.read_vials(WASTE_STATUS),
+        vials.read_vials()[0],
+        vials.read_vials()[1],
     )
 
 
@@ -300,8 +300,10 @@ def generate_experiment_from_existing_data():
         # Delete the contour plot files, and the model based on the model ID
         contour_plot.with_suffix(".png").unlink()
         contour_plot.with_suffix(".svg").unlink()
-        model_name = Path(
-            pedot_analysis.ml_file_paths.model_base_path).name + f"_{output.model_id}"
+        model_name = (
+            Path(pedot_analysis.ml_file_paths.model_base_path).name
+            + f"_{output.model_id}"
+        )
         model_path = Path(pedot_analysis.ml_file_paths.model_base_path)
         model_path = model_path.with_name(model_name).with_suffix(".pth")
         model_path.unlink()
@@ -345,6 +347,16 @@ def resume_epanda():
     )
 
 
+def remove_training_data():
+    """Removes the training data associated with a given experiment_id from the database."""
+    experiment_id = int(
+        input("Enter the experiment ID to remove the training data for: ")
+        .strip()
+        .lower()
+    )
+    sql_ml_functions.delete_training_data(experiment_id)
+
+
 menu_options = {
     "0": run_epanda_with_ml,
     "1": run_epanda_without_ml,
@@ -356,6 +368,7 @@ menu_options = {
     "2.2": remove_experiment_from_database,
     "2.3": print_wellplate_info,
     "2.4": print_queue_info,
+    "2.5": remove_training_data,
     "3": reset_vials_stock,
     "4": reset_vials_waste,
     "5": input_new_vial_values_stock,
