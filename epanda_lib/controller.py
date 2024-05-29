@@ -19,45 +19,34 @@ import time
 from pathlib import Path
 from typing import Sequence
 
-from slack_sdk.errors import (
-    BotUserAccessError,
-    SlackApiError,
-    SlackClientConfigurationError,
-    SlackClientError,
-    SlackClientNotConnectedError,
-    SlackObjectFormationError,
-    SlackRequestError,
-    SlackTokenRotationError,
-)
+from slack_sdk.errors import (BotUserAccessError, SlackApiError,
+                              SlackClientConfigurationError, SlackClientError,
+                              SlackClientNotConnectedError,
+                              SlackObjectFormationError, SlackRequestError,
+                              SlackTokenRotationError)
 
 from . import e_panda
-from .analyzer.pedot import pedot_analyzer, run_ml_model as pedot_ml_model
-from .config.config import RANDOM_FLAG, STOCK_STATUS, WASTE_STATUS, read_testing_config
+from .analyzer.pedot import pedot_analyzer
+from .analyzer.pedot import run_ml_model as pedot_ml_model
+from .config.config import RANDOM_FLAG, read_testing_config
 from .e_panda import CAFailure, CVFailure, DepositionFailure, OCPFailure
-from .errors import (
-    ProtocolNotFoundError,
-    ShutDownCommand,
-    WellImportError,
-    NoExperimentFromModel,
-)
-from .experiment_class import (
-    ExperimentBase,
-    ExperimentResult,
-    ExperimentStatus,
-    select_specific_result,
-)
+from .errors import (NoExperimentFromModel, ProtocolNotFoundError,
+                     ShutDownCommand, WellImportError)
+from .experiment_class import (ExperimentBase, ExperimentResult,
+                               ExperimentStatus, select_specific_result)
+from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
 from .obs_controls import OBSController
-from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
-from .pump_control import MockPump, Pump
+from .pump_control import MockPump, SyringePump
 from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
+from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .utilities import SystemState
-from .instrument_toolkit import Toolkit
-from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_files
+from .vials import (StockVial, Vial2, WasteVial, get_current_vials,
+                    update_vial_state_files)
 from .wellplate import Wellplate
 
 # set up slack globally so that it can be used in the main function and others
@@ -126,7 +115,7 @@ def main(
             mill=toolkit.mill,
         )
         ## Update the system state with new vial and wellplate information
-        update_vial_state_files(stock_vials, waste_vials, STOCK_STATUS, WASTE_STATUS)
+        update_vial_state_files(stock_vials, waste_vials, 'STOCK_STATUS', 'WASTE_STATUS')
 
         # experiemnt loop
         while True:
@@ -314,7 +303,7 @@ def main(
             ## Update the system state with new vial and wellplate information
             toolkit.pump.pipette.reset_contents()
             update_vial_state_files(
-                stock_vials, waste_vials, STOCK_STATUS, WASTE_STATUS
+                stock_vials, waste_vials, 'STOCK_STATUS', 'WASTE_STATUS'
             )
             if toolkit.pump.pipette.volume > 0:
                 # assume unreal volume, not actually solution, set to 0
@@ -419,8 +408,8 @@ def establish_system_state() -> (
         wellplate (wellplate_module.Wells): wellplate object
     """
     slack = SlackBot()
-    stock_vials = read_vials(STOCK_STATUS)
-    waste_vials = read_vials(WASTE_STATUS)
+    stock_vials = get_current_vials("stock")
+    waste_vials = get_current_vials("waste")
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = Wellplate()
@@ -610,7 +599,7 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
     mill.connect_to_mill()
     mill.homing_sequence()
     scale = Scale(address="COM6")
-    pump = Pump(mill=mill, scale=scale)
+    pump = SyringePump(mill=mill, scale=scale)
     # pstat_connected = echem.pstatconnect()
     instruments = Toolkit(
         mill=mill,
