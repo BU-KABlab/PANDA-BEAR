@@ -34,9 +34,10 @@ from epanda_lib.sql_tools import (
     sql_utilities,
 )
 from epanda_lib.wellplate import Well, Wellplate
+from epanda_lib import vials
 
-STOCK_STATUS = config.STOCK_STATUS
-WASTE_STATUS = config.WASTE_STATUS
+# STOCK_STATUS = config.STOCK_STATUS
+# WASTE_STATUS = config.WASTE_STATUS
 
 
 # region Slack Tickets
@@ -538,15 +539,23 @@ class SlackBot:
     def __vial_status(self, channel_id):
         """Sends the vial status to the user."""
         # Get vial status
-        ## Load the vial status json file
-        stock_vials = pd.read_json(STOCK_STATUS)
-        ## Filter for just the vial position and volume
+        # ## Load the vial status json file
+        # stock_vials = pd.read_json(STOCK_STATUS)
+        # ## Filter for just the vial position and volume
+        # stock_vials = stock_vials[["position", "volume", "name", "contents"]]
+        # # Drop any vials that have null values
+        # stock_vials = stock_vials.dropna()
+        # ## set position to be a string and volume to be a float
+        # stock_vials["position"] = stock_vials["position"].astype(str)
+        # stock_vials["volume"] = stock_vials["volume"].astype(float)
+
+        stock_vials = vials.get_current_vials('stock') # returns a list of Vial objects 
+        stock_vials = pd.DataFrame([vial.to_dict() for vial in stock_vials])
         stock_vials = stock_vials[["position", "volume", "name", "contents"]]
-        # Drop any vials that have null values
         stock_vials = stock_vials.dropna()
-        ## set position to be a string and volume to be a float
         stock_vials["position"] = stock_vials["position"].astype(str)
         stock_vials["volume"] = stock_vials["volume"].astype(float)
+
         ## Create a bar graph with volume on the x-axis and position on the y-axis
         ## Send the graph to slack
         plt.bar(
@@ -576,7 +585,9 @@ class SlackBot:
         plt.close()
 
         # And the same for the waste vials
-        waste_vials = pd.read_json(WASTE_STATUS)
+        # waste_vials = pd.read_json(WASTE_STATUS)
+        waste_vials = vials.get_current_vials('waste')
+        waste_vials = pd.DataFrame([vial.to_dict() for vial in waste_vials])
         waste_vials = waste_vials[["position", "volume", "name"]]
         # Drop any vials that have null values
         waste_vials = waste_vials.dropna()
@@ -657,44 +668,48 @@ class SlackBot:
         vial_color = []
         vial_marker = []  # a circle for these circular vials
         ## Vials
-        with open(WASTE_STATUS, "r", encoding="utf-8") as stock:
-            data = json.load(stock)
-            for vial in data:
-                vial_x.append(vial["vial_coordinates"]["x"])
-                vial_y.append(vial["vial_coordinates"]["y"])
-                volume = vial["volume"]
-                capacity = vial["capacity"]
-                if vial["name"] is None or vial["name"] == "":
-                    vial_color.append("black")
-                    vial_marker.append("x")
-                elif volume / capacity > 0.75:
-                    vial_color.append("red")
-                    vial_marker.append("o")
-                elif volume / capacity > 0.50:
-                    vial_color.append("yellow")
-                    vial_marker.append("o")
-                else:
-                    vial_color.append("green")
-                    vial_marker.append("o")
-        with open(STOCK_STATUS, "r", encoding="utf-8") as stock:
-            data = json.load(stock)
-            for vial in data:
-                vial_x.append(vial["vial_coordinates"]["x"])
-                vial_y.append(vial["vial_coordinates"]["y"])
-                volume = vial["volume"]
-                capacity = vial["capacity"]
-                if vial["name"] is None or vial["name"] == "":
-                    vial_color.append("black")
-                    vial_marker.append("x")
-                elif volume / capacity > 0.5:
-                    vial_color.append("green")
-                    vial_marker.append("o")
-                elif volume / capacity > 0.25:
-                    vial_color.append("yellow")
-                    vial_marker.append("o")
-                else:
-                    vial_color.append("red")
-                    vial_marker.append("o")
+        # with open(WASTE_STATUS, "r", encoding="utf-8") as stock:
+        #     data = json.load(stock)
+        data = vials.get_current_vials('waste')
+        for vial in data:
+            vial = vial.to_dict()
+            vial_x.append(vial["vial_coordinates"]["x"])
+            vial_y.append(vial["vial_coordinates"]["y"])
+            volume = vial["volume"]
+            capacity = vial["capacity"]
+            if vial["name"] is None or vial["name"] == "":
+                vial_color.append("black")
+                vial_marker.append("x")
+            elif volume / capacity > 0.75:
+                vial_color.append("red")
+                vial_marker.append("o")
+            elif volume / capacity > 0.50:
+                vial_color.append("yellow")
+                vial_marker.append("o")
+            else:
+                vial_color.append("green")
+                vial_marker.append("o")
+        # with open(STOCK_STATUS, "r", encoding="utf-8") as stock:
+        #     data = json.load(stock)
+        data = vials.get_current_vials('stock')
+        for vial in data:
+            vial = vial.to_dict()
+            vial_x.append(vial["vial_coordinates"]["x"])
+            vial_y.append(vial["vial_coordinates"]["y"])
+            volume = vial["volume"]
+            capacity = vial["capacity"]
+            if vial["name"] is None or vial["name"] == "":
+                vial_color.append("black")
+                vial_marker.append("x")
+            elif volume / capacity > 0.5:
+                vial_color.append("green")
+                vial_marker.append("o")
+            elif volume / capacity > 0.25:
+                vial_color.append("yellow")
+                vial_marker.append("o")
+            else:
+                vial_color.append("red")
+                vial_marker.append("o")
 
         # rinse_vial = {"x": -411, "y": -30}
         # vial_x.append(rinse_vial["x"])

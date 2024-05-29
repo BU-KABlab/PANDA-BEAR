@@ -3,16 +3,18 @@ Vial class for creating vial objects with their position and contents
 """
 
 # pylint: disable=line-too-long
-import json
+import ast
+# import json
 import logging
 import math
-from decimal import Decimal
-from pathlib import Path
-from typing import Sequence, Union
+from decimal import Decimal, getcontext
+# from pathlib import Path
+from typing import Sequence, Union, List, Tuple
 
-from .config.config import STOCK_STATUS, WASTE_STATUS
-from .vessel import (OverDraftException, OverFillException, Vessel,
-                     VesselCoordinates)
+from requests import get
+
+from .sql_tools.sql_utilities import execute_sql_command#, convert_decimals
+from .vessel import OverDraftException, OverFillException, Vessel, VesselCoordinates
 
 # set up A logger for the vials module
 # logger = logging.getLogger(__name__)
@@ -22,6 +24,8 @@ from .vessel import (OverDraftException, OverFillException, Vessel,
 # system_handler.setFormatter(formatter)
 # logger.addHandler(system_handler)
 vial_logger = logging.getLogger("e_panda")
+getcontext().prec = 6
+
 
 class Vial2(Vessel):
     """
@@ -72,8 +76,8 @@ class Vial2(Vessel):
         vial_coordinates: Union[VesselCoordinates],
         radius: Decimal,
         height: Decimal,
-        contamination: int,
-        contents,
+        contamination: int = 0,
+        contents=None,
         viscosity_cp: Decimal = Decimal(0.0),
         depth: Decimal = Decimal(0),
         concentration: Decimal = Decimal(0.0),
@@ -104,13 +108,29 @@ class Vial2(Vessel):
         self.position = position
         self.radius = radius
         self.height = height
-        self.coordinates.z_top = self.coordinates.z_bottom + height
+        self.coordinates.z_top = Decimal(self.coordinates.z_bottom) + Decimal(
+            self.height
+        )
         self.base = round(math.pi * math.pow(self.radius, 2.0), 6)
         self.depth = self.calculate_depth()
         self.contamination = contamination
         self.category = category
         self.viscosity_cp = viscosity_cp
         self.concentration = concentration
+
+        # loop through the attributes and any of type Decimal should be quantized to 6 decimal places
+        for key, value in self.__dict__.items():
+            if isinstance(value, Decimal):
+                if (
+                    value == value.to_integral_value()
+                ):  # Check if the value is an integer
+                    setattr(self, key, value)
+                else:
+                    precision = len(str(value).split(".")[1])
+                    getcontext().prec = precision
+                    d = Decimal(str(value))
+                    setattr(self, key, d.__round__(6))
+                    getcontext().prec = 6
 
     def calculate_depth(self) -> Decimal:
         """
@@ -120,7 +140,7 @@ class Vial2(Vessel):
             Decimal: The current depth of the solution in the vial.
         """
         radius_mm = self.radius
-        area_mm2 = Decimal(math.pi) * Decimal(radius_mm)**2
+        area_mm2 = Decimal(math.pi) * Decimal(radius_mm) ** 2
         volume_mm3 = self.volume
         height = round(volume_mm3 / area_mm2, 4)
         depth = height + self.coordinates.z_bottom - 2
@@ -139,6 +159,7 @@ class Vial2(Vessel):
         Returns:
             bool: True if the volume to be added is within the vial's capacity, False otherwise.
         """
+        volume_to_add = Decimal(str(volume_to_add))
         if self.volume + volume_to_add > self.capacity:
             raise OverFillException(
                 self.name, self.volume, volume_to_add, self.capacity
@@ -159,31 +180,101 @@ class Vial2(Vessel):
         """
         super().update_volume(added_volume)
         self.depth = self.calculate_depth()
-        self.write_volume_to_disk()
+        self.update_contamination()
+        # self.write_volume_to_disk()
+        self.insert_updated_vial_in_db()
         return self
 
-    def write_volume_to_disk(self) -> None: #TODO replace with using the db
+    def write_volume_to_disk(self) -> None:  # TODO replace with using the db
         """
         Writes the current volume and contamination of the vial to the appropriate file.
         """
-        vial_logger.info("Writing %s volume to vial file...", self.name)
-        vial_file_path = STOCK_STATUS if self.category == 0 else WASTE_STATUS
+        # vial_logger.info("Writing %s volume to vial file...", self.name)
+        # vial_file_path = STOCK_STATUS if self.category == 0 else WASTE_STATUS
 
-        with open(vial_file_path, "r", encoding="UTF-8") as file:
-            solutions = json.load(file)
+        # with open(vial_file_path, "r", encoding="UTF-8") as file:
+        #     solutions = json.load(file)
 
-        for solution in solutions:
-            if solution["name"] == self.name and solution["position"] == self.position:
-                solution["volume"] = self.volume
-                solution["contamination"] = self.contamination
-                solution["depth"] = self.depth
-                # solution["contents"] = self.contents
-                break
+        # for solution in solutions:
+        #     if solution["name"] == self.name and solution["position"] == self.position:
+        #         solution["volume"] = self.volume
+        #         solution["contamination"] = self.contamination
+        #         solution["depth"] = self.depth
+        #         # solution["contents"] = self.contents
+        #         break
 
-        with open(vial_file_path, "w", encoding="UTF-8") as file:
-            json.dump(solutions, file, indent=4)
+        # with open(vial_file_path, "w", encoding="UTF-8") as file:
+        #     json.dump(solutions, file, indent=4)
+        self.insert_updated_vial_in_db()
 
-    def update_contamination(self, new_contamination: int = None) -> None: # Update with a db method
+    def insert_updated_vial_in_db(self) -> None:  # Update with a db method
+        """
+        Inserts a new vial record into the 'vials' table in the db. This will be used by
+        the vial_status view as the most recent vial status.
+        """
+        try:
+            execute_sql_command(
+                """
+                INSERT INTO vials (
+                    name,
+                    category,
+                    position,
+                    volume,
+                    capacity,
+                    density,
+                    vial_coordinates,
+                    radius,
+                    height,
+                    contamination,
+                    contents,
+                    viscosity_cp,
+                    depth,
+                    concentration
+                )
+                VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                )
+                """,
+                (
+                    self.name,
+                    self.category,
+                    self.position,
+                    self.volume,
+                    self.capacity,
+                    self.density,
+                    str(self.coordinates.standard_dict()),
+                    self.radius,
+                    self.height,
+                    self.contamination,
+                    str(self.contents),
+                    self.viscosity_cp,
+                    self.depth,
+                    self.concentration,
+                ),
+            )
+        except Exception as e:
+            vial_logger.error(
+                "Error occurred while updating vial status in the db: %s", e
+            )
+            vial_logger.error("Continuing....")
+            vial_logger.exception(e)
+
+    def update_contamination(
+        self, new_contamination: int = None
+    ) -> None:  # Update with a db method
         """
         Updates the contamination count of the vial.
 
@@ -194,10 +285,32 @@ class Vial2(Vessel):
             self.contamination = new_contamination
         else:
             self.contamination += 1
+
+        # Update the db
+        self.insert_updated_vial_in_db()
         return self
 
     def __str__(self) -> str:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
+
+    def to_dict(self) -> dict:
+        """Return the vial as a dictionary"""
+        return {
+            "name": self.name,
+            "category": self.category,
+            "position": self.position,
+            "volume": self.volume,
+            "capacity": self.capacity,
+            "density": self.density,
+            "vial_coordinates": self.coordinates,
+            "radius": self.radius,
+            "height": self.height,
+            "contamination": self.contamination,
+            "contents": self.contents,
+            "viscosity_cp": self.viscosity_cp,
+            "depth": self.depth,
+            "concentration": self.concentration,
+        }
 
 
 class StockVial(Vial2):
@@ -368,132 +481,283 @@ class WasteVial(Vial2):
         )
 
         # Update the file
-        update_vial_state_file([self], WASTE_STATUS)
+        self.insert_updated_vial_in_db()
         self.log_contents()
 
         return self
 
 
-def read_vials(filename) -> Sequence[Union[StockVial, WasteVial]]:
+def get_current_vials(group: str = None) -> List[dict]:
+    """
+    Get the current vials from the db
+
+    Args:
+        group (str, optional): The group of vials to get. Either "stock" or "waste". Defaults to None.
+
+    """
+    vial_parameters = []
+    try:
+        vial_parameters = execute_sql_command(
+            """
+            SELECT
+                name,
+                category,
+                position,
+                volume,
+                capacity,
+                density,
+                vial_coordinates,
+                radius,
+                height,
+                contamination,
+                contents,
+                viscosity_cp 
+            FROM vial_status
+            """
+        )
+    except Exception as e:
+        vial_logger.error("Error occurred while reading vials from the db: %s", e)
+        vial_logger.error("Continuing with empty vial list....")
+        vial_logger.exception(e)
+
+    vial_parameters_copy = list(vial_parameters)  # Convert the tuple to a list
+    vial_parameters = []
+    for vial in vial_parameters_copy:
+        coordinate_string = ast.literal_eval(vial[6])
+        vial_dict = {
+            "name": vial[0],
+            "category": vial[1],
+            "position": vial[2],
+            "volume": Decimal(round(vial[3], 6)),
+            "capacity": Decimal(round(vial[4], 6)),
+            "density": Decimal(round(vial[5], 6)),
+            "vial_coordinates": VesselCoordinates(**coordinate_string),
+            "radius": Decimal(round(vial[7], 6)),
+            "height": Decimal(round(vial[8], 6)),
+            "contamination": Decimal(round(vial[9], 6)),
+            "contents": vial[10],
+            "viscosity_cp": Decimal(round(vial[11], 6)),
+        }
+        # vial = Vial2(**vial_dict)
+        if group is not None:  # Filter by group
+            if vial_dict["category"] == get_vial_category(group):
+                vial_parameters.append(vial_dict)
+
+    return vial_parameters
+
+def get_vial_category(group_name: str) -> int:
+    """Get the category of the vial"""
+    if group_name.lower() == "stock":
+        return 0
+    elif group_name.lower() == "waste":
+        return 1
+    elif group_name.lower() == "test":
+        return 99
+    else:
+        return None
+
+def read_vials() -> Tuple[List[StockVial], List[WasteVial]]:
     """
     Read in the virtual vials from the json file
     """
-    filename_ob = Path.cwd() / filename
-    with open(filename_ob, "r", encoding="ascii") as file:
-        vial_parameters = json.load(file)
+    # filename_ob = Path.cwd() / filename
+    # with open(filename_ob, "r", encoding="ascii") as file:
+    #     vial_parameters = json.load(file)
 
-    list_of_solutions = []
+    # Get the vial information from the vials table in the db
+    vial_parameters = get_current_vials()
+
+    list_of_stock_solutions = []
+    list_of_waste_solutions = []
     for items in vial_parameters:
         if items["name"] is not None:
             if items["category"] == 0:  # Stock vial
                 read_vial = StockVial(
-                #     name=str(items["name"]).lower(),
-                #     position=str(items["position"]).lower(),
-                #     volume=items["volume"],
-                #     capacity=items["capacity"],
-                #     density=items["density"],
-                #     coordinates=Vessel_Coordinates(**items["vial_coordinates"]),
-                #     radius=items["radius"],
-                #     height=items["height"],
-                #     contamination=items["contamination"],
-                #     contents=items["contents"],
-                #     viscosity_cp=items["viscosity_cp"],
-                # )
+                    #     name=str(items["name"]).lower(),
+                    #     position=str(items["position"]).lower(),
+                    #     volume=items["volume"],
+                    #     capacity=items["capacity"],
+                    #     density=items["density"],
+                    #     coordinates=Vessel_Coordinates(**items["vial_coordinates"]),
+                    #     radius=items["radius"],
+                    #     height=items["height"],
+                    #     contamination=items["contamination"],
+                    #     contents=items["contents"],
+                    #     viscosity_cp=items["viscosity_cp"],
+                    # )
                     **items
                 )
-                list_of_solutions.append(read_vial)
+                list_of_stock_solutions.append(read_vial)
             elif items["category"] == 1:  # Waste vial
                 read_vial = WasteVial(
-                #     name=str(items["name"]).lower(),
-                #     position=str(items["position"]).lower(),
-                #     volume=items["volume"],
-                #     capacity=items["capacity"],
-                #     density=items["density"],
-                #     coordinates=Vessel_Coordinates(**items["vial_coordinates"]),
-                #     radius=items["radius"],
-                #     height=items["height"],
-                #     contamination=items["contamination"],
-                #     contents=items["contents"],
-                #     viscosity_cp=items["viscosity_cp"],
-                # )
+                    #     name=str(items["name"]).lower(),
+                    #     position=str(items["position"]).lower(),
+                    #     volume=items["volume"],
+                    #     capacity=items["capacity"],
+                    #     density=items["density"],
+                    #     coordinates=Vessel_Coordinates(**items["vial_coordinates"]),
+                    #     radius=items["radius"],
+                    #     height=items["height"],
+                    #     contamination=items["contamination"],
+                    #     contents=items["contents"],
+                    #     viscosity_cp=items["viscosity_cp"],
+                    # )
                     **items
                 )
-                list_of_solutions.append(read_vial)
-    return list_of_solutions
+                list_of_waste_solutions.append(read_vial)
+    return list_of_stock_solutions, list_of_waste_solutions
 
 
-def update_vial_state_file(vial_objects: Sequence[Vial2], filename): # Update with a db method
-    """
-    Update the vials in the json file. This is used to update the volume, contents, and contamination of the vials
-    """
-    filename_ob = Path.cwd() / filename
-    with open(filename_ob, "r", encoding="UTF-8") as file:
-        vial_parameters = json.load(file)
+# def update_vial_state_file(
+#     vial_objects: Sequence[Vial2], filename
+# ):  # Update with a db method
+#     """
+#     Update the vials in the json file. This is used to update the volume, contents, and contamination of the vials
+#     """
+    # filename_ob = Path.cwd() / filename
+    # with open(filename_ob, "r", encoding="UTF-8") as file:
+    #     vial_parameters = json.load(file)
 
+    # for vial in vial_objects:
+    #     for vial_param in vial_parameters:
+    #         if str(vial_param["position"]) == vial.position.lower():
+    #             vial_param["volume"] = vial.volume
+    #             vial_param["contamination"] = vial.contamination
+    #             vial_param["contents"] = vial.contents
+    #             break
+
+    # with open(filename_ob, "w", encoding="UTF-8") as file:
+    #     json.dump(vial_parameters, file, indent=4)
+
+    # return 0
+    # input_new_vials_into_db(vial_objects)
+
+
+def input_new_vials_into_db(vial_objects: Sequence[Vial2]) -> None:
+    """Insert the given vials in the vial objects into the vials table in the db"""
+    # for vial in vial_objects:
+    #     try:
+    #         execute_sql_command(
+    #             """
+    #             INSERT INTO vials (
+    #                 name,
+    #                 category,
+    #                 position,
+    #                 volume,
+    #                 capacity,
+    #                 density,
+    #                 vial_coordinates,
+    #                 radius,
+    #                 height,
+    #                 contamination,
+    #                 contents,
+    #                 viscosity_cp,
+    #                 depth,
+    #                 concentration
+    #             )
+    #             VALUES (
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?,
+    #                 ?
+    #             )
+    #             """,
+    #             (
+    #                 vial.name,
+    #                 vial.category,
+    #                 vial.position,
+    #                 vial.volume,
+    #                 vial.capacity,
+    #                 vial.density,
+    #                 vial.coordinates,
+    #                 vial.radius,
+    #                 vial.height,
+    #                 vial.contamination,
+    #                 vial.contents,
+    #                 vial.viscosity_cp,
+    #                 vial.depth,
+    #                 vial.concentration,
+    #             ),
+    #         )
+    #     except Exception as e:
+    #         vial_logger.error("Error occurred while updating vial status in the db: %s", e)
+    #         vial_logger.error("Continuing....")
+    #         vial_logger.exception(e)
     for vial in vial_objects:
-        for vial_param in vial_parameters:
-            if str(vial_param["position"]) == vial.position.lower():
-                vial_param["volume"] = vial.volume
-                vial_param["contamination"] = vial.contamination
-                vial_param["contents"] = vial.contents
-                break
+        vial.insert_updated_vial_in_db()
 
-    with open(filename_ob, "w", encoding="UTF-8") as file:
-        json.dump(vial_parameters, file, indent=4)
 
-    return 0
-
-def update_vial_state_files(stock_vials: Sequence[StockVial], waste_vials: Sequence[WasteVial], stock_filename: str, waste_filename: str):
+def update_vial_state_files(
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+    stock_filename: str,
+    waste_filename: str,
+) -> None:
     """
     Update the vials in the json file. This is used to update the volume, contents, and contamination of the vials
     """
-    stock_filename_ob = Path.cwd() / stock_filename
-    with open(stock_filename_ob, "r", encoding="UTF-8") as file:
-        stock_vial_parameters = json.load(file)
+    # stock_filename_ob = Path.cwd() / stock_filename
+    # with open(stock_filename_ob, "r", encoding="UTF-8") as file:
+    #     stock_vial_parameters = json.load(file)
 
-    for vial in stock_vials:
-        for vial_param in stock_vial_parameters:
-            if str(vial_param["position"]) == vial.position.lower():
-                vial_param["volume"] = vial.volume
-                vial_param["contamination"] = vial.contamination
-                vial_param["contents"] = vial.contents
-                break
+    # for vial in stock_vials:
+    #     for vial_param in stock_vial_parameters:
+    #         if str(vial_param["position"]) == vial.position.lower():
+    #             vial_param["volume"] = vial.volume
+    #             vial_param["contamination"] = vial.contamination
+    #             vial_param["contents"] = vial.contents
+    #             break
 
-    with open(stock_filename_ob, "w", encoding="UTF-8") as file:
-        json.dump(stock_vial_parameters, file, indent=4)
+    # with open(stock_filename_ob, "w", encoding="UTF-8") as file:
+    #     json.dump(stock_vial_parameters, file, indent=4)
 
-    waste_filename_ob = Path.cwd() / waste_filename
-    with open(waste_filename_ob, "r", encoding="UTF-8") as file:
-        waste_vial_parameters = json.load(file)
+    # waste_filename_ob = Path.cwd() / waste_filename
+    # with open(waste_filename_ob, "r", encoding="UTF-8") as file:
+    #     waste_vial_parameters = json.load(file)
 
-    for vial in waste_vials:
-        for vial_param in waste_vial_parameters:
-            if str(vial_param["position"]) == vial.position.lower():
-                vial_param["volume"] = vial.volume
-                vial_param["contamination"] = vial.contamination
-                vial_param["contents"] = vial.contents
-                break
+    # for vial in waste_vials:
+    #     for vial_param in waste_vial_parameters:
+    #         if str(vial_param["position"]) == vial.position.lower():
+    #             vial_param["volume"] = vial.volume
+    #             vial_param["contamination"] = vial.contamination
+    #             vial_param["contents"] = vial.contents
+    #             break
 
-    with open(waste_filename_ob, "w", encoding="UTF-8") as file:
-        json.dump(waste_vial_parameters, file, indent=4)
+    # with open(waste_filename_ob, "w", encoding="UTF-8") as file:
+    #     json.dump(waste_vial_parameters, file, indent=4)
 
-    return 0
+    # return 0
+    input_new_vials_into_db(stock_vials)
+    input_new_vials_into_db(waste_vials)
 
-def input_new_vial_values(vialgroup: str):
+
+def input_new_vial_values(vialgroup: str) -> None:
     """For user inputting the new vial values for the state file"""
     ## Fetch the current state file
-    filename = ""
-    if vialgroup == "stock":
-        filename = STOCK_STATUS
-    elif vialgroup == "waste":
-        filename = WASTE_STATUS
-    else:
-        vial_logger.error("Invalid vial group")
-        raise ValueError
+    # filename = ""
+    # if vialgroup == "stock":
+    #     filename = STOCK_STATUS
+    # elif vialgroup == "waste":
+    #     filename = WASTE_STATUS
+    # else:
+    #     vial_logger.error("Invalid vial group")
+    #     raise ValueError
 
-    with open(filename, "r", encoding="UTF-8") as file:
-        vial_parameters = json.load(file)
+    # with open(filename, "r", encoding="UTF-8") as file:
+    #     vial_parameters = json.load(file)
 
+    vial_parameters = get_current_vials(vialgroup)
+    vial_list = []
     ## Print the current vials and their values
     print("Current vials:")
     print(
@@ -501,6 +765,7 @@ def input_new_vial_values(vialgroup: str):
     )
     for vial in vial_parameters:
         vial = Vial2(**vial)
+        vial_list.append(vial)
         if vial.contents is None:
             vial.contents = {}
         if vial.name is None:
@@ -589,12 +854,13 @@ def input_new_vial_values(vialgroup: str):
             print("Invalid vial position")
             continue
 
-    ## Write the new values to the state file
-    with open(filename, "w", encoding="UTF-8") as file:
-        json.dump(vial_parameters, file, indent=4)
+    ## Insert the new values to the db
+    # with open(filename, "w", encoding="UTF-8") as file:
+    #     json.dump(vial_parameters, file, indent=4)
+    input_new_vials_into_db(vial_list)
 
 
-def reset_vials(vialgroup: str):
+def reset_vials(vialgroup: str) -> None:
     """
     Resets the volume and contamination of the current vials to their capacity and 0 respectively
 
@@ -603,26 +869,52 @@ def reset_vials(vialgroup: str):
     """
     ## Fetch the current state file
     filename = ""
-    if vialgroup == "stock":
-        filename = STOCK_STATUS
-    elif vialgroup == "waste":
-        filename = WASTE_STATUS
-    else:
-        vial_logger.error("Invalid vial group")
+    # if vialgroup == "stock":
+    # filename = STOCK_STATUS
+    # elif vialgroup == "waste":
+    # filename = WASTE_STATUS
+    # else:
+    #     vial_logger.error("Invalid vial group")
+    #     raise ValueError
+
+    if vialgroup not in ["stock", "waste","test"]:
+        vial_logger.error("Invalid vial group %s given for resetting vials", vialgroup)
         raise ValueError
 
-    with open(filename, "r", encoding="UTF-8") as file:
-        vial_parameters = json.load(file)
+    # with open(filename, "r", encoding="UTF-8") as file:
+    #     vial_parameters = json.load(file)
+    vial_parameters = get_current_vials(vialgroup)
 
     ## Loop through each vial and set the volume and contamination
     for vial in vial_parameters:
+        vial = Vial2(**vial)
+
         if vialgroup == "stock":
-            vial["volume"] = vial["capacity"]
+            vial.volume = vial.capacity
         elif vialgroup == "waste":
-            vial["volume"] = Decimal(1000)
-            vial["contents"] = {}
-        vial["contamination"] = Decimal(0)
+            vial.volume = Decimal(1000)
+            vial.contents = {}
+        vial.contamination = Decimal(0)
+
+        vial.insert_updated_vial_in_db()
 
     ## Write the new values to the state file
-    with open(filename, "w", encoding="UTF-8") as file:
-        json.dump(vial_parameters, file, indent=4)
+    # with open(filename, "w", encoding="UTF-8") as file:
+    #     json.dump(vial_parameters, file, indent=4)
+
+
+def delete_vial_position_and_hx_from_db(position: str) -> None:
+    """Delete the vial position and hx from the db"""
+    try:
+        execute_sql_command(
+            """
+            DELETE FROM vials WHERE position = ?
+            """,
+            (position,),
+        )
+    except Exception as e:
+        vial_logger.error(
+            "Error occurred while deleting vial position and hx from the db: %s", e
+        )
+        vial_logger.error("Continuing....")
+        vial_logger.exception(e)

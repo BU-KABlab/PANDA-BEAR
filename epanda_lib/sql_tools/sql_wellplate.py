@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from typing import List, Tuple
 from epanda_lib.sql_tools import sql_utilities
+from epanda_lib import wellplate
 
 
 logger = sql_utilities.logger
@@ -244,9 +245,8 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
             plate_id = row[0]
             if plate_id is None:
                 plate_id = current_plate_id
-
         wells.append(
-            Tuple(
+            wellplate.Well(
                 well_id=row[2],
                 well_type_number=row[1],
                 status=row[3],
