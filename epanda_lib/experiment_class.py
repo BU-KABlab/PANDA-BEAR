@@ -264,7 +264,7 @@ class ExperimentBase:
     protocol_id: int = None
     priority: Optional[int] = 0
     well_id: Optional[str] = None
-    pin: str = None
+    pin: Union[str, int] = None
     project_id: int = None
     solutions: dict = None
     solutions_corrected: dict = solutions
@@ -1050,7 +1050,7 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
                     experiment.experiment_id,
                     parameter.parameter_type,
                     (
-                        json.dumps(parameter.parameter_value)
+                        json.dumps(parameter.parameter_value, default=decimal_default)
                         if isinstance(parameter.parameter_value, dict)
                         else parameter.parameter_value
                     ),
@@ -1352,10 +1352,14 @@ def select_specific_result(
         return results[0]
 
     return results
-    
+
 
 # endregion
 
+def decimal_default(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError
 
 if __name__ == "__main__":
     test_serialize_experimentbase()
