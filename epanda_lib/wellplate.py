@@ -47,7 +47,7 @@ class WellCoordinates:
         self.x = Decimal(x)
         self.y = Decimal(y)
         self.z_top = Decimal(z_top)
-        self.z_bottom = Decimal(z_bottom)
+        self.z_bottom = Decimal(z_bottom) if z_bottom is not None else Decimal(0)
 
     def __str__(self) -> str:
         """Returns a string representation of the coordinates."""
@@ -606,7 +606,7 @@ class Wellplate:
             Decimal(well_capacity),
             Decimal(height),
             shape,
-            self.z_bottom + height,  # z_top
+            self.z_bottom + Decimal(height),  # z_top
         )
 
     def load_wellplate_location(
@@ -1000,6 +1000,30 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
     )
     new_wells = sql_wellplate.count_wells_with_new_status()
     return int(current_plate_id), int(current_type_number), new_wells
+
+# def draw_the current_well_status():
+#     """
+#     Draw the current well status using white, yellow, green, and red colored squares
+#     """
+#     # load the current wellplate
+#     # determine the status of each well
+#     # draw the wellplate with the status of each well
+
+#     # get the current wellplate
+#     current_plate_id, current_type_number, new_wells = read_current_wellplate_info()
+#     current_wellplate = Wellplate(type_number=current_type_number,plate_id=current_plate_id)
+#     # get the status of each well
+#     for well in current_wellplate.wells.values():
+#         well: Well
+#         well_status = well.status
+#         if well_status == "new":
+#             well_color = "white"
+#         elif well_status == "empty":
+#             well_color = "yellow"
+#         elif well_status == "full":
+#             well_color = "green"
+#         else:
+#             well_color = "red"
 
 
 if __name__ == "__main__":
