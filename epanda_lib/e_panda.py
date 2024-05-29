@@ -44,7 +44,7 @@ from epanda_lib.image_tools import add_data_zone
 from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
 from epanda_lib.obs_controls import OBSController
-from epanda_lib.pump_control import MockPump, Pump
+from epanda_lib.pump_control import MockPump, SyringePump
 from epanda_lib.instrument_toolkit import Toolkit
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well
@@ -84,7 +84,7 @@ def forward_pipette_v2(
     volume: Decimal,
     from_vessel: Union[Well, StockVial, WasteVial],
     to_vessel: Union[Well, WasteVial],
-    pump: Union[Pump, MockPump],
+    pump: Union[SyringePump, MockPump],
     mill: Union[Mill, MockMill],
     pumping_rate: Optional[Decimal] = None,
 ):
@@ -161,7 +161,7 @@ def forward_pipette_v2(
 
             # withdraw a little to engage screw receive nothing
             pump.withdraw(
-                volume=AIR_GAP, solution=None, rate=pump.max_pump_rate
+                volume_to_withdraw=AIR_GAP, solution=None, rate=pump.max_pump_rate
             )  # withdraw air gap to engage screw
 
             # if isinstance(from_vessel, Well):
@@ -186,7 +186,7 @@ def forward_pipette_v2(
 
             # Withdraw the solution from the source and receive the updated vessel object
             pump.withdraw(
-                volume=repetition_vol,
+                volume_to_withdraw=repetition_vol,
                 solution=from_vessel,
                 rate=pumping_rate,
                 weigh=False,
@@ -194,14 +194,14 @@ def forward_pipette_v2(
 
             if isinstance(from_vessel, Well):
                 pump.withdraw(
-                    volume=20, solution=None, rate=pump.max_pump_rate, weigh=False
+                    volume_to_withdraw=20, solution=None, rate=pump.max_pump_rate, weigh=False
                 )  # If the from vessel is a well withdraw a little extra to ensure cleared well
 
             mill.move_to_safe_position()
 
             # Withdraw an air gap to prevent dripping, receive nothing
             pump.withdraw(
-                volume=DRIP_STOP, solution=None, rate=pump.max_pump_rate, weigh=False
+                volume_to_withdraw=DRIP_STOP, solution=None, rate=pump.max_pump_rate, weigh=False
             )
 
             logger.debug(
@@ -326,7 +326,7 @@ def flush_v2(
     stock_vials: Sequence[StockVial],
     flush_solution_name: str,
     mill: Union[Mill, MockMill],
-    pump: Union[Pump, MockPump],
+    pump: Union[SyringePump, MockPump],
     pumping_rate=Decimal(0.5),
     flush_volume:Decimal=Decimal(120.0),
     flush_count=1,
@@ -386,7 +386,7 @@ def flush_v2(
 def purge_pipette(
     waste_vials: Sequence[WasteVial],
     mill: Union[Mill, MockMill],
-    pump: Union[Pump, MockPump],
+    pump: Union[SyringePump, MockPump],
 ):
     """
     Move the pipette over an available waste vessel and purge its contents
