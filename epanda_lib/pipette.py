@@ -13,11 +13,17 @@ getcontext().prec = 6
 class Pipette:
     """Class for storing pipette information"""
 
-    def __init__(self, capacity_ul: Decimal = Decimal(0.0)):
+    def __init__(self, capacity_ul: Decimal = None):
         """Initialize the pipette"""
+        self.capacity_ul: Decimal = Decimal(0.0)
+        self.capacity_ml: Decimal = Decimal(0.0)
+        self._volume_ul: Decimal = Decimal(0.0)
+        self._volume_ml: Decimal = Decimal(0.0)
+        self.contents = {}
+
         if capacity_ul is not None and capacity_ul > 0:
-            self.capacity_ul: Decimal = capacity_ul
-            self.capacity_ml: Decimal = capacity_ul / Decimal(
+            self.capacity_ul: Decimal = Decimal(capacity_ul)
+            self.capacity_ml: Decimal = Decimal(capacity_ul) / Decimal(
                 1000
             )  # convert capacity to ml, Decimal division by int is OK
             self._volume_ul: Decimal = Decimal(0.0)
@@ -49,8 +55,6 @@ class Pipette:
     @volume.setter
     def volume(self, volume: Decimal) -> None:
         """Set the volume of the pipette in ul"""
-        if volume < 0:
-            raise ValueError("Volume must be non-negative.")
         self._volume_ul = volume
         self._volume_ml = volume / Decimal(1000)
         self.log_contents()
@@ -85,6 +89,7 @@ class Pipette:
         self.contents = {}
         self._volume_ul = Decimal(0)
         self._volume_ml = Decimal(0)
+        self.update_state_file()
         self.log_contents()
 
     def log_contents(self) -> None:
@@ -153,12 +158,15 @@ class Pipette:
         pipette_status = get_pieptte_status()
         if pipette_status is not None:
             self.capacity_ul = pipette_status.capacity_ul
-            self.capacity_ml = self.capacity_ml
+            self.capacity_ml = pipette_status.capacity_ml
             self._volume_ul = pipette_status.volume
             self._volume_ml = pipette_status.volume_ml
             self.contents = pipette_status.contents
         else:
             self.reset_contents()
+            self.capacity_ul = Decimal("200")
+            self.capacity_ml = Decimal("0.2")
+            self.update_state_file()
 
     def __str__(self):
         return f"Pipette has {self._volume_ul} ul of liquid"
@@ -170,10 +178,10 @@ def get_pieptte_status() -> Pipette:
     if result is None:
         return None
     pipette_status = PipetteStatus(Decimal(0), Decimal(0), Decimal(0), Decimal(0), {})
-    pipette_status.capacity_ul = Decimal(result[0])
-    pipette_status.capacity_ml = Decimal(result[1])
-    pipette_status.volume = Decimal(result[2])
-    pipette_status.volume_ml = Decimal(result[3])
+    pipette_status.capacity_ul = Decimal(str(result[0]))
+    pipette_status.capacity_ml = Decimal(str(result[1]))
+    pipette_status.volume = Decimal(str(result[2]))
+    pipette_status.volume_ml = Decimal(str(result[3]))
     pipette_status.contents = json.loads(result[4]) if result[4] is not None else {}
     return pipette_status
 
