@@ -1,13 +1,13 @@
+import unittest
+import time
+import nesp_lib
+from epanda_lib.pump_control import MockMill, MockPump, MockScale
+from epanda_lib.vessel import VesselCoordinates
+
 """_summary_
 """
 
-import unittest
-from decimal import Decimal, getcontext
-import time
-import nesp_lib
 
-from epanda_lib.pump_control import MockMill, MockPump, MockScale
-from epanda_lib.vessel import VesselCoordinates
 from epanda_lib.vials import (
     StockVial,
     Vial2,
@@ -17,8 +17,6 @@ from epanda_lib.vials import (
 )
 
 # pylint: disable=missing-function-docstring, protected-access
-
-getcontext().prec = 6
 
 
 class TestSyringePump(unittest.TestCase):
@@ -55,29 +53,27 @@ class TestSyringePump(unittest.TestCase):
         self.pump.pipette.reset_contents()
 
         # Check the pipiette is reset
-        assert self.pump.pipette.capacity_ul == Decimal("200")
-        assert self.pump.pipette.capacity_ml == Decimal("0.2")
-        assert self.pump.pipette._volume_ul == Decimal("0")
-        assert self.pump.pipette._volume_ml == Decimal("0")
+        assert self.pump.pipette.capacity_ul == float(200)
+        assert self.pump.pipette.capacity_ml == float(0.2)
+        assert self.pump.pipette._volume_ul == float(0)
+        assert self.pump.pipette._volume_ml == float(0)
         assert self.pump.pipette.contents == {}
 
     def test_withdraw(self):
 
-        self.pump.withdraw(100, solution=self.vial, rate=Decimal("0.5"))
-        assert self.vial.volume == Decimal("900")
+        self.pump.withdraw(100, solution=self.vial, rate=0.5)
+        assert self.vial.volume == float(900)
         assert self.vial.contamination == 1
         assert (
             self.pump.pump.pumping_direction.value
             == nesp_lib.PumpingDirection.WITHDRAW.value
         )
-        assert self.pump.pump.pumping_rate == Decimal("0.5")
-        assert self.pump.pipette.liquid_volume() == Decimal("100")
+        assert self.pump.pump.pumping_rate == 0.5
+        assert self.pump.pipette.liquid_volume() == 100
 
-        assert self.pump.pipette._volume_ul == Decimal("100")
-        assert self.pump.pipette._volume_ml == Decimal("0.1")
-        assert self.pump.pipette.contents == {"test_contents": 100} | {
-            "test_contents": Decimal("100")
-        }
+        assert self.pump.pipette._volume_ul == 100
+        assert self.pump.pipette._volume_ml == 0.1
+        assert self.pump.pipette.contents == {"test_contents": 100}
 
     def test_withdraw_air(self):
 
@@ -86,50 +82,50 @@ class TestSyringePump(unittest.TestCase):
             self.pump.pump.pumping_direction.value
             == nesp_lib.PumpingDirection.WITHDRAW.value
         )
-        assert self.pump.pump.pumping_rate == float(Decimal("0.640"))
-        assert self.pump.pipette.liquid_volume() == Decimal("0")
-        assert self.pump.pipette._volume_ul == Decimal("100")
-        assert self.pump.pipette._volume_ml == Decimal("0.1")
+        assert self.pump.pump.pumping_rate == float(0.640)
+        assert self.pump.pipette.liquid_volume() == 0
+        assert self.pump.pipette._volume_ul == 100
+        assert self.pump.pipette._volume_ml == 0.1
         assert self.pump.pipette.contents == {}
 
     def test_infuse_air(self):
 
-        self.pump.pipette.volume = Decimal("100")
+        self.pump.pipette.volume = 100
         self.pump.infuse_air(100)
         assert (
             self.pump.pump.pumping_direction.value
             == nesp_lib.PumpingDirection.INFUSE.value
         )
-        assert self.pump.pump.pumping_rate == float(Decimal("0.640"))
-        assert self.pump.pipette.liquid_volume() == Decimal("0")
-        assert self.pump.pipette._volume_ul == Decimal("0")
-        assert self.pump.pipette._volume_ml == Decimal("0")
+        assert self.pump.pump.pumping_rate == float(0.640)
+        assert self.pump.pipette.liquid_volume() == 0
+        assert self.pump.pipette._volume_ul == 0
+        assert self.pump.pipette._volume_ml == 0
         assert self.pump.pipette.contents == {}
 
     def test_infuse(self):
 
-        self.pump.pipette.volume = Decimal("100")
+        self.pump.pipette.volume = 100
         self.pump.pipette.contents = {"test_contents": 100}
         self.pump.infuse(
-            Decimal("100"),
+            100,
             being_infused=self.vial,
             infused_into=self.waste_vial,
-            rate=Decimal("0.5"),
-            blowout_ul=Decimal("0"),
+            rate=0.5,
+            blowout_ul=0,
             weigh=False,
         )
-        assert self.waste_vial.volume == Decimal("100")
+        assert self.waste_vial.volume == 100
         assert self.waste_vial.contamination == 1
         assert (
             self.pump.pump.pumping_direction.value
             == nesp_lib.PumpingDirection.INFUSE.value
         )
-        assert self.pump.pump.pumping_rate == Decimal("0.5")
-        assert self.pump.pipette.liquid_volume() == Decimal("0")
-        assert self.pump.pipette._volume_ul == Decimal("0")
-        assert self.pump.pipette._volume_ml == Decimal("0")
+        assert self.pump.pump.pumping_rate == 0.5
+        assert self.pump.pipette.liquid_volume() == 0
+        assert self.pump.pipette._volume_ul == 0
+        assert self.pump.pipette._volume_ml == 0
         assert self.pump.pipette.contents == {"test_contents": 0} | {
-            "test_contents": Decimal("0")
+            "test_contents": 0
         }
 
     def tearDown(self):
