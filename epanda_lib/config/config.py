@@ -1,6 +1,5 @@
 """The home of all project specific strings and values that are 
 better to be set in one place than to be scattered around the code."""
-from decimal import Decimal, getcontext
 from pathlib import Path
 
 def get_repo_path():
@@ -23,12 +22,11 @@ def write_testing_config(value: bool):
     with open(config_path, "w", encoding="utf-8") as f:
         f.write(str(value))## Project values
 
-AIR_GAP = Decimal(40.0)  # ul
-DRIP_STOP = Decimal(5.0)  # ul
-PURGE_VOLUME = Decimal(20)  # ul
+AIR_GAP = float(40.0)  # ul
+DRIP_STOP = float(5.0)  # ul
+PURGE_VOLUME = float(20)  # ul
 RANDOM_FLAG = False  # Set to True to randomize the order of the experiments
-DEFAULT_PUMPING_RATE = Decimal(0.3)  # ul/s
-getcontext().prec = 6  # Set the precision of the decimal module globally
+DEFAULT_PUMPING_RATE = float(0.3)  # ul/s
 ## Testing flag
 # testing.txt is the only place to change the mode besides from the main menue
 # This should no be put into a db since depending on its setting a different db is used.
