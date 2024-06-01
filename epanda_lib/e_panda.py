@@ -24,7 +24,6 @@ Returns:
 # Standard library imports
 import logging
 import math
-from decimal import Decimal
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
@@ -81,12 +80,12 @@ testing_logger.addHandler(testing_handler)
 
 
 def forward_pipette_v2(
-    volume: Decimal,
+    volume: float,
     from_vessel: Union[Well, StockVial, WasteVial],
     to_vessel: Union[Well, WasteVial],
     pump: Union[SyringePump, MockPump],
     mill: Union[Mill, MockMill],
-    pumping_rate: Optional[Decimal] = None,
+    pumping_rate: Optional[float] = None,
 ):
     """
     Pipette a volume from one vessel to another
@@ -119,10 +118,10 @@ def forward_pipette_v2(
     4. Repeat 2-3 until all repetitions are complete
 
     Args:
-        volume (Decimal): The volume to be pipetted in microliters
+        volume (float): The volume to be pipetted in microliters
         from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
         to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
-        pumping_rate (Decimal): The pumping rate in ml/min
+        pumping_rate (float): The pumping rate in ml/min
         pump (object): The pump object
         mill (object): The mill object
         wellplate (Wells object): The wellplate object
@@ -131,7 +130,7 @@ def forward_pipette_v2(
         None (void function) since the objects are passed by reference
 
     """
-    if volume > Decimal(0.00):
+    if volume > float(0.00):
         logger.info(
             "Forward pipetting %f ul from %s to %s",
             volume,
@@ -152,7 +151,7 @@ def forward_pipette_v2(
             pumping_rate = pump.max_pump_rate
 
         repetitions = int(math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))) # We first round up, then declare an int
-        repetition_vol = volume / repetitions # Decimal division by an int is allowed and a Decimal
+        repetition_vol = volume / repetitions
 
         for j in range(repetitions):
             logger.info("Repetition %d of %d", j + 1, repetitions)
@@ -327,8 +326,8 @@ def flush_v2(
     flush_solution_name: str,
     mill: Union[Mill, MockMill],
     pump: Union[SyringePump, MockPump],
-    pumping_rate=Decimal(0.5),
-    flush_volume:Decimal=Decimal(120.0),
+    pumping_rate=float(0.5),
+    flush_volume:float=float(120.0),
     flush_count=1,
     instructions: Optional[ExperimentBase] = None,
 ):
@@ -340,8 +339,8 @@ def flush_v2(
         flush_solution_name (str): The name of the solution to flush with
         mill (object): The mill object
         pump (object): The pump object
-        pumping_rate (Decimal): The pumping rate in ml/min
-        flush_volume (Decimal): The volume to flush with in microliters
+        pumping_rate (float): The pumping rate in ml/min
+        flush_volume (float): The volume to flush with in microliters
         flush_count (int): The number of times to flush
 
     Returns:
@@ -418,14 +417,14 @@ def purge_pipette(
 
 
 def solution_selector(
-    solutions: Sequence[StockVial], solution_name: str, volume: Decimal
+    solutions: Sequence[StockVial], solution_name: str, volume: float
 ) -> StockVial:
     """
     Select the solution from which to withdraw from, from the list of solution objects
     Args:
         solutions (list): The list of solution objects
         solution_name (str): The name of the solution to select
-        volume (Decimal): The volume to be pipetted
+        volume (float): The volume to be pipetted
     Returns:
         solution (object): The solution object
     """
@@ -433,7 +432,7 @@ def solution_selector(
         # if the solution names match and the requested volume is less than the available volume (volume - 10% of capacity)
         if (
             solution.name.lower() == solution_name.lower()
-            and Decimal(solution.volume) - Decimal(0.10) * Decimal(solution.capacity) > (volume)
+            and round(float(solution.volume) - float(0.10) * float(solution.capacity),6) > (volume)
         ):
             logger.debug(
                 "Selected stock vial: %s in position %s",
@@ -445,14 +444,14 @@ def solution_selector(
 
 
 def waste_selector(
-    solutions: Sequence[WasteVial], solution_name: str, volume: Decimal
+    solutions: Sequence[WasteVial], solution_name: str, volume: float
 ) -> WasteVial:
     """
     Select the solution in which to deposit into from the list of solution objects
     Args:
         solutions (list): The list of solution objects
         solution_name (str): The name of the solution to select
-        volume (Decimal): The volume to be pipetted
+        volume (float): The volume to be pipetted
     Returns:
         solution (object): The solution object
     """
@@ -460,7 +459,7 @@ def waste_selector(
     for waste_solution in solutions:
         if (
             waste_solution.name.lower() == solution_name
-            and (waste_solution.volume + volume) < waste_solution.capacity
+            and round((float(waste_solution.volume) + float(str(volume))),6) < waste_solution.capacity
         ):
             logger.debug(
                 "Selected waste vial: %s in position %s",
@@ -761,24 +760,24 @@ def apply_log_filter(
     logger.addFilter(custom_filter)
 
 
-def volume_correction(volume:Decimal, density:Decimal=None, viscosity:Decimal=None) -> Decimal:
+def volume_correction(volume:float, density:float=None, viscosity:float=None) -> float:
     """
     Corrects the volume of the solution based on the density and viscosity of the solution
 
     Args:
-        volume (Decimal): The volume to be corrected
-        density (Decimal): The density of the solution
-        viscosity (Decimal): The viscosity of the solution
+        volume (float): The volume to be corrected
+        density (float): The density of the solution
+        viscosity (float): The viscosity of the solution
 
     Returns:
-        corrected_volume (Decimal): The corrected volume
+        corrected_volume (float): The corrected volume
     """
     if density is None:
-        density = Decimal(1.0)
+        density = float(1.0)
     if viscosity is None:
-        viscosity = Decimal(1.0)
-    corrected_volume = volume * (Decimal(1.0) + (Decimal(1.0) - density) * (Decimal(1.0) - viscosity))
-    return Decimal(corrected_volume)
+        viscosity = float(1.0)
+    corrected_volume = round(volume * (float(1.0) + (float(1.0) - density) * (float(1.0) - viscosity)),6)
+    return float(corrected_volume)
 
 
 def image_well(

@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from epanda_lib.sql_tools.sql_utilities import (
     execute_sql_command,
     execute_sql_command_no_return,
@@ -22,10 +20,10 @@ def select_pipette_status():
     result = execute_sql_command(
         """
         SELECT 
-        capacity_ul,
-        capacity_ml,
-        volume_ul  ,
-        volume_ml  ,
+        ROUND(capacity_ul, 6) AS capacity_ul,
+        ROUND(capacity_ml, 6) AS capacity_ml,
+        ROUND(volume_ul, 6) AS volume_ul,
+        ROUND(volume_ml, 6) AS volume_ml,
         contents   
  
         FROM pipette_status
@@ -40,10 +38,10 @@ def select_pipette_status():
 
 
 def insert_pipette_status(
-    capacity_ul: Decimal,
-    capacity_ml: Decimal,
-    volume: Decimal,
-    volume_ml: Decimal,
+    capacity_ul: float,
+    capacity_ml: float,
+    volume: float,
+    volume_ml: float,
     contents: str,
 ):
     """
@@ -64,10 +62,10 @@ def insert_pipette_status(
         VALUES (?, ?, ?, ?, ?)
         """,
         (
-            capacity_ul,
-            capacity_ml,
-            volume,
-            volume_ml,
+            round(capacity_ul, 6),
+            round(capacity_ml, 6),
+            round(volume, 6),
+            round(volume_ml, 6),
             contents,
         ),
     )

@@ -1,21 +1,83 @@
 """Useful functions and dataclasses for the project."""
 
 import dataclasses
+from decimal import Decimal
 from enum import Enum
 
 import pulp
 
+class WellStatus(Enum):
+    """Class for naming of the well status"""
 
-@dataclasses.dataclass
+    EMPTY = "empty"
+    FILLED = "filled"
+    MIXED = "mixed"
+    ERROR = "error"
+    BUSY = "running"
+    ON = "on"
+    OFF = "off"
+    TESTING = "testing"
+    CALIBRATING = "calibrating"
+    SHUTDOWN = "shutdown"
+    PAUSE = "pause"
+    RESUME = "resume"
+    WAITING = "waiting"
+
 class Coordinates:
     """Class for storing coordinates"""
 
-    x: float
-    y: float
-    z: float
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
 
     def __str__(self):
         return f"({self.x}, {self.y}, {self.z})"
+
+    @property
+    def x(self):
+        """Getter for the x-coordinate"""
+        return round(float(self._x), 6)
+
+    @x.setter
+    def x(self, value):
+        if isinstance(value, Decimal):
+            value = float(value)
+        elif not isinstance(value, (int, float)):
+            raise ValueError(
+                "x-coordinate must be an int, float, or Decimal object"
+            )
+        self._x = round(value, 6)
+
+    @property
+    def y(self):
+        """Getter for the y-coordinate"""
+        return round(float(self._y), 6)
+
+    @y.setter
+    def y(self, value):
+        if isinstance(value, Decimal):
+            value = float(value)
+        elif not isinstance(value, (int, float)):
+            raise ValueError(
+                "y-coordinate must be an int, float, or Decimal object"
+            )
+        self._y = round(value, 6)
+
+    @property
+    def z(self):
+        """Getter for the z-coordinate"""
+        return round(float(self._z), 6)
+
+    @z.setter
+    def z(self, value):
+        if isinstance(value, Decimal):
+            value = float(value)
+        elif not isinstance(value, (int, float)):
+            raise ValueError(
+                "z-coordinate must be an int, float, or Decimal object"
+            )
+        self._z = round(value, 6)
 
 
 @dataclasses.dataclass
@@ -74,6 +136,11 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
     """
     num_vials = len(vial_concentrations)
 
+    # Validate and clean the incoming data to remove any Decimal objects
+    vial_concentrations = [float(c) for c in vial_concentrations]
+    v_total = float(v_total)
+    c_target = float(c_target)
+
     # Create a problem instance
     prob = pulp.LpProblem("VialMixing", pulp.LpMinimize)
 
@@ -126,39 +193,3 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
         return vial_volumes, deviation_value
     else:
         return None, None
-
-
-if __name__ == "__main__":
-    C = [0.01, 0.03, 0.10]  # Concentrations of each vial in mM
-    VOL_TOTAL = 120  # Total volume to achieve in uL
-    C_target = [
-        0.027,
-        0.023,
-        0.020,
-        0.017,
-        0.013,
-        0.010,
-        0.085,
-        0.070,
-        0.055,
-        0.040,
-        0.025,
-        0.030,
-        0.100,
-        0.088,
-        0.077,
-        0.065,
-        0.053,
-        0.042,
-    ]  # Target concentration in mM
-
-    for c in C_target:
-        print(f"Target concentration: {c} mM")
-        volumes, deviation = solve_vials_ilp(C, VOL_TOTAL, c)
-        if volumes is not None:
-            print(f"Concentration of each vial: {C}")
-            print(f"Volumes to draw from each vial: {volumes} uL")
-            print(f"Deviation from target concentration: {deviation} mM")
-        else:
-            print("No solution found")
-        print()

@@ -9,7 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Tuple, Union, get_type_hints
 
-from pydantic import ConfigDict, RootModel, TypeAdapter
+from pydantic import ConfigDict, RootModel
 from pydantic.dataclasses import dataclass
 
 from epanda_lib.sql_tools.sql_utilities import (execute_sql_command,
@@ -296,7 +296,9 @@ class ExperimentBase:
     jira_issue_key: Optional[str] = None
     experiment_type: int = 0
     well: object= None
-
+    # FIXME: Seperate the set status, and set status and save methods from the experimentbase. The experiment base should just be a dataclass
+    # What could be an alternative is that there is a wrapper class that has the set status and set status and save methods using what
+    # Method that the project chooses to use to save the data to the database
     def set_status(self, new_status: ExperimentStatus) -> None:
         """Set the status of the experiment"""
         self.status = new_status
@@ -624,6 +626,7 @@ experiment_types_by_project_id = {
     1: EchemExperimentBase,
     16: EdotExperiment,
     11: CorrectionFactorExperiment,
+    999: EdotExperiment
 }
 
 
@@ -696,73 +699,6 @@ def serialize_results(results: ExperimentResult) -> str:
     return RootModel[ExperimentResult](results).model_dump_json(indent=4)
 
 
-def test_parse():
-    """Test that the class can be parsed from json and back"""
-    value = make_test_value()
-    print(f"Original---> {value}")
-    sample_json = RootModel[ExperimentBase](value).model_dump_json(indent=4)
-    parsed_value = RootModel[ExperimentBase].model_validate_json(sample_json).root
-    print(f"Parsed--->{parsed_value}")
-    assert value == parsed_value
-
-
-def test_serialize_experiment():
-    """Test that the class can be serialized to json"""
-    value = make_test_value()
-    sample_json = RootModel[ExperimentBase](value).model_dump_json(indent=4)
-    print(sample_json)
-    with open("temp_test_file.json", "w", encoding="UTF-8") as f:
-        f.write(sample_json)
-
-
-def test_serialize_experimentbase():
-    """Test that the class can be serialized to json"""
-    value = make_test_base_value()
-    sample_json = RootModel[ExperimentBase](value).model_dump_json(indent=4)
-    print(sample_json)
-    with open("temp_test_file.json", "w", encoding="UTF-8") as f:
-        f.write(sample_json)
-
-
-# def test_serialize_layered_experiment():
-#     '''Test that the class can be serialized to json'''
-#     value = make_test_layered_value()
-#     sample_json = RootModel[LayeredExperiments](value).model_dump_json(indent=4)
-#     print(sample_json)
-#     with open('temp_test_file.json', 'w', encoding='UTF-8') as f:
-#         f.write(sample_json)
-
-
-def test_serialize_results():
-    """Test that the class can be serialized to json"""
-    value = ExperimentResult(
-        experiment_id=0,
-        well_id="D5",
-        ocp_ca_file=["ocp_dep_file"],
-        ocp_ca_passed=[True],
-        ocp_cv_file=["ocp_char_file"],
-        ocp_cv_passed=[True],
-        ca_data_file=["deposition_data_file"],
-        # deposition_plot_files=["deposition_plot_file"],
-        # deposition_max_values=[0.0],
-        # depsotion_min_values=[0.0],
-        cv_data_file=["characterization_data_file"],
-        # characterization_plot_files=["characterization_plot_file"],
-        # characterization_max_values=[0.0],
-        # characterization_min_values=[0.0],
-    )
-    sample_json = RootModel[ExperimentResult](value).model_dump_json(indent=4)
-    print(sample_json)
-    with open("temp_test_file.json", "w", encoding="UTF-8") as f:
-        f.write(sample_json)
-
-
-def test_schema():
-    """Test that the class can generate a json schema"""
-    # Useful if you have tools that validate your json externally
-    print(json.dumps(TypeAdapter(ExperimentBase).json_schema(), indent=4))
-
-
 experiment_classes = {
     1: EchemExperimentBase,
     2: CorrectionFactorExperiment,
@@ -785,7 +721,7 @@ def get_all_type_hints(cls):
 
 
 
-# region Experiment Functions
+# region Experiment SQL Functions
 
 
 def select_next_experiment_id() -> int:
@@ -1360,8 +1296,3 @@ def decimal_default(obj):
     if isinstance(obj, Decimal):
         return float(obj)
     raise TypeError
-
-if __name__ == "__main__":
-    test_serialize_experimentbase()
-    test_parse()
-    test_schema()

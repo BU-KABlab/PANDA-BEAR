@@ -2,7 +2,7 @@ import logging
 import sqlite3
 from decimal import Decimal
 from epanda_lib.config.config import PATH_TO_LOGS, SQL_DB_PATH, LOCAL_REPO_PATH
-
+import time
 
 # Set up logging
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
@@ -65,6 +65,8 @@ def execute_sql_command(sql_command: str, parameters: tuple = None, test:bool = 
     finally:
         conn.close()
 
+    #time.sleep(1)
+
     return result
 
 
@@ -126,6 +128,8 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None, te
     finally:
         # Close the connection
         conn.close()
+
+    #time.sleep(1)
 
 def convert_decimals(parameters):
     new_parameters = []

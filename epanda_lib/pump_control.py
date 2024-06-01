@@ -5,7 +5,6 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
 import logging
 import time
-from decimal import Decimal, getcontext
 from typing import Optional, Union
 
 
@@ -22,8 +21,6 @@ from epanda_lib.utilities import Coordinates, Instruments
 from epanda_lib.vessel import VesselLogger
 import epanda_lib.wellplate as wp
 from epanda_lib.vials import StockVial, Vial2, WasteVial
-
-getcontext().prec = 6
 
 pump_control_logger = logging.getLogger("e_panda")
 if not pump_control_logger.hasHandlers():
@@ -82,8 +79,8 @@ class SyringePump:
         Initialize the pump and set the capacity.
         """
         self.pump = self.set_up_pump()
-        self.max_pump_rate = Decimal('0.640')  # ml/min
-        self.syringe_capacity = Decimal('1.0')  # mL
+        self.max_pump_rate = float(0.640)  # ml/min
+        self.syringe_capacity = float(1.0)  # mL
         self.pipette = Pipette()
         self.mill = mill
         if scale is not None:
@@ -115,9 +112,9 @@ class SyringePump:
 
     def withdraw(
         self,
-        volume_to_withdraw: Decimal,
+        volume_to_withdraw: float,
         solution: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
-        rate: Decimal = None,
+        rate: float = None,
         weigh: bool = False,
         results: ExperimentResult = None,
     ):
@@ -134,7 +131,7 @@ class SyringePump:
         """
         # Perform the withdrawl
         # TODO Consider tracking the volume of air in the pipette as blowout and dripstop?
-        volume_to_withdraw = Decimal(volume_to_withdraw)
+        volume_to_withdraw = float(volume_to_withdraw)
         if volume_to_withdraw > 0:
             volume_ml = volume_to_withdraw / 1000 # convert the volume argument from ul to ml
 
@@ -171,7 +168,7 @@ class SyringePump:
                     }
                     # Update the pipette contents
                     for key, ratio in content_ratio.items():
-                        self.pipette.update_contents(key, Decimal(f'{ratio}') * volume_to_withdraw)
+                        self.pipette.update_contents(key, float(ratio * volume_to_withdraw))
                 else:
                     self.pipette.update_contents(solution.contents, volume_to_withdraw)
                 # Update the solution volume and contents
@@ -182,9 +179,9 @@ class SyringePump:
         else:
             return None
 
-    def withdraw_air(self, volume: Decimal):
+    def withdraw_air(self, volume: float):
         """Withdraw the given ul of air with the pipette"""
-        volume = Decimal(volume)
+        volume = float(volume)
         if volume > 0:
             volume_ml = volume / 1000
             _, _ = self.run_pump(
@@ -205,11 +202,11 @@ class SyringePump:
 
     def infuse(
         self,
-        volume_to_infuse: Decimal,
+        volume_to_infuse: float,
         being_infused: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
         infused_into: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
-        rate: Decimal = Decimal('0.5'),
-        blowout_ul: Decimal = Decimal('0.0'),
+        rate: float = float(0.5),
+        blowout_ul: float = float(0.0),
         weigh: bool = False,
         results: ExperimentResult = None,
     ) -> int:
@@ -228,8 +225,8 @@ class SyringePump:
         """
         # convert the volume argument from ul to ml
         # pumprecord = {}
-        volume_ul = Decimal(volume_to_infuse)
-        blowout_ml = Decimal(blowout_ul) / 1000
+        volume_ul = float(volume_to_infuse)
+        blowout_ml = float(blowout_ul) / 1000
         if volume_ul > 0:
             volume_ml = volume_ul / 1000
             if being_infused is not None:
@@ -255,7 +252,7 @@ class SyringePump:
             pump_control_logger.info(
                 "Pump has infused: %0.6f ml (%0.6f of solution) at %fmL/min Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
-                float(Decimal(self.pump.volume_infused) - blowout_ml),
+                float(float(self.pump.volume_infused) - blowout_ml),
                 self.pump.pumping_rate,
                 self.pipette.volume,
             )
@@ -282,16 +279,16 @@ class SyringePump:
                 }
 
                 for key, ratio in content_ratio.items():
-                    self.pipette.update_contents(key, -volume_ul * Decimal(str(ratio)))
+                    self.pipette.update_contents(key, -volume_ul * ratio)
 
                 return 0
             return 0
         else:
             return 0
 
-    def infuse_air(self, volume: Decimal):
+    def infuse_air(self, volume: float):
         """Infuse the given ul of air with the pipette"""
-        volume_ul = Decimal(volume)
+        volume_ul = float(volume)
         if volume_ul > 0:
             volume_ml = volume_ul / 1000
             _, _ = self.run_pump(
@@ -311,18 +308,18 @@ class SyringePump:
     def run_pump(
         self,
         pump_direction: nesp_lib.PumpingDirection,
-        volume_ml:Decimal,
+        volume_ml:float,
         rate=None,
         density=None,
-        blowout_ml=Decimal('0.0'),
+        blowout_ml=float(0.0),
         weigh: bool = False,
-        viscosity: Decimal = None,
-    ) -> tuple[Decimal, dict]:
+        viscosity: float = None,
+    ) -> tuple[float, dict]:
         """Combine all the common commands to run the pump into one function"""
         pumping_record = {}
-        volume_ml = Decimal(volume_ml)
-        blowout_ml = Decimal(blowout_ml)
-        density = Decimal(density) if density is not None else None
+        volume_ml = float(volume_ml)
+        blowout_ml = float(blowout_ml)
+        density = float(density) if density is not None else None
         if volume_ml <= 0:
             return 0, pumping_record
         # Set the pump parameters for the run
@@ -342,7 +339,7 @@ class SyringePump:
         post_weight = 0.00
         ## Get scale value prior to pump action
         if density is not None and density != 0 and weigh:
-            # pre_weight = Decimal(self.scale.read_scale())
+            # pre_weight = float(self.scale.read_scale())
             scale_logger.debug(
                 "Expected difference in scale reading: %f", volume_ml * density
             )
@@ -361,8 +358,8 @@ class SyringePump:
 
         ## Get scale value after pump action
         if density is not None and density != 0 and weigh:
-            # post_weight = Decimal(self.scale.value())
-            # post_weight = Decimal(self.scale.read_scale())
+            # post_weight = float(self.scale.value())
+            # post_weight = float(self.scale.read_scale())
             scale_logger.debug("Scale reading after %s: %f", action, post_weight)
             scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
             scale_logger.info(
@@ -398,8 +395,8 @@ class SyringePump:
         log_msg = f"Pump has {action_type}: {action_volume} ml"
         pump_control_logger.debug(log_msg)
         if density is not None and density != 0 and weigh:
-            expected_difference = Decimal(volume_ml * density)
-            difference = Decimal(post_weight - pre_weight)
+            expected_difference = float(volume_ml * density)
+            difference = float(post_weight - pre_weight)
             scale_logger.debug("Expected difference: %f", expected_difference)
             scale_logger.debug("Actual difference: %f", difference)
             percent_error = abs(
@@ -416,8 +413,8 @@ class SyringePump:
         self,
         mix_location: Optional[dict] = None,
         mix_repetitions=3,
-        mix_volume=Decimal('200.0'),
-        mix_rate=Decimal('0.62'),
+        mix_volume=float(200.0),
+        mix_rate=float(0.62),
     ):
         """Mix the solution in the pipette by withdrawing and infusing the solution
         Args:
@@ -483,13 +480,13 @@ class SyringePump:
             self.mill.move_to_safe_position()
             return None
 
-    def update_pipette_volume(self, volume_ml: Decimal):
+    def update_pipette_volume(self, volume_ml: float):
         """Change the volume of the pipette in ml"""
-        volume_ml = Decimal(volume_ml)
+        volume_ml = float(volume_ml)
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
-            self.pipette.volume -= volume_ml * 1000
+            self.pipette.volume = round(self.pipette.volume - (volume_ml * 1000.6))
         else:
-            self.pipette.volume += volume_ml * 1000
+            self.pipette.volume = round(self.pipette.volume + (volume_ml * 1000),6)
 
 
 class MockPump(SyringePump):

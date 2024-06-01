@@ -10,8 +10,7 @@ import math
 import os
 
 # pylint: disable=line-too-long
-from decimal import Decimal
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from epanda_lib import experiment_class
 
@@ -23,31 +22,30 @@ from .vessel import Vessel
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
 
-
 class WellCoordinates:
     """
     Represents the coordinates of a well.
 
     Args:
     -----
-        x (Decimal): The x-coordinate of the well.
-        y (Decimal): The y-coordinate of the well.
-        z_top (Decimal): The z-coordinate of top the well.
-        z_bottom (Decimal): The z-coordinate of the bottom of the well.
+        x (Union[int, float]): The x-coordinate of the well.
+        y (Union[int, float]): The y-coordinate of the well.
+        z_top (Union[int, float]): The z-coordinate of top the well.
+        z_bottom (Union[int, float]): The z-coordinate of the bottom of the well.
     """
 
     def __init__(
         self,
-        x: Decimal,
-        y: Decimal,
-        z_top: Decimal = Decimal(0),
-        z_bottom: Decimal = None,
+        x: Union[int, float],
+        y: Union[int, float],
+        z_top: Union[int, float] = 0,
+        z_bottom: Optional[Union[int, float]] = None,
     ) -> None:
         """Initializes a new instance of the Coordinates class."""
-        self.x = Decimal(x)
-        self.y = Decimal(y)
-        self.z_top = Decimal(z_top)
-        self.z_bottom = Decimal(z_bottom) if z_bottom is not None else Decimal(0)
+        self.x = x
+        self.y = y
+        self.z_top = z_top
+        self.z_bottom = z_bottom if z_bottom is not None else 0
 
     def __str__(self) -> str:
         """Returns a string representation of the coordinates."""
@@ -60,17 +58,17 @@ class WellCoordinates:
     def to_dict(self) -> dict:
         """Returns a dictionary representation of the coordinates."""
         return {
-            "x": str(self.x),
-            "y": str(self.y),
-            "z_top": str(self.z_top),
-            "z_bottom": str(self.z_bottom) if self.z_bottom is not None else None,
+            "x": self.x,
+            "y": self.y,
+            "z_top": self.z_top,
+            "z_bottom": self.z_bottom if self.z_bottom is not None else None,
         }
 
-    def __getitem__(self, key: str) -> Decimal:
+    def __getitem__(self, key: str) -> Union[int, float]:
         """Returns the value of the specified key."""
         return getattr(self, key)
 
-    def __setitem__(self, key: str, value: Decimal) -> None:
+    def __setitem__(self, key: str, value: Union[int, float]) -> None:
         """Sets the value of the specified key."""
         setattr(self, key, value)
 
@@ -123,16 +121,16 @@ class Well(Vessel):
         well_id (str): The ID of the well.
         plate_id (int): The ID of the well plate.
         coordinates (WellCoordinates): The coordinates of the well.
-        volume (Decimal): The volume of the well.
+        volume (float): The volume of the well.
         status (str): The status of the well.
         contents (dict): The contents of the well.
         status_date (str): The date of the well status. (Optional)
-        depth (Decimal): The depth of the well. (Optional)
-        capacity (Decimal): The capacity of the well. (Optional)
-        height (Decimal): The height of the well. (Optional)
+        depth (float): The depth of the well. (Optional)
+        capacity (float): The capacity of the well. (Optional)
+        height (float): The height of the well. (Optional)
         experiment_id (int): The ID of the experiment. (Optional)
         project_id (int): The ID of the project. (Optional)
-        density (Decimal): The density of the well. (Optional)
+        density (float): The density of the well. (Optional)
         campaign_id (int): The ID of the campaign. (Optional)
         well_type_number (int): The type of well. (Optional)
     """
@@ -142,16 +140,16 @@ class Well(Vessel):
         well_id: str,
         plate_id: int,
         coordinates: WellCoordinates,
-        volume: Decimal,
+        volume: float,
         status: str,
         contents: dict = {},
         status_date: str = None,
-        depth: Decimal = None,
-        capacity: Decimal = None,
-        height: Decimal = None,
+        depth: float = None,
+        capacity: float = None,
+        height: float = None,
         experiment_id: int = None,
         project_id: int = None,
-        density: Decimal = None,
+        density: float = None,
         campaign_id: int = None,
         well_type_number: int = None,
     ):
@@ -164,7 +162,7 @@ class Well(Vessel):
         self.contents: dict = contents
         self.project_id: int = project_id
         self.campaign_id: int = campaign_id
-        self.volume: Decimal = volume
+        self.volume: float = volume
         if isinstance(coordinates, WellCoordinates):
             self.coordinates: WellCoordinates = coordinates
         else:
@@ -173,11 +171,11 @@ class Well(Vessel):
             except json.JSONDecodeError:
                 self.coordinates = WellCoordinates(0, 0)
 
-        self.density: Decimal = density
+        self.density: float = density
         self.name: str = well_id
-        self.height: Decimal = height
-        self.depth: Decimal = depth
-        self.capacity: Decimal = capacity
+        self.height: float = height
+        self.depth: float = depth
+        self.capacity: float = capacity
         self.type_number: int = well_type_number
 
         super().__init__(
@@ -205,7 +203,7 @@ class Well(Vessel):
             "project_id": self.project_id,
             "volume": str(
                 self.volume
-            ),  # Convert Decimal to string so it can be printed or serialized to JSON
+            ),  # Convert float to string so it can be printed or serialized to JSON
             "coordinates": self.coordinates.to_json_string(),
         }
 
@@ -217,7 +215,7 @@ class Well(Vessel):
         """Returns the contents of the well."""
         return self.contents
 
-    def update_contents(self, from_vessel: dict, volume: Decimal) -> None:
+    def update_contents(self, from_vessel: dict, volume: float) -> None:
         """Updates the contents of the well in the well_status.json file."""
 
         # If we are removing a volume from a well we assume that the contents are equally mixed
@@ -226,10 +224,13 @@ class Well(Vessel):
 
         # If we are removing a volume from a well then we update the Self contents accordingly
         # We are assuming a well is equally mixed and we remove the same proportion of each vessel name AKA solution name
-        if volume < Decimal(0):
+        if volume < float(0):
+            if not isinstance(from_vessel, dict):
+                from_vessel = {from_vessel: volume}
+
             try:
-                current_content_ratios: Decimal = {
-                    key: Decimal(value) / Decimal(sum(self.get_contents().values()))
+                current_content_ratios: float = {
+                    key: float(value) / float(sum(self.get_contents().values()))
                     for key, value in self.get_contents().items()
                 }
 
@@ -243,12 +244,12 @@ class Well(Vessel):
                 logger.error("Error occurred while updating well contents: %s", e)
                 logger.error("Not critical, continuing....")
 
-        elif volume == Decimal(0):
+        elif volume == float(0):
             logger.debug("Volume to add was 0 well %s contents unchanged", self.name)
 
         # If we are adding a volume to a well then we update the provided vessel name AKA solution name
         # in the well contents with the provided volume
-        else:
+        elif volume > float(0):
             for key in from_vessel.keys():
                 if key in self.contents.keys():
                     self.contents[key] += from_vessel[key]
@@ -293,8 +294,8 @@ class Wellplate:
     Attributes:
     -----------
         wells (Dict[str, Well]): A dictionary of well objects.
-        a1_x (Decimal): The x-coordinate of well A1.
-        a1_y (Decimal): The y-coordinate of well A1.
+        a1_x (float): The x-coordinate of well A1.
+        a1_y (float): The y-coordinate of well A1.
         orientation (int): The orientation of the well plate (0-3).
         columns (str): The string representation of well plate columns.
         rows (int): The number of rows in the well plate.
@@ -305,8 +306,8 @@ class Wellplate:
 
     def __init__(
         self,
-        x_a1: Decimal = Decimal(0),
-        y_a1: Decimal = Decimal(0),
+        x_a1: float = float(0),
+        y_a1: float = float(0),
         orientation: int = 0,
         columns: str = "ABCDEFGH",
         rows: int = 13,
@@ -324,11 +325,9 @@ class Wellplate:
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
-        self.z_bottom = Decimal(-72)
-        self.echem_height = Decimal(-70)  # for every well
-        self.image_height = Decimal(
-            -35
-        )  # The height from which to image the well in mm
+        self.z_bottom = (-72)
+        self.echem_height = (-70)  # for every well
+        self.image_height = (-35)  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
         plate_id, _, _ = sql_wellplate.select_current_wellplate_info()
         self.plate_id = (
@@ -336,11 +335,11 @@ class Wellplate:
         )  # The id of the well plate
 
         # From the well_type.csv file in config but has defaults
-        self.z_top = Decimal(0)
-        self.height = Decimal(6.0)  # The height of the well plate in mm
-        self.radius = Decimal(3.25)  # new circular wells
-        self.well_offset = Decimal(9.0)  # mm from center to center
-        self.well_capacity = Decimal(300)  # ul
+        self.z_top = float(0)
+        self.height = float(6.0)  # The height of the well plate in mm
+        self.radius = float(3.25)  # new circular wells
+        self.well_offset = float(9.0)  # mm from center to center
+        self.well_capacity = float(300)  # ul
         # overwrite the default values with the values from the well_type.csv file
         (
             self.radius,
@@ -364,7 +363,7 @@ class Wellplate:
             "y": self.a1_y,
             "z_top": self.z_top,
         }  # coordinates of A1
-        self.initial_volume = Decimal(0.00)
+        self.initial_volume = float(0.00)
         self.establish_new_wells()  # we need to establish the wells before we can update their status from file
         self.calculate_well_locations()  # now we can calculate the well locations
         current_wellplate_id, current_wellplate_type, _ = (
@@ -443,9 +442,9 @@ class Wellplate:
                 coordinates["y"] = round(coordinates["y"], 3)
                 coordinates["z_top"] = round(coordinates["z_top"], 3)
                 new_coordinates = WellCoordinates(
-                    Decimal(coordinates["x"]),
-                    Decimal(coordinates["y"]),
-                    Decimal(coordinates["z_top"]),
+                    float(coordinates["x"]),
+                    float(coordinates["y"]),
+                    float(coordinates["z_top"]),
                 )
                 self.set_coordinates(well_id, new_coordinates)
 
@@ -458,13 +457,13 @@ class Wellplate:
                     plate_id=self.plate_id,
                     well_id=well_id,
                     coordinates=WellCoordinates(
-                        x=Decimal(0), y=Decimal(0), z_top=Decimal(0)
+                        x=float(0), y=float(0), z_top=float(0)
                     ),
                     volume=self.initial_volume,
                     height=self.height,
                     depth=self.z_bottom,
                     status="new",
-                    density=Decimal(1.0),
+                    density=float(1.0),
                     capacity=self.well_capacity,
                     contents={},
                 )
@@ -518,19 +517,19 @@ class Wellplate:
         """Return the contents of a specific well"""
         return self.wells[well_id.upper()].contents
 
-    def get_volume(self, well_id: str) -> Decimal:
+    def get_volume(self, well_id: str) -> float:
         """Return the volume of a specific well"""
         return self.wells[well_id.upper()].volume
 
-    def get_depth(self, well_id: str) -> Decimal:
+    def get_depth(self, well_id: str) -> float:
         """Return the depth of a specific well"""
         return self.wells[well_id.upper()].depth
 
-    def get_density(self, well_id) -> Decimal:
+    def get_density(self, well_id) -> float:
         """Return the density of a specific well"""
         return self.wells[well_id.upper()].density
 
-    def check_volume(self, well_id, added_volume: Decimal) -> bool:
+    def check_volume(self, well_id, added_volume: float) -> bool:
         """Check if a volume can fit in a specific well"""
         info_message = f"Checking if {added_volume} can fit in {well_id} ..."
         logger.info(info_message)
@@ -543,7 +542,7 @@ class Wellplate:
             logger.info(info_message)
             return True
 
-    def update_volume(self, well_id: str, added_volume: Decimal):
+    def update_volume(self, well_id: str, added_volume: float):
         """Update the volume of a specific well"""
         well_id = well_id.upper()
         if self.wells[well_id].volume + added_volume > self.well_capacity:
@@ -556,13 +555,13 @@ class Wellplate:
         else:
             self.wells[well_id].volume += added_volume
             radius_mm = self.radius
-            area_mm2 = Decimal(math.pi) * radius_mm**2
+            area_mm2 = float(math.pi) * radius_mm**2
             volume_mm3 = self.wells[well_id].volume
-            depth = Decimal(volume_mm3) / Decimal(area_mm2) + self.z_bottom
+            depth = float(volume_mm3) / float(area_mm2) + self.z_bottom
             if depth < self.z_bottom:
                 depth = self.z_bottom
-            if depth - Decimal(0.05) > self.z_bottom:
-                depth -= Decimal(0.05)
+            if depth - float(0.05) > self.z_bottom:
+                depth -= float(0.05)
             self.wells[well_id].depth = depth
             if self.wells[well_id].depth < self.z_bottom:
                 self.wells[well_id].depth = self.z_bottom
@@ -592,7 +591,7 @@ class Wellplate:
 
     def read_well_type_characteristics(
         self, type_number: int
-    ) -> tuple[Decimal, Decimal, Decimal, Decimal]:
+    ) -> tuple[float]:
         """Read the well type characteristics from the well_type.csv config file"""
 
         # Select the well type characteristics from the well_types sql table given the type_number
@@ -601,17 +600,17 @@ class Wellplate:
         )
 
         return (
-            Decimal(radius),
-            Decimal(well_offset),
-            Decimal(well_capacity),
-            Decimal(height),
+            float(radius),
+            float(well_offset),
+            float(well_capacity),
+            float(height),
             shape,
-            self.z_bottom + Decimal(height),  # z_top
+            self.z_bottom + float(height),  # z_top
         )
 
     def load_wellplate_location(
         self,
-    ) -> tuple[Decimal, Decimal, Decimal, int, int, str, Decimal]:
+    ) -> tuple[float, int, int, str, float]:
         """Load the location of the well plate from the well_location json file"""
 
         # check if it exists
@@ -640,13 +639,13 @@ class Wellplate:
         # }
         with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as f:
             data = json.load(f)
-            x = Decimal(data["x"])
-            y = Decimal(data["y"])
-            z_bottom = Decimal(data["z-bottom"])
+            x = float(data["x"])
+            y = float(data["y"])
+            z_bottom = float(data["z-bottom"])
             orientation = data["orientation"]
             rows = data["rows"]
             cols = data["cols"]
-            echem_height = Decimal(data["echem_height"])
+            echem_height = float(data["echem_height"])
 
         return (x, y, z_bottom, orientation, rows, cols, echem_height)
 

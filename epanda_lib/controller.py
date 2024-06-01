@@ -46,7 +46,7 @@ from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .utilities import SystemState
 from .vials import (StockVial, Vial2, WasteVial, get_current_vials,
-                    update_vial_state_files)
+                    update_vial_state_files, read_vials)
 from .wellplate import Wellplate
 
 # set up slack globally so that it can be used in the main function and others
@@ -361,6 +361,7 @@ def main(
         # )
 
         logger.error(error)
+        logger.exception(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error  # raise error to go to finally. If we don't know what caused an error we don't want to continue
 
@@ -408,8 +409,9 @@ def establish_system_state() -> (
         wellplate (wellplate_module.Wells): wellplate object
     """
     slack = SlackBot()
-    stock_vials = get_current_vials("stock")
-    waste_vials = get_current_vials("waste")
+    stock_vials, waste_vials = read_vials()
+    #stock_vials = get_current_vials("stock")
+    #waste_vials = get_current_vials("waste")
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = Wellplate()
@@ -633,6 +635,8 @@ def share_analysis_to_slack(
     """
     # If the AL campaign length is set, run the ML analysis
     # We do the analysis on the experiment that just finished
+    if read_testing_config():
+        return
     if slack is None:
         slack = SlackBot()
 
