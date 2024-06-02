@@ -395,7 +395,7 @@ def main(
         obs.stop_recording()
         sql_system_state.set_system_status(SystemState.IDLE)
         slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
-        print("ePANDA is shutting down...goodbye")
+        print("ePANDA is shutting down...returning to main menu...goodbye")
 
 
 def establish_system_state() -> (
@@ -487,9 +487,9 @@ def establish_system_state() -> (
         slack.send_slack_message("alert", "There are no clear wells on the wellplate")
         slack.send_slack_message(
             "alert",
-            "Please replace the wellplate and confirm in the terminal that the program should continue",
+            "Please replace the wellplate and restart the program from the main menu",
         )
-        exit()
+        raise ShutDownCommand
 
     return stock_vials_only, waste_vials_only, wellplate
 
