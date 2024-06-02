@@ -15,8 +15,11 @@ system_handler = logging.FileHandler(PATH_TO_LOGS / "sql_utilities.log")
 system_handler.setFormatter(formatter)
 logger.addHandler(system_handler)
 
+
 # region Utility Functions
-def execute_sql_command(sql_command: str, parameters: tuple = None, test:bool = False) -> list:
+def execute_sql_command(
+    sql_command: str, parameters: tuple = None, test: bool = False
+) -> list:
     """
     Execute an SQL command on the database.
 
@@ -38,7 +41,7 @@ def execute_sql_command(sql_command: str, parameters: tuple = None, test:bool = 
 
     try:
         # Log the SQL command
-        logger.debug("Executing SQL command: %s",sql_command)
+        logger.debug("Executing SQL command: %s", sql_command)
         logger.debug("Parameters: %s", parameters)
         # Execute the SQL command
         if parameters:
@@ -55,22 +58,24 @@ def execute_sql_command(sql_command: str, parameters: tuple = None, test:bool = 
         conn.commit()
 
         # Log the result
-        logger.debug("SQL command executed successfully. Result: %s",result)
+        logger.debug("SQL command executed successfully. Result: %s", result)
     except sqlite3.Error as e:
-        logger.error("An error occurred: %s",e)
-        logger.error("SQL command: %s",sql_command)
-        logger.error("Parameters: %s",parameters)
+        logger.error("An error occurred: %s", e)
+        logger.error("SQL command: %s", sql_command)
+        logger.error("Parameters: %s", parameters)
         conn.rollback()  # Rollback the transaction if error
         raise e
     finally:
         conn.close()
 
-    #time.sleep(1)
+    # time.sleep(1)
 
     return result
 
 
-def execute_sql_command_no_return(sql_command: str, parameters: tuple = None, test:bool = False) -> None:
+def execute_sql_command_no_return(
+    sql_command: str, parameters: tuple = None, test: bool = False
+) -> None:
     """
     Execute an SQL command on the database without returning anything.
 
@@ -85,13 +90,10 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None, te
         conn = sqlite3.connect(LOCAL_REPO_PATH / "epanda_test.db")
     else:
         conn = sqlite3.connect(SQL_DB_PATH)
-    
-    # Convert Decimal to float
-    parameters = convert_decimals(parameters)
 
     # Manually control transactions
-    conn.isolation_level = None  
-    
+    conn.isolation_level = None
+
     cursor = conn.cursor()
 
     # Start a new transaction
@@ -105,6 +107,8 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None, te
         logger.debug("Parameters: %s", parameters)
 
         if parameters:
+            parameters = convert_decimals(parameters)
+
             if isinstance(parameters[0], tuple):
                 cursor.executemany(sql_command, parameters)
             else:
@@ -129,7 +133,8 @@ def execute_sql_command_no_return(sql_command: str, parameters: tuple = None, te
         # Close the connection
         conn.close()
 
-    #time.sleep(1)
+    # time.sleep(1)
+
 
 def convert_decimals(parameters):
     new_parameters = []
