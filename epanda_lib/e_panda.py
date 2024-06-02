@@ -356,16 +356,16 @@ def flush_v2(
             flush_volume,
             flush_solution_name,
         )
-        flush_solution = solution_selector(
-            stock_vials, flush_solution_name, flush_volume
-        )
-        waste_vial = waste_selector(waste_vials, "waste", flush_volume)
+        
 
         for _ in range(flush_count):
+
             forward_pipette_v2(
                 flush_volume,
-                from_vessel=flush_solution,
-                to_vessel=waste_vial,
+                from_vessel=solution_selector(
+            stock_vials, flush_solution_name, flush_volume
+            ),
+                to_vessel= waste_selector(waste_vials, "waste", flush_volume),
                 pump=pump,
                 mill=mill,
                 pumping_rate=pumping_rate,
