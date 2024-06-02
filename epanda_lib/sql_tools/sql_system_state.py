@@ -33,7 +33,7 @@ def get_current_pin() -> int:
     if result == []:
         return None
     result = str(result[0][0]).replace(" ", "")
-    return int(result)
+    return str(int(result))
 
 def select_system_status(look_back:int = 1) -> SystemState:
     """
