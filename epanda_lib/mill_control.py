@@ -45,6 +45,13 @@ console_handler.setFormatter(console_formatter)
 console_handler.setLevel(logging.WARNING)
 logger.addHandler(console_handler)
 
+# Mill movement logger
+mill_movement_logger = logging.getLogger("mill_movement")
+mill_movement_logger.setLevel(logging.DEBUG)
+mill_movement_handler = logging.FileHandler(PATH_TO_LOGS / "mill_movement.log")
+mill_movement_handler.setFormatter(formatter)
+mill_movement_logger.addHandler(mill_movement_handler)
+
 
 class Mill:
     """
@@ -172,7 +179,7 @@ class Mill:
         """Encodes and sends commands to the mill and returns the response"""
         try:
             logger.debug("Command sent: %s", command)
-
+            mill_movement_logger.debug("%s", command)
             command_bytes = str(command).encode()
             self.ser_mill.write(command_bytes + b"\n")
             time.sleep(2)
