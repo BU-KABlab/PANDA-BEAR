@@ -620,12 +620,19 @@ class EdotExperiment(EchemExperimentBase):
     experiment_type: int = 2  # edot
     edot_concentration: Decimal = Decimal(0.1)  # mM
 
+@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
+class FeCnVerificaitonExperiments(EchemExperimentBase):
+    """Define the default data that is used to run an FeCn experiment"""
+
+    project_id: int = 17
+    well_type_number: int = 4  # ito
 
 experiment_types_by_project_id = {
     0: ExperimentBase,
     1: EchemExperimentBase,
     16: EdotExperiment,
     11: CorrectionFactorExperiment,
+    17: FeCnVerificaitonExperiments,
     999: EdotExperiment
 }
 
