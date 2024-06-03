@@ -168,4 +168,6 @@ def fecn_conc_experiment(
             mill=toolkit.mill,
         )
 
+    instructions.set_status(ExperimentStatus.COMPLETE)
+
     toolkit.global_logger.info("Experiment %d complete\n\n", instructions.experiment_id)
