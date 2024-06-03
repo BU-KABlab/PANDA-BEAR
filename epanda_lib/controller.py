@@ -511,7 +511,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
         return False
     for solution in experiment.solutions:
         if str(solution).lower() not in [
-            str(vial.name).lower() for vial in stock_vials
+            str(vial.contents).lower() for vial in stock_vials
         ]:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
