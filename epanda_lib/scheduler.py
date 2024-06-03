@@ -159,7 +159,7 @@ class Scheduler:
         """Update the priority of experiments in the queue"""
         try:
             execute_sql_command(
-                "UPDATE experiments SET priority = ? WHERE id = ?",
+                "UPDATE experiments SET priority = ? WHERE experiment_id = ?",
                 (priority, experiment_id),
             )
         except sqlite3.Error as e:
@@ -172,8 +172,8 @@ class Scheduler:
         """Update the experiment information in the experiments table"""
         try:
             execute_sql_command(
-                "UPDATE experiments SET ? = ? WHERE id = ?",
-                (column, getattr(experiment, column), experiment.experiment_id),
+                f"UPDATE experiments SET {column} = ? WHERE experiment_id = ?",
+                (getattr(experiment, column), experiment.experiment_id),
             )
         except sqlite3.Error as e:
             logger.error("Error occured while updating experiment information: %s", e)
