@@ -847,6 +847,7 @@ def input_new_vial_values(vialgroup: str) -> None:
     #     vial_parameters = json.load(file)
 
     vial_parameters = get_current_vials(vialgroup)
+    vial_parameters = sorted(vial_parameters, key=lambda x: x["position"])
     vial_list = []
     vial_lines = []
     ## Print the current vials and their values
@@ -896,46 +897,51 @@ def input_new_vial_values(vialgroup: str) -> None:
         if choice == "q":
             break
         for vial in vial_parameters:
-            if vial["position"] == choice:
+            vial = Vial2(**vial)
+            if vial.position == choice:
                 print(
                     "Please enter the new values for the vial, if you leave any blank the value will not be changed"
                 )
-                print(f"\nVial {vial['position']}:")
+                print(f"\nVial {vial.position}:")
                 new_name = input(
-                    f"Enter the new name of the vial (Current name is {vial['name']}): "
+                    f"Enter the new name of the vial (Current name is {vial.name}): "
                 )
                 if new_name != "":
-                    vial["name"] = new_name
+                    vial.name = new_name
                 new_contents = input(
-                    f"Enter the new contents of the vial (Current contents are {vial['contents']}): "
+                    f"Enter the new contents of the vial (Current contents are {vial.contents}): "
                 )
                 if new_contents != "":
-                    vial["contents"] = new_contents
+                    vial.contents = new_contents
                 new_density = input(
-                    f"Enter the new density of the vial (Current density is {vial['density']}): "
+                    f"Enter the new density of the vial (Current density is {vial.density}): "
                 )
                 if new_density != "":
-                    vial["density"] = float(new_density)
+                    vial.density = float(new_density)
                 new_volume = input(
-                    f"Enter the new volume of the vial (Current volume is {vial['volume']}): "
+                    f"Enter the new volume of the vial (Current volume is {vial.volume}): "
                 )
                 if new_volume != "":
-                    vial["volume"] = float(new_volume)
+                    vial.volume = float(new_volume)
                 new_capacity = input(
-                    f"Enter the new capacity of the vial (Current capacity is {vial['capacity']}): "
+                    f"Enter the new capacity of the vial (Current capacity is {vial.capacity}): "
                 )
                 if new_capacity != "":
-                    vial["capacity"] = float(new_capacity)
+                    vial.capacity = float(new_capacity)
                 new_contamination = input(
-                    f"Enter the new contamination of the vial (Current contamination is {vial['contamination']}): "
+                    f"Enter the new contamination of the vial (Current contamination is {vial.contamination}): "
                 )
                 if new_contamination != "":
-                    vial["contamination"] = int(new_contamination)
+                    vial.contamination = int(new_contamination)
+
+                vial.insert_updated_vial_in_db()
                 # print("\r" + " " * 100 + "\r", end="")  # Clear the previous table
                 print("\nCurrent vials:")
                 print(
                     f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Density':<15} {'Volume':<15} {'Capacity':<15} {'Contamination':<15}"
                 )
+                vial_parameters = get_current_vials(vialgroup)
+                vial_parameters = sorted(vial_parameters, key=lambda x: x["position"])
                 for vial in vial_parameters:
                     vial = Vial2(**vial)
                     if vial.contents is None:
@@ -949,15 +955,11 @@ def input_new_vial_values(vialgroup: str) -> None:
                         vial.capacity = ""
                         vial.contamination = ""
 
+                    contents_str = str(vial.contents)  # Convert contents dictionary to string
                     print(
-                        f"{vial.position:<10} {vial.name:<20} {vial.contents:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
+                        f"{vial.position:<10} {vial.name:<20} {contents_str:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
                     )
                 break
         else:
             print("Invalid vial position")
             continue
-
-    ## Insert the new values to the db
-    # with open(filename, "w", encoding="UTF-8") as file:
-    #     json.dump(vial_parameters, file, indent=4)
-    input_new_vials_into_db(vial_list)
