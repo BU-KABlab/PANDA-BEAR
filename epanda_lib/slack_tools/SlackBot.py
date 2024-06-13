@@ -5,7 +5,7 @@
 import base64
 
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
-
+from enum import Enum
 import os
 import json
 import logging
@@ -38,6 +38,15 @@ from epanda_lib import vials
 
 # STOCK_STATUS = config.STOCK_STATUS
 # WASTE_STATUS = config.WASTE_STATUS
+
+class Cameras(Enum):
+    """
+    Enum for camera types
+    """
+    WEBCAM = 0
+    VIALS = 1
+    PSTAT = 2
+
 
 
 # region Slack Tickets
@@ -449,7 +458,17 @@ class SlackBot:
             try:
                 parts = text.split("-")
                 camera = parts[1].strip().lower()
-                self._take_screenshot(channel_id, camera)
+                # # Validate the camera choice against the Cameras enum
+                # try:
+                #     camera = Cameras[camera.upper()]
+                # except KeyError:
+                #     message = "Please specify a valid camera to take a screenshot of."
+                #     self.send_slack_message(channel_id, message)
+                #     message = "Valid cameras are: webcam, vials, pstat"
+                #     self.send_slack_message(channel_id, message)
+                #     return 1
+
+                self.take_screenshot(channel_id, camera)
             except IndexError:
                 message = (
                     "Please specify which camera to take a screenshot of with a '-'."
@@ -760,7 +779,7 @@ class SlackBot:
         }
         return color_mapping.get(status, "gold")
 
-    def _take_screenshot(self, channel_id, camera_name: str):
+    def take_screenshot(self, channel_id, camera_name: str):
         """Take a screenshot of the camera."""
         try:
             file_name = "tmp_screenshot.png"

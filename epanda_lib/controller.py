@@ -332,6 +332,12 @@ def main(
         # )
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
+
+        slack.take_screenshot('alert', 'webcam')
+        slack.take_screenshot('alert', 'vials')
+        slack.send_slack_message("alert", "Please check the terminal to move the mill to the rest position")
+        input("Press enter to continue")
+
         raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
 
     except ProtocolNotFoundError as error:

@@ -427,8 +427,8 @@ if __name__ == "__main__":
                 "alert", "OCP Failure has occured. Please check the system."
             )
             channel_id = slack.channel_id("alert")
-            slack._take_screenshot(channel_id, "webcam")
-            slack._take_screenshot(channel_id, "vials")
+            slack.take_screenshot(channel_id, "webcam")
+            slack.take_screenshot(channel_id, "vials")
             time.sleep(5)
             slack.send_slack_message("alert", "Would you like to continue? (y/n): ")
             while True:
