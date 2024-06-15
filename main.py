@@ -432,15 +432,15 @@ if __name__ == "__main__":
             time.sleep(5)
             slack.send_slack_message("alert", "Would you like to continue? (y/n): ")
             while True:
-                usr_choice = slack.check_latest_message(channel_id)[0].strip().lower()
-                if usr_choice == "y":
+                contiue_choice = slack.check_latest_message(channel_id)[0].strip().lower()
+                if contiue_choice == "y":
                     break
-                if usr_choice == "n":
+                if contiue_choice == "n":
                     break
-            if usr_choice == "n":
+            if contiue_choice == "n":
                 continue
-            if usr_choice == "y":
-                run_epanda_without_ml()
+            if contiue_choice == "y":
+                menu_options[user_choice]()
 
         except Exception as e:
             print(f"An error occurred: {e}")
