@@ -42,7 +42,7 @@ decimal.getcontext().prec = 6
 def run_epanda_with_ml():
     """Runs ePANDA."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "running ePANDA", read_testing_config()
+        utilities.SystemState.BUSY, "running ePANDA"
     )
     length = int(input("Enter the campaign length: ").strip().lower())
     controller.main(al_campaign_length=length)
@@ -51,7 +51,7 @@ def run_epanda_with_ml():
 def run_epanda_without_ml():
     """Runs ePANDA."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "running ePANDA", read_testing_config()
+        utilities.SystemState.BUSY, "running ePANDA"
     )
     controller.main()
 
@@ -59,7 +59,7 @@ def run_epanda_without_ml():
 def genererate_pedot_experiment():
     """Generates a PEDOT experiment."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "generating PEDOT experiment", read_testing_config()
+        utilities.SystemState.BUSY, "generating PEDOT experiment"
     )
     dep_v = float(input("Enter the deposition voltage: ").strip().lower())
     dep_t = float(input("Enter the deposition time: ").strip().lower())
@@ -71,7 +71,7 @@ def genererate_pedot_experiment():
 def change_wellplate():
     """Changes the current wellplate."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "changing wellplate", read_testing_config()
+        utilities.SystemState.BUSY, "changing wellplate"
     )
     wellplate.load_new_wellplate(ask=True)
 
@@ -122,7 +122,7 @@ def print_queue_info():
 def reset_vials_stock():
     """Resets the stock vials."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "resetting stock vials", read_testing_config()
+        utilities.SystemState.BUSY, "resetting stock vials"
     )
     vials.reset_vials("stock")
 
@@ -130,7 +130,7 @@ def reset_vials_stock():
 def reset_vials_waste():
     """Resets the waste vials."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "resetting waste vials", read_testing_config()
+        utilities.SystemState.BUSY, "resetting waste vials"
     )
     vials.reset_vials("waste")
 
@@ -138,7 +138,7 @@ def reset_vials_waste():
 def input_new_vial_values_stock():
     """Inputs new values for the stock vials."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "inputting new vial values", read_testing_config()
+        utilities.SystemState.BUSY, "inputting new vial values"
     )
     vials.input_new_vial_values("stock")
 
@@ -146,7 +146,7 @@ def input_new_vial_values_stock():
 def input_new_vial_values_waste():
     """Inputs new values for the waste vials."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "inputting new vial values", read_testing_config()
+        utilities.SystemState.BUSY, "inputting new vial values"
     )
     vials.input_new_vial_values("waste")
 
@@ -154,7 +154,7 @@ def input_new_vial_values_waste():
 def change_wellplate_location():
     """Changes the location of the current wellplate."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "changing wellplate location", read_testing_config()
+        utilities.SystemState.BUSY, "changing wellplate location"
     )
     wellplate.change_wellplate_location()
 
@@ -162,7 +162,7 @@ def change_wellplate_location():
 def run_experiment_generator():
     """Runs the edot voltage sweep experiment."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "generating experiment files", read_testing_config()
+        utilities.SystemState.BUSY, "generating experiment files"
     )
     sql_generator_utilities.read_in_generators()
     available_generators = sql_generator_utilities.get_generators()
@@ -206,7 +206,7 @@ def calibrate_mill():
         mill = mill_control.Mill
 
     sql_system_state.set_system_status(
-        utilities.SystemState.CALIBRATING, "calibrating the mill", read_testing_config()
+        utilities.SystemState.CALIBRATING, "calibrating the mill"
     )
 
     mill_calibration_and_positioning.calibrate_mill(
@@ -225,7 +225,7 @@ def test_camera():
 def generate_experiment_from_existing_data():
     """Generates an experiment from existing data using the ML model."""
     sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "generating experiment", read_testing_config()
+        utilities.SystemState.BUSY, "generating experiment"
     )
     next_experiment = scheduler.determine_next_experiment_id()
     output = pedot_analysis.pedot_model(
@@ -315,7 +315,7 @@ def generate_experiment_from_existing_data():
 def exit_program():
     """Exits the program."""
     sql_system_state.set_system_status(
-        utilities.SystemState.OFF, "exiting ePANDA", read_testing_config()
+        utilities.SystemState.OFF, "exiting ePANDA"
     )
     print("Exiting ePANDA. Goodbye!")
     sys.exit()
@@ -329,21 +329,21 @@ def refresh():
 def stop_epanda():
     """Stops the ePANDA loop."""
     sql_system_state.set_system_status(
-        utilities.SystemState.SHUTDOWN, "stopping ePANDA", read_testing_config()
+        utilities.SystemState.SHUTDOWN, "stopping ePANDA"
     )
 
 
 def pause_epanda():
     """Pauses the ePANDA loop."""
     sql_system_state.set_system_status(
-        utilities.SystemState.PAUSE, "stopping ePANDA", read_testing_config()
+        utilities.SystemState.PAUSE, "stopping ePANDA"
     )
 
 
 def resume_epanda():
     """Resumes the ePANDA loop."""
     sql_system_state.set_system_status(
-        utilities.SystemState.RESUME, "stopping ePANDA", read_testing_config()
+        utilities.SystemState.RESUME, "stopping ePANDA"
     )
 
 
@@ -387,14 +387,14 @@ menu_options = {
 if __name__ == "__main__":
 
     sql_system_state.set_system_status(
-        utilities.SystemState.ON, "at main menu", read_testing_config()
+        utilities.SystemState.ON, "at main menu"
     )
     time.sleep(1)
     sql_protocol_utilities.read_in_protocols()
 
     while True:
         sql_system_state.set_system_status(
-            utilities.SystemState.IDLE, "at main menu", read_testing_config()
+            utilities.SystemState.IDLE, "at main menu"
         )
         # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
         print()
@@ -447,5 +447,5 @@ if __name__ == "__main__":
             break  # Exit the program if an unknown error occurs
 
     sql_system_state.set_system_status(
-        utilities.SystemState.OFF, "exiting ePANDA", read_testing_config()
+        utilities.SystemState.OFF, "exiting ePANDA"
     )
