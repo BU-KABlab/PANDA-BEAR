@@ -160,7 +160,7 @@ def main(
                             f"New experiment generated from existing data {new_experiment.experiment_id}",
                         )
                         al_campaign_iteration += 1
-                        continue  # continue to the next iteration of the while new experiment is None loop
+                        break  # break out of the while new experiment is None loop
                     else:
                         slack.send_slack_message(
                             "alert", "No new experiment generated from existing data"
@@ -305,7 +305,7 @@ def main(
             update_vial_state_files(
                 stock_vials, waste_vials, 'STOCK_STATUS', 'WASTE_STATUS'
             )
-            if toolkit.pump.pipette.volume > 0:
+            if toolkit.pump.pipette.volume > 0 and toolkit.pump.pipette.volume_ml < 1:
                 # assume unreal volume, not actually solution, set to 0
                 toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume_ml)
             if one_off:
@@ -357,6 +357,17 @@ def main(
         logger.info("User commanded shutting down of ePANDA")
         raise ShutDownCommand from error  # raise error to go to finally.
         # This was triggered by the user to indicate they want to stop the program
+    
+    except KeyboardInterrupt as exc:
+        if new_experiment is not None:
+            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+        sql_system_state.set_system_status(SystemState.ERROR)
+        # scheduler.change_well_status(
+        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+        # )
+        logger.info("Keyboard interrupt detected")
+        slack.send_slack_message("alert", "ePANDA was interrupted by the user")
+        raise KeyboardInterrupt from exc  # raise error to go to finally. This was triggered by the user to indicate they want to stop the program
 
     except Exception as error:
         if new_experiment is not None:
@@ -370,17 +381,6 @@ def main(
         logger.exception(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
         raise error  # raise error to go to finally. If we don't know what caused an error we don't want to continue
-
-    except KeyboardInterrupt as exc:
-        if new_experiment is not None:
-            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-        sql_system_state.set_system_status(SystemState.ERROR)
-        # scheduler.change_well_status(
-        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-        # )
-        logger.info("Keyboard interrupt detected")
-        slack.send_slack_message("alert", "ePANDA was interrupted by the user")
-        raise KeyboardInterrupt from exc  # raise error to to go finally. This was triggered by the user to indicate they want to stop the program
 
     finally:
         if new_experiment is not None:
