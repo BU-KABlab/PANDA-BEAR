@@ -35,9 +35,6 @@ DEFAULT_PUMPING_RATE = float(0.3)  # ul/s
 ## Flag to use only local paths
 USE_LOCAL_PATHS = read_testing_config()
 
-## FLIR Camera related - must be python 3.6
-PYTHON_360_PATH = Path("C:\\Users\\Kab Lab\\anaconda3\\envs\\python360\\python.exe")
-CAMERA_SCRIPT_PATH = Path("camera.py")
 ## Define local repository path
 LOCAL_REPO_PATH = Path(__file__).parents[2]
 
@@ -68,6 +65,10 @@ __DATA = "data"
 #__EXPERIMENTS_ERROR = "experiments_error"
 __LOGS = "logs"
 __SYS_STATE = "system state"
+
+## FLIR Camera related - must be python 3.6
+PYTHON_360_PATH = Path("C:\\Users\\Kab Lab\\anaconda3\\envs\\python360\\python.exe")
+CAMERA_SCRIPT_PATH = Path(LOCAL_REPO_PATH/__CODE/"camera.py")
 
 ## Build complete paths for each project directory or file
 if USE_LOCAL_PATHS:
