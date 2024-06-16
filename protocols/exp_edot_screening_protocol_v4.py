@@ -227,40 +227,41 @@ def pedotdeposition(
 
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
+
+    ## Move the electrode to the well
+    # Move the electrode to above the well
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.z_top,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate to 1000 to avoid splashing
+    toolkit.mill.set_feed_rate(100)
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.echem_height,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate back to 2000
+    toolkit.mill.set_feed_rate(2000)
+
+    toolkit.global_logger.info("3. Performing CA deposition")
     try:
-        ## Move the electrode to the well
-        # Move the electrode to above the well
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
+        chrono_amp(instructions, file_tag="CA_deposition")
 
-        toolkit.global_logger.info("3. Performing CA deposition")
-        try:
-            chrono_amp(instructions, file_tag="CA_deposition")
+    except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
+        toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+        raise e
+    except Exception as e:
+        toolkit.global_logger.error("Unknown error occurred during chrono_amp: %s", str(e))
+        raise e
 
-        except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
-            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-            raise e
-        except Exception as e:
-            toolkit.global_logger.error("Unknown error occurred during chrono_amp: %s", str(e))
-            raise e
-    finally:
-        toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
-        toolkit.mill.rinse_electrode(3)
+    # Rinse electrode
+    toolkit.global_logger.info("4. Rinsing electrode")
+    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
@@ -381,38 +382,39 @@ def pedotbleaching(
 
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
-    try:
-        ## Move the electrode to the well
-        # Move the electrode to above the well
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
 
-        toolkit.global_logger.info("3. Performing CA")
-        try:
-            chrono_amp_edot_bleaching(instructions)
-        except Exception as e:
-            toolkit.global_logger.error(
-                "Error occurred during chrono_amp bleaching: %s", str(e)
-            )
-            raise e
-    finally:
-        toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
-        toolkit.mill.rinse_electrode(3)
+    ## Move the electrode to the well
+    # Move the electrode to above the well
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.z_top,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate to 1000 to avoid splashing
+    toolkit.mill.set_feed_rate(100)
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.echem_height,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate back to 2000
+    toolkit.mill.set_feed_rate(2000)
+
+    toolkit.global_logger.info("3. Performing CA")
+    try:
+        chrono_amp_edot_bleaching(instructions)
+    except Exception as e:
+        toolkit.global_logger.error(
+            "Error occurred during chrono_amp bleaching: %s", str(e)
+        )
+        raise e
+
+    # Rinse electrode
+    toolkit.global_logger.info("4. Rinsing electrode")
+    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
@@ -529,9 +531,12 @@ def pedotcoloring(
             )
             raise e
     finally:
-        toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
-        toolkit.mill.rinse_electrode(3)
+        pass
+
+    # Rinse electrode
+    toolkit.global_logger.info("4. Rinsing electrode")
+    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
