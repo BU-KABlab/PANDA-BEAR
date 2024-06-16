@@ -1,12 +1,32 @@
 """
+driver.py
 A Python driver for Sartorius and Minebea Intec ethernet scales.
 
 Distributed under the GNU General Public License v2
-Copyright (C) 2019 NuMat Technologies
+Copyright (C) 2024 Gregory Robben
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software Foundation,
+Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+Modifications:
+- Added async context manager methods (__aenter__, __aexit__)
+- Implemented get_info method to retrieve scale information
+- Additional error handling in the _parse method
+- Other minor improvements and bug fixes
 """
 
 import logging
-import time
 from typing import Any
 import asyncio
 
@@ -139,6 +159,7 @@ class Scale:
         }
     def read_scale(self):
         """Get scale reading."""
+        import time
         reading = self.loop.run_until_complete(self.get())
         while not reading['stable']:      # Get mass, units, stability
             time.sleep(0.1)

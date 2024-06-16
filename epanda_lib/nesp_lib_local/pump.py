@@ -1,15 +1,36 @@
-from .port import Port
-from .status import Status
-from .alarm_status import AlarmStatus
-from .pumping_direction import PumpingDirection
-from .exceptions import *
+"""
+This module provides a Pump class that represents a pump device.
 
-import typing
+MIT License:
+Copyright (c) 2021 Florian Lapp
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+
 import binascii
-import re
-import time
 import enum
+import re
 import threading
+import time
+import typing
+
+from .alarm_status import AlarmStatus
+from .exceptions import *
+from .port import Port
+from .pumping_direction import PumpingDirection
+from .status import Status
+
 
 class Pump :
     """Pump."""
@@ -439,16 +460,16 @@ class Pump :
         'UL' : lambda value : value * 1_000.0,
     }
 
-    def __error_handle_not_applicable() -> None :
+    def __error_handle_not_applicable(self) -> None :
         raise StateException()
 
-    def __error_handle_out_of_range() -> None :
+    def __error_handle_out_of_range(self) -> None :
         raise ValueError()
 
-    def __error_handle_communication() -> None :
+    def __error_handle_communication(self) -> None :
         raise ChecksumRequestException()
 
-    def __error_handle_ignored() -> None :
+    def __error_handle_ignored(self) -> None :
         pass
 
     __ERROR = {
@@ -462,13 +483,13 @@ class Pump :
         'IGN' : __error_handle_ignored
     }
 
-    def __argument_str(value : str) -> str :
+    def __argument_str(self, value : str) -> str :
         return value
 
-    def __argument_int(value : int) -> str :
+    def __argument_int(self, value : int) -> str :
         return str(value)
 
-    def __argument_float(value : float) -> str :
+    def __argument_float(self, value : float) -> str :
         # From the docs: Maximum of 4 digits plus 1 decimal point. Maximum of 3 digits to the right
         # of the decimal point.
         if value.is_integer() :
