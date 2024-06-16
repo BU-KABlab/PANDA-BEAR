@@ -16,7 +16,7 @@ from PIL import Image
 
 import epanda_lib.analyzer.pedot as pedot_analysis
 from epanda_lib import (
-    camera_call_camera,
+    flir_camera,
     controller,
     experiment_class,
     mill_calibration_and_positioning,
@@ -219,7 +219,7 @@ def calibrate_mill():
 
 def test_camera():
     """Runs the mill control in testing mode."""
-    camera_call_camera.capture_new_image()
+    flir_camera.capture_new_image()
 
 
 def generate_experiment_from_existing_data():

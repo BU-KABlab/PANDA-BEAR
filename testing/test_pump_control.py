@@ -1,7 +1,7 @@
 import unittest
 import time
 import nesp_lib
-from epanda_lib.pump_control import MockMill, MockPump, MockScale
+from epanda_lib.syringepump import MockMill, MockPump, MockScale
 from epanda_lib.vessel import VesselCoordinates
 
 """_summary_

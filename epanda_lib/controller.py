@@ -38,7 +38,7 @@ from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
 from .obs_controls import OBSController
-from .pump_control import MockPump, SyringePump
+from .syringepump import MockPump, SyringePump
 from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
 from .scheduler import Scheduler

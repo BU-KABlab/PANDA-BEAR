@@ -4,7 +4,7 @@ from logging import Logger
 from typing import Union
 
 from epanda_lib.mill_control import Mill, MockMill
-from epanda_lib.pump_control import MockPump, SyringePump
+from epanda_lib.syringepump import MockPump, SyringePump
 from epanda_lib.sartorius_local import Scale
 from epanda_lib.sartorius_local.mock import Scale as MockScale
 import epanda_lib.wellplate as wp

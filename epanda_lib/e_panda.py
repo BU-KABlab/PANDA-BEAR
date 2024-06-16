@@ -24,6 +24,7 @@ Returns:
 # Standard library imports
 import logging
 import math
+
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
@@ -31,19 +32,33 @@ from typing import Optional, Sequence, Tuple, Union
 from PIL import Image
 
 # Local application imports
-from epanda_lib.camera_call_camera import capture_new_image
-from epanda_lib.config.config import (AIR_GAP, DRIP_STOP, PATH_TO_DATA,
-                                      PATH_TO_LOGS, read_testing_config)
+from epanda_lib.flir_camera import capture_new_image
+from epanda_lib.config.config import (
+    AIR_GAP,
+    DRIP_STOP,
+    PATH_TO_DATA,
+    PATH_TO_LOGS,
+    read_testing_config,
+)
 from epanda_lib.correction_factors import correction_factor
-from epanda_lib.errors import (CAFailure, CVFailure, DepositionFailure,
-                               NoAvailableSolution, OCPFailure)
-from epanda_lib.experiment_class import (EchemExperimentBase, ExperimentBase,
-                                         ExperimentResult, ExperimentStatus)
+from epanda_lib.errors import (
+    CAFailure,
+    CVFailure,
+    DepositionFailure,
+    NoAvailableSolution,
+    OCPFailure,
+)
+from epanda_lib.experiment_class import (
+    EchemExperimentBase,
+    ExperimentBase,
+    ExperimentResult,
+    ExperimentStatus,
+)
 from epanda_lib.image_tools import add_data_zone
 from epanda_lib.log_tools import CustomLoggingFilter
 from epanda_lib.mill_control import Instruments, Mill, MockMill
 from epanda_lib.obs_controls import OBSController
-from epanda_lib.pump_control import MockPump, SyringePump
+from epanda_lib.syringepump import MockPump, SyringePump
 from epanda_lib.instrument_toolkit import Toolkit
 from epanda_lib.vials import StockVial, WasteVial
 from epanda_lib.wellplate import Well
@@ -53,13 +68,17 @@ TESTING = read_testing_config()
 if TESTING:
     from epanda_lib.gamry_control_WIP_mock import GamryPotentiostat as echem
     from epanda_lib.gamry_control_WIP_mock import (
-        potentiostat_chrono_parameters, potentiostat_cv_parameters,
-        potentiostat_ocp_parameters)
+        potentiostat_chrono_parameters,
+        potentiostat_cv_parameters,
+        potentiostat_ocp_parameters,
+    )
 else:
     import epanda_lib.gamry_control_WIP as echem
-    from epanda_lib.gamry_control_WIP import (potentiostat_chrono_parameters,
-                                              potentiostat_cv_parameters,
-                                              potentiostat_ocp_parameters)
+    from epanda_lib.gamry_control_WIP import (
+        potentiostat_chrono_parameters,
+        potentiostat_cv_parameters,
+        potentiostat_ocp_parameters,
+    )
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
@@ -150,7 +169,9 @@ def forward_pipette_v2(
         if pumping_rate is None:
             pumping_rate = pump.max_pump_rate
 
-        repetitions = int(math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))) # We first round up, then declare an int
+        repetitions = int(
+            math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
+        )  # We first round up, then declare an int
         repetition_vol = volume / repetitions
 
         for j in range(repetitions):
@@ -193,14 +214,20 @@ def forward_pipette_v2(
 
             if isinstance(from_vessel, Well):
                 pump.withdraw(
-                    volume_to_withdraw=20, solution=None, rate=pump.max_pump_rate, weigh=False
+                    volume_to_withdraw=20,
+                    solution=None,
+                    rate=pump.max_pump_rate,
+                    weigh=False,
                 )  # If the from vessel is a well withdraw a little extra to ensure cleared well
 
             mill.move_to_safe_position()
 
             # Withdraw an air gap to prevent dripping, receive nothing
             pump.withdraw(
-                volume_to_withdraw=DRIP_STOP, solution=None, rate=pump.max_pump_rate, weigh=False
+                volume_to_withdraw=DRIP_STOP,
+                solution=None,
+                rate=pump.max_pump_rate,
+                weigh=False,
             )
 
             logger.debug(
@@ -226,7 +253,6 @@ def forward_pipette_v2(
             )
 
             weigh = bool(isinstance(to_vessel, Well))
-
 
             # Infuse into the to_vessel
             # try:
@@ -327,7 +353,7 @@ def flush_v2(
     mill: Union[Mill, MockMill],
     pump: Union[SyringePump, MockPump],
     pumping_rate=float(0.5),
-    flush_volume:float=float(120.0),
+    flush_volume: float = float(120.0),
     flush_count=1,
     instructions: Optional[ExperimentBase] = None,
 ):
@@ -356,16 +382,15 @@ def flush_v2(
             flush_volume,
             flush_solution_name,
         )
-        
 
         for _ in range(flush_count):
 
             forward_pipette_v2(
                 flush_volume,
                 from_vessel=solution_selector(
-            stock_vials, flush_solution_name, flush_volume
-            ),
-                to_vessel= waste_selector(waste_vials, "waste", flush_volume),
+                    stock_vials, flush_solution_name, flush_volume
+                ),
+                to_vessel=waste_selector(waste_vials, "waste", flush_volume),
                 pump=pump,
                 mill=mill,
                 pumping_rate=pumping_rate,
@@ -430,10 +455,9 @@ def solution_selector(
     """
     for solution in solutions:
         # if the solution names match and the requested volume is less than the available volume (volume - 10% of capacity)
-        if (
-            solution.name.lower() == solution_name.lower()
-            and round(float(solution.volume) - float(0.10) * float(solution.capacity),6) > (volume)
-        ):
+        if solution.name.lower() == solution_name.lower() and round(
+            float(solution.volume) - float(0.10) * float(solution.capacity), 6
+        ) > (volume):
             logger.debug(
                 "Selected stock vial: %s in position %s",
                 solution.name,
@@ -459,7 +483,8 @@ def waste_selector(
     for waste_solution in solutions:
         if (
             waste_solution.name.lower() == solution_name
-            and round((float(waste_solution.volume) + float(str(volume))),6) < waste_solution.capacity
+            and round((float(waste_solution.volume) + float(str(volume))), 6)
+            < waste_solution.capacity
         ):
             logger.debug(
                 "Selected waste vial: %s in position %s",
@@ -571,7 +596,9 @@ def chrono_amp(
         except Exception as e:
             ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during deposition: %s", e)
-            raise CAFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
+            raise CAFailure(
+                ca_instructions.experiment_id, ca_instructions.well_id
+            ) from e
 
     except OCPFailure as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
@@ -586,7 +613,9 @@ def chrono_amp(
     except Exception as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
-        raise DepositionFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
+        raise DepositionFailure(
+            ca_instructions.experiment_id, ca_instructions.well_id
+        ) from e
 
     finally:
         pstat.pstatdisconnect()
@@ -686,9 +715,7 @@ def cyclic_volt(
             cv_instructions.project_campaign_id,
             cv_instructions.well_id,
         )
-        cv_instructions.results.set_cv_data_file(
-            characterization_data_file, file_tag
-        )
+        cv_instructions.results.set_cv_data_file(characterization_data_file, file_tag)
         # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
         if overwrite_inital_voltage:
@@ -725,7 +752,9 @@ def cyclic_volt(
         except Exception as e:
             cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during CV: %s", e)
-            raise CVFailure(cv_instructions.experiment_id, cv_instructions.well_id) from e
+            raise CVFailure(
+                cv_instructions.experiment_id, cv_instructions.well_id
+            ) from e
 
     except OCPFailure as e:
         cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
@@ -760,7 +789,9 @@ def apply_log_filter(
     logger.addFilter(custom_filter)
 
 
-def volume_correction(volume:float, density:float=None, viscosity:float=None) -> float:
+def volume_correction(
+    volume: float, density: float = None, viscosity: float = None
+) -> float:
     """
     Corrects the volume of the solution based on the density and viscosity of the solution
 
@@ -776,7 +807,9 @@ def volume_correction(volume:float, density:float=None, viscosity:float=None) ->
         density = float(1.0)
     if viscosity is None:
         viscosity = float(1.0)
-    corrected_volume = round(volume * (float(1.0) + (float(1.0) - density) * (float(1.0) - viscosity)),6)
+    corrected_volume = round(
+        volume * (float(1.0) + (float(1.0) - density) * (float(1.0) - viscosity)), 6
+    )
     return float(corrected_volume)
 
 
@@ -806,7 +839,7 @@ def image_well(
         well_id = well_id = instructions.well_id or "test"
         # create file path
         filepath = image_filepath_generator(
-            exp_id, well_id, instructions.project_campaign_id ,step_description
+            exp_id, well_id, instructions.project_campaign_id, step_description
         )
 
         # position lens above the well
@@ -836,8 +869,7 @@ def image_well(
             )
             img.save(dz_filepath)
             instructions.results.append_image_file(
-                dz_filepath,
-                context=step_description + "_dz"
+                dz_filepath, context=step_description + "_dz"
             )
         logger.debug("Image of well %s captured", instructions.well_id)
 
@@ -863,8 +895,13 @@ def image_well(
             logger.info("Moving camera to safe position")
             toolkit.mill.move_to_safe_position()  # move to safe height above target well
 
+
 def image_filepath_generator(
-    exp_id: int = "test", project_id:int = "test", project_campaign_id:int = "test",well_id: str = "test", step_description: str = None
+    exp_id: int = "test",
+    project_id: int = "test",
+    project_campaign_id: int = "test",
+    well_id: str = "test",
+    step_description: str = None,
 ) -> Path:
     """
     Generate the file path for the image

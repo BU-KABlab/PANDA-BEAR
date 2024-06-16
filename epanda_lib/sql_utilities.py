@@ -23,7 +23,7 @@ from epanda_lib.experiment_class import (EchemExperimentBase, ExperimentBase,
 from epanda_lib.utilities import SystemState
 from epanda_lib.wellplate import (Well,  # , WellCoordinatesEncoder
                                   WellCoordinates)
-from epanda_lib.pump_control import Pipette
+from epanda_lib.pipette import Pipette
 
 # Set up logging
 # set up logging to log to both the pump_control.log file and the ePANDA.log file

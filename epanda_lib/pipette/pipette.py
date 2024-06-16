@@ -1,10 +1,14 @@
+"""Module for the pipette class"""
+
 import json
-from epanda_lib.vessel import logger as vessel_logger
 
 from epanda_lib.sql_tools.sql_pipette import (
     insert_pipette_status,
     select_pipette_status,
 )
+from epanda_lib.vessel import logger as vessel_logger
+
+from .state import PipetteState
 
 
 class Pipette:
@@ -38,7 +42,9 @@ class Pipette:
 
     def update_contents(self, solution: str, volume_change: float) -> None:
         """Update the contents of the pipette"""
-        self.contents[solution] = round(float(self.contents.get(solution, 0)) + volume_change, 6)
+        self.contents[solution] = round(
+            float(self.contents.get(solution, 0)) + volume_change, 6
+        )
         self.log_contents()
 
     @property
@@ -112,13 +118,15 @@ class Pipette:
         """
         Select the current state of the pipette from the db
         """
-        pipette_status = get_pieptte_status()
+        pipette_status = self.get_pipette_status()
         if pipette_status is not None:
             self.capacity_ul = round(float(pipette_status.capacity_ul), 6)
             self.capacity_ml = round(float(pipette_status.capacity_ml), 6)
             self._volume_ul = round(float(pipette_status.volume), 6)
             self._volume_ml = round(float(pipette_status.volume_ml), 6)
-            self.contents = {k: round(float(v), 6) for k, v in pipette_status.contents.items()}
+            self.contents = {
+                k: round(float(v), 6) for k, v in pipette_status.contents.items()
+            }
         else:
             self.reset_contents()
             self.capacity_ul = 200.0
@@ -128,32 +136,15 @@ class Pipette:
     def __str__(self):
         return f"Pipette has {self._volume_ul} ul of liquid"
 
-
-def get_pieptte_status() -> Pipette:
-    """Get the status of the pipette"""
-    result = select_pipette_status()
-    if result is None:
-        return None
-    pipette_status = PipetteStatus(0.0, 0.0, 0.0, 0.0, {})
-    pipette_status.capacity_ul = round(float(result[0]), 6)
-    pipette_status.capacity_ml = round(float(result[1]), 6)
-    pipette_status.volume = round(float(result[2]), 6)
-    pipette_status.volume_ml = round(float(result[3]), 6)
-    pipette_status.contents = json.loads(result[4]) if result[4] is not None else {}
-    return pipette_status
-
-
-class PipetteStatus:
-    def __init__(
-        self,
-        capacity_ul: float,
-        capacity_ml: float,
-        volume: float,
-        volume_ml: float,
-        contents: dict,
-    ):
-        self.capacity_ul = capacity_ul
-        self.capacity_ml = capacity_ml
-        self.volume = volume
-        self.volume_ml = volume_ml
-        self.contents = contents
+    def get_pipette_status(self) -> "PipetteState":
+        """Get the status of the pipette"""
+        result = select_pipette_status()
+        if result is None:
+            return None
+        pipette_status = PipetteState(0.0, 0.0, 0.0, 0.0, {})
+        pipette_status.capacity_ul = round(float(result[0]), 6)
+        pipette_status.capacity_ml = round(float(result[1]), 6)
+        pipette_status.volume = round(float(result[2]), 6)
+        pipette_status.volume_ml = round(float(result[3]), 6)
+        pipette_status.contents = json.loads(result[4]) if result[4] is not None else {}
+        return pipette_status
