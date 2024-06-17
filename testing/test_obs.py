@@ -1,5 +1,5 @@
 import unittest
-from epanda_lib.obs_controls import OBSController
+from panda_lib.obs_controls import OBSController
 import time
 from pathlib import Path
 

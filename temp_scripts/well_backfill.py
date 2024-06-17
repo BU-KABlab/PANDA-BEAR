@@ -2,8 +2,8 @@
 
 from pathlib import Path
 import pandas as pd
-from epanda_lib import sql_utilities
-from epanda_lib.sql_utilities import save_wells_to_db, Well, WellCoordinates, ExperimentResultsRecord
+from panda_lib import sql_utilities
+from panda_lib.sql_utilities import save_wells_to_db, Well, WellCoordinates, ExperimentResultsRecord
 import json
 
 def wellplate_backfill(plate_id:int):

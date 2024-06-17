@@ -15,8 +15,8 @@ Date: 2024-06-01
 from typing import Sequence
 
 # Non-standard imports
-from epanda_lib.controller import Toolkit
-from epanda_lib.e_panda import (
+from panda_lib.controller import Toolkit
+from panda_lib.e_panda import (
     forward_pipette_v2,
     solution_selector,
     cyclic_volt,
@@ -24,10 +24,10 @@ from epanda_lib.e_panda import (
     image_well,
     flush_v2,
 )
-from epanda_lib.experiment_class import ExperimentBase, ExperimentStatus
-from epanda_lib.vials import StockVial, WasteVial
-from epanda_lib.correction_factors import correction_factor
-from epanda_lib.mill_control import Instruments
+from panda_lib.experiment_class import ExperimentBase, ExperimentStatus
+from panda_lib.vials import StockVial, WasteVial
+from panda_lib.correction_factors import correction_factor
+from panda_lib.mill_control import Instruments
 
 
 def main(

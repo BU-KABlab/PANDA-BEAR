@@ -1,7 +1,7 @@
 """Script to starting and stopping the ePANDA Slack Bot"""
 
 import time
-from epanda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.slack_tools.SlackBot import SlackBot
 choose_testing_mode = input("Enter 't' for testing mode or 'n' for non-testing mode: ").strip().lower()
 if choose_testing_mode == "t":
     test = True

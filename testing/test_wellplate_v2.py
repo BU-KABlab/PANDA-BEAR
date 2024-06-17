@@ -1,7 +1,7 @@
 import unittest
-from epanda_lib import sql_utilities
-from epanda_lib.wellplate import WellCoordinates, Wellplate
-from epanda_lib.experiment_class import ExperimentBase
+from panda_lib import sql_utilities
+from panda_lib.wellplate import WellCoordinates, Wellplate
+from panda_lib.experiment_class import ExperimentBase
 import time
 class TestWellplate(unittest.TestCase):
 

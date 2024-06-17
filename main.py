@@ -14,8 +14,8 @@ from pathlib import Path
 
 from PIL import Image
 
-import epanda_lib.analyzer.pedot as pedot_analysis
-from epanda_lib import (
+import panda_lib.analyzer.pedot as pedot_analysis
+from panda_lib import (
     flir_camera,
     controller,
     experiment_class,
@@ -27,17 +27,17 @@ from epanda_lib import (
     vials,
     wellplate,
 )
-from epanda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
-from epanda_lib.config.config_tools import read_testing_config, write_testing_config
-from epanda_lib.sql_tools import (
+from panda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
+from panda_lib.config.config_tools import read_testing_config, write_testing_config
+from panda_lib.sql_tools import (
     sql_generator_utilities,
     sql_protocol_utilities,
     sql_queue,
     sql_system_state,
     remove_testing_experiments
 )
-from epanda_lib.sql_tools import sql_ml_functions
-from epanda_lib.analyzer.pedot import pedot_analyzer
+from panda_lib.sql_tools import sql_ml_functions
+from panda_lib.analyzer.pedot import pedot_analyzer
 
 
 decimal.getcontext().prec = 6

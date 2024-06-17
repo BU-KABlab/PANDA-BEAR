@@ -10,10 +10,10 @@ Date: 2024-06-01
     
 """
 
-from epanda_lib import experiment_class
-from epanda_lib.config.config import read_testing_config, DEFAULT_PUMPING_RATE
-from epanda_lib.sql_tools.sql_system_state import get_current_pin
-from epanda_lib.scheduler import Scheduler, determine_next_experiment_id
+from panda_lib import experiment_class
+from panda_lib.config.config import read_testing_config, DEFAULT_PUMPING_RATE
+from panda_lib.sql_tools.sql_system_state import get_current_pin
+from panda_lib.scheduler import Scheduler, determine_next_experiment_id
 
 PROJECT_ID = 17
 EXPERIMENT_NAME = "fecn_conc_assessment"

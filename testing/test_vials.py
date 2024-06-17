@@ -2,7 +2,7 @@ import unittest
 from decimal import Decimal
 from unittest.mock import patch
 
-from epanda_lib.vials import (
+from panda_lib.vials import (
     StockVial,
     VesselCoordinates,
     WasteVial,

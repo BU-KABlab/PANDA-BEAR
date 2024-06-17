@@ -1,6 +1,6 @@
 """Test the vials module"""
 import unittest
-from epanda_lib.vials import Vial2, OverFillException, OverDraftException, Vessel
+from panda_lib.vials import Vial2, OverFillException, OverDraftException, Vessel
 
 class TestVessel(unittest.TestCase):
     """Test class for Vessel"""

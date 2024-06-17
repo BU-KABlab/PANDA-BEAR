@@ -1,11 +1,11 @@
 """Reanalyze the given experiments for the correct rgb values"""
 
-from epanda_lib.analyzer.pedot import PEDOT_FindLAB as lab
-from epanda_lib.analyzer.pedot.ml_input import (
+from panda_lib.analyzer.pedot import PEDOT_FindLAB as lab
+from panda_lib.analyzer.pedot.ml_input import (
     populate_required_information as analysis_input
     )
-from epanda_lib.analyzer.pedot.pedot_classes import RawMetrics, RequiredData
-from epanda_lib.sql_utilities import (ExperimentResultsRecord,
+from panda_lib.analyzer.pedot.pedot_classes import RawMetrics, RequiredData
+from panda_lib.sql_utilities import (ExperimentResultsRecord,
                                       insert_experiment_results)
 
 experiments = list(range(10000875, 10000896 + 1))

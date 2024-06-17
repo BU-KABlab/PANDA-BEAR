@@ -2,11 +2,11 @@
 
 import json
 
-from epanda_lib import experiment_class
-from epanda_lib import wellplate
-from epanda_lib.config.config import read_testing_config
-from epanda_lib.scheduler import Scheduler, determine_next_experiment_id
-from epanda_lib.sql_tools.sql_system_state import get_current_pin
+from panda_lib import experiment_class
+from panda_lib import wellplate
+from panda_lib.config.config import read_testing_config
+from panda_lib.scheduler import Scheduler, determine_next_experiment_id
+from panda_lib.sql_tools.sql_system_state import get_current_pin
 
 TEST: bool = read_testing_config()
 CURRENT_PIN =  get_current_pin()

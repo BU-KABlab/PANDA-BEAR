@@ -8,9 +8,9 @@ Notes:
 from typing import Sequence
 
 # Non-standard imports
-from epanda_lib.utilities import Toolkit
-from epanda_lib.correction_factors import correction_factor
-from epanda_lib.e_panda import (
+from panda_lib.utilities import Toolkit
+from panda_lib.correction_factors import correction_factor
+from panda_lib.e_panda import (
     chrono_amp,
     flush_v2,
     forward_pipette_v2,
@@ -19,9 +19,9 @@ from epanda_lib.e_panda import (
     waste_selector,
     rinse_v2,
 )
-from epanda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
-from epanda_lib.mill_control import Instruments
-from epanda_lib.vials import StockVial, WasteVial
+from panda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
+from panda_lib.mill_control import Instruments
+from panda_lib.vials import StockVial, WasteVial
 
 
 def main(

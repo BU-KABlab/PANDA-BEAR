@@ -1,5 +1,5 @@
 """Test that the slackbot is working correctly."""
-from epanda_lib.slack_tools import SlackBot
+from panda_lib.slack_tools import SlackBot
 
 bot = SlackBot.SlackBot(True)
 #bot.send_slack_message('alert',"Test message")

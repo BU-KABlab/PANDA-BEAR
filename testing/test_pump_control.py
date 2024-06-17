@@ -1,14 +1,14 @@
 import unittest
 import time
 import nesp_lib
-from epanda_lib.syringepump import MockMill, MockPump, MockScale
-from epanda_lib.vessel import VesselCoordinates
+from panda_lib.syringepump import MockMill, MockPump, MockScale
+from panda_lib.vessel import VesselCoordinates
 
 """_summary_
 """
 
 
-from epanda_lib.vials import (
+from panda_lib.vials import (
     StockVial,
     Vial2,
     WasteVial,

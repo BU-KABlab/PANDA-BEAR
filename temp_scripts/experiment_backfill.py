@@ -3,9 +3,9 @@
 import json
 from pathlib import Path
 
-from epanda_lib import sql_utilities
-from epanda_lib.experiment_class import ExperimentResult
-from epanda_lib.sql_utilities import (EchemExperimentBase,
+from panda_lib import sql_utilities
+from panda_lib.experiment_class import ExperimentResult
+from panda_lib.sql_utilities import (EchemExperimentBase,
                                       insert_experiment_parameters,
                                       insert_experiment_results,
                                       insert_experiments)

@@ -1,5 +1,5 @@
 import unittest
-from epanda_lib.utilities import solve_vials_ilp, Coordinates
+from panda_lib.utilities import solve_vials_ilp, Coordinates
 
 class TestUtilities(unittest.TestCase):
 

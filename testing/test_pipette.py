@@ -1,6 +1,6 @@
 import time
 import unittest
-from epanda_lib.pipette import Pipette
+from panda_lib.pipette import Pipette
 
 class TestPipette(unittest.TestCase):
     """
