@@ -5,7 +5,7 @@ from typing import Sequence
 
 # Non-standard imports
 from panda_lib.controller import Toolkit
-from panda_lib.e_panda import (
+from panda_lib.actions import (
     forward_pipette_v2,
     solution_selector,
     chrono_amp,
@@ -17,7 +17,7 @@ from panda_lib.e_panda import (
     CVFailure,
     DepositionFailure
 )
-from panda_lib.e_panda_custom import (
+from panda_lib.actions_pedot import (
     chrono_amp_edot_bleaching,
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,

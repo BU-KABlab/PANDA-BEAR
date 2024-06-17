@@ -12,7 +12,7 @@ from typing import Sequence
 
 from panda_lib.controller import Toolkit
 from panda_lib.correction_factors import correction_factor
-from panda_lib.e_panda import (cyclic_volt, forward_pipette_v2, image_well,
+from panda_lib.actions import (cyclic_volt, forward_pipette_v2, image_well,
                                 solution_selector, waste_selector)
 from panda_lib.experiment_class import EchemExperimentBase, ExperimentStatus
 from panda_lib.mill_control import Instruments

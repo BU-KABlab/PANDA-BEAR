@@ -48,7 +48,7 @@ __MILL_CONFIG_FILE_NAME = "mill_config.json"
 __WELLPLATE_CONFIG_FILE_NAME = "wellplate_location.json"
 
 ## Project directory names
-__CODE = "epanda_lib"
+__CODE = "panda_lib"
 __CONFIG = "config"
 __DATA = "data"
 __LOGS = "logs"

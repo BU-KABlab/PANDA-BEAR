@@ -25,11 +25,11 @@ from slack_sdk.errors import (BotUserAccessError, SlackApiError,
                               SlackObjectFormationError, SlackRequestError,
                               SlackTokenRotationError)
 
-from . import e_panda
+from . import actions
 from .analyzer.pedot import pedot_analyzer
 from .analyzer.pedot import run_ml_model as pedot_ml_model
 from .config.config import RANDOM_FLAG, read_testing_config
-from .e_panda import CAFailure, CVFailure, DepositionFailure, OCPFailure
+from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .errors import (NoExperimentFromModel, ProtocolNotFoundError,
                      ShutDownCommand, WellImportError)
 from .experiment_class import (ExperimentBase, ExperimentResult,
@@ -45,7 +45,7 @@ from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .utilities import SystemState
-from .vials import (StockVial, Vial2, WasteVial, get_current_vials,
+from .vials import (StockVial, Vial2, WasteVial,
                     update_vial_state_files, read_vials)
 from .wellplate import Wellplate
 
@@ -72,7 +72,7 @@ def main(
     slack = SlackBot()
     obs = OBSController()
     ## Reset the logger to log to the ePANDA.log file and format
-    e_panda.apply_log_filter()
+    actions.apply_log_filter()
     # print(printpanda())
     print("Starting ePANDA...")
     slack.test = use_mock_instruments
@@ -98,7 +98,7 @@ def main(
         ## Check that the pipette is empty, if not dispose of full volume into waste
         if toolkit.pump.pipette.volume > 0:
             obs.place_text_on_screen("Pipette is not empty, purging into waste")
-            e_panda.purge_pipette(
+            actions.purge_pipette(
                 waste_vials=waste_vials,
                 mill=toolkit.mill,
                 pump=toolkit.pump,
@@ -106,7 +106,7 @@ def main(
         # Flush the pipette tip with water before we start
         obs.place_text_on_screen("Initial flushing of pipette tip")
         logger.info("Flushing pipette tip")
-        e_panda.flush_v2(
+        actions.flush_v2(
             stock_vials=stock_vials,
             waste_vials=waste_vials,
             flush_solution_name="rinse",
@@ -121,7 +121,7 @@ def main(
         while True:
             ## Reset the logger to log to the ePANDA.log file and format
             obs.place_text_on_screen("")
-            e_panda.apply_log_filter()
+            actions.apply_log_filter()
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
@@ -234,7 +234,7 @@ def main(
             # scheduler.remove_from_queue(new_experiment)
 
             ## Run the experiment
-            e_panda.apply_log_filter(
+            actions.apply_log_filter(
                 new_experiment.experiment_id,
                 new_experiment.well_id,
                 str(new_experiment.project_id)
@@ -274,7 +274,7 @@ def main(
             share_to_slack(new_experiment)
 
             ## Reset the logger to log to the ePANDA.log file and format after the experiment is complete
-            e_panda.apply_log_filter()
+            actions.apply_log_filter()
 
             ## With returned experiment and results, update the experiment status and post the final status
             post_experiment_status_msg = f"Experiment {new_experiment.experiment_id} ended with status {new_experiment.status.value}"

@@ -3,9 +3,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
-from panda_lib.config.config import (PATH_TO_DATA, PATH_TO_LOGS, STOCK_STATUS,
-                            WASTE_STATUS)
-from panda_lib.e_panda import capture_new_image
+from panda_lib.config.config import (PATH_TO_DATA, PATH_TO_LOGS)
+from panda_lib.actions import capture_new_image
 from panda_lib.mill_control import (CommandExecutionError, Instruments,
                            LocationNotFound, Mill, MillConfigError,
                            MillConfigNotFound, MillConnectionError, MockMill,
@@ -146,8 +145,8 @@ def movement_test(mill: Mill):
             well15 = wellplate.get_coordinates("b9")
 
             ## Load the vials
-            stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
-            waste_vials: Sequence[WasteVial] = read_vials(WASTE_STATUS)
+            stock_vials: Sequence[StockVial] = read_vials()[0]
+            waste_vials: Sequence[WasteVial] = read_vials()[1]
 
             # mill.safe_move(well1["x"], well1["y"], wellplate.z_top, instrument=Instruments.PIPETTE)
             input(
@@ -225,8 +224,8 @@ def only_z_move_test(mill: Mill):
             a12 = wellplate.get_coordinates("A12")
             ## Load the vials
 
-            stock_vials: Sequence[StockVial] = read_vials(STOCK_STATUS)
-            waste_vials: Sequence[WasteVial] = read_vials(WASTE_STATUS)
+            stock_vials: Sequence[StockVial] = read_vials()[0]
+            waste_vials: Sequence[WasteVial] = read_vials()[1]
 
             mill.safe_move(a1["x"], a1["y"], -40, instrument=Instruments.PIPETTE)
             mill.safe_move(

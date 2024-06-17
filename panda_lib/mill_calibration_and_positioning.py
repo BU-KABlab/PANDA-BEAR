@@ -21,8 +21,7 @@ from typing import Sequence
 
 from panda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_result
 
-from .config.config import read_testing_config
-from .e_panda import capture_new_image, image_filepath_generator
+from .actions import capture_new_image, image_filepath_generator
 from .mill_control import Mill, MockMill
 from .utilities import Instruments
 from .vials import StockVial, WasteVial
@@ -477,9 +476,7 @@ def main():
         testing = True
     else:
         testing = False
-
-    from .vials import STOCK_STATUS, WASTE_STATUS, read_vials
-
+    from panda_lib.vials import read_vials
     print("Testing mode:", testing)
     input("Press enter to continue")
     # Create the mill object
@@ -489,8 +486,8 @@ def main():
     wellplate_to_use = Wellplate()
 
     # Create the stock vial objects
-    stock_vials_to_use: Sequence[StockVial] = read_vials(STOCK_STATUS)
-    waste_vials_to_use: Sequence[WasteVial] = read_vials(WASTE_STATUS)
+    stock_vials_to_use: Sequence[StockVial] = read_vials()[0]
+    waste_vials_to_use: Sequence[WasteVial] = read_vials()[1]
 
     calibrate_mill(
         mill_to_use, wellplate_to_use, stock_vials_to_use, waste_vials_to_use

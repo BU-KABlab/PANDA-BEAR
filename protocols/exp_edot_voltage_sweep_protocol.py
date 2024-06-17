@@ -10,7 +10,7 @@ from typing import Sequence
 # Non-standard imports
 from panda_lib.utilities import Toolkit
 from panda_lib.correction_factors import correction_factor
-from panda_lib.e_panda import (
+from panda_lib.actions import (
     chrono_amp,
     flush_v2,
     forward_pipette_v2,

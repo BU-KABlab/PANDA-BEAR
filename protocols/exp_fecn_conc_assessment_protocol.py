@@ -16,7 +16,7 @@ from typing import Sequence
 
 # Non-standard imports
 from panda_lib.controller import Toolkit
-from panda_lib.e_panda import (
+from panda_lib.actions import (
     forward_pipette_v2,
     solution_selector,
     cyclic_volt,

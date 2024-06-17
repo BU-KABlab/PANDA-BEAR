@@ -1,6 +1,6 @@
 """Custom functions for the epanda library which are specific to a particular experiment type."""
 
-from panda_lib.e_panda import (
+from panda_lib.actions import (
     EchemExperimentBase,
     ExperimentResult,
     ExperimentStatus,
