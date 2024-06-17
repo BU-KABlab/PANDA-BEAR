@@ -34,8 +34,11 @@ from epanda_lib.sql_tools import (
     sql_protocol_utilities,
     sql_queue,
     sql_system_state,
+    remove_testing_experiments
 )
 from epanda_lib.sql_tools import sql_ml_functions
+from epanda_lib.analyzer.pedot import pedot_analyzer
+
 
 decimal.getcontext().prec = 6
 
@@ -53,7 +56,11 @@ def run_epanda_without_ml():
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "running ePANDA"
     )
-    controller.main()
+    one_off = input("Is this a one-off run? (y/n): ").strip().lower()
+    if one_off[0] == "y":
+        controller.main(one_off=True)
+    else:
+        controller.main()
 
 
 def genererate_pedot_experiment():
@@ -311,6 +318,26 @@ def generate_experiment_from_existing_data():
 
         return
 
+def analyze_pedot_experiment():
+    """Analyzes a PEDOT experiment."""
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "analyzing PEDOT experiment"
+    )
+    experiment_id = int(
+        input("Enter the experiment ID to analyze: ").strip().lower()
+    )
+
+    to_train = input("Train the model? (y/n): ").strip().lower()
+    dont_train = True if to_train[0] == "n" else False
+    results = pedot_analysis.pedot_analyzer(experiment_id, dont_train)
+    print(results)
+
+def clean_up_testing_experiments():
+    """Cleans up the testing experiments."""
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "cleaning up testing experiments"
+    )
+    remove_testing_experiments.main()
 
 def exit_program():
     """Exits the program."""
@@ -369,6 +396,7 @@ menu_options = {
     "2.3": print_wellplate_info,
     "2.4": print_queue_info,
     "2.5": remove_training_data,
+    "2.6": clean_up_testing_experiments,
     "3": reset_vials_stock,
     "4": reset_vials_waste,
     "5": input_new_vial_values_stock,
@@ -380,6 +408,7 @@ menu_options = {
     "11": test_camera,
     "12": generate_experiment_from_existing_data,
     "13": genererate_pedot_experiment,
+    "14": analyze_pedot_experiment,
     "r": refresh,
     "q": exit_program,
 }

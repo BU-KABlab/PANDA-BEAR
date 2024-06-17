@@ -134,6 +134,8 @@ class ExperimentStatus(str, Enum):
     PAUSED = "paused"
     CANCELLED = "cancelled"
     PENDING = "pending"  # pending experiments either are waiting for a well to be assigned or lack the correct well type
+    SAVING = "saving"
+    ANALYZING = "analyzing"
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))

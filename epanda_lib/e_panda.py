@@ -332,17 +332,6 @@ def rinse_v2(
             mill=toolkit.mill,
         )
 
-        # check that the pipette is empty
-        if toolkit.pump.pipette.volume > 0:
-            # toolkit.pump.infuse(
-            #     volume_to_infuse=toolkit.pump.pipette.volume,
-            #     being_infused=None,
-            #     infused_into=waste_selector(waste_vials, "waste", 0),
-            #     rate=toolkit.pump.max_pump_rate,
-            #     blowout_ul=0,
-            # )
-            # FIXME: This is a temporary fix to ensure that the pipette is empty
-            toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume)
     return 0
 
 

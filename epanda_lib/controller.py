@@ -281,25 +281,30 @@ def main(
             logger.info(post_experiment_status_msg)
             # slack.send_slack_message("alert", post_experiment_status_msg)
 
+            new_experiment.set_status_and_save(ExperimentStatus.SAVING)
             scheduler.save_results(new_experiment)
             experiment_id = new_experiment.experiment_id
+
+            if not TESTING:
+                # Analyze the experiment (will handle if in testing)
+                new_experiment.set_status_and_save(ExperimentStatus.ANALYZING)
+                pedot_analyzer(experiment_id)
+
+                next_exp_id = None
+                # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
+                if (
+                    al_campaign_length is not None
+                    and al_campaign_iteration < al_campaign_length
+                ):
+                    next_exp_id = pedot_ml_model()
+                    al_campaign_iteration += 1
+
+                # Share the analysis results with slack
+                share_analysis_to_slack(experiment_id, next_exp_id, slack)
+
+            new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            ## Clean up
             new_experiment = None  # reset new_experiment to None so that we can check the queue again
-
-            # Analyze the experiment (will handle if in testing)
-            pedot_analyzer(experiment_id)
-
-            next_exp_id = None
-            # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-            if (
-                al_campaign_length is not None
-                and al_campaign_iteration < al_campaign_length
-            ):
-                next_exp_id = pedot_ml_model()
-                al_campaign_iteration += 1
-
-            # Share the analysis results with slack
-            share_analysis_to_slack(experiment_id, next_exp_id, slack)
-
             ## Update the system state with new vial and wellplate information
             toolkit.pump.pipette.reset_contents()
             update_vial_state_files(

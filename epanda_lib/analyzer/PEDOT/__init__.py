@@ -42,11 +42,9 @@ ml_file_paths = MLInput(
 )
 
 
-def pedot_analyzer(experiment_id: int, train_in_testing:bool=False) -> MLTrainingData:
+def pedot_analyzer(experiment_id: int, dont_train:bool=False) -> MLTrainingData:
     """
-    Analyzes the PEDOT experiment.
-    
-    Skips the analysis if the system is in testing mode.
+    Analyzes the PEDOT experiment and returns the training data for the ML model.
 
     Args:
         experiment_id (int): The experiment ID to analyze.
@@ -55,9 +53,9 @@ def pedot_analyzer(experiment_id: int, train_in_testing:bool=False) -> MLTrainin
         MLTrainingData: The training data to be used for the ML model.
     
     """
-    if read_testing_config() and not train_in_testing:
-        # If the system is in testing mode, nothing to analyze
+    if read_testing_config():
         return
+
     if experiment_id is None:
         experiment_id = determine_next_experiment_id() - 1 # Get the last experiment ID
 
@@ -118,7 +116,9 @@ def pedot_analyzer(experiment_id: int, train_in_testing:bool=False) -> MLTrainin
     # df_new_training_data.to_csv(
     #     ml_file_paths.training_file_path, mode="a", header=False, index=False
     # )
-    insert_ml_training_data(df_new_training_data)
+    if not dont_train:
+        insert_ml_training_data(df_new_training_data)
+
     return ml_training_data
 
 def run_ml_model(generate_experiment_id=None) -> MLOutput:
