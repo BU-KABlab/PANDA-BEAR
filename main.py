@@ -36,7 +36,7 @@ from panda_lib.sql_tools import (
     sql_system_state,
     remove_testing_experiments
 )
-from panda_lib.sql_tools import sql_ml_functions
+from panda_lib.analyzer.pedot import sql_ml_functions
 from panda_lib.analyzer.pedot import pedot_analyzer
 
 

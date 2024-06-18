@@ -12,7 +12,7 @@ from panda_lib.config.config import (
     read_testing_config,
 )
 
-from panda_lib.sql_tools.sql_ml_functions import insert_ml_training_data
+from panda_lib.analyzer.pedot.sql_ml_functions import insert_ml_training_data
 
 
 from . import PEDOT_FindLAB as lab
@@ -32,13 +32,11 @@ from .ml_model import pedot_model
 
 # Set up the ML filepaths, for this project this is hardcoded only here
 ml_file_paths = MLInput(
-    training_file_path=Path(
-        "epanda_lib/analyzer/pedot/ml_model/training_data/MLTrainingData_PEDOT.csv"
-    ),
-    model_base_path=Path("epanda_lib/analyzer/pedot/ml_model/pedot_gp_model_v8"),
-    counter_file_path=Path("epanda_lib/analyzer/pedot/ml_model/model_counter.txt"),
-    BestTestPointsCSV=Path("epanda_lib/analyzer/pedot/ml_model/BestTestPoints.csv"),
-    contourplots_path="epanda_lib\\analyzer\\pedot\\ml_model\\contourplots\\contourplot",
+    training_file_path=Path("ml_model/training_data/MLTrainingData_PEDOT.csv"),
+    model_base_path=Path("ml_model/pedot_gp_model_v8"),
+    counter_file_path=Path("ml_model/model_counter.txt"),
+    BestTestPointsCSV=Path("ml_model/BestTestPoints.csv"),
+    contourplots_path="ml_model/contourplots/contourplot",
 )
 
 

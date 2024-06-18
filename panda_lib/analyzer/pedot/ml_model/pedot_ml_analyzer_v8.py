@@ -31,7 +31,7 @@ from panda_lib.experiment_class import (
     ExperimentResultsRecord,
     insert_experiment_results,
 )
-from panda_lib.sql_tools.sql_ml_functions import (
+from panda_lib.analyzer.pedot.sql_ml_functions import (
     model_iteration,
     select_best_test_points,
     select_best_test_points_by_model_id,
@@ -624,11 +624,12 @@ def main(
 
 if __name__ == "__main__":
 
-    TEST_TRAINING_FILE_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\MLTrainingData_PEDOT.csv"  # training data file path
-    TEST_MODEL_BASE_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\pedot_gp_model_v8"
-    TEST_COUNTER_FILE_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\model_counter.txt"
-    TEST_BESTTESTPOINTSCSV = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\BestTestPoints.csv"  # file to save best test points, adds to the file doesn't overwrite
-    TEST_CONTOURPLOTS_PATH = "D:\\1-PhD\\2-PANDA-BEAR\\DataAnalysis\\PEDOT\\ML\\TestingEnv-v8\\contourplots\\"  # file to save contour plots, without extension
+    # Before running update the paths accordingly
+    TEST_TRAINING_FILE_PATH = "MLTrainingData_PEDOT.csv"  # training data file path
+    TEST_MODEL_BASE_PATH = "pedot_gp_model_v8"
+    TEST_COUNTER_FILE_PATH = "model_counter.txt"
+    TEST_BESTTESTPOINTSCSV = "BestTestPoints.csv"  # file to save best test points, adds to the file doesn't overwrite
+    TEST_CONTOURPLOTS_PATH = "contourplots\\"  # file to save contour plots, without extension
 
     main(
         TEST_TRAINING_FILE_PATH,

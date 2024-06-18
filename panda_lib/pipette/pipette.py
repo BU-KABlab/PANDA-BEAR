@@ -2,7 +2,7 @@
 
 import json
 
-from panda_lib.sql_tools.sql_pipette import (
+from panda_lib.pipette.sql_pipette import (
     insert_pipette_status,
     select_pipette_status,
 )
