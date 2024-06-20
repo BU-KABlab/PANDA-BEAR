@@ -1,6 +1,6 @@
 """Utilities for working with generators in the database."""
 
-from panda_lib.sql_utilities import (
+from panda_lib.sql_tools.sql_protocols_and_generators import (
     GeneratorEntry,
     get_generators,
     get_generator_by_id,

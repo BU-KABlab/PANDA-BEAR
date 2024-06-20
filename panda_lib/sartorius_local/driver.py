@@ -30,7 +30,7 @@ import logging
 from typing import Any
 import asyncio
 
-from sartorius.util import Client, SerialClient, TcpClient
+from .util import Client, SerialClient, TcpClient
 
 logger = logging.getLogger('sartorius')
 

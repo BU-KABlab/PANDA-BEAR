@@ -20,7 +20,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 from typing import Any
 
-from sartorius.driver import Scale
+from .driver import Scale
 
 
 def command_line(args: Any = None) -> None:

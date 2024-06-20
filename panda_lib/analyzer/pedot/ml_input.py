@@ -1,4 +1,5 @@
-from panda_lib import sql_utilities
+from panda_lib.sql_tools import sql_system_state
+from panda_lib.experiment_class import select_specific_result, select_specific_parameter
 from panda_lib.config.config_tools import read_testing_config
 import pandas as pd
 from .pedot_classes import RequiredData
@@ -17,8 +18,8 @@ df = pd.DataFrame(data)
 
 def populate_required_information(experiment_id: int) -> RequiredData:
     """Populates the required information for the machine learning input."""
-    sql_utilities.set_system_status(
-        sql_utilities.SystemState.BUSY, "analyzing data", read_testing_config()
+    sql_system_state.set_system_status(
+        sql_system_state.SystemState.BUSY, "analyzing data", read_testing_config()
     )
     df.loc[df['name'] == 'experiment_id', 'value'] = experiment_id
 
@@ -26,7 +27,7 @@ def populate_required_information(experiment_id: int) -> RequiredData:
     parameters = df.loc[df['source'] == 'parameter', 'name']
     for parameter in parameters:
         try:
-            df.loc[df['name'] == parameter, 'value'] = sql_utilities.select_specific_parameter(
+            df.loc[df['name'] == parameter, 'value'] = select_specific_parameter(
                 experiment_id, parameter
             )
         except Exception as e:
@@ -38,7 +39,7 @@ def populate_required_information(experiment_id: int) -> RequiredData:
     for row in table:
         try:
             name, result_type, context = row
-            value = sql_utilities.select_specific_result(
+            value = select_specific_result(
                 experiment_id, result_type, context
             )
             if value is not None:
@@ -46,8 +47,8 @@ def populate_required_information(experiment_id: int) -> RequiredData:
         except Exception as e:
             print(f"Error getting result {row}: {e}")
             df.loc[(df['name'] == name), 'value'] = None
-    sql_utilities.set_system_status(
-        sql_utilities.SystemState.IDLE, "ready", read_testing_config()
+    sql_system_state.set_system_status(
+        sql_system_state.SystemState.IDLE, "ready", read_testing_config()
     )
 
     # Convert the df into a MLInput object
