@@ -3,19 +3,14 @@
 import json
 from pathlib import Path
 
-from panda_lib import sql_utilities
-from panda_lib.experiment_class import ExperimentResult
-from panda_lib.sql_utilities import (EchemExperimentBase,
-                                      insert_experiment_parameters,
-                                      insert_experiment_results,
-                                      insert_experiments)
+from panda_lib.experiment_class import (EchemExperimentBase, ExperimentResult,
+                                        insert_experiment_parameters,
+                                        insert_experiment_results,
+                                        insert_experiments,
+                                        select_experiment_information)
 
-PARAMS_FOLDER = Path(
-    "\\\\engnas.bu.edu\\research\\eng_research_kablab\\Shared Resources\\PANDA\\greg\\select_experiments\\"
-)
-RESULTS_FOLDER = Path(
-    "\\\\engnas.bu.edu\\research\\eng_research_kablab\\Shared Resources\\PANDA\\data\\"
-)
+PARAMS_FOLDER = Path()
+RESULTS_FOLDER = Path()
 # Load in each json file in the PARAMS_FOLDER and insert the experiment parameters into the database
 for file in PARAMS_FOLDER.glob("*.json"):
     with open(file, "r", encoding="utf-8") as f:
@@ -86,7 +81,7 @@ for file in PARAMS_FOLDER.glob("*.json"):
 
     # Insert the experiment parameters
     # check if the experiment is already in the database
-    experiment_exists = sql_utilities.select_experiment_information(data["id"])
+    experiment_exists = select_experiment_information(data["id"])
     if experiment_exists is None:
         insert_experiments(
             [

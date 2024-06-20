@@ -5,7 +5,7 @@ from panda_lib.analyzer.pedot.ml_input import (
     populate_required_information as analysis_input
     )
 from panda_lib.analyzer.pedot.pedot_classes import RawMetrics, RequiredData
-from panda_lib.sql_utilities import (ExperimentResultsRecord,
+from panda_lib.experiment_class import (ExperimentResultsRecord,
                                       insert_experiment_results)
 
 experiments = list(range(10000875, 10000896 + 1))

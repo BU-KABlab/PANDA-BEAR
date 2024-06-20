@@ -2,9 +2,9 @@
 
 from pathlib import Path
 import pandas as pd
-from panda_lib import sql_utilities
-from panda_lib.sql_utilities import save_wells_to_db, Well, WellCoordinates, ExperimentResultsRecord
-import json
+from panda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_results
+from panda_lib.wellplate import Well, WellCoordinates
+from panda_lib.sql_tools.sql_wellplate import save_wells_to_db, select_wellplate_wells
 
 def wellplate_backfill(plate_id:int):
     well_hx_file = Path(
@@ -156,7 +156,7 @@ def result_backfill_from_training_data():
     Find the well id in the trianing data and backfill the results"""
     plate_id = 110
     # Get the experiment ids
-    wells = sql_utilities.select_wellplate_wells(plate_id)
+    wells = select_wellplate_wells(plate_id)
     well_to_experiment = {well.well_id: well.experiment_id for well in wells}
 
     # Load the MLtraining data
@@ -296,7 +296,7 @@ def result_backfill_from_training_data():
             result_value=well_data["edot_concentration"].values[0],
             context=None,
         ))
-        sql_utilities.insert_experiment_results(results)
+        insert_experiment_results(results)
 
 if __name__ == "__main__":
     wellplate_backfill(plate_id=110)
