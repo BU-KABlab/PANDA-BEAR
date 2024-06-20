@@ -53,6 +53,7 @@ __CONFIG = "config"
 __DATA = "data"
 __LOGS = "logs"
 __SYS_STATE = "system state"
+__IMAGES = "application_images"
 
 ## FLIR Camera related - must be python 3.6
 PYTHON_360_PATH = Path("C:\\Users\\Kab Lab\\anaconda3\\envs\\python360\\python.exe")
@@ -69,11 +70,13 @@ if USE_LOCAL_PATHS:
     PATH_TO_DATA = LOCAL_REPO_PATH / __DATA
     PATH_TO_LOGS = LOCAL_REPO_PATH / __LOGS
     PATH_TO_STATUS = PATH_TO_CODE / __SYS_STATE
+    PATH_TO_IMAGES = PATH_TO_CODE / __IMAGES
 
     # Files
     MILL_CONFIG = PATH_TO_CONFIG / __MILL_CONFIG_FILE_NAME
     WELLPLATE_LOCATION = PATH_TO_CONFIG / __WELLPLATE_CONFIG_FILE_NAME
     EPANDA_LOG = PATH_TO_LOGS / "ePANDA.log"
+    DATA_ZONE_LOGO = PATH_TO_IMAGES / "data_zone_logo.png"
 
     # DB
     SQL_DB_PATH = LOCAL_REPO_PATH /"epanda_test.db"
@@ -88,6 +91,7 @@ if USE_LOCAL_PATHS:
         PATH_TO_DATA,
         PATH_TO_LOGS,
         PATH_TO_STATUS,
+        PATH_TO_IMAGES,
     ]:
         path = Path(path)
         if not path.exists():
@@ -105,11 +109,13 @@ else:  # Use network paths
     PATH_TO_DATA = NETWORK_PATH / __DATA
     PATH_TO_LOGS = NETWORK_PATH / __LOGS
     PATH_TO_STATUS = NETWORK_PATH / __SYS_STATE
+    PATH_TO_IMAGES = PATH_TO_CODE / __IMAGES
 
     # Files
     MILL_CONFIG = PATH_TO_CONFIG / __MILL_CONFIG_FILE_NAME
     WELLPLATE_LOCATION = PATH_TO_CONFIG / __WELLPLATE_CONFIG_FILE_NAME
     EPANDA_LOG = PATH_TO_LOGS / "ePANDA.log"
+    DATA_ZONE_LOGO = PATH_TO_IMAGES / "data_zone_logo.png"
 
     # DB
     SQL_DB_PATH = NETWORK_PATH /"epanda_prod.db"
@@ -123,6 +129,7 @@ else:  # Use network paths
         PATH_TO_DATA,
         PATH_TO_LOGS,
         PATH_TO_STATUS,
+        PATH_TO_IMAGES,
     ]:
         path = Path(path)
         if not path.exists():
