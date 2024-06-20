@@ -1,22 +1,9 @@
 #Untracked directories
-code\experiments_completed\**
-code\experiments_error\**
-code\experiment_queue\**
+logs/
+data/
 
 #Untracked files
 *.pyc
-code/misc_code_testing/ePANDA_pro_pic.jpeg
 *slack_credentials.py
-*secrets.py
-code/atlassian_tools/kablab_projects.py
-scarth.py
-logs/ePANDA.log
-logs/mill_control.log
-logs/mill_movement.log
-logs/obs_control.log
-logs/pipette.log
-logs/pump_control.log
-logs/scale.log
-logs/sql_utilities.log
-logs/testing.log
-logs/vessel.log
+*secrets*
+*/atlassian_tools/kablab_projects.py
