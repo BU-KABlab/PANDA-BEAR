@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-class Experiment(Base):
+class Experiments(Base):
     """
     Experiments are the core of the system.
 

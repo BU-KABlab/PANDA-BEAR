@@ -1,0 +1,185 @@
+import datetime
+from datetime import datetime as dt
+from typing import List, Optional
+
+from sqlalchemy import Column, Integer, String, create_engine, text, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
+from sqlalchemy.sql.sqltypes import DateTime, DECIMAL, Float, TEXT
+from sqlalchemy import event
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class Experiments(Base):
+    """Experiments table model"""
+
+    __tablename__ = "experiments"
+    experiment_id = Column(Integer, primary_key=True)
+    project_id = Column(Integer)
+    project_campaign_id = Column(Integer)
+    well_type = Column(Integer)
+    protocol_id = Column(Integer)
+    pin = Column(String)
+    experiment_type = Column(Integer)
+    jira_issue_key = Column(String)
+    priority = Column(Integer, default=0)
+    process_type = Column(Integer, default=0)
+    filename = Column(String, default=None)
+    created = Column(DateTime)
+    updated = Column(DateTime, default=dt.now(datetime.UTC))
+
+    results: Mapped[list["ExperimentResults"]] = relationship(
+        "ExperimentResults", backref="experiment"
+    )
+    parameters: Mapped[list["ExperimentParameters"]] = relationship(
+        "ExperimentParameters", backref="experiment"
+    )
+
+    def __repr__(self):
+        return f"<Experiments(experiment_id={self.experiment_id}, project_id={self.project_id}, project_campaign_id={self.project_campaign_id}, well_type={self.well_type}, protocol_id={self.protocol_id}, pin={self.pin}, experiment_type={self.experiment_type}, jira_issue_key={self.jira_issue_key}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, created={self.created}, updated={self.updated})>"
+
+    # @classmethod
+    # def get_by_id(cls, session, experiment_id: int) -> Optional["Experiments"]:
+    #     return session.query(cls).filter(cls.experiment_id == experiment_id).first()
+
+
+class ExperimentResults(Base):
+    """ExperimentResults table model"""
+
+    __tablename__ = "experiment_results"
+    id = Column(Integer, primary_key=True)
+    experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"))
+    result_type = Column(String)
+    result_value = Column(String)
+    created = Column(DateTime, default=dt.now)
+    updated = Column(DateTime, default=dt.now, onupdate=dt.now)
+    context = Column(String)
+
+    def __repr__(self):
+        return f"<ExperimentResults(id={self.id}, experiment_id={self.experiment_id}, result_type={self.result_type}, result_value={self.result_value}, created={self.created}, updated={self.updated}, context={self.context})>"
+
+
+class ExperimentParameters(Base):
+    """ExperimentParameters table model"""
+
+    __tablename__ = "experiment_parameters"
+    id = Column(Integer, primary_key=True)
+    experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"))
+    parameter_type = Column(String)
+    parameter_value = Column(String)
+    created = Column(DateTime, default=dt.now)
+    updated = Column(DateTime, default=dt.now, onupdate=dt.now)
+    context = Column(String)
+
+    def __repr__(self):
+        return f"<ExperimentParameters(id={self.id}, experiment_id={self.experiment_id}, parameter_type={self.parameter_type}, parameter_value={self.parameter_value}, created={self.created}, updated={self.updated}, context={self.context})>"
+
+
+class ExperimentGenerators(Base):
+    """ExperimentGenerators table model"""
+
+    __tablename__ = "generators"
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer)
+    protocol_id = Column(Integer)
+    name = Column(String)
+    filepath = Column(String)
+
+    def __repr__(self):
+        return f"<ExperimentGenerators(id={self.id}, project_id={self.project_id}, protocol_id={self.protocol_id}, name={self.name}, filepath={self.filepath})>"
+
+
+class MlPedotBestTestPoints(Base):
+    """MlPedotBestTestPoints table model"""
+
+    __tablename__ = "ml_pedot_best_test_points"
+    model_id = Column(Integer, primary_key=True)
+    experiment_id = Column(Integer, unique=True)
+    best_test_point_scalar = Column(String)
+    best_test_point_original = Column(String)
+    best_test_point = Column(String)
+    v_dep = Column(DECIMAL(18, 8))
+    t_dep = Column(DECIMAL(18, 8))
+    edot_concentration = Column(DECIMAL(18, 8))
+    predicted_response = Column(DECIMAL(18, 8))
+    standard_deviation = Column(DECIMAL(18, 8))
+    models_current_rmse = Column(DECIMAL(18, 8))
+
+    def __repr__(self):
+        return f"<MlPedotBestTestPoints(model_id={self.model_id}, experiment_id={self.experiment_id}, best_test_point_scalar={self.best_test_point_scalar}, best_test_point_original={self.best_test_point_original}, best_test_point={self.best_test_point}, v_dep={self.v_dep}, t_dep={self.t_dep}, edot_concentration={self.edot_concentration}, predicted_response={self.predicted_response}, standard_deviation={self.standard_deviation}, models_current_rmse={self.models_current_rmse})>"
+
+
+class MlPedotTrainingData(Base):
+    """MlPedotTrainingData table model"""
+
+    __tablename__ = "ml_pedot_training_data"
+    id = Column(Integer, primary_key=True)
+    delta_e = Column(DECIMAL(18, 8))
+    voltage = Column(DECIMAL(18, 8))
+    time = Column(DECIMAL(18, 8))
+    bleach_cp = Column(DECIMAL(18, 8))
+    concentration = Column(DECIMAL(18, 8))
+    experiment_id = Column(Integer)
+
+    def __repr__(self):
+        return f"<MlPedotTrainingData(id={self.id}, delta_e={self.delta_e}, voltage={self.voltage}, time={self.time}, bleach_cp={self.bleach_cp}, concentration={self.concentration}, experiment_id={self.experiment_id})>"
+
+class Pipette(Base):
+    """Pipette table model"""
+
+    __tablename__ = "pipette"
+    id = Column(Integer, primary_key=True)
+    capacity_ul = Column(Float, nullable=False)
+    capacity_ml = Column(Float, nullable=False)
+    volume_ul = Column(Float, nullable=False)
+    volume_ml = Column(Float, nullable=False)
+    contents = Column(String)
+    updated = Column(DateTime, default=dt.now)
+
+    def __repr__(self):
+        return f"<Pipette(id={self.id}, capacity_ul={self.capacity_ul}, capacity_ml={self.capacity_ml}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, contents={self.contents}, updated={self.updated})>"
+
+    # @event.listens_for(Pipette, 'after_update')
+    # def log_pipette_update(mapper, connection, target):
+    #     # Create a new PipetteLog entry with the updated volume
+    #     pipette_log = PipetteLog(pipette_id=target.id, volume_ul=target.volume_ul, volume_ml=target.volume_ml)
+    #     connection.add(pipette_log)
+    #     connection.commit()
+
+class PipetteLog(Base):
+    """PipetteLog table model"""
+
+    __tablename__ = "pipette_log"
+    id = Column(Integer, primary_key=True)
+    pipette_id = Column(Integer, ForeignKey("pipette.id"))
+    volume_ul = Column(Float, nullable=False)
+    volume_ml = Column(Float, nullable=False)
+    updated = Column(DateTime, default=dt.now)
+
+    def __repr__(self):
+        return f"<PipetteLog(id={self.id}, pipette_id={self.pipette_id}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, updated={self.updated})>"
+
+class Projects(Base):
+    """Projects table model"""
+
+    __tablename__ = "projects"
+    project_id = Column(Integer, primary_key=True)
+    project_name = Column(String)
+    # project_description = Column(String)
+    # created = Column(DateTime)
+    # updated = Column(DateTime, default=dt.now)
+
+    # def __repr__(self):
+    #     return f"<Projects(project_id={self.project_id}, project_name={self.project_name}, project_description={self.project_description}, created={self.created}, updated={self.updated})>"
+    
+    def __repr__(self):
+        return f"<Projects(project_id={self.project_id}, project_name={self.project_name})>"
+
+class Protocols(Base):
+    __tablename__ = "protocols"
+    id = Column(Integer, primary_key=True)
+    project = Column(Integer, ForeignKey("projects.project_id"))
+    name = Column(TEXT)
+    filepath = Column(TEXT)
