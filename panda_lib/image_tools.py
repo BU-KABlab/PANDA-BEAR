@@ -5,211 +5,9 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+from panda_lib.config.config import DATA_ZONE_LOGO
 from panda_lib.sql_tools import sql_utilities
 from panda_lib.experiment_class import ExperimentBase
-
-# def add_data_zone(image: Image, experiment: ExperimentBase = None, context: str = None) -> Image:
-#     """Adds a data zone to the bottom of the image."""
-#     # Determine the size of the image
-#     # Get the date and time from the image metadata
-#     date_time = get_image_date_time(image, experiment)
-#     banner_height = 100
-#     banner = create_banner(image.width, banner_height)
-#     drawn_banner = ImageDraw.Draw(banner)
-
-#     draw_vertical_lines(drawn_banner, banner_height)
-
-#     text_starts = calculate_text_starts(image.width)
-#     segment_widths = [250, 250.0, 200.0, 150.0, 600.0, 175.0, 175.0, 200.0]
-
-#     draw_logo(drawn_banner, text_starts[0], banner)
-#     draw_epanda_pin(drawn_banner, text_starts[1], experiment.pin)
-#     draw_date(drawn_banner, text_starts[2], date_time)
-#     draw_project(drawn_banner, text_starts[3], experiment.project_id, experiment.project_campaign_id)
-#     draw_experiment(drawn_banner, text_starts[4], experiment.experiment_id, context, text_starts, segment_widths)
-#     draw_wellplate_well_id(drawn_banner, text_starts[5], experiment.plate_id, experiment.well_id)
-#     draw_substrate_type(drawn_banner, text_starts[6], get_substrate(experiment))
-
-#     image_with_banner = create_image_with_banner(image, banner, banner_height)
-#     return image_with_banner
-
-# def get_image_date_time(image: Image, experiment: ExperimentBase) -> datetime:
-#     """Get the date and time from the image metadata."""
-#     try:
-#         # Check the image file type
-#         if image.format == "TIFF":
-#             tiff_tags = image.tag_v2
-#             date_time = tiff_tags.get("DateTime")
-#             if date_time is not None:
-#                 date_time = datetime.strptime(date_time, "%Y:%m:%d %H:%M:%S")
-#             else:
-#                 # Fallback on file creation date if unable to get from metadata
-#                 file_creation_time = datetime.fromtimestamp(Path(image.filename).stat().st_ctime)
-#                 date_time = file_creation_time
-#         else:
-#             # Fallback on file creation date if unable to get from metadata
-#             if experiment is None:
-#                 date_time = datetime.now().isoformat(timespec="seconds")
-#             else:
-#                 file_creation_time = datetime.fromtimestamp(Path(image.filename).stat().st_ctime)
-#                 date_time = file_creation_time
-#         if isinstance(date_time, str):
-#             date_time = datetime.fromisoformat(date_time)
-#     except:
-#         # Fallback on current time if all else fails
-#         date_time = datetime.now().isoformat(timespec="seconds")
-#     return date_time
-
-# def create_banner(width: int, height: int) -> Image:
-#     """Create a banner image with the specified width and height."""
-#     return Image.new("RGB", (width, height), "black")
-
-# def draw_vertical_lines(draw_banner: ImageDraw, banner_height: int) -> None:
-#     """Draw vertical white lines to separate the segments."""
-#     segment_widths = [250, 250.0, 200.0, 150.0, 600.0, 175.0, 175.0, 200.0]
-#     segment_starts = [0] + [
-#         round(sum(segment_widths[:i]), 0) for i in range(1, len(segment_widths))
-#     ]
-
-#     for segment_start in segment_starts[1:]:
-#         draw_banner.line(
-#             (segment_start, 0, segment_start, banner_height), fill="white", width=2
-#         )
-
-# def calculate_text_starts(width: int) -> list[int]:
-#     """Calculate the starting x-coordinate for each text segment."""
-#     segment_widths = [250, 250.0, 200.0, 150.0, 600.0, 175.0, 175.0, 200.0]
-#     segment_starts = [0] + [
-#         round(sum(segment_widths[:i]), 0) for i in range(1, len(segment_widths))
-#     ]
-
-#     # offset the segments to not touch the lines
-#     text_starts = [segment + 5 for segment in segment_starts]
-#     return text_starts
-
-# def draw_logo(draw_banner: ImageDraw, epanda_logo_x: int, banner: Image) -> None:
-#     """Draw the ePANDA logo on the banner."""
-#     logo = Image.open(Path(__file__).parent.parent / "images" / "data_zone_logo.png")
-#     logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
-#     banner.paste(logo, (epanda_logo_x, 0))
-
-# def draw_epanda_pin(draw_banner: ImageDraw, version_x: int, pin: str) -> None:
-#     """Draw the ePANDA PIN on the banner."""
-#     font = ImageFont.truetype("arial.ttf", 30)
-#     draw_banner.text(
-#         (version_x, 0), "ePANDA PIN", font=font, fill="white", align="center"
-#     )
-#     draw_banner.text(
-#         (version_x, 30),
-#         f"{pin[:10]}\n{pin[-11:]}",
-#         font=ImageFont.truetype("arial.ttf", 20),
-#         fill="white",
-#         align="center",
-#     )
-
-# def draw_date(draw_banner: ImageDraw, date_x: int, date_time: datetime) -> None:
-#     """Draw the date and time on the banner."""
-#     font = ImageFont.truetype("arial.ttf", 30)
-#     draw_banner.text((date_x, 0), "Date", font=font, fill="white", align="center")
-#     draw_banner.text(
-#         (date_x, 30),
-#         date_time.strftime("%Y-%m-%d"),
-#         font=font,
-#         fill="white",
-#         align="center",
-#     )
-#     draw_banner.text(
-#         (date_x, 60),
-#         date_time.strftime("%H:%M:%S"),
-#         font=font,
-#         fill="white",
-#         align="center",
-#     )
-
-# def draw_project(draw_banner: ImageDraw, project_id_x: int, project_id: int, campaign_id: int) -> None:
-#     """Draw the project ID on the banner."""
-#     font = ImageFont.truetype("arial.ttf", 30)
-#     draw_banner.text(
-#         (project_id_x, 0), "Project", font=font, fill="white", align="center"
-#     )
-#     draw_banner.text(
-#         (project_id_x, 30),
-#         f"{str(project_id)}-{str(campaign_id)}",
-#         font=font,
-#         fill="white",
-#         align="center",
-#     )
-
-# def draw_experiment(draw_banner: ImageDraw, experiment_id_x: int, experiment_id: int, context: str, segment_starts, segment_widths) -> None:
-#     """Draw the experiment ID on the banner."""
-#     font = ImageFont.truetype("arial.ttf", 30)
-#     draw_banner.text(
-#         (experiment_id_x, 0),
-#         f"Experiment {str(experiment_id)}",
-#         font=font,
-#         fill="white",
-#         align="center",
-#     )
-#     horizontal_line_x = segment_starts[4]
-#     draw_banner.line(
-#         (horizontal_line_x, 50, horizontal_line_x + segment_widths[4], 50),
-#         fill="white",
-#         width=2,
-#     )
-#     draw_banner.text(
-#         (experiment_id_x, 60),
-#         f"{str(context).capitalize()}",
-#         font=font,
-#         fill="white",
-#         align="center",
-#     )
-
-# def draw_wellplate_well_id(draw_banner: ImageDraw, wellplate_well_id_x: int, wellplate_id: int, well_id: str) -> None:
-#     """Draw the wellplate and well ID on the banner."""
-#     font = ImageFont.truetype("arial.ttf", 30)
-#     draw_banner.text(
-#         (wellplate_well_id_x, 0), "Wellplate", font=font, fill="white", align="center"
-#     )
-#     draw_banner.text(
-#         (wellplate_well_id_x, 30),
-#         f"{str(wellplate_id)} - {well_id}",
-#         font=font,
-#         fill="white",
-#         align="center",
-#     )
-
-# def draw_substrate_type(draw_banner: ImageDraw, substrate_type_x: int, substrate: str) -> None:
-#     """Draw the substrate type on the banner."""
-#     font = ImageFont.truetype("arial.ttf", 30)
-#     draw_banner.text(
-#         (substrate_type_x, 0), "Substrate", font=font, fill="white", align="center"
-#     )
-#     draw_banner.text(
-#         (substrate_type_x, 30), f"{substrate}", font=font, fill="white", align="center"
-#     )
-
-# def create_image_with_banner(image: Image, banner: Image, banner_height: int) -> Image:
-#     """Create a new image with the banner at the bottom."""
-#     image_with_banner = Image.new(
-#         "RGB", (image.width, image.height + banner_height), "white"
-#     )
-#     image_with_banner.paste(image, (0, 0))
-#     image_with_banner.paste(banner, (0, image.height))
-#     return image_with_banner
-
-# def get_substrate(experiment: ExperimentBase) -> str:
-#     """Get the substrate type from the database."""
-#     try:
-#         substrate = str(
-#             sql_utilities.execute_sql_command(
-#                 "SELECT substrate FROM well_types WHERE id = (SELECT type_id FROM wellplates WHERE id = ?)",
-#                 (experiment.plate_id,),
-#             )[0][0]
-#         )
-#     except:
-#         substrate = "ITO"
-#     return substrate
-
 
 def add_data_zone(
     image: Image, experiment: ExperimentBase = None, context: str = None
@@ -294,7 +92,7 @@ def add_data_zone(
 
     # ePANDA logo
     epanda_logo_x = text_starts[0]
-    logo = Image.open(Path(__file__).parent.parent / "images" / "data_zone_logo.png")
+    logo = Image.open(DATA_ZONE_LOGO)
     logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
     banner.paste(logo, (epanda_logo_x, 0))
     # ePANDA version
@@ -432,9 +230,8 @@ def invert_image(image_path: str) -> str:
 
 
 if __name__ == "__main__":
-    test_image = Image.open(
-        r"C:\Users\Gregory Robben\SynologyDrive\Downloads\16_2_10000596_G8_before_deposition_image_0.tiff"
-    )
+
+    test_image = Image.open(Path(input("Enter the path to the image: ")))
     # pin = "201010102040500000101"
     # date_time = "2021-01-01 12:00:00"
     # project_id = 16
@@ -449,8 +246,6 @@ if __name__ == "__main__":
         experiment=None, image=test_image, context="before deposition"
     )
     new_image.show()
-    new_image.save(
-        r"C:\Users\Gregory Robben\SynologyDrive\Downloads\16_2_10000596_G8_before_deposition_image_0_with_banner.tiff"
-    )
+    new_image.save(Path(input("Enter the path to save the image to: ")))
 
     # inverted_image_path = invert_image(r"images\PANDA_logo.png")
