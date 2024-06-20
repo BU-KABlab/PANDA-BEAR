@@ -204,13 +204,13 @@ def process_metrics(metrics: RawMetrics, input_df: RequiredData) -> PEDOTMetrics
             )
 
         calculated_metrics = PEDOTMetrics(
-                experiment_id=input_df.experiment_id,
-                DepositionChargePassed=charge,
-                BleachChargePassed=bleach_charge,
-                Capacitance=capacitance,
-                DepositionEfficiency=dep_eff,
-                ElectrochromicEfficiency=echromic_eff,
-            )
+            experiment_id=input_df.experiment_id,
+            DepositionChargePassed=charge,
+            BleachChargePassed=bleach_charge,
+            Capacitance=capacitance,
+            DepositionEfficiency=dep_eff,
+            ElectrochromicEfficiency=echromic_eff,
+        )
         print(f"Processed experiment_ID: {input_df.experiment_id}")
 
     except Exception as e:
