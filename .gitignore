@@ -7,3 +7,4 @@ data/
 *slack_credentials.py
 *secrets*
 */atlassian_tools/kablab_projects.py
+test_db.db
