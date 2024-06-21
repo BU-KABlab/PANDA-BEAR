@@ -22,6 +22,7 @@ from .vessel import Vessel
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
 
+
 class WellCoordinates:
     """
     Represents the coordinates of a well.
@@ -325,9 +326,9 @@ class Wellplate:
         self.rows = rows
         self.columns = columns
         self.orientation = orientation
-        self.z_bottom = (-72)
-        self.echem_height = (-70)  # for every well
-        self.image_height = (-35)  # The height from which to image the well in mm
+        self.z_bottom = -72
+        self.echem_height = -70  # for every well
+        self.image_height = -35  # The height from which to image the well in mm
         self.type_number = type_number  # The type of well plate
         plate_id, _, _ = sql_wellplate.select_current_wellplate_info()
         self.plate_id = (
@@ -456,9 +457,7 @@ class Wellplate:
                 self.wells[well_id] = Well(
                     plate_id=self.plate_id,
                     well_id=well_id,
-                    coordinates=WellCoordinates(
-                        x=float(0), y=float(0), z_top=float(0)
-                    ),
+                    coordinates=WellCoordinates(x=float(0), y=float(0), z_top=float(0)),
                     volume=self.initial_volume,
                     height=self.height,
                     depth=self.z_bottom,
@@ -589,9 +588,7 @@ class Wellplate:
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s", well_id, well_data["status"])
 
-    def read_well_type_characteristics(
-        self, type_number: int
-    ) -> tuple[float]:
+    def read_well_type_characteristics(self, type_number: int) -> tuple[float]:
         """Read the well type characteristics from the well_type.csv config file"""
 
         # Select the well type characteristics from the well_types sql table given the type_number
@@ -999,6 +996,7 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
     )
     new_wells = sql_wellplate.count_wells_with_new_status()
     return int(current_plate_id), int(current_type_number), new_wells
+
 
 # def draw_the current_well_status():
 #     """
