@@ -222,3 +222,15 @@ class MockOBSController:
     def set_recording_file_name(self, file_name: str):
         """Set the recording file name"""
         pass
+
+    def take_snapshot(self, source: str = "Webcam"):
+        """Takes a snapshot of the given source and returns a base64 encoded string of the image"""
+        pass
+
+    def change_image(self, new_image_path, source_name: str = "image"):
+        pass
+
+    def disconnect_from_obs(self):
+        """Disconnect from OBS"""
+        pass
+
