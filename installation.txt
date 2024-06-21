@@ -35,5 +35,7 @@ Before you start the PANDA SDL please ensure the following is complete:
     The .env file is where your specific vales such as file paths and api keys
     are stored. Please complete it for the program to operate correctly.
 
+5. Install both conda environments and activate panda_sdl_311
+
 
 
