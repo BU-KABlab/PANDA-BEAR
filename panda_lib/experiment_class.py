@@ -2,6 +2,7 @@
 
 # pylint: disable=invalid-name, line-too-long, import-outside-toplevel, broad-exception-caught, protected-access
 import json
+import os
 from dataclasses import field
 from datetime import datetime
 from decimal import Decimal
@@ -263,7 +264,7 @@ class ExperimentBase:
 
     experiment_id: int = None
     experiment_name: str = None
-    protocol_id: int = None
+    protocol_id: Union[int,str] = None
     priority: Optional[int] = 0
     well_id: Optional[str] = None
     pin: Union[str, int] = None
@@ -306,7 +307,11 @@ class ExperimentBase:
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
         try:
-            from .obs_controls import OBSController
+            if os.environ["PANDA_SDL_TESTING"] == '1':
+                from .obs_controls import MockOBSController as OBSController
+            else:
+                from .obs_controls import OBSController
+
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
@@ -332,7 +337,10 @@ class ExperimentBase:
         # Save the experiment to the database
         update_experiment(self)
         try:
-            from .obs_controls import OBSController
+            if os.environ["PANDA_SDL_TESTING"] == '1':
+                from .obs_controls import MockOBSController as OBSController
+            else:
+                from .obs_controls import OBSController
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:

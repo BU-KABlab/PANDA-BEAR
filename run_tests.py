@@ -1,5 +1,5 @@
 """For running test scripts in the testing directory"""
-from testing import(
+from panda_lib.testing_and_validation import(
     test_pump_control,
     test_vials,
     test_pipette,

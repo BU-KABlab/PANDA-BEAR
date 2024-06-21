@@ -24,6 +24,7 @@ Returns:
 # Standard library imports
 import logging
 import math
+import os
 
 # Third party or custom imports
 from pathlib import Path
@@ -57,7 +58,7 @@ from panda_lib.experiment_class import (
 from panda_lib.image_tools import add_data_zone
 from panda_lib.log_tools import CustomLoggingFilter
 from panda_lib.mill_control import Instruments, Mill, MockMill
-from panda_lib.obs_controls import OBSController
+from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.instrument_toolkit import Toolkit
 from panda_lib.vials import StockVial, WasteVial
@@ -866,7 +867,10 @@ def image_well(
 
         # Post to obs
         try:
-            obs = OBSController()
+            if os.environ.get("PANDA_SDL_TESTING") == "1":
+                obs = MockOBSController()
+            else:
+                obs = OBSController()
             obs.change_image(new_image_path=filepath)
         except:
             # Not critical if the image is not posted to OBS

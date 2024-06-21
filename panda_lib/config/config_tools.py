@@ -2,6 +2,7 @@
 from pathlib import Path
 import importlib
 from panda_lib.config import config
+import os
 
 def get_repo_path():
     """Returns the path of the repository."""
@@ -31,3 +32,4 @@ def write_testing_config(value: bool):
     config_path = repo_path / "config" / "testing.txt"
     with open(config_path, "w", encoding="utf-8") as f:
         f.write(str(value))
+    os.environ["PANDA_SDL_TESTING"] = str(int(value))

@@ -1,4 +1,5 @@
 """Utilities for working with protocols in the database."""
+
 import os
 import sqlite3
 from panda_lib.config.config import SQL_DB_PATH
@@ -57,15 +58,21 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
     Returns:
         ProtocolEntry: The protocol from the database.
     """
+
+    if isinstance(protocol_id, str):
+        query = "SELECT id, project, name, filepath FROM protocols WHERE name = ?"
+    else:
+        query = "SELECT id, project, name, filepath FROM protocols WHERE id = ?"
+
     try:
         conn = sqlite3.connect(SQL_DB_PATH)
         cursor = conn.cursor()
 
         # Get the protocol from the database
         cursor.execute(
-            "SELECT id, project, name, filepath FROM protocols WHERE id = ?",
-            (protocol_id,)
-            )
+            query,
+            (protocol_id,),
+        )
         protocol = cursor.fetchone()
 
         conn.close()
@@ -73,8 +80,11 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
         protocol_entry = ProtocolEntry(*protocol)
         return protocol_entry
     except TypeError as exc:
-        raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.") from exc
-    
+        raise ProtocolNotFoundError(
+            f"Protocol with id {protocol_id} not found."
+        ) from exc
+
+
 def insert_protocol(protocol_id, project, name, filepath):
     """
     Insert a protocol into the database.
@@ -156,8 +166,17 @@ def read_in_protocols():
         None
     """
 
+    # Get the protocols folder from the environment variables    
+    try:
+        protocols = os.environ["PANDA_SDL_PROTOCOLS_DIR"]
+    except KeyError as e:
+        raise ValueError(
+            "PANDA_SDL_PROTOCOLS_DIR environment variable not set in .env file."
+        ) from e
+
     # Get all files in the protocols folder
-    protocols = os.listdir("protocols")
+    protocols = os.listdir(protocols)
+
     # Remove an non .py files
     protocols = [protocol for protocol in protocols if protocol.endswith(".py")]
     # Get the current protocols from the database
@@ -240,6 +259,8 @@ def select_protocol_name(protocol_id) -> str:
     conn.close()
 
     return protocol_name
+
+
 # end region
 if __name__ == "__main__":
     read_in_protocols()

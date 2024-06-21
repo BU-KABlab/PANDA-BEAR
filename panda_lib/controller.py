@@ -14,6 +14,7 @@ Additionally controller should be able to:
 
 # pylint: disable=line-too-long, broad-exception-caught
 import importlib
+import os
 import sys
 import time
 from pathlib import Path
@@ -37,7 +38,7 @@ from .experiment_class import (ExperimentBase, ExperimentResult,
 from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
-from .obs_controls import OBSController
+from .obs_controls import MockOBSController, OBSController
 from .syringepump import MockPump, SyringePump
 from .sartorius_local import Scale
 from .sartorius_local.mock import Scale as MockScale
@@ -70,7 +71,10 @@ def main(
     # import exp_b_pipette_contamination_assessment_protocol as exp_b
     # import protocols
     slack = SlackBot()
-    obs = OBSController()
+    if os.environ.get("PANDA_SDL_TESTING") == "1":
+        obs = MockOBSController()
+    else:
+        obs = OBSController()
     ## Reset the logger to log to the ePANDA.log file and format
     actions.apply_log_filter()
     # print(printpanda())

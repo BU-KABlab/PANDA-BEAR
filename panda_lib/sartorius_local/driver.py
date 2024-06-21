@@ -41,7 +41,7 @@ class Scale:
     This implements a version of the Scale Manufacturers Association
     standardized communications protocol.
     """
-    
+
     def __init__(self, address: str = '', ip: str = '', port: int = 49155,
                  **kwargs: Any) -> None:
         """Set up connection parameters, IP address and port.

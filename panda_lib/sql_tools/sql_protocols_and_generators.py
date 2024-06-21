@@ -6,6 +6,7 @@ from panda_lib.config.config import SQL_DB_PATH
 
 # region Generators
 
+
 class GeneratorEntry:
     """A class to represent a generator entry in the database."""
 
@@ -152,15 +153,23 @@ def read_in_generators():
         None
     """
 
+    # Get the generators folder from the environment variables
+    try:
+        generators = os.environ["PANDA_SDL_GENERATORS_DIR"]
+    except KeyError as e:
+        raise ValueError(
+            "PANDA_SDL_GENERATORS_DIR environment variable not set in .env file."
+        ) from e
+
     # Get all files in the generators folder
-    generators = os.listdir("experiment_generators")
+    generators = os.listdir(generators)
 
     # Remove any __ files from the list
     generators = [generator for generator in generators if "__" not in generator]
 
     # remove any non-python files from the list
     generators = [generator for generator in generators if ".py" in generator]
-    
+
     # Get the current generators from the database
     current_generators = get_generators()
 
@@ -243,6 +252,7 @@ def get_generator_name(generator_id) -> str:
 
     return generator_name
 
+
 def run_generator(generator_id):
     """
     Run a generator.
@@ -255,10 +265,13 @@ def run_generator(generator_id):
     """
     generator = get_generator_by_id(generator_id)
     print(f"Running generator {generator.name}...")
-    generator_module = importlib.import_module(f"experiment_generators.{generator.filepath[:-3]}")
+    generator_module = importlib.import_module(
+        f"experiment_generators.{generator.filepath[:-3]}"
+    )
     generator_function = getattr(generator_module, "main")
     generator_function()
     print(f"Generator {generator.name} complete.")
+
 
 # endregion
 
@@ -323,8 +336,8 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
         # Get the protocol from the database
         cursor.execute(
             "SELECT id, project, name, filepath FROM protocols WHERE id = ?",
-            (protocol_id,)
-            )
+            (protocol_id,),
+        )
         protocol = cursor.fetchone()
 
         conn.close()
@@ -332,8 +345,11 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
         protocol_entry = ProtocolEntry(*protocol)
         return protocol_entry
     except TypeError as exc:
-        raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.") from exc
-    
+        raise ProtocolNotFoundError(
+            f"Protocol with id {protocol_id} not found."
+        ) from exc
+
+
 def insert_protocol(protocol_id, project, name, filepath):
     """
     Insert a protocol into the database.
@@ -499,4 +515,6 @@ def select_protocol_name(protocol_id) -> str:
     conn.close()
 
     return protocol_name
+
+
 # end region

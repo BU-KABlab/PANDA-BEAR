@@ -7,6 +7,7 @@ import ast
 import json
 import logging
 import math
+
 # from pathlib import Path
 from typing import Sequence, Union, List, Tuple
 
@@ -21,6 +22,7 @@ from .vessel import OverDraftException, OverFillException, Vessel, VesselCoordin
 # system_handler.setFormatter(formatter)
 # logger.addHandler(system_handler)
 vial_logger = logging.getLogger("e_panda")
+
 
 class Vial2(Vessel):
     """
@@ -103,9 +105,7 @@ class Vial2(Vessel):
         self.position = position
         self.radius = radius
         self.height = height
-        self.coordinates.z_top = float(self.coordinates.z_bottom) + float(
-            self.height
-        )
+        self.coordinates.z_top = float(self.coordinates.z_bottom) + float(self.height)
         self.base = round(math.pi * math.pow(self.radius, 2.0), 6)
         self.depth = self.calculate_depth()
         self.contamination = contamination
@@ -144,11 +144,11 @@ class Vial2(Vessel):
         area_mm2 = float(math.pi) * float(radius_mm) ** 2
         volume_mm3 = self.volume
         height = round((volume_mm3) / (area_mm2), 4)
-        depth = round(float(height + float(self.coordinates.z_bottom) - float('2')),6)
+        depth = round(float(height + float(self.coordinates.z_bottom) - float("2")), 6)
         if depth < self.coordinates.z_bottom + 1:
             depth = self.coordinates.z_bottom + 1
         return depth
-        #return self.coordinates.z_bottom
+        # return self.coordinates.z_bottom
 
     def check_volume(self, volume_to_add: float) -> bool:
         """
@@ -469,9 +469,9 @@ class WasteVial(Vial2):
             try:
                 for key, value in from_vessel.items():
                     if key in self.contents:
-                        self.contents[key] += round(float(value),6)
+                        self.contents[key] += round(float(value), 6)
                     else:
-                        self.contents[key] = round(float(value),6)
+                        self.contents[key] = round(float(value), 6)
 
             except Exception as e:
                 vial_logger.error("Error occurred while updating well contents: %s", e)
@@ -479,7 +479,9 @@ class WasteVial(Vial2):
 
         else:  # from_vessel is a string
             if from_vessel in self.contents:
-                self.contents[from_vessel] = round(self.contents[from_vessel] + volume, 6)
+                self.contents[from_vessel] = round(
+                    self.contents[from_vessel] + volume, 6
+                )
             else:
                 self.contents[from_vessel] = round(volume, 6)
         vial_logger.debug(
@@ -533,15 +535,15 @@ def get_current_vials(group: str = None) -> List[dict]:
     for vial in vial_parameters_copy:
         coordinate_string = ast.literal_eval(vial[6])
         contents = vial[10]
-        if contents == 'none':
+        if contents == "none":
             if vial[1] == 0:
                 contents = None
             else:
                 contents = {}
 
-        elif contents == '':
+        elif contents == "":
             contents = None
-        
+
         elif "{" in contents:
             contents = ast.literal_eval(vial[10])
         # if contents is not None and not isinstance(contents, dict):
@@ -563,7 +565,9 @@ def get_current_vials(group: str = None) -> List[dict]:
             "contamination": round(float(vial[9]), 6),
             "contents": contents,
             "viscosity_cp": round(float(vial[11]), 6),
-            "concentration": round(float(vial[12]), 6),
+            "concentration": (
+                round(float(vial[12]), 6) if vial[1] == 0 else None
+            ),  # Only stock vials have concentration
             "depth": round(float(vial[13]), 6),
         }
         # vial = Vial2(**vial_dict)
@@ -575,6 +579,7 @@ def get_current_vials(group: str = None) -> List[dict]:
 
     return vial_parameters
 
+
 def get_vial_category(group_name: str) -> int:
     """Get the category of the vial"""
     if group_name.lower() == "stock":
@@ -585,6 +590,7 @@ def get_vial_category(group_name: str) -> int:
         return 99
     else:
         return None
+
 
 def read_vials() -> Tuple[List[StockVial], List[WasteVial]]:
     """
@@ -644,23 +650,23 @@ def read_vials() -> Tuple[List[StockVial], List[WasteVial]]:
 #     """
 #     Update the vials in the json file. This is used to update the volume, contents, and contamination of the vials
 #     """
-    # filename_ob = Path.cwd() / filename
-    # with open(filename_ob, "r", encoding="UTF-8") as file:
-    #     vial_parameters = json.load(file)
+# filename_ob = Path.cwd() / filename
+# with open(filename_ob, "r", encoding="UTF-8") as file:
+#     vial_parameters = json.load(file)
 
-    # for vial in vial_objects:
-    #     for vial_param in vial_parameters:
-    #         if str(vial_param["position"]) == vial.position.lower():
-    #             vial_param["volume"] = vial.volume
-    #             vial_param["contamination"] = vial.contamination
-    #             vial_param["contents"] = vial.contents
-    #             break
+# for vial in vial_objects:
+#     for vial_param in vial_parameters:
+#         if str(vial_param["position"]) == vial.position.lower():
+#             vial_param["volume"] = vial.volume
+#             vial_param["contamination"] = vial.contamination
+#             vial_param["contents"] = vial.contents
+#             break
 
-    # with open(filename_ob, "w", encoding="UTF-8") as file:
-    #     json.dump(vial_parameters, file, indent=4)
+# with open(filename_ob, "w", encoding="UTF-8") as file:
+#     json.dump(vial_parameters, file, indent=4)
 
-    # return 0
-    # input_new_vials_into_db(vial_objects)
+# return 0
+# input_new_vials_into_db(vial_objects)
 
 
 def input_new_vials_into_db(vial_objects: Sequence[Vial2]) -> None:
@@ -770,6 +776,7 @@ def update_vial_state_files(
     input_new_vials_into_db(stock_vials)
     input_new_vials_into_db(waste_vials)
 
+
 def reset_vials(vialgroup: str) -> None:
     """
     Resets the volume and contamination of the current vials to their capacity and 0 respectively
@@ -787,7 +794,7 @@ def reset_vials(vialgroup: str) -> None:
     #     vial_logger.error("Invalid vial group")
     #     raise ValueError
 
-    if vialgroup not in ["stock", "waste","test"]:
+    if vialgroup not in ["stock", "waste", "test"]:
         vial_logger.error("Invalid vial group %s given for resetting vials", vialgroup)
         raise ValueError
 
@@ -830,7 +837,6 @@ def delete_vial_position_and_hx_from_db(position: str) -> None:
         vial_logger.exception(e)
 
 
-
 def input_new_vial_values(vialgroup: str) -> None:
     """For user inputting the new vial values for the state file"""
     ## Fetch the current state file
@@ -852,7 +858,7 @@ def input_new_vial_values(vialgroup: str) -> None:
     vial_lines = []
     ## Print the current vials and their values
     print("Current vials:")
-    
+
     max_lengths = [10, 20, 20, 15, 15, 15, 15]  # Initialize max lengths for each column
     for vial in vial_parameters:
         vial = Vial2(**vial)
@@ -877,15 +883,15 @@ def input_new_vial_values(vialgroup: str) -> None:
             vial.capacity,
             vial.contamination,
         ]
-        max_lengths = [max(max_lengths[i], len(str(values[i]))) for i in range(len(values))]  # Update max lengths
+        max_lengths = [
+            max(max_lengths[i], len(str(values[i]))) for i in range(len(values))
+        ]  # Update max lengths
 
         vial_lines.append(
             f"{values[0]:<{max_lengths[0]}} {values[1]:<{max_lengths[1]}} {values[2]:<{max_lengths[2]}} {values[3]:<{max_lengths[3]}} {values[4]:<{max_lengths[4]}} {values[5]:<{max_lengths[5]}} {values[6]:<{max_lengths[6]}}"
         )
-    
-    header_string = (
-        f"{'Position':<{max_lengths[0]}} {'Name':<{max_lengths[1]}} {'Contents':<{max_lengths[2]}} {'Density':<{max_lengths[3]}} {'Volume':<{max_lengths[4]}} {'Capacity':<{max_lengths[5]}} {'Contamination':<{max_lengths[6]}}"
-    )
+
+    header_string = f"{'Position':<{max_lengths[0]}} {'Name':<{max_lengths[1]}} {'Contents':<{max_lengths[2]}} {'Density':<{max_lengths[3]}} {'Volume':<{max_lengths[4]}} {'Capacity':<{max_lengths[5]}} {'Contamination':<{max_lengths[6]}}"
     print(header_string)
     for line in vial_lines:
         print(line)
@@ -955,7 +961,9 @@ def input_new_vial_values(vialgroup: str) -> None:
                         vial.capacity = ""
                         vial.contamination = ""
 
-                    contents_str = str(vial.contents)  # Convert contents dictionary to string
+                    contents_str = str(
+                        vial.contents
+                    )  # Convert contents dictionary to string
                     print(
                         f"{vial.position:<10} {vial.name:<20} {contents_str:<20} {vial.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
                     )

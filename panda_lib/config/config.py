@@ -1,12 +1,17 @@
 """The home of all project specific strings and values that are 
 better to be set in one place than to be scattered around the code."""
+
 from pathlib import Path
+from os import environ
+import sqlite3
+
 
 def get_repo_path():
     """Returns the path of the repository."""
     current_file = Path(__file__).resolve()
     repo_path = current_file.parent.parent
     return repo_path
+
 
 def read_testing_config():
     """Reads the testing configuration file."""
@@ -15,33 +20,61 @@ def read_testing_config():
     with open(config_path, "r", encoding="utf-8") as f:
         return f.read().strip() == "True"
 
+
 def write_testing_config(value: bool):
     """Writes the testing configuration file."""
     repo_path = get_repo_path()
     config_path = repo_path / "config" / "testing.txt"
     with open(config_path, "w", encoding="utf-8") as f:
-        f.write(str(value))## Project values
+        f.write(str(value))
+    environ["PANDA_SDL_TESTING"] = str(int(value))
 
+
+## Project default values
 AIR_GAP = float(40.0)  # ul
 DRIP_STOP = float(5.0)  # ul
 PURGE_VOLUME = float(20)  # ul
-RANDOM_FLAG = False  # Set to True to randomize the order of the experiments
+RANDOM_FLAG = False  # True to randomize experiment order (grouped by priority)
 DEFAULT_PUMPING_RATE = float(0.3)  # ul/s
-## Testing flag
-# testing.txt is the only place to change the mode besides from the main menue
-# This should no be put into a db since depending on its setting a different db is used.
-# TODO: instead of seperate dbs what about seperate schemas?
-# TODO this is more of an environment variable file than config file, look into python-dotenv
-## Flag to use only local paths
-USE_LOCAL_PATHS = read_testing_config()
 
-## Define local repository path
+## Define local repository path - will also be used during testing
 LOCAL_REPO_PATH = Path(__file__).parents[2]
 
-## Define network path
-NETWORK_PATH = Path(
-    "//engnas.bu.edu/research/eng_research_kablab/Shared Resources/PANDA/"
-)
+## Testing flag
+# testing.txt is the only place to change the mode besides from the main menue
+# The file is created if it does not exist
+
+if not (LOCAL_REPO_PATH / "panda_lib" / "config" / "testing.txt").exists():
+    write_testing_config(True)  # Default is testing mode
+
+## Flag to use only local paths - can be changed while running the program
+TESTING_MODE_ACTIVE = read_testing_config()
+try:
+    TESTING_DIRECTORY = environ["PANDA_SDL_TESTING_PATH"]
+
+    if TESTING_DIRECTORY in [None, "",'None']:
+        raise KeyError
+
+    TESTING_DIRECTORY = Path(TESTING_DIRECTORY)
+
+except KeyError:
+    TESTING_DIRECTORY = LOCAL_REPO_PATH
+## Define external path for data, logs, and system state
+
+if not TESTING_MODE_ACTIVE:
+    try:
+        PRODUCTION_DIRECTORY = environ["PANDA_SDL_EXTERNAL_PATH"]
+
+        if PRODUCTION_DIRECTORY in [None, "",'None']:
+            raise KeyError
+
+        PRODUCTION_DIRECTORY = Path(PRODUCTION_DIRECTORY)
+    except KeyError:
+        print("PANDA_SDL_EXTERNAL_PATH environment variable not set.")
+        print("Switching to testing mode")
+        write_testing_config(True)
+        TESTING_MODE_ACTIVE = True
+
 
 ## Project File Names
 __MILL_CONFIG_FILE_NAME = "mill_config.json"
@@ -55,21 +88,28 @@ __LOGS = "logs"
 __SYS_STATE = "system state"
 __IMAGES = "application_images"
 
-## FLIR Camera related - must be python 3.6
-PYTHON_360_PATH = Path("C:\\Users\\Kab Lab\\anaconda3\\envs\\python360\\python.exe")
-CAMERA_SCRIPT_PATH = Path(LOCAL_REPO_PATH/__CODE/"camera.py")
+## FLIR Camera related - must be a python 3.6 environment
+try:
+    PYTHON_360_PATH = environ["PANDA_SDL_PYTHON_360_PATH"]
+
+    if PYTHON_360_PATH in [None, "",'None']:
+        raise KeyError
+
+    PYTHON_360_PATH = Path(PYTHON_360_PATH)
+except KeyError:
+    raise ValueError("PANDA_SDL_PYTHON_360_PATH environment variable not set.")
+
+CAMERA_SCRIPT_PATH = Path(LOCAL_REPO_PATH / __CODE / "flir_camera" / "camera.py")
 
 ## Build complete paths for each project directory or file
-if USE_LOCAL_PATHS:
+if TESTING_MODE_ACTIVE:
     # Directories
     PATH_TO_CODE = LOCAL_REPO_PATH / __CODE
-    PATH_TO_SYSTEM_STATE = PATH_TO_CODE / __SYS_STATE
     PATH_TO_CONFIG = PATH_TO_CODE / __CONFIG
-    PATH_TO_DATA = LOCAL_REPO_PATH / __DATA
-    PATH_TO_LOGS = PATH_TO_CODE / __LOGS
-    PATH_TO_DATA = LOCAL_REPO_PATH / __DATA
-    PATH_TO_LOGS = LOCAL_REPO_PATH / __LOGS
-    PATH_TO_STATUS = PATH_TO_CODE / __SYS_STATE
+    PATH_TO_DATA = TESTING_DIRECTORY / __DATA
+    PATH_TO_LOGS = TESTING_DIRECTORY / __LOGS
+    PATH_TO_DATA = TESTING_DIRECTORY / __DATA
+    PATH_TO_LOGS = TESTING_DIRECTORY / __LOGS
     PATH_TO_IMAGES = PATH_TO_CODE / __IMAGES
 
     # Files
@@ -79,36 +119,49 @@ if USE_LOCAL_PATHS:
     DATA_ZONE_LOGO = PATH_TO_IMAGES / "data_zone_logo.png"
 
     # DB
-    SQL_DB_PATH = LOCAL_REPO_PATH /"epanda_test.db"
+    try:
+        SQL_DB_PATH = environ["PANDA_SDL_TESTING_DB_PATH"]
+
+        if SQL_DB_PATH in [None, "",'None']:
+            raise KeyError
+
+        SQL_DB_PATH = Path(SQL_DB_PATH)
+    except KeyError:
+        print("PANDA_SDL_TESTING_DB_PATH environment variable not set in .env file.")
+        print("Using default path")
+        SQL_DB_PATH = LOCAL_REPO_PATH / "test.db"
+
+    # Test that the db exists, and if not create it using the included test_db.sql
+    if not SQL_DB_PATH.exists():
+        Path(SQL_DB_PATH).with_suffix(".db").touch()
+        conn = sqlite3.connect(SQL_DB_PATH)
+        with open(LOCAL_REPO_PATH / "test_db.sql", "r") as f:
+            conn.executescript(f.read())
+        conn.close()
 
     ## Validate that all paths exist and create them if they don't
     for path in [
         PATH_TO_CODE,
-        PATH_TO_SYSTEM_STATE,
         PATH_TO_CONFIG,
         PATH_TO_DATA,
         PATH_TO_LOGS,
         PATH_TO_DATA,
         PATH_TO_LOGS,
-        PATH_TO_STATUS,
         PATH_TO_IMAGES,
     ]:
         path = Path(path)
         if not path.exists():
-            # print(f"Creating {path}")
             path.mkdir()
             print(f"Created {path}")
 
-else:  # Use network paths
+else:  # Use external paths
     # Directories
     PATH_TO_CODE = LOCAL_REPO_PATH / __CODE
-    PATH_TO_SYSTEM_STATE = NETWORK_PATH / __SYS_STATE
     PATH_TO_CONFIG = PATH_TO_CODE / __CONFIG
-    PATH_TO_DATA = NETWORK_PATH / __DATA
-    PATH_TO_LOGS = NETWORK_PATH / __LOGS
-    PATH_TO_DATA = NETWORK_PATH / __DATA
-    PATH_TO_LOGS = NETWORK_PATH / __LOGS
-    PATH_TO_STATUS = NETWORK_PATH / __SYS_STATE
+    PATH_TO_DATA = PRODUCTION_DIRECTORY / __DATA
+    PATH_TO_LOGS = PRODUCTION_DIRECTORY / __LOGS
+    PATH_TO_DATA = PRODUCTION_DIRECTORY / __DATA
+    PATH_TO_LOGS = PRODUCTION_DIRECTORY / __LOGS
     PATH_TO_IMAGES = PATH_TO_CODE / __IMAGES
 
     # Files
@@ -118,44 +171,42 @@ else:  # Use network paths
     DATA_ZONE_LOGO = PATH_TO_IMAGES / "data_zone_logo.png"
 
     # DB
-    SQL_DB_PATH = NETWORK_PATH /"epanda_prod.db"
+    try:
+        SQL_DB_PATH = environ["PANDA_SDL_PRODUCTION_DB_PATH"]
+
+        if SQL_DB_PATH in [None, "",'None']:
+            raise KeyError
+
+        SQL_DB_PATH = Path(SQL_DB_PATH)
+    except KeyError:
+        print("PANDA_SDL_PRODUCTION_DB_PATH environment variable not set in .env file.")
+        print("Using a local db")
+        SQL_DB_PATH = LOCAL_REPO_PATH / "prod.db"
+        if not Path(SQL_DB_PATH).with_suffix(".db").exists():
+            Path(SQL_DB_PATH).with_suffix(".db").touch()
+            conn = sqlite3.connect(SQL_DB_PATH)
+            with open(LOCAL_REPO_PATH / "test_db.sql", "r") as f:
+                conn.executescript(f.read())
+            conn.close()
+
+    # Test that a connection can be made to the db. If not raise exception
+    try:
+        conn = sqlite3.connect(SQL_DB_PATH)
+        conn.close()
+    except sqlite3.Error as e:
+        raise f"Error connecting to database: {e}" from e
+
     ## Validate that all paths exist and create them if they don't
     for path in [
         PATH_TO_CODE,
-        PATH_TO_SYSTEM_STATE,
         PATH_TO_CONFIG,
         PATH_TO_DATA,
         PATH_TO_LOGS,
         PATH_TO_DATA,
         PATH_TO_LOGS,
-        PATH_TO_STATUS,
         PATH_TO_IMAGES,
     ]:
         path = Path(path)
         if not path.exists():
-            # print(f"Creating {path}")
             path.mkdir()
             print(f"Created {path}")
-
-## Validate that all files exist and create them if they don't
-for file in [
-    MILL_CONFIG,
-    WELLPLATE_LOCATION,
-    EPANDA_LOG,
-]:
-    file_path = Path(PATH_TO_SYSTEM_STATE / file)
-    if not file_path.exists():
-        # print(f"Creating {file_path}")
-        file_path.touch()
-        print(f"Created {file_path}")
-
-## Rename existing log file if it exists with timestamp
-# if EPANDA_LOG.exists():
-#     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-#     new_name = EPANDA_LOG.with_name(f"ePANDA_{timestamp}.log")
-#     EPANDA_LOG.rename(new_name)
-#     print(f"Renamed {EPANDA_LOG} to {new_name}")
-
-# ## Create new log file
-# EPANDA_LOG.touch()
-# print(f"Created {EPANDA_LOG}")
