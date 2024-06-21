@@ -8,12 +8,12 @@ import time
 from typing import Optional, Union
 
 
-from panda_lib import nesp_lib_local as nesp_lib
+from panda_lib.nesp_lib_py import nesp_lib
 from panda_lib.config.config import PATH_TO_LOGS
 from panda_lib.correction_factors import reverse_correction_factor
 from panda_lib.experiment_class import ExperimentResult
 from panda_lib.mill_control import Mill, MockMill
-from panda_lib.nesp_lib_local.mock import Pump as MockNespLibPump
+from panda_lib.nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 from panda_lib.pipette import Pipette
 from panda_lib.sartorius_local.driver import Scale
 from panda_lib.sartorius_local.mock import Scale as MockScale
