@@ -102,6 +102,9 @@ def insert_protocol(protocol_id, project, name, filepath):
     conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
+    # Clean the name of any file extensions
+    name = name.split(".")[0]
+
     # Insert the protocol into the database
     cursor.execute(
         "INSERT INTO protocols (id, project, name, filepath) VALUES (?, ?, ?, ?)",
