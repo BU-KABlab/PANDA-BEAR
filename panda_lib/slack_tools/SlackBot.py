@@ -3,50 +3,65 @@
 # pylint: disable=line-too-long
 
 import base64
-
-# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
-from enum import Enum
-import os
 import json
 import logging
+import os
 import time
 from dataclasses import dataclass
 from datetime import datetime
+
+# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
+from enum import Enum
 from io import BytesIO
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import dotenv
 from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 import panda_lib.config.config as config
 import panda_lib.experiment_class as exp
-from panda_lib.config.secrets import Slack as slack_cred
+from panda_lib import vials
 from panda_lib.image_tools import add_data_zone
 from panda_lib.obs_controls import OBSController
 from panda_lib.sql_tools import (
     sql_queue,
     sql_slack_tickets,
     sql_system_state,
-    sql_wellplate,
     sql_utilities,
+    sql_wellplate,
 )
 from panda_lib.wellplate import Well, Wellplate
-from panda_lib import vials
 
+dotenv.load_dotenv()
 # STOCK_STATUS = config.STOCK_STATUS
 # WASTE_STATUS = config.WASTE_STATUS
+
+
+@dataclass
+class SlackCred:
+    """This class is used to store the slack secrets"""
+
+    TOKEN = os.environ.get("SLACK_TOKEN")
+    DATA_CHANNEL_ID = os.environ.get("SLACK_DATA_CHANNEL_ID")
+    TEST_DATA_CHANNEL_ID = os.environ.get("SLACK_TEST_DATA_CHANNEL_ID")
+    CONVERSATION_CHANNEL_ID = os.environ.get("SLACK_CONVERSATION_CHANNEL_ID")
+    TEST_CONVERSATION_CHANNEL_ID = os.environ.get("SLACK_TEST_CONVERSATION_CHANNEL_ID")
+    ALERT_CHANNEL_ID = os.environ.get("SLACK_ALERT_CHANNEL_ID")
+    TEST_ALERT_CHANNEL_ID = os.environ.get("SLACK_TEST_ALERT_CHANNEL_ID")
+
 
 class Cameras(Enum):
     """
     Enum for camera types
     """
+
     WEBCAM = 0
     VIALS = 1
     PSTAT = 2
-
 
 
 # region Slack Tickets
@@ -62,13 +77,15 @@ class SlackTicket:
     addressed_timestamp: str
 
 
-def insert_slack_ticket(ticket: SlackTicket, test:bool=False) -> None:
+def insert_slack_ticket(ticket: SlackTicket, test: bool = False) -> None:
     """
     Insert a slack ticket into the slack_tickets table.
 
     Args:
         ticket (SlackTicket): The slack ticket to insert.
     """
+    if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        test = True
     sql_utilities.execute_sql_command_no_return(
         """
         INSERT INTO slack_tickets (
@@ -93,7 +110,7 @@ def insert_slack_ticket(ticket: SlackTicket, test:bool=False) -> None:
     )
 
 
-def select_slack_ticket(msg_id: str, test:bool=False) -> SlackTicket:
+def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
     """
     Select a slack ticket from the slack_tickets table.
 
@@ -103,6 +120,8 @@ def select_slack_ticket(msg_id: str, test:bool=False) -> SlackTicket:
     Returns:
         SlackTicket: The slack ticket.
     """
+    if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        test = True
     result = sql_utilities.execute_sql_command(
         """
         SELECT
@@ -127,15 +146,22 @@ class SlackBot:
     """Class for sending messages to Slack."""
 
     def __init__(self, test: bool = config.read_testing_config()) -> None:
+
         self.logger = logging.getLogger("e_panda")
         self.test = test
-        self.client = WebClient(token=slack_cred.TOKEN)
+        self.client = WebClient(token=SlackCred.TOKEN)
+        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+            self.test = True
 
     def send_slack_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
-        client = WebClient(slack_cred.TOKEN)
+        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+            return
+
+
+        client = WebClient(SlackCred.TOKEN)
         channel_id = self.channel_id(channel_id)
-        if channel_id == 0:
+        if channel_id == 0 or channel_id is None:
             return
 
         try:
@@ -150,7 +176,11 @@ class SlackBot:
 
     def send_slack_file(self, channel: str, file, message=None) -> int:
         """Send a file to Slack."""
-        client = WebClient(slack_cred.TOKEN)
+
+        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+            return
+        
+        client = WebClient(SlackCred.TOKEN)
         file = Path(file)
         filename_to_post = file.name
 
@@ -180,7 +210,7 @@ class SlackBot:
 
     # def post_message_with_files(self, channel, message, file_list):
     #     """Post a message with files to Slack."""
-    #     client = WebClient(slack_cred.TOKEN)
+    #     client = WebClient(SlackCred.TOKEN)
     #     channel_id = self.channel_id(channel)
     #     file_ids = []
     #     file_urls = []
@@ -209,9 +239,11 @@ class SlackBot:
     #         ],
     #     )
 
-    def upload_images(self, channel, images,message):
+    def upload_images(self, channel, images, message):
         """Upload images to Slack."""
-        client = WebClient(slack_cred.TOKEN)
+        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+            return
+        client = WebClient(SlackCred.TOKEN)
         channel_id = self.channel_id(channel)
         image_paths = [Path(image) for image in images]
         file_upload_parts = []
@@ -232,7 +264,9 @@ class SlackBot:
 
     def check_latest_message(self, channel: str) -> str:
         """Check Slack for the latest message."""
-        client = WebClient(token=slack_cred.TOKEN)
+        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+            return
+        client = WebClient(token=SlackCred.TOKEN)
         channel_id = self.channel_id(channel)
         if channel_id == 0:
             return 0
@@ -253,10 +287,11 @@ class SlackBot:
 
     def check_slack_messages(self, channel: str) -> int:
         """Check Slack for messages."""
-
+        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+            return
         # WebClient insantiates a client that can call API methods
         # When using Bolt, you can use either `app.client` or the `client` passed to listeners.
-        client = WebClient(token=slack_cred.TOKEN)
+        client = WebClient(token=SlackCred.TOKEN)
         # Store conversation history
         conversation_history = []
         # ID of the channel you want to send the message to
@@ -516,7 +551,7 @@ class SlackBot:
     def __help_menu(self, channel_id):
         """Sends the help menu to the user."""
 
-        if channel_id != slack_cred.DATA_CHANNEL_ID:
+        if channel_id != SlackCred.DATA_CHANNEL_ID:
             message = (
                 "Here is a list of commands I understand:\n"
                 "help -> displays this message\n"
@@ -534,7 +569,7 @@ class SlackBot:
                 "stop - stops the experiment loop\n"
                 "exit -> closes the slackbot\n"
             )
-        else: # data channel
+        else:  # data channel
             message = (
                 "Here is a list of commands I understand:\n"
                 "help -> displays this message\n"
@@ -568,7 +603,7 @@ class SlackBot:
         # stock_vials["position"] = stock_vials["position"].astype(str)
         # stock_vials["volume"] = stock_vials["volume"].astype(float)
 
-        stock_vials = vials.get_current_vials('stock') # returns a list of Vial objects 
+        stock_vials = vials.get_current_vials("stock")  # returns a list of Vial objects
         stock_vials = pd.DataFrame([vial.to_dict() for vial in stock_vials])
         stock_vials = stock_vials[["position", "volume", "name", "contents"]]
         stock_vials = stock_vials.dropna()
@@ -605,7 +640,7 @@ class SlackBot:
 
         # And the same for the waste vials
         # waste_vials = pd.read_json(WASTE_STATUS)
-        waste_vials = vials.get_current_vials('waste')
+        waste_vials = vials.get_current_vials("waste")
         waste_vials = pd.DataFrame([vial.to_dict() for vial in waste_vials])
         waste_vials = waste_vials[["position", "volume", "name"]]
         # Drop any vials that have null values
@@ -689,7 +724,7 @@ class SlackBot:
         ## Vials
         # with open(WASTE_STATUS, "r", encoding="utf-8") as stock:
         #     data = json.load(stock)
-        data = vials.get_current_vials('waste')
+        data = vials.get_current_vials("waste")
         for vial in data:
             vial = vial.to_dict()
             vial_x.append(vial["vial_coordinates"]["x"])
@@ -710,7 +745,7 @@ class SlackBot:
                 vial_marker.append("o")
         # with open(STOCK_STATUS, "r", encoding="utf-8") as stock:
         #     data = json.load(stock)
-        data = vials.get_current_vials('stock')
+        data = vials.get_current_vials("stock")
         for vial in data:
             vial = vial.to_dict()
             vial_x.append(vial["vial_coordinates"]["x"])
@@ -815,7 +850,7 @@ class SlackBot:
             self.send_slack_message(channel_id, "Error taking screenshot")
             self.send_slack_message(channel_id, str(e))
             return 1
-        
+
     def __share_experiment_images(self, experiment_id: int):
         """Share the images for an experiment."""
         # Look up there experiment_id in the db and find all results of type image
@@ -831,40 +866,42 @@ class SlackBot:
             result: exp.ExperimentResultsRecord
             if "dz" not in result.result_value:
                 results.remove(result)
-        
+
         # Now make a list of the image paths
         image_paths = [result.result_value for result in results]
 
         # Now send the images to slack
-        self.upload_images("data", image_paths, f"Images for experiment {experiment_id}")
+        self.upload_images(
+            "data", image_paths, f"Images for experiment {experiment_id}"
+        )
 
     def channel_id(self, channel: str) -> str:
         """Return the channel ID based on the channel name."""
         if channel == "conversation":
             channel_id = (
-                slack_cred.CONVERSATION_CHANNEL_ID
+                SlackCred.CONVERSATION_CHANNEL_ID
                 if not self.test
-                else slack_cred.TEST_ALERT_CHANNEL_ID
+                else SlackCred.TEST_ALERT_CHANNEL_ID
             )
         elif channel == "alert":
             channel_id = (
-                slack_cred.ALERT_CHANNEL_ID
+                SlackCred.ALERT_CHANNEL_ID
                 if not self.test
-                else slack_cred.TEST_ALERT_CHANNEL_ID
+                else SlackCred.TEST_ALERT_CHANNEL_ID
             )
         elif channel == "data":
             channel_id = (
-                slack_cred.DATA_CHANNEL_ID
+                SlackCred.DATA_CHANNEL_ID
                 if not self.test
-                else slack_cred.TEST_DATA_CHANNEL_ID
+                else SlackCred.TEST_DATA_CHANNEL_ID
             )
         elif channel in [
-            slack_cred.CONVERSATION_CHANNEL_ID,
-            slack_cred.ALERT_CHANNEL_ID,
-            slack_cred.DATA_CHANNEL_ID,
-            slack_cred.TEST_ALERT_CHANNEL_ID,
-            slack_cred.TEST_DATA_CHANNEL_ID,
-            slack_cred.TEST_CONVERSATION_CHANNEL_ID,
+            SlackCred.CONVERSATION_CHANNEL_ID,
+            SlackCred.ALERT_CHANNEL_ID,
+            SlackCred.DATA_CHANNEL_ID,
+            SlackCred.TEST_ALERT_CHANNEL_ID,
+            SlackCred.TEST_DATA_CHANNEL_ID,
+            SlackCred.TEST_CONVERSATION_CHANNEL_ID,
         ]:
             channel_id = channel
         else:

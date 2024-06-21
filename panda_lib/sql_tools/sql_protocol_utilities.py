@@ -77,6 +77,21 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
 
         conn.close()
 
+        if protocol is None and isinstance(protocol_id, str):
+            protocol_id = protocol_id + ".py"
+            conn = sqlite3.connect(SQL_DB_PATH)
+            cursor = conn.cursor()
+
+            # Get the protocol from the database
+            cursor.execute(
+                query,
+                (protocol_id,),
+            )
+            protocol = cursor.fetchone()
+
+            conn.close()
+            
+
         protocol_entry = ProtocolEntry(*protocol)
         return protocol_entry
     except TypeError as exc:

@@ -29,7 +29,6 @@ import os
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
-
 from PIL import Image
 
 # Local application imports
@@ -867,7 +866,7 @@ def image_well(
 
         # Post to obs
         try:
-            if os.environ.get("PANDA_SDL_TESTING") == "1":
+            if os.environ.get("PANDA_SDL_TESTING") == "1" or os.environ["PANDA_SDL_USE_OBS"] == '0':
                 obs = MockOBSController()
             else:
                 obs = OBSController()

@@ -1,4 +1,4 @@
-name: panda_sdl
+name: panda_sdl_311
 channels:
   - conda-forge
   - defaults

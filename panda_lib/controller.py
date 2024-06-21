@@ -71,7 +71,7 @@ def main(
     # import exp_b_pipette_contamination_assessment_protocol as exp_b
     # import protocols
     slack = SlackBot()
-    if os.environ.get("PANDA_SDL_TESTING") == "1":
+    if os.environ.get("PANDA_SDL_TESTING") == "1" or os.environ["PANDA_SDL_USE_OBS"] == '0':
         obs = MockOBSController()
     else:
         obs = OBSController()

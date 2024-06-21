@@ -307,7 +307,7 @@ class ExperimentBase:
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
         try:
-            if os.environ["PANDA_SDL_TESTING"] == '1':
+            if os.environ["PANDA_SDL_TESTING"] == '1' or os.environ["PANDA_SDL_USE_OBS"] == '0':
                 from .obs_controls import MockOBSController as OBSController
             else:
                 from .obs_controls import OBSController
@@ -337,7 +337,7 @@ class ExperimentBase:
         # Save the experiment to the database
         update_experiment(self)
         try:
-            if os.environ["PANDA_SDL_TESTING"] == '1':
+            if os.environ["PANDA_SDL_TESTING"] == '1' or os.environ["PANDA_SDL_USE_OBS"] == '0':
                 from .obs_controls import MockOBSController as OBSController
             else:
                 from .obs_controls import OBSController

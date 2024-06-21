@@ -5,12 +5,12 @@ It is used to place the experiment information on the screen and to turn on and 
 
 # pylint: disable=unnecessary-pass
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 import obsws_python as obsws
 from obsws_python import error as OBSerror
-
+import os
 from .config.config import PATH_TO_LOGS, read_testing_config
-from .config.secrets import OBSSecrets
 from .log_tools import e_panda_logger as logger
 
 ## set up logging to log to both the obs_control.log file and the ePANDA.log file
@@ -22,6 +22,14 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 # logger.addHandler(system_handler)
 
+@dataclass
+class OBSSecrets:
+    """This class is used to store the OBS secrets"""
+
+    HOST = os.environ.get("OBS_HOST")
+    PASSWORD = os.environ.get("OBS_PASSWORD")
+    PORT = int(os.environ.get("OBS_PORT"))
+    TIMEOUT = int(os.environ.get("OBS_TIMEOUT"))
 
 class OBSController:
     """This class is used simplify the control the OBS software for our needs"""
