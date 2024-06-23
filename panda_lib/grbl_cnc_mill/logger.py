@@ -8,7 +8,7 @@ def set_up_mill_logger(path_to_logs:Path) -> logging.Logger:
     Args:
     path_to_logs (Path): The path to the logs directory.
     """
-    logger = logging.getLogger("e_panda")
+    logger = logging.getLogger("grbl_cnc_mill")
     if not logger.hasHandlers():
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.DEBUG)

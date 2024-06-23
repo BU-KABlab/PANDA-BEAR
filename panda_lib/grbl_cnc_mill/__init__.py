@@ -3,8 +3,8 @@
 VERSION = '1.0.0'
 """Version of grbl_cnc_mill."""
 
-from .instruments import Instruments
 from .driver import Mill
-from .mock import MockMill
-from .states_codes import Status, AlarmStatus, ErrorCodes
 from .exceptions import *
+from .instruments import Instruments
+from .mock import MockMill
+from .status_codes import AlarmStatus, ErrorCodes, Status

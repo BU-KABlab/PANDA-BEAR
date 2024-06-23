@@ -9,16 +9,16 @@ from unittest import mock
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
-from config.config import (
+from panda_lib.config.config import (
     PATH_TO_LOGS,
 )
-from grbl_cnc_mill.instruments import Instruments
-from grbl_cnc_mill.exceptions import (
+from .instruments import Instruments
+from .exceptions import (
     CommandExecutionError,
     StatusReturnError,
 )
-from grbl_cnc_mill.logger import set_up_mill_logger
-from grbl_cnc_mill.driver import Mill as RealMill
+from .logger import set_up_mill_logger
+from .driver import Mill as RealMill
 
 logger = set_up_mill_logger(PATH_TO_LOGS)
 

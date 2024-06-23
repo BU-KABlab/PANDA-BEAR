@@ -30,12 +30,9 @@ from pathlib import Path
 # from pydantic.dataclasses import dataclass
 
 import serial
-from config.config import (
+from panda_lib.config.config import (
     MILL_CONFIG,
-    PATH_TO_DATA,
     PATH_TO_LOGS,
-    STOCK_STATUS,
-    WASTE_STATUS,
 )
 
 # local libraries
@@ -49,7 +46,7 @@ from .exceptions import (
     StatusReturnError,
     CNCMillException,
 )
-from .states_codes import Status, AlarmStatus, ErrorCodes
+from .status_codes import Status, AlarmStatus, ErrorCodes
 from .instruments import Instruments
 
 # Set up the logger
@@ -120,7 +117,7 @@ class Mill:
         """Close the serial connection to the mill"""
         logger.info("Disconnecting from the mill")
         self.ser_mill.close()
-        time.sleep(15)
+        time.sleep(15) # Wait for the connection to close
         logger.info("Mill connected: %s", self.ser_mill.is_open)
         print("Mill connected: ", self.ser_mill.is_open)
 
@@ -149,13 +146,7 @@ class Mill:
             time.sleep(2)
             mill_response = self.ser_mill.readline().decode().rstrip()
 
-            if command == "F2000":
-                logger.debug("Returned %s", mill_response)
-
-            elif command == "?":
-                logger.debug("Returned %s", mill_response)
-
-            elif command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G"]:
+            if command not in ["$H", "$X", "(ctrl-x)", "$C", "$#", "$G", "F2000", "?"]:
                 logger.debug("Initially %s", mill_response)
                 self.wait_for_completion(mill_response)
                 mill_response = self.current_status()
@@ -221,7 +212,7 @@ class Mill:
 
     def reset(self):
         """Reset the mill"""
-        self.execute_command("(ctrl-x)")
+        self.execute_command("$X")
 
     def home(self, timeout=90):
         """Home the mill with a timeout"""
@@ -400,8 +391,8 @@ class Mill:
         coords = self.config["electrode_bath"]
         self.safe_move(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
         for _ in range(rinses):
-            self.move_electrode_to_position(coords["x"], coords["y"], coords["z"])
-            self.move_electrode_to_position(coords["x"], coords["y"], 0)
+            self.move_to_position(coords["x"], coords["y"], coords["z"], instrument=Instruments.ELECTRODE)
+            self.move_to_position(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
         return 0
 
     def rest_electrode(self):
@@ -428,64 +419,46 @@ class Mill:
         # )
 
         return self.execute_command("G01 Z0")
-
-    def move_pipette_to_position(
-        self,
-        x_coord: float = 0,
-        y_coord: float = 0,
-        z_coord=0.00,
-    ) -> int:
+    
+    def move_to_position(self, x_coord: float, y_coord: float, z_coord: float = 0.00, instrument: Instruments = Instruments.CENTER) -> int:
         """
-        Move the pipette to the specified coordinates.
+        Move the mill to the specified coordinates.
         Args:
-            x (float): X coordinate.
-            y (float): Y coordinate.
-            z (float): Z coordinate.
+            x_coord (float): X coordinate.
+            y_coord (float): Y coordinate.
+            z_coord (float): Z coordinate.
+            instrument (Instruments): Instrument to move.
         Returns:
             str: Response from the mill after executing the command.
         """
-        # offsets = {"x": -88, "y": 0, "z": 0}
-        offsets = self.config["instrument_offsets"]["pipette"]
-        # mill_move = "G01 X{} Y{} Z{}"  # move to specified coordinates
-        # command = mill_move.format(
-        #     x_coord + offsets["x"], y_coord +
-        #     offsets["y"], z_coord + offsets["z"]
-        # )
-        # self.execute_command(str(command))
-        command_coordinates = [
-            x_coord + offsets["x"],
-            y_coord + offsets["y"],
-            z_coord + offsets["z"],
-        ]
-        self.move_center_to_position(*command_coordinates)
-        return 0
+        # Fetch offsets for the specified instrument
+        try:
+            offsets = self.config["instrument_offsets"][instrument.value]
+        except KeyError as e:
+            logger.error("Instrument not found in config file")
+            raise MillConfigError("Instrument not found in config file") from e
+        # updated target coordinates with offsets so the center of the mill moves to the right spot
+        x_coord = x_coord + offsets["x"]
+        y_coord = y_coord + offsets["y"]
+        z_coord = z_coord + offsets["z"]
 
-    def move_electrode_to_position(
-        self, x_coord: float, y_coord: float, z_coord: float = 0.00
-    ) -> int:
-        """
-        Move the electrode to the specified coordinates.
-        Args:
-            coordinates (dict): Dictionary containing x, y, and z coordinates.
-        Returns:
-            str: Response from the mill after executing the command.
-        """
-        # offsets = {"x": 36, "y": 30, "z": 0}
-        offsets = self.config["instrument_offsets"]["electrode"]
-        # move to specified coordinates
-        # mill_move = "G01 X{} Y{} Z{}"
-        # command = mill_move.format(
-        #     (x_coord + offsets["x"]), (y_coord +
-        #                                offsets["y"]), (z_coord + offsets["z"])
-        # )
-        # self.execute_command(str(command))
+        # Double check that the target coordinates are within the working volume
+        working_volume = self.config["working_volume"]
+        if x_coord > 0 or x_coord < working_volume["x"]:
+            logger.error("x coordinate out of range")
+            raise ValueError("x coordinate out of range")
+        if y_coord > 0 or y_coord < working_volume["y"]:
+            logger.error("y coordinate out of range")
+            raise ValueError("y coordinate out of range")
+        if z_coord > 0 or z_coord < working_volume["z"]:
+            logger.error("z coordinate out of range")
+            raise ValueError("z coordinate out of range")
 
-        command_coordinates = [
-            x_coord + offsets["x"],
-            y_coord + offsets["y"],
-            z_coord + offsets["z"],
-        ]
-        self.move_center_to_position(*command_coordinates)
+        mill_move = "G01 X{} Y{} Z{}"  # Format of the move command
+        command_coordinates = [x_coord, y_coord, z_coord]
+
+        command = mill_move.format(*command_coordinates)
+        self.execute_command(command)
         return 0
 
     def update_offset(self, offset_type, offset_x, offset_y, offset_z):
