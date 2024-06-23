@@ -37,5 +37,8 @@ Before you start the PANDA SDL please ensure the following is complete:
 
 5. Install both conda environments and activate panda_sdl_311
 
+6. Install the PyCapture2 and FlyCapture2 SDK from FLIR into the two conda envs:
+	https://www.flir.com/products/flycapture-sdk/
+
 
 
