@@ -6,5 +6,11 @@ data/
 *.pyc
 *slack_credentials.py
 *secrets*
-*/atlassian_tools/kablab_projects.py
-test_db.db
+.vscode
+*.pyc
+*__pycache__
+*.DS_store
+*.swp
+.ipynb_checkpoints
+*.egg-info
+*.log
