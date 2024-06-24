@@ -661,7 +661,13 @@ def print_env_variables():
     print("Environment Variables:")
     dotenv_path = Path(__file__).parent / '.env'
     dotenv.load_dotenv(dotenv_path)
-    for key, value in os.environ.items():
+
+    # Get the environment variables from the .env file
+    env_variables = dotenv.dotenv_values(dotenv_path)
+
+    # Print the environment variables
+    print("Environment Variables:")
+    for key, value in env_variables.items():
         print(f"{key}: {value}")
     
 

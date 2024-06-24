@@ -20,34 +20,47 @@ import time
 from pathlib import Path
 from typing import Sequence
 
-from slack_sdk.errors import (BotUserAccessError, SlackApiError,
-                              SlackClientConfigurationError, SlackClientError,
-                              SlackClientNotConnectedError,
-                              SlackObjectFormationError, SlackRequestError,
-                              SlackTokenRotationError)
+from slack_sdk.errors import (
+    BotUserAccessError,
+    SlackApiError,
+    SlackClientConfigurationError,
+    SlackClientError,
+    SlackClientNotConnectedError,
+    SlackObjectFormationError,
+    SlackRequestError,
+    SlackTokenRotationError,
+)
+
+from sartorius.sartorius import Scale
+from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
+from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .analyzer.pedot import pedot_analyzer
 from .analyzer.pedot import run_ml_model as pedot_ml_model
 from .config.config import RANDOM_FLAG, read_testing_config
-from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
-from .errors import (NoExperimentFromModel, ProtocolNotFoundError,
-                     ShutDownCommand, WellImportError)
-from .experiment_class import (ExperimentBase, ExperimentResult,
-                               ExperimentStatus, select_specific_result)
+from .errors import (
+    NoExperimentFromModel,
+    ProtocolNotFoundError,
+    ShutDownCommand,
+    WellImportError,
+)
+from .experiment_class import (
+    ExperimentBase,
+    ExperimentResult,
+    ExperimentStatus,
+    select_specific_result,
+)
 from .instrument_toolkit import Toolkit
 from .log_tools import e_panda_logger as logger
 from .mill_control import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
-from .syringepump import MockPump, SyringePump
-from sartorius.sartorius import Scale
-from sartorius.sartorius.mock import Scale as MockScale
 from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
+from .syringepump import MockPump, SyringePump
 from .utilities import SystemState
-from .vials import (StockVial, Vial2, WasteVial,
-                    update_vial_state_files, read_vials)
+from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_files
 from .wellplate import Wellplate
 
 # set up slack globally so that it can be used in the main function and others
@@ -71,7 +84,10 @@ def main(
     # import exp_b_pipette_contamination_assessment_protocol as exp_b
     # import protocols
     slack = SlackBot()
-    if os.environ.get("PANDA_SDL_TESTING") == "1" or os.environ["PANDA_SDL_USE_OBS"] == '0':
+    if (
+        os.environ.get("PANDA_SDL_TESTING") == "1"
+        or os.environ["PANDA_SDL_USE_OBS"] == "0"
+    ):
         obs = MockOBSController()
     else:
         obs = OBSController()
@@ -119,7 +135,9 @@ def main(
             mill=toolkit.mill,
         )
         ## Update the system state with new vial and wellplate information
-        update_vial_state_files(stock_vials, waste_vials, 'STOCK_STATUS', 'WASTE_STATUS')
+        update_vial_state_files(
+            stock_vials, waste_vials, "STOCK_STATUS", "WASTE_STATUS"
+        )
 
         # experiemnt loop
         while True:
@@ -312,7 +330,7 @@ def main(
             ## Update the system state with new vial and wellplate information
             toolkit.pump.pipette.reset_contents()
             update_vial_state_files(
-                stock_vials, waste_vials, 'STOCK_STATUS', 'WASTE_STATUS'
+                stock_vials, waste_vials, "STOCK_STATUS", "WASTE_STATUS"
             )
             if toolkit.pump.pipette.volume > 0 and toolkit.pump.pipette.volume_ml < 1:
                 # assume unreal volume, not actually solution, set to 0
@@ -342,9 +360,11 @@ def main(
         logger.error(error)
         slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
 
-        slack.take_screenshot('alert', 'webcam')
-        slack.take_screenshot('alert', 'vials')
-        slack.send_slack_message("alert", "Please check the terminal to move the mill to the rest position")
+        slack.take_screenshot("alert", "webcam")
+        slack.take_screenshot("alert", "vials")
+        slack.send_slack_message(
+            "alert", "Please check the terminal to move the mill to the rest position"
+        )
         input("Press enter to continue")
 
         raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
@@ -366,7 +386,7 @@ def main(
         logger.info("User commanded shutting down of ePANDA")
         raise ShutDownCommand from error  # raise error to go to finally.
         # This was triggered by the user to indicate they want to stop the program
-    
+
     except KeyboardInterrupt as exc:
         if new_experiment is not None:
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
@@ -425,8 +445,8 @@ def establish_system_state() -> (
     """
     slack = SlackBot()
     stock_vials, waste_vials = read_vials()
-    #stock_vials = get_current_vials("stock")
-    #waste_vials = get_current_vials("waste")
+    # stock_vials = get_current_vials("stock")
+    # waste_vials = get_current_vials("waste")
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
     wellplate = Wellplate()

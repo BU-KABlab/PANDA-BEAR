@@ -135,7 +135,7 @@ if TESTING_MODE_ACTIVE:
     if not SQL_DB_PATH.exists():
         Path(SQL_DB_PATH).with_suffix(".db").touch()
         conn = sqlite3.connect(SQL_DB_PATH)
-        with open(LOCAL_REPO_PATH / "test_db.sql", "r") as f:
+        with open(LOCAL_REPO_PATH / "template_db.sql", "r") as f:
             conn.executescript(f.read())
         conn.close()
 
@@ -185,7 +185,7 @@ else:  # Use external paths
         if not Path(SQL_DB_PATH).with_suffix(".db").exists():
             Path(SQL_DB_PATH).with_suffix(".db").touch()
             conn = sqlite3.connect(SQL_DB_PATH)
-            with open(LOCAL_REPO_PATH / "test_db.sql", "r") as f:
+            with open(LOCAL_REPO_PATH / "template_db.sql", "r") as f:
                 conn.executescript(f.read())
             conn.close()
 
