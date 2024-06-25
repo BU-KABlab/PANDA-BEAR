@@ -133,7 +133,9 @@ class SyringePump:
         # TODO Consider tracking the volume of air in the pipette as blowout and dripstop?
         volume_to_withdraw = float(volume_to_withdraw)
         if volume_to_withdraw > 0:
-            volume_ml = volume_to_withdraw / 1000 # convert the volume argument from ul to ml
+            volume_ml = (
+                volume_to_withdraw / 1000
+            )  # convert the volume argument from ul to ml
 
             if solution is not None and isinstance(solution, Vial2):
                 density = solution.density
@@ -168,7 +170,9 @@ class SyringePump:
                     }
                     # Update the pipette contents
                     for key, ratio in content_ratio.items():
-                        self.pipette.update_contents(key, float(ratio * volume_to_withdraw))
+                        self.pipette.update_contents(
+                            key, float(ratio * volume_to_withdraw)
+                        )
                 else:
                     self.pipette.update_contents(solution.contents, volume_to_withdraw)
                 # Update the solution volume and contents
@@ -196,9 +200,9 @@ class SyringePump:
             )
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
-            return 0 # return 0 if successful
+            return 0  # return 0 if successful
         else:
-            return 1 # return 1 if volume is 0
+            return 1  # return 1 if volume is 0
 
     def infuse(
         self,
@@ -308,7 +312,7 @@ class SyringePump:
     def run_pump(
         self,
         pump_direction: nesp_lib.PumpingDirection,
-        volume_ml:float,
+        volume_ml: float,
         rate=None,
         density=None,
         blowout_ml=float(0.0),
@@ -325,9 +329,13 @@ class SyringePump:
         # Set the pump parameters for the run
         if self.pump.pumping_direction != pump_direction:
             self.pump.pumping_direction = pump_direction
-        self.pump.pumping_volume = float(volume_ml + blowout_ml)  # conver to float for nesp-lib
+        self.pump.pumping_volume = float(
+            volume_ml + blowout_ml
+        )  # conver to float for nesp-lib
         if rate is None:
-            self.pump.pumping_rate = float(self.max_pump_rate) # conver to float for nesp-lib
+            self.pump.pumping_rate = float(
+                self.max_pump_rate
+            )  # conver to float for nesp-lib
         else:
             self.pump.pumping_rate = float(rate)
         action = (
@@ -385,7 +393,9 @@ class SyringePump:
             }
 
         action_type = (
-            "infused" if pump_direction == nesp_lib.PumpingDirection.INFUSE else "withdrawn"
+            "infused"
+            if pump_direction == nesp_lib.PumpingDirection.INFUSE
+            else "withdrawn"
         )
         action_volume = (
             self.pump.volume_infused
@@ -486,7 +496,7 @@ class SyringePump:
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
             self.pipette.volume = round(self.pipette.volume - (volume_ml * 1000.6))
         else:
-            self.pipette.volume = round(self.pipette.volume + (volume_ml * 1000),6)
+            self.pipette.volume = round(self.pipette.volume + (volume_ml * 1000), 6)
 
 
 class MockPump(SyringePump):
@@ -533,7 +543,6 @@ def _mock_pump_testing_routine():
         assert mock_pump.pipette.volume == 0
         assert mock_pump.pipette.volume_ml == 0
         # mock_pump.mix()
-
 
 
 if __name__ == "__main__":

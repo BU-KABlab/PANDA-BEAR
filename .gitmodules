@@ -1,5 +1,5 @@
-[submodule "nesp-lib-py"]
-	path = nesp-lib-py
+[submodule "nesp_lib_py"]
+	path = nesp_lib_py
 	url = https://github.com/BU-KABlab/nesp-lib-py
 [submodule "sartorius"]
 	path = sartorius

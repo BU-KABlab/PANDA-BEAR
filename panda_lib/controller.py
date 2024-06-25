@@ -576,6 +576,7 @@ def system_status_loop(slack: SlackBot):
     """
     while True:
         first_pause = True
+        slack.check_slack_messages("alert")
         # Check the system status
         system_status = sql_system_state.select_system_status(2)
         if SystemState.SHUTDOWN in system_status:

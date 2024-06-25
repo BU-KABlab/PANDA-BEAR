@@ -37,8 +37,6 @@ from panda_lib.sql_tools import (
 from panda_lib.wellplate import Well, Wellplate
 
 dotenv.load_dotenv()
-# STOCK_STATUS = config.STOCK_STATUS
-# WASTE_STATUS = config.WASTE_STATUS
 
 
 @dataclass
@@ -58,7 +56,6 @@ class Cameras(Enum):
     """
     Enum for camera types
     """
-
     WEBCAM = 0
     VIALS = 1
     PSTAT = 2
@@ -150,6 +147,13 @@ class SlackBot:
         self.logger = logging.getLogger("e_panda")
         self.test = test
         self.client = WebClient(token=SlackCred.TOKEN)
+        self.test = self.client.auth_test()
+
+        if not self.test["ok"]:
+            self.logger.error("Slack connection failed.")
+            return
+
+        self.user_id = self.test["user_id"]
         if os.environ["PANDA_SDL_USE_SLACK"] == "0":
             self.test = True
 
@@ -157,7 +161,6 @@ class SlackBot:
         """Send a message to Slack."""
         if os.environ["PANDA_SDL_USE_SLACK"] == "0":
             print(message)
-
 
         client = WebClient(SlackCred.TOKEN)
         channel_id = self.channel_id(channel_id)
@@ -179,7 +182,7 @@ class SlackBot:
 
         if os.environ["PANDA_SDL_USE_SLACK"] == "0":
             return
-        
+
         client = WebClient(SlackCred.TOKEN)
         file = Path(file)
         filename_to_post = file.name
@@ -274,11 +277,26 @@ class SlackBot:
         try:
             result = client.conversations_history(
                 channel=channel_id,
-                limit=1,
+                limit=100,
                 inclusive=True,
                 # latest=datetime.now().timestamp(),
             )
-            conversation_history = result["messages"][0]["text"]
+
+            # With the 100 messages, find the most recent message that is not from the bot
+            conversation_history = None
+            for message in result["messages"]:
+                if message["user"] != self.user_id:
+                    conversation_history = message["text"]
+
+            if conversation_history is None:
+                # This means the past 100 messages are from the bot, we should stop
+                sql_system_state.set_system_status(
+                    sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.test
+                )
+
+            else:
+                conversation_history = result["messages"][0]["text"]
+
             return conversation_history
         except SlackApiError as error:
             error_msg = f"Error creating conversation: {format(error)}"
@@ -309,7 +327,7 @@ class SlackBot:
             # https://api.slack.com/methods/conversations.history$pagination
             result = client.conversations_history(
                 channel=channel_id,
-                limit=5,
+                limit=100,
                 inclusive=True,
                 latest=datetime.now().timestamp(),
             )
@@ -333,34 +351,7 @@ class SlackBot:
                     response = self.parse_slack_message(
                         msg_text[8:].rstrip(), channel_id
                     )
-                    # Add message to csv file
-                    # with open(
-                    #     SLACK_TICKETS,
-                    #     "a",
-                    #     newline="",
-                    #     encoding="utf-8",
-                    # ) as csvfile:
-                    #     writer = csv.DictWriter(
-                    #         csvfile,
-                    #         fieldnames=[
-                    #             "msg_id",
-                    #             "channel_id",
-                    #             "msg_txt",
-                    #             "valid_cmd",
-                    #             "ts",
-                    #             "addressed_ts",
-                    #         ],
-                    #     )
-                    #     writer.writerow(
-                    #         {
-                    #             "msg_id": msg_id,
-                    #             "channel_id": channel_id,
-                    #             "msg_txt": msg_text,
-                    #             "valid_cmd": response,
-                    #             "ts": msg_ts,
-                    #             "addressed_ts": datetime.now().timestamp(),
-                    #         }
-                    #     )
+
                     insert_slack_ticket(
                         SlackTicket(
                             msg_id=msg_id,
@@ -382,8 +373,6 @@ class SlackBot:
                     continue
 
             return 1
-            # Print results
-            # print(json.dumps(conversation_history2, indent=2))
 
         except SlackApiError as error:
             error_msg = f"Error creating conversation: {format(error)}"
@@ -392,26 +381,6 @@ class SlackBot:
 
     def find_id(self, msg_id):
         """Find the message ID in the slack ticket tracker csv file."""
-        # with open(
-        #     SLACK_TICKETS,
-        #     newline="",
-        #     encoding="utf-8",
-        # ) as csvfile:
-        #     reader = csv.DictReader(
-        #         csvfile,
-        #         fieldnames=[
-        #             "msg_id",
-        #             "channel_id",
-        #             "msg_txt",
-        #             "valid_cmd",
-        #             "ts",
-        #             "addressed_ts",
-        #         ],
-        #     )
-        #     for row in reader:
-        #         if row["msg_id"] == msg_id:
-        #             return row
-        # return False
         ticket = select_slack_ticket(msg_id, test=self.test)
         if ticket is not None:
             return ticket
