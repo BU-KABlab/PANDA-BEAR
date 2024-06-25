@@ -667,14 +667,14 @@ class Wellplate:
     def write_wellplate_location(self) -> None:
         """Write the location of the well plate to the well_location json file"""
         data_to_write = {
-            "x": str(self.a1_x),
-            "y": str(self.a1_y),
-            "orientation": self.orientation,
+            "x": float(self.a1_x),
+            "y": float(self.a1_y),
+            "orientation": int(self.orientation),
             "rows": self.rows,
             "cols": self.columns,
-            "z-bottom": str(self.z_bottom),
-            "z-top": str(self.z_top),
-            "echem_height": str(self.echem_height),
+            "z-bottom": float(self.z_bottom),
+            "z-top": float(self.z_top),
+            "echem_height": float(self.echem_height),
         }
         with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
             json.dump(data_to_write, f, indent=4)
