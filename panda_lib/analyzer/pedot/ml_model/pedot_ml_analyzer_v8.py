@@ -33,21 +33,13 @@ from panda_lib.experiment_class import (
 )
 from panda_lib.analyzer.pedot.sql_ml_functions import (
     model_iteration,
-    select_best_test_points,
-    select_best_test_points_by_model_id,
-    select_best_test_points_by_experiment_id,
     insert_best_test_point,
     select_ml_training_data,
-    insert_ml_training_data,
-    execute_sql_command,
 )
 
 
 def main(
-    training_file_path,
     model_base_path,
-    counter_file_path,
-    BestTestPointsCSV,
     contourplots_path,
     experiment_id: int = 0,
 ) -> tuple[float, float, float, float, float, int]:
@@ -106,12 +98,12 @@ def main(
     #     # except FileNotFoundError:
     #     #     return 0
 
-    #def update_counter(file_path, counter):
-        #"""Update the counter in the file."""
-        # with open(file_path, "w") as file:
-        #     file.write(str(counter))
+    # def update_counter(file_path, counter):
+    # """Update the counter in the file."""
+    # with open(file_path, "w") as file:
+    #     file.write(str(counter))
 
-    def load_model(base_path, counter_file, train_x, train_y):
+    def load_model(base_path, train_x, train_y):
         """Load the model from a file."""
         counter = model_iteration()
         load_filename = f"{base_path}_{counter}.pth"
@@ -131,7 +123,7 @@ def main(
             print(f"An error occurred while loading model: {e}")
             return None, None, None
 
-    def save_model(model, optimizer, base_path, counter_file):
+    def save_model(model, optimizer, base_path):
         """Save the model to a file and increment the counter."""
         counter = model_iteration()
         new_counter = counter + 1
@@ -145,7 +137,7 @@ def main(
             },
             filename,
         )
-        #update_counter(counter_file, new_counter)
+        # update_counter(counter_file, new_counter)
         return filename, new_counter
 
     def get_next_filename(base_path, extensions):
@@ -309,9 +301,7 @@ def main(
         # Set hyperparameters and call model
         # likelihood = gpytorch.likelihoods.GaussianLikelihood(noise=torch.tensor(noise))
         # model = GPModel(train_x, train_y, likelihood, lengthscale=lengthscale, outputscale=outputscale)
-        model, likelihood, lr = load_model(
-            model_base_path, counter_file_path, train_x, train_y
-        )
+        model, likelihood, lr = load_model(model_base_path, train_x, train_y)
 
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
         mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
@@ -349,7 +339,7 @@ def main(
     rmse = np.sqrt(mean_squared_error(actuals, predictions))
     print(f"RMSE: {rmse}")
 
-    _, model_id = save_model(model, optimizer, model_base_path, counter_file_path)
+    _, model_id = save_model(model, optimizer, model_base_path)
 
     model.eval()
     likelihood.eval()
@@ -558,7 +548,7 @@ def main(
         voltage_grid, time_grid, mean_grid, levels=50, cmap="viridis"
     )
     fig.colorbar(contour_mean, ax=axes[2])
-    axes[2].set_title(f"$\Delta$ E$_{{00}}$ {edot_concentration} M")  # Modified title
+    axes[2].set_title(f"ΔE₀₀ {edot_concentration} M")  # Modified title
     axes[2].set_xlabel("Voltage (scaled)")
     axes[2].set_ylabel("Time (scaled)")
     contourplots_filename = get_next_filename(
@@ -618,7 +608,7 @@ def main(
         predicted_mean,
         predicted_stddev,
         f"{contourplots_filename}.png",
-        model_id
+        model_id,
     )
 
 
@@ -629,12 +619,12 @@ if __name__ == "__main__":
     TEST_MODEL_BASE_PATH = "pedot_gp_model_v8"
     TEST_COUNTER_FILE_PATH = "model_counter.txt"
     TEST_BESTTESTPOINTSCSV = "BestTestPoints.csv"  # file to save best test points, adds to the file doesn't overwrite
-    TEST_CONTOURPLOTS_PATH = "contourplots\\"  # file to save contour plots, without extension
+    TEST_CONTOURPLOTS_PATH = (
+        "contourplots\\"  # file to save contour plots, without extension
+    )
 
     main(
-        TEST_TRAINING_FILE_PATH,
-        TEST_MODEL_BASE_PATH,
-        TEST_COUNTER_FILE_PATH,
-        TEST_BESTTESTPOINTSCSV,
-        TEST_CONTOURPLOTS_PATH,
+        model_base_path=TEST_MODEL_BASE_PATH,
+        contourplots_path=TEST_CONTOURPLOTS_PATH,
+        experiment_id=1
     )
