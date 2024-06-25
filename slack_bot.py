@@ -2,12 +2,14 @@
 
 import time
 from panda_lib.slack_tools.SlackBot import SlackBot
-choose_testing_mode = input("Enter 't' for testing mode or 'n' for non-testing mode: ").strip().lower()
-if choose_testing_mode == "t":
-    test = True
-else:
-    test = False
-bot = SlackBot(test=test)
+
+#pylint: disable=broad-exception-caught
+choose_testing_mode = input("Testing? (y/n): ").strip().lower()
+TEST = False
+if choose_testing_mode[0] == "y":
+    TEST = True
+
+bot = SlackBot(test=TEST)
 print("Starting Slack Bot")
 STATUS = bot.check_slack_messages(channel="alert")
 while STATUS == 1:
