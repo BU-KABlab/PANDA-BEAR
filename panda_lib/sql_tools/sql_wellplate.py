@@ -224,7 +224,7 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
     wells = []
     for row in result:
         try:
-            incoming_contents = json.loads(row[5])
+            incoming_contents = dict(json.loads(row[5]))
         except json.JSONDecodeError:
             incoming_contents = {}
         except TypeError:
@@ -236,6 +236,12 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
         except json.JSONDecodeError:
             incoming_coordinates = (0, 0)
 
+
+        # Convert NULL or blank cells to 0 for integer fields
+        well_type_number = int(row[1]) if row[1] else 0
+        volume = int(row[8]) if row[8] else 0
+        capacity = int(row[10]) if row[10] else 0
+        height = int(row[11]) if row[11] else 0
         # well_height, well_capacity,
         # TODO currently the wepplate object applies the well_height and well_capacity
         # If we want the wells to be the primary source of this information, we need to
@@ -245,20 +251,21 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
             plate_id = row[0]
             if plate_id is None:
                 plate_id = current_plate_id
+
         wells.append(
             wellplate.Well(
-                well_id=row[2],
-                well_type_number=row[1],
-                status=row[3],
-                status_date=row[4],
+                well_id=str(row[2]),
+                well_type_number=well_type_number,
+                status=str(row[3]),
+                status_date=str(row[4]),
                 contents=incoming_contents,
-                experiment_id=row[6],
-                project_id=row[7],
-                volume=row[8],
+                experiment_id=int(row[6]),
+                project_id=int(row[7]),
+                volume=volume,
                 coordinates=incoming_coordinates,
-                capacity=row[10],
-                height=row[11],
-                plate_id=plate_id,
+                capacity=capacity,
+                height=height,
+                plate_id=int(plate_id),
             )
         )
     return wells
