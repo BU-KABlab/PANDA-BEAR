@@ -124,20 +124,20 @@ def main(
                 pump=toolkit.pump,
             )
         # Flush the pipette tip with water before we start
-        obs.place_text_on_screen("Initial flushing of pipette tip")
-        logger.info("Flushing pipette tip")
-        actions.flush_v2(
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-            flush_solution_name="rinse",
-            flush_volume=140,
-            pump=toolkit.pump,
-            mill=toolkit.mill,
-        )
-        ## Update the system state with new vial and wellplate information
-        update_vial_state_files(
-            stock_vials, waste_vials, "STOCK_STATUS", "WASTE_STATUS"
-        )
+        # obs.place_text_on_screen("Initial flushing of pipette tip")
+        # logger.info("Flushing pipette tip")
+        # actions.flush_v2(
+        #     stock_vials=stock_vials,
+        #     waste_vials=waste_vials,
+        #     flush_solution_name="rinse",
+        #     flush_volume=140,
+        #     pump=toolkit.pump,
+        #     mill=toolkit.mill,
+        # )
+        # ## Update the system state with new vial and wellplate information
+        # update_vial_state_files(
+        #     stock_vials, waste_vials, "STOCK_STATUS", "WASTE_STATUS"
+        # )
 
         # experiemnt loop
         while True:
