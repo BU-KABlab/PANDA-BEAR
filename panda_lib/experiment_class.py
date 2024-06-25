@@ -270,6 +270,13 @@ class ExperimentBase:
     pin: Union[str, int] = None
     project_id: int = None
     solutions: dict = None
+
+    # Validate that all dictionary keys are lowercase
+    if solutions is not None:
+        for key in solutions.keys():
+            solutions[str(key).lower()] = solutions.pop(key) # Change the key to lowercase
+    else:
+        solutions = {}
     solutions_corrected: dict = solutions
     well_type_number: int = (
         None  # is used to indicate the type of well the experiment should run in
