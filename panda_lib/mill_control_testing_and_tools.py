@@ -1,16 +1,39 @@
+"""
+
+For testing the movement and functionality of the mill.
+
+"""
+
 import logging
+from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
-from panda_lib.config.config import (PATH_TO_DATA, PATH_TO_LOGS)
 from panda_lib.actions import capture_new_image
-from panda_lib.mill_control import (CommandExecutionError, Instruments,
-                           LocationNotFound, Mill, MillConfigError,
-                           MillConfigNotFound, MillConnectionError, MockMill,
-                           StatusReturnError, logger)
+from panda_lib.mill_control import (
+    CommandExecutionError,
+    Instruments,
+    LocationNotFound,
+    Mill,
+    MillConfigError,
+    MillConfigNotFound,
+    MillConnectionError,
+    MockMill,
+    StatusReturnError,
+    logger,
+)
 from panda_lib.vials import StockVial, WasteVial, read_vials
 from panda_lib.wellplate import Well, Wellplate
+
+config = ConfigParser()
+config.read("config/panda_sdl_config.ini")
+if config.getboolean("OPTIONS", "testing"):
+    PATH_TO_DATA = config.get("PATHS_TESTING", "data_dir")
+    PATH_TO_LOGS = config.get("PATHS_TESTING", "logging_dir")
+else:
+    PATH_TO_DATA = config.get("PATHS_PRODUCTION", "data_dir")
+    PATH_TO_LOGS = config.get("PATHS_PRODUCTION", "logging_dir")
 
 
 def wellplate_scan(mill_arg: Mill = None, capture_images=False):
@@ -137,9 +160,11 @@ def movement_test(mill: Mill):
             stock_vials: Sequence[StockVial] = read_vials()[0]
             waste_vials: Sequence[WasteVial] = read_vials()[1]
 
-            # mill.safe_move(well1["x"], well1["y"], wellplate.z_top, instrument=Instruments.PIPETTE)
+            # mill.safe_move(
+            # well1["x"], well1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
+            #)
             input(
-                "Begin the movement test to each corner of the wellplate. Press enter to continue..."
+                "Begin corner to corner test. Press enter to continue..."
             )
 
             if (
@@ -263,9 +288,7 @@ if __name__ == "__main__":
         print("Welcome to the Mill Control Menu!")
         print("1. Run movement test")
         print("2. Run wellplate scan")
-        print(
-            "3. Start mill and use debugger via breakpoint. Move to safe position and rest electrode after testing."
-        )
+        print("3. Start mill and use debugger via breakpoints.")
         print("4. Only Z move test")
         print("0. Exit")
 
