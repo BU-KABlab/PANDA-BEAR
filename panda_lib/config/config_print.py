@@ -4,15 +4,15 @@ from configparser import ConfigParser
 from pathlib import Path
 
 # Read the config file
-config_file = "./panda_lib/config/panda_sdl_config.ini"
+CONFIG_FILE = "./panda_lib/config/panda_sdl_config.ini"
 config = ConfigParser()
-config.read(config_file)
+config.read(CONFIG_FILE)
 
 
 local_dir = Path(__file__).parent.parent
 config.set("PATHS_GENERAL", "local_dir", str(local_dir))
-config.write(open(config_file, "w", encoding="utf-8"))
-config.read(config_file)
+config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
+config.read(CONFIG_FILE)
 
 # Print the config file values
 for section in config.sections():
