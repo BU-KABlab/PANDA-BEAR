@@ -25,6 +25,7 @@ Returns:
 import logging
 import math
 import os
+from configparser import ConfigParser
 
 # Third party or custom imports
 from pathlib import Path
@@ -34,10 +35,6 @@ from PIL import Image
 # Local application imports
 from panda_lib.flir_camera import capture_new_image
 from panda_lib.config.config import (
-    AIR_GAP,
-    DRIP_STOP,
-    PATH_TO_DATA,
-    PATH_TO_LOGS,
     read_testing_config,
 )
 from panda_lib.correction_factors import correction_factor
@@ -79,6 +76,19 @@ else:
         potentiostat_cv_parameters,
         potentiostat_ocp_parameters,
     )
+
+config = ConfigParser()
+config.read("config/panda_sdl_config.ini")
+# Constants
+
+AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
+DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop")
+if TESTING:
+    PATH_TO_DATA = config.get("PATHS_PRODUCTION", "data_dir")
+    PATH_TO_LOGS = config.get("PATHS_PRODUCTION", "logging_dir")
+else:
+    PATH_TO_DATA = config.get("PATHS_TESTING", "data_dir")
+    PATH_TO_LOGS = config.get("PATHS_TESTING", "logging_dir")
 
 # set up logging to log to both the pump_control.log file and the ePANDA.log file
 logger = logging.getLogger("e_panda")
