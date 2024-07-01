@@ -5,7 +5,6 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from panda_lib.config.config import DATA_ZONE_LOGO
 from panda_lib.sql_tools import sql_utilities
 from panda_lib.experiment_class import ExperimentBase
 
@@ -91,10 +90,15 @@ def add_data_zone(
     text_starts = [segment + 5 for segment in segment_starts]
 
     # ePANDA logo
-    epanda_logo_x = text_starts[0]
-    logo = Image.open(DATA_ZONE_LOGO)
-    logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
-    banner.paste(logo, (epanda_logo_x, 0))
+    try:
+        epanda_logo_x = text_starts[0]
+        logo = Image.open("panda_lib/application photos/data_zone_logo.png")
+        logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
+        banner.paste(logo, (epanda_logo_x, 0))
+     # incase the file cannot be found
+    except FileNotFoundError:
+        # TODO: add logger to this module
+        pass
     # ePANDA version
     version_x = text_starts[1]
     draw_banner.text(
