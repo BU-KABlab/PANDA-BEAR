@@ -3,7 +3,6 @@
         "ms-vscode-remote.remote-wsl",
         "ms-python.vscode-pylance",
         "ms-python.pylint",
-        "jojoee.conda-cheatsheet",
         "ms-python.black-formatter",
         "github.vscode-pull-request-github",
         "ms-python.isort"
