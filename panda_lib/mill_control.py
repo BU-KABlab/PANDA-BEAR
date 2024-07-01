@@ -21,36 +21,27 @@ import logging
 import re
 import sys
 import time
+from configparser import ConfigParser
 from unittest.mock import MagicMock
+from venv import logger
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
-from .config.config import MILL_CONFIG, PATH_TO_LOGS
-from .log_tools import e_panda_logger as logger
+from .log_tools import setup_default_logger
 from .utilities import Coordinates, Instruments
 
 # add the mill_control logger
-formatter = logging.Formatter(
-    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
-)
-system_handler = logging.FileHandler(PATH_TO_LOGS / "mill_control.log")
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
-console_handler = logging.StreamHandler()
-console_formatter = logging.Formatter(
-    "%(levelname)-10s &%(module)s& %(funcName)-20s & %(lineno)5d & %(message)s"
-)
-console_handler.setFormatter(console_formatter)
-console_handler.setLevel(logging.WARNING)
-logger.addHandler(console_handler)
+logger = setup_default_logger(log_name="mill_control",console_level=logging.WARNING)
 
-# Mill movement logger
-mill_movement_logger = logging.getLogger("mill_movement")
-mill_movement_logger.setLevel(logging.DEBUG)
-mill_movement_handler = logging.FileHandler(PATH_TO_LOGS / "mill_movement.log")
-mill_movement_handler.setFormatter(formatter)
-mill_movement_logger.addHandler(mill_movement_handler)
+# Mill movement logger - just for the movement commands
+mill_movement_logger = setup_default_logger(log_name="mill_movement",console_level=logging.WARNING)
+
+config = ConfigParser()
+config.read("config/panda_sdl_config.ini")
+MILL_COM_PORT = config.get("MILL", "port")
+MILL_BAUD_RATE = config.getint("MILL", "baud_rate")
+MILL_TIMEOUT = config.getint("MILL", "timeout")
 
 
 class Mill:
@@ -74,13 +65,12 @@ class Mill:
         """Connect to the mill"""
         try:
             ser_mill = serial.Serial(
-                # Hardcoded serial port (consider making this configurable)
-                port="COM4",
-                baudrate=115200,
+                port=config.get("MILL", "port"),
+                baudrate= config.getint("MILL", "baud_rate"), #115200
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS,
-                timeout=10,
+                timeout=config.getint("MILL", "timeout"), #10,
             )
             time.sleep(2)
 
@@ -107,7 +97,7 @@ class Mill:
         if "alarm" in status.lower():
             logger.warning("Mill is in alarm state")
             reset_alarm = input("Reset the mill? (y/n): ")
-            if reset_alarm.lower() == "y":
+            if reset_alarm[0].lower() == "y":
                 self.reset()
             else:
                 logger.error("Mill is in alarm state, user chose not to reset the mill")
@@ -120,7 +110,7 @@ class Mill:
         if "unlock" not in status.lower():
             logger.error("Mill is not locked")
             proceed = input("Proceed? (y/n): ")
-            if proceed.lower() == "n":
+            if proceed[0].lower() == "n":
                 raise MillConnectionError("Mill is not locked")
             else:
                 logger.warning("Proceeding despite mill not being locked")
@@ -163,7 +153,7 @@ class Mill:
     def read_json_config(self) -> dict:
         """Read the config file"""
         try:
-            config_file_path = MILL_CONFIG
+            config_file_path = ".\\panda_lib\\config\\" + self.config_file
             with open(config_file_path, "r", encoding="UTF-8") as file:
                 configuration = json.load(file)
             logger.debug("Mill config loaded")
@@ -561,7 +551,7 @@ class Mill:
         }
 
         self.config["instrument_offsets"][offset_type] = offset
-        config_file_path = MILL_CONFIG
+        config_file_path = ".\\panda_lib\\config\\" + self.config_file
         if not config_file_path.exists():
             logger.error("Config file not found")
             raise MillConfigNotFound
