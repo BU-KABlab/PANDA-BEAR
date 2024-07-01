@@ -51,6 +51,7 @@ if not TESTING_MODE_ACTIVE:
         print("Switching to testing mode")
         config.set("OPTIONS", "testing", "True")
         config.write(open(configuration_path, "w",encoding="utf-8"))
+        config.read(configuration_path)
         TESTING_MODE_ACTIVE = True
 
 
