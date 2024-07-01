@@ -33,26 +33,24 @@ from panda_lib.sql_tools import (
     sql_protocol_utilities,
     sql_queue,
     sql_system_state,
-    remove_testing_experiments
+    remove_testing_experiments,
 )
 from panda_lib.analyzer.pedot import sql_ml_functions
 
+
 dotenv.load_dotenv()
+
 
 def run_epanda_with_ml():
     """Runs ePANDA."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "running ePANDA"
-    )
+    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running ePANDA")
     length = int(input("Enter the campaign length: ").strip().lower())
     controller.main(al_campaign_length=length)
 
 
 def run_epanda_without_ml():
     """Runs ePANDA."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "running ePANDA"
-    )
+    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running ePANDA")
     one_off = input("Is this a one-off run? (y/n): ").strip().lower()
     if one_off[0] == "y":
         controller.main(one_off=True)
@@ -74,9 +72,7 @@ def genererate_pedot_experiment():
 
 def change_wellplate():
     """Changes the current wellplate."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "changing wellplate"
-    )
+    sql_system_state.set_system_status(utilities.SystemState.BUSY, "changing wellplate")
     wellplate.load_new_wellplate(ask=True)
 
 
@@ -235,10 +231,7 @@ def generate_experiment_from_existing_data():
     )
     next_experiment = scheduler.determine_next_experiment_id()
     output = pedot_analysis.pedot_model(
-        pedot_analysis.ml_file_paths.training_file_path,
         pedot_analysis.ml_file_paths.model_base_path,
-        pedot_analysis.ml_file_paths.counter_file_path,
-        pedot_analysis.ml_file_paths.BestTestPointsCSV,
         pedot_analysis.ml_file_paths.contourplots_path,
         next_experiment,
     )
@@ -317,19 +310,19 @@ def generate_experiment_from_existing_data():
 
         return
 
+
 def analyze_pedot_experiment():
     """Analyzes a PEDOT experiment."""
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "analyzing PEDOT experiment"
     )
-    experiment_id = int(
-        input("Enter the experiment ID to analyze: ").strip().lower()
-    )
+    experiment_id = int(input("Enter the experiment ID to analyze: ").strip().lower())
 
     to_train = input("Train the model? (y/n): ").strip().lower()
     dont_train = True if to_train[0] == "n" else False
     results = pedot_analysis.pedot_analyzer(experiment_id, dont_train)
     print(results)
+
 
 def clean_up_testing_experiments():
     """Cleans up the testing experiments."""
@@ -338,11 +331,10 @@ def clean_up_testing_experiments():
     )
     remove_testing_experiments.main()
 
+
 def exit_program():
     """Exits the program."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.OFF, "exiting ePANDA"
-    )
+    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting ePANDA")
     print("Exiting ePANDA. Goodbye!")
     sys.exit()
 
@@ -361,16 +353,12 @@ def stop_epanda():
 
 def pause_epanda():
     """Pauses the ePANDA loop."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.PAUSE, "stopping ePANDA"
-    )
+    sql_system_state.set_system_status(utilities.SystemState.PAUSE, "stopping ePANDA")
 
 
 def resume_epanda():
     """Resumes the ePANDA loop."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.RESUME, "stopping ePANDA"
-    )
+    sql_system_state.set_system_status(utilities.SystemState.RESUME, "stopping ePANDA")
 
 
 def remove_training_data():
@@ -449,7 +437,9 @@ when it starts in an interactive mode:
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
 
-    """)    
+    """
+    )
+
 
 def show_conditions():
     """Shows the conditions."""
@@ -653,13 +643,15 @@ Software Foundation, write to the Free Software Foundation; we sometimes
 make exceptions for this.  Our decision will be guided by the two goals
 of preserving the free status of all derivatives of our free software and
 of promoting the sharing and reuse of software generally.
-    """)
+    """
+    )
+
 
 def print_env_variables():
     """Prints the dot environment variables."""
     # Get the environment variables
     print("Environment Variables:")
-    dotenv_path = Path(__file__).parent / '.env'
+    dotenv_path = Path(__file__).parent / ".env"
     dotenv.load_dotenv(dotenv_path)
 
     # Get the environment variables from the .env file
@@ -669,7 +661,7 @@ def print_env_variables():
     print("Environment Variables:")
     for key, value in env_variables.items():
         print(f"{key}: {value}")
-    
+
 
 menu_options = {
     "0": run_epanda_with_ml,
@@ -705,26 +697,23 @@ menu_options = {
 
 if __name__ == "__main__":
 
-    print("""
+    print(
+        """
     PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
     PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warrenty' 
     for more details.
     
     This is free software, and you are welcome to redistribute it
     under certain conditions; choose `show_conditions' for details.
-          """)
-
-
-    sql_system_state.set_system_status(
-        utilities.SystemState.ON, "at main menu"
+          """
     )
+
+    sql_system_state.set_system_status(utilities.SystemState.ON, "at main menu")
     time.sleep(1)
     sql_protocol_utilities.read_in_protocols()
 
     while True:
-        sql_system_state.set_system_status(
-            utilities.SystemState.IDLE, "at main menu"
-        )
+        sql_system_state.set_system_status(utilities.SystemState.IDLE, "at main menu")
         # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
         print()
         print(print_panda.print_panda())
@@ -761,7 +750,9 @@ if __name__ == "__main__":
             time.sleep(5)
             slack.send_slack_message("alert", "Would you like to continue? (y/n): ")
             while True:
-                contiue_choice = slack.check_latest_message(channel_id)[0].strip().lower()
+                contiue_choice = (
+                    slack.check_latest_message(channel_id)[0].strip().lower()
+                )
                 if contiue_choice == "y":
                     break
                 if contiue_choice == "n":
@@ -775,6 +766,4 @@ if __name__ == "__main__":
             print(f"An error occurred: {e}")
             break  # Exit the program if an unknown error occurs
 
-    sql_system_state.set_system_status(
-        utilities.SystemState.OFF, "exiting ePANDA"
-    )
+    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting ePANDA")
