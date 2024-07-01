@@ -1,15 +1,17 @@
+"""
+SQLAlchemy models for the PANDA database
+"""
+
+# pylint: disable=too-few-public-methods, line-too-long
 import datetime
 from datetime import datetime as dt
-from typing import List, Optional
 
-from sqlalchemy import Column, Integer, String, create_engine, text, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
-from sqlalchemy.sql.sqltypes import DateTime, DECIMAL, Float, TEXT
-from sqlalchemy import event
+from sqlalchemy import Column, ForeignKey, Integer, String, text
+from sqlalchemy.orm import Mapped, relationship, declarative_base
+from sqlalchemy.sql.sqltypes import DECIMAL, JSON, TEXT, Boolean, DateTime, Float
 
 
-class Base(DeclarativeBase):
-    pass
+Base = declarative_base()
 
 
 class Experiments(Base):
@@ -126,6 +128,7 @@ class MlPedotTrainingData(Base):
     def __repr__(self):
         return f"<MlPedotTrainingData(id={self.id}, delta_e={self.delta_e}, voltage={self.voltage}, time={self.time}, bleach_cp={self.bleach_cp}, concentration={self.concentration}, experiment_id={self.experiment_id})>"
 
+
 class Pipette(Base):
     """Pipette table model"""
 
@@ -148,6 +151,7 @@ class Pipette(Base):
     #     connection.add(pipette_log)
     #     connection.commit()
 
+
 class PipetteLog(Base):
     """PipetteLog table model"""
 
@@ -161,6 +165,7 @@ class PipetteLog(Base):
     def __repr__(self):
         return f"<PipetteLog(id={self.id}, pipette_id={self.pipette_id}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, updated={self.updated})>"
 
+
 class Projects(Base):
     """Projects table model"""
 
@@ -171,15 +176,135 @@ class Projects(Base):
     # created = Column(DateTime)
     # updated = Column(DateTime, default=dt.now)
 
-    # def __repr__(self):
-    #     return f"<Projects(project_id={self.project_id}, project_name={self.project_name}, project_description={self.project_description}, created={self.created}, updated={self.updated})>"
-    
     def __repr__(self):
         return f"<Projects(project_id={self.project_id}, project_name={self.project_name})>"
 
+
 class Protocols(Base):
+    """Protocols table model"""
+
     __tablename__ = "protocols"
     id = Column(Integer, primary_key=True)
     project = Column(Integer, ForeignKey("projects.project_id"))
     name = Column(TEXT)
     filepath = Column(TEXT)
+
+
+class SlackTickets(Base):
+    """SlackTickets table model"""
+
+    __tablename__ = "slack_tickets"
+    msg_id = Column(String, primary_key=True, nullable=False, unique=True)
+    channel_id = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    response = Column(Integer)
+    timestamp = Column(String)
+    addressed_timestamp = Column(String)
+    db_timestamp = Column(String, default=text("(datetime('now', 'localtime'))"))
+
+    def __repr__(self):
+        return f"<SlackTickets(msg_id={self.msg_id}, channel_id={self.channel_id}, message={self.message}, response={self.response}, timestamp={self.timestamp}, addressed_timestamp={self.addressed_timestamp}, db_timestamp={self.db_timestamp})>"
+
+
+class SystemStatus(Base):
+    """SystemStatus table model"""
+
+    __tablename__ = "system_status"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    status = Column(String, nullable=False)
+    comment = Column(String)
+    status_time = Column(DateTime, default=dt.now(datetime.UTC))
+    test_mode = Column(Boolean)
+
+    def __repr__(self):
+        return f"<SystemStatus(id={self.id}, status={self.status}, comment={self.comment}, status_time={self.status_time}, test_mode={self.test_mode})>"
+
+
+class Users(Base):
+    """Users table model"""
+
+    __tablename__ = "users"
+    user_id = Column(Integer, primary_key=True)
+    username = Column(String)
+    password = Column(String)
+    email = Column(String)
+    created = Column(DateTime)
+    updated = Column(DateTime, default=dt.now)
+
+    def __repr__(self):
+        return f"<Users(user_id={self.user_id}, username={self.username}, password={self.password}, email={self.email}, created={self.created}, updated={self.updated})>"
+
+
+class Vials(Base):
+    """Vials table model"""
+
+    __tablename__ = "vials"
+    id = Column(Integer, primary_key=True)
+    position = Column(String)
+    contents = Column(String)
+    viscosity_cp = Column(Float)
+    concentration = Column(Float)
+    density = Column(Float)
+    category = Column(Integer)
+    radius = Column(Integer)
+    height = Column(Integer)
+    depth = Column(Integer)
+    name = Column(String)
+    volume = Column(Float)
+    capacity = Column(Integer)
+    contamination = Column(Integer)
+    vial_coordinates = Column(String)
+    updated = Column(DateTime, default=dt.now)
+
+    def __repr__(self):
+        return f"<Vials(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
+
+
+class WellHx(Base):
+    """WellHx table model"""
+
+    __tablename__ = "well_hx"
+    plate_id = Column(Integer, primary_key=True)
+    well_id = Column(String, primary_key=True)
+    experiment_id = Column(Integer)
+    project_id = Column(Integer)
+    status = Column(String)
+    status_date = Column(DateTime, default=dt.now)
+    contents = Column(JSON)
+    volume = Column(Float)
+    coordinates = Column(JSON)
+    updated = Column(DateTime, default=dt.now)
+
+    def __repr__(self):
+        return f"<WellHx(plate_id={self.plate_id}, well_id={self.well_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, volume={self.volume}, coordinates={self.coordinates}, updated={self.updated})>"
+
+
+class WellTypes(Base):
+    """WellTypes table model"""
+
+    __tablename__ = "well_types"
+    id = Column(Integer, primary_key=True)
+    substrate = Column(String)
+    gasket = Column(String)
+    count = Column(Integer)
+    shape = Column(String)
+    radius_mm = Column(Float)
+    offset_mm = Column(Float)
+    height_mm = Column(Float)
+    max_liquid_height_mm = Column(Float)
+    capacity_ul = Column(Float)
+
+    def __repr__(self):
+        return f"<WellTypes(id={self.id}, substrate={self.substrate}, gasket={self.gasket}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.offset_mm}, height_mm={self.height_mm}, max_liquid_height_mm={self.max_liquid_height_mm}, capacity_ul={self.capacity_ul})>"
+
+
+class WellPlates(Base):
+    """WellPlates table model"""
+
+    __tablename__ = "wellplates"
+    id = Column(Integer, primary_key=True)
+    type_id = Column(Integer, ForeignKey("well_types.id"))
+    current = Column(Boolean, default=False)
+
+    def __repr__(self):
+        return f"<WellPlates(id={self.id}, type_id={self.type_id}, current={self.current})>"
