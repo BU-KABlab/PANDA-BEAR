@@ -1,24 +1,31 @@
+"""
+SQL Utilities for the PANDA_SDL project
+
+This module contains utility functions for executing SQL commands on the database.
+
+"""
+
+from configparser import ConfigParser
 import logging
 import sqlite3
 from decimal import Decimal
-from panda_lib.config.config import PATH_TO_LOGS, SQL_DB_PATH, LOCAL_REPO_PATH
-import time
 
-# Set up logging
-# set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger("sql_utilities")
-logger.setLevel(logging.INFO)  # change to INFO to reduce verbosity
-formatter = logging.Formatter(
-    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
-)
-system_handler = logging.FileHandler(PATH_TO_LOGS / "sql_utilities.log")
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
+from panda_lib.log_tools import setup_default_logger
 
+logger: logging.Logger = setup_default_logger(log_name="sql_logger")
+config = ConfigParser()
+config.read("config/panda_sdl_config.ini")
+
+if config.getboolean("OPTIONS", "TESTING"):
+    SQL_DB_ADDR = config.get("PATHS_TESTING", "sql_db_address")
+    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_repo_path")
+else:
+    SQL_DB_ADDR = config.get("PATHS_PRODUCTION", "sql_db_address")
+    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_repo_path")
 
 # region Utility Functions
 def execute_sql_command(
-    sql_command: str, parameters: tuple = None, test: bool = False
+    sql_command: str, parameters: tuple = None
 ) -> list:
     """
     Execute an SQL command on the database.
@@ -30,10 +37,8 @@ def execute_sql_command(
     Returns:
         List: The result of the SQL command.
     """
-    if test:
-        conn = sqlite3.connect(LOCAL_REPO_PATH / "epanda_test.db")
-    else:
-        conn = sqlite3.connect(SQL_DB_PATH)
+    conn = sqlite3.connect(SQL_DB_ADDR)
+
     conn.isolation_level = None  # Manually control transactions
     cursor = conn.cursor()
 
@@ -74,7 +79,7 @@ def execute_sql_command(
 
 
 def execute_sql_command_no_return(
-    sql_command: str, parameters: tuple = None, test: bool = False
+    sql_command: str, parameters: tuple = None
 ) -> None:
     """
     Execute an SQL command on the database without returning anything.
@@ -86,10 +91,7 @@ def execute_sql_command_no_return(
     if sql_command is None:
         return
 
-    if test:
-        conn = sqlite3.connect(LOCAL_REPO_PATH / "epanda_test.db")
-    else:
-        conn = sqlite3.connect(SQL_DB_PATH)
+    conn = sqlite3.connect(SQL_DB_ADDR)
 
     # Manually control transactions
     conn.isolation_level = None
@@ -137,6 +139,15 @@ def execute_sql_command_no_return(
 
 
 def convert_decimals(parameters):
+    """
+    Convert Decimal objects to floats in a list of parameters.
+
+    Args:
+        parameters (list): The list of parameters.
+
+    Returns:
+        list: The list of parameters with Decimal objects converted to floats.
+    """
     new_parameters = []
     if isinstance(parameters[0], tuple):
         for parameter in parameters:
