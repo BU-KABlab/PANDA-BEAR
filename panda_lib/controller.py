@@ -38,7 +38,7 @@ from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .analyzer.pedot import pedot_analyzer
 from .analyzer.pedot import run_ml_model as pedot_ml_model
-from .config.config import RANDOM_FLAG, read_testing_config
+from .config.config import read_testing_config
 from .errors import (
     NoExperimentFromModel,
     ProtocolNotFoundError,
@@ -52,7 +52,7 @@ from .experiment_class import (
     select_specific_result,
 )
 from .instrument_toolkit import Toolkit
-from .log_tools import e_panda_logger as logger
+from .log_tools import setup_default_logger
 from .mill_control import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
 from .scheduler import Scheduler
@@ -64,7 +64,7 @@ from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_fi
 from .wellplate import Wellplate
 
 # set up slack globally so that it can be used in the main function and others
-
+logger = setup_default_logger(log_name="panda_log")
 TESTING = read_testing_config()
 
 
@@ -72,6 +72,7 @@ def main(
     use_mock_instruments: bool = TESTING,
     one_off: bool = False,
     al_campaign_length: int = None,
+    random_experiment_selection: bool = False,
 ):
     """
     Main function
@@ -150,7 +151,7 @@ def main(
 
             ## Ask the scheduler for the next experiment
             new_experiment, _ = scheduler.read_next_experiment_from_queue(
-                random_pick=RANDOM_FLAG
+                random_pick=random_experiment_selection
             )
 
             while new_experiment is None:
