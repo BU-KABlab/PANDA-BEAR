@@ -5,7 +5,7 @@ import json
 import pandas as pd
 
 from panda_lib import experiment_class, wellplate
-from panda_lib.config.config import read_testing_config, DEFAULT_PUMPING_RATE
+from panda_lib.config.config import read_testing_config
 from panda_lib.scheduler import Scheduler, determine_next_experiment_id
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 
@@ -48,7 +48,6 @@ def main():
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={"edot": 120, "liclo4": 0, "rinse": 120},
                 solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
-                pumping_rate=DEFAULT_PUMPING_RATE,
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + " " + str(experiment_id),
                 override_well_selection=0,  # 0 to use new wells only, 1 to reuse a well
@@ -76,7 +75,7 @@ def main():
         print(f"Experiment id: {experiment.experiment_id}")
         print(f"Well id: {experiment.well_id}")
         print(f"Solutions: {json.dumps(experiment.solutions)}")
-        print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")
+        print(f"Pumping rate: {experiment.pumping_rate}")
         print(
             f"Project campaign id: {experiment.project_id}.{experiment.project_campaign_id}\n"
         )
@@ -110,7 +109,6 @@ def main():
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={"edot": 0, "liclo4": 120, "rinse": 0},
-                pumping_rate=DEFAULT_PUMPING_RATE,
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + " " + "bleaching" + " " + str(experiment_id),
                 override_well_selection=1,
@@ -131,7 +129,6 @@ def main():
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={"edot": 0, "liclo4": 120, "rinse": 120},
-                pumping_rate=DEFAULT_PUMPING_RATE,
                 filename=EXPERIMENT_NAME + " " + "coloring" + " " + str(experiment_id),
                 override_well_selection=1,
                 process_type=3,  # 1 for deposition, 2 for bleaching, 3 for coloring, 4 for char
@@ -151,7 +148,6 @@ def main():
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={"edot": 0, "liclo4": 120, "rinse": 120},
-                pumping_rate=DEFAULT_PUMPING_RATE,
                 filename=EXPERIMENT_NAME + " " + "char" + " " + str(experiment_id),
                 override_well_selection=1,
                 process_type=4,
@@ -167,7 +163,7 @@ def main():
         print(f"Experiment id: {experiment.experiment_id}")
         print(f"Well id: {experiment.well_id}")
         print(f"Solutions: {json.dumps(experiment.solutions)}")
-        print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")
+        print(f"Pumping rate: {experiment.pumping_rate}")
         print(
             f"Project campaign id: {experiment.project_id}.{experiment.project_campaign_id}\n"
         )

@@ -1,7 +1,6 @@
 """Generates a PEDOT experiment."""
 
 from panda_lib import experiment_class
-from panda_lib.config.config import DEFAULT_PUMPING_RATE
 from panda_lib.correction_factors import correction_factor
 from panda_lib.scheduler import Scheduler, determine_next_experiment_id
 from panda_lib.sql_tools.sql_system_state import get_current_pin
@@ -29,7 +28,6 @@ def pedot_generator(
             project_campaign_id=campaign_id,
             solutions={"edot": 120, "liclo4": 0, "rinse": 120},
             solutions_corrected={},
-            pumping_rate=DEFAULT_PUMPING_RATE,
             status=experiment_class.ExperimentStatus.NEW,
             filename=experiment_name + " " + str(experiment_id),
             # Echem specific

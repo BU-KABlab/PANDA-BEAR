@@ -3,7 +3,7 @@
 import pandas as pd
 
 from panda_lib import experiment_class
-from panda_lib.config.config import read_testing_config, DEFAULT_PUMPING_RATE
+from panda_lib.config.config import read_testing_config
 from panda_lib.scheduler import Scheduler, determine_next_experiment_id
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 
@@ -42,7 +42,6 @@ def main():
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={"edot": 120, "liclo4": 120, "rinse": 120},
                 solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
-                pumping_rate=DEFAULT_PUMPING_RATE,
                 status=experiment_class.ExperimentStatus.NEW,
                 filename=EXPERIMENT_NAME + " " + str(experiment_id),
                 # Echem specific
@@ -63,20 +62,5 @@ def main():
         )
         experiment_id += 1
 
-    # for experiment in experiments:
-        ## Print a recipt of the wellplate and its experiments noting the solution and volume
-        # print(f"Experiment name: {experiment.experiment_name}")
-        # print(f"Experiment id: {experiment.experiment_id}")
-        # print(f"Well id: {experiment.well_id}")
-        # print(f"Solutions: {json.dumps(experiment.solutions)}")
-        # print(f"Pumping rate: {DEFAULT_PUMPING_RATE}")
-        # print(
-        #     f"Project campaign id: {experiment.project_id}.{experiment.project_campaign_id}\n"
-        # )
-        # print(f"CA Paramaters: {experiment.print_ca_parameters()}\n")
-        # print(f"CV Paramaters: {experiment.print_cv_parameters()}\n")
-
-    # Add experiments to the queue
-    # input("Press enter to add the experiments")
     scheduler = Scheduler()
     scheduler.add_nonfile_experiments(experiments)
