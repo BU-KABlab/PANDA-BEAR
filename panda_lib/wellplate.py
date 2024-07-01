@@ -396,9 +396,9 @@ class Wellplate:
             "z_top": self.z_top,
         }  # coordinates of A1
         self.calculate_well_locations()
-        for well in self.wells:
-            well: Well
-            self.update_well_coordinates(well, well.coordinates)
+        for well_id in self.wells:
+            well:Well = self.wells[well_id]
+            self.update_well_coordinates(well_id, well.coordinates)
 
     def calculate_well_locations(self) -> None:
         """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
@@ -659,7 +659,7 @@ class Wellplate:
         ) = self.load_wellplate_location()
 
         # Update the wells for the z_bottom as the depth
-        if isinstance(self.wells, dict) and isinstance(self.wells.values()[0], Well):
+        if isinstance(self.wells, dict) and all(isinstance(value, Well) for value in self.wells.values()):
             for well in self.wells.values():
                 well: Well
                 well.depth = self.z_bottom
