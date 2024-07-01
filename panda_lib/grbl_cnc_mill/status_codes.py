@@ -1,3 +1,5 @@
+"""Status codes for the CNC mill."""
+
 from enum import Enum
 from .exceptions import CNCMillException
 

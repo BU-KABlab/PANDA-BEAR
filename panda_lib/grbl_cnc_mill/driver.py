@@ -30,10 +30,6 @@ from pathlib import Path
 # from pydantic.dataclasses import dataclass
 
 import serial
-from panda_lib.config.config import (
-    MILL_CONFIG,
-    PATH_TO_LOGS,
-)
 
 # local libraries
 from .logger import set_up_mill_logger
@@ -49,8 +45,10 @@ from .exceptions import (
 from .status_codes import Status, AlarmStatus, ErrorCodes
 from .instruments import Instruments
 
+current_directory = Path(__file__).parent
+
 # Set up the logger
-logger = set_up_mill_logger(PATH_TO_LOGS)
+logger = set_up_mill_logger(current_directory / "logs")
 
 
 class Mill:
@@ -58,10 +56,10 @@ class Mill:
     Set up the mill connection and pass commands, including special commands
     """
 
-    def __init__(self, config_file="configuration.json"):
-        self.config_file = config_file
+    def __init__(self):
+        self.mill_config_file = "_configuration.json"
         self.active_connection = False
-        self.config = self.read_json_config()
+        self.mill_config = self.read_mill_config()
         self.ser_mill: serial.Serial = self.connect_to_mill()
 
     def homing_sequence(self):
@@ -121,10 +119,10 @@ class Mill:
         logger.info("Mill connected: %s", self.ser_mill.is_open)
         print("Mill connected: ", self.ser_mill.is_open)
 
-    def read_json_config(self):
+    def read_json_config(self, config_file):
         """Read the config file"""
         try:
-            config_file_path = MILL_CONFIG
+            config_file_path = current_directory / config_file
             with open(config_file_path, "r", encoding="UTF-8") as file:
                 configuration = json.load(file)
             logger.debug("Mill config loaded: %s", configuration)
@@ -135,6 +133,10 @@ class Mill:
         except Exception as err:
             logger.error("Error reading config file: %s", str(err))
             raise MillConfigError("Error reading config file") from err
+    
+    def read_mill_config(self):
+        """Read the mill config file"""
+        return self.read_json_config(self.mill_config_file)
 
     def execute_command(self, command):
         """Encodes and sends commands to the mill and returns the response"""
@@ -292,8 +294,8 @@ class Mill:
         Returns:
             str: Response from the mill after executing the command.
         """
-        offsets = self.config["instrument_offsets"]["center"]
-        working_volume = self.config["working_volume"]
+        offsets = self.mill_config["instrument_offsets"]["center"]
+        working_volume = self.mill_config["working_volume"]
 
         mill_move = "G01 X{} Y{} Z{}"  # Move to specified coordinates
 
@@ -359,14 +361,14 @@ class Mill:
         if instrument in [Instruments.CENTER, Instruments.LENS]:
             current_coordinates = [x_coord, y_coord, z_coord]
         elif instrument == Instruments.PIPETTE:
-            offsets = self.config["instrument_offsets"]["pipette"]
+            offsets = self.mill_config["instrument_offsets"]["pipette"]
             current_coordinates = [
                 x_coord - offsets["x"],
                 y_coord - offsets["y"],
                 z_coord - offsets["z"],
             ]
         elif instrument == Instruments.ELECTRODE:
-            offsets = self.config["instrument_offsets"]["electrode"]
+            offsets = self.mill_config["instrument_offsets"]["electrode"]
             current_coordinates = [
                 x_coord - offsets["x"],
                 y_coord - offsets["y"],
@@ -388,7 +390,7 @@ class Mill:
         Returns:
             None
         """
-        coords = self.config["electrode_bath"]
+        coords = self.mill_config["electrode_bath"]
         self.safe_move(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
         for _ in range(rinses):
             self.move_to_position(coords["x"], coords["y"], coords["z"], instrument=Instruments.ELECTRODE)
@@ -404,7 +406,7 @@ class Mill:
         Returns:
             None
         """
-        coords = self.config["electrode_bath"]
+        coords = self.mill_config["electrode_bath"]
         self.move_to_safe_position()
         self.safe_move(
             coords["x"], coords["y"], coords["z"], instrument=Instruments.ELECTRODE
@@ -433,7 +435,7 @@ class Mill:
         """
         # Fetch offsets for the specified instrument
         try:
-            offsets = self.config["instrument_offsets"][instrument.value]
+            offsets = self.mill_config["instrument_offsets"][instrument.value]
         except KeyError as e:
             logger.error("Instrument not found in config file")
             raise MillConfigError("Instrument not found in config file") from e
@@ -443,7 +445,7 @@ class Mill:
         z_coord = z_coord + offsets["z"]
 
         # Double check that the target coordinates are within the working volume
-        working_volume = self.config["working_volume"]
+        working_volume = self.mill_config["working_volume"]
         if x_coord > 0 or x_coord < working_volume["x"]:
             logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
@@ -465,22 +467,18 @@ class Mill:
         """
         Update the offset in the config file
         """
-        current_offset = self.config[offset_type]
+        current_offset = self.mill_config[offset_type]
         offset = {
             "x": current_offset["x"] + offset_x,
             "y": current_offset["y"] + offset_y,
             "z": current_offset["z"] + offset_z,
         }
 
-        self.config["instrument_offsets"][offset_type] = offset
-        config_file_path = MILL_CONFIG
-        if not config_file_path.exists():
-            logger.error("Config file not found")
-            raise MillConfigNotFound
+        self.mill_config["instrument_offsets"][offset_type] = offset
 
         try:
-            with open(config_file_path, "w", encoding="UTF-8") as file:
-                json.dump(self.config, file, indent=4)
+            with open(self.mill_config_file, "w", encoding="UTF-8") as file:
+                json.dump(self.mill_config, file, indent=4)
             logger_message = f"Updated {offset_type} to {offset}"
             logger.info(logger_message)
             return 0
@@ -517,18 +515,18 @@ class Mill:
             #  - it is not equal to the target Z coordinate
             #  - the fixed_z flag is not set (i.e. fixed_z = False) or it is set (i.e. fixed_z = True)
             # Additionally, current_z should be below the safe height.
-            if current_z < self.config["safe_height_floor"]:
+            if current_z < self.mill_config["safe_height_floor"]:
                 logger.debug("Testing - Would be moving to Z = 0")
                 logger.debug(
-                    "Reason:\n\tcurrent_z is below self.config['safe_height_floor'] %s",
-                    current_z < self.config["safe_height_floor"],
+                    "Reason:\n\tcurrent_z is below self.mill_config['safe_height_floor'] %s",
+                    current_z < self.mill_config["safe_height_floor"],
                 )
                 # self.execute_command("G01 Z0")
             else:
                 logger.debug("Testing - Would not be moving to Z = 0")
                 logger.debug(
-                    "Reason:\n\tcurrent_z is at or above self.config['safe_height_floor'] %s",
-                    current_z >= self.config["safe_height_floor"],
+                    "Reason:\n\tcurrent_z is at or above self.mill_config['safe_height_floor'] %s",
+                    current_z >= self.mill_config["safe_height_floor"],
                 )
         else:
             logger.debug("Testing - Would not be moving to Z = 0")
@@ -562,14 +560,14 @@ class Mill:
                 "Current Z coordinate is zero, moving to the target coordinates without moving to Z = 0"
             )
         # Fetch offsets for the specified instrument
-        offsets = self.config["instrument_offsets"][instrument.value]
+        offsets = self.mill_config["instrument_offsets"][instrument.value]
         # updated target coordinates with offsets so the center of the mill moves to the right spot
         x_coord = x_coord + offsets["x"]
         y_coord = y_coord + offsets["y"]
         z_coord = z_coord + offsets["z"]
 
         # Double check that the target coordinates are within the working volume
-        working_volume = self.config["working_volume"]
+        working_volume = self.mill_config["working_volume"]
         if x_coord > 0 or x_coord < working_volume["x"]:
             logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
