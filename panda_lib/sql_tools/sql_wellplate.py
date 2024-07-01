@@ -242,6 +242,8 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
         volume = int(row[8]) if row[8] else 0
         capacity = int(row[10]) if row[10] else 0
         height = int(row[11]) if row[11] else 0
+        experiment_id = int(row[6]) if row[6] else None
+        project_id = int(row[7]) if row[7] else None
         # well_height, well_capacity,
         # TODO currently the wepplate object applies the well_height and well_capacity
         # If we want the wells to be the primary source of this information, we need to
@@ -259,8 +261,8 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
                 status=str(row[3]),
                 status_date=str(row[4]),
                 contents=incoming_contents,
-                experiment_id=int(row[6]),
-                project_id=int(row[7]),
+                experiment_id=experiment_id,
+                project_id=project_id,
                 volume=volume,
                 coordinates=incoming_coordinates,
                 capacity=capacity,
