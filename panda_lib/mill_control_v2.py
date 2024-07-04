@@ -24,7 +24,6 @@ import time
 import serial
 
 from .wellplate import Wellplate
-from .config.config import MILL_CONFIG, STOCK_STATUS, WASTE_STATUS
 
 # Configure the logger
 # logger = logging.getLogger(__name__)
