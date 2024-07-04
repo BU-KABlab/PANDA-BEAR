@@ -20,6 +20,8 @@ if config.getboolean("OPTIONS", "testing"):
 else:
     PATH_TO_LOGS = Path(config.get("PATHS_PRODUCTION", "logging_dir"))
 
+obs_config = config["OBS"]
+
 ## set up logging to log to both the obs_control.log file and the ePANDA.log file
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
 file_handler = logging.FileHandler(PATH_TO_LOGS / "obs_control.log")
@@ -33,10 +35,10 @@ logger.addHandler(file_handler)
 class OBSSecrets:
     """This class is used to store the OBS secrets"""
 
-    HOST = os.environ.get("OBS_HOST")
-    PASSWORD = os.environ.get("OBS_PASSWORD")
-    PORT = int(os.environ.get("OBS_PORT"))
-    TIMEOUT = int(os.environ.get("OBS_TIMEOUT"))
+    HOST = obs_config.get("obs_host")
+    PASSWORD = obs_config.get("obs_password")
+    PORT = obs_config.getint("obs_port")
+    TIMEOUT = obs_config.getint("obs_timeout")
 
 class OBSController:
     """This class is used simplify the control the OBS software for our needs"""
