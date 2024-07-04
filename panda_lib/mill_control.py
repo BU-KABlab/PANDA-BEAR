@@ -38,9 +38,9 @@ logger = setup_default_logger(log_name="mill_control",console_level=logging.WARN
 mill_movement_logger = setup_default_logger(log_name="mill_movement",console_level=logging.WARNING)
 
 config = ConfigParser()
-config.read("config/panda_sdl_config.ini")
+config.read("panda_lib/config/panda_sdl_config.ini")
 MILL_COM_PORT = config.get("MILL", "port")
-MILL_BAUD_RATE = config.getint("MILL", "baud_rate")
+MILL_BAUD_RATE = config.getint("MILL", "baudrate")
 MILL_TIMEOUT = config.getint("MILL", "timeout")
 
 

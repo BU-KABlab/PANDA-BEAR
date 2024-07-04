@@ -14,13 +14,15 @@ from typing import Optional, Tuple, Union
 
 from panda_lib import experiment_class
 
-from .config.config import MILL_CONFIG, WELLPLATE_LOCATION
 from .errors import OverFillException
 from .sql_tools import sql_utilities, sql_wellplate
 from .vessel import Vessel
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger("e_panda")
+logger = logging.getLogger("panda")
+
+MILL_CONFIG = "panda_lib/config/mill_config.json"
+WELLPLATE_LOCATION = "panda_lib/config/well_location.json" #TODO use wellpalte table going forward
 
 
 class WellCoordinates:

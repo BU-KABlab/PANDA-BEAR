@@ -6,7 +6,7 @@ import logging
 import configparser
 
 config = configparser.ConfigParser()
-config.read("config/panda_sdl_config.ini")
+config.read("panda_lib\\config\\panda_sdl_config.ini")
 
 if config.getboolean("OPTIONS", "testing"):
     EPANDA_LOG = config.get("PATHS_TESTING", "logging_dir")
@@ -15,8 +15,8 @@ else:
 
 
 def setup_default_logger(
-    log_file=EPANDA_LOG,
-    log_name="panda_logger",
+    log_file= "panda.log",
+    log_name="panda",
     file_level=logging.DEBUG,
     console_level=logging.INFO,
 ):
@@ -37,7 +37,7 @@ def setup_default_logger(
         "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
     )
     # The file handler will write to the log file
-    file_handler = logging.FileHandler(log_file)
+    file_handler = logging.FileHandler(EPANDA_LOG + log_file)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
@@ -48,7 +48,7 @@ def setup_default_logger(
     return logger
 
 
-default_logger = setup_default_logger(EPANDA_LOG)
+default_logger = setup_default_logger()
 
 
 class CustomLoggingFilter(logging.Filter):

@@ -5,8 +5,15 @@ from typing import Tuple
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict
 import numpy as np
-from .config.config import PATH_TO_DATA
+from configparser import ConfigParser
+
 logger = logging.getLogger("e_panda")
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
+if config.getboolean("OPTIONS", "testing"):
+    PATH_TO_DATA = pathlib.Path(config.get("PATHS_TESTING", "data_dir"))
+else:
+    PATH_TO_DATA = pathlib.Path(config.get("PATHS_PRODUCTION", "data_dir"))
 
 class GamryPotentiostat:
     def __init__(self):

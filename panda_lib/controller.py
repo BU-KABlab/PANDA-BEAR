@@ -38,7 +38,7 @@ from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .analyzer.pedot import pedot_analyzer
 from .analyzer.pedot import run_ml_model as pedot_ml_model
-from .config.config import read_testing_config
+from .config.config_tools import read_testing_config
 from .errors import (
     NoExperimentFromModel,
     ProtocolNotFoundError,

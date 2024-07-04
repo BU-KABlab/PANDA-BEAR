@@ -14,14 +14,14 @@ from panda_lib.log_tools import setup_default_logger
 
 logger: logging.Logger = setup_default_logger(log_name="sql_logger")
 config = ConfigParser()
-config.read("config/panda_sdl_config.ini")
+config.read("panda_lib/config/panda_sdl_config.ini")
 
 if config.getboolean("OPTIONS", "TESTING"):
-    SQL_DB_ADDR = config.get("PATHS_TESTING", "sql_db_address")
-    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_repo_path")
+    SQL_DB_ADDR = config.get("PATHS_TESTING", "testing_db_address")
+    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_dir")
 else:
-    SQL_DB_ADDR = config.get("PATHS_PRODUCTION", "sql_db_address")
-    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_repo_path")
+    SQL_DB_ADDR = config.get("PATHS_PRODUCTION", "production_db_address")
+    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_dir")
 
 # region Utility Functions
 def execute_sql_command(

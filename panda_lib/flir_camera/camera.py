@@ -13,7 +13,7 @@ from pathlib import Path
 import PyCapture2
 
 
-PATH_TO_LOGS = Path("epanda_lib/logs")
+PATH_TO_LOGS = Path("panda_lib/logs")
 
 
 class FLIRCamera:

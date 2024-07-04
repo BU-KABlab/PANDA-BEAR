@@ -10,8 +10,15 @@ from pathlib import Path
 import obsws_python as obsws
 from obsws_python import error as OBSerror
 import os
-from .config.config import PATH_TO_LOGS, read_testing_config
-from .log_tools import e_panda_logger as logger
+from configparser import ConfigParser
+from .log_tools import default_logger as logger
+
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
+if config.getboolean("OPTIONS", "testing"):
+    PATH_TO_LOGS = Path(config.get("PATHS_TESTING", "logging_dir"))
+else:
+    PATH_TO_LOGS = Path(config.get("PATHS_PRODUCTION", "logging_dir"))
 
 ## set up logging to log to both the obs_control.log file and the ePANDA.log file
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
@@ -140,7 +147,7 @@ Well: {well_id}"""
 
     def start_recording(self):
         """Start the recording"""
-        if read_testing_config():
+        if config.getboolean("OPTIONS", "testing"):
             return
         try:
             self.client.start_record()
@@ -150,7 +157,7 @@ Well: {well_id}"""
 
     def stop_recording(self):
         """Stop the recording"""
-        if read_testing_config():
+        if config.getboolean("OPTIONS", "testing"):
             return
         try:
             self.client.stop_record()

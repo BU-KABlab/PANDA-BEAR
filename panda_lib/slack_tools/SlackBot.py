@@ -3,7 +3,7 @@
 # pylint: disable=line-too-long
 
 import base64
-import json
+import configparser
 import logging
 import os
 import time
@@ -22,7 +22,7 @@ from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-import panda_lib.config.config as config
+from panda_lib.config.config_tools import read_testing_config
 import panda_lib.experiment_class as exp
 from panda_lib import vials
 from panda_lib.image_tools import add_data_zone
@@ -36,21 +36,26 @@ from panda_lib.sql_tools import (
 )
 from panda_lib.wellplate import Well, Wellplate
 
-dotenv.load_dotenv()
+ # Initialize the configparser
+config = configparser.ConfigParser()
 
+# Read the configuration file
+config.read("panda_lib/config/panda_sdl_config.ini")
+
+# Access the SLACK section
+slack_config = config["SLACK"]
 
 @dataclass
 class SlackCred:
     """This class is used to store the slack secrets"""
-
-    TOKEN = os.environ.get("SLACK_TOKEN")
-    DATA_CHANNEL_ID = os.environ.get("SLACK_DATA_CHANNEL_ID")
-    TEST_DATA_CHANNEL_ID = os.environ.get("SLACK_TEST_DATA_CHANNEL_ID")
-    CONVERSATION_CHANNEL_ID = os.environ.get("SLACK_CONVERSATION_CHANNEL_ID")
-    TEST_CONVERSATION_CHANNEL_ID = os.environ.get("SLACK_TEST_CONVERSATION_CHANNEL_ID")
-    ALERT_CHANNEL_ID = os.environ.get("SLACK_ALERT_CHANNEL_ID")
-    TEST_ALERT_CHANNEL_ID = os.environ.get("SLACK_TEST_ALERT_CHANNEL_ID")
-
+    # Assign the values from the configuration file
+    TOKEN = slack_config.get("slack_token")
+    DATA_CHANNEL_ID = slack_config.get("slack_data_channel_id")
+    TEST_DATA_CHANNEL_ID = slack_config.get("slack_test_data_channel_id")
+    CONVERSATION_CHANNEL_ID = slack_config.get("slack_conversation_channel_id")
+    TEST_CONVERSATION_CHANNEL_ID = slack_config.get("slack_test_conversation_channel_id")
+    ALERT_CHANNEL_ID = slack_config.get("slack_alert_channel_id")
+    TEST_ALERT_CHANNEL_ID = slack_config.get("slack_test_alert_channel_id")
 
 class Cameras(Enum):
     """
@@ -103,7 +108,6 @@ def insert_slack_ticket(ticket: SlackTicket, test: bool = False) -> None:
             ticket.timestamp,
             ticket.addressed_timestamp,
         ),
-        test=test,
     )
 
 
@@ -132,7 +136,6 @@ def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
         WHERE msg_id = ?
         """,
         (msg_id,),
-        test=test,
     )
     if result == []:
         return None
@@ -142,7 +145,7 @@ def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
 class SlackBot:
     """Class for sending messages to Slack."""
 
-    def __init__(self, test: bool = config.read_testing_config()) -> None:
+    def __init__(self, test: bool = read_testing_config()) -> None:
 
         self.logger = logging.getLogger("e_panda")
         self.test = test

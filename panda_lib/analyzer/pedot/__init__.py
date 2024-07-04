@@ -7,10 +7,7 @@ from panda_lib.experiment_class import (
     ExperimentResultsRecord,
     insert_experiment_result,
 )
-
-from panda_lib.config.config import (
-    read_testing_config,
-)
+from configparser import ConfigParser
 
 from panda_lib.analyzer.pedot.sql_ml_functions import insert_ml_training_data
 
@@ -29,6 +26,9 @@ from .pedot_classes import (
     RawMetrics,
 )
 from .ml_model import pedot_model
+
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
 
 # Set up the ML filepaths, for this project this is hardcoded only here
 ml_file_paths = MLInput(
@@ -51,7 +51,7 @@ def pedot_analyzer(experiment_id: int, dont_train:bool=False) -> MLTrainingData:
         MLTrainingData: The training data to be used for the ML model.
     
     """
-    if read_testing_config():
+    if config.getboolean("OPTIONS", "testing"):
         return
 
     if experiment_id is None:
@@ -131,10 +131,7 @@ def run_ml_model(generate_experiment_id=None) -> MLOutput:
 
     # Run the ML model
     results = pedot_model(
-        ml_file_paths.training_file_path,
         ml_file_paths.model_base_path,
-        ml_file_paths.counter_file_path,
-        ml_file_paths.BestTestPointsCSV,
         ml_file_paths.contourplots_path,
         experiment_id=generate_experiment_id,
     )

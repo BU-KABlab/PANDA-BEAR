@@ -6,14 +6,14 @@ Or starting the ePANDA either with or without mock instruments.
 """
 
 # pylint: disable=broad-exception-caught, protected-access
-import os
 import sys
 import time
 from pathlib import Path
-import dotenv
 from PIL import Image
 
 from panda_lib.config.config_tools import read_testing_config, write_testing_config
+from panda_lib.config.config_print import main as print_config, resolve_config_paths
+resolve_config_paths()
 import panda_lib.analyzer.pedot as pedot_analysis
 from panda_lib import (
     flir_camera,
@@ -36,9 +36,6 @@ from panda_lib.sql_tools import (
     remove_testing_experiments,
 )
 from panda_lib.analyzer.pedot import sql_ml_functions
-
-
-dotenv.load_dotenv()
 
 
 def run_epanda_with_ml():
@@ -647,21 +644,6 @@ of promoting the sharing and reuse of software generally.
     )
 
 
-def print_env_variables():
-    """Prints the dot environment variables."""
-    # Get the environment variables
-    print("Environment Variables:")
-    dotenv_path = Path(__file__).parent / ".env"
-    dotenv.load_dotenv(dotenv_path)
-
-    # Get the environment variables from the .env file
-    env_variables = dotenv.dotenv_values(dotenv_path)
-
-    # Print the environment variables
-    print("Environment Variables:")
-    for key, value in env_variables.items():
-        print(f"{key}: {value}")
-
 
 menu_options = {
     "0": run_epanda_with_ml,
@@ -691,7 +673,7 @@ menu_options = {
     "r": refresh,
     "w": show_warrenty,
     "c": show_conditions,
-    "env": print_env_variables,
+    "env": print_config,
     "q": exit_program,
 }
 

@@ -13,7 +13,7 @@ from typing import Sequence, Union, List, Tuple
 from .sql_tools.sql_utilities import execute_sql_command
 from .vessel import OverDraftException, OverFillException, Vessel, VesselCoordinates
 
-vial_logger = logging.getLogger("panda_log")
+vial_logger = logging.getLogger("panda")
 
 
 class Vial2(Vessel):

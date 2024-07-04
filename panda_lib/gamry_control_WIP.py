@@ -12,13 +12,21 @@ import numpy as np
 import pandas as pd
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
+from configparser import ConfigParser
 
-from .config.config import PATH_TO_DATA
+
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
+if config.getboolean("OPTIONS", "testing"):
+    PATH_TO_DATA = pathlib.Path(config.get("PATHS_TESTING", "data_dir"))
+else:
+    PATH_TO_DATA = pathlib.Path(config.get("PATHS_PRODUCTION", "data_dir"))
 
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
 ## set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger("e_panda")
+logger = logging.getLogger("panda")
+
 # global variables
 global PSTAT
 global DEVICES

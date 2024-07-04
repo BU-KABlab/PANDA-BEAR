@@ -11,7 +11,6 @@ from nesp_lib_py import nesp_lib
 from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 
 import panda_lib.wellplate as wp
-from panda_lib.config.config import PATH_TO_LOGS
 from panda_lib.correction_factors import reverse_correction_factor
 from panda_lib.experiment_class import ExperimentResult
 from panda_lib.mill_control import Mill, MockMill
@@ -22,29 +21,11 @@ from panda_lib.vials import StockVial, Vial2, WasteVial
 from sartorius.sartorius.driver import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 
-pump_control_logger = logging.getLogger("e_panda")
-if not pump_control_logger.hasHandlers():
-    pump_control_logger = logging.getLogger("pump_control")
-    pump_control_logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
-    )
-    file_handler = logging.FileHandler(PATH_TO_LOGS / "pump_control.log")
-    file_handler.setFormatter(formatter)
-    pump_control_logger.addHandler(file_handler)
+from panda_lib.log_tools import setup_default_logger, default_logger as pump_control_logger
 
-scale_logger = logging.getLogger("e_panda")
-if not scale_logger.hasHandlers():
-    scale_logger = logging.getLogger("scale")
-    scale_logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
-    )
-    file_handler = logging.FileHandler(PATH_TO_LOGS / "scale.log")
-    file_handler.setFormatter(formatter)
-    scale_logger.addHandler(file_handler)
+scale_logger = setup_default_logger(log_name="scale")
 
-vessel_logger = VesselLogger("pipette").logger
+vessel_logger = setup_default_logger(log_name="vessel")
 
 
 class SyringePump:

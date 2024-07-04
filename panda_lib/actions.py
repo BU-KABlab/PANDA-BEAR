@@ -34,8 +34,8 @@ from PIL import Image
 
 # Local application imports
 from panda_lib.flir_camera import capture_new_image
-from panda_lib.config.config import (
-    read_testing_config,
+from panda_lib.config.config_tools import (
+    read_testing_config
 )
 from panda_lib.correction_factors import correction_factor
 from panda_lib.errors import (
@@ -78,11 +78,11 @@ else:
     )
 
 config = ConfigParser()
-config.read("config/panda_sdl_config.ini")
+config.read("panda_lib/config/panda_sdl_config.ini")
 # Constants
 
 AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
-DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop")
+DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
 if TESTING:
     PATH_TO_DATA = config.get("PATHS_PRODUCTION", "data_dir")
     PATH_TO_LOGS = config.get("PATHS_PRODUCTION", "logging_dir")
@@ -90,23 +90,9 @@ else:
     PATH_TO_DATA = config.get("PATHS_TESTING", "data_dir")
     PATH_TO_LOGS = config.get("PATHS_TESTING", "logging_dir")
 
-# set up logging to log to both the pump_control.log file and the ePANDA.log file
-logger = logging.getLogger("e_panda")
-logger.setLevel(logging.DEBUG)  # change to INFO to reduce verbosity
-formatter = logging.Formatter(
-    "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
-)
-system_handler = logging.FileHandler(PATH_TO_LOGS / "ePANDA.log")
-system_handler.setFormatter(formatter)
-logger.addHandler(system_handler)
-
-# Add a testing logger
-testing_logger = logging.getLogger("testing")
-testing_logger.setLevel(logging.DEBUG)
-testing_handler = logging.FileHandler(PATH_TO_LOGS / "testing.log")
-testing_handler.setFormatter(formatter)
-testing_logger.addHandler(testing_handler)
-
+# Set up logging
+logger = logging.getLogger("panda")
+testing_logging = logging.getLogger("panda")
 
 def forward_pipette_v2(
     volume: float,
@@ -783,7 +769,10 @@ def apply_log_filter(
     experiment_formatter = logging.Formatter(
         "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
     )
-    system_handler.setFormatter(experiment_formatter)
+
+    logger_handlers = logger.handlers
+    for handler in logger_handlers:
+        handler.setFormatter(experiment_formatter)
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
     logger.addFilter(custom_filter)
 

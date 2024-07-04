@@ -2,10 +2,12 @@
 Vessel module.
 """
 
-import logging
 from typing import Union, Optional
-from .config.config import PATH_TO_LOGS
-from .errors import OverFillException, OverDraftException
+from panda_lib.errors import OverFillException, OverDraftException
+from panda_lib.log_tools import setup_default_logger
+
+# Set up the logger
+logger = setup_default_logger(log_name="vessel")
 
 
 class VesselLogger:
@@ -14,14 +16,7 @@ class VesselLogger:
     """
 
     def __init__(self, name):
-        self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(
-            "%(asctime)s&%(name)s&%(module)s&%(funcName)s&%(lineno)d&%(message)s"
-        )
-        file_handler = logging.FileHandler(PATH_TO_LOGS / f"{name}.log")
-        file_handler.setFormatter(formatter)
-        self.logger.addHandler(file_handler)
+        self.logger = setup_default_logger(log_name=name)
 
 
 # Create an instance of the logger for the vessel module
