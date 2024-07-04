@@ -224,7 +224,7 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
     wells = []
     for row in result:
         try:
-            incoming_contents = dict(json.loads(row[5]))
+            incoming_contents = (json.loads(row[5]))
         except json.JSONDecodeError:
             incoming_contents = {}
         except TypeError:

@@ -21,16 +21,7 @@ from configparser import ConfigParser
 from pathlib import Path
 from typing import Sequence
 
-from slack_sdk.errors import (
-    BotUserAccessError,
-    SlackApiError,
-    SlackClientConfigurationError,
-    SlackClientError,
-    SlackClientNotConnectedError,
-    SlackObjectFormationError,
-    SlackRequestError,
-    SlackTokenRotationError,
-)
+from slack_sdk import errors as slack_errors
 
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
@@ -279,7 +270,7 @@ def main(
 
             # Convert the file path to a module name
             module_name = (
-                ("protocols." + protocol_entry.filepath).replace("/", ".").rstrip(".py")
+                ("panda_protocols." + protocol_entry.filepath).replace("/", ".").rstrip(".py")
             )
 
             # Import the module
@@ -782,16 +773,7 @@ def share_to_slack(experiment: ExperimentBase):
                 images_with_dz.append(image)
 
             slack.upload_images("data", images_with_dz, "")
-    except (
-        SlackApiError,
-        SlackClientError,
-        SlackRequestError,
-        BotUserAccessError,
-        SlackTokenRotationError,
-        SlackObjectFormationError,
-        SlackClientNotConnectedError,
-        SlackClientConfigurationError,
-    ) as error:
+    except slack_errors as error:
         logger.error(
             "A Slack specific error occured while sharing images from experiment %d with slack: %s",
             experiment.experiment_id,

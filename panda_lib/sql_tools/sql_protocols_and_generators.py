@@ -276,7 +276,7 @@ def run_generator(generator_id):
     generator = get_generator_by_id(generator_id)
     print(f"Running generator {generator.name}...")
     generator_module = importlib.import_module(
-        f"experiment_generators.{generator.filepath[:-3]}"
+        f"panda_experiment_generators.{generator.filepath[:-3]}"
     )
     generator_function = getattr(generator_module, "main")
     generator_function()

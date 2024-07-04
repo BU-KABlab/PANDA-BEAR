@@ -3,7 +3,6 @@
 import pandas as pd
 
 from panda_lib import experiment_class
-from panda_lib.config.config import read_testing_config
 from panda_lib.scheduler import Scheduler, determine_next_experiment_id
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 
@@ -13,13 +12,11 @@ EXPERIMENT_NAME = "system_test"
 CAMPAIGN_ID = 999
 
 params_df = pd.read_csv(
-    r".\experiment_generators\system_test_params.csv"
+    r".\panda_experiment_generators\system_test_params.csv"
 )  # Update path with location on PANDA computer
 
 def main():
     """Runs the edot voltage sweep experiment generator."""
-    print("TEST MODE: ", read_testing_config())
-    input("Press enter to continue")
 
     # controller.load_new_wellplate(new_wellplate_type_number=6)
     starting_experiment_id = determine_next_experiment_id()

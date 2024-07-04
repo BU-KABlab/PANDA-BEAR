@@ -84,11 +84,11 @@ config.read("panda_lib/config/panda_sdl_config.ini")
 AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
 DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
 if TESTING:
-    PATH_TO_DATA = config.get("PATHS_PRODUCTION", "data_dir")
-    PATH_TO_LOGS = config.get("PATHS_PRODUCTION", "logging_dir")
+    PATH_TO_DATA = Path(config.get("PATHS_PRODUCTION", "data_dir"))
+    PATH_TO_LOGS = Path(config.get("PATHS_PRODUCTION", "logging_dir"))
 else:
-    PATH_TO_DATA = config.get("PATHS_TESTING", "data_dir")
-    PATH_TO_LOGS = config.get("PATHS_TESTING", "logging_dir")
+    PATH_TO_DATA = Path(config.get("PATHS_TESTING", "data_dir"))
+    PATH_TO_LOGS = Path(config.get("PATHS_TESTING", "logging_dir"))
 
 # Set up logging
 logger = logging.getLogger("panda")

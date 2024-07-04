@@ -680,14 +680,16 @@ menu_options = {
 if __name__ == "__main__":
 
     print(
-        """
-    PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
-    PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warrenty' 
-    for more details.
+"""
+\n
+PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
+PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warrenty' 
+for more details.
     
-    This is free software, and you are welcome to redistribute it
-    under certain conditions; choose `show_conditions' for details.
-          """
+This is free software, and you are welcome to redistribute it
+under certain conditions; choose `show_conditions' for details.
+
+"""
     )
 
     sql_system_state.set_system_status(utilities.SystemState.ON, "at main menu")

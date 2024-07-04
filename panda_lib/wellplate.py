@@ -22,7 +22,7 @@ from .vessel import Vessel
 logger = logging.getLogger("panda")
 
 MILL_CONFIG = "panda_lib/config/mill_config.json"
-WELLPLATE_LOCATION = "panda_lib/config/well_location.json" #TODO use wellpalte table going forward
+WELLPLATE_LOCATION = "panda_lib/config/wellplate_location.json" #TODO use wellpalte table going forward
 
 
 class WellCoordinates:
