@@ -1,11 +1,16 @@
 import importlib
 import os
 import sqlite3
-
-from panda_lib.config.config import SQL_DB_PATH
-
+from configparser import ConfigParser
 # region Generators
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
+if config.getboolean("OPTIONS", "TESTING"):
+    sql_db_path = config.get("PATHS_TESTING", "testing_db_address")
+else:
+    sql_db_path = config.get("PATHS_PRODUCTION", "production_db_address")
 
+SQL_DB_PATH = sql_db_path
 
 class GeneratorEntry:
     """A class to represent a generator entry in the database."""
@@ -31,6 +36,7 @@ def get_generators() -> list:
     Returns:
         list: A list of all generators in the database.
     """
+
     conn = sqlite3.connect(SQL_DB_PATH)
     cursor = conn.cursor()
 
@@ -154,12 +160,16 @@ def read_in_generators():
     """
 
     # Get the generators folder from the environment variables
-    try:
-        generators = os.environ["PANDA_SDL_GENERATORS_DIR"]
-    except KeyError as e:
-        raise ValueError(
-            "PANDA_SDL_GENERATORS_DIR environment variable not set in .env file."
-        ) from e
+    # try:
+    #     generators = os.environ["PANDA_SDL_GENERATORS_DIR"]
+    # except KeyError as e:
+    #     raise ValueError(
+    #         "PANDA_SDL_GENERATORS_DIR environment variable not set in .env file."
+    #     ) from e
+
+    # Get the generators folder from the config.ini file
+    generators = config.get("PATHS_GENERAL", "generators_dir")
+
 
     # Get all files in the generators folder
     generators = os.listdir(generators)

@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import dotenv
 from PIL import Image
+import slack
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
@@ -44,6 +45,7 @@ config.read("panda_lib/config/panda_sdl_config.ini")
 
 # Access the SLACK section
 slack_config = config["SLACK"]
+config_options = config["OPTIONS"]
 
 @dataclass
 class SlackCred:
@@ -86,7 +88,7 @@ def insert_slack_ticket(ticket: SlackTicket, test: bool = False) -> None:
     Args:
         ticket (SlackTicket): The slack ticket to insert.
     """
-    if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+    if config_options.getboolean["use_slack"]:
         test = True
     sql_utilities.execute_sql_command_no_return(
         """
@@ -121,7 +123,7 @@ def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
     Returns:
         SlackTicket: The slack ticket.
     """
-    if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+    if config_options.getboolean["use_slack"]:
         test = True
     result = sql_utilities.execute_sql_command(
         """
@@ -157,12 +159,12 @@ class SlackBot:
             return
 
         self.user_id = self.test["user_id"]
-        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        if config_options.getboolean["use_slack"]:
             self.test = True
 
     def send_slack_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
-        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        if config_options.getboolean["use_slack"]:
             print(message)
 
         client = WebClient(SlackCred.TOKEN)
@@ -183,7 +185,7 @@ class SlackBot:
     def send_slack_file(self, channel: str, file, message=None) -> int:
         """Send a file to Slack."""
 
-        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        if config_options.getboolean["use_slack"]:
             return
 
         client = WebClient(SlackCred.TOKEN)
@@ -247,7 +249,7 @@ class SlackBot:
 
     def upload_images(self, channel, images, message):
         """Upload images to Slack."""
-        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        if config_options.getboolean["use_slack"]:
             return
         client = WebClient(SlackCred.TOKEN)
         channel_id = self.channel_id(channel)
@@ -270,7 +272,7 @@ class SlackBot:
 
     def check_latest_message(self, channel: str) -> str:
         """Check Slack for the latest message."""
-        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        if config_options.getboolean["use_slack"]:
             return
         client = WebClient(token=SlackCred.TOKEN)
         channel_id = self.channel_id(channel)
@@ -308,7 +310,7 @@ class SlackBot:
 
     def check_slack_messages(self, channel: str) -> int:
         """Check Slack for messages."""
-        if os.environ["PANDA_SDL_USE_SLACK"] == "0":
+        if config_options.getboolean["use_slack"]:
             return
         # WebClient insantiates a client that can call API methods
         # When using Bolt, you can use either `app.client` or the `client` passed to listeners.

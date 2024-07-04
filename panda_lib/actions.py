@@ -865,7 +865,7 @@ def image_well(
 
         # Post to obs
         try:
-            if os.environ.get("PANDA_SDL_TESTING") == "1" or os.environ["PANDA_SDL_USE_OBS"] == '0':
+            if config.getboolean("OPTIONS",'testing') or config.getboolean("OPTIONS","use_obs"):
                 obs = MockOBSController()
             else:
                 obs = OBSController()

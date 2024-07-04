@@ -3,6 +3,7 @@
 # pylint: disable=invalid-name, line-too-long, import-outside-toplevel, broad-exception-caught, protected-access
 import json
 import os
+from configparser import ConfigParser
 from dataclasses import field
 from datetime import datetime
 from decimal import Decimal
@@ -15,7 +16,8 @@ from pydantic.dataclasses import dataclass
 
 from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
                                                 execute_sql_command_no_return)
-
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
 
 class ExperimentResultsRecord:
     """
@@ -314,7 +316,7 @@ class ExperimentBase:
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
         try:
-            if os.environ["PANDA_SDL_TESTING"] == '1' or os.environ["PANDA_SDL_USE_OBS"] == '0':
+            if config.getboolean("OPTIONS","testing") or not config.getboolean("OPTIONS","use_obs"):
                 from .obs_controls import MockOBSController as OBSController
             else:
                 from .obs_controls import OBSController
@@ -344,7 +346,7 @@ class ExperimentBase:
         # Save the experiment to the database
         update_experiment(self)
         try:
-            if os.environ["PANDA_SDL_TESTING"] == '1' or os.environ["PANDA_SDL_USE_OBS"] == '0':
+            if config.getboolean("OPTIONS","testing") or not config.getboolean("OPTIONS","use_obs"):
                 from .obs_controls import MockOBSController as OBSController
             else:
                 from .obs_controls import OBSController

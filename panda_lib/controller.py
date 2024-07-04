@@ -17,6 +17,7 @@ import importlib
 import os
 import sys
 import time
+from configparser import ConfigParser
 from pathlib import Path
 from typing import Sequence
 
@@ -63,6 +64,9 @@ from .utilities import SystemState
 from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_files
 from .wellplate import Wellplate
 
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
+
 # set up slack globally so that it can be used in the main function and others
 logger = setup_default_logger(log_name="panda_log")
 TESTING = read_testing_config()
@@ -86,8 +90,8 @@ def main(
     # import protocols
     slack = SlackBot()
     if (
-        os.environ.get("PANDA_SDL_TESTING") == "1"
-        or os.environ["PANDA_SDL_USE_OBS"] == "0"
+        config.getboolean("OPTIONS","testing")
+        or not config.getboolean("OPTIONS","use_obs")
     ):
         obs = MockOBSController()
     else:

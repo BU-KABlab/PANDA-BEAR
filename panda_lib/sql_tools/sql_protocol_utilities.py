@@ -1,5 +1,6 @@
 """Utilities for working with protocols in the database."""
 
+from configparser import ConfigParser
 import os
 import sqlite3
 from panda_lib.config.config import SQL_DB_PATH
@@ -185,12 +186,16 @@ def read_in_protocols():
     """
 
     # Get the protocols folder from the environment variables    
-    try:
-        protocols = os.environ["PANDA_SDL_PROTOCOLS_DIR"]
-    except KeyError as e:
-        raise ValueError(
-            "PANDA_SDL_PROTOCOLS_DIR environment variable not set in .env file."
-        ) from e
+    # try:
+    #     protocols = os.environ["PANDA_SDL_PROTOCOLS_DIR"]
+    # except KeyError as e:
+    #     raise ValueError(
+    #         "PANDA_SDL_PROTOCOLS_DIR environment variable not set in .env file."
+    #     ) from e
+    config = ConfigParser()
+    config.read("panda_lib/config/panda_sdl_config.ini")
+    protocols = config.get("PATHS_GENERAL", "protocols_dir")
+
 
     # Get all files in the protocols folder
     protocols = os.listdir(protocols)

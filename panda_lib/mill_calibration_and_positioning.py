@@ -17,6 +17,7 @@ The module relies on other modules such as:
 import json
 import os
 import platform
+from configparser import ConfigParser
 from typing import Sequence
 
 from panda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_result
@@ -27,6 +28,9 @@ from .utilities import Instruments
 from .vials import StockVial, WasteVial
 from .wellplate import Well, WellCoordinates, Wellplate
 
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
+config = config["MILL"]
 
 def check_mill_settings(mill: Mill, *args, **kwargs):
     """
