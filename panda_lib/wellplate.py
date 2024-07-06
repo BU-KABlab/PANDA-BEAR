@@ -18,7 +18,7 @@ from .errors import OverFillException
 from .sql_tools import sql_utilities, sql_wellplate
 from .vessel import Vessel
 
-## set up logging to log to both the pump_control.log file and the ePANDA.log file
+## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
 MILL_CONFIG = "panda_lib/config/mill_config.json"

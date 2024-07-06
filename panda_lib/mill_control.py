@@ -1,6 +1,6 @@
 """
 This module contains the MillControl class, which is used to control the a GRBL CNC machine.
-The MillControl class is used by the EPanda class to move the pipette and electrode to the
+The MillControl class is used by the actions module to move the pipette and electrode to the
 specified coordinates. 
 
 The MillControl class contains methods to move the pipette and

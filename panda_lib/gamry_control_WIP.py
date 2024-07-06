@@ -24,7 +24,7 @@ else:
 
 # pylint: disable=global-statement, invalid-name, global-variable-undefined
 
-## set up logging to log to both the pump_control.log file and the ePANDA.log file
+## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
 # global variables

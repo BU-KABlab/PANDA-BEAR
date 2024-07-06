@@ -1,8 +1,8 @@
 """
-The main menue of ePANDA.
+The main menue of PANDA_SDL.
 
-Useful for one-off tasks that don't require the full ePANDA program to run.
-Or starting the ePANDA either with or without mock instruments.
+Useful for one-off tasks that don't require the full PANDA_SDL program to run.
+Or starting the PANDA_SDL either with or without mock instruments.
 """
 
 # pylint: disable=broad-exception-caught, protected-access
@@ -38,16 +38,16 @@ from panda_lib.sql_tools import (
 from panda_lib.analyzer.pedot import sql_ml_functions
 
 
-def run_epanda_with_ml():
-    """Runs ePANDA."""
-    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running ePANDA")
+def run_panda_sdl_with_ml():
+    """Runs PANDA_SDL and enables the ML analysis."""
+    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running PANDA_SDL")
     length = int(input("Enter the campaign length: ").strip().lower())
     controller.main(al_campaign_length=length)
 
 
-def run_epanda_without_ml():
-    """Runs ePANDA."""
-    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running ePANDA")
+def run_panda_sdl_without_ml():
+    """Runs PANDA_SDL."""
+    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running PANDA_SDL")
     one_off = input("Is this a one-off run? (y/n): ").strip().lower()
     if one_off[0] == "y":
         controller.main(one_off=True)
@@ -331,8 +331,8 @@ def clean_up_testing_experiments():
 
 def exit_program():
     """Exits the program."""
-    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting ePANDA")
-    print("Exiting ePANDA. Goodbye!")
+    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting PANDA_SDL")
+    print("Exiting PANDA_SDL. Goodbye!")
     sys.exit()
 
 
@@ -341,21 +341,21 @@ def refresh():
     Refreshes the main menue. Re-read the current wellplate info, and queue."""
 
 
-def stop_epanda():
-    """Stops the ePANDA loop."""
+def stop_panda_sdl():
+    """Stops the PANDA_SDL loop."""
     sql_system_state.set_system_status(
-        utilities.SystemState.SHUTDOWN, "stopping ePANDA"
+        utilities.SystemState.SHUTDOWN, "stopping PANDA_SDL"
     )
 
 
-def pause_epanda():
-    """Pauses the ePANDA loop."""
-    sql_system_state.set_system_status(utilities.SystemState.PAUSE, "stopping ePANDA")
+def pause_panda_sdl():
+    """Pauses the PANDA_SDL loop."""
+    sql_system_state.set_system_status(utilities.SystemState.PAUSE, "stopping PANDA_SDL")
 
 
-def resume_epanda():
-    """Resumes the ePANDA loop."""
-    sql_system_state.set_system_status(utilities.SystemState.RESUME, "stopping ePANDA")
+def resume_panda_sdl():
+    """Resumes the PANDA_SDL loop."""
+    sql_system_state.set_system_status(utilities.SystemState.RESUME, "stopping PANDA_SDL")
 
 
 def remove_training_data():
@@ -646,11 +646,11 @@ of promoting the sharing and reuse of software generally.
 
 
 menu_options = {
-    "0": run_epanda_with_ml,
-    "1": run_epanda_without_ml,
-    "1.1": stop_epanda,
-    "1.2": pause_epanda,
-    "1.3": resume_epanda,
+    "0": run_panda_sdl_with_ml,
+    "1": run_panda_sdl_without_ml,
+    "1.1": stop_panda_sdl,
+    "1.2": pause_panda_sdl,
+    "1.3": resume_panda_sdl,
     "2": change_wellplate,
     "2.1": remove_wellplate_from_database,
     "2.2": remove_experiment_from_database,
@@ -702,7 +702,7 @@ under certain conditions; choose `show_conditions' for details.
         print()
         print(print_panda.print_panda())
         print()
-        print("Welcome to ePANDA!")
+        print("Welcome to PANDA_SDL!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
         num, p_type, free_wells = wellplate.read_current_wellplate_info()
         print(
@@ -721,7 +721,7 @@ under certain conditions; choose `show_conditions' for details.
                 print("Invalid choice. Please try again.")
                 continue
         except controller.ShutDownCommand:
-            pass  # The epanda loop has been stopped but we don't want to exit the program
+            pass  # The PANDA_SDL loop has been stopped but we don't want to exit the program
 
         except controller.OCPFailure:
             slack = controller.SlackBot()
@@ -750,4 +750,4 @@ under certain conditions; choose `show_conditions' for details.
             print(f"An error occurred: {e}")
             break  # Exit the program if an unknown error occurs
 
-    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting ePANDA")
+    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting PANDA_SDL")

@@ -1,5 +1,5 @@
 """
-Methods and classses related to logging for the ePANDA project
+Methods and classses related to logging for the PANDA_SDL project
 """
 
 import logging
@@ -9,9 +9,9 @@ config = configparser.ConfigParser()
 config.read("panda_lib\\config\\panda_sdl_config.ini")
 
 if config.getboolean("OPTIONS", "testing"):
-    EPANDA_LOG = config.get("PATHS_TESTING", "logging_dir")
+    PANDA_SDL_LOG = config.get("PATHS_TESTING", "logging_dir")
 else:
-    EPANDA_LOG = config.get("PATHS_PRODUCTION", "logging_dir")
+    PANDA_SDL_LOG = config.get("PATHS_PRODUCTION", "logging_dir")
 
 
 def setup_default_logger(
@@ -37,7 +37,7 @@ def setup_default_logger(
         "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
     )
     # The file handler will write to the log file
-    file_handler = logging.FileHandler(EPANDA_LOG + log_file)
+    file_handler = logging.FileHandler(PANDA_SDL_LOG + log_file)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 

@@ -22,10 +22,10 @@ else:
 
 obs_config = config["OBS"]
 
-## set up logging to log to both the obs_control.log file and the ePANDA.log file
+## set up logging to log to both the obs_control.log file and the PANDA_SDL.log file
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(message)s")
 file_handler = logging.FileHandler(PATH_TO_LOGS / "obs_control.log")
-# system_handler = logging.FileHandler("ePANDA.log")
+# system_handler = logging.FileHandler("PANDA_SDL.log")
 file_handler.setFormatter(formatter)
 # system_handler.setFormatter(formatter)
 logger.addHandler(file_handler)

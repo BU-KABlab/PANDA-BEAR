@@ -1,4 +1,4 @@
-"""Custom functions for the epanda library which are specific to a particular experiment type."""
+"""Custom functions for the PANDA_SDL library which are specific to a particular experiment type."""
 
 from panda_lib.actions import (
     EchemExperimentBase,

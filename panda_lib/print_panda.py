@@ -33,7 +33,7 @@
     # return image
 
 def print_panda():
-    """Prints the ePANDA panda."""
+    """Prints the PANDA SDL panda."""
     image = r"""
                                                           @@@@@@@@@@@@@            
          @@@@@@                         @@@@@         @@@               @@@@        @@@@@@

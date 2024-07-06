@@ -87,24 +87,24 @@ def main(
         obs = MockOBSController()
     else:
         obs = OBSController()
-    ## Reset the logger to log to the ePANDA.log file and format
+    ## Reset the logger to log to the PANDA_SDL.log file and format
     actions.apply_log_filter()
     # print(printpanda())
-    print("Starting ePANDA...")
+    print("Starting PANDA_SDL...")
     slack.test = use_mock_instruments
-    slack.send_slack_message("alert", "ePANDA is starting up")
+    slack.send_slack_message("alert", "PANDA_SDL is starting up")
     toolkit = None
     al_campaign_iteration = 0
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
-        obs.place_text_on_screen("ePANDA is starting up")
+        obs.place_text_on_screen("PANDA_SDL is starting up")
         obs.start_recording()
         new_experiment = None
         # Connect to equipment
         toolkit = connect_to_instruments(use_mock_instruments)
         logger.info("Connected to instruments")
-        slack.send_slack_message("alert", "ePANDA has connected to equipment")
-        obs.place_text_on_screen("ePANDA has connected to equipment")
+        slack.send_slack_message("alert", "PANDA_SDL has connected to equipment")
+        obs.place_text_on_screen("PANDA_SDL has connected to equipment")
         ## Initialize scheduler
         scheduler = Scheduler()
 
@@ -119,25 +119,10 @@ def main(
                 mill=toolkit.mill,
                 pump=toolkit.pump,
             )
-        # Flush the pipette tip with water before we start
-        # obs.place_text_on_screen("Initial flushing of pipette tip")
-        # logger.info("Flushing pipette tip")
-        # actions.flush_v2(
-        #     stock_vials=stock_vials,
-        #     waste_vials=waste_vials,
-        #     flush_solution_name="rinse",
-        #     flush_volume=140,
-        #     pump=toolkit.pump,
-        #     mill=toolkit.mill,
-        # )
-        # ## Update the system state with new vial and wellplate information
-        # update_vial_state_files(
-        #     stock_vials, waste_vials, "STOCK_STATUS", "WASTE_STATUS"
-        # )
 
         # experiemnt loop
         while True:
-            ## Reset the logger to log to the ePANDA.log file and format
+            ## Reset the logger to log to the PANDA_SDL.log file and format
             obs.place_text_on_screen("")
             actions.apply_log_filter()
             sql_system_state.set_system_status(SystemState.BUSY)
@@ -285,13 +270,16 @@ def main(
                 waste_vials=waste_vials,
             )
 
+            # Analysis function call if experiment includes one
+            # TODO: Add analysis function call here
+
             ## Update the experiment status to complete
             # new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
 
             # Share any results images with the slack data channel
             share_to_slack(new_experiment)
 
-            ## Reset the logger to log to the ePANDA.log file and format after the experiment is complete
+            ## Reset the logger to log to the PANDA_SDL.log file and format after the experiment is complete
             actions.apply_log_filter()
 
             ## With returned experiment and results, update the experiment status and post the final status
@@ -301,24 +289,24 @@ def main(
 
             new_experiment.set_status_and_save(ExperimentStatus.SAVING)
             scheduler.save_results(new_experiment)
-            experiment_id = new_experiment.experiment_id
+            # experiment_id = new_experiment.experiment_id
 
-            if not TESTING:
-                # Analyze the experiment (will handle if in testing)
-                new_experiment.set_status_and_save(ExperimentStatus.ANALYZING)
-                pedot_analyzer(experiment_id)
+            # if not TESTING:
+            #     # Analyze the experiment (will handle if in testing)
+            #     new_experiment.set_status_and_save(ExperimentStatus.ANALYZING)
+            #     pedot_analyzer(experiment_id)
 
-                next_exp_id = None
-                # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-                if (
-                    al_campaign_length is not None
-                    and al_campaign_iteration < al_campaign_length
-                ):
-                    next_exp_id = pedot_ml_model()
-                    al_campaign_iteration += 1
+            #     next_exp_id = None
+            #     # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
+            #     if (
+            #         al_campaign_length is not None
+            #         and al_campaign_iteration < al_campaign_length
+            #     ):
+            #         next_exp_id = pedot_ml_model()
+            #         al_campaign_iteration += 1
 
                 # Share the analysis results with slack
-                share_analysis_to_slack(experiment_id, next_exp_id, slack)
+                # share_analysis_to_slack(experiment_id, next_exp_id, slack)
 
             new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
             ## Clean up
@@ -335,7 +323,7 @@ def main(
                 break  # break out of the while True loop
 
             if SystemState.SHUTDOWN in sql_system_state.select_system_status(2):
-                slack.send_slack_message("alert", "ePANDA is shutting down")
+                slack.send_slack_message("alert", "PANDA_SDL is shutting down")
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
@@ -354,7 +342,7 @@ def main(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
         # )
         logger.error(error)
-        slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
+        slack.send_slack_message("alert", f"PANDA_SDL encountered an error: {error}")
 
         slack.take_screenshot("alert", "webcam")
         slack.take_screenshot("alert", "vials")
@@ -370,7 +358,7 @@ def main(
             new_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.ERROR)
         logger.error(error)
-        slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
+        slack.send_slack_message("alert", f"PANDA_SDL encountered an error: {error}")
         raise error
     except ShutDownCommand as error:
         if new_experiment is not None:
@@ -379,7 +367,7 @@ def main(
         # scheduler.change_well_status(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
         # )
-        logger.info("User commanded shutting down of ePANDA")
+        logger.info("User commanded shutting down of PANDA_SDL")
         raise ShutDownCommand from error  # raise error to go to finally.
         # This was triggered by the user to indicate they want to stop the program
 
@@ -391,7 +379,7 @@ def main(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
         # )
         logger.info("Keyboard interrupt detected")
-        slack.send_slack_message("alert", "ePANDA was interrupted by the user")
+        slack.send_slack_message("alert", "PANDA_SDL was interrupted by the user")
         raise KeyboardInterrupt from exc  # raise error to go to finally. This was triggered by the user to indicate they want to stop the program
 
     except Exception as error:
@@ -404,7 +392,7 @@ def main(
 
         logger.error(error)
         logger.exception(error)
-        slack.send_slack_message("alert", f"ePANDA encountered an error: {error}")
+        slack.send_slack_message("alert", f"PANDA_SDL encountered an error: {error}")
         raise error  # raise error to go to finally. If we don't know what caused an error we don't want to continue
 
     finally:
@@ -425,8 +413,8 @@ def main(
         obs.place_text_on_screen("")
         obs.stop_recording()
         sql_system_state.set_system_status(SystemState.IDLE)
-        slack.send_slack_message("alert", "ePANDA is shutting down...goodbye")
-        print("ePANDA is shutting down...returning to main menu...goodbye")
+        slack.send_slack_message("alert", "PANDA_SDL is shutting down...goodbye")
+        print("PANDA_SDL is shutting down...returning to main menu...goodbye")
 
 
 def establish_system_state() -> (
@@ -582,7 +570,7 @@ def system_status_loop(slack: SlackBot):
             # if SystemState.IDLE in system_status:
             #     break
             if first_pause:
-                slack.send_slack_message("alert", "ePANDA is paused")
+                slack.send_slack_message("alert", "PANDA_SDL is paused")
                 first_pause = False
             for remaining in range(60, 0, -1):
                 sys.stdout.write("\r")
@@ -600,7 +588,7 @@ def system_status_loop(slack: SlackBot):
             elif SystemState.IDLE in system_status:
                 break
         elif SystemState.RESUME in system_status:
-            slack.send_slack_message("alert", "ePANDA is resuming")
+            slack.send_slack_message("alert", "PANDA_SDL is resuming")
             sql_system_state.set_system_status(SystemState.BUSY)
             break
         else:

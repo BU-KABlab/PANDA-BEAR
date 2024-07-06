@@ -89,20 +89,20 @@ def add_data_zone(
     # offset the segments to not touch the lines
     text_starts = [segment + 5 for segment in segment_starts]
 
-    # ePANDA logo
+    # PANDA_SDL logo
     try:
-        epanda_logo_x = text_starts[0]
+        panda_sdl_logo_x = text_starts[0]
         logo = Image.open("panda_lib/application photos/data_zone_logo.png")
         logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
-        banner.paste(logo, (epanda_logo_x, 0))
+        banner.paste(logo, (panda_sdl_logo_x, 0))
      # incase the file cannot be found
     except FileNotFoundError:
         # TODO: add logger to this module
         pass
-    # ePANDA version
+    # PANDA_SDL version
     version_x = text_starts[1]
     draw_banner.text(
-        (version_x, 0), "ePANDA PIN", font=font, fill="white", align="center"
+        (version_x, 0), "PANDA SDL PIN", font=font, fill="white", align="center"
     )
     draw_banner.text(
         (version_x, 30),
