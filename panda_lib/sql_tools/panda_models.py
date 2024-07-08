@@ -130,7 +130,20 @@ class MlPedotTrainingData(Base):
 
 
 class Pipette(Base):
-    """Pipette table model"""
+    """
+    Pipette table model
+
+    Attributes:
+        id (int): The pipette ID.
+        capacity_ul (float): The pipette capacity in microliters.
+        capacity_ml (float): The pipette capacity in milliliters.
+        volume_ul (float): The pipette volume in microliters.
+        volume_ml (float): The pipette volume in milliliters.
+        contents (str): The contents of the pipette.
+        updated (datetime): The last time the pipette was updated.
+        
+    
+    """
 
     __tablename__ = "pipette"
     id = Column(Integer, primary_key=True)
@@ -140,17 +153,11 @@ class Pipette(Base):
     volume_ml = Column(Float, nullable=False)
     contents = Column(String)
     updated = Column(DateTime, default=dt.now)
+    active = Column(Integer) # 0 = inactive, 1 = active
+    uses = Column(Integer, default = 0)
 
     def __repr__(self):
         return f"<Pipette(id={self.id}, capacity_ul={self.capacity_ul}, capacity_ml={self.capacity_ml}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, contents={self.contents}, updated={self.updated})>"
-
-    # @event.listens_for(Pipette, 'after_update')
-    # def log_pipette_update(mapper, connection, target):
-    #     # Create a new PipetteLog entry with the updated volume
-    #     pipette_log = PipetteLog(pipette_id=target.id, volume_ul=target.volume_ul, volume_ml=target.volume_ml)
-    #     connection.add(pipette_log)
-    #     connection.commit()
-
 
 class PipetteLog(Base):
     """PipetteLog table model"""
@@ -305,6 +312,14 @@ class WellPlates(Base):
     id = Column(Integer, primary_key=True)
     type_id = Column(Integer, ForeignKey("well_types.id"))
     current = Column(Boolean, default=False)
+    a1_x = Column(Float)
+    a1_y = Column(Float)
+    orientation = Column(Integer)
+    rows = Column(Integer)
+    columns = Column(String)
+    z_bottom = Column(Float)
+    z_top = Column(Float)
+    echem_height = Column(Float)
 
     def __repr__(self):
         return f"<WellPlates(id={self.id}, type_id={self.type_id}, current={self.current})>"
