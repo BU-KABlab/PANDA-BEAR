@@ -158,7 +158,7 @@ class SyringePump:
                     self.pipette.update_contents(solution.contents, volume_to_withdraw)
                 # Update the solution volume and contents
                 solution.update_volume(-volume_to_withdraw)
-                solution.update_contents(solution.contents, -volume_to_withdraw)
+                solution.update_contents(solution.contents, -volume_to_withdraw, save=True)
 
                 return None
         else:
@@ -255,7 +255,8 @@ class SyringePump:
             ):  # The we need to update the volume and contents of the vessel
 
                 infused_into.update_volume(volume_ul)
-                infused_into.update_contents(self.pipette.contents, volume_ul)
+                infused_into.update_contents(self.pipette.contents, volume_ul, save=True)
+                infused_into.save_to_db()
 
                 # Update the pipette contents
                 content_ratio = {
