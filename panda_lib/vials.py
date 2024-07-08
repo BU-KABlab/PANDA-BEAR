@@ -8,6 +8,7 @@ import logging
 import math
 
 # from pathlib import Path
+from dataclasses import asdict
 from typing import Sequence, Union, List, Tuple
 
 from .sql_tools.sql_utilities import execute_sql_command
@@ -164,7 +165,7 @@ class Vial2(Vessel):
         else:
             return True
 
-    def update_volume(self, added_volume: float) -> None:
+    def update_volume(self, added_volume: float, save:bool = False) -> None:
         """
         Updates the volume of the vial by adding the specified volume.
 
@@ -175,15 +176,9 @@ class Vial2(Vessel):
         self.depth = self.calculate_depth()
         self.update_contamination()
         # self.write_volume_to_disk()
-        self.insert_updated_vial_in_db()
+        if save:
+            self.insert_updated_vial_in_db()
         return self
-
-    def write_volume_to_disk(self) -> None:
-        """
-        Writes the current volume and contamination of the vial to the appropriate file.
-        """
-    
-        self.insert_updated_vial_in_db()
 
     def insert_updated_vial_in_db(self) -> None:
         """
@@ -233,7 +228,7 @@ class Vial2(Vessel):
                     self.volume,
                     self.capacity,
                     self.density,
-                    str(self.coordinates.standard_dict()),
+                    str(asdict(self.coordinates)),
                     self.radius,
                     self.height,
                     self.contamination,
@@ -357,15 +352,10 @@ class StockVial(Vial2):
         )
         self.category = 0
 
-    def update_contents(self, from_vessel: str, volume: float) -> None:
+    def update_contents(self, from_vessel: str, volume: float, save:bool = False) -> None:
         "Stock vial contents don't change"
         self.log_contents()
         return self
-
-    def get_contents(self) -> dict:
-        """Return the contents of the stock vial as a dictionary"""
-        return {self.name: self.volume}
-
 
 class WasteVial(Vial2):
     """
@@ -433,7 +423,7 @@ class WasteVial(Vial2):
         )
         self.category = category
 
-    def update_contents(self, from_vessel: Union[str, dict], volume: float) -> None:
+    def update_contents(self, from_vessel: Union[str, dict], volume: float, save:bool = False) -> None:
         """Update the contentes of the waste vial"""
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
         # Ensure self.contents is a dictionary
@@ -466,7 +456,8 @@ class WasteVial(Vial2):
         )
 
         # Update the file
-        self.insert_updated_vial_in_db()
+        if save:
+            self.insert_updated_vial_in_db()
         self.log_contents()
 
         return self
