@@ -527,6 +527,27 @@ def update_well(well_to_update: object) -> None:
     )
     return sql_utilities.execute_sql_command_no_return(statement, values)
 
+def delete_well_from_db(well_id: str, plate_id: int = None) -> None:
+    """
+    Delete a well from the well_hx table.
+
+    Args:
+        well_id (str): The well ID.
+        plate_id (int): The plate ID.
+    """
+    if plate_id is None:
+        plate_id = sql_utilities.execute_sql_command(
+            "SELECT id FROM wellplates WHERE current = 1"
+        )[0][0]
+
+    sql_utilities.execute_sql_command_no_return(
+        """
+        DELETE FROM well_hx
+        WHERE well_id = ?
+        AND plate_id = ?
+        """,
+        (well_id, plate_id),
+    )
 
 def get_well(
     well_id: str,
