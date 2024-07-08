@@ -10,6 +10,7 @@ import math
 import os
 
 # pylint: disable=line-too-long
+from dataclasses import dataclass, field
 from typing import Optional, Tuple, Union
 
 from panda_lib import experiment_class
@@ -25,6 +26,7 @@ MILL_CONFIG = "panda_lib/config/mill_config.json"
 WELLPLATE_LOCATION = "panda_lib/config/wellplate_location.json" #TODO use wellpalte table going forward
 
 
+@dataclass
 class WellCoordinates:
     """
     Represents the coordinates of a well.
@@ -36,27 +38,14 @@ class WellCoordinates:
         z_top (Union[int, float]): The z-coordinate of top the well.
         z_bottom (Union[int, float]): The z-coordinate of the bottom of the well.
     """
+    x: Union[int, float]
+    y: Union[int, float]
+    z_top: Union[int, float] = 0
+    z_bottom: Optional[Union[int, float]] = field(default=None)
 
-    def __init__(
-        self,
-        x: Union[int, float],
-        y: Union[int, float],
-        z_top: Union[int, float] = 0,
-        z_bottom: Optional[Union[int, float]] = None,
-    ) -> None:
-        """Initializes a new instance of the Coordinates class."""
-        self.x = x
-        self.y = y
-        self.z_top = z_top
-        self.z_bottom = z_bottom if z_bottom is not None else 0
-
-    def __str__(self) -> str:
-        """Returns a string representation of the coordinates."""
-        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}, "z_bottom"={self.z_bottom}'
-
-    def __repr__(self) -> str:
-        """Returns a string representation of the coordinates."""
-        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}, "z_bottom"={self.z_bottom}'
+    def __post_init__(self):
+        if self.z_bottom is None:
+            self.z_bottom = 0
 
     def to_dict(self) -> dict:
         """Returns a dictionary representation of the coordinates."""
@@ -64,37 +53,8 @@ class WellCoordinates:
             "x": self.x,
             "y": self.y,
             "z_top": self.z_top,
-            "z_bottom": self.z_bottom if self.z_bottom is not None else None,
+            "z_bottom": self.z_bottom,
         }
-
-    def __getitem__(self, key: str) -> Union[int, float]:
-        """Returns the value of the specified key."""
-        return getattr(self, key)
-
-    def __setitem__(self, key: str, value: Union[int, float]) -> None:
-        """Sets the value of the specified key."""
-        setattr(self, key, value)
-
-    def __iter__(self):
-        return iter([self.x, self.y, self.z_top, self.z_bottom])
-
-    def __len__(self):
-        return 4
-
-    def __eq__(self, other: "WellCoordinates") -> bool:
-        """Returns True if the coordinates are equal, False otherwise."""
-        return all(
-            [
-                self.x == other.x,
-                self.y == other.y,
-                self.z_top == other.z_top,
-                self.z_bottom == other.z_bottom,
-            ]
-        )
-
-    def __ne__(self, other: "WellCoordinates") -> bool:
-        """Returns True if the coordinates are not equal, False otherwise."""
-        return not self.__eq__(other)
 
     def to_json_string(self) -> str:
         """Returns a JSON string representation of the coordinates."""
