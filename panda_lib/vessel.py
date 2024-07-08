@@ -1,7 +1,7 @@
 """
 Vessel module.
 """
-
+from dataclasses import dataclass
 from typing import Union, Optional
 from panda_lib.errors import OverFillException, OverDraftException
 from panda_lib.log_tools import setup_default_logger
@@ -22,6 +22,7 @@ class VesselLogger:
 # Create an instance of the logger for the vessel module
 logger = VesselLogger("vessel").logger
 
+@dataclass
 class VesselCoordinates:
     """
     Represents the coordinates of a vessel.
@@ -34,76 +35,19 @@ class VesselCoordinates:
         z_bottom (Union[int, float, float], optional): The z-coordinate of the bottom of the vessel.
     """
 
-    def __init__(
-        self,
-        x: Union[int, float],
-        y: Union[int, float],
-        z_top: Union[int, float] = 0,
-        z_bottom: Optional[Union[int, float]] = None,
-    ) -> None:
-        """Initializes a new instance of the Coordinates class."""
-        self.x = float(x)
-        self.y = float(y)
-        self.z_top = float(z_top)
-        self.z_bottom = float(z_bottom) if z_bottom is not None else 0
+    x: Union[int, float]
+    y: Union[int, float]
+    z_top: Union[int, float] = 0
+    z_bottom: Optional[Union[int, float]] = None
 
-    def __str__(self) -> str:
-        """Returns a string representation of the coordinates."""
-        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}, "z_bottom"={self.z_bottom}'
-
-    def __repr__(self) -> str:
-        """Returns a string representation of the coordinates."""
-        return f'"x"={self.x}, "y"={self.y}, "z_top"={self.z_top}, "z_bottom"={self.z_bottom}'
-
-    def __dict__(self) -> dict:
-        """Returns a dictionary representation of the coordinates."""
-        return {
-            "x": self.x,
-            "y": self.y,
-            "z_top": self.z_top,
-            "z_bottom": self.z_bottom,
-        }
-
-    def standard_dict(self) -> dict:
-        """Returns a dictionary representation of the coordinates with only integers and floats."""
-        return {
-            "x": round(self.x, 6),
-            "y": round(self.y, 6),
-            "z_top": round(self.z_top, 6),
-            "z_bottom": round(self.z_bottom, 6),
-        }
-
-    def to_dict(self) -> dict:
-        return self.standard_dict()
-
-    def __getitem__(self, key: str) -> Union[int, float]:
-        """Returns the value of the specified key."""
-        return getattr(self, key)
-
-    def __setitem__(self, key: str, value: Union[int, float]) -> None:
-        """Sets the value of the specified key."""
-        setattr(self, key, value)
-
-    def __iter__(self):
-        return iter([self.x, self.y, self.z_top, self.z_bottom])
-
-    def __len__(self):
-        return 4
-
-    def __eq__(self, other: "VesselCoordinates") -> bool:
-        """Returns True if the coordinates are equal, False otherwise."""
-        return all(
-            [
-                self.x == other.x,
-                self.y == other.y,
-                self.z_top == other.z_top,
-                self.z_bottom == other.z_bottom,
-            ]
-        )
-
-    def __ne__(self, other: "VesselCoordinates") -> bool:
-        """Returns True if the coordinates are not equal, False otherwise."""
-        return not self.__eq__(other)
+    def __post_init__(self):
+        if self.z_bottom is None:
+            self.z_bottom = 0
+        
+        self.x = round(self.x, 6)
+        self.y = round(self.y, 6)
+        self.z_top = round(self.z_top, 6)
+        self.z_bottom = round(self.z_bottom, 6)
 
 
 class Vessel:
@@ -237,7 +181,7 @@ class Vessel:
         # the different ways they save to the db
         pass
 
-    def update_contents(self, from_vessel: str, volume: float) -> None:
+    def update_contents(self, from_vessel: str, volume: float, save:bool = False) -> None:
         """
         Updates the contents of the vessel.
 
@@ -248,16 +192,6 @@ class Vessel:
         """
         # Different vessels will have different implementations of this method
         pass
-
-    def get_contents(self) -> dict:
-        """
-        Returns the contents of the vessel.
-
-        Returns:
-        --------
-        dict: The contents of the vessel.
-        """
-        return self.contents
 
     def log_contents(self) -> None:
         """Logs the contents of the vessel."""
