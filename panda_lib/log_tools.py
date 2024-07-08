@@ -37,7 +37,7 @@ def setup_default_logger(
         "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
     )
     # The file handler will write to the log file
-    file_handler = logging.FileHandler(PANDA_SDL_LOG + log_file)
+    file_handler = logging.FileHandler(PANDA_SDL_LOG + "/" + log_file)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
