@@ -23,6 +23,82 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
     return result != []
 
 
+def select_wellplate_location(plate_id: int = None) -> str:
+    """Select the location and characteristics of the wellplate from the wellplate
+     table. If no plate_id is given, the current wellplate is assumed
+
+    Args:
+        plate_id (int): The plate ID.
+
+    Returns:
+        x (float): The x coordinate of A1.
+        y (float): The y coordinate of A1.
+        z_bottom (float): The z coordinate of the bottom of the wellplate.
+        orientation (int): The orientation of the wellplate.
+        rows (int): The number of rows in the wellplate.
+        cols (str): The column names of the wellplate.
+        echem_height(float): The height of performing electrochemistry in a well.
+
+    """
+
+    if plate_id is None:
+        plate_id = sql_utilities.execute_sql_command(
+            "SELECT id FROM wellplates WHERE current = 1"
+        )[0][0]
+
+    result = sql_utilities.execute_sql_command(
+        """
+        SELECT 
+            a1_x, 
+            a1_y, 
+            z-bottom,
+            z-top
+            orientation, 
+            rows, 
+            cols, 
+            echem_height
+        FROM wellplates
+        WHERE id = ?
+        """,
+        (plate_id,),
+    )
+    if result == []:
+        return None
+
+    # Validate the types of the results
+    x = float(result[0][0])
+    y = float(result[0][1])
+    z_bottom = float(result[0][2])
+    z_top = float(result[0][3])
+    orientation = int(result[0][4])
+    rows = int(result[0][5])
+    cols = result[0][6]
+    echem_height = float(result[0][7])
+    return x, y, z_bottom,z_top, orientation, rows, cols, echem_height
+
+
+def update_wellplate_location(
+    plate_id: int,
+    x: float,
+    y: float,
+    z_bottom: float,
+    z_top: float,
+    orientation: int,
+    rows: int,
+    cols: str,
+    echem_height: float,
+) -> None:
+    """Update the location and characteristics of the wellplate in the wellplates table"""
+    sql_utilities.execute_sql_command_no_return(
+        """
+        UPDATE wellplates
+        SET a1_x = ?, a1_y = ?, z_bottom = ?, z_top = ?, orientation = ?, rows = ?, cols = ?, echem_height = ?
+        WHERE id = ?
+        """,
+        (x, y, z_bottom, z_top, orientation, rows, cols, echem_height, plate_id),
+    )
+
+
 def update_current_wellplate(new_plate_id: int) -> None:
     """Changes the current wellplate's current value to 0 and sets the new
     wellplate's current value to 1"""
@@ -224,7 +300,7 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
     wells = []
     for row in result:
         try:
-            incoming_contents = (json.loads(row[5]))
+            incoming_contents = json.loads(row[5])
         except json.JSONDecodeError:
             incoming_contents = {}
         except TypeError:
@@ -235,7 +311,6 @@ def select_wellplate_wells(plate_id: int = None) -> List[object]:
             # incoming_coordinates = wellplate.WellCoordinates(**incoming_coordinates)
         except json.JSONDecodeError:
             incoming_coordinates = (0, 0)
-
 
         # Convert NULL or blank cells to 0 for integer fields
         well_type_number = int(row[1]) if row[1] else 0
@@ -527,6 +602,7 @@ def update_well(well_to_update: object) -> None:
     )
     return sql_utilities.execute_sql_command_no_return(statement, values)
 
+
 def delete_well_from_db(well_id: str, plate_id: int = None) -> None:
     """
     Delete a well from the well_hx table.
@@ -548,6 +624,7 @@ def delete_well_from_db(well_id: str, plate_id: int = None) -> None:
         """,
         (well_id, plate_id),
     )
+
 
 def get_well(
     well_id: str,
@@ -670,9 +747,7 @@ def select_well_characteristics(type_id: int) -> tuple[int, int, int, int, str]:
     )[0]
 
 
-def update_well_coordinates(
-    well_id: str, plate_id: int, coordinates: object
-) -> None:
+def update_well_coordinates(well_id: str, plate_id: int, coordinates: object) -> None:
     """
     Update the coordinates of a well in the well_hx table.
 

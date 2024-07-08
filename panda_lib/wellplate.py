@@ -309,11 +309,12 @@ class Wellplate:
             self.a1_x,
             self.a1_y,
             self.z_bottom,
+            self.z_top,
             self.orientation,
             self.rows,
             self.columns,
             self.echem_height,
-        ) = self.load_wellplate_location()  # from the json file
+        ) = self.load_wellplate_location()
         self.a1_coordinates = {
             "x": self.a1_x,
             "y": self.a1_y,
@@ -340,6 +341,7 @@ class Wellplate:
             self.a1_x,
             self.a1_y,
             self.z_bottom,
+            self.z_top,
             self.orientation,
             self.rows,
             self.columns,
@@ -563,23 +565,23 @@ class Wellplate:
     def load_wellplate_location(
         self,
     ) -> tuple[float, int, int, str, float]:
-        """Load the location of the well plate from the well_location json file"""
+        """Load the location of the well plate from the wellplates table  file"""
 
-        # check if it exists
-        if not os.path.exists(WELLPLATE_LOCATION):
-            logger.warning(
-                "Well location file not found at %s. Returning defaults",
-                WELLPLATE_LOCATION,
-            )
-            return (
-                self.a1_x,
-                self.a1_y,
-                self.z_bottom,
-                self.orientation,
-                self.rows,
-                self.columns,
-                self.echem_height,
-            )
+        # # check if it exists
+        # if not os.path.exists(WELLPLATE_LOCATION):
+        #     logger.warning(
+        #         "Well location file not found at %s. Returning defaults",
+        #         WELLPLATE_LOCATION,
+        #     )
+        #     return (
+        #         self.a1_x,
+        #         self.a1_y,
+        #         self.z_bottom,
+        #         self.orientation,
+        #         self.rows,
+        #         self.columns,
+        #         self.echem_height,
+        #     )
         # Looks like this:
         # {
         # "x": -233,
@@ -589,17 +591,20 @@ class Wellplate:
         # "cols": "ABCDEFGH",
         # "z-bottom": -77
         # }
-        with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as f:
-            data = json.load(f)
-            x = float(data["x"])
-            y = float(data["y"])
-            z_bottom = float(data["z-bottom"])
-            orientation = data["orientation"]
-            rows = data["rows"]
-            cols = data["cols"]
-            echem_height = float(data["echem_height"])
+        # with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as f:
+        #     data = json.load(f)
+        #     x = float(data["x"])
+        #     y = float(data["y"])
+        #     z_bottom = float(data["z-bottom"])
+        #     orientation = data["orientation"]
+        #     rows = data["rows"]
+        #     cols = data["cols"]
+        #     echem_height = float(data["echem_height"])
 
-        return (x, y, z_bottom, orientation, rows, cols, echem_height)
+
+        return sql_wellplate.select_wellplate_location()
+
+        # return (x, y, z_bottom, orientation, rows, cols, echem_height)
 
     def reload_wellplate_location(self) -> None:
         """Reload the well plate location from the well_location json file"""
@@ -607,6 +612,7 @@ class Wellplate:
             self.a1_x,
             self.a1_y,
             self.z_bottom,
+            self.z_top,
             self.orientation,
             self.rows,
             self.columns,
@@ -621,18 +627,30 @@ class Wellplate:
 
     def write_wellplate_location(self) -> None:
         """Write the location of the well plate to the well_location json file"""
-        data_to_write = {
-            "x": float(self.a1_x),
-            "y": float(self.a1_y),
-            "orientation": int(self.orientation),
-            "rows": self.rows,
-            "cols": self.columns,
-            "z-bottom": float(self.z_bottom),
-            "z-top": float(self.z_top),
-            "echem_height": float(self.echem_height),
-        }
-        with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
-            json.dump(data_to_write, f, indent=4)
+        # data_to_write = {
+        #     "x": float(self.a1_x),
+        #     "y": float(self.a1_y),
+        #     "orientation": int(self.orientation),
+        #     "rows": self.rows,
+        #     "cols": self.columns,
+        #     "z-bottom": float(self.z_bottom),
+        #     "z-top": float(self.z_top),
+        #     "echem_height": float(self.echem_height),
+        # }
+        # with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
+        #     json.dump(data_to_write, f, indent=4)
+
+        sql_wellplate.update_wellplate_location(
+            self.plate_id,
+            self.a1_x,
+            self.a1_y,
+            self.z_bottom,
+            self.z_top,
+            self.orientation,
+            self.rows,
+            self.columns,
+            self.echem_height,
+        )
         logger.debug("Well plate location written to file")
 
         self.reload_wellplate_location()
