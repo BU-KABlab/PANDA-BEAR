@@ -1,74 +1,203 @@
-from panda_lib.sql_tools.sql_utilities import (
-    execute_sql_command,
-    execute_sql_command_no_return,
-)
+# from panda_lib.sql_tools.sql_utilities import (
+#     execute_sql_command,
+#     execute_sql_command_no_return,
+# )
 
-# region Pipette
+# # region Pipette
 
 
-def select_pipette_status():
+# def select_pipette_status():
+#     """
+#     Get the pipette status from the pipette_status table.
+
+#     And return a pipette instance to be applied to the pipette that
+#     is in memory.
+
+#     Returns:
+#         Pipette: The current pipette status.
+
+#     """
+#     result = execute_sql_command(
+#         """
+#         SELECT
+#         ROUND(capacity_ul, 6) AS capacity_ul,
+#         ROUND(capacity_ml, 6) AS capacity_ml,
+#         ROUND(volume_ul, 6) AS volume_ul,
+#         ROUND(volume_ml, 6) AS volume_ml,
+#         contents
+
+#         FROM pipette_status
+#         ORDER BY updated DESC
+#         LIMIT 1
+#         """
+#     )
+#     if result == []:
+#         return None
+
+#     return result[0]
+
+
+# def insert_pipette_status(
+#     capacity_ul: float,
+#     capacity_ml: float,
+#     volume: float,
+#     volume_ml: float,
+#     contents: str,
+# ):
+#     """
+#     Insert the pipette status into the pipette_status table.
+
+#     Args:
+#         pipette (Pipette): The pipette status to insert.
+#     """
+#     execute_sql_command_no_return(
+#         """
+#         INSERT INTO pipette (
+#             capacity_ul,
+#             capacity_ml,
+#             volume_ul,
+#             volume_ml,
+#             contents
+#             )
+#         VALUES (?, ?, ?, ?, ?)
+#         """,
+#         (
+#             round(capacity_ul, 6),
+#             round(capacity_ml, 6),
+#             round(volume, 6),
+#             round(volume_ml, 6),
+#             contents,
+#         ),
+#     )
+
+
+# # endregion
+
+
+from configparser import ConfigParser
+from panda_lib.sql_tools.panda_models import (
+    Pipette,
+)  # Ensure you import your Base and Pipette model
+from panda_lib.sql_tools.db_setup import SessionLocal
+
+config = ConfigParser()
+config.read("panda_lib/config/panda_sdl_config.ini")
+precision = config.getint("OPTIONS", "precision")
+
+def select_pipette_status(pipette_id: int = None):
     """
     Get the pipette status from the pipette_status table.
-
     And return a pipette instance to be applied to the pipette that
     is in memory.
-
     Returns:
         Pipette: The current pipette status.
-
     """
-    result = execute_sql_command(
-        """
-        SELECT 
-        ROUND(capacity_ul, 6) AS capacity_ul,
-        ROUND(capacity_ml, 6) AS capacity_ml,
-        ROUND(volume_ul, 6) AS volume_ul,
-        ROUND(volume_ml, 6) AS volume_ml,
-        contents   
- 
-        FROM pipette_status
-        ORDER BY updated DESC
-        LIMIT 1
-        """
-    )
-    if result == []:
-        return None
+    with SessionLocal() as session:
+        if pipette_id is None:
+            pipette_status = session.query(Pipette).filter(Pipette.active == 1).order_by(Pipette.updated.desc()).first()
+        else:
+            pipette_status = session.query(Pipette).filter(Pipette.id == pipette_id).first()
+        session.close()
+    return pipette_status
 
-    return result[0]
-
-
-def insert_pipette_status(
+def update_pipette_status(
     capacity_ul: float,
     capacity_ml: float,
-    volume: float,
+    volume_ul: float,
     volume_ml: float,
     contents: str,
+    pipette_id: int,
 ):
     """
-    Insert the pipette status into the pipette_status table.
+    Update the pipette status of the pipette with the matching id in the pipette_status table.
+    If the pipette with the given id is not found, insert a new pipette.
+    Args:
+        capacity_ul (float): Capacity in microliters.
+        capacity_ml (float): Capacity in milliliters.
+        volume_ul (float): Volume in microliters.
+        volume_ml (float): Volume in milliliters.
+        contents (str): Contents of the pipette.
+        pipette_id (int): ID of the pipette to update or insert.
+    """
+    with SessionLocal() as session:
+        pipette_status = session.query(Pipette).filter(Pipette.id == pipette_id).first()
+        if pipette_status is None:
+            new_pipette_status = Pipette(
+                capacity_ul=round(capacity_ul, precision),
+                capacity_ml=round(capacity_ml, precision),
+                volume_ul=round(volume_ul, precision),
+                volume_ml=round(volume_ml, precision),
+                contents=contents,
+                id=pipette_id,
+            )
+            session.add(new_pipette_status)
+        else:
+            pipette_status.capacity_ul = round(capacity_ul, precision)
+            pipette_status.capacity_ml = round(capacity_ml, precision)
+            pipette_status.volume_ul = round(volume_ul, precision)
+            pipette_status.volume_ml = round(volume_ml, precision)
+            pipette_status.contents = contents
+        session.commit()
+        session.close()
+
+
+def select_current_pipette_id():
+    """
+    Get the pipette status from the pipette_status table.
+    And return a pipette instance to be applied to the pipette that
+    is in memory.
+    Returns:
+        Pipette: The current pipette status.
+    """
+    with SessionLocal() as session:
+        pipette_status = session.query(Pipette).order_by(Pipette.updated.desc()).first()
+        session.close()
+    return pipette_status.id
+
+def insert_new_pipette(pipette_id:int= None, capacity: float = 200):
+    """
+    Insert a new pipette with the given id into the pipette_status table.
+    If no pipette ID is given, a new ID is generated by incrementing from the highest ID.
+    If no capacity is given, a capacity of 200 ul is assumed.
 
     Args:
-        pipette (Pipette): The pipette status to insert.
+        pipette_id (int): ID of the new pipette.
+        capacity (float): Capacity of the new pipette.
+    
     """
-    execute_sql_command_no_return(
-        """
-        INSERT INTO pipette (
-            capacity_ul,
-            capacity_ml,
-            volume_ul,
-            volume_ml,
-            contents
-            )
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (
-            round(capacity_ul, 6),
-            round(capacity_ml, 6),
-            round(volume, 6),
-            round(volume_ml, 6),
-            contents,
-        ),
-    )
+    with SessionLocal() as session:
+        if pipette_id is None:
+            pipette_id = session.query(Pipette).order_by(Pipette.id.desc()).first().id + 1
 
+        # Check if the id already exists
+        if session.query(Pipette).filter(Pipette.id == pipette_id).first() is not None:
+            print(f"Pipette with ID {pipette_id} already exists.")
+            return pipette_id
 
-# endregion
+        new_pipette = Pipette(
+            capacity_ul=round(capacity, precision),
+            capacity_ml=round(capacity / 1000, precision),
+            volume_ul=0,
+            volume_ml=0,
+            contents="{}",
+            id=pipette_id,
+        )
+        session.add(new_pipette)
+        session.commit()
+        session.close()
+
+    return pipette_id
+
+def activate_pipette(pipette_id: int):
+    """
+    Activate the pipette with the given id in the pipette_status table by
+    deactivating all other pipettes and activating the pipette with the given id.
+
+    Args:
+        pipette_id (int): ID of the pipette to activate.
+    """
+    with SessionLocal() as session:
+        session.query(Pipette).update({Pipette.active: 0})
+        session.query(Pipette).filter(Pipette.id == pipette_id).update({Pipette.active: 1})
+        session.commit()
+        session.close()
