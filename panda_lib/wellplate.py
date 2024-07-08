@@ -10,7 +10,7 @@ import math
 import os
 
 # pylint: disable=line-too-long
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Optional, Tuple, Union
 
 from panda_lib import experiment_class
@@ -47,18 +47,9 @@ class WellCoordinates:
         if self.z_bottom is None:
             self.z_bottom = 0
 
-    def to_dict(self) -> dict:
-        """Returns a dictionary representation of the coordinates."""
-        return {
-            "x": self.x,
-            "y": self.y,
-            "z_top": self.z_top,
-            "z_bottom": self.z_bottom,
-        }
-
     def to_json_string(self) -> str:
         """Returns a JSON string representation of the coordinates."""
-        return json.dumps(self.to_dict())
+        return json.dumps(asdict(self))
 
 
 class WellCoordinatesEncoder(json.JSONEncoder):
@@ -67,7 +58,7 @@ class WellCoordinatesEncoder(json.JSONEncoder):
     def default(self, o) -> dict:
         """Returns a dictionary representation of the WellCoordinates object."""
         if isinstance(o, WellCoordinates):
-            return o.to_dict()
+            return asdict(o)
         return super().default(o)
 
     def encode(self, o) -> str:
@@ -174,11 +165,7 @@ class Well(Vessel):
         """Returns a string representation of the well."""
         return f"Well({self.well_id}, {self.status}, {self.status_date}, {self.contents}, {self.experiment_id}, {self.project_id}, {str(self.volume)}, {self.coordinates})"
 
-    def get_contents(self) -> dict:
-        """Returns the contents of the well."""
-        return self.contents
-
-    def update_contents(self, from_vessel: dict, volume: float) -> None:
+    def update_contents(self, from_vessel: dict, volume: float, save:bool = False) -> None:
         """Updates the contents of the well in the well_status.json file."""
 
         # If we are removing a volume from a well we assume that the contents are equally mixed
@@ -193,11 +180,11 @@ class Well(Vessel):
 
             try:
                 current_content_ratios: float = {
-                    key: float(value) / float(sum(self.get_contents().values()))
-                    for key, value in self.get_contents().items()
+                    key: float(value) / float(sum(self.contents.values()))
+                    for key, value in self.contents.items()
                 }
 
-                for key, value in self.get_contents().items():
+                for key, value in self.contents.items():
                     self.contents[key] = value + round(
                         (volume * current_content_ratios[key]), 6
                     )
@@ -221,7 +208,8 @@ class Well(Vessel):
                     self.contents[key] = from_vessel[key]
                     logger.debug("New %s contents: %s", self.name, self.contents)
         # Update the well in the db and log its new contents
-        self.save_to_db()
+        if save:
+            self.save_to_db()
         self.log_contents()
 
     def update_status(self, new_status: str) -> None:
@@ -246,6 +234,11 @@ class Well(Vessel):
         sql_wellplate.update_well_coordinates(
             self.well_id, self.plate_id, new_coordinates
         )
+
+    def delete_well_from_db(self) -> None:
+        """Deletes the well from the database"""
+        sql_wellplate.delete_well_from_db(self.well_id, self.plate_id)
+        logger.info("Well %s deleted from the database", self.name)
 
 
 class Wellplate:
