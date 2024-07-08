@@ -11,9 +11,9 @@ logger = logging.getLogger("e_panda")
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
 if config.getboolean("OPTIONS", "testing"):
-    PATH_TO_DATA = pathlib.Path(config.get("PATHS_TESTING", "data_dir"))
+    PATH_TO_DATA = pathlib.Path(config.get("TESTING", "data_dir"))
 else:
-    PATH_TO_DATA = pathlib.Path(config.get("PATHS_PRODUCTION", "data_dir"))
+    PATH_TO_DATA = pathlib.Path(config.get("PRODUCTION", "data_dir"))
 
 class GamryPotentiostat:
     def __init__(self):

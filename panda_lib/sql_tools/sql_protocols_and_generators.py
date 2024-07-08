@@ -6,9 +6,9 @@ from configparser import ConfigParser
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
 if config.getboolean("OPTIONS", "TESTING"):
-    sql_db_path = config.get("PATHS_TESTING", "testing_db_address")
+    sql_db_path = config.get("TESTING", "testing_db_address")
 else:
-    sql_db_path = config.get("PATHS_PRODUCTION", "production_db_address")
+    sql_db_path = config.get("PRODUCTION", "production_db_address")
 
 SQL_DB_PATH = sql_db_path
 
@@ -168,7 +168,7 @@ def read_in_generators():
     #     ) from e
 
     # Get the generators folder from the config.ini file
-    generators = config.get("PATHS_GENERAL", "generators_dir")
+    generators = config.get("GENERAL", "generators_dir")
 
 
     # Get all files in the generators folder

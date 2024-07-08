@@ -13,12 +13,12 @@ from configparser import ConfigParser
 # Read the config file
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
-PYTHON_360_PATH = config.get("PATHS_GENERAL", "python_360_path")
+PYTHON_360_PATH = config.get("GENERAL", "python_360_path")
 CAMERA_SCRIPT_PATH = "panda_lib/flir_camera/camera.py"
 if config.getboolean("OPTIONS", "testing"):
-    PATH_TO_DATA = Path(config.get("PATHS_TESTING", "data_dir"))
+    PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
 else:
-    PATH_TO_DATA = Path(config.get("PATHS_PRODUCTION", "data_dir"))
+    PATH_TO_DATA = Path(config.get("PRODUCTION", "data_dir"))
 
 
 def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.tiff")) -> None:

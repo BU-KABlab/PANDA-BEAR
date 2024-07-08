@@ -29,11 +29,11 @@ from panda_lib.wellplate import Well, Wellplate
 config = ConfigParser()
 config.read("config/panda_sdl_config.ini")
 if config.getboolean("OPTIONS", "testing"):
-    PATH_TO_DATA = config.get("PATHS_TESTING", "data_dir")
-    PATH_TO_LOGS = config.get("PATHS_TESTING", "logging_dir")
+    PATH_TO_DATA = config.get("TESTING", "data_dir")
+    PATH_TO_LOGS = config.get("TESTING", "logging_dir")
 else:
-    PATH_TO_DATA = config.get("PATHS_PRODUCTION", "data_dir")
-    PATH_TO_LOGS = config.get("PATHS_PRODUCTION", "logging_dir")
+    PATH_TO_DATA = config.get("PRODUCTION", "data_dir")
+    PATH_TO_LOGS = config.get("PRODUCTION", "logging_dir")
 
 
 def wellplate_scan(mill_arg: Mill = None, capture_images=False):

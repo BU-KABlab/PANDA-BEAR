@@ -27,7 +27,7 @@ LOCAL_REPO_PATH = Path(__file__).parents[2]
 ## Flag to use only local paths - can be changed while running the program
 TESTING_MODE_ACTIVE = config.getboolean("OPTIONS", "testing")
 try:
-    TESTING_DIRECTORY = config.get("PATHS_TESTING","testing_dir")
+    TESTING_DIRECTORY = config.get("TESTING","testing_dir")
 
     if TESTING_DIRECTORY in [None, "",'None']:
         raise KeyError
@@ -40,7 +40,7 @@ except KeyError:
 
 if not TESTING_MODE_ACTIVE:
     try:
-        PRODUCTION_DIRECTORY = config.get("PATHS_PRODUCTION","production_dir")
+        PRODUCTION_DIRECTORY = config.get("PRODUCTION","production_dir")
 
         if PRODUCTION_DIRECTORY in [None, "",'None']:
             raise KeyError
@@ -57,7 +57,7 @@ if not TESTING_MODE_ACTIVE:
 
 ## FLIR Camera related - must be a python 3.6 environment
 try:
-    PYTHON_360_PATH = config.get("PATHS_GENERAL", "python_360_path")
+    PYTHON_360_PATH = config.get("GENERAL", "python_360_path")
 
     if PYTHON_360_PATH in [None, "",'None']:
         raise KeyError
@@ -74,7 +74,7 @@ if TESTING_MODE_ACTIVE:
 
     # DB
     try:
-        SQL_DB_PATH = config.get("PATHS_TESTING","testing_db_address")
+        SQL_DB_PATH = config.get("TESTING","testing_db_address")
 
         if SQL_DB_PATH in [None, "",'None']:
             raise KeyError
@@ -96,7 +96,7 @@ if TESTING_MODE_ACTIVE:
 else:
     # DB
     try:
-        SQL_DB_PATH = config.get("PATHS_PRODUCTION","production_db_address")
+        SQL_DB_PATH = config.get("PRODUCTION","production_db_address")
 
         if SQL_DB_PATH in [None, "",'None']:
             raise KeyError

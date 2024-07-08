@@ -17,11 +17,11 @@ config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
 
 if config.getboolean("OPTIONS", "TESTING"):
-    SQL_DB_ADDR = config.get("PATHS_TESTING", "testing_db_address")
-    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_dir")
+    SQL_DB_ADDR = config.get("TESTING", "testing_db_address")
+    LOCAL_REPO_PATH = config.get("GENERAL", "local_dir")
 else:
-    SQL_DB_ADDR = config.get("PATHS_PRODUCTION", "production_db_address")
-    LOCAL_REPO_PATH = config.get("PATHS_GENERAL", "local_dir")
+    SQL_DB_ADDR = config.get("PRODUCTION", "production_db_address")
+    LOCAL_REPO_PATH = config.get("GENERAL", "local_dir")
 
 # region Utility Functions
 def execute_sql_command(

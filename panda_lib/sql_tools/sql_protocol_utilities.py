@@ -194,7 +194,7 @@ def read_in_protocols():
     #     ) from e
     config = ConfigParser()
     config.read("panda_lib/config/panda_sdl_config.ini")
-    protocols = config.get("PATHS_GENERAL", "protocols_dir")
+    protocols = config.get("GENERAL", "protocols_dir")
 
 
     # Get all files in the protocols folder

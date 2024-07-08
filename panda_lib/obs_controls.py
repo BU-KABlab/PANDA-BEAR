@@ -16,9 +16,9 @@ from .log_tools import default_logger as logger
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
 if config.getboolean("OPTIONS", "testing"):
-    PATH_TO_LOGS = Path(config.get("PATHS_TESTING", "logging_dir"))
+    PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
 else:
-    PATH_TO_LOGS = Path(config.get("PATHS_PRODUCTION", "logging_dir"))
+    PATH_TO_LOGS = Path(config.get("PRODUCTION", "logging_dir"))
 
 obs_config = config["OBS"]
 

@@ -9,9 +9,9 @@ config = configparser.ConfigParser()
 config.read("panda_lib\\config\\panda_sdl_config.ini")
 
 if config.getboolean("OPTIONS", "testing"):
-    PANDA_SDL_LOG = config.get("PATHS_TESTING", "logging_dir")
+    PANDA_SDL_LOG = config.get("TESTING", "logging_dir")
 else:
-    PANDA_SDL_LOG = config.get("PATHS_PRODUCTION", "logging_dir")
+    PANDA_SDL_LOG = config.get("PRODUCTION", "logging_dir")
 
 
 def setup_default_logger(
