@@ -15,36 +15,27 @@ else:
 
 
 def setup_default_logger(
-    log_file= "panda.log",
+    log_file="panda.log",
     log_name="panda",
     file_level=logging.DEBUG,
     console_level=logging.INFO,
 ):
-    """
-    Set up a logger with a file handler and a stream handler.
-
-    Args:
-        log_file (str): The path to the log file.
-        log_name (str): The name of the logger.
-
-    Returns:
-        logging.Logger: The logger.
-
-    """
     logger = logging.getLogger(log_name)
-    logger.setLevel(file_level)  # change to INFO to reduce verbosity
-    formatter = logging.Formatter(
-        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
-    )
-    # The file handler will write to the log file
-    file_handler = logging.FileHandler(PANDA_SDL_LOG + "/" + log_file)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    if not logger.handlers:  # Check if the logger already has handlers attached
+        logger.setLevel(file_level)
+        formatter = logging.Formatter(
+            "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
+        )
 
-    # The stream handler will print to the console
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(console_level)
-    logger.addHandler(console_handler)
+        file_handler = logging.FileHandler(PANDA_SDL_LOG + "/" + log_name + ".log")
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(console_level)
+        console_handler.setFormatter(formatter)  # Ensure console output is formatted
+        logger.addHandler(console_handler)
+
     return logger
 
 

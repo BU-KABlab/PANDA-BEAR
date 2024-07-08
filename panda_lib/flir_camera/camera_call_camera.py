@@ -49,6 +49,8 @@ def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.
         shell=True,
     )
 
+    return file_name
+
 if __name__ == "__main__":
     FILE_NAME =  "test image"
     file_path=Path(PATH_TO_DATA / str(FILE_NAME)).with_suffix(".png")

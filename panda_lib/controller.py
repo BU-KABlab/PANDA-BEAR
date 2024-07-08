@@ -761,7 +761,16 @@ def share_to_slack(experiment: ExperimentBase):
                 images_with_dz.append(image)
 
             slack.upload_images("data", images_with_dz, "")
-    except slack_errors as error:
+    except (
+        slack_errors.SlackApiError,
+        slack_errors.SlackClientError,
+        slack_errors.SlackRequestError,
+        slack_errors.SlackTokenRotationError,
+        slack_errors.BotUserAccessError,
+        slack_errors.SlackClientConfigurationError,
+        slack_errors.SlackObjectFormationError,
+        slack_errors.SlackRequestError
+    ) as error:
         logger.error(
             "A Slack specific error occured while sharing images from experiment %d with slack: %s",
             experiment.experiment_id,

@@ -256,7 +256,6 @@ class SyringePump:
 
                 infused_into.update_volume(volume_ul)
                 infused_into.update_contents(self.pipette.contents, volume_ul, save=True)
-                infused_into.save_to_db()
 
                 # Update the pipette contents
                 content_ratio = {

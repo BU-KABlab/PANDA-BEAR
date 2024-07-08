@@ -6,6 +6,7 @@ from typing import List, Tuple
 from panda_lib.sql_tools import sql_utilities
 from panda_lib import wellplate
 
+from dataclasses import asdict
 
 logger = sql_utilities.logger
 
@@ -51,8 +52,8 @@ def select_wellplate_location(plate_id: int = None) -> str:
         SELECT 
             a1_x, 
             a1_y, 
-            z-bottom,
-            z-top
+            z_bottom,
+            z_top,
             orientation, 
             rows, 
             cols, 
@@ -474,7 +475,7 @@ def save_well_to_db(well_to_save: object) -> None:
         well_to_save.status_date,
         json.dumps(well_to_save.contents),
         well_to_save.volume,
-        json.dumps(well_to_save.coordinates.to_dict()),
+        json.dumps(asdict(well_to_save.coordinates)),
     )
     sql_utilities.execute_sql_command_no_return(statement, values)
 
@@ -523,7 +524,7 @@ def save_wells_to_db(wells_to_save: List[object]) -> None:
                 datetime.now().isoformat(timespec="seconds"),
                 json.dumps(well.contents),
                 well.volume,
-                json.dumps(well.coordinates.to_dict()),
+                json.dumps(asdict(well.coordinates)),
             )
         )
     sql_utilities.execute_sql_command_no_return(statement, values)
@@ -560,7 +561,7 @@ def insert_well(well_to_insert: object) -> None:
         datetime.now().isoformat(timespec="seconds"),
         json.dumps(well_to_insert.contents),
         well_to_insert.volume,
-        json.dumps(well_to_insert.coordinates.to_dict()),
+        json.dumps(asdict(well_to_insert.coordinates)),
     )
     return sql_utilities.execute_sql_command_no_return(statement, values)
 
@@ -596,7 +597,7 @@ def update_well(well_to_update: object) -> None:
         datetime.now().isoformat(timespec="seconds"),
         json.dumps(well_to_update.contents),
         well_to_update.volume,
-        json.dumps(well_to_update.coordinates.to_dict()),
+        json.dumps(asdict(well_to_update.coordinates)),
         well_to_update.plate_id,
         well_to_update.well_id,
     )
@@ -768,7 +769,7 @@ def update_well_coordinates(well_id: str, plate_id: int, coordinates: object) ->
         WHERE well_id = ?
         AND plate_id = ?
         """,
-        (json.dumps(coordinates.to_dict()), well_id, plate_id),
+        (json.dumps(asdict(coordinates)), well_id, plate_id),
     )
 
 

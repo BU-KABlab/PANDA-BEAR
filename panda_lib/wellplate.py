@@ -51,6 +51,10 @@ class WellCoordinates:
         """Returns a JSON string representation of the coordinates."""
         return json.dumps(asdict(self))
 
+    def __getitem__(self, key: str) -> Union[int, float]:
+        """Allows subscripting the WellCoordinates for attributes."""
+        return getattr(self, key)
+
 
 class WellCoordinatesEncoder(json.JSONEncoder):
     """Custom JSON encoder for the WellCoordinates class."""

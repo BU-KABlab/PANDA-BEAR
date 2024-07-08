@@ -2,7 +2,7 @@
 Vessel module.
 """
 from dataclasses import dataclass
-from typing import Union, Optional
+from typing import Any, Union, Optional
 from panda_lib.errors import OverFillException, OverDraftException
 from panda_lib.log_tools import setup_default_logger
 
@@ -43,12 +43,15 @@ class VesselCoordinates:
     def __post_init__(self):
         if self.z_bottom is None:
             self.z_bottom = 0
-        
+
         self.x = round(self.x, 6)
         self.y = round(self.y, 6)
         self.z_top = round(self.z_top, 6)
         self.z_bottom = round(self.z_bottom, 6)
 
+    def __getitem__(self, key: str) -> Union[int, float]:
+        """Allows subscripting the WellCoordinates for attributes."""
+        return getattr(self, key)
 
 class Vessel:
     """
