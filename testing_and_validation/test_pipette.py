@@ -1,7 +1,8 @@
 import time
 import unittest
 from panda_lib.pipette import Pipette
-from panda_lib.pipette.sql_pipette import insert_new_pipette
+from panda_lib.pipette.sql_pipette import insert_new_pipette, activate_pipette
+from panda_lib.pipette import sql_pipette
 
 # class TestPipette(unittest.TestCase):
 #     """
@@ -102,52 +103,92 @@ from panda_lib.pipette.sql_pipette import insert_new_pipette
 
 class TestPipette2(unittest.TestCase):
     def setUp(self):
-        test_pipette_id = insert_new_pipette(999)
+        test_pipette_id = insert_new_pipette(999, activate = True)
         self.pipette = Pipette(test_pipette_id)
-        self.pipette.activate_pipette()
 
         self.pipette.reset_contents()
         self.assertEqual(self.pipette.capacity_ul, 200)
         self.assertEqual(self.pipette.capacity_ml, 0.2)
-        
 
     def test_set_capacity(self):
         self.pipette.set_capacity(500)
+
+        # Test that the capacity is set correctly in memory
         self.assertEqual(self.pipette.capacity_ul, 500)
         self.assertEqual(self.pipette.capacity_ml, 0.5)
+
+        # Test that the capacity is set correctly in the database
+        pipette_status = sql_pipette.select_pipette_status(self.pipette.id)
+        self.assertEqual(pipette_status.capacity_ul, 500)
+        self.assertEqual(pipette_status.capacity_ml, 0.5)
 
     def test_update_contents(self):
         self.pipette.update_contents("Solution A", 200)
         self.assertEqual(self.pipette.contents["Solution A"], 200)
+        pipette_status = sql_pipette.select_pipette_status(self.pipette.id)
+        self.assertEqual(pipette_status.contents["Solution A"], 200)
+
+        # Test a negative change
+        self.pipette.update_contents("Solution A", -50)
+        self.assertEqual(self.pipette.contents["Solution A"], 150)
+        pipette_status = sql_pipette.select_pipette_status(self.pipette.id)
+        self.assertEqual(pipette_status.contents["Solution A"], 150)
+
+
 
     def test_volume(self):
         self.pipette.volume = 300
         self.assertEqual(self.pipette.volume, 300)
+        pipette_status = sql_pipette.select_pipette_status(self.pipette.id)
+        self.assertEqual(pipette_status.volume_ul, 300)
 
     def test_volume_ml(self):
         self.pipette.volume_ml = 0.5
         self.assertEqual(self.pipette.volume_ml, 0.5)
+        pipette_status = sql_pipette.select_pipette_status(self.pipette.id)
+        self.assertEqual(pipette_status.volume_ml, 0.5)
+
 
     def test_liquid_volume(self):
         self.pipette.update_contents("Solution A", 200)
         self.pipette.update_contents("Solution B", 150)
+        pipette_status = sql_pipette.select_pipette_status(self.pipette.id)
         self.assertEqual(self.pipette.liquid_volume(), 350)
-        self.assertEqual(self.pipette._volume_ul, 350)
+        self.assertEqual(self.pipette.volume, 350)
+        self.assertEqual(pipette_status.volume_ul, 350)
+
+
+
 
     def test_reset_contents(self):
         self.pipette.update_contents("Solution A", 200)
+        self.assertEqual(self.pipette.contents["Solution A"], 200)
+
         self.pipette.reset_contents()
         self.assertEqual(self.pipette.contents, {})
         self.assertEqual(self.pipette.volume, 0)
         self.assertEqual(self.pipette.volume_ml, 0)
 
+        pipette_status = sql_pipette.select_pipette_status(self.pipette.id)
+        self.assertEqual(pipette_status.contents, {})
+        self.assertEqual(pipette_status.volume_ul, 0)
+        self.assertEqual(pipette_status.volume_ml, 0)
+
     def tearDown(self) -> None:
+        """
+        Clean up the test by resetting the pipette capacity
+        """
         self.pipette.set_capacity(200)
         self.pipette.reset_contents()
 
 
+
+
 def main():
+    current_pipette_id = sql_pipette.select_current_pipette_id()
     unittest.main()
+    activate_pipette(current_pipette_id)
+
 
 if __name__ == "__main__":
     main()
