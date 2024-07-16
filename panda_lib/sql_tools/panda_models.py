@@ -6,7 +6,7 @@ SQLAlchemy models for the PANDA database
 import datetime
 from datetime import datetime as dt
 
-from sqlalchemy import Column, ForeignKey, Integer, String, text
+from sqlalchemy import Column, ForeignKey, Integer, String, text, Text
 from sqlalchemy.orm import Mapped, relationship, declarative_base
 from sqlalchemy.sql.sqltypes import DECIMAL, JSON, TEXT, Boolean, DateTime, Float
 
@@ -141,6 +141,8 @@ class Pipette(Base):
         volume_ml (float): The pipette volume in milliliters.
         contents (str): The contents of the pipette.
         updated (datetime): The last time the pipette was updated.
+        active (int): The status of the pipette. 0 = inactive, 1 = active.
+        uses (int): The number of times the pipette has been used.
         
     
     """
@@ -151,7 +153,7 @@ class Pipette(Base):
     capacity_ml = Column(Float, nullable=False)
     volume_ul = Column(Float, nullable=False)
     volume_ml = Column(Float, nullable=False)
-    contents = Column(String)
+    contents = Column(Text)
     updated = Column(DateTime, default=dt.now)
     active = Column(Integer) # 0 = inactive, 1 = active
     uses = Column(Integer, default = 0)

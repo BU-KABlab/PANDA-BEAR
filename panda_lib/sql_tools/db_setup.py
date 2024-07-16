@@ -26,7 +26,7 @@ elif db_type == "mysql":
 else:
     raise ValueError(f"Unsupported database type: {db_type}")
 
-engine = create_engine(DATABASE_URL, echo=True, future=True)
+engine = create_engine(DATABASE_URL, echo=False, future=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

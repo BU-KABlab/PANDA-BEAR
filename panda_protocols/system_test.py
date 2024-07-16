@@ -215,9 +215,11 @@ def pedotdeposition(
 
     # Pipette the calculated volumes from the edot vials into the well
     for vial, volume in zip(edot_vials, edot_vial_volumes):
-        volume = correction_factor(volume, vial.viscosity_cp)
+        if volume == 0:
+            continue
+        corrected_volume = correction_factor(volume, vial.viscosity_cp)
         forward_pipette_v2(
-            volume=volume,
+            volume=corrected_volume,
             from_vessel=vial,
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
             pump=toolkit.pump,

@@ -5,7 +5,8 @@ import json
 from panda_lib.pipette.sql_pipette import (
     activate_pipette,
     update_pipette_status,
-    select_pipette_status
+    select_pipette_status,
+    deincrement_use_count
     )
 from panda_lib.vessel import logger as vessel_logger
 
@@ -41,7 +42,7 @@ class Pipette:
         self.contents[solution] = round(
             float(self.contents.get(solution, 0)) + volume_change, 6
         )
-        self._volume_ul += volume_change
+        self.volume += volume_change
         self.log_contents()
         self.record_pipette_state()
 
@@ -56,21 +57,19 @@ class Pipette:
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
         self._volume_ul = round(float(volume), 6)
-        self._volume_ml = round(float(volume) / 1000, 6)
         self.log_contents()
         self.record_pipette_state()
 
     @property
     def volume_ml(self) -> float:
         """Get the volume of the pipette in ml"""
-        return self._volume_ml
+        return self.volume / 1000
 
     @volume_ml.setter
     def volume_ml(self, volume: float) -> None:
         """Set the volume of the pipette in ml"""
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
-        self._volume_ml = round(float(volume), 6)
         self._volume_ul = round(float(volume) * 1000, 6)
         self.log_contents()
         self.record_pipette_state()
@@ -92,6 +91,9 @@ class Pipette:
         self._volume_ml = 0.0
         self.log_contents()
         self.record_pipette_state()
+        # Resetting the contents triggers the use counter to still increment
+        # We need to deduct the use counter by 1
+        deincrement_use_count(self.id)
 
     def log_contents(self) -> None:
         """Log the contents of the pipette"""
@@ -107,8 +109,8 @@ class Pipette:
         update_pipette_status(
             self.capacity_ul,
             self.capacity_ml,
-            self._volume_ul,
-            self._volume_ml,
+            self.volume,
+            self.volume_ml,
             json.dumps(self.contents),
             self.id,
         )
@@ -124,9 +126,9 @@ class Pipette:
                 self.id = pipette_status.id
                 self.capacity_ul = round(float(pipette_status.capacity_ul), 6)
                 self.capacity_ml = round(float(pipette_status.capacity_ml), 6)
-                self._volume_ul = round(float(pipette_status.volume), 6)
+                self._volume_ul = round(float(pipette_status.volume_ul), 6)
                 self._volume_ml = round(float(pipette_status.volume_ml), 6)
-                self.contents = json.loads(pipette_status.contents) if pipette_status.contents is not None else {}
+                self.contents = pipette_status.contents if pipette_status.contents is not None else {}
             else:
                 raise InvalidPipetteID("No pipette found in the database")
 
@@ -137,7 +139,7 @@ class Pipette:
                 self.capacity_ml = round(float(pipette_status.capacity_ml), 6)
                 self._volume_ul = round(float(pipette_status.volume_ul), 6)
                 self._volume_ml = round(float(pipette_status.volume_ml), 6)
-                self.contents = json.loads(pipette_status.contents) if pipette_status.contents is not None else {}
+                self.contents =pipette_status.contents
 
                 if pipette_status.active == 0:
                     print(f"Pipette with id {self.id} is inactive.")

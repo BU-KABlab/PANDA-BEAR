@@ -22,14 +22,15 @@ import panda_lib.analyzer.pedot as pedot_analysis
 from license_text import show_conditions, show_warrenty
 from panda_lib import (controller, experiment_class, flir_camera,
                        mill_calibration_and_positioning, mill_control,
-                       print_panda, scheduler, utilities, vials, wellplate)
+                       print_panda, scheduler, utilities, vials, wellplate, pipette)
 from panda_lib.analyzer.pedot import sql_ml_functions
 from panda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
 
 from panda_lib.sql_tools import (remove_testing_experiments,
                                  sql_generator_utilities,
                                  sql_protocol_utilities, sql_queue,
-                                 sql_system_state)
+                                 sql_system_state
+                                 )
 
 
 def run_panda_sdl_with_ml():
@@ -364,6 +365,11 @@ def remove_training_data():
     )
     sql_ml_functions.delete_training_data(experiment_id)
 
+def change_pipette_tip():
+    """Changes the pipette tip."""
+    sql_system_state.set_system_status(utilities.SystemState.BUSY, "changing pipette tip")
+    pipette.insert_new_pipette()
+
 menu_options = {
     "0": run_panda_sdl_with_ml,
     "1": run_panda_sdl_without_ml,
@@ -389,6 +395,7 @@ menu_options = {
     "12": generate_experiment_from_existing_data,
     "13": genererate_pedot_experiment,
     "14": analyze_pedot_experiment,
+    "15": change_pipette_tip,
     "r": refresh,
     "w": show_warrenty,
     "c": show_conditions,
@@ -420,11 +427,15 @@ if __name__ == "__main__":
         print("Welcome to PANDA_SDL!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
         num, p_type, free_wells = wellplate.read_current_wellplate_info()
+        current_pipette = pipette.select_current_pipette_id()
         print(
-            f"The current wellplate is #{num} - Type: {p_type} - Available Wells: {free_wells}"
+            f"""
+The current wellplate is #{num} - Type: {p_type} - Available Wells: {free_wells}
+The current pipette id is {current_pipette}
+The queue has {scheduler.get_queue_length()} experiments.
+"""
         )
-        print(f"The queue has {scheduler.get_queue_length()} experiments.")
-        print("What would you like to do?")
+        print("\nWhat would you like to do?")
         for key, value in menu_options.items():
             print(f"{key}. {value.__name__.replace('_', ' ').title()}")
 

@@ -312,13 +312,10 @@ def main(
             ## Clean up
             new_experiment = None  # reset new_experiment to None so that we can check the queue again
             ## Update the system state with new vial and wellplate information
-            toolkit.pump.pipette.reset_contents()
-            update_vial_state_files(
-                stock_vials, waste_vials, "STOCK_STATUS", "WASTE_STATUS"
-            )
+
             if toolkit.pump.pipette.volume > 0 and toolkit.pump.pipette.volume_ml < 1:
                 # assume unreal volume, not actually solution, set to 0
-                toolkit.pump.update_pipette_volume(toolkit.pump.pipette.volume_ml)
+                toolkit.pump.pipette.reset_contents()
             if one_off:
                 break  # break out of the while True loop
 
