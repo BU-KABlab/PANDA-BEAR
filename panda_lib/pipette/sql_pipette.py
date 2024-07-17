@@ -108,7 +108,6 @@ def select_pipette_status(pipette_id: Union[int, None] = None):
             pipette_status = (
                 session.query(Pipette).filter(Pipette.id == pipette_id).first()
             )
-        session.close()
 
         if pipette_status.contents:
             try:
@@ -159,7 +158,6 @@ def update_pipette_status(
             pipette_status.volume_ml = round(volume_ml, precision)
             pipette_status.contents = contents
         session.commit()
-        session.close()
 
 
 def deincrement_use_count(pipette_id: int):
@@ -189,7 +187,6 @@ def deincrement_use_count(pipette_id: int):
         else:
             pipette_status.uses -= 1
             session.commit()
-        session.close()
 
 
 def select_current_pipette_id():
@@ -251,7 +248,6 @@ def insert_new_pipette(
         # Wrap up the transaction
         session.commit()
         activate_pipette(pipette_id)
-        session.close()
 
     return pipette_id
 
@@ -270,4 +266,3 @@ def activate_pipette(pipette_id: int):
             {Pipette.active: 1}
         )
         session.commit()
-        session.close()
