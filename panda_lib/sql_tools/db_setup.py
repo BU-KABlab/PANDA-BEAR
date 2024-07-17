@@ -32,6 +32,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Test connection from config file
 
+
 def test_connection():
     """Test the connection to the database."""
     try:
@@ -42,7 +43,9 @@ def test_connection():
         print("Tables in the database:")
         with SessionLocal() as session:
             if db_type == "sqlite":
-                result = session.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
+                result = session.execute(
+                    text("SELECT name FROM sqlite_master WHERE type='table';")
+                )
             else:
                 result = session.execute(text("SHOW TABLES;"))
             for row in result:
@@ -50,7 +53,8 @@ def test_connection():
     except Exception as e:
         print(f"Connection failed: {e}")
         raise e
-    
+
+
 if __name__ == "__main__":
     print()
     test_connection()
