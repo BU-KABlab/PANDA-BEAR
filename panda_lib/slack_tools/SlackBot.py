@@ -135,7 +135,7 @@ def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
         WHERE msg_id = ?
         """,
         (msg_id,),
-    )
+    ) #TODO: Replace with SQLAlchemy query
     if result == []:
         return None
     return SlackTicket(*result[0])
