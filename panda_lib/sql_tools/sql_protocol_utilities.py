@@ -1,9 +1,13 @@
 """Utilities for working with protocols in the database."""
 
-from configparser import ConfigParser
 import os
-import sqlite3
-from panda_lib.config.config import SQL_DB_PATH
+from ast import List
+from configparser import ConfigParser
+
+# import sqlite3
+# from panda_lib.config.config import SQL_DB_PATH
+from db_setup import SessionLocal
+from panda_models import Protocols
 
 # region Protocols
 from panda_lib.errors import ProtocolNotFoundError
@@ -22,7 +26,7 @@ class ProtocolEntry:
         return f"{self.protocol_id}: {self.name}"
 
 
-def select_protocols() -> list:
+def select_protocols() -> List[ProtocolEntry]:
     """
     Get all protocols from the database.
 
@@ -32,14 +36,25 @@ def select_protocols() -> list:
     Returns:
         list: A list of all protocols in the database.
     """
-    conn = sqlite3.connect(SQL_DB_PATH)
-    cursor = conn.cursor()
+    # conn = sqlite3.connect(SQL_DB_PATH)
+    # cursor = conn.cursor()
 
-    # Get all protocols from the database
-    cursor.execute("SELECT * FROM protocols")
-    protocols = cursor.fetchall()
+    # # Get all protocols from the database
+    # cursor.execute("SELECT * FROM protocols")
+    # protocols = cursor.fetchall()
 
-    conn.close()
+    # conn.close()
+
+    # protocol_entries = []
+    # for protocol in protocols:
+    #     protocol_entry = ProtocolEntry(*protocol)
+    #     protocol_entries.append(protocol_entry)
+
+    # return protocol_entries
+
+    with SessionLocal() as session:
+        result = session.query(Protocols).all()
+        protocols = result.fetchall()
 
     protocol_entries = []
     for protocol in protocols:
@@ -60,45 +75,62 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
         ProtocolEntry: The protocol from the database.
     """
 
-    if isinstance(protocol_id, str):
-        query = "SELECT id, project, name, filepath FROM protocols WHERE name = ?"
-    else:
-        query = "SELECT id, project, name, filepath FROM protocols WHERE id = ?"
+    # if isinstance(protocol_id, str):
+    #     query = "SELECT id, project, name, filepath FROM protocols WHERE name = ?"
+    # else:
+    #     query = "SELECT id, project, name, filepath FROM protocols WHERE id = ?"
 
-    try:
-        conn = sqlite3.connect(SQL_DB_PATH)
-        cursor = conn.cursor()
+    # try:
+    #     conn = sqlite3.connect(SQL_DB_PATH)
+    #     cursor = conn.cursor()
 
-        # Get the protocol from the database
-        cursor.execute(
-            query,
-            (protocol_id,),
-        )
-        protocol = cursor.fetchone()
+    #     # Get the protocol from the database
+    #     cursor.execute(
+    #         query,
+    #         (protocol_id,),
+    #     )
+    #     protocol = cursor.fetchone()
 
-        conn.close()
+    #     conn.close()
 
-        if protocol is None and isinstance(protocol_id, str):
-            protocol_id = protocol_id + ".py"
-            conn = sqlite3.connect(SQL_DB_PATH)
-            cursor = conn.cursor()
+    #     if protocol is None and isinstance(protocol_id, str):
+    #         protocol_id = protocol_id + ".py"
+    #         conn = sqlite3.connect(SQL_DB_PATH)
+    #         cursor = conn.cursor()
 
-            # Get the protocol from the database
-            cursor.execute(
-                query,
-                (protocol_id,),
+    #         # Get the protocol from the database
+    #         cursor.execute(
+    #             query,
+    #             (protocol_id,),
+    #         )
+    #         protocol = cursor.fetchone()
+
+    #         conn.close()
+
+    #     protocol_entry = ProtocolEntry(*protocol)
+    #     return protocol_entry
+    # except TypeError as exc:
+    #     raise ProtocolNotFoundError(
+    #         f"Protocol with id {protocol_id} not found."
+    #     ) from exc
+
+    with SessionLocal() as session:
+        if isinstance(protocol_id, str):
+            result = (
+                session.query(Protocols).filter(Protocols.name == protocol_id).first()
             )
-            protocol = cursor.fetchone()
+        else:
+            result = (
+                session.query(Protocols).filter(Protocols.id == protocol_id).first()
+            )
 
-            conn.close()
-            
+        if result is None:
+            raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.")
+        protocol_entry = ProtocolEntry(
+            result.id, result.project, result.name, result.filepath
+        )
 
-        protocol_entry = ProtocolEntry(*protocol)
-        return protocol_entry
-    except TypeError as exc:
-        raise ProtocolNotFoundError(
-            f"Protocol with id {protocol_id} not found."
-        ) from exc
+    return protocol_entry
 
 
 def insert_protocol(protocol_id, project, name, filepath):
@@ -115,20 +147,29 @@ def insert_protocol(protocol_id, project, name, filepath):
         None
     """
 
-    conn = sqlite3.connect(SQL_DB_PATH)
-    cursor = conn.cursor()
+    # conn = sqlite3.connect(SQL_DB_PATH)
+    # cursor = conn.cursor()
 
-    # Clean the name of any file extensions
-    name = name.split(".")[0]
+    # # Clean the name of any file extensions
+    # name = name.split(".")[0]
 
-    # Insert the protocol into the database
-    cursor.execute(
-        "INSERT INTO protocols (id, project, name, filepath) VALUES (?, ?, ?, ?)",
-        (protocol_id, project, name, filepath),
-    )
+    # # Insert the protocol into the database
+    # cursor.execute(
+    #     "INSERT INTO protocols (id, project, name, filepath) VALUES (?, ?, ?, ?)",
+    #     (protocol_id, project, name, filepath),
+    # )
 
-    conn.commit()
-    conn.close()
+    # conn.commit()
+    # conn.close()
+
+    with SessionLocal() as session:
+        # Clean the name of any file extensions, split on "." and take the first element
+        name = name.split(".")[0]
+
+        # Insert the protocol into the database
+        session.add(
+            Protocols(id=protocol_id, project=project, name=name, filepath=filepath)
+        )
 
 
 def update_protocol(protocol_id, new_name):
@@ -142,16 +183,22 @@ def update_protocol(protocol_id, new_name):
     Returns:
         None
     """
-    conn = sqlite3.connect(SQL_DB_PATH)
-    cursor = conn.cursor()
+    # conn = sqlite3.connect(SQL_DB_PATH)
+    # cursor = conn.cursor()
 
-    # Update the name of the protocol in the database
-    cursor.execute(
-        "UPDATE protocols SET name = ? WHERE id = ?", (new_name, protocol_id)
-    )
+    # # Update the name of the protocol in the database
+    # cursor.execute(
+    #     "UPDATE protocols SET name = ? WHERE id = ?", (new_name, protocol_id)
+    # )
 
-    conn.commit()
-    conn.close()
+    # conn.commit()
+    # conn.close()
+
+    with SessionLocal() as session:
+        # Update the name of the protocol in the database
+        session.query(Protocols).filter(Protocols.id == protocol_id).update(
+            {"name": new_name}
+        )
 
 
 def delete_protocol(protocol_id):
@@ -164,14 +211,18 @@ def delete_protocol(protocol_id):
     Returns:
         None
     """
-    conn = sqlite3.connect(SQL_DB_PATH)
-    cursor = conn.cursor()
+    # conn = sqlite3.connect(SQL_DB_PATH)
+    # cursor = conn.cursor()
 
-    # Delete the protocol from the database
-    cursor.execute("DELETE FROM protocols WHERE id = ?", (protocol_id,))
+    # # Delete the protocol from the database
+    # cursor.execute("DELETE FROM protocols WHERE id = ?", (protocol_id,))
 
-    conn.commit()
-    conn.close()
+    # conn.commit()
+    # conn.close()
+
+    with SessionLocal() as session:
+        # Delete the protocol from the database
+        session.query(Protocols).filter(Protocols.id == protocol_id).delete()
 
 
 def read_in_protocols():
@@ -185,7 +236,7 @@ def read_in_protocols():
         None
     """
 
-    # Get the protocols folder from the environment variables    
+    # Get the protocols folder from the environment variables
     # try:
     #     protocols = os.environ["PANDA_SDL_PROTOCOLS_DIR"]
     # except KeyError as e:
@@ -195,7 +246,6 @@ def read_in_protocols():
     config = ConfigParser()
     config.read("panda_lib/config/panda_sdl_config.ini")
     protocols = config.get("GENERAL", "protocols_dir")
-
 
     # Get all files in the protocols folder
     protocols = os.listdir(protocols)
@@ -215,7 +265,7 @@ def read_in_protocols():
         next_protocol_id = 1
 
     # Get the filenames of the current protocols
-    current_protocol_filenames = [protocol.name for protocol in current_protocols]
+    #current_protocol_filenames = [protocol.name for protocol in current_protocols]
     # get filepaths of current protocols
     current_protocol_filepaths = [protocol.filepath for protocol in current_protocols]
     # Iterate through the protocols
@@ -250,14 +300,26 @@ def select_protocol_id(protocol_name) -> int:
     Returns:
         int: The id of the protocol.
     """
-    conn = sqlite3.connect(SQL_DB_PATH)
-    cursor = conn.cursor()
+    # conn = sqlite3.connect(SQL_DB_PATH)
+    # cursor = conn.cursor()
 
-    # Get the id of the protocol from the database
-    cursor.execute("SELECT id FROM protocols WHERE name = ?", (protocol_name,))
-    protocol_id = cursor.fetchone()[0]
+    # # Get the id of the protocol from the database
+    # cursor.execute("SELECT id FROM protocols WHERE name = ?", (protocol_name,))
+    # protocol_id = cursor.fetchone()[0]
 
-    conn.close()
+    # conn.close()
+
+    # return protocol_id
+
+    with SessionLocal() as session:
+        result = (
+            session.query(Protocols).filter(Protocols.name == protocol_name).first()
+        )
+        if result is None:
+            raise ProtocolNotFoundError(
+                f"Protocol with name {protocol_name} not found."
+            )
+        protocol_id = result.id
 
     return protocol_id
 
@@ -272,14 +334,22 @@ def select_protocol_name(protocol_id) -> str:
     Returns:
         str: The name of the protocol.
     """
-    conn = sqlite3.connect(SQL_DB_PATH)
-    cursor = conn.cursor()
+    # conn = sqlite3.connect(SQL_DB_PATH)
+    # cursor = conn.cursor()
 
-    # Get the name of the protocol from the database
-    cursor.execute("SELECT name FROM protocols WHERE id = ?", (protocol_id,))
-    protocol_name = cursor.fetchone()[0]
+    # # Get the name of the protocol from the database
+    # cursor.execute("SELECT name FROM protocols WHERE id = ?", (protocol_id,))
+    # protocol_name = cursor.fetchone()[0]
 
-    conn.close()
+    # conn.close()
+
+    # return protocol_name
+
+    with SessionLocal() as session:
+        result = session.query(Protocols).filter(Protocols.id == protocol_id).first()
+        if result is None:
+            raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.")
+        protocol_name = result.name
 
     return protocol_name
 
