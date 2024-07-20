@@ -5,7 +5,12 @@
 #     execute_sql_command_no_return,
 # )
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import Experiments, ExperimentParameters, ExperimentResults, WellHx
+from panda_lib.sql_tools.panda_models import (
+    Experiments,
+    ExperimentParameters,
+    ExperimentResults,
+    WellHx,
+)
 
 
 def main():
@@ -27,7 +32,6 @@ def main():
     """
     # sql_command = "SELECT experiment_id FROM experiments WHERE project_id = 999"
     # experiment_ids = execute_sql_command(sql_command)
-    
 
     # # Delete records from experiment_parameters
     # sql_command = "DELETE FROM experiment_parameters WHERE experiment_id IN ({})".format(
@@ -50,21 +54,35 @@ def main():
     # execute_sql_command_no_return(sql_command)
 
     with SessionLocal() as session:
-        experiment_ids = session.query(Experiments.experiment_id).filter(Experiments.project_id == 999).all()
+        experiment_ids = (
+            session.query(Experiments.experiment_id)
+            .filter(Experiments.project_id == 999)
+            .all()
+        )
 
-        session.query(ExperimentParameters).filter(ExperimentParameters.experiment_id.in_(experiment_ids)).delete(synchronize_session=False)
-        session.query(ExperimentResults).filter(ExperimentResults.experiment_id.in_(experiment_ids)).delete(synchronize_session=False)
-        session.query(WellHx).filter(WellHx.project_id == 999).update({
-            WellHx.experiment_id: None,
-            WellHx.project_id: None,
-            WellHx.status: 'new',
-            WellHx.status_date: None,
-            WellHx.contents: {},
-            WellHx.volume: 0
-        }, synchronize_session=False)
-        session.query(Experiments).filter(Experiments.project_id == 999).delete(synchronize_session=False)
+        session.query(ExperimentParameters).filter(
+            ExperimentParameters.experiment_id.in_(experiment_ids)
+        ).delete(synchronize_session=False)
+        session.query(ExperimentResults).filter(
+            ExperimentResults.experiment_id.in_(experiment_ids)
+        ).delete(synchronize_session=False)
+        session.query(WellHx).filter(WellHx.project_id == 999).update(
+            {
+                WellHx.experiment_id: None,
+                WellHx.project_id: None,
+                WellHx.status: "new",
+                WellHx.status_date: None,
+                WellHx.contents: {},
+                WellHx.volume: 0,
+            },
+            synchronize_session=False,
+        )
+        session.query(Experiments).filter(Experiments.project_id == 999).delete(
+            synchronize_session=False
+        )
 
     print("Testing experiments removed")
+
 
 if __name__ == "__main__":
     main()
