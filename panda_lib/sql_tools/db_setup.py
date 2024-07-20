@@ -1,4 +1,27 @@
-# db_setup.py
+"""
+db_setup.py
+
+This script sets up the database connection and tests the connection to the
+database. It reads the database configuration from the panda_sdl_config.ini
+file and creates a connection to the database using SQLAlchemy. The script
+also tests the connection to the database by executing a simple query to
+retrieve the list of tables in the database.
+
+The script uses the ConfigParser module to read the configuration file and
+determine whether it's in testing or production mode. Based on the mode, it
+reads the database configuration parameters such as the database type,
+address, user, and password. It constructs the DATABASE_URL based on the
+database type and creates an engine using SQLAlchemy. The script also defines
+a sessionmaker object called SessionLocal, which is used to create a session
+with the database. The test_connection() function tests the connection to the
+database by connecting to the engine and executing a query to retrieve the
+list of tables in the database. If the connection is successful, it prints
+the list of tables; otherwise, it prints an error message.
+
+The script can be run as a standalone script to test the connection to the
+database.
+"""
+
 from configparser import ConfigParser
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
