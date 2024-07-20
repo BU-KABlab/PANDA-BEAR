@@ -1,10 +1,11 @@
 """Clean out testing experiments"""
 
-from panda_lib.sql_tools.sql_utilities import (
-    execute_sql_command,
-    execute_sql_command_no_return,
-)
-
+# from panda_lib.sql_tools.sql_utilities import (
+#     execute_sql_command,
+#     execute_sql_command_no_return,
+# )
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import Experiments, ExperimentParameters, ExperimentResults, WellHx
 
 
 def main():
@@ -24,28 +25,44 @@ def main():
     Finally remove the experiments from experiments table
     Get the experiment_ids
     """
-    sql_command = "SELECT experiment_id FROM experiments WHERE project_id = 999"
-    experiment_ids = execute_sql_command(sql_command)
+    # sql_command = "SELECT experiment_id FROM experiments WHERE project_id = 999"
+    # experiment_ids = execute_sql_command(sql_command)
+    
 
-    # Delete records from experiment_parameters
-    sql_command = "DELETE FROM experiment_parameters WHERE experiment_id IN ({})".format(
-        ", ".join([str(experiment_id[0]) for experiment_id in experiment_ids])
-    )
-    execute_sql_command_no_return(sql_command)
+    # # Delete records from experiment_parameters
+    # sql_command = "DELETE FROM experiment_parameters WHERE experiment_id IN ({})".format(
+    #     ", ".join([str(experiment_id[0]) for experiment_id in experiment_ids])
+    # )
+    # execute_sql_command_no_return(sql_command)
 
-    # Delete records from experiment_results
-    sql_command = "DELETE FROM experiment_results WHERE experiment_id IN ({})".format(
-        ", ".join([str(experiment_id[0]) for experiment_id in experiment_ids])
-    )
-    execute_sql_command_no_return(sql_command)
+    # # Delete records from experiment_results
+    # sql_command = "DELETE FROM experiment_results WHERE experiment_id IN ({})".format(
+    #     ", ".join([str(experiment_id[0]) for experiment_id in experiment_ids])
+    # )
+    # execute_sql_command_no_return(sql_command)
 
-    # Update records in well_hx
-    sql_command = "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new', status_date = NULL, contents = '{}', volume = 0 WHERE project_id = 999"
-    execute_sql_command_no_return(sql_command)
+    # # Update records in well_hx
+    # sql_command = "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new', status_date = NULL, contents = '{}', volume = 0 WHERE project_id = 999"
+    # execute_sql_command_no_return(sql_command)
 
-    # Delete records from experiments
-    sql_command = "DELETE FROM experiments WHERE project_id = 999"
-    execute_sql_command_no_return(sql_command)
+    # # Delete records from experiments
+    # sql_command = "DELETE FROM experiments WHERE project_id = 999"
+    # execute_sql_command_no_return(sql_command)
+
+    with SessionLocal() as session:
+        experiment_ids = session.query(Experiments.experiment_id).filter(Experiments.project_id == 999).all()
+
+        session.query(ExperimentParameters).filter(ExperimentParameters.experiment_id.in_(experiment_ids)).delete(synchronize_session=False)
+        session.query(ExperimentResults).filter(ExperimentResults.experiment_id.in_(experiment_ids)).delete(synchronize_session=False)
+        session.query(WellHx).filter(WellHx.project_id == 999).update({
+            WellHx.experiment_id: None,
+            WellHx.project_id: None,
+            WellHx.status: 'new',
+            WellHx.status_date: None,
+            WellHx.contents: {},
+            WellHx.volume: 0
+        }, synchronize_session=False)
+        session.query(Experiments).filter(Experiments.project_id == 999).delete(synchronize_session=False)
 
     print("Testing experiments removed")
 
