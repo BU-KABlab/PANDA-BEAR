@@ -143,8 +143,8 @@ class Pipette(Base):
         updated (datetime): The last time the pipette was updated.
         active (int): The status of the pipette. 0 = inactive, 1 = active.
         uses (int): The number of times the pipette has been used.
-        
-    
+
+
     """
 
     __tablename__ = "pipette"
@@ -155,11 +155,12 @@ class Pipette(Base):
     volume_ml = Column(Float, nullable=False)
     contents = Column(Text)
     updated = Column(DateTime, default=dt.now)
-    active = Column(Integer) # 0 = inactive, 1 = active
-    uses = Column(Integer, default = 0)
+    active = Column(Integer)  # 0 = inactive, 1 = active
+    uses = Column(Integer, default=0)
 
     def __repr__(self):
         return f"<Pipette(id={self.id}, capacity_ul={self.capacity_ul}, capacity_ml={self.capacity_ml}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, contents={self.contents}, updated={self.updated})>"
+
 
 class PipetteLog(Base):
     """PipetteLog table model"""
@@ -325,3 +326,42 @@ class WellPlates(Base):
 
     def __repr__(self):
         return f"<WellPlates(id={self.id}, type_id={self.type_id}, current={self.current})>"
+
+
+class Queue(Base):
+    """Queue view model"""
+
+    __tablename__ = "queue"
+    experiment_id = Column(Integer, primary_key=True)
+    project_id = Column(Integer)
+    priority = Column(Integer)
+    process_type = Column(String)
+    filename = Column(String)
+    well_type = Column(String, name="well type")
+    well_id = Column(String)
+    status = Column(String)
+    status_date = Column(DateTime)
+
+    def __repr__(self):
+        return f"<Queue(experiment_id={self.experiment_id}, project_id={self.project_id}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, well_type={self.well_type}, well_id={self.well_id}, status={self.status}, status_date={self.status_date})>"
+
+
+class WellStatus(Base):
+    """WellStatus view model"""
+
+    __tablename__ = "well_status"
+    plate_id = Column(Integer, primary_key=True)
+    type_number = Column(Integer)
+    well_id = Column(String, primary_key=True)
+    status = Column(String)
+    status_date = Column(DateTime)
+    contents = Column(JSON)
+    experiment_id = Column(Integer)
+    project_id = Column(Integer)
+    volume = Column(Float)
+    coordinates = Column(JSON)
+    capacity = Column(Float)
+    height = Column(Float)
+
+    def __repr__(self):
+        return f"<WellStatus(plate_id={self.plate_id}, type_number={self.type_number}, well_id={self.well_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, experiment_id={self.experiment_id}, project_id={self.project_id}, volume={self.volume}, coordinates={self.coordinates}, capacity={self.capacity}, height={self.height})>"
