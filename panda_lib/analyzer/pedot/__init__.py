@@ -1,31 +1,22 @@
 """PEDOT Experiments Analyzer."""
 
 # pylint: disable=line-too-long
-from pathlib import Path
-import pandas as pd
-from panda_lib.experiment_class import (
-    ExperimentResultsRecord,
-    insert_experiment_result,
-)
 from configparser import ConfigParser
+from pathlib import Path
+
+import pandas as pd
 
 from panda_lib.analyzer.pedot.sql_ml_functions import insert_ml_training_data
-
+from panda_lib.experiment_class import (ExperimentResultsRecord,
+                                        insert_experiment_result)
 
 from . import PEDOT_FindLAB as lab
 from . import PEDOT_MetricsCalc as met
-from .experiment_generator import pedot_generator, determine_next_experiment_id
+from .experiment_generator import determine_next_experiment_id, pedot_generator
 from .ml_input import populate_required_information as analysis_input
-from .pedot_classes import (
-    MLInput,
-    MLOutput,
-    PEDOTParams,
-    RequiredData,
-    PEDOTMetrics,
-    MLTrainingData,
-    RawMetrics,
-)
 from .ml_model import pedot_model
+from .pedot_classes import (MLInput, MLOutput, MLTrainingData, PEDOTMetrics,
+                            PEDOTParams, RawMetrics, RequiredData)
 
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
