@@ -7,8 +7,6 @@ wellplate and the wells in it.
 import json
 import logging
 import math
-import os
-
 # pylint: disable=line-too-long
 from dataclasses import asdict, dataclass, field
 from typing import Optional, Tuple, Union
@@ -16,14 +14,17 @@ from typing import Optional, Tuple, Union
 from panda_lib import experiment_class
 
 from .errors import OverFillException
-from .sql_tools import sql_utilities, sql_wellplate
+from .sql_tools import sql_wellplate
+from .sql_tools.db_setup import SessionLocal
+from .sql_tools.panda_models import (ExperimentParameters, Experiments, WellHx,
+                                     WellPlates, MillConfig)
 from .vessel import Vessel
 
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
-MILL_CONFIG = "panda_lib/config/mill_config.json"
-WELLPLATE_LOCATION = "panda_lib/config/wellplate_location.json" #TODO use wellpalte table going forward
+#MILL_CONFIG = "panda_lib/config/mill_config.json"
+# WELLPLATE_LOCATION = "panda_lib/config/wellplate_location.json" #TODO use wellpalte table going forward
 
 
 @dataclass
@@ -645,15 +646,15 @@ class Wellplate:
         #     json.dump(data_to_write, f, indent=4)
 
         sql_wellplate.update_wellplate_location(
-            self.plate_id,
-            self.a1_x,
-            self.a1_y,
-            self.z_bottom,
-            self.z_top,
-            self.orientation,
-            self.rows,
-            self.columns,
-            self.echem_height,
+            plate_id = self.plate_id,
+            a1_x = self.a1_x,
+            a1_y = self.a1_y,
+            z_bottom = self.z_bottom,
+            z_top = self.z_top,
+            orientation = self.orientation,
+            rows = self.rows,
+            columns = self.columns,
+            echem_height = self.echem_height,
         )
         logger.debug("Well plate location written to file")
 
@@ -693,12 +694,10 @@ def _remove_wellplate_from_db(plate_id: int) -> None:
     if user_choice.strip().lower()[0] != "y":
         print("No action taken")
         return
-    sql_utilities.execute_sql_command(
-        "DELETE FROM well_hx WHERE plate_id = ?", (plate_id,)
-    )
-    sql_utilities.execute_sql_command(
-        "DELETE FROM wellplates WHERE id = ?", (plate_id,)
-    )
+    with SessionLocal() as session:
+        session.query(WellHx).filter(WellHx.plate_id == plate_id).delete()
+        session.query(WellPlates).filter(WellPlates.id == plate_id).delete()
+        session.commit()
 
 
 def _remove_experiment_from_db(experiment_id: int) -> None:
@@ -725,18 +724,24 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
         print("No action taken")
         return
     # Delete the experiment and all its data from the experiment tables
-    sql_utilities.execute_sql_command(
-        "DELETE FROM experiments WHERE experiment_id = ?", (experiment_id,)
-    )
-    sql_utilities.execute_sql_command(
-        "DELETE FROM experiment_parameters WHERE experiment_id = ?", (experiment_id,)
-    )
+    # sql_utilities.execute_sql_command(
+    #     "DELETE FROM experiments WHERE experiment_id = ?", (experiment_id,)
+    # )
+    # sql_utilities.execute_sql_command(
+    #     "DELETE FROM experiment_parameters WHERE experiment_id = ?", (experiment_id,)
+    # )
 
-    # Update the well in the well_hx table with the experiment id to NULL
-    sql_utilities.execute_sql_command(
-        "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new' WHERE experiment_id = ?",
-        (experiment_id,),
-    )
+    # # Update the well in the well_hx table with the experiment id to NULL
+    # sql_utilities.execute_sql_command(
+    #     "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new' WHERE experiment_id = ?",
+    #     (experiment_id,),
+    # )
+    
+    with SessionLocal() as session:
+        session.query(Experiments).filter(Experiments.experiment_id == experiment_id).delete()
+        session.query(ExperimentParameters).filter(ExperimentParameters.experiment_id == experiment_id).delete()
+        session.query(WellHx).filter(WellHx.experiment_id == experiment_id).update({"experiment_id": None, "project_id": None, "status": "new"})
+        session.commit()
 
     input("Experiment deleted. Press enter to continue...")
 
@@ -744,9 +749,13 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
 def change_wellplate_location():
     """Change the location of the wellplate"""
     ## Load the working volume from mill_config.json
-    with open(MILL_CONFIG, "r", encoding="UTF-8") as file:
-        mill_config = json.load(file)
-    working_volume = mill_config["working_volume"]
+    # with open(MILL_CONFIG, "r", encoding="UTF-8") as file:
+    #     mill_config = json.load(file)
+    # working_volume = mill_config["working_volume"]
+
+    with SessionLocal() as session:
+        mill_config_record = session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+        working_volume = mill_config_record.config["working_volume"]
 
     ## Ask for the new location
     while True:
@@ -789,22 +798,29 @@ def change_wellplate_location():
             print("Invalid input. Please enter 0, 1, 2, or 3.")
 
     ## Get the current location config
-    with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as file:
-        current_location = json.load(file)
+    # with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as file:
+    #     current_location = json.load(file)
 
-    new_location = {
-        "x": new_location_x,
-        "y": new_location_y,
-        "orientation": new_orientation,
-        "rows": current_location["rows"],
-        "cols": current_location["cols"],
-        "z-bottom": current_location["z-bottom"],
-        "z-top": current_location["z-top"],
-        "echem_height": current_location["echem_height"],
-    }
-    ## Write the new location to the wellplate_location.txt file
-    with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as file:
-        json.dump(new_location, file, indent=4)
+    # new_location = {
+    #     "x": new_location_x,
+    #     "y": new_location_y,
+    #     "orientation": new_orientation,
+    #     "rows": current_location["rows"],
+    #     "cols": current_location["cols"],
+    #     "z-bottom": current_location["z-bottom"],
+    #     "z-top": current_location["z-top"],
+    #     "echem_height": current_location["echem_height"],
+    # }
+    # ## Write the new location to the wellplate_location.txt file
+    # with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as file:
+    #     json.dump(new_location, file, indent=4)
+
+    sql_wellplate.update_wellplate_location(
+        plate_id=None,
+        a1_x = new_location_x,
+        a1_y = new_location_y,
+        orientation = new_orientation
+    )
 
 
 def load_new_wellplate(
