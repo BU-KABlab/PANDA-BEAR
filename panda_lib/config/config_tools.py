@@ -1,6 +1,13 @@
 """Utilities for setting and reading the configuration files"""
 from pathlib import Path
 from configparser import ConfigParser
+from dotenv import load_dotenv
+import os
+
+def get_env_var(env_var_name: str) -> str:
+    """Returns the value of an environment variable."""
+    load_dotenv()
+    return os.getenv(env_var_name)
 
 def get_repo_path():
     """Returns the path of the repository."""
@@ -10,18 +17,28 @@ def get_repo_path():
 
 def read_testing_config():
     """Reads the testing configuration file."""
-    repo_path = get_repo_path()
-    config_path = repo_path / "config" / "panda_sdl_config.ini"
+    config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
     config = ConfigParser()
     config.read(config_path)
     return config.getboolean("OPTIONS", "testing")
 
 def write_testing_config(enable_testing: bool):
     """Writes the testing configuration file."""
-    repo_path = get_repo_path()
-    config_path = repo_path / "config" / "panda_sdl_config.ini"
+    config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
     config = ConfigParser()
     config.read(config_path)
     config.set("OPTIONS", "testing", str(enable_testing))
     with open(config_path, "w", encoding='utf-8') as config_file:
         config.write(config_file)
+
+def test():
+    """Tests the functions in this module."""
+    print(get_repo_path())
+    print(read_testing_config())
+    write_testing_config(True)
+    print(read_testing_config())
+    write_testing_config(False)
+    print(read_testing_config())
+
+if __name__ == "__main__":
+    test()
