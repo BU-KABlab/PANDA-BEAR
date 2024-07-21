@@ -29,7 +29,7 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
         return session.query(WellPlates).filter(WellPlates.id == plate_id).count() > 0
 
 
-def select_wellplate_location(plate_id: Union[int, None] = None) -> str:
+def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple:
     """Select the location and characteristics of the wellplate from the wellplate
      table. If no plate_id is given, the current wellplate is assumed
 
@@ -102,39 +102,23 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> str:
         )
 
 
-def update_wellplate_location(
-    plate_id: int,
-    x: float,
-    y: float,
-    z_bottom: float,
-    z_top: float,
-    orientation: int,
-    rows: int,
-    cols: str,
-    echem_height: float,
-) -> None:
+def update_wellplate_location(plate_id: Union[int,None], **kwargs) -> None:
     """Update the location and characteristics of the wellplate in the wellplates table"""
-    # sql_utilities.execute_sql_command_no_return(
-    #     """
-    #     UPDATE wellplates
-    #     SET a1_x = ?, a1_y = ?, z_bottom = ?, z_top = ?, orientation = ?, rows = ?, cols = ?, echem_height = ?
-    #     WHERE id = ?
-    #     """,
-    #     (x, y, z_bottom, z_top, orientation, rows, cols, echem_height, plate_id),
-    # )
-
     with SessionLocal() as session:
+
+        if plate_id is None:
+            plate_id = (
+                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+            )
+
         wellplate = session.query(WellPlates).filter(WellPlates.id == plate_id).first()
         if wellplate is None:
-            return None
-        wellplate.a1_x = x
-        wellplate.a1_y = y
-        wellplate.z_bottom = z_bottom
-        wellplate.z_top = z_top
-        wellplate.orientation = orientation
-        wellplate.rows = rows
-        wellplate.columns = cols
-        wellplate.echem_height = echem_height
+            raise ValueError(f"Wellplate {plate_id} does not exist")
+        for key, value in kwargs.items():
+            if hasattr(wellplate, key):
+                setattr(wellplate, key, value)
+            else:
+                raise ValueError(f"Invalid characteristic: {key}")
         session.commit()
 
 
