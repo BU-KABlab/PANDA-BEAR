@@ -365,3 +365,16 @@ class WellStatus(Base):
 
     def __repr__(self):
         return f"<WellStatus(plate_id={self.plate_id}, type_number={self.type_number}, well_id={self.well_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, experiment_id={self.experiment_id}, project_id={self.project_id}, volume={self.volume}, coordinates={self.coordinates}, capacity={self.capacity}, height={self.height})>"
+
+class MillConfig(Base):
+    """
+    Stores the JSON config for the grbl mill
+    """
+    
+    __tablename__ = "mill_config"
+    id = Column(Integer, primary_key=True)
+    config = Column(JSON, nullable=False)
+    timstamp = Column(DateTime, default=dt.now)
+
+    def __repr__(self):
+        return f"<MillConfig(id={self.id}, config={self.config})>"

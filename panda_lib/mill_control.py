@@ -30,6 +30,8 @@ from venv import logger
 import serial
 from .log_tools import setup_default_logger
 from .utilities import Coordinates, Instruments
+from .sql_tools.db_setup import SessionLocal
+from .sql_tools.panda_models import MillConfig
 
 # add the mill_control logger
 logger = setup_default_logger(log_name="mill_control",console_level=logging.WARNING)
@@ -152,18 +154,27 @@ class Mill:
 
     def read_json_config(self) -> dict:
         """Read the config file"""
-        try:
-            config_file_path = ".\\panda_lib\\config\\" + self.config_file
-            with open(config_file_path, "r", encoding="UTF-8") as file:
-                configuration = json.load(file)
-            logger.debug("Mill config loaded")
-            return configuration
-        except FileNotFoundError as err:
-            logger.error("Config file not found")
-            raise MillConfigNotFound("Config file not found") from err
-        except Exception as err:
-            logger.error("Error reading config file: %s", str(err))
-            raise MillConfigError("Error reading config file") from err
+        # try:
+        #     config_file_path = ".\\panda_lib\\config\\" + self.config_file
+        #     with open(config_file_path, "r", encoding="UTF-8") as file:
+        #         configuration = json.load(file)
+        #     logger.debug("Mill config loaded")
+        #     return configuration
+        # except FileNotFoundError as err:
+        #     logger.error("Config file not found")
+        #     raise MillConfigNotFound("Config file not found") from err
+        # except Exception as err:
+        #     logger.error("Error reading config file: %s", str(err))
+        #     raise MillConfigError("Error reading config file") from err
+
+        with SessionLocal() as session:
+            mill_config = session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+            if mill_config:
+                return mill_config.config
+            else:
+                logger.error("Config not found in db")
+                raise MillConfigNotFound("Config file not found")
+            
 
     def execute_command(self, command: str):
         """Encodes and sends commands to the mill and returns the response"""
