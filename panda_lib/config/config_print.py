@@ -1,14 +1,19 @@
 """config test, read back the config file and interpret the paths"""
 
+import os
 from configparser import ConfigParser
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 def main():
     # Read the config file
-    CONFIG_FILE = "./panda_lib/config/panda_sdl_config.ini"
+    CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
     config = ConfigParser()
     config.read(CONFIG_FILE)
-
 
     local_dir = Path(__file__).parent.parent
     config.set("PATHS_GENERAL", "local_dir", str(local_dir))
@@ -41,9 +46,10 @@ def main():
             else:
                 print(f"{key} = {value}")
         print()
-    
+
     # Write the updated config file
     config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
+
 
 def resolve_config_paths():
     # Read the config file
@@ -60,7 +66,7 @@ def resolve_config_paths():
                 continue
 
             if "dir" in key or "path" in key:
-                    # Check if the path exists
+                # Check if the path exists
                 if not Path(value).exists():
                     continue
 
@@ -70,6 +76,7 @@ def resolve_config_paths():
 
     # Write the updated config file
     config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
+
 
 if __name__ == "__main__":
     main()
