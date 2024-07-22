@@ -471,7 +471,6 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
         if result == []:
             return None
 
-        current_plate_id = select_current_wellplate_info()[0]
         wells = []
         for row in result:
             try:
