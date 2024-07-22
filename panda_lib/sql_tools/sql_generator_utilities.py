@@ -12,14 +12,15 @@ import os
 
 # import sqlite3
 from configparser import ConfigParser
-from db_setup import SessionLocal
-from panda_models import ExperimentGenerators
+
+from panda_lib.config.config_tools import read_config
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import ExperimentGenerators
 
 # from sqlalchemy.orm import Session
 
 # region Generators
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 # if config.getboolean("OPTIONS", "TESTING"):
 #     sql_db_path = config.get("TESTING", "testing_db_address")
 # else:

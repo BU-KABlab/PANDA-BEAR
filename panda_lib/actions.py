@@ -24,8 +24,6 @@ Returns:
 # Standard library imports
 import logging
 import math
-import os
-from configparser import ConfigParser
 
 # Third party or custom imports
 from pathlib import Path
@@ -35,7 +33,7 @@ from PIL import Image
 # Local application imports
 from panda_lib.flir_camera import capture_new_image
 from panda_lib.config.config_tools import (
-    read_testing_config
+    read_testing_config, read_config
 )
 from panda_lib.correction_factors import correction_factor
 from panda_lib.errors import (
@@ -77,8 +75,7 @@ else:
         potentiostat_ocp_parameters,
     )
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 # Constants
 
 AIR_GAP = config.getfloat("DEFAULTS", "air_gap")

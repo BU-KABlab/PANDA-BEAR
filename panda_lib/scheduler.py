@@ -14,35 +14,36 @@ from typing import Tuple, Union
 
 import pandas as pd
 
+from panda_lib.log_tools import setup_default_logger
+
 from .experiment_class import (
     ExperimentBase,
     ExperimentStatus,
-    select_experiment_information,
-    select_experiment_paramaters,
     insert_experiment,
     insert_experiment_parameters,
-    select_next_experiment_id,
-    update_experiment_status,
     insert_experiment_result,
     insert_experiments_parameters,
+    select_experiment_information,
+    select_experiment_paramaters,
+    select_next_experiment_id,
+    update_experiment_status,
 )
-from .sql_tools.sql_utilities import execute_sql_command
-from .sql_tools.sql_wellplate import (
-    select_well_status,
-    select_next_available_well,
-    get_well,
-    select_current_wellplate_info,
-    update_well,
-    count_wells_with_new_status,
-)
+from .sql_tools.db_setup import SessionLocal
+from .sql_tools.panda_models import ExperimentParameters, Experiments
 from .sql_tools.sql_queue import (
-    get_next_experiment_from_queue,
     count_queue_length,
+    get_next_experiment_from_queue,
     select_queue,
 )
+from .sql_tools.sql_wellplate import (
+    count_wells_with_new_status,
+    get_well,
+    select_current_wellplate_info,
+    select_next_available_well,
+    select_well_status,
+    update_well,
+)
 from .wellplate import Well
-
-from panda_lib.log_tools import setup_default_logger
 
 logger = setup_default_logger(log_name="scheduler")
 
@@ -150,10 +151,16 @@ class Scheduler:
     def update_experiment_queue_priority(self, experiment_id: int, priority: int):
         """Update the priority of experiments in the queue"""
         try:
-            execute_sql_command(
-                "UPDATE experiments SET priority = ? WHERE experiment_id = ?",
-                (priority, experiment_id),
-            )
+            # execute_sql_command(
+            #     "UPDATE experiments SET priority = ? WHERE experiment_id = ?",
+            #     (priority, experiment_id),
+            # )
+            with SessionLocal() as session:
+                session.query(Experiments).filter_by(
+                    experiment_id=experiment_id
+                ).update({"priority": priority})
+                session.commit()
+
         except sqlite3.Error as e:
             logger.error(
                 "Error occured while updating experiment queue priority: %s", e
@@ -163,10 +170,16 @@ class Scheduler:
     def update_experiment_info(self, experiment: ExperimentBase, column: str) -> None:
         """Update the experiment information in the experiments table"""
         try:
-            execute_sql_command(
-                f"UPDATE experiments SET {column} = ? WHERE experiment_id = ?",
-                (getattr(experiment, column), experiment.experiment_id),
-            )
+            # execute_sql_command(
+            #     f"UPDATE experiments SET {column} = ? WHERE experiment_id = ?",
+            #     (getattr(experiment, column), experiment.experiment_id),
+            # )
+
+            with SessionLocal() as session:
+                session.query(Experiments).filter_by(
+                    experiment_id=experiment.experiment_id
+                ).update({column: getattr(experiment, column)})
+                session.commit()
         except sqlite3.Error as e:
             logger.error("Error occured while updating experiment information: %s", e)
             raise e
@@ -176,10 +189,16 @@ class Scheduler:
     ) -> None:
         """Update the experiment parameters in the experiment_parameters table"""
         try:
-            execute_sql_command(
-                "UPDATE experiment_parameters SET ? = ? WHERE experiment_id = ?",
-                (parameter, experiment[parameter], experiment.experiment_id),
-            )
+            # execute_sql_command(
+            #     "UPDATE experiment_parameters SET ? = ? WHERE experiment_id = ?",
+            #     (parameter, experiment[parameter], experiment.experiment_id),
+            # )
+
+            with SessionLocal() as session:
+                session.query(ExperimentParameters).filter_by(
+                    experiment_id=experiment.experiment_id
+                ).update({parameter: getattr(experiment, parameter)})
+                session.commit()
         except sqlite3.Error as e:
             logger.error("Error occured while updating experiment parameters: %s", e)
             raise e

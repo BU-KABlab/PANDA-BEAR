@@ -3,10 +3,10 @@ Methods and classses related to logging for the PANDA_SDL project
 """
 
 import logging
-import configparser
+import os
+from panda_lib.config import config_tools
+config = config_tools.read_config()
 
-config = configparser.ConfigParser()
-config.read("panda_lib\\config\\panda_sdl_config.ini")
 
 if config.getboolean("OPTIONS", "testing"):
     PANDA_SDL_LOG = config.get("TESTING", "logging_dir")
@@ -20,6 +20,10 @@ def setup_default_logger(
     file_level=logging.DEBUG,
     console_level=logging.INFO,
 ):
+    """Setup a default logger for the PANDA_SDL project"""
+
+    if not os.path.exists(PANDA_SDL_LOG):
+        os.makedirs(PANDA_SDL_LOG)
     logger = logging.getLogger(log_name)
     if not logger.handlers:  # Check if the logger already has handlers attached
         logger.setLevel(file_level)

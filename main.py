@@ -426,11 +426,11 @@ if __name__ == "__main__":
         print()
         print("Welcome to PANDA_SDL!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
-        num, p_type, free_wells = wellplate.read_current_wellplate_info()
+        num, p_type, new_wells = wellplate.read_current_wellplate_info()
         current_pipette = pipette.select_current_pipette_id()
         print(
             f"""
-The current wellplate is #{num} - Type: {p_type} - Available Wells: {free_wells}
+The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
 The current pipette id is {current_pipette}
 The queue has {scheduler.get_queue_length()} experiments.
 """

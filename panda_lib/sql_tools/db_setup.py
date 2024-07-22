@@ -27,8 +27,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+from panda_lib.config.config_tools import read_config
+
+config = read_config()
 # Determine if it's testing or production
 if config.getboolean("OPTIONS", "testing"):
     db_type = config.get("TESTING", "testing_db_type")

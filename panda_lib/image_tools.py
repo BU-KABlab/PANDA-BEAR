@@ -5,7 +5,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from panda_lib.sql_tools import sql_utilities
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import WellTypes
 from panda_lib.experiment_class import ExperimentBase
 
 def add_data_zone(
@@ -33,12 +34,15 @@ def add_data_zone(
         well_id = experiment.well_id
 
         try:
-            substrate = str(
-                sql_utilities.execute_sql_command(
-                    "SELECT substrate FROM well_types WHERE id = (SELECT type_id FROM wellplates WHERE id = ?)",
-                    (wellplate_id,),
-                )[0][0]
-            )
+            # substrate = str(
+            #     sql_utilities.execute_sql_command(
+            #         "SELECT substrate FROM well_types WHERE id = (SELECT type_id FROM wellplates WHERE id = ?)",
+            #         (wellplate_id,),
+            #     )[0][0]
+            # )
+
+            session = SessionLocal()
+            substrate = session.query(WellTypes).filter_by(id=wellplate_id).first().substrate
         except:
             substrate = "ITO"
 

@@ -5,10 +5,11 @@ from configparser import ConfigParser
 from pathlib import Path
 import sqlite3
 
+from panda_lib.config.config_tools import get_env_var, read_config
 
-configuration_path = Path(__file__).parent / "panda_sdl_config.ini"
-config = ConfigParser()
-config.read(configuration_path)
+
+configuration_path = get_env_var("PANDA_SDL_CONFIG_PATH")
+config = read_config()
 
 def get_repo_path():
     """Returns the path of the repository."""

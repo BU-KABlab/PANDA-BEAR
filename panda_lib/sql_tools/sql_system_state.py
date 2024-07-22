@@ -2,10 +2,10 @@
 Reading and writing the system state to the database.
 """
 
-from configparser import ConfigParser
+from panda_lib.config.config_tools import read_config
 from panda_lib.utilities import SystemState
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import SystemStatus
+from panda_lib.sql_tools.panda_models import SystemStatus, SystemVersions
 
 # from panda_lib.sql_tools.sql_utilities import execute_sql_command, execute_sql_command_no_return
 
@@ -80,8 +80,7 @@ from panda_lib.sql_tools.panda_models import SystemStatus
 #         (system_status.value, comment, test_mode),
 #     )
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 
 TESTING = config.getboolean("OPTIONS", "testing")
 
@@ -94,11 +93,20 @@ def get_current_pin() -> int:
         int: The current pin.
     """
     with SessionLocal() as session:
-        result = session.execute(
-            "SELECT pin FROM system_status ORDER BY status_time DESC LIMIT 1"
+        # result = session.execute(
+        #     "SELECT pin FROM system_status ORDER BY status_time DESC LIMIT 1"
+        # )
+        # for row in result:
+        #     return row[0]
+
+        result = (
+            session.query(SystemVersions.pin)
+            .order_by(SystemVersions.id.desc())
+            .limit(1)
+            .all()
         )
-        for row in result:
-            return row[0]
+
+        return result[0][0] if result else None
 
 
 def select_system_status(look_back: int = 1) -> SystemState:

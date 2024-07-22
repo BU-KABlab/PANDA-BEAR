@@ -987,7 +987,7 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
     current_plate_id, current_type_number, _ = (
         sql_wellplate.select_current_wellplate_info()
     )
-    new_wells = sql_wellplate.count_wells_with_new_status()
+    new_wells = sql_wellplate.count_wells_with_new_status(current_plate_id)
     return int(current_plate_id), int(current_type_number), new_wells
 
 

@@ -21,13 +21,14 @@ import logging
 import re
 import sys
 import time
-from configparser import ConfigParser
 from unittest.mock import MagicMock
 from venv import logger
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
+
+from panda_lib.config.config_tools import read_config
 from .log_tools import setup_default_logger
 from .utilities import Coordinates, Instruments
 from .sql_tools.db_setup import SessionLocal
@@ -39,8 +40,7 @@ logger = setup_default_logger(log_name="mill_control",console_level=logging.WARN
 # Mill movement logger - just for the movement commands
 mill_movement_logger = setup_default_logger(log_name="mill_movement",console_level=logging.WARNING)
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 MILL_COM_PORT = config.get("MILL", "port")
 MILL_BAUD_RATE = config.getint("MILL", "baudrate")
 MILL_TIMEOUT = config.getint("MILL", "timeout")

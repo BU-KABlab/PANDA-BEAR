@@ -6,9 +6,9 @@ from configparser import ConfigParser
 
 # import sqlite3
 # from panda_lib.config.config import SQL_DB_PATH
-from db_setup import SessionLocal
-from panda_models import Protocols
-
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import Protocols
+ 
 # region Protocols
 from panda_lib.errors import ProtocolNotFoundError
 
@@ -26,7 +26,7 @@ class ProtocolEntry:
         return f"{self.protocol_id}: {self.name}"
 
 
-def select_protocols() -> List[ProtocolEntry]:
+def select_protocols() -> List(ProtocolEntry):
     """
     Get all protocols from the database.
 
@@ -53,12 +53,13 @@ def select_protocols() -> List[ProtocolEntry]:
     # return protocol_entries
 
     with SessionLocal() as session:
-        result = session.query(Protocols).all()
-        protocols = result.fetchall()
+        protocols = session.query(Protocols).all()
 
     protocol_entries = []
     for protocol in protocols:
-        protocol_entry = ProtocolEntry(*protocol)
+        protocol_entry = ProtocolEntry(
+            protocol.id, protocol.project, protocol.name, protocol.filepath
+        )
         protocol_entries.append(protocol_entry)
 
     return protocol_entries

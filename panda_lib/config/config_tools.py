@@ -31,6 +31,13 @@ def write_testing_config(enable_testing: bool):
     with open(config_path, "w", encoding='utf-8') as config_file:
         config.write(config_file)
 
+def read_config() -> ConfigParser:
+    """Reads a configuration file."""
+    config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
+    config = ConfigParser()
+    config.read(config_path)
+    return config
+
 def test():
     """Tests the functions in this module."""
     print(get_repo_path())

@@ -9,12 +9,11 @@ from dataclasses import dataclass
 from pathlib import Path
 import obsws_python as obsws
 from obsws_python import error as OBSerror
-import os
-from configparser import ConfigParser
+
+from .config.config_tools import read_config
 from .log_tools import default_logger as logger
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 if config.getboolean("OPTIONS", "testing"):
     PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
 else:

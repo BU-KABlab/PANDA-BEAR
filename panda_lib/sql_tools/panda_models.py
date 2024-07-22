@@ -319,7 +319,7 @@ class WellPlates(Base):
     a1_y = Column(Float)
     orientation = Column(Integer)
     rows = Column(Integer)
-    columns = Column(String)
+    cols = Column(String)
     z_bottom = Column(Float)
     z_top = Column(Float)
     echem_height = Column(Float)
@@ -378,3 +378,24 @@ class MillConfig(Base):
 
     def __repr__(self):
         return f"<MillConfig(id={self.id}, config={self.config})>"
+    
+class SystemVersions(Base):
+    """SystemVersions table model"""
+
+    __tablename__ = "system_versions"
+    id = Column(Integer, primary_key=True)
+    mill = Column(Integer, nullable=False)
+    pump = Column(Text, default='00')
+    potentiostat = Column(Text, default='00')
+    reference_electrode = Column(Text, default='00')
+    working_electrode = Column(Text, default='00')
+    wells = Column(Text, default='00')
+    pipette_adapter = Column(Text, default='00')
+    optics = Column(Text, default='00')
+    scale = Column(Text, default='00')
+    camera = Column(Text, default='00')
+    lens = Column(Text, default='00')
+    pin = Column(Text, default=text("(CAST (mill AS TEXT) || ' ' || CAST (pump AS TEXT) || ' ' || CAST (potentiostat AS TEXT) || ' ' || CAST (reference_electrode AS TEXT) || ' ' || CAST (working_electrode AS TEXT) || ' ' || CAST (wells AS TEXT) || ' ' || CAST (pipette_adapter AS TEXT) || ' ' || CAST (optics AS TEXT) || ' ' || CAST (scale AS TEXT) || ' ' || CAST (camera AS TEXT) || ' ' || CAST (lens AS TEXT))"))
+
+    def __repr__(self):
+        return f"<SystemVersions(id={self.id}, mill={self.mill}, pump={self.pump}, potentiostat={self.potentiostat}, reference_electrode={self.reference_electrode}, working_electrode={self.working_electrode}, wells={self.wells}, pipette_adapter={self.pipette_adapter}, optics={self.optics}, scale={self.scale}, camera={self.camera}, lens={self.lens}, pin={self.pin})>"

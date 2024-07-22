@@ -7,16 +7,15 @@ from decimal import Decimal
 from typing import Tuple
 
 import comtypes
-from comtypes import client
 import numpy as np
 import pandas as pd
+from comtypes import client
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
-from configparser import ConfigParser
 
+from panda_lib.config.config_tools import read_config
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 if config.getboolean("OPTIONS", "testing"):
     PATH_TO_DATA = pathlib.Path(config.get("TESTING", "data_dir"))
 else:

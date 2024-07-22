@@ -14,10 +14,8 @@ Additionally controller should be able to:
 
 # pylint: disable=line-too-long, broad-exception-caught
 import importlib
-import os
 import sys
 import time
-from configparser import ConfigParser
 from pathlib import Path
 from typing import Sequence
 
@@ -30,7 +28,7 @@ from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .analyzer.pedot import pedot_analyzer
 from .analyzer.pedot import run_ml_model as pedot_ml_model
-from .config.config_tools import read_testing_config
+from .config.config_tools import read_config, read_testing_config
 from .errors import (
     NoExperimentFromModel,
     ProtocolNotFoundError,
@@ -55,9 +53,7 @@ from .utilities import SystemState
 from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_files
 from .wellplate import Wellplate
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
-
+config = read_config()
 # set up slack globally so that it can be used in the main function and others
 logger = setup_default_logger(log_name="panda_log")
 TESTING = read_testing_config()

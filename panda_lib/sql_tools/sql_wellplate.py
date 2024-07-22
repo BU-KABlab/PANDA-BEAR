@@ -97,7 +97,7 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple:
             wellplate.z_top,
             wellplate.orientation,
             wellplate.rows,
-            wellplate.columns,
+            wellplate.cols,
             wellplate.echem_height,
         )
 
@@ -186,8 +186,8 @@ def check_if_current_wellplate_is_new() -> bool:
         result = (
             session.query(WellHx.status)
             .filter(
-                WellHx.plate_id
-                == session.query(WellPlates.id).filter(WellPlates.current == 1)
+            WellHx.plate_id
+            == session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
             )
             .all()
         )
@@ -576,15 +576,17 @@ def count_wells_with_new_status(plate_id: Union[int, None] = None) -> int:
     # return int(result[0][0])
 
     with SessionLocal() as session:
-        if plate_id is not None:
-            result = (
-                session.query(WellHx)
-                .filter(WellHx.status == "new")
-                .filter(WellHx.plate_id == plate_id)
-                .count()
+        if plate_id is None:
+            plate_id = (
+                session.query(WellPlates).filter(WellPlates.current == 1).first().id
             )
-        else:
-            result = session.query(WellHx).filter(WellHx.status == "new").count()
+
+        result = (
+            session.query(WellHx)
+            .filter(WellHx.status == "new")
+            .filter(WellHx.plate_id == plate_id)
+            .count()
+        )
         return result
 
 

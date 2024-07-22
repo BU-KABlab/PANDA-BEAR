@@ -11,8 +11,10 @@ import math
 from dataclasses import asdict
 from typing import Sequence, Union, List, Tuple
 
-from .sql_tools.sql_utilities import execute_sql_command
+from .sql_tools.db_setup import SessionLocal
+from .sql_tools.panda_models import Vials
 from .vessel import OverDraftException, OverFillException, Vessel, VesselCoordinates
+
 
 vial_logger = logging.getLogger("panda")
 
@@ -185,59 +187,80 @@ class Vial2(Vessel):
         Inserts a new vial record into the 'vials' table in the db. This will be used by
         the vial_status view as the most recent vial status.
         """
+        # try:
+        #     execute_sql_command(
+        #         """
+        #         INSERT INTO vials (
+        #             name,
+        #             category,
+        #             position,
+        #             volume,
+        #             capacity,
+        #             density,
+        #             vial_coordinates,
+        #             radius,
+        #             height,
+        #             contamination,
+        #             contents,
+        #             viscosity_cp,
+        #             depth,
+        #             concentration
+        #         )
+        #         VALUES (
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?,
+        #             ?
+        #         )
+        #         """,
+        #         (
+        #             self.name,
+        #             self.category,
+        #             self.position,
+        #             self.volume,
+        #             self.capacity,
+        #             self.density,
+        #             str(asdict(self.coordinates)),
+        #             self.radius,
+        #             self.height,
+        #             self.contamination,
+        #             str(self.contents),
+        #             self.viscosity_cp,
+        #             self.depth,
+        #             self.concentration,
+        #         ),
+        #     )
         try:
-            execute_sql_command(
-                """
-                INSERT INTO vials (
-                    name,
-                    category,
-                    position,
-                    volume,
-                    capacity,
-                    density,
-                    vial_coordinates,
-                    radius,
-                    height,
-                    contamination,
-                    contents,
-                    viscosity_cp,
-                    depth,
-                    concentration
+            with SessionLocal() as session:
+                vial = Vials(
+                    name=self.name,
+                    category=self.category,
+                    position=self.position,
+                    volume=self.volume,
+                    capacity=self.capacity,
+                    density=self.density,
+                    vial_coordinates=str(asdict(self.coordinates)),
+                    radius=self.radius,
+                    height=self.height,
+                    contamination=self.contamination,
+                    contents=str(self.contents),
+                    viscosity_cp=self.viscosity_cp,
+                    depth=self.depth,
+                    concentration=self.concentration,
                 )
-                VALUES (
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?,
-                    ?
-                )
-                """,
-                (
-                    self.name,
-                    self.category,
-                    self.position,
-                    self.volume,
-                    self.capacity,
-                    self.density,
-                    str(asdict(self.coordinates)),
-                    self.radius,
-                    self.height,
-                    self.contamination,
-                    str(self.contents),
-                    self.viscosity_cp,
-                    self.depth,
-                    self.concentration,
-                ),
-            )
+                session.add(vial)
+                session.commit()
+                
         except Exception as e:
             vial_logger.error(
                 "Error occurred while updating vial status in the db: %s", e
@@ -473,26 +496,31 @@ def get_current_vials(group: str = None) -> List[dict]:
     """
     vial_parameters = []
     try:
-        vial_parameters = execute_sql_command(
-            """
-            SELECT
-                name,
-                category,
-                position,
-                volume,
-                capacity,
-                density,
-                vial_coordinates,
-                radius,
-                height,
-                contamination,
-                contents,
-                viscosity_cp,
-                concentration,
-                depth
-            FROM vial_status
-            """
-        )
+        # vial_parameters = execute_sql_command(
+        #     """
+        #     SELECT
+        #         name,
+        #         category,
+        #         position,
+        #         volume,
+        #         capacity,
+        #         density,
+        #         vial_coordinates,
+        #         radius,
+        #         height,
+        #         contamination,
+        #         contents,
+        #         viscosity_cp,
+        #         concentration,
+        #         depth
+        #     FROM vial_status
+        #     """
+        # )
+
+        with SessionLocal() as session:
+            vials = session.query(Vials).all()
+            for vial in vials:
+                vial_parameters.append(asdict(vial))
     except Exception as e:
         vial_logger.error("Error occurred while reading vials from the db: %s", e)
         vial_logger.error("Continuing with empty vial list....")
@@ -634,12 +662,16 @@ def reset_vials(vialgroup: str) -> None:
 def delete_vial_position_and_hx_from_db(position: str) -> None:
     """Delete the vial position and hx from the db"""
     try:
-        execute_sql_command(
-            """
-            DELETE FROM vials WHERE position = ?
-            """,
-            (position,),
-        )
+        # execute_sql_command(
+        #     """
+        #     DELETE FROM vials WHERE position = ?
+        #     """,
+        #     (position,),
+        # )
+
+        with SessionLocal() as session:
+            session.query(Vials).filter(Vials.position == position).delete()
+            session.commit()
     except Exception as e:
         vial_logger.error(
             "Error occurred while deleting vial position and hx from the db: %s", e

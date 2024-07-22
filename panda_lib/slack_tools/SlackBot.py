@@ -27,11 +27,11 @@ from panda_lib.image_tools import add_data_zone
 from panda_lib.obs_controls import OBSController
 from panda_lib.sql_tools import (
     sql_queue,
-    sql_slack_tickets,
     sql_system_state,
-    sql_utilities,
     sql_wellplate,
 )
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import SlackTickets
 from panda_lib.wellplate import Well, Wellplate
 
  # Initialize the configparser
@@ -87,27 +87,40 @@ def insert_slack_ticket(ticket: SlackTicket, test: bool = False) -> None:
     """
     if config_options.getboolean("use_slack"):
         test = True
-    sql_utilities.execute_sql_command_no_return(
-        """
-        INSERT INTO slack_tickets (
-            msg_id,
-            channel_id,
-            message,
-            response,
-            timestamp,
-            addressed_timestamp
+    # sql_utilities.execute_sql_command_no_return(
+    #     """
+    #     INSERT INTO slack_tickets (
+    #         msg_id,
+    #         channel_id,
+    #         message,
+    #         response,
+    #         timestamp,
+    #         addressed_timestamp
+    #         )
+    #     VALUES (?, ?, ?, ?, ?, ?)
+    #     """,
+    #     (
+    #         ticket.msg_id,
+    #         ticket.channel_id,
+    #         ticket.msg_text,
+    #         ticket.valid_cmd,
+    #         ticket.timestamp,
+    #         ticket.addressed_timestamp,
+    #     ),
+    # )
+
+    with SessionLocal() as session:
+        session.add(
+            SlackTickets(
+                msg_id=ticket.msg_id,
+                channel_id=ticket.channel_id,
+                message=ticket.msg_text,
+                response=ticket.valid_cmd,
+                timestamp=ticket.timestamp,
+                addressed_timestamp=ticket.addressed_timestamp,
             )
-        VALUES (?, ?, ?, ?, ?, ?)
-        """,
-        (
-            ticket.msg_id,
-            ticket.channel_id,
-            ticket.msg_text,
-            ticket.valid_cmd,
-            ticket.timestamp,
-            ticket.addressed_timestamp,
-        ),
-    )
+        )
+        session.commit()
 
 
 def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
@@ -122,20 +135,23 @@ def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
     """
     if config_options.getboolean("use_slack"):
         test = True
-    result = sql_utilities.execute_sql_command(
-        """
-        SELECT
-            msg_id,
-            channel_id,
-            message,
-            response,
-            timestamp,
-            addressed_timestamp
-        FROM slack_tickets
-        WHERE msg_id = ?
-        """,
-        (msg_id,),
-    ) #TODO: Replace with SQLAlchemy query
+    # result = sql_utilities.execute_sql_command(
+    #     """
+    #     SELECT
+    #         msg_id,
+    #         channel_id,
+    #         message,
+    #         response,
+    #         timestamp,
+    #         addressed_timestamp
+    #     FROM slack_tickets
+    #     WHERE msg_id = ?
+    #     """,
+    #     (msg_id,),
+    # ) #TODO: Replace with SQLAlchemy query
+
+    with SessionLocal() as session:
+        result = session.query(SlackTickets).filter(SlackTickets.msg_id == msg_id).all()
     if result == []:
         return None
     return SlackTicket(*result[0])
