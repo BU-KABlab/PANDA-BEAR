@@ -120,11 +120,14 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
             result = (
                 session.query(Protocols).filter(Protocols.name == protocol_id).first()
             )
+            if result is None:
+                result = (
+                    session.query(Protocols).filter(Protocols.name == protocol_id+".py").first()
+                )
         else:
             result = (
                 session.query(Protocols).filter(Protocols.id == protocol_id).first()
             )
-
         if result is None:
             raise ProtocolNotFoundError(f"Protocol with id {protocol_id} not found.")
         protocol_entry = ProtocolEntry(
