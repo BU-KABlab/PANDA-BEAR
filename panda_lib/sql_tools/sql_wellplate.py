@@ -5,6 +5,8 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import List, Tuple, Union
 
+from sqlalchemy import DateTime
+
 from panda_lib import wellplate as wellplate_module
 from panda_lib.sql_tools import sql_utilities
 from panda_lib.sql_tools.db_setup import SessionLocal
@@ -474,14 +476,20 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
         wells = []
         for row in result:
             try:
-                incoming_contents = json.loads(row[5])
+                if isinstance(row[5],str):
+                    incoming_contents = json.loads(row[5])
+                else:
+                    incoming_contents = row[5]
             except json.JSONDecodeError:
                 incoming_contents = {}
             except TypeError:
                 incoming_contents = {}
 
             try:
-                incoming_coordinates = json.loads(row[9])
+                if isinstance(row[9],str):
+                    incoming_coordinates = json.loads(row[9])
+                else:
+                    incoming_coordinates = row[9]
             except json.JSONDecodeError:
                 incoming_coordinates = (0, 0)
 
@@ -690,7 +698,36 @@ def save_well_to_db(well_to_save: object) -> None:
                 session.query(WellPlates).filter(WellPlates.current == 1).first().id
             )
 
-        session.add(WellHx(**well_to_save.__dict__))
+        # Leaving this commented if we want to change how the table is structured.
+        # Currently the table is unique on plate_id and well_id, but we could in the future
+        # Allow for multiple entries with the same well_id and plate_id but different status
+        # Then use a view to get the most recent status for each well_id and plate_id
+        # session.add(WellHx(
+        #     plate_id=well_to_save.plate_id,
+        #     well_id=well_to_save.well_id,
+        #     experiment_id=well_to_save.experiment_id,
+        #     project_id=well_to_save.project_id,
+        #     status=well_to_save.status,
+        #     status_date=datetime.strptime(well_to_save.status_date,'%Y-%m-%dT%H:%M:%S'),
+        #     contents=well_to_save.contents,
+        #     volume=well_to_save.volume,
+        #     coordinates=well_to_save.coordinates.__dict__
+        # ))
+
+        # Instead we will update the status of the well if it already exists
+        session.query(WellHx).filter(WellHx.plate_id == well_to_save.plate_id).filter(
+            WellHx.well_id == well_to_save.well_id
+        ).update(
+            {
+                WellHx.experiment_id: well_to_save.experiment_id,
+                WellHx.project_id: well_to_save.project_id,
+                WellHx.status: well_to_save.status,
+                WellHx.status_date: datetime.strptime(well_to_save.status_date,'%Y-%m-%dT%H:%M:%S'),
+                WellHx.contents: json.dumps(well_to_save.contents),
+                WellHx.volume: well_to_save.volume,
+                WellHx.coordinates: json.dumps(asdict(well_to_save.coordinates)),
+            }
+        )
         session.commit()
 
 
