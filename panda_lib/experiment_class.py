@@ -75,25 +75,25 @@ class ExperimentParameterRecord:
     The table has columns:
     id,
     experiment_id,
-    parameter_type,
+    parameter_name,
     parameter_value
     """
 
-    def __init__(self, experiment_id: int, parameter_type: str, parameter_value: str):
+    def __init__(self, experiment_id: int, parameter_name: str, parameter_value: str):
         self.experiment_id = experiment_id
-        self.parameter_type = parameter_type
+        self.parameter_name = parameter_name
         self.parameter_value = parameter_value
 
     def __str__(self):
-        return f"Experiment ID: {self.experiment_id}, Parameter Type: {self.parameter_type}, Parameter Value: {self.parameter_value}"
+        return f"Experiment ID: {self.experiment_id}, Parameter Type: {self.parameter_name}, Parameter Value: {self.parameter_value}"
 
     def __repr__(self):
-        return f"ExperimentParameterRecord({self.experiment_id}, {self.parameter_type}, {self.parameter_value})"
+        return f"ExperimentParameterRecord({self.experiment_id}, {self.parameter_name}, {self.parameter_value})"
 
     def __eq__(self, other):
         return (
             self.experiment_id == other.experiment_id
-            and self.parameter_type == other.parameter_type
+            and self.parameter_name == other.parameter_type
             and self.parameter_value == other.parameter_value
         )
 
@@ -101,15 +101,15 @@ class ExperimentParameterRecord:
         return not self.__eq__(other)
 
     def __hash__(self):
-        return hash((self.experiment_id, self.parameter_type, self.parameter_value))
+        return hash((self.experiment_id, self.parameter_name, self.parameter_value))
 
     def __iter__(self):
         yield self.experiment_id
-        yield self.parameter_type
+        yield self.parameter_name
         yield self.parameter_value
 
     def __list__(self):
-        return [self.experiment_id, self.parameter_type, self.parameter_value]
+        return [self.experiment_id, self.parameter_name, self.parameter_value]
 
 
 class ExperimentStatus(str, Enum):
@@ -381,7 +381,7 @@ class ExperimentBase:
         all_parameters = [
             parameter
             for parameter in all_parameters
-            if parameter.parameter_type
+            if parameter.parameter_name
             not in [
                 "project_id",
                 "project_campaign_id",
@@ -423,24 +423,28 @@ class ExperimentBase:
             return None
 
         for parameter in parameter_list:
-            parameter = ExperimentParameterRecord(*parameter)
+            parameter = ExperimentParameterRecord(
+                experiment_id=parameter.experiment_id,
+                parameter_name=parameter.parameter_name,
+                parameter_value=parameter.parameter_value,
+            )
             try:
                 attribute_type = get_all_type_hints(type(self))[
-                    parameter.parameter_type
+                    parameter.parameter_name
                 ]
             except KeyError as exc:
                 # The attribute is not in ExperimentBase, check in the class hierarchy
                 cls = find_attribute_in_hierarchy(
-                    self.__class__, parameter.parameter_type
+                    self.__class__, parameter.parameter_name
                 )
                 if cls is not None:
-                    attribute_type = get_all_type_hints(cls)[parameter.parameter_type]
+                    attribute_type = get_all_type_hints(cls)[parameter.parameter_name]
                 else:
                     print(
-                        f"Attribute {parameter.parameter_type} not found in class hierarchy"
+                        f"Attribute {parameter.parameter_name} not found in class hierarchy"
                     )
                     raise AttributeError(
-                        f"Attribute {parameter.parameter_type} not found in class hierarchy"
+                        f"Attribute {parameter.parameter_name} not found in class hierarchy"
                     ) from exc
 
             if isinstance(
@@ -487,14 +491,14 @@ class ExperimentBase:
             else:
                 print(f"Unknown attribute type {attribute_type}")
 
-            if hasattr(self, parameter.parameter_type):  # Check if the attribute exists
-                setattr(self, parameter.parameter_type, parameter.parameter_value)
+            if hasattr(self, parameter.parameter_name):  # Check if the attribute exists
+                setattr(self, parameter.parameter_name, parameter.parameter_value)
             else:
                 # If the attribute does not exist, add it to the object, this is
                 # to avoid every experiment needing to have attributes of other experiments
                 # Example: Edot experiments have edot_concentration, but not all experiments have this
                 setattr(
-                    self.__class__, parameter.parameter_type, parameter.parameter_value
+                    self.__class__, parameter.parameter_name, parameter.parameter_value
                 )
 
 
@@ -798,32 +802,30 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
     # )
 
     with SessionLocal() as session:
-        result = session.query(Experiments).filter(Experiments.experiment_id == experiment_id).all()
-    values = []
-    for row in result:
-        values.append(row)
+        result = session.query(Experiments).filter(Experiments.experiment_id == experiment_id).first()
 
-    if values == []:
+    if result is None:
         return None
     else:
 
         # With the project_id known to determine the experiment type
         # object type
-        project_id = values[0][1]
+
+        project_id = result.project_id
         experiment_object = experiment_types_by_project_id.get(project_id)()
 
         experiment = experiment_object
         experiment.experiment_id = experiment_id
-        experiment.project_id = values[0][1]
-        experiment.project_campaign_id = values[0][2]
-        experiment.well_type_number = values[0][3]
-        experiment.protocol_id = values[0][4]
-        experiment.pin = values[0][5]
-        experiment.experiment_type = values[0][6]
-        experiment.jira_issue_key = values[0][7]
-        experiment.priority = values[0][8]
-        experiment.process_type = values[0][9]
-        experiment.filename = values[0][10]
+        experiment.project_id = result.project_id
+        experiment.project_campaign_id = result.project_campaign_id
+        experiment.well_type_number = result.well_type
+        experiment.protocol_id = result.protocol_id
+        experiment.pin = result.pin
+        experiment.experiment_type = result.experiment_type
+        experiment.jira_issue_key = result.jira_issue_key
+        experiment.priority = result.priority
+        experiment.process_type = result.process_type
+        experiment.filename = result.filename
         return experiment
 
 
@@ -1050,7 +1052,7 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
             parameters_to_insert.append(
                 (
                     experiment.experiment_id,
-                    parameter.parameter_type,
+                    parameter.parameter_name,
                     (
                         json.dumps(parameter.parameter_value, default=decimal_default)
                         if isinstance(parameter.parameter_value, dict)
