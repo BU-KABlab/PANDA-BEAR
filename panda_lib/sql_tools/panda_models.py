@@ -6,13 +6,19 @@ SQLAlchemy models for the PANDA database
 import datetime
 from datetime import datetime as dt
 
-from sqlalchemy import Column, ForeignKey, Integer, String, text, Text
-from sqlalchemy.orm import Mapped, relationship, declarative_base
-from sqlalchemy.sql.sqltypes import DECIMAL, JSON, TEXT, Boolean, DateTime, Float
-
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, text
+from sqlalchemy.orm import Mapped, declarative_base, relationship
+from sqlalchemy.sql.sqltypes import (DECIMAL, JSON, TEXT, Boolean, DateTime,
+                                     Float)
 
 Base = declarative_base()
 
+from sqlalchemy.inspection import inspect
+
+
+def model_to_dict(model):
+    return {c.key: getattr(model, c.key)
+            for c in inspect(model).mapper.column_attrs}
 
 class Experiments(Base):
     """Experiments table model"""
@@ -69,14 +75,13 @@ class ExperimentParameters(Base):
     __tablename__ = "experiment_parameters"
     id = Column(Integer, primary_key=True)
     experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"))
-    parameter_type = Column(String)
+    parameter_name = Column(String)
     parameter_value = Column(String)
     created = Column(DateTime, default=dt.now)
     updated = Column(DateTime, default=dt.now, onupdate=dt.now)
-    context = Column(String)
 
     def __repr__(self):
-        return f"<ExperimentParameters(id={self.id}, experiment_id={self.experiment_id}, parameter_type={self.parameter_type}, parameter_value={self.parameter_value}, created={self.created}, updated={self.updated}, context={self.context})>"
+        return f"<ExperimentParameters(id={self.id}, experiment_id={self.experiment_id}, parameter_type={self.parameter_name}, parameter_value={self.parameter_value}, created={self.created}, updated={self.updated}, context={self.context})>"
 
 
 class ExperimentGenerators(Base):
@@ -370,15 +375,15 @@ class MillConfig(Base):
     """
     Stores the JSON config for the grbl mill
     """
-    
+
     __tablename__ = "mill_config"
     id = Column(Integer, primary_key=True)
     config = Column(JSON, nullable=False)
-    timstamp = Column(DateTime, default=dt.now)
+    timestamp = Column(DateTime, default=dt.now)
 
     def __repr__(self):
         return f"<MillConfig(id={self.id}, config={self.config})>"
-    
+
 class SystemVersions(Base):
     """SystemVersions table model"""
 
@@ -399,3 +404,27 @@ class SystemVersions(Base):
 
     def __repr__(self):
         return f"<SystemVersions(id={self.id}, mill={self.mill}, pump={self.pump}, potentiostat={self.potentiostat}, reference_electrode={self.reference_electrode}, working_electrode={self.working_electrode}, wells={self.wells}, pipette_adapter={self.pipette_adapter}, optics={self.optics}, scale={self.scale}, camera={self.camera}, lens={self.lens}, pin={self.pin})>"
+
+class VialStatus(Base):
+    """VialStatus view model"""
+
+    __tablename__ = "vial_status"
+    id = Column(Integer, primary_key=True)
+    position = Column(String)
+    contents = Column(String)
+    viscosity_cp = Column(Float)
+    concentration = Column(Float)
+    density = Column(Float)
+    category = Column(Integer)
+    radius = Column(Integer)
+    height = Column(Integer)
+    depth = Column(Integer)
+    name = Column(String)
+    volume = Column(Float)
+    capacity = Column(Integer)
+    contamination = Column(Integer)
+    vial_coordinates = Column(String)
+    updated = Column(DateTime, default=dt.now)
+
+    def __repr__(self):
+        return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
