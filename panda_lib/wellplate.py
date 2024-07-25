@@ -7,6 +7,7 @@ wellplate and the wells in it.
 import json
 import logging
 import math
+
 # pylint: disable=line-too-long
 from dataclasses import asdict, dataclass, field
 from typing import Optional, Tuple, Union
@@ -16,14 +17,19 @@ from panda_lib import experiment_class
 from .errors import OverFillException
 from .sql_tools import sql_wellplate
 from .sql_tools.db_setup import SessionLocal
-from .sql_tools.panda_models import (ExperimentParameters, Experiments, WellHx,
-                                     WellPlates, MillConfig)
+from .sql_tools.panda_models import (
+    ExperimentParameters,
+    Experiments,
+    WellHx,
+    WellPlates,
+    MillConfig,
+)
 from .vessel import Vessel
 
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
-#MILL_CONFIG = "panda_lib/config/mill_config.json"
+# MILL_CONFIG = "panda_lib/config/mill_config.json"
 # WELLPLATE_LOCATION = "panda_lib/config/wellplate_location.json" #TODO use wellpalte table going forward
 
 
@@ -39,6 +45,7 @@ class WellCoordinates:
         z_top (Union[int, float]): The z-coordinate of top the well.
         z_bottom (Union[int, float]): The z-coordinate of the bottom of the well.
     """
+
     x: Union[int, float]
     y: Union[int, float]
     z_top: Union[int, float] = 0
@@ -101,7 +108,7 @@ class Well(Vessel):
         coordinates: WellCoordinates,
         volume: float,
         status: str,
-        contents: dict = {},
+        contents: dict = None,
         status_date: str = None,
         depth: float = None,
         capacity: float = None,
@@ -113,6 +120,9 @@ class Well(Vessel):
         well_type_number: int = None,
     ):
         """ """
+        if contents is None:
+            contents = {}
+
         self.plate_id: int = plate_id
         self.well_id: str = well_id
         self.experiment_id: int = experiment_id
@@ -122,6 +132,7 @@ class Well(Vessel):
         self.project_id: int = project_id
         self.campaign_id: int = campaign_id
         self.volume: float = volume
+
         if isinstance(coordinates, WellCoordinates):
             self.coordinates: WellCoordinates = coordinates
         else:
@@ -151,26 +162,33 @@ class Well(Vessel):
         """Returns a string representation of the well."""
         return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
 
-    def __dict__(self) -> dict:
+    def to__dict__(self) -> dict:
         """Returns a dictionary representation of the well."""
         return {
             "well_id": self.well_id,
+            "plate_id": self.plate_id,
+            "coordinates": self.coordinates,
+            "volume": self.volume,
             "status": self.status,
+            "contents": self.contents,
             "status_date": self.status_date,
-            "contents": json.dumps(self.contents),
+            "depth": self.depth,
+            "capacity": self.capacity,
+            "height": self.height,
             "experiment_id": self.experiment_id,
             "project_id": self.project_id,
-            "volume": str(
-                self.volume
-            ),  # Convert float to string so it can be printed or serialized to JSON
-            "coordinates": self.coordinates.to_json_string(),
+            "density": self.density,
+            "campaign_id": self.campaign_id,
+            "well_type_number": self.type_number,
         }
 
     def __repr__(self) -> str:
         """Returns a string representation of the well."""
         return f"Well({self.well_id}, {self.status}, {self.status_date}, {self.contents}, {self.experiment_id}, {self.project_id}, {str(self.volume)}, {self.coordinates})"
 
-    def update_contents(self, from_vessel: dict, volume: float, save:bool = False) -> None:
+    def update_contents(
+        self, from_vessel: dict, volume: float, save: bool = False
+    ) -> None:
         """Updates the contents of the well in the well_status.json file."""
 
         # If we are removing a volume from a well we assume that the contents are equally mixed
@@ -191,12 +209,16 @@ class Well(Vessel):
 
                 for key, value in self.contents.items():
                     self.contents[key] = value + round(
-                        (volume * current_content_ratios[key]), 6
+                        (volume * current_content_ratios[key]),
+                        6,  # TODO get the precision from config
                     )
 
                 # logger.debug("Well %s is empty", self.name)
-            except Exception as e:
-                logger.error("Error occurred while updating well contents: %s", e)
+            except KeyError as e:
+                logger.error("Key Error occurred while updating well contents: %s", e)
+                logger.error("Not critical, continuing....")
+            except ValueError as e:
+                logger.error("Value Error occurred while updating well contents: %s", e)
                 logger.error("Not critical, continuing....")
 
         elif volume == float(0):
@@ -359,7 +381,7 @@ class Wellplate:
         }  # coordinates of A1
         self.calculate_well_locations()
         for well_id in self.wells:
-            well:Well = self.wells[well_id]
+            well: Well = self.wells[well_id]
             self.update_well_coordinates(well_id, well.coordinates)
 
     def calculate_well_locations(self) -> None:
@@ -606,7 +628,6 @@ class Wellplate:
         #     cols = data["cols"]
         #     echem_height = float(data["echem_height"])
 
-
         return sql_wellplate.select_wellplate_location()
 
         # return (x, y, z_bottom, orientation, rows, cols, echem_height)
@@ -625,7 +646,9 @@ class Wellplate:
         ) = self.load_wellplate_location()
 
         # Update the wells for the z_bottom as the depth
-        if isinstance(self.wells, dict) and all(isinstance(value, Well) for value in self.wells.values()):
+        if isinstance(self.wells, dict) and all(
+            isinstance(value, Well) for value in self.wells.values()
+        ):
             for well in self.wells.values():
                 well: Well
                 well.depth = self.z_bottom
@@ -646,15 +669,15 @@ class Wellplate:
         #     json.dump(data_to_write, f, indent=4)
 
         sql_wellplate.update_wellplate_location(
-            plate_id = self.plate_id,
-            a1_x = self.a1_x,
-            a1_y = self.a1_y,
-            z_bottom = self.z_bottom,
-            z_top = self.z_top,
-            orientation = self.orientation,
-            rows = self.rows,
-            columns = self.columns,
-            echem_height = self.echem_height,
+            plate_id=self.plate_id,
+            a1_x=self.a1_x,
+            a1_y=self.a1_y,
+            z_bottom=self.z_bottom,
+            z_top=self.z_top,
+            orientation=self.orientation,
+            rows=self.rows,
+            columns=self.columns,
+            echem_height=self.echem_height,
         )
         logger.debug("Well plate location written to file")
 
@@ -736,11 +759,17 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
     #     "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new' WHERE experiment_id = ?",
     #     (experiment_id,),
     # )
-    
+
     with SessionLocal() as session:
-        session.query(Experiments).filter(Experiments.experiment_id == experiment_id).delete()
-        session.query(ExperimentParameters).filter(ExperimentParameters.experiment_id == experiment_id).delete()
-        session.query(WellHx).filter(WellHx.experiment_id == experiment_id).update({"experiment_id": None, "project_id": None, "status": "new"})
+        session.query(Experiments).filter(
+            Experiments.experiment_id == experiment_id
+        ).delete()
+        session.query(ExperimentParameters).filter(
+            ExperimentParameters.experiment_id == experiment_id
+        ).delete()
+        session.query(WellHx).filter(WellHx.experiment_id == experiment_id).update(
+            {"experiment_id": None, "project_id": None, "status": "new"}
+        )
         session.commit()
 
     input("Experiment deleted. Press enter to continue...")
@@ -754,7 +783,9 @@ def change_wellplate_location():
     # working_volume = mill_config["working_volume"]
 
     with SessionLocal() as session:
-        mill_config_record = session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+        mill_config_record = (
+            session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+        )
         working_volume = mill_config_record.config["working_volume"]
 
     ## Ask for the new location
@@ -817,9 +848,9 @@ def change_wellplate_location():
 
     sql_wellplate.update_wellplate_location(
         plate_id=None,
-        a1_x = new_location_x,
-        a1_y = new_location_y,
-        orientation = new_orientation
+        a1_x=new_location_x,
+        a1_y=new_location_y,
+        orientation=new_orientation,
     )
 
 
