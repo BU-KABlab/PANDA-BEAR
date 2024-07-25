@@ -12,7 +12,7 @@ from dataclasses import asdict
 from typing import Sequence, Union, List, Tuple
 
 from .sql_tools.db_setup import SessionLocal
-from .sql_tools.panda_models import Vials
+from .sql_tools.panda_models import VialStatus, Vials, model_to_dict
 from .vessel import OverDraftException, OverFillException, Vessel, VesselCoordinates
 
 
@@ -486,7 +486,7 @@ class WasteVial(Vial2):
         return self
 
 
-def get_current_vials(group: str = None) -> List[dict]:
+def get_current_vials(group: Union[None,str] = None) -> List[dict]:
     """
     Get the current vials from the db
 
@@ -518,9 +518,9 @@ def get_current_vials(group: str = None) -> List[dict]:
         # )
 
         with SessionLocal() as session:
-            vials = session.query(Vials).all()
+            vials = session.query(VialStatus).all()
             for vial in vials:
-                vial_parameters.append(asdict(vial))
+                vial_parameters.append(model_to_dict(vial))
     except Exception as e:
         vial_logger.error("Error occurred while reading vials from the db: %s", e)
         vial_logger.error("Continuing with empty vial list....")
@@ -529,10 +529,10 @@ def get_current_vials(group: str = None) -> List[dict]:
     vial_parameters_copy = list(vial_parameters)  # Convert the tuple to a list
     vial_parameters = []
     for vial in vial_parameters_copy:
-        coordinate_string = ast.literal_eval(vial[6])
-        contents = vial[10]
+        coordinate_string = ast.literal_eval(vial['vial_coordinates'])
+        contents = vial['contents']
         if contents == "none":
-            if vial[1] == 0:
+            if vial['category'] == 0:
                 contents = None
             else:
                 contents = {}
@@ -541,26 +541,26 @@ def get_current_vials(group: str = None) -> List[dict]:
             contents = None
 
         elif "{" in contents:
-            contents = ast.literal_eval(vial[10])
+            contents = ast.literal_eval(vial['contents'])
 
 
         vial_dict = {
-            "name": vial[0],
-            "category": vial[1],
-            "position": vial[2],
-            "volume": round(float(vial[3]), 6),
-            "capacity": round(float(vial[4]), 6),
-            "density": round(float(vial[5]), 6),
+            "name": vial['name'],
+            "category": vial['category'],
+            "position": vial['position'],
+            "volume": round(float(vial['volume']), 6),
+            "capacity": round(float(vial['capacity']), 6),
+            "density": round(float(vial['density']), 6),
             "vial_coordinates": VesselCoordinates(**coordinate_string),
-            "radius": round(float(vial[7]), 6),
-            "height": round(float(vial[8]), 6),
-            "contamination": round(float(vial[9]), 6),
+            "radius": round(float(vial['radius']), 6),
+            "height": round(float(vial['height']), 6),
+            "contamination": round(float(vial['contamination']), 6),
             "contents": contents,
-            "viscosity_cp": round(float(vial[11]), 6),
+            "viscosity_cp": round(float(vial['viscosity_cp']), 6),
             "concentration": (
-                round(float(vial[12]), 6) if vial[1] == 0 else None
+            round(float(vial['concentration']), 6) if vial['category'] == 0 else None
             ),  # Only stock vials have concentration
-            "depth": round(float(vial[13]), 6),
+            "depth": round(float(vial['depth']), 6),
         }
         # vial = Vial2(**vial_dict)
         if group is not None:  # Filter by group
@@ -704,7 +704,22 @@ def input_new_vial_values(vialgroup: str) -> None:
 
     max_lengths = [10, 20, 20, 15, 15, 15, 15]  # Initialize max lengths for each column
     for vial in vial_parameters:
-        vial = Vial2(**vial)
+        vial = Vial2(
+            name=vial["name"],
+            category=vial["category"],
+            position=vial["position"],
+            volume=vial["volume"],
+            capacity=vial["capacity"],
+            density=vial["density"],
+            vial_coordinates=vial["vial_coordinates"],
+            radius=vial["radius"],
+            height=vial["height"],
+            contamination=vial["contamination"],
+            contents = vial["contents"],
+            viscosity_cp=vial["viscosity_cp"],
+            depth=vial["depth"],
+            concentration=vial["concentration"],
+        )
         vial_list.append(vial)
         if vial.contents is None:
             vial.contents = {}
