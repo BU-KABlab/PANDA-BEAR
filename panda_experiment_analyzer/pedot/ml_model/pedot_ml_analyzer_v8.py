@@ -31,7 +31,7 @@ from panda_lib.experiment_class import (
     ExperimentResultsRecord,
     insert_experiment_results,
 )
-from panda_lib.analyzer.pedot.sql_ml_functions import (
+from panda_experiment_analyzer.pedot.sql_ml_functions import (
     model_iteration,
     insert_best_test_point,
     select_ml_training_data,

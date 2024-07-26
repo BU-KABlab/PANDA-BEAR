@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from panda_lib.analyzer.pedot.sql_ml_functions import insert_ml_training_data
+from panda_experiment_analyzer.pedot.sql_ml_functions import insert_ml_training_data
 from panda_lib.experiment_class import (ExperimentResultsRecord,
                                         insert_experiment_result)
 
@@ -31,7 +31,7 @@ ml_file_paths = MLInput(
 )
 
 
-def pedot_analyzer(experiment_id: int, dont_train:bool=False) -> MLTrainingData:
+def analyze(experiment_id: int, add_to_training_data:bool=False) -> MLTrainingData:
     """
     Analyzes the PEDOT experiment and returns the training data for the ML model.
 
@@ -105,7 +105,7 @@ def pedot_analyzer(experiment_id: int, dont_train:bool=False) -> MLTrainingData:
     # df_new_training_data.to_csv(
     #     ml_file_paths.training_file_path, mode="a", header=False, index=False
     # )
-    if not dont_train:
+    if add_to_training_data:
         insert_ml_training_data(df_new_training_data)
 
     return ml_training_data
@@ -155,7 +155,7 @@ def main(experiment_id: int = None, generate_experiment: bool = True):
 
     """
     # Analyze the experiment
-    pedot_analyzer(experiment_id)
+    analyze(experiment_id, add_to_training_data = True)
 
     if not generate_experiment:
         return None

@@ -23,7 +23,7 @@ from panda_lib.actions_pedot import (
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,
 )
-from panda_lib.experiment_class import EdotExperiment, ExperimentStatus
+from panda_lib.experiment_class import PEDOTExperiment, ExperimentStatus
 from panda_lib.vials import StockVial, WasteVial
 from panda_lib.correction_factors import correction_factor
 from panda_lib.mill_control import Instruments
@@ -31,7 +31,7 @@ from panda_lib.utilities import solve_vials_ilp
 
 
 def main(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -50,7 +50,7 @@ def main(
 
 
 def pedot_lhs_v1_screening(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -109,7 +109,7 @@ def pedot_lhs_v1_screening(
 
 
 def pedotdeposition(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -305,7 +305,7 @@ def pedotdeposition(
 
 
 def pedotbleaching(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -422,7 +422,7 @@ def pedotbleaching(
 
 
 def pedotcoloring(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -540,7 +540,7 @@ def pedotcoloring(
 
 
 def pedotcv(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],

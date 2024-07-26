@@ -22,7 +22,7 @@ from panda_lib.actions_pedot import (
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,
 )
-from panda_lib.experiment_class import EdotExperiment, ExperimentStatus
+from panda_lib.experiment_class import PEDOTExperiment, ExperimentStatus
 from panda_lib.vials import StockVial, WasteVial
 from panda_lib.correction_factors import correction_factor
 from panda_lib.mill_control import Instruments
@@ -30,7 +30,7 @@ from panda_lib.utilities import solve_vials_ilp
 
 
 def main(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -49,7 +49,7 @@ def main(
 
 
 def pedot_lhs_v1_screening(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -76,75 +76,72 @@ def pedot_lhs_v1_screening(
         )
 
     # Run the experiment based on its experiment type
-    if instructions.process_type == 1:
-        pedotdeposition(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotbleaching(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotcoloring(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotcv(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-    elif instructions.process_type == 2:
-        pedotbleaching(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotcoloring(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-        pedotcv(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
+    # if instructions.process_type in [0,1]:
+    #     pedotdeposition(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    #     pedotbleaching(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    #     pedotcoloring(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
 
-    elif instructions.process_type == 3:
-        pedotcoloring(
+    # elif instructions.process_type == 2:
+    #     pedotbleaching(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    #     pedotcoloring(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+
+
+    # elif instructions.process_type == 3:
+    #     pedotcoloring(
+    #         instructions=instructions,
+    #         toolkit=toolkit,
+    #         stock_vials=stock_vials,
+    #         waste_vials=waste_vials,
+    #     )
+    pedotdeposition(
             instructions=instructions,
             toolkit=toolkit,
             stock_vials=stock_vials,
             waste_vials=waste_vials,
         )
-        pedotcv(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
-    elif instructions.process_type == 4:
-        pedotcv(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
+    pedotbleaching(
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
+    pedotcoloring(
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
+
+    instructions.set_status_and_save(ExperimentStatus.COMPLETE)
 
 
 def pedotdeposition(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -230,40 +227,41 @@ def pedotdeposition(
 
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
+
+    ## Move the electrode to the well
+    # Move the electrode to above the well
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.z_top,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate to 1000 to avoid splashing
+    toolkit.mill.set_feed_rate(100)
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.echem_height,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate back to 2000
+    toolkit.mill.set_feed_rate(2000)
+
+    toolkit.global_logger.info("3. Performing CA deposition")
     try:
-        ## Move the electrode to the well
-        # Move the electrode to above the well
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
+        chrono_amp(instructions, file_tag="CA_deposition")
 
-        toolkit.global_logger.info("3. Performing CA deposition")
-        try:
-            chrono_amp(instructions, file_tag="CA_deposition")
+    except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
+        toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+        raise e
+    except Exception as e:
+        toolkit.global_logger.error("Unknown error occurred during chrono_amp: %s", str(e))
+        raise e
 
-        except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
-            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-            raise e
-        except Exception as e:
-            toolkit.global_logger.error("Unknown error occurred during chrono_amp: %s", str(e))
-            raise e
-    finally:
-        toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
-        toolkit.mill.rinse_electrode(3)
+    # Rinse electrode
+    toolkit.global_logger.info("4. Rinsing electrode")
+    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
@@ -340,7 +338,7 @@ def pedotdeposition(
 
 
 def pedotbleaching(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -368,13 +366,13 @@ def pedotbleaching(
 
     instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
-    toolkit.global_logger.info("1. Depositing EDOT into well: %s", instructions.well_id)
+    toolkit.global_logger.info("1. Depositing liclo4 into well: %s", instructions.well_id)
     forward_pipette_v2(
-        volume=instructions.solutions_corrected["liclo4"],
+        volume=correction_factor(120),
         from_vessel=solution_selector(
             stock_vials,
             "liclo4",
-            instructions.solutions_corrected["liclo4"],
+            correction_factor(120), #hard code this
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
         pump=toolkit.pump,
@@ -384,38 +382,39 @@ def pedotbleaching(
 
     ## Move the electrode to the well
     toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
-    try:
-        ## Move the electrode to the well
-        # Move the electrode to above the well
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
 
-        toolkit.global_logger.info("3. Performing CA")
-        try:
-            chrono_amp_edot_bleaching(instructions)
-        except Exception as e:
-            toolkit.global_logger.error(
-                "Error occurred during chrono_amp bleaching: %s", str(e)
-            )
-            raise e
-    finally:
-        toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
-        toolkit.mill.rinse_electrode(3)
+    ## Move the electrode to the well
+    # Move the electrode to above the well
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.z_top,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate to 1000 to avoid splashing
+    toolkit.mill.set_feed_rate(100)
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.echem_height,
+        instrument=Instruments.ELECTRODE,
+    )
+    # Set the feed rate back to 2000
+    toolkit.mill.set_feed_rate(2000)
+
+    toolkit.global_logger.info("3. Performing CA")
+    try:
+        chrono_amp_edot_bleaching(instructions)
+    except Exception as e:
+        toolkit.global_logger.error(
+            "Error occurred during chrono_amp bleaching: %s", str(e)
+        )
+        raise e
+
+    # Rinse electrode
+    toolkit.global_logger.info("4. Rinsing electrode")
+    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
@@ -457,7 +456,7 @@ def pedotbleaching(
 
 
 def pedotcoloring(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
@@ -489,11 +488,11 @@ def pedotcoloring(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
     forward_pipette_v2(
-        volume=instructions.solutions_corrected["liclo4"],
+        volume=correction_factor(120),
         from_vessel=solution_selector(
             stock_vials,
             "liclo4",
-            instructions.solutions_corrected["liclo4"],
+            correction_factor(120),
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
         pump=toolkit.pump,
@@ -532,9 +531,12 @@ def pedotcoloring(
             )
             raise e
     finally:
-        toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
-        toolkit.mill.rinse_electrode(3)
+        pass
+
+    # Rinse electrode
+    toolkit.global_logger.info("4. Rinsing electrode")
+    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
 
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
@@ -575,7 +577,7 @@ def pedotcoloring(
 
 
 def pedotcv(
-    instructions: EdotExperiment,
+    instructions: PEDOTExperiment,
     toolkit: Toolkit,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],

@@ -21,14 +21,14 @@ def main():
     # controller.load_new_wellplate(new_wellplate_type_number=6)
     starting_experiment_id = determine_next_experiment_id()
     experiment_id = starting_experiment_id
-    experiments: list[experiment_class.EdotExperiment] = []
+    experiments: list[experiment_class.PEDOTExperiment] = []
 
     for _, row in params_df.iterrows():
         dep_v = row["dep_V"]  # dep_V is used for deposition voltage
         dep_t = row["dep_T"]  # dep_T is used for deposition time
 
         experiments.append(
-            experiment_class.EdotExperiment(
+            experiment_class.PEDOTExperiment(
                 experiment_id=experiment_id,
                 protocol_id='system_test',
                 well_id='A1',

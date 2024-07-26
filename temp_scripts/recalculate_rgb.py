@@ -1,10 +1,10 @@
 """Reanalyze the given experiments for the correct rgb values"""
 
-from panda_lib.analyzer.pedot import PEDOT_FindLAB as lab
-from panda_lib.analyzer.pedot.ml_input import (
+from panda_experiment_analyzer.pedot import PEDOT_FindLAB as lab
+from panda_experiment_analyzer.pedot.ml_input import (
     populate_required_information as analysis_input
     )
-from panda_lib.analyzer.pedot.pedot_classes import RawMetrics, RequiredData
+from panda_experiment_analyzer.pedot.pedot_classes import RawMetrics, RequiredData
 from panda_lib.experiment_class import (ExperimentResultsRecord,
                                       insert_experiment_results)
 
