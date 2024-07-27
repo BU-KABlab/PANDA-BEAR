@@ -20,10 +20,10 @@ from panda_lib.config.config_tools import (read_testing_config,
 
 resolve_config_paths() # Yes I know the import order is wrong, but this must be run before anything else is loaded
 
-import panda_experiment_analyzer.pedot as pedot_analysis
+import panda_experiment_analyzers.pedot as pedot_analysis
 from license_text import show_conditions, show_warrenty
-from panda_experiment_analyzer.pedot import sql_ml_functions
-from panda_experiment_analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
+from panda_experiment_analyzers.pedot import sql_ml_functions
+from panda_experiment_analyzers.pedot.pedot_classes import MLOutput, PEDOTParams
 from panda_lib import (controller, experiment_class, flir_camera,
                        mill_calibration_and_positioning, mill_control, pipette,
                        print_panda, scheduler, utilities, vials, wellplate)
