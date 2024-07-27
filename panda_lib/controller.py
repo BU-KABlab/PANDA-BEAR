@@ -26,8 +26,6 @@ from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
-from .analyzer.pedot import pedot_analyzer
-from .analyzer.pedot import run_ml_model as pedot_ml_model
 from .config.config_tools import read_config, read_testing_config
 from .errors import (
     NoExperimentFromModel,
@@ -50,7 +48,7 @@ from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .syringepump import MockPump, SyringePump
 from .utilities import SystemState
-from .vials import StockVial, Vial2, WasteVial, read_vials, update_vial_state_files
+from .vials import StockVial, Vial2, WasteVial, read_vials
 from .wellplate import Wellplate
 
 config = read_config()
@@ -95,7 +93,7 @@ def main(
     try:
         obs.place_text_on_screen("PANDA_SDL is starting up")
         obs.start_recording()
-        new_experiment = None
+        current_experiment = None
         # Connect to equipment
         toolkit = connect_to_instruments(use_mock_instruments)
         logger.info("Connected to instruments")
@@ -125,46 +123,41 @@ def main(
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
 
-            ## Ask the scheduler for the next experiment
-            new_experiment, _ = scheduler.read_next_experiment_from_queue(
-                random_pick=random_experiment_selection
-            )
 
-            while new_experiment is None:
-                sql_system_state.set_system_status(
-                    SystemState.PAUSE, "Waiting for new experiments"
+            while current_experiment is None:
+                ## Ask the scheduler for the next experiment
+                current_experiment, _ = scheduler.read_next_experiment_from_queue(
+                    random_pick=random_experiment_selection
                 )
-                # scheduler.check_inbox()
-                new_experiment, _ = scheduler.read_next_experiment_from_queue()
-                if new_experiment is not None:
+                if current_experiment is not None:
                     slack.send_slack_message(
-                        "alert", f"New experiment {new_experiment.experiment_id} found"
+                        "alert", f"New experiment {current_experiment.experiment_id} found"
                     )
                     break  # break out of the while new experiment is None loop
 
                 # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-                if (
-                    al_campaign_length is not None
-                    and al_campaign_iteration < al_campaign_length
-                ):
-                    # We run the model on with experiments that have already been run
-                    sql_system_state.set_system_status(
-                        SystemState.BUSY, "Running ML model"
-                    )
-                    next_exp_id = pedot_ml_model()
-                    new_experiment, _ = scheduler.read_next_experiment_from_queue()
-                    if new_experiment is not None:
-                        slack.send_slack_message(
-                            "alert",
-                            f"New experiment generated from existing data {new_experiment.experiment_id}",
-                        )
-                        al_campaign_iteration += 1
-                        break  # break out of the while new experiment is None loop
-                    else:
-                        slack.send_slack_message(
-                            "alert", "No new experiment generated from existing data"
-                        )
-                        raise NoExperimentFromModel()
+                # if (
+                #     al_campaign_length is not None
+                #     and al_campaign_iteration < al_campaign_length
+                # ):
+                #     # We run the model on with experiments that have already been run
+                #     sql_system_state.set_system_status(
+                #         SystemState.BUSY, "Running ML model"
+                #     )
+                #     next_exp_id = pedot_ml_model()
+                #     new_experiment, _ = scheduler.read_next_experiment_from_queue()
+                #     if new_experiment is not None:
+                #         slack.send_slack_message(
+                #             "alert",
+                #             f"New experiment generated from existing data {new_experiment.experiment_id}",
+                #         )
+                #         al_campaign_iteration += 1
+                #         break  # break out of the while new experiment is None loop
+                #     else:
+                #         slack.send_slack_message(
+                #             "alert", "No new experiment generated from existing data"
+                #         )
+                #         raise NoExperimentFromModel()
                 logger.info(
                     "No new experiments to run...waiting a minute for new experiments"
                 )
@@ -178,7 +171,7 @@ def main(
                 system_status_loop(slack)
 
             ## confirm that the new experiment is a valid experiment object
-            if not isinstance(new_experiment, ExperimentBase):
+            if not isinstance(current_experiment, ExperimentBase):
                 logger.error("The experiment object is not valid")
                 slack.send_slack_message(
                     "alert",
@@ -188,65 +181,59 @@ def main(
 
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Initialize a results object
-            new_experiment.results = ExperimentResult(
-                experiment_id=new_experiment.experiment_id,
-                well_id=new_experiment.well_id,
+            current_experiment.results = ExperimentResult(
+                experiment_id=current_experiment.experiment_id,
+                well_id=current_experiment.well_id,
             )
             ## Check that there is enough volume in the stock vials to run the experiment
-            if not check_stock_vials(new_experiment, stock_vials):
-                error_message = f"Experiment {new_experiment.experiment_id} cannot be run because there is not enough volume in the stock vials"
+            if not check_stock_vials(current_experiment, stock_vials):
+                error_message = f"Experiment {current_experiment.experiment_id} cannot be run because there is not enough volume in the stock vials"
                 slack.send_slack_message(
                     "alert",
                     error_message,
                 )
                 logger.error(error_message)
 
-                new_experiment.priority = 999
+                current_experiment.priority = 999
                 scheduler.update_experiment_info(
-                    new_experiment, "priority"
+                    current_experiment, "priority"
                 )  # update the experiment file with the new status and priority
                 scheduler.update_experiment_queue_priority(
-                    new_experiment.experiment_id, new_experiment.priority
+                    current_experiment.experiment_id, current_experiment.priority
                 )
-                new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+                current_experiment.set_status_and_save(ExperimentStatus.ERROR)
                 break  # break out of the while True loop
 
             # Announce the experiment
             pre_experiment_status_msg = (
-                f"Running experiment {new_experiment.experiment_id}"
+                f"Running experiment {current_experiment.experiment_id}"
             )
             logger.info(pre_experiment_status_msg)
             slack.send_slack_message("alert", pre_experiment_status_msg)
 
             ## Update the experiment status to running
-            new_experiment.plate_id = toolkit.wellplate.plate_id
-            new_experiment.well = toolkit.wellplate.wells[new_experiment.well_id]
-            new_experiment.well.plate_id = toolkit.wellplate.plate_id
-            new_experiment.well.experiment_id = new_experiment.experiment_id
-            new_experiment.well.project_id = new_experiment.project_id
-            new_experiment.set_status_and_save(ExperimentStatus.RUNNING)
-            # scheduler.change_well_status(
-            #     wellplate.wells[new_experiment.well_id], new_experiment
-            # )
-            # With the experiment now running, remove it from the queue
-            # Any errors that occur after this point will be caught and the experiment will be marked as errored
-            # scheduler.remove_from_queue(new_experiment)
+            current_experiment.plate_id = toolkit.wellplate.plate_id
+            current_experiment.well = toolkit.wellplate.wells[current_experiment.well_id]
+            current_experiment.well.plate_id = toolkit.wellplate.plate_id
+            current_experiment.well.experiment_id = current_experiment.experiment_id
+            current_experiment.well.project_id = current_experiment.project_id
+            current_experiment.set_status_and_save(ExperimentStatus.RUNNING)
 
             ## Run the experiment
             actions.apply_log_filter(
-                new_experiment.experiment_id,
-                new_experiment.well_id,
-                str(new_experiment.project_id)
+                current_experiment.experiment_id,
+                current_experiment.well_id,
+                str(current_experiment.project_id)
                 + "."
-                + str(new_experiment.project_campaign_id),
+                + str(current_experiment.project_campaign_id),
                 test=use_mock_instruments,
             )
 
-            logger.info("Beginning experiment %d", new_experiment.experiment_id)
+            logger.info("Beginning experiment %d", current_experiment.experiment_id)
 
             # Get the protocol entry
             protocol_entry: sql_protocol_utilities.ProtocolEntry = (
-                sql_protocol_utilities.select_protocol_by_id(new_experiment.protocol_id)
+                sql_protocol_utilities.select_protocol_by_id(current_experiment.protocol_id)
             )
 
             # Convert the file path to a module name
@@ -260,31 +247,28 @@ def main(
             # Get the main function from the module
             protocol_function = getattr(protocol_module, "main")
             protocol_function(
-                instructions=new_experiment,
+                instructions=current_experiment,
                 toolkit=toolkit,
                 stock_vials=stock_vials,
                 waste_vials=waste_vials,
             )
 
             # Analysis function call if experiment includes one
-            # TODO: Add analysis function call here
-
-            ## Update the experiment status to complete
-            # new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            current_experiment.analyzer(current_experiment.experiment_id)
 
             # Share any results images with the slack data channel
-            share_to_slack(new_experiment)
+            share_to_slack(current_experiment)
 
             ## Reset the logger to log to the PANDA_SDL.log file and format after the experiment is complete
             actions.apply_log_filter()
 
             ## With returned experiment and results, update the experiment status and post the final status
-            post_experiment_status_msg = f"Experiment {new_experiment.experiment_id} ended with status {new_experiment.status.value}"
+            post_experiment_status_msg = f"Experiment {current_experiment.experiment_id} ended with status {current_experiment.status.value}"
             logger.info(post_experiment_status_msg)
             # slack.send_slack_message("alert", post_experiment_status_msg)
 
-            new_experiment.set_status_and_save(ExperimentStatus.SAVING)
-            scheduler.save_results(new_experiment)
+            current_experiment.set_status_and_save(ExperimentStatus.SAVING)
+            scheduler.save_results(current_experiment)
             # experiment_id = new_experiment.experiment_id
 
             # if not TESTING:
@@ -304,9 +288,49 @@ def main(
                 # Share the analysis results with slack
                 # share_analysis_to_slack(experiment_id, next_exp_id, slack)
 
-            new_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            if not TESTING:
+                # Check if a campaign length was set and if we have reached the end of the campaign
+                if al_campaign_length is not None and al_campaign_iteration >= al_campaign_length:
+                    slack.send_slack_message(
+                        "alert",
+                        "The AL campaign length has been reached. PANDA_SDL is shutting down",
+                    )
+                    raise ShutDownCommand
+                
+                # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
+                if (
+                    al_campaign_length is not None
+                    and al_campaign_iteration < al_campaign_length
+                ):
+                    # We run the model on with experiments that have already been run
+                    sql_system_state.set_system_status(
+                        SystemState.BUSY, "Running ML model"
+                    )
+                    next_exp_id = current_experiment.generator() # generate an experiment with the appropriate parameters 
+                    current_experiment, _ = scheduler.read_next_experiment_from_queue(
+                        random_pick=random_experiment_selection
+                    )
+                    if current_experiment is not None:
+                        slack.send_slack_message(
+                            "alert",
+                            f"New experiment generated from data {next_exp_id}",
+                        )
+                        slack.send_slack_message(
+                            "alert",
+                            f"Next experiment {current_experiment.experiment_id}"
+                        )
+                        al_campaign_iteration += 1
+                        continue # continue to the next experiment
+
+                    else:
+                        slack.send_slack_message(
+                            "alert", "No new experiment generated from existing data"
+                        )
+                        raise NoExperimentFromModel()
+
+
             ## Clean up
-            new_experiment = None  # reset new_experiment to None so that we can check the queue again
+            current_experiment = None  # reset new_experiment to None so that we can check the queue again
             ## Update the system state with new vial and wellplate information
 
             if toolkit.pump.pipette.volume > 0 and toolkit.pump.pipette.volume_ml < 1:
@@ -327,9 +351,9 @@ def main(
         CVFailure,
         CAFailure,
     ) as error:
-        if new_experiment is not None:
-            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            share_to_slack(new_experiment)
+        if current_experiment is not None:
+            current_experiment.set_status_and_save(ExperimentStatus.ERROR)
+            share_to_slack(current_experiment)
         sql_system_state.set_system_status(SystemState.ERROR)
         # scheduler.change_well_status(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -347,15 +371,15 @@ def main(
         raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
 
     except ProtocolNotFoundError as error:
-        if new_experiment is not None:
-            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+        if current_experiment is not None:
+            current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.ERROR)
         logger.error(error)
         slack.send_slack_message("alert", f"PANDA_SDL encountered an error: {error}")
         raise error
     except ShutDownCommand as error:
-        if new_experiment is not None:
-            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+        if current_experiment is not None:
+            current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.OFF)
         # scheduler.change_well_status(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -365,8 +389,8 @@ def main(
         # This was triggered by the user to indicate they want to stop the program
 
     except KeyboardInterrupt as exc:
-        if new_experiment is not None:
-            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+        if current_experiment is not None:
+            current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.ERROR)
         # scheduler.change_well_status(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -376,8 +400,8 @@ def main(
         raise KeyboardInterrupt from exc  # raise error to go to finally. This was triggered by the user to indicate they want to stop the program
 
     except Exception as error:
-        if new_experiment is not None:
-            new_experiment.set_status_and_save(ExperimentStatus.ERROR)
+        if current_experiment is not None:
+            current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.ERROR)
         # scheduler.change_well_status(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -389,12 +413,12 @@ def main(
         raise error  # raise error to go to finally. If we don't know what caused an error we don't want to continue
 
     finally:
-        if new_experiment is not None:
+        if current_experiment is not None:
             ## Update location of experiment instructions and save results
             # scheduler.update_experiment_file(new_experiment)
             # scheduler.update_experiment_location(new_experiment)
-            scheduler.save_results(new_experiment)
-            share_to_slack(new_experiment)
+            scheduler.save_results(current_experiment)
+            share_to_slack(current_experiment)
 
         # Save the current wellplate
         # if toolkit.wellplate:

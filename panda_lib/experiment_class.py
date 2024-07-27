@@ -1,13 +1,14 @@
 """ Experiment data class"""
 
 # pylint: disable=invalid-name, line-too-long, import-outside-toplevel, broad-exception-caught, protected-access
+import importlib.util
 import json
 from dataclasses import field
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Tuple, Union, get_type_hints
+from typing import Callable, List, Optional, Tuple, Union, get_type_hints
 
 from pydantic import ConfigDict, RootModel
 from pydantic.dataclasses import dataclass
@@ -16,8 +17,22 @@ from panda_lib.config.config_tools import read_config
 # from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
 #                                                 execute_sql_command_no_return)
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import Experiments, ExperimentParameters, ExperimentResults, WellHx, WellPlates
+from panda_lib.sql_tools.panda_models import (ExperimentParameters,
+                                              ExperimentResults, Experiments,
+                                              WellHx, WellPlates)
+
 config = read_config()
+
+def load_analysis_script(script_path: str) -> Callable:
+    """Load a script from a file and return the analyze function"""
+    spec = importlib.util.spec_from_file_location("module.name", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    # Check that the module has an analyze function
+    if not hasattr(module, "analyze"):
+        raise AttributeError(f"Module {script_path} does not have an analyze function")
+    return module.analyze
 
 class ExperimentResultsRecord:
     """
@@ -308,6 +323,38 @@ class ExperimentBase:
     jira_issue_key: Optional[str] = None
     experiment_type: int = 0
     well: object= None
+
+    analyzer: Union[Callable, str, None] = None
+    generator: Union[Callable, str, None] = None
+
+    def run_analysis(self):
+        """Run the analysis"""
+        if isinstance(self.analyzer, str):
+            # Load and execute the script
+            analysis_function = load_analysis_script(self.analyzer)
+            analysis_function(experiment_id=self.experiment_id, add_to_training_data=True)
+        elif callable(self.analyzer):
+            # Directly call the function
+            self.analyzer(experiment_id=self.experiment_id, add_to_training_data=True)
+
+        else:
+            print("\n No analysis function provided for experiment %s\n", self.experiment_id)
+
+    def run_generator(self):
+        """Run the generator"""
+        if isinstance(self.generator, str):
+            # Load and execute the script
+            generator_function = load_analysis_script(self.generator)
+            generator_function()
+        elif callable(self.generator):
+            # Directly call the function
+            self.generator()
+
+        else:
+            print("\n No generator function provided for experiment %s\n", self.experiment_id)
+
+
+
     # FIXME: Seperate the set status, and set status and save methods from the experimentbase. The experiment base should just be a dataclass
     # What could be an alternative is that there is a wrapper class that has the set status and set status and save methods using what
     # Method that the project chooses to use to save the data to the database
@@ -635,13 +682,14 @@ class EchemExperimentBase(ExperimentBase):
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
-class EdotExperiment(EchemExperimentBase):
+class PEDOTExperiment(EchemExperimentBase):
     """Define the default data that is used to run an edot experiment"""
 
     project_id: int = 16
     well_type_number: int = 4  # ito
     experiment_type: int = 2  # edot
     edot_concentration: Decimal = Decimal(0.1)  # mM
+
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class FeCnVerificaitonExperiments(EchemExperimentBase):
@@ -653,10 +701,10 @@ class FeCnVerificaitonExperiments(EchemExperimentBase):
 experiment_types_by_project_id = {
     0: ExperimentBase,
     1: EchemExperimentBase,
-    16: EdotExperiment,
+    16: PEDOTExperiment,
     11: CorrectionFactorExperiment,
     17: FeCnVerificaitonExperiments,
-    999: EdotExperiment
+    999: PEDOTExperiment
 }
 
 
