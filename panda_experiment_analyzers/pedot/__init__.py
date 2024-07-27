@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from panda_experiment_analyzer.pedot.sql_ml_functions import insert_ml_training_data
+from panda_experiment_analyzers.pedot.sql_ml_functions import insert_ml_training_data
 from panda_lib.experiment_class import (ExperimentResultsRecord,
                                         insert_experiment_result)
 

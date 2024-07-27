@@ -4,7 +4,7 @@ from panda_lib import experiment_class
 from panda_lib.correction_factors import correction_factor
 from panda_lib.scheduler import Scheduler, determine_next_experiment_id
 from panda_lib.sql_tools.sql_system_state import get_current_pin
-from panda_experiment_analyzer.pedot import analyze, run_ml_model
+from panda_experiment_analyzers.pedot import analyze, run_ml_model
 
 from .pedot_classes import PEDOTParams
 
