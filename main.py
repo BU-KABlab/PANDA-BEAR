@@ -13,24 +13,24 @@ from pathlib import Path
 
 from PIL import Image
 
-from panda_lib.config.config_print import main as print_config, resolve_config_paths
+from panda_lib.config.config_print import main as print_config
+from panda_lib.config.config_print import resolve_config_paths
 from panda_lib.config.config_tools import (read_testing_config,
                                            write_testing_config)
+
 resolve_config_paths() # Yes I know the import order is wrong, but this must be run before anything else is loaded
 
-import panda_lib.analyzer.pedot as pedot_analysis
+import panda_experiment_analyzer.pedot as pedot_analysis
 from license_text import show_conditions, show_warrenty
+from panda_experiment_analyzer.pedot import sql_ml_functions
+from panda_experiment_analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
 from panda_lib import (controller, experiment_class, flir_camera,
-                       mill_calibration_and_positioning, mill_control,
-                       print_panda, scheduler, utilities, vials, wellplate, pipette)
-from panda_lib.analyzer.pedot import sql_ml_functions
-from panda_lib.analyzer.pedot.pedot_classes import MLOutput, PEDOTParams
-
+                       mill_calibration_and_positioning, mill_control, pipette,
+                       print_panda, scheduler, utilities, vials, wellplate)
 from panda_lib.sql_tools import (remove_testing_experiments,
                                  sql_generator_utilities,
                                  sql_protocol_utilities, sql_queue,
-                                 sql_system_state
-                                 )
+                                 sql_system_state)
 
 
 def run_panda_sdl_with_ml():
@@ -314,8 +314,8 @@ def analyze_pedot_experiment():
     experiment_id = int(input("Enter the experiment ID to analyze: ").strip().lower())
 
     to_train = input("Train the model? (y/n): ").strip().lower()
-    dont_train = True if to_train[0] == "n" else False
-    results = pedot_analysis.pedot_analyzer(experiment_id, dont_train)
+    add_to_training_data = True if to_train[0] == "y" else False
+    results = pedot_analysis.analyze(experiment_id, add_to_training_data=add_to_training_data)
     print(results)
 
 
