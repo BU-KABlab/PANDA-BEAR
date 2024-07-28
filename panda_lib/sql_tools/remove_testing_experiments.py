@@ -60,6 +60,8 @@ def main():
             .all()
         )
 
+        experiment_ids = [experiment_id[0] for experiment_id in experiment_ids]
+
         session.query(ExperimentParameters).filter(
             ExperimentParameters.experiment_id.in_(experiment_ids)
         ).delete(synchronize_session=False)
@@ -80,6 +82,7 @@ def main():
         session.query(Experiments).filter(Experiments.project_id == 999).delete(
             synchronize_session=False
         )
+        session.commit()
 
     print("Testing experiments removed")
 

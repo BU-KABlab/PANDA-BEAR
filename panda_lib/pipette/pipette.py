@@ -43,7 +43,6 @@ class Pipette:
             float(self.contents.get(solution, 0)) + volume_change, 6
         )
         self.volume += volume_change
-        self.log_contents()
         self.record_pipette_state()
 
     @property

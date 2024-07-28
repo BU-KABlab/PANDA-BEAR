@@ -71,8 +71,7 @@ def main(
         use_mock_instruments (bool, optional): Whether to use mock instruments. Defaults to False.
         one_off (bool, optional): Whether to run one experiment and then exit. Defaults to False.
     """
-    # import exp_b_pipette_contamination_assessment_protocol as exp_b
-    # import protocols
+
     slack = SlackBot()
     if (
         config.getboolean("OPTIONS","testing")
@@ -83,12 +82,12 @@ def main(
         obs = OBSController()
     ## Reset the logger to log to the PANDA_SDL.log file and format
     actions.apply_log_filter()
-    # print(printpanda())
-    print("Starting PANDA_SDL...")
     slack.test = use_mock_instruments
     slack.send_slack_message("alert", "PANDA_SDL is starting up")
     toolkit = None
     al_campaign_iteration = 0
+    current_experiment = None
+
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
         obs.place_text_on_screen("PANDA_SDL is starting up")
@@ -238,11 +237,11 @@ def main(
 
             # Convert the file path to a module name
             module_name = (
-                ("panda_protocols." + protocol_entry.filepath).replace("/", ".").rstrip(".py")
+                Path((config.get("GENERAL","protocols_dir") + "." + protocol_entry.filepath).replace("/", ".").rstrip(".py"))
             )
 
             # Import the module
-            protocol_module = importlib.import_module(module_name)
+            protocol_module = importlib.import_module(module_name.name)
 
             # Get the main function from the module
             protocol_function = getattr(protocol_module, "main")
@@ -254,7 +253,8 @@ def main(
             )
 
             # Analysis function call if experiment includes one
-            current_experiment.analyzer(current_experiment.experiment_id)
+            if not TESTING:
+                current_experiment.analyzer(current_experiment.analyzer)
 
             # Share any results images with the slack data channel
             share_to_slack(current_experiment)
@@ -575,8 +575,8 @@ def system_status_loop(slack: SlackBot):
     """
     Loop to check the system status and update the system status
     """
+    first_pause = True
     while True:
-        first_pause = True
         slack.check_slack_messages("alert")
         # Check the system status
         system_status = sql_system_state.select_system_status(2)
@@ -610,8 +610,6 @@ def system_status_loop(slack: SlackBot):
             break
         else:
             break
-        # if SystemState.ERROR in system_status:
-        #     raise ShutDownCommand
 
 
 def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
@@ -763,7 +761,7 @@ def share_to_slack(experiment: ExperimentBase):
             if image[0].name.endswith("dz.tiff")
         ]
         if len(images_with_dz) == 0:
-            logger.error("The experiment has no dz.tiff image files")
+            logger.error("The experiment %d has no dz.tiff image files", experiment.experiment_id)
             msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value} but has no datazoned image files to share"
             slack.send_slack_message("data", msg)
             return

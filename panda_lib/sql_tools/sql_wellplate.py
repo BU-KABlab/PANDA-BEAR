@@ -236,7 +236,7 @@ def get_number_of_wells(plate_id: Union[int, None] = None) -> int:
                 session.query(WellHx)
                 .filter(
                     WellHx.plate_id
-                    == session.query(WellPlates.id).filter(WellPlates.current == 1)
+                    == session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
                 )
                 .count()
             )
@@ -284,7 +284,7 @@ def get_number_of_clear_wells(plate_id: Union[int, None] = None) -> int:
                 session.query(WellHx)
                 .filter(
                     WellHx.plate_id
-                    == session.query(WellPlates.id).filter(WellPlates.current == 1)
+                    == session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
                 )
                 .filter(WellHx.status.in_(["new", "clear", "queued"]))
                 .count()

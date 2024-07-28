@@ -249,7 +249,7 @@ def read_in_generators():
     current_generators = get_generators()
 
     # Get the current generator ids
-    current_generator_ids = [generator.generator_id for generator in current_generators]
+    current_generator_ids = [generator.id for generator in current_generators]
 
     # Get the next generator id
     if current_generator_ids:
@@ -273,7 +273,7 @@ def read_in_generators():
             # Get the id of the generator
             generator_id = current_generators[
                 current_generator_filepaths.index(generator)
-            ].generator_id
+            ].id
 
             # Update the generator in the database
             update_generator(generator_id, generator)
@@ -281,7 +281,7 @@ def read_in_generators():
     # Delete any generators that are no longer in the generators folder
     for generator in current_generators:
         if generator.filepath not in generators:
-            delete_generator(generator.generator_id)
+            delete_generator(generator.id)
 
 
 def get_generator_id(generator_name) -> int:

@@ -5,7 +5,6 @@ import importlib.util
 import json
 from dataclasses import field
 from datetime import datetime
-from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple, Union, get_type_hints
@@ -166,20 +165,20 @@ class ExperimentResult:
     ocp_ca_passed: List[Tuple[bool, str]] = field(default_factory=list)
     ocp_cv_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_cv_passed: List[Tuple[bool, str]] = field(default_factory=list)
-    ocp_cv_final_voltage: List[Tuple[Decimal, str]] = field(default_factory=list)
+    ocp_cv_final_voltage: List[Tuple[float, str]] = field(default_factory=list)
     ca_data_file: List[Tuple[Path, str]] = field(default_factory=list)
     cv_data_file: List[Tuple[Path, str]] = field(default_factory=list)
     image: List[Tuple[Path, str]] = field(default_factory=list)
     # deposition_plot_files: list[Path] = field(default_factory=list)
-    # deposition_max_values: list[Decimal] = field(default_factory=list)
-    # depsotion_min_values: list[Decimal] = field(default_factory=list)
+    # deposition_max_values: list[float] = field(default_factory=list)
+    # depsotion_min_values: list[float] = field(default_factory=list)
     # characterization_plot_files: list[Path] = field(default_factory=list)
-    # characterization_max_values: list[Decimal] = field(default_factory=list)
-    # characterization_min_values: list[Decimal] = field(default_factory=list)
+    # characterization_max_values: list[float] = field(default_factory=list)
+    # characterization_min_values: list[float] = field(default_factory=list)
     pumping_record: list = None
 
     def set_ocp_ca_file(
-        self, file: Path, passed: bool, final_voltage: Decimal, context: str = None
+        self, file: Path, passed: bool, final_voltage: float, context: str = None
     ):
         """Set the file, the pass/fail status, and the final voltage"""
         self.ocp_ca_file.append((file, context))
@@ -187,7 +186,7 @@ class ExperimentResult:
         self.ocp_cv_final_voltage.append((final_voltage, context))
 
     def set_ocp_cv_file(
-        self, file: Path, passed: bool, final_voltage: Decimal, context: str = None
+        self, file: Path, passed: bool, final_voltage: float, context: str = None
     ):
         """Set the file, the pass/fail status, and the final voltage"""
         self.ocp_cv_file.append((file, context))
@@ -198,8 +197,8 @@ class ExperimentResult:
         self,
         file: Path,
         # plot_file: Path = None,
-        # max_value: Decimal = None,
-        # min_value: Decimal = None,
+        # max_value: float = None,
+        # min_value: float = None,
         context: str = None,
     ):
         """Set the file, the plot file, the max value, and the min value"""
@@ -215,8 +214,8 @@ class ExperimentResult:
         self,
         file: Path,
         # plot_file: Path = None,
-        # max_value: Decimal = None,
-        # min_value: Decimal = None,
+        # max_value: float = None,
+        # min_value: float = None,
         context: str = None,
     ):
         """Set the file, the plot file, the max value, and the min value"""
@@ -298,7 +297,7 @@ class ExperimentBase:
     well_type_number: int = (
         None  # is used to indicate the type of well the experiment should run in
     )
-    pumping_rate: Decimal = Decimal("0.3")
+    pumping_rate: float = float(0.3)
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None  # Optional[FilePath] = None
@@ -310,7 +309,7 @@ class ExperimentBase:
     well_type_number: int = (
         None  # is used to indicate the type of well the experiment should run in
     )
-    pumping_rate: Decimal = Decimal(0.3)
+    pumping_rate: float = float(0.3)
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None  # Optional[FilePath] = None
@@ -521,8 +520,8 @@ class ExperimentBase:
 
             elif attribute_type == int:
                 parameter.parameter_value = int(parameter.parameter_value)
-            elif attribute_type in [Decimal, float]:
-                parameter.parameter_value = Decimal(parameter.parameter_value)
+            elif attribute_type in [float, float]:
+                parameter.parameter_value = float(parameter.parameter_value)
             elif attribute_type == bool:
                 parameter.parameter_value = bool(parameter.parameter_value)
             elif attribute_type == str:
@@ -554,7 +553,7 @@ class CorrectionFactorExperiment(ExperimentBase):
     """Define the data that is used to run an experiment"""
 
     project_id: int = 11
-    correction_factor: Decimal = Decimal(1.0)
+    correction_factor: float = float(1.0)
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
@@ -580,27 +579,27 @@ class EchemExperimentBase(ExperimentBase):
     rinse_count: int = 4  # Default rinse count
     rinse_vol: int = 120  # Default rinse volume
 
-    ca_sample_period: Decimal = Decimal(0.1)  # Deposition sample period
-    ca_prestep_voltage: Decimal = Decimal(0.0)  # Pre-step voltage (V)
-    ca_prestep_time_delay: Decimal = Decimal(0.0)  # Pre-step delay time (s)
-    ca_step_1_voltage: Decimal = Decimal(-1.7)  # Step 1 voltage (V), deposition potential (V)
-    ca_step_1_time: Decimal = Decimal(300.0)  # run time 300 seconds, deposition duration (s)
-    ca_step_2_voltage: Decimal = Decimal(0.0)  # Step 2 voltage (V)
-    ca_step_2_time: Decimal = Decimal(0.0)  # Step 2 time (s)
-    ca_sample_rate: Decimal = Decimal(0.5)  # sample period (s)
+    ca_sample_period: float = float(0.1)  # Deposition sample period
+    ca_prestep_voltage: float = float(0.0)  # Pre-step voltage (V)
+    ca_prestep_time_delay: float = float(0.0)  # Pre-step delay time (s)
+    ca_step_1_voltage: float = float(-1.7)  # Step 1 voltage (V), deposition potential (V)
+    ca_step_1_time: float = float(300.0)  # run time 300 seconds, deposition duration (s)
+    ca_step_2_voltage: float = float(0.0)  # Step 2 voltage (V)
+    ca_step_2_time: float = float(0.0)  # Step 2 time (s)
+    ca_sample_rate: float = float(0.5)  # sample period (s)
 
     char_sol_name: str = ""  # Characterization solution name
     char_vol: int = 0  # Characterization solution volume
-    cv_sample_period: Decimal = Decimal(0.1)  # Characterization sample period
-    cv_initial_voltage: Decimal = Decimal(0.0)  # initial voltage
-    cv_first_anodic_peak: Decimal = Decimal(0.5)  # first anodic peak
-    cv_second_anodic_peak: Decimal = Decimal(-0.2)  # second anodic peak
-    cv_final_voltage: Decimal = Decimal(0.0)  # final voltage
-    cv_step_size: Decimal = Decimal(0.01)  # step size
+    cv_sample_period: float = float(0.1)  # Characterization sample period
+    cv_initial_voltage: float = float(0.0)  # initial voltage
+    cv_first_anodic_peak: float = float(0.5)  # first anodic peak
+    cv_second_anodic_peak: float = float(-0.2)  # second anodic peak
+    cv_final_voltage: float = float(0.0)  # final voltage
+    cv_step_size: float = float(0.01)  # step size
     cv_cycle_count: int = 3  # number of cycles
-    cv_scan_rate_cycle_1: Decimal = Decimal(0.1)
-    cv_scan_rate_cycle_2: Decimal = Decimal(0.1)
-    cv_scan_rate_cycle_3: Decimal = Decimal(0.1)
+    cv_scan_rate_cycle_1: float = float(0.1)
+    cv_scan_rate_cycle_2: float = float(0.1)
+    cv_scan_rate_cycle_3: float = float(0.1)
 
     @property
     def cv_sample_rate(self):
@@ -688,7 +687,7 @@ class PEDOTExperiment(EchemExperimentBase):
     project_id: int = 16
     well_type_number: int = 4  # ito
     experiment_type: int = 2  # edot
-    edot_concentration: Decimal = Decimal(0.1)  # mM
+    edot_concentration: float = float(0.1)  # mM
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
@@ -816,7 +815,7 @@ def select_next_experiment_id() -> int:
         result = session.query(Experiments.experiment_id).order_by(Experiments.experiment_id.desc()).first()
     if result == []:
         return 10000000
-    return result[0][0] + 1
+    return result[0] + 1
 
 
 def select_experiment_information(experiment_id: int) -> ExperimentBase:
@@ -1069,7 +1068,7 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                                     priority=parameter[8],
                                     process_type=parameter[9],
                                     filename=parameter[10],
-                                    created=parameter[11]))
+                                    created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S")))
         session.commit()
 
 
@@ -1102,7 +1101,7 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
                     experiment.experiment_id,
                     parameter.parameter_name,
                     (
-                        json.dumps(parameter.parameter_value, default=decimal_default)
+                        json.dumps(parameter.parameter_value, default=str)
                         if isinstance(parameter.parameter_value, dict)
                         else parameter.parameter_value
                     ),
@@ -1127,7 +1126,7 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
             session.add(ExperimentParameters(experiment_id=parameter[0],
                                              parameter_name=parameter[1],
                                              parameter_value=parameter[2],
-                                             created=parameter[3]))
+                                             created=datetime.strptime(parameter[3], "%Y-%m-%dT%H:%M:%S")))
         session.commit()
 
 
@@ -1268,7 +1267,8 @@ def update_experiment_status(
     # )
 
     with SessionLocal() as session:
-        session.query(WellHx).filter(WellHx.well_id == well_id).filter(WellHx.plate_id == session.query(WellPlates.id).filter(WellPlates.current == 1)).update(
+        subquery = session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
+        session.query(WellHx).filter(WellHx.well_id == well_id).filter(WellHx.plate_id == subquery).update(
             {WellHx.status: status.value,
              WellHx.status_date: status_date,
              WellHx.experiment_id: experiment_id,
@@ -1466,8 +1466,3 @@ def select_specific_result(
 
 
 # endregion
-
-def decimal_default(obj):
-    if isinstance(obj, Decimal):
-        return float(obj)
-    raise TypeError

@@ -20,10 +20,7 @@ from panda_lib.config.config_tools import (read_testing_config,
 
 resolve_config_paths() # Yes I know the import order is wrong, but this must be run before anything else is loaded
 
-import panda_experiment_analyzers.pedot as pedot_analysis
 from license_text import show_conditions, show_warrenty
-from panda_experiment_analyzers.pedot import sql_ml_functions
-from panda_experiment_analyzers.pedot.pedot_classes import MLOutput, PEDOTParams
 from panda_lib import (controller, experiment_class, flir_camera,
                        mill_calibration_and_positioning, mill_control, pipette,
                        print_panda, scheduler, utilities, vials, wellplate)
@@ -55,6 +52,8 @@ def genererate_pedot_experiment():
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "generating PEDOT experiment"
     )
+    from panda_experiment_analyzers.pedot.pedot_classes import MLOutput, PEDOTParams
+    import panda_experiment_analyzers.pedot as pedot_analysis
     dep_v = float(input("Enter the deposition voltage: ").strip().lower())
     dep_t = float(input("Enter the deposition time: ").strip().lower())
     concentration = float(input("Enter the concentration: ").strip().lower())
@@ -168,7 +167,7 @@ def run_experiment_generator():
         return
     print("Available generators:")
     for generator in available_generators:
-        print(generator)
+        print(generator.id,generator.name)
 
     generator_id = (
         input("Enter the id of the generator you would like to run or 'q' to go back: ")
@@ -221,6 +220,11 @@ def test_image():
 
 def generate_experiment_from_existing_data():
     """Generates an experiment from existing data using the ML model."""
+    import panda_experiment_analyzers.pedot as pedot_analysis
+    from panda_experiment_analyzers.pedot import sql_ml_functions
+    from panda_experiment_analyzers.pedot.pedot_classes import MLOutput, PEDOTParams
+
+
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "generating experiment"
     )
@@ -308,6 +312,7 @@ def generate_experiment_from_existing_data():
 
 def analyze_pedot_experiment():
     """Analyzes a PEDOT experiment."""
+    import panda_experiment_analyzers.pedot as pedot_analysis
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "analyzing PEDOT experiment"
     )
@@ -358,6 +363,8 @@ def resume_panda_sdl():
 
 def remove_training_data():
     """Removes the training data associated with a given experiment_id from the database."""
+    from panda_experiment_analyzers.pedot import sql_ml_functions
+
     experiment_id = int(
         input("Enter the experiment ID to remove the training data for: ")
         .strip()
