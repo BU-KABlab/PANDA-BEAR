@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def main():
+def print_config_values():
     # Read the config file
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
     config = ConfigParser()
@@ -79,4 +79,4 @@ def resolve_config_paths():
 
 
 if __name__ == "__main__":
-    main()
+    print_config_values()

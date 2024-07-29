@@ -16,13 +16,13 @@ of the mill.
 # pylint: disable=line-too-long
 
 # standard libraries
-import json
 import logging
 import re
 import sys
 import time
 from unittest.mock import MagicMock
 from venv import logger
+from typing import Union
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
@@ -51,16 +51,15 @@ class Mill:
     Set up the mill connection and pass commands, including special commands
     """
 
-    def __init__(self, config_file="mill_config.json"):
-        self.config_file = config_file
+    def __init__(self):
         self.active_connection = False
-        self.config = self.read_json_config()
+        self.config = self.fetch_config()
         self.ser_mill: serial.Serial = None
 
     def homing_sequence(self):
         """Home the mill, set the feed rate, and clear the buffers"""
         self.home()
-        self.set_feed_rate(2000)  # Set feed rate to 2000
+        self.set_feed_rate(2000)
         self.clear_buffers()
 
     def connect_to_mill(self) -> serial.Serial:
@@ -152,7 +151,7 @@ class Mill:
             self.active_connection = False
             self.ser_mill = None
 
-    def read_json_config(self) -> dict:
+    def fetch_config(self) -> dict:
         """Read the config file"""
         # try:
         #     config_file_path = ".\\panda_lib\\config\\" + self.config_file
@@ -172,9 +171,27 @@ class Mill:
             if mill_config:
                 return mill_config.config
             else:
-                logger.error("Config not found in db")
-                raise MillConfigNotFound("Config file not found")
-            
+                logger.error("Config not found in db...attempting to fetch from mill")
+
+                try:
+                    self.connect_to_mill()
+                    current_config = self.grbl_settings()
+                    self.disconnect()
+                    self.save_config(current_config)
+                    return current_config
+                except Exception as e:
+                    raise MillConfigNotFound("Config file not found") from e
+
+    def save_config(self, mill_config: Union[None,dict] = None):
+        """Save the config to the db"""
+        if mill_config is None:
+            mill_config = self.config
+        with SessionLocal() as session:
+            mill_config_record = MillConfig(config=mill_config)
+            session.add(mill_config_record)
+            session.commit()
+        
+        logger.info("Config saved to db")
 
     def execute_command(self, command: str):
         """Encodes and sends commands to the mill and returns the response"""
@@ -562,20 +579,13 @@ class Mill:
         }
 
         self.config["instrument_offsets"][offset_type] = offset
-        config_file_path = ".\\panda_lib\\config\\" + self.config_file
-        if not config_file_path.exists():
-            logger.error("Config file not found")
-            raise MillConfigNotFound
 
-        try:
-            with open(config_file_path, "w", encoding="UTF-8") as file:
-                json.dump(self.config, file, indent=4)
-            logger_message = f"Updated {offset_type} to {offset}"
-            logger.info(logger_message)
-            return 0
-        except MillConfigNotFound as update_offset_exception:
-            logger.error(update_offset_exception)
-            return 3
+        # with SessionLocal() as session:
+        #     mill_config = session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+        #     mill_config.config = self.config
+        #     session.commit()
+
+        self.save_config()
 
     ## Special versions of the movement commands that avoid diagonal movements
     def safe_move(
@@ -748,8 +758,8 @@ class MockMill(Mill):
     safe_move(x_coord, y_coord, z_coord, instrument): Simulate a safe move with horizontal and vertical movements.
     """
 
-    def __init__(self, config_file="mill_config.json"):
-        super().__init__(config_file)
+    def __init__(self):
+        super().__init__()
         self.ser_mill: serial.Serial = None
         self.current_x = 0.0
         self.current_y = 0.0
