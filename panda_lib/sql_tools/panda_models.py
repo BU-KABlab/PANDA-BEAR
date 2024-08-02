@@ -284,11 +284,11 @@ class WellHx(Base):
     experiment_id = Column(Integer)
     project_id = Column(Integer)
     status = Column(String)
-    status_date = Column(DateTime, default=dt.now)
+    status_date = Column(DateTime, default=dt.now())
     contents = Column(JSON)
     volume = Column(Float)
     coordinates = Column(JSON)
-    updated = Column(DateTime, default=dt.now)
+    updated = Column(DateTime, default=dt.now())
 
     def __repr__(self):
         return f"<WellHx(plate_id={self.plate_id}, well_id={self.well_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, volume={self.volume}, coordinates={self.coordinates}, updated={self.updated})>"

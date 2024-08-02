@@ -162,7 +162,21 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
     # )
 
     with SessionLocal() as session:
-        session.add(WellPlates(id=plate_id, type_id=type_id, current=0))
+        session.add(
+            WellPlates(
+                id=plate_id,
+                type_id=type_id,
+                current=0,
+                cols = "ABCDEFGH",
+                rows = 12,
+                a1_x = 0,
+                a1_y = 0,
+                z_bottom = 0,
+                z_top = 0,
+                orientation = 0,
+                echem_height = 0
+            )
+            )
         session.commit()
 
 
@@ -787,7 +801,16 @@ def save_wells_to_db(wells_to_save: List[object]) -> None:
                     session.query(WellPlates).filter(WellPlates.current == 1).first().id
                 )
 
-            session.add(WellHx(**well.__dict__))
+            session.add(WellHx(
+                plate_id=well.plate_id,
+                well_id=well.well_id,
+                experiment_id=well.experiment_id,
+                project_id=well.project_id,
+                status=well.status,
+                contents=json.dumps(well.contents),
+                volume=well.volume,
+                coordinates=json.dumps(asdict(well.coordinates)),
+            ))
         session.commit()
 
 
