@@ -55,7 +55,20 @@ def resolve_config_paths():
     # Read the config file
     CONFIG_FILE = "./panda_lib/config/panda_sdl_config.ini"
     config = ConfigParser()
-    config.read(CONFIG_FILE)
+
+    try:
+        config.read(CONFIG_FILE)
+    except FileNotFoundError:
+        print("Config file not found. Generating defualt config file.")
+
+        # Generate default config file from default_config.ini
+        default_config = ConfigParser()
+        default_config.read("./panda_lib/config/default_config.ini")
+        with open(CONFIG_FILE, "w") as configfile:
+            default_config.write(configfile)
+
+        # Read the config file
+        config.read(CONFIG_FILE)
 
     # Print the config file values
     for section in config.sections():
