@@ -1,6 +1,7 @@
 """Module for the pipette class"""
 
 import json
+import time
 
 from panda_lib.pipette.sql_pipette import (
     activate_pipette,
@@ -42,8 +43,9 @@ class Pipette:
         self.contents[solution] = round(
             float(self.contents.get(solution, 0)) + volume_change, 6
         )
-        self.volume += volume_change
+        self._volume_ul += volume_change
         self.record_pipette_state()
+        time.sleep(0.01)
 
     @property
     def volume(self) -> float:
@@ -58,6 +60,7 @@ class Pipette:
         self._volume_ul = round(float(volume), 6)
         self.log_contents()
         self.record_pipette_state()
+        time.sleep(0.01)
 
     @property
     def volume_ml(self) -> float:
