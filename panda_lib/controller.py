@@ -53,7 +53,7 @@ from .wellplate import Wellplate
 
 config = read_config()
 # set up slack globally so that it can be used in the main function and others
-logger = setup_default_logger(log_name="panda_log")
+logger = setup_default_logger(log_name="panda")
 TESTING = read_testing_config()
 
 
