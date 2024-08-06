@@ -14,4 +14,4 @@ data/
 .ipynb_checkpoints
 *.egg-info
 *.log
-panda_sdl_config.ini
+*panda_sdl_config.ini
