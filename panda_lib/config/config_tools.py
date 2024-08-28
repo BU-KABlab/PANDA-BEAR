@@ -1,8 +1,10 @@
 """Utilities for setting and reading the configuration files"""
-from pathlib import Path
-from configparser import ConfigParser
-from dotenv import load_dotenv
 import os
+from configparser import ConfigParser
+from pathlib import Path
+
+from dotenv import load_dotenv
+
 
 def get_env_var(env_var_name: str) -> str:
     """Returns the value of an environment variable."""

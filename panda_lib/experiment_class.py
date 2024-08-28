@@ -326,6 +326,15 @@ class ExperimentBase:
     analyzer: Union[Callable, str, None] = None
     generator: Union[Callable, str, None] = None
 
+    @property
+    def experiment_identifier(self):
+        """
+        For consistent naming of experiment files
+
+        Template: {experiment_id}_{experiment_name}_{plate_id}_{well_id}
+        """
+        return f"{self.experiment_id}_{self.experiment_name}_{self.plate_id}_{self.well_id}"
+
     def run_analysis(self):
         """Run the analysis"""
         if isinstance(self.analyzer, str):
@@ -559,7 +568,7 @@ class CorrectionFactorExperiment(ExperimentBase):
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class EchemExperimentBase(ExperimentBase):
     """
-    Define the data that is used to run an experiment
+    Define the data that is used to run an elechrochemical experiment
 
     This is the base class for all echem experiments
     """
@@ -679,7 +688,7 @@ class EchemExperimentBase(ExperimentBase):
         {self.print_cv_parameters()}
     """
 
-
+# TODO: Is there a way to store experiment types in a database and then load them instead of hardcoding them?
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class PEDOTExperiment(EchemExperimentBase):
     """Define the default data that is used to run an edot experiment"""
@@ -800,7 +809,6 @@ def get_all_type_hints(cls):
 
 # region Experiment SQL Functions
 
-
 def select_next_experiment_id() -> int:
     """Determines the next experiment id by checking the experiment table"""
     # result = execute_sql_command(
@@ -914,7 +922,7 @@ def select_experiment_paramaters(
     for row in result:
         values.append(row)
 
-    if values == []:
+    if not values:
         return None
 
     if not experiment_object:
@@ -958,7 +966,7 @@ def select_specific_parameter(experiment_id: int, parameter_name: str):
     with SessionLocal() as session:
         result = session.query(ExperimentParameters.parameter_value).filter(ExperimentParameters.experiment_id == experiment_id).filter(ExperimentParameters.parameter_name == parameter_name).all()
 
-    if result == []:
+    if not result:
         return None
     return result[0][0]
 
@@ -1435,7 +1443,7 @@ def select_specific_result(
     # else:
     #     result = execute_sql_command(
     #         """
-    #         SELECT 
+    #         SELECT
     #             experiment_id,
     #             result_type,
     #             result_value,
@@ -1452,13 +1460,13 @@ def select_specific_result(
         else:
             result = session.query(ExperimentResults).filter(ExperimentResults.experiment_id == experiment_id).filter(ExperimentResults.result_type == result_type).filter(ExperimentResults.context == context).all()
 
-    if result == []:
+    if not result:
         return None
-    
+
     results = []
     for row in result:
         results.append(ExperimentResultsRecord(*row))
-    
+
     if len(results) == 1:
         return results[0]
 

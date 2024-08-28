@@ -1,12 +1,11 @@
 """The home of all project specific strings and values that are 
 better to be set in one place than to be scattered around the code."""
 
+import sqlite3
 from configparser import ConfigParser
 from pathlib import Path
-import sqlite3
 
 from panda_lib.config.config_tools import get_env_var, read_config
-
 
 configuration_path = get_env_var("PANDA_SDL_CONFIG_PATH")
 config = read_config()

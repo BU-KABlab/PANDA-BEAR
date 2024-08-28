@@ -162,13 +162,17 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
     # )
 
     with SessionLocal() as session:
+
+        # Fetch the information about the type of wellplate
+        well_type = session.query(WellTypes).filter(WellTypes.id == type_id).first()
+
         session.add(
             WellPlates(
                 id=plate_id,
                 type_id=type_id,
                 current=0,
-                cols = "ABCDEFGH",
-                rows = 12,
+                cols = well_type.cols,
+                rows = well_type.rows,
                 a1_x = 0,
                 a1_y = 0,
                 z_bottom = 0,

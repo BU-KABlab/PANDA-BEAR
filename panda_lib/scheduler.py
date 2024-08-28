@@ -16,33 +16,22 @@ import pandas as pd
 
 from panda_lib.log_tools import setup_default_logger
 
-from .experiment_class import (
-    ExperimentBase,
-    ExperimentStatus,
-    insert_experiment,
-    insert_experiment_parameters,
-    insert_experiment_result,
-    insert_experiments_parameters,
-    select_experiment_information,
-    select_experiment_paramaters,
-    select_next_experiment_id,
-    update_experiment_status,
-)
+from .experiment_class import (ExperimentBase, ExperimentStatus,
+                               insert_experiment, insert_experiment_parameters,
+                               insert_experiment_result,
+                               insert_experiments_parameters,
+                               select_experiment_information,
+                               select_experiment_paramaters,
+                               select_next_experiment_id,
+                               update_experiment_status)
 from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import ExperimentParameters, Experiments
-from .sql_tools.sql_queue import (
-    count_queue_length,
-    get_next_experiment_from_queue,
-    select_queue,
-)
-from .sql_tools.sql_wellplate import (
-    count_wells_with_new_status,
-    get_well,
-    select_current_wellplate_info,
-    select_next_available_well,
-    select_well_status,
-    update_well,
-)
+from .sql_tools.sql_queue import (count_queue_length,
+                                  get_next_experiment_from_queue, select_queue)
+from .sql_tools.sql_wellplate import (count_wells_with_new_status, get_well,
+                                      select_current_wellplate_info,
+                                      select_next_available_well,
+                                      select_well_status, update_well)
 from .wellplate import Well
 
 logger = setup_default_logger(log_name="scheduler")
@@ -390,25 +379,25 @@ class Scheduler:
         return 1
 
     def save_results(self, experiment: ExperimentBase) -> None:
-        """Save the results of the experiment to the experiment_results table in the SQLite database.
+        """
+        Save the results of the experiment to the experiment_results table in the SQL database.
 
-            The results are saved in a one to many relationship with the experiment id as the foreign key.
-            Each result value is saved as a separate row in the table.
-            This function accepts an Experiment object and turns it into a dictionary to be saved in the database.
+        The results are saved in a one to many relationship with the experiment id as the foreign key.
+        Each result value is saved as a separate row in the table.
+        This function accepts an Experiment object and turns it into a dictionary to be saved in the database.
 
-            The results table has columns:
-                - id (primary key) - autoincrement
-                - experiment_id (foreign key)
-                - result_type
-                - result_value
-                - created (timestamp)
-                - modified (timestamp)
+        The results table has columns:
+            - id (primary key) - autoincrement
+            - experiment_id (foreign key)
+            - result_type
+            - result_value
+            - created (timestamp)
+            - modified (timestamp)
         Args:
             experiment (ExperimentBase): The experiment that was just run
-            results (ExperimentResult): The results of the experiment
 
-            Returns:
-                None
+        Returns:
+            None
         """
         # Turn the results into a list of values
         results_lists = experiment.results.one_to_many()

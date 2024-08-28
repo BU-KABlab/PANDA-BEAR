@@ -480,7 +480,7 @@ def waste_selector(
 def chrono_amp(
     ca_instructions: EchemExperimentBase,
     file_tag: str = None,
-    custom_parameters: potentiostat_chrono_parameters = None,
+    custom_parameters: Union[potentiostat_chrono_parameters, None] = None,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.

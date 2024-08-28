@@ -55,11 +55,20 @@ def run_panda_sdl_with_ml():
 def run_panda_sdl_without_ml():
     """Runs PANDA_SDL."""
     sql_system_state.set_system_status(utilities.SystemState.BUSY, "running PANDA_SDL")
-    one_off = input("Is this a one-off run? (y/n): ").strip().lower()
-    if one_off[0] == "y":
-        controller.main(one_off=True)
-    else:
-        controller.main()
+    while True:
+        one_off = input("Is this a one-off run? (y/n): ").strip().lower()
+        if not one_off:
+            print("Invalid choice. Please try again.")
+            continue
+        elif one_off[0] == "y":
+            controller.main(one_off=True)
+            break
+        elif one_off[0] == "n":
+            controller.main()
+            break
+        else:
+            print("Invalid choice. Please try again.")
+            continue
 
 
 def change_wellplate():

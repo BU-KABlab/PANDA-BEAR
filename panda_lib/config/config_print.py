@@ -16,11 +16,12 @@ def print_config_values():
     config.read(CONFIG_FILE)
 
     local_dir = Path(__file__).parent.parent
-    config.set("PATHS_GENERAL", "local_dir", str(local_dir))
+    config.set("GENERAL", "local_dir", str(local_dir))
     config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
     config.read(CONFIG_FILE)
 
     # Print the config file values
+    print(f"\n\nConfig file: {CONFIG_FILE}\n")
     for section in config.sections():
         print(f"[{section}]")
         for key, value in config.items(section):
@@ -31,12 +32,13 @@ def print_config_values():
                 continue
 
             if "dir" in key or "path" in key:
-                try:
-                    # Check if the path exists
-                    assert Path(value).exists()
-                except AssertionError:
-                    print(f"{key} = Path does not exist: {value}")
-                    continue
+                if value not in [None, "", "None",'""']:
+                    try:
+                        # Check if the path exists
+                        assert Path(value).exists()
+                    except AssertionError:
+                        print(f"{key} = Path does not exist: {value}")
+                        continue
 
                 # Generate complete path
                 complete_path = Path(value).resolve()
@@ -49,6 +51,8 @@ def print_config_values():
 
     # Write the updated config file
     config.write(open(CONFIG_FILE, "w", encoding="utf-8"))
+
+    input("\nPress Enter to continue...\n\n")
 
 
 def resolve_config_paths():
