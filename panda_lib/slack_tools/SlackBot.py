@@ -163,20 +163,22 @@ class SlackBot:
     def __init__(self, test: bool = read_testing_config()) -> None:
 
         self.logger = logging.getLogger("e_panda")
-        self.test = test
+        self.testing = test
         self.client = WebClient(token=SlackCred.TOKEN)
-        self.test = self.client.auth_test()
+        self.auth_test_response = self.client.auth_test()
 
-        if not self.test["ok"]:
+        if not self.auth_test_response["ok"]:
             self.logger.error("Slack connection failed.")
             return
 
-        self.user_id = self.test["user_id"]
+        self.user_id = self.auth_test_response["user_id"]
         if not config_options.getboolean("use_slack"):
-            self.test = True
+            self.testing = True
 
     def send_slack_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
+
+        # Check if slack is enabled
         if not config_options.getboolean("use_slack"):
             print(message)
             return
@@ -199,6 +201,7 @@ class SlackBot:
     def send_slack_file(self, channel: str, file, message=None) -> int:
         """Send a file to Slack."""
 
+        # Check if slack is enabled
         if not config_options.getboolean("use_slack"):
             return
 
@@ -230,41 +233,13 @@ class SlackBot:
             self.logger.error(log_msg)
             return 0
 
-    # def post_message_with_files(self, channel, message, file_list):
-    #     """Post a message with files to Slack."""
-    #     client = WebClient(SlackCred.TOKEN)
-    #     channel_id = self.channel_id(channel)
-    #     file_ids = []
-    #     file_urls = []
-    #     for file in file_list:
-    #         file = Path(file)
-    #         upload = client.files_upload_v2(
-    #             channel=channel_id,
-    #             file=str(file.resolve()),
-    #             filename=file.name,
-    #         )
-    #         file_ids.append(upload["file"]["id"])
-    #         file_urls.append(upload["file"]["url_private"])
-    #     # Post a message with the uploaded images
-
-    #     # Post a single message with all the uploaded files
-    #     client.chat_postMessage(
-    #         channel=channel_id,
-    #         text=message,
-    #         attachments=[
-    #             {
-    #                 "title": "Uploaded Image",
-    #                 "image_url": f"{url}",
-    #                 "alt_text": "Uploaded Image",
-    #             }
-    #             for url in file_urls
-    #         ],
-    #     )
-
     def upload_images(self, channel, images, message):
         """Upload images to Slack."""
+
+        # Check if slack is enabled
         if not config_options.getboolean("use_slack"):
             return
+
         client = WebClient(SlackCred.TOKEN)
         channel_id = self.channel_id(channel)
         image_paths = [Path(image) for image in images]
@@ -310,7 +285,7 @@ class SlackBot:
             if conversation_history is None:
                 # This means the past 100 messages are from the bot, we should stop
                 sql_system_state.set_system_status(
-                    sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.test
+                    sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.testing
                 )
 
             else:
@@ -380,7 +355,7 @@ class SlackBot:
                             timestamp=msg_ts,
                             addressed_timestamp=datetime.now().timestamp(),
                         ),
-                        test=self.test,
+                        test=self.testing,
                     )
 
                     if response == 0:
@@ -400,7 +375,7 @@ class SlackBot:
 
     def find_id(self, msg_id):
         """Find the message ID in the slack ticket tracker csv file."""
-        ticket = select_slack_ticket(msg_id, test=self.test)
+        ticket = select_slack_ticket(msg_id, test=self.testing)
         if ticket is not None:
             return ticket
         return False
@@ -503,13 +478,13 @@ class SlackBot:
             sql_system_state.select_system_status()
         elif text[0:5] == "pause":
             sql_system_state.set_system_status(
-                sql_system_state.SystemState.PAUSE, "pausing ePANDA", self.test
+                sql_system_state.SystemState.PAUSE, "pausing ePANDA", self.testing
             )
             return 1
 
         elif text[0:6] == "resume":
             sql_system_state.set_system_status(
-                sql_system_state.SystemState.RESUME, "resuming ePANDA", self.test
+                sql_system_state.SystemState.RESUME, "resuming ePANDA", self.testing
             )
             return 1
 
@@ -522,11 +497,14 @@ class SlackBot:
             )
             return 1
 
-        elif text[0:4] == "stop":
+        elif text[0:4] == "shutdown":
             sql_system_state.set_system_status(
-                sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.test
+                sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.testing
             )
             return 1
+
+        elif text[0:4] == "stop":
+            return 0
 
         elif text[0:4] == "exit":
             return 0
@@ -868,19 +846,19 @@ class SlackBot:
         if channel == "conversation":
             channel_id = (
                 SlackCred.CONVERSATION_CHANNEL_ID
-                if not self.test
+                if not self.testing
                 else SlackCred.TEST_ALERT_CHANNEL_ID
             )
         elif channel == "alert":
             channel_id = (
                 SlackCred.ALERT_CHANNEL_ID
-                if not self.test
+                if not self.testing
                 else SlackCred.TEST_ALERT_CHANNEL_ID
             )
         elif channel == "data":
             channel_id = (
                 SlackCred.DATA_CHANNEL_ID
-                if not self.test
+                if not self.testing
                 else SlackCred.TEST_DATA_CHANNEL_ID
             )
         elif channel in [
@@ -895,6 +873,23 @@ class SlackBot:
         else:
             return 0
         return channel_id
+
+    def run(self):
+        """Run the slack bot."""
+        self.status = 1
+        while self.status == 1:
+            try:
+                time.sleep(5)
+                self.status = self.check_slack_messages(channel="alert")
+                self.check_slack_messages(channel="data")
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                print(e)
+                time.sleep(15)
+                continue
+
+        print("Stopping Slack Bot")
 
 
 if __name__ == "__main__":
