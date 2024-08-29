@@ -186,6 +186,31 @@ class Well(Vessel):
         """Returns a string representation of the well."""
         return f"Well({self.well_id}, {self.status}, {self.status_date}, {self.contents}, {self.experiment_id}, {self.project_id}, {str(self.volume)}, {self.coordinates})"
 
+    def __iter__(self) -> Tuple:
+        """Returns an iterator of the well attributes."""
+        return iter(
+            (
+                self.well_id,
+                self.plate_id,
+                self.coordinates,
+                self.volume,
+                self.status,
+                self.contents,
+                self.status_date,
+                self.depth,
+                self.capacity,
+                self.height,
+                self.experiment_id,
+                self.project_id,
+                self.density,
+                self.campaign_id,
+                self.type_number,
+            )
+        )
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
     def update_contents(
         self, from_vessel: dict, volume: float, save: bool = False
     ) -> None:

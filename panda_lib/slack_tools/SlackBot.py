@@ -151,10 +151,18 @@ def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
     # ) #TODO: Replace with SQLAlchemy query
 
     with SessionLocal() as session:
-        result = session.query(SlackTickets).filter(SlackTickets.msg_id == msg_id).all()
-    if result == []:
+        ticket = session.query(SlackTickets).filter(SlackTickets.msg_id == msg_id).first()
+    if not ticket:
         return None
-    return SlackTicket(*result[0])
+    return SlackTicket(
+        msg_id=ticket.msg_id,
+        channel_id=ticket.channel_id,
+        msg_text=ticket.message,
+        valid_cmd=ticket.response,
+        timestamp=ticket.timestamp,
+        addressed_timestamp=ticket.addressed_timestamp,
+
+    )
 
 
 class SlackBot:
@@ -523,16 +531,17 @@ class SlackBot:
                 "help -> displays this message\n"
                 # "plot experiment # - plots plots the CV data for experiment #\n"
                 # "data experiment # - sends the data files for experiment #\n"
-                "status experiment # - displays the status of experiment #\n"
+                "status experiment # -> displays the status of experiment #\n"
                 "vial status -> displays the status of the vials\n"
                 "well status -> displays the status of the wells and the rest of the deck\n"
                 "queue length -> displays the length of the queue\n"
                 "status -> displays the status of the vials, wells, and queue\n"
                 "screenshot-{camera name} -> takes a screenshot of the specified camera\n"
-                "pause - pauses the experiment loop\n"
-                "resume - resumes the experiment loop\n"
+                "pause -> pauses the experiment loop\n"
+                "resume -> resumes the experiment loop\n"
                 # "start - starts the experiment loop\n"
-                "stop - stops the experiment loop\n"
+                "shutdown -> stops the experiment loop and the main menu\n"
+                "stop -> stops the monitoring loop\n"
                 "exit -> closes the slackbot\n"
             )
         else:  # data channel
@@ -541,17 +550,18 @@ class SlackBot:
                 "help -> displays this message\n"
                 # "plot experiment # - plots plots the CV data for experiment #\n"
                 # "data experiment # - sends the data files for experiment #\n"
-                "images experiment # - sends the images for experiment #\n"
-                "status experiment # - displays the status of experiment #\n"
+                "images experiment # -> sends the images for experiment #\n"
+                "status experiment # -> displays the status of experiment #\n"
                 "vial status -> displays the status of the vials\n"
                 "well status -> displays the status of the wells and the rest of the deck\n"
                 "queue length -> displays the length of the queue\n"
                 "status -> displays the status of the vials, wells, and queue\n"
                 "screenshot-{camera name} -> takes a screenshot of the specified camera\n"
-                "pause - pauses the experiment loop\n"
-                "resume - resumes the experiment loop\n"
+                "pause -> pauses the experiment loop\n"
+                "resume -> resumes the experiment loop\n"
                 # "start - starts the experiment loop\n"
-                "stop - stops the experiment loop\n"
+                "shutdown -> stops the experiment loop and the main menu\n"
+                "stop -> stops the monitoring loop\n"
             )
         self.send_slack_message(channel_id, message)
         return 1
@@ -877,6 +887,7 @@ class SlackBot:
     def run(self):
         """Run the slack bot."""
         self.status = 1
+        self.send_slack_message("alert", "PANDA Bot is monitoring Slack")
         while self.status == 1:
             try:
                 time.sleep(5)
@@ -888,7 +899,7 @@ class SlackBot:
                 print(e)
                 time.sleep(15)
                 continue
-
+        self.send_slack_message("alert", "PANDA Bot is off duty")
         print("Stopping Slack Bot")
 
 
