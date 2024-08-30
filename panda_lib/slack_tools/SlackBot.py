@@ -225,7 +225,7 @@ class SlackBot:
             result = None
             with open(file, "rb") as f:
                 result = client.files_upload_v2(
-                    channel=channel_id,
+                    channel_id=channel_id,
                     file=f,
                     filename=filename_to_post,
                     initial_comment=message,
@@ -261,7 +261,7 @@ class SlackBot:
             )
         response = client.files_upload_v2(
             file_uploads=file_upload_parts,
-            channel=channel_id,
+            channel_id=channel_id,
             initial_comment=message,
         )
 
@@ -647,16 +647,16 @@ class SlackBot:
         """Sends the well status to the user."""
         # Check current wellplate type
         _, type_number, _ = sql_wellplate.select_current_wellplate_info()
-        _, _, _, _, wellplate_type = sql_wellplate.select_well_characteristics(
+        wellplate_type = sql_wellplate.select_well_characteristics(
             type_number
         )
         # Choose the correct wellplate object based on the wellplate type
         wellplate: Wellplate = None
-        if wellplate_type == "circular":
+        if wellplate_type.shape == "circular":
             wellplate = Wellplate(
                 type_number=type_number,
             )
-        elif wellplate_type == "square":
+        elif wellplate_type.shape == "square":
             wellplate = Wellplate(
                 type_number=type_number,
             )
@@ -683,13 +683,19 @@ class SlackBot:
 
         ## Label the wellplate with the plate id below the bottom row and centered to the wellplate
         # get the coordinates of wells H12 and A12
-        h12: dict = wellplate.get_coordinates("H12")
-        a12: dict = wellplate.get_coordinates("A12")
+        corners = wellplate.get_corners()
+        top_right = corners["top_right"]
+        bottom_right = corners["bottom_right"]
+        bottom_left = corners["bottom_left"]
+        top_left = corners["top_left"]
+        
+
+
         # calculate the center of the wellplate
-        center = h12["x"] + (a12["x"] - h12["x"]) / 2
+        center = bottom_left["x"] + (bottom_right["x"] - bottom_left["x"]) / 2
         # plot the plate id
         plt.text(
-            center, h12["y"] - 20, str(wellplate.plate_id), color="black", ha="center"
+            center, bottom_left["y"] - 20, str(wellplate.plate_id), color="black", ha="center"
         )
 
         ## Vial coordinates
@@ -741,6 +747,11 @@ class SlackBot:
                 vial_color.append("red")
                 vial_marker.append("o")
 
+        try:
+            vial_radius = data[0]["radius"]
+        except IndexError:
+            vial_radius = 100
+
         # rinse_vial = {"x": -411, "y": -30}
         # vial_x.append(rinse_vial["x"])
         # vial_y.append(rinse_vial["y"])
@@ -752,20 +763,22 @@ class SlackBot:
 
         # Plot the well plate
         plt.scatter(
-            x_coordinates, y_coordinates, marker=marker, c=color, s=75, alpha=0.5
+            x_coordinates, y_coordinates, marker=marker, c=color, s=mm_to_points(wellplate.radius*2), alpha=0.5
         )
-        plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=200, alpha=1)
+        plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=mm_to_points(vial_radius*2), alpha=1)
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.title("Status of Stage Items")
         plt.grid(True, "both")
         plt.xlim(-420, 10)
         plt.ylim(-310, 10)
-        plt.savefig("well_status.png", format="png")
+        file_path_for_plot = Path("well_status.png")
+        plt.savefig(file_path_for_plot, format="png")
+        # plt_img = Image.open(file_path_for_plot)
         plt.close()
         # Send the plot to Slack
-        self.send_slack_file(channel_id, "well_status.png")
-        Path("well_status.png").unlink()
+        self.upload_images(channel_id, [file_path_for_plot.absolute()], "Well Status")
+        file_path_for_plot.unlink()
         return 1
 
     def __queue_length(self, channel_id):
@@ -902,6 +915,10 @@ class SlackBot:
         self.send_slack_message("alert", "PANDA Bot is off duty")
         print("Stopping Slack Bot")
 
+def mm_to_points(radius_mm):
+    radius_inch = radius_mm / 25.4  # Convert mm to inches
+    radius_points = radius_inch * 72  # Convert inches to points
+    return radius_points
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)
