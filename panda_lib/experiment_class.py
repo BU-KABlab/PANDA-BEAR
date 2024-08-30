@@ -821,7 +821,7 @@ def select_next_experiment_id() -> int:
 
     with SessionLocal() as session:
         result = session.query(Experiments.experiment_id).order_by(Experiments.experiment_id.desc()).first()
-    if result == []:
+    if result in [None, []]:
         return 10000000
     return result[0] + 1
 
