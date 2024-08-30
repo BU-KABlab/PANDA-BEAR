@@ -85,6 +85,7 @@ def main(
     """
 
     controller_slack = SlackBot(test=use_mock_instruments)
+    slack_thread = threading.Thread(target=run_slack_bot, args=(use_mock_instruments,))
     if (
         config.getboolean("OPTIONS","testing")
         or not config.getboolean("OPTIONS","use_obs")
@@ -127,7 +128,7 @@ def main(
         # experiemnt loop
         while True:
             ## Begin slack monitoring
-            slack_thread = threading.Thread(target=run_slack_bot, args=(use_mock_instruments,))
+            
             slack_thread.start()
 
             ## Reset the logger to log to the PANDA_SDL.log file and format
@@ -446,7 +447,8 @@ def main(
         obs.stop_recording()
         sql_system_state.set_system_status(SystemState.IDLE)
         controller_slack.send_slack_message("alert", "Please command the slack monitor to 'stop' to end the slack monitoring")
-        slack_thread.join()
+        if slack_thread.is_alive():
+            slack_thread.join()
         controller_slack.send_slack_message("alert", "PANDA_SDL is shutting down...goodbye")
         print("PANDA_SDL is shutting down...returning to main menu...goodbye")
 
@@ -491,9 +493,12 @@ def establish_system_state() -> (
             "alert",
             "Please refill the stock vials and confirm in the terminal that the program should continue",
         )
-        input(
-            "Confirm that the program should continue by pressing enter or ctrl+c to exit"
+        options = input(
+            "Confirm that the program should continue by pressing enter or q to exit: "
         )
+        if options.lower() == "q":
+            slack.send_slack_message("alert", "PANDA_SDL is shutting down")
+            raise ShutDownCommand
         slack.send_slack_message("alert", "The program is continuing")
 
     ## read through the waste vials and log their name, contents, and volume
@@ -517,9 +522,13 @@ def establish_system_state() -> (
             "alert",
             "Please empty the waste vials and confirm in the terminal that the program should continue",
         )
-        input(
-            "Confirm that the program should continue by pressing enter or ctrl+c to exit"
+        options = input(
+            "Confirm that the program should continue by pressing enter or q to exit: "
         )
+        if options.lower() == "q":
+            slack.send_slack_message("alert", "PANDA_SDL is shutting down")
+            raise ShutDownCommand
+
         slack.send_slack_message("alert", "The program is continuing")
 
     ## read the wellplate json and log the status of each well in a grid
