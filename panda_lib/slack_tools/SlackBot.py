@@ -763,9 +763,9 @@ class SlackBot:
 
         # Plot the well plate
         plt.scatter(
-            x_coordinates, y_coordinates, marker=marker, c=color, s=mm_to_points(wellplate.radius*2), alpha=0.5
+            x_coordinates, y_coordinates, marker=marker, c=color, s=3.14 *(wellplate.radius**2), alpha=0.5
         )
-        plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=mm_to_points(vial_radius*2), alpha=1)
+        plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=3.14 *(vial_radius**2), alpha=1)
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.title("Status of Stage Items")
@@ -914,11 +914,6 @@ class SlackBot:
                 continue
         self.send_slack_message("alert", "PANDA Bot is off duty")
         print("Stopping Slack Bot")
-
-def mm_to_points(radius_mm):
-    radius_inch = radius_mm / 25.4  # Convert mm to inches
-    radius_points = radius_inch * 72  # Convert inches to points
-    return radius_points
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)
