@@ -23,8 +23,9 @@ from .sql_tools.panda_models import (
     WellHx,
     WellPlates,
     MillConfig,
+    WellTypes,
 )
-from .vessel import Vessel
+from .vessel import Vessel, VesselCoordinates
 
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
@@ -133,7 +134,7 @@ class Well(Vessel):
         self.campaign_id: int = campaign_id
         self.volume: float = volume
 
-        if isinstance(coordinates, WellCoordinates):
+        if isinstance(coordinates, (WellCoordinates, VesselCoordinates)):
             self.coordinates: WellCoordinates = coordinates
         else:
             try:
@@ -348,15 +349,15 @@ class Wellplate:
         self.radius = float(3.25)  # new circular wells
         self.well_offset = float(9.0)  # mm from center to center
         self.well_capacity = float(300)  # ul
-        # overwrite the default values with the values from the well_type.csv file
-        (
-            self.radius,
-            self.well_offset,
-            self.well_capacity,
-            self.height,
-            self.shape,
-            self.z_top,
-        ) = self.read_well_type_characteristics(self.type_number)
+        # overwrite the default values with the values from the well_type table
+        wellplate_type = self.read_well_type_characteristics(self.type_number)
+        self.radius = wellplate_type.radius_mm
+        self.well_offset = wellplate_type.offset_mm
+        self.well_capacity = wellplate_type.capacity_ul
+        self.height = wellplate_type.height_mm
+        self.shape = wellplate_type.shape
+        self.z_top = self.z_bottom + float(wellplate_type.height_mm)
+        # Load the well plate location from the well_location json file
         (
             self.a1_x,
             self.a1_y,
@@ -412,7 +413,7 @@ class Wellplate:
     def calculate_well_locations(self) -> None:
         """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
         for col_idx, col in enumerate(self.columns):
-            for row in range(1, self.rows):
+            for row in range(1, self.rows+1): # range is exclusive of the last number so we add 1
                 well_id = col + str(row)
                 if well_id == "A1":
                     coordinates = self.a1_coordinates
@@ -461,7 +462,7 @@ class Wellplate:
     def establish_new_wells(self) -> None:
         """Establish new wells in the well plate"""
         for col in self.columns:
-            for row in range(1, self.rows):
+            for row in range(1, self.rows+1): # range is exclusive of the last number so we add 1
                 well_id = col + str(row)
                 self.wells[well_id] = Well(
                     plate_id=self.plate_id,
@@ -520,6 +521,42 @@ class Wellplate:
         """Update the coordinates of a specific well"""
         well_id = well_id.upper()
         self.wells[well_id].update_well_coordinates = new_coordinates
+
+    def get_corners(self) -> dict:
+        """
+        Return the coordinates of the corners of the well plate.
+
+        First checks the wellplate type to determine the number of rows and cols,
+        then using the first and last wells of the first and last rows to determine the corners.
+        
+        Returns:
+            dict: The coordinates of the corners of the well plate
+        """
+
+
+
+
+        # Possible order depending on orientation
+        if self.orientation == 0:
+            corner_keys = ['top_right', 'bottom_right', 'top_left', 'bottom_left'] # A1 towards origin at top right
+        elif self.orientation == 1:
+            corner_keys = ['top_left', 'bottom_left', 'top_right', 'bottom_right'] # A1 at bottom right
+        elif self.orientation == 2:
+            corner_keys = ['top_right', 'bottom_right', 'top_left', 'bottom_left'] # A1 at bottom left
+        elif self.orientation == 3:
+            corner_keys = ['top_left', 'bottom_left', 'top_right', 'bottom_right'] # A1 at top left
+        
+
+        corners = {}
+        # Get the corners of the well plate
+        for col in [self.columns[0], self.columns[-1]]:
+            for row in [1, self.rows]:
+                well_id = col + str(row)
+                well = self.wells[well_id]
+                key = corner_keys.pop(0)
+                corners[key] = well.coordinates
+
+        return corners
 
     def get_contents(self, well_id: str) -> dict:
         """Return the contents of a specific well"""
@@ -597,22 +634,11 @@ class Wellplate:
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s", well_id, well_data["status"])
 
-    def read_well_type_characteristics(self, type_number: int) -> tuple[float]:
+    def read_well_type_characteristics(self, type_number: int) -> WellTypes:
         """Read the well type characteristics from the well_type.csv config file"""
 
         # Select the well type characteristics from the well_types sql table given the type_number
-        radius, well_offset, well_capacity, height, shape = (
-            sql_wellplate.select_well_characteristics(type_number)
-        )
-
-        return (
-            float(radius),
-            float(well_offset),
-            float(well_capacity),
-            float(height),
-            shape,
-            self.z_bottom + float(height),  # z_top
-        )
+        return sql_wellplate.select_well_characteristics(type_number)
 
     def load_wellplate_location(
         self,
