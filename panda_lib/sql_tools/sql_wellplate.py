@@ -1072,7 +1072,7 @@ def get_well_by_experiment_id(experiment_id: str) -> Tuple:
 #     )
 
 
-def select_well_characteristics(type_id: int) -> tuple[int, int, int, int, str]:
+def select_well_characteristics(type_id: int) -> WellTypes:
     """
     Select the well characteristics from the well_types table.
 
@@ -1080,8 +1080,7 @@ def select_well_characteristics(type_id: int) -> tuple[int, int, int, int, str]:
         type_id (int): The well type ID.
 
     Returns:
-        tuple[int, int, int, int, str]: The well type ID, the radius, the offset,
-        the capacity, the height, and the shape.
+        The SQL Alchemy object for the well type.
     """
     # return sql_utilities.execute_sql_command(
     #     "SELECT radius_mm, offset_mm, capacity_ul, height_mm, shape FROM well_types WHERE id = ?",
@@ -1089,17 +1088,7 @@ def select_well_characteristics(type_id: int) -> tuple[int, int, int, int, str]:
     # )[0]
 
     with SessionLocal() as session:
-        result = (
-            session.query(
-                WellTypes.radius_mm,
-                WellTypes.offset_mm,
-                WellTypes.capacity_ul,
-                WellTypes.height_mm,
-                WellTypes.shape,
-            )
-            .filter(WellTypes.id == type_id)
-            .first()
-        )
+        result = session.query(WellTypes).filter(WellTypes.id == type_id).first()
         return result
 
 
