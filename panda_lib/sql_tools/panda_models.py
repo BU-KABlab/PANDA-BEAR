@@ -306,17 +306,22 @@ class WellTypes(Base):
     substrate = Column(String)
     gasket = Column(String)
     count = Column(Integer)
-    rows = Column(Integer)
-    cols = Column(String)
+    rows = Column(String)
+    cols = Column(Integer)
     shape = Column(String)
     radius_mm = Column(Float)
-    offset_mm = Column(Float)
-    height_mm = Column(Float)
+    offset_rows_mm = Column(Float)
+    offset_cols_mm = Column(Float)
+    gasket_length_mm = Column(Float)
+    gasket_width_mm = Column(Float)
+    gasket_height_mm = Column(Float)
+    a1_x_wall_offset_mm = Column(Float)
+    a1_y_wall_offset_mm = Column(Float)
     max_liquid_height_mm = Column(Float)
     capacity_ul = Column(Float)
 
     def __repr__(self):
-        return f"<WellTypes(id={self.id}, substrate={self.substrate}, gasket={self.gasket}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.offset_mm}, height_mm={self.height_mm}, max_liquid_height_mm={self.max_liquid_height_mm}, capacity_ul={self.capacity_ul})>"
+        return f"<WellTypes(id={self.id}, substrate={self.substrate}, gasket={self.gasket}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.offset_rows_mm}, height_mm={self.gasket_height_mm}, max_liquid_height_mm={self.max_liquid_height_mm}, capacity_ul={self.capacity_ul})>"
 
 
 class WellPlates(Base):
@@ -329,8 +334,8 @@ class WellPlates(Base):
     a1_x = Column(Float)
     a1_y = Column(Float)
     orientation = Column(Integer)
-    rows = Column(Integer)
-    cols = Column(String)
+    rows = Column(String)
+    cols = Column(Integer)
     z_bottom = Column(Float)
     z_top = Column(Float)
     echem_height = Column(Float)
