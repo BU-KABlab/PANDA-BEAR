@@ -8,6 +8,7 @@ import logging
 import time
 from dataclasses import dataclass
 from datetime import datetime
+from math import fabs
 
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 from enum import Enum
@@ -692,7 +693,7 @@ class SlackBot:
 
 
         # calculate the center of the wellplate
-        center = bottom_left["x"] + (bottom_right["x"] - bottom_left["x"]) / 2
+        center = bottom_left["x"] + (fabs(bottom_left["x"]) - fabs(bottom_right["x"])) / 2
         # plot the plate id
         plt.text(
             center, bottom_left["y"] - 20, str(wellplate.plate_id), color="black", ha="center"
@@ -868,7 +869,7 @@ class SlackBot:
             "error": "red",
             "paused": "blue",
         }
-        return color_mapping.get(status, "gold")
+        return color_mapping.get(status, "purple")
 
     def take_screenshot(self, channel_id, camera_name: str):
         """Take a screenshot of the camera."""
