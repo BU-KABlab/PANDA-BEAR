@@ -98,8 +98,6 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple:
             wellplate.z_bottom,
             wellplate.z_top,
             wellplate.orientation,
-            wellplate.rows,
-            wellplate.cols,
             wellplate.echem_height,
         )
 
@@ -109,6 +107,7 @@ def update_wellplate_location(plate_id: Union[int,None], **kwargs) -> None:
     with SessionLocal() as session:
 
         if plate_id is None:
+            logger.info("No plate_id provided, updating the current wellplate")
             plate_id = (
                 session.query(WellPlates).filter(WellPlates.current == 1).first().id
             )
@@ -480,7 +479,7 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
                 WellHx.volume,
                 WellHx.coordinates,
                 WellTypes.capacity_ul,
-                WellTypes.height_mm,
+                WellTypes.gasket_height_mm,
             )
             .join(WellPlates, WellHx.plate_id == WellPlates.id)
             .join(WellTypes, WellPlates.type_id == WellTypes.id)
