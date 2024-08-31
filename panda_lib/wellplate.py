@@ -615,30 +615,30 @@ class Wellplate:
         if self.orientation == 0:
             corner_keys = [
                 "top_right",
-                "bottom_right",
                 "top_left",
+                "bottom_right",
                 "bottom_left",
             ]  # A1 towards origin at top right
         elif self.orientation == 1:
             corner_keys = [
-                "top_left",
                 "bottom_left",
-                "top_right",
                 "bottom_right",
+                "top_left",
+                "top_right",
             ]  # A1 at bottom right
         elif self.orientation == 2:
             corner_keys = [
-                "top_right",
-                "bottom_right",
                 "top_left",
                 "bottom_left",
+                "top_right",
+                "bottom_right",
             ]  # A1 at bottom left
         elif self.orientation == 3:
             corner_keys = [
-                "top_left",
-                "bottom_left",
-                "top_right",
                 "bottom_right",
+                "top_right",
+                "bottom_left",
+                "top_left",
             ]  # A1 at top left
 
         corners = {}
