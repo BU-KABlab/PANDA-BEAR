@@ -5,7 +5,7 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import List, Tuple, Union
 
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, Integer, func, cast
 
 from panda_lib import wellplate as wellplate_module
 from panda_lib.sql_tools import sql_utilities
@@ -651,7 +651,7 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
             session.query(WellHx.well_id)
             .filter(WellHx.status == "new")
             .filter(WellHx.plate_id == plate_id)
-            .order_by(WellHx.well_id.asc())
+            .order_by(func.substr(WellHx.well_id, 1, 1), cast(func.substr(WellHx.well_id, 2), Integer).asc())
             .first()
         )
         if result is None:
