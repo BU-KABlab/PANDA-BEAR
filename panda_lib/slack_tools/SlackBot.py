@@ -32,7 +32,7 @@ from panda_lib.sql_tools import (
 )
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import SlackTickets
-from panda_lib.wellplate import Well, Wellplate
+from panda_lib.wellplate import Well, Wellplate, WellCoordinates
 
  # Initialize the configparser
 config = configparser.ConfigParser()
@@ -708,7 +708,7 @@ class SlackBot:
         #     data = json.load(stock)
         data = vials.get_current_vials("waste")
         for vial in data:
-            vial = vial.to_dict()
+            #vial = vial.to_dict()
             vial_x.append(vial["vial_coordinates"]["x"])
             vial_y.append(vial["vial_coordinates"]["y"])
             volume = vial["volume"]
@@ -729,7 +729,7 @@ class SlackBot:
         #     data = json.load(stock)
         data = vials.get_current_vials("stock")
         for vial in data:
-            vial = vial.to_dict()
+            #vial = vial.to_dict()
             vial_x.append(vial["vial_coordinates"]["x"])
             vial_y.append(vial["vial_coordinates"]["y"])
             volume = vial["volume"]
@@ -752,14 +752,81 @@ class SlackBot:
         except IndexError:
             vial_radius = 100
 
-        # rinse_vial = {"x": -411, "y": -30}
-        # vial_x.append(rinse_vial["x"])
-        # vial_y.append(rinse_vial["y"])
-        # vial_color.append("black")
-        ## combine the well and vial coordinates
-        # x_coordinates.extend(stock_vial_x)
-        # y_coordinates.extend(stock_vial_y)
-        # color.extend(vial_color)
+        # Draw the gasket outline
+        gasket_length = wellplate.gasket_length
+        gasket_width = wellplate.gasket_width
+        orientation = wellplate.orientation
+        
+
+        if orientation == 0:
+            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_x_wall_offset, wellplate.a1_y + wellplate.a1_y_wall_offset,0)
+
+            gasket_x = [
+                gasket_origin.x,
+                gasket_origin.x,
+                gasket_origin.x - gasket_width,
+                gasket_origin.x - gasket_width,
+                gasket_origin.x,
+            ]
+            gasket_y = [
+                gasket_origin.y,
+                gasket_origin.y - gasket_length,
+                gasket_origin.y - gasket_length,
+                gasket_origin.y,
+                gasket_origin.y,
+            ]
+        elif orientation == 1:
+            gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
+            gasket_x = [
+                gasket_origin.x,
+                gasket_origin.x,
+                gasket_origin.x + gasket_width,
+                gasket_origin.x + gasket_width,
+                gasket_origin.x,
+            ]
+            gasket_y = [
+                gasket_origin.y,
+                gasket_origin.y + gasket_length,
+                gasket_origin.y + gasket_length,
+                gasket_origin.y,
+                gasket_origin.y,
+            ]
+        elif orientation == 2:
+            gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y + wellplate.a1_y_wall_offset,0)
+            gasket_x = [
+                gasket_origin.x,
+                gasket_origin.x + gasket_length,
+                gasket_origin.x + gasket_length,
+                gasket_origin.x,
+                gasket_origin.x,
+            ]
+            gasket_y = [
+                gasket_origin.y,
+                gasket_origin.y,
+                gasket_origin.y - gasket_width,
+                gasket_origin.y - gasket_width,
+                gasket_origin.y,
+            ]
+        elif orientation == 3:
+            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
+            gasket_x = [
+                gasket_origin.x,
+                gasket_origin.x - gasket_length,
+                gasket_origin.x - gasket_length,
+                gasket_origin.x,
+                gasket_origin.x,
+            ]
+            gasket_y = [
+                gasket_origin.y,
+                gasket_origin.y,
+                gasket_origin.y + gasket_width,
+                gasket_origin.y + gasket_width,
+                gasket_origin.y,
+            ]
+        else:
+            raise ValueError("Invalid orientation value. Must be 0, 1, 2, or 3.")
+
+        plt.plot(gasket_x, gasket_y, c="black", lw=1.5)
 
         # Plot the well plate
         plt.scatter(

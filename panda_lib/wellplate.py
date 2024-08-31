@@ -306,6 +306,10 @@ class Wellplate:
         a1_x (float): The x-coordinate of well A1.
         a1_y (float): The y-coordinate of well A1.
         orientation (int): The orientation of the well plate (0-3).
+            0 - Vertical, wells become more negative in both x and y from A1
+            1 - Vertical, wells become less negative in both x and y from A1
+            2 - Horizontal, wells become less negative from A1 in x and y
+            3 - Horizontal, wells become more negative from A1 in x and y
         columns (str): The string representation of well plate columns.
         rows (int): The number of rows in the well plate.
         type_number (int): The type of well plate.
@@ -318,45 +322,53 @@ class Wellplate:
         x_a1: float = float(0),
         y_a1: float = float(0),
         orientation: int = 0,
-        columns: str = "ABCDEFGH",
-        rows: int = 13,
-        type_number: int = 4,
+        columns: int = 12,
+        rows: str = "ABCDEFGH",
+        type_number: Union[int,None] = None,
         new_well_plate: bool = False,
         plate_id: int = None,
     ) -> None:
         """
         Initializes a new instance of the Wells2 class.
-
         """
         self.wells = {}
         self.a1_x = x_a1
         self.a1_y = y_a1
-        self.rows = rows
-        self.columns = columns
+        self.rows: str = rows
+        self.columns: int = columns
         self.orientation = orientation
         self.z_bottom = -72
         self.echem_height = -70  # for every well
         self.image_height = -35  # The height from which to image the well in mm
-        self.type_number = type_number  # The type of well plate
-        plate_id, _, _ = sql_wellplate.select_current_wellplate_info()
+        current_plate_id, current_type_number, _ = sql_wellplate.select_current_wellplate_info()
+        if type_number is None:
+            self.type_number = current_type_number
+        else:
+            self.type_number = type_number
         self.plate_id = (
-            plate_id if plate_id is None else plate_id
+            current_plate_id if plate_id is None else plate_id
         )  # The id of the well plate
-
-        # From the well_type.csv file in config but has defaults
         self.z_top = float(0)
         self.height = float(6.0)  # The height of the well plate in mm
         self.radius = float(3.25)  # new circular wells
-        self.well_offset = float(9.0)  # mm from center to center
+        self.well_row_offset = float(9.0)  # mm from center to center
+        self.well_col_offset = float(9.0)  # mm from center to center
         self.well_capacity = float(300)  # ul
         # overwrite the default values with the values from the well_type table
         wellplate_type = self.read_well_type_characteristics(self.type_number)
         self.radius = wellplate_type.radius_mm
-        self.well_offset = wellplate_type.offset_mm
+        self.well_row_offset = wellplate_type.offset_rows_mm
+        self.well_col_offset = wellplate_type.offset_cols_mm
         self.well_capacity = wellplate_type.capacity_ul
-        self.height = wellplate_type.height_mm
+        self.height = wellplate_type.gasket_height_mm
         self.shape = wellplate_type.shape
-        self.z_top = self.z_bottom + float(wellplate_type.height_mm)
+        self.z_top = self.z_bottom + float(wellplate_type.gasket_height_mm)
+        self.gasket_length = wellplate_type.gasket_length_mm
+        self.gasket_width = wellplate_type.gasket_width_mm
+        self.a1_y_wall_offset = wellplate_type.a1_y_wall_offset_mm
+        self.a1_x_wall_offset = wellplate_type.a1_x_wall_offset_mm
+        self.rows = wellplate_type.rows
+        self.columns = int(wellplate_type.cols)
         # Load the well plate location from the well_location json file
         (
             self.a1_x,
@@ -364,8 +376,6 @@ class Wellplate:
             self.z_bottom,
             self.z_top,
             self.orientation,
-            self.rows,
-            self.columns,
             self.echem_height,
         ) = self.load_wellplate_location()
         self.a1_coordinates = {
@@ -396,8 +406,6 @@ class Wellplate:
             self.z_bottom,
             self.z_top,
             self.orientation,
-            self.rows,
-            self.columns,
             self.echem_height,
         ) = self.load_wellplate_location()
         self.a1_coordinates = {
@@ -410,10 +418,12 @@ class Wellplate:
             well: Well = self.wells[well_id]
             self.update_well_coordinates(well_id, well.coordinates)
 
-    def calculate_well_locations(self) -> None:
+    def calculate_well_locations_old(self) -> None:
         """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
         for col_idx, col in enumerate(self.columns):
-            for row in range(1, self.rows+1): # range is exclusive of the last number so we add 1
+            for row in range(
+                1, self.rows + 1
+            ):  # range is exclusive of the last number so we add 1
                 well_id = col + str(row)
                 if well_id == "A1":
                     coordinates = self.a1_coordinates
@@ -421,8 +431,8 @@ class Wellplate:
                     if depth < self.z_bottom:
                         depth = self.z_bottom
                 else:
-                    x_offset = col_idx * self.well_offset
-                    y_offset = (row - 1) * self.well_offset
+                    x_offset = col_idx * self.well_row_offset
+                    y_offset = (row - 1) * self.well_row_offset
                     if self.orientation == 0:
                         coordinates = {
                             "x": self.a1_coordinates["x"] - x_offset,
@@ -459,11 +469,75 @@ class Wellplate:
                 )
                 self.set_coordinates(well_id, new_coordinates)
 
+    def calculate_well_locations(self) -> None:
+        """
+        This method is used to calculate the location of the wells in a well plate.
+        It uses the A1 coordinates as the reference point, applying the row and
+        column offsets to calculate the coordinates of the other wells, and using
+        the appropriate sign for the offsets according to the orientation of the well plate.
+
+        Note the rows with be lettered and the columns numbered.
+        """
+        row_offset = self.well_row_offset
+        col_offset = self.well_col_offset
+        orientation = self.orientation
+
+        for row_idx, row in enumerate(self.rows):
+            for col in range(
+                1, self.columns + 1
+            ):  # We start at 1 and include the last number
+                well_id = row + str(col)
+                if well_id == "A1":
+                    x = self.a1_x
+                    y = self.a1_y
+                    depth = self.z_bottom
+                    if depth < self.z_bottom:
+                        depth = self.z_bottom
+                    else:
+                        depth = self.z_bottom
+                else:
+                    if orientation == 0:
+                        x = self.a1_x - row_idx * row_offset
+                        y = self.a1_y - (col - 1) * col_offset
+                    elif orientation == 1:
+                        x = self.a1_x + row_idx * row_offset
+                        y = self.a1_y + (col - 1) * col_offset
+                    elif orientation == 2:
+                        x = self.a1_x + (col - 1) * col_offset
+                        y = self.a1_y - row_idx * row_offset
+                    elif orientation == 3:
+                        x = self.a1_x - (col - 1) * col_offset
+                        y = self.a1_y + row_idx * row_offset
+                    else:
+                        raise ValueError(
+                            "Invalid orientation value. Must be 0, 1, 2, or 3."
+                        )
+
+                depth = self.z_bottom
+                if depth < self.z_bottom:
+                    depth = self.z_bottom
+                else:
+                    depth = self.z_bottom
+                top = self.z_top
+
+                # Round the coordinates to 2 decimal places
+                coordinates = WellCoordinates(
+                    x=round(x, 3),
+                    y=round(y, 3),
+                    z_top=round(top, 3),
+                    z_bottom=round(depth, 3),
+                )
+
+                self.set_coordinates(well_id, coordinates)
+
     def establish_new_wells(self) -> None:
         """Establish new wells in the well plate"""
-        for col in self.columns:
-            for row in range(1, self.rows+1): # range is exclusive of the last number so we add 1
-                well_id = col + str(row)
+
+        for _, row in enumerate(
+            self.rows
+        ):  # range is exclusive of the last number so we add 1
+            for col in range(1, self.columns + 1):
+                well_id = str(row) + str(col)
                 self.wells[well_id] = Well(
                     plate_id=self.plate_id,
                     well_id=well_id,
@@ -518,9 +592,13 @@ class Wellplate:
     def update_well_coordinates(
         self, well_id: str, new_coordinates: WellCoordinates
     ) -> None:
-        """Update the coordinates of a specific well"""
+        """Update the coordinates of a specific well in the db and in memory"""
+
+        logger.info("Updating well %s coordinates to %s", well_id, new_coordinates)
         well_id = well_id.upper()
         self.wells[well_id].update_well_coordinates = new_coordinates
+        logger.debug("Updating well %s coordinates in the database", well_id)
+        sql_wellplate.update_well_coordinates(well_id, self.plate_id, new_coordinates)
 
     def get_corners(self) -> dict:
         """
@@ -528,30 +606,46 @@ class Wellplate:
 
         First checks the wellplate type to determine the number of rows and cols,
         then using the first and last wells of the first and last rows to determine the corners.
-        
+
         Returns:
             dict: The coordinates of the corners of the well plate
         """
 
-
-
-
         # Possible order depending on orientation
         if self.orientation == 0:
-            corner_keys = ['top_right', 'bottom_right', 'top_left', 'bottom_left'] # A1 towards origin at top right
+            corner_keys = [
+                "top_right",
+                "bottom_right",
+                "top_left",
+                "bottom_left",
+            ]  # A1 towards origin at top right
         elif self.orientation == 1:
-            corner_keys = ['top_left', 'bottom_left', 'top_right', 'bottom_right'] # A1 at bottom right
+            corner_keys = [
+                "top_left",
+                "bottom_left",
+                "top_right",
+                "bottom_right",
+            ]  # A1 at bottom right
         elif self.orientation == 2:
-            corner_keys = ['top_right', 'bottom_right', 'top_left', 'bottom_left'] # A1 at bottom left
+            corner_keys = [
+                "top_right",
+                "bottom_right",
+                "top_left",
+                "bottom_left",
+            ]  # A1 at bottom left
         elif self.orientation == 3:
-            corner_keys = ['top_left', 'bottom_left', 'top_right', 'bottom_right'] # A1 at top left
-        
+            corner_keys = [
+                "top_left",
+                "bottom_left",
+                "top_right",
+                "bottom_right",
+            ]  # A1 at top left
 
         corners = {}
         # Get the corners of the well plate
-        for col in [self.columns[0], self.columns[-1]]:
-            for row in [1, self.rows]:
-                well_id = col + str(row)
+        for col in [1, self.columns]:
+            for row in [self.rows[0], self.rows[-1]]:
+                well_id = str(row) + str(col)
                 well = self.wells[well_id]
                 key = corner_keys.pop(0)
                 corners[key] = well.coordinates
@@ -684,15 +778,13 @@ class Wellplate:
         # return (x, y, z_bottom, orientation, rows, cols, echem_height)
 
     def reload_wellplate_location(self) -> None:
-        """Reload the well plate location from the well_location json file"""
+        """Reload the well plate location from the wellplate table"""
         (
             self.a1_x,
             self.a1_y,
             self.z_bottom,
             self.z_top,
             self.orientation,
-            self.rows,
-            self.columns,
             self.echem_height,
         ) = self.load_wellplate_location()
 
@@ -705,7 +797,7 @@ class Wellplate:
                 well.depth = self.z_bottom
 
     def write_wellplate_location(self) -> None:
-        """Write the location of the well plate to the well_location json file"""
+        """Write the location of the well plate to the wellplates table"""
         # data_to_write = {
         #     "x": float(self.a1_x),
         #     "y": float(self.a1_y),
@@ -727,7 +819,7 @@ class Wellplate:
             z_top=self.z_top,
             orientation=self.orientation,
             rows=self.rows,
-            columns=self.columns,
+            cols=self.columns,
             echem_height=self.echem_height,
         )
         logger.debug("Well plate location written to file")
@@ -839,6 +931,11 @@ def change_wellplate_location():
         )
         working_volume = mill_config_record.config["working_volume"]
 
+    ## Get the current plate id and location
+    current_plate_id, current_type_number, _ = sql_wellplate.select_current_wellplate_info()
+    print(f"Current wellplate id: {current_plate_id}")
+    print(f"Current wellplate type number: {current_type_number}")
+
     ## Ask for the new location
     while True:
         new_location_x = float(input("Enter the new x location of the wellplate: "))
@@ -865,13 +962,12 @@ def change_wellplate_location():
         new_orientation = int(
             input(
                 """
-                Orientation of the wellplate:
-                    0 - Vertical, wells become more negative from A1
-                    1 - Vertical, wells become less negative from A1
-                    2 - Horizontal, wells become more negative from A1
-                    3 - Horizontal, wells become less negative from A1
-                Enter the new orientation of the wellplate: 
-                """
+Orientation of the wellplate:
+    0 - Vertical, wells become more negative from A1
+    1 - Vertical, wells become less negative from A1
+    2 - Horizontal, wells become more negative from A1
+    3 - Horizontal, wells become less negative from A1
+Enter the new orientation of the wellplate: """
             )
         )
         if new_orientation in [0, 1, 2, 3]:
@@ -897,12 +993,28 @@ def change_wellplate_location():
     # with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as file:
     #     json.dump(new_location, file, indent=4)
 
-    sql_wellplate.update_wellplate_location(
-        plate_id=None,
-        a1_x=new_location_x,
-        a1_y=new_location_y,
-        orientation=new_orientation,
-    )
+    wellplate = Wellplate(
+            plate_id=current_plate_id,
+        )
+
+    wellplate.a1_x = new_location_x
+    wellplate.a1_y = new_location_y
+    wellplate.orientation = new_orientation
+    wellplate.write_wellplate_location()
+    wellplate.recalculate_well_locations()
+
+
+
+    # sql_wellplate.update_wellplate_location(
+    #     plate_id=current_plate_id,
+    #     a1_x=new_location_x,
+    #     a1_y=new_location_y,
+    #     orientation=new_orientation,
+    # )
+
+
+
+    
 
 
 def load_new_wellplate(
