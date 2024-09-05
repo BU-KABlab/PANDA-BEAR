@@ -5,6 +5,7 @@ SQLAlchemy models for the PANDA database
 # pylint: disable=too-few-public-methods, line-too-long
 import datetime
 from datetime import datetime as dt
+from datetime import timezone
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, text
 from sqlalchemy.orm import Mapped, declarative_base, relationship
@@ -36,7 +37,7 @@ class Experiments(Base):
     process_type = Column(Integer, default=0)
     filename = Column(String, default=None)
     created = Column(DateTime)
-    updated = Column(DateTime, default=dt.now(datetime.UTC))
+    updated = Column(DateTime, default=dt.now(timezone.utc))
 
     results: Mapped[list["ExperimentResults"]] = relationship(
         "ExperimentResults", backref="experiment"
@@ -61,8 +62,8 @@ class ExperimentResults(Base):
     experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"))
     result_type = Column(String)
     result_value = Column(String)
-    created = Column(DateTime, default=dt.now(datetime.UTC))
-    updated = Column(DateTime, default=dt.now(datetime.UTC), onupdate=dt.now(datetime.UTC))
+    created = Column(DateTime, default=dt.now(timezone.utc))
+    updated = Column(DateTime, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc))
     context = Column(String)
 
     def __repr__(self):
@@ -78,7 +79,7 @@ class ExperimentParameters(Base):
     parameter_name = Column(String)
     parameter_value = Column(String)
     created = Column(DateTime, default=dt.now)
-    updated = Column(DateTime, default=dt.now, onupdate=dt.now(datetime.UTC))
+    updated = Column(DateTime, default=dt.now, onupdate=dt.now(timezone.utc))
 
     def __repr__(self):
         return f"<ExperimentParameters(id={self.id}, experiment_id={self.experiment_id}, parameter_type={self.parameter_name}, parameter_value={self.parameter_value}, created={self.created}, updated={self.updated}, context={self.context})>"
@@ -159,7 +160,7 @@ class Pipette(Base):
     volume_ul = Column(Float, nullable=False)
     volume_ml = Column(Float, nullable=False)
     contents = Column(Text)
-    updated = Column(DateTime, default=dt.now(datetime.UTC))
+    updated = Column(DateTime, default=dt.now(timezone.utc))
     active = Column(Integer)  # 0 = inactive, 1 = active
     uses = Column(Integer, default=0)
 
@@ -175,7 +176,7 @@ class PipetteLog(Base):
     pipette_id = Column(Integer, ForeignKey("pipette.id"))
     volume_ul = Column(Float, nullable=False)
     volume_ml = Column(Float, nullable=False)
-    updated = Column(DateTime, default=dt.now(datetime.UTC))
+    updated = Column(DateTime, default=dt.now(timezone.utc))
 
     def __repr__(self):
         return f"<PipetteLog(id={self.id}, pipette_id={self.pipette_id}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, updated={self.updated})>"
@@ -228,7 +229,7 @@ class SystemStatus(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     status = Column(String, nullable=False)
     comment = Column(String)
-    status_time = Column(DateTime, default=dt.now(datetime.UTC))
+    status_time = Column(DateTime, default=dt.now(timezone.utc))
     test_mode = Column(Boolean)
 
     def __repr__(self):
@@ -244,7 +245,7 @@ class Users(Base):
     password = Column(String)
     email = Column(String)
     created = Column(DateTime)
-    updated = Column(DateTime, default=dt.now(datetime.UTC))
+    updated = Column(DateTime, default=dt.now(timezone.utc))
 
     def __repr__(self):
         return f"<Users(user_id={self.user_id}, username={self.username}, password={self.password}, email={self.email}, created={self.created}, updated={self.updated})>"
@@ -273,7 +274,7 @@ class Vials(Base):
     capacity = Column(Integer)
     contamination = Column(Integer)
     vial_coordinates = Column(String)
-    updated = Column(DateTime, default = dt.now(datetime.UTC))
+    updated = Column(DateTime, default = dt.now(timezone.utc))
 
     def __repr__(self):
         return f"<Vials(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
@@ -288,11 +289,11 @@ class WellHx(Base):
     experiment_id = Column(Integer)
     project_id = Column(Integer)
     status = Column(String)
-    status_date = Column(DateTime, default=dt.now(datetime.UTC))
+    status_date = Column(DateTime, default=dt.now(timezone.utc))
     contents = Column(JSON)
     volume = Column(Float)
     coordinates = Column(JSON)
-    updated = Column(DateTime, default=dt.now(datetime.UTC))
+    updated = Column(DateTime, default=dt.now(timezone.utc))
 
     def __repr__(self):
         return f"<WellHx(plate_id={self.plate_id}, well_id={self.well_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, volume={self.volume}, coordinates={self.coordinates}, updated={self.updated})>"
@@ -390,7 +391,7 @@ class MillConfig(Base):
     __tablename__ = "mill_config"
     id = Column(Integer, primary_key=True)
     config = Column(JSON, nullable=False)
-    timestamp = Column(DateTime, default=dt.now(datetime.UTC))
+    timestamp = Column(DateTime, default=dt.now(timezone.utc))
 
     def __repr__(self):
         return f"<MillConfig(id={self.id}, config={self.config})>"
@@ -435,7 +436,7 @@ class VialStatus(Base):
     capacity = Column(Integer)
     contamination = Column(Integer)
     vial_coordinates = Column(String)
-    updated = Column(DateTime, default=dt.now(datetime.UTC))
+    updated = Column(DateTime, default=dt.now(timezone.utc))
 
     def __repr__(self):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"

@@ -54,13 +54,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     xz-utils \
     zlib1g-dev \
-    zstd 
-
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh && \
- bash nodesource_setup.sh && \
- apt-get install -y nodejs && \
- node -v
+    zstd
 
 RUN apt-get clean \
     && apt-get update \

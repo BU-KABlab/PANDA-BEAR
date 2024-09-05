@@ -2,7 +2,7 @@
 
 import os
 from ast import List
-from configparser import ConfigParser
+from panda_lib.config.config_tools import read_config, read_testing_config
 
 # import sqlite3
 # from panda_lib.config.config import SQL_DB_PATH
@@ -247,8 +247,7 @@ def read_in_protocols():
     #     raise ValueError(
     #         "PANDA_SDL_PROTOCOLS_DIR environment variable not set in .env file."
     #     ) from e
-    config = ConfigParser()
-    config.read("panda_lib/config/panda_sdl_config.ini")
+    config = read_config()
     protocols = config.get("GENERAL", "protocols_dir")
 
     # Get all files in the protocols folder
