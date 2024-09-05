@@ -31,7 +31,7 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
         return session.query(WellPlates).filter(WellPlates.id == plate_id).count() > 0
 
 
-def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple:
+def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float, float, float, float, int, float]:
     """Select the location and characteristics of the wellplate from the wellplate
      table. If no plate_id is given, the current wellplate is assumed
 
@@ -42,9 +42,8 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple:
         x (float): The x coordinate of A1.
         y (float): The y coordinate of A1.
         z_bottom (float): The z coordinate of the bottom of the wellplate.
+        z_top (float): The z coordinate of the top of the wellplate.
         orientation (int): The orientation of the wellplate.
-        rows (int): The number of rows in the wellplate.
-        cols (str): The column names of the wellplate.
         echem_height(float): The height of performing electrochemistry in a well.
 
     """

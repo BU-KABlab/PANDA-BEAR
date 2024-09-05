@@ -25,10 +25,8 @@ from main_menu_custom_fucntions import (
 from license_text import show_conditions, show_warrenty
 from panda_lib import (
     controller,
-    experiment_class,
     flir_camera,
     mill_calibration_and_positioning,
-    mill_control,
     pipette,
     print_panda,
     scheduler,
@@ -202,19 +200,12 @@ def toggle_testing_mode():
 
 def calibrate_mill():
     """Calibrates the mill."""
-    if read_testing_config():
-        # print("Cannot calibrate the mill in testing mode.")
-        # return
-        mill = mill_control.MockMill
-    else:
-        mill = mill_control.Mill
-
     sql_system_state.set_system_status(
         utilities.SystemState.CALIBRATING, "calibrating the mill"
     )
 
     mill_calibration_and_positioning.calibrate_mill(
-        mill,
+        read_testing_config(),
         wellplate.Wellplate(),
         vials.read_vials()[0],
         vials.read_vials()[1],

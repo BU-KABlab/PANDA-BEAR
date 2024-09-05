@@ -18,7 +18,7 @@ import json
 import os
 import platform
 from configparser import ConfigParser
-from typing import Sequence
+from typing import Sequence, Union
 
 from panda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_result
 
@@ -451,12 +451,17 @@ menu_options = {
 
 
 def calibrate_mill(
-    mill: Mill,
+    use_mock_mill: bool,
     wellplate: Wellplate,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
 ):
     """Calibrate the mill to the wellplate and stock vials"""
+    if not use_mock_mill:
+        mill = Mill
+    else:
+        mill = MockMill
+
     # Connect to the mill
     with mill() as mill:
         while True:
@@ -483,8 +488,6 @@ def main():
     from panda_lib.vials import read_vials
     print("Testing mode:", testing)
     input("Press enter to continue")
-    # Create the mill object
-    mill_to_use = MockMill()
 
     # Create the wellplate object
     wellplate_to_use = Wellplate()
@@ -494,7 +497,7 @@ def main():
     waste_vials_to_use: Sequence[WasteVial] = read_vials()[1]
 
     calibrate_mill(
-        mill_to_use, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
+        True, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
     )
 
 

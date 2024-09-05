@@ -21,7 +21,7 @@ else:
     PATH_TO_DATA = Path(config.get("PRODUCTION", "data_dir"))
 
 
-def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.tiff")) -> None:
+def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.tiff")) -> Path:
     """Capture a new image from the camera"""
     # Path to the Python interpreter
     python_360_path = PYTHON_360_PATH

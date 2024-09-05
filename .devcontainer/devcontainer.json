@@ -1,0 +1,64 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "PANDA SDL",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	// "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+	// // Use a Dockerfile to build the dev container
+    "build": {
+        "dockerfile": "panda_sdl.dockerfile",
+        "args": {
+            "USER_UID": "${localEnv:UID}",
+            "USER_GID": "${localEnv:GID}"
+        }
+    },
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+	"features": {
+			"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {},
+			"ghcr.io/devcontainers/features/node:1": {}
+		},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'initializeCommand' to run commands before the container is created.
+    // "initializeCommand": " git config --global --add safe.directory /workspaces/panda_sdl && git config --global user.name 'erasmus95' && git config --global user.email 'gregoryrobben@gmail.com'",
+
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// Git Related
+	"postCreateCommand": "git config --global --add safe.directory /workspaces/panda_sdl && git submodule update --init --recursive && pip3 install --upgrade pip && pip3 install --user -r requirements.txt",
+    	// Prompt for the configuaration.ini file path
+		// "echo 'Please enter the path to the configuration.ini file' && read CONFIG_PATH && if [ -f $CONFIG_PATH ]; then echo 'PANDA_SDL_CONFIG_PATH=$CONFIG_PATH' >> /workspaces/panda_sdl/.env; else echo 'Invalid path'; fi"
+	// Ask the user if they would like the template database to be created
+	// "postCreateCommand": "echo 'Would you like to create the template database? (y/n)' && read CREATE_DB && if [ $CREATE_DB = 'y' ]; then python3 /workspaces/panda_sdl/panda_sdl.py --create-db; fi",
+	// ],
+	// Add runArgs to pass additional arguments to the Docker run command
+    "runArgs": [
+        "--privileged", // Allows the container to access all devices on the host
+        "--device=/dev/bus/usb" // Maps the USB devices from the host to the container
+    ],
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.isort",
+				"yzhang.markdown-all-in-one",
+				"ms-python.python",
+				"ms-python.debugpy",
+				"mtxr.sqltools",
+				"mtxr.sqltools-driver-sqlite",
+				"ms-python.vscode-pylance",
+				"ms-python.pylint",
+				"GitHub.vscode-pull-request-github",
+				"ms-python.black-formatter"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

@@ -1,44 +1,36 @@
-Before you start the PANDA SDL please ensure the following is complete:
+<!-- title: PANDA SDL Installation Instructions -->
+# Installation
 
-1. OBS .env variables 
-    If you want to use OBS to record your lab area. Please install OBS and establish
-    a local webserver for PANDA_SDL to communicate with. Complete the OBS portion
-    of the .env file with the applicable information. If you do not wish to use OBS
-    then set the PANDA_SDL_USE_OBS variable to '0' (with quotation marks).
 
-2. Slack .env variables
-    If you want to use slack, you will need to research how to create
-    a slackbot and invite it to your workspace. Once set up, PANDA SDL uses 3 channels
-    for communication and 3 copies of those channels for testing. 
-    
-    CONVERSATION_CHANNEL_ID is for general conversation and rarely used by the bot,
-    but is good to have the connection incase you want to have data sent into the chat_postMessage
+## .env File
+PANDA_SDL only uses one .env variable to point to the location of your configuration file.This way the config file can live outside of the repository and safely contain keys and tokens.
 
-    ALERT_CHANNEL_ID is the primary channel for the slack_bot. This is where most
-    notifications go.
-
-    DATA_CHANNEL_ID is where the results of experiments are shared.
-
-    Please fill in the .env section accordingly.
-    
-    If you do not want slack notifications
-    then set the PANDA_SDL_USE_SLACK variable to '0' (with the quotation marks). 
-
-3. Protocol vs Experiment Generators
-    PANDA_SDL defines the list of steps to perform an experiment as a protocol.
+## Config File
+There is a default_config.ini under panda_sdl/config which you should use as a template. Not all fields are required. A few fields are less self explanatory or an explanation is too long for a comment:
+ - **Protocols vs Experiment Generators**:
+    PANDA_SDL defines the list of steps to perform an experiment as a *protocol*.
     Metadata about an experiment, including which protocol to follow, is defined
-    in the experiment_generator. There is usually a one-to-one ratio of protocols to
-    generators unless you update the protocol but the metadata stays the same.
+    in the *ExperimentBase* object which the *experiment_generator* creates. There is usually a one-to-one ratio of protocols to generators unless the protocol is updated but the metadata stays the same.
 
+## Python Dependencies
+All PANDA SDL dependencies are listed in the requirements.txt file. If using the devcontainer these are installed for you. If not using the devcontainer, you can add them to your environment with:
 
-4. Complete the .env file
-    The .env file is where your specific vales such as file paths and api keys
-    are stored. Please complete it for the program to operate correctly.
+```pip install -r requirements.txt```
 
-5. Install both conda environments and activate panda_sdl_311
+## Third Party / Proprietary Dependencies
+The project depends on one proprietary dependency from Teledyne FLIR for the imaging. See the README file in panda_sdl/flir_camera directory for installation isntructions.
 
-6. Install the PyCapture2 and FlyCapture2 SDK from FLIR into the two conda envs:
-	https://www.flir.com/products/flycapture-sdk/
+## Setting up Slack [Optional]
+To obtain a token for your own SlackBot you will need to follow the [instructions](https://api.slack.com/quickstart) from Slack on making a Slack App.
 
+### Scopes
+Request both read and write scopes.
 
+### Access Token
+Get the access token from the OAuth & Permissions page and add it to your ini file.
+
+### Channel IDs
+For each channel that you want the app to have access to you first need to add the bot to the channel, and then find the channel ID by going to that channel in the Slack app, click the channel name at the top, and scroll to the bottom of the pop-up. There will be Channel ID: ######### and a copy button. Repeat for each channel and add the appropriate code in the ini file.
+
+## Setting up OBS [Optional]
 

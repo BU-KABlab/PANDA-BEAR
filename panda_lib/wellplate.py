@@ -10,7 +10,7 @@ import math
 
 # pylint: disable=line-too-long
 from dataclasses import asdict, dataclass, field
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, NoReturn
 
 from panda_lib import experiment_class
 
@@ -331,15 +331,15 @@ class Wellplate:
         """
         Initializes a new instance of the Wells2 class.
         """
-        self.wells = {}
-        self.a1_x = x_a1
-        self.a1_y = y_a1
+        self.wells:dict = {}
+        self.a1_x:float = x_a1
+        self.a1_y:float = y_a1
         self.rows: str = rows
         self.columns: int = columns
-        self.orientation = orientation
-        self.z_bottom = -72
-        self.echem_height = -70  # for every well
-        self.image_height = -35  # The height from which to image the well in mm
+        self.orientation:int = orientation
+        self.z_bottom:float = -72
+        self.echem_height:float = -70  # for every well
+        self.image_height:float = -35  # The height from which to image the well in mm
         current_plate_id, current_type_number, _ = sql_wellplate.select_current_wellplate_info()
         if type_number is None:
             self.type_number = current_type_number
@@ -348,27 +348,27 @@ class Wellplate:
         self.plate_id = (
             current_plate_id if plate_id is None else plate_id
         )  # The id of the well plate
-        self.z_top = float(0)
-        self.height = float(6.0)  # The height of the well plate in mm
-        self.radius = float(3.25)  # new circular wells
-        self.well_row_offset = float(9.0)  # mm from center to center
-        self.well_col_offset = float(9.0)  # mm from center to center
-        self.well_capacity = float(300)  # ul
+        self.z_top:float = float(0)
+        self.height:float = float(6.0)  # The height of the well plate in mm
+        self.radius:float = float(3.25)  # new circular wells
+        self.well_row_offset:float = float(9.0)  # mm from center to center
+        self.well_col_offset:float = float(9.0)  # mm from center to center
+        self.well_capacity:float = float(300)  # ul
         # overwrite the default values with the values from the well_type table
         wellplate_type = self.read_well_type_characteristics(self.type_number)
-        self.radius = wellplate_type.radius_mm
-        self.well_row_offset = wellplate_type.offset_rows_mm
-        self.well_col_offset = wellplate_type.offset_cols_mm
-        self.well_capacity = wellplate_type.capacity_ul
-        self.height = wellplate_type.gasket_height_mm
-        self.shape = wellplate_type.shape
-        self.z_top = self.z_bottom + float(wellplate_type.gasket_height_mm)
-        self.gasket_length = wellplate_type.gasket_length_mm
-        self.gasket_width = wellplate_type.gasket_width_mm
-        self.a1_y_wall_offset = wellplate_type.a1_y_wall_offset_mm
-        self.a1_x_wall_offset = wellplate_type.a1_x_wall_offset_mm
-        self.rows = wellplate_type.rows
-        self.columns = int(wellplate_type.cols)
+        self.radius:float = wellplate_type.radius_mm
+        self.well_row_offset:float = wellplate_type.offset_rows_mm
+        self.well_col_offset:float = wellplate_type.offset_cols_mm
+        self.well_capacity:float = wellplate_type.capacity_ul
+        self.height:float = wellplate_type.gasket_height_mm
+        self.shape:str = wellplate_type.shape
+        self.z_top:float = self.z_bottom + float(wellplate_type.gasket_height_mm)
+        self.gasket_length:float = wellplate_type.gasket_length_mm
+        self.gasket_width:float = wellplate_type.gasket_width_mm
+        self.a1_y_wall_offset:float = wellplate_type.a1_y_wall_offset_mm
+        self.a1_x_wall_offset:float = wellplate_type.a1_x_wall_offset_mm
+        self.rows:str = wellplate_type.rows
+        self.columns:int = int(wellplate_type.cols)
         # Load the well plate location from the well_location json file
         (
             self.a1_x,
@@ -418,56 +418,56 @@ class Wellplate:
             well: Well = self.wells[well_id]
             self.update_well_coordinates(well_id, well.coordinates)
 
-    def calculate_well_locations_old(self) -> None:
-        """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
-        for col_idx, col in enumerate(self.columns):
-            for row in range(
-                1, self.rows + 1
-            ):  # range is exclusive of the last number so we add 1
-                well_id = col + str(row)
-                if well_id == "A1":
-                    coordinates = self.a1_coordinates
-                    depth = self.z_bottom
-                    if depth < self.z_bottom:
-                        depth = self.z_bottom
-                else:
-                    x_offset = col_idx * self.well_row_offset
-                    y_offset = (row - 1) * self.well_row_offset
-                    if self.orientation == 0:
-                        coordinates = {
-                            "x": self.a1_coordinates["x"] - x_offset,
-                            "y": self.a1_coordinates["y"] - y_offset,
-                            "z_top": self.z_top,
-                        }
-                    elif self.orientation == 1:
-                        coordinates = {
-                            "x": self.a1_coordinates["x"] + x_offset,
-                            "y": self.a1_coordinates["y"] + y_offset,
-                            "z_top": self.z_top,
-                        }
-                    elif self.orientation == 2:
-                        coordinates = {
-                            "x": self.a1_coordinates["x"] - x_offset,
-                            "y": self.a1_coordinates["y"] - y_offset,
-                            "z_top": self.z_top,
-                        }
-                    elif self.orientation == 3:
-                        coordinates = {
-                            "x": self.a1_coordinates["x"] + x_offset,
-                            "y": self.a1_coordinates["y"] + y_offset,
-                            "z_top": self.z_top,
-                        }
+    # def calculate_well_locations_old(self) -> None:
+    #     """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
+    #     for col_idx, col in enumerate(self.columns):
+    #         for row in range(
+    #             1, self.rows + 1
+    #         ):  # range is exclusive of the last number so we add 1
+    #             well_id = col + str(row)
+    #             if well_id == "A1":
+    #                 coordinates = self.a1_coordinates
+    #                 depth = self.z_bottom
+    #                 if depth < self.z_bottom:
+    #                     depth = self.z_bottom
+    #             else:
+    #                 x_offset = col_idx * self.well_row_offset
+    #                 y_offset = (row - 1) * self.well_row_offset
+    #                 if self.orientation == 0:
+    #                     coordinates = {
+    #                         "x": self.a1_coordinates["x"] - x_offset,
+    #                         "y": self.a1_coordinates["y"] - y_offset,
+    #                         "z_top": self.z_top,
+    #                     }
+    #                 elif self.orientation == 1:
+    #                     coordinates = {
+    #                         "x": self.a1_coordinates["x"] + x_offset,
+    #                         "y": self.a1_coordinates["y"] + y_offset,
+    #                         "z_top": self.z_top,
+    #                     }
+    #                 elif self.orientation == 2:
+    #                     coordinates = {
+    #                         "x": self.a1_coordinates["x"] - x_offset,
+    #                         "y": self.a1_coordinates["y"] - y_offset,
+    #                         "z_top": self.z_top,
+    #                     }
+    #                 elif self.orientation == 3:
+    #                     coordinates = {
+    #                         "x": self.a1_coordinates["x"] + x_offset,
+    #                         "y": self.a1_coordinates["y"] + y_offset,
+    #                         "z_top": self.z_top,
+    #                     }
 
-                # Round the coordinates to 2 decimal places
-                coordinates["x"] = round(coordinates["x"], 3)
-                coordinates["y"] = round(coordinates["y"], 3)
-                coordinates["z_top"] = round(coordinates["z_top"], 3)
-                new_coordinates = WellCoordinates(
-                    float(coordinates["x"]),
-                    float(coordinates["y"]),
-                    float(coordinates["z_top"]),
-                )
-                self.set_coordinates(well_id, new_coordinates)
+    #             # Round the coordinates to 2 decimal places
+    #             coordinates["x"] = round(coordinates["x"], 3)
+    #             coordinates["y"] = round(coordinates["y"], 3)
+    #             coordinates["z_top"] = round(coordinates["z_top"], 3)
+    #             new_coordinates = WellCoordinates(
+    #                 float(coordinates["x"]),
+    #                 float(coordinates["y"]),
+    #                 float(coordinates["z_top"]),
+    #             )
+    #             self.set_coordinates(well_id, new_coordinates)
 
     def calculate_well_locations(self) -> None:
         """
@@ -736,7 +736,7 @@ class Wellplate:
 
     def load_wellplate_location(
         self,
-    ) -> tuple[float, int, int, str, float]:
+    ) -> Tuple[float, float, float, float, int, float]:
         """Load the location of the well plate from the wellplates table  file"""
 
         # # check if it exists
@@ -775,7 +775,7 @@ class Wellplate:
 
         return sql_wellplate.select_wellplate_location()
 
-        # return (x, y, z_bottom, orientation, rows, cols, echem_height)
+        # return (x, y, z_bottom, z_top, orientation, echem_height)
 
     def reload_wellplate_location(self) -> None:
         """Reload the well plate location from the wellplate table"""
@@ -939,7 +939,9 @@ def change_wellplate_location():
     ## Ask for the new location
     while True:
         new_location_x = float(input("Enter the new x location of the wellplate: "))
-
+        if isinstance(new_location_x, NoReturn):
+            print("Invalid input. Please enter a number.")
+            continue
         if new_location_x > working_volume["x"] and new_location_x < 0:
             break
 
@@ -948,7 +950,10 @@ def change_wellplate_location():
         )
 
     while True:
-        new_location_y = float(input("Enter the new y location of the wellplate: "))
+        new_location_y:float = float(input("Enter the new y location of the wellplate: "))
+        if isinstance(new_location_y, NoReturn):
+            print("Invalid input. Please enter a number.")
+            continue
 
         if new_location_y > working_volume["y"] and new_location_y < 0:
             break
@@ -1118,12 +1123,12 @@ def load_new_wellplate_sql(
     )
 
     if ask:
-        new_plate_id = input(
+        new_plate_id = int(input(
             f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
-        )
-        new_wellplate_type_number = input(
+        ))
+        new_wellplate_type_number = int(input(
             f"Enter the new wellplate type number (Current type is {current_type_number}): "
-        )
+        ))
     else:
         if new_plate_id is None or new_plate_id == "":
             new_plate_id = current_wellplate_id + 1
