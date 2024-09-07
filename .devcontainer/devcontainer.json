@@ -1,17 +1,17 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-	"name": "PANDA SDL",
+	"name": "panda_sdl",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	// "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
-	// // Use a Dockerfile to build the dev container
-    "build": {
-        "dockerfile": "panda_sdl.dockerfile",
-        "args": {
-            "USER_UID": "${localEnv:UID}",
-            "USER_GID": "${localEnv:GID}"
-        }
-    },
+	// Use a Dockerfile to build the dev container
+	"build": {
+		"dockerfile": "panda_sdl.dockerfile",
+		"args": {
+			"USER_UID": "${localEnv:UID}",
+			"USER_GID": "${localEnv:GID}"
+		}
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -38,7 +38,8 @@
 	// Add runArgs to pass additional arguments to the Docker run command
     "runArgs": [
         "--privileged", // Allows the container to access all devices on the host
-        "--device=/dev/bus/usb" // Maps the USB devices from the host to the container
+        "--device=/dev/bus/usb", // Maps the USB devices from the host to the container
+		"--name=panda_sdl"
     ],
 
 	// Configure tool-specific properties.
