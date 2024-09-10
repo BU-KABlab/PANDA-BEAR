@@ -29,7 +29,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// Git Related
-	"postCreateCommand": "git config --global --add safe.directory $PWD && git submodule update --init --recursive && pip3 install --upgrade pip && pip3 install --user -r /workspaces/panda_bear/requirements.txt",
+	"postCreateCommand": "git config --global --add safe.directory $PWD && git submodule update --init --recursive && pip3 install --upgrade pip && pip3 install --user -r /workspaces/panda_bear/requirements.txt && npm install sqlite3",
     	// Prompt for the configuaration.ini file path
 		// "echo 'Please enter the path to the configuration.ini file' && read CONFIG_PATH && if [ -f $CONFIG_PATH ]; then echo 'PANDA_SDL_CONFIG_PATH=$CONFIG_PATH' >> /workspaces/panda_sdl/.env; else echo 'Invalid path'; fi"
 	// Ask the user if they would like the template database to be created

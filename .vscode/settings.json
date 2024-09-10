@@ -23,20 +23,8 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "name": "test",
-            "database": "${workspaceFolder:PANDA-BEAR}/test_db.db"
-        },
-        {
-            "previewLimit": 50,
-            "driver": "SQLite",
-            "name": "mirror_test",
-            "database": "${workspaceFolder:PANDA-BEAR}/epanda_test.db"
-        },
-        {
-            "previewLimit": 1000,
-            "driver": "SQLite",
-            "database": "${workspaceFolder:PANDA-BEAR}/epanda_test.db",
-            "name": "epanda_test"
+            "name": "test_db",
+            "database": "test_db.db"
         }
     ],
     "sqltools.useNodeRuntime": true,

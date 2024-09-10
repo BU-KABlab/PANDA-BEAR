@@ -262,7 +262,7 @@ class SlackBot:
             )
         response = client.files_upload_v2(
             file_uploads=file_upload_parts,
-            channel_id=channel_id,
+            channel=channel_id,
             initial_comment=message,
         )
 
@@ -330,7 +330,7 @@ class SlackBot:
             # https://api.slack.com/methods/conversations.history$pagination
             result = client.conversations_history(
                 channel=channel_id,
-                limit=100,
+                limit=1,
                 inclusive=True,
                 latest=datetime.now().timestamp(),
             )

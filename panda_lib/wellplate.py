@@ -357,16 +357,16 @@ class Wellplate:
         # overwrite the default values with the values from the well_type table
         wellplate_type = self.read_well_type_characteristics(self.type_number)
         self.radius:float = wellplate_type.radius_mm
-        self.well_row_offset:float = wellplate_type.offset_rows_mm
-        self.well_col_offset:float = wellplate_type.offset_cols_mm
+        self.well_row_offset:float = wellplate_type.y_spacing
+        self.well_col_offset:float = wellplate_type.x_spacing
         self.well_capacity:float = wellplate_type.capacity_ul
         self.height:float = wellplate_type.gasket_height_mm
         self.shape:str = wellplate_type.shape
         self.z_top:float = self.z_bottom + float(wellplate_type.gasket_height_mm)
         self.gasket_length:float = wellplate_type.gasket_length_mm
         self.gasket_width:float = wellplate_type.gasket_width_mm
-        self.a1_y_wall_offset:float = wellplate_type.a1_y_wall_offset_mm
-        self.a1_x_wall_offset:float = wellplate_type.a1_x_wall_offset_mm
+        self.a1_y_wall_offset:float = wellplate_type.y_offset
+        self.a1_x_wall_offset:float = wellplate_type.x_offset
         self.rows:str = wellplate_type.rows
         self.columns:int = int(wellplate_type.cols)
         # Load the well plate location from the well_location json file
