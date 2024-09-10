@@ -284,7 +284,7 @@ def instrument_check():
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "running instrument check"
     )
-    intruments = controller.connect_to_instruments()
+    intruments = controller.connect_to_instruments(False)
     controller.disconnect_from_instruments(intruments)
 
 menu_options = {
