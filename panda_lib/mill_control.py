@@ -190,7 +190,7 @@ class Mill:
             mill_config_record = MillConfig(config=mill_config)
             session.add(mill_config_record)
             session.commit()
-        
+
         logger.info("Config saved to db")
 
     def execute_command(self, command: str):

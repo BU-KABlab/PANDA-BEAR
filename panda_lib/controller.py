@@ -22,8 +22,8 @@ from typing import Sequence
 
 from slack_sdk import errors as slack_errors
 
-from sartorius.sartorius import Scale
-from sartorius.sartorius.mock import Scale as MockScale
+from sartorius import Scale
+from sartorius.mock import Scale as MockScale
 
 from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
@@ -658,20 +658,47 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
         return instruments
 
     logger.info("Connecting to instruments:")
-    mill = Mill()
-    mill.connect_to_mill()
-    mill.homing_sequence()
-    scale = Scale(address="COM6")
-    pump = SyringePump(mill=mill, scale=scale)
-    # pstat_connected = echem.pstatconnect()
+    try:
+        logger.debug("Connecting to mill")
+        mill = Mill()
+        mill.connect_to_mill()
+        home_mill = input("Would you like to home the mill? (y/n): ")
+        if home_mill.lower() == "y":
+            mill.homing_sequence()
+    except Exception as error:
+        logger.error("No mill connected")
+        raise error
+    
+    try:
+        logger.debug("Connecting to scale")
+        scale = Scale(address="COM6")
+        model, serial, software = scale.get_info()
+        if not model:
+            logger.error("No scale connected")
+            # raise Exception("No scale connected")
+        logger.debug("Connected to scale: %s", model)
+    except Exception as error:
+        logger.error("No scale connected")
+        raise error
+    
+    try:
+        logger.debug("Connecting to pump")
+        pump = SyringePump(mill=mill, scale=scale)
+        logger.debug("Connected to pump at %s",pump.pump.address)
+
+    except Exception as error:
+        logger.error("No pump connected")
+        raise error
+    
+    logger.info("Connected to instruments")
     instruments = Toolkit(
-        mill=mill,
-        scale=scale,
-        pump=pump,
-        wellplate=None,
-        global_logger=logger,
-        experiment_logger=logger,
-    )
+            mill=mill,
+            scale=scale,
+            pump=pump,
+            wellplate=None,
+            global_logger=logger,
+            experiment_logger=logger,
+        )
     return instruments
 
 

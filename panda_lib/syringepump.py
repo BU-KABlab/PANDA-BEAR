@@ -11,6 +11,7 @@ from nesp_lib_py import nesp_lib
 from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 
 import panda_lib.wellplate as wp
+from panda_lib.config.config_tools import read_config
 from panda_lib.correction_factors import reverse_correction_factor
 from panda_lib.experiment_class import ExperimentResult
 from panda_lib.mill_control import Mill, MockMill
@@ -18,8 +19,8 @@ from panda_lib.pipette import Pipette
 from panda_lib.utilities import Coordinates, Instruments
 from panda_lib.vessel import VesselLogger
 from panda_lib.vials import StockVial, Vial2, WasteVial
-from sartorius.sartorius.driver import Scale
-from sartorius.sartorius.mock import Scale as MockScale
+from sartorius.driver import Scale
+from sartorius.mock import Scale as MockScale
 
 from panda_lib.log_tools import setup_default_logger, default_logger as pump_control_logger
 
@@ -27,7 +28,10 @@ scale_logger = setup_default_logger(log_name="scale")
 
 vessel_logger = setup_default_logger(log_name="vessel")
 
-PRECISION = 6 #Rounding precision for volume calculations
+config = read_config()
+
+
+PRECISION = config.getint("OPTIONS", "precision")
 
 class SyringePump:
     """
@@ -78,7 +82,7 @@ class SyringePump:
         """
         try:
             pump_control_logger.info("Setting up pump...")
-            pump_port = nesp_lib.Port("COM5", 19200)
+            pump_port = nesp_lib.Port(config.get("PUMP","port", fallback="COM5"), config.get("PUMP","baudrate",fallback=19200))
             syringe_pump = nesp_lib.Pump(pump_port)
             syringe_pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
             syringe_pump.volume_infused_clear()

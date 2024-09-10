@@ -279,6 +279,13 @@ def change_pipette_tip():
     )
     pipette.insert_new_pipette()
 
+def instrument_check():
+    """Runs the instrument check."""
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "running instrument check"
+    )
+    intruments = controller.connect_to_instruments()
+    controller.disconnect_from_instruments(intruments)
 
 menu_options = {
     "0": run_panda_sdl_with_ml,
@@ -305,6 +312,7 @@ menu_options = {
     "8": generate_pedot_experiment_from_existing_data,
     "8.1": genererate_pedot_experiment,
     "8.2": analyze_pedot_experiment,
+    "9": instrument_check,
     "t": toggle_testing_mode,
     "r": refresh,
     "w": show_warrenty,
