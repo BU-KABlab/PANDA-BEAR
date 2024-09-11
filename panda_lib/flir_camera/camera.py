@@ -4,32 +4,36 @@ Requires the PyCapture2 library to be installed and run in a python 3.6 environm
 This script is used to capture images from the FLIR camera.
 """
 
-import argparse
 import logging
-import sys
 from pathlib import Path
-
-
+import os
+from typing import Union
 import PySpin
+# from panda_lib.log_tools import setup_default_logger
 
-def locate_connected_cameras():
+
+# logger = setup_default_logger(
+#     log_name="FLIRCamera", console_level=logging.DEBUG, file_level=logging.DEBUG
+# )
+
+
+def locate_connected_cameras() -> PySpin.CameraList:
     """
     This function locates all connected cameras and returns the list of cameras found.
     """
 
     # Retrieve singleton reference to system object
-    system = PySpin.System.GetInstance()
+    system: PySpin.SystemPtr = PySpin.System.GetInstance()
 
     # Get current library version
-    version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
-
+    version: PySpin.LibraryVersion = system.GetLibraryVersion()
+    print(f"Library version: {version.major}.{version.minor}.{version.type}.{version.build}")
     # Retrieve list of cameras from the system
-    cam_list = system.GetCameras()
+    cam_list: PySpin.CameraList = system.GetCameras()
 
     num_cameras = cam_list.GetSize()
 
-    print('Number of cameras detected: %d' % num_cameras)
+    print(f"Number of cameras detected: {num_cameras}")
 
     # Finish if there are no cameras
     if num_cameras == 0:
@@ -40,8 +44,8 @@ def locate_connected_cameras():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Clear camera list before releasing system
@@ -50,371 +54,431 @@ def locate_connected_cameras():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return cam_list
-# PATH_TO_LOGS = Path("panda_lib/logs")
+
+def fetch_camera_list() -> PySpin.CameraList:
+    """
+    This function locates all connected cameras and returns the list of cameras found.
+    """
+
+    # Retrieve singleton reference to system object
+    system: PySpin.SystemPtr = PySpin.System.GetInstance()
+
+    # Get current library version
+    version: PySpin.LibraryVersion = system.GetLibraryVersion()
+    print(f"Library version: {version.major}.{version.minor}.{version.type}.{version.build}")
+    # Retrieve list of cameras from the system
+    cam_list: PySpin.CameraList = system.GetCameras()
+
+    num_cameras = cam_list.GetSize()
+
+    print(f"Number of cameras detected: {num_cameras}")
+
+    # Finish if there are no cameras
+    if num_cameras == 0:
+
+        # Clear camera list before releasing system
+        cam_list.Clear()
+
+        # Release system instance
+        system.ReleaseInstance()
+
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
+        return False
+
+    return cam_list
+
+class StreamMode:
+    """
+    'Enum' for choosing stream mode
+    """
+
+    STREAM_MODE_TELEDYNE_GIGE_VISION = 0  # Teledyne Gige Vision stream mode is the default stream mode for spinview which is supported on Windows
+    STREAM_MODE_PGRLWF = 1  # Light Weight Filter driver is our legacy driver which is supported on Windows
+    STREAM_MODE_SOCKET = 2  # Socket is supported for MacOS and Linux, and uses native OS network sockets instead of a filter driver
 
 
-# class FLIRCamera:
-#     """Class to control the FLIR camera"""
-
-#     def __init__(self, print_to_console: bool = True):
-#         self.camera = None
-#         self.bus = None
-#         self.num_cams = None
-#         self.uid = None
-#         self.camera_logger: logging.Logger = logging.getLogger("FLIRCamera")
-#         self.capturing = False
-#         self.print_to_console: bool = print_to_console
-
-#         # Set up logging
-#         self.camera_logger.setLevel(
-#             logging.INFO if self.print_to_console else logging.DEBUG
-#         )
-#         ch = logging.StreamHandler()
-#         ch.setLevel(logging.INFO if self.print_to_console else logging.DEBUG)
-#         formatter = logging.Formatter(
-#             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-#         )
-#         ch.setFormatter(formatter)
-#         self.camera_logger.addHandler(ch)
-
-#         ch = logging.FileHandler(PATH_TO_LOGS / "camera.log")
-#         ch.setLevel(logging.DEBUG)
-#         ch.setFormatter(formatter)
-#         self.camera_logger.addHandler(ch)
-
-#     def __enter__(self):
-#         self.connect()
-#         self.epanda_camera_profile()
-#         return self
-
-#     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-#         self.disconnect()
-
-#     def connect(self):
-#         """Connect to the first camera found on the bus"""
-#         # Ensure sufficient cameras are found
-#         self.bus = PyCapture2.BusManager()
-#         self.num_cams = self.bus.getNumOfCameras()
-#         self.camera_logger.debug("Number of cameras detected: %d", self.num_cams)
-#         if not self.num_cams:
-#             self.camera_logger.debug("Insufficient number of cameras. Exiting...")
-#             sys.exit()
-
-#         # Select camera on 0th index
-#         self.camera = PyCapture2.Camera()
-#         self.uid = self.bus.getCameraFromIndex(0)
-#         self.camera.connect(self.uid)
-#         self.print_camera_info()
-
-#         # Enable camera embedded timestamp
-#         self.enable_embedded_timestamp(True)
-
-#         self.camera_logger.debug("Starting image capture...")
-#         self.camera.startCapture()
-
-#     def disconnect(self):
-#         """Disconnect the camera"""
-#         # Disable camera embedded timestamp
-#         self.camera.stopCapture()
-#         self.enable_embedded_timestamp(False)
-#         self.camera.disconnect()
-
-#     def print_build_info(self):
-#         """Prints PyCapture2 Library Information"""
-#         lib_ver = PyCapture2.getLibraryVersion()
-#         self.camera_logger.debug(
-#             "PyCapture2 library version: %d %d %d %d",
-#             lib_ver[0],
-#             lib_ver[1],
-#             lib_ver[2],
-#             lib_ver[3],
-#         )
-#         self.camera_logger.debug()
-
-#     def print_camera_info(self):
-#         """Prints camera details"""
-#         cam_info = self.camera.getCameraInfo()
-#         self.camera_logger.debug("\n*** CAMERA INFORMATION ***\n")
-#         self.camera_logger.debug("Serial number - %d", cam_info.serialNumber)
-#         self.camera_logger.debug("Camera model - %s", cam_info.modelName)
-#         self.camera_logger.debug("Camera vendor - %s", cam_info.vendorName)
-#         self.camera_logger.debug("Sensor - %s", cam_info.sensorInfo)
-#         self.camera_logger.debug("Resolution - %s", cam_info.sensorResolution)
-#         self.camera_logger.debug("Firmware version - %s", cam_info.firmwareVersion)
-#         self.camera_logger.debug("Firmware build time - %s", cam_info.firmwareBuildTime)
-
-#     def enable_embedded_timestamp(self, enable_timestamp):
-#         """Enables/Disables embedded timestamp"""
-#         embedded_info = self.camera.getEmbeddedImageInfo()
-#         if embedded_info.available.timestamp:
-#             self.camera.setEmbeddedImageInfo(timestamp=enable_timestamp)
-#             if enable_timestamp:
-#                 self.camera_logger.debug("\nTimeStamp is enabled.\n")
-#             else:
-#                 self.camera_logger.debug("\nTimeStamp is disabled.\n")
-
-#     def grab_images(
-#         self, num_images_to_grab, save=False, save_path=None, save_name=None
-#     ):
-#         """Grabs images from the camera"""
-#         prev_ts = None
-#         cam = self.camera
-#         image: PyCapture2.Image = None
-#         for _ in range(num_images_to_grab):
-#             try:
-#                 image = cam.retrieveBuffer()
-#             except PyCapture2.Fc2error as fc2_err:
-#                 self.camera_logger.debug("Error retrieving buffer : %s", fc2_err)
-#                 continue
-
-#             ts = image.getTimeStamp()
-#             if prev_ts:
-#                 diff = (ts.cycleSeconds - prev_ts.cycleSeconds) * 8000 + (
-#                     ts.cycleCount - prev_ts.cycleCount
-#                 )
-#                 self.camera_logger.debug(
-#                     "Timestamp [ %d %d ] - %d", ts.cycleSeconds, ts.cycleCount, diff
-#                 )
-#             prev_ts = ts
-
-#         newimg = image.convert(PyCapture2.PIXEL_FORMAT.BGR)
-#         if save:
-#             if save_path is None:
-#                 save_path = ""
-#             if save_name is None:
-#                 save_name = "fc2TestImage.png"
-#             self.camera_logger.debug("Saving the last image to %s", save_name)
-#             newimg.save(
-#                 (save_path + "\\" + save_name).encode("utf-8"),
-#                 PyCapture2.IMAGE_FILE_FORMAT.TIFF,
-#             )
-#         return newimg
-
-#     def set_brightness(self, brightness):
-#         """Sets the brightness for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.BRIGHTNESS
-#             brightness_property = self.camera.getProperty(prop)
-#             brightness_property.absControl = True
-#             brightness_property.absValue = brightness
-#             self.camera.setProperty(brightness_property)
-#             self.camera_logger.debug("Brightness set to: %d", brightness)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting brightness: %s", fc2_err)
-
-#     def set_exposure(self, exposure_time):
-#         """Sets the exposure time for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.AUTO_EXPOSURE
-#             auto_exposure = self.camera.getProperty(prop)
-#             auto_exposure.autoManualMode = False
-#             auto_exposure.absControl = True
-#             auto_exposure.onOff = True
-#             auto_exposure.autoManualMode = False
-#             auto_exposure.absValue = exposure_time
-#             self.camera.setProperty(auto_exposure)
-#             self.camera_logger.debug("Exposure time set to: %d", exposure_time)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting exposure time: %s", fc2_err)
-
-#     def set_sharpness(self, sharpness):
-#         """Sets the sharpness for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.SHARPNESS
-#             sharpness_property = self.camera.getProperty(prop)
-#             sharpness_property.absControl = True
-#             sharpness_property.absValue = sharpness
-#             self.camera.setProperty(sharpness_property)
-#             self.camera_logger.debug("Sharpness set to: %d", sharpness)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting sharpness: %s", fc2_err)
-
-#     def set_hue(self, hue):
-#         """Sets the hue for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.HUE
-#             hue_property = self.camera.getProperty(prop)
-#             hue_property.absControl = True
-#             hue_property.absValue = hue
-#             self.camera.setProperty(hue_property)
-#             self.camera_logger.debug("Hue set to: %d", hue)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting hue: %s", fc2_err)
-
-#     def set_saturation(self, saturation):
-#         """Sets the saturation for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.SATURATION
-#             saturation_property = self.camera.getProperty(prop)
-#             saturation_property.absControl = True
-#             saturation_property.absValue = saturation
-#             self.camera.setProperty(saturation_property)
-#             self.camera_logger.debug("Saturation set to: %d", saturation)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting saturation: %s", fc2_err)
-
-#     def set_gamma(self, gamma):
-#         """Sets the gamma for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.GAMMA
-#             gamma_property = self.camera.getProperty(prop)
-#             gamma_property.absControl = True
-#             gamma_property.onOff = True
-#             gamma_property.absValue = gamma
-#             self.camera.setProperty(gamma_property)
-#             self.camera_logger.debug("Gamma set to: %d", gamma)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting gamma: %s", fc2_err)
-
-#     def set_shutter(self, shutter):
-#         """Sets the shutter for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.SHUTTER
-#             shutter_property = self.camera.getProperty(prop)
-#             shutter_property.absControl = True
-#             shutter_property.onOff = True
-#             shutter_property.autoManualMode = False
-#             shutter_property.absValue = shutter
-#             self.camera.setProperty(shutter_property)
-#             self.camera_logger.debug("Shutter set to: %d", shutter)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting shutter: %s", fc2_err)
-
-#     def set_gain(self, gain):
-#         """Sets the gain for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.GAIN
-#             gain_property = self.camera.getProperty(prop)
-#             gain_property.absControl = True
-#             gain_property.onOff = True
-#             gain_property.autoManualMode = False
-#             gain_property.absValue = gain
-#             self.camera.setProperty(gain_property)
-#             self.camera_logger.debug("Gain set to: %d", gain)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting gain: %s", fc2_err)
-
-#     def set_framerate(self, framerate):
-#         """Sets the framerate for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.FRAME_RATE
-#             framerate_property = self.camera.getProperty(prop)
-#             framerate_property.absControl = True
-#             framerate_property.onOff = True
-#             framerate_property.autoManualMode = False
-#             framerate_property.absValue = framerate
-#             self.camera.setProperty(framerate_property)
-#             self.camera_logger.debug("Framerate set to: %d", framerate)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting framerate: %s", fc2_err)
-
-#     def set_white_balance(self, red, blue):
-#         """Sets the white balance for the camera"""
-#         try:
-#             prop = PyCapture2.PROPERTY_TYPE.WHITE_BALANCE
-#             wb = self.camera.getProperty(prop)
-#             wb.onOff = True
-#             wb.absControl = False
-#             wb.autoManualMode = False
-#             wb.valueA = red
-#             wb.valueB = blue
-#             self.camera.setProperty(wb)
-#             self.camera_logger.debug("White balance set to: %d %d", red, blue)
-#         except PyCapture2.Fc2error as fc2_err:
-#             self.camera_logger.debug("Error setting white balance: %s", fc2_err)
-
-#     def epanda_camera_profile(self):
-#         """Camera settings for the epanda profile"""
-#         self.camera_logger.debug("Turning off auto settings...")
-#         self.set_brightness(12.012)
-#         self.set_exposure(1.392)
-#         self.set_sharpness(1024)
-#         self.set_hue(0.0)
-#         self.set_saturation(100)
-#         self.set_gamma(1.250)
-#         self.set_shutter(50.023)
-#         self.set_gain(0.0)
-#         self.set_framerate(5)
-#         self.set_white_balance(762, 813)
-#         self.enable_embedded_image_info()
-
-#     def enable_embedded_image_info(self):
-#         """Enable embedding of various camera settings"""
-#         embedded_info = self.camera.getEmbeddedImageInfo()
-#         if embedded_info.available.timestamp:
-#             self.camera.setEmbeddedImageInfo(timestamp=True)
-#         else:
-#             print("Timestamp is not available.")
-
-#         if embedded_info.available.frameCounter:
-#             self.camera.setEmbeddedImageInfo(frameCounter=True)
-#         else:
-#             print("Frame counter is not available.")
-
-#         if embedded_info.available.gain:
-#             self.camera.setEmbeddedImageInfo(gain=True)
-#         else:
-#             print("Gain is not available.")
-
-#         if embedded_info.available.shutter:
-#             self.camera.setEmbeddedImageInfo(shutter=True)
-#         else:
-#             print("Shutter is not available.")
-
-#         if embedded_info.available.brightness:
-#             self.camera.setEmbeddedImageInfo(brightness=True)
-#         else:
-#             print("Brightness is not available.")
-
-#         if embedded_info.available.exposure:
-#             self.camera.setEmbeddedImageInfo(exposure=True)
-#         else:
-#             print("Exposure is not available.")
-
-#         if embedded_info.available.whiteBalance:
-#             self.camera.setEmbeddedImageInfo(whiteBalance=True)
-#         else:
-#             print("White balance is not available.")
-
-#         if embedded_info.available.ROIPosition:
-#             self.camera.setEmbeddedImageInfo(ROIPosition=True)
-#         else:
-#             print("ROI position is not available.")
-
-#     def get_stats(self) -> dict:
-#         """camera.getStats() -> cameraStats"""
-#         return self.camera.getStats()
+CHOSEN_STREAMMODE = StreamMode.STREAM_MODE_TELEDYNE_GIGE_VISION
+NUM_IMAGES = 10  # number of images to grab
 
 
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser(description="Process some integers.")
+def set_stream_mode(
+    cam: PySpin.CameraPtr, stream_mode: StreamMode = CHOSEN_STREAMMODE
+) -> bool:
+    """
+    This function changes the stream mode
 
-#     parser.add_argument(
-#         "--num_images", type=int, default=1, help="Number of images to grab"
-#     )
-#     parser.add_argument(
-#         "--save", type=bool, default=False, help="Whether to save the image"
-#     )
-#     parser.add_argument(
-#         "--save_path", type=str, default="images/", help="Path to save the image"
-#     )
+    :param cam: Camera to change stream mode.
+    :type cam: CameraPtr
+    :type nodemap_tlstream: INodeMap
+    :return: True if successful, False otherwise.
+    :rtype: bool
+    """
+    stream_mode = "TeledyneGigeVision"
 
-#     parser.add_argument(
-#         "--file_name", type=str, default="test.tiff", help="Name of the file to save"
-#     )
+    if stream_mode == StreamMode.STREAM_MODE_TELEDYNE_GIGE_VISION:
+        stream_mode = "TeledyneGigeVision"
+    elif stream_mode == StreamMode.STREAM_MODE_PGRLWF:
+        stream_mode = "LWF"
+    elif stream_mode == StreamMode.STREAM_MODE_SOCKET:
+        stream_mode = "Socket"
 
-#     parser.add_argument(
-#         "--print_to_console", type=bool, default=True, help="Print to console"
-#     )
+    result = True
 
-#     args = parser.parse_args()
-#     logging.basicConfig(level=logging.DEBUG)
-#     with FLIRCamera() as camera:
-#         camera.grab_images(
-#             num_images_to_grab=int(args.num_images),
-#             save=True,
-#             save_path=args.save_path,
-#             save_name=args.file_name,
-#         )
+    # Retrieve Stream nodemap
+    nodemap_tlstream = cam.GetTLStreamNodeMap()
+
+    # In order to access the node entries, they have to be casted to a pointer type (CEnumerationPtr here)
+    node_stream_mode = PySpin.CEnumerationPtr(nodemap_tlstream.GetNode("StreamMode"))
+
+    # The node "StreamMode" is only available for GEV cameras.
+    # Skip setting stream mode if the node is inaccessible.
+    if not PySpin.IsReadable(node_stream_mode) or not PySpin.IsWritable(
+        node_stream_mode
+    ):
+        return True
+
+    # Retrieve the desired entry node from the enumeration node
+    node_stream_mode_custom = PySpin.CEnumEntryPtr(
+        node_stream_mode.GetEntryByName(stream_mode)
+    )
+
+    if not PySpin.IsReadable(node_stream_mode_custom):
+        # Failed to get custom stream node
+        print(f"Stream mode {stream_mode} not available. Aborting...")
+        return False
+
+    # Retrieve integer value from entry node
+    stream_mode_custom = node_stream_mode_custom.GetValue()
+
+    # Set integer as new value for enumeration node
+    node_stream_mode.SetIntValue(stream_mode_custom)
+
+    print(f"Stream Mode set to {node_stream_mode.GetCurrentEntry().GetSymbolic()}...")
+    return result
+
+
+def acquire_images(
+    cam: PySpin.CameraPtr,
+    nodemap: PySpin.INodeMap,
+    nodemap_tldevice: PySpin.INodeMap,
+    image_path: Union[str, Path] = None,
+    num_images: int = NUM_IMAGES,
+) -> bool:
+    """
+    This function acquires and saves 10 images from a device.
+
+    :param cam: Camera to acquire images from.
+    :param nodemap: Device nodemap.
+    :param nodemap_tldevice: Transport layer device nodemap.
+    :type cam: CameraPtr
+    :type nodemap: INodeMap
+    :type nodemap_tldevice: INodeMap
+    :return: True if successful, False otherwise.
+    :rtype: bool
+    """
+
+    print("*** IMAGE ACQUISITION ***\n")
+    try:
+        result = True
+
+        # Set acquisition mode to continuous
+        #
+        #  *** NOTES ***
+        #  Because the example acquires and saves 10 images, setting acquisition
+        #  mode to continuous lets the example finish. If set to single frame
+        #  or multiframe (at a lower number of images), the example would just
+        #  hang. This would happen because the example has been written to
+        #  acquire 10 images while the camera would have been programmed to
+        #  retrieve less than that.
+        #
+        #  Setting the value of an enumeration node is slightly more complicated
+        #  than other node types. Two nodes must be retrieved: first, the
+        #  enumeration node is retrieved from the nodemap; and second, the entry
+        #  node is retrieved from the enumeration node. The integer value of the
+        #  entry node is then set as the new value of the enumeration node.
+        #
+        #  Notice that both the enumeration and the entry nodes are checked for
+        #  availability and readability/writability. Enumeration nodes are
+        #  generally readable and writable whereas their entry nodes are only
+        #  ever readable.
+        #
+        #  Retrieve enumeration node from nodemap
+
+        # In order to access the node entries, they have to be casted to a 
+        # pointer type (CEnumerationPtr here)
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsReadable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (enum retrieval). Aborting..."
+            )
+            return False
+
+        # Retrieve entry node from enumeration node
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry retrieval). Aborting..."
+            )
+            return False
+
+        # Retrieve integer value from entry node
+        acquisition_mode_continuous = node_acquisition_mode_continuous.GetValue()
+
+        # Set integer value from entry node as new value of enumeration node
+        node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
+
+        print("Acquisition mode set to continuous...")
+
+        #  Begin acquiring images
+        #
+        #  *** NOTES ***
+        #  What happens when the camera begins acquiring images depends on the
+        #  acquisition mode. Single frame captures only a single image, multi
+        #  frame catures a set number of images, and continuous captures a
+        #  continuous stream of images. Because the example calls for the
+        #  retrieval of 10 images, continuous mode has been set.
+        #
+        #  *** LATER ***
+        #  Image acquisition must be ended when no more images are needed.
+        cam.BeginAcquisition()
+
+        print("Acquiring images...")
+
+        #  Retrieve device serial number for filename
+        #
+        #  *** NOTES ***
+        #  The device serial number is retrieved in order to keep cameras from
+        #  overwriting one another. Grabbing image IDs could also accomplish
+        #  this.
+        device_serial_number = ""
+        node_device_serial_number = PySpin.CStringPtr(
+            nodemap_tldevice.GetNode("DeviceSerialNumber")
+        )
+        if PySpin.IsReadable(node_device_serial_number):
+            device_serial_number = node_device_serial_number.GetValue()
+            print(f"Device serial number retrieved as {device_serial_number}...")
+
+        # Retrieve, convert, and save images
+
+        # Create ImageProcessor instance for post processing images
+        processor = PySpin.ImageProcessor()
+
+        # Set default image processor color processing method
+        #
+        # *** NOTES ***
+        # By default, if no specific color processing algorithm is set, the image
+        # processor will default to NEAREST_NEIGHBOR method.
+        processor.SetColorProcessing(
+            PySpin.SPINNAKER_COLOR_PROCESSING_ALGORITHM_HQ_LINEAR
+        )
+
+        for i in range(num_images):
+            try:
+
+                #  Retrieve next received image
+                #
+                #  *** NOTES ***
+                #  Capturing an image houses images on the camera buffer. Trying
+                #  to capture an image that does not exist will hang the camera.
+                #
+                #  *** LATER ***
+                #  Once an image from the buffer is saved and/or no longer
+                #  needed, the image must be released in order to keep the
+                #  buffer from filling up.
+                image_result: PySpin.ImagePtr = cam.GetNextImage(1000)
+
+                #  Ensure image completion
+                #
+                #  *** NOTES ***
+                #  Images can easily be checked for completion. This should be
+                #  done whenever a complete image is expected or required.
+                #  Further, check image status for a little more insight into
+                #  why an image is incomplete.
+                if image_result.IsIncomplete():
+                    print(
+                        f"Image incomplete with image status {image_result.GetImageStatus()}..."
+                    )
+
+                else:
+
+                    #  Print image information; height and width recorded in pixels
+                    #
+                    #  *** NOTES ***
+                    #  Images have quite a bit of available metadata including
+                    #  things such as CRC, image status, and offset values, to
+                    #  name a few.
+                    width = image_result.GetWidth()
+                    height = image_result.GetHeight()
+                    print(f"Grabbed Image {i}, width = {width}, height = {height}...")
+
+                    #  Convert image to mono 8
+                    #
+                    #  *** NOTES ***
+                    #  Images can be converted between pixel formats by using
+                    #  the appropriate enumeration value. Unlike the original
+                    #  image, the converted one does not need to be released as
+                    #  it does not affect the camera buffer.
+                    #
+                    #  When converting images, color processing algorithm is an
+                    #  optional parameter.
+                    # image_converted: PySpin.ImagePtr = processor.Convert(
+                    #     image_result, PySpin.PixelFormat_BayerBG8
+                    # )
+
+                    # Create a unique filename
+                    if device_serial_number:
+                        filename = f"Acquisition-{device_serial_number}-{i}.jpg"
+                    else:  # if serial number is empty
+                        filename = f"Acquisition-{i}.jpg"
+
+                    #  Save image
+                    #
+                    #  *** NOTES ***
+                    #  The standard practice of the examples is to use device
+                    #  serial numbers to keep images of one device from
+                    #  overwriting those of another.
+                    if image_path is None:
+                        image_path = Path("images")
+                        filepath = os.path.join(image_path, filename)
+                    else:
+                        image_path = Path(image_path)
+                        filepath = image_path
+                    # image_converted.Save(filepath)
+                    image_result.Save(filepath)
+                    print(f"Image saved at {filepath}...")
+
+                    #  Release image
+                    #
+                    #  *** NOTES ***
+                    #  Images retrieved directly from the camera (i.e. non-converted
+                    #  images) need to be released in order to keep from filling the
+                    #  buffer.
+                    image_result.Release()
+                    print("")
+
+            except PySpin.SpinnakerException as ex:
+                print(f"Error: {ex}")
+                return False
+
+        #  End acquisition
+        #
+        #  *** NOTES ***
+        #  Ending acquisition appropriately helps ensure that devices clean up
+        #  properly and do not need to be power-cycled to maintain integrity.
+        cam.EndAcquisition()
+
+    except PySpin.SpinnakerException as ex:
+        print(f"Error: {ex}")
+        return False
+
+    return result
+
+
+def print_device_info(nodemap: PySpin.INodeMap) -> bool:
+    """
+    This function prints the device information of the camera from the transport
+    layer; please see NodeMapInfo example for more in-depth comments on printing
+    device information from the nodemap.
+
+    :param nodemap: Transport layer device nodemap.
+    :type nodemap: INodeMap
+    :returns: True if successful, False otherwise.
+    :rtype: bool
+    """
+
+    print("*** DEVICE INFORMATION ***\n")
+
+    try:
+        result = True
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
+
+        if PySpin.IsReadable(node_device_information):
+            features = node_device_information.GetFeatures()
+            for feature in features:
+                node_feature = PySpin.CValuePtr(feature)
+                print(
+                    f"{node_feature.GetName()}: {node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'}"
+                )
+
+        else:
+            print("Device control information not readable.")
+
+    except PySpin.SpinnakerException as ex:
+        print(f"Error: {ex}")
+        return False
+
+    return result
+
+
+def run_single_camera(cam: PySpin.CameraPtr, image_path: Union[str, Path] = None, num_images:int = 1) -> bool:
+    """
+    This function acts as the body of the example; please see NodeMapInfo example
+    for more in-depth comments on setting up cameras.
+
+    :param cam: Camera to run on.
+    :type cam: CameraPtr
+    :return: True if successful, False otherwise.
+    :rtype: bool
+    """
+    try:
+        result = True
+
+        # Retrieve TL device nodemap and print device information
+        nodemap_tldevice = cam.GetTLDeviceNodeMap()
+
+        result &= print_device_info(nodemap_tldevice)
+
+        # Initialize camera
+        cam.Init()
+
+        # Retrieve GenICam nodemap
+        nodemap = cam.GetNodeMap()
+
+        # Set Stream Modes
+        # result &= set_stream_mode(cam)
+
+        # Acquire images
+        result &= acquire_images(cam, nodemap, nodemap_tldevice, image_path, num_images)
+
+        # Deinitialize camera
+        cam.DeInit()
+
+    except PySpin.SpinnakerException as ex:
+        print(f"Error: {ex}")
+        result = False
+
+    return 0
+
+
+if __name__ == "__main__":
+    # This function locates all connected cameras
+    locate_connected_cameras()
+    system = PySpin.System.GetInstance()
+    camera_list = system.GetCameras()
+    pyspin_system: PySpin.SystemPtr = PySpin.System.GetInstance()
+    # Run example on each camera
+    for instance, camera in enumerate(camera_list):
+        print(f"Running example for camera {instance+1}...")
+        RESULT = run_single_camera(camera)
+        if RESULT:
+            print(f"Camera {instance+1} example complete...")
+        else:
+            print(f"Camera {instance+1} example failed...")
+    # Clear camera list before releasing system
+    camera_list.Clear()
+
+    # Release system instance
+    pyspin_system.ReleaseInstance()
+
+    input("Done! Press Enter to exit...")
