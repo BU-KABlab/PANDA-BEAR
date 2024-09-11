@@ -27,6 +27,10 @@ from .mill_control import Mill, MockMill
 from .utilities import Instruments
 from .vials import StockVial, WasteVial
 from .wellplate import Well, WellCoordinates, Wellplate
+from .log_tools import setup_default_logger
+import logging
+
+logger = setup_default_logger(log_name="mill_config",console_level=logging.DEBUG)
 
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
@@ -42,57 +46,296 @@ def check_mill_settings(mill: Mill, *args, **kwargs):
     Repeat until the user is satisfied.
     """
 
-    while True:
-        response = mill.execute_command("$$")  # Get settings
-        # print(response)
+    # mill settings
+    update_grbl_settings(mill)
+    # instrument offsets
+    update_instrument_offsets(mill)
+    # add or remove an instrument
+    manage_instruments(mill)
+    # working volume
+    update_working_volume(mill)
+    # electrode bath
+    update_electrode_bath(mill)
+    # safe floor height
+    update_safe_floor_height(mill)
 
-        ## Check settings
-        # Load settings from config and compare to current settings
+def update_grbl_settings(mill: Mill, *args, **kwargs):
+    """
+    Fetch the settings list from the grbl controller and compare to the settings file.
+    If there are differences, ask the user if they would like to change the settings.
+    If so, ask for the settings to change and the new value.
+    Update the settings file and send the new setting to the mill.
+    Confirm the setting has been applied and save the settings file.
+    Repeat until the user is satisfied.
+    """
+    while True:
+        response = mill.execute_command("$$")  # Get grlb settings
+        if response is None:
+            logger.error("Error fetching grbl settings")
+            break
+
+        # Check grbl settings
         settings: dict = mill.config["settings"]
-        # List out settings and note any differences.
-        for setting in settings:
-            if settings[setting] != int(response[setting]):
-                print(
-                    f"Setting {setting:<4} | Current: {response[setting]:<10}, Config: {settings[setting]:<5}"
-                )
+        # List out grbl settings and note any differences.
+        print("\nCurrent grbl settings:")
+        for setting, value in response.items():
+            if str(settings.get(setting)) != value:
+                print(f"Setting {setting:<4} | Current: {value:<10}, Config: {settings.get(setting):<5}")
             else:
-                print(f"Setting {setting:<4} | Current: {response[setting]:<10}")
+                print(f"Setting {setting:<4} | Current: {value:<10}")
 
         # Ask if user wants to change settings
-        change_settings = input("Would you like to change any settings? (y/n): ")
-        if change_settings.lower() != "y":
+        change_settings = input("Would you like to change any grbl settings? (y/n): ")
+        if change_settings.lower() in ["y", "yes", ""]:
+            while True:
+                # Ask for setting to change
+                setting_to_change = input("Enter the setting you would like to change: ")
+                if setting_to_change not in settings:
+                    print("Setting not found")
+                    continue
+                # Ask for the new value
+                new_value = input(f"Enter the new value for {setting_to_change}: ")
+                # Update loaded settings file
+                settings[setting_to_change] = new_value
+                mill.config["settings"] = settings
+
+                change_settings = input("Would you like to change any other settings? (y/n): ")
+                if change_settings.lower() in ["n", "no"]:
+                    break
+
+            # Send the new settings to the mill
+            for setting, value in settings.items():
+                mill.execute_command(f"{setting}={value}")
+            # Confirm settings have been applied
+            response = mill.execute_command("$$")  # Get settings
+            if response == settings:
+                print("Settings have been applied")
+                # Save the settings file
+                mill.config["settings"] = settings
+                mill.save_config()
+                break
+            else:
+                mill.fetch_config() # Reset the settings to the last saved settings
+                print("Settings have not been applied")
+                try_again = input("Would you like to try again? (y/n): ")
+                if try_again.lower() in ["n", "no"]:
+                    break
+        else:
             break
 
-        while True:
-            # Ask for settings to change
-            setting_to_change = input("Enter the setting you would like to change: ")
-            if setting_to_change not in settings:
-                print("Setting not found")
-                continue
-            # Ask for the new value
-            new_value = input(f"Enter the new value for {setting_to_change}: ")
-            # Update loaded settings file
-            settings[setting_to_change] = new_value
+def update_instrument_offsets(mill: Mill, *args, **kwargs):
+    """
+    Fetch the instrument offsets from the mill and compare to the settings file.
+    If there are differences, ask the user if they would like to change the settings.
+    If so, ask for the instrument to change and the new value.
+    Update the settings file and send the new setting to the mill.
+    Confirm the setting has been applied and save the settings file.
+    Repeat until the user is satisfied.
+    """
+    # Review the instrument offset settings
+    instrument_offsets = mill.config["instrument_offsets"]
+    print("\nCurrent instrument offsets:")
+    for instrument in instrument_offsets:
+        print(f"{instrument}: {instrument_offsets[instrument]}")
 
-            change_settings = input(
-                "Would you like to change any other settings? (y/n): "
-            )
-            if change_settings.lower() != "y":
+    # Ask if user wants to change instrument offsets
+    change_instrument_offsets = input("\nWould you like to change any instrument offsets? (y/n): ")
+    if change_instrument_offsets.lower() in ["y", "yes", ""]:
+        while True:
+            instrument_to_change = input("Enter the instrument you would like to change: ")
+            if instrument_to_change not in instrument_offsets:
+                print("Instrument not found")
+                continue
+
+            new_coordinates = {}
+            for coordinate in ["x", "y", "z"]:
+                while True: # Validation loop
+                    new_coordinate = input(f"Enter the new {coordinate.upper()} coordinate for the {instrument_to_change} or enter for no change: ")
+                    if new_coordinate != "":
+                        try:
+                            new_coordinates[coordinate] = float(new_coordinate)
+                            break
+                        except ValueError:
+                            print("Invalid input, please try again")
+                            continue
+                    else:
+                        new_coordinates[coordinate] = instrument_offsets[instrument_to_change][coordinate]
+                        break
+
+            instrument_offsets[instrument_to_change] = new_coordinates
+
+            # Save the updated instrument offsets to the config file
+            mill.config["instrument_offsets"] = instrument_offsets
+            mill.save_config()
+
+            mill.fetch_config()  # Update the mill with the new settings
+            # Check that the changed instrument offsets match the new settings
+            # If they do not, ask the user if they would like to try again
+            response = mill.config["instrument_offsets"][instrument_to_change]
+            if response["x"] == new_coordinates["x"] and response["y"] == new_coordinates["y"] and response["z"] == new_coordinates["z"]:
+                print(f"{instrument_to_change} has been updated to {response}")
+            else:
+                print(f"{instrument_to_change} has not been updated")
+                try_again = input("Would you like to try again? (y/n): ")
+                if try_again.lower() in ["y", "yes", ""]:
+                    continue
+
+            change_instrument_offsets = input("Would you like to change any other instrument offsets? (y/n): ")
+            if change_instrument_offsets.lower() in ["n",'no']:
                 break
 
-        # Send the new setting to the mill
-        for setting in settings:
-            mill.execute_command(f"{setting}={settings[setting]}")
-        # Confirm setting has been applied
-        response = mill.execute_command("$$")  # Get settings
-        if response == settings:
-            print("Settings have been applied")
-            # Save the settings file
-            with open(mill.config_file, "w", encoding="utf-8") as f:
-                json.dump(mill.config, f)
-            break
+def manage_instruments(mill: Mill, *args, **kwargs):
+    """
+    Add or remove an instrument from the mill
+    """
+    # Display the current instruments
+    instruments:dict = mill.config["instrument_offsets"]
+    print("\nCurrent instruments:")
+    for instrument in instruments:
+        print(instrument)
+
+    while True:
+        modify_instruments = input("Would you like to add or remove an instrument? (add/remove/done): ")
+        if modify_instruments.lower() in ["add", "a", ""]:
+            new_instrument = input("Enter the name of the new instrument: ")
+            instruments[new_instrument] = {"x": 0, "y": 0, "z": 0}
+            mill.config["instrument_offsets"] = instruments
+            mill.save_config()
+            print(f"{new_instrument} has been added to the instruments")
+            change_new_instrument_offset = input("Would you like to change the offset for the new instrument? (y/n): ")
+            if change_new_instrument_offset.lower() in ["y", "yes", ""]:
+                new_coordinates = {}
+                for coordinate in ["x", "y", "z"]:
+                    while True:
+                        new_coordinate = input(f"Enter the new {coordinate.upper()} coordinate for the {new_instrument} or enter for no change: ")
+                        if new_coordinate != "":
+                            try:
+                                new_coordinates[coordinate] = float(new_coordinate)
+                                break # exit new instrument offset loop
+                            except ValueError:
+                                print("Invalid input, please try again")
+                                continue
+                        else:
+                            new_coordinates[coordinate] = 0
+                            break # exit new instrument offset loop
+
+                instruments[new_instrument] = new_coordinates
+                mill.config["instrument_offsets"] = instruments
+                mill.save_config()
+        elif modify_instruments.lower() in ["remove", "r"]:
+            while True:
+                remove_instrument = input("Enter the name of the instrument to remove (or 'back' to go back): ")
+                if remove_instrument.lower() == "back":
+                    break # exit remove instrument loop
+                if remove_instrument in instruments:
+                    instruments.pop(remove_instrument)
+                    mill.config["instruments"] = instruments
+                    mill.save_config()
+                    print(f"{remove_instrument} has been removed from the instruments")
+                    break # exit remove instrument loop
+                print("Instrument not found")
+                continue # continue remove instrument loop
         else:
-            print("Settings have not been applied")
+            break # exit modify instruments loop
+
+def update_working_volume(mill: Mill, *args, **kwargs):
+    """
+    Update the working volume of the mill
+    """
+    # Display the working volume
+    working_volume = mill.config["working_volume"]
+    print(f"Current working volume: {working_volume}")
+    
+    while True: # Loop to modify the working volume
+        modify_working_volume = input("Would you like to change the working volume? (y/n): ")
+        if modify_working_volume.lower() in ["y", "yes", ""]:
+            new_working_volume = {}
+            for coordinate in ["x", "y", "z"]:
+                while True: # Validation loop
+                    new_coordinate = input(f"Enter the new {coordinate.upper()} coordinate for the working volume or enter for no change: ")
+                    if new_coordinate != "":
+                        try:
+                            new_working_volume[coordinate] = float(new_coordinate)
+                            break
+                        except ValueError:
+                            print("Invalid input, please try again")
+                            continue
+                    else:
+                        new_working_volume[coordinate] = working_volume[coordinate]
+                        break
+
+            mill.config["working_volume"] = new_working_volume
+            mill.save_config()
+        
+            print(f"New working volume: {working_volume}")
+        else:
+            break
+
+def update_electrode_bath(mill: Mill, *args, **kwargs):
+    """
+    Update the location of the electrode bath
+    """
+    # Show the location of the electrode bath
+    electrode_bath = mill.config["electrode_bath"]
+    print(f"Current electrode bath location: {electrode_bath}")
+    while True:
+        modify_electrode_bath = input("Would you like to change the electrode bath location? (y/n): ")
+        if modify_electrode_bath.lower() in ["y", "yes", ""]:
+            new_coordinates = {}
+            for coordinate in ["x", "y", "z"]:
+                while True: # Validation loop
+                    new_coordinate = input(f"Enter the new {coordinate.upper()} coordinate for the electrode bath or enter for no change: ")
+                    if new_coordinate != "":
+                        try:
+                            new_coordinates[coordinate] = float(new_coordinate)
+                            break
+                        except ValueError:
+                            print("Invalid input, please try again")
+                            continue
+                    else:
+                        new_coordinates[coordinate] = electrode_bath[coordinate]
+                        break
+
+            electrode_bath = new_coordinates
+
+            mill.config["electrode_bath"] = electrode_bath
+            mill.save_config()
+
+            print(f"New electrode bath location: {electrode_bath}")
+        else:
+            break
+
+def update_safe_floor_height(mill: Mill, *args, **kwargs):
+    """
+    Update the safe floor height of the mill
+    """
+    # Show the safe floor height
+    safe_floor_height = mill.config["safe_height_floor"]
+    print(f"Current safe floor height: {safe_floor_height}")
+    while True:
+        change_safe_floor_level = input("Would you like to change the safe floor height? (y/n): ")
+        if change_safe_floor_level.lower() == "y":
+            new_safe_floor_height = input(f"Enter the new safe floor height or enter for no change: ")
+
+            if new_safe_floor_height == "":
+                new_safe_floor_height = safe_floor_height
+
+            try:
+                new_safe_floor_height = float(new_safe_floor_height)
+            except ValueError:
+                print("Invalid input, please try again")
+                continue
+
+            safe_floor_height = new_safe_floor_height
+
+            mill.config["safe_height_floor"] = safe_floor_height
+            mill.save_config()
+
+            print(f"New safe floor height: {safe_floor_height}")
+        else:
+            break
+
+
 
 
 def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
@@ -463,7 +706,7 @@ def calibrate_mill(
         mill = MockMill
 
     # Connect to the mill
-    with mill() as mill:
+    with mill() as cncmill:
         while True:
             # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             print("\n\n")
@@ -472,9 +715,9 @@ def calibrate_mill(
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
             if option == "q":
-                mill.rest_electrode()
+                cncmill.rest_electrode()
                 break
-            menu_options[option](mill, wellplate, stock_vials, waste_vials)
+            menu_options[option](cncmill, wellplate, stock_vials, waste_vials)
 
 
 def main():
