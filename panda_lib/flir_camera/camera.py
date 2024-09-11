@@ -12,7 +12,46 @@ from pathlib import Path
 
 import PySpin
 
+def locate_connected_cameras():
+    """
+    This function locates all connected cameras and returns the list of cameras found.
+    """
 
+    # Retrieve singleton reference to system object
+    system = PySpin.System.GetInstance()
+
+    # Get current library version
+    version = system.GetLibraryVersion()
+    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+
+    # Retrieve list of cameras from the system
+    cam_list = system.GetCameras()
+
+    num_cameras = cam_list.GetSize()
+
+    print('Number of cameras detected: %d' % num_cameras)
+
+    # Finish if there are no cameras
+    if num_cameras == 0:
+
+        # Clear camera list before releasing system
+        cam_list.Clear()
+
+        # Release system instance
+        system.ReleaseInstance()
+
+        print('Not enough cameras!')
+        input('Done! Press Enter to exit...')
+        return False
+
+    # Clear camera list before releasing system
+    cam_list.Clear()
+
+    # Release system instance
+    system.ReleaseInstance()
+
+    input('Done! Press Enter to exit...')
+    return cam_list
 # PATH_TO_LOGS = Path("panda_lib/logs")
 
 
