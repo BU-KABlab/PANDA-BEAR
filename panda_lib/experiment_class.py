@@ -700,18 +700,26 @@ class PEDOTExperiment(EchemExperimentBase):
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
-class FeCnVerificaitonExperiments(EchemExperimentBase):
+class FeCnVerificationExperiment(EchemExperimentBase):
     """Define the default data that is used to run an FeCn experiment"""
 
     project_id: int = 17
     well_type_number: int = 4  # ito
 
+@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
+class PGMAExperiment(EchemExperimentBase):
+    """Define the default data that is used to run a PGMA experiment"""
+    project_id: int = 18
+    well_type_number: int = 7  # gold
+
+
 experiment_types_by_project_id = {
     0: ExperimentBase,
     1: EchemExperimentBase,
     16: PEDOTExperiment,
+    17: FeCnVerificationExperiment,
     11: CorrectionFactorExperiment,
-    17: FeCnVerificaitonExperiments,
+    18: PGMAExperiment,
     999: PEDOTExperiment
 }
 
