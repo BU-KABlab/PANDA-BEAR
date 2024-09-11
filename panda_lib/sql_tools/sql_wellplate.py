@@ -39,12 +39,12 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float,
         plate_id (int): The plate ID.
 
     Returns:
-        x (float): The x coordinate of A1.
-        y (float): The y coordinate of A1.
-        z_bottom (float): The z coordinate of the bottom of the wellplate.
-        z_top (float): The z coordinate of the top of the wellplate.
-        orientation (int): The orientation of the wellplate.
-        echem_height(float): The height of performing electrochemistry in a well.
+        x (float): The x coordinate of A1. 
+        y (float): The y coordinate of A1. 
+        z_bottom (float): The z coordinate of the bottom of the wellplate. 
+        z_top (float): The z coordinate of the top of the wellplate. 
+        orientation (int): The orientation of the wellplate. 
+        echem_height(float): The height of performing electrochemistry in a well. 
 
     """
 

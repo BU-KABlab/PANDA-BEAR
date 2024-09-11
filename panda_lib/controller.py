@@ -744,7 +744,10 @@ def connect_to_instruments(
             instruments.flir_camera = None
         else:
             instruments.flir_camera = cam_list.GetByIndex(0)
-            instruments.flir_camera.Init()
+            # instruments.flir_camera.Init()
+            cam_list.Clear()
+            system.ReleaseInstance()
+
             logger.debug("Connected to FLIR Camera")
     except Exception as error:
         logger.error("No FLIR Camera connected, %s", error)
@@ -762,8 +765,8 @@ def connect_to_instruments(
 def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
-    instruments.mill.disconnect()
-    instruments.flir_camera.DeInit()
+    if instruments.mill: instruments.mill.disconnect()
+    # if instruments.flir_camera: instruments.flir_camera.DeInit()
 
     logger.info("Disconnected from instruments")
     return
