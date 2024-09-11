@@ -287,15 +287,13 @@ def instrument_check():
     intruments, all_found = controller.connect_to_instruments(False)
     if all_found:
         print("All instruments are connected.")
-        print("The instruments are:")
-        for instrument in intruments:
-            print(instrument)
+        input("Press Enter to continue...")
     else:
         print("Not all instruments are connected.")
-        print("The instruments are:")
-        for instrument in intruments:
-            print(instrument)
+        input("Press Enter to continue...")
+
     controller.disconnect_from_instruments(intruments)
+    return
 
 menu_options = {
     "0": run_panda_sdl_with_ml,
