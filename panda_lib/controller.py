@@ -18,6 +18,7 @@ import sys
 import time
 import threading
 from pathlib import Path
+import PySpin
 from typing import Sequence
 
 from slack_sdk import errors as slack_errors
@@ -57,6 +58,7 @@ config = read_config()
 logger = setup_default_logger(log_name="panda")
 TESTING = read_testing_config()
 
+
 def run_slack_bot(testing_mode: bool = TESTING):
     """
     Run the slack bot
@@ -68,6 +70,7 @@ def run_slack_bot(testing_mode: bool = TESTING):
     slack_monitor.send_slack_message("alert", "Starting Slack Monitoring")
     slack_monitor.run()
     slack_monitor.send_slack_message("alert", "Slack Monitoring has stopped")
+
 
 def main(
     use_mock_instruments: bool = TESTING,
@@ -86,9 +89,8 @@ def main(
 
     controller_slack = SlackBot(test=use_mock_instruments)
     slack_thread = threading.Thread(target=run_slack_bot, args=(use_mock_instruments,))
-    if (
-        config.getboolean("OPTIONS","testing")
-        or not config.getboolean("OPTIONS","use_obs")
+    if config.getboolean("OPTIONS", "testing") or not config.getboolean(
+        "OPTIONS", "use_obs"
     ):
         obs = MockOBSController()
     else:
@@ -110,7 +112,9 @@ def main(
         if not all_found:
             raise Exception("Not all instruments connected")
         logger.info("Connected to instruments")
-        controller_slack.send_slack_message("alert", "PANDA_SDL has connected to equipment")
+        controller_slack.send_slack_message(
+            "alert", "PANDA_SDL has connected to equipment"
+        )
         obs.place_text_on_screen("PANDA_SDL has connected to equipment")
         ## Initialize scheduler
         scheduler = Scheduler()
@@ -130,7 +134,7 @@ def main(
         # experiemnt loop
         while True:
             ## Begin slack monitoring
-            
+
             slack_thread.start()
 
             ## Reset the logger to log to the PANDA_SDL.log file and format
@@ -140,7 +144,6 @@ def main(
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
 
-
             while current_experiment is None:
                 ## Ask the scheduler for the next experiment
                 current_experiment, _ = scheduler.read_next_experiment_from_queue(
@@ -148,7 +151,8 @@ def main(
                 )
                 if current_experiment is not None:
                     controller_slack.send_slack_message(
-                        "alert", f"New experiment {current_experiment.experiment_id} found"
+                        "alert",
+                        f"New experiment {current_experiment.experiment_id} found",
                     )
                     break  # break out of the while new experiment is None loop
 
@@ -230,7 +234,9 @@ def main(
 
             ## Update the experiment status to running
             current_experiment.plate_id = toolkit.wellplate.plate_id
-            current_experiment.well = toolkit.wellplate.wells[current_experiment.well_id]
+            current_experiment.well = toolkit.wellplate.wells[
+                current_experiment.well_id
+            ]
             current_experiment.well.plate_id = toolkit.wellplate.plate_id
             current_experiment.well.experiment_id = current_experiment.experiment_id
             current_experiment.well.project_id = current_experiment.project_id
@@ -250,12 +256,16 @@ def main(
 
             # Get the protocol entry
             protocol_entry: sql_protocol_utilities.ProtocolEntry = (
-                sql_protocol_utilities.select_protocol_by_id(current_experiment.protocol_id)
+                sql_protocol_utilities.select_protocol_by_id(
+                    current_experiment.protocol_id
+                )
             )
 
             # Convert the file path to a module name
-            module_name = (
-                Path((config.get("GENERAL","protocols_dir") + "." + protocol_entry.filepath).replace("/", ".").rstrip(".py"))
+            module_name = Path(
+                (config.get("GENERAL", "protocols_dir") + "." + protocol_entry.filepath)
+                .replace("/", ".")
+                .rstrip(".py")
             )
 
             # Import the module
@@ -303,18 +313,21 @@ def main(
             #         next_exp_id = pedot_ml_model()
             #         al_campaign_iteration += 1
 
-                # Share the analysis results with slack
-                # share_analysis_to_slack(experiment_id, next_exp_id, slack)
+            # Share the analysis results with slack
+            # share_analysis_to_slack(experiment_id, next_exp_id, slack)
 
             if not TESTING:
                 # Check if a campaign length was set and if we have reached the end of the campaign
-                if al_campaign_length is not None and al_campaign_iteration >= al_campaign_length:
+                if (
+                    al_campaign_length is not None
+                    and al_campaign_iteration >= al_campaign_length
+                ):
                     controller_slack.send_slack_message(
                         "alert",
                         "The AL campaign length has been reached. PANDA_SDL is shutting down",
                     )
                     raise ShutDownCommand
-                
+
                 # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
                 if (
                     al_campaign_length is not None
@@ -324,7 +337,9 @@ def main(
                     sql_system_state.set_system_status(
                         SystemState.BUSY, "Running ML model"
                     )
-                    next_exp_id = current_experiment.generator() # generate an experiment with the appropriate parameters 
+                    next_exp_id = (
+                        current_experiment.generator()
+                    )  # generate an experiment with the appropriate parameters
                     current_experiment, _ = scheduler.read_next_experiment_from_queue(
                         random_pick=random_experiment_selection
                     )
@@ -335,17 +350,16 @@ def main(
                         )
                         controller_slack.send_slack_message(
                             "alert",
-                            f"Next experiment {current_experiment.experiment_id}"
+                            f"Next experiment {current_experiment.experiment_id}",
                         )
                         al_campaign_iteration += 1
-                        continue # continue to the next experiment
+                        continue  # continue to the next experiment
 
                     else:
                         controller_slack.send_slack_message(
                             "alert", "No new experiment generated from existing data"
                         )
                         raise NoExperimentFromModel()
-
 
             ## Clean up
             current_experiment = None  # reset new_experiment to None so that we can check the queue again
@@ -358,7 +372,9 @@ def main(
                 break  # break out of the while True loop
 
             if SystemState.SHUTDOWN in sql_system_state.select_system_status(2):
-                controller_slack.send_slack_message("alert", "PANDA_SDL is shutting down")
+                controller_slack.send_slack_message(
+                    "alert", "PANDA_SDL is shutting down"
+                )
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
@@ -377,7 +393,9 @@ def main(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
         # )
         logger.error(error)
-        controller_slack.send_slack_message("alert", f"PANDA_SDL encountered an error: {error}")
+        controller_slack.send_slack_message(
+            "alert", f"PANDA_SDL encountered an error: {error}"
+        )
 
         controller_slack.take_screenshot("alert", "webcam")
         controller_slack.take_screenshot("alert", "vials")
@@ -393,7 +411,9 @@ def main(
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.ERROR)
         logger.error(error)
-        controller_slack.send_slack_message("alert", f"PANDA_SDL encountered an error: {error}")
+        controller_slack.send_slack_message(
+            "alert", f"PANDA_SDL encountered an error: {error}"
+        )
         raise error
     except ShutDownCommand as error:
         if current_experiment is not None:
@@ -414,7 +434,9 @@ def main(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
         # )
         logger.info("Keyboard interrupt detected")
-        controller_slack.send_slack_message("alert", "PANDA_SDL was interrupted by the user")
+        controller_slack.send_slack_message(
+            "alert", "PANDA_SDL was interrupted by the user"
+        )
         raise KeyboardInterrupt from exc  # raise error to go to finally. This was triggered by the user to indicate they want to stop the program
 
     except Exception as error:
@@ -427,7 +449,9 @@ def main(
 
         logger.error(error)
         logger.exception(error)
-        controller_slack.send_slack_message("alert", f"PANDA_SDL encountered an error: {error}")
+        controller_slack.send_slack_message(
+            "alert", f"PANDA_SDL encountered an error: {error}"
+        )
         raise error  # raise error to go to finally. If we don't know what caused an error we don't want to continue
 
     finally:
@@ -448,10 +472,15 @@ def main(
         obs.place_text_on_screen("")
         obs.stop_recording()
         sql_system_state.set_system_status(SystemState.IDLE)
-        controller_slack.send_slack_message("alert", "Please command the slack monitor to 'stop' to end the slack monitoring")
+        controller_slack.send_slack_message(
+            "alert",
+            "Please command the slack monitor to 'stop' to end the slack monitoring",
+        )
         if slack_thread.is_alive():
             slack_thread.join()
-        controller_slack.send_slack_message("alert", "PANDA_SDL is shutting down...goodbye")
+        controller_slack.send_slack_message(
+            "alert", "PANDA_SDL is shutting down...goodbye"
+        )
         print("PANDA_SDL is shutting down...returning to main menu...goodbye")
 
 
@@ -640,70 +669,87 @@ def system_status_loop(slack: SlackBot):
             break
 
 
-def connect_to_instruments(use_mock_instruments: bool = TESTING) -> tuple[Toolkit, bool]:
+def connect_to_instruments(
+    use_mock_instruments: bool = TESTING,
+) -> tuple[Toolkit, bool]:
     """Connect to the instruments"""
+    instruments = Toolkit(
+        mill=None,
+        scale=None,
+        pump=None,
+        wellplate=None,
+        global_logger=logger,
+        experiment_logger=logger,
+    )
+
     if use_mock_instruments:
         logger.info("Using mock instruments")
-        mill = MockMill()
-        mill.connect_to_mill()
-        scale = MockScale()
-        pump = MockPump(mill=mill, scale=scale)
+        instruments.mill = MockMill()
+        instruments.mill.connect_to_mill()
+        instruments.scale = MockScale()
+        instruments.pump = MockPump()
         # pstat = echem_mock.GamryPotentiostat.connect()
-        instruments = Toolkit(
-            mill=mill,
-            scale=scale,
-            pump=pump,
-            wellplate=None,
-            global_logger=logger,
-            experiment_logger=logger,
-        )
         return instruments
 
     incomplete = False
     logger.info("Connecting to instruments:")
     try:
         logger.debug("Connecting to mill")
-        mill = Mill()
-        mill.connect_to_mill()
+        instruments.mill = Mill()
+        instruments.mill.connect_to_mill()
         home_mill = input("Would you like to home the mill? (y/n): ")
         if home_mill.lower() == "y":
-            mill.homing_sequence()
+            instruments.mill.homing_sequence()
     except Exception as error:
         logger.error("No mill connected, %s", error)
+        instruments.mill = None
         # raise error
         incomplete = True
-    
-    try:
-        logger.debug("Connecting to scale")
-        scale = Scale(address="COM6")
-        model, serial, software = scale.get_info()
-        if not model:
-            logger.error("No scale connected")
-            # raise Exception("No scale connected")
-        logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
-    except Exception as error:
-        logger.error("No scale connected, %s", error)
-        # raise error
-        incomplete = True
+
+    # try:
+    #     logger.debug("Connecting to scale")
+    #     scale = Scale(address="COM6")
+    #     info_dict = scale.get_info()
+    #     model = info_dict["model"]
+    #     serial = info_dict["serial"]
+    #     software = info_dict["software"]
+    #     if not model:
+    #         logger.error("No scale connected")
+    #         # raise Exception("No scale connected")
+    #     logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
+    # except Exception as error:
+    #     logger.error("No scale connected, %s", error)
+    #     instruments.scale = None
+    #     # raise error
+    #     incomplete = True
 
     try:
         logger.debug("Connecting to pump")
-        pump = SyringePump(mill=mill, scale=scale)
-        logger.debug("Connected to pump at %s",pump.pump.address)
+        instruments.pump = SyringePump()
+        logger.debug("Connected to pump at %s", instruments.pump.pump.address)
 
     except Exception as error:
         logger.error("No pump connected, %s", error)
+        instruments.pump = None
         # raise error
         incomplete = True
 
-    instruments = Toolkit(
-            mill=mill,
-            scale=scale,
-            pump=pump,
-            wellplate=None,
-            global_logger=logger,
-            experiment_logger=logger,
-        )
+    # Check for FLIR Camera
+    try:
+        logger.debug("Connecting to FLIR Camera")
+        system = PySpin.System.GetInstance()
+        cam_list = system.GetCameras()
+        if cam_list.GetSize() == 0:
+            logger.error("No FLIR Camera connected")
+            instruments.flir_camera = None
+        else:
+            instruments.flir_camera = cam_list.GetByIndex(0)
+            instruments.flir_camera.Init()
+            logger.debug("Connected to FLIR Camera")
+    except Exception as error:
+        logger.error("No FLIR Camera connected, %s", error)
+        instruments.flir_camera = None
+        incomplete = True
 
     if incomplete:
         print("Not all instruments connected")
@@ -717,8 +763,10 @@ def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
     instruments.mill.disconnect()
+    instruments.flir_camera.DeInit()
 
     logger.info("Disconnected from instruments")
+    return
 
 
 def share_analysis_to_slack(
@@ -825,7 +873,9 @@ def share_to_slack(experiment: ExperimentBase):
             if image[0].name.endswith("dz.tiff")
         ]
         if len(images_with_dz) == 0:
-            logger.error("The experiment %d has no dz.tiff image files", experiment.experiment_id)
+            logger.error(
+                "The experiment %d has no dz.tiff image files", experiment.experiment_id
+            )
             msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value} but has no datazoned image files to share"
             slack.send_slack_message("data", msg)
             return
@@ -848,7 +898,7 @@ def share_to_slack(experiment: ExperimentBase):
         slack_errors.BotUserAccessError,
         slack_errors.SlackClientConfigurationError,
         slack_errors.SlackObjectFormationError,
-        slack_errors.SlackRequestError
+        slack_errors.SlackRequestError,
     ) as error:
         logger.error(
             "A Slack specific error occured while sharing images from experiment %d with slack: %s",

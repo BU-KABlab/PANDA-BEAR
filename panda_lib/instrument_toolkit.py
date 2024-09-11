@@ -8,7 +8,7 @@ from panda_lib.syringepump import MockPump, SyringePump
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 import panda_lib.wellplate as wp
-
+import PySpin
 
 @dataclass
 class Toolkit:
@@ -20,3 +20,4 @@ class Toolkit:
     wellplate: wp.Wellplate = None
     global_logger: Logger = None
     experiment_logger: Logger = None
+    flir_camera: PySpin.Camera = None
