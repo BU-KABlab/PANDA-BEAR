@@ -14,7 +14,7 @@ from PIL import Image
 
 from panda_lib.config.config_print import print_config_values as print_config
 from panda_lib.config.config_print import resolve_config_paths
-from panda_lib.config.config_tools import read_testing_config, write_testing_config
+from panda_lib.config.config_tools import read_testing_config, write_testing_config, read_config
 
 resolve_config_paths()  # Yes I know the import order is wrong, but this must be run before anything else is loaded
 from main_menu_custom_fucntions import (
@@ -284,7 +284,17 @@ def instrument_check():
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "running instrument check"
     )
-    intruments = controller.connect_to_instruments(False)
+    intruments, all_found = controller.connect_to_instruments(False)
+    if all_found:
+        print("All instruments are connected.")
+        print("The instruments are:")
+        for instrument in intruments:
+            print(instrument)
+    else:
+        print("Not all instruments are connected.")
+        print("The instruments are:")
+        for instrument in intruments:
+            print(instrument)
     controller.disconnect_from_instruments(intruments)
 
 menu_options = {
@@ -322,7 +332,7 @@ menu_options = {
 }
 
 if __name__ == "__main__":
-
+    config = read_config()
     print(
         textwrap.dedent(
             """\n
@@ -348,6 +358,10 @@ if __name__ == "__main__":
         print()
         print("Welcome to PANDA_SDL!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
+        if read_testing_config():
+            print("Database address: ", read_config()["TESTING"]["testing_db_address"])
+        else:
+            print("Database address: ", read_config()["PRODUCTION"]["production_db_address"])
         num, p_type, new_wells = wellplate.read_current_wellplate_info()
         current_pipette = pipette.select_current_pipette_id()
         print(

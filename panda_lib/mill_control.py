@@ -67,7 +67,7 @@ class Mill:
         try:
             ser_mill = serial.Serial(
                 port=config.get("MILL", "port"),
-                baudrate= config.getint("MILL", "baud_rate"), #115200
+                baudrate= config.getint("MILL", "baudrate"), #115200
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS,
@@ -94,7 +94,13 @@ class Mill:
 
         # Check if the mill is currently in alarm state
         # If it is, reset the mill
-        status = self.ser_mill.readlines()[-1].decode().rstrip()
+        status = self.ser_mill.readlines()
+        logger.debug("Status: %s", status)
+        if not status:
+            logger.error("Error reading status from the mill")
+            status = ""
+        else:
+            status = status[-1].decode().rstrip()
         if "alarm" in status.lower():
             logger.warning("Mill is in alarm state")
             reset_alarm = input("Reset the mill? (y/n): ")

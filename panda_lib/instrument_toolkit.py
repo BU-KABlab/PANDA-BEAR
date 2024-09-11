@@ -14,9 +14,9 @@ import panda_lib.wellplate as wp
 class Toolkit:
     """A class to hold all of the instruments"""
 
-    mill: Union[Mill, MockMill]
-    scale: Union[Scale, MockScale]
-    pump: Union[SyringePump, MockPump]
+    mill: Union[Mill, MockMill, None]
+    scale: Union[Scale, MockScale, None]
+    pump: Union[SyringePump, MockPump, None]
     wellplate: wp.Wellplate = None
     global_logger: Logger = None
     experiment_logger: Logger = None

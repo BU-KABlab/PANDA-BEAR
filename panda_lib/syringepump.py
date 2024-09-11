@@ -19,8 +19,8 @@ from panda_lib.pipette import Pipette
 from panda_lib.utilities import Coordinates, Instruments
 from panda_lib.vessel import VesselLogger
 from panda_lib.vials import StockVial, Vial2, WasteVial
-from sartorius.driver import Scale
-from sartorius.mock import Scale as MockScale
+from sartorius.sartorius.driver import Scale
+from sartorius.sartorius.mock import Scale as MockScale
 
 from panda_lib.log_tools import setup_default_logger, default_logger as pump_control_logger
 

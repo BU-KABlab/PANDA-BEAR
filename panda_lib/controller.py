@@ -22,8 +22,8 @@ from typing import Sequence
 
 from slack_sdk import errors as slack_errors
 
-from sartorius import Scale
-from sartorius.mock import Scale as MockScale
+from sartorius.sartorius import Scale
+from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
@@ -106,7 +106,9 @@ def main(
         obs.start_recording()
         current_experiment = None
         # Connect to equipment
-        toolkit = connect_to_instruments(use_mock_instruments)
+        toolkit, all_found = connect_to_instruments(use_mock_instruments)
+        if not all_found:
+            raise Exception("Not all instruments connected")
         logger.info("Connected to instruments")
         controller_slack.send_slack_message("alert", "PANDA_SDL has connected to equipment")
         obs.place_text_on_screen("PANDA_SDL has connected to equipment")
@@ -638,7 +640,7 @@ def system_status_loop(slack: SlackBot):
             break
 
 
-def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
+def connect_to_instruments(use_mock_instruments: bool = TESTING) -> tuple[Toolkit, bool]:
     """Connect to the instruments"""
     if use_mock_instruments:
         logger.info("Using mock instruments")
@@ -657,6 +659,7 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
         )
         return instruments
 
+    incomplete = False
     logger.info("Connecting to instruments:")
     try:
         logger.debug("Connecting to mill")
@@ -666,8 +669,9 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
         if home_mill.lower() == "y":
             mill.homing_sequence()
     except Exception as error:
-        logger.error("No mill connected")
-        raise error
+        logger.error("No mill connected, %s", error)
+        # raise error
+        incomplete = True
     
     try:
         logger.debug("Connecting to scale")
@@ -676,21 +680,22 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
         if not model:
             logger.error("No scale connected")
             # raise Exception("No scale connected")
-        logger.debug("Connected to scale: %s", model)
+        logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
     except Exception as error:
-        logger.error("No scale connected")
-        raise error
-    
+        logger.error("No scale connected, %s", error)
+        # raise error
+        incomplete = True
+
     try:
         logger.debug("Connecting to pump")
         pump = SyringePump(mill=mill, scale=scale)
         logger.debug("Connected to pump at %s",pump.pump.address)
 
     except Exception as error:
-        logger.error("No pump connected")
-        raise error
-    
-    logger.info("Connected to instruments")
+        logger.error("No pump connected, %s", error)
+        # raise error
+        incomplete = True
+
     instruments = Toolkit(
             mill=mill,
             scale=scale,
@@ -699,7 +704,13 @@ def connect_to_instruments(use_mock_instruments: bool = TESTING) -> Toolkit:
             global_logger=logger,
             experiment_logger=logger,
         )
-    return instruments
+
+    if incomplete:
+        print("Not all instruments connected")
+        return instruments, False
+
+    logger.info("Connected to instruments")
+    return instruments, True
 
 
 def disconnect_from_instruments(instruments: Toolkit):
