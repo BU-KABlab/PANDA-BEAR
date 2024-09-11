@@ -35,7 +35,7 @@ from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import MillConfig
 
 # add the mill_control logger
-logger = setup_default_logger(log_name="mill_control",console_level=logging.WARNING)
+logger = setup_default_logger(log_name="mill_control",console_level=logging.INFO)
 
 # Mill movement logger - just for the movement commands
 mill_movement_logger = setup_default_logger(log_name="mill_movement",console_level=logging.WARNING)
@@ -97,8 +97,14 @@ class Mill:
         status = self.ser_mill.readlines()
         logger.debug("Status: %s", status)
         if not status:
-            logger.error("Error reading status from the mill")
-            status = ""
+            logger.warning("Initial status reading from the mill is blank")
+            logger.warning("Querying the mill for status")
+
+            status = self.current_status()
+            logger.debug("Status: %s", status)
+            if not status:
+                logger.error("Failed to get status from the mill")
+                raise MillConnectionError("Failed to get status from the mill")
         else:
             status = status[-1].decode().rstrip()
         if "alarm" in status.lower():
@@ -156,6 +162,7 @@ class Mill:
             logger.info("Serial connection to mill closed successfully")
             self.active_connection = False
             self.ser_mill = None
+        return
 
     def fetch_config(self) -> dict:
         """Read the config file"""
@@ -301,10 +308,12 @@ class Mill:
         command = "?"
         command_bytes = command.encode()
         status = ""
-        while status == "":
+        attempt_limit = 25
+        while status == "" and attempt_limit > 0:
             self.ser_mill.write(command_bytes + b"\n")
             time.sleep(0.25)
             status = self.ser_mill.readline().decode().rstrip()
+            attempt_limit -= 1
         # Check for busy
         while status == "ok":
             status = self.ser_mill.readline().decode().rstrip()
