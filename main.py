@@ -40,6 +40,7 @@ from panda_lib.sql_tools import (
     sql_protocol_utilities,
     sql_queue,
     sql_system_state,
+    sql_wellplate,
 )
 
 
@@ -105,8 +106,29 @@ def remove_experiment_from_database():
 
 
 def print_wellplate_info():
-    """Prints a summary of the current wellplate."""
-    print("Feature coming soon...")
+    """
+    Prints a summary of the current wellplate.
+    
+    Wellplate ID - type
+    Available new wells: x
+    Location of A1: x, y
+    
+    """
+    # input("Feature coming soon...")
+    well_num, plate_type, avail_wells = wellplate.read_current_wellplate_info()
+    x, y, z_bottom, z_top, orientation, echem_height = sql_wellplate.select_wellplate_location(num)
+    print(
+        f"""
+        Wellplate {well_num} - Type: {plate_type}
+        Available new wells: {avail_wells}
+        Location of A1: x={x}, y={y}
+        Bottom Z: {z_bottom}
+        Top Z: {z_top}
+        Orientation: {orientation}
+        Echem height: {echem_height}
+        """
+    )
+    input("Press Enter to continue...")
 
 
 def print_queue_info():
