@@ -7,6 +7,8 @@ import logging
 import time
 from typing import Optional, Union
 
+from serial import SerialException
+
 from nesp_lib_py import nesp_lib
 from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 
@@ -59,7 +61,7 @@ class SyringePump:
     """
 
     def __init__(
-        self, mill: Union[Mill, MockMill], scale: Union[Scale, MockScale] = None
+        self
     ):
         """
         Initialize the pump and set the capacity.
@@ -68,10 +70,10 @@ class SyringePump:
         self.max_pump_rate = float(0.640)  # ml/min
         self.syringe_capacity = float(1.0)  # mL
         self.pipette = Pipette()
-        self.mill = mill
-        if scale is not None:
-            self.scale = scale
-        else:
+        try:
+            # self.scale = Scale(address="COM6")
+            self.scale = MockScale()
+        except (ScaleNotFoundError, SerialException):
             self.scale = MockScale()
 
     def set_up_pump(self):
@@ -467,76 +469,76 @@ class SyringePump:
 
         return 0, pumping_record
 
-    def mix(
-        self,
-        mix_location: Optional[dict] = None,
-        mix_repetitions=3,
-        mix_volume=float(200.0),
-        mix_rate=float(0.62),
-    ):
-        """Mix the solution in the pipette by withdrawing and infusing the solution
-        Args:
-            mix_location (dict): Dictionary containing x, y, and z coordinates of the position.
-            mix_repetitions (int): Number of times to mix the solution.
-            mix_volume (float): Volume to be infused in microliters.
-            mix_rate (float): Pumping rate in milliliters per minute.
+    # def mix(
+    #     self,
+    #     mix_location: Optional[dict] = None,
+    #     mix_repetitions=3,
+    #     mix_volume=float(200.0),
+    #     mix_rate=float(0.62),
+    # ):
+    #     """Mix the solution in the pipette by withdrawing and infusing the solution
+    #     Args:
+    #         mix_location (dict): Dictionary containing x, y, and z coordinates of the position.
+    #         mix_repetitions (int): Number of times to mix the solution.
+    #         mix_volume (float): Volume to be infused in microliters.
+    #         mix_rate (float): Pumping rate in milliliters per minute.
 
-        Returns:
-            None
-        """
-        pump_control_logger.info("Mixing %d times", mix_repetitions)
+    #     Returns:
+    #         None
+    #     """
+    #     pump_control_logger.info("Mixing %d times", mix_repetitions)
 
-        if mix_location is None:
-            for i in range(mix_repetitions):
-                pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(volume_to_withdraw=mix_volume, rate=mix_rate)
-                current_coords = Coordinates(*self.mill.current_coordinates())
+    #     if mix_location is None:
+    #         for i in range(mix_repetitions):
+    #             pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
+    #             self.withdraw(volume_to_withdraw=mix_volume, rate=mix_rate)
+    #             current_coords = Coordinates(*self.mill.current_coordinates())
 
-                self.mill.set_feed_rate(500)
-                self.mill.safe_move(
-                    x_coord=current_coords.x,
-                    y_coord=current_coords.y,
-                    z_coord=current_coords.z + 5.0,
-                    instrument=Instruments.PIPETTE,
-                )
-                self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
-                self.mill.safe_move(
-                    x_coord=current_coords.x,
-                    y_coord=current_coords.y,
-                    z_coord=current_coords.z,
-                    instrument=Instruments.PIPETTE,
-                )
-                self.mill.set_feed_rate(2000)
-        else:
-            # move to mix location
-            self.mill.safe_move(
-                x_coord=mix_location["x"],
-                y_coord=mix_location["y"],
-                z_coord=mix_location["depth"],
-                instrument=Instruments.PIPETTE,
-            )
+    #             self.mill.set_feed_rate(500)
+    #             self.mill.safe_move(
+    #                 x_coord=current_coords.x,
+    #                 y_coord=current_coords.y,
+    #                 z_coord=current_coords.z + 5.0,
+    #                 instrument=Instruments.PIPETTE,
+    #             )
+    #             self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
+    #             self.mill.safe_move(
+    #                 x_coord=current_coords.x,
+    #                 y_coord=current_coords.y,
+    #                 z_coord=current_coords.z,
+    #                 instrument=Instruments.PIPETTE,
+    #             )
+    #             self.mill.set_feed_rate(2000)
+    #     else:
+    #         # move to mix location
+    #         self.mill.safe_move(
+    #             x_coord=mix_location["x"],
+    #             y_coord=mix_location["y"],
+    #             z_coord=mix_location["depth"],
+    #             instrument=Instruments.PIPETTE,
+    #         )
 
-            for i in range(mix_repetitions):
-                pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
-                self.withdraw(volume_to_withdraw=mix_volume, rate=mix_rate)
-                self.mill.set_feed_rate(500)
-                self.mill.safe_move(
-                    x_coord=mix_location["x"],
-                    y_coord=mix_location["y"],
-                    z_coord=mix_location["depth"] + 1.5,
-                    instrument=Instruments.PIPETTE,
-                )
-                self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
-                self.mill.safe_move(
-                    x_coord=mix_location["x"],
-                    y_coord=mix_location["y"],
-                    z_coord=mix_location["depth"],
-                    instrument=Instruments.PIPETTE,
-                )
-                self.mill.set_feed_rate(2000)
-            # move back to original position
-            self.mill.move_to_safe_position()
-            return None
+    #         for i in range(mix_repetitions):
+    #             pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
+    #             self.withdraw(volume_to_withdraw=mix_volume, rate=mix_rate)
+    #             self.mill.set_feed_rate(500)
+    #             self.mill.safe_move(
+    #                 x_coord=mix_location["x"],
+    #                 y_coord=mix_location["y"],
+    #                 z_coord=mix_location["depth"] + 1.5,
+    #                 instrument=Instruments.PIPETTE,
+    #             )
+    #             self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
+    #             self.mill.safe_move(
+    #                 x_coord=mix_location["x"],
+    #                 y_coord=mix_location["y"],
+    #                 z_coord=mix_location["depth"],
+    #                 instrument=Instruments.PIPETTE,
+    #             )
+    #             self.mill.set_feed_rate(2000)
+    #         # move back to original position
+    #         self.mill.move_to_safe_position()
+    #         return None
 
     def update_pipette_volume(self, volume_ml: float):
         """Change the volume of the pipette in ml"""
@@ -567,23 +569,23 @@ class MockPump(SyringePump):
         return syringe_pump
 
 
-def _test_mixing():
-    """Test the mixing function"""
-    from .wellplate import Wellplate
+# def _test_mixing():
+#     """Test the mixing function"""
+#     from .wellplate import Wellplate
 
-    wellplate = Wellplate()
-    a1 = wellplate.get_coordinates("A1")
-    with Mill() as mill:
-        mill.homing_sequence()
-        syringe_pump = SyringePump(mill=mill, scale=Scale())
-        mill.safe_move(a1["x"], a1["y"], a1["depth"], Instruments.PIPETTE)
-        syringe_pump.mix()
+#     wellplate = Wellplate()
+#     a1 = wellplate.get_coordinates("A1")
+#     with Mill() as mill:
+#         mill.homing_sequence()
+#         syringe_pump = SyringePump()
+#         mill.safe_move(a1["x"], a1["y"], a1["depth"], Instruments.PIPETTE)
+#         syringe_pump.mix()
 
 
 def _mock_pump_testing_routine():
     """Test the pump"""
     with MockMill() as mill:
-        mock_pump = MockPump(mill=mill, scale=MockScale())
+        mock_pump = MockPump()
         mock_pump.withdraw(100)
         assert mock_pump.pipette.volume == 100
         assert mock_pump.pipette.volume_ml == 0.1
@@ -592,6 +594,9 @@ def _mock_pump_testing_routine():
         assert mock_pump.pipette.volume_ml == 0
         # mock_pump.mix()
 
+class ScaleNotFoundError(Exception):
+    """Raised when a scale is not found"""
+    pass
 
 if __name__ == "__main__":
     # test_mixing()
