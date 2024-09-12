@@ -44,6 +44,7 @@ RUN apt-get update && apt-get install -y \
     libusb-1.0-0 \
     libxcb-xinerama0 \
     libxcb-xinput0 \
+    minicom \
     qt5-qmake \
     qtbase5-dev \
     qtbase5-dev-tools \
@@ -51,6 +52,7 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     tar \
     tk-dev \
+    usbutils \
     wget \
     xz-utils \
     zlib1g-dev \
