@@ -9,12 +9,60 @@ from pathlib import Path
 import os
 from typing import Union
 import PySpin
-# from panda_lib.log_tools import setup_default_logger
+from configparser import ConfigParser
+from dotenv import load_dotenv
+
+def read_config() -> ConfigParser:
+    """Reads a configuration file."""
+    load_dotenv()
+    config_path = os.getenv("PANDA_SDL_CONFIG_PATH")
+    config = ConfigParser()
+    config.read(config_path)
+    return config
+
+config = read_config()
 
 
-# logger = setup_default_logger(
-#     log_name="FLIRCamera", console_level=logging.DEBUG, file_level=logging.DEBUG
-# )
+if config.getboolean("OPTIONS", "testing"):
+    PANDA_SDL_LOG = config.get("TESTING", "logging_dir")
+else:
+    PANDA_SDL_LOG = config.get("PRODUCTION", "logging_dir")
+
+
+def setup_default_logger(
+    log_file="panda.log",
+    log_name="panda",
+    file_level=logging.DEBUG,
+    console_level=logging.DEBUG,
+):
+    """Setup a default logger for the PANDA_SDL project"""
+
+    if not os.path.exists(PANDA_SDL_LOG):
+        os.makedirs(PANDA_SDL_LOG)
+    default_logger = logging.getLogger(log_name)
+    if not default_logger.handlers:  # Check if the logger already has handlers attached
+        default_logger.setLevel(file_level)
+        formatter = logging.Formatter(
+            "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
+        )
+
+        file_handler = logging.FileHandler(PANDA_SDL_LOG + "/" + log_name + ".log")
+        file_handler.setFormatter(formatter)
+        default_logger.addHandler(file_handler)
+
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(console_level)
+        console_formatter = logging.Formatter(
+            "%(message)s"
+        )
+        console_handler.setFormatter(console_formatter)  # Ensure console output is formatted
+        default_logger.addHandler(console_handler)
+
+    return default_logger
+
+logger = setup_default_logger(
+    log_name="FLIRCamera", console_level=logging.DEBUG, file_level=logging.DEBUG
+)
 
 
 def locate_connected_cameras() -> PySpin.CameraList:
@@ -207,6 +255,7 @@ def acquire_images(
         #
         #  Retrieve enumeration node from nodemap
 
+        # cam.Color
         # In order to access the node entries, they have to be casted to a 
         # pointer type (CEnumerationPtr here)
         node_acquisition_mode = PySpin.CEnumerationPtr(
@@ -336,9 +385,9 @@ def acquire_images(
 
                     # Create a unique filename
                     if device_serial_number:
-                        filename = f"Acquisition-{device_serial_number}-{i}.jpg"
+                        filename = f"Acquisition-{device_serial_number}-{i}.tiff"
                     else:  # if serial number is empty
-                        filename = f"Acquisition-{i}.jpg"
+                        filename = f"Acquisition-{i}.tiff"
 
                     #  Save image
                     #
@@ -469,35 +518,128 @@ def set_brightness(cam: PySpin.CameraPtr, brightness: int):
     :type cam: CameraPtr
     :type brightness: int
     """
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Brightness"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(brightness)
+    #         print(f"Brightness set to: {brightness}")
+    #     else:
+    #         print("Brightness property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting brightness: {ex}")
+
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Brightness"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(brightness)
-            print(f"Brightness set to: {brightness}")
-        else:
-            print("Brightness property not writable.")
+        result = True
+        cam.Brightness.SetValue(brightness)
+        print(f"Brightness set to: {brightness}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting brightness: {ex}")
+        result = False
 
 
-def set_exposure(cam: PySpin.CameraPtr, exposure_time: float):
+def set_exposure(cam: PySpin.CameraPtr, exposure: float):
     """
-    Sets the exposure time for the camera.
+     This function configures a custom exposure time. Automatic exposure is turned
+     off in order to allow for the customization, and then the custom setting is
+     applied.
 
-    :param cam: Camera to set exposure time for.
-    :param exposure_time: Exposure time value to set.
+     :param cam: Camera to configure exposure for.
+     :type cam: CameraPtr
+     :return: True if successful, False otherwise.
+     :rtype: bool
+    """
+
+    print('*** CONFIGURING EXPOSURE ***\n')
+
+    try:
+        result = True
+
+        # Turn off automatic exposure mode
+        #
+        # *** NOTES ***
+        # Automatic exposure prevents the manual configuration of exposure
+        # times and needs to be turned off for this example. Enumerations
+        # representing entry nodes have been added to QuickSpin. This allows
+        # for the much easier setting of enumeration nodes to new values.
+        #
+        # The naming convention of QuickSpin enums is the name of the
+        # enumeration node followed by an underscore and the symbolic of
+        # the entry node. Selecting "Off" on the "ExposureAuto" node is
+        # thus named "ExposureAuto_Off".
+        #
+        # *** LATER ***
+        # Exposure time can be set automatically or manually as needed. This
+        # example turns automatic exposure off to set it manually and back
+        # on to return the camera to its default state.
+
+        if cam.ExposureAuto.GetAccessMode() != PySpin.RW:
+            print('Unable to disable automatic exposure. Aborting...')
+            return False
+
+        cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
+        print('Automatic exposure disabled...')
+
+        # Set exposure time manually; exposure time recorded in microseconds
+        #
+        # *** NOTES ***
+        # Notice that the node is checked for availability and writability
+        # prior to the setting of the node. In QuickSpin, availability and
+        # writability are ensured by checking the access mode.
+        #
+        # Further, it is ensured that the desired exposure time does not exceed
+        # the maximum. Exposure time is counted in microseconds - this can be
+        # found out either by retrieving the unit with the GetUnit() method or
+        # by checking SpinView.
+
+        if cam.ExposureTime.GetAccessMode() != PySpin.RW:
+            print('Unable to set exposure time. Aborting...')
+            return False
+
+        # Ensure desired exposure time does not exceed the maximum
+        exposure_time_to_set = exposure
+        exposure_time_to_set = min(cam.ExposureTime.GetMax(), exposure_time_to_set)
+        cam.ExposureTime.SetValue(exposure_time_to_set)
+        print('Shutter time set to %s us...\n' % exposure_time_to_set)
+
+    except PySpin.SpinnakerException as ex:
+        print('Error: %s' % ex)
+        result = False
+
+    return result
+
+
+def reset_exposure(cam: PySpin.CameraPtr) -> bool:
+    """
+    This function returns the camera to a normal state by re-enabling automatic exposure.
+
+    :param cam: Camera to reset exposure on.
     :type cam: CameraPtr
-    :type exposure_time: float
+    :return: True if successful, False otherwise.
+    :rtype: bool
     """
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("ExposureTime"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(exposure_time)
-            print(f"Exposure time set to: {exposure_time}")
-        else:
-            print("Exposure time property not writable.")
+        result = True
+
+        # Turn automatic exposure back on
+        #
+        # *** NOTES ***
+        # Automatic exposure is turned on in order to return the camera to its
+        # default state.
+
+        if cam.ExposureAuto.GetAccessMode() != PySpin.RW:
+            print('Unable to enable automatic exposure (node retrieval). Non-fatal error...')
+            return False
+
+        cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Continuous)
+
+        print('Automatic exposure enabled...')
+
     except PySpin.SpinnakerException as ex:
-        print(f"Error setting exposure time: {ex}")
+        print('Error: %s' % ex)
+        result = False
+
+    return result
+
 
 
 def set_sharpness(cam: PySpin.CameraPtr, sharpness: int):
@@ -509,15 +651,25 @@ def set_sharpness(cam: PySpin.CameraPtr, sharpness: int):
     :type cam: CameraPtr
     :type sharpness: int
     """
-    try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Sharpness"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(sharpness)
-            print(f"Sharpness set to: {sharpness}")
-        else:
-            print("Sharpness property not writable.")
-    except PySpin.SpinnakerException as ex:
-        print(f"Error setting sharpness: {ex}")
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Sharpness"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(sharpness)
+    #         print(f"Sharpness set to: {sharpness}")
+    #     else:
+    #         print("Sharpness property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting sharpness: {ex}")
+
+    # try:
+    #     result = True
+    #     cam.SharpeningEnable.SetValue(PySpin.Camera.SharpeningEnableEnums.SharpeningEnable_Off)
+    #     cam.SharpeningAuto.SetValue(False)
+    #     cam.Sharpening.SetValue(sharpness)
+    #     print(f"Sharpness set to: {sharpness}")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting sharpness: {ex}")
+    #     result = False
 
 
 def set_hue(cam: PySpin.CameraPtr, hue: int):
@@ -529,16 +681,23 @@ def set_hue(cam: PySpin.CameraPtr, hue: int):
     :type cam: CameraPtr
     :type hue: int
     """
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Hue"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(hue)
+    #         print(f"Hue set to: {hue}")
+    #     else:
+    #         print("Hue property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting hue: {ex}")
+
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Hue"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(hue)
-            print(f"Hue set to: {hue}")
-        else:
-            print("Hue property not writable.")
+        result = True
+        cam.Hue.SetValue(hue)
+        print(f"Hue set to: {hue}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting hue: {ex}")
-
+        result = False
 
 def set_saturation(cam: PySpin.CameraPtr, saturation: int):
     """
@@ -549,16 +708,25 @@ def set_saturation(cam: PySpin.CameraPtr, saturation: int):
     :type cam: CameraPtr
     :type saturation: int
     """
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Saturation"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(saturation)
+    #         print(f"Saturation set to: {saturation}")
+    #     else:
+    #         print("Saturation property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting saturation: {ex}")
+
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Saturation"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(saturation)
-            print(f"Saturation set to: {saturation}")
-        else:
-            print("Saturation property not writable.")
+        result = True
+        cam.SaturationEnable.SetValue(True)
+        cam.Saturation.SetValue(saturation)
+        print(f"Saturation set to: {saturation}")
+
     except PySpin.SpinnakerException as ex:
         print(f"Error setting saturation: {ex}")
-
+        result = False
 
 def set_gamma(cam: PySpin.CameraPtr, gamma: int):
     """
@@ -569,15 +737,23 @@ def set_gamma(cam: PySpin.CameraPtr, gamma: int):
     :type cam: CameraPtr
     :type gamma: int
     """
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Gamma"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(gamma)
+    #         print(f"Gamma set to: {gamma}")
+    #     else:
+    #         print("Gamma property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting gamma: {ex}")
+
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Gamma"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(gamma)
-            print(f"Gamma set to: {gamma}")
-        else:
-            print("Gamma property not writable.")
+        result = True
+        cam.Gamma.SetValue(gamma)
+        print(f"Gamma set to: {gamma}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting gamma: {ex}")
+        result = False
 
 
 def set_shutter(cam: PySpin.CameraPtr, shutter: float):
@@ -589,15 +765,23 @@ def set_shutter(cam: PySpin.CameraPtr, shutter: float):
     :type cam: CameraPtr
     :type shutter: float
     """
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Shutter"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(shutter)
+    #         print(f"Shutter set to: {shutter}")
+    #     else:
+    #         print("Shutter property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting shutter: {ex}")
+
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Shutter"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(shutter)
-            print(f"Shutter set to: {shutter}")
-        else:
-            print("Shutter property not writable.")
+        result = True
+        cam.Shutter.SetValue(shutter)
+        print(f"Shutter set to: {shutter}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting shutter: {ex}")
+        result = False
 
 
 def set_gain(cam: PySpin.CameraPtr, gain: float):
@@ -609,15 +793,23 @@ def set_gain(cam: PySpin.CameraPtr, gain: float):
     :type cam: CameraPtr
     :type gain: float
     """
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Gain"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(gain)
+    #         print(f"Gain set to: {gain}")
+    #     else:
+    #         print("Gain property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting gain: {ex}")
+
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Gain"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(gain)
-            print(f"Gain set to: {gain}")
-        else:
-            print("Gain property not writable.")
+        result = True
+        cam.Gain.SetValue(gain)
+        print(f"Gain set to: {gain}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting gain: {ex}")
+        result = False
 
 
 def set_framerate(cam: PySpin.CameraPtr, framerate: float):
@@ -629,15 +821,24 @@ def set_framerate(cam: PySpin.CameraPtr, framerate: float):
     :type cam: CameraPtr
     :type framerate: float
     """
+    # try:
+    #     prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("AcquisitionFrameRate"))
+    #     if PySpin.IsWritable(prop):
+    #         prop.SetValue(framerate)
+    #         print(f"Framerate set to: {framerate}")
+    #     else:
+    #         print("Framerate property not writable.")
+    # except PySpin.SpinnakerException as ex:
+    #     print(f"Error setting framerate: {ex}")
+
     try:
-        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("AcquisitionFrameRate"))
-        if PySpin.IsWritable(prop):
-            prop.SetValue(framerate)
-            print(f"Framerate set to: {framerate}")
-        else:
-            print("Framerate property not writable.")
+        result = True
+        cam.AcquisitionFrameRateEnable.SetValue(True)
+        cam.AcquisitionFrameRate.SetValue(framerate)
+        print(f"Framerate set to: {framerate}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting framerate: {ex}")
+        result = False
 
 
 def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
@@ -662,6 +863,22 @@ def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
             print("White balance properties not writable.")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting white balance: {ex}")
+
+def set_panda_image_profile(cam: PySpin.CameraPtr):
+    """
+    Camera settings for the panda profile
+    """
+    print("Turning off auto settings...")
+    # set_brightness(cam, 12.012)
+    set_exposure(cam, 1.392)
+    set_sharpness(cam, 1024)
+    set_hue(cam, 0.0)
+    set_saturation(cam, 100)
+    set_gamma(cam, 1.250)
+    set_shutter(cam, 50.023)
+    set_gain(cam, 0.0)
+    set_framerate(cam, 5)
+    set_white_balance(cam, 762, 813)
 
 # def epanda_camera_profile(self):
 #     """Camera settings for the epanda profile"""
@@ -874,13 +1091,15 @@ def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
 if __name__ == "__main__":
     # This function locates all connected cameras
     locate_connected_cameras()
-    system = PySpin.System.GetInstance()
-    camera_list = system.GetCameras()
     pyspin_system: PySpin.SystemPtr = PySpin.System.GetInstance()
+    camera_list = pyspin_system.GetCameras()
+
     # Run example on each camera
     for instance, camera in enumerate(camera_list):
         print(f"Running example for camera {instance+1}...")
-        RESULT = run_single_camera(camera)
+        print(f"Applying panda profile to camera {instance+1}...")
+        # set_panda_image_profile(camera)
+        RESULT = run_single_camera(camera, num_images=1)
         if RESULT:
             print(f"Camera {instance+1} example complete...")
         else:
