@@ -460,6 +460,416 @@ def run_single_camera(cam: PySpin.CameraPtr, image_path: Union[str, Path] = None
 
     return 0
 
+def set_brightness(cam: PySpin.CameraPtr, brightness: int):
+    """
+    Sets the brightness for the camera.
+
+    :param cam: Camera to set brightness for.
+    :param brightness: Brightness value to set.
+    :type cam: CameraPtr
+    :type brightness: int
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Brightness"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(brightness)
+            print(f"Brightness set to: {brightness}")
+        else:
+            print("Brightness property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting brightness: {ex}")
+
+
+def set_exposure(cam: PySpin.CameraPtr, exposure_time: float):
+    """
+    Sets the exposure time for the camera.
+
+    :param cam: Camera to set exposure time for.
+    :param exposure_time: Exposure time value to set.
+    :type cam: CameraPtr
+    :type exposure_time: float
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("ExposureTime"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(exposure_time)
+            print(f"Exposure time set to: {exposure_time}")
+        else:
+            print("Exposure time property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting exposure time: {ex}")
+
+
+def set_sharpness(cam: PySpin.CameraPtr, sharpness: int):
+    """
+    Sets the sharpness for the camera.
+
+    :param cam: Camera to set sharpness for.
+    :param sharpness: Sharpness value to set.
+    :type cam: CameraPtr
+    :type sharpness: int
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Sharpness"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(sharpness)
+            print(f"Sharpness set to: {sharpness}")
+        else:
+            print("Sharpness property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting sharpness: {ex}")
+
+
+def set_hue(cam: PySpin.CameraPtr, hue: int):
+    """
+    Sets the hue for the camera.
+
+    :param cam: Camera to set hue for.
+    :param hue: Hue value to set.
+    :type cam: CameraPtr
+    :type hue: int
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Hue"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(hue)
+            print(f"Hue set to: {hue}")
+        else:
+            print("Hue property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting hue: {ex}")
+
+
+def set_saturation(cam: PySpin.CameraPtr, saturation: int):
+    """
+    Sets the saturation for the camera.
+
+    :param cam: Camera to set saturation for.
+    :param saturation: Saturation value to set.
+    :type cam: CameraPtr
+    :type saturation: int
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Saturation"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(saturation)
+            print(f"Saturation set to: {saturation}")
+        else:
+            print("Saturation property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting saturation: {ex}")
+
+
+def set_gamma(cam: PySpin.CameraPtr, gamma: int):
+    """
+    Sets the gamma for the camera.
+
+    :param cam: Camera to set gamma for.
+    :param gamma: Gamma value to set.
+    :type cam: CameraPtr
+    :type gamma: int
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Gamma"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(gamma)
+            print(f"Gamma set to: {gamma}")
+        else:
+            print("Gamma property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting gamma: {ex}")
+
+
+def set_shutter(cam: PySpin.CameraPtr, shutter: float):
+    """
+    Sets the shutter for the camera.
+
+    :param cam: Camera to set shutter for.
+    :param shutter: Shutter value to set.
+    :type cam: CameraPtr
+    :type shutter: float
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Shutter"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(shutter)
+            print(f"Shutter set to: {shutter}")
+        else:
+            print("Shutter property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting shutter: {ex}")
+
+
+def set_gain(cam: PySpin.CameraPtr, gain: float):
+    """
+    Sets the gain for the camera.
+
+    :param cam: Camera to set gain for.
+    :param gain: Gain value to set.
+    :type cam: CameraPtr
+    :type gain: float
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("Gain"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(gain)
+            print(f"Gain set to: {gain}")
+        else:
+            print("Gain property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting gain: {ex}")
+
+
+def set_framerate(cam: PySpin.CameraPtr, framerate: float):
+    """
+    Sets the framerate for the camera.
+
+    :param cam: Camera to set framerate for.
+    :param framerate: Framerate value to set.
+    :type cam: CameraPtr
+    :type framerate: float
+    """
+    try:
+        prop = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("AcquisitionFrameRate"))
+        if PySpin.IsWritable(prop):
+            prop.SetValue(framerate)
+            print(f"Framerate set to: {framerate}")
+        else:
+            print("Framerate property not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting framerate: {ex}")
+
+
+def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
+    """
+    Sets the white balance for the camera.
+
+    :param cam: Camera to set white balance for.
+    :param red: Red channel value to set.
+    :param blue: Blue channel value to set.
+    :type cam: CameraPtr
+    :type red: float
+    :type blue: float
+    """
+    try:
+        prop_red = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("BalanceRatioSelector"))
+        prop_blue = PySpin.CFloatPtr(cam.GetNodeMap().GetNode("BalanceRatioSelector"))
+        if PySpin.IsWritable(prop_red) and PySpin.IsWritable(prop_blue):
+            prop_red.SetValue(red)
+            prop_blue.SetValue(blue)
+            print(f"White balance set to: Red={red}, Blue={blue}")
+        else:
+            print("White balance properties not writable.")
+    except PySpin.SpinnakerException as ex:
+        print(f"Error setting white balance: {ex}")
+
+# def epanda_camera_profile(self):
+#     """Camera settings for the epanda profile"""
+#     self.set_brightness(12.012)
+#     self.set_exposure(1.392)
+#     self.set_sharpness(1024)
+#     self.set_hue(0.0)
+#     self.set_saturation(100)
+#     self.set_gamma(1.250)
+#     self.set_shutter(50.023)
+#     self.set_gain(0.0)
+#     self.set_framerate(5)
+#     self.set_white_balance(762, 813)
+#     self.enable_embedded_image_info()
+
+#     def set_brightness(self, brightness):
+#         """Sets the brightness for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.BRIGHTNESS
+#             brightness_property = self.camera.getProperty(prop)
+#             brightness_property.absControl = True
+#             brightness_property.absValue = brightness
+#             self.camera.setProperty(brightness_property)
+#             self.camera_logger.debug("Brightness set to: %d", brightness)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting brightness: %s", fc2_err)
+
+#     def set_exposure(self, exposure_time):
+#         """Sets the exposure time for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.AUTO_EXPOSURE
+#             auto_exposure = self.camera.getProperty(prop)
+#             auto_exposure.autoManualMode = False
+#             auto_exposure.absControl = True
+#             auto_exposure.onOff = True
+#             auto_exposure.autoManualMode = False
+#             auto_exposure.absValue = exposure_time
+#             self.camera.setProperty(auto_exposure)
+#             self.camera_logger.debug("Exposure time set to: %d", exposure_time)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting exposure time: %s", fc2_err)
+
+#     def set_sharpness(self, sharpness):
+#         """Sets the sharpness for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.SHARPNESS
+#             sharpness_property = self.camera.getProperty(prop)
+#             sharpness_property.absControl = True
+#             sharpness_property.absValue = sharpness
+#             self.camera.setProperty(sharpness_property)
+#             self.camera_logger.debug("Sharpness set to: %d", sharpness)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting sharpness: %s", fc2_err)
+
+#     def set_hue(self, hue):
+#         """Sets the hue for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.HUE
+#             hue_property = self.camera.getProperty(prop)
+#             hue_property.absControl = True
+#             hue_property.absValue = hue
+#             self.camera.setProperty(hue_property)
+#             self.camera_logger.debug("Hue set to: %d", hue)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting hue: %s", fc2_err)
+
+#     def set_saturation(self, saturation):
+#         """Sets the saturation for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.SATURATION
+#             saturation_property = self.camera.getProperty(prop)
+#             saturation_property.absControl = True
+#             saturation_property.absValue = saturation
+#             self.camera.setProperty(saturation_property)
+#             self.camera_logger.debug("Saturation set to: %d", saturation)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting saturation: %s", fc2_err)
+
+#     def set_gamma(self, gamma):
+#         """Sets the gamma for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.GAMMA
+#             gamma_property = self.camera.getProperty(prop)
+#             gamma_property.absControl = True
+#             gamma_property.onOff = True
+#             gamma_property.absValue = gamma
+#             self.camera.setProperty(gamma_property)
+#             self.camera_logger.debug("Gamma set to: %d", gamma)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting gamma: %s", fc2_err)
+
+#     def set_shutter(self, shutter):
+#         """Sets the shutter for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.SHUTTER
+#             shutter_property = self.camera.getProperty(prop)
+#             shutter_property.absControl = True
+#             shutter_property.onOff = True
+#             shutter_property.autoManualMode = False
+#             shutter_property.absValue = shutter
+#             self.camera.setProperty(shutter_property)
+#             self.camera_logger.debug("Shutter set to: %d", shutter)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting shutter: %s", fc2_err)
+
+#     def set_gain(self, gain):
+#         """Sets the gain for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.GAIN
+#             gain_property = self.camera.getProperty(prop)
+#             gain_property.absControl = True
+#             gain_property.onOff = True
+#             gain_property.autoManualMode = False
+#             gain_property.absValue = gain
+#             self.camera.setProperty(gain_property)
+#             self.camera_logger.debug("Gain set to: %d", gain)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting gain: %s", fc2_err)
+
+#     def set_framerate(self, framerate):
+#         """Sets the framerate for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.FRAME_RATE
+#             framerate_property = self.camera.getProperty(prop)
+#             framerate_property.absControl = True
+#             framerate_property.onOff = True
+#             framerate_property.autoManualMode = False
+#             framerate_property.absValue = framerate
+#             self.camera.setProperty(framerate_property)
+#             self.camera_logger.debug("Framerate set to: %d", framerate)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting framerate: %s", fc2_err)
+
+#     def set_white_balance(self, red, blue):
+#         """Sets the white balance for the camera"""
+#         try:
+#             prop = PyCapture2.PROPERTY_TYPE.WHITE_BALANCE
+#             wb = self.camera.getProperty(prop)
+#             wb.onOff = True
+#             wb.absControl = False
+#             wb.autoManualMode = False
+#             wb.valueA = red
+#             wb.valueB = blue
+#             self.camera.setProperty(wb)
+#             self.camera_logger.debug("White balance set to: %d %d", red, blue)
+#         except PyCapture2.Fc2error as fc2_err:
+#             self.camera_logger.debug("Error setting white balance: %s", fc2_err)
+
+#     def epanda_camera_profile(self):
+#         """Camera settings for the epanda profile"""
+#         self.camera_logger.debug("Turning off auto settings...")
+#         self.set_brightness(12.012)
+#         self.set_exposure(1.392)
+#         self.set_sharpness(1024)
+#         self.set_hue(0.0)
+#         self.set_saturation(100)
+#         self.set_gamma(1.250)
+#         self.set_shutter(50.023)
+#         self.set_gain(0.0)
+#         self.set_framerate(5)
+#         self.set_white_balance(762, 813)
+#         self.enable_embedded_image_info()
+
+#     def enable_embedded_image_info(self):
+#         """Enable embedding of various camera settings"""
+#         embedded_info = self.camera.getEmbeddedImageInfo()
+#         if embedded_info.available.timestamp:
+#             self.camera.setEmbeddedImageInfo(timestamp=True)
+#         else:
+#             print("Timestamp is not available.")
+
+#         if embedded_info.available.frameCounter:
+#             self.camera.setEmbeddedImageInfo(frameCounter=True)
+#         else:
+#             print("Frame counter is not available.")
+
+#         if embedded_info.available.gain:
+#             self.camera.setEmbeddedImageInfo(gain=True)
+#         else:
+#             print("Gain is not available.")
+
+#         if embedded_info.available.shutter:
+#             self.camera.setEmbeddedImageInfo(shutter=True)
+#         else:
+#             print("Shutter is not available.")
+
+#         if embedded_info.available.brightness:
+#             self.camera.setEmbeddedImageInfo(brightness=True)
+#         else:
+#             print("Brightness is not available.")
+
+#         if embedded_info.available.exposure:
+#             self.camera.setEmbeddedImageInfo(exposure=True)
+#         else:
+#             print("Exposure is not available.")
+
+#         if embedded_info.available.whiteBalance:
+#             self.camera.setEmbeddedImageInfo(whiteBalance=True)
+#         else:
+#             print("White balance is not available.")
+
+#         if embedded_info.available.ROIPosition:
+#             self.camera.setEmbeddedImageInfo(ROIPosition=True)
+#         else:
+#             print("ROI position is not available.")
+
+
+
 
 if __name__ == "__main__":
     # This function locates all connected cameras
