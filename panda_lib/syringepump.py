@@ -66,9 +66,9 @@ class SyringePump:
         """
         Initialize the pump and set the capacity.
         """
+        self.max_pump_rate = config.getfloat("PUMP","max_pumping_rate", fallback=0.640)  # ml/min
+        self.syringe_capacity = config.getfloat("PUMP","syringe_capacity", fallback=1.0)  # mL
         self.pump = self.set_up_pump()
-        self.max_pump_rate = float(0.640)  # ml/min
-        self.syringe_capacity = float(1.0)  # mL
         self.pipette = Pipette()
         try:
             # self.scale = Scale(address="COM6")
@@ -84,9 +84,10 @@ class SyringePump:
         """
         try:
             pump_control_logger.info("Setting up pump...")
-            pump_port = nesp_lib.Port(config.get("PUMP","port", fallback="COM5"), config.get("PUMP","baudrate",fallback=19200))
+            pump_port = nesp_lib.Port(config.get("PUMP","port", fallback="COM5"), config.getint("PUMP","baudrate",fallback=19200))
             syringe_pump = nesp_lib.Pump(pump_port)
-            syringe_pump.syringe_diameter = 4.600  # millimeters #4.643 #4.685
+            syringe_pump.syringe_diameter = config.getfloat("PUMP","syringe_inside_diameter", fallback=4.600)  # millimeters
+            syringe_pump.pumping_rate = self.max_pump_rate
             syringe_pump.volume_infused_clear()
             syringe_pump.volume_withdrawn_clear()
             log_msg = f"Pump found at address {syringe_pump.address}"
@@ -236,7 +237,7 @@ class SyringePump:
         volume_to_infuse: float,
         being_infused: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
         infused_into: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
-        rate: float = float(0.5),
+        rate: float = None,
         blowout_ul: float = float(0.0),
         weigh: bool = False,
         results: ExperimentResult = None,
@@ -256,13 +257,13 @@ class SyringePump:
             int: The difference in weight if weighing, otherwise 0
         """
         # Convert volume to microliters
-        volume_ul = float(volume_to_infuse)
+        volume_ul = round(float(volume_to_infuse), PRECISION)
         # Convert blowout volume to milliliters
-        blowout_ml = float(blowout_ul) / 1000
+        blowout_ml = round(float(blowout_ul) / 1000, PRECISION)
 
         if volume_ul > 0:
             # Convert volume to milliliters
-            volume_ml = volume_ul / 1000
+            volume_ml = round(volume_ul / 1000, PRECISION)
 
             if being_infused is not None:
                 # Get density and viscosity from the solution being infused
@@ -272,6 +273,7 @@ class SyringePump:
                 density = None
                 viscosity = None
                 # If no solution is given, assume air and use the max pump rate
+            if not rate:
                 rate = self.max_pump_rate
 
             # Run the pump to infuse the solution
@@ -301,7 +303,7 @@ class SyringePump:
 
             # Log the infusion details
             pump_control_logger.info(
-                "Pump has infused: %0.6f ul (%0.6f ul of solution) at %fmL/min Pipette volume: %0.3f ul",
+                "Pump has infused: %0.4f ul (%0.4f ul of solution) at %fmL/min Pipette volume: %0.4f ul",
                 volume_infused_ul_total,
                 volume_infused_ul,
                 self.pump.pumping_rate,
@@ -336,7 +338,7 @@ class SyringePump:
                 # We don't need to include the blowout because it was accounted for earlier
                 self.pipette.volume -= volume_infused_ul
 
-            return 0
+            return 0 #TODO return infused into like withdraw does
         else: # If the volume is 0
             return None
 
