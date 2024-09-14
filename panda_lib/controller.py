@@ -697,9 +697,7 @@ def connect_to_instruments(
         logger.debug("Connecting to mill")
         instruments.mill = Mill()
         instruments.mill.connect_to_mill()
-        home_mill = input("Would you like to home the mill? (y/n): ")
-        if home_mill.lower() == "y":
-            instruments.mill.homing_sequence()
+        instruments.mill.homing_sequence()
     except Exception as error:
         logger.error("No mill connected, %s", error)
         instruments.mill = None
@@ -761,11 +759,100 @@ def connect_to_instruments(
     logger.info("Connected to instruments")
     return instruments, True
 
+def test_instrument_connections(
+    use_mock_instruments: bool = TESTING,
+) -> tuple[Toolkit, bool]:
+    """Connect to the instruments"""
+    instruments = Toolkit(
+        mill=None,
+        scale=None,
+        pump=None,
+        wellplate=None,
+        global_logger=logger,
+        experiment_logger=logger,
+    )
+
+    if use_mock_instruments:
+        logger.info("Using mock instruments")
+        instruments.mill = MockMill()
+        instruments.mill.connect_to_mill()
+        instruments.scale = MockScale()
+        instruments.pump = MockPump()
+        # pstat = echem_mock.GamryPotentiostat.connect()
+        return instruments
+
+    incomplete = False
+    logger.info("Connecting to instruments:")
+    try:
+        logger.debug("Connecting to mill")
+        instruments.mill = Mill()
+        instruments.mill.connect_to_mill()
+    except Exception as error:
+        logger.error("No mill connected, %s", error)
+        instruments.mill = None
+        # raise error
+        incomplete = True
+
+    # try:
+    #     logger.debug("Connecting to scale")
+    #     scale = Scale(address="COM6")
+    #     info_dict = scale.get_info()
+    #     model = info_dict["model"]
+    #     serial = info_dict["serial"]
+    #     software = info_dict["software"]
+    #     if not model:
+    #         logger.error("No scale connected")
+    #         # raise Exception("No scale connected")
+    #     logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
+    # except Exception as error:
+    #     logger.error("No scale connected, %s", error)
+    #     instruments.scale = None
+    #     # raise error
+    #     incomplete = True
+
+    try:
+        logger.debug("Connecting to pump")
+        instruments.pump = SyringePump()
+        logger.debug("Connected to pump at %s", instruments.pump.pump.address)
+
+    except Exception as error:
+        logger.error("No pump connected, %s", error)
+        instruments.pump = None
+        # raise error
+        incomplete = True
+
+    # Check for FLIR Camera
+    try:
+        logger.debug("Connecting to FLIR Camera")
+        system = PySpin.System.GetInstance()
+        cam_list = system.GetCameras()
+        if cam_list.GetSize() == 0:
+            logger.error("No FLIR Camera connected")
+            instruments.flir_camera = None
+        else:
+            instruments.flir_camera = cam_list.GetByIndex(0)
+            # instruments.flir_camera.Init()
+            cam_list.Clear()
+            system.ReleaseInstance()
+
+            logger.debug("Connected to FLIR Camera")
+    except Exception as error:
+        logger.error("No FLIR Camera connected, %s", error)
+        instruments.flir_camera = None
+        incomplete = True
+
+    if incomplete:
+        print("Not all instruments connected")
+        return instruments, False
+
+    logger.info("Connected to instruments")
+    return instruments, True
 
 def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
-    if instruments.mill: instruments.mill.disconnect()
+    if instruments.mill: 
+        instruments.mill.disconnect()
     # if instruments.flir_camera: instruments.flir_camera.DeInit()
 
     logger.info("Disconnected from instruments")
