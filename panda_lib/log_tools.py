@@ -17,8 +17,8 @@ else:
 def setup_default_logger(
     log_file="panda.log",
     log_name="panda",
-    file_level=logging.DEBUG,
-    console_level=logging.DEBUG,
+    file_level=config.get("LOGGING", "file_level"),
+    console_level=config.get("LOGGING", "console_level"),
 ):
     """Setup a default logger for the PANDA_SDL project"""
 
