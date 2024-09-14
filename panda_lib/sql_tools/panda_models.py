@@ -340,6 +340,7 @@ class WellPlates(Base):
     z_bottom = Column(Float)
     z_top = Column(Float)
     echem_height = Column(Float)
+    image_height = Column(Float)
 
     def __repr__(self):
         return f"<WellPlates(id={self.id}, type_id={self.type_id}, current={self.current})>"

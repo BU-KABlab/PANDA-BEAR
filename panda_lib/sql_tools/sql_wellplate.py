@@ -31,7 +31,7 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
         return session.query(WellPlates).filter(WellPlates.id == plate_id).count() > 0
 
 
-def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float, float, float, float, int, float]:
+def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float, float, float, float, int, float, float]:
     """Select the location and characteristics of the wellplate from the wellplate
      table. If no plate_id is given, the current wellplate is assumed
 
@@ -98,6 +98,7 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float,
             wellplate.z_top,
             wellplate.orientation,
             wellplate.echem_height,
+            wellplate.image_height
         )
 
 
