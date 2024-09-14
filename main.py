@@ -299,23 +299,36 @@ def change_pipette_tip():
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "changing pipette tip"
     )
-    pipette.insert_new_pipette()
+    while True:
+        try:
+            new_capacity = float(input("Enter the new capacity of the pipette tip (ul): "))
+            break
+        except ValueError:
+            print("Invalid input. Please try again.")
+    pipette.insert_new_pipette(capacity=new_capacity)
 
 def instrument_check():
     """Runs the instrument check."""
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "running instrument check"
     )
-    intruments, all_found = controller.connect_to_instruments(False)
+    intruments, all_found = controller.test_instrument_connections(False)
     if all_found:
-        print("All instruments are connected.")
         input("Press Enter to continue...")
     else:
-        print("Not all instruments are connected.")
         input("Press Enter to continue...")
 
     controller.disconnect_from_instruments(intruments)
     return
+
+def test_pipette():
+    """Runs the pipette test."""
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "running pipette test"
+    )
+    from testing_and_validation.pump_suction_test import main as pipette_test
+    pipette_test()
+
 
 menu_options = {
     "0": run_panda_sdl_with_ml,
@@ -343,6 +356,7 @@ menu_options = {
     "8.1": genererate_pedot_experiment,
     "8.2": analyze_pedot_experiment,
     "9": instrument_check,
+    "10": test_pipette,
     "t": toggle_testing_mode,
     "r": refresh,
     "w": show_warrenty,
