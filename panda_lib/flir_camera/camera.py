@@ -401,8 +401,10 @@ def acquire_images(
                     else:
                         image_path = Path(image_path)
                         filepath = image_path
+                    if filepath.suffix != ".tiff":
+                        filepath = filepath.with_suffix(".tiff")
                     # image_converted.Save(filepath)
-                    image_result.Save(filepath)
+                    image_result.Save(str(filepath))
                     print(f"Image saved at {filepath}...")
 
                     #  Release image

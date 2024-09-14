@@ -81,7 +81,7 @@ def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.
     # Run example on each camera
     for _, camera in enumerate(camera_list):
         camera: PySpin.CameraPtr
-        result = run_single_camera(camera, image_path=file_name.stem, num_images=num_images)
+        result = run_single_camera(camera, image_path=file_name, num_images=num_images)
         if result:
             print(f"Camera {camera.DeviceID} took image...")
         else:
