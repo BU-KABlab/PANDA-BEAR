@@ -55,6 +55,7 @@ class Mill:
         self.active_connection = False
         self.config = self.fetch_config()
         self.ser_mill: serial.Serial = None
+        self.homed = False
 
     def homing_sequence(self):
         """Home the mill, set the feed rate, and clear the buffers"""
@@ -152,6 +153,11 @@ class Mill:
     def disconnect(self):
         """Close the serial connection to the mill"""
         logger.info("Disconnecting from the mill")
+
+        if self.homed:
+            logger.debug("Mill was homed, resting electrode")
+            self.rest_electrode()
+
         self.ser_mill.close()
         time.sleep(2)
         logger.info("Mill connected: %s", self.ser_mill.is_open)
@@ -287,9 +293,10 @@ class Mill:
             status = self.current_status()
             if "Idle" in status:
                 logger.info("Homing completed")
+                self.homed = True
                 break
 
-            time.sleep(2)  # Adjust the sleep interval as needed
+            time.sleep(2) # Check every 2 seconds
 
     def __wait_for_completion(self, incoming_status, timeout=90):
         """Wait for the mill to complete the previous command"""
@@ -608,7 +615,7 @@ class Mill:
         x_coord,
         y_coord,
         z_coord,
-        instrument: Instruments = Instruments.CENTER,
+        instrument: Instruments,
     ) -> int:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
@@ -792,6 +799,9 @@ class MockMill(Mill):
     def disconnect(self):
         """Disconnect from the mill"""
         logger.info("Disconnecting from the mill")
+        if self.homed:
+            self.rest_electrode()
+        logger.info("Closing the serial connection to the mill")
         self.ser_mill.close()
         self.active_connection = False
 
