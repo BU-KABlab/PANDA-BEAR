@@ -337,9 +337,9 @@ class Wellplate:
         self.rows: str = rows
         self.columns: int = columns
         self.orientation:int = orientation
-        self.z_bottom:float = -72
-        self.echem_height:float = -70  # for every well
-        self.image_height:float = -35  # The height from which to image the well in mm
+        self.z_bottom:float = -70
+        self.echem_height:float = -72.5  # for every well
+        self.image_height:float = -50  # The height from which to image the well in mm
         current_plate_id, current_type_number, _ = sql_wellplate.select_current_wellplate_info()
         if type_number is None:
             self.type_number = current_type_number
@@ -377,6 +377,7 @@ class Wellplate:
             self.z_top,
             self.orientation,
             self.echem_height,
+            self.image_height,
         ) = self.load_wellplate_location()
         self.a1_coordinates = {
             "x": self.a1_x,
@@ -925,6 +926,8 @@ def change_wellplate_location():
     #     mill_config = json.load(file)
     # working_volume = mill_config["working_volume"]
 
+    
+
     with SessionLocal() as session:
         mill_config_record = (
             session.query(MillConfig).order_by(MillConfig.id.desc()).first()
@@ -936,10 +939,19 @@ def change_wellplate_location():
     print(f"Current wellplate id: {current_plate_id}")
     print(f"Current wellplate type number: {current_type_number}")
 
+    wellplate = Wellplate(
+            plate_id=current_plate_id,
+        )
+
     ## Ask for the new location
     while True:
-        new_location_x = float(input("Enter the new x location of the wellplate: "))
-        if isinstance(new_location_x, NoReturn):
+        new_location_x = (input("Enter the new x location of the wellplate: "))
+        if new_location_x == "":
+            new_location_x = wellplate.a1_x
+            break
+        try:
+            new_location_x = float(new_location_x)
+        except ValueError:
             print("Invalid input. Please enter a number.")
             continue
         if new_location_x > working_volume["x"] and new_location_x < 0:
@@ -950,10 +962,17 @@ def change_wellplate_location():
         )
 
     while True:
-        new_location_y:float = float(input("Enter the new y location of the wellplate: "))
-        if isinstance(new_location_y, NoReturn):
-            print("Invalid input. Please enter a number.")
-            continue
+        new_location_y = (input("Enter the new y location of the wellplate: "))
+
+        if new_location_y == "":
+            new_location_y = wellplate.a1_y
+            break
+        else:
+            try:
+                new_location_y = float(new_location_y)
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+                continue
 
         if new_location_y > working_volume["y"] and new_location_y < 0:
             break
