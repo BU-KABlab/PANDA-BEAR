@@ -175,6 +175,8 @@ def insert_protocol(protocol_id, project, name, filepath):
             Protocols(id=protocol_id, project=project, name=name, filepath=filepath)
         )
 
+        session.commit()
+
 
 def update_protocol(protocol_id, new_name):
     """
@@ -227,6 +229,8 @@ def delete_protocol(protocol_id):
     with SessionLocal() as session:
         # Delete the protocol from the database
         session.query(Protocols).filter(Protocols.id == protocol_id).delete()
+
+        
 
 
 def read_in_protocols():
