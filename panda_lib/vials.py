@@ -869,7 +869,7 @@ def generate_template_vial_csv_file() -> None:
     print(f"Template vial csv file saved as {filename}")
 
 
-def import_vial_csv_file(filename: str) -> None:
+def import_vial_csv_file(filename: str = None) -> None:
     """
     Import the vial csv file and add the vials to the db
     """

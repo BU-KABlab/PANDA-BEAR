@@ -330,6 +330,19 @@ def test_pipette():
     from testing_and_validation.pump_suction_test import main as pipette_test
     pipette_test()
 
+def import_vial_data():
+    """Imports vial data from a csv file."""
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "importing vial data"
+    )
+    vials.import_vial_csv_file()
+
+def generate_vial_data_template():
+    """Generates a vial data template."""
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "generating vial data template"
+    )
+    vials.generate_template_vial_csv_file()
 
 menu_options = {
     "0": run_panda_sdl_with_ml,
@@ -347,6 +360,8 @@ menu_options = {
     "3.1": reset_vials_waste,
     "3.2": input_new_vial_values_stock,
     "3.3": input_new_vial_values_waste,
+    "3.4": import_vial_data,
+    "3.5": generate_vial_data_template,
     "4": print_queue_info,
     "4.1": run_experiment_generator,
     "4.2": remove_experiment_from_database,
