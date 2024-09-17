@@ -3,6 +3,9 @@
 import dataclasses
 from decimal import Decimal
 from enum import Enum
+import tkinter as tk
+from tkinter import filedialog
+
 
 import pulp
 
@@ -193,3 +196,19 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
         return vial_volumes, deviation_value
     else:
         return None, None
+
+# File picker
+def file_picker(file_types=None):
+    """Open a file picker dialog and return the selected file path."""
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(filetypes=file_types)
+    return file_path
+
+# Directory picker
+def directory_picker():
+    """Open a directory picker dialog and return the selected directory path."""
+    root = tk.Tk()
+    root.withdraw()
+    directory_path = filedialog.askdirectory()
+    return directory_path
