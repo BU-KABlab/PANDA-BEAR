@@ -4,10 +4,11 @@ Vial class for creating vial objects with their position and contents
 
 # pylint: disable=line-too-long
 import ast
+import csv
 import logging
 import math
 
-# from pathlib import Path
+from pathlib import Path
 from dataclasses import asdict
 from typing import Sequence, Union, List, Tuple
 
@@ -829,3 +830,79 @@ def input_new_vial_values(vialgroup: str) -> None:
         else:
             print("Invalid vial position")
             continue
+
+def generate_template_vial_csv_file() -> None:
+    """
+    Generate a template vial csv file that can be filled with 
+    multiple vials and their values
+    """
+    filename = "vials.csv"
+
+    # Prompt the user to idenitfy the directory to save the file
+    directory = input(
+        "Enter the directory to save the file (Press enter to save in the current directory): "
+    )
+    if directory != "":
+        filename = directory + "/" + filename
+
+    filename = Path(filename) # Convert to a Path object
+
+    with open(filename, "w", encoding="UTF-8") as file:
+        file.write(
+            "name,contents,category,position,volume,capacity,density,vial_coordinates,radius,height,contamination,viscosity_cp,concentration\n"
+        )
+        file.write("none,none,0,s1,20000,20000,1,{'x': -4, 'y': -72, 'z_bottom': -74},14,57,0,1,1,1\n")
+        file.write("none,none,0,s2,20000,20000,1,{'x': -4, 'y': -105, 'z_bottom': -74},14,57,0,1,1,1\n")
+        file.write("none,none,0,s3,20000,20000,1,{'x': -4, 'y': -138, 'z_bottom': -74},14,57,0,1,1,1\n")
+        file.write("none,none,0,s4,20000,20000,1,{'x': -4, 'y': -171, 'z_bottom': -74},14,57,0,1,1,1\n")
+        file.write("none,none,0,s5,20000,20000,1,{'x': -4, 'y': -204, 'z_bottom': -74},14,57,0,1,1,1\n")
+        file.write("none,none,0,s6,20000,20000,1,{'x': -4, 'y': -237, 'z_bottom': -74},14,57,0,1,1,1\n")
+        file.write("none,none,0,s7,20000,20000,1,{'x': -4, 'y': -270, 'z_bottom': -74},14,57,0,1,1,1\n")
+        file.write("none,none,0,e1,20000,20000,1,{'x': -409,'y': -35, 'z_bottom': -50},14,57,0,1,1,1\n")
+        file.write("waste,{},1,w0,1000,20000,0,{'x': -50, 'y': -7, 'z_bottom': -74},14,57,0,0,,0\n")
+        file.write("waste,{},1,w1,1000,20000,0,{'x': -50, 'y': -40, 'z_bottom': -74},14,57,0,0,,0\n")
+        file.write("waste,{},1,w2,1000,20000,0,{'x': -50, 'y': -73, 'z_bottom': -74},14,57,0,0,,0\n")
+        file.write("waste,{},1,w3,1000,20000,0,{'x': -50, 'y': -106, 'z_bottom': -74},14,57,0,0,,0\n")
+        file.write("waste,{},1,w4,1000,20000,0,{'x': -50, 'y': -139, 'z_bottom': -74},14,57,0,0,,0\n")
+        file.write("waste,{},1,w5,1000,20000,0,{'x': -50, 'y': -172, 'z_bottom': -74},14,57,0,0,,0\n")
+        file.write("waste,{},1,w6,1000,20000,0,{'x': -50, 'y': -205, 'z_bottom': -74},14,57,0,0,,0\n")
+        file.write("waste,{},1,w7,1000,20000,0,{'x': -50, 'y': -238, 'z_bottom': -74},14,57,0,0,,0\n")
+
+    print(f"Template vial csv file saved as {filename}")
+
+
+def import_vial_csv_file(filename: str) -> None:
+    """
+    Import the vial csv file and add the vials to the db
+    """
+    with open(filename, "r", encoding="UTF-8") as file:
+        csv_reader = csv.DictReader(file)
+        vial_parameters = []
+        for row in csv_reader:
+            vial_parameters.append(row)
+
+    for each_vial in vial_parameters:
+        try:
+            vial = Vial2(
+                name=str(each_vial["name"]),
+                category=int(each_vial["category"]),
+                position=each_vial["position"],
+                volume=float(each_vial["volume"]),
+                capacity=float(each_vial["capacity"]),
+                density=float(each_vial["density"]),
+                vial_coordinates=ast.literal_eval(each_vial["vial_coordinates"]),
+                radius=float(each_vial["radius"]),
+                height=float(each_vial["height"]),
+                contamination=int(each_vial["contamination"]),
+                contents=ast.literal_eval(each_vial["contents"]),
+                viscosity_cp=float(each_vial["viscosity_cp"]),
+                concentration=float(each_vial["concentration"]),
+            )
+            vial.insert_updated_vial_in_db()
+            vial_logger.info("Vial %s imported successfully", vial.position)
+        except Exception as e:
+            vial_logger.error(
+                "Error occurred while importing vial %s: %s", each_vial["position"], e
+            )
+            vial_logger.error("Continuing....")
+            vial_logger.exception(e)
