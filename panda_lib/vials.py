@@ -12,6 +12,8 @@ from pathlib import Path
 from dataclasses import asdict
 from typing import Sequence, Union, List, Tuple
 
+from panda_lib.utilities import directory_picker, file_picker
+
 from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import VialStatus, Vials, model_to_dict
 from .vessel import OverDraftException, OverFillException, Vessel, VesselCoordinates
@@ -839,13 +841,9 @@ def generate_template_vial_csv_file() -> None:
     filename = "vials.csv"
 
     # Prompt the user to idenitfy the directory to save the file
-    directory = input(
-        "Enter the directory to save the file (Press enter to save in the current directory): "
-    )
-    if directory != "":
-        filename = directory + "/" + filename
+    directory = directory_picker()
 
-    filename = Path(filename) # Convert to a Path object
+    filename = Path(directory / filename) # Convert to a Path object
 
     with open(filename, "w", encoding="UTF-8") as file:
         file.write(
@@ -875,6 +873,9 @@ def import_vial_csv_file(filename: str) -> None:
     """
     Import the vial csv file and add the vials to the db
     """
+    if not filename:
+        filename = file_picker("csv")
+
     with open(filename, "r", encoding="UTF-8") as file:
         csv_reader = csv.DictReader(file)
         vial_parameters = []
