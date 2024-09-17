@@ -53,7 +53,15 @@ class Experiments(Base):
     # def get_by_id(cls, session, experiment_id: int) -> Optional["Experiments"]:
     #     return session.query(cls).filter(cls.experiment_id == experiment_id).first()
 
+class ExperimentStatusView(Base):
+    """ExperimentStatus view model"""
 
+    __tablename__ = "experiment_status"
+    experiment_id = Column(Integer, primary_key=True)
+    status = Column(String)
+
+    def __repr__(self):
+        return f"<ExperimentStatus(experiment_id={self.experiment_id}, status={self.status})>"
 class ExperimentResults(Base):
     """ExperimentResults table model"""
 
@@ -201,7 +209,7 @@ class Protocols(Base):
 
     __tablename__ = "protocols"
     id = Column(Integer, primary_key=True)
-    project = Column(Integer, ForeignKey("projects.project_id"))
+    project = Column(Integer)
     name = Column(TEXT)
     filepath = Column(TEXT)
 
