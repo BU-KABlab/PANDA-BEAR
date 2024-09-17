@@ -29,8 +29,8 @@
 from typing import Sequence
 
 # Non-standard imports
-from epanda_lib.controller import Toolkit
-from epanda_lib.e_panda import (
+from panda_lib.controller import Toolkit
+from panda_lib.actions import (
     forward_pipette_v2,
     solution_selector,
     chrono_amp,
@@ -42,13 +42,13 @@ from epanda_lib.e_panda import (
     CVFailure,
     DepositionFailure
 )
-from epanda_lib.e_panda_custom import (
+from panda_lib.actions_pgma import (
     cyclic_volt_pgma_fc
 )
-from epanda_lib.experiment_class import PGMAExperiment, ExperimentStatus
-from epanda_lib.vials import StockVial, WasteVial
-from epanda_lib.correction_factors import correction_factor
-from epanda_lib.mill_control import Instruments
+from panda_lib.experiment_class import PGMAExperiment, ExperimentStatus
+from panda_lib.vials import StockVial, WasteVial
+from panda_lib.correction_factors import correction_factor
+from panda_lib.mill_control import Instruments
 
 
 def main(
