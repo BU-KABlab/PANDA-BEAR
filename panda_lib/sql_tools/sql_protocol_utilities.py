@@ -2,13 +2,13 @@
 
 import os
 from ast import List
-from panda_lib.config.config_tools import read_config, read_testing_config
+from panda_lib.config.config_tools import read_config
 
 # import sqlite3
 # from panda_lib.config.config import SQL_DB_PATH
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import Protocols
- 
+
 # region Protocols
 from panda_lib.errors import ProtocolNotFoundError
 
@@ -122,7 +122,9 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
             )
             if result is None:
                 result = (
-                    session.query(Protocols).filter(Protocols.name == protocol_id+".py").first()
+                    session.query(Protocols)
+                    .filter(Protocols.name == protocol_id + ".py")
+                    .first()
                 )
         else:
             result = (
@@ -230,8 +232,6 @@ def delete_protocol(protocol_id):
         # Delete the protocol from the database
         session.query(Protocols).filter(Protocols.id == protocol_id).delete()
 
-        
-
 
 def read_in_protocols():
     """
@@ -272,7 +272,7 @@ def read_in_protocols():
         next_protocol_id = 1
 
     # Get the filenames of the current protocols
-    #current_protocol_filenames = [protocol.name for protocol in current_protocols]
+    # current_protocol_filenames = [protocol.name for protocol in current_protocols]
     # get filepaths of current protocols
     current_protocol_filepaths = [protocol.filepath for protocol in current_protocols]
     # Iterate through the protocols
