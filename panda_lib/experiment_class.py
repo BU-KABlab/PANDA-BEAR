@@ -17,7 +17,7 @@ from panda_lib.config.config_tools import read_config
 #                                                 execute_sql_command_no_return)
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (ExperimentParameters,
-                                              ExperimentResults, Experiments,
+                                              ExperimentResults, Experiments, ExperimentStatusView,
                                               WellHx, WellPlates)
 
 config = read_config()
@@ -997,7 +997,7 @@ def select_experiment_status(experiment_id: int) -> str:
     # )
 
     with SessionLocal() as session:
-        result = session.query(Experiments.status).filter(Experiments.experiment_id == experiment_id).all()
+        result = session.query(ExperimentStatusView.status).filter(ExperimentStatusView.experiment_id == experiment_id).all()
 
     if result == []:
         return ValueError("No experiment found with that ID")
