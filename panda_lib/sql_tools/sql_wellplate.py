@@ -45,6 +45,7 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float,
         z_top (float): The z coordinate of the top of the wellplate. 
         orientation (int): The orientation of the wellplate. 
         echem_height(float): The height of performing electrochemistry in a well. 
+        image_height(float): The height of the image taken of the wellplate.
 
     """
 
