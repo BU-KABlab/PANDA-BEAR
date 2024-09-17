@@ -116,7 +116,7 @@ def print_wellplate_info():
     """
     # input("Feature coming soon...")
     well_num, plate_type, avail_wells = wellplate.read_current_wellplate_info()
-    x, y, z_bottom, z_top, orientation, echem_height = sql_wellplate.select_wellplate_location(num)
+    x, y, z_bottom, z_top, orientation, echem_height, image_height = sql_wellplate.select_wellplate_location(num)
     print(
         f"""
         Wellplate {well_num} - Type: {plate_type}
@@ -126,6 +126,7 @@ def print_wellplate_info():
         Top Z: {z_top}
         Orientation: {orientation}
         Echem height: {echem_height}
+        Image height: {image_height}
         """
     )
     input("Press Enter to continue...")
