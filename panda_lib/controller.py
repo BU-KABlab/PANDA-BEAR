@@ -689,7 +689,7 @@ def connect_to_instruments(
         instruments.scale = MockScale()
         instruments.pump = MockPump()
         # pstat = echem_mock.GamryPotentiostat.connect()
-        return instruments
+        return instruments, True
 
     incomplete = False
     logger.info("Connecting to instruments:")
