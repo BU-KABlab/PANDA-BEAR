@@ -5,6 +5,7 @@ Vial class for creating vial objects with their position and contents
 # pylint: disable=line-too-long
 import ast
 import csv
+import json
 import logging
 import math
 
@@ -843,28 +844,32 @@ def generate_template_vial_csv_file() -> None:
     # Prompt the user to idenitfy the directory to save the file
     directory = directory_picker()
 
-    filename = Path(directory / filename) # Convert to a Path object
+    filename = Path(directory) / Path(filename) # Convert to a Path object
 
-    with open(filename, "w", encoding="UTF-8") as file:
-        file.write(
-            "name,contents,category,position,volume,capacity,density,vial_coordinates,radius,height,contamination,viscosity_cp,concentration\n"
-        )
-        file.write("none,none,0,s1,20000,20000,1,{'x': -4, 'y': -72, 'z_bottom': -74},14,57,0,1,1,1\n")
-        file.write("none,none,0,s2,20000,20000,1,{'x': -4, 'y': -105, 'z_bottom': -74},14,57,0,1,1,1\n")
-        file.write("none,none,0,s3,20000,20000,1,{'x': -4, 'y': -138, 'z_bottom': -74},14,57,0,1,1,1\n")
-        file.write("none,none,0,s4,20000,20000,1,{'x': -4, 'y': -171, 'z_bottom': -74},14,57,0,1,1,1\n")
-        file.write("none,none,0,s5,20000,20000,1,{'x': -4, 'y': -204, 'z_bottom': -74},14,57,0,1,1,1\n")
-        file.write("none,none,0,s6,20000,20000,1,{'x': -4, 'y': -237, 'z_bottom': -74},14,57,0,1,1,1\n")
-        file.write("none,none,0,s7,20000,20000,1,{'x': -4, 'y': -270, 'z_bottom': -74},14,57,0,1,1,1\n")
-        file.write("none,none,0,e1,20000,20000,1,{'x': -409,'y': -35, 'z_bottom': -50},14,57,0,1,1,1\n")
-        file.write("waste,{},1,w0,1000,20000,0,{'x': -50, 'y': -7, 'z_bottom': -74},14,57,0,0,,0\n")
-        file.write("waste,{},1,w1,1000,20000,0,{'x': -50, 'y': -40, 'z_bottom': -74},14,57,0,0,,0\n")
-        file.write("waste,{},1,w2,1000,20000,0,{'x': -50, 'y': -73, 'z_bottom': -74},14,57,0,0,,0\n")
-        file.write("waste,{},1,w3,1000,20000,0,{'x': -50, 'y': -106, 'z_bottom': -74},14,57,0,0,,0\n")
-        file.write("waste,{},1,w4,1000,20000,0,{'x': -50, 'y': -139, 'z_bottom': -74},14,57,0,0,,0\n")
-        file.write("waste,{},1,w5,1000,20000,0,{'x': -50, 'y': -172, 'z_bottom': -74},14,57,0,0,,0\n")
-        file.write("waste,{},1,w6,1000,20000,0,{'x': -50, 'y': -205, 'z_bottom': -74},14,57,0,0,,0\n")
-        file.write("waste,{},1,w7,1000,20000,0,{'x': -50, 'y': -238, 'z_bottom': -74},14,57,0,0,,0\n")
+
+    with open(filename, "w", encoding="UTF-8", newline='') as file:
+        csv_writer = csv.writer(file)
+        csv_writer.writerow([
+            "name", "contents", "category", "position", "volume", "capacity", "density",
+            "vial_coordinates", "radius", "height", "contamination", "viscosity_cp", "concentration"
+        ])
+        csv_writer.writerow(["none", "none", 0, "s0", 20000, 20000, 1, json.dumps({'x': -4, 'y': -39, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "s1", 20000, 20000, 1, json.dumps({'x': -4, 'y': -72, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "s2", 20000, 20000, 1, json.dumps({'x': -4, 'y': -105, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "s3", 20000, 20000, 1, json.dumps({'x': -4, 'y': -138, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "s4", 20000, 20000, 1, json.dumps({'x': -4, 'y': -171, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "s5", 20000, 20000, 1, json.dumps({'x': -4, 'y': -204, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "s6", 20000, 20000, 1, json.dumps({'x': -4, 'y': -237, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "s7", 20000, 20000, 1, json.dumps({'x': -4, 'y': -270, 'z_bottom': -74}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["none", "none", 0, "e1", 20000, 20000, 1, json.dumps({'x': -409, 'y': -35, 'z_bottom': -50}), 14, 57, 0, 1, 1])
+        csv_writer.writerow(["waste", "{}", 1, "w0", 1000, 20000, 0, json.dumps({'x': -50, 'y': -7, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(["waste", "{}", 1, "w1", 1000, 20000, 0, json.dumps({'x': -50, 'y': -40, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(["waste", "{}", 1, "w2", 1000, 20000, 0, json.dumps({'x': -50, 'y': -73, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(["waste", "{}", 1, "w3", 1000, 20000, 0, json.dumps({'x': -50, 'y': -106, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(["waste", "{}", 1, "w4", 1000, 20000, 0, json.dumps({'x': -50, 'y': -139, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(["waste", "{}", 1, "w5", 1000, 20000, 0, json.dumps({'x': -50, 'y': -172, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(["waste", "{}", 1, "w6", 1000, 20000, 0, json.dumps({'x': -50, 'y': -205, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(["waste", "{}", 1, "w7", 1000, 20000, 0, json.dumps({'x': -50, 'y': -238, 'z_bottom': -74}), 14, 57, 0, 0, 0])
 
     print(f"Template vial csv file saved as {filename}")
 
@@ -884,6 +889,20 @@ def import_vial_csv_file(filename: str = None) -> None:
 
     for each_vial in vial_parameters:
         try:
+
+            if each_vial["vial_coordinates"] in [None, "", "{}", '{}']:
+                vial_coordinates = {"x": 0, "y": 0, "z_bottom": 0}
+            else:
+                vial_coordinates = json.loads(each_vial["vial_coordinates"])
+
+            if each_vial["contents"] in ["{}", '{}']:
+                contents = {}
+            else:
+                try:
+                    contents = json.loads(each_vial["contents"])
+                except:
+                    contents = str(each_vial["contents"])
+
             vial = Vial2(
                 name=str(each_vial["name"]),
                 category=int(each_vial["category"]),
@@ -891,11 +910,11 @@ def import_vial_csv_file(filename: str = None) -> None:
                 volume=float(each_vial["volume"]),
                 capacity=float(each_vial["capacity"]),
                 density=float(each_vial["density"]),
-                vial_coordinates=ast.literal_eval(each_vial["vial_coordinates"]),
+                vial_coordinates=vial_coordinates,
                 radius=float(each_vial["radius"]),
                 height=float(each_vial["height"]),
                 contamination=int(each_vial["contamination"]),
-                contents=ast.literal_eval(each_vial["contents"]),
+                contents=contents,
                 viscosity_cp=float(each_vial["viscosity_cp"]),
                 concentration=float(each_vial["concentration"]),
             )
