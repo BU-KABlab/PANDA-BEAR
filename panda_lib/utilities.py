@@ -200,9 +200,15 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
 # File picker
 def file_picker(file_types=None):
     """Open a file picker dialog and return the selected file path."""
+    if file_types is None:
+        file_types = [("CSV", "*.csv")]
+    elif isinstance(file_types, str):
+        file_types = [(file_types.upper(), f"*.{file_types.lower()}")]
     root = tk.Tk()
     root.withdraw()
+    root.attributes('-topmost', True)
     file_path = filedialog.askopenfilename(filetypes=file_types)
+    root.destroy()
     return file_path
 
 # Directory picker
@@ -210,5 +216,7 @@ def directory_picker():
     """Open a directory picker dialog and return the selected directory path."""
     root = tk.Tk()
     root.withdraw()
+    root.attributes('-topmost', True)
     directory_path = filedialog.askdirectory()
+    root.destroy()
     return directory_path
