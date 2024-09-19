@@ -14,7 +14,12 @@ from PIL import Image
 
 from panda_lib.config.config_print import print_config_values as print_config
 from panda_lib.config.config_print import resolve_config_paths
-from panda_lib.config.config_tools import read_testing_config, write_testing_config, read_config
+from panda_lib.config.config_tools import (
+    read_testing_config,
+    write_testing_config,
+    read_config,
+)
+from panda_lib.experiment_class import ExperimentBase
 
 resolve_config_paths()  # Yes I know the import order is wrong, but this must be run before anything else is loaded
 from main_menu_custom_fucntions import (
@@ -108,15 +113,17 @@ def remove_experiment_from_database():
 def print_wellplate_info():
     """
     Prints a summary of the current wellplate.
-    
+
     Wellplate ID - type
     Available new wells: x
     Location of A1: x, y
-    
+
     """
     # input("Feature coming soon...")
     well_num, plate_type, avail_wells = wellplate.read_current_wellplate_info()
-    x, y, z_bottom, z_top, orientation, echem_height, image_height = sql_wellplate.select_wellplate_location(num)
+    (x, y, z_bottom, z_top, orientation, echem_height, image_height) = (
+        sql_wellplate.select_wellplate_location(num)
+    )
     print(
         f"""
         Wellplate {well_num} - Type: {plate_type}
@@ -137,8 +144,8 @@ def print_queue_info():
     current_queue = sql_queue.select_queue()
     print("Current Queue:")
     for experiment in current_queue:
-        print(experiment)
-
+        experiment: ExperimentBase
+        print(f"{experiment.experiment_id}-{experiment.priority}-{experiment.filename}-{experiment.well_id}")
     input("Press Enter to continue...")
 
 
@@ -302,11 +309,14 @@ def change_pipette_tip():
     )
     while True:
         try:
-            new_capacity = float(input("Enter the new capacity of the pipette tip (ul): "))
+            new_capacity = float(
+                input("Enter the new capacity of the pipette tip (ul): ")
+            )
             break
         except ValueError:
             print("Invalid input. Please try again.")
     pipette.insert_new_pipette(capacity=new_capacity)
+
 
 def instrument_check():
     """Runs the instrument check."""
@@ -322,13 +332,16 @@ def instrument_check():
     controller.disconnect_from_instruments(intruments)
     return
 
+
 def test_pipette():
     """Runs the pipette test."""
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "running pipette test"
     )
     from testing_and_validation.pump_suction_test import main as pipette_test
+
     pipette_test()
+
 
 def import_vial_data():
     """Imports vial data from a csv file."""
@@ -337,12 +350,14 @@ def import_vial_data():
     )
     vials.import_vial_csv_file()
 
+
 def generate_vial_data_template():
     """Generates a vial data template."""
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "generating vial data template"
     )
     vials.generate_template_vial_csv_file()
+
 
 menu_options = {
     "0": run_panda_sdl_with_ml,
@@ -408,7 +423,10 @@ if __name__ == "__main__":
         if read_testing_config():
             print("Database address: ", read_config()["TESTING"]["testing_db_address"])
         else:
-            print("Database address: ", read_config()["PRODUCTION"]["production_db_address"])
+            print(
+                "Database address: ",
+                read_config()["PRODUCTION"]["production_db_address"],
+            )
         num, p_type, new_wells = wellplate.read_current_wellplate_info()
         current_pipette = pipette.select_current_pipette_id()
         print(
