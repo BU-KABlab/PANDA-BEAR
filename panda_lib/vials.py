@@ -171,7 +171,7 @@ class Vial2(Vessel):
         else:
             return True
 
-    def update_volume(self, added_volume: float, save:bool = False) -> None:
+    def update_volume(self, added_volume: float, save: bool = False) -> None:
         """
         Updates the volume of the vial by adding the specified volume.
 
@@ -264,7 +264,7 @@ class Vial2(Vessel):
                 )
                 session.add(vial)
                 session.commit()
-                
+
         except Exception as e:
             vial_logger.error(
                 "Error occurred while updating vial status in the db: %s", e
@@ -379,10 +379,13 @@ class StockVial(Vial2):
         )
         self.category = 0
 
-    def update_contents(self, from_vessel: str, volume: float, save:bool = False) -> None:
+    def update_contents(
+        self, from_vessel: str, volume: float, save: bool = False
+    ) -> None:
         "Stock vial contents don't change"
         self.log_contents()
         return self
+
 
 class WasteVial(Vial2):
     """
@@ -450,14 +453,18 @@ class WasteVial(Vial2):
         )
         self.category = category
 
-    def update_contents(self, from_vessel: Union[str, dict], volume: float, save:bool = False) -> None:
+    def update_contents(
+        self, from_vessel: Union[str, dict], volume: float, save: bool = False
+    ) -> None:
         """Update the contentes of the waste vial"""
         vial_logger.debug("Updating %s %s contents...", self.name, self.position)
         # Ensure self.contents is a dictionary
         if not isinstance(self.contents, dict):
             try:
                 self.contents = ast.literal_eval(self.contents)
-            except:
+            except Exception as e:
+                vial_logger.error("Error occurred while converting contents to dict. Setting blank contents...")
+                vial_logger.error("Error: %s", e)
                 self.contents = {}
         if isinstance(from_vessel, dict):
             try:
@@ -490,7 +497,7 @@ class WasteVial(Vial2):
         return self
 
 
-def get_current_vials(group: Union[None,str] = None) -> List[dict]:
+def get_current_vials(group: Union[None, str] = None) -> List[dict]:
     """
     Get the current vials from the db
 
@@ -533,10 +540,10 @@ def get_current_vials(group: Union[None,str] = None) -> List[dict]:
     vial_parameters_copy = list(vial_parameters)  # Convert the tuple to a list
     vial_parameters = []
     for vial in vial_parameters_copy:
-        coordinate_string = ast.literal_eval(vial['vial_coordinates'])
-        contents = vial['contents']
+        coordinate_string = ast.literal_eval(vial["vial_coordinates"])
+        contents = vial["contents"]
         if contents == "none":
-            if vial['category'] == 0:
+            if vial["category"] == 0:
                 contents = None
             else:
                 contents = {}
@@ -545,26 +552,27 @@ def get_current_vials(group: Union[None,str] = None) -> List[dict]:
             contents = None
 
         elif "{" in contents:
-            contents = ast.literal_eval(vial['contents'])
-
+            contents = ast.literal_eval(vial["contents"])
 
         vial_dict = {
-            "name": vial['name'],
-            "category": vial['category'],
-            "position": vial['position'],
-            "volume": round(float(vial['volume']), 6),
-            "capacity": round(float(vial['capacity']), 6),
-            "density": round(float(vial['density']), 6),
+            "name": vial["name"],
+            "category": vial["category"],
+            "position": vial["position"],
+            "volume": round(float(vial["volume"]), 6),
+            "capacity": round(float(vial["capacity"]), 6),
+            "density": round(float(vial["density"]), 6),
             "vial_coordinates": VesselCoordinates(**coordinate_string),
-            "radius": round(float(vial['radius']), 6),
-            "height": round(float(vial['height']), 6),
-            "contamination": round(float(vial['contamination']), 6),
+            "radius": round(float(vial["radius"]), 6),
+            "height": round(float(vial["height"]), 6),
+            "contamination": round(float(vial["contamination"]), 6),
             "contents": contents,
-            "viscosity_cp": round(float(vial['viscosity_cp']), 6),
+            "viscosity_cp": round(float(vial["viscosity_cp"]), 6),
             "concentration": (
-            round(float(vial['concentration']), 6) if vial['category'] == 0 else None
+                round(float(vial["concentration"]), 6)
+                if vial["category"] == 0
+                else None
             ),  # Only stock vials have concentration
-            "depth": round(float(vial['depth']), 6),
+            "depth": round(float(vial["depth"]), 6),
         }
         # vial = Vial2(**vial_dict)
         if group is not None:  # Filter by group
@@ -601,16 +609,10 @@ def read_vials() -> Tuple[List[StockVial], List[WasteVial]]:
     for items in vial_parameters:
         if items["name"] is not None:
             if items["category"] == 0:  # Stock vial
-                read_vial = StockVial(
-
-                    **items
-                )
+                read_vial = StockVial(**items)
                 list_of_stock_solutions.append(read_vial)
             elif items["category"] == 1:  # Waste vial
-                read_vial = WasteVial(
-
-                    **items
-                )
+                read_vial = WasteVial(**items)
                 list_of_waste_solutions.append(read_vial)
     return list_of_stock_solutions, list_of_waste_solutions
 
@@ -660,7 +662,6 @@ def reset_vials(vialgroup: str) -> None:
         vial.contamination = float(0)
 
         vial.insert_updated_vial_in_db()
-
 
 
 def delete_vial_position_and_hx_from_db(position: str) -> None:
@@ -719,7 +720,7 @@ def input_new_vial_values(vialgroup: str) -> None:
             radius=vial["radius"],
             height=vial["height"],
             contamination=vial["contamination"],
-            contents = vial["contents"],
+            contents=vial["contents"],
             viscosity_cp=vial["viscosity_cp"],
             depth=vial["depth"],
             concentration=vial["concentration"],
@@ -834,9 +835,10 @@ def input_new_vial_values(vialgroup: str) -> None:
             print("Invalid vial position")
             continue
 
+
 def generate_template_vial_csv_file() -> None:
     """
-    Generate a template vial csv file that can be filled with 
+    Generate a template vial csv file that can be filled with
     multiple vials and their values
     """
     filename = "vials.csv"
@@ -844,32 +846,316 @@ def generate_template_vial_csv_file() -> None:
     # Prompt the user to idenitfy the directory to save the file
     directory = directory_picker()
 
-    filename = Path(directory) / Path(filename) # Convert to a Path object
+    filename = Path(directory) / Path(filename)  # Convert to a Path object
 
-
-    with open(filename, "w", encoding="UTF-8", newline='') as file:
+    with open(filename, "w", encoding="UTF-8", newline="") as file:
         csv_writer = csv.writer(file)
-        csv_writer.writerow([
-            "name", "contents", "category", "position", "volume", "capacity", "density",
-            "vial_coordinates", "radius", "height", "contamination", "viscosity_cp", "concentration"
-        ])
-        csv_writer.writerow(["none", "none", 0, "s0", 20000, 20000, 1, json.dumps({'x': -4, 'y': -39, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "s1", 20000, 20000, 1, json.dumps({'x': -4, 'y': -72, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "s2", 20000, 20000, 1, json.dumps({'x': -4, 'y': -105, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "s3", 20000, 20000, 1, json.dumps({'x': -4, 'y': -138, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "s4", 20000, 20000, 1, json.dumps({'x': -4, 'y': -171, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "s5", 20000, 20000, 1, json.dumps({'x': -4, 'y': -204, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "s6", 20000, 20000, 1, json.dumps({'x': -4, 'y': -237, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "s7", 20000, 20000, 1, json.dumps({'x': -4, 'y': -270, 'z_bottom': -74}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["none", "none", 0, "e1", 20000, 20000, 1, json.dumps({'x': -409, 'y': -35, 'z_bottom': -50}), 14, 57, 0, 1, 1])
-        csv_writer.writerow(["waste", "{}", 1, "w0", 1000, 20000, 0, json.dumps({'x': -50, 'y': -7, 'z_bottom': -74}), 14, 57, 0, 0, 0])
-        csv_writer.writerow(["waste", "{}", 1, "w1", 1000, 20000, 0, json.dumps({'x': -50, 'y': -40, 'z_bottom': -74}), 14, 57, 0, 0, 0])
-        csv_writer.writerow(["waste", "{}", 1, "w2", 1000, 20000, 0, json.dumps({'x': -50, 'y': -73, 'z_bottom': -74}), 14, 57, 0, 0, 0])
-        csv_writer.writerow(["waste", "{}", 1, "w3", 1000, 20000, 0, json.dumps({'x': -50, 'y': -106, 'z_bottom': -74}), 14, 57, 0, 0, 0])
-        csv_writer.writerow(["waste", "{}", 1, "w4", 1000, 20000, 0, json.dumps({'x': -50, 'y': -139, 'z_bottom': -74}), 14, 57, 0, 0, 0])
-        csv_writer.writerow(["waste", "{}", 1, "w5", 1000, 20000, 0, json.dumps({'x': -50, 'y': -172, 'z_bottom': -74}), 14, 57, 0, 0, 0])
-        csv_writer.writerow(["waste", "{}", 1, "w6", 1000, 20000, 0, json.dumps({'x': -50, 'y': -205, 'z_bottom': -74}), 14, 57, 0, 0, 0])
-        csv_writer.writerow(["waste", "{}", 1, "w7", 1000, 20000, 0, json.dumps({'x': -50, 'y': -238, 'z_bottom': -74}), 14, 57, 0, 0, 0])
+        csv_writer.writerow(
+            [
+                "name",
+                "contents",
+                "category",
+                "position",
+                "volume",
+                "capacity",
+                "density",
+                "vial_coordinates",
+                "radius",
+                "height",
+                "contamination",
+                "viscosity_cp",
+                "concentration",
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s0",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -39, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s1",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -72, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s2",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -105, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s3",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -138, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s4",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -171, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s5",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -204, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s6",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -237, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "s7",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -4, "y": -270, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "none",
+                "none",
+                0,
+                "e1",
+                20000,
+                20000,
+                1,
+                json.dumps({"x": -409, "y": -35, "z_bottom": -50}),
+                14,
+                57,
+                0,
+                1,
+                1,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w0",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -7, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w1",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -40, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w2",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -73, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w3",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -106, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w4",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -139, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w5",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -172, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w6",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -205, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                "waste",
+                "{}",
+                1,
+                "w7",
+                1000,
+                20000,
+                0,
+                json.dumps({"x": -50, "y": -238, "z_bottom": -74}),
+                14,
+                57,
+                0,
+                0,
+                0,
+            ]
+        )
 
     print(f"Template vial csv file saved as {filename}")
 
@@ -890,17 +1176,21 @@ def import_vial_csv_file(filename: str = None) -> None:
     for each_vial in vial_parameters:
         try:
 
-            if each_vial["vial_coordinates"] in [None, "", "{}", '{}']:
+            if each_vial["vial_coordinates"] in [None, "", "{}", "{}"]:
                 vial_coordinates = {"x": 0, "y": 0, "z_bottom": 0}
             else:
                 vial_coordinates = json.loads(each_vial["vial_coordinates"])
 
-            if each_vial["contents"] in ["{}", '{}']:
+            if each_vial["contents"] in ["{}", "{}"]:
                 contents = {}
             else:
                 try:
                     contents = json.loads(each_vial["contents"])
-                except:
+                except json.JSONDecodeError:
+                    vial_logger.error(
+                        "Error decoding contents for vial %s. Loading as string instead.",
+                        each_vial["position"],
+                    )
                     contents = str(each_vial["contents"])
 
             vial = Vial2(
