@@ -13,13 +13,14 @@ from pydantic import ConfigDict, RootModel
 from pydantic.dataclasses import dataclass
 
 from panda_lib.config.config_tools import read_config
+from panda_lib.log_tools import setup_default_logger
 # from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
 #                                                 execute_sql_command_no_return)
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (ExperimentParameters,
                                               ExperimentResults, Experiments, ExperimentStatusView,
                                               WellHx, WellPlates)
-
+experiment_logger = setup_default_logger("panda.log", "experiment_logger")
 config = read_config()
 
 def load_analysis_script(script_path: str) -> Callable:
@@ -346,7 +347,7 @@ class ExperimentBase:
             self.analyzer(experiment_id=self.experiment_id, add_to_training_data=True)
 
         else:
-            print("\n No analysis function provided for experiment %s\n", self.experiment_id)
+            experiment_logger.debug("\n No analysis function provided for experiment %s\n", self.experiment_id)
 
     def run_generator(self):
         """Run the generator"""
@@ -359,7 +360,7 @@ class ExperimentBase:
             self.generator()
 
         else:
-            print("\n No generator function provided for experiment %s\n", self.experiment_id)
+            experiment_logger.debug("\n No generator function provided for experiment %s\n", self.experiment_id)
 
 
 
@@ -379,7 +380,7 @@ class ExperimentBase:
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
-            print(f"Error sending status to OBS: {e}")
+            experiment_logger.error(f"Error sending status to OBS: {e}")
             # don't raise the error, just print it
 
     def set_status_and_save(self, new_status: ExperimentStatus) -> None:
@@ -388,14 +389,23 @@ class ExperimentBase:
 
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
-        self.well.status = new_status
-        self.well.status_date = datetime.now().isoformat(timespec="seconds")
+
+        if not self.well or not isinstance(self.well, object):
+            experiment_logger.warning("Well object not set. Checking for Well ID")
+            if self.well_id:
+                self.well = sql_wellplate.get_well_by_id(self.well_id)
+            else:
+                experiment_logger.error("Well ID not set, cannot save status")
+                return
+        
         # Save the well to the database
         if self.well:
+            self.well.status = new_status
+            self.well.status_date = datetime.now().isoformat(timespec="seconds")
             sql_wellplate.save_well_to_db(self.well)
 
         else:
-            print("Well object not set. Saving to db via alternative method")
+            experiment_logger.debug("Well object not set. Saving to db via alternative method")
             update_experiment_status(self)
 
         # Save the experiment to the database
@@ -408,7 +418,7 @@ class ExperimentBase:
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
-            print(f"Error sending status to OBS: {e}")
+            experiment_logger.error(f"Error sending status to OBS: {e}")
             # don't raise the error, just print it
 
     def is_same_id(self, other) -> bool:
@@ -495,7 +505,7 @@ class ExperimentBase:
                 if cls is not None:
                     attribute_type = get_all_type_hints(cls)[parameter.parameter_name]
                 else:
-                    print(
+                    experiment_logger.debug(
                         f"Attribute {parameter.parameter_name} not found in class hierarchy"
                     )
                     raise AttributeError(
@@ -544,7 +554,7 @@ class ExperimentBase:
                     parameter.parameter_value
                 )
             else:
-                print(f"Unknown attribute type {attribute_type}")
+                experiment_logger.debug(f"Unknown attribute type {attribute_type}")
 
             if hasattr(self, parameter.parameter_name):  # Check if the attribute exists
                 setattr(self, parameter.parameter_name, parameter.parameter_value)
