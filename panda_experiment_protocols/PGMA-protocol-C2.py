@@ -1,29 +1,30 @@
 """The sequence of steps for a PGMA experiment."""
+
 # Solutions needed
-    #1 - PGMA-phenol 
-    #2 - DMFc + PEG-FC (referred to as FC)
+# 1 - PGMA-phenol
+# 2 - DMFc + PEG-FC (referred to as FC)
 # Rinse solutions needed
-    #1 - DMF-TBAP
-    #2 - DMF
-    #3 - acetonitrile
+# 1 - DMF-TBAP
+# 2 - DMF
+# 3 - acetonitrile
 # Steps
-    # Pre-characterization
-        # image
-        # dispense solution 2
-        # CV pre-characterization
-        # rinse well DMF-TBAP
-        # image
-    # Deposition
-        # dispense solution 1
-        # CA deposition (vary the time and voltage)
-        # rinse well DMF-TBAP
-        # image
-    # Post-characterization
-        # dispense solution 2
-        # CV post-characterization
-        # rinse well DMF
-        # rinse well acetonitrile
-        # image
+# Pre-characterization
+# image
+# dispense solution 2
+# CV pre-characterization
+# rinse well DMF-TBAP
+# image
+# Deposition
+# dispense solution 1
+# CA deposition (vary the time and voltage)
+# rinse well DMF-TBAP
+# image
+# Post-characterization
+# dispense solution 2
+# CV post-characterization
+# rinse well DMF
+# rinse well acetonitrile
+# image
 
 # Standard imports
 from typing import Sequence
@@ -40,11 +41,9 @@ from panda_lib.actions import (
     OCPFailure,
     CAFailure,
     CVFailure,
-    DepositionFailure
+    DepositionFailure,
 )
-from panda_lib.actions_pgma import (
-    cyclic_volt_pgma_fc
-)
+from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 from panda_lib.experiment_class import PGMAExperiment, ExperimentStatus
 from panda_lib.vials import StockVial, WasteVial
 from panda_lib.correction_factors import correction_factor
@@ -190,14 +189,15 @@ def PGMAdeposition(
             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
             raise e
         except Exception as e:
-            toolkit.global_logger.error("Unknown error occurred during chrono_amp: %s", str(e))
+            toolkit.global_logger.error(
+                "Unknown error occurred during chrono_amp: %s", str(e)
+            )
             raise e
     finally:
         toolkit.global_logger.info("3b. Rinsing electrode")
         instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode(3)
 
-    
     # Clear the well
     toolkit.global_logger.info("4a. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
@@ -259,6 +259,7 @@ def PGMAdeposition(
     image_well(toolkit, instructions, "AfterDepDry")
     toolkit.global_logger.info("PGMA deposition complete\n\n")
 
+
 def FC_prechar(
     instructions: PGMAExperiment,
     toolkit: Toolkit,
@@ -267,13 +268,13 @@ def FC_prechar(
 ):
     """
     1. Take before image
-    2. Dispensing DMFc-PEG-FC into well
-    3. Moving electrode to well
-    4. Performing CV
-    5. Rinsing electrode
-    6. Clearing well contents into waste
-    7. Flushing the pipette tip
-    8. Rinsing with DMF-TBAP
+    2. Dispense DMFc-PEG-FC into well
+    3. Move electrode to well
+    4. Perform CV
+    5. Rinse electrode
+    6. Clear well contents into waste
+    7. Flush the pipette tip
+    8. Rinse with DMF-TBAP
     9. Take after image
 
     Args:
@@ -284,7 +285,7 @@ def FC_prechar(
     """
     solution_name = "FC"
     current_well = toolkit.wellplate.wells[instructions.well_id]
-    
+
     toolkit.global_logger.info("1. Take before image")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "BareWell")
@@ -333,9 +334,7 @@ def FC_prechar(
         try:
             cyclic_volt_pgma_fc(instructions)
         except Exception as e:
-            toolkit.global_logger.error(
-                "Error occurred during FC CV: %s", str(e)
-            )
+            toolkit.global_logger.error("Error occurred during FC CV: %s", str(e))
             raise e
     finally:
         toolkit.global_logger.info("3c. Rinsing electrode")
@@ -395,7 +394,7 @@ def FC_prechar(
             pump=toolkit.pump,
             mill=toolkit.mill,
         )
-    
+
         toolkit.global_logger.info("5. Take after image")
         instructions.set_status_and_save(ExperimentStatus.IMAGING)
         image_well(
@@ -405,6 +404,7 @@ def FC_prechar(
         )
     instructions.set_status(ExperimentStatus.COMPLETE)
     toolkit.global_logger.info("FC Pre-CV complete\n\n")
+
 
 def FC_postchar(
     instructions: PGMAExperiment,
@@ -475,9 +475,7 @@ def FC_postchar(
         try:
             cyclic_volt_pgma_fc(instructions)
         except Exception as e:
-            toolkit.global_logger.error(
-                "Error occurred during FC CV: %s", str(e)
-            )
+            toolkit.global_logger.error("Error occurred during FC CV: %s", str(e))
             raise e
     finally:
         toolkit.global_logger.info("2c. Rinsing electrode")
@@ -537,7 +535,7 @@ def FC_postchar(
             pump=toolkit.pump,
             mill=toolkit.mill,
         )
-    
+
     toolkit.global_logger.info("4a. Flushing the pipette tip with ACNrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
