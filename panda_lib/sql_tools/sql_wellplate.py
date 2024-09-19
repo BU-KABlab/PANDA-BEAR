@@ -945,7 +945,7 @@ def delete_well_from_db(well_id: str, plate_id: Union[int, None] = None) -> None
         session.commit()
 
 
-def get_well(
+def get_well_by_id(
     well_id: str,
     plate_id: Union[int, None] = None,
 ) -> object:
