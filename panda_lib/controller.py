@@ -154,6 +154,7 @@ def main(
                         "alert",
                         f"New experiment {current_experiment.experiment_id} found",
                     )
+
                     break  # break out of the while new experiment is None loop
 
                 # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
@@ -200,6 +201,7 @@ def main(
                 )
                 break  # break out of the while True loop
 
+            logger.info("Experiment %d selected and validated", current_experiment.experiment_id)
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Initialize a results object
             current_experiment.results = ExperimentResult(
@@ -600,8 +602,8 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
     """
     ## Check that the experiment has solutions and those soltuions are in the stock vials
     if len(experiment.solutions) == 0:
-        logger.error("The experiment has no solutions")
-        return False
+        logger.warning("The experiment has no solutions.")
+        return True
     for solution in experiment.solutions:
         if str(solution).lower() not in [
             str(vial.contents).lower() for vial in stock_vials
