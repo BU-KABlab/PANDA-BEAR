@@ -28,7 +28,7 @@ from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import ExperimentParameters, Experiments
 from .sql_tools.sql_queue import (count_queue_length,
                                   get_next_experiment_from_queue, select_queue)
-from .sql_tools.sql_wellplate import (count_wells_with_new_status, get_well,
+from .sql_tools.sql_wellplate import (count_wells_with_new_status, get_well_by_id,
                                       select_current_wellplate_info,
                                       select_next_available_well,
                                       select_well_status, update_well)
@@ -78,7 +78,7 @@ class Scheduler:
         # If the well is a string, get a well object
         if isinstance(well, str):
             well_id = well
-            well: Well = get_well(well_id=well_id)
+            well: Well = get_well_by_id(well_id=well_id)
             if well is None:
                 logger.error("Well %s not found", well_id)
                 raise ValueError(f"Well {well_id} not found")

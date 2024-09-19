@@ -13,7 +13,7 @@ class TestWellplate(unittest.TestCase):
         # Get the coordinates of a well
         well = "A2"
         well_coord = self.wp.get_coordinates(well)
-        db_well_coord = sql_utilities.get_well(well).coordinates
+        db_well_coord = sql_utilities.get_well_by_id(well).coordinates
 
         # Check that the coordinates are the same
         self.assertEqual(well_coord, db_well_coord)
@@ -23,7 +23,7 @@ class TestWellplate(unittest.TestCase):
         new_coordinates = WellCoordinates(0, 0, 0)
         self.wp.update_well_coordinates(well, new_coordinates)
         new_memory = self.wp.get_coordinates(well)
-        new_db = sql_utilities.get_well(well).coordinates
+        new_db = sql_utilities.get_well_by_id(well).coordinates
 
         # Check that the coordinates are the same
         self.assertEqual(new_memory, new_db, new_coordinates)
@@ -31,7 +31,7 @@ class TestWellplate(unittest.TestCase):
         # Change the coordinates back to the original
         self.wp.update_well_coordinates(well, original_coordinates)
         memory = self.wp.get_coordinates(well)
-        db = sql_utilities.get_well(well).coordinates
+        db = sql_utilities.get_well_by_id(well).coordinates
 
         # Check that the coordinates are the same
         self.assertEqual(memory, db, original_coordinates)
@@ -42,7 +42,7 @@ class TestWellplate(unittest.TestCase):
         # Get the status of a well
         well = "A2"
         well_status = self.wp.wells[well].status
-        db_well_status = sql_utilities.get_well(well).status
+        db_well_status = sql_utilities.get_well_by_id(well).status
 
         # Check that the status is the same
         self.assertEqual(well_status, db_well_status)
@@ -53,7 +53,7 @@ class TestWellplate(unittest.TestCase):
         time.sleep(1)
         self.wp.update_well_status(well, new_status)
         memory = self.wp.wells[well].status
-        db = sql_utilities.get_well(well).status
+        db = sql_utilities.get_well_by_id(well).status
 
         # Check that the status is the same
         self.assertEqual(memory, db, new_status)
@@ -61,7 +61,7 @@ class TestWellplate(unittest.TestCase):
         # Change the status back to the original
         self.wp.update_well_status(well, original_status)
         memory = self.wp.wells[well].status
-        db = sql_utilities.get_well(well).status
+        db = sql_utilities.get_well_by_id(well).status
 
         # Check that the status is the same
         self.assertEqual(memory, db, original_status)
