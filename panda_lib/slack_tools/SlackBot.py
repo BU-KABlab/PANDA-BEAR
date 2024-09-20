@@ -581,7 +581,7 @@ class SlackBot:
         # stock_vials["volume"] = stock_vials["volume"].astype(float)
 
         stock_vials = vials.get_current_vials("stock")  # returns a list of Vial objects
-        stock_vials = pd.DataFrame([vial.to_dict() for vial in stock_vials])
+        stock_vials = pd.DataFrame([vial for vial in stock_vials])
         stock_vials = stock_vials[["position", "volume", "name", "contents"]]
         stock_vials = stock_vials.dropna()
         stock_vials["position"] = stock_vials["position"].astype(str)
