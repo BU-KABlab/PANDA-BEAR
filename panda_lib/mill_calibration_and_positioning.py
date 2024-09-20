@@ -478,16 +478,43 @@ def calibrate_z_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **k
             .upper()
             .strip()
         )
-        if well_id == "DONE":
+        if well_id in ["DONE", "d"]:
             break
 
         current_z_bottom = wellplate.z_bottom
+        print("""
+This calibration will move the pipette to the top of the well and give you the current z_bottom.
+You will be asked to for a new z_bottom, and the pipette will move to that position.
+You will be asked to accept the setting, and if you do not, you will be asked to input a new z_bottom.
+              """)
+        
         print(f"Current z_bottom of {well_id}: {current_z_bottom}")
+        print(f"Current coordinates of {well_id}: {wellplate.get_coordinates(well_id)}")
+
+        input("Press enter to continue...")
+
 
         mill.safe_move(
             wellplate.get_coordinates(well_id, "x"),
             wellplate.get_coordinates(well_id, "y"),
-            current_z_bottom,
+            0,
+            Instruments.PIPETTE,
+        )
+        while True:
+            goto = input("Enter a z_bottom to test or enter for no change: ")
+            if goto == "":
+                goto = current_z_bottom
+            try:
+                goto = float(goto)
+                break
+            except ValueError:
+                print("Invalid input, please try again")
+                continue
+        
+        mill.safe_move(
+            wellplate.get_coordinates(well_id, "x"),
+            wellplate.get_coordinates(well_id, "y"),
+            goto,
             Instruments.PIPETTE,
         )
 
