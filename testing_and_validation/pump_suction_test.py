@@ -12,32 +12,37 @@ from panda_lib.controller import (
     disconnect_from_instruments,
 )
 
+purge = 40
+drip_stop = 5
+
 def main():
     """Test the syringe and pipette for retention and suction."""
     # Establish system state
     stock, waste, _ = establish_system_state()
 
     # Connect to instruments
-    toolkit, _ = connect_to_instruments()
+    toolkit, _ = connect_to_instruments(False)
+
+    test_volume = float(input("Enter the volume to test (uL): "))
 
     
     while True:
         # Select solution
-        test_solution = solution_selector(stock, "water", 1000)
-        test_waste = waste_selector(waste, "waste", 1000)
+        test_solution = solution_selector(stock, "water", test_volume)
+        test_waste = waste_selector(waste, "waste", test_volume)
 
         # Withdraw water, raise to z=0, and hold it for 60 seconds
-        toolkit.pump.withdraw(40)
+        toolkit.pump.withdraw(purge)
         toolkit.mill.safe_move(
             test_solution.coordinates.x,
             test_solution.coordinates.y,
             test_solution.coordinates.z_bottom,
             Instruments.PIPETTE,
         )
-        toolkit.pump.withdraw(1000, test_solution)
+        toolkit.pump.withdraw(test_volume, test_solution)
         toolkit.mill.move_to_safe_position()
-        toolkit.pump.withdraw(25)
-        time.sleep(60)
+        toolkit.pump.withdraw(drip_stop)
+        time.sleep(15)
         input("Press enter to continue...")
         toolkit.mill.safe_move(
             test_waste.coordinates.x,
@@ -45,12 +50,11 @@ def main():
             test_waste.coordinates.z_top,
             Instruments.PIPETTE,
         )
-        toolkit.pump.infuse(1045, test_waste)
-
+        toolkit.pump.infuse(test_volume,test_solution, test_waste, blowout_ul=drip_stop+purge)
         # Forward pipette
         # test_forward_pipette = input("Do a forward pipette test? (y/n): ")
         # if test_forward_pipette.lower() == "y":
-        #     forward_pipette_v2(1000, test_solution, test_waste, toolkit.pump, toolkit.mill)
+        #     forward_pipette_v2(test_volume, test_solution, test_waste, toolkit.pump, toolkit.mill)
 
         go_again = input("Do another test? (y/n): ")
         if go_again.lower() == "n":
