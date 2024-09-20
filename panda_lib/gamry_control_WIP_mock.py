@@ -72,6 +72,7 @@ class GamryPotentiostat:
             while filepath.exists():
                 next_file_name = f"{file_name}_{i}"
                 filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
+                filepath.resolve()
                 i += 1
 
         COMPLETE_FILE_NAME = filepath
