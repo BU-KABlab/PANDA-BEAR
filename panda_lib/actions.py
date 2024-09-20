@@ -909,6 +909,75 @@ def image_filepath_generator(
         i += 1
     return filepath
 
+def mix(
+        mill: Union[Mill, MockMill],
+        pump: Union[SyringePump, MockPump],
+        well: Well,
+        well_id: str,
+        volume: float,
+        mix_count: int = 3,
+        mix_height: float = None,
+):
+    """
+    Mix the solution in the well by pipetting it up and down
+
+    Args:
+        mill (object): The mill object
+        pump (object): The pump object
+        wellplate (object): The wellplate object
+        well_id (str): The well to be mixed
+        volume (float): The volume to be mixed
+        mix_count (int): The number of times to mix
+        mix_height (float): The height to mix at
+    """
+    if mix_height is None:
+        mix_height = well.depth + well.height
+    else:
+        mix_height = well.depth + mix_height
+
+    logger.info("Mixing well %s %dx...", well_id, mix_count)
+
+    # Withdraw air for blow out volume
+    pump.withdraw_air(40)
+
+    for i in range(mix_count):
+        logger.info("Mixing well %s %d of %d...", well_id, i + 1, mix_count)
+        # Move to the bottom of the target well
+        mill.safe_move(
+            x_coord=well.coordinates.x,
+            y_coord=well.coordinates.y,
+            z_coord=well.depth,
+            instrument=Instruments.PIPETTE,
+        )
+
+        # Withdraw the solutions from the well
+        pump.withdraw(
+            volume_to_withdraw=volume,
+            solution=well,
+            rate=pump.max_pump_rate,
+            weigh=False,
+        )
+
+        mill.safe_move(
+            x_coord=well.coordinates.x,
+            y_coord=well.coordinates.y,
+            z_coord=mix_height,
+            instrument=Instruments.PIPETTE,
+        )
+
+        # Deposit the solution back into the well
+        pump.infuse(
+            volume_to_infuse=volume,
+            being_infused=None,
+            infused_into=well,
+            rate=pump.max_pump_rate,
+            blowout_ul=0,
+            weigh=False,
+        )
+
+    pump.infuse_air(40)
+    mill.move_to_safe_position()
+    return 0
 
 if __name__ == "__main__":
     pass
