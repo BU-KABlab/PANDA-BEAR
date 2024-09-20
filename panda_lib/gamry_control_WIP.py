@@ -57,6 +57,8 @@ def pstatconnect():
         OPEN_CONNECTION = True
     else:
         logger.debug("\tPstat not connected")
+        OPEN_CONNECTION = False
+    return OPEN_CONNECTION
 
 
 class GamryCOMError(Exception):
