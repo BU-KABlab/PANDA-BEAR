@@ -492,10 +492,10 @@ class Wellplate:
                     x = self.a1_x
                     y = self.a1_y
                     depth = self.z_bottom
-                    if depth < self.z_bottom:
-                        depth = self.z_bottom
-                    else:
-                        depth = self.z_bottom
+                    # if depth < self.z_bottom:
+                    #     depth = self.z_bottom
+                    # else:
+                    #     depth = self.z_bottom
                 else:
                     if orientation == 0:
                         x = self.a1_x - row_idx * row_offset
@@ -515,10 +515,10 @@ class Wellplate:
                         )
 
                 depth = self.z_bottom
-                if depth < self.z_bottom:
-                    depth = self.z_bottom
-                else:
-                    depth = self.z_bottom
+                # if depth < self.z_bottom:
+                #     depth = self.z_bottom
+                # else:
+                #     depth = self.z_bottom
                 top = self.z_top
 
                 # Round the coordinates to 2 decimal places
