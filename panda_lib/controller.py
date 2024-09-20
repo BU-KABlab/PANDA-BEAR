@@ -23,6 +23,7 @@ from typing import Sequence
 
 from slack_sdk import errors as slack_errors
 
+from panda_lib import gamry_control_WIP
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 
@@ -299,6 +300,7 @@ def main(
 
             current_experiment.set_status_and_save(ExperimentStatus.SAVING)
             scheduler.save_results(current_experiment)
+            current_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
             # experiment_id = new_experiment.experiment_id
 
             # if not TESTING:
@@ -834,6 +836,7 @@ def test_instrument_connections(
         if cam_list.GetSize() == 0:
             logger.error("No FLIR Camera connected")
             instruments.flir_camera = None
+            incomplete = True
         else:
             instruments.flir_camera = cam_list.GetByIndex(0)
             # instruments.flir_camera.Init()
@@ -841,9 +844,24 @@ def test_instrument_connections(
             system.ReleaseInstance()
 
             logger.debug("Connected to FLIR Camera")
+
     except Exception as error:
         logger.error("No FLIR Camera connected, %s", error)
         instruments.flir_camera = None
+        incomplete = True
+
+    # Connect to PSTAT
+    try:
+        logger.debug("Connecting to Potentiostat")
+        connected = gamry_control_WIP.pstatconnect()
+        if not connected:
+            logger.error("No Potentiostat connected")
+            incomplete = True
+        else:
+            logger.debug("Connected to Potentiostat")
+            gamry_control_WIP.pstatdisconnect()
+    except Exception as error:
+        logger.error("Error connecting to Potentiostat, %s", error)
         incomplete = True
 
     if incomplete:
