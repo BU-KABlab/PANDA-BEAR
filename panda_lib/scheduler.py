@@ -228,6 +228,9 @@ class Scheduler:
                 )
                 experiment.well_id = target_well
 
+        # Data clean the solutions to all be lowercase
+        experiment.solutions = [str(x).lower() for x in experiment.solutions]
+
         # Save the experiment as a separate file in the experiment_queue subfolder
         experiment.set_status_and_save(ExperimentStatus.QUEUED)
 
