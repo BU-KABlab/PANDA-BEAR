@@ -140,6 +140,7 @@ def PGMAdeposition(
         waste_vials (Sequence[WasteVial]): _description_
     """
     solution_name = "PGMA-phenol"
+    solution_name = solution_name.lower()
     current_well = toolkit.wellplate.wells[instructions.well_id]
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
@@ -283,7 +284,8 @@ def FC_prechar(
         stock_vials (Sequence[StockVial]): _description_
         waste_vials (Sequence[WasteVial]): _description_
     """
-    solution_name = "FC"
+    solution_name = "fc"
+    solution_name = solution_name.lower()
     current_well = toolkit.wellplate.wells[instructions.well_id]
 
     toolkit.global_logger.info("1. Take before image")
@@ -296,7 +298,7 @@ def FC_prechar(
         "2. Dispensing %s into well: %s", solution_name, instructions.well_id
     )
     forward_pipette_v2(
-        volume=instructions.solutions_corrected[solution_name],
+        volume=instructions.solutions_corrected[solution_name.lower()],
         from_vessel=solution_selector(
             stock_vials,
             solution_name,
@@ -430,6 +432,7 @@ def FC_postchar(
         waste_vials (Sequence[WasteVial]): _description_
     """
     solution_name = "FC"
+    solution_name = solution_name.lower()
     current_well = toolkit.wellplate.wells[instructions.well_id]
     instructions.set_status(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
