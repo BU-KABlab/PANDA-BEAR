@@ -49,6 +49,8 @@ class OBSController:
         client_port=OBSSecrets.PORT,
         client_timeout=3,
     ):
+        if config.getboolean("OPTIONS", "testing"):
+            return
         try:
             self.client = obsws.ReqClient(
                 host=client_host,
