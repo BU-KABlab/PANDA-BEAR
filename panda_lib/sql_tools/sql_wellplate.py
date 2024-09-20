@@ -982,6 +982,9 @@ def get_well_by_id(
         )
         if result == []:
             return None
+        
+        # Convert coordinates to a WellCoordinates object
+        result[0].coordinates = wellplate_module.WellCoordinates(**json.loads(result[0].coordinates))
         return result[0]
 
 
