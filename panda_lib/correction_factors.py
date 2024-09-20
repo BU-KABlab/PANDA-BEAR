@@ -51,3 +51,6 @@ def reverse_correction_factor(x, viscosity) -> float:
         original_volume = x
 
     return original_volume
+
+if __name__ == '__main__':
+    print(correction_factor(200,1.0002))
