@@ -757,10 +757,9 @@ class SlackBot:
         gasket_length = wellplate.gasket_length
         gasket_width = wellplate.gasket_width
         orientation = wellplate.orientation
-        
 
         if orientation == 0:
-            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_x_wall_offset, wellplate.a1_y + wellplate.a1_y_wall_offset,0)
+            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_y_wall_offset, wellplate.a1_y + wellplate.a1_x_wall_offset,0)
 
             gasket_x = [
                 gasket_origin.x,
@@ -873,6 +872,9 @@ class SlackBot:
 
     def take_screenshot(self, channel_id, camera_name: str):
         """Take a screenshot of the camera."""
+        if not config_options.getboolean("use_obs"):
+            self.send_slack_message(channel_id, "OBS is not enabled")
+            return 1
         try:
             file_name = "tmp_screenshot.png"
             obs = OBSController()
