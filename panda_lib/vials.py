@@ -529,7 +529,7 @@ def get_current_vials(group: Union[None, str] = None) -> List[dict]:
         # )
 
         with SessionLocal() as session:
-            vials = session.query(VialStatus).all()
+            vials = session.query(VialStatus).order_by(VialStatus.position).all()
             for vial in vials:
                 vial_parameters.append(model_to_dict(vial))
     except Exception as e:
