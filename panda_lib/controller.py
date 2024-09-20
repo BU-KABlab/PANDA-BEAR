@@ -605,7 +605,9 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
         logger.warning("The experiment has no solutions.")
         return True
     for solution in experiment.solutions:
-        if str(solution).lower() not in [
+        solution_lwr = str(solution).lower()
+        logger.debug("Checking for solution %s in stock vials", solution_lwr)
+        if str(solution_lwr).lower() not in [
             str(vial.contents).lower() for vial in stock_vials
         ]:
             logger.error(
@@ -617,10 +619,11 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
     for solution in experiment.solutions:
+        solution_lwr = str(solution).lower()
         volume_required = experiment.solutions[solution]
         volume_available = sum(
-            [vial.volume for vial in stock_vials if vial.name == solution]
-        )
+            [vial.volume for vial in stock_vials if str(vial.name).lower() == solution_lwr]
+        ) # we sum the volumes of all stock vials with the same name
         if volume_available < volume_required:
             logger.error(
                 "There is not enough volume of solution %s to run the experiment",
