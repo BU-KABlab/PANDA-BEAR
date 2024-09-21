@@ -288,11 +288,6 @@ class Well(Vessel):
             self.well_id, self.plate_id, new_coordinates
         )
 
-    def delete_well_from_db(self) -> None:
-        """Deletes the well from the database"""
-        sql_wellplate.delete_well_from_db(self.well_id, self.plate_id)
-        logger.info("Well %s deleted from the database", self.name)
-
 
 class Wellplate:
     """
