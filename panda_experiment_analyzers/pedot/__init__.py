@@ -6,9 +6,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from panda_experiment_analyzers.pedot.sql_ml_functions import insert_ml_training_data
+from panda_experiment_analyzers.pedot.sql_ml_functions import \
+    insert_ml_training_data
+from panda_lib.config.config_tools import read_testing_config
 from panda_lib.experiment_class import (ExperimentResultsRecord,
-                                        insert_experiment_result)
+                                        insert_experiment_result,
+                                        select_specific_result)
+from panda_lib.slack_tools.SlackBot import SlackBot
 
 from . import PEDOT_FindLAB as lab
 from . import PEDOT_MetricsCalc as met
@@ -138,6 +142,93 @@ def run_ml_model(generate_experiment_id=None) -> MLOutput:
     # Generate the next experiment
     exp_id = pedot_generator(params, experiment_name="PEDOT_Optimization", campaign_id=0)
     return exp_id
+
+def share_analysis_to_slack(
+    experiment_id: int, next_exp_id: int = None, slack: SlackBot = None
+):
+    """
+    Share the analysis results with the slack data channel
+
+    Args:
+        experiment_id (int): The experiment ID to analyze
+        next_exp_id (int, optional): The next experiment ID. Defaults to None.
+        slack (SlackBot, optional): The slack bot. Defaults to None.
+    """
+    # If the AL campaign length is set, run the ML analysis
+    # We do the analysis on the experiment that just finished
+    if read_testing_config():
+        return
+    if slack is None:
+        slack = SlackBot()
+
+    # First built the analysis message about the just completed experiment
+    roi_path = None
+    delta_e00 = None
+
+    try:
+        roi_path = Path(
+            select_specific_result(experiment_id, "coloring_roi_path").result_value
+        )
+    except AttributeError:
+        pass
+    try:
+        delta_e00 = select_specific_result(experiment_id, "delta_e00").result_value
+    except AttributeError:
+        pass
+
+    if roi_path is not None:
+        slack.send_slack_file(
+            "data",
+            roi_path,
+            f"ROI for Experiment {experiment_id}:",
+        )
+    if delta_e00 is not None:
+        slack.send_slack_message(
+            "data", f"Delta E for Experiment {experiment_id}: {delta_e00}"
+        )
+
+    # Then fetch the ML results and build the message
+    # Our list of relevant results
+    results_to_find = [
+        "PEDOT_Deposition_Voltage",
+        "PEDOT_Deposition_Time",
+        "PEDOT_Concentration",
+        "PEDOT_Predicted_Mean",
+        "PEDOT_Predicted_Uncertainty",
+    ]
+    ml_results = []
+    if (
+        next_exp_id is not None
+    ):  # If we have a next experiment ID, we can fetch the results
+        for result_type in results_to_find:
+            ml_results.append(
+                select_specific_result(next_exp_id, result_type).result_value
+            )
+        # Compose message
+        ml_results_msg = f"""
+        Experiment {next_exp_id} Parameters and Predictions:\n
+        Deposition Voltage: {ml_results[0]}\n
+        Deposition Time: {ml_results[1]}\n
+        Concentration: {ml_results[2]}\n
+        Predicted Mean: {ml_results[3]}\n
+        Predicted StdDev: {ml_results[4]}\n
+        """
+
+        # fetch the contour plot
+        contour_plot = Path(
+            select_specific_result(next_exp_id, "PEDOT_Contour_Plots").result_value
+        )
+
+        slack.send_slack_message("data", ml_results_msg)
+        if contour_plot is not None:
+            slack.send_slack_file(
+                "data",
+                contour_plot,
+                f"contour_plot_{next_exp_id}",
+            )
+
+    return
+
 
 def main(experiment_id: int = None, generate_experiment: bool = True):
     """

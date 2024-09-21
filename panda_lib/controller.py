@@ -24,6 +24,7 @@ import PySpin
 from slack_sdk import errors as slack_errors
 
 from panda_lib import gamry_control_WIP, scheduler
+from panda_experiment_analyzers import pedot as pedot_analyzer
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 
@@ -103,7 +104,7 @@ def main(
         toolkit, all_found = connect_to_instruments(use_mock_instruments)
         if not all_found:
             raise Exception("Not all instruments connected")
-        logger.info("Connected to instruments")
+
         controller_slack.send_slack_message(
             "alert", "PANDA_SDL has connected to equipment"
         )
@@ -124,7 +125,6 @@ def main(
         # experiemnt loop
         while True:
             ## Begin slack monitoring
-
             slack_thread.start()
 
             ## Reset the logger to log to the PANDA_SDL.log file and format
@@ -189,7 +189,7 @@ def main(
                     "alert",
                     "An invalid experiment object was passed to the controller",
                 )
-                break  # break out of the while True loop
+                break  # break out of the main while True loop
 
             logger.info("Experiment %d selected and validated", current_experiment.experiment_id)
             sql_system_state.set_system_status(SystemState.BUSY)
@@ -273,8 +273,8 @@ def main(
             )
 
             # Analysis function call if experiment includes one
-            if not TESTING:
-                current_experiment.analyzer(current_experiment.analyzer)
+            if not TESTING and current_experiment.analyzer is not None:
+                current_experiment.analyzer(current_experiment)
 
             # Share any results images with the slack data channel
             share_to_slack(current_experiment)
@@ -307,7 +307,7 @@ def main(
             #         al_campaign_iteration += 1
 
             # Share the analysis results with slack
-            # share_analysis_to_slack(experiment_id, next_exp_id, slack)
+            # pedot_analyzer.share_analysis_to_slack(experiment_id, next_exp_id, slack)
 
             if not TESTING:
                 # Check if a campaign length was set and if we have reached the end of the campaign
@@ -863,99 +863,11 @@ def test_instrument_connections(
 def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
-    if instruments.mill: 
+    if instruments.mill:
         instruments.mill.disconnect()
     # if instruments.flir_camera: instruments.flir_camera.DeInit()
 
     logger.info("Disconnected from instruments")
-    return
-
-
-def share_analysis_to_slack(
-    experiment_id: int, next_exp_id: int = None, slack: SlackBot = None
-):
-    """
-    Share the analysis results with the slack data channel
-
-    Args:
-        experiment_id (int): The experiment ID to analyze
-        next_exp_id (int, optional): The next experiment ID. Defaults to None.
-        slack (SlackBot, optional): The slack bot. Defaults to None.
-    """
-    # If the AL campaign length is set, run the ML analysis
-    # We do the analysis on the experiment that just finished
-    if read_testing_config():
-        return
-    if slack is None:
-        slack = SlackBot()
-
-    # First built the analysis message about the just completed experiment
-    roi_path = None
-    delta_e00 = None
-
-    try:
-        roi_path = Path(
-            select_specific_result(experiment_id, "coloring_roi_path").result_value
-        )
-    except AttributeError:
-        pass
-    try:
-        delta_e00 = select_specific_result(experiment_id, "delta_e00").result_value
-    except AttributeError:
-        pass
-
-    if roi_path is not None:
-        slack.send_slack_file(
-            "data",
-            roi_path,
-            f"ROI for Experiment {experiment_id}:",
-        )
-    if delta_e00 is not None:
-        slack.send_slack_message(
-            "data", f"Delta E for Experiment {experiment_id}: {delta_e00}"
-        )
-
-    # Then fetch the ML results and build the message
-    # Our list of relevant results
-    results_to_find = [
-        "PEDOT_Deposition_Voltage",
-        "PEDOT_Deposition_Time",
-        "PEDOT_Concentration",
-        "PEDOT_Predicted_Mean",
-        "PEDOT_Predicted_Uncertainty",
-    ]
-    ml_results = []
-    if (
-        next_exp_id is not None
-    ):  # If we have a next experiment ID, we can fetch the results
-        for result_type in results_to_find:
-            ml_results.append(
-                select_specific_result(next_exp_id, result_type).result_value
-            )
-        # Compose message
-        ml_results_msg = f"""
-        Experiment {next_exp_id} Parameters and Predictions:\n
-        Deposition Voltage: {ml_results[0]}\n
-        Deposition Time: {ml_results[1]}\n
-        Concentration: {ml_results[2]}\n
-        Predicted Mean: {ml_results[3]}\n
-        Predicted StdDev: {ml_results[4]}\n
-        """
-
-        # fetch the contour plot
-        contour_plot = Path(
-            select_specific_result(next_exp_id, "PEDOT_Contour_Plots").result_value
-        )
-
-        slack.send_slack_message("data", ml_results_msg)
-        if contour_plot is not None:
-            slack.send_slack_file(
-                "data",
-                contour_plot,
-                f"contour_plot_{next_exp_id}",
-            )
-
-    return
 
 
 def share_to_slack(experiment: ExperimentBase):
