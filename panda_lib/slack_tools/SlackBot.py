@@ -14,6 +14,7 @@ from math import fabs
 from enum import Enum
 from io import BytesIO
 from pathlib import Path
+from typing import Union
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -580,279 +581,23 @@ class SlackBot:
         # stock_vials["position"] = stock_vials["position"].astype(str)
         # stock_vials["volume"] = stock_vials["volume"].astype(float)
 
-        stock_vials = vials.get_current_vials("stock")  # returns a list of Vial objects
-        stock_vials = pd.DataFrame([vial for vial in stock_vials])
-        stock_vials = stock_vials[["position", "volume", "name", "contents"]]
-        stock_vials = stock_vials.dropna()
-        stock_vials["position"] = stock_vials["position"].astype(str)
-        stock_vials["volume"] = stock_vials["volume"].astype(float)
+        stock_status, waste_status = vial_status()
+        self.send_slack_file(channel_id, stock_status)
+        self.send_slack_file(channel_id, waste_status)
+        Path(stock_status).unlink()
+        Path(waste_status).unlink()
 
-        ## Create a bar graph with volume on the x-axis and position on the y-axis
-        ## Send the graph to slack
-        plt.bar(
-            stock_vials["position"],
-            stock_vials["volume"],
-            align="center",
-            alpha=0.5,
-            color="blue",
-        )
-        # label each bar with the volume
-        for i, v in enumerate(stock_vials["volume"]):
-            plt.text(i, v, str(round(v, 4)), color="black", ha="center")
-
-        # Draw a horizontal line at 4000
-        plt.axhline(y=2000, color="red", linestyle="-")
-        # Write the name of the vial vertically in the bar
-        for i, v in enumerate(stock_vials["contents"]):
-            plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
-        plt.xlabel("Position")
-        plt.ylabel("Volume")
-        plt.title("Stock Vial Status")
-        plt.savefig("vial_status.png")
-        self.send_slack_file(channel_id, "vial_status.png")
-
-        ## Delete the graph file
-        Path("vial_status.png").unlink()
-        plt.close()
-
-        # And the same for the waste vials
-        # waste_vials = pd.read_json(WASTE_STATUS)
-        waste_vials = vials.get_current_vials("waste")
-        waste_vials = pd.DataFrame([vial.to_dict() for vial in waste_vials])
-        waste_vials = waste_vials[["position", "volume", "name"]]
-        # Drop any vials that have null values
-        waste_vials = waste_vials.dropna()
-        waste_vials["position"] = waste_vials["position"].astype(str)
-        waste_vials["volume"] = waste_vials["volume"].astype(float)
-        plt.bar(
-            waste_vials["position"],
-            waste_vials["volume"],
-            align="center",
-            alpha=0.5,
-            color="blue",
-        )
-        for i, v in enumerate(waste_vials["volume"]):
-            plt.text(i, v, str(round(v, 4)), color="black", ha="center")
-        plt.axhline(y=20000, color="red", linestyle="-")
-        for i, v in enumerate(waste_vials["name"]):
-            plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
-        plt.xlabel("Position")
-        plt.ylabel("Volume")
-        plt.title("Waste Vial Status")
-        plt.savefig("waste_status.png")
-        self.send_slack_file(channel_id, "waste_status.png")
-        Path("waste_status.png").unlink()
-        plt.close()
 
     def __well_status(self, channel_id):
         """Sends the well status to the user."""
-        # Check current wellplate type
-        _, type_number, _ = sql_wellplate.select_current_wellplate_info()
-        wellplate_type = sql_wellplate.select_well_characteristics(
-            type_number
-        )
-        # Choose the correct wellplate object based on the wellplate type
-        wellplate: Wellplate = None
-        if wellplate_type.shape == "circular":
-            wellplate = Wellplate(
-                type_number=type_number,
-            )
-        elif wellplate_type.shape == "square":
-            wellplate = Wellplate(
-                type_number=type_number,
-            )
-
-        ## Well coordinates and colors
-        # Plot the well plate on a coordinate plane.
-        x_coordinates = []
-        y_coordinates = []
-        color = []
-
-        current_wells = sql_wellplate.select_wellplate_wells()
-        # turn tuple of well info into a list of well objects
-        current_wells = [Well(*well) for well in current_wells]
-
-        for well in current_wells:
-            x_coordinates.append(well.coordinates["x"])
-            y_coordinates.append(well.coordinates["y"])
-            color.append(self._get_well_color(well.status))
-
-        if wellplate.shape == "circular":
-            marker = "o"
-        else:
-            marker = "s"
-
-        ## Label the wellplate with the plate id below the bottom row and centered to the wellplate
-        # get the coordinates of wells H12 and A12
-        corners = wellplate.get_corners()
-        top_right = corners["top_right"]
-        bottom_right = corners["bottom_right"]
-        bottom_left = corners["bottom_left"]
-        top_left = corners["top_left"]
-        
-
-
-        # calculate the center of the wellplate
-        center = bottom_left["x"] + (fabs(bottom_left["x"]) - fabs(bottom_right["x"])) / 2
-        # plot the plate id
-        plt.text(
-            center, bottom_left["y"] - 20, str(wellplate.plate_id), color="black", ha="center"
-        )
-
-        ## Vial coordinates
-        vial_x = []
-        vial_y = []
-        vial_color = []
-        vial_marker = []  # a circle for these circular vials
-        ## Vials
-        # with open(WASTE_STATUS, "r", encoding="utf-8") as stock:
-        #     data = json.load(stock)
-        data = vials.get_current_vials("waste")
-        for vial in data:
-            #vial = vial.to_dict()
-            vial_x.append(vial["vial_coordinates"]["x"])
-            vial_y.append(vial["vial_coordinates"]["y"])
-            volume = vial["volume"]
-            capacity = vial["capacity"]
-            if vial["name"] is None or vial["name"] == "":
-                vial_color.append("black")
-                vial_marker.append("x")
-            elif volume / capacity > 0.75:
-                vial_color.append("red")
-                vial_marker.append("o")
-            elif volume / capacity > 0.50:
-                vial_color.append("yellow")
-                vial_marker.append("o")
-            else:
-                vial_color.append("green")
-                vial_marker.append("o")
-        # with open(STOCK_STATUS, "r", encoding="utf-8") as stock:
-        #     data = json.load(stock)
-        data = vials.get_current_vials("stock")
-        for vial in data:
-            #vial = vial.to_dict()
-            vial_x.append(vial["vial_coordinates"]["x"])
-            vial_y.append(vial["vial_coordinates"]["y"])
-            volume = vial["volume"]
-            capacity = vial["capacity"]
-            if vial["name"] is None or vial["name"] == "":
-                vial_color.append("black")
-                vial_marker.append("x")
-            elif volume / capacity > 0.5:
-                vial_color.append("green")
-                vial_marker.append("o")
-            elif volume / capacity > 0.25:
-                vial_color.append("yellow")
-                vial_marker.append("o")
-            else:
-                vial_color.append("red")
-                vial_marker.append("o")
-
-        try:
-            vial_radius = data[0]["radius"]
-        except IndexError:
-            vial_radius = 100
-
-        # Draw the gasket outline
-        gasket_length = wellplate.gasket_length
-        gasket_width = wellplate.gasket_width
-        orientation = wellplate.orientation
-
-        if orientation == 0:
-            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_y_wall_offset, wellplate.a1_y + wellplate.a1_x_wall_offset,0)
-
-            gasket_x = [
-                gasket_origin.x,
-                gasket_origin.x,
-                gasket_origin.x - gasket_width,
-                gasket_origin.x - gasket_width,
-                gasket_origin.x,
-            ]
-            gasket_y = [
-                gasket_origin.y,
-                gasket_origin.y - gasket_length,
-                gasket_origin.y - gasket_length,
-                gasket_origin.y,
-                gasket_origin.y,
-            ]
-        elif orientation == 1:
-            gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
-            gasket_x = [
-                gasket_origin.x,
-                gasket_origin.x,
-                gasket_origin.x + gasket_width,
-                gasket_origin.x + gasket_width,
-                gasket_origin.x,
-            ]
-            gasket_y = [
-                gasket_origin.y,
-                gasket_origin.y + gasket_length,
-                gasket_origin.y + gasket_length,
-                gasket_origin.y,
-                gasket_origin.y,
-            ]
-        elif orientation == 2:
-            gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y + wellplate.a1_y_wall_offset,0)
-            gasket_x = [
-                gasket_origin.x,
-                gasket_origin.x + gasket_length,
-                gasket_origin.x + gasket_length,
-                gasket_origin.x,
-                gasket_origin.x,
-            ]
-            gasket_y = [
-                gasket_origin.y,
-                gasket_origin.y,
-                gasket_origin.y - gasket_width,
-                gasket_origin.y - gasket_width,
-                gasket_origin.y,
-            ]
-        elif orientation == 3:
-            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
-            gasket_x = [
-                gasket_origin.x,
-                gasket_origin.x - gasket_length,
-                gasket_origin.x - gasket_length,
-                gasket_origin.x,
-                gasket_origin.x,
-            ]
-            gasket_y = [
-                gasket_origin.y,
-                gasket_origin.y,
-                gasket_origin.y + gasket_width,
-                gasket_origin.y + gasket_width,
-                gasket_origin.y,
-            ]
-        else:
-            raise ValueError("Invalid orientation value. Must be 0, 1, 2, or 3.")
-
-        plt.plot(gasket_x, gasket_y, c="black", lw=1.5)
-
-        # Plot the well plate
-        plt.scatter(
-            x_coordinates, y_coordinates, marker=marker, c=color, s=3.14 *(wellplate.radius**2), alpha=0.5
-        )
-        plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=3.14 *(vial_radius**2), alpha=1)
-        plt.xlabel("X")
-        plt.ylabel("Y")
-        plt.title("Status of Stage Items")
-        plt.grid(True, "both")
-        plt.xlim(-420, 10)
-        plt.ylim(-310, 10)
-        file_path_for_plot = Path("well_status.png")
-        plt.savefig(file_path_for_plot, format="png")
-        # plt_img = Image.open(file_path_for_plot)
-        plt.close()
-        # Send the plot to Slack
+        file_path_for_plot = well_status()
         self.upload_images(channel_id, [file_path_for_plot.absolute()], "Well Status")
         file_path_for_plot.unlink()
         return 1
 
     def __queue_length(self, channel_id):
         # Get queue length
-        queue_length = 0
-        queue_length = sql_queue.count_queue_length()
-        message = f"The queue length is {queue_length}."
+        message = f"The queue length is {sql_queue.count_queue_length()}."
         self.send_slack_message(channel_id, message)
         return 1
 
@@ -984,6 +729,305 @@ class SlackBot:
                 continue
         self.send_slack_message("alert", "PANDA Bot is off duty")
         print("Stopping Slack Bot")
+
+
+
+def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
+    """
+    Create plots of the vial status' and return the file paths.
+    """
+    # Get vial status
+    # ## Load the vial status json file
+    # stock_vials = pd.read_json(STOCK_STATUS)
+    # ## Filter for just the vial position and volume
+    # stock_vials = stock_vials[["position", "volume", "name", "contents"]]
+    # # Drop any vials that have null values
+    # stock_vials = stock_vials.dropna()
+    # ## set position to be a string and volume to be a float
+    # stock_vials["position"] = stock_vials["position"].astype(str)
+    # stock_vials["volume"] = stock_vials["volume"].astype(float)
+
+    stock_vials = vials.get_current_vials("stock")  # returns a list of Vial objects
+    stock_vials = pd.DataFrame([vial for vial in stock_vials])
+    stock_vials = stock_vials[["position", "volume", "name", "contents"]]
+    stock_vials = stock_vials.dropna()
+    stock_vials["position"] = stock_vials["position"].astype(str)
+    stock_vials["volume"] = stock_vials["volume"].astype(float)
+
+    ## Create a bar graph with volume on the x-axis and position on the y-axis
+    ## Send the graph to slack
+    plt.bar(
+        stock_vials["position"],
+        stock_vials["volume"],
+        align="center",
+        alpha=0.5,
+        color="blue",
+    )
+    # label each bar with the volume
+    for i, v in enumerate(stock_vials["volume"]):
+        plt.text(i, v, str(round(v, 4)), color="black", ha="center")
+
+    # Draw a horizontal line at 4000
+    plt.axhline(y=2000, color="red", linestyle="-")
+    # Write the name of the vial vertically in the bar
+    for i, v in enumerate(stock_vials["contents"]):
+        plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
+    plt.xlabel("Position")
+    plt.ylabel("Volume")
+    plt.title("Stock Vial Status")
+
+    filepath_stock = Path("vial_status.png")
+    plt.savefig(filepath_stock, format="png")
+    plt.close()
+
+    # And the same for the waste vials
+    # waste_vials = pd.read_json(WASTE_STATUS)
+    waste_vials = vials.get_current_vials("waste")
+    waste_vials = pd.DataFrame([vial for vial in waste_vials])
+    waste_vials = waste_vials[["position", "volume", "name"]]
+    # Drop any vials that have null values
+    waste_vials = waste_vials.dropna()
+    waste_vials["position"] = waste_vials["position"].astype(str)
+    waste_vials["volume"] = waste_vials["volume"].astype(float)
+    plt.bar(
+        waste_vials["position"],
+        waste_vials["volume"],
+        align="center",
+        alpha=0.5,
+        color="blue",
+    )
+    for i, v in enumerate(waste_vials["volume"]):
+        plt.text(i, v, str(round(v, 4)), color="black", ha="center")
+    plt.axhline(y=20000, color="red", linestyle="-")
+    for i, v in enumerate(waste_vials["name"]):
+        plt.text(i, 10, str(v), color="black", ha="center", rotation=90)
+    plt.xlabel("Position")
+    plt.ylabel("Volume")
+    plt.title("Waste Vial Status")
+    filepath_waste = Path("waste_status.png")
+    plt.savefig(filepath_waste, format="png")
+    plt.close()
+    if vial_type == "stock":
+        return filepath_stock.absolute()
+    elif vial_type == "waste":
+        return filepath_waste.absolute()
+    else:
+        return filepath_stock.absolute(), filepath_waste.absolute()
+
+def well_status() -> Path:
+    """
+    Create a plot of the well status and return the file path.
+    """
+    # Check current wellplate type
+    _, type_number, _ = sql_wellplate.select_current_wellplate_info()
+    wellplate_type = sql_wellplate.select_well_characteristics(
+        type_number
+    )
+    # Choose the correct wellplate object based on the wellplate type
+    wellplate: Wellplate = None
+    if wellplate_type.shape == "circular":
+        wellplate = Wellplate(
+            type_number=type_number,
+        )
+    elif wellplate_type.shape == "square":
+        wellplate = Wellplate(
+            type_number=type_number,
+        )
+
+    ## Well coordinates and colors
+    # Plot the well plate on a coordinate plane.
+    x_coordinates = []
+    y_coordinates = []
+    color = []
+
+    current_wells = sql_wellplate.select_wellplate_wells()
+    # turn tuple of well info into a list of well objects
+    current_wells = [Well(*well) for well in current_wells]
+
+    for well in current_wells:
+        x_coordinates.append(well.coordinates["x"])
+        y_coordinates.append(well.coordinates["y"])
+        color.append(get_well_color(well.status))
+
+    if wellplate.shape == "circular":
+        marker = "o"
+    else:
+        marker = "s"
+
+    ## Label the wellplate with the plate id below the bottom row and centered to the wellplate
+    # get the coordinates of wells H12 and A12
+    corners = wellplate.get_corners()
+    top_right = corners["top_right"]
+    bottom_right = corners["bottom_right"]
+    bottom_left = corners["bottom_left"]
+    top_left = corners["top_left"]
+
+    # calculate the center of the wellplate
+    center = bottom_left["x"] + (fabs(bottom_left["x"]) - fabs(bottom_right["x"])) / 2
+    # plot the plate id
+    plt.text(
+        center, bottom_left["y"] - 20, str(wellplate.plate_id), color="black", ha="center"
+    )
+
+    ## Vial coordinates
+    vial_x = []
+    vial_y = []
+    vial_color = []
+    vial_marker = []  # a circle for these circular vials
+    ## Vials
+    # with open(WASTE_STATUS, "r", encoding="utf-8") as stock:
+    #     data = json.load(stock)
+    data = vials.get_current_vials("waste")
+    for vial in data:
+        #vial = vial.to_dict()
+        vial_x.append(vial["vial_coordinates"]["x"])
+        vial_y.append(vial["vial_coordinates"]["y"])
+        volume = vial["volume"]
+        capacity = vial["capacity"]
+        if vial["name"] is None or vial["name"] == "":
+            vial_color.append("black")
+            vial_marker.append("x")
+        elif volume / capacity > 0.75:
+            vial_color.append("red")
+            vial_marker.append("o")
+        elif volume / capacity > 0.50:
+            vial_color.append("yellow")
+            vial_marker.append("o")
+        else:
+            vial_color.append("green")
+            vial_marker.append("o")
+    # with open(STOCK_STATUS, "r", encoding="utf-8") as stock:
+    #     data = json.load(stock)
+    data = vials.get_current_vials("stock")
+    for vial in data:
+        #vial = vial.to_dict()
+        vial_x.append(vial["vial_coordinates"]["x"])
+        vial_y.append(vial["vial_coordinates"]["y"])
+        volume = vial["volume"]
+        capacity = vial["capacity"]
+        if vial["name"] is None or vial["name"] == "":
+            vial_color.append("black")
+            vial_marker.append("x")
+        elif volume / capacity > 0.5:
+            vial_color.append("green")
+            vial_marker.append("o")
+        elif volume / capacity > 0.25:
+            vial_color.append("yellow")
+            vial_marker.append("o")
+        else:
+            vial_color.append("red")
+            vial_marker.append("o")
+
+    try:
+        vial_radius = data[0]["radius"]
+    except IndexError:
+        vial_radius = 100
+
+    # Draw the gasket outline
+    gasket_length = wellplate.gasket_length
+    gasket_width = wellplate.gasket_width
+    orientation = wellplate.orientation
+
+    if orientation == 0:
+        gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_y_wall_offset, wellplate.a1_y + wellplate.a1_x_wall_offset,0)
+
+        gasket_x = [
+            gasket_origin.x,
+            gasket_origin.x,
+            gasket_origin.x - gasket_width,
+            gasket_origin.x - gasket_width,
+            gasket_origin.x,
+        ]
+        gasket_y = [
+            gasket_origin.y,
+            gasket_origin.y - gasket_length,
+            gasket_origin.y - gasket_length,
+            gasket_origin.y,
+            gasket_origin.y,
+        ]
+    elif orientation == 1:
+        gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
+        gasket_x = [
+            gasket_origin.x,
+            gasket_origin.x,
+            gasket_origin.x + gasket_width,
+            gasket_origin.x + gasket_width,
+            gasket_origin.x,
+        ]
+        gasket_y = [
+            gasket_origin.y,
+            gasket_origin.y + gasket_length,
+            gasket_origin.y + gasket_length,
+            gasket_origin.y,
+            gasket_origin.y,
+        ]
+    elif orientation == 2:
+        gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y + wellplate.a1_y_wall_offset,0)
+        gasket_x = [
+            gasket_origin.x,
+            gasket_origin.x + gasket_length,
+            gasket_origin.x + gasket_length,
+            gasket_origin.x,
+            gasket_origin.x,
+        ]
+        gasket_y = [
+            gasket_origin.y,
+            gasket_origin.y,
+            gasket_origin.y - gasket_width,
+            gasket_origin.y - gasket_width,
+            gasket_origin.y,
+        ]
+    elif orientation == 3:
+        gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
+        gasket_x = [
+            gasket_origin.x,
+            gasket_origin.x - gasket_length,
+            gasket_origin.x - gasket_length,
+            gasket_origin.x,
+            gasket_origin.x,
+        ]
+        gasket_y = [
+            gasket_origin.y,
+            gasket_origin.y,
+            gasket_origin.y + gasket_width,
+            gasket_origin.y + gasket_width,
+            gasket_origin.y,
+        ]
+    else:
+        raise ValueError("Invalid orientation value. Must be 0, 1, 2, or 3.")
+
+    plt.plot(gasket_x, gasket_y, c="black", lw=1.5)
+
+    # Plot the well plate
+    plt.scatter(
+        x_coordinates, y_coordinates, marker=marker, c=color, s=3.14 *(wellplate.radius**2), alpha=0.5
+    )
+    plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=3.14 *(vial_radius**2), alpha=1)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Status of Stage Items")
+    plt.grid(True, "both")
+    plt.xlim(-420, 10)
+    plt.ylim(-310, 10)
+    file_path_for_plot = Path("well_status.png")
+    plt.savefig(file_path_for_plot, format="png")
+    plt.close()
+    return file_path_for_plot.absolute()
+
+
+def get_well_color( status: str) -> str:
+    """Get the color of a well based on its status."""
+    if status is None:
+        return "black"
+    color_mapping = {
+        "empty": "black",
+        "new": "grey",
+        "queued": "orange",
+        "complete": "green",
+        "error": "red",
+        "paused": "blue",
+    }
+    return color_mapping.get(status, "purple")
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)
