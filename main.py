@@ -22,11 +22,11 @@ from panda_lib.config.config_tools import (
 from panda_lib.experiment_class import ExperimentBase
 
 resolve_config_paths()  # Yes I know the import order is wrong, but this must be run before anything else is loaded
-from main_menu_custom_fucntions import (
-    generate_pedot_experiment_from_existing_data,
-    genererate_pedot_experiment,
-    analyze_pedot_experiment,
-)
+# from main_menu_custom_fucntions import (
+#     generate_pedot_experiment_from_existing_data,
+#     genererate_pedot_experiment,
+#     analyze_pedot_experiment,
+# )
 from license_text import show_conditions, show_warrenty
 from panda_lib import (
     controller,
@@ -107,23 +107,29 @@ def remove_experiment_from_database():
         read_testing_config(),
     )
     removed = []
-    not_removed = []
+    not_removed = {}
 
     for experiment in experiments_to_remove:
         try:
             experiment = int(experiment)
-            result = wellplate._remove_experiment_from_db(experiment)
+            result, note = wellplate._remove_experiment_from_db(experiment)
             if result:
                 removed.append(experiment)
             else:
-                not_removed.append(experiment)
+                not_removed[experiment] = note
         except ValueError:
             print(f"Invalid experiment number: {experiment}")
-            not_removed.append(experiment)
+            not_removed[experiment] = "Invalid experiment number"
+            continue
+        except Exception as removal_e:
+            print(f"An error occurred: {removal_e}")
+            not_removed[experiment] = removal_e
             continue
 
-    print(f"Removed experiments: {removed}")
-    print(f"Experiments not removed: {not_removed}")
+    print(f"Experiments removed: {removed}")
+    print("Experiments not removed:")
+    for experiment, note in not_removed.items():
+        print(f"{experiment}: {note}")
     input("Press Enter to continue...")
 
 def print_wellplate_info():

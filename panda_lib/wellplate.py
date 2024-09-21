@@ -765,29 +765,13 @@ def _remove_wellplate_from_db(plate_id: int) -> None:
         session.commit()
 
 
-def _remove_experiment_from_db(experiment_id: int) -> bool:
+def _remove_experiment_from_db(experiment_id: int) -> tuple[bool, str]:
     """Removes the experiment from the database"""
 
     # Check that no experiment_results exist for this experiment. If they do, do not delete the experiment
     results = experiment_class.select_results(experiment_id)
     if results:
-        print(
-            """
-            This experiment has associated results. If you really want to delete the experiment,
-            please delete the results before deleting the experiment."""
-        )
-        input("Press enter to continue...")
-        return False
-
-    user_choice = input(
-        "Are you sure you want to remove the experiment and all its data from the database? This is irreversible. (y/n): "
-    )
-    if not user_choice:
-        print("No action taken")
-        return False
-    if user_choice.strip().lower()[0] != "y":
-        print("No action taken")
-        return False
+        return False, "Experiment has associated results"
 
     # Remove the experiment from the database in three steps:
     # 1. Remove the experiment from the experiments table
@@ -806,19 +790,13 @@ def _remove_experiment_from_db(experiment_id: int) -> bool:
             )
             session.commit()
 
-        return True
+        return True, "Experiment deleted successfully"
     except Exception as e:
         print(f"Error occurred while deleting the experiment: {e}")
-        return False
+        return False, f"Error occurred while deleting the experiment: {e}"
 
 def change_wellplate_location():
     """Change the location of the wellplate"""
-    ## Load the working volume from mill_config.json
-    # with open(MILL_CONFIG, "r", encoding="UTF-8") as file:
-    #     mill_config = json.load(file)
-    # working_volume = mill_config["working_volume"]
-
-    
 
     with SessionLocal() as session:
         mill_config_record = (
