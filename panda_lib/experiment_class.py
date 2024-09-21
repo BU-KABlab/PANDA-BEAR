@@ -34,6 +34,9 @@ def load_analysis_script(script_path: str) -> Callable:
         raise AttributeError(f"Module {script_path} does not have an analyze function")
     return module.analyze
 
+# class ResultType(str, Enum):
+    
+
 class ExperimentResultsRecord:
     """
     A class for representing a single entry in a result table.
