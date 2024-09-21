@@ -132,13 +132,6 @@ def clear_queue() -> None:
 
 def count_queue_length() -> int:
     """Count the number of experiments in the queue"""
-    # result = execute_sql_command(
-    #     """
-    #     SELECT COUNT(*) FROM queue
-    #     WHERE status = 'queued'
-    #     """
-    # )
-    # return int(result[0][0])
 
     with SessionLocal() as session:
         return session.query(Queue).filter(Queue.status == "queued").count()
