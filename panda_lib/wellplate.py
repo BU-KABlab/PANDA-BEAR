@@ -10,7 +10,7 @@ import math
 
 # pylint: disable=line-too-long
 from dataclasses import asdict, dataclass, field
-from typing import Optional, Tuple, Union, NoReturn
+from typing import Optional, Tuple, Union
 
 from panda_lib import experiment_class
 
@@ -414,57 +414,6 @@ class Wellplate:
             well: Well = self.wells[well_id]
             self.update_well_coordinates(well_id, well.coordinates)
 
-    # def calculate_well_locations_old(self) -> None:
-    #     """Take the coordinates of A1 and calculate the x,y,z coordinates of the other wells based on the well plate type"""
-    #     for col_idx, col in enumerate(self.columns):
-    #         for row in range(
-    #             1, self.rows + 1
-    #         ):  # range is exclusive of the last number so we add 1
-    #             well_id = col + str(row)
-    #             if well_id == "A1":
-    #                 coordinates = self.a1_coordinates
-    #                 depth = self.z_bottom
-    #                 if depth < self.z_bottom:
-    #                     depth = self.z_bottom
-    #             else:
-    #                 x_offset = col_idx * self.well_row_offset
-    #                 y_offset = (row - 1) * self.well_row_offset
-    #                 if self.orientation == 0:
-    #                     coordinates = {
-    #                         "x": self.a1_coordinates["x"] - x_offset,
-    #                         "y": self.a1_coordinates["y"] - y_offset,
-    #                         "z_top": self.z_top,
-    #                     }
-    #                 elif self.orientation == 1:
-    #                     coordinates = {
-    #                         "x": self.a1_coordinates["x"] + x_offset,
-    #                         "y": self.a1_coordinates["y"] + y_offset,
-    #                         "z_top": self.z_top,
-    #                     }
-    #                 elif self.orientation == 2:
-    #                     coordinates = {
-    #                         "x": self.a1_coordinates["x"] - x_offset,
-    #                         "y": self.a1_coordinates["y"] - y_offset,
-    #                         "z_top": self.z_top,
-    #                     }
-    #                 elif self.orientation == 3:
-    #                     coordinates = {
-    #                         "x": self.a1_coordinates["x"] + x_offset,
-    #                         "y": self.a1_coordinates["y"] + y_offset,
-    #                         "z_top": self.z_top,
-    #                     }
-
-    #             # Round the coordinates to 2 decimal places
-    #             coordinates["x"] = round(coordinates["x"], 3)
-    #             coordinates["y"] = round(coordinates["y"], 3)
-    #             coordinates["z_top"] = round(coordinates["z_top"], 3)
-    #             new_coordinates = WellCoordinates(
-    #                 float(coordinates["x"]),
-    #                 float(coordinates["y"]),
-    #                 float(coordinates["z_top"]),
-    #             )
-    #             self.set_coordinates(well_id, new_coordinates)
-
     def calculate_well_locations(self) -> None:
         """
         This method is used to calculate the location of the wells in a well plate.
@@ -735,41 +684,7 @@ class Wellplate:
     ) -> Tuple[float, float, float, float, int, float]:
         """Load the location of the well plate from the wellplates table  file"""
 
-        # # check if it exists
-        # if not os.path.exists(WELLPLATE_LOCATION):
-        #     logger.warning(
-        #         "Well location file not found at %s. Returning defaults",
-        #         WELLPLATE_LOCATION,
-        #     )
-        #     return (
-        #         self.a1_x,
-        #         self.a1_y,
-        #         self.z_bottom,
-        #         self.orientation,
-        #         self.rows,
-        #         self.columns,
-        #         self.echem_height,
-        #     )
-        # Looks like this:
-        # {
-        # "x": -233,
-        # "y": -35,
-        # "orientation": 0,
-        # "rows": 13,
-        # "cols": "ABCDEFGH",
-        # "z-bottom": -77
-        # }
-        # with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as f:
-        #     data = json.load(f)
-        #     x = float(data["x"])
-        #     y = float(data["y"])
-        #     z_bottom = float(data["z-bottom"])
-        #     orientation = data["orientation"]
-        #     rows = data["rows"]
-        #     cols = data["cols"]
-        #     echem_height = float(data["echem_height"])
-
-        return sql_wellplate.select_wellplate_location()
+        return sql_wellplate.select_wellplate_location(plate_id=self.plate_id)
 
         # return (x, y, z_bottom, z_top, orientation, echem_height)
 
@@ -794,18 +709,6 @@ class Wellplate:
 
     def write_wellplate_location(self) -> None:
         """Write the location of the well plate to the wellplates table"""
-        # data_to_write = {
-        #     "x": float(self.a1_x),
-        #     "y": float(self.a1_y),
-        #     "orientation": int(self.orientation),
-        #     "rows": self.rows,
-        #     "cols": self.columns,
-        #     "z-bottom": float(self.z_bottom),
-        #     "z-top": float(self.z_top),
-        #     "echem_height": float(self.echem_height),
-        # }
-        # with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as f:
-        #     json.dump(data_to_write, f, indent=4)
 
         sql_wellplate.update_wellplate_location(
             plate_id=self.plate_id,
@@ -885,19 +788,6 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
     if user_choice.strip().lower()[0] != "y":
         print("No action taken")
         return
-    # Delete the experiment and all its data from the experiment tables
-    # sql_utilities.execute_sql_command(
-    #     "DELETE FROM experiments WHERE experiment_id = ?", (experiment_id,)
-    # )
-    # sql_utilities.execute_sql_command(
-    #     "DELETE FROM experiment_parameters WHERE experiment_id = ?", (experiment_id,)
-    # )
-
-    # # Update the well in the well_hx table with the experiment id to NULL
-    # sql_utilities.execute_sql_command(
-    #     "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new' WHERE experiment_id = ?",
-    #     (experiment_id,),
-    # )
 
     with SessionLocal() as session:
         session.query(Experiments).filter(
@@ -994,24 +884,6 @@ Enter the new orientation of the wellplate: """
         else:
             print("Invalid input. Please enter 0, 1, 2, or 3.")
 
-    ## Get the current location config
-    # with open(WELLPLATE_LOCATION, "r", encoding="UTF-8") as file:
-    #     current_location = json.load(file)
-
-    # new_location = {
-    #     "x": new_location_x,
-    #     "y": new_location_y,
-    #     "orientation": new_orientation,
-    #     "rows": current_location["rows"],
-    #     "cols": current_location["cols"],
-    #     "z-bottom": current_location["z-bottom"],
-    #     "z-top": current_location["z-top"],
-    #     "echem_height": current_location["echem_height"],
-    # }
-    # ## Write the new location to the wellplate_location.txt file
-    # with open(WELLPLATE_LOCATION, "w", encoding="UTF-8") as file:
-    #     json.dump(new_location, file, indent=4)
-
     wellplate = Wellplate(
             plate_id=current_plate_id,
         )
@@ -1021,20 +893,6 @@ Enter the new orientation of the wellplate: """
     wellplate.orientation = new_orientation
     wellplate.write_wellplate_location()
     wellplate.recalculate_well_locations()
-
-
-
-    # sql_wellplate.update_wellplate_location(
-    #     plate_id=current_plate_id,
-    #     a1_x=new_location_x,
-    #     a1_y=new_location_y,
-    #     orientation=new_orientation,
-    # )
-
-
-
-    
-
 
 def load_new_wellplate(
     ask: bool = False,
@@ -1202,31 +1060,6 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
     )
     new_wells = sql_wellplate.count_wells_with_new_status(current_plate_id)
     return int(current_plate_id), int(current_type_number), new_wells
-
-
-# def draw_the current_well_status():
-#     """
-#     Draw the current well status using white, yellow, green, and red colored squares
-#     """
-#     # load the current wellplate
-#     # determine the status of each well
-#     # draw the wellplate with the status of each well
-
-#     # get the current wellplate
-#     current_plate_id, current_type_number, new_wells = read_current_wellplate_info()
-#     current_wellplate = Wellplate(type_number=current_type_number,plate_id=current_plate_id)
-#     # get the status of each well
-#     for well in current_wellplate.wells.values():
-#         well: Well
-#         well_status = well.status
-#         if well_status == "new":
-#             well_color = "white"
-#         elif well_status == "empty":
-#             well_color = "yellow"
-#         elif well_status == "full":
-#             well_color = "green"
-#         else:
-#             well_color = "red"
 
 
 if __name__ == "__main__":
