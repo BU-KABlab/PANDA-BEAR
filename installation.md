@@ -13,12 +13,15 @@ There is a default_config.ini under panda_sdl/config which you should use as a t
     in the *ExperimentBase* object which the *experiment_generator* creates. There is usually a one-to-one ratio of protocols to generators unless the protocol is updated but the metadata stays the same.
 
 ## Python Dependencies
-All PANDA SDL dependencies are listed in the requirements.txt file. If using the devcontainer these are installed for you. If not using the devcontainer, you can add them to your environment with:
+PANDA SDL depends on Python 3.10+. All dependencies are listed in the requirements.txt file. If using the devcontainer these are installed for you. If not using the devcontainer, you can add them to your environment with:
 
 ```pip install -r requirements.txt```
 
 ## Third Party / Proprietary Dependencies
 The project depends on one proprietary dependency from Teledyne FLIR for the imaging. See the README file in panda_sdl/flir_camera directory for installation isntructions.
+
+## Project Data
+PANDA SDL uses sqlalchemy to interface with databases. By default a sqlite dialect is used, and there is a demonstration sqlite database. 
 
 ## Setting up Slack [Optional]
 To obtain a token for your own SlackBot you will need to follow the [instructions](https://api.slack.com/quickstart) from Slack on making a Slack App.
