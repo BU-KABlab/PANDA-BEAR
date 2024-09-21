@@ -5,12 +5,13 @@ Description: For generation of PGMA-phenol experiments with 10 mm diameter wells
 the second campaign of PGMA experiments.
 """
 
-import pandas as pd
 from pathlib import Path
-from panda_lib import experiment_class
-from panda_lib.config.config_tools import read_testing_config, read_config
+
+import pandas as pd
+
+from panda_lib import experiment_class, scheduler
+from panda_lib.config.config_tools import read_config, read_testing_config
 from panda_lib.sql_tools.sql_system_state import get_current_pin
-from panda_lib.scheduler import Scheduler, determine_next_experiment_id
 
 config = read_config()
 TESTING = read_testing_config()
@@ -32,7 +33,7 @@ params_df = pd.read_csv(
 
 def main():
     """Runs the PGMA experiment generator."""
-    starting_experiment_id = determine_next_experiment_id()
+    starting_experiment_id = scheduler.determine_next_experiment_id()
     experiment_id = starting_experiment_id
     experiments: list[experiment_class.PGMAExperiment] = []
 
@@ -87,5 +88,4 @@ def main():
 
         experiment_id += 1
 
-    scheduler = Scheduler()
     scheduler.add_nonfile_experiments(experiments)

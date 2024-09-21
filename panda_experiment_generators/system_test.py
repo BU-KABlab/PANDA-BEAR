@@ -3,13 +3,14 @@
 import pandas as pd
 
 from panda_lib import experiment_class
-from panda_lib.scheduler import Scheduler, determine_next_experiment_id
+from panda_lib import scheduler
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 
 CURRENT_PIN =  get_current_pin()
 PROJECT_ID = 999
 EXPERIMENT_NAME = "system_test"
 CAMPAIGN_ID = 999
+PLATE_TYPE = 4
 
 params_df = pd.read_csv(
     r".\panda_experiment_generators\system_test_params.csv"
@@ -19,7 +20,7 @@ def main():
     """Runs the edot voltage sweep experiment generator."""
 
     # controller.load_new_wellplate(new_wellplate_type_number=6)
-    starting_experiment_id = determine_next_experiment_id()
+    starting_experiment_id = scheduler.determine_next_experiment_id()
     experiment_id = starting_experiment_id
     experiments: list[experiment_class.PEDOTExperiment] = []
 
@@ -32,15 +33,13 @@ def main():
                 experiment_id=experiment_id,
                 protocol_id='system_test',
                 well_id='A1',
-                well_type_number=4,
+                well_type_number=PLATE_TYPE,
                 experiment_name=EXPERIMENT_NAME,
                 pin=str(CURRENT_PIN),
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={"edot": 120, "liclo4": 120, "rinse": 120},
-                solutions_corrected={"edot": 0, "liclo4": 0, "rinse": 0},
-                status=experiment_class.ExperimentStatus.NEW,
-                filename=EXPERIMENT_NAME + " " + str(experiment_id),
+                filename=EXPERIMENT_NAME + "_" + str(experiment_id),
                 # Echem specific
                 ocp=1,
                 baseline=0,
@@ -59,5 +58,4 @@ def main():
         )
         experiment_id += 1
 
-    scheduler = Scheduler()
     scheduler.add_nonfile_experiments(experiments)

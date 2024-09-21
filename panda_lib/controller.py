@@ -15,38 +15,29 @@ Additionally controller should be able to:
 # pylint: disable=line-too-long, broad-exception-caught
 import importlib
 import sys
-import time
 import threading
+import time
 from pathlib import Path
-import PySpin
 from typing import Sequence
 
+import PySpin
 from slack_sdk import errors as slack_errors
 
-from panda_lib import gamry_control_WIP
+from panda_lib import gamry_control_WIP, scheduler
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .config.config_tools import read_config, read_testing_config
-from .errors import (
-    NoExperimentFromModel,
-    ProtocolNotFoundError,
-    ShutDownCommand,
-    WellImportError,
-)
-from .experiment_class import (
-    ExperimentBase,
-    ExperimentResult,
-    ExperimentStatus,
-    select_specific_result,
-)
+from .errors import (NoExperimentFromModel, ProtocolNotFoundError,
+                     ShutDownCommand, WellImportError)
+from .experiment_class import (ExperimentBase, ExperimentResult,
+                               ExperimentStatus, select_specific_result)
 from .instrument_toolkit import Toolkit
 from .log_tools import setup_default_logger
 from .mill_control import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
-from .scheduler import Scheduler
 from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .syringepump import MockPump, SyringePump
@@ -117,8 +108,6 @@ def main(
             "alert", "PANDA_SDL has connected to equipment"
         )
         obs.place_text_on_screen("PANDA_SDL has connected to equipment")
-        ## Initialize scheduler
-        scheduler = Scheduler()
 
         ## Establish state of system - we do this each time because each experiment changes the system state
         stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
