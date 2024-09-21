@@ -765,10 +765,10 @@ def _remove_wellplate_from_db(plate_id: int) -> None:
         session.commit()
 
 
-def _remove_experiment_from_db(experiment_id: int) -> None:
+def _remove_experiment_from_db(experiment_id: int) -> bool:
     """Removes the experiment from the database"""
 
-    # Check that no experiment_results exist for this experiment
+    # Check that no experiment_results exist for this experiment. If they do, do not delete the experiment
     results = experiment_class.select_results(experiment_id)
     if results:
         print(
@@ -777,32 +777,39 @@ def _remove_experiment_from_db(experiment_id: int) -> None:
             please delete the results before deleting the experiment."""
         )
         input("Press enter to continue...")
-        return
+        return False
 
     user_choice = input(
         "Are you sure you want to remove the experiment and all its data from the database? This is irreversible. (y/n): "
     )
     if not user_choice:
         print("No action taken")
-        return
+        return False
     if user_choice.strip().lower()[0] != "y":
         print("No action taken")
-        return
+        return False
 
-    with SessionLocal() as session:
-        session.query(Experiments).filter(
-            Experiments.experiment_id == experiment_id
-        ).delete()
-        session.query(ExperimentParameters).filter(
-            ExperimentParameters.experiment_id == experiment_id
-        ).delete()
-        session.query(WellHx).filter(WellHx.experiment_id == experiment_id).update(
-            {"experiment_id": None, "project_id": None, "status": "new"}
-        )
-        session.commit()
+    # Remove the experiment from the database in three steps:
+    # 1. Remove the experiment from the experiments table
+    # 2. Remove the experiment parameters from the experiment_parameters table
+    # 3. Update the well_hx table to remove the experiment_id and project_id
+    try:
+        with SessionLocal() as session:
+            session.query(Experiments).filter(
+                Experiments.experiment_id == experiment_id
+            ).delete()
+            session.query(ExperimentParameters).filter(
+                ExperimentParameters.experiment_id == experiment_id
+            ).delete()
+            session.query(WellHx).filter(WellHx.experiment_id == experiment_id).update(
+                {"experiment_id": None, "project_id": None, "status": "new"}
+            )
+            session.commit()
 
-    input("Experiment deleted. Press enter to continue...")
-
+        return True
+    except Exception as e:
+        print(f"Error occurred while deleting the experiment: {e}")
+        return False
 
 def change_wellplate_location():
     """Change the location of the wellplate"""
