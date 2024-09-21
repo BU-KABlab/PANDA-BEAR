@@ -5,7 +5,7 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import List, Tuple, Union
 
-from sqlalchemy import DateTime, Integer, func, cast
+from sqlalchemy import Integer, func, cast
 
 from panda_lib import wellplate as wellplate_module
 from panda_lib.sql_tools import sql_utilities
@@ -18,14 +18,6 @@ logger = sql_utilities.logger
 # region Wellplate Functions
 def check_if_wellplate_exists(plate_id: int) -> bool:
     """Check if a wellplate exists in the wellplates table"""
-    # result = sql_utilities.execute_sql_command(
-    #     """
-    #     SELECT * FROM wellplates
-    #     WHERE id = ?
-    #     """,
-    #     (plate_id,),
-    # )
-    # return result != []
 
     with SessionLocal() as session:
         return session.query(WellPlates).filter(WellPlates.id == plate_id).count() > 0
@@ -48,41 +40,6 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float,
         image_height(float): The height of the image taken of the wellplate.
 
     """
-
-    # if plate_id is None:
-    #     plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-
-    # result = sql_utilities.execute_sql_command(
-    #     """
-    #     SELECT
-    #         a1_x,
-    #         a1_y,
-    #         z_bottom,
-    #         z_top,
-    #         orientation,
-    #         rows,
-    #         cols,
-    #         echem_height
-    #     FROM wellplates
-    #     WHERE id = ?
-    #     """,
-    #     (plate_id,),
-    # )
-    # if result == []:
-    #     return None
-
-    # # Validate the types of the results
-    # x = float(result[0][0])
-    # y = float(result[0][1])
-    # z_bottom = float(result[0][2])
-    # z_top = float(result[0][3])
-    # orientation = int(result[0][4])
-    # rows = int(result[0][5])
-    # cols = result[0][6]
-    # echem_height = float(result[0][7])
-    # return x, y, z_bottom,z_top, orientation, rows, cols, echem_height
 
     with SessionLocal() as session:
         if plate_id is None:
@@ -127,19 +84,6 @@ def update_wellplate_location(plate_id: Union[int,None], **kwargs) -> None:
 def update_current_wellplate(new_plate_id: int) -> None:
     """Changes the current wellplate's current value to 0 and sets the new
     wellplate's current value to 1"""
-    # sql_utilities.execute_sql_command_no_return(
-    #     """
-    #     UPDATE wellplates SET current = 0
-    #     WHERE current = 1
-    #     """
-    # )
-    # sql_utilities.execute_sql_command_no_return(
-    #     """
-    #     UPDATE wellplates SET current = 1
-    #     WHERE id = ?
-    #     """,
-    #     (new_plate_id,),
-    # )
 
     with SessionLocal() as session:
         session.query(WellPlates).filter(WellPlates.current == 1).update(
@@ -153,13 +97,6 @@ def update_current_wellplate(new_plate_id: int) -> None:
 
 def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
     """Add a new wellplate to the wellplates table"""
-    # sql_utilities.execute_sql_command_no_return(
-    #     """
-    #     INSERT INTO wellplates (id, type_id, current)
-    #     VALUES (?, ?, 0)
-    #     """,
-    #     (plate_id, type_id),
-    # )
 
     with SessionLocal() as session:
 
@@ -186,21 +123,6 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
 
 def check_if_current_wellplate_is_new() -> bool:
     """Check if the current wellplate is new"""
-    # result = sql_utilities.execute_sql_command(
-    #     """
-    #     SELECT status FROM well_hx
-    #     WHERE plate_id = (SELECT id FROM wellplates WHERE current = 1)
-    #     """
-    # )
-    # if result == []:
-    #     logger.info("No current wellplate found")
-    #     return False
-
-    # # If all the results are 'new' then the wellplate is new
-    # for row in result:
-    #     if row[0] != "new":
-    #         return False
-    # return True
 
     with SessionLocal() as session:
         result = (
@@ -231,22 +153,6 @@ def get_number_of_wells(plate_id: Union[int, None] = None) -> int:
     Returns:
         int: The number of wells.
     """
-    # if plate_id is None:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #         SELECT COUNT(*) FROM well_hx
-    #         WHERE plate_id = (SELECT id FROM wellplates WHERE current = 1)
-    #         """
-    #     )
-    # else:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #         SELECT COUNT(*) FROM well_hx
-    #         WHERE plate_id = ?
-    #         """,
-    #         (plate_id,),
-    #     )
-    # return int(result[0][0])
 
     with SessionLocal() as session:
         if plate_id is None:
@@ -277,24 +183,6 @@ def get_number_of_clear_wells(plate_id: Union[int, None] = None) -> int:
     Returns:
         int: The number of wells with status in 'new', 'clear','queued'.
     """
-    # if plate_id is None:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #         SELECT COUNT(*) FROM well_hx
-    #         WHERE status IN ('new', 'clear','queued')
-    #         AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
-    #         """
-    #     )
-    # else:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #         SELECT COUNT(*) FROM well_hx
-    #         WHERE status IN ('new', 'clear','queued')
-    #         AND plate_id = ?
-    #         """,
-    #         (plate_id,),
-    #     )
-    # return int(result[0][0])
 
     with SessionLocal() as session:
         if plate_id is None:
@@ -349,118 +237,7 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
     Selects all wells from the well_hx table for a specific wellplate.
     Or if no plate_id is provided, all wells of the current wellplate are
     selected.
-
-    The table has columns:
-    plate_id,
-    type_number,
-    well_id,
-    status,
-    status_date,
-    contents,
-    experiment_id,
-    project_id,
-    volume,
-    coordinates
     """
-    # if plate_id is None:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #         SELECT
-    #             plate_id,
-    #             type_number,
-    #             well_id,
-    #             status,
-    #             status_date,
-    #             contents,
-    #             experiment_id,
-    #             project_id,
-    #             volume,
-    #             coordinates,
-    #             capacity,
-    #             height
-
-    #         FROM well_status
-    #         ORDER BY well_id ASC
-    #         """
-    #     )
-    # else:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #     SELECT
-    #         a.plate_id,
-    #         b.type_id as type_number,
-    #         a.well_id,
-    #         a.status,
-    #         a.status_date,
-    #         a.contents,
-    #         a.experiment_id,
-    #         a.project_id,
-    #         a.volume,
-    #         a.coordinates,
-    #         c.capacity_ul as capacity,
-    #         c.height_mm as height
-    #     FROM well_hx as a
-    #     JOIN wellplates as b
-    #     ON a.plate_id = b.id
-    #     JOIN well_types as c
-    #     ON b.type_id = c.id
-    #     WHERE a.plate_id = ?
-    #         """,
-    #         (plate_id,),
-    #     )
-    # if result == []:
-    #     return None
-
-    # current_plate_id = select_current_wellplate_info()[0]
-    # wells = []
-    # for row in result:
-    #     try:
-    #         incoming_contents = json.loads(row[5])
-    #     except json.JSONDecodeError:
-    #         incoming_contents = {}
-    #     except TypeError:
-    #         incoming_contents = {}
-
-    #     try:
-    #         incoming_coordinates = json.loads(row[9])
-    #         # incoming_coordinates = wellplate.WellCoordinates(**incoming_coordinates)
-    #     except json.JSONDecodeError:
-    #         incoming_coordinates = (0, 0)
-
-    #     # Convert NULL or blank cells to 0 for integer fields
-    #     well_type_number = int(row[1]) if row[1] else 0
-    #     volume = int(row[8]) if row[8] else 0
-    #     capacity = int(row[10]) if row[10] else 0
-    #     height = int(row[11]) if row[11] else 0
-    #     experiment_id = int(row[6]) if row[6] else None
-    #     project_id = int(row[7]) if row[7] else None
-    #     # well_height, well_capacity,
-    #     # TODO currently the wepplate object applies the well_height and well_capacity
-    #     # If we want the wells to be the primary source of this information, we need to
-    #     # update this script to also pull from well_types and the stop applying
-    #     # the infomation in the wellplate object
-    #     if plate_id is None:
-    #         plate_id = row[0]
-    #         if plate_id is None:
-    #             plate_id = current_plate_id
-
-    #     wells.append(
-    #         wellplate.Well(
-    #             well_id=str(row[2]),
-    #             well_type_number=well_type_number,
-    #             status=str(row[3]),
-    #             status_date=str(row[4]),
-    #             contents=incoming_contents,
-    #             experiment_id=experiment_id,
-    #             project_id=project_id,
-    #             volume=volume,
-    #             coordinates=incoming_coordinates,
-    #             capacity=capacity,
-    #             height=height,
-    #             plate_id=int(plate_id),
-    #         )
-    #     )
-    # return wells
 
     with SessionLocal() as session:
         if plate_id is None:
@@ -670,45 +447,6 @@ def save_well_to_db(well_to_save: object) -> None:
         values are different.
     Otherwise insert the well into the table.
     """
-    # statement = """
-    #     INSERT INTO well_hx (
-    #     plate_id,
-    #     well_id,
-    #     experiment_id,
-    #     project_id,
-    #     status,
-    #     status_date,
-    #     contents,
-    #     volume,
-    #     coordinates
-    #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    #     ON CONFLICT (plate_id, well_id) DO UPDATE SET
-    #     experiment_id = excluded.experiment_id,
-    #     project_id = excluded.project_id,
-    #     status = excluded.status,
-    #     status_date = excluded.status_date,
-    #     contents = excluded.contents,
-    #     volume = excluded.volume,
-    #     coordinates = excluded.coordinates
-
-    # """
-    # if well_to_save.plate_id in [None, 0]:
-    #     well_to_save.plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-
-    # values = (
-    #     well_to_save.plate_id,
-    #     well_to_save.well_id,
-    #     well_to_save.experiment_id,
-    #     well_to_save.project_id,
-    #     well_to_save.status,
-    #     well_to_save.status_date,
-    #     json.dumps(well_to_save.contents),
-    #     well_to_save.volume,
-    #     json.dumps(asdict(well_to_save.coordinates)),
-    # )
-    # sql_utilities.execute_sql_command_no_return(statement, values)
 
     with SessionLocal() as session:
         if well_to_save.plate_id in [None, 0]:
@@ -755,48 +493,6 @@ def save_wells_to_db(wells_to_save: List[object]) -> None:
         values are different.
     Otherwise insert the well into the table.
     """
-    # statement = """
-    #     INSERT INTO well_hx (
-    #     plate_id,
-    #     well_id,
-    #     experiment_id,
-    #     project_id,
-    #     status,
-    #     status_date,
-    #     contents,
-    #     volume,
-    #     coordinates
-    #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    #     ON CONFLICT (plate_id, well_id) DO UPDATE SET
-    #     experiment_id = excluded.experiment_id,
-    #     project_id = excluded.project_id,
-    #     status = excluded.status,
-    #     status_date = excluded.status_date,
-    #     contents = excluded.contents,
-    #     volume = excluded.volume,
-    #     coordinates = excluded.coordinates
-    # """
-    # values = []
-    # for well in wells_to_save:
-    #     if well.plate_id in [None, 0]:
-    #         well.plate_id = sql_utilities.execute_sql_command(
-    #             "SELECT id FROM wellplates WHERE current = 1"
-    #         )[0][0]
-
-    #     values.append(
-    #         (
-    #             well.plate_id,
-    #             well.well_id,
-    #             well.experiment_id,
-    #             well.project_id,
-    #             well.status,
-    #             datetime.now().isoformat(timespec="seconds"),
-    #             json.dumps(well.contents),
-    #             well.volume,
-    #             json.dumps(asdict(well.coordinates)),
-    #         )
-    #     )
-    # sql_utilities.execute_sql_command_no_return(statement, values)
 
     with SessionLocal() as session:
         for well in wells_to_save:
@@ -820,38 +516,17 @@ def save_wells_to_db(wells_to_save: List[object]) -> None:
 
 def insert_well(well_to_insert: object) -> None:
     """
-    Get the SQL statement for inserting the entry into the well_hx table.
+    Insert a well into the well_hx table.
+
+    Insert_well will accept a well object, and using its attributes, insert a new
+    row into the well_hx table.
+
+    Args:
+        well_to_insert (Well): The well to insert.
 
     Returns:
-        str: The SQL statement.
+        None
     """
-    # statement = """
-    # INSERT INTO well_hx (
-    #     plate_id,
-    #     well_id,
-    #     experiment_id,
-    #     project_id,
-    #     status,
-    #     status_date,
-    #     contents,
-    #     volume,
-    #     coordinates
-
-    #     )
-    # VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    # """
-    # values = (
-    #     well_to_insert.plate_id,
-    #     well_to_insert.well_id,
-    #     well_to_insert.experiment_id,
-    #     well_to_insert.project_id,
-    #     well_to_insert.status,
-    #     datetime.now().isoformat(timespec="seconds"),
-    #     json.dumps(well_to_insert.contents),
-    #     well_to_insert.volume,
-    #     json.dumps(asdict(well_to_insert.coordinates)),
-    # )
-    # return sql_utilities.execute_sql_command_no_return(statement, values)
 
     with SessionLocal() as session:
         session.add(WellHx(**well_to_insert.__dict__))
@@ -862,38 +537,12 @@ def update_well(well_to_update: object) -> None:
     """
     Updating the entry in the well_hx table that matches the well and plate ids.
 
+    Args:
+        well_to_update (Well): The well to update.
+
     Returns:
-        str: The SQL statement.
+        None
     """
-    # statement = """
-    # UPDATE well_hx
-    # SET
-    #     plate_id = ?,
-    #     well_id = ?,
-    #     experiment_id = ?,
-    #     project_id = ?,
-    #     status = ?,
-    #     status_date = ?,
-    #     contents = ?,
-    #     volume = ?,
-    #     coordinates = ?
-    # WHERE plate_id = ?
-    # AND well_id = ?
-    # """
-    # values = (
-    #     well_to_update.plate_id,
-    #     well_to_update.well_id,
-    #     well_to_update.experiment_id,
-    #     well_to_update.project_id,
-    #     well_to_update.status,
-    #     datetime.now().isoformat(timespec="seconds"),
-    #     json.dumps(well_to_update.contents),
-    #     well_to_update.volume,
-    #     json.dumps(asdict(well_to_update.coordinates)),
-    #     well_to_update.plate_id,
-    #     well_to_update.well_id,
-    # )
-    # return sql_utilities.execute_sql_command_no_return(statement, values)
 
     with SessionLocal() as session:
         session.query(WellHx).filter(WellHx.plate_id == well_to_update.plate_id).filter(
@@ -911,40 +560,6 @@ def update_well(well_to_update: object) -> None:
         )
         session.commit()
 
-
-def delete_well_from_db(well_id: str, plate_id: Union[int, None] = None) -> None:
-    """
-    Delete a well from the well_hx table.
-
-    Args:
-        well_id (str): The well ID.
-        plate_id (int): The plate ID.
-    """
-    # if plate_id is None:
-    #     plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-
-    # sql_utilities.execute_sql_command_no_return(
-    #     """
-    #     DELETE FROM well_hx
-    #     WHERE well_id = ?
-    #     AND plate_id = ?
-    #     """,
-    #     (well_id, plate_id),
-    # )
-
-    with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
-            )
-        session.query(WellHx).filter(WellHx.plate_id == plate_id).filter(
-            WellHx.well_id == well_id
-        ).delete()
-        session.commit()
-
-
 def get_well_by_id(
     well_id: str,
     plate_id: Union[int, None] = None,
@@ -959,15 +574,6 @@ def get_well_by_id(
     Returns:
         Well: The well.
     """
-
-    # if plate_id is None:
-    #     plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-
-    # statement = "SELECT * FROM well_hx WHERE plate_id = ? AND well_id = ?"
-    # values = (plate_id, well_id)
-    # return complete_well_information(statement, values)
 
     with SessionLocal() as session:
         if plate_id is None:
@@ -998,23 +604,6 @@ def get_well_by_experiment_id(experiment_id: str) -> Tuple:
     Returns:
         Well: The well.
     """
-    # statement = """
-    #     SELECT
-    #         plate_id,
-    #         well_id,
-    #         experiment_id,
-    #         project_id,
-    #         status,
-    #         status_date,
-    #         contents,
-    #         volume,
-    #         coordinates
-
-    #     FROM well_hx WHERE experiment_id = ?"
-    # )
-    # """
-    # values = (experiment_id,)
-    # return complete_well_information(statement, values)
 
     with SessionLocal() as session:
         result = (
@@ -1023,56 +612,6 @@ def get_well_by_experiment_id(experiment_id: str) -> Tuple:
         if result == []:
             return None
         return result[0]
-
-
-# def complete_well_information(returned_well_model: WellHx) -> Tuple:
-#     """
-#     Take in the well model from other functions and turn the output into the Well object.
-#     """
-#     result = sql_utilities.execute_sql_command(sql_command, values)
-#     (
-#         plate_id,
-#         well_id,
-#         experiment_id,
-#         project_id,
-#         status,
-#         status_date,
-#         contents,
-#         volume,
-#         coordinates,
-#         _,
-#     ) = result[0]
-
-#     if result == []:
-#         logger.error("Error: No well found in the well_hx table.")
-#         logger.error("Statment Was: %s, Values Were: %s", sql_command, values)
-#         return None
-
-#     # Based on the plate ID, get the well type number, capacity, height
-#     well_type = sql_utilities.execute_sql_command(
-#         "SELECT type_id FROM wellplates WHERE id = ?", (plate_id,)
-#     )
-
-#     try:
-#         capacity, height = sql_utilities.execute_sql_command(
-#             "SELECT capacity_ul, height_mm FROM well_types WHERE id = ?",
-#             (well_type[0][0],),
-#         )[0]
-#     except IndexError:
-#         capacity, height = 300, 6
-#     return Tuple(
-#         plate_id,
-#         well_id,
-#         experiment_id,
-#         project_id,
-#         status,
-#         status_date,
-#         contents,
-#         volume,
-#         (json.loads(coordinates)),
-#         capacity,
-#         height,
-#     )
 
 
 def select_well_characteristics(type_id: int) -> PlateTypes:
@@ -1085,10 +624,6 @@ def select_well_characteristics(type_id: int) -> PlateTypes:
     Returns:
         The SQL Alchemy object for the well type.
     """
-    # return sql_utilities.execute_sql_command(
-    #     "SELECT radius_mm, offset_mm, capacity_ul, height_mm, shape FROM well_types WHERE id = ?",
-    #     (type_id,),
-    # )[0]
 
     with SessionLocal() as session:
         result = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
@@ -1099,27 +634,13 @@ def update_well_coordinates(
     well_id: str, plate_id: Union[int, None], coordinates: object
 ) -> None:
     """
-    Update the coordinates of a well in the well_hx table.
+    Update the coordinates of an individal well in the well_hx table.
 
     Args:
         well_id (str): The well ID.
         plate_id (int): The plate ID.
         coordinates (WellCoordinates): The coordinates.
     """
-    # if plate_id is None:
-    #     plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-
-    # sql_utilities.execute_sql_command(
-    #     """
-    #     UPDATE well_hx
-    #     SET coordinates = ?
-    #     WHERE well_id = ?
-    #     AND plate_id = ?
-    #     """,
-    #     (json.dumps(asdict(coordinates)), well_id, plate_id),
-    # )
 
     with SessionLocal() as session:
         if plate_id is None:
@@ -1143,23 +664,6 @@ def update_well_status(
         plate_id (int): The plate ID.
         status (str): The status.
     """
-    # if plate_id is None:
-    #     plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-    # if status is None:
-    #     status = select_well_status(well_id, plate_id)
-
-    # sql_utilities.execute_sql_command_no_return(
-    #     """
-    #     UPDATE well_hx
-    #     SET status = ?,
-    #         status_date = datetime('now', 'localtime')
-    #     WHERE well_id = ?
-    #     AND plate_id = ?
-    #     """,
-    #     (status, well_id, plate_id),
-    # )
 
     with SessionLocal() as session:
         if plate_id is None:
