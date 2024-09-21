@@ -319,23 +319,25 @@ class Wellplate:
         orientation: int = 0,
         columns: int = 12,
         rows: str = "ABCDEFGH",
-        type_number: Union[int,None] = None,
+        type_number: Union[int, None] = None,
         new_well_plate: bool = False,
         plate_id: int = None,
     ) -> None:
         """
         Initializes a new instance of the Wells2 class.
         """
-        self.wells:dict = {}
-        self.a1_x:float = x_a1
-        self.a1_y:float = y_a1
+        self.wells: dict = {}
+        self.a1_x: float = x_a1
+        self.a1_y: float = y_a1
         self.rows: str = rows
         self.columns: int = columns
-        self.orientation:int = orientation
-        self.z_bottom:float = -70
-        self.echem_height:float = -72.5  # for every well
-        self.image_height:float = -50  # The height from which to image the well in mm
-        current_plate_id, current_type_number, _ = sql_wellplate.select_current_wellplate_info()
+        self.orientation: int = orientation
+        self.z_bottom: float = -70
+        self.echem_height: float = -72.5  # for every well
+        self.image_height: float = -50  # The height from which to image the well in mm
+        current_plate_id, current_type_number, _ = (
+            sql_wellplate.select_current_wellplate_info()
+        )
         if type_number is None:
             self.type_number = current_type_number
         else:
@@ -343,27 +345,27 @@ class Wellplate:
         self.plate_id = (
             current_plate_id if plate_id is None else plate_id
         )  # The id of the well plate
-        self.z_top:float = float(0)
-        self.height:float = float(6.0)  # The height of the well plate in mm
-        self.radius:float = float(3.25)  # new circular wells
-        self.well_row_offset:float = float(9.0)  # mm from center to center
-        self.well_col_offset:float = float(9.0)  # mm from center to center
-        self.well_capacity:float = float(300)  # ul
+        self.z_top: float = float(0)
+        self.height: float = float(6.0)  # The height of the well plate in mm
+        self.radius: float = float(3.25)  # new circular wells
+        self.well_row_offset: float = float(9.0)  # mm from center to center
+        self.well_col_offset: float = float(9.0)  # mm from center to center
+        self.well_capacity: float = float(300)  # ul
         # overwrite the default values with the values from the well_type table
         wellplate_type = self.read_well_type_characteristics(self.type_number)
-        self.radius:float = wellplate_type.radius_mm
-        self.well_row_offset:float = wellplate_type.y_spacing
-        self.well_col_offset:float = wellplate_type.x_spacing
-        self.well_capacity:float = wellplate_type.capacity_ul
-        self.height:float = wellplate_type.gasket_height_mm
-        self.shape:str = wellplate_type.shape
-        self.z_top:float = self.z_bottom + float(wellplate_type.gasket_height_mm)
-        self.gasket_length:float = wellplate_type.gasket_length_mm
-        self.gasket_width:float = wellplate_type.gasket_width_mm
-        self.a1_y_wall_offset:float = wellplate_type.y_offset
-        self.a1_x_wall_offset:float = wellplate_type.x_offset
-        self.rows:str = wellplate_type.rows
-        self.columns:int = int(wellplate_type.cols)
+        self.radius: float = wellplate_type.radius_mm
+        self.well_row_offset: float = wellplate_type.y_spacing
+        self.well_col_offset: float = wellplate_type.x_spacing
+        self.well_capacity: float = wellplate_type.capacity_ul
+        self.height: float = wellplate_type.gasket_height_mm
+        self.shape: str = wellplate_type.shape
+        self.z_top: float = self.z_bottom + float(wellplate_type.gasket_height_mm)
+        self.gasket_length: float = wellplate_type.gasket_length_mm
+        self.gasket_width: float = wellplate_type.gasket_width_mm
+        self.a1_y_wall_offset: float = wellplate_type.y_offset
+        self.a1_x_wall_offset: float = wellplate_type.x_offset
+        self.rows: str = wellplate_type.rows
+        self.columns: int = int(wellplate_type.cols)
         # Load the well plate location from the well_location json file
         (
             self.a1_x,
@@ -779,21 +781,31 @@ def _remove_experiment_from_db(experiment_id: int) -> tuple[bool, str]:
     # 3. Update the well_hx table to remove the experiment_id and project_id
     try:
         with SessionLocal() as session:
-            session.query(Experiments).filter(
-                Experiments.experiment_id == experiment_id
-            ).delete()
-            session.query(ExperimentParameters).filter(
-                ExperimentParameters.experiment_id == experiment_id
-            ).delete()
-            session.query(WellHx).filter(WellHx.experiment_id == experiment_id).update(
-                {"experiment_id": None, "project_id": None, "status": "new"}
+            out_experiments = (
+                session.query(Experiments)
+                .filter(Experiments.experiment_id == experiment_id)
+                .delete()
+            )
+            out_params = (
+                session.query(ExperimentParameters)
+                .filter(ExperimentParameters.experiment_id == experiment_id)
+                .delete()
+            )
+            out_wells = (
+                session.query(WellHx)
+                .filter(WellHx.experiment_id == experiment_id)
+                .update({"experiment_id": None, "project_id": None, "status": "new"})
             )
             session.commit()
 
-        return True, "Experiment deleted successfully"
+        if (out_experiments + out_params + out_wells) > 0:
+            return True, "Experiment deleted successfully"
+        else:
+            return False, "Experiment not found"
     except Exception as e:
         print(f"Error occurred while deleting the experiment: {e}")
         return False, f"Error occurred while deleting the experiment: {e}"
+
 
 def change_wellplate_location():
     """Change the location of the wellplate"""
@@ -805,17 +817,19 @@ def change_wellplate_location():
         working_volume = mill_config_record.config["working_volume"]
 
     ## Get the current plate id and location
-    current_plate_id, current_type_number, _ = sql_wellplate.select_current_wellplate_info()
+    current_plate_id, current_type_number, _ = (
+        sql_wellplate.select_current_wellplate_info()
+    )
     print(f"Current wellplate id: {current_plate_id}")
     print(f"Current wellplate type number: {current_type_number}")
 
     wellplate = Wellplate(
-            plate_id=current_plate_id,
-        )
+        plate_id=current_plate_id,
+    )
 
     ## Ask for the new location
     while True:
-        new_location_x = (input("Enter the new x location of the wellplate: "))
+        new_location_x = input("Enter the new x location of the wellplate: ")
         if new_location_x == "":
             new_location_x = wellplate.a1_x
             break
@@ -832,7 +846,7 @@ def change_wellplate_location():
         )
 
     while True:
-        new_location_y = (input("Enter the new y location of the wellplate: "))
+        new_location_y = input("Enter the new y location of the wellplate: ")
 
         if new_location_y == "":
             new_location_y = wellplate.a1_y
@@ -870,14 +884,15 @@ Enter the new orientation of the wellplate: """
             print("Invalid input. Please enter 0, 1, 2, or 3.")
 
     wellplate = Wellplate(
-            plate_id=current_plate_id,
-        )
+        plate_id=current_plate_id,
+    )
 
     wellplate.a1_x = new_location_x
     wellplate.a1_y = new_location_y
     wellplate.orientation = new_orientation
     wellplate.write_wellplate_location()
     wellplate.recalculate_well_locations()
+
 
 def load_new_wellplate(
     ask: bool = False,
@@ -980,12 +995,16 @@ def load_new_wellplate_sql(
     )
 
     if ask:
-        new_plate_id = int(input(
-            f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
-        ))
-        new_wellplate_type_number = int(input(
-            f"Enter the new wellplate type number (Current type is {current_type_number}): "
-        ))
+        new_plate_id = int(
+            input(
+                f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
+            )
+        )
+        new_wellplate_type_number = int(
+            input(
+                f"Enter the new wellplate type number (Current type is {current_type_number}): "
+            )
+        )
     else:
         if new_plate_id is None or new_plate_id == "":
             new_plate_id = current_wellplate_id + 1
