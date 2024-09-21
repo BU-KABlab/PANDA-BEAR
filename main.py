@@ -99,16 +99,32 @@ def remove_wellplate_from_database():
 
 def remove_experiment_from_database():
     """Removes a user provided experiment from the database."""
-    experiment_to_remove = int(
-        input("Enter the experiment number to remove: ").strip().lower()
-    )
+    experiments_to_remove = input("Enter the experiment number(s) to remove seperated by commas: ").strip().lower()
+    experiments_to_remove = experiments_to_remove.split(",")
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY,
         "removing experiment from database",
         read_testing_config(),
     )
-    wellplate._remove_experiment_from_db(experiment_to_remove)
+    removed = []
+    not_removed = []
 
+    for experiment in experiments_to_remove:
+        try:
+            experiment = int(experiment)
+            result = wellplate._remove_experiment_from_db(experiment)
+            if result:
+                removed.append(experiment)
+            else:
+                not_removed.append(experiment)
+        except ValueError:
+            print(f"Invalid experiment number: {experiment}")
+            not_removed.append(experiment)
+            continue
+
+    print(f"Removed experiments: {removed}")
+    print(f"Experiments not removed: {not_removed}")
+    input("Press Enter to continue...")
 
 def print_wellplate_info():
     """
