@@ -10,7 +10,7 @@ from sqlalchemy import DateTime, Integer, func, cast
 from panda_lib import wellplate as wellplate_module
 from panda_lib.sql_tools import sql_utilities
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import WellHx, WellPlates, WellTypes
+from panda_lib.sql_tools.panda_models import WellHx, WellPlates, PlateTypes
 
 logger = sql_utilities.logger
 
@@ -164,7 +164,7 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
     with SessionLocal() as session:
 
         # Fetch the information about the type of wellplate
-        well_type = session.query(WellTypes).filter(WellTypes.id == type_id).first()
+        well_type = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
 
         session.add(
             WellPlates(
@@ -479,11 +479,11 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
                 WellHx.project_id,
                 WellHx.volume,
                 WellHx.coordinates,
-                WellTypes.capacity_ul,
-                WellTypes.gasket_height_mm,
+                PlateTypes.capacity_ul,
+                PlateTypes.gasket_height_mm,
             )
             .join(WellPlates, WellHx.plate_id == WellPlates.id)
-            .join(WellTypes, WellPlates.type_id == WellTypes.id)
+            .join(PlateTypes, WellPlates.type_id == PlateTypes.id)
             .filter(WellHx.plate_id == plate_id)
             .order_by(WellHx.well_id.asc())
             .all()
@@ -1075,7 +1075,7 @@ def get_well_by_experiment_id(experiment_id: str) -> Tuple:
 #     )
 
 
-def select_well_characteristics(type_id: int) -> WellTypes:
+def select_well_characteristics(type_id: int) -> PlateTypes:
     """
     Select the well characteristics from the well_types table.
 
@@ -1091,7 +1091,7 @@ def select_well_characteristics(type_id: int) -> WellTypes:
     # )[0]
 
     with SessionLocal() as session:
-        result = session.query(WellTypes).filter(WellTypes.id == type_id).first()
+        result = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
         return result
 
 

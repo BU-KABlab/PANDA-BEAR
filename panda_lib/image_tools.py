@@ -6,7 +6,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import WellTypes
+from panda_lib.sql_tools.panda_models import PlateTypes
 from panda_lib.experiment_class import ExperimentBase
 
 def add_data_zone(
@@ -42,7 +42,7 @@ def add_data_zone(
             # )
 
             session = SessionLocal()
-            substrate = session.query(WellTypes).filter_by(id=wellplate_id).first().substrate
+            substrate = session.query(PlateTypes).filter_by(id=wellplate_id).first().substrate
         except:
             substrate = "ITO"
 

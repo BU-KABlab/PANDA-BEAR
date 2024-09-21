@@ -307,10 +307,10 @@ class WellHx(Base):
         return f"<WellHx(plate_id={self.plate_id}, well_id={self.well_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, volume={self.volume}, coordinates={self.coordinates}, updated={self.updated})>"
 
 
-class WellTypes(Base):
+class PlateTypes(Base):
     """WellTypes table model"""
 
-    __tablename__ = "well_types"
+    __tablename__ = "plate_types"
     id: int = Column(Integer, primary_key=True)
     substrate: str = Column(String)
     gasket: str = Column(String)

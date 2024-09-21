@@ -23,7 +23,7 @@ from .sql_tools.panda_models import (
     WellHx,
     WellPlates,
     MillConfig,
-    WellTypes,
+    PlateTypes,
 )
 from .vessel import Vessel, VesselCoordinates
 
@@ -729,7 +729,7 @@ class Wellplate:
         for well_id, well_data in self.wells.items():
             logger.info("Well %s status: %s", well_id, well_data["status"])
 
-    def read_well_type_characteristics(self, type_number: int) -> WellTypes:
+    def read_well_type_characteristics(self, type_number: int) -> PlateTypes:
         """Read the well type characteristics from the well_type.csv config file"""
 
         # Select the well type characteristics from the well_types sql table given the type_number
