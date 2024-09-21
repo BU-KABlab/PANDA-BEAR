@@ -281,6 +281,7 @@ class ExperimentBase:
 
     experiment_id: int = None
     experiment_name: str = None
+    experiment_name = experiment_name.lower() if experiment_name else None
     protocol_id: Union[int,str] = None
     priority: Optional[int] = 0
     well_id: Optional[str] = None
@@ -1420,15 +1421,17 @@ def select_results(experiment_id: int) -> List[ExperimentResultsRecord]:
     #     """,
     #     (experiment_id,),
     # )
-
+    results = []
     with SessionLocal() as session:
         result = session.query(ExperimentResults).filter(ExperimentResults.experiment_id == experiment_id).all()
-    result_parameters = []
+
     for row in result:
-        result_parameters.append(row)
-    results = []
-    for row in result_parameters:
-        results.append(ExperimentResultsRecord(*row))
+        results.append(ExperimentResultsRecord(
+            experiment_id=row.experiment_id,
+            result_type=row.result_type,
+            result_value=row.result_value,
+            context=row.context
+        ))
     return results
 
 
