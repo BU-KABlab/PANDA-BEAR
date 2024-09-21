@@ -2,7 +2,7 @@
 Vessel module.
 """
 from dataclasses import dataclass
-from typing import Any, Union, Optional
+from typing import Union, Optional
 from panda_lib.errors import OverFillException, OverDraftException
 from panda_lib.log_tools import setup_default_logger
 
