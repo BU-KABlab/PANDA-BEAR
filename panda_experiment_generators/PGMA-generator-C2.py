@@ -17,8 +17,10 @@ TESTING = read_testing_config()
 PROJECT_ID = 18
 EXPERIMENT_NAME = "PGMA-screening-C2"
 CAMPAIGN_ID = 1
+PLATE_TYPE = 7 # 10 mm diameter wells
 DEFAULT_PUMPING_RATE = config.getfloat("DEFAULTS", "pumping_rate")
 GENERATORS_DIR = Path(config.get("GENERAL", "generators_dir"))
+SYSTEM_VERSION = get_current_pin()
 
 print("TEST MODE: ", TESTING)
 input("Press enter to continue")
@@ -43,9 +45,9 @@ def main():
                 experiment_id=experiment_id,
                 protocol_id='PGMA-protocol-C2',  # figure this out
                 well_id="A1",
-                well_type_number=7,
+                well_type_number=PLATE_TYPE,
                 experiment_name=EXPERIMENT_NAME,
-                pin=get_current_pin(),
+                pin=SYSTEM_VERSION,
                 project_id=PROJECT_ID,
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={
@@ -55,16 +57,8 @@ def main():
                     "DMFrinse": 320,
                     "ACNrinse": 320,
                 },
-                solutions_corrected={
-                    "PGMA-phenol": 0,
-                    "DMF-TBAPrinse": 0,
-                    "FC": 0,
-                    "DMFrinse": 0,
-                    "ACNrinse": 0,
-                },
                 pumping_rate=DEFAULT_PUMPING_RATE,
-                status=experiment_class.ExperimentStatus.NEW,
-                filename=EXPERIMENT_NAME + " " + str(experiment_id),
+                filename=EXPERIMENT_NAME + "_" + str(experiment_id),
                 # Echem specific
                 ocp=1,
                 baseline=0,
