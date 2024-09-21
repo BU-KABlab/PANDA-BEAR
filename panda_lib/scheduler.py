@@ -29,14 +29,11 @@ from .experiment_class import (
     update_experiment_status,
 )
 from .sql_tools.db_setup import SessionLocal
-from .sql_tools.panda_models import ExperimentParameters, Experiments
+from .sql_tools.panda_models import ExperimentParameters, Experiments, Projects
 from .sql_tools.sql_queue import (
-    count_queue_length,
     get_next_experiment_from_queue,
-    select_queue,
 )
 from .sql_tools.sql_wellplate import (
-    count_wells_with_new_status,
     get_well_by_id,
     select_current_wellplate_info,
     select_next_available_well,
@@ -330,6 +327,10 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
                 )
                 experiment.well_id = target_well
 
+        # Check if the project_id is in the projects table, if not add it
+        if not check_project_id(experiment.project_id):
+            add_project_id(experiment.project_id)
+
         # Individually insert the experiment and update the status
         # We do this so that the wellchecker is checking as the wells are allocated
         # The parameters are quite lengthly, so we will save those for a bulk entry
@@ -377,6 +378,27 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
     logger.info("Experiments loaded and added to queue")
     return 1
 
+def check_project_id(project_id: int) -> bool:
+    """Check if the project_id is in the projects table"""
+    try:
+        with SessionLocal() as session:
+            project = session.query(Projects).filter_by(project_id=project_id).first()
+            if project is None:
+                return False
+            return True
+    except sqlite3.Error as e:
+        logger.error("Error occured while checking project id: %s", e)
+        raise e
+
+def add_project_id(project_id: int) -> None:
+    """Add the project_id to the projects table"""
+    try:
+        with SessionLocal() as session:
+            session.add(Projects(project_id=project_id))
+            session.commit()
+    except sqlite3.Error as e:
+        logger.error("Error occured while adding project id: %s", e)
+        raise e
 
 def save_results(experiment: ExperimentBase) -> None:
     """
@@ -405,34 +427,6 @@ def save_results(experiment: ExperimentBase) -> None:
     for result in results_lists:
         # Save the results to the database
         insert_experiment_result(result)
-
-
-def count_available_wells(self) -> int:
-    """Return the number of wells available for experiments"""
-    try:
-        available_wells = count_wells_with_new_status()
-        return available_wells
-    except sqlite3.Error as e:
-        logger.error("Error occured while counting available wells: %s", e)
-        raise e
-
-
-def get_queue(self) -> pd.DataFrame:
-    """Return the queue as a DataFrame"""
-    try:
-        queue = select_queue()
-        queue = pd.DataFrame(
-            queue, columns=["id", "priority", "process_type", "filename"]
-        )
-        return queue
-    except sqlite3.Error as e:
-        logger.error("Error occured while getting queue: %s", e)
-        raise e
-
-
-def get_queue_length() -> int:
-    """Get queue length"""
-    return count_queue_length()
 
 
 def determine_next_experiment_id() -> int:
