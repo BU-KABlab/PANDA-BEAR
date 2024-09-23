@@ -430,8 +430,10 @@ if __name__ == "__main__":
         ).strip()
     )
 
+    time.sleep(2)
+
     sql_system_state.set_system_status(utilities.SystemState.ON, "at main menu")
-    time.sleep(1)
+    time.sleep(0.1)
     sql_protocol_utilities.read_in_protocols()
 
     while True:
@@ -455,7 +457,7 @@ if __name__ == "__main__":
             f"""
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
 The current pipette id is {current_pipette}
-The queue has {scheduler.get_queue_length()} experiments.
+The queue has {sql_queue.count_queue_length()} experiments.
 """
         )
         print("\nWhat would you like to do?")
