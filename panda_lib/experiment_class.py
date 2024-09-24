@@ -291,33 +291,14 @@ class ExperimentBase:
     pin: Union[str, int] = None
     project_id: int = None
     solutions: dict = None
-
-    # Validate that all dictionary keys are lowercase
-    if solutions is not None:
-        for key in solutions.keys():
-            solutions[str(key).lower()] = solutions.pop(key) # Change the key to lowercase
-    else:
-        solutions = {}
-    solutions_corrected: dict = solutions
-    well_type_number: int = (
-        None  # is used to indicate the type of well the experiment should run in
-    )
+    solutions_corrected: dict = None
+    well_type_number: int = None
     pumping_rate: float = float(0.3)
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None  # Optional[FilePath] = None
     well_id: Optional[str] = None
     pin: str = None
-    project_id: int = None
-    solutions: dict = None
-    solutions_corrected: dict = solutions
-    well_type_number: int = (
-        None  # is used to indicate the type of well the experiment should run in
-    )
-    pumping_rate: float = float(0.3)
-    status: ExperimentStatus = ExperimentStatus.NEW
-    status_date: datetime = field(default_factory=datetime.now)
-    filename: str = None  # Optional[FilePath] = None
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
     protocol_type: int = 1  # depreciated
@@ -327,9 +308,17 @@ class ExperimentBase:
     jira_issue_key: Optional[str] = None
     experiment_type: int = 0
     well: object= None
-
     analyzer: Union[Callable, str, None] = None
     generator: Union[Callable, str, None] = None
+
+    def __post_init__(self):
+        # Validate that all dictionary keys are lowercase
+        if self.solutions is None:
+            self.solutions = {}
+        else:
+            self.solutions = {key.lower(): value for key, value in self.solutions.items()}
+        if self.solutions_corrected is None:
+            self.solutions_corrected = self.solutions
 
     @property
     def experiment_identifier(self):
