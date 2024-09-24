@@ -65,7 +65,9 @@ def run_panda_sdl_without_ml():
             print("Invalid choice. Please try again.")
             continue
         elif one_off[0] == "y":
-            controller.main(one_off=True)
+            print_queue_info()
+            spec_id = input("Enter the experiment ID: ").strip().lower()
+            controller.main(one_off=True, specific_experiment_id=spec_id)
             break
         elif one_off[0] == "n":
             controller.main()
@@ -165,9 +167,10 @@ def print_queue_info():
     """Prints a summary of the current queue."""
     current_queue = sql_queue.select_queue()
     print("Current Queue:")
-    for experiment in current_queue:
-        experiment: ExperimentBase
-        print(f"{experiment.experiment_id}-{experiment.priority}-{experiment.filename}-{experiment.well_id}")
+    print("Experiment ID-Project ID-Campaign ID-Priority-Well ID")
+    for exp in current_queue:
+        exp: ExperimentBase
+        print(f"{exp.experiment_id}-{exp.project_id}-{exp.project_campaign_id}-{exp.priority}-{exp.well_id}")
     input("Press Enter to continue...")
 
 
