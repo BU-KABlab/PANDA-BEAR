@@ -8,20 +8,25 @@ import pandas as pd
 
 from panda_experiment_analyzers.pedot.sql_ml_functions import \
     insert_ml_training_data
+from panda_lib import experiment_class, scheduler
 from panda_lib.config.config_tools import read_testing_config
+from panda_lib.correction_factors import correction_factor
 from panda_lib.experiment_class import (ExperimentResultsRecord,
                                         insert_experiment_result,
                                         select_specific_result)
 from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.sql_tools.sql_system_state import get_current_pin
 
 from . import PEDOT_FindLAB as lab
 from . import PEDOT_MetricsCalc as met
-from .experiment_generator import determine_next_experiment_id, pedot_generator
 from .ml_input import populate_required_information as analysis_input
 from .ml_model import pedot_model
 from .pedot_classes import (MLInput, MLOutput, MLTrainingData, PEDOTMetrics,
                             PEDOTParams, RawMetrics, RequiredData)
 
+CURRENT_PIN = get_current_pin()
+
+PROJECT_ID = 16
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
 
@@ -33,6 +38,117 @@ ml_file_paths = MLInput(
     BestTestPointsCSV=Path("ml_model/BestTestPoints.csv"),
     contourplots_path="ml_model/contourplots/contourplot",
 )
+
+
+def main(experiment_id: int = None, generate_experiment: bool = True):
+    """
+    Main function for the PEDOT analyzer.
+
+    If the system is in testing mode, the function will only generate a new experiment.
+    It will not analyze the experiment.
+
+    Args:
+        experiment_id (int, optional): The experiment ID to analyze. Defaults to None.
+        generate_experiment (bool, optional): Whether to generate a new experiment. Defaults to True.
+
+    Returns:
+        int: The ID of the new experiment if generate_experiment is True. Otherwise, None.
+
+    """
+    # Analyze the experiment
+    analyze(experiment_id, add_to_training_data=True)
+
+    if not generate_experiment:
+        return None
+
+    # Run the ML model
+    new_experiment_id = run_ml_model()  # Generate a new experiment
+    return new_experiment_id
+
+
+def run_ml_model(generate_experiment_id=None) -> MLOutput:
+    """
+    Runs the ML model for the PEDOT experiment.
+
+    Args:
+        generate_experiment_id ([type], optional): The experiment ID to generate. Defaults to None.
+    """
+    if generate_experiment_id is None:
+        generate_experiment_id = scheduler.determine_next_experiment_id()
+
+    # Run the ML model
+    results = pedot_model(
+        ml_file_paths.model_base_path,
+        ml_file_paths.contourplots_path,
+        experiment_id=generate_experiment_id,
+    )
+
+    ml_output = MLOutput(*results)
+
+    params = PEDOTParams(
+        dep_v=ml_output.v_dep,
+        dep_t=ml_output.t_dep,
+        concentration=ml_output.edot_concentration,
+    )
+
+    # Generate the next experiment
+    exp_id = pedot_generator(
+        params, experiment_name="PEDOT_Optimization", campaign_id=0
+    )
+    return exp_id
+
+
+
+
+
+def pedot_generator(
+    params: PEDOTParams, experiment_name="PEDOT_Optimization", campaign_id=0
+) -> int:
+    """Generates a PEDOT experiment."""
+    experiment_id = scheduler.determine_next_experiment_id()
+    experiment = experiment_class.PEDOTExperiment(
+        experiment_id=experiment_id,
+        protocol_id=15,  # PEDOT protocol v4
+        well_id="A1",  # Default to A1, let the program decide where else to put it
+        well_type_number=4,
+        experiment_name=experiment_name,
+        pin=str(CURRENT_PIN),
+        project_id=PROJECT_ID,
+        project_campaign_id=campaign_id,
+        solutions={"edot": 120, "liclo4": 0, "rinse": 120},
+        solutions_corrected={},
+        status=experiment_class.ExperimentStatus.NEW,
+        filename=experiment_name + " " + str(experiment_id),
+        # Echem specific
+        ocp=1,
+        baseline=0,
+        cv=0,
+        ca=1,
+        ca_sample_period=0.1,
+        ca_prestep_voltage=0.0,
+        ca_prestep_time_delay=0.0,
+        ca_step_1_voltage=params.dep_v,
+        ca_step_1_time=params.dep_t,
+        ca_step_2_voltage=0.0,
+        ca_step_2_time=0.0,
+        ca_sample_rate=0.5,
+        edot_concentration=params.concentration,
+        analyzer=analyze,
+        generator=run_ml_model,
+    )
+
+    # Add the correction factors
+    for solution in experiment.solutions.keys():
+        experiment.solutions_corrected[solution] = correction_factor(
+            experiment.solutions[solution], experiment.well_type_number
+        )
+
+    scheduler.add_nonfile_experiments(
+        [
+            experiment,
+        ]
+    )
+    return experiment_id
 
 
 def analyze(experiment_id: int, add_to_training_data:bool=False) -> MLTrainingData:
@@ -50,7 +166,7 @@ def analyze(experiment_id: int, add_to_training_data:bool=False) -> MLTrainingDa
         return
 
     if experiment_id is None:
-        experiment_id = determine_next_experiment_id() - 1 # Get the last experiment ID
+        experiment_id = scheduler.determine_next_experiment_id() - 1 # Get the last experiment ID
 
     input_data: RequiredData = analysis_input(experiment_id)
     metrics:RawMetrics = lab.rgbtolab(input_data)
@@ -114,34 +230,6 @@ def analyze(experiment_id: int, add_to_training_data:bool=False) -> MLTrainingDa
 
     return ml_training_data
 
-def run_ml_model(generate_experiment_id=None) -> MLOutput:
-    """
-    Runs the ML model for the PEDOT experiment.
-
-    Args:
-        generate_experiment_id ([type], optional): The experiment ID to generate. Defaults to None.
-    """
-    if generate_experiment_id is None:
-        generate_experiment_id = determine_next_experiment_id()
-
-    # Run the ML model
-    results = pedot_model(
-        ml_file_paths.model_base_path,
-        ml_file_paths.contourplots_path,
-        experiment_id=generate_experiment_id,
-    )
-
-    ml_output = MLOutput(*results)
-
-    params = PEDOTParams(
-        dep_v=ml_output.v_dep,
-        dep_t=ml_output.t_dep,
-        concentration=ml_output.edot_concentration,
-    )
-
-    # Generate the next experiment
-    exp_id = pedot_generator(params, experiment_name="PEDOT_Optimization", campaign_id=0)
-    return exp_id
 
 def share_analysis_to_slack(
     experiment_id: int, next_exp_id: int = None, slack: SlackBot = None
@@ -228,29 +316,3 @@ def share_analysis_to_slack(
             )
 
     return
-
-
-def main(experiment_id: int = None, generate_experiment: bool = True):
-    """
-    Main function for the PEDOT analyzer.
-    
-    If the system is in testing mode, the function will only generate a new experiment.
-    It will not analyze the experiment.
-
-    Args:
-        experiment_id (int, optional): The experiment ID to analyze. Defaults to None.
-        generate_experiment (bool, optional): Whether to generate a new experiment. Defaults to True.
-
-    Returns:
-        int: The ID of the new experiment if generate_experiment is True. Otherwise, None.
-
-    """
-    # Analyze the experiment
-    analyze(experiment_id, add_to_training_data = True)
-
-    if not generate_experiment:
-        return None
-
-    # Run the ML model
-    new_experiment_id = run_ml_model() # Generate a new experiment
-    return new_experiment_id
