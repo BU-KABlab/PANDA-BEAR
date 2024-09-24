@@ -23,9 +23,6 @@ DEFAULT_PUMPING_RATE = config.getfloat("DEFAULTS", "pumping_rate")
 GENERATORS_DIR = Path(config.get("GENERAL", "generators_dir"))
 SYSTEM_VERSION = get_current_pin()
 
-print("TEST MODE: ", TESTING)
-input("Press enter to continue")
-
 params_df = pd.read_csv(
    GENERATORS_DIR / "LHS-Parameters-C2.csv"
 )  # Update path with location on PANDA computer
