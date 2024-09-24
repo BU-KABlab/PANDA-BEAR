@@ -436,13 +436,38 @@ if __name__ == "__main__":
     time.sleep(0.1)
     sql_protocol_utilities.read_in_protocols()
 
+    print()
+    print(print_panda.print_panda())
+    print()
+    print("Welcome to PANDA_SDL!")
+
+    # User sign in
+    while True:
+        user_name = input("Enter your username: ").strip().lower()
+        # Look up user in db
+
+        # If user is not found, ask if they would like to create a new user
+
+        # If user is found, ask for password
+
+        # If password is correct, continue to main menu
+
+        # If password is incorrect, ask if they would like to try again
+
+        # If user chooses to try again, repeat password input
+
+        # If user chooses to exit, exit the program
+        break
+
+
+
     while True:
         sql_system_state.set_system_status(utilities.SystemState.IDLE, "at main menu")
         # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
         print()
         print(print_panda.print_panda())
         print()
-        print("Welcome to PANDA_SDL!")
+        print(f"Welcome {user_name}!")
         print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
         if read_testing_config():
             print("Database address: ", read_config()["TESTING"]["testing_db_address"])
@@ -469,7 +494,7 @@ The queue has {sql_queue.count_queue_length()} experiments.
             if user_choice in menu_options:
                 menu_options[user_choice]()
             else:
-                print("Invalid choice. Please try again.")
+                input("Invalid choice. Please try again.")
                 continue
         except controller.ShutDownCommand:
             pass  # The PANDA_SDL loop has been stopped but we don't want to exit the program
