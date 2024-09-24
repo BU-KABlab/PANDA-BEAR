@@ -11,6 +11,8 @@ from panda_lib.controller import (
     connect_to_instruments,
     disconnect_from_instruments,
 )
+from panda_lib.correction_factors import correction_factor
+from panda_lib.utilities import input_validation
 
 purge = 40
 drip_stop = 5
@@ -23,9 +25,11 @@ def main():
     # Connect to instruments
     toolkit, _ = connect_to_instruments(False)
 
-    test_volume = float(input("Enter the volume to test (uL): "))
+    test_volume = input_validation("Enter the volume to test (uL): ", (float,int), 0, 1000)
 
-    
+    test_volume = correction_factor(test_volume)
+
+    # Test the syringe and pipette for retention and suction
     while True:
         # Select solution
         test_solution = solution_selector(stock, "water", test_volume)
