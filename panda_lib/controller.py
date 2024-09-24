@@ -70,6 +70,7 @@ def main(
     one_off: bool = False,
     al_campaign_length: int = None,
     random_experiment_selection: bool = False,
+    specific_experiment_id: int = None,
 ):
     """
     Main function
@@ -137,8 +138,9 @@ def main(
             while current_experiment is None:
                 ## Ask the scheduler for the next experiment
                 current_experiment, _ = scheduler.read_next_experiment_from_queue(
-                    random_pick=random_experiment_selection
+                    random_pick=random_experiment_selection, experiment_id=specific_experiment_id
                 )
+                specific_experiment_id = None  # reset the specific experiment id so that we don't keep running the same experiment
                 if current_experiment is not None:
                     controller_slack.send_slack_message(
                         "alert",

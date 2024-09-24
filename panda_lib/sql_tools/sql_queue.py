@@ -47,7 +47,7 @@ def select_queue() -> list:
         return session.query(Queue).order_by(Queue.priority, Queue.experiment_id).all()
 
 
-def get_next_experiment_from_queue(random_pick: bool = False) -> tuple[int, int, str]:
+def get_next_experiment_from_queue(random_pick: bool = False, specific_experiment_id:int = None) -> tuple[int, int, str]:
     """
     Reads the next experiment from the queue table, the experiment with the
     highest priority (lowest value).
@@ -61,30 +61,25 @@ def get_next_experiment_from_queue(random_pick: bool = False) -> tuple[int, int,
     Returns:
         tuple: The experiment ID, the process type, and the filename.
     """
-    # if random_pick:
-    #     result = execute_sql_command(
-    #         """
-    #         SELECT experiment_id, process_type, filename, project_id, well_id FROM queue
-    #         WHERE priority = (SELECT MIN(priority) FROM queue)
-    #         AND status = 'queued'
-    #         ORDER BY RANDOM()
-    #         LIMIT 1
-    #         """
-    #     )
-    # else:
-    #     result = execute_sql_command(
-    #         """
-    #         SELECT experiment_id, process_type, filename, project_id, well_id FROM queue
-    #         WHERE priority = (SELECT MIN(priority) FROM queue)
-    #         AND status = 'queued'
-    #         ORDER BY experiment_id ASC
-    #         LIMIT 1
-    #         """
-    #     )
+    
+    if specific_experiment_id:
+        with SessionLocal() as session:
+            result = (
+                session.query(Queue)
+                .filter(Queue.experiment_id == specific_experiment_id)
+                .first()
+            )
 
-    # if result == []:
-    #     return None
-    # return result[0][0], result[0][1], result[0][2], result[0][3], result[0][4]
+            if result is None:
+                return None
+
+            return (
+                result.experiment_id,
+                result.process_type,
+                result.filename,
+                result.project_id,
+                result.well_id,
+            )
 
     with SessionLocal() as session:
         if random_pick:
