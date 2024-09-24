@@ -98,6 +98,7 @@ def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> No
 
 def read_next_experiment_from_queue(
     random_pick: bool = True,
+    experiment_id: int = None,
 ) -> Tuple[ExperimentBase, Path]:
     """
     Reads the next experiment from the queue table, the experiment with the highest priority (lowest number).
@@ -106,14 +107,14 @@ def read_next_experiment_from_queue(
 
     Args:
         random_pick (bool): Whether to randomly select an experiment from the queue.
+        experiment_id (int): The experiment id to select from the queue.
 
     Returns:
         Tuple[ExperimentBase]: The next experiment.
     """
     # Get the next experiment from the queue
-
     try:
-        queue_info = get_next_experiment_from_queue(random_pick)
+        queue_info = get_next_experiment_from_queue(random_pick, experiment_id)
     except sqlite3.Error as e:
         logger.error("Error occured while reading next experiment from queue: %s", e)
         raise e
@@ -225,8 +226,8 @@ def add_nonfile_experiment(
             experiment.well_id = target_well
 
     # Data clean the solutions to all be lowercase
-    experiment.solutions = [str(x).lower() for x in experiment.solutions]
-
+    experiment.solutions = {k.lower(): v for k, v in experiment.solutions.items()}
+    experiment.solutions_corrected = experiment.solutions
     # Save the experiment as a separate file in the experiment_queue subfolder
     experiment.set_status_and_save(ExperimentStatus.QUEUED)
 
@@ -331,6 +332,10 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
         if not check_project_id(experiment.project_id):
             add_project_id(experiment.project_id)
 
+        # Data clean the solutions to all be lowercase
+        experiment.solutions = {k.lower(): v for k, v in experiment.solutions.items()}
+        experiment.solutions_corrected = experiment.solutions
+
         # Individually insert the experiment and update the status
         # We do this so that the wellchecker is checking as the wells are allocated
         # The parameters are quite lengthly, so we will save those for a bulk entry
@@ -382,7 +387,7 @@ def check_project_id(project_id: int) -> bool:
     """Check if the project_id is in the projects table"""
     try:
         with SessionLocal() as session:
-            project = session.query(Projects).filter_by(project_id=project_id).first()
+            project = session.query(Projects).filter_by(id=project_id).first()
             if project is None:
                 return False
             return True
@@ -394,7 +399,7 @@ def add_project_id(project_id: int) -> None:
     """Add the project_id to the projects table"""
     try:
         with SessionLocal() as session:
-            session.add(Projects(project_id=project_id))
+            session.add(Projects(id=project_id))
             session.commit()
     except sqlite3.Error as e:
         logger.error("Error occured while adding project id: %s", e)
