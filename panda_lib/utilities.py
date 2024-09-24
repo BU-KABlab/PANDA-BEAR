@@ -220,3 +220,29 @@ def directory_picker():
     directory_path = filedialog.askdirectory()
     root.destroy()
     return directory_path
+
+def input_validation(prompt:str, valid_types:tuple|type|list, value_range:tuple=None, allow_blank:bool = True, custom_error:str=None):
+    """Prompt the user for input and validate the input type."""
+
+    error_message = custom_error if custom_error else "Invalid input type. Please try again."
+
+    while True:
+        try:
+            user_input = input(prompt)
+            if not user_input and allow_blank:
+                return None
+            if isinstance(valid_types, tuple):
+                if not isinstance(user_input, valid_types):
+                    raise ValueError(error_message)
+            elif not isinstance(user_input, valid_types):
+                raise ValueError(error_message)
+
+            if value_range:
+                if not value_range[0] <= user_input <= value_range[1]:
+                    raise ValueError(f"Value must be between {value_range[0]} and {value_range[1]}")
+
+            return user_input
+        except ValueError as e:
+            print(e)
+            continue
+        
