@@ -231,18 +231,26 @@ def input_validation(prompt:str, valid_types:tuple|type|list, value_range:tuple=
             user_input = input(prompt)
             if not user_input and allow_blank:
                 return None
-            if isinstance(valid_types, tuple):
-                if not isinstance(user_input, valid_types):
+
+            # Attempt to convert the input to each of the valid types
+            if isinstance(valid_types, (tuple, list)):
+                for valid_type in valid_types:
+                    try:
+                        converted_input = valid_type(user_input)
+                        break
+                    except (ValueError, TypeError):
+                        continue
+                else:
                     raise ValueError(error_message)
-            elif not isinstance(user_input, valid_types):
-                raise ValueError(error_message)
+            else:
+                converted_input = valid_types(user_input)
 
-            if value_range:
-                if not value_range[0] <= user_input <= value_range[1]:
-                    raise ValueError(f"Value must be between {value_range[0]} and {value_range[1]}")
+            # Check if the converted input is within the specified range
+            if value_range and not (value_range[0] <= converted_input <= value_range[1]):
+                raise ValueError(f"Input must be between {value_range[0]} and {value_range[1]}.")
 
-            return user_input
+            return converted_input
+
         except ValueError as e:
             print(e)
-            continue
         
