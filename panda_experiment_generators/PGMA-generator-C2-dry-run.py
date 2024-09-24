@@ -41,15 +41,16 @@ def main():
         dep_v = row["Voltage"]  # dep_V is used for deposition voltage
         dep_t = row["Time"]  # dep_t is used for deposition time
 
+        # Generate a test experiment for dry run
         experiments.append(
             experiment_class.PGMAExperiment(
                 experiment_id=experiment_id,
-                protocol_id='PGMA-protocol-C2',  # figure this out
+                protocol_id='PGMA-protocol-C2',
                 well_id="A1",
                 well_type_number=PLATE_TYPE,
-                experiment_name=EXPERIMENT_NAME,
+                experiment_name='TEST_' + EXPERIMENT_NAME,
                 pin=SYSTEM_VERSION,
-                project_id=PROJECT_ID,
+                project_id=999,
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={
                     "PGMA-phenol": 320,
@@ -59,7 +60,7 @@ def main():
                     "ACNrinse": 320,
                 },
                 pumping_rate=DEFAULT_PUMPING_RATE,
-                filename=str(experiment_id),
+                filename='test_'+str(experiment_id),
                 # Echem specific
                 ocp=1,
                 baseline=0,
@@ -85,7 +86,6 @@ def main():
                 cv_sample_period=0.1,
             )
         )
-
-        experiment_id += 1
+        break
 
     scheduler.add_nonfile_experiments(experiments)
