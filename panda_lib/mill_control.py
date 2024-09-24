@@ -616,7 +616,7 @@ class Mill:
         y_coord,
         z_coord,
         instrument: Instruments,
-    ) -> int:
+    ) -> Coordinates:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
         Args:
@@ -625,7 +625,7 @@ class Mill:
             z_coord (float): Z coordinate.
             instrument (Instruments): The instrument to move to the specified coordinates.
         Returns:
-            str: Response from the mill after executing the commands.
+            Coordinates: Current center coordinates.
         """
         # Get the current coordinates
         current_coordinates = Coordinates(*self.current_coordinates(instrument))
@@ -691,7 +691,7 @@ class Mill:
         for command in commands:
             self.execute_command(command)
 
-        return 0
+        return Coordinates(*self.current_coordinates(instrument)) #TODO - check if this is the right return or should it be the instrument coordinates
 
     def __should_move_to_zero_first(
         self,
