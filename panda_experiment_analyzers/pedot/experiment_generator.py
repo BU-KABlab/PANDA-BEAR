@@ -2,11 +2,12 @@
 
 from panda_lib import experiment_class
 from panda_lib.correction_factors import correction_factor
-from panda_lib.scheduler import Scheduler, determine_next_experiment_id
+from panda_lib import scheduler
 from panda_lib.sql_tools.sql_system_state import get_current_pin
-from panda_experiment_analyzers.pedot import analyze, run_ml_model
+from panda_experiment_analyzers.pedot.generator import run_ml_model
 
 from .pedot_classes import PEDOTParams
+from .analysis import analyze
 
 CURRENT_PIN =  get_current_pin()
 
@@ -17,7 +18,7 @@ def pedot_generator(
     params: PEDOTParams, experiment_name="PEDOT_Optimization", campaign_id=0
 ) -> int:
     """Generates a PEDOT experiment."""
-    experiment_id = determine_next_experiment_id()
+    experiment_id = scheduler.determine_next_experiment_id()
     experiment = experiment_class.PEDOTExperiment(
         experiment_id=experiment_id,
         protocol_id=15,  # PEDOT protocol v4
@@ -55,6 +56,5 @@ def pedot_generator(
             experiment.solutions[solution], experiment.well_type_number
         )
 
-    scheduler = Scheduler()
     scheduler.add_nonfile_experiments([experiment,])
     return experiment_id
