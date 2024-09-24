@@ -194,7 +194,7 @@ class Projects(Base):
     """Projects table model"""
 
     __tablename__ = "projects"
-    project_id = Column(INTEGER, primary_key=True)
+    id = Column(INTEGER, primary_key=True)
     project_name = Column(TEXT)
     # project_description = Column(TEXT)
     # created = Column(TEXT)
@@ -388,6 +388,7 @@ class Queue(Base):
     __tablename__ = "queue"
     experiment_id = Column(INTEGER, primary_key=True)
     project_id = Column(INTEGER)
+    project_campaign_id = Column(INTEGER)
     priority = Column(INTEGER)
     process_type = Column(TEXT)
     filename = Column(TEXT)
