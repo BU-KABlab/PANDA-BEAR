@@ -24,7 +24,7 @@ import PySpin
 from slack_sdk import errors as slack_errors
 
 from panda_lib import gamry_control_WIP, scheduler
-from panda_experiment_analyzers import pedot as pedot_analyzer
+# from panda_experiment_analyzers import pedot as pedot_analyzer
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 
