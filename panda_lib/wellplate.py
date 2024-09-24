@@ -405,6 +405,7 @@ class Wellplate:
             self.z_top,
             self.orientation,
             self.echem_height,
+            self.image_height,
         ) = self.load_wellplate_location()
         self.a1_coordinates = {
             "x": self.a1_x,
@@ -699,6 +700,7 @@ class Wellplate:
             self.z_top,
             self.orientation,
             self.echem_height,
+            self.image_height,
         ) = self.load_wellplate_location()
 
         # Update the wells for the z_bottom as the depth
