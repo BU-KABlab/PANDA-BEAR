@@ -404,6 +404,11 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
             print(f"Instrument has been toggled to {instrument}")
             well_id = input("Enter the well ID to test (e.g., A1): ").lower()
 
+        # Ensure that the well_id is valid
+        if well_id.upper() not in wellplate.wells:
+            print("Invalid well ID")
+            continue
+
         # Provide the current coordinates of the well
         original_coordinates = wellplate.get_coordinates(well_id)
         print(f"Current coordinates of {well_id}: {original_coordinates}")
@@ -563,7 +568,7 @@ You will be asked to accept the setting, and if you do not, you will be asked to
                 (-80, 0),
             )
 
-            mill.safe_move(
+            current = mill.safe_move(
                 wellplate.get_coordinates(well_id, "x"),
                 wellplate.get_coordinates(well_id, "y"),
                 new_z_bottom,
@@ -579,12 +584,14 @@ You will be asked to accept the setting, and if you do not, you will be asked to
             wellplate.z_bottom = new_z_bottom
             wellplate.z_top = new_z_bottom + wellplate.height
             for well in wellplate.wells:
-                well: Well
-                well.depth = new_z_bottom
-                well.height = new_z_bottom + well.height
+                well_obj: Well = wellplate.wells[well]
+                well_obj.depth = new_z_bottom
+                well_obj.height = new_z_bottom + well_obj.height
                 # We do this instead of recalculating every well location incase
                 # they are uniquely located in x and y
                 # We are assuming the z_bottom is the same for all wells
+                wellplate.write_wellplate_location()  # json file for wellplate location
+                wellplate.recalculate_well_locations()  # Update wells with new coords and depth
         else:
             wellplate.update_well_coordinates(
                 well_id,
@@ -595,8 +602,53 @@ You will be asked to accept the setting, and if you do not, you will be asked to
                     z_top=new_z_bottom + wellplate.height,
                 ),
             )
-        wellplate.write_wellplate_location()
 
+def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
+    """Calibrate the height for the echem"""
+    # Move the pipette to the top of the wellplate
+    response = input(
+        "Electrode will move to 0 above A1. Press enter to proceed or 'q' to quit: "
+    )
+    if response.lower() == "q":
+        return
+    
+    mill.safe_move(
+        wellplate.get_coordinates("A1", "x"),
+        wellplate.get_coordinates("A1", "y"),
+        0,
+        Instruments.ELECTRODE,
+    )
+
+    print(f"Current echem height is set to: {wellplate.echem_height}")
+
+    # Set a new echem height?
+    new_echem_height = input(
+        "Would you like to set a new echem height? (y/n): "
+    ).lower()
+    if new_echem_height in ["y", "yes", ""]:
+        while True:
+            new_echem_height = input_validation(
+                "Enter the new echem height or enter for no change: ", float, (-80, 0)
+            )
+
+            current = mill.safe_move(
+                wellplate.get_coordinates("A1", "x"),
+                wellplate.get_coordinates("A1", "y"),
+                new_echem_height,
+                Instruments.ELECTRODE,
+            )
+
+            response = input(
+                f"Is the echem in the correct position at {current.z}? (yes/no): "
+            ).lower()
+
+            if response in ["y", "yes", ""]:
+                break
+
+        if new_echem_height is not None:
+            wellplate.echem_height = new_echem_height
+            wellplate.write_wellplate_location()
+            print(f"New echem height: {wellplate.echem_height}")
 
 def calibrate_vials(
     mill: Mill,
@@ -642,24 +694,41 @@ def calibrate_camera_focus(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     mill.safe_move(
         wellplate.get_coordinates("A1", "x"),
         wellplate.get_coordinates("A1", "y"),
-        0,
+        wellplate.image_height,
         Instruments.LENS,
     )
 
-    while True:
-        print(f"Current image height: {wellplate.image_height}")
-        # Set a new image height?
-        new_image_height = input(
-            "Would you like to set a new image height? (y/n): "
-        ).lower()
-        if new_image_height == "y":
-            new_height = input_validation(
-                "Enter the new image height: ", float, (wellplate.z_top, 0)
+
+    print(f"Current image height: {wellplate.image_height}")
+
+    # Set a new image height?
+    new_image_height = input(
+        "Would you like to set a new image height? (y/n): "
+    ).lower()
+    if new_image_height in ["y", "yes", ""]:
+        while True:
+            new_image_height = input_validation(
+                "Enter the new image height or enter for no change: ", float, (-80, 0)
             )
 
-        wellplate.image_height = new_height
-        wellplate.write_wellplate_location()
-        print(f"New image height: {new_height}")
+            current = mill.safe_move(
+                wellplate.get_coordinates("A1", "x"),
+                wellplate.get_coordinates("A1", "y"),
+                new_image_height,
+                Instruments.LENS,
+            )
+
+            response = input(
+                f"Is the camera in the correct position at {current.z}? (yes/no): "
+            ).lower()
+
+            if response in ["y", "yes", ""]:
+                break
+
+        if new_image_height is not None:
+            wellplate.image_height = new_image_height
+            wellplate.write_wellplate_location()
+            print(f"New image height: {wellplate.image_height}")
 
 
 def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwargs):
@@ -688,14 +757,6 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
         context = input(
             "Enter the context (BeforeDeposition, AfterBleaching, AfterColoring): "
         ).strip()
-
-        # Move the camera to the top of the well
-        mill.safe_move(
-            wellplate.get_coordinates(well_id, "x"),
-            wellplate.get_coordinates(well_id, "y"),
-            0,
-            Instruments.LENS,
-        )
 
         # lower to the wellplate's image height
         mill.safe_move(
@@ -767,7 +828,7 @@ menu_options = {
     "1": home_mill,
     "3": calibrate_wells,
     "4": calibrate_z_bottom_of_wellplate,
-    # "5": calibrate_vials,
+    "5": calibrate_echem_height,
     "6": calibrate_camera_focus,
     "7": capture_well_photo_manually,
     "q": quit_calibration,
@@ -796,7 +857,7 @@ def calibrate_mill(
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
             if option == "q":
-                cncmill.rest_electrode()
+                #cncmill.rest_electrode()
                 break
             menu_options[option](cncmill, wellplate, stock_vials, waste_vials)
 
