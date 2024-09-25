@@ -55,7 +55,8 @@
 				"ms-python.vscode-pylance",
 				"ms-python.pylint",
 				"GitHub.vscode-pull-request-github",
-				"ms-python.black-formatter"
+				"ms-python.black-formatter",
+				"analytic-signal.preview-tiff"
 			]
 		}
 	}
