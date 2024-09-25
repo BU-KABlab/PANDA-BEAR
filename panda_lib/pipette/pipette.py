@@ -72,9 +72,9 @@ class Pipette:
         """Set the volume of the pipette in ml"""
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
-        self._volume_ul = round(float(volume) * 1000, 6)
-        self.log_contents()
-        self.record_pipette_state()
+        self.volume = round(float(volume) * 1000, 6)
+        #self.log_contents()
+        #self.record_pipette_state()
 
     def liquid_volume(self) -> float:
         """Get the volume of liquid in the pipette in ul
@@ -159,6 +159,7 @@ class Pipette:
                                  """)
 
     def activate_pipette(self):
+        """Activate the pipette"""
         activate_pipette(self.id)
 
         # pipette_status:PipetteState = self.get_pipette_status()
