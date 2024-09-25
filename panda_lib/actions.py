@@ -266,6 +266,36 @@ def forward_pipette_v2(
             #         "Overfill exception occurred during pipette into %s. %s", to_vessel.name, e
             #     )
             #     new_to_vessel = waste_selector(waste_vials, "waste", 0)
+
+            # Check if the pipette has any residual solution(s) left
+            for solution, volume in pump.pipette.contents.items():
+                if volume > 0.0:
+                    logger.warning(
+                        "Pipette has residual volume of %f ul. Purging...", volume
+                    )
+                    pump.infuse(
+                        volume_to_infuse=volume,
+                        being_infused=solution,
+                        infused_into=to_vessel,
+                        rate=pump.max_pump_rate,
+                        blowout_ul=volume,
+                    )
+
+            # Check if the pipette has any residual volume left
+            if pump.pipette.volume > 0.0:
+                logger.warning(
+                    "Pipette has residual volume of %f ul. Purging...", pump.pipette.volume
+                )
+                pump.infuse(
+                    volume_to_infuse=pump.pipette.volume,
+                    being_infused=None,
+                    infused_into=to_vessel,
+                    rate=pump.max_pump_rate,
+                    blowout_ul=pump.pipette.volume,
+                )
+
+                pump.pipette.volume = 0.0
+
             # endregion
 
 
