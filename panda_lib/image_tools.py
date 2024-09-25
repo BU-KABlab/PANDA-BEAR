@@ -4,10 +4,12 @@ from datetime import datetime
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
+from pytz import utc
 
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import PlateTypes
+from panda_lib.sql_tools.panda_models import PlateTypes, WellPlates
 from panda_lib.experiment_class import ExperimentBase
+from panda_lib.utilities import input_validation
 
 def add_data_zone(
     image: Image, experiment: ExperimentBase = None, context: str = None
@@ -40,9 +42,22 @@ def add_data_zone(
             #         (wellplate_id,),
             #     )[0][0]
             # )
+            if experiment.well_type_number is None:
+                # Fetch the type number based on the plate id
+                if experiment.plate_id is not None:
+                    with SessionLocal() as session:
+                        experiment.well_type_number = (
+                            session.query(WellPlates)
+                            .filter_by(id=experiment.plate_id)
+                            .first()
+                            .type_id
+                        )
+                else:
+                    experiment.well_type_number = input_validation("Enter the well type number: ",int,(0,1000000), False, None)
 
-            session = SessionLocal()
-            substrate = session.query(PlateTypes).filter_by(id=wellplate_id).first().substrate
+
+            with SessionLocal() as session:
+                substrate = session.query(PlateTypes).filter_by(id=experiment.well_type_number).first().substrate
         except:
             substrate = "ITO"
 
@@ -62,7 +77,7 @@ def add_data_zone(
         else:
             # Fallback on file creation date if unable to get from metadata
             if experiment is None:
-                date_time = datetime.now().isoformat(timespec="seconds")
+                date_time = datetime.now(tz=utc).isoformat(timespec="seconds")
             else:
                 file_creation_time = datetime.fromtimestamp(
                     Path(image.filename).stat().st_ctime
@@ -72,7 +87,7 @@ def add_data_zone(
             date_time = datetime.fromisoformat(date_time)
     except:
         # Fallback on current time if all else fails
-        date_time = datetime.now().isoformat(timespec="seconds")
+        date_time = datetime.now(tz=utc).isoformat(timespec="seconds")
 
     font = ImageFont.truetype("arial.ttf", 30)
     banner_height = 100
@@ -96,7 +111,7 @@ def add_data_zone(
     # PANDA_SDL logo
     try:
         panda_sdl_logo_x = text_starts[0]
-        logo = Image.open("panda_lib/application photos/data_zone_logo.png")
+        logo = Image.open("panda_lib/application_images/data_zone_logo.png")
         logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
         banner.paste(logo, (panda_sdl_logo_x, 0))
      # incase the file cannot be found
