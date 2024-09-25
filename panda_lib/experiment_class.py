@@ -1478,7 +1478,11 @@ def select_specific_result(
 
     results = []
     for row in result:
-        results.append(ExperimentResultsRecord(*row))
+        results.append(ExperimentResultsRecord(
+            row.experiment_id,
+            row.result_type,
+            row.result_value,
+            row.context))
 
     if len(results) == 1:
         return results[0]
