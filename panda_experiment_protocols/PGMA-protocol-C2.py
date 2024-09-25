@@ -334,7 +334,7 @@ def FC_prechar(
 
         toolkit.global_logger.info("3b. Performing CV")
         try:
-            cyclic_volt_pgma_fc(instructions)
+            cyclic_volt_pgma_fc(instructions, file_tag="FC_prechar")
         except Exception as e:
             toolkit.global_logger.error("Error occurred during FC CV: %s", str(e))
             raise e
@@ -397,13 +397,13 @@ def FC_prechar(
             mill=toolkit.mill,
         )
 
-        toolkit.global_logger.info("5. Take after image")
-        instructions.set_status_and_save(ExperimentStatus.IMAGING)
-        image_well(
-            toolkit=toolkit,
-            instructions=instructions,
-            step_description="AfterPreCV",
-        )
+    toolkit.global_logger.info("5. Take after image")
+    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    image_well(
+        toolkit=toolkit,
+        instructions=instructions,
+        step_description="AfterPreCV",
+    )
     instructions.set_status(ExperimentStatus.COMPLETE)
     toolkit.global_logger.info("FC Pre-CV complete\n\n")
 
@@ -476,7 +476,7 @@ def FC_postchar(
 
         toolkit.global_logger.info("2b. Performing CV")
         try:
-            cyclic_volt_pgma_fc(instructions)
+            cyclic_volt_pgma_fc(instructions, file_tag="FC_postchar")
         except Exception as e:
             toolkit.global_logger.error("Error occurred during FC CV: %s", str(e))
             raise e
@@ -577,12 +577,12 @@ def FC_postchar(
             mill=toolkit.mill,
         )
 
-        toolkit.global_logger.info("5. Take after image")
-        instructions.set_status_and_save(ExperimentStatus.IMAGING)
-        image_well(
-            toolkit=toolkit,
-            instructions=instructions,
-            step_description="AfterCV",
-        )
+    toolkit.global_logger.info("5. Take after image")
+    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    image_well(
+        toolkit=toolkit,
+        instructions=instructions,
+        step_description="AfterCV",
+    )
     instructions.set_status(ExperimentStatus.COMPLETE)
     toolkit.global_logger.info("FC CV complete\n\n")
