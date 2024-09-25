@@ -894,17 +894,14 @@ def share_to_slack(experiment: ExperimentBase):
             msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value} but has no datazoned image files to share"
             slack.send_slack_message("data", msg)
             return
-        slack.send_slack_message(
-            "data",
-            f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value}. Photos taken:",
-        )
+        
         for image in experiment.results.image:
             image: Path = image[0]
             images_with_dz = []
             if image.name.endswith("dz.tiff"):
                 images_with_dz.append(image)
-
-            slack.upload_images("data", images_with_dz, "")
+            msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value}. Photos taken:"
+            slack.upload_images("data", images_with_dz, msg)
     except (
         slack_errors.SlackApiError,
         slack_errors.SlackClientError,
