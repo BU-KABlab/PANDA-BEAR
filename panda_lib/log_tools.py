@@ -4,6 +4,7 @@ Methods and classses related to logging for the PANDA_SDL project
 
 import logging
 import os
+import time
 from panda_lib.config import config_tools
 config = config_tools.read_config()
 
@@ -30,7 +31,8 @@ def setup_default_logger(
         formatter = logging.Formatter(
             "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
         )
-
+        # Set the converter to use UTC
+        formatter.converter = time.gmtime
         file_handler = logging.FileHandler(PANDA_SDL_LOG + "/" + log_name + ".log")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
