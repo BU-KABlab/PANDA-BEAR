@@ -801,7 +801,11 @@ def input_new_vial_values(vialgroup: str) -> None:
                     f"Enter the new contamination of the vial (Current contamination is {vial.contamination}): "
                 )
                 if new_contamination != "":
-                    vial.contamination = int(new_contamination)
+                    try:
+                        vial.contamination = int(new_contamination)
+                    except ValueError:
+                        print("Invalid value for contamination. Should be integer")
+                        continue
 
                 vial.insert_updated_vial_in_db()
                 # print("\r" + " " * 100 + "\r", end="")  # Clear the previous table
