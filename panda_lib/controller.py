@@ -382,7 +382,6 @@ def main(
     ) as error:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
-            share_to_slack(current_experiment)
         sql_system_state.set_system_status(SystemState.ERROR)
         # scheduler.change_well_status(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
@@ -859,7 +858,7 @@ def test_instrument_connections(
         print("Not all instruments connected")
         return instruments, False
 
-    logger.info("Connected to instruments")
+    logger.info("Connected to all instruments")
     return instruments, True
 
 def disconnect_from_instruments(instruments: Toolkit):
