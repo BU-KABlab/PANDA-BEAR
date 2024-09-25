@@ -509,7 +509,7 @@ def run_single_camera(cam: PySpin.CameraPtr, image_path: Union[str, Path] = None
         print(f"Error: {ex}")
         result = False
 
-    return 0
+    return result
 
 def set_brightness(cam: PySpin.CameraPtr, brightness: int):
     """
@@ -537,6 +537,8 @@ def set_brightness(cam: PySpin.CameraPtr, brightness: int):
     except PySpin.SpinnakerException as ex:
         print(f"Error setting brightness: {ex}")
         result = False
+
+    return result
 
 
 def set_exposure(cam: PySpin.CameraPtr, exposure: float):
