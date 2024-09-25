@@ -66,6 +66,7 @@ config = ConfigParser()
 #     )
 
 def file_enumeration(file_path:Path) -> Path:
+    """Enumerate a file path if it already exists"""
     i=1
     while file_path.exists():
         file_path = file_path.with_name(file_path.stem + "_" + str(i) + file_path.suffix)
@@ -93,3 +94,18 @@ def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.
     pyspin_system.ReleaseInstance()
 
     return file_name
+
+if __name__ == "__main__":
+    from PIL import Image
+    import time
+    FILE_NAME =  "test image"
+    file_path=Path(f'images/{str(FILE_NAME)}').with_suffix(".tiff")
+    capture_new_image(
+        save=True, num_images=1, file_name=file_path
+    )
+    time.sleep(5)
+    # Show the image
+    with Image.open(file_path) as img:
+        img.show()
+
+    Path.unlink(file_path)
