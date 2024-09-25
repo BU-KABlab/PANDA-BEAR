@@ -3,30 +3,22 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 """
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
-import logging
 import time
 from typing import Optional, Union
-
-from serial import SerialException
 
 from nesp_lib_py import nesp_lib
 from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 
 import panda_lib.wellplate as wp
 from panda_lib.config.config_tools import read_config
-from panda_lib.correction_factors import reverse_correction_factor
 from panda_lib.experiment_class import ExperimentResult
-from panda_lib.mill_control import Mill, MockMill
 from panda_lib.pipette import Pipette
-from panda_lib.utilities import Coordinates, Instruments
-from panda_lib.vessel import VesselLogger
 from panda_lib.vials import StockVial, Vial2, WasteVial
-from sartorius.sartorius.driver import Scale
-from sartorius.sartorius.mock import Scale as MockScale
 
-from panda_lib.log_tools import setup_default_logger, default_logger as pump_control_logger
-
-scale_logger = setup_default_logger(log_name="scale")
+from panda_lib.log_tools import (
+    setup_default_logger,
+    default_logger as pump_control_logger,
+)
 
 vessel_logger = setup_default_logger(log_name="vessel")
 
@@ -34,6 +26,7 @@ config = read_config()
 
 
 PRECISION = config.getint("OPTIONS", "precision")
+
 
 class SyringePump:
     """
@@ -60,21 +53,18 @@ class SyringePump:
         OverDraftException: Raised when a syringe is over drawn.
     """
 
-    def __init__(
-        self
-    ):
+    def __init__(self):
         """
         Initialize the pump and set the capacity.
         """
-        self.max_pump_rate = config.getfloat("PUMP","max_pumping_rate", fallback=0.640)  # ml/min
-        self.syringe_capacity = config.getfloat("PUMP","syringe_capacity", fallback=1.0)  # mL
+        self.max_pump_rate = config.getfloat(
+            "PUMP", "max_pumping_rate", fallback=0.640
+        )  # ml/min
+        self.syringe_capacity = config.getfloat(
+            "PUMP", "syringe_capacity", fallback=1.0
+        )  # mL
         self.pump = self.set_up_pump()
         self.pipette = Pipette()
-        try:
-            # self.scale = Scale(address="COM6")
-            self.scale = MockScale()
-        except (ScaleNotFoundError, SerialException):
-            self.scale = MockScale()
 
     def set_up_pump(self):
         """
@@ -84,9 +74,14 @@ class SyringePump:
         """
         try:
             pump_control_logger.info("Setting up pump...")
-            pump_port = nesp_lib.Port(config.get("PUMP","port", fallback="COM5"), config.getint("PUMP","baudrate",fallback=19200))
+            pump_port = nesp_lib.Port(
+                config.get("PUMP", "port", fallback="COM5"),
+                config.getint("PUMP", "baudrate", fallback=19200),
+            )
             syringe_pump = nesp_lib.Pump(pump_port)
-            syringe_pump.syringe_diameter = config.getfloat("PUMP","syringe_inside_diameter", fallback=4.600)  # millimeters
+            syringe_pump.syringe_diameter = config.getfloat(
+                "PUMP", "syringe_inside_diameter", fallback=4.600
+            )  # millimeters
             syringe_pump.pumping_rate = self.max_pump_rate
             syringe_pump.volume_infused_clear()
             syringe_pump.volume_withdrawn_clear()
@@ -138,16 +133,13 @@ class SyringePump:
                 nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density, weigh
             )
 
-
             if solution is not None and isinstance(solution, Vial2):
                 pumprecord["solution"] = solution.name
             if results is not None:
                 results.pumping_record.append(pumprecord)
 
-
-
-            volume_withdrawn_ml = round(self.pump.volume_withdrawn,PRECISION)
-            volume_withdrawn_ul = round(volume_withdrawn_ml * 1000,PRECISION)
+            volume_withdrawn_ml = round(self.pump.volume_withdrawn, PRECISION)
+            volume_withdrawn_ul = round(volume_withdrawn_ml * 1000, PRECISION)
 
             # Update the pipette volume
             if isinstance(solution, (Vial2, wp.Well)):
@@ -170,7 +162,9 @@ class SyringePump:
 
                 # Update the solution volume and contents
                 solution.update_volume(-volume_withdrawn_ul)
-                solution.update_contents(solution.contents, -volume_withdrawn_ul, save=True)
+                solution.update_contents(
+                    solution.contents, -volume_withdrawn_ul, save=True
+                )
 
                 # Updating the contents also updates the volume so we are done here
 
@@ -186,12 +180,14 @@ class SyringePump:
                 self.pump.volume_withdrawn_clear()
 
                 return None
-            
+
             elif solution is None:
-                # If the solution is not a vial, or a well, we don't track it 
+                # If the solution is not a vial, or a well, we don't track it
                 # as contents of the pipette but we do track the volume.
                 # This is likely the case for air. Only the volume is updated.
-                self.pipette.volume = round(self.pipette.volume + volume_withdrawn_ul,PRECISION)
+                self.pipette.volume = round(
+                    self.pipette.volume + volume_withdrawn_ul, PRECISION
+                )
 
                 pump_control_logger.info(
                     "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
@@ -209,7 +205,6 @@ class SyringePump:
         else:
             # If the volume is 0, return None
             return None
-
 
     def withdraw_air(self, volume: float):
         """Withdraw the given ul of air with the pipette"""
@@ -321,7 +316,9 @@ class SyringePump:
             if infused_into is not None:
                 # Update the volume and contents of the destination vial or well
                 infused_into.update_volume(volume_infused_ul)
-                infused_into.update_contents(self.pipette.contents, volume_infused_ul, save=True)
+                infused_into.update_contents(
+                    self.pipette.contents, volume_infused_ul, save=True
+                )
 
                 # Calculate the ratio of each content in the pipette
                 content_ratio = {
@@ -338,8 +335,8 @@ class SyringePump:
                 # We don't need to include the blowout because it was accounted for earlier
                 self.pipette.volume -= volume_infused_ul
 
-            return 0 #TODO return infused into like withdraw does
-        else: # If the volume is 0
+            return 0  # TODO return infused into like withdraw does
+        else:  # If the volume is 0
             return None
 
     def infuse_air(self, volume: float):
@@ -395,15 +392,6 @@ class SyringePump:
             if pump_direction == nesp_lib.PumpingDirection.WITHDRAW
             else "Infusing"
         )
-        pre_weight = 0.00
-        post_weight = 0.00
-        ## Get scale value prior to pump action
-        if density is not None and density != 0 and weigh:
-            # pre_weight = float(self.scale.read_scale())
-            scale_logger.debug(
-                "Expected difference in scale reading: %f", volume_ml * density
-            )
-            scale_logger.debug("Scale reading before %s: %f", action, pre_weight)
 
         pump_control_logger.info(
             "%s %f ml at %f mL/min...", action, volume_ml, self.pump.pumping_rate
@@ -414,35 +402,14 @@ class SyringePump:
             pass
         pump_control_logger.debug("Done %s", action)
 
-        # time.sleep(3)  # let the scale settle
-
-        ## Get scale value after pump action
-        if density is not None and density != 0 and weigh:
-            # post_weight = float(self.scale.value())
-            # post_weight = float(self.scale.read_scale())
-            scale_logger.debug("Scale reading after %s: %f", action, post_weight)
-            scale_logger.debug("Scale reading difference: %f", post_weight - pre_weight)
-            scale_logger.info(
-                "Data,%s,%f,%f,%f,%f,%f,%f,%f",
-                action,
-                volume_ml,
-                reverse_correction_factor(volume_ml * 1000, viscosity) / 1000,
-                density,
-                pre_weight,
-                post_weight,
-                self.pump.pumping_rate,
-                viscosity,
-            )
-            pumping_record = {
-                "action": action,
-                "solution": "",
-                "volume": volume_ml,
-                "density": density,
-                "pre_weight": pre_weight,
-                "post_weight": post_weight,
-                "pumping_rate": self.pump.pumping_rate,
-                "viscosity": viscosity,
-            }
+        pumping_record = {
+            "action": action,
+            "solution": "",
+            "volume": volume_ml,
+            "density": density,
+            "pumping_rate": self.pump.pumping_rate,
+            "viscosity": viscosity,
+        }
 
         action_type = (
             "infused"
@@ -456,99 +423,21 @@ class SyringePump:
         )
         log_msg = f"Pump has {action_type}: {action_volume} ml"
         pump_control_logger.debug(log_msg)
-        if density is not None and density != 0 and weigh:
-            expected_difference = float(volume_ml * density)
-            difference = float(post_weight - pre_weight)
-            scale_logger.debug("Expected difference: %f", expected_difference)
-            scale_logger.debug("Actual difference: %f", difference)
-            percent_error = abs(
-                (difference - expected_difference) / expected_difference
-            )
-            if percent_error > 0.50:
-                scale_logger.warning("Percent error is above 50%")
-                # SlackBot().send_slack_message('alert',f'WARNING: Percent Error was {percent_error*100}% for most recent experiment')
-            return difference, pumping_record
 
         return 0, pumping_record
 
-    # def mix(
-    #     self,
-    #     mix_location: Optional[dict] = None,
-    #     mix_repetitions=3,
-    #     mix_volume=float(200.0),
-    #     mix_rate=float(0.62),
-    # ):
-    #     """Mix the solution in the pipette by withdrawing and infusing the solution
-    #     Args:
-    #         mix_location (dict): Dictionary containing x, y, and z coordinates of the position.
-    #         mix_repetitions (int): Number of times to mix the solution.
-    #         mix_volume (float): Volume to be infused in microliters.
-    #         mix_rate (float): Pumping rate in milliliters per minute.
-
-    #     Returns:
-    #         None
-    #     """
-    #     pump_control_logger.info("Mixing %d times", mix_repetitions)
-
-    #     if mix_location is None:
-    #         for i in range(mix_repetitions):
-    #             pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
-    #             self.withdraw(volume_to_withdraw=mix_volume, rate=mix_rate)
-    #             current_coords = Coordinates(*self.mill.current_coordinates())
-
-    #             self.mill.set_feed_rate(500)
-    #             self.mill.safe_move(
-    #                 x_coord=current_coords.x,
-    #                 y_coord=current_coords.y,
-    #                 z_coord=current_coords.z + 5.0,
-    #                 instrument=Instruments.PIPETTE,
-    #             )
-    #             self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
-    #             self.mill.safe_move(
-    #                 x_coord=current_coords.x,
-    #                 y_coord=current_coords.y,
-    #                 z_coord=current_coords.z,
-    #                 instrument=Instruments.PIPETTE,
-    #             )
-    #             self.mill.set_feed_rate(2000)
-    #     else:
-    #         # move to mix location
-    #         self.mill.safe_move(
-    #             x_coord=mix_location["x"],
-    #             y_coord=mix_location["y"],
-    #             z_coord=mix_location["depth"],
-    #             instrument=Instruments.PIPETTE,
-    #         )
-
-    #         for i in range(mix_repetitions):
-    #             pump_control_logger.debug("Mixing %d of %d times", i, mix_repetitions)
-    #             self.withdraw(volume_to_withdraw=mix_volume, rate=mix_rate)
-    #             self.mill.set_feed_rate(500)
-    #             self.mill.safe_move(
-    #                 x_coord=mix_location["x"],
-    #                 y_coord=mix_location["y"],
-    #                 z_coord=mix_location["depth"] + 1.5,
-    #                 instrument=Instruments.PIPETTE,
-    #             )
-    #             self.infuse(volume_to_infuse=mix_volume, rate=mix_rate)
-    #             self.mill.safe_move(
-    #                 x_coord=mix_location["x"],
-    #                 y_coord=mix_location["y"],
-    #                 z_coord=mix_location["depth"],
-    #                 instrument=Instruments.PIPETTE,
-    #             )
-    #             self.mill.set_feed_rate(2000)
-    #         # move back to original position
-    #         self.mill.move_to_safe_position()
-    #         return None
 
     def update_pipette_volume(self, volume_ml: float):
         """Change the volume of the pipette in ml"""
         volume_ml = float(volume_ml)
         if self.pump.pumping_direction == nesp_lib.PumpingDirection.INFUSE:
-            self.pipette.volume = round(self.pipette.volume - (volume_ml * 1000), PRECISION)
+            self.pipette.volume = round(
+                self.pipette.volume - (volume_ml * 1000), PRECISION
+            )
         else:
-            self.pipette.volume = round(self.pipette.volume + (volume_ml * 1000), PRECISION)
+            self.pipette.volume = round(
+                self.pipette.volume + (volume_ml * 1000), PRECISION
+            )
 
 
 class MockPump(SyringePump):
@@ -570,40 +459,9 @@ class MockPump(SyringePump):
         time.sleep(2)
         return syringe_pump
 
-
-# def _test_mixing():
-#     """Test the mixing function"""
-#     from .wellplate import Wellplate
-
-#     wellplate = Wellplate()
-#     a1 = wellplate.get_coordinates("A1")
-#     with Mill() as mill:
-#         mill.homing_sequence()
-#         syringe_pump = SyringePump()
-#         mill.safe_move(a1["x"], a1["y"], a1["depth"], Instruments.PIPETTE)
-#         syringe_pump.mix()
-
-
-def _mock_pump_testing_routine():
-    """Test the pump"""
-    with MockMill() as mill:
-        mock_pump = MockPump()
-        mock_pump.withdraw(100)
-        assert mock_pump.pipette.volume == 100
-        assert mock_pump.pipette.volume_ml == 0.1
-        mock_pump.infuse(100)
-        assert mock_pump.pipette.volume == 0
-        assert mock_pump.pipette.volume_ml == 0
-        # mock_pump.mix()
-
-class ScaleNotFoundError(Exception):
-    """Raised when a scale is not found"""
-    pass
-
 if __name__ == "__main__":
     # test_mixing()
     # _mock_pump_testing_routine()
-    # pump = Pump(mill=MockMill(), scale=MockScale())
     # pump.withdraw(160, rate=0.64)
     # pump.infuse(167.43, rate=0.64, blowout_ul=0)
 
