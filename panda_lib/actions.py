@@ -193,7 +193,7 @@ def forward_pipette_v2(
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],
-                from_vessel.depth,
+                from_vessel.coordinates.z_bottom, #from_vessel.depth,
                 Instruments.PIPETTE,
             )  # go to solution depth
 
