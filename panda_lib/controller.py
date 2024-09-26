@@ -25,7 +25,6 @@ from slack_sdk import errors as slack_errors
 
 from panda_lib import gamry_control_WIP, scheduler
 # from panda_experiment_analyzers import pedot as pedot_analyzer
-from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
@@ -34,7 +33,7 @@ from .config.config_tools import read_config, read_testing_config
 from .errors import (NoExperimentFromModel, ProtocolNotFoundError,
                      ShutDownCommand, WellImportError)
 from .experiment_class import (ExperimentBase, ExperimentResult,
-                               ExperimentStatus, select_specific_result)
+                               ExperimentStatus)
 from .instrument_toolkit import Toolkit
 from .log_tools import setup_default_logger
 from .mill_control import Mill, MockMill
@@ -48,7 +47,7 @@ from .wellplate import Wellplate
 
 config = read_config()
 # set up slack globally so that it can be used in the main function and others
-logger = setup_default_logger(log_name="panda")
+logger = setup_default_logger(log_name="controller")
 TESTING = read_testing_config()
 
 
@@ -60,9 +59,7 @@ def run_slack_bot(testing_mode: bool = TESTING):
         testing_mode (bool, optional): Whether to run the slack bot in testing mode. Defaults to TESTING.
     """
     slack_monitor = SlackBot(test=testing_mode)
-    slack_monitor.send_slack_message("alert", "Starting Slack Monitoring")
     slack_monitor.run()
-    slack_monitor.send_slack_message("alert", "Slack Monitoring has stopped")
 
 
 def main(
@@ -894,7 +891,7 @@ def share_to_slack(experiment: ExperimentBase):
             msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value} but has no datazoned image files to share"
             slack.send_slack_message("data", msg)
             return
-        
+
         for image in experiment.results.image:
             image: Path = image[0]
             images_with_dz = []
