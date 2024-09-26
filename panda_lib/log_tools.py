@@ -6,6 +6,10 @@ import logging
 import os
 import time
 from panda_lib.config import config_tools
+from functools import wraps
+import logging
+import time
+
 config = config_tools.read_config()
 
 
@@ -39,10 +43,10 @@ def setup_default_logger(
 
         console_handler = logging.StreamHandler()
         console_handler.setLevel(console_level)
-        console_formatter = logging.Formatter(
-            "%(message)s"
-        )
-        console_handler.setFormatter(console_formatter)  # Ensure console output is formatted
+        console_formatter = logging.Formatter("%(message)s")
+        console_handler.setFormatter(
+            console_formatter
+        )  # Ensure console output is formatted
         logger.addHandler(console_handler)
 
     return logger
@@ -70,3 +74,26 @@ class CustomLoggingFilter(logging.Filter):
         record.custom3 = self.custom3
         record.custom4 = self.custom4
         return True
+
+
+def timing_wrapper(func):
+    """A decorator that logs the time taken for a function to execute"""
+    timing_logger = setup_default_logger(
+        log_file="timing.log",
+        log_name="timing",
+        file_level=logging.DEBUG,
+        console_level=logging.ERROR,
+    )
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        timing_logger.info(
+            "%s,%s,%s, %.4f", func.__name__, start_time, end_time, elapsed_time
+        )
+        return result
+
+    return wrapper

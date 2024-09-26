@@ -253,4 +253,3 @@ def input_validation(prompt:str, valid_types:tuple|type|list, value_range:tuple=
 
         except ValueError as e:
             print(e)
-        
