@@ -24,6 +24,8 @@ Returns:
 # Standard library imports
 import logging
 import math
+import time
+from functools import wraps
 
 # Third party or custom imports
 from pathlib import Path
@@ -50,7 +52,7 @@ from panda_lib.experiment_class import (
     ExperimentStatus,
 )
 from panda_lib.image_tools import add_data_zone
-from panda_lib.log_tools import CustomLoggingFilter
+from panda_lib.log_tools import CustomLoggingFilter, setup_default_logger
 from panda_lib.mill_control import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
@@ -90,7 +92,21 @@ else:
 # Set up logging
 logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
+timing_logger = setup_default_logger(log_file="timing.log", log_name="timing", file_level=logging.DEBUG, console_level=logging.ERROR)
 
+def timing_wrapper(func):
+    """"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        timing_logger.info("%s,%s,%s, %.4f", func.__name__, start_time, end_time, elapsed_time)
+        return result
+    return wrapper
+
+@timing_wrapper
 def forward_pipette_v2(
     volume: float,
     from_vessel: Union[Well, StockVial, WasteVial],
@@ -298,7 +314,7 @@ def forward_pipette_v2(
 
             # endregion
 
-
+@timing_wrapper
 def rinse_v2(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
@@ -357,7 +373,7 @@ def rinse_v2(
 
     return 0
 
-
+@timing_wrapper
 def flush_v2(
     waste_vials: Sequence[WasteVial],
     stock_vials: Sequence[StockVial],
@@ -418,7 +434,7 @@ def flush_v2(
         logger.info("No flushing required. Flush volume is 0. Continuing...")
     return 0
 
-
+@timing_wrapper
 def purge_pipette(
     waste_vials: Sequence[WasteVial],
     mill: Union[Mill, MockMill],
@@ -452,7 +468,7 @@ def purge_pipette(
         blowout_ul=total_volume - liquid_volume,
     )
 
-
+@timing_wrapper
 def solution_selector(
     solutions: Sequence[StockVial], solution_name: str, volume: float
 ) -> StockVial:
@@ -478,7 +494,7 @@ def solution_selector(
             return solution
     raise NoAvailableSolution(solution_name)
 
-
+@timing_wrapper
 def waste_selector(
     solutions: Sequence[WasteVial], solution_name: str, volume: float
 ) -> WasteVial:
@@ -506,7 +522,7 @@ def waste_selector(
             return waste_solution
     raise NoAvailableSolution(solution_name)
 
-
+@timing_wrapper
 def chrono_amp(
     ca_instructions: EchemExperimentBase,
     file_tag: str = None,
@@ -634,7 +650,7 @@ def chrono_amp(
 
     return ca_instructions, ca_results
 
-
+@timing_wrapper
 def cyclic_volt(
     cv_instructions: EchemExperimentBase,
     file_tag: str = None,
@@ -803,7 +819,7 @@ def apply_log_filter(
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
     logger.addFilter(custom_filter)
 
-
+@timing_wrapper
 def volume_correction(
     volume: float, density: float = None, viscosity: float = None
 ) -> float:
@@ -827,7 +843,7 @@ def volume_correction(
     )
     return float(corrected_volume)
 
-
+@timing_wrapper
 def image_well(
     toolkit: Toolkit,
     instructions: EchemExperimentBase = None,
@@ -913,7 +929,7 @@ def image_well(
             logger.info("Moving camera to safe position")
             toolkit.mill.move_to_safe_position()  # move to safe height above target well
 
-
+@timing_wrapper
 def image_filepath_generator(
     exp_id: int = "test",
     project_id: int = "test",
@@ -938,7 +954,7 @@ def image_filepath_generator(
         filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
         i += 1
     return filepath
-
+@timing_wrapper
 def mix(
         mill: Union[Mill, MockMill],
         pump: Union[SyringePump, MockPump],
