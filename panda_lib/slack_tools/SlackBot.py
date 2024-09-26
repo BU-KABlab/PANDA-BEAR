@@ -84,7 +84,7 @@ class SlackTicket:
     addressed_timestamp: str
 
 
-def insert_slack_ticket(ticket: SlackTicket, test: bool = False) -> None:
+def insert_slack_ticket(ticket: SlackTicket) -> None:
     """
     Insert a slack ticket into the slack_tickets table.
 
@@ -108,7 +108,7 @@ def insert_slack_ticket(ticket: SlackTicket, test: bool = False) -> None:
         session.commit()
 
 
-def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
+def select_slack_ticket(msg_id: str) -> SlackTicket:
     """
     Select a slack ticket from the slack_tickets table.
 
@@ -332,7 +332,6 @@ class SlackBot:
                             timestamp=msg_ts,
                             addressed_timestamp=datetime.now().timestamp(),
                         ),
-                        test=self.testing,
                     )
 
                     if response == 0:
@@ -352,7 +351,7 @@ class SlackBot:
 
     def find_id(self, msg_id):
         """Find the message ID in the slack ticket tracker csv file."""
-        ticket = select_slack_ticket(msg_id, test=self.testing)
+        ticket = select_slack_ticket(msg_id)
         if ticket is not None:
             return ticket
         return False
