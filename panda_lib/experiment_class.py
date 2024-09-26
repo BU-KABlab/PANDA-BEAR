@@ -20,7 +20,7 @@ from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (ExperimentParameters,
                                               ExperimentResults, Experiments, ExperimentStatusView,
                                               WellHx, WellPlates)
-experiment_logger = setup_default_logger("panda.log", "experiment_logger")
+experiment_logger = setup_default_logger(log_name="experiment_logger")
 config = read_config()
 
 def load_analysis_script(script_path: str) -> Callable:
