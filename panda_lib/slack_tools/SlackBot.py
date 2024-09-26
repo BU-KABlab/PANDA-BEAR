@@ -91,29 +91,8 @@ def insert_slack_ticket(ticket: SlackTicket, test: bool = False) -> None:
     Args:
         ticket (SlackTicket): The slack ticket to insert.
     """
-    if config_options.getboolean("use_slack"):
-        test = True
-    # sql_utilities.execute_sql_command_no_return(
-    #     """
-    #     INSERT INTO slack_tickets (
-    #         msg_id,
-    #         channel_id,
-    #         message,
-    #         response,
-    #         timestamp,
-    #         addressed_timestamp
-    #         )
-    #     VALUES (?, ?, ?, ?, ?, ?)
-    #     """,
-    #     (
-    #         ticket.msg_id,
-    #         ticket.channel_id,
-    #         ticket.msg_text,
-    #         ticket.valid_cmd,
-    #         ticket.timestamp,
-    #         ticket.addressed_timestamp,
-    #     ),
-    # )
+    # if config_options.getboolean("use_slack"):
+    #     test = True
 
     with SessionLocal() as session:
         session.add(
@@ -139,22 +118,6 @@ def select_slack_ticket(msg_id: str, test: bool = False) -> SlackTicket:
     Returns:
         SlackTicket: The slack ticket.
     """
-    if config_options.getboolean("use_slack"):
-        test = True
-    # result = sql_utilities.execute_sql_command(
-    #     """
-    #     SELECT
-    #         msg_id,
-    #         channel_id,
-    #         message,
-    #         response,
-    #         timestamp,
-    #         addressed_timestamp
-    #     FROM slack_tickets
-    #     WHERE msg_id = ?
-    #     """,
-    #     (msg_id,),
-    # ) #TODO: Replace with SQLAlchemy query
 
     with SessionLocal() as session:
         ticket = session.query(SlackTickets).filter(SlackTickets.msg_id == msg_id).first()
