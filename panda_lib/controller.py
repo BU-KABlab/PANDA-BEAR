@@ -927,7 +927,7 @@ def share_to_slack(experiment: ExperimentBase):
 
         # Now send the images to slack
         slack.upload_images(
-            "data", image_paths, f"Images for experiment {msg}"
+            "data", image_paths, f"{msg}"
         )
     except (
         slack_errors.SlackApiError,
