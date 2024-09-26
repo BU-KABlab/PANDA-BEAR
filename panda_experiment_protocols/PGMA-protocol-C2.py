@@ -116,6 +116,8 @@ def PGMA_dep_v2_screening(
         waste_vials=waste_vials,
     )
 
+    instructions.set_status(ExperimentStatus.COMPLETE)
+
 
 def PGMAdeposition(
     instructions: PGMAExperiment,
@@ -258,7 +260,8 @@ def PGMAdeposition(
     toolkit.global_logger.info("6. Take after image")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "AfterDepDry")
-    toolkit.global_logger.info("PGMA deposition complete\n\n")
+    toolkit.global_logger.info("PGMA deposition complete")
+    print("\n\n")
 
 
 def FC_prechar(
@@ -405,7 +408,8 @@ def FC_prechar(
         step_description="AfterPreCV",
     )
     instructions.set_status(ExperimentStatus.COMPLETE)
-    toolkit.global_logger.info("FC Pre-CV complete\n\n")
+    toolkit.global_logger.info("FC Pre-CV complete")
+    print("\n\n")
 
 
 def FC_postchar(
@@ -585,4 +589,5 @@ def FC_postchar(
         step_description="AfterCV",
     )
     instructions.set_status(ExperimentStatus.COMPLETE)
-    toolkit.global_logger.info("FC CV complete\n\n")
+    toolkit.global_logger.info("FC CV complete")
+    print("\n\n")
