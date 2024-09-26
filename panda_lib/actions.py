@@ -202,7 +202,7 @@ def forward_pipette_v2(
                 volume_to_withdraw=repetition_vol,
                 solution=from_vessel,
                 rate=pumping_rate,
-                weigh=False,
+
             )  # pipette now has air gap + repetition vol
 
             if isinstance(from_vessel, Well):
@@ -210,7 +210,7 @@ def forward_pipette_v2(
                     volume_to_withdraw=20,
                     solution=None,
                     rate=pump.max_pump_rate,
-                    weigh=False,
+
                 )  # If the from vessel is a well withdraw a little extra to ensure cleared well
 
             mill.move_to_safe_position()
@@ -220,7 +220,7 @@ def forward_pipette_v2(
                 volume_to_withdraw=DRIP_STOP,
                 solution=None,
                 rate=pump.max_pump_rate,
-                weigh=False,
+
             )
 
             logger.debug(
@@ -259,7 +259,7 @@ def forward_pipette_v2(
                     if isinstance(from_vessel, Well)
                     else AIR_GAP + DRIP_STOP
                 ),
-                weigh=weigh,
+
             )
             # except OverFillException as e:
             #     logger.error(
@@ -275,7 +275,7 @@ def forward_pipette_v2(
                     )
                     pump.infuse(
                         volume_to_infuse=volume,
-                        being_infused=solution,
+                        being_infused=None,
                         infused_into=to_vessel,
                         rate=pump.max_pump_rate,
                         blowout_ul=volume,
