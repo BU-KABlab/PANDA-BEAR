@@ -34,9 +34,7 @@ from PIL import Image
 
 # Local application imports
 from panda_lib.flir_camera import capture_new_image
-from panda_lib.config.config_tools import (
-    read_testing_config, read_config
-)
+from panda_lib.config.config_tools import read_testing_config, read_config
 from panda_lib.correction_factors import correction_factor
 from panda_lib.errors import (
     CAFailure,
@@ -52,11 +50,12 @@ from panda_lib.experiment_class import (
     ExperimentStatus,
 )
 from panda_lib.image_tools import add_data_zone
-from panda_lib.log_tools import CustomLoggingFilter, setup_default_logger
+from panda_lib.log_tools import CustomLoggingFilter, timing_wrapper
 from panda_lib.mill_control import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.instrument_toolkit import Toolkit
+
 from panda_lib.vials import StockVial, WasteVial
 from panda_lib.wellplate import Well
 
@@ -92,19 +91,7 @@ else:
 # Set up logging
 logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
-timing_logger = setup_default_logger(log_file="timing.log", log_name="timing", file_level=logging.DEBUG, console_level=logging.ERROR)
 
-def timing_wrapper(func):
-    """"""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        timing_logger.info("%s,%s,%s, %.4f", func.__name__, start_time, end_time, elapsed_time)
-        return result
-    return wrapper
 
 @timing_wrapper
 def forward_pipette_v2(
@@ -209,7 +196,7 @@ def forward_pipette_v2(
             mill.safe_move(
                 from_vessel.coordinates["x"],
                 from_vessel.coordinates["y"],
-                from_vessel.coordinates.z_bottom, #from_vessel.depth,
+                from_vessel.coordinates.z_bottom,  # from_vessel.depth,
                 Instruments.PIPETTE,
             )  # go to solution depth
 
@@ -218,7 +205,6 @@ def forward_pipette_v2(
                 volume_to_withdraw=repetition_vol,
                 solution=from_vessel,
                 rate=pumping_rate,
-
             )  # pipette now has air gap + repetition vol
 
             if isinstance(from_vessel, Well):
@@ -226,7 +212,6 @@ def forward_pipette_v2(
                     volume_to_withdraw=20,
                     solution=None,
                     rate=pump.max_pump_rate,
-
                 )  # If the from vessel is a well withdraw a little extra to ensure cleared well
 
             mill.move_to_safe_position()
@@ -236,7 +221,6 @@ def forward_pipette_v2(
                 volume_to_withdraw=DRIP_STOP,
                 solution=None,
                 rate=pump.max_pump_rate,
-
             )
 
             logger.debug(
@@ -261,7 +245,7 @@ def forward_pipette_v2(
                 Instruments.PIPETTE,
             )
 
-            weigh = bool(isinstance(to_vessel, Well))
+            # weigh = bool(isinstance(to_vessel, Well))
 
             # Infuse into the to_vessel
             # try:
@@ -275,7 +259,6 @@ def forward_pipette_v2(
                     if isinstance(from_vessel, Well)
                     else AIR_GAP + DRIP_STOP
                 ),
-
             )
             # except OverFillException as e:
             #     logger.error(
@@ -300,7 +283,8 @@ def forward_pipette_v2(
             # Check if the pipette has any residual volume left
             if pump.pipette.volume > 0.0:
                 logger.warning(
-                    "Pipette has residual volume of %f ul. Purging...", pump.pipette.volume
+                    "Pipette has residual volume of %f ul. Purging...",
+                    pump.pipette.volume,
                 )
                 pump.infuse(
                     volume_to_infuse=pump.pipette.volume,
@@ -313,6 +297,7 @@ def forward_pipette_v2(
                 pump.pipette.volume = 0.0
 
             # endregion
+
 
 @timing_wrapper
 def rinse_v2(
@@ -372,6 +357,7 @@ def rinse_v2(
         )
 
     return 0
+
 
 @timing_wrapper
 def flush_v2(
@@ -434,6 +420,7 @@ def flush_v2(
         logger.info("No flushing required. Flush volume is 0. Continuing...")
     return 0
 
+
 @timing_wrapper
 def purge_pipette(
     waste_vials: Sequence[WasteVial],
@@ -468,6 +455,7 @@ def purge_pipette(
         blowout_ul=total_volume - liquid_volume,
     )
 
+
 @timing_wrapper
 def solution_selector(
     solutions: Sequence[StockVial], solution_name: str, volume: float
@@ -493,6 +481,7 @@ def solution_selector(
             )
             return solution
     raise NoAvailableSolution(solution_name)
+
 
 @timing_wrapper
 def waste_selector(
@@ -521,6 +510,7 @@ def waste_selector(
             )
             return waste_solution
     raise NoAvailableSolution(solution_name)
+
 
 @timing_wrapper
 def chrono_amp(
@@ -649,6 +639,7 @@ def chrono_amp(
         pstat.pstatdisconnect()
 
     return ca_instructions, ca_results
+
 
 @timing_wrapper
 def cyclic_volt(
@@ -819,6 +810,7 @@ def apply_log_filter(
     custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
     logger.addFilter(custom_filter)
 
+
 @timing_wrapper
 def volume_correction(
     volume: float, density: float = None, viscosity: float = None
@@ -842,6 +834,7 @@ def volume_correction(
         volume * (float(1.0) + (float(1.0) - density) * (float(1.0) - viscosity)), 6
     )
     return float(corrected_volume)
+
 
 @timing_wrapper
 def image_well(
@@ -908,7 +901,9 @@ def image_well(
 
         # Post to obs
         try:
-            if config.getboolean("OPTIONS",'testing') or config.getboolean("OPTIONS","use_obs"):
+            if config.getboolean("OPTIONS", "testing") or config.getboolean(
+                "OPTIONS", "use_obs"
+            ):
                 obs = MockOBSController()
             else:
                 obs = OBSController()
@@ -928,6 +923,7 @@ def image_well(
         if well_id != "test":
             logger.info("Moving camera to safe position")
             toolkit.mill.move_to_safe_position()  # move to safe height above target well
+
 
 @timing_wrapper
 def image_filepath_generator(
@@ -954,15 +950,17 @@ def image_filepath_generator(
         filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
         i += 1
     return filepath
+
+
 @timing_wrapper
 def mix(
-        mill: Union[Mill, MockMill],
-        pump: Union[SyringePump, MockPump],
-        well: Well,
-        well_id: str,
-        volume: float,
-        mix_count: int = 3,
-        mix_height: float = None,
+    mill: Union[Mill, MockMill],
+    pump: Union[SyringePump, MockPump],
+    well: Well,
+    well_id: str,
+    volume: float,
+    mix_count: int = 3,
+    mix_height: float = None,
 ):
     """
     Mix the solution in the well by pipetting it up and down
@@ -1024,6 +1022,7 @@ def mix(
     pump.infuse_air(40)
     mill.move_to_safe_position()
     return 0
+
 
 if __name__ == "__main__":
     pass

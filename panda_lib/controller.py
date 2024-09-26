@@ -24,18 +24,22 @@ import PySpin
 from slack_sdk import errors as slack_errors
 
 from panda_lib import gamry_control_WIP, scheduler
+
 # from panda_experiment_analyzers import pedot as pedot_analyzer
 from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
 from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .config.config_tools import read_config, read_testing_config
-from .errors import (NoExperimentFromModel, ProtocolNotFoundError,
-                     ShutDownCommand, WellImportError)
-from .experiment_class import (ExperimentBase, ExperimentResult,
-                               ExperimentStatus)
+from .errors import (
+    NoExperimentFromModel,
+    ProtocolNotFoundError,
+    ShutDownCommand,
+    WellImportError,
+)
+from .experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
 from .instrument_toolkit import Toolkit
-from .log_tools import setup_default_logger
+from .log_tools import setup_default_logger, timing_wrapper
 from .mill_control import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
 from .slack_tools.SlackBot import SlackBot
@@ -79,7 +83,7 @@ def main(
     """
 
     controller_slack = SlackBot(test=use_mock_instruments)
-    slack_thread = threading.Thread(target=run_slack_bot, args=(use_mock_instruments,))
+    # slack_thread = threading.Thread(target=run_slack_bot, args=(use_mock_instruments,))
     if config.getboolean("OPTIONS", "testing") or not config.getboolean(
         "OPTIONS", "use_obs"
     ):
@@ -123,7 +127,7 @@ def main(
         # experiemnt loop
         while True:
             ## Begin slack monitoring
-            slack_thread.start()
+            # slack_thread.start()
 
             ## Reset the logger to log to the PANDA_SDL.log file and format
             obs.place_text_on_screen("")
@@ -135,7 +139,8 @@ def main(
             while current_experiment is None:
                 ## Ask the scheduler for the next experiment
                 current_experiment, _ = scheduler.read_next_experiment_from_queue(
-                    random_pick=random_experiment_selection, experiment_id=specific_experiment_id
+                    random_pick=random_experiment_selection,
+                    experiment_id=specific_experiment_id,
                 )
                 specific_experiment_id = None  # reset the specific experiment id so that we don't keep running the same experiment
                 if current_experiment is not None:
@@ -190,7 +195,9 @@ def main(
                 )
                 break  # break out of the main while True loop
 
-            logger.info("Experiment %d selected and validated", current_experiment.experiment_id)
+            logger.info(
+                "Experiment %d selected and validated", current_experiment.experiment_id
+            )
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Initialize a results object
             current_experiment.results = ExperimentResult(
@@ -463,18 +470,18 @@ def main(
         obs.place_text_on_screen("")
         obs.stop_recording()
         sql_system_state.set_system_status(SystemState.IDLE)
-        controller_slack.send_slack_message(
-            "alert",
-            "Please command the slack monitor to 'stop' to end the slack monitoring",
-        )
-        if slack_thread.is_alive():
-            slack_thread.join()
+        # controller_slack.send_slack_message(
+        #     "alert",
+        #     "Please command the slack monitor to 'stop' to end the slack monitoring",
+        # )
+        # if slack_thread.is_alive():
+        #     slack_thread.join()
         controller_slack.send_slack_message(
             "alert", "PANDA_SDL is shutting down...goodbye"
         )
         print("PANDA_SDL is shutting down...returning to main menu...goodbye")
 
-
+@timing_wrapper
 def establish_system_state() -> (
     tuple[Sequence[StockVial], Sequence[WasteVial], Wellplate]
 ):
@@ -577,7 +584,7 @@ def establish_system_state() -> (
 
     return stock_vials_only, waste_vials_only, wellplate
 
-
+@timing_wrapper
 def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) -> bool:
     """
     Check that there is enough volume in the stock vials to run the experiment
@@ -611,8 +618,12 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
         solution_lwr = str(solution).lower()
         volume_required = experiment.solutions[solution]
         volume_available = sum(
-            [vial.volume for vial in stock_vials if str(vial.name).lower() == solution_lwr]
-        ) # we sum the volumes of all stock vials with the same name
+            [
+                vial.volume
+                for vial in stock_vials
+                if str(vial.name).lower() == solution_lwr
+            ]
+        )  # we sum the volumes of all stock vials with the same name
         if volume_available < volume_required:
             logger.error(
                 "There is not enough volume of solution %s to run the experiment",
@@ -621,7 +632,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
             return False
     return True
 
-
+@timing_wrapper
 def system_status_loop(slack: SlackBot):
     """
     Loop to check the system status and update the system status
@@ -662,7 +673,7 @@ def system_status_loop(slack: SlackBot):
         else:
             break
 
-
+@timing_wrapper
 def connect_to_instruments(
     use_mock_instruments: bool = TESTING,
 ) -> tuple[Toolkit, bool]:
@@ -753,6 +764,7 @@ def connect_to_instruments(
     logger.info("Connected to instruments")
     return instruments, True
 
+@timing_wrapper
 def test_instrument_connections(
     use_mock_instruments: bool = TESTING,
 ) -> tuple[Toolkit, bool]:
@@ -858,6 +870,7 @@ def test_instrument_connections(
     logger.info("Connected to all instruments")
     return instruments, True
 
+@timing_wrapper
 def disconnect_from_instruments(instruments: Toolkit):
     """Disconnect from the instruments"""
     logger.info("Disconnecting from instruments:")
@@ -867,7 +880,7 @@ def disconnect_from_instruments(instruments: Toolkit):
 
     logger.info("Disconnected from instruments")
 
-
+@timing_wrapper
 def share_to_slack(experiment: ExperimentBase):
     """Share the results of the experiment to the slack data channel"""
     slack = SlackBot(test=TESTING)

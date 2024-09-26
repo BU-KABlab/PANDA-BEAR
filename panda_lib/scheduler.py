@@ -14,7 +14,7 @@ from typing import Tuple, Union
 
 import pandas as pd
 
-from panda_lib.log_tools import setup_default_logger
+from panda_lib.log_tools import setup_default_logger, timing_wrapper
 
 from .experiment_class import (
     ExperimentBase,
@@ -44,7 +44,7 @@ from .wellplate import Well
 
 logger = setup_default_logger(log_name="scheduler")
 
-
+@timing_wrapper
 def check_well_status(well_to_check: str, plate_id: int = None) -> str:
     """Checks the status of the well in the well_status view in the SQLite database"""
     try:
@@ -54,7 +54,7 @@ def check_well_status(well_to_check: str, plate_id: int = None) -> str:
         logger.error("Error occured while checking well status: %s", e)
         raise e
 
-
+@timing_wrapper
 def choose_next_new_well(plate_id: int = None) -> str:
     """Choose the next available well for an experiment"""
     try:
@@ -64,7 +64,7 @@ def choose_next_new_well(plate_id: int = None) -> str:
         logger.error("Error occured while choosing next well: %s", e)
         raise e
 
-
+@timing_wrapper
 def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> None:
     """Change the status of the well in the well_status view in the SQLite database"""
     logger.debug(
@@ -95,7 +95,7 @@ def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> No
         logger.error("Error occured while changing well status: %s", e)
         raise e
 
-
+@timing_wrapper
 def read_next_experiment_from_queue(
     random_pick: bool = True,
     experiment_id: int = None,
@@ -134,7 +134,7 @@ def read_next_experiment_from_queue(
 
     return echem_experiment_base, filename
 
-
+@timing_wrapper
 def update_experiment_queue_priority(experiment_id: int, priority: int):
     """Update the priority of experiments in the queue"""
     try:
@@ -152,7 +152,7 @@ def update_experiment_queue_priority(experiment_id: int, priority: int):
         logger.error("Error occured while updating experiment queue priority: %s", e)
         raise e
 
-
+@timing_wrapper
 def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
     """Update the experiment information in the experiments table"""
     try:
@@ -170,7 +170,7 @@ def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
         logger.error("Error occured while updating experiment information: %s", e)
         raise e
 
-
+@timing_wrapper
 def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> None:
     """Update the experiment parameters in the experiment_parameters table"""
     try:
@@ -188,7 +188,7 @@ def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> 
         logger.error("Error occured while updating experiment parameters: %s", e)
         raise e
 
-
+@timing_wrapper
 def add_nonfile_experiment(
     experiment: ExperimentBase, override_well_available=False
 ) -> str:
@@ -261,7 +261,7 @@ def add_nonfile_experiment(
     logger.info("Experiment %s added to queue", experiment.experiment_id)
     return "success"
 
-
+@timing_wrapper
 def add_to_queue(experiment: ExperimentBase) -> ExperimentBase:
     """Add the given experiment to the queue table"""
     # Add the experiment to the queue
@@ -280,7 +280,7 @@ def add_to_queue(experiment: ExperimentBase) -> ExperimentBase:
         raise e  # raise the error to be caught by the calling function
     return experiment
 
-
+@timing_wrapper
 def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
     """
     Adds an experiment which is not a file to the experiment queue directly.
@@ -382,7 +382,7 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
 
     logger.info("Experiments loaded and added to queue")
     return 1
-
+@timing_wrapper
 def check_project_id(project_id: int) -> bool:
     """Check if the project_id is in the projects table"""
     try:
@@ -394,7 +394,7 @@ def check_project_id(project_id: int) -> bool:
     except sqlite3.Error as e:
         logger.error("Error occured while checking project id: %s", e)
         raise e
-
+@timing_wrapper
 def add_project_id(project_id: int) -> None:
     """Add the project_id to the projects table"""
     try:
@@ -404,7 +404,7 @@ def add_project_id(project_id: int) -> None:
     except sqlite3.Error as e:
         logger.error("Error occured while adding project id: %s", e)
         raise e
-
+@timing_wrapper
 def save_results(experiment: ExperimentBase) -> None:
     """
     Save the results of the experiment to the experiment_results table in the SQL database.
@@ -433,7 +433,7 @@ def save_results(experiment: ExperimentBase) -> None:
         # Save the results to the database
         insert_experiment_result(result)
 
-
+@timing_wrapper
 def determine_next_experiment_id() -> int:
     """Load well history to get last experiment id and increment by 1"""
     return select_next_experiment_id()

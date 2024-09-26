@@ -17,6 +17,7 @@ from panda_lib.vials import StockVial, Vial2, WasteVial
 from panda_lib.log_tools import (
     setup_default_logger,
     default_logger as pump_control_logger,
+    timing_wrapper,
 )
 
 vessel_logger = setup_default_logger(log_name="vessel")
@@ -64,7 +65,7 @@ class SyringePump:
         )  # mL
         self.pump = self.set_up_pump()
         self.pipette = Pipette()
-
+    @timing_wrapper
     def set_up_pump(self):
         """
         Set up the syringe pump using hardcoded settings.
@@ -92,7 +93,7 @@ class SyringePump:
             pump_control_logger.exception(e)
             raise e
         return syringe_pump
-
+    @timing_wrapper
     def withdraw(
         self,
         volume_to_withdraw: float,
@@ -190,7 +191,7 @@ class SyringePump:
         self.pump.volume_withdrawn_clear()
 
         return None
-
+    @timing_wrapper
     def withdraw_air(self, volume: float) -> int:
         """Withdraw the given ul of air with the pipette"""
         volume_ml = round(float(volume/1000),PRECISION)
@@ -307,7 +308,7 @@ class SyringePump:
 
         return 0  # TODO return infused into like withdraw does
 
-
+    @timing_wrapper
     def infuse_air(self, volume: float) -> int:
         """Infuse the given ul of air with the pipette"""
         volume_ml = round(float(volume/1000),PRECISION)
@@ -325,7 +326,7 @@ class SyringePump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
         return 0
-
+    @timing_wrapper
     def run_pump(
         self,
         pump_direction: nesp_lib.PumpingDirection,
@@ -381,7 +382,7 @@ class SyringePump:
 
         return 0
 
-
+    @timing_wrapper
     def update_pipette_volume(self, volume_ml: float):
         """Change the volume of the pipette in ml"""
         volume_ml = float(volume_ml)

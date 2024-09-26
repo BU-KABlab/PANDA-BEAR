@@ -29,16 +29,18 @@ from typing import Union
 import serial
 
 from panda_lib.config.config_tools import read_config
-from .log_tools import setup_default_logger
+from .log_tools import setup_default_logger, timing_wrapper
 from .utilities import Coordinates, Instruments
 from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import MillConfig
 
 # add the mill_control logger
-logger = setup_default_logger(log_name="mill_control",console_level=logging.INFO)
+logger = setup_default_logger(log_name="mill_control", console_level=logging.INFO)
 
 # Mill movement logger - just for the movement commands
-mill_movement_logger = setup_default_logger(log_name="mill_movement",console_level=logging.WARNING)
+mill_movement_logger = setup_default_logger(
+    log_name="mill_movement", console_level=logging.WARNING
+)
 
 config = read_config()
 MILL_COM_PORT = config.get("MILL", "port")
@@ -57,22 +59,24 @@ class Mill:
         self.ser_mill: serial.Serial = None
         self.homed = False
 
+    @timing_wrapper
     def homing_sequence(self):
         """Home the mill, set the feed rate, and clear the buffers"""
         self.home()
         self.set_feed_rate(2000)
         self.clear_buffers()
 
+    @timing_wrapper
     def connect_to_mill(self) -> serial.Serial:
         """Connect to the mill"""
         try:
             ser_mill = serial.Serial(
                 port=config.get("MILL", "port"),
-                baudrate= config.getint("MILL", "baudrate"), #115200
+                baudrate=config.getint("MILL", "baudrate"),  # 115200
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS,
-                timeout=config.getint("MILL", "timeout"), #10,
+                timeout=config.getint("MILL", "timeout"),  # 10,
             )
             time.sleep(2)
 
@@ -150,6 +154,7 @@ class Mill:
         self.disconnect()
         logger.info("Exiting the mill context manager")
 
+    @timing_wrapper
     def disconnect(self):
         """Close the serial connection to the mill"""
         logger.info("Disconnecting from the mill")
@@ -170,6 +175,7 @@ class Mill:
             self.ser_mill = None
         return
 
+    @timing_wrapper
     def fetch_config(self) -> dict:
         """Read the config file"""
         # try:
@@ -186,7 +192,9 @@ class Mill:
         #     raise MillConfigError("Error reading config file") from err
 
         with SessionLocal() as session:
-            mill_config = session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+            mill_config = (
+                session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+            )
             if mill_config:
                 return mill_config.config
             else:
@@ -201,7 +209,8 @@ class Mill:
                 except Exception as e:
                     raise MillConfigNotFound("Config file not found") from e
 
-    def save_config(self, mill_config: Union[None,dict] = None):
+    @timing_wrapper
+    def save_config(self, mill_config: Union[None, dict] = None):
         """Save the config to the db"""
         if mill_config is None:
             mill_config = self.config
@@ -267,18 +276,22 @@ class Mill:
 
         return mill_response
 
+    @timing_wrapper
     def stop(self):
         """Stop the mill"""
         self.execute_command("!")
 
+    @timing_wrapper
     def reset(self):
         """Reset or unlock the mill"""
         self.execute_command("$X")
 
+    @timing_wrapper
     def soft_reset(self):
         """Soft reset the mill"""
         self.execute_command("0x18")
 
+    @timing_wrapper
     def home(self, timeout=90):
         """Home the mill with a timeout"""
         self.execute_command("$H")
@@ -296,7 +309,7 @@ class Mill:
                 self.homed = True
                 break
 
-            time.sleep(2) # Check every 2 seconds
+            time.sleep(2)  # Check every 2 seconds
 
     def __wait_for_completion(self, incoming_status, timeout=90):
         """Wait for the mill to complete the previous command"""
@@ -310,6 +323,7 @@ class Mill:
             time.sleep(1)
         return status
 
+    @timing_wrapper
     def current_status(self) -> str:
         """Get the current status of the mill"""
         command = "?"
@@ -326,36 +340,44 @@ class Mill:
             status = self.ser_mill.readline().decode().rstrip()
         return status
 
+    @timing_wrapper
     def set_feed_rate(self, rate):
         """Set the feed rate"""
         self.execute_command(f"F{rate}")
 
+    @timing_wrapper
     def clear_buffers(self):
         """Clear input and output buffers"""
         self.ser_mill.flushInput()  # Clear input buffer
         self.ser_mill.flushOutput()  # Clear output buffer
 
+    @timing_wrapper
     def gcode_mode(self):
         """Ask the mill for its gcode mode"""
         return self.execute_command("$C")
 
+    @timing_wrapper
     def gcode_parameters(self):
         """Ask the mill for its gcode parameters"""
         return self.execute_command("$#")
 
+    @timing_wrapper
     def gcode_parser_state(self):
         """Ask the mill for its gcode parser state"""
         return self.execute_command("$G")
 
+    @timing_wrapper
     def grbl_settings(self) -> dict:
         """Ask the mill for its grbl settings"""
         return self.execute_command("$$")
 
+    @timing_wrapper
     def set_grbl_setting(self, setting: str, value: str):
         """Set a grbl setting"""
         command = f"${setting}={value}"
         return self.execute_command(command)
 
+    @timing_wrapper
     def current_coordinates(self, instrument=Instruments.CENTER) -> list:
         """
         Get the current coordinates of the mill.
@@ -385,9 +407,9 @@ class Mill:
             for _ in range(max_attempts):
                 try:
                     if match:
-                        x_coord = round(float(match.group(1)),3)
-                        y_coord = round(float(match.group(2)),3)
-                        z_coord = round(float(match.group(3)),3)
+                        x_coord = round(float(match.group(1)), 3)
+                        y_coord = round(float(match.group(2)), 3)
+                        z_coord = round(float(match.group(3)), 3)
                         log_message = f"WPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
                         logger.info(log_message)
                         break
@@ -463,6 +485,7 @@ class Mill:
         logger.debug("Current_coordinates: %s", current_coordinates)
         return current_coordinates
 
+    @timing_wrapper
     def rinse_electrode(self, rinses: int = 3):
         """
         Rinse the electrode by moving it to the rinse position and back to the
@@ -479,6 +502,7 @@ class Mill:
             self._move_electrode_to_position(coords["x"], coords["y"], 0)
         return 0
 
+    @timing_wrapper
     def rest_electrode(self):
         """
         Rinse the electrode by moving it to the rinse position and back to the
@@ -495,6 +519,7 @@ class Mill:
         )
         return 0
 
+    @timing_wrapper
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
         # [initial_x, initial_y, initial_z] = self.current_coordinates()
@@ -504,6 +529,7 @@ class Mill:
 
         return self.execute_command("G01 Z0")
 
+    @timing_wrapper
     def _move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
         """
         WARNING: Will move diagonally
@@ -541,6 +567,7 @@ class Mill:
         self.execute_command(command)
         return 0
 
+    @timing_wrapper
     def _move_pipette_to_position(
         self,
         x_coord: float = 0,
@@ -567,6 +594,7 @@ class Mill:
         self._move_center_to_position(*command_coordinates)
         return 0
 
+    @timing_wrapper
     def _move_electrode_to_position(
         self, x_coord: float, y_coord: float, z_coord: float = 0.00
     ) -> int:
@@ -589,6 +617,7 @@ class Mill:
         self._move_center_to_position(*command_coordinates)
         return 0
 
+    @timing_wrapper
     def update_offset(self, offset_type, offset_x, offset_y, offset_z):
         """
         Update the offset in the config file
@@ -610,6 +639,7 @@ class Mill:
         self.save_config()
 
     ## Special versions of the movement commands that avoid diagonal movements
+    @timing_wrapper
     def safe_move(
         self,
         x_coord,
@@ -691,7 +721,9 @@ class Mill:
         for command in commands:
             self.execute_command(command)
 
-        return Coordinates(*self.current_coordinates(instrument)) #TODO - check if this is the right return or should it be the instrument coordinates
+        return Coordinates(
+            *self.current_coordinates(instrument)
+        )  # TODO - check if this is the right return or should it be the instrument coordinates
 
     def __should_move_to_zero_first(
         self,
