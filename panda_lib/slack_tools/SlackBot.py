@@ -720,8 +720,9 @@ class SlackBot:
     def run(self):
         """Run the slack bot."""
         self.status = 1
+        # self._terminate_event = threading.Event()
         self.send_slack_message("alert", "PANDA Bot is monitoring Slack")
-        while self.status == 1:
+        while self.status == 1:# and not self._terminate_event.is_set():
             try:
                 time.sleep(5)
                 self.status = self.check_slack_messages(channel="alert")
@@ -735,7 +736,9 @@ class SlackBot:
         self.send_slack_message("alert", "PANDA Bot is off duty")
         print("Stopping Slack Bot")
 
-
+    # def terminate(self):
+    #     """Terminate the slack bot."""
+    #     self._terminate_event.set()
 
 def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
     """
