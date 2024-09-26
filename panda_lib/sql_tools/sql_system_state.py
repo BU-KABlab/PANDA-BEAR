@@ -2,6 +2,9 @@
 Reading and writing the system state to the database.
 """
 
+import datetime
+
+from pytz import utc
 from panda_lib.config.config_tools import read_config
 from panda_lib.utilities import SystemState
 from panda_lib.sql_tools.db_setup import SessionLocal
@@ -119,7 +122,7 @@ def select_system_status(look_back: int = 1) -> SystemState:
     with SessionLocal() as session:
         result = (
             session.query(SystemStatus.status)
-            .order_by(SystemStatus.status_time.desc())
+            .order_by(SystemStatus.id.desc())
             .limit(look_back)
             .all()
         )
@@ -138,7 +141,7 @@ def set_system_status(
     with SessionLocal() as session:
         session.add(
             SystemStatus(
-                status=system_status.value, comment=comment, test_mode=test_mode
+                status=system_status.value, comment=comment, status_time=datetime.datetime.now(tz= utc)  ,test_mode=test_mode
             )
         )
         session.commit()
