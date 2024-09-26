@@ -489,7 +489,8 @@ class SlackBot:
             return 1
 
         elif text[0:7] == "status":
-            sql_system_state.select_system_status()
+            system_status = sql_system_state.select_system_status()
+            message = f"The system status is {system_status}."
         elif text[0:5] == "pause":
             sql_system_state.set_system_status(
                 sql_system_state.SystemState.PAUSE, "pausing ePANDA", self.testing
