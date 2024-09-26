@@ -37,7 +37,7 @@ from .errors import (
     ShutDownCommand,
     WellImportError,
 )
-from .experiment_class import ExperimentBase, ExperimentResult, ExperimentStatus
+from .experiment_class import ExperimentBase, ExperimentResult, ExperimentResultsRecord, ExperimentStatus, select_specific_result
 from .instrument_toolkit import Toolkit
 from .log_tools import setup_default_logger, timing_wrapper
 from .mill_control import Mill, MockMill
@@ -892,6 +892,8 @@ def share_to_slack(experiment: ExperimentBase):
         logger.error("The experiment has no image files")
         return
     try:
+        exp_id = experiment.experiment_id
+        
         images_with_dz = [
             image
             for image in experiment.results.image
@@ -899,19 +901,34 @@ def share_to_slack(experiment: ExperimentBase):
         ]
         if len(images_with_dz) == 0:
             logger.error(
-                "The experiment %d has no dz.tiff image files", experiment.experiment_id
+                "The experiment %d has no dz.tiff image files", exp_id
             )
-            msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value} but has no datazoned image files to share"
+            msg = f"Experiment {exp_id} has completed with status {exp_id} but has no datazoned image files to share"
             slack.send_slack_message("data", msg)
             return
 
-        for image in experiment.results.image:
-            image: Path = image[0]
-            images_with_dz = []
-            if image.name.endswith("dz.tiff"):
-                images_with_dz.append(image)
-            msg = f"Experiment {experiment.experiment_id} has completed with status {experiment.status.value}. Photos taken:"
-            slack.upload_images("data", images_with_dz, msg)
+        # for image in experiment.results.image:
+        #     image: Path = image[0]
+        #     images_with_dz = []
+        #     if image.name.endswith("dz.tiff"):
+        #         images_with_dz.append(image)
+        msg = f"Experiment {exp_id} has completed with status {experiment.status}. Photos taken:"
+        #     slack.upload_images("data", images_with_dz, msg)
+
+        results = select_specific_result(exp_id, "image")
+
+        for result in results:
+            result: ExperimentResultsRecord
+            if "dz" not in result.result_value:
+                results.remove(result)
+
+        # Now make a list of the image paths
+        image_paths = [result.result_value for result in results]
+
+        # Now send the images to slack
+        slack.upload_images(
+            "data", image_paths, f"Images for experiment {msg}"
+        )
     except (
         slack_errors.SlackApiError,
         slack_errors.SlackClientError,
