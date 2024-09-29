@@ -3,7 +3,7 @@
 import threading
 from panda_lib.slack_tools.SlackBot import SlackBot
 
-TEST = True
+TEST = False
 
 def run_slack_bot():
     """Run the SlackBot"""
