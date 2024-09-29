@@ -553,13 +553,13 @@ class Mill:
         ]
 
         # check that command coordinates are within working volume
-        if command_coordinates[0] > 0 or command_coordinates[0] < working_volume["x"]:
+        if command_coordinates[0] > 1 or command_coordinates[0] < working_volume["x"]:
             logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if command_coordinates[1] > 0 or command_coordinates[1] < working_volume["y"]:
+        if command_coordinates[1] > 1 or command_coordinates[1] < working_volume["y"]:
             logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if command_coordinates[2] > 0 or command_coordinates[2] < working_volume["z"]:
+        if command_coordinates[2] > 1 or command_coordinates[2] < working_volume["z"]:
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
@@ -689,13 +689,13 @@ class Mill:
 
         # Double check that the target coordinates are within the working volume
         working_volume = Coordinates(**self.config["working_volume"])
-        if offset_coordinates.x > 0 or offset_coordinates.x < working_volume.x:
+        if offset_coordinates.x > 1 or offset_coordinates.x < working_volume.x:
             logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if offset_coordinates.y > 0 or offset_coordinates.y < working_volume.y:
+        if offset_coordinates.y > 1 or offset_coordinates.y < working_volume.y:
             logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if offset_coordinates.z > 0 or offset_coordinates.z < working_volume.z:
+        if offset_coordinates.z > 1 or offset_coordinates.z < working_volume.z:
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
