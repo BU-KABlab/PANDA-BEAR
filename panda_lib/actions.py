@@ -806,9 +806,12 @@ def apply_log_filter(
 
     logger_handlers = logger.handlers
     for handler in logger_handlers:
+        if handler.get_name() == "console_handler":
+            # Dont add the filter to the console handler
+            continue
         handler.setFormatter(experiment_formatter)
-    custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
-    logger.addFilter(custom_filter)
+        custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
+        handler.addFilter(custom_filter)
 
 
 @timing_wrapper
