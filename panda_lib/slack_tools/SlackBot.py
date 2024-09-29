@@ -481,7 +481,11 @@ class SlackBot:
             return 1
 
         elif text[0:4] == "stop":
-            return 0
+            sql_system_state.set_system_status(
+                sql_system_state.SystemState.IDLE, "stopping ePANDA", self.testing
+            )
+            self.send_slack_message(channel_id, "Stopping the controller loop")
+            return 1
 
         elif text[0:4] == "exit":
             return 0
@@ -530,7 +534,8 @@ class SlackBot:
                 "resume -> resumes the experiment loop\n"
                 # "start - starts the experiment loop\n"
                 "shutdown -> stops the experiment loop and the main menu\n"
-                "stop -> stops the monitoring loop\n"
+                "stop -> stops the controller loop\n"
+                "exit -> closes the slackbot\n"
             )
         self.send_slack_message(channel_id, message)
         return 1
@@ -895,7 +900,7 @@ def well_status() -> Path:
             vial_y.append(vial["vial_coordinates"]["y"])
             volume = vial["volume"]
             capacity = vial["capacity"]
-            if vial["name"] is None or vial["name"] == "":
+            if vial["name"] is None or vial["name"] in ["", "None", "none"] or capacity == 0:
                 vial_color.append("black")
                 vial_marker.append("x")
             elif volume / capacity > 0.5:
