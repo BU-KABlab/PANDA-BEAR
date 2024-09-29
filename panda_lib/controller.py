@@ -271,17 +271,25 @@ def main(
 
             # Get the main function from the module
             protocol_function = getattr(protocol_module, "main")
-            protocol_function(
-                instructions=current_experiment,
-                toolkit=toolkit,
-                stock_vials=stock_vials,
-                waste_vials=waste_vials,
-            )
+            
+            try:
+                protocol_function(
+                    instructions=current_experiment,
+                    toolkit=toolkit,
+                    stock_vials=stock_vials,
+                    waste_vials=waste_vials,
+                )
+            except Exception as error:
+                logger.error(error)
+                current_experiment.set_status_and_save(ExperimentStatus.ERROR)
+                raise error
 
             # Analysis function call if experiment includes one
-            if not TESTING and current_experiment.analyzer is not None:
-                current_experiment.analyzer(current_experiment)
-
+            # if not TESTING and current_experiment.analyzer is not None:
+            #     current_experiment.analyzer(current_experiment)
+            current_experiment.set_status_and_save(ExperimentStatus.SAVING)
+            scheduler.save_results(current_experiment)
+            current_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
             # Share any results images with the slack data channel
             share_to_slack(current_experiment)
 
@@ -293,9 +301,7 @@ def main(
             logger.info(post_experiment_status_msg)
             # slack.send_slack_message("alert", post_experiment_status_msg)
 
-            current_experiment.set_status_and_save(ExperimentStatus.SAVING)
-            scheduler.save_results(current_experiment)
-            current_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            
             # experiment_id = new_experiment.experiment_id
 
             # if not TESTING:
@@ -662,9 +668,9 @@ def system_status_loop(slack: SlackBot):
             sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
             sys.stdout.flush()
             sys.stdout.write("\n")
-            if SystemState.PAUSE in system_status:
+            if SystemState.PAUSE == system_status[0]:
                 continue
-            elif SystemState.IDLE in system_status:
+            elif SystemState.IDLE == system_status[0]:
                 break
         elif SystemState.RESUME in system_status:
             slack.send_slack_message("alert", "PANDA_SDL is resuming")
@@ -894,12 +900,43 @@ def share_to_slack(experiment: ExperimentBase):
     try:
         exp_id = experiment.experiment_id
         
-        images_with_dz = [
-            image
-            for image in experiment.results.image
-            if image[0].name.endswith("dz.tiff")
-        ]
-        if len(images_with_dz) == 0:
+        # images_with_dz = [
+        #     image
+        #     for image in experiment.results.image
+        #     if image[0].name.endswith("dz.tiff")
+        # ]
+        # if len(images_with_dz) == 0:
+        #     logger.error(
+        #         "The experiment %d has no dz.tiff image files", exp_id
+        #     )
+        #     msg = f"Experiment {exp_id} has completed with status {exp_id} but has no datazoned image files to share"
+        #     slack.send_slack_message("data", msg)
+        #     return
+
+        # for image in experiment.results.image:
+        #     image: Path = image[0]
+        #     images_with_dz = []
+        #     if image.name.endswith("dz.tiff"):
+        #         images_with_dz.append(image)
+        # msg = f"Experiment {exp_id} has completed with status {experiment.status}. Photos taken:"
+        #     slack.upload_images("data", images_with_dz, msg)
+
+        results = select_specific_result(exp_id, "image")
+
+        if results is None:
+            logger.error(
+                "The experiment %d has no image files", exp_id
+            )
+            msg = f"Experiment {exp_id} has completed with status {exp_id} but has no image files to share"
+            slack.send_slack_message("data", msg)
+            return
+
+        for result in results:
+            result: ExperimentResultsRecord
+            if "dz" not in result.result_value:
+                results.remove(result)
+
+        if len(results) == 0:
             logger.error(
                 "The experiment %d has no dz.tiff image files", exp_id
             )
@@ -907,25 +944,8 @@ def share_to_slack(experiment: ExperimentBase):
             slack.send_slack_message("data", msg)
             return
 
-        # for image in experiment.results.image:
-        #     image: Path = image[0]
-        #     images_with_dz = []
-        #     if image.name.endswith("dz.tiff"):
-        #         images_with_dz.append(image)
         msg = f"Experiment {exp_id} has completed with status {experiment.status}. Photos taken:"
-        #     slack.upload_images("data", images_with_dz, msg)
-
-        results = select_specific_result(exp_id, "image")
-
-        for result in results:
-            result: ExperimentResultsRecord
-            if "dz" not in result.result_value:
-                results.remove(result)
-
-        # Now make a list of the image paths
         image_paths = [result.result_value for result in results]
-
-        # Now send the images to slack
         slack.upload_images(
             "data", image_paths, f"{msg}"
         )
