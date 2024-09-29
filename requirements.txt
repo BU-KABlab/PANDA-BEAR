@@ -41,7 +41,6 @@ scipy==1.14.1
 six==1.16.0
 slack_sdk==3.32.0
 smmap==5.0.1
-spinnaker-python @ file:///C:/Users/Kab%20Lab/Downloads/spinnaker_python_win/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl#sha256=5d9e20c8b906d67640d47430e482321f897c763f79f65c6c24f03a66f87241d6
 SQLAlchemy==2.0.34
 sympy==1.13.2
 threadpoolctl==3.5.0
