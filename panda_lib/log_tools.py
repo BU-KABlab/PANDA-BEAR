@@ -44,6 +44,7 @@ def setup_default_logger(
         console_handler = logging.StreamHandler()
         console_handler.setLevel(console_level)
         console_formatter = logging.Formatter("%(message)s")
+        console_formatter.converter = time.gmtime
         console_handler.setFormatter(console_formatter)  # Ensure console output is formatted
         logger.addHandler(console_handler)
 
