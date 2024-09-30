@@ -24,12 +24,10 @@ Returns:
 # Standard library imports
 import logging
 import math
-import time
-from functools import wraps
 
 # Third party or custom imports
 from pathlib import Path
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional, Tuple, Union
 from PIL import Image
 
 # Local application imports
@@ -55,8 +53,7 @@ from panda_lib.mill_control import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.instrument_toolkit import Toolkit
-
-from panda_lib.vials import StockVial, WasteVial
+from panda_lib.vials import StockVial, WasteVial, read_vials
 from panda_lib.wellplate import Well
 
 TESTING = read_testing_config()
@@ -303,8 +300,6 @@ def forward_pipette_v2(
 def rinse_v2(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     Rinse the well with rinse_vol ul.
@@ -328,7 +323,6 @@ def rinse_v2(
         forward_pipette_v2(
             volume=correction_factor(instructions.rinse_vol),
             from_vessel=solution_selector(
-                stock_vials,
                 "rinse",
                 correction_factor(instructions.rinse_vol),
             ),
@@ -348,7 +342,6 @@ def rinse_v2(
             volume=correction_factor(instructions.rinse_vol),
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
-                waste_vials,
                 "waste",
                 correction_factor(instructions.rinse_vol),
             ),
@@ -361,8 +354,6 @@ def rinse_v2(
 
 @timing_wrapper
 def flush_v2(
-    waste_vials: Sequence[WasteVial],
-    stock_vials: Sequence[StockVial],
     flush_solution_name: str,
     mill: Union[Mill, MockMill],
     pump: Union[SyringePump, MockPump],
@@ -401,10 +392,8 @@ def flush_v2(
 
             forward_pipette_v2(
                 flush_volume,
-                from_vessel=solution_selector(
-                    stock_vials, flush_solution_name, flush_volume
-                ),
-                to_vessel=waste_selector(waste_vials, "waste", flush_volume),
+                from_vessel=solution_selector(flush_solution_name, flush_volume),
+                to_vessel=waste_selector("waste", flush_volume),
                 pump=pump,
                 mill=mill,
                 pumping_rate=pumping_rate,
@@ -423,7 +412,6 @@ def flush_v2(
 
 @timing_wrapper
 def purge_pipette(
-    waste_vials: Sequence[WasteVial],
     mill: Union[Mill, MockMill],
     pump: Union[SyringePump, MockPump],
 ):
@@ -437,7 +425,7 @@ def purge_pipette(
     """
     liquid_volume = pump.pipette.liquid_volume()
     total_volume = pump.pipette.volume
-    purge_vial = waste_selector(waste_vials, "waste", liquid_volume)
+    purge_vial = waste_selector("waste", liquid_volume)
 
     # Move to the purge vial
     mill.safe_move(
@@ -457,9 +445,7 @@ def purge_pipette(
 
 
 @timing_wrapper
-def solution_selector(
-    solutions: Sequence[StockVial], solution_name: str, volume: float
-) -> StockVial:
+def solution_selector(solution_name: str, volume: float) -> StockVial:
     """
     Select the solution from which to withdraw from, from the list of solution objects
     Args:
@@ -469,7 +455,10 @@ def solution_selector(
     Returns:
         solution (object): The solution object
     """
-    for solution in solutions:
+    # Fetch updated solutions from the db
+    stock_vials, _ = read_vials()
+
+    for solution in stock_vials:
         # if the solution names match and the requested volume is less than the available volume (volume - 10% of capacity)
         if solution.name.lower() == solution_name.lower() and round(
             float(solution.volume) - float(0.10) * float(solution.capacity), 6
@@ -484,9 +473,7 @@ def solution_selector(
 
 
 @timing_wrapper
-def waste_selector(
-    solutions: Sequence[WasteVial], solution_name: str, volume: float
-) -> WasteVial:
+def waste_selector(solution_name: str, volume: float) -> WasteVial:
     """
     Select the solution in which to deposit into from the list of solution objects
     Args:
@@ -496,21 +483,22 @@ def waste_selector(
     Returns:
         solution (object): The solution object
     """
+    # Fetch updated solutions from the db
+    _, wate_vials = read_vials()
     solution_name = solution_name.lower()
-    for waste_solution in solutions:
+    for waste_vial in wate_vials:
         if (
-            waste_solution.name.lower() == solution_name
-            and round((float(waste_solution.volume) + float(str(volume))), 6)
-            < waste_solution.capacity
+            waste_vial.name.lower() == solution_name
+            and round((float(waste_vial.volume) + float(str(volume))), 6)
+            < waste_vial.capacity
         ):
             logger.debug(
                 "Selected waste vial: %s in position %s",
-                waste_solution.name,
-                waste_solution.position,
+                waste_vial.name,
+                waste_vial.position,
             )
-            return waste_solution
+            return waste_vial
     raise NoAvailableSolution(solution_name)
-
 
 @timing_wrapper
 def chrono_amp(
@@ -810,7 +798,9 @@ def apply_log_filter(
             # Dont add the filter to the console handler
             continue
         handler.setFormatter(experiment_formatter)
-        custom_filter = CustomLoggingFilter(campaign_id, experiment_id, target_well, test)
+        custom_filter = CustomLoggingFilter(
+            campaign_id, experiment_id, target_well, test
+        )
         handler.addFilter(custom_filter)
 
 
@@ -864,9 +854,11 @@ def image_well(
 
         exp_id = instructions.experiment_id or "test"
         well_id = well_id = instructions.well_id or "test"
+        pjct_id = instructions.project_id or "test"
+        cmpgn_id = instructions.project_campaign_id or "test"
         # create file path
         filepath = image_filepath_generator(
-            exp_id, well_id, instructions.project_campaign_id, step_description
+            exp_id, pjct_id, cmpgn_id, well_id,step_description
         )
 
         # position lens above the well
