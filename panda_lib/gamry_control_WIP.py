@@ -5,6 +5,9 @@ import pathlib
 import time
 from decimal import Decimal
 from typing import Tuple
+import threading
+import os
+import sys
 
 import comtypes
 import numpy as np
@@ -37,6 +40,30 @@ global CONNECTION
 global ACTIVE
 global COMPLETE_FILE_NAME
 global OPEN_CONNECTION
+
+
+def countdown_timer(samplerate, cycle):
+    """Countdown timer for the data acquisition"""
+    if not isinstance(samplerate, int) or not isinstance(cycle, int) or samplerate <= 0 or cycle <= 0:
+        logger.error("Invalid samplerate or cycle. Both must be positive integers.")
+        return
+
+    estimated_time = samplerate * cycle
+    logger.debug("Estimated time for data acquisition: %d seconds", estimated_time)
+
+    try:
+        while estimated_time > 0:
+            time.sleep(1)
+            estimated_time -= 1
+            minutes, seconds = divmod(estimated_time, 60)
+            sys.stdout.write("\r")
+            sys.stdout.write(f"Time remaining: {minutes} minutes {seconds} seconds")
+            sys.stdout.flush()
+    except KeyboardInterrupt:
+        logger.info("Countdown timer interrupted.")
+    finally:
+        sys.stdout.write("\n")
+        logger.debug("Countdown timer complete")
 
 
 def pstatconnect():
@@ -238,9 +265,16 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     DTAQ.Init(PSTAT)
     PSTAT.SetSignal(SIGNAL)
     PSTAT.SetCell(GAMRY_COM.CellOn)
+
+    # Start a new thread to run a countdown timer
+    countdown_thread = threading.Thread(target=countdown_timer, args=(CVsamplerate, CVcycle), name = "countdown_thread")
+    countdown_thread.start()
+    
     DTAQ.Run(True)
-    # Code for timing started
-    # start_time = time.time()
+
+    # Join the countdown thread to the main thread
+    countdown_thread.join()
+
     logger.debug("cyclic: made it to run end")
 
 
@@ -272,7 +306,14 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     PSTAT.SetSignal(SIGNAL)
     PSTAT.SetCell(GAMRY_COM.CellOn)
 
+        # Start a new thread to run a countdown timer
+    countdown_thread = threading.Thread(target=countdown_timer, args=(CAt1+CAt2, 1), name = "countdown_thread")
+    countdown_thread.start()
+    
     DTAQ.Run(True)
+
+    # Join the countdown thread to the main thread
+    countdown_thread.join()
 
     # Code for timing started
     # start_time = time.time()
