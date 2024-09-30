@@ -488,6 +488,7 @@ class VialStatus(Base):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
 
 class PotentiostatReadout(Base):
+    """PotentiostatReadout table model"""
     __tablename__ = 'potentiostat_readouts'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -503,10 +504,10 @@ class PotentiostatReadout(Base):
     #     technique = connection.execute(
     #         f"SELECT * FROM potentiostat_techniques WHERE technique = '{target.technique}'"
     #     ).fetchone()
-        
+
     #     if not technique:
     #         raise ValueError(f"Technique '{target.technique}' is not listed in the PotentiostatTechniques table.")
-        
+
     #     interface_column = f"gamry_{target.interface}"
     #     if not getattr(technique, interface_column, False):
     #         raise ValueError(f"Interface '{target.interface}' is not supported for technique '{target.technique}'.")
@@ -515,6 +516,7 @@ class PotentiostatReadout(Base):
 event.listen(PotentiostatReadout, 'before_insert', PotentiostatReadout.validate_interface)
 
 class PotentiostatTechniques(Base):
+    """PotentiostatTechniques table model"""
     __tablename__ = 'potentiostat_techniques'
 
     id = Column(Integer, primary_key=True)
