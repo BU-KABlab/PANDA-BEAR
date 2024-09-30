@@ -15,7 +15,7 @@ from panda_lib.actions import (
     OCPFailure,
     CAFailure,
     CVFailure,
-    DepositionFailure
+    DepositionFailure,
 )
 from panda_lib.actions_pedot import (
     chrono_amp_edot_bleaching,
@@ -69,7 +69,6 @@ def pedot_lhs_v1_screening(
         instructions.solutions_corrected[solution] = correction_factor(
             instructions.solutions[solution],
             solution_selector(
-                stock_vials,
                 solution,  # The solution name
                 instructions.solutions[solution],  # The volume of the solution
             ).viscosity_cp,
@@ -110,7 +109,6 @@ def pedot_lhs_v1_screening(
     #         waste_vials=waste_vials,
     #     )
 
-
     # elif instructions.process_type == 3:
     #     pedotcoloring(
     #         instructions=instructions,
@@ -119,11 +117,11 @@ def pedot_lhs_v1_screening(
     #         waste_vials=waste_vials,
     #     )
     pedotdeposition(
-            instructions=instructions,
-            toolkit=toolkit,
-            stock_vials=stock_vials,
-            waste_vials=waste_vials,
-        )
+        instructions=instructions,
+        toolkit=toolkit,
+        stock_vials=stock_vials,
+        waste_vials=waste_vials,
+    )
     pedotbleaching(
         instructions=instructions,
         toolkit=toolkit,
@@ -163,7 +161,9 @@ def pedotdeposition(
         stock_vials (Sequence[StockVial]): _description_
         waste_vials (Sequence[WasteVial]): _description_
     """
-    toolkit.global_logger.info("Running experimnet %s part 1", instructions.experiment_id)
+    toolkit.global_logger.info(
+        "Running experimnet %s part 1", instructions.experiment_id
+    )
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "BeforeDeposition")
@@ -179,9 +179,7 @@ def pedotdeposition(
     # actual volume to be pipetted is calculated using the correction factor.
 
     edot_vials = [
-        vial
-        for vial in stock_vials
-        if vial.name == "edot" and vial.volume > 0
+        vial for vial in stock_vials if vial.name == "edot" and vial.volume > 0
     ]
 
     # If there are no edot vials, raise an error
@@ -192,13 +190,10 @@ def pedotdeposition(
     # There are one or more vials, let's calculate the volume to be pipetted from each
     # vial to get the desired volume and concentration
     edot_vial_volumes, deviation = solve_vials_ilp(
-
         # Concentrations of each vial in mM
         vial_concentrations=[vial.concentration for vial in edot_vials],
-
         # Total volume to achieve in uL
         v_total=instructions.solutions["edot"],
-
         # Target concentration in mM
         c_target=instructions.edot_concentration,
     )
@@ -209,9 +204,7 @@ def pedotdeposition(
     toolkit.global_logger.info(
         "Volumes to draw from each edot vial: %s uL", edot_vial_volumes
     )
-    toolkit.global_logger.info(
-        "Deviation from target concentration: %s mM", deviation
-    )
+    toolkit.global_logger.info("Deviation from target concentration: %s mM", deviation)
 
     # Pipette the calculated volumes from the edot vials into the well
     for vial, volume in zip(edot_vials, edot_vial_volumes):
@@ -257,7 +250,9 @@ def pedotdeposition(
         toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
         raise e
     except Exception as e:
-        toolkit.global_logger.error("Unknown error occurred during chrono_amp: %s", str(e))
+        toolkit.global_logger.error(
+            "Unknown error occurred during chrono_amp: %s", str(e)
+        )
         raise e
 
     # Rinse electrode
@@ -272,7 +267,6 @@ def pedotdeposition(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
-            waste_vials,
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -283,12 +277,9 @@ def pedotdeposition(
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=1,
     )
 
     toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
@@ -299,7 +290,6 @@ def pedotdeposition(
         forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
-                stock_vials,
                 "rinse",
                 correction_factor(120),
             ),
@@ -319,7 +309,6 @@ def pedotdeposition(
             volume=correction_factor(120),
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
-                waste_vials,
                 "waste",
                 correction_factor(120),
             ),
@@ -361,20 +350,23 @@ def pedotbleaching(
         stock_vials (Sequence[StockVial]): _description_
         waste_vials (Sequence[WasteVial]): _description_
     """
-    toolkit.global_logger.info("Running experiment %s part 2", instructions.experiment_id)
+    toolkit.global_logger.info(
+        "Running experiment %s part 2", instructions.experiment_id
+    )
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "BeforeBleaching")
 
     instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
     ## Deposit the experiment solution into the well
-    toolkit.global_logger.info("1. Depositing liclo4 into well: %s", instructions.well_id)
+    toolkit.global_logger.info(
+        "1. Depositing liclo4 into well: %s", instructions.well_id
+    )
     forward_pipette_v2(
         volume=correction_factor(120),
         from_vessel=solution_selector(
-            stock_vials,
             "liclo4",
-            correction_factor(120), #hard code this
+            correction_factor(120),  # hard code this
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
         pump=toolkit.pump,
@@ -425,7 +417,6 @@ def pedotbleaching(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
-            waste_vials,
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -436,12 +427,9 @@ def pedotbleaching(
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=1,
     )
 
     toolkit.global_logger.info("7. Take after image")
@@ -479,7 +467,9 @@ def pedotcoloring(
         stock_vials (Sequence[StockVial]): _description_
         waste_vials (Sequence[WasteVial]): _description_
     """
-    toolkit.global_logger.info("Running experiment %s part 3", instructions.experiment_id)
+    toolkit.global_logger.info(
+        "Running experiment %s part 3", instructions.experiment_id
+    )
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "BeforeColoring")
@@ -492,7 +482,6 @@ def pedotcoloring(
     forward_pipette_v2(
         volume=correction_factor(120),
         from_vessel=solution_selector(
-            stock_vials,
             "liclo4",
             correction_factor(120),
         ),
@@ -547,7 +536,6 @@ def pedotcoloring(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
-            waste_vials,
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -558,8 +546,6 @@ def pedotcoloring(
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
@@ -602,7 +588,9 @@ def pedotcv(
         stock_vials (Sequence[StockVial]): _description_
         waste_vials (Sequence[WasteVial]): _description_
     """
-    toolkit.global_logger.info("Running experiment %s part 4", instructions.experiment_id)
+    toolkit.global_logger.info(
+        "Running experiment %s part 4", instructions.experiment_id
+    )
     toolkit.global_logger.info("0. Imaging the well")
     instructions.set_status_and_save(ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "BeforeCharacterizing")
@@ -615,7 +603,6 @@ def pedotcv(
     forward_pipette_v2(
         volume=instructions.solutions_corrected["liclo4"],
         from_vessel=solution_selector(
-            stock_vials,
             "liclo4",
             instructions.solutions_corrected["liclo4"],
         ),
@@ -665,7 +652,6 @@ def pedotcv(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
-            waste_vials,
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
@@ -676,8 +662,6 @@ def pedotcv(
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="rinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
@@ -699,7 +683,6 @@ def pedotcv(
         forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
-                stock_vials,
                 "rinse",
                 correction_factor(120),
             ),
@@ -713,7 +696,6 @@ def pedotcv(
             volume=correction_factor(120),
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
-                waste_vials,
                 "waste",
                 correction_factor(120),
             ),
