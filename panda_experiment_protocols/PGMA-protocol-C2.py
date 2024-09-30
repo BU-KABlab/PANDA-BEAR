@@ -90,7 +90,6 @@ def PGMA_dep_v2_screening(
         instructions.solutions_corrected[solution] = correction_factor(
             instructions.solutions[solution],
             solution_selector(
-                stock_vials,
                 solution,  # The solution name
                 instructions.solutions[solution],  # The volume of the solution
             ).viscosity_cp,
@@ -152,7 +151,6 @@ def PGMAdeposition(
     forward_pipette_v2(
         volume=instructions.solutions_corrected[solution_name],
         from_vessel=solution_selector(
-            stock_vials,
             solution_name,
             instructions.solutions_corrected[solution_name],
         ),
@@ -208,7 +206,6 @@ def PGMAdeposition(
         volume=current_well.volume,
         from_vessel=current_well,
         to_vessel=waste_selector(
-            waste_vials,
             "waste",
             current_well.volume,
         ),
@@ -235,7 +232,6 @@ def PGMAdeposition(
         forward_pipette_v2(
             volume=correction_factor(320),
             from_vessel=solution_selector(
-                stock_vials,
                 "DMF-TBAPrinse",
                 correction_factor(320),
             ),
@@ -249,7 +245,6 @@ def PGMAdeposition(
             volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
-                waste_vials,
                 "waste",
                 correction_factor(320),
             ),
@@ -303,7 +298,6 @@ def FC_prechar(
     forward_pipette_v2(
         volume=instructions.solutions_corrected[solution_name.lower()],
         from_vessel=solution_selector(
-            stock_vials,
             solution_name,
             instructions.solutions_corrected[solution_name],
         ),
@@ -353,7 +347,6 @@ def FC_prechar(
         volume=current_well.volume,
         from_vessel=current_well,
         to_vessel=waste_selector(
-            waste_vials,
             "waste",
             current_well.volume,
         ),
@@ -378,7 +371,6 @@ def FC_prechar(
         forward_pipette_v2(
             volume=correction_factor(320),
             from_vessel=solution_selector(
-                stock_vials,
                 "DMF-TBAPrinse",
                 correction_factor(320),
             ),
@@ -392,7 +384,6 @@ def FC_prechar(
             volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
-                waste_vials,
                 "waste",
                 correction_factor(320),
             ),
@@ -446,7 +437,6 @@ def FC_postchar(
     forward_pipette_v2(
         volume=instructions.solutions_corrected[solution_name],
         from_vessel=solution_selector(
-            stock_vials,
             solution_name,
             instructions.solutions_corrected[solution_name],
         ),
@@ -496,7 +486,6 @@ def FC_postchar(
         volume=current_well.volume,
         from_vessel=current_well,
         to_vessel=waste_selector(
-            waste_vials,
             "waste",
             current_well.volume,
         ),
@@ -521,7 +510,6 @@ def FC_postchar(
         forward_pipette_v2(
             volume=correction_factor(320),
             from_vessel=solution_selector(
-                stock_vials,
                 "DMFrinse",
                 correction_factor(320),
             ),
@@ -535,7 +523,6 @@ def FC_postchar(
             volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
-                waste_vials,
                 "waste",
                 correction_factor(320),
             ),
@@ -559,7 +546,6 @@ def FC_postchar(
         forward_pipette_v2(
             volume=correction_factor(320),
             from_vessel=solution_selector(
-                stock_vials,
                 "ACNrinse",
                 correction_factor(320),
             ),
@@ -573,7 +559,6 @@ def FC_postchar(
             volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
-                waste_vials,
                 "waste",
                 correction_factor(320),
             ),
