@@ -378,7 +378,7 @@ class Mill:
         return self.execute_command(command)
 
     @timing_wrapper
-    def current_coordinates(self, instrument=Instruments.CENTER) -> list:
+    def current_coordinates(self, instrument=Instruments.CENTER) -> Coordinates:
         """
         Get the current coordinates of the mill.
         Args:
@@ -483,7 +483,7 @@ class Mill:
             raise ValueError("Invalid instrument")
         current_coordinates = [round(coord, 3) for coord in current_coordinates]
         logger.debug("Current_coordinates: %s", current_coordinates)
-        return current_coordinates
+        return Coordinates(*current_coordinates)
 
     @timing_wrapper
     def rinse_electrode(self, rinses: int = 3):
@@ -658,7 +658,7 @@ class Mill:
             Coordinates: Current center coordinates.
         """
         # Get the current coordinates
-        current_coordinates = Coordinates(*self.current_coordinates(instrument))
+        current_coordinates = self.current_coordinates(instrument)
 
         # Fetch offsets for the specified instrument
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
@@ -705,25 +705,30 @@ class Mill:
         # Initialize a list to store the movement commands
         commands = []
 
-        # Generate horizontal movements
-        if offset_coordinates.x != current_coordinates.x:
-            commands.append(f"G01 X{offset_coordinates.x}")
-
-        if offset_coordinates.y != current_coordinates.y:
-            commands.append(f"G01 Y{offset_coordinates.y}")
-
-        # Generate vertical movements
-        current_coordinates = Coordinates(*self.current_coordinates(instrument))
-        if offset_coordinates.z != current_coordinates.z:
+        if self.current_coordinates(instrument).z == 0:
+            # If the mill is already at Z=0, we can move directly to the target x,y coordinates
+            commands.append(f"G01 X{offset_coordinates.x} Y{offset_coordinates.y}")
+            # Then we can move to the target z coordinate
             commands.append(f"G01 Z{offset_coordinates.z}")
+        else:
+            # Generate stepwise horizontal movements
+            if offset_coordinates.x != current_coordinates.x:
+                commands.append(f"G01 X{offset_coordinates.x}")
+
+            if offset_coordinates.y != current_coordinates.y:
+                commands.append(f"G01 Y{offset_coordinates.y}")
+
+            # Generate vertical movements
+            current_coordinates = self.current_coordinates(instrument)
+            if offset_coordinates.z != current_coordinates.z:
+                commands.append(f"G01 Z{offset_coordinates.z}")
 
         # Execute the commands one by one
         for command in commands:
             self.execute_command(command)
 
-        return Coordinates(
-            *self.current_coordinates(instrument)
-        )  # TODO - check if this is the right return or should it be the instrument coordinates
+        return self.current_coordinates(instrument)
+        # TODO - check if this is the right return or should it be the instrument coordinates
 
     def __should_move_to_zero_first(
         self,
