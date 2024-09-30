@@ -15,13 +15,14 @@ Base = declarative_base()
 
 
 def model_to_dict(model):
+    """Convert a SQLAlchemy model to a dictionary."""
     return {c.key: getattr(model, c.key) for c in inspect(model).mapper.column_attrs}
 
 
 class Experiments(Base):
     """Experiments table model"""
 
-    __tablename__ = "experiments"
+    __tablename__ = "panda_experiments"
     experiment_id = Column(BigInteger, primary_key=True)
     project_id = Column(Integer)
     project_campaign_id = Column(Integer)
@@ -54,7 +55,7 @@ class Experiments(Base):
 class ExperimentStatusView(Base):
     """ExperimentStatus view model"""
 
-    __tablename__ = "experiment_status"
+    __tablename__ = "panda_experiment_status"
     experiment_id = Column(Integer, primary_key=True)
     status = Column(String)
 
@@ -65,9 +66,9 @@ class ExperimentStatusView(Base):
 class ExperimentResults(Base):
     """ExperimentResults table model"""
 
-    __tablename__ = "experiment_results"
+    __tablename__ = "panda_experiment_results"
     id = Column(Integer, primary_key=True)
-    experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"))
+    experiment_id = Column(Integer, ForeignKey("panda_experiments.experiment_id"))
     result_type = Column(String)
     result_value = Column(String)
     created = Column(String, default=dt.now(timezone.utc))
@@ -81,9 +82,9 @@ class ExperimentResults(Base):
 class ExperimentParameters(Base):
     """ExperimentParameters table model"""
 
-    __tablename__ = "experiment_parameters"
+    __tablename__ = "panda_experiment_parameters"
     id = Column(Integer, primary_key=True)
-    experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"))
+    experiment_id = Column(Integer, ForeignKey("panda_experiments.experiment_id"))
     parameter_name = Column(String)
     parameter_value = Column(String)
     created = Column(String, default=dt.now)
@@ -96,7 +97,7 @@ class ExperimentParameters(Base):
 class ExperimentGenerators(Base):
     """ExperimentGenerators table model"""
 
-    __tablename__ = "generators"
+    __tablename__ = "panda_generators"
     id = Column(Integer, primary_key=True)
     project_id = Column(Integer)
     protocol_id = Column(Integer)
@@ -110,7 +111,7 @@ class ExperimentGenerators(Base):
 class MlPedotBestTestPoints(Base):
     """MlPedotBestTestPoints table model"""
 
-    __tablename__ = "ml_pedot_best_test_points"
+    __tablename__ = "panda_ml_pedot_best_test_points"
     model_id = Column(Integer, primary_key=True)
     experiment_id = Column(Integer, unique=True)
     best_test_point_scalar = Column(String)
@@ -130,7 +131,7 @@ class MlPedotBestTestPoints(Base):
 class MlPedotTrainingData(Base):
     """MlPedotTrainingData table model"""
 
-    __tablename__ = "ml_pedot_training_data"
+    __tablename__ = "panda_ml_pedot_training_data"
     id = Column(Integer, primary_key=True)
     delta_e = Column(Float(18, 8))
     voltage = Column(Float(18, 8))
@@ -161,7 +162,7 @@ class Pipette(Base):
 
     """
 
-    __tablename__ = "pipette"
+    __tablename__ = "panda_pipette"
     id = Column(Integer, primary_key=True)
     capacity_ul = Column(Float, nullable=False)
     capacity_ml = Column(Float, nullable=False)
@@ -179,9 +180,9 @@ class Pipette(Base):
 class PipetteLog(Base):
     """PipetteLog table model"""
 
-    __tablename__ = "pipette_log"
+    __tablename__ = "panda_pipette_log"
     id = Column(Integer, primary_key=True)
-    pipette_id = Column(Integer, ForeignKey("pipette.id"))
+    pipette_id = Column(Integer, ForeignKey("panda_pipette.id"))
     volume_ul = Column(Float, nullable=False)
     volume_ml = Column(Float, nullable=False)
     updated = Column(String, default=dt.now(timezone.utc))
@@ -193,7 +194,7 @@ class PipetteLog(Base):
 class Projects(Base):
     """Projects table model"""
 
-    __tablename__ = "projects"
+    __tablename__ = "panda_projects"
     id = Column(Integer, primary_key=True)
     project_name = Column(String)
     # project_description = Column(String)
@@ -207,7 +208,7 @@ class Projects(Base):
 class Protocols(Base):
     """Protocols table model"""
 
-    __tablename__ = "protocols"
+    __tablename__ = "panda_protocols"
     id = Column(Integer, primary_key=True)
     project = Column(Integer)
     name = Column(String)
@@ -217,7 +218,7 @@ class Protocols(Base):
 class SlackTickets(Base):
     """SlackTickets table model"""
 
-    __tablename__ = "slack_tickets"
+    __tablename__ = "panda_slack_tickets"
     msg_id = Column(String, primary_key=True, nullable=False, unique=True)
     channel_id = Column(String, nullable=False)
     message = Column(String, nullable=False)
@@ -233,7 +234,7 @@ class SlackTickets(Base):
 class SystemStatus(Base):
     """SystemStatus table model"""
 
-    __tablename__ = "system_status"
+    __tablename__ = "panda_system_status"
     id = Column(Integer, primary_key=True, autoincrement=True)
     status = Column(String, nullable=False)
     comment = Column(String)
@@ -246,7 +247,7 @@ class SystemStatus(Base):
 class Users(Base):
     """Users table model"""
 
-    __tablename__ = "users"
+    __tablename__ = "panda_users"
     id = Column(Integer, primary_key=True, autoincrement=True)
     first = Column(String, nullable=False)
     last = Column(String, nullable=False)
@@ -294,7 +295,7 @@ class Vials(Base):
     Categories: 0 = Stock, 1 = Waste, 2 = Reagent, 3 = Unknown
     """
 
-    __tablename__ = "vials"
+    __tablename__ = "panda_vials"
     id = Column(Integer, primary_key=True)
     position = Column(String)
     contents = Column(String)
@@ -319,7 +320,7 @@ class Vials(Base):
 class WellHx(Base):
     """WellHx table model"""
 
-    __tablename__ = "well_hx"
+    __tablename__ = "panda_well_hx"
     plate_id = Column(Integer, primary_key=True)
     well_id = Column(String, primary_key=True)
     experiment_id = Column(Integer)
@@ -338,7 +339,7 @@ class WellHx(Base):
 class PlateTypes(Base):
     """WellTypes table model"""
 
-    __tablename__ = "plate_types"
+    __tablename__ = "panda_plate_types"
     id: int = Column(Integer, primary_key=True)
     substrate: str = Column(String)
     gasket: str = Column(String)
@@ -364,9 +365,9 @@ class PlateTypes(Base):
 class WellPlates(Base):
     """WellPlates table model"""
 
-    __tablename__ = "wellplates"
+    __tablename__ = "panda_wellplates"
     id = Column(Integer, primary_key=True)
-    type_id = Column(Integer, ForeignKey("plate_types.id"))
+    type_id = Column(Integer, ForeignKey("panda_plate_types.id"))
     current = Column(Boolean, default=False)
     a1_x = Column(Float)
     a1_y = Column(Float)
@@ -385,7 +386,7 @@ class WellPlates(Base):
 class Queue(Base):
     """Queue view model"""
 
-    __tablename__ = "queue"
+    __tablename__ = "panda_queue"
     experiment_id = Column(Integer, primary_key=True)
     project_id = Column(Integer)
     project_campaign_id = Column(Integer)
@@ -404,7 +405,7 @@ class Queue(Base):
 class WellStatus(Base):
     """WellStatus view model"""
 
-    __tablename__ = "well_status"
+    __tablename__ = "panda_well_status"
     plate_id = Column(Integer, primary_key=True)
     type_number = Column(Integer)
     well_id = Column(String, primary_key=True)
@@ -427,7 +428,7 @@ class MillConfig(Base):
     Stores the JSON config for the grbl mill
     """
 
-    __tablename__ = "mill_config"
+    __tablename__ = "panda_mill_config"
     id = Column(Integer, primary_key=True)
     config = Column(JSON, nullable=False)
     timestamp = Column(String, default=dt.now(timezone.utc))
@@ -439,7 +440,7 @@ class MillConfig(Base):
 class SystemVersions(Base):
     """SystemVersions table model"""
 
-    __tablename__ = "system_versions"
+    __tablename__ = "panda_system_versions"
     id = Column(Integer, primary_key=True)
     mill = Column(Integer, nullable=False)
     pump = Column(String, default="00")
@@ -466,7 +467,7 @@ class SystemVersions(Base):
 class VialStatus(Base):
     """VialStatus view model"""
 
-    __tablename__ = "vial_status"
+    __tablename__ = "panda_vial_status"
     id = Column(Integer, primary_key=True)
     position = Column(String)
     contents = Column(String)
@@ -496,7 +497,7 @@ class PotentiostatReadout(Base):
     interface = Column(String, nullable=False)
     technique = Column(String, nullable=False)
     readout_values = Column(Text, nullable=False)
-    experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"), nullable=False)
+    experiment_id = Column(Integer, ForeignKey("panda_experiments.experiment_id"), nullable=False)
 
     # @staticmethod
     # def validate_interface(mapper, connection, target):
