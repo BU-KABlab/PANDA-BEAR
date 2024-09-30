@@ -277,8 +277,6 @@ def main(
                 protocol_function(
                     instructions=current_experiment,
                     toolkit=toolkit,
-                    stock_vials=stock_vials,
-                    waste_vials=waste_vials,
                 )
             except Exception as error:
                 logger.error(error)
