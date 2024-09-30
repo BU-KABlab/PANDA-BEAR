@@ -8,11 +8,11 @@ from typing import List, Tuple, Union
 from sqlalchemy import Integer, func, cast
 
 from panda_lib import wellplate as wellplate_module
-from panda_lib.sql_tools import sql_utilities
+from panda_lib.sql_tools import sql_reports
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import WellHx, WellPlates, PlateTypes
 
-logger = sql_utilities.logger
+logger = sql_reports.logger
 
 
 # region Wellplate Functions

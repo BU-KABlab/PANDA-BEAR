@@ -6,7 +6,7 @@ SQLAlchemy models for the PANDA database
 from datetime import datetime as dt
 from datetime import timezone
 
-from sqlalchemy import Column, ForeignKey, text, event, Table
+from sqlalchemy import Column, ForeignKey, Text, text, event, Table
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, relationship
 from sqlalchemy.sql.sqltypes import BigInteger, Integer, JSON, Float, String, Boolean
@@ -486,3 +486,42 @@ class VialStatus(Base):
 
     def __repr__(self):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
+
+class PotentiostatReadout(Base):
+    __tablename__ = 'potentiostat_readouts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(String, nullable=False)
+    interface = Column(String, nullable=False)
+    technique = Column(String, nullable=False)
+    readout_values = Column(Text, nullable=False)
+    experiment_id = Column(Integer, ForeignKey("experiments.experiment_id"), nullable=False)
+
+    # @staticmethod
+    # def validate_interface(mapper, connection, target):
+    #     """Validate if the technique is listed in the PotentiostatTechniques table and the interface is supported."""
+    #     technique = connection.execute(
+    #         f"SELECT * FROM potentiostat_techniques WHERE technique = '{target.technique}'"
+    #     ).fetchone()
+        
+    #     if not technique:
+    #         raise ValueError(f"Technique '{target.technique}' is not listed in the PotentiostatTechniques table.")
+        
+    #     interface_column = f"gamry_{target.interface}"
+    #     if not getattr(technique, interface_column, False):
+    #         raise ValueError(f"Interface '{target.interface}' is not supported for technique '{target.technique}'.")
+
+# Attach the event listener to the PotentiostatReadout model
+event.listen(PotentiostatReadout, 'before_insert', PotentiostatReadout.validate_interface)
+
+class PotentiostatTechniques(Base):
+    __tablename__ = 'potentiostat_techniques'
+
+    id = Column(Integer, primary_key=True)
+    technique = Column(String, nullable=False)
+    technique_description = Column(String, nullable=True)
+    technique_params = Column(JSON, nullable=True)
+    gamry_1010T = Column(Boolean, nullable=False)
+    gamry_1010B = Column(Boolean, nullable=False)
+    gamry_1010E = Column(Boolean, nullable=False)
+    
