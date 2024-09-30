@@ -106,7 +106,7 @@ class SyringePump:
         Args:
             volume (float): Volume to be withdrawn in microliters.
             solution (Vial object or str): The vial or wellplate ID to withdraw from
-            rate (float): Pumping rate in milliliters per minute.
+            rate (float): Pumping rate in milliliters per minute. None defaults to the max pump rate.
 
         Returns:
             The updated solution object if given one
@@ -225,7 +225,7 @@ class SyringePump:
             volume_to_infuse (float): Volume to be infused in microliters.
             being_infused (Vial object): The solution being infused to get the density
             infused_into (str or Vial): The destination of the solution (well or vial)
-            rate (float): Pumping rate in milliliters per minute.
+            rate (float): Pumping rate in milliliters per minute. None defaults to the max pump rate.
             blowout_ul (float): The volume to blowout in microliters
             weigh (bool): If true, will weigh the solution before and after infusing and log the difference
             results (ExperimentResult): The experiment results object to store pumping records

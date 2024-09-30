@@ -142,158 +142,60 @@ def forward_pipette_v2(
         None (void function) since the objects are passed by reference
 
     """
-    if volume > float(0.00):
-        logger.info(
-            "Forward pipetting %f ul from %s to %s",
-            volume,
-            from_vessel.name,
-            to_vessel.name,
+    if volume <= 0.0:
+        return
+
+    logger.info(
+        "Forward pipetting %f ul from %s to %s",
+        volume,
+        from_vessel.name,
+        to_vessel.name,
+    )
+
+    # Check to ensure that the from_vessel and to_vessel are an allowed combination
+    if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
+        raise ValueError("Cannot pipette from a well to a stock vial")
+    if isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
+        raise ValueError("Cannot pipette from a waste vial to a well")
+    if isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
+        raise ValueError("Cannot pipette from a stock vial to a stock vial")
+
+    # Calculate the number of repetitions
+
+    repetitions = math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
+    repetition_vol = volume / repetitions
+
+    for j in range(repetitions):
+        logger.info("Repetition %d of %d", j + 1, repetitions)
+
+        # Withdraw solution
+        pump.withdraw(volume_to_withdraw=AIR_GAP)
+        mill.safe_move(from_vessel.coordinates["x"], from_vessel.coordinates["y"], from_vessel.coordinates.z_bottom, Instruments.PIPETTE)
+        pump.withdraw(volume_to_withdraw=repetition_vol, solution=from_vessel, rate=pumping_rate)
+        if isinstance(from_vessel, Well):
+            pump.withdraw(volume_to_withdraw=20)
+        mill.move_to_safe_position()
+        pump.withdraw(volume_to_withdraw=DRIP_STOP)
+
+        # Deposit solution
+        mill.safe_move(to_vessel.coordinates.x, to_vessel.coordinates.y, to_vessel.coordinates.z_top, Instruments.PIPETTE)
+        pump.infuse(
+            volume_to_infuse=repetition_vol,
+            being_infused=from_vessel,
+            infused_into=to_vessel,
+            blowout_ul=(AIR_GAP + DRIP_STOP + 20 if isinstance(from_vessel, Well) else AIR_GAP + DRIP_STOP),
         )
-        # Check to ensure that the from_vessel and to_vessel are an allowed combination
-        if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
-            raise ValueError("Cannot pipette from a well to a stock vial")
-        if isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
-            raise ValueError("Cannot pipette from a waste vial to a well")
-        if isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
-            raise ValueError("Cannot pipette from a stock vial to a stock vial")
 
-        # Calculate the number of repetitions
-        # based on pipette capacity and drip stop
-        if pumping_rate is None:
-            pumping_rate = pump.max_pump_rate
+        # Purge residual solution
+        for solution, vol in pump.pipette.contents.items():
+            if vol > 0.0:
+                logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
+                pump.infuse(volume_to_infuse=vol, being_infused=None, infused_into=to_vessel, blowout_ul=vol)
 
-        repetitions = int(
-            math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
-        )  # We first round up, then declare an int
-        repetition_vol = volume / repetitions
-
-        for j in range(repetitions):
-            logger.info("Repetition %d of %d", j + 1, repetitions)
-            # region First half: pick up solution
-            logger.debug("Withdrawing %f of air gap...", AIR_GAP)
-
-            # withdraw a little to engage screw receive nothing
-            pump.withdraw(
-                volume_to_withdraw=AIR_GAP, solution=None, rate=pump.max_pump_rate
-            )  # withdraw air gap to engage screw
-
-            # if isinstance(from_vessel, Well):
-            #     logger.info(
-            #         "Moving to %s at %s...", from_vessel.name, from_vessel.coordinates
-            #     )
-            #     from_vessel: Well = from_vessel
-            #     mill.safe_move(
-            #         from_vessel.coordinates["x"],
-            #         from_vessel.coordinates["y"],
-            #         from_vessel.depth,
-            #         Instruments.PIPETTE,
-            #     )
-            # else:
-            logger.info("Moving to %s at %s...", from_vessel.name, from_vessel.position)
-            mill.safe_move(
-                from_vessel.coordinates["x"],
-                from_vessel.coordinates["y"],
-                from_vessel.coordinates.z_bottom,  # from_vessel.depth,
-                Instruments.PIPETTE,
-            )  # go to solution depth
-
-            # Withdraw the solution from the source and receive the updated vessel object
-            pump.withdraw(
-                volume_to_withdraw=repetition_vol,
-                solution=from_vessel,
-                rate=pumping_rate,
-            )  # pipette now has air gap + repetition vol
-
-            if isinstance(from_vessel, Well):
-                pump.withdraw(
-                    volume_to_withdraw=20,
-                    solution=None,
-                    rate=pump.max_pump_rate,
-                )  # If the from vessel is a well withdraw a little extra to ensure cleared well
-
-            mill.move_to_safe_position()
-
-            # Withdraw an air gap to prevent dripping, receive nothing
-            pump.withdraw(
-                volume_to_withdraw=DRIP_STOP,
-                solution=None,
-                rate=pump.max_pump_rate,
-            )
-
-            logger.debug(
-                "From Vessel %s volume: %f depth: %f",
-                from_vessel.name,
-                from_vessel.volume,
-                from_vessel.depth,
-            )
-            # endregion
-            # region Second Half: Deposit to to_vessel
-            logger.info("Moving to: %s...", to_vessel.name)
-
-            if isinstance(to_vessel, Well):
-                to_vessel: Well = to_vessel
-            else:
-                to_vessel: WasteVial = to_vessel
-
-            mill.safe_move(
-                to_vessel.coordinates.x,
-                to_vessel.coordinates.y,
-                to_vessel.coordinates.z_top,
-                Instruments.PIPETTE,
-            )
-
-            # weigh = bool(isinstance(to_vessel, Well))
-
-            # Infuse into the to_vessel
-            # try:
-            pump.infuse(
-                volume_to_infuse=repetition_vol,
-                being_infused=from_vessel,
-                infused_into=to_vessel,
-                rate=pump.max_pump_rate,
-                blowout_ul=(
-                    AIR_GAP + DRIP_STOP + 20
-                    if isinstance(from_vessel, Well)
-                    else AIR_GAP + DRIP_STOP
-                ),
-            )
-            # except OverFillException as e:
-            #     logger.error(
-            #         "Overfill exception occurred during pipette into %s. %s", to_vessel.name, e
-            #     )
-            #     new_to_vessel = waste_selector(waste_vials, "waste", 0)
-
-            # Check if the pipette has any residual solution(s) left
-            for solution, volume in pump.pipette.contents.items():
-                if volume > 0.0:
-                    logger.warning(
-                        "Pipette has residual volume of %f ul. Purging...", volume
-                    )
-                    pump.infuse(
-                        volume_to_infuse=volume,
-                        being_infused=None,
-                        infused_into=to_vessel,
-                        rate=pump.max_pump_rate,
-                        blowout_ul=volume,
-                    )
-
-            # Check if the pipette has any residual volume left
-            if pump.pipette.volume > 0.0:
-                logger.warning(
-                    "Pipette has residual volume of %f ul. Purging...",
-                    pump.pipette.volume,
-                )
-                pump.infuse(
-                    volume_to_infuse=pump.pipette.volume,
-                    being_infused=None,
-                    infused_into=to_vessel,
-                    rate=pump.max_pump_rate,
-                    blowout_ul=pump.pipette.volume,
-                )
-
-                pump.pipette.volume = 0.0
-
-            # endregion
+        if pump.pipette.volume > 0.0:
+            logger.warning("Pipette has residual volume of %f ul. Purging...", pump.pipette.volume)
+            pump.infuse(volume_to_infuse=pump.pipette.volume, being_infused=None, infused_into=to_vessel, blowout_ul=pump.pipette.volume)
+            pump.pipette.volume = 0.0
 
 
 @timing_wrapper

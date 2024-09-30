@@ -612,20 +612,16 @@ class Mill:
 
     ## Special versions of the movement commands that avoid diagonal movements
     @timing_wrapper
-    def safe_move(
-        self,
-        x_coord,
-        y_coord,
-        z_coord,
-        instrument: Instruments,
-    ) -> Coordinates:
+    def safe_move(self, x_coord, y_coord, z_coord, instrument: Instruments) -> Coordinates:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
+        
         Args:
             x_coord (float): X coordinate.
             y_coord (float): Y coordinate.
             z_coord (float): Z coordinate.
             instrument (Instruments): The instrument to move to the specified coordinates.
+        
         Returns:
             Coordinates: Current center coordinates.
         """
@@ -634,7 +630,7 @@ class Mill:
 
         # Fetch offsets for the specified instrument
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
-        # updated target coordinates with offsets so the center of the mill moves to the right spot
+        # Update target coordinates with offsets so the center of the mill moves to the right spot
         offset_coordinates = Coordinates(
             x=round(x_coord + offsets.x, 3),
             y=round(y_coord + offsets.y, 3),
@@ -656,28 +652,27 @@ class Mill:
         if move_to_zero_first:
             logger.debug("Moving to Z=0 first")
             self.execute_command("G01 Z0")
+            # Since we moved to Z=0, we need to update the current coordinates
+            current_coordinates = self.current_coordinates(instrument)
         else:
             logger.debug("Not moving to Z=0 first")
 
         # Double check that the target coordinates are within the working volume
         working_volume = Coordinates(**self.config["working_volume"])
-        if offset_coordinates.x > 1 or offset_coordinates.x < working_volume.x:
+        if not (working_volume.x <= offset_coordinates.x <= 1):
             logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if offset_coordinates.y > 1 or offset_coordinates.y < working_volume.y:
+        if not (working_volume.y <= offset_coordinates.y <= 1):
             logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if offset_coordinates.z > 1 or offset_coordinates.z < working_volume.z:
+        if not (working_volume.z <= offset_coordinates.z <= 1):
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
-        # Calculate the differences between the current and target coordinates
-        # dx = offset_coordinates.x - current_coordinates.x
-        # dy = offset_coordinates.y - current_coordinates.y
         # Initialize a list to store the movement commands
         commands = []
 
-        if self.current_coordinates(instrument).z == 0:
+        if current_coordinates.z == 0:
             # If the mill is already at Z=0, we can move directly to the target x,y coordinates
             commands.append(f"G01 X{offset_coordinates.x} Y{offset_coordinates.y}")
             # Then we can move to the target z coordinate
@@ -691,7 +686,6 @@ class Mill:
                 commands.append(f"G01 Y{offset_coordinates.y}")
 
             # Generate vertical movements
-            current_coordinates = self.current_coordinates(instrument)
             if offset_coordinates.z != current_coordinates.z:
                 commands.append(f"G01 Z{offset_coordinates.z}")
 
@@ -700,7 +694,6 @@ class Mill:
             self.execute_command(command)
 
         return self.current_coordinates(instrument)
-        # TODO - check if this is the right return or should it be the instrument coordinates
 
     def __should_move_to_zero_first(
         self,
