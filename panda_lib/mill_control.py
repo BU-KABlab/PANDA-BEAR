@@ -47,6 +47,10 @@ MILL_COM_PORT = config.get("MILL", "port")
 MILL_BAUD_RATE = config.getint("MILL", "baudrate")
 MILL_TIMEOUT = config.getint("MILL", "timeout")
 
+# Compile regex patterns once
+wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
+mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
+
 
 class Mill:
     """
@@ -320,7 +324,7 @@ class Mill:
                 logger.warning("wait_for_completion: Command execution timed out")
                 return status
             status = self.current_status()
-            time.sleep(1)
+            time.sleep(0.25)
         return status
 
     @timing_wrapper
@@ -378,7 +382,7 @@ class Mill:
         return self.execute_command(command)
 
     @timing_wrapper
-    def current_coordinates(self, instrument=Instruments.CENTER) -> Coordinates:
+    def current_coordinates(self, instrument:Instruments=Instruments.CENTER) -> Coordinates:
         """
         Get the current coordinates of the mill.
         Args:
@@ -395,65 +399,40 @@ class Mill:
 
         if status_mode not in [0, 1, 2, 3]:
             logger.error("Invalid status mode")
-            # default to 3
-            status_mode = 3
+            raise ValueError("Invalid status mode")
+
+        max_attempts = 3
+        homing_pull_off = self.config["settings"]["$27"]
 
         if status_mode in [0, 2]:
-            # Regular expression to extract WPox coordinates
-            wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
-            # Look for WPos coordinates
             match = wpos_pattern.search(status)
-            max_attempts = 3
             for _ in range(max_attempts):
-                try:
-                    if match:
-                        x_coord = round(float(match.group(1)), 3)
-                        y_coord = round(float(match.group(2)), 3)
-                        z_coord = round(float(match.group(3)), 3)
-                        log_message = f"WPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
-                        logger.info(log_message)
-                        break
-                    else:
-                        logger.warning(
-                            "WPos coordinates not found in the line. Trying again..."
-                        )
-                        raise LocationNotFound
-                except LocationNotFound as e:
-                    logger.error(
-                        "Error occurred while getting WPos coordinates: %s", str(e)
-                    )
+                if match:
+                    x_coord = round(float(match.group(1)), 3)
+                    y_coord = round(float(match.group(2)), 3)
+                    z_coord = round(float(match.group(3)), 3)
+                    logger.info("WPos coordinates: X = %s, Y = %s, Z = %s", x_coord, y_coord, z_coord)
+                    break
+                else:
+                    logger.warning("WPos coordinates not found in the line. Trying again...")
                     if _ == max_attempts - 1:
-                        raise
+                        logger.error("Error occurred while getting WPos coordinates")
+                        raise LocationNotFound
         elif status_mode in [1, 3]:
-            # Regular expression to extract MPos coordinates
-            mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
             match = mpos_pattern.search(status)
-            max_attempts = 3
             for _ in range(max_attempts):
-                try:
-                    if (
-                        match
-                    ):  # Add 3 to the coordinates to account for the machine offset
-                        homing_pull_off = self.config["settings"]["$27"]
-                        x_coord = float(match.group(1)) + homing_pull_off
-                        y_coord = float(match.group(2)) + homing_pull_off
-                        z_coord = float(match.group(3)) + homing_pull_off
-                        log_message = f"MPos coordinates: X = {x_coord - homing_pull_off}, Y = {y_coord- homing_pull_off}, Z = {z_coord- homing_pull_off}"
-                        logger.debug(log_message)
-                        log_message = f"WPos coordinates: X = {x_coord}, Y = {y_coord}, Z = {z_coord}"
-                        logger.debug(log_message)
-                        break
-                    else:
-                        logger.warning(
-                            "MPos coordinates not found in the line. Trying again..."
-                        )
-                        raise LocationNotFound
-                except LocationNotFound as e:
-                    logger.error(
-                        "Error occurred while getting MPos coordinates: %s", str(e)
-                    )
+                if match:
+                    x_coord = float(match.group(1)) + homing_pull_off
+                    y_coord = float(match.group(2)) + homing_pull_off
+                    z_coord = float(match.group(3)) + homing_pull_off
+                    logger.debug("MPos coordinates: X = %s, Y = %s, Z = %s", x_coord - homing_pull_off, y_coord - homing_pull_off, z_coord - homing_pull_off)
+                    logger.debug("WPos coordinates: X = %s, Y = %s, Z = %s", x_coord, y_coord, z_coord)
+                    break
+                else:
+                    logger.warning("MPos coordinates not found in the line. Trying again...")
                     if _ == max_attempts - 1:
-                        raise
+                        logger.error("Error occurred while getting MPos coordinates")
+                        raise LocationNotFound
         else:
             logger.critical("Failed to obtain coordinates from the mill")
             self.stop()
@@ -462,27 +441,20 @@ class Mill:
 
         # So far we have obtain the mill's coordinates
         # Now we need to adjust them based on the instrument to communicate where the current instrument is
-        if instrument in [Instruments.CENTER, Instruments.LENS]:
-            current_coordinates = [x_coord, y_coord, z_coord]
-        elif instrument == Instruments.PIPETTE:
-            offsets = self.config["instrument_offsets"]["pipette"]
-            current_coordinates = [
-                x_coord - offsets["x"],
-                y_coord - offsets["y"],
-                z_coord - offsets["z"],
-            ]
-        elif instrument == Instruments.ELECTRODE:
-            offsets = self.config["instrument_offsets"]["electrode"]
-            current_coordinates = [
-                x_coord - offsets["x"],
-                y_coord - offsets["y"],
-                z_coord - offsets["z"],
-            ]
+        try:
+            if instrument in [Instruments.CENTER, Instruments.LENS]:
+                current_coordinates = [x_coord, y_coord, z_coord]
 
-        else:
-            raise ValueError("Invalid instrument")
-        current_coordinates = [round(coord, 3) for coord in current_coordinates]
-        logger.debug("Current_coordinates: %s", current_coordinates)
+            else:
+                offsets = self.config["instrument_offsets"][instrument.value]
+                current_coordinates = [
+                    x_coord - offsets["x"],
+                    y_coord - offsets["y"],
+                    z_coord - offsets["z"],
+                ]
+
+        except Exception as exception:
+            raise ValueError("Invalid instrument") from exception
         return Coordinates(*current_coordinates)
 
     @timing_wrapper
