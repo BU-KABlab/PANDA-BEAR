@@ -107,6 +107,7 @@ class SystemState(Enum):
     PAUSE = "pause"
     RESUME = "resume"
     WAITING = "waiting"
+    STOP = "stop"
 
 
 @dataclasses.dataclass

@@ -482,12 +482,13 @@ class SlackBot:
 
         elif text[0:4] == "stop":
             sql_system_state.set_system_status(
-                sql_system_state.SystemState.IDLE, "stopping ePANDA", self.testing
+                sql_system_state.SystemState.STOP, "stopping ePANDA", self.testing
             )
             self.send_slack_message(channel_id, "Stopping the controller loop")
             return 1
 
         elif text[0:4] == "exit":
+            # Exits the slackbot
             return 0
 
         else:

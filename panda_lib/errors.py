@@ -114,3 +114,10 @@ class OverDraftException(Exception):
 
     def __str__(self) -> str:
         return f"OverDraftException: {self.name} has {self.volume} + {self.added_volume} < 0"
+
+class StopCommand(Exception):
+    """Raised when a stop command is issued"""
+
+    def __init__(self, message="Stop command issued"):
+        self.message = message
+        super().__init__(self.message)

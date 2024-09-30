@@ -36,6 +36,7 @@ from .errors import (
     ProtocolNotFoundError,
     ShutDownCommand,
     WellImportError,
+    StopCommand
 )
 from .experiment_class import ExperimentBase, ExperimentResult, ExperimentResultsRecord, ExperimentStatus, select_specific_result
 from .instrument_toolkit import Toolkit
@@ -383,7 +384,9 @@ def main(
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
-            system_status_loop(controller_slack)
+            status = system_status_loop(controller_slack)
+            if status == SystemState.STOP:
+                break # break out of the while True loop
     except (
         OCPFailure,
         DepositionFailure,
@@ -419,6 +422,7 @@ def main(
             "alert", f"PANDA_SDL encountered an error: {error}"
         )
         raise error
+
     except ShutDownCommand as error:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
@@ -647,10 +651,19 @@ def system_status_loop(slack: SlackBot):
     while True:
         slack.check_slack_messages("alert")
         # Check the system status
-        system_status = sql_system_state.select_system_status(2)
+        system_status = sql_system_state.select_system_status(1)
         if SystemState.SHUTDOWN in system_status:
             raise ShutDownCommand
-        elif SystemState.PAUSE in system_status:
+        
+        if SystemState.STOP in system_status:
+            return SystemState.STOP
+
+        if SystemState.RESUME in system_status:
+            slack.send_slack_message("alert", "PANDA_SDL is resuming")
+            sql_system_state.set_system_status(SystemState.BUSY)
+            break
+        
+        if SystemState.PAUSE in system_status:
             # elif SystemState.PAUSE in system_status or SystemState.WAITING in system_status:
             # if SystemState.IDLE in system_status:
             #     break
@@ -668,16 +681,7 @@ def system_status_loop(slack: SlackBot):
             sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
             sys.stdout.flush()
             sys.stdout.write("\n")
-            if SystemState.PAUSE == system_status[0]:
-                continue
-            elif SystemState.IDLE == system_status[0]:
-                break
-        elif SystemState.RESUME in system_status:
-            slack.send_slack_message("alert", "PANDA_SDL is resuming")
-            sql_system_state.set_system_status(SystemState.BUSY)
-            break
-        else:
-            break
+            continue
 
 @timing_wrapper
 def connect_to_instruments(
