@@ -513,7 +513,7 @@ class PotentiostatReadout(Base):
     #         raise ValueError(f"Interface '{target.interface}' is not supported for technique '{target.technique}'.")
 
 # Attach the event listener to the PotentiostatReadout model
-event.listen(PotentiostatReadout, 'before_insert', PotentiostatReadout.validate_interface)
+# event.listen(PotentiostatReadout, 'before_insert', PotentiostatReadout.validate_interface)
 
 class PotentiostatTechniques(Base):
     """PotentiostatTechniques table model"""
