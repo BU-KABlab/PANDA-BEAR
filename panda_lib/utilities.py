@@ -1,13 +1,12 @@
 """Useful functions and dataclasses for the project."""
 
 import dataclasses
-from decimal import Decimal
 from enum import Enum
 import tkinter as tk
 from tkinter import filedialog
 
-
 import pulp
+
 
 class WellStatus(Enum):
     """Class for naming of the well status"""
@@ -25,6 +24,7 @@ class WellStatus(Enum):
     PAUSE = "pause"
     RESUME = "resume"
     WAITING = "waiting"
+
 
 class Coordinates:
     """Class for storing coordinates"""
@@ -44,12 +44,8 @@ class Coordinates:
 
     @x.setter
     def x(self, value):
-        if isinstance(value, Decimal):
-            value = float(value)
-        elif not isinstance(value, (int, float)):
-            raise ValueError(
-                "x-coordinate must be an int, float, or Decimal object"
-            )
+        if not isinstance(value, (int, float)):
+            raise ValueError("x-coordinate must be an int, float, or Decimal object")
         self._x = round(value, 6)
 
     @property
@@ -59,12 +55,8 @@ class Coordinates:
 
     @y.setter
     def y(self, value):
-        if isinstance(value, Decimal):
-            value = float(value)
-        elif not isinstance(value, (int, float)):
-            raise ValueError(
-                "y-coordinate must be an int, float, or Decimal object"
-            )
+        if not isinstance(value, (int, float)):
+            raise ValueError("y-coordinate must be an int, float, or Decimal object")
         self._y = round(value, 6)
 
     @property
@@ -74,16 +66,11 @@ class Coordinates:
 
     @z.setter
     def z(self, value):
-        if isinstance(value, Decimal):
-            value = float(value)
-        elif not isinstance(value, (int, float)):
-            raise ValueError(
-                "z-coordinate must be an int, float, or Decimal object"
-            )
+        if not isinstance(value, (int, float)):
+            raise ValueError("z-coordinate must be an int, float, or Decimal object")
         self._z = round(value, 6)
 
 
-@dataclasses.dataclass
 class Instruments(Enum):
     """Class for naming of the mill instruments"""
 
@@ -198,7 +185,7 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
     else:
         return None, None
 
-# File picker
+
 def file_picker(file_types=None):
     """Open a file picker dialog and return the selected file path."""
     if file_types is None:
@@ -207,25 +194,34 @@ def file_picker(file_types=None):
         file_types = [(file_types.upper(), f"*.{file_types.lower()}")]
     root = tk.Tk()
     root.withdraw()
-    root.attributes('-topmost', True)
+    root.attributes("-topmost", True)
     file_path = filedialog.askopenfilename(filetypes=file_types)
     root.destroy()
     return file_path
 
-# Directory picker
+
 def directory_picker():
     """Open a directory picker dialog and return the selected directory path."""
     root = tk.Tk()
     root.withdraw()
-    root.attributes('-topmost', True)
+    root.attributes("-topmost", True)
     directory_path = filedialog.askdirectory()
     root.destroy()
     return directory_path
 
-def input_validation(prompt:str, valid_types:tuple|type|list, value_range:tuple=None, allow_blank:bool = True, custom_error:str=None):
+
+def input_validation(
+    prompt: str,
+    valid_types: tuple | type | list,
+    value_range: tuple = None,
+    allow_blank: bool = True,
+    custom_error: str = None,
+):
     """Prompt the user for input and validate the input type."""
 
-    error_message = custom_error if custom_error else "Invalid input type. Please try again."
+    error_message = (
+        custom_error if custom_error else "Invalid input type. Please try again."
+    )
 
     while True:
         try:
@@ -247,8 +243,12 @@ def input_validation(prompt:str, valid_types:tuple|type|list, value_range:tuple=
                 converted_input = valid_types(user_input)
 
             # Check if the converted input is within the specified range
-            if value_range and not (value_range[0] <= converted_input <= value_range[1]):
-                raise ValueError(f"Input must be between {value_range[0]} and {value_range[1]}.")
+            if value_range and not (
+                value_range[0] <= converted_input <= value_range[1]
+            ):
+                raise ValueError(
+                    f"Input must be between {value_range[0]} and {value_range[1]}."
+                )
 
             return converted_input
 
