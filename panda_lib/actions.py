@@ -357,13 +357,12 @@ def flush_v2(
     flush_solution_name: str,
     mill: Union[Mill, MockMill],
     pump: Union[SyringePump, MockPump],
-    pumping_rate=float(0.5),
     flush_volume: float = float(120.0),
-    flush_count=1,
+    flush_count:int=1,
     instructions: Optional[ExperimentBase] = None,
 ):
     """
-    Flush the pipette tip with the designated flush_volume ul of DMF to remove any residue
+    Flush the pipette tip with the designated flush_volume ul to remove any residue
     Args:
         waste_vials (list): The list of waste vials
         stock_vials (list): The list of stock vials
@@ -375,8 +374,7 @@ def flush_v2(
         flush_count (int): The number of times to flush
 
     Returns:
-        stock_vials (list): The updated list of stock vials
-        waste_vials (list): The updated list of waste vials
+        None (void function) since the objects are passed by reference
     """
 
     if flush_volume > 0.000:
@@ -396,7 +394,6 @@ def flush_v2(
                 to_vessel=waste_selector("waste", flush_volume),
                 pump=pump,
                 mill=mill,
-                pumping_rate=pumping_rate,
             )
 
         logger.info(
