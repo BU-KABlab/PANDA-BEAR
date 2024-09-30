@@ -26,8 +26,6 @@
 # rinse well acetonitrile
 # image
 
-# Standard imports
-from typing import Sequence
 
 # Non-standard imports
 from panda_lib.controller import Toolkit
@@ -45,7 +43,6 @@ from panda_lib.actions import (
 )
 from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 from panda_lib.experiment_class import PGMAExperiment, ExperimentStatus
-from panda_lib.vials import StockVial, WasteVial
 from panda_lib.correction_factors import correction_factor
 from panda_lib.mill_control import Instruments
 
@@ -53,27 +50,22 @@ from panda_lib.mill_control import Instruments
 def main(
     instructions: PGMAExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
+    **kwargs,
 ):
     """
-    Wrapper function for the PGMA_dep_v1_screening function.
+    Wrapper function for the PGMA_dep_v2_screening function.
     This function is called by the PANDA scheduler.
-    It is the main function for the PGMA_dep_v1_screening protocol.
+    It is the main function for the PGMA_dep_v2_screening protocol.
     """
     PGMA_dep_v2_screening(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
     )
 
 
 def PGMA_dep_v2_screening(
     instructions: PGMAExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     The initial screening of the PGMA solution
@@ -99,20 +91,14 @@ def PGMA_dep_v2_screening(
     FC_prechar(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
     )
     PGMAdeposition(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
     )
     FC_postchar(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
     )
 
     instructions.set_status(ExperimentStatus.COMPLETE)
@@ -121,8 +107,6 @@ def PGMA_dep_v2_screening(
 def PGMAdeposition(
     instructions: PGMAExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     1. Depositing PGMA into well
@@ -216,12 +200,10 @@ def PGMAdeposition(
     toolkit.global_logger.info("4b. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="DMF-TBAPrinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=1,
+
     )
 
     toolkit.global_logger.info("5. Rinsing the well 4x with rinse")
@@ -262,8 +244,6 @@ def PGMAdeposition(
 def FC_prechar(
     instructions: PGMAExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     1. Take before image
@@ -357,12 +337,10 @@ def FC_prechar(
     toolkit.global_logger.info("4a. Flushing the pipette tip with DMF-TBAPrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="DMF-TBAPrinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=1,
+
     )
 
     toolkit.global_logger.info("4b. Rinsing the well 4x with DMF-TBAPrinse")
@@ -406,8 +384,6 @@ def FC_prechar(
 def FC_postchar(
     instructions: PGMAExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     1. Dispensing DMFc-PEG-FC into well
@@ -496,12 +472,10 @@ def FC_postchar(
     toolkit.global_logger.info("3a. Flushing the pipette tip with DMFrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="DMFrinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=1,
+
     )
 
     toolkit.global_logger.info("3b. Rinsing the well 4x with DMFrinse")
@@ -533,12 +507,10 @@ def FC_postchar(
     toolkit.global_logger.info("4a. Flushing the pipette tip with ACNrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
-        waste_vials=waste_vials,
-        stock_vials=stock_vials,
         flush_solution_name="ACNrinse",
         mill=toolkit.mill,
         pump=toolkit.pump,
-        flush_count=1,
+
     )
     toolkit.global_logger.info("4b. Rinsing the well 4x with ACNrinse")
     for _ in range(4):
