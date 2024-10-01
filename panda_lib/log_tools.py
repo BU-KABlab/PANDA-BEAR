@@ -9,6 +9,8 @@ from panda_lib.config import config_tools
 from functools import wraps
 import logging
 import time
+import os
+from typing import Optional
 
 config = config_tools.read_config()
 
@@ -39,10 +41,13 @@ def setup_default_logger(
         formatter.converter = time.gmtime
         file_handler = logging.FileHandler(PANDA_SDL_LOG + "/" + log_name + ".log")
         file_handler.setFormatter(formatter)
+        file_handler.setLevel(file_level)
+        file_handler.set_name("file_handler")
         logger.addHandler(file_handler)
 
         console_handler = logging.StreamHandler()
         console_handler.setLevel(console_level)
+        console_handler.set_name("console_handler")
         console_formatter = logging.Formatter("%(message)s")
         console_formatter.converter = time.gmtime
         console_handler.setFormatter(console_formatter)  # Ensure console output is formatted
@@ -74,6 +79,28 @@ class CustomLoggingFilter(logging.Filter):
         record.custom4 = self.custom4
         return True
 
+
+def apply_log_filter(
+    logger: logging.Logger,
+    experiment_id: int = None,
+    target_well: Optional[str] = None,
+    campaign_id: Optional[str] = None,
+    test: Optional[bool] = config.getboolean("OPTIONS", "testing"),):
+    """Add custom value to log format"""
+    experiment_formatter = logging.Formatter(
+        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
+    )
+
+    logger_handlers = logger.handlers
+    for handler in logger_handlers:
+        if handler.get_name() == "console_handler":
+            # Dont add the filter to the console handler
+            continue
+        handler.setFormatter(experiment_formatter)
+        custom_filter = CustomLoggingFilter(
+            campaign_id, experiment_id, target_well, test
+        )
+        handler.addFilter(custom_filter)
 
 def timing_wrapper(func):
     """A decorator that logs the time taken for a function to execute"""

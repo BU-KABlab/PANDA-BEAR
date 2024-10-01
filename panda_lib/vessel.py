@@ -131,7 +131,7 @@ class Vessel:
             )
 
         self.volume = round(self.volume + added_volume, 6)
-        logger.info(
+        logger.debug(
             "%s&%s",
             self.name + "_" + self.position if self.position is not None else self.name,
             self.volume,
@@ -198,7 +198,7 @@ class Vessel:
 
     def log_contents(self) -> None:
         """Logs the contents of the vessel."""
-        logger.info(
+        logger.debug(
             "%s&%s&%s",
             self.name + "_" + self.position if self.position is not None else self.name,
             self.volume,

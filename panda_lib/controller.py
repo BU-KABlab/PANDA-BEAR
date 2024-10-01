@@ -26,6 +26,7 @@ from slack_sdk import errors as slack_errors
 from panda_lib import gamry_control_WIP, scheduler
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
+from panda_lib.sql_tools import sql_queue
 from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
@@ -40,7 +41,7 @@ from .errors import (
 )
 from .experiment_class import ExperimentBase, ExperimentResult, ExperimentResultsRecord, ExperimentStatus, select_specific_result
 from .instrument_toolkit import Toolkit
-from .log_tools import setup_default_logger, timing_wrapper
+from .log_tools import setup_default_logger, timing_wrapper, apply_log_filter
 from .mill_control import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
 from .slack_tools.SlackBot import SlackBot
@@ -92,7 +93,7 @@ def main(
     else:
         obs = OBSController()
     ## Reset the logger to log to the PANDA_SDL.log file and format
-    actions.apply_log_filter()
+    apply_log_filter(logger=logger)
     controller_slack.send_slack_message("alert", "PANDA_SDL is starting up")
     toolkit = None
     al_campaign_iteration = 0
@@ -132,7 +133,7 @@ def main(
 
             ## Reset the logger to log to the PANDA_SDL.log file and format
             obs.place_text_on_screen("")
-            actions.apply_log_filter()
+            apply_log_filter(logger=logger)
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
             stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
@@ -185,7 +186,9 @@ def main(
                 sql_system_state.set_system_status(
                     SystemState.PAUSE, "Waiting for new experiments"
                 )
-                system_status_loop(controller_slack)
+                status = system_status_loop(controller_slack)
+                if status == SystemState.STOP:
+                    break  # break out of the main while True loop
 
             ## confirm that the new experiment is a valid experiment object
             if not isinstance(current_experiment, ExperimentBase):
@@ -242,7 +245,8 @@ def main(
             current_experiment.set_status_and_save(ExperimentStatus.RUNNING)
 
             ## Run the experiment
-            actions.apply_log_filter(
+            apply_log_filter(
+                logger,
                 current_experiment.experiment_id,
                 current_experiment.well_id,
                 str(current_experiment.project_id)
@@ -293,7 +297,7 @@ def main(
             share_to_slack(current_experiment)
 
             ## Reset the logger to log to the PANDA_SDL.log file and format after the experiment is complete
-            actions.apply_log_filter()
+            apply_log_filter(logger=logger)
 
             ## With returned experiment and results, update the experiment status and post the final status
             post_experiment_status_msg = f"Experiment {current_experiment.experiment_id} ended with status {current_experiment.status.value}"
@@ -652,7 +656,7 @@ def system_status_loop(slack: SlackBot):
         system_status = sql_system_state.select_system_status(1)
         if SystemState.SHUTDOWN in system_status:
             raise ShutDownCommand
-        
+
         if SystemState.STOP in system_status:
             return SystemState.STOP
 
@@ -660,7 +664,10 @@ def system_status_loop(slack: SlackBot):
             slack.send_slack_message("alert", "PANDA_SDL is resuming")
             sql_system_state.set_system_status(SystemState.BUSY)
             break
-        
+        if len(sql_queue.select_queue()) > 0:
+            slack.send_slack_message("alert", "PANDA_SDL is resuming")
+            sql_system_state.set_system_status(SystemState.BUSY)
+            break
         if SystemState.PAUSE in system_status:
             # elif SystemState.PAUSE in system_status or SystemState.WAITING in system_status:
             # if SystemState.IDLE in system_status:
@@ -679,7 +686,7 @@ def system_status_loop(slack: SlackBot):
             sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
             sys.stdout.flush()
             sys.stdout.write("\n")
-            break
+            continue
 
 @timing_wrapper
 def connect_to_instruments(

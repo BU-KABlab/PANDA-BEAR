@@ -99,12 +99,13 @@ class Pipette:
 
     def log_contents(self) -> None:
         """Log the contents of the pipette"""
-        vessel_logger.info(
+        vessel_logger.debug(
             "%s&%s&%s",
             "pipette",
             self._volume_ul,
             self.contents,
         )
+        print(f"Pipette has {self._volume_ul} ul of liquid")
 
     def record_pipette_state(self) -> None:
         """Update the state file for the pipette"""

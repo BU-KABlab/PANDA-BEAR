@@ -680,29 +680,6 @@ def cyclic_volt(
     return cv_instructions, cv_instructions.results
 
 
-def apply_log_filter(
-    experiment_id: int = None,
-    target_well: Optional[str] = None,
-    campaign_id: Optional[str] = None,
-    test: bool = TESTING,
-):
-    """Add custom value to log format"""
-    experiment_formatter = logging.Formatter(
-        "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
-    )
-
-    logger_handlers = logger.handlers
-    for handler in logger_handlers:
-        if handler.get_name() == "console_handler":
-            # Dont add the filter to the console handler
-            continue
-        handler.setFormatter(experiment_formatter)
-        custom_filter = CustomLoggingFilter(
-            campaign_id, experiment_id, target_well, test
-        )
-        handler.addFilter(custom_filter)
-
-
 @timing_wrapper
 def volume_correction(
     volume: float, density: float = None, viscosity: float = None
