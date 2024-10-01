@@ -212,10 +212,10 @@ def PGMAdeposition(
         # Pipette the rinse solution into the well
         toolkit.global_logger.info("Rinse %d of 4", i + 1)
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=solution_selector(
                 "DMF-TBAPrinse",
-                correction_factor(160),
+                correction_factor(320),
             ),
             to_vessel=current_well,
             pump=toolkit.pump,
@@ -224,11 +224,11 @@ def PGMAdeposition(
         )
         # Clear the well
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
                 "waste",
-                correction_factor(160),
+                correction_factor(320),
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
@@ -347,10 +347,10 @@ def FC_prechar(
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=solution_selector(
                 "DMF-TBAPrinse",
-                correction_factor(160),
+                correction_factor(320),
             ),
             to_vessel=current_well,
             pump=toolkit.pump,
@@ -359,11 +359,11 @@ def FC_prechar(
         )
         # Clear the well
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
                 "waste",
-                correction_factor(160),
+                correction_factor(320),
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
@@ -482,10 +482,10 @@ def FC_postchar(
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=solution_selector(
                 "DMFrinse",
-                correction_factor(160),
+                correction_factor(320),
             ),
             to_vessel=current_well,
             pump=toolkit.pump,
@@ -494,11 +494,11 @@ def FC_postchar(
         )
         # Clear the well
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
                 "waste",
-                correction_factor(160),
+                correction_factor(320),
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
@@ -516,10 +516,10 @@ def FC_postchar(
     for _ in range(4):
         # Pipette the rinse solution into the well
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=solution_selector(
                 "ACNrinse",
-                correction_factor(160),
+                correction_factor(320),
             ),
             to_vessel=current_well,
             pump=toolkit.pump,
@@ -528,11 +528,11 @@ def FC_postchar(
         )
         # Clear the well
         forward_pipette_v2(
-            volume=correction_factor(160),
+            volume=correction_factor(320),
             from_vessel=current_well,
             to_vessel=waste_selector(
                 "waste",
-                correction_factor(160),
+                correction_factor(320),
             ),
             pump=toolkit.pump,
             mill=toolkit.mill,
