@@ -44,14 +44,9 @@ global OPEN_CONNECTION
 
 def countdown_timer(samplerate, cycle):
     """Countdown timer for the data acquisition"""
-    if not isinstance(samplerate, int) or not isinstance(cycle, int) or samplerate <= 0 or cycle <= 0:
-        logger.error("Invalid samplerate or cycle. Both must be positive integers.")
-        return
-
-    estimated_time = samplerate * cycle
-    logger.debug("Estimated time for data acquisition: %d seconds", estimated_time)
-
     try:
+        estimated_time = abs(samplerate * cycle)
+        logger.debug("Estimated time for data acquisition: %d seconds", estimated_time)
         while estimated_time > 0:
             time.sleep(1)
             estimated_time -= 1
@@ -61,6 +56,8 @@ def countdown_timer(samplerate, cycle):
             sys.stdout.flush()
     except KeyboardInterrupt:
         logger.info("Countdown timer interrupted.")
+    except Exception as e:
+        logger.error("Error occurred during countdown timer: %s", e)
     finally:
         sys.stdout.write("\n")
         logger.debug("Countdown timer complete")
