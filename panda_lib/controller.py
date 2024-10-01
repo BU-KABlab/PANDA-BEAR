@@ -679,7 +679,7 @@ def system_status_loop(slack: SlackBot):
             sys.stdout.write("Waiting for new experiments: 0 seconds remaining")
             sys.stdout.flush()
             sys.stdout.write("\n")
-            continue
+            break
 
 @timing_wrapper
 def connect_to_instruments(

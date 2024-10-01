@@ -625,27 +625,48 @@ class Mill:
         Returns:
             Coordinates: Current center coordinates.
         """
-        # Get the current coordinates
+        goto = Coordinates(x=x_coord, y=y_coord, z=z_coord)
         current_coordinates = self.current_coordinates(instrument)
-
-        # Fetch offsets for the specified instrument
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
-        # Update target coordinates with offsets so the center of the mill moves to the right spot
-        offset_coordinates = Coordinates(
-            x=round(x_coord + offsets.x, 3),
-            y=round(y_coord + offsets.y, 3),
-            z=round(z_coord + offsets.z, 3),
-        )
-        logger.debug(
-            "Target coordinates: [%s, %s, %s]",
-            offset_coordinates.x,
-            offset_coordinates.y,
-            offset_coordinates.z,
-        )
+        if (goto.x, goto.y) == (current_coordinates.x, current_coordinates.y):
+            # If the mill is already at the target x,y coordinates, we can move directly to the target z coordinate once we check the z offset
+            if goto.z == current_coordinates.z + offsets.z:
+                logger.debug("%s is already at the target coordinates of [%s, %s, %s]", instrument, x_coord, y_coord, z_coord)
+                return current_coordinates
+            
+            else:
+                # Update target coordinates with offsets so the center of the mill moves to the right spot
+                target_coordinates = Coordinates(
+                    x=x_coord,
+                    y=y_coord,
+                    z=z_coord + offsets.z,
+                )
+                logger.debug(
+                    "Target coordinates: [%s, %s, %s]",
+                    target_coordinates.x,
+                    target_coordinates.y,
+                    target_coordinates.z,
+                )
+            
+        else: # Fetch offsets for the specified instrument
+            
+            # Update target coordinates with offsets so the center of the mill moves to the right spot
+            target_coordinates = Coordinates(
+                x=x_coord + offsets.x,
+                y=y_coord + offsets.y,
+                z=z_coord + offsets.z,
+            )
+            logger.debug(
+                "Target coordinates: [%s, %s, %s]",
+                target_coordinates.x,
+                target_coordinates.y,
+                target_coordinates.z,
+            )
+        logger.debug("Movement deltas of X: %s, Y: %s, Z: %s", target_coordinates.x - current_coordinates.x, target_coordinates.y - current_coordinates.y, target_coordinates.z - current_coordinates.z)
 
         move_to_zero_first = self.__should_move_to_zero_first(
             current_coordinates,
-            offset_coordinates,
+            target_coordinates,
             self.config["safe_height_floor"],
         )
 
@@ -659,35 +680,35 @@ class Mill:
 
         # Double check that the target coordinates are within the working volume
         working_volume = Coordinates(**self.config["working_volume"])
-        if not (working_volume.x <= offset_coordinates.x <= 1):
+        if not (working_volume.x <= target_coordinates.x <= 1):
             logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if not (working_volume.y <= offset_coordinates.y <= 1):
+        if not (working_volume.y <= target_coordinates.y <= 1):
             logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if not (working_volume.z <= offset_coordinates.z <= 1):
+        if not (working_volume.z <= target_coordinates.z <= 1):
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
         # Initialize a list to store the movement commands
         commands = []
 
-        if current_coordinates.z == 0:
+        if current_coordinates.z >= self.config["safe_height_floor"]:
             # If the mill is already at Z=0, we can move directly to the target x,y coordinates
-            commands.append(f"G01 X{offset_coordinates.x} Y{offset_coordinates.y}")
+            commands.append(f"G01 X{target_coordinates.x} Y{target_coordinates.y}")
             # Then we can move to the target z coordinate
-            commands.append(f"G01 Z{offset_coordinates.z}")
+            commands.append(f"G01 Z{target_coordinates.z}")
         else:
             # Generate stepwise horizontal movements
-            if offset_coordinates.x != current_coordinates.x:
-                commands.append(f"G01 X{offset_coordinates.x}")
+            if target_coordinates.x != current_coordinates.x:
+                commands.append(f"G01 X{target_coordinates.x}")
 
-            if offset_coordinates.y != current_coordinates.y:
-                commands.append(f"G01 Y{offset_coordinates.y}")
+            if target_coordinates.y != current_coordinates.y:
+                commands.append(f"G01 Y{target_coordinates.y}")
 
             # Generate vertical movements
-            if offset_coordinates.z != current_coordinates.z:
-                commands.append(f"G01 Z{offset_coordinates.z}")
+            if target_coordinates.z != current_coordinates.z:
+                commands.append(f"G01 Z{target_coordinates.z}")
 
         # Execute the commands one by one
         for command in commands:
@@ -698,7 +719,7 @@ class Mill:
     def __should_move_to_zero_first(
         self,
         current: Coordinates,
-        offset: Coordinates,
+        destination: Coordinates,
         safe_height_floor,
     ):
         """
@@ -710,41 +731,15 @@ class Mill:
         Returns:
             bool: True if the mill should move to Z=0 first, False otherwise.
         """
-        # Extract the current coordinates
+        # If current Z is 0 or at or above the safe floor height, no need to move to Z=0
+        if current.z >= 0 or current.z >= safe_height_floor:
+            return False
 
-        if offset.z not in (0, current.z):
-            if current.z == 0:
-                # Expecting False because Z is already at 0
-                move_to_zero_first = False
-            elif current.x != offset.x and current.y != offset.y:
-                # Expecting True because Z is changing, X and Y are changing
-                # But if Z is below the safe floor height, expect False
-                move_to_zero_first = current.z < safe_height_floor
-            elif current.x == offset.x and current.y == offset.y:
-                # Expecting False because Z is changing, but X and Y are not changing
-                move_to_zero_first = False
-            else:
-                # Default to True
-                move_to_zero_first = True
-        else:  # offset_z_coord is 0 or current.z
-            # If Z is already at 0, expect False
-            if current.z == 0:
-                move_to_zero_first = False
-            # If Z is at or above the safe floor height, expect False
-            elif current.z >= safe_height_floor:
-                move_to_zero_first = False
-            # If Z is below the safe floor height, expect True if X and Y are changing
-            elif current.z < safe_height_floor:
-                # If X and Y are changing, expect True
-                move_to_zero_first = not (
-                    current.x == offset.x and current.y == offset.y
-                )
+        # If current Z is below the safe floor height and X or Y coordinates are different, move to Z=0
+        if current.x != destination.x or current.y != destination.y:
+            return True
 
-            else:
-                # Default to True
-                move_to_zero_first = True
-
-        return move_to_zero_first
+        return False
 
 
 class MockMill(Mill):
