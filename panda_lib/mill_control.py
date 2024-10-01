@@ -626,59 +626,43 @@ class Mill:
             Coordinates: Current center coordinates.
         """
         goto = Coordinates(x=x_coord, y=y_coord, z=z_coord)
-        current_coordinates = self.current_coordinates(instrument)
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
-        if (goto.x, goto.y) == (current_coordinates.x, current_coordinates.y):
-            # If the mill is already at the target x,y coordinates, we can move directly to the target z coordinate once we check the z offset
-            if goto.z == current_coordinates.z + offsets.z:
-                logger.debug("%s is already at the target coordinates of [%s, %s, %s]", instrument, x_coord, y_coord, z_coord)
-                return current_coordinates
-            
-            else:
-                # Update target coordinates with offsets so the center of the mill moves to the right spot
-                target_coordinates = Coordinates(
-                    x=x_coord,
-                    y=y_coord,
-                    z=z_coord + offsets.z,
-                )
-                logger.debug(
-                    "Target coordinates: [%s, %s, %s]",
-                    target_coordinates.x,
-                    target_coordinates.y,
-                    target_coordinates.z,
-                )
-            
-        else: # Fetch offsets for the specified instrument
-            
-            # Update target coordinates with offsets so the center of the mill moves to the right spot
-            target_coordinates = Coordinates(
-                x=x_coord + offsets.x,
-                y=y_coord + offsets.y,
-                z=z_coord + offsets.z,
-            )
-            logger.debug(
-                "Target coordinates: [%s, %s, %s]",
-                target_coordinates.x,
-                target_coordinates.y,
-                target_coordinates.z,
-            )
-        logger.debug("Movement deltas of X: %s, Y: %s, Z: %s", target_coordinates.x - current_coordinates.x, target_coordinates.y - current_coordinates.y, target_coordinates.z - current_coordinates.z)
+        current_coordinates = self.current_coordinates(instrument)
 
-        move_to_zero_first = self.__should_move_to_zero_first(
-            current_coordinates,
-            target_coordinates,
-            self.config["safe_height_floor"],
-        )
+        if self._is_already_at_target(goto, current_coordinates, offsets):
+            logger.debug("%s is already at the target coordinates of [%s, %s, %s]", instrument, x_coord, y_coord, z_coord)
+            return current_coordinates
 
-        if move_to_zero_first:
+        target_coordinates = self._calculate_target_coordinates(goto, current_coordinates, offsets)
+        self._log_target_coordinates(target_coordinates)
+
+        if self.__should_move_to_zero_first(current_coordinates, target_coordinates, self.config["safe_height_floor"]):
             logger.debug("Moving to Z=0 first")
             self.execute_command("G01 Z0")
-            # Since we moved to Z=0, we need to update the current coordinates
             current_coordinates = self.current_coordinates(instrument)
         else:
             logger.debug("Not moving to Z=0 first")
 
-        # Double check that the target coordinates are within the working volume
+        self._validate_target_coordinates(target_coordinates)
+
+        commands = self._generate_movement_commands(current_coordinates, target_coordinates)
+        self._execute_commands(commands)
+
+        return self.current_coordinates(instrument)
+
+    def _is_already_at_target(self, goto:Coordinates, current_coordinates:Coordinates, offsets:Coordinates):
+        return (goto.x, goto.y) == (current_coordinates.x, current_coordinates.y) and goto.z == current_coordinates.z + offsets.z
+
+    def _calculate_target_coordinates(self, goto:Coordinates, current_coordinates:Coordinates, offsets:Coordinates):
+        if (goto.x, goto.y) == (current_coordinates.x, current_coordinates.y):
+            return Coordinates(x=goto.x, y=goto.y, z=goto.z + offsets.z)
+        else:
+            return Coordinates(x=goto.x + offsets.x, y=goto.y + offsets.y, z=goto.z + offsets.z)
+
+    def _log_target_coordinates(self, target_coordinates:Coordinates):
+        logger.debug("Target coordinates: [%s, %s, %s]", target_coordinates.x, target_coordinates.y, target_coordinates.z)
+
+    def _validate_target_coordinates(self, target_coordinates:Coordinates):
         working_volume = Coordinates(**self.config["working_volume"])
         if not (working_volume.x <= target_coordinates.x <= 1):
             logger.error("x coordinate out of range")
@@ -690,31 +674,23 @@ class Mill:
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
-        # Initialize a list to store the movement commands
+    def _generate_movement_commands(self, current_coordinates:Coordinates, target_coordinates:Coordinates):
         commands = []
-
         if current_coordinates.z >= self.config["safe_height_floor"]:
-            # If the mill is already at Z=0, we can move directly to the target x,y coordinates
             commands.append(f"G01 X{target_coordinates.x} Y{target_coordinates.y}")
-            # Then we can move to the target z coordinate
             commands.append(f"G01 Z{target_coordinates.z}")
         else:
-            # Generate stepwise horizontal movements
             if target_coordinates.x != current_coordinates.x:
                 commands.append(f"G01 X{target_coordinates.x}")
-
             if target_coordinates.y != current_coordinates.y:
                 commands.append(f"G01 Y{target_coordinates.y}")
-
-            # Generate vertical movements
             if target_coordinates.z != current_coordinates.z:
                 commands.append(f"G01 Z{target_coordinates.z}")
+        return commands
 
-        # Execute the commands one by one
+    def _execute_commands(self, commands):
         for command in commands:
             self.execute_command(command)
-
-        return self.current_coordinates(instrument)
 
     def __should_move_to_zero_first(
         self,
