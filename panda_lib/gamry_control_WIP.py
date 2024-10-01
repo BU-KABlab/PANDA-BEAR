@@ -54,13 +54,14 @@ def countdown_timer(samplerate, cycle):
             sys.stdout.write("\r")
             sys.stdout.write(f"Time remaining: {minutes} minutes {seconds} seconds")
             sys.stdout.flush()
+            sys.stdout.write("\n")
+        logger.debug("Countdown timer complete")
     except KeyboardInterrupt:
         logger.info("Countdown timer interrupted.")
     except Exception as e:
         logger.error("Error occurred during countdown timer: %s", e)
     finally:
         sys.stdout.write("\n")
-        logger.debug("Countdown timer complete")
 
 
 def pstatconnect():
