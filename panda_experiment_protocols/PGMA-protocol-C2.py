@@ -148,23 +148,14 @@ def PGMAdeposition(
     toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
     try:
         ## Move the electrode to the well
-        # Move the electrode to above the well
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
+            second_z_cord=toolkit.wellplate.echem_height,
+            second_z_cord_feed=100,
         )
-        # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA deposition")
         try:
@@ -291,23 +282,14 @@ def FC_prechar(
     toolkit.global_logger.info("3a. Moving electrode to well: %s", instructions.well_id)
     try:
         ## Move the electrode to the well
-        # Move the electrode to above the well
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
+            second_z_cord=toolkit.wellplate.echem_height,
+            second_z_cord_feed=100,
         )
-        # Set the feed rate to 100 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3b. Performing CV")
         try:
@@ -426,23 +408,14 @@ def FC_postchar(
     toolkit.global_logger.info("2a. Moving electrode to well: %s", instructions.well_id)
     try:
         ## Move the electrode to the well
-        # Move the electrode to above the well
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
+            second_z_cord=toolkit.wellplate.echem_height,
+            second_z_cord_feed=100,
         )
-        # Set the feed rate to 100 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("2b. Performing CV")
         try:

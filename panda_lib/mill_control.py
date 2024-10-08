@@ -47,6 +47,8 @@ MILL_COM_PORT = config.get("MILL", "port")
 MILL_BAUD_RATE = config.getint("MILL", "baudrate")
 MILL_TIMEOUT = config.getint("MILL", "timeout")
 
+mill_move = "G01 X{} Y{} Z{}"  # Move to specified coordinates
+mill_move_z = "G01 Z{}"  # Move to specified Z coordinate
 # Compile regex patterns once
 wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
@@ -467,11 +469,17 @@ class Mill:
         Returns:
             None
         """
+        command_block = []
         coords = self.config["electrode_bath"]
         self.safe_move(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
+
         for _ in range(rinses):
-            self._move_electrode_to_position(coords["x"], coords["y"], coords["z"])
-            self._move_electrode_to_position(coords["x"], coords["y"], 0)
+            command_block.append(f"G01 Z{coords['z']}")
+            command_block.append(f"G01 Z0")
+
+        command_block = "\n".join(command_block)
+        self.execute_command(command_block)
+
         return 0
 
     @timing_wrapper
@@ -494,11 +502,6 @@ class Mill:
     @timing_wrapper
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
-        # [initial_x, initial_y, initial_z] = self.current_coordinates()
-        # mill_response = self.move_center_to_position(
-        #     initial_x, initial_y, 0
-        # )
-
         return self.execute_command("G01 Z0")
 
     @timing_wrapper
@@ -515,8 +518,6 @@ class Mill:
         """
         offsets = self.config["instrument_offsets"]["center"]
         working_volume = self.config["working_volume"]
-
-        mill_move = "G01 X{} Y{} Z{}"  # Move to specified coordinates
 
         command_coordinates = [
             x_coord + offsets["x"],
@@ -539,55 +540,6 @@ class Mill:
         self.execute_command(command)
         return 0
 
-    @timing_wrapper
-    def _move_pipette_to_position(
-        self,
-        x_coord: float = 0,
-        y_coord: float = 0,
-        z_coord=0.00,
-    ) -> int:
-        """
-        WARNING: Will move diagonally
-        Move the pipette to the specified coordinates.
-        Args:
-            x (float): X coordinate.
-            y (float): Y coordinate.
-            z (float): Z coordinate.
-        Returns:
-            str: Response from the mill after executing the command.
-        """
-        # offsets = {"x": -88, "y": 0, "z": 0}
-        offsets = self.config["instrument_offsets"]["pipette"]
-        command_coordinates = [
-            x_coord + offsets["x"],
-            y_coord + offsets["y"],
-            z_coord + offsets["z"],
-        ]
-        self._move_center_to_position(*command_coordinates)
-        return 0
-
-    @timing_wrapper
-    def _move_electrode_to_position(
-        self, x_coord: float, y_coord: float, z_coord: float = 0.00
-    ) -> int:
-        """
-        WARNING: Will move diagonally
-        Move the electrode to the specified coordinates.
-        Args:
-            coordinates (dict): Dictionary containing x, y, and z coordinates.
-        Returns:
-            str: Response from the mill after executing the command.
-        """
-        # offsets = {"x": 36, "y": 30, "z": 0}
-        offsets = self.config["instrument_offsets"]["electrode"]
-
-        command_coordinates = [
-            x_coord + offsets["x"],
-            y_coord + offsets["y"],
-            z_coord + offsets["z"],
-        ]
-        self._move_center_to_position(*command_coordinates)
-        return 0
 
     @timing_wrapper
     def update_offset(self, offset_type, offset_x, offset_y, offset_z):
