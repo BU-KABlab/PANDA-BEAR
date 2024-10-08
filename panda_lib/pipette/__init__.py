@@ -7,5 +7,6 @@ from .sql_pipette import (
     update_pipette_status,
     deincrement_use_count,
     insert_new_pipette,
-    activate_pipette
+    activate_pipette,
+    select_current_pipette_uses,
 )

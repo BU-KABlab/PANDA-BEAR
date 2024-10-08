@@ -191,16 +191,29 @@ def deincrement_use_count(pipette_id: int):
 
 def select_current_pipette_id():
     """
-    Get the pipette status from the pipette_status table.
+    Get the active pipette status from the pipette_status table.
     And return a pipette instance to be applied to the pipette that
     is in memory.
     Returns:
         Pipette: The current pipette status.
     """
     with SessionLocal() as session:
-        pipette_status = session.query(Pipette).order_by(Pipette.updated.desc()).first()
+        pipette_status = session.query(Pipette).filter(Pipette.active == 1).first()
         session.close()
     return pipette_status.id
+
+def select_current_pipette_uses():
+    """
+    Get the active pipette status from the pipette_status table.
+    And return a pipette record instance to be applied to the pipette that
+    is in memory.
+    Returns:
+        Pipette: The current pipette status.
+    """
+    with SessionLocal() as session:
+        pipette_status = session.query(Pipette).filter(Pipette.active == 1).first()
+        session.close()
+    return pipette_status.uses
 
 
 def insert_new_pipette(

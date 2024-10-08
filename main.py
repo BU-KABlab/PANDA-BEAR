@@ -481,10 +481,11 @@ if __name__ == "__main__":
             )
         num, p_type, new_wells = wellplate.read_current_wellplate_info()
         current_pipette = pipette.select_current_pipette_id()
+        uses = pipette.select_current_pipette_uses()
         print(
             f"""
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
-The current pipette id is {current_pipette}
+The current pipette id is {current_pipette} and has {1000-uses} uses left.
 The queue has {sql_queue.count_queue_length()} experiments.
 """
         )
