@@ -3,13 +3,12 @@
 Requires the PyCapture2 library to be installed and run in a python 3.6 environment.
 This script is used to capture images from the FLIR camera.
 """
-
+from configparser import ConfigParser
 import logging
 from pathlib import Path
 import os
 from typing import Union
 import PySpin
-from configparser import ConfigParser
 from dotenv import load_dotenv
 
 def read_config() -> ConfigParser:
