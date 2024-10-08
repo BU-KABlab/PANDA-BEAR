@@ -612,7 +612,7 @@ class Mill:
 
     ## Special versions of the movement commands that avoid diagonal movements
     @timing_wrapper
-    def safe_move(self, x_coord, y_coord, z_coord, instrument: Instruments) -> Coordinates:
+    def safe_move(self, x_coord, y_coord, z_coord, instrument: Instruments, second_z_cord:float = None, second_z_cord_feed:float = None) -> Coordinates:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
         
@@ -625,6 +625,7 @@ class Mill:
         Returns:
             Coordinates: Current center coordinates.
         """
+        commands = []
         goto = Coordinates(x=x_coord, y=y_coord, z=z_coord)
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
         current_coordinates = self.current_coordinates(instrument)
@@ -638,14 +639,23 @@ class Mill:
 
         if self.__should_move_to_zero_first(current_coordinates, target_coordinates, self.config["safe_height_floor"]):
             logger.debug("Moving to Z=0 first")
-            self.execute_command("G01 Z0")
-            current_coordinates = self.current_coordinates(instrument)
+            # self.execute_command("G01 Z0")
+            commands.append("G01 Z0")
+            # current_coordinates = self.current_coordinates(instrument)
         else:
             logger.debug("Not moving to Z=0 first")
 
         self._validate_target_coordinates(target_coordinates)
 
-        commands = self._generate_movement_commands(current_coordinates, target_coordinates)
+        commands.extend(self._generate_movement_commands(current_coordinates, target_coordinates))
+
+        if second_z_cord is not None:
+            # Add the movement to the second z coordinate and feed rate
+            commands.append(f"G01 Z{second_z_cord} F{second_z_cord_feed}")
+            # Restore the feed rate to the default of 2000
+            commands.append("F2000")
+        # Form the individual movement commands into a block seperated by \n
+        commands = "\n".join(commands)
         self._execute_commands(commands)
 
         return self.current_coordinates(instrument)
