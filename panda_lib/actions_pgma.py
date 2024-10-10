@@ -5,7 +5,7 @@ from panda_lib.actions import (
     ExperimentResult,
     ExperimentStatus,
     logger,
-    potentiostat_cv_parameters,
+    cv_parameters,
     cyclic_volt,
     OCPFailure,
     CVFailure,
@@ -30,7 +30,7 @@ def cyclic_volt_pgma_fc(
     try:
         logger.info("Characterizing well: %s", cv_instructions.well_id)
 
-        characterizing_cyclic_volt_params = potentiostat_cv_parameters(
+        characterizing_cyclic_volt_params = cv_parameters(
             CVvi=0.0,
             CVap1=1.0,
             CVap2=-0.3,

@@ -32,8 +32,8 @@ def main():
     # Test the syringe and pipette for retention and suction
     while True:
         # Select solution
-        test_solution = solution_selector(stock, "water", test_volume)
-        test_waste = waste_selector(waste, "waste", test_volume)
+        test_solution = solution_selector("water", test_volume)
+        test_waste = waste_selector("waste", test_volume)
 
         # Withdraw water, raise to z=0, and hold it for 60 seconds
         toolkit.pump.withdraw(purge)
@@ -63,5 +63,7 @@ def main():
         go_again = input("Do another test? (y/n): ")
         if go_again.lower() == "n":
             break
+
+    toolkit.mill.rest_electrode()
     # Disconnect from instruments
     disconnect_from_instruments(toolkit)

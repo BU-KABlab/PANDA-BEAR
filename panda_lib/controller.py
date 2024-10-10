@@ -121,7 +121,6 @@ def main(
         if toolkit.pump.pipette.volume > 0:
             obs.place_text_on_screen("Pipette is not empty, purging into waste")
             actions.purge_pipette(
-                waste_vials=waste_vials,
                 mill=toolkit.mill,
                 pump=toolkit.pump,
             )

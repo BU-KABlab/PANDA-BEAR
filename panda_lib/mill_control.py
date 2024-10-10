@@ -384,7 +384,9 @@ class Mill:
         return self.execute_command(command)
 
     @timing_wrapper
-    def current_coordinates(self, instrument:Instruments=Instruments.CENTER) -> Coordinates:
+    def current_coordinates(
+        self, instrument: Instruments = Instruments.CENTER
+    ) -> Coordinates:
         """
         Get the current coordinates of the mill.
         Args:
@@ -413,10 +415,17 @@ class Mill:
                     x_coord = round(float(match.group(1)), 3)
                     y_coord = round(float(match.group(2)), 3)
                     z_coord = round(float(match.group(3)), 3)
-                    logger.info("WPos coordinates: X = %s, Y = %s, Z = %s", x_coord, y_coord, z_coord)
+                    logger.info(
+                        "WPos coordinates: X = %s, Y = %s, Z = %s",
+                        x_coord,
+                        y_coord,
+                        z_coord,
+                    )
                     break
                 else:
-                    logger.warning("WPos coordinates not found in the line. Trying again...")
+                    logger.warning(
+                        "WPos coordinates not found in the line. Trying again..."
+                    )
                     if _ == max_attempts - 1:
                         logger.error("Error occurred while getting WPos coordinates")
                         raise LocationNotFound
@@ -427,11 +436,23 @@ class Mill:
                     x_coord = float(match.group(1)) + homing_pull_off
                     y_coord = float(match.group(2)) + homing_pull_off
                     z_coord = float(match.group(3)) + homing_pull_off
-                    logger.debug("MPos coordinates: X = %s, Y = %s, Z = %s", x_coord - homing_pull_off, y_coord - homing_pull_off, z_coord - homing_pull_off)
-                    logger.debug("WPos coordinates: X = %s, Y = %s, Z = %s", x_coord, y_coord, z_coord)
+                    logger.debug(
+                        "MPos coordinates: X = %s, Y = %s, Z = %s",
+                        x_coord - homing_pull_off,
+                        y_coord - homing_pull_off,
+                        z_coord - homing_pull_off,
+                    )
+                    logger.debug(
+                        "WPos coordinates: X = %s, Y = %s, Z = %s",
+                        x_coord,
+                        y_coord,
+                        z_coord,
+                    )
                     break
                 else:
-                    logger.warning("MPos coordinates not found in the line. Trying again...")
+                    logger.warning(
+                        "MPos coordinates not found in the line. Trying again..."
+                    )
                     if _ == max_attempts - 1:
                         logger.error("Error occurred while getting MPos coordinates")
                         raise LocationNotFound
@@ -540,7 +561,6 @@ class Mill:
         self.execute_command(command)
         return 0
 
-
     @timing_wrapper
     def update_offset(self, offset_type, offset_x, offset_y, offset_z):
         """
@@ -564,32 +584,52 @@ class Mill:
 
     ## Special versions of the movement commands that avoid diagonal movements
     @timing_wrapper
-    def safe_move(self, x_coord, y_coord, z_coord, instrument: Instruments, second_z_cord:float = None, second_z_cord_feed:float = None) -> Coordinates:
+    def safe_move(
+        self,
+        x_coord,
+        y_coord,
+        z_coord,
+        instrument: Instruments,
+        second_z_cord: float = None,
+        second_z_cord_feed: float = None,
+    ) -> Coordinates:
         """
         Move the mill to the specified coordinates using only horizontal and vertical movements.
-        
+
         Args:
             x_coord (float): X coordinate.
             y_coord (float): Y coordinate.
             z_coord (float): Z coordinate.
             instrument (Instruments): The instrument to move to the specified coordinates.
-        
+            second_z_cord (float): The second z coordinate to move to.
+            second_z_cord_feed (float): The feed rate to use when moving to the second z coordinate.
+
         Returns:
             Coordinates: Current center coordinates.
         """
         commands = []
         goto = Coordinates(x=x_coord, y=y_coord, z=z_coord)
         offsets = Coordinates(**self.config["instrument_offsets"][instrument.value])
-        current_coordinates = self.current_coordinates(instrument)
+        current_coordinates = self.current_coordinates()
 
         if self._is_already_at_target(goto, current_coordinates, offsets):
-            logger.debug("%s is already at the target coordinates of [%s, %s, %s]", instrument, x_coord, y_coord, z_coord)
+            logger.debug(
+                "%s is already at the target coordinates of [%s, %s, %s]",
+                instrument,
+                x_coord,
+                y_coord,
+                z_coord,
+            )
             return current_coordinates
 
-        target_coordinates = self._calculate_target_coordinates(goto, current_coordinates, offsets)
+        target_coordinates = self._calculate_target_coordinates(
+            goto, current_coordinates, offsets
+        )
         self._log_target_coordinates(target_coordinates)
 
-        if self.__should_move_to_zero_first(current_coordinates, target_coordinates, self.config["safe_height_floor"]):
+        if self.__should_move_to_zero_first(
+            current_coordinates, target_coordinates, self.config["safe_height_floor"]
+        ):
             logger.debug("Moving to Z=0 first")
             # self.execute_command("G01 Z0")
             commands.append("G01 Z0")
@@ -599,7 +639,9 @@ class Mill:
 
         self._validate_target_coordinates(target_coordinates)
 
-        commands.extend(self._generate_movement_commands(current_coordinates, target_coordinates))
+        commands.extend(
+            self._generate_movement_commands(current_coordinates, target_coordinates)
+        )
 
         if second_z_cord is not None:
             # Add the movement to the second z coordinate and feed rate
@@ -612,19 +654,42 @@ class Mill:
 
         return self.current_coordinates(instrument)
 
-    def _is_already_at_target(self, goto:Coordinates, current_coordinates:Coordinates, offsets:Coordinates):
-        return (goto.x, goto.y) == (current_coordinates.x, current_coordinates.y) and goto.z == current_coordinates.z + offsets.z
+    def _is_already_at_target(
+        self, goto: Coordinates, current_coordinates: Coordinates, offsets: Coordinates
+    ):
+        """Check if the mill is already at the target coordinates"""
+        return (goto.x + offsets.x, goto.y + offsets.y) == (
+            current_coordinates.x,
+            current_coordinates.y,
+        ) and goto.z + offsets.z == current_coordinates.z
 
-    def _calculate_target_coordinates(self, goto:Coordinates, current_coordinates:Coordinates, offsets:Coordinates):
+    def _calculate_target_coordinates(
+        self, goto: Coordinates, current_coordinates: Coordinates, offsets: Coordinates
+    ):
+        """
+        Calculate the target coordinates for the mill. Checking if the mill is already at the target coordinates and only moving if necessary.
+
+        Args:
+            goto (Coordinates): The target coordinates.
+            current_coordinates (Coordinates): The current coordinates of the mill center.
+            offsets (Coordinates): The offsets for the instrument.
+        """
         if (goto.x, goto.y) == (current_coordinates.x, current_coordinates.y):
             return Coordinates(x=goto.x, y=goto.y, z=goto.z + offsets.z)
         else:
-            return Coordinates(x=goto.x + offsets.x, y=goto.y + offsets.y, z=goto.z + offsets.z)
+            return Coordinates(
+                x=goto.x + offsets.x, y=goto.y + offsets.y, z=goto.z + offsets.z
+            )
 
-    def _log_target_coordinates(self, target_coordinates:Coordinates):
-        logger.debug("Target coordinates: [%s, %s, %s]", target_coordinates.x, target_coordinates.y, target_coordinates.z)
+    def _log_target_coordinates(self, target_coordinates: Coordinates):
+        logger.debug(
+            "Target coordinates: [%s, %s, %s]",
+            target_coordinates.x,
+            target_coordinates.y,
+            target_coordinates.z,
+        )
 
-    def _validate_target_coordinates(self, target_coordinates:Coordinates):
+    def _validate_target_coordinates(self, target_coordinates: Coordinates):
         working_volume = Coordinates(**self.config["working_volume"])
         if not (working_volume.x <= target_coordinates.x <= 1):
             logger.error("x coordinate out of range")
@@ -636,7 +701,9 @@ class Mill:
             logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
-    def _generate_movement_commands(self, current_coordinates:Coordinates, target_coordinates:Coordinates):
+    def _generate_movement_commands(
+        self, current_coordinates: Coordinates, target_coordinates: Coordinates
+    ):
         commands = []
         if current_coordinates.z >= self.config["safe_height_floor"]:
             commands.append(f"G01 X{target_coordinates.x} Y{target_coordinates.y}")
@@ -651,8 +718,11 @@ class Mill:
         return commands
 
     def _execute_commands(self, commands):
-        for command in commands:
-            self.execute_command(command)
+        if isinstance(commands, str):
+            self.execute_command(commands)
+        else:
+            for command in commands:
+                self.execute_command(command)
 
     def __should_move_to_zero_first(
         self,

@@ -608,8 +608,8 @@ class EchemExperimentBase(ExperimentBase):
     cv_step_size: float = float(0.01)  # step size
     cv_cycle_count: int = 3  # number of cycles
     cv_scan_rate_cycle_1: float = float(0.1)
-    cv_scan_rate_cycle_2: float = float(0.1)
-    cv_scan_rate_cycle_3: float = float(0.1)
+    cv_scan_rate_cycle_2: float = cv_scan_rate_cycle_1
+    cv_scan_rate_cycle_3: float = cv_scan_rate_cycle_1
 
     @property
     def cv_sample_rate(self):

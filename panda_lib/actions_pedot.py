@@ -5,8 +5,8 @@ from panda_lib.actions import (
     ExperimentResult,
     ExperimentStatus,
     logger,
-    potentiostat_chrono_parameters,
-    potentiostat_cv_parameters,
+    chrono_parameters,
+    cv_parameters,
     chrono_amp,
     cyclic_volt,
     OCPFailure,
@@ -34,7 +34,7 @@ def chrono_amp_edot_bleaching(
     try:
         logger.info("Setting up eChem bleaching process...")
 
-        bleaching_params = potentiostat_chrono_parameters(
+        bleaching_params = chrono_parameters(
             CAvi=0.0,
             CAti=0.0,
             CAv1=-0.6,
@@ -86,7 +86,7 @@ def chrono_amp_edot_coloring(
         # echem setup
         logger.info("Setting up eChem coloring process...")
 
-        coloring_params = potentiostat_chrono_parameters(
+        coloring_params = chrono_parameters(
             CAvi=0.0,
             CAti=0.0,
             CAv1=0.5,
@@ -139,7 +139,7 @@ def cyclic_volt_edot_characterizing(
     try:
         logger.info("Characterizing well: %s", cv_instructions.well_id)
 
-        characterizing_cyclic_volt_params = potentiostat_cv_parameters(
+        characterizing_cyclic_volt_params = cv_parameters(
             CVvi=0.0,
             CVap1=0.8,
             CVap2=-0.8,

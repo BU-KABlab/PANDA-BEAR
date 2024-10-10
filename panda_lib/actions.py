@@ -48,7 +48,7 @@ from panda_lib.experiment_class import (
     ExperimentStatus,
 )
 from panda_lib.image_tools import add_data_zone
-from panda_lib.log_tools import CustomLoggingFilter, timing_wrapper
+from panda_lib.log_tools import timing_wrapper
 from panda_lib.mill_control import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
@@ -61,15 +61,15 @@ TESTING = read_testing_config()
 if TESTING:
     from panda_lib.gamry_control_WIP_mock import GamryPotentiostat as echem
     from panda_lib.gamry_control_WIP_mock import (
-        potentiostat_chrono_parameters,
-        potentiostat_cv_parameters,
+        chrono_parameters,
+        cv_parameters,
         potentiostat_ocp_parameters,
     )
 else:
     import panda_lib.gamry_control_WIP as echem
     from panda_lib.gamry_control_WIP import (
-        potentiostat_chrono_parameters,
-        potentiostat_cv_parameters,
+        chrono_parameters,
+        cv_parameters,
         potentiostat_ocp_parameters,
     )
 
@@ -187,7 +187,7 @@ def forward_pipette_v2(
         )
 
         # Purge residual solution
-        for solution, vol in pump.pipette.contents.items():
+        for _, vol in pump.pipette.contents.items():
             if vol > 0.0:
                 logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
                 pump.infuse(volume_to_infuse=vol, being_infused=None, infused_into=to_vessel, blowout_ul=vol)
@@ -298,7 +298,7 @@ def flush_v2(
                 mill=mill,
             )
 
-        logger.info(
+        logger.debug(
             "Flushed pipette tip with %f ul of %s %dx times...",
             flush_volume,
             flush_solution_name,
@@ -403,7 +403,7 @@ def waste_selector(solution_name: str, volume: float) -> WasteVial:
 def chrono_amp(
     ca_instructions: EchemExperimentBase,
     file_tag: str = None,
-    custom_parameters: Union[potentiostat_chrono_parameters, None] = None,
+    custom_parameters: Union[chrono_parameters, None] = None,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
@@ -418,9 +418,6 @@ def chrono_amp(
         dep_results (ExperimentResult): The updated experiment results
     """
     try:
-        # echem setup
-        logger.info("Setting up eChem deposition experiments...")
-
         if TESTING:
             pstat = echem()
         else:
@@ -476,17 +473,9 @@ def chrono_amp(
             # FEATURE have chrono return the max and min values for the deposition
             # and save them to the results
             if custom_parameters:  # if not none then use the custom parameters
-                pstat.chrono(
-                    CAvi=custom_parameters.CAvi,
-                    CAti=custom_parameters.CAti,
-                    CAv1=custom_parameters.CAv1,
-                    CAt1=custom_parameters.CAt1,
-                    CAv2=custom_parameters.CAv2,
-                    CAt2=custom_parameters.CAt2,
-                    CAsamplerate=custom_parameters.CAsamplerate,
-                )  # unpack the custom parameters
+                chrono_params = custom_parameters
             else:
-                pstat.chrono(
+                chrono_params = chrono_parameters(
                     CAvi=ca_instructions.ca_prestep_voltage,
                     CAti=ca_instructions.ca_prestep_time_delay,
                     CAv1=ca_instructions.ca_step_1_voltage,
@@ -495,7 +484,9 @@ def chrono_amp(
                     CAt2=ca_instructions.ca_step_2_time,
                     CAsamplerate=ca_instructions.ca_sample_period,
                 )  # CA
-
+            pstat.chrono(
+                chrono_params
+            )
             pstat.activecheck()
             ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
         except Exception as e:
@@ -533,7 +524,7 @@ def cyclic_volt(
     cv_instructions: EchemExperimentBase,
     file_tag: str = None,
     overwrite_inital_voltage: bool = True,
-    custom_parameters: potentiostat_cv_parameters = None,
+    custom_parameters: cv_parameters = None,
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:
     """
     Cyclicvoltamety in a well. This includes the OCP and CV steps.
@@ -542,8 +533,14 @@ def cyclic_volt(
     No pipetting is performed in this step.
     Rinse the electrode after characterization.
 
+    WARNING: Do not change the instructions initial voltage during a custom CV unless you are sure that the instructions
+    are meant to be changed. The initial voltage should only be changed during regular CV step.
+
     Args:
         char_instructions (Experiment): The experiment instructions
+        file_tag (str): The file tag to be used for the data files
+        overwrite_inital_voltage (bool): Whether to overwrite the initial voltage with the final OCP voltage
+        custom_parameters (potentiostat_cv_parameters): The custom CV parameters to be used
 
     Returns:
         char_instructions (Experiment): The updated experiment instructions
@@ -627,32 +624,25 @@ def cyclic_volt(
         if overwrite_inital_voltage:
             cv_instructions.cv_initial_voltage = ocp_final_voltage
 
+        if custom_parameters:  # if not none then use the custom parameters
+            cv_params = custom_parameters
+            cv_params.CVvi = ocp_final_voltage  # still need to set the initial voltage, not overwriting the original
+        else:
+            cv_params = cv_parameters(
+                CVvi=cv_instructions.cv_initial_voltage,
+                CVap1=cv_instructions.cv_first_anodic_peak,
+                CVap2=cv_instructions.cv_second_anodic_peak,
+                CVvf=cv_instructions.cv_final_voltage,
+                CVsr1=cv_instructions.cv_scan_rate_cycle_1,
+                CVsr2=cv_instructions.cv_scan_rate_cycle_2,
+                CVsr3=cv_instructions.cv_scan_rate_cycle_3,
+                CVcycle=cv_instructions.cv_cycle_count,
+            )
+
         try:
-            if custom_parameters:  # if not none then use the custom parameters
-                custom_parameters.CVvi = ocp_final_voltage  # still need to set the initial voltage, not overwriting the original
-                pstat.cyclic(
-                    CVvi=custom_parameters.CVvi,
-                    CVap1=custom_parameters.CVap1,
-                    CVap2=custom_parameters.CVap2,
-                    CVvf=custom_parameters.CVvf,
-                    CVsr1=custom_parameters.CVsr1,
-                    CVsr2=custom_parameters.CVsr2,
-                    CVsr3=custom_parameters.CVsr3,
-                    CVsamplerate=custom_parameters.CVsamplerate,
-                    CVcycle=custom_parameters.CVcycle,
-                )  # unpack the custom parameters
-            else:
-                pstat.cyclic(
-                    CVvi=ocp_final_voltage,  # we always start where we left off in the OCP but don't always change the initial voltage
-                    CVap1=cv_instructions.cv_first_anodic_peak,
-                    CVap2=cv_instructions.cv_second_anodic_peak,
-                    CVvf=cv_instructions.cv_final_voltage,
-                    CVsr1=cv_instructions.cv_scan_rate_cycle_1,
-                    CVsr2=cv_instructions.cv_scan_rate_cycle_2,
-                    CVsr3=cv_instructions.cv_scan_rate_cycle_3,
-                    CVsamplerate=cv_instructions.cv_sample_rate,
-                    CVcycle=cv_instructions.cv_cycle_count,
-                )
+            pstat.cyclic(
+                cv_params
+            )
             pstat.activecheck()
 
         except Exception as e:
@@ -725,9 +715,6 @@ def image_well(
     try:
         instructions.set_status_and_save(ExperimentStatus.IMAGING)
         logger.info("Imaging well %s", instructions.well_id)
-        # capture image
-        logger.debug("Capturing image of well %s", instructions.well_id)
-
         exp_id = instructions.experiment_id or "test"
         well_id = well_id = instructions.well_id or "test"
         pjct_id = instructions.project_id or "test"
@@ -738,7 +725,7 @@ def image_well(
         )
 
         # position lens above the well
-        logger.info("Moving camera above well %s", well_id)
+        logger.debug("Moving camera above well %s", well_id)
         if well_id != "test":
             toolkit.mill.safe_move(
                 toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
@@ -752,6 +739,7 @@ def image_well(
         if TESTING:
             Path(filepath).touch()
         else:
+            logger.debug("Capturing image of well %s", instructions.well_id)
             capture_new_image(save=True, num_images=1, file_name=filepath)
 
             dz_filename = filepath.stem + "_dz" + filepath.suffix
@@ -779,9 +767,10 @@ def image_well(
             else:
                 obs = OBSController()
             obs.change_image(new_image_path=filepath)
-        except:
+        except Exception as e:
             # Not critical if the image is not posted to OBS
             logger.exception("Failed to post image to OBS")
+            logger.exception(e)
 
     except Exception as e:
         logger.exception(
@@ -792,7 +781,7 @@ def image_well(
     finally:
         # move camera to safe position
         if well_id != "test":
-            logger.info("Moving camera to safe position")
+            logger.debug("Moving camera to safe position")
             toolkit.mill.move_to_safe_position()  # move to safe height above target well
 
 

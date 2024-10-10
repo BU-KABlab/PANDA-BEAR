@@ -1,4 +1,5 @@
 """Module to inferface with Gamry Potentiostat"""
+
 import gc
 import logging
 import pathlib
@@ -42,6 +43,54 @@ global COMPLETE_FILE_NAME
 global OPEN_CONNECTION
 
 
+@dataclass(config=ConfigDict(validate_assignment=True))
+class cv_parameters:
+    """CV Setup Parameters"""
+
+    # CV Setup Parameters
+    CVvi: float = 0.0  # initial voltage
+    CVap1: float = 0.5  # first anodic peak
+    CVap2: float = -0.2  # second anodic peak
+    CVvf: float = 0.0  # final voltage
+    CVstep: float = 0.01  # step size
+    CVsr1: float = 0.1  # scan rate cycle 1
+    CVsr2: float = CVsr1  # scan rate cycle 2
+    CVsr3: float = CVsr1  # scan rate cycle 3
+    CVsamplerate: float = CVstep / CVsr1
+    CVcycle: int = 3  # number of cycles
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class chrono_parameters:
+    """CA Setup Parameters"""
+
+    # CA/CP Setup Parameters
+    CAvi: float = 0.0  # Pre-step voltage (V)
+    CAti: float = 0.0  # Pre-step delay time (s)
+    CAv1: float = -1.7  # Step 1 voltage (V)
+    CAt1: float = 300.0  # run time 300 seconds
+    CAv2: float = 0.0  # Step 2 voltage (V)
+    CAt2: float = 0.0  # Step 2 time (s)
+    CAsamplerate: float = 0.5  # sample period (s)
+    # Max current (mA)
+    # Limit I (mA/cm^2)
+    # PF Corr. (ohm)
+    # Equil. time (s)
+    # Expected Max V (V)
+    # Initial Delay on
+    # Initial Delay (s)
+
+
+@dataclass(config=ConfigDict(validate_assignment=True))
+class potentiostat_ocp_parameters:
+    """OCP Setup Parameters"""
+
+    # OCP Setup Parameters
+    OCPvi: float = 0.0
+    OCPti: float = 15.0
+    OCPrate: float = 0.5
+
+
 def countdown_timer(samplerate, cycle):
     """Countdown timer for the data acquisition"""
     try:
@@ -52,7 +101,9 @@ def countdown_timer(samplerate, cycle):
             estimated_time -= 1
             minutes, seconds = divmod(estimated_time, 60)
             sys.stdout.write("\r")
-            sys.stdout.write(f"Time remaining: {int(minutes)} minutes {round(seconds,2)} seconds")
+            sys.stdout.write(
+                f"Time remaining: {int(minutes)} minutes {round(seconds,2)} seconds"
+            )
             sys.stdout.flush()
         sys.stdout.write("\n")
         logger.debug("Countdown timer complete")
@@ -206,7 +257,9 @@ def setfilename(
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
+            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(
+                ".txt"
+            )
             i += 1
     else:
         file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
@@ -217,14 +270,16 @@ def setfilename(
         i = 1
         while filepath.exists():
             next_file_name = f"{file_name}_{i}"
-            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
+            filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(
+                ".txt"
+            )
             i += 1
 
     COMPLETE_FILE_NAME = filepath
     return COMPLETE_FILE_NAME
 
 
-def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
+def cyclic(params: cv_parameters):
     """cyclic voltammetry"""
     global DTAQ
     global SIGNAL
@@ -244,20 +299,20 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     CONNECTION = client.GetEvents(DTAQ, DTAQ_SINK)
 
     SIGNAL.Init(
-        PSTAT,
-        CVvi,
-        CVap1,
-        CVap2,
-        CVvf,
-        CVsr1,
-        CVsr2,
-        CVsr3,
-        0.0,
-        0.0,
-        0.0,
-        CVsamplerate,
-        CVcycle,
-        GAMRY_COM.PstatMode,
+        PSTAT,  # Pstat object
+        params.CVvi,  # initial voltage
+        params.CVap1,  # first anodic peak
+        params.CVap2,  # second anodic peak
+        params.CVvf,  # final voltage
+        params.CVsr1,  # scan rate cycle 1
+        params.CVsr2,  # scan rate cycle 2
+        params.CVsr3,  # scan rate cycle 3
+        0.0,  # HoltTime0
+        0.0,  # HoldTime1
+        0.0,  # HoldTime2
+        params.CVsamplerate,  # sample rate
+        params.CVcycle,  # number of cycles
+        GAMRY_COM.PstatMode,  # mode
     )
     initializepstat()
     DTAQ.Init(PSTAT)
@@ -265,9 +320,19 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     PSTAT.SetCell(GAMRY_COM.CellOn)
 
     # Start a new thread to run a countdown timer
-    countdown_thread = threading.Thread(target=countdown_timer, args=(CVsamplerate, CVcycle), name = "countdown_thread")
+    total_potential_distance = (
+        abs(params.CVap1 - params.CVvi)
+        + abs(params.CVap2 - params.CVap1)
+        + abs(params.CVvf - params.CVap2)
+    )
+    time_per_cycle = total_potential_distance * params.CVsamplerate
+    countdown_thread = threading.Thread(
+        target=countdown_timer,
+        args=(time_per_cycle, params.CVcycle),
+        name="countdown_thread",
+    )
     countdown_thread.start()
-    
+
     DTAQ.Run(True)
 
     # Join the countdown thread to the main thread
@@ -276,7 +341,7 @@ def cyclic(CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle)
     logger.debug("cyclic: made it to run end")
 
 
-def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
+def chrono(params: chrono_parameters):
     global DTAQ
     global SIGNAL
     global DTAQ_SINK
@@ -296,7 +361,15 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     CONNECTION = client.GetEvents(DTAQ, DTAQ_SINK)
 
     SIGNAL.Init(
-        PSTAT, CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate, GAMRY_COM.PstatMode
+        PSTAT,
+        params.CAvi,
+        params.CAti,
+        params.CAv1,
+        params.CAt1,
+        params.CAv2,
+        params.CAt2,
+        params.CAsamplerate,
+        GAMRY_COM.PstatMode,
     )
     initializepstat()
 
@@ -304,10 +377,14 @@ def chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
     PSTAT.SetSignal(SIGNAL)
     PSTAT.SetCell(GAMRY_COM.CellOn)
 
-        # Start a new thread to run a countdown timer
-    countdown_thread = threading.Thread(target=countdown_timer, args=(CAt1+CAt2, 1), name = "countdown_thread")
+    # Start a new thread to run a countdown timer
+    countdown_thread = threading.Thread(
+        target=countdown_timer,
+        args=(params.CAti + params.CAt1 + params.CAt2, 1),
+        name="countdown_thread",
+    )
     countdown_thread.start()
-    
+
     DTAQ.Run(True)
 
     # Join the countdown thread to the main thread
@@ -411,58 +488,10 @@ def mock_CA(MCAvi, MCAti, MCArate):
     logger.debug("mock ca: made it to run end")
 
 
-@dataclass(config=ConfigDict(validate_assignment=True))
-class potentiostat_cv_parameters:
-    """CV Setup Parameters"""
-
-    # CV Setup Parameters
-    CVvi: float = 0.0  # initial voltage
-    CVap1: float = 0.5
-    CVap2: float = -0.2
-    CVvf: float = 0.0  # final voltage
-    CVstep: float = 0.01
-    CVsr1: float = 0.1
-    CVcycle: int = 3
-    CVsr2: float = CVsr1
-    CVsr3: float = CVsr1
-    CVsamplerate: float = CVstep / CVsr1
-
-
-@dataclass(config=ConfigDict(validate_assignment=True))
-class potentiostat_chrono_parameters:
-    """CA Setup Parameters"""
-
-    # CA/CP Setup Parameters
-    CAvi: float = 0.0  # Pre-step voltage (V)
-    CAti: float = 0.0  # Pre-step delay time (s)
-    CAv1: float = -1.7  # Step 1 voltage (V)
-    CAt1: float = 300.0  # run time 300 seconds
-    CAv2: float = 0.0  # Step 2 voltage (V)
-    CAt2: float = 0.0  # Step 2 time (s)
-    CAsamplerate: float = 0.5  # sample period (s)
-    # Max current (mA)
-    # Limit I (mA/cm^2)
-    # PF Corr. (ohm)
-    # Equil. time (s)
-    # Expected Max V (V)
-    # Initial Delay on
-    # Initial Delay (s)
-
-
-@dataclass(config=ConfigDict(validate_assignment=True))
-class potentiostat_ocp_parameters:
-    """OCP Setup Parameters"""
-
-    # OCP Setup Parameters
-    OCPvi: float = 0.0
-    OCPti: float = 15.0
-    OCPrate: float = 0.5
-
-
 if __name__ == "__main__":
     try:
         pstatconnect()  # grab first pstat
-        COMPLETE_FILE_NAME = setfilename(10000384, "OCP",16,2,"B4")
+        COMPLETE_FILE_NAME = setfilename(10000384, "OCP", 16, 2, "B4")
         OCP(
             potentiostat_ocp_parameters.OCPvi,
             potentiostat_ocp_parameters.OCPti,
@@ -474,25 +503,18 @@ if __name__ == "__main__":
         # time.sleep(0.5)
         ## echem CA - deposition
         if check_vf_range(COMPLETE_FILE_NAME.with_suffix(".txt")):
-            COMPLETE_FILE_NAME = setfilename(10000384, "CV",16,2,"B4")
-            cyclic(
-                0.0,
-                -2,
-                1.0,
-                -2,
-                0.05,
-                0.05,
-                0.05,
-                0.1,
-                3,
+            COMPLETE_FILE_NAME = setfilename(10000384, "CV", 16, 2, "B4")
+            cv_parameters = cv_parameters(
+                0.0, 1.0, -0.3, 1.0, 0.025, 0.025, 0.025, 0.002, 3
             )
+            cyclic(cv_parameters)
             # chrono(CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate)
             logger.debug("made it to try")
             while ACTIVE is True:
                 client.PumpEvents(1)
                 time.sleep(0.5)
             ## echem plot the data
-            #Analyzer.plotdata("CV", COMPLETE_FILE_NAME)
+            # Analyzer.plotdata("CV", COMPLETE_FILE_NAME)
         pstatdisconnect()
         del CONNECTION
 

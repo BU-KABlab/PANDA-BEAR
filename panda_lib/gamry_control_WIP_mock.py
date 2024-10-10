@@ -96,7 +96,7 @@ class GamryPotentiostat:
         self.disconnect()
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class potentiostat_cv_parameters:
+class cv_parameters:
     """CV Setup Parameters"""
 
     # CV Setup Parameters
@@ -113,7 +113,7 @@ class potentiostat_cv_parameters:
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
-class potentiostat_chrono_parameters:
+class chrono_parameters:
     """CA Setup Parameters"""
 
     # CA/CP Setup Parameters

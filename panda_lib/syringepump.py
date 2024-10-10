@@ -73,7 +73,7 @@ class SyringePump:
             Pump: Initialized pump object.
         """
         try:
-            pump_control_logger.info("Setting up pump...")
+            pump_control_logger.debug("Setting up pump...")
             pump_port = nesp_lib.Port(
                 config.get("PUMP", "port", fallback="COM5"),
                 config.getint("PUMP", "baudrate", fallback=19200),
@@ -160,7 +160,7 @@ class SyringePump:
             # Updating the contents also updates the volume so we are done here
 
             # log the action and return
-            pump_control_logger.info(
+            pump_control_logger.debug(
                 "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
                 self.pump.volume_withdrawn,
                 self.pump.pumping_rate,
@@ -179,7 +179,7 @@ class SyringePump:
             self.pipette.volume + volume_withdrawn_ul, PRECISION
         )
 
-        pump_control_logger.info(
+        pump_control_logger.debug(
             "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
             self.pump.volume_withdrawn,
             self.pump.pumping_rate,
@@ -201,7 +201,7 @@ class SyringePump:
             nesp_lib.PumpingDirection.WITHDRAW, volume_ml, self.max_pump_rate
         )
         self.update_pipette_volume(self.pump.volume_withdrawn)
-        pump_control_logger.info(
+        pump_control_logger.debug(
             "Pump has withdrawn: %0.6f ml of air at %fmL/min  Pipette vol: %0.3f ul",
             self.pump.volume_withdrawn,
             self.pump.pumping_rate,
@@ -276,7 +276,7 @@ class SyringePump:
         self.pump.volume_withdrawn_clear()
 
         # Log the infusion details
-        pump_control_logger.info(
+        pump_control_logger.debug(
             "Pump has infused: %0.4f ul (%0.4f ul of solution) at %fmL/min Pipette volume: %0.4f ul",
             volume_infused_ul_total,
             volume_infused_ul,
@@ -292,10 +292,13 @@ class SyringePump:
             )
 
             # Calculate the ratio of each content in the pipette
-            content_ratio = {
-                key: value / sum(self.pipette.contents.values())
-                for key, value in self.pipette.contents.items()
-            }
+            if sum(self.pipette.contents.values() or [0]) > 0:
+                content_ratio = {
+                    key: value / sum(self.pipette.contents.values())
+                    for key, value in self.pipette.contents.items()
+                }
+            else:
+                content_ratio = {key: 1 for key in self.pipette.contents.keys()}
 
             # Update the contents of the pipette based on the content ratio
             for key, ratio in content_ratio.items():
@@ -317,7 +320,7 @@ class SyringePump:
                 nesp_lib.PumpingDirection.INFUSE, volume_ml, self.max_pump_rate
             )
             self.pipette.volume_ml -= round(self.pump.volume_infused, PRECISION)
-            pump_control_logger.info(
+            pump_control_logger.debug(
                 "Pump has infused: %0.6f ml of air at %fmL/min Pipette volume: %0.3f ul",
                 self.pump.volume_infused,
                 self.pump.pumping_rate,
