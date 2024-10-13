@@ -626,7 +626,7 @@ class Mill:
             goto, current_coordinates, offsets
         )
         self._log_target_coordinates(target_coordinates)
-
+        move_to_zero = False
         if self.__should_move_to_zero_first(
             current_coordinates, target_coordinates, self.config["safe_height_floor"]
         ):
@@ -634,13 +634,14 @@ class Mill:
             # self.execute_command("G01 Z0")
             commands.append("G01 Z0")
             # current_coordinates = self.current_coordinates(instrument)
+            move_to_zero = True
         else:
             logger.debug("Not moving to Z=0 first")
 
         self._validate_target_coordinates(target_coordinates)
 
         commands.extend(
-            self._generate_movement_commands(current_coordinates, target_coordinates)
+            self._generate_movement_commands(current_coordinates, target_coordinates,move_to_zero)
         )
 
         if second_z_cord is not None:
@@ -702,7 +703,7 @@ class Mill:
             raise ValueError("z coordinate out of range")
 
     def _generate_movement_commands(
-        self, current_coordinates: Coordinates, target_coordinates: Coordinates
+        self, current_coordinates: Coordinates, target_coordinates: Coordinates, move_z_first: bool = False
     ):
         commands = []
         if current_coordinates.z >= self.config["safe_height_floor"]:
@@ -714,6 +715,8 @@ class Mill:
             if target_coordinates.y != current_coordinates.y:
                 commands.append(f"G01 Y{target_coordinates.y}")
             if target_coordinates.z != current_coordinates.z:
+                commands.append(f"G01 Z{target_coordinates.z}")
+            if target_coordinates.z == current_coordinates.z and move_z_first: # The mill moved to Z=0 first, so move back to the target Z
                 commands.append(f"G01 Z{target_coordinates.z}")
         return commands
 

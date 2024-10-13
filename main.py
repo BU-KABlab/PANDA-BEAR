@@ -485,7 +485,7 @@ if __name__ == "__main__":
         print(
             f"""
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
-The current pipette id is {current_pipette} and has {1000-uses} uses left.
+The current pipette id is {current_pipette} and has {int(round((2000-uses)/2,0))} uses left.
 The queue has {sql_queue.count_queue_length()} experiments.
 """
         )

@@ -487,17 +487,19 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
             )
 
         if coordinates_changed:
-            if well_id.upper() == "A1":
-                recalc = input(
-                    "Would you like to recalculate all well locations? (y/n): "
-                )
-                if recalc[0].lower() == "y":
-                    wellplate.a1_x = new_coordinates.x
-                    wellplate.a1_y = new_coordinates.y
-                    wellplate.write_wellplate_location()  # json file for wellplate location
-                    wellplate.recalculate_well_locations()  # Update wells with new coords and depth
-            else:  # Update the well with new well coordinates
-                wellplate.update_well_coordinates(well_id, new_coordinates)
+            save = input("Would you like to save the new coordinates? (y/n): ")
+            if save.lower() in ["y", "yes", ""]:
+                if well_id.upper() == "A1":
+                    recalc = input(
+                        "Would you like to recalculate all well locations? (y/n): "
+                    )
+                    if recalc[0].lower() == "y":
+                        wellplate.a1_x = new_coordinates.x
+                        wellplate.a1_y = new_coordinates.y
+                        wellplate.write_wellplate_location()  # json file for wellplate location
+                        wellplate.recalculate_well_locations()  # Update wells with new coords and depth
+                else:  # Update the well with new well coordinates
+                    wellplate.update_well_coordinates(well_id, new_coordinates)
 
 
 def calibrate_z_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwargs):
