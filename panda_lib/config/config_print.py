@@ -85,7 +85,12 @@ def resolve_config_paths():
             if "dir" in key or "path" in key:
                 # Check if the path exists
                 if not Path(value).exists():
-                    continue
+                    print(f"{key} = Path does not exist: {value}")
+                    create = input("Create the path? (y/n): ")
+                    if create.lower() == "y":
+                        Path(value).mkdir(parents=True, exist_ok=True)
+                    else:
+                        continue
 
                 # Generate complete path
                 complete_path = Path(value).resolve()
