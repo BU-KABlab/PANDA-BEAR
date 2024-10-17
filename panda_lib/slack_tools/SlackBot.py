@@ -347,7 +347,7 @@ class SlackBot:
         except SlackApiError as error:
             error_msg = f"Error creating conversation: {format(error)}"
             self.logger.error(error_msg)
-            return 0
+            return 0 #todo haandle rate limiting error with a sleep
 
     def find_id(self, msg_id):
         """Find the message ID in the slack ticket tracker csv file."""
