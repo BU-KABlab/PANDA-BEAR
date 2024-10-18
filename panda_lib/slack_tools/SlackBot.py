@@ -708,7 +708,12 @@ class SlackBot:
                 time.sleep(15)
                 continue
         self.send_slack_message("alert", "PANDA Bot is off duty")
-        print("Stopping Slack Bot")
+
+    
+    def off_duty(self):
+        self.status = 0
+        self.send_slack_message("alert", "PANDA Bot is off duty")
+        return
 
     # def terminate(self):
     #     """Terminate the slack bot."""

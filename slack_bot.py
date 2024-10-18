@@ -1,21 +1,33 @@
-"""Script to starting and stopping the ePANDA Slack Bot"""
+"""Script to starting the ePANDA Slack Bot"""
 
-import threading
 from panda_lib.slack_tools.SlackBot import SlackBot
+import argparse
 
-TEST = False
 
-def run_slack_bot():
+def run_slack_bot(testing=False):
     """Run the SlackBot"""
-    bot = SlackBot(test=TEST)
-    print("Starting Slack Bot")
+    bot = SlackBot(test=testing)
     bot.run()
 
-# Create a thread to run the SlackBot
-slack_bot_thread = threading.Thread(target=run_slack_bot)
 
-# Start the thread
-slack_bot_thread.start()
+def main():
+    parser = argparse.ArgumentParser(description="Run the Slack bot.")
+    parser.add_argument(
+        "--testing", action="store_true", help="Run the bot in testing mode."
+    )
+    parser.add_argument(
+        "--production", action="store_true", help="Run the bot in production mode."
+    )
 
-# Optionally, you can join the thread if you want the main program to wait for it to finish
-slack_bot_thread.join()
+    args = parser.parse_args()
+
+    if args.testing:
+        run_slack_bot(testing=True)
+    elif args.production:
+        run_slack_bot(testing=False)
+    else:
+        run_slack_bot(testing=True)
+
+
+if __name__ == "__main__":
+    main()

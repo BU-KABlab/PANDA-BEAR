@@ -6,9 +6,13 @@ Or starting the PANDA_SDL either with or without mock instruments.
 """
 
 # pylint: disable=broad-exception-caught, protected-access
+import multiprocessing
+import subprocess
 import sys
 import textwrap
+import threading
 import time
+from typing import Tuple
 
 from PIL import Image
 
@@ -383,40 +387,72 @@ def generate_vial_data_template():
     )
     vials.generate_template_vial_csv_file()
 
+def slack_monitor_bot(testing=False):
+    """Runs the slack monitor bot."""
+    bot = controller.SlackBot(test=testing)
+    bot.run()
 
-menu_options = {
-    "0": run_panda_sdl_with_ml,
-    "1": run_panda_sdl_without_ml,
-    "1.1": stop_panda_sdl,
-    "1.2": pause_panda_sdl,
-    "1.3": resume_panda_sdl,
-    "2": change_wellplate,
-    "2.1": change_wellplate_location,
-    "2.2": remove_wellplate_from_database,
-    "2.3": print_wellplate_info,
-    "2.5": remove_training_data,
-    "2.6": clean_up_testing_experiments,
-    "3": reset_vials_stock,
-    "3.1": reset_vials_waste,
-    "3.2": input_new_vial_values_stock,
-    "3.3": input_new_vial_values_waste,
-    "3.4": import_vial_data,
-    "3.5": generate_vial_data_template,
-    "4": print_queue_info,
-    "4.1": run_experiment_generator,
-    "4.2": remove_experiment_from_database,
-    "5": change_pipette_tip,
-    "6": calibrate_mill,
-    "7": test_image,
-    "8": instrument_check,
-    "9": test_pipette,
-    "t": toggle_testing_mode,
-    "r": refresh,
-    "w": show_warrenty,
-    "c": show_conditions,
-    "env": print_config,
-    "q": exit_program,
-}
+def run_experiment(uchoice) -> multiprocessing.Process:
+    """Runs the experiment in a separate process."""
+    exp_process = multiprocessing.Process(target=uchoice)
+    exp_process.start()
+    return exp_process
+
+experiment_choices = ["0", "1"]
+blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
+
+def main_menu(reduced:bool = False) -> Tuple[callable, str]:
+
+    menu_options = {
+        "0": run_panda_sdl_with_ml,
+        "1": run_panda_sdl_without_ml,
+        "1.1": stop_panda_sdl,
+        "1.2": pause_panda_sdl,
+        "1.3": resume_panda_sdl,
+        "2": change_wellplate,
+        "2.1": change_wellplate_location,
+        "2.2": remove_wellplate_from_database,
+        "2.3": print_wellplate_info,
+        "2.5": remove_training_data,
+        "2.6": clean_up_testing_experiments,
+        "3": reset_vials_stock,
+        "3.1": reset_vials_waste,
+        "3.2": input_new_vial_values_stock,
+        "3.3": input_new_vial_values_waste,
+        "3.4": import_vial_data,
+        "3.5": generate_vial_data_template,
+        "4": print_queue_info,
+        "4.1": run_experiment_generator,
+        "4.2": remove_experiment_from_database,
+        "5": change_pipette_tip,
+        "6": calibrate_mill,
+        "7": test_image,
+        "8": instrument_check,
+        "9": test_pipette,
+        "t": toggle_testing_mode,
+        "r": refresh,
+        "w": show_warrenty,
+        "c": show_conditions,
+        "env": print_config,
+        "q": exit_program,
+    }
+
+    if reduced:
+        # Remove the blocking options
+        for key in blocking_choices:
+            menu_options.pop(key, None)
+
+    while True:
+        print("\nWhat would you like to do?")
+        for key, value in menu_options.items():
+            print(f"{key}. {value.__name__.replace('_', ' ').title()}")
+
+        user_choice = input("Enter the number of your choice: ").strip().lower()
+        if user_choice in menu_options:
+            return menu_options[user_choice], user_choice
+        else:
+            input("Invalid choice. Please try again.")
+            continue
 
 if __name__ == "__main__":
     config = read_config()
@@ -461,9 +497,14 @@ if __name__ == "__main__":
 
         # If user chooses to exit, exit the program
         break
-
-
-
+    
+    testing_state = "testing" if read_testing_config() else "production"
+    slackbot_process = subprocess.Popen(
+        [sys.executable, "slack_bot.py", "--testing" if testing_state == "testing" else "--production"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    # Main loop
     while True:
         sql_system_state.set_system_status(utilities.SystemState.IDLE, "at main menu")
         # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
@@ -489,20 +530,25 @@ The current pipette id is {current_pipette} and has {int(round((2000-uses)/2,0))
 The queue has {sql_queue.count_queue_length()} experiments.
 """
         )
-        print("\nWhat would you like to do?")
-        for key, value in menu_options.items():
-            print(f"{key}. {value.__name__.replace('_', ' ').title()}")
-
-        user_choice = input("Enter the number of your choice: ").strip().lower()
+        user_choice, choice_key = main_menu()
+        # experiment_process:multiprocessing.Process = None
         try:
-            if user_choice in menu_options:
-                menu_options[user_choice]()
-            else:
-                input("Invalid choice. Please try again.")
+            if choice_key in experiment_choices:
+                user_choice()
+                # exp_process = multiprocessing.Process(target=user_choice)
+                # exp_process.start()
+                # exp_process.join()
+                # Start a thread to handle the main menu with reduced options
+                #menu_thread = threading.Thread(target=main_menu, args=(True,))
+                #menu_thread.start()
+                #menu_thread.join()  # Wait for the menu thread to finish
                 continue
+            user_choice()
         except controller.ShutDownCommand:
-            pass  # The PANDA_SDL loop has been stopped but we don't want to exit the program
-
+            # if experiment_process:
+            #     experiment_process.terminate()
+            # The PANDA_SDL loop has been stopped but we don't want to exit the program
+            pass
         except controller.OCPFailure:
             slack = controller.SlackBot()
             slack.send_slack_message(
@@ -524,10 +570,13 @@ The queue has {sql_queue.count_queue_length()} experiments.
             if contiue_choice == "n":
                 continue
             if contiue_choice == "y":
-                menu_options[user_choice]()
+                user_choice()
 
         except Exception as e:
             print(f"An error occurred: {e}")
+            # experiment_process.terminate()
             break  # Exit the program if an unknown error occurs
 
+    # End of program tasks
+    slackbot_process.terminate()
     sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting PANDA_SDL")
