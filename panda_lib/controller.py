@@ -26,6 +26,7 @@ from slack_sdk import errors as slack_errors
 from panda_lib import gamry_control_WIP, scheduler
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
+from panda_lib.pawduino import ArduinoLink, MockArduinoLink, PawduinoFunctions, PawduinoReturnCodes
 from panda_lib.sql_tools import sql_queue
 from sartorius.sartorius.mock import Scale as MockScale
 
@@ -788,6 +789,7 @@ def test_instrument_connections(
         scale=None,
         pump=None,
         wellplate=None,
+        arduino=None,
         global_logger=logger,
         experiment_logger=logger,
     )
@@ -798,6 +800,7 @@ def test_instrument_connections(
         instruments.mill.connect_to_mill()
         instruments.scale = MockScale()
         instruments.pump = MockPump()
+        instruments.arduino = MockArduinoLink()
         # pstat = echem_mock.GamryPotentiostat.connect()
         return instruments
 
@@ -875,6 +878,20 @@ def test_instrument_connections(
             gamry_control_WIP.pstatdisconnect()
     except Exception as error:
         logger.error("Error connecting to Potentiostat, %s", error)
+        incomplete = True
+
+    # Connect to Arduino
+    try:
+        logger.debug("Connecting to Arduino")
+        with ArduinoLink() as arduino:
+            if arduino.send(PawduinoFunctions.HELLO) != PawduinoReturnCodes.HELLO:
+                logger.error("No Arduino connected")
+                incomplete = True
+                instruments.arduino = None
+            logger.debug("Connected to Arduino")
+            instruments.arduino = arduino
+    except Exception as error:
+        logger.error("Error connecting to Arduino, %s", error)
         incomplete = True
 
     if incomplete:

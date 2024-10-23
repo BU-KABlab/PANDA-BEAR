@@ -9,6 +9,7 @@ from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 import panda_lib.wellplate as wp
 import PySpin
+from pawduino import ArduinoLink
 
 @dataclass
 class Toolkit:
@@ -21,3 +22,4 @@ class Toolkit:
     global_logger: Logger = None
     experiment_logger: Logger = None
     flir_camera: PySpin.Camera = None
+    arduino: ArduinoLink = None
