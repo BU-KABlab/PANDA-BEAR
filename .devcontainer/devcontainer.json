@@ -38,7 +38,7 @@
 	// Add runArgs to pass additional arguments to the Docker run command
     "runArgs": [
         "--privileged", // Allows the container to access all devices on the host
-        "--device=/dev/bus/usb", // Maps the USB devices from the host to the container
+        "--device=/dev/bus/usb:/dev/bus/usb", // Maps the USB devices from the host to the container
 		"--name=panda_sdl"
     ],
 
@@ -56,7 +56,11 @@
 				"ms-python.pylint",
 				"GitHub.vscode-pull-request-github",
 				"ms-python.black-formatter",
-				"analytic-signal.preview-tiff"
+				"analytic-signal.preview-tiff",
+				"ms-python.isort",
+				"ms-azuretools.vscode-docker"
+
+
 			]
 		}
 	}

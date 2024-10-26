@@ -52,6 +52,8 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     tar \
     tk-dev \
+    udev \
+    unzip \
     usbutils \
     wget \
     xz-utils \
@@ -65,11 +67,17 @@ RUN apt-get clean \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Create the /etc/udev/rules.d/ directory if it doesn't exist
+RUN mkdir -p /etc/udev/rules.d/
+
 # Copy the Spinnaker tar file into container
 COPY /installers/${SPINNAKER_TAR_FILE} /tmp/${SPINNAKER_TAR_FILE}
 
 # Copy Spinnaker Python SDK tar file into container
 COPY /installers/${SPINNAKER_PYTHON_TAR_FILE} /tmp/${SPINNAKER_PYTHON_TAR_FILE}
+
+# Copy NI-VISA zip file into container
+COPY /installers/NILinux2024Q4DeviceDrivers.zip /tmp/NILinux2024Q4DeviceDrivers.zip
 
 # Create a usrgroup called flirimaging
 RUN groupadd flirimaging
@@ -85,10 +93,16 @@ RUN usermod -aG flirimaging root
 # Run the install script
 RUN cd /tmp && tar -xzf ${SPINNAKER_TAR_FILE} && \ 
 cd $(ls | grep spinnaker- | head -n 1) && \ 
-echo -e "yes\nyes\n\nyes\nyes\nno\nno" | sh install_spinnaker.sh
+echo -e "yes\n\nyes\nyes\n\nyes\nno\nno\nno" | sh install_spinnaker.sh
 
 # Install Spinnaker Python SDK
 RUN cd /tmp && tar -xzf ${SPINNAKER_PYTHON_TAR_FILE} && pip install ${SPINNAKER_PYTHON_VERSION}
+
+# Install NI-VISA and dependencies
+RUN cd /tmp && unzip NILinux2024Q4DeviceDrivers.zip && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2004-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2204-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2404-drivers-stream.deb
+
+# Install PyVISA
+RUN pip install pyvisa
 
 # Switch to the new user (uncomment if needed)
 # ARG USER_UID=1000
