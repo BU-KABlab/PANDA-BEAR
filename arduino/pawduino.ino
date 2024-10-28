@@ -3,33 +3,56 @@
 // Currently features include: turning on/off white LEDs, turning on/off red LEDs, turning on/off 5V electromagnet
 
 // libraries
-#include <Arduino.h>
+// Include Libraries
+#include "Arduino.h"
+#include "Adafruit_NeoPixel.h"
 
-// white leds pin
+// Pin Definitions
+#define LEDR_1_PIN 5
+#define LEDR_2_PIN 6
+#define NEOPIXEL_RING_PIN 2
+#define EMAG 3
+
+// Message Definitions
 /*white leds */
 #define wo 1
 #define wf 2
-#define wled_pin 13 // TODO: change to correct pin for circuit
 /*red leds*/
 #define ro 3
 #define rf 4
-#define rled_pin 13 // TODO: change to correct pin for circuit
 /*electromagnet*/
 #define eo 5
 #define ef 6
-#define emag_pin 13 // TODO: change to correct pin for circuit
-
-/*hello message - 99*/
+/*hello message*/
 #define hello 99
+
+// Global variables and defines
+#define NUMPIXELS 16
+// object initialization
+Adafruit_NeoPixel ring(NUMPIXELS, NEOPIXEL_RING_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup()
 {
   // initialize serial communication:
   Serial.begin(115200);
-  // initialize the pins as an output:
-  pinMode(wled_pin, OUTPUT);
-  // pinMode(rled_pin, OUTPUT);
-  // pinMode(emag_pin, OUTPUT);
+  while (!Serial)
+    ; // wait for serial port to connect
+  Serial.println("OK");
+  pinMode(EMAG, OUTPUT);
+  pinMode(LEDR_1_PIN, OUTPUT);
+  pinMode(LEDR_2_PIN, OUTPUT);
+  ring.begin();
+  ring.setBrightness(500); // adjust brightness here
+  ring.show();            // Initialize all pixels to 'off'
+}
+
+void ringFill(uint32_t color)
+{
+  for (int i = 0; i < ring.numPixels(); i++)
+  {                               // For each pixel in strip...
+    ring.setPixelColor(i, color); //  Set pixel's color (in RAM)
+  }
+  ring.show();
 }
 
 void loop()
@@ -39,42 +62,52 @@ void loop()
   {
     // look for the next valid integer in the incoming serial stream:
     int command = Serial.parseInt();
-    // if (Serial.read() == '\n') {
-    //     continue; // Ignore the newline character
-    // }
-    // do it!
+
     switch (command)
     {
     case wo:
-      digitalWrite(wled_pin, HIGH);
-      Serial.println(101);
+      ringFill(ring.Color(255, 255, 255)); // White
+      Serial.println("101");
       break;
     case wf:
-      digitalWrite(wled_pin, LOW);
-      Serial.println(102);
+      ring.clear();
+      ring.show();
+      Serial.println("102");
       break;
     case ro:
-      digitalWrite(rled_pin, HIGH);
-      Serial.println(103);
+      digitalWrite(LEDR_1_PIN, HIGH);
+      digitalWrite(LEDR_2_PIN, HIGH);
+      ring.setPixelColor(0, ring.Color(0, 0, 255));
+      ring.setPixelColor(8, ring.Color(0, 0, 255));
+      ring.show();
+      Serial.println("103");
       break;
     case rf:
-      digitalWrite(rled_pin, LOW);
-      Serial.println(104);
+      digitalWrite(LEDR_1_PIN, LOW);
+      digitalWrite(LEDR_2_PIN, LOW);
+      ring.clear();
+      ring.show();
+      Serial.println("104");
       break;
     case eo:
-      digitalWrite(emag_pin, HIGH);
-      Serial.println(105);
+      digitalWrite(EMAG, HIGH);
+      Serial.println("105");
       break;
     case ef:
-      digitalWrite(emag_pin, LOW);
-      Serial.println(106);
+      digitalWrite(EMAG, LOW);
+      Serial.println("106");
       break;
-
     case hello:
-      Serial.println(999);
+      Serial.println("999");
       break;
     default:
-      Serial.println('recieved command: ' + command + ' is not recognized');
+      Serial.println(-1);
+    }
+
+    // Clear the serial buffer
+    while (Serial.available() > 0)
+    {
+      Serial.read();
     }
   }
 }
