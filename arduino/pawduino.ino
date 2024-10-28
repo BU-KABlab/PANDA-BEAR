@@ -7,61 +7,74 @@
 
 // white leds pin
 /*white leds */
-#define wo 0x01
-#define wf 0x02
-#define wled_pin 13
+#define wo 1
+#define wf 2
+#define wled_pin 13 // TODO: change to correct pin for circuit
 /*red leds*/
-#define ro 0x03
-#define rf 0x04
-#define rled_pin 12
+#define ro 3
+#define rf 4
+#define rled_pin 13 // TODO: change to correct pin for circuit
 /*electromagnet*/
-#define eo 0x05
-#define ef 0x06
-#define emag_pin 11
+#define eo 5
+#define ef 6
+#define emag_pin 13 // TODO: change to correct pin for circuit
 
-void setup() {
+/*hello message - 99*/
+#define hello 99
+
+void setup()
+{
   // initialize serial communication:
   Serial.begin(115200);
-    // initialize the pins as an output:
-    pinMode(wled_pin, OUTPUT);
-    pinMode(rled_pin, OUTPUT);
-    pinMode(emag_pin, OUTPUT);
+  // initialize the pins as an output:
+  pinMode(wled_pin, OUTPUT);
+  // pinMode(rled_pin, OUTPUT);
+  // pinMode(emag_pin, OUTPUT);
 }
 
-void loop() {
+void loop()
+{
   // if there's any serial available, read it:
-  while (Serial.available() > 0) {
+  while (Serial.available() > 0)
+  {
     // look for the next valid integer in the incoming serial stream:
     int command = Serial.parseInt();
+    // if (Serial.read() == '\n') {
+    //     continue; // Ignore the newline character
+    // }
     // do it!
-    switch (command) {
-      case wo:
-        digitalWrite(wled_pin, HIGH);
-        Serial.println(1);
-        break;
-      case wf:
-        digitalWrite(wled_pin, LOW);
-        Serial.println(2);
-        break;
-      case ro:
-        digitalWrite(rled_pin, HIGH);
-        Serial.println(3);
-        break;
-      case rf:
-        digitalWrite(rled_pin, LOW);
-        Serial.println(4);
-        break;
-      case eo:
-        digitalWrite(emag_pin, HIGH);
-        Serial.println(5);
-        break;
-      case ef:
-        digitalWrite(emag_pin, LOW);
-        Serial.println(6);
-        break;
-      default:
-        Serial.println(-1);
+    switch (command)
+    {
+    case wo:
+      digitalWrite(wled_pin, HIGH);
+      Serial.println(101);
+      break;
+    case wf:
+      digitalWrite(wled_pin, LOW);
+      Serial.println(102);
+      break;
+    case ro:
+      digitalWrite(rled_pin, HIGH);
+      Serial.println(103);
+      break;
+    case rf:
+      digitalWrite(rled_pin, LOW);
+      Serial.println(104);
+      break;
+    case eo:
+      digitalWrite(emag_pin, HIGH);
+      Serial.println(105);
+      break;
+    case ef:
+      digitalWrite(emag_pin, LOW);
+      Serial.println(106);
+      break;
+
+    case hello:
+      Serial.println(999);
+      break;
+    default:
+      Serial.println('recieved command: ' + command + ' is not recognized');
     }
   }
 }
-
