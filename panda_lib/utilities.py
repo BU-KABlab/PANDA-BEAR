@@ -78,6 +78,7 @@ class Instruments(Enum):
     PIPETTE = "pipette"
     ELECTRODE = "electrode"
     LENS = "lens"
+    DECAPPER = "decapper"
 
 
 class SystemState(Enum):
@@ -216,6 +217,7 @@ def input_validation(
     value_range: tuple = None,
     allow_blank: bool = True,
     custom_error: str = None,
+    menu_items: list = None,
 ):
     """Prompt the user for input and validate the input type."""
 
@@ -225,7 +227,7 @@ def input_validation(
 
     while True:
         try:
-            user_input = input(prompt)
+            user_input = input(prompt).strip()
             if not user_input and allow_blank:
                 return None
 
@@ -248,6 +250,12 @@ def input_validation(
             ):
                 raise ValueError(
                     f"Input must be between {value_range[0]} and {value_range[1]}."
+                )
+
+            # Check if the converted input is in the specified menu items
+            if menu_items and converted_input not in menu_items:
+                raise ValueError(
+                    f"Input must be one of the following: {', '.join(menu_items)}."
                 )
 
             return converted_input
