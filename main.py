@@ -10,35 +10,20 @@ import multiprocessing
 import subprocess
 import sys
 import textwrap
-import threading
 import time
 from typing import Tuple
 
 from PIL import Image
 
-from panda_lib.config.config_print import print_config_values as print_config
-from panda_lib.config.config_print import resolve_config_paths
-from panda_lib.config.config_tools import (
-    read_testing_config,
-    write_testing_config,
-    read_config,
-)
+from panda_lib.config import read_config, read_testing_config, write_testing_config, print_config_values as print_config
 from panda_lib.experiment_class import ExperimentBase
 
-resolve_config_paths()  # Yes I know the import order is wrong, but this must be run before anything else is loaded
-# from main_menu_custom_fucntions import (
-#     generate_pedot_experiment_from_existing_data,
-#     genererate_pedot_experiment,
-#     analyze_pedot_experiment,
-# )
 from license_text import show_conditions, show_warrenty
 from panda_lib import (
     controller,
-    flir_camera,
-    mill_calibration_and_positioning,
+    imaging,
     pipette,
     print_panda,
-    scheduler,
     utilities,
     vials,
     wellplate,
@@ -51,6 +36,7 @@ from panda_lib.sql_tools import (
     sql_system_state,
     sql_wellplate,
 )
+from panda_lib.movement import mill_calibration_and_positioning
 
 
 def run_panda_sdl_with_ml():
@@ -273,7 +259,7 @@ def calibrate_mill():
 
 def test_image():
     """Runs the mill control in testing mode."""
-    image = flir_camera.capture_new_image()
+    image = imaging.capture_new_image()
     open_image = Image.open(image)
     open_image.show()
 
