@@ -26,7 +26,7 @@ To electrodeposit polymer thin films, evaluate and compare their electrical prop
 * [Vial tube rack](https://github.com/erasmus95/PANDA-BEAR/blob/main/3d-prints/TubeRack_2mLx10_v1_scaled.stl)
 
 ## Software
-* [Python 3](https://www.python.org/)
+* [Python 3.10](https://www.python.org/)
 * [Anaconda](https://www.anaconda.com/)
 * [Slack SDK](https://slack.dev/python-slack-sdk/)
 * [Silicon Labs CP210x_Universal_Windows_Driver](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads)

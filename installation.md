@@ -17,7 +17,7 @@ There is a default_config.ini under panda_sdl/config which you should use as a t
 
 ## Python Dependencies
 
-PANDA SDL depends on Python 3.10+. All dependencies are listed in the requirements.txt file with the exception of the FLIR library (see Third Party/Proprietary Dependencies). If using the devcontainer these are installed for you. If not using the devcontainer, you can add them to your environment with the following terminal command after navigating to the repository directory:
+PANDA SDL depends on Python 3.10 (3.11 does not work due to FLIR's PySpin being capped) All dependencies are listed in the requirements.txt file with the exception of the FLIR library (see Third Party/Proprietary Dependencies). If using the devcontainer these are installed for you. If not using the devcontainer, you can add them to your environment with the following terminal command after navigating to the repository directory:
 
 ```pip install -r requirements.txt```
 

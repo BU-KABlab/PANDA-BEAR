@@ -15,28 +15,18 @@ from typing import Tuple
 
 from PIL import Image
 
-from panda_lib.config import read_config, read_testing_config, write_testing_config, print_config_values as print_config
-from panda_lib.experiment_class import ExperimentBase
-
 from license_text import show_conditions, show_warrenty
-from panda_lib import (
-    controller,
-    imaging,
-    pipette,
-    print_panda,
-    utilities,
-    vials,
-    wellplate,
-)
-from panda_lib.sql_tools import (
-    remove_testing_experiments,
-    sql_generator_utilities,
-    sql_protocol_utilities,
-    sql_queue,
-    sql_system_state,
-    sql_wellplate,
-)
+from panda_lib import (controller, imaging, pipette, print_panda, utilities,
+                       vials, wellplate)
+from panda_lib.config import print_config_values as print_config
+from panda_lib.config import (read_config, read_testing_config,
+                              write_testing_config)
+from panda_lib.experiment_class import ExperimentBase
 from panda_lib.movement import mill_calibration_and_positioning
+from panda_lib.sql_tools import (remove_testing_experiments,
+                                 sql_generator_utilities,
+                                 sql_protocol_utilities, sql_queue,
+                                 sql_system_state, sql_wellplate)
 
 
 def run_panda_sdl_with_ml():
