@@ -12,8 +12,6 @@ import sqlite3
 from pathlib import Path
 from typing import Tuple, Union
 
-import pandas as pd
-
 from panda_lib.log_tools import setup_default_logger, timing_wrapper
 
 from .experiment_class import (
