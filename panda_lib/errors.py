@@ -121,3 +121,10 @@ class StopCommand(Exception):
     def __init__(self, message="Stop command issued"):
         self.message = message
         super().__init__(self.message)
+
+class InstrumentConnectionError(excpetion):
+    """Raised when the instrument connection fails"""
+
+    def __init__(self, message="Instrument connection fails"):
+        self.message = message
+        super().__init__(self.message)
