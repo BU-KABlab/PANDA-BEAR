@@ -23,10 +23,10 @@ from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from panda_lib.config.config_tools import read_testing_config
+from panda_lib.config.config_tools import read_testing_config, read_config
 import panda_lib.experiment_class as exp
 from panda_lib import vials
-from panda_lib.image_tools import add_data_zone
+from panda_lib.imaging.image_tools import add_data_zone
 from panda_lib.obs_controls import OBSController
 from panda_lib.sql_tools import (
     sql_queue,
@@ -44,7 +44,7 @@ plot_lock = threading.Lock()
 config = configparser.ConfigParser()
 
 # Read the configuration file
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 
 # Access the SLACK section
 slack_config = config["SLACK"]
