@@ -3,7 +3,7 @@
 import sqlite3
 from pathlib import Path
 
-from panda_lib.config.config import SQL_DB_PATH
+from panda_lib.config.old_config import SQL_DB_PATH
 
 
 def main():
