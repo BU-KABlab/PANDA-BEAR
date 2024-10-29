@@ -866,7 +866,7 @@ def test_instrument_connections(
     try:
         logger.debug("Connecting to Arduino")
         with ArduinoLink() as arduino:
-            if not arduino.configuered:
+            if not arduino.configured:
                 logger.error("No Arduino connected")
                 incomplete = True
                 instruments.arduino = None
