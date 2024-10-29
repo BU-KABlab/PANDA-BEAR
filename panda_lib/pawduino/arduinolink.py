@@ -2,12 +2,13 @@
 This module provides a class to link the computer and the Arduino
 """
 import enum
+import os
 import queue
 import time
-
+import threading
 import serial
 import serial.tools.list_ports
-
+from serial import Serial
 
 class ArduinoLink:
     """
@@ -30,20 +31,33 @@ class ArduinoLink:
     arduinoQueue = queue.Queue()
 
     def __init__(self, port_address: str = "COM3", baud_rate: int = 115200):
-        self.port = port_address
-        self.baud_rate: int = baud_rate
+        """Initialize the ArduinoLink class"""
+        self.ser:Serial = None
+        self.port_address:str = port_address
+        self.baud_rate:int = baud_rate
+        self.timeout:int = 1
         self.configured: bool = False
-        self.serial: serial.Serial = None
+        self.ack: str = 'OK'
         self.configure()
 
     def __enter__(self):
+        """For use in a with statement"""
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """Close the connection to the Arduino when exiting the with statement"""
         self.close()
 
     def choose_arduino_port(self):
-        ports = serial.tools.list_ports.comports()
+        """Interactive method to choose the port that the Arduino is connected to"""
+        # Check the OS and list the available ports accordingly
+        if os.name == "posix":
+            ports = serial.tools.list_ports.grep("ttyACM")
+        elif os.name == "nt":
+            ports = serial.tools.list_ports.grep("COM")
+        else:
+            print("Unsupported OS")
+            return
         choices = []
         print("PORT\tDEVICE\t\t\tMANUFACTURER")
         for index, value in enumerate(sorted(ports)):
@@ -52,35 +66,49 @@ class ArduinoLink:
                 print(index, "\t", value.name, "\t", value.manufacturer)
         choice = int(input("Choose the port that the Arduino is connected to: "))
         if choice in choices:
-            self.port = sorted(ports)[choice]
+            port = sorted(ports)[choice]
+            return port.name
 
     def close(self):
-        self.serial.close()
+        """Close the connection to the Arduino"""
+        self.ser.close()
 
     def configure(self):
-        if self.port is None:
-            self.choose_arduino_port()
-            self.serial = serial.Serial(self.port.name, self.baud_rate, timeout=1)
+        """Configure the connection to the Arduino"""
+        if self.ser is None:
+            self.ser = Serial(self.choose_arduino_port(), self.baud_rate, self.timeout)
         else:
-            self.serial = serial.Serial(self.port, self.baud_rate, timeout=1)
+            self.ser = Serial(self.port_address, self.baud_rate, self.timeout)
 
-        if self.serial.isOpen():
-            print(f"Connected to {self.serial.name} at {self.baud_rate} baud")
-            rx = self.send(PawduinoFunctions.HELLO.value)
-            if rx == PawduinoReturnCodes.HELLO.value:
-                print("Arduino is ready")
+        if self.ser.isOpen():
+            print(f"Connected to {self.ser.name} at {self.baud_rate} baud")
+
+            # Look for acknowlegement
+            rx = self.ser.readline().decode().strip()
+            if rx == self.ack:
+                print("Arduino acknowledged connection")
                 self.configured = True
             else:
                 print("Arduino is not ready")
                 self.configured = False
                 return
+
+            rx = self.send(PawduinoFunctions.HELLO.value)
+            if rx == PawduinoReturnCodes.HELLO.value:
+                print("Arduino is configured")
+                self.configured = True
+            else:
+                print("Arduino is not configured")
+                self.configured = False
+                return
         else:
-            print(f"Failed to connect to {self.port.name} at {self.baud_rate} baud")
+            print(f"Failed to connect to {self.ser.name} at {self.baud_rate} baud")
             self.configured = False
             return
 
     def receive(self):
-        rx = self.serial.readline()
+        """Listen to the Arduino and put the messages in the queue"""
+        rx = self.ser.readline()
         # print(f"Received: {rx}")
         if rx:
             rxd = rx.decode().strip()
@@ -89,14 +117,42 @@ class ArduinoLink:
             return rxd
         else:
             return None
+        
+    def trecieve(self):
+        """Threaded version of receive using the queue.
+        To be started elsewere.
+        """
+        rx = b''
+        while True:
+            rx = self.ser.readline()
+            if rx and rx != b'' and rx != b'\n':
+                rxd = rx.decode().strip()
+                self.arduinoQueue.put(rxd)
+                rx = b''
+            time.sleep(0.1)
+
+    def tsend(self, cmd):
+        """Threaded version of send using the queue.
+        To be started elsewere.
+        """
+        msg = str(cmd)
+        self.ser.flushInput()
+        self.ser.flushOutput()
+        self.ser.write(msg.encode())
+        time.sleep(0.5)
+        while self.arduinoQueue.empty():
+            time.sleep(0.1)
+        rx = self.arduinoQueue.get(timeout=1)
+        return rx
 
     def send(self, cmd):
-        self.serial.flushInput()
-        self.serial.flushOutput()
+        """Send a message to the Arduino and wait for a response"""
+        self.ser.flushInput()
+        self.ser.flushOutput()
         msg = str(cmd)
         attempts = 0
         while True:
-            self.serial.write(msg.encode())
+            self.ser.write(msg.encode())
             time.sleep(0.5)
             rx = self.receive()
             if rx is not None:
@@ -111,6 +167,63 @@ class ArduinoLink:
         except (ValueError, TypeError):
             return rx
 
+class MockArduinoLink:
+    """
+    This class provides a mock link between the computer and the Arduino
+
+    The class provides the following methods:
+    - send (sends a message to the Arduino and waits for a response)
+
+    The class provides the following attributes:
+    - arduinoQueue (a queue to store messages from the Arduino)
+    """
+
+    arduinoQueue = queue.Queue()
+
+    def __init__(self):
+        """Initialize the MockArduinoLink class"""
+        self.configured: bool = False
+        self.ack: str = 'OK'
+
+    def __enter__(self):
+        """For use in a with statement"""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Close the connection to the Arduino when exiting the with statement"""
+        pass
+
+    def send(self, cmd):
+        """Send a message to the Arduino and wait for a response"""
+        try:
+            cmd = int(cmd)
+            return PawduinoReturnCodes[cmd].value
+        except (ValueError, TypeError):
+            return PawduinoReturnCodes[cmd].value
+
+    def receive(self):
+        """Listen to the Arduino and put the messages in the queue"""
+        pass
+
+    def configure(self):
+        """Configure the connection to the Arduino"""
+        self.configured = True
+
+    def close(self):
+        """Close the connection to the Arduino"""
+        pass
+
+    def trecieve(self):
+        """Threaded version of receive using the queue.
+        To be started elsewere.
+        """
+        pass
+
+    def tsend(self, cmd):
+        """Threaded version of send using the queue.
+        To be started elsewere.
+        """
+        return self.send(cmd)
 
 class PawduinoFunctions(enum.Enum):
     """
