@@ -31,8 +31,8 @@ from typing import Optional, Tuple, Union
 from PIL import Image
 
 # Local application imports
-from panda_lib.flir_camera import capture_new_image
-from panda_lib.config.config_tools import read_testing_config, read_config
+from panda_lib.imaging import capture_new_image, add_data_zone, image_filepath_generator
+from panda_lib.config.config_tools import read_testing_config, read_config, ConfigParserError
 from panda_lib.correction_factors import correction_factor
 from panda_lib.errors import (
     CAFailure,
@@ -47,9 +47,8 @@ from panda_lib.experiment_class import (
     ExperimentResult,
     ExperimentStatus,
 )
-from panda_lib.image_tools import add_data_zone
 from panda_lib.log_tools import timing_wrapper
-from panda_lib.mill_control import Instruments, Mill, MockMill
+from panda_lib.movement import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.instrument_toolkit import Toolkit
@@ -59,15 +58,15 @@ from panda_lib.wellplate import Well
 TESTING = read_testing_config()
 
 if TESTING:
-    from panda_lib.gamry_control_WIP_mock import GamryPotentiostat as echem
-    from panda_lib.gamry_control_WIP_mock import (
+    from panda_lib.gamry_potentiostat.gamry_control_mock import GamryPotentiostat as echem
+    from panda_lib.gamry_potentiostat.gamry_control_mock import (
         chrono_parameters,
         cv_parameters,
         potentiostat_ocp_parameters,
     )
 else:
-    import panda_lib.gamry_control_WIP as echem
-    from panda_lib.gamry_control_WIP import (
+    import panda_lib.gamry_potentiostat.gamry_control as echem
+    from panda_lib.gamry_potentiostat.gamry_control import (
         chrono_parameters,
         cv_parameters,
         potentiostat_ocp_parameters,
@@ -76,14 +75,18 @@ else:
 config = read_config()
 # Constants
 
-AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
-DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
-if TESTING:
-    PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
-    PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
-else:
-    PATH_TO_DATA = Path(config.get("PRODUCTION", "data_dir"))
-    PATH_TO_LOGS = Path(config.get("PRODUCTION", "logging_dir"))
+try:
+    AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
+    DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
+    if TESTING:
+        PATH_TO_DATA = Path(config.get("TESTING", "data_dir"))
+        PATH_TO_LOGS = Path(config.get("TESTING", "logging_dir"))
+    else:
+        PATH_TO_DATA = Path(config.get("PRODUCTION", "data_dir"))
+        PATH_TO_LOGS = Path(config.get("PRODUCTION", "logging_dir"))
+except ConfigParserError as e:
+    logging.error("Failed to read config file. Error: %s", e)
+    raise e
 
 # Set up logging
 logger = logging.getLogger("panda")
@@ -721,7 +724,7 @@ def image_well(
         cmpgn_id = instructions.project_campaign_id or "test"
         # create file path
         filepath = image_filepath_generator(
-            exp_id, pjct_id, cmpgn_id, well_id,step_description
+            exp_id, pjct_id, cmpgn_id, well_id,step_description, PATH_TO_DATA
         )
 
         # position lens above the well
@@ -785,31 +788,31 @@ def image_well(
             toolkit.mill.move_to_safe_position()  # move to safe height above target well
 
 
-@timing_wrapper
-def image_filepath_generator(
-    exp_id: int = "test",
-    project_id: int = "test",
-    project_campaign_id: int = "test",
-    well_id: str = "test",
-    step_description: str = None,
-) -> Path:
-    """
-    Generate the file path for the image
-    """
-    # create file name
-    if step_description is not None:
-        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
-    else:
-        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
-    file_name = file_name.replace(" ", "_")  # clean up the file name
-    file_name_start = file_name + "_0"  # enumerate the file name
-    filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".tiff")
-    i = 1
-    while filepath.exists():
-        next_file_name = f"{file_name}_{i}"
-        filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
-        i += 1
-    return filepath
+# @timing_wrapper
+# def image_filepath_generator(
+#     exp_id: int = "test",
+#     project_id: int = "test",
+#     project_campaign_id: int = "test",
+#     well_id: str = "test",
+#     step_description: str = None,
+# ) -> Path:
+#     """
+#     Generate the file path for the image
+#     """
+#     # create file name
+#     if step_description is not None:
+#         file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
+#     else:
+#         file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
+#     file_name = file_name.replace(" ", "_")  # clean up the file name
+#     file_name_start = file_name + "_0"  # enumerate the file name
+#     filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".tiff")
+#     i = 1
+#     while filepath.exists():
+#         next_file_name = f"{file_name}_{i}"
+#         filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
+#         i += 1
+#     return filepath
 
 
 @timing_wrapper

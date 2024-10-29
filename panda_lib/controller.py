@@ -15,7 +15,6 @@ Additionally controller should be able to:
 # pylint: disable=line-too-long, broad-exception-caught
 import importlib
 import sys
-import threading
 import time
 from pathlib import Path
 from typing import Sequence
@@ -23,27 +22,27 @@ from typing import Sequence
 import PySpin
 from slack_sdk import errors as slack_errors
 
-from panda_lib import gamry_control_WIP, scheduler
+from panda_lib import scheduler
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
+from panda_lib.gamry_potentiostat import gamry_control
 from panda_lib.pawduino import ArduinoLink, MockArduinoLink, PawduinoFunctions, PawduinoReturnCodes
 from panda_lib.sql_tools import sql_queue
-from sartorius.sartorius.mock import Scale as MockScale
 
 from . import actions
-from .actions import CAFailure, CVFailure, DepositionFailure, OCPFailure
+from .errors import CAFailure, CVFailure, DepositionFailure, OCPFailure
 from .config.config_tools import read_config, read_testing_config
 from .errors import (
     NoExperimentFromModel,
     ProtocolNotFoundError,
     ShutDownCommand,
     WellImportError,
-    StopCommand
+    InstrumentConnectionError
 )
 from .experiment_class import ExperimentBase, ExperimentResult, ExperimentResultsRecord, ExperimentStatus, select_specific_result
 from .instrument_toolkit import Toolkit
 from .log_tools import setup_default_logger, timing_wrapper, apply_log_filter
-from .mill_control import Mill, MockMill
+from .movement import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
 from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
@@ -108,7 +107,7 @@ def main(
         # Connect to equipment
         toolkit, all_found = connect_to_instruments(use_mock_instruments)
         if not all_found:
-            raise Exception("Not all instruments connected")
+            raise InstrumentConnectionError("Not all instruments connected")
 
         controller_slack.send_slack_message(
             "alert", "PANDA_SDL has connected to equipment"
@@ -116,7 +115,7 @@ def main(
         obs.place_text_on_screen("PANDA_SDL has connected to equipment")
 
         ## Establish state of system - we do this each time because each experiment changes the system state
-        stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
+        stock_vials, _, toolkit.wellplate = establish_system_state()
 
         ## Check that the pipette is empty, if not dispose of full volume into waste
         if toolkit.pump.pipette.volume > 0:
@@ -136,7 +135,7 @@ def main(
             apply_log_filter(logger=logger)
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
-            stock_vials, waste_vials, toolkit.wellplate = establish_system_state()
+            stock_vials, _, toolkit.wellplate = establish_system_state()
 
             while current_experiment is None:
                 ## Ask the scheduler for the next experiment
@@ -276,7 +275,7 @@ def main(
 
             # Get the main function from the module
             protocol_function = getattr(protocol_module, "main")
-            
+
             try:
                 protocol_function(
                     instructions=current_experiment,
@@ -409,7 +408,7 @@ def main(
         controller_slack.take_screenshot("alert", "webcam")
         controller_slack.take_screenshot("alert", "vials")
         controller_slack.send_slack_message(
-            "alert", "Please check the terminal to move the mill to the rest position"
+            "alert", "Please use the terminal move the mill to the rest position if safe to do so."
         )
         input("Press enter to continue")
 
@@ -429,9 +428,6 @@ def main(
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.OFF)
-        # scheduler.change_well_status(
-        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-        # )
         logger.info("User commanded shutting down of PANDA_SDL")
         raise ShutDownCommand from error  # raise error to go to finally.
         # This was triggered by the user to indicate they want to stop the program
@@ -440,9 +436,6 @@ def main(
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.ERROR)
-        # scheduler.change_well_status(
-        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-        # )
         logger.info("Keyboard interrupt detected")
         controller_slack.send_slack_message(
             "alert", "PANDA_SDL was interrupted by the user"
@@ -453,10 +446,6 @@ def main(
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.ERROR)
-        # scheduler.change_well_status(
-        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
-        # )
-
         logger.error(error)
         logger.exception(error)
         controller_slack.send_slack_message(
@@ -466,16 +455,9 @@ def main(
 
     finally:
         if current_experiment is not None:
-            ## Update location of experiment instructions and save results
-            # scheduler.update_experiment_file(new_experiment)
-            # scheduler.update_experiment_location(new_experiment)
             scheduler.save_results(current_experiment)
             share_to_slack(current_experiment)
 
-        # Save the current wellplate
-        # if toolkit.wellplate:
-        #     toolkit.wellplate.save_wells_to_db()  # load a "new" wellplate to save and update wells
-        # close out of serial connections
         toolkit.mill.rest_electrode()
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
@@ -706,7 +688,7 @@ def connect_to_instruments(
         logger.info("Using mock instruments")
         instruments.mill = MockMill()
         instruments.mill.connect_to_mill()
-        instruments.scale = MockScale()
+        # instruments.scale = MockScale()
         instruments.pump = MockPump()
         # pstat = echem_mock.GamryPotentiostat.connect()
         return instruments, True
@@ -798,7 +780,7 @@ def test_instrument_connections(
         logger.info("Using mock instruments")
         instruments.mill = MockMill()
         instruments.mill.connect_to_mill()
-        instruments.scale = MockScale()
+        # instruments.scale = MockScale()
         instruments.pump = MockPump()
         instruments.arduino = MockArduinoLink()
         # pstat = echem_mock.GamryPotentiostat.connect()
@@ -869,13 +851,13 @@ def test_instrument_connections(
     # Connect to PSTAT
     try:
         logger.debug("Connecting to Potentiostat")
-        connected = gamry_control_WIP.pstatconnect()
+        connected = gamry_control.pstatconnect()
         if not connected:
             logger.error("No Potentiostat connected")
             incomplete = True
         else:
             logger.debug("Connected to Potentiostat")
-            gamry_control_WIP.pstatdisconnect()
+            gamry_control.pstatdisconnect()
     except Exception as error:
         logger.error("Error connecting to Potentiostat, %s", error)
         incomplete = True
@@ -884,7 +866,7 @@ def test_instrument_connections(
     try:
         logger.debug("Connecting to Arduino")
         with ArduinoLink() as arduino:
-            if arduino.send(PawduinoFunctions.HELLO) != PawduinoReturnCodes.HELLO:
+            if not arduino.configuered:
                 logger.error("No Arduino connected")
                 incomplete = True
                 instruments.arduino = None
@@ -924,7 +906,7 @@ def share_to_slack(experiment: ExperimentBase):
         return
     try:
         exp_id = experiment.experiment_id
-        
+
         # images_with_dz = [
         #     image
         #     for image in experiment.results.image

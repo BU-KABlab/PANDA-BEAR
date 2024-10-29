@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
-from panda_lib.mill_control import Mill, MockMill
+from panda_lib.movement import Mill, MockMill
 from panda_lib.syringepump import MockPump, SyringePump
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
