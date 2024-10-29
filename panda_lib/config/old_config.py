@@ -54,20 +54,6 @@ if not TESTING_MODE_ACTIVE:
         config.read(configuration_path)
         TESTING_MODE_ACTIVE = True
 
-
-## FLIR Camera related - must be a python 3.6 environment
-try:
-    PYTHON_360_PATH = config.get("GENERAL", "python_360_path")
-
-    if PYTHON_360_PATH in [None, "",'None']:
-        raise KeyError
-
-    PYTHON_360_PATH = Path(PYTHON_360_PATH)
-except KeyError as e:
-    raise ValueError("PANDA_SDL_PYTHON_360_PATH environment variable not set.") from e
-
-CAMERA_SCRIPT_PATH = Path(LOCAL_REPO_PATH / "panda_lib" / "flir_camera" / "camera.py")
-
 ## Build complete paths for each project directory or file
 if TESTING_MODE_ACTIVE:
     # Directories

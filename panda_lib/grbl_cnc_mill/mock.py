@@ -9,9 +9,7 @@ from unittest import mock
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
-from panda_lib.config.config import (
-    PATH_TO_LOGS,
-)
+from panda_lib.config import read_logging_dir
 from .instruments import Instruments
 from .exceptions import (
     CommandExecutionError,
@@ -20,7 +18,7 @@ from .exceptions import (
 from .logger import set_up_mill_logger
 from .driver import Mill as RealMill
 
-logger = set_up_mill_logger(PATH_TO_LOGS)
+logger = set_up_mill_logger(read_logging_dir())
 
 
 class MockMill(RealMill):

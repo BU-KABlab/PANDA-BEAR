@@ -11,7 +11,11 @@ from pathlib import Path
 from typing import Sequence
 
 from panda_lib.actions import capture_new_image
-from panda_lib.mill_control import (
+
+from panda_lib.vials import StockVial, WasteVial, read_vials
+from panda_lib.wellplate import Well, Wellplate
+
+from . import (
     CommandExecutionError,
     Instruments,
     LocationNotFound,
@@ -23,8 +27,6 @@ from panda_lib.mill_control import (
     StatusReturnError,
     logger,
 )
-from panda_lib.vials import StockVial, WasteVial, read_vials
-from panda_lib.wellplate import Well, Wellplate
 
 config = ConfigParser()
 config.read("config/panda_sdl_config.ini")

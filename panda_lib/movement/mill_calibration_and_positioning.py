@@ -14,22 +14,22 @@ The module relies on other modules such as:
     - `config`
 """
 
+import logging
 # pylint: disable=unused-argument
-import json
 import os
 import platform
 from configparser import ConfigParser
-from typing import Sequence, Union
+from typing import Sequence
 
-from panda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_result
+from panda_lib.experiment_class import (ExperimentResultsRecord,
+                                        insert_experiment_result)
+from panda_lib.imaging import capture_new_image, image_filepath_generator
+from panda_lib.log_tools import setup_default_logger
+from panda_lib.utilities import Instruments, input_validation
+from panda_lib.vials import StockVial, WasteVial
+from panda_lib.wellplate import Well, WellCoordinates, Wellplate
 
-from .actions import capture_new_image, image_filepath_generator
 from .mill_control import Mill, MockMill
-from .utilities import Instruments, input_validation
-from .vials import StockVial, WasteVial
-from .wellplate import Well, WellCoordinates, Wellplate
-from .log_tools import setup_default_logger
-import logging
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 
@@ -124,7 +124,7 @@ def update_grbl_settings(mill: Mill, *args, **kwargs):
                 mill.save_config()
                 break
             else:
-                mill.fetch_config()  # Reset the settings to the last saved settings
+                mill.fetch_saved_config()  # Reset the settings to the last saved settings
                 print("Settings have not been applied")
                 try_again = input("Would you like to try again? (y/n): ")
                 if try_again.lower() in ["n", "no"]:
@@ -135,18 +135,18 @@ def update_grbl_settings(mill: Mill, *args, **kwargs):
 
 def update_instrument_offsets(mill: Mill, *args, **kwargs):
     """
-    Fetch the instrument offsets from the mill and compare to the settings file.
-    If there are differences, ask the user if they would like to change the settings.
+    Fetch the instrument offsets from the mill instance, and ask the user if they
+    would like to change the settings.
     If so, ask for the instrument to change and the new value.
-    Update the settings file and send the new setting to the mill.
+    Update the settings file and send the new setting to the mill instance.
     Confirm the setting has been applied and save the settings file.
     Repeat until the user is satisfied.
     """
     # Review the instrument offset settings
-    instrument_offsets = mill.config["instrument_offsets"]
+    instrument_offsets:dict = mill.config["instrument_offsets"]
     print("\nCurrent instrument offsets:")
-    for instrument in instrument_offsets:
-        print(f"{instrument}: {instrument_offsets[instrument]}")
+    for instrument, offset in instrument_offsets:
+        print(f"{instrument}: {offset}")
 
     # Ask if user wants to change instrument offsets
     change_instrument_offsets = input(
@@ -154,9 +154,12 @@ def update_instrument_offsets(mill: Mill, *args, **kwargs):
     )
     if change_instrument_offsets.lower() in ["y", "yes", ""]:
         while True:
-            instrument_to_change = input(
-                "Enter the instrument you would like to change: "
+            instrument_to_change = input_validation(
+                "Enter the instrument you would like to change: ",
+                str,
+                menu_items=list(instrument_offsets.keys()),
             )
+
             if instrument_to_change not in instrument_offsets:
                 print("Instrument not found")
                 continue
@@ -174,7 +177,7 @@ def update_instrument_offsets(mill: Mill, *args, **kwargs):
                         except ValueError:
                             print("Invalid input, please try again")
                             continue
-                    else:
+                    else: # If the user enters nothing, keep the current value
                         new_coordinates[coordinate] = instrument_offsets[
                             instrument_to_change
                         ][coordinate]
@@ -186,7 +189,7 @@ def update_instrument_offsets(mill: Mill, *args, **kwargs):
             mill.config["instrument_offsets"] = instrument_offsets
             mill.save_config()
 
-            mill.fetch_config()  # Update the mill with the new settings
+            mill.fetch_saved_config()  # Update the mill with the new settings
             # Check that the changed instrument offsets match the new settings
             # If they do not, ask the user if they would like to try again
             response = mill.config["instrument_offsets"][instrument_to_change]

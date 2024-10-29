@@ -73,6 +73,30 @@ def file_enumeration(file_path:Path) -> Path:
         i+=1
     return file_path
 
+def image_filepath_generator(
+    exp_id: int = "test",
+    project_id: int = "test",
+    project_campaign_id: int = "test",
+    well_id: str = "test",
+    step_description: str = None,
+    data_path: Path = Path("images"),
+) -> Path:
+    """
+    Generate the file path for the image
+    """
+    # create file name
+    if step_description is not None:
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
+    else:
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
+    file_name = file_name.replace(" ", "_")  # clean up the file name
+    file_name_start = file_name + "_0"  # enumerate the file name
+    filepath = Path(data_path / str(file_name_start)).with_suffix(".tiff")
+    i = 1
+    while filepath.exists():
+        filepath = file_enumeration(filepath)
+    return filepath
+
 def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.tiff")) -> Path:
     """Capture a new image from the FLIR camera"""
     # Check the file name and ennumerate if it already exists

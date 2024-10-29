@@ -7,8 +7,6 @@ import time
 from decimal import Decimal
 from typing import Tuple
 import threading
-import os
-import sys
 
 import comtypes
 import numpy as np
@@ -18,6 +16,7 @@ from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
 from panda_lib.config.config_tools import read_config
+from gamry_potentiostat.timer import countdown_timer
 
 config = read_config()
 if config.getboolean("OPTIONS", "testing"):
@@ -91,89 +90,10 @@ class potentiostat_ocp_parameters:
     OCPrate: float = 0.5
 
 
-def countdown_timer(samplerate, cycle):
-    """Countdown timer for the data acquisition"""
-    try:
-        estimated_time = abs(samplerate * cycle)
-        logger.debug("Estimated time for data acquisition: %d seconds", estimated_time)
-        while estimated_time > 0:
-            time.sleep(1)
-            estimated_time -= 1
-            minutes, seconds = divmod(estimated_time, 60)
-            sys.stdout.write("\r")
-            sys.stdout.write(
-                f"Time remaining: {int(minutes)} minutes {round(seconds,2)} seconds"
-            )
-            sys.stdout.flush()
-        sys.stdout.write("\n")
-        logger.debug("Countdown timer complete")
-    except KeyboardInterrupt:
-        logger.info("Countdown timer interrupted.")
-    except Exception as e:
-        logger.error("Error occurred during countdown timer: %s", e)
-    finally:
-        sys.stdout.write("\n")
-
-
-def pstatconnect():
-    """connect to the pstat"""
-    global PSTAT
-    global DEVICES
-    global GAMRY_COM
-    global OPEN_CONNECTION
-
-    GAMRY_COM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
-    PSTAT = client.CreateObject("GamryCOM.GamryPC6Pstat")
-    DEVICES = client.CreateObject("GamryCOM.GamryDeviceList")
-    PSTAT.Init(DEVICES.EnumSections()[0])  # grab first pstat
-    PSTAT.Open()  # open connection to pstat
-
-    if DEVICES.EnumSections():
-        logger.debug("\tPstat connected: %s", DEVICES.EnumSections()[0])
-        OPEN_CONNECTION = True
-    else:
-        logger.debug("\tPstat not connected")
-        OPEN_CONNECTION = False
-    return OPEN_CONNECTION
-
-
 class GamryCOMError(Exception):
     """Exception raised when a COM error occurs."""
 
     pass
-
-
-def gamry_error_decoder(err):
-    """Decode a COM error from GamryCOM into a more useful exception."""
-    if isinstance(err, comtypes.COMError):
-        hresult = 2**32 + err.args[0]
-        if hresult & 0x20000000:
-            return GamryCOMError(f"0x{hresult:08x}: {err.args[1]}")
-    return err
-
-
-def initializepstat():
-    """initialize the pstat"""
-    PSTAT.SetCtrlMode(GAMRY_COM.PstatMode)
-    PSTAT.SetCell(GAMRY_COM.CellOff)
-    PSTAT.SetIEStability(GAMRY_COM.StabilityNorm)
-    PSTAT.SetVchRangeMode(True)
-    PSTAT.SetVchRange(10.0)  # Expected Max Voltage
-    PSTAT.SetIERangeMode(True)  # True = Auto, False = Manual
-    # the following command allows us to set our range manually
-    # pstat.SetIERange (x)
-
-
-def stopacq():
-    """stop the acquisition"""
-    global ACTIVE
-    global PSTAT
-    global GAMRY_COM
-    ACTIVE = False
-    PSTAT.SetCell(GAMRY_COM.CellOff)
-    time.sleep(1)
-    gc.collect()
-    return
 
 
 class GamryDtaqEvents(object):
@@ -214,6 +134,63 @@ class GamryDtaqEvents(object):
         time.sleep(2.0)
         self.call_stopacq()
         self.call_savedata(self.complete_file_name)
+
+
+def pstatconnect():
+    """connect to the pstat"""
+    global PSTAT
+    global DEVICES
+    global GAMRY_COM
+    global OPEN_CONNECTION
+
+    GAMRY_COM = client.GetModule(["{BD962F0D-A990-4823-9CF5-284D1CDD9C6D}", 1, 0])
+    PSTAT = client.CreateObject("GamryCOM.GamryPC6Pstat")
+    DEVICES = client.CreateObject("GamryCOM.GamryDeviceList")
+    PSTAT.Init(DEVICES.EnumSections()[0])  # grab first pstat
+    PSTAT.Open()  # open connection to pstat
+
+    if DEVICES.EnumSections():
+        logger.debug("\tPstat connected: %s", DEVICES.EnumSections()[0])
+        OPEN_CONNECTION = True
+    else:
+        logger.debug("\tPstat not connected")
+        OPEN_CONNECTION = False
+    return OPEN_CONNECTION
+
+
+def gamry_error_decoder(err):
+    """Decode a COM error from GamryCOM into a more useful exception."""
+    if isinstance(err, comtypes.COMError):
+        hresult = 2**32 + err.args[0]
+        if hresult & 0x20000000:
+            return GamryCOMError(f"0x{hresult:08x}: {err.args[1]}")
+    return err
+
+
+def initializepstat():
+    """initialize the pstat"""
+    PSTAT.SetCtrlMode(GAMRY_COM.PstatMode)
+    PSTAT.SetCell(GAMRY_COM.CellOff)
+    PSTAT.SetIEStability(GAMRY_COM.StabilityNorm)
+    PSTAT.SetVchRangeMode(True)
+    PSTAT.SetVchRange(10.0)  # Expected Max Voltage
+    PSTAT.SetIERangeMode(True)  # True = Auto, False = Manual
+    # the following command allows us to set our range manually
+    # pstat.SetIERange (x)
+
+
+def stopacq():
+    """stop the acquisition"""
+    global ACTIVE
+    global PSTAT
+    global GAMRY_COM
+    ACTIVE = False
+    PSTAT.SetCell(GAMRY_COM.CellOff)
+    time.sleep(1)
+    gc.collect()
+    return
+
+
 
 
 def pstatdisconnect():
@@ -289,7 +266,7 @@ def cyclic(params: cv_parameters):
     global ACTIVE
     # global complete_file_name
 
-    logger.debug("cyclic: made it to run")
+    logger.debug("cyclic: made it to run start")
     ACTIVE = True
 
     # signal and dtaq object creation
@@ -342,6 +319,17 @@ def cyclic(params: cv_parameters):
 
 
 def chrono(params: chrono_parameters):
+    """chronoamperometry
+    
+    :param CAvi: initial voltage
+    :param CAti: time interval
+    :param CAv1: voltage 1
+    :param CAt1: time 1
+    :param CAv2: voltage 2
+    :param CAt2: time 2
+    :param CAsamplerate: sample rate
+    
+    """
     global DTAQ
     global SIGNAL
     global DTAQ_SINK
@@ -396,6 +384,14 @@ def chrono(params: chrono_parameters):
 
 
 def OCP(OCPvi, OCPti, OCPrate):
+    """
+    open circuit potential
+
+    :param OCPvi: initial voltage
+    :param OCPti: time interval
+    :param OCPrate: rate of change
+    
+    """
     global DTAQ
     global SIGNAL
     global DTAQ_SINK
@@ -429,12 +425,14 @@ def OCP(OCPvi, OCPti, OCPrate):
 
 
 def activecheck():
+    """check if an experiment is active"""
     while ACTIVE is True:
         client.PumpEvents(1)
         time.sleep(0.5)
 
 
 def check_vf_range(filename) -> Tuple[bool, float]:
+    """Check if the Vf value is in the valid range for an echem experiment."""
     try:
         ocp_data = pd.read_csv(
             filename,
@@ -456,36 +454,6 @@ def check_vf_range(filename) -> Tuple[bool, float]:
     except Exception as error:
         logger.error("Error occurred while checking Vf: %s", error)
         return False, 0.0
-
-
-def mock_CA(MCAvi, MCAti, MCArate):
-    global DTAQ
-    global SIGNAL
-    global DTAQ_SINK
-    global CONNECTION
-    global GAMRY_COM
-    global ACTIVE
-    ACTIVE = True
-
-    logger.debug("mock ca: made it to run")
-
-    # signal and dtaq object creation
-    SIGNAL = client.CreateObject("GamryCOM.GamrySignalConst")
-    DTAQ = client.CreateObject("GamryCOM.GamryDtaqOcv")
-
-    DTAQ_SINK = GamryDtaqEvents(DTAQ, COMPLETE_FILE_NAME)
-    CONNECTION = client.GetEvents(DTAQ, DTAQ_SINK)
-
-    SIGNAL.Init(PSTAT, MCAvi, MCAti, MCArate, GAMRY_COM.PstatMode)
-    initializepstat()
-
-    DTAQ.Init(PSTAT)
-    PSTAT.SetSignal(SIGNAL)
-    PSTAT.SetCell(GAMRY_COM.CellOff)
-
-    DTAQ.Run(True)
-    # start_time = time.time()
-    logger.debug("mock ca: made it to run end")
 
 
 if __name__ == "__main__":
