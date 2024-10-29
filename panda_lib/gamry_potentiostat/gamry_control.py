@@ -16,7 +16,7 @@ from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
 from panda_lib.config.config_tools import read_config
-from gamry_potentiostat.timer import countdown_timer
+from .timer import countdown_timer
 
 config = read_config()
 if config.getboolean("OPTIONS", "testing"):

@@ -5,7 +5,6 @@ For testing the movement and functionality of the mill.
 """
 
 import logging
-from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence
@@ -14,22 +13,22 @@ from panda_lib.actions import capture_new_image
 
 from panda_lib.vials import StockVial, WasteVial, read_vials
 from panda_lib.wellplate import Well, Wellplate
+from panda_lib.config.config_tools import read_config
 
-from . import (
-    CommandExecutionError,
+from .mill_control import (
     Instruments,
-    LocationNotFound,
     Mill,
     MillConfigError,
     MillConfigNotFound,
     MillConnectionError,
-    MockMill,
+    CommandExecutionError,
     StatusReturnError,
-    logger,
+    LocationNotFound,
+    MockMill,
+    mill_control_logger as logger,
 )
 
-config = ConfigParser()
-config.read("config/panda_sdl_config.ini")
+config = read_config()
 if config.getboolean("OPTIONS", "testing"):
     PATH_TO_DATA = config.get("TESTING", "data_dir")
     PATH_TO_LOGS = config.get("TESTING", "logging_dir")

@@ -69,6 +69,7 @@ when it starts in an interactive mode:
 
     """
     )
+    input("\nPress Enter to continue...")
 
 
 def show_conditions():
@@ -275,4 +276,4 @@ of preserving the free status of all derivatives of our free software and
 of promoting the sharing and reuse of software generally.
     """
     )
-
+    input("\nPress Enter to continue...")

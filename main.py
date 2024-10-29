@@ -378,7 +378,7 @@ experiment_choices = ["0", "1"]
 blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 
 def main_menu(reduced:bool = False) -> Tuple[callable, str]:
-
+    """Main menu for PANDA_SDL."""
     menu_options = {
         "0": run_panda_sdl_with_ml,
         "1": run_panda_sdl_without_ml,
@@ -426,9 +426,8 @@ def main_menu(reduced:bool = False) -> Tuple[callable, str]:
         user_choice = input("Enter the number of your choice: ").strip().lower()
         if user_choice in menu_options:
             return menu_options[user_choice], user_choice
-        else:
-            input("Invalid choice. Please try again.")
-            continue
+        input("Invalid choice. Please try again.")
+        continue
 
 if __name__ == "__main__":
     config = read_config()
@@ -474,9 +473,9 @@ if __name__ == "__main__":
         # If user chooses to exit, exit the program
         break
     
-    testing_state = "testing" if read_testing_config() else "production"
+    TESTING_STATE = "testing" if read_testing_config() else "production"
     slackbot_process = subprocess.Popen(
-        [sys.executable, "slack_bot.py", "--testing" if testing_state == "testing" else "--production"],
+        [sys.executable, "slack_bot.py", "--testing" if TESTING_STATE == "testing" else "--production"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
@@ -506,11 +505,11 @@ The current pipette id is {current_pipette} and has {int(round((2000-uses)/2,0))
 The queue has {sql_queue.count_queue_length()} experiments.
 """
         )
-        user_choice, choice_key = main_menu()
+        function_name, choice_key = main_menu()
         # experiment_process:multiprocessing.Process = None
         try:
             if choice_key in experiment_choices:
-                user_choice()
+                function_name()
                 # exp_process = multiprocessing.Process(target=user_choice)
                 # exp_process.start()
                 # exp_process.join()
@@ -519,7 +518,7 @@ The queue has {sql_queue.count_queue_length()} experiments.
                 #menu_thread.start()
                 #menu_thread.join()  # Wait for the menu thread to finish
                 continue
-            user_choice()
+            function_name()
         except controller.ShutDownCommand:
             # if experiment_process:
             #     experiment_process.terminate()
@@ -546,7 +545,7 @@ The queue has {sql_queue.count_queue_length()} experiments.
             if contiue_choice == "n":
                 continue
             if contiue_choice == "y":
-                user_choice()
+                function_name()
 
         except Exception as e:
             print(f"An error occurred: {e}")

@@ -9,7 +9,7 @@ from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 import panda_lib.wellplate as wp
 import PySpin
-from pawduino import ArduinoLink
+from panda_lib.pawduino import ArduinoLink
 
 @dataclass
 class Toolkit:
