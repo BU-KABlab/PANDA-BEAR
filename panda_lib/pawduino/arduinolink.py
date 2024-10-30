@@ -178,11 +178,11 @@ class ArduinoLink:
 
     def curvature_lights_on(self):
         """Turn on the rb lights"""
-        return self.send(PawduinoFunctions.RB_LIGHTS_ON.value)
+        return self.send(PawduinoFunctions.CURVATURE_LIGHTS_ON.value)
 
     def curvature_lights_off(self):
         """Turn off the rb lights"""
-        return self.send(PawduinoFunctions.RB_LIGHTS_OFF.value)
+        return self.send(PawduinoFunctions.CURVATURE_LIGHTS_OFF.value)
 
     def decapper_engage(self):
         """Engage the decapper"""
@@ -278,8 +278,8 @@ class PawduinoFunctions(enum.Enum):
 
     WHITE_LIGHTS_ON = 1
     WHITE_LIGHTS_OFF = 2
-    RB_LIGHTS_ON = 3
-    RB_LIGHTS_OFF = 4
+    CURVATURE_LIGHTS_ON = 3
+    CURVATURE_LIGHTS_OFF = 4
     DECAPPPER_ON = 5
     DECAPPPER_OFF = 6
     HELLO = 99
@@ -302,8 +302,8 @@ class PawduinoReturnCodes(enum.Enum):
     HELLO = 999
     WHITE_LIGHTS_ON = 101
     WHITE_LIGHTS_OFF = 102
-    RB_LIGHTS_ON = 103
-    RB_LIGHTS_OFF = 104
+    CURVATURE_LIGHTS_ON = 103
+    CURVATURE_LIGHTS_OFF = 104
     DECAPPPER_ON = 105
     DECAPPPER_OFF = 106
 
