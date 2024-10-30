@@ -18,8 +18,8 @@
 #define wo 1
 #define wf 2
 /*red leds*/
-#define ro 3
-#define rf 4
+#define co 3
+#define cf 4
 /*electromagnet*/
 #define eo 5
 #define ef 6
@@ -74,15 +74,16 @@ void loop()
       ring.show();
       Serial.println("102");
       break;
-    case ro:
-      digitalWrite(LEDR_1_PIN, HIGH);
+    case co:
+      digitalWrite(LEDR_1_PIN, HIGH); // turn on red LED
       digitalWrite(LEDR_2_PIN, HIGH);
-      ring.setPixelColor(0, ring.Color(0, 0, 255));
+      ringFill(ring.Color(255, 255, 255)); // White
+      ring.setPixelColor(0, ring.Color(0, 0, 255)); // Blue
       ring.setPixelColor(8, ring.Color(0, 0, 255));
       ring.show();
       Serial.println("103");
       break;
-    case rf:
+    case cf:
       digitalWrite(LEDR_1_PIN, LOW);
       digitalWrite(LEDR_2_PIN, LOW);
       ring.clear();
