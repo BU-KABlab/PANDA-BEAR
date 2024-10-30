@@ -3,13 +3,15 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Union
 
+import PySpin
+
+import panda_lib.wellplate as wp
 from panda_lib.movement import Mill, MockMill
+from panda_lib.pawduino import ArduinoLink
 from panda_lib.syringepump import MockPump, SyringePump
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
-import panda_lib.wellplate as wp
-import PySpin
-from panda_lib.pawduino import ArduinoLink
+
 
 @dataclass
 class Toolkit:

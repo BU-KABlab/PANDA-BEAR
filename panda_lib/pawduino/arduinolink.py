@@ -1,14 +1,15 @@
 """
 This module provides a class to link the computer and the Arduino
 """
+
 import enum
 import os
 import queue
 import time
-import threading
 import serial
 import serial.tools.list_ports
 from serial import Serial
+
 
 class ArduinoLink:
     """
@@ -32,12 +33,12 @@ class ArduinoLink:
 
     def __init__(self, port_address: str = "COM3", baud_rate: int = 115200):
         """Initialize the ArduinoLink class"""
-        self.ser:Serial = None
-        self.port_address:str = port_address
-        self.baud_rate:int = baud_rate
-        self.timeout:int = 1
+        self.ser: Serial = None
+        self.port_address: str = port_address
+        self.baud_rate: int = baud_rate
+        self.timeout: int = 1
         self.configured: bool = False
-        self.ack: str = 'OK'
+        self.ack: str = "OK"
         self.configure()
 
     def __enter__(self):
@@ -117,18 +118,18 @@ class ArduinoLink:
             return rxd
         else:
             return None
-        
+
     def trecieve(self):
         """Threaded version of receive using the queue.
         To be started elsewere.
         """
-        rx = b''
+        rx = b""
         while True:
             rx = self.ser.readline()
-            if rx and rx != b'' and rx != b'\n':
+            if rx and rx != b"" and rx != b"\n":
                 rxd = rx.decode().strip()
                 self.arduinoQueue.put(rxd)
-                rx = b''
+                rx = b""
             time.sleep(0.1)
 
     def tsend(self, cmd):
@@ -167,6 +168,40 @@ class ArduinoLink:
         except (ValueError, TypeError):
             return rx
 
+    def white_lights_on(self):
+        """Turn on the white lights"""
+        return self.send(PawduinoFunctions.WHITE_LIGHTS_ON.value)
+
+    def white_lights_off(self):
+        """Turn off the white lights"""
+        return self.send(PawduinoFunctions.WHITE_LIGHTS_OFF.value)
+
+    def curvature_lights_on(self):
+        """Turn on the rb lights"""
+        return self.send(PawduinoFunctions.RB_LIGHTS_ON.value)
+
+    def curvature_lights_off(self):
+        """Turn off the rb lights"""
+        return self.send(PawduinoFunctions.RB_LIGHTS_OFF.value)
+
+    def decapper_engage(self):
+        """Engage the decapper"""
+        return self.send(PawduinoFunctions.DECAPPPER_ON.value)
+
+    def decapper_disengage(self):
+        """Disengage the decapper"""
+        return self.send(PawduinoFunctions.DECAPPPER_OFF.value)
+
+    def hello(self):
+        """Send a hello message to the Arduino"""
+        return self.send(PawduinoFunctions.HELLO.value)
+    
+    def lights_off(self):
+        """Turn off all lights"""
+        self.white_lights_off()
+        self.curvature_lights_off()
+
+
 class MockArduinoLink:
     """
     This class provides a mock link between the computer and the Arduino
@@ -183,7 +218,7 @@ class MockArduinoLink:
     def __init__(self):
         """Initialize the MockArduinoLink class"""
         self.configured: bool = False
-        self.ack: str = 'OK'
+        self.ack: str = "OK"
 
     def __enter__(self):
         """For use in a with statement"""
@@ -224,6 +259,7 @@ class MockArduinoLink:
         To be started elsewere.
         """
         return self.send(cmd)
+
 
 class PawduinoFunctions(enum.Enum):
     """

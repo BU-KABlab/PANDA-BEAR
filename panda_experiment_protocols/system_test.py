@@ -16,6 +16,7 @@ from panda_lib.actions import (
     CAFailure,
     CVFailure,
     DepositionFailure,
+    Instruments
 )
 from panda_lib.actions_pedot import (
     chrono_amp_edot_bleaching,
@@ -25,7 +26,6 @@ from panda_lib.actions_pedot import (
 from panda_lib.experiment_class import PEDOTExperiment, ExperimentStatus
 from panda_lib.vials import StockVial, WasteVial
 from panda_lib.correction_factors import correction_factor
-from panda_lib.mill_control import Instruments
 from panda_lib.utilities import solve_vials_ilp
 
 
@@ -215,8 +215,7 @@ def pedotdeposition(
             volume=corrected_volume,
             from_vessel=vial,
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
 
@@ -270,16 +269,14 @@ def pedotdeposition(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="rinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
+        toolkit=toolkit
     )
 
     toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
@@ -294,8 +291,7 @@ def pedotdeposition(
                 correction_factor(120),
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=toolkit.pump.max_pump_rate,
         )
         toolkit.mill.safe_move(
@@ -312,8 +308,7 @@ def pedotdeposition(
                 "waste",
                 correction_factor(120),
             ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
         )
 
     toolkit.global_logger.info("8. Take after image")
@@ -369,8 +364,7 @@ def pedotbleaching(
             correction_factor(120),  # hard code this
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
         pumping_rate=instructions.pumping_rate,
     )
 
@@ -420,16 +414,14 @@ def pedotbleaching(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="rinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("7. Take after image")
@@ -486,8 +478,7 @@ def pedotcoloring(
             correction_factor(120),
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
         pumping_rate=instructions.pumping_rate,
     )
 
@@ -539,16 +530,14 @@ def pedotcoloring(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="rinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
+        toolkit=toolkit,
         flush_count=3,
     )
 
@@ -607,8 +596,7 @@ def pedotcv(
             instructions.solutions_corrected["liclo4"],
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
         pumping_rate=instructions.pumping_rate,
     )
 
@@ -655,16 +643,14 @@ def pedotcv(
             "waste",
             toolkit.wellplate.wells[instructions.well_id].volume,
         ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="rinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
+        toolkit=toolkit,
         flush_count=3,
     )
 
@@ -687,8 +673,7 @@ def pedotcv(
                 correction_factor(120),
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=toolkit.pump.max_pump_rate,
         )
         # Clear the well
@@ -699,8 +684,7 @@ def pedotcv(
                 "waste",
                 correction_factor(120),
             ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
         )
 
     toolkit.global_logger.info("9. Take end image")

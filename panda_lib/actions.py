@@ -32,7 +32,11 @@ from PIL import Image
 
 # Local application imports
 from panda_lib.imaging import capture_new_image, add_data_zone, image_filepath_generator
-from panda_lib.config.config_tools import read_testing_config, read_config, ConfigParserError
+from panda_lib.config.config_tools import (
+    read_testing_config,
+    read_config,
+    ConfigParserError,
+)
 from panda_lib.correction_factors import correction_factor
 from panda_lib.errors import (
     CAFailure,
@@ -58,7 +62,9 @@ from panda_lib.wellplate import Well
 TESTING = read_testing_config()
 
 if TESTING:
-    from panda_lib.gamry_potentiostat.gamry_control_mock import GamryPotentiostat as echem
+    from panda_lib.gamry_potentiostat.gamry_control_mock import (
+        GamryPotentiostat as echem,
+    )
     from panda_lib.gamry_potentiostat.gamry_control_mock import (
         chrono_parameters,
         cv_parameters,
@@ -73,8 +79,8 @@ else:
     )
 
 config = read_config()
-# Constants
 
+# Constants
 try:
     AIR_GAP = config.getfloat("DEFAULTS", "air_gap")
     DRIP_STOP = config.getfloat("DEFAULTS", "drip_stop_volume")
@@ -98,9 +104,8 @@ def forward_pipette_v2(
     volume: float,
     from_vessel: Union[Well, StockVial, WasteVial],
     to_vessel: Union[Well, WasteVial],
-    pump: Union[SyringePump, MockPump],
-    mill: Union[Mill, MockMill],
-    pumping_rate: Optional[float] = None,
+    toolkit: Toolkit,
+    pumping_rate: float = None,
 ):
     """
     Pipette a volume from one vessel to another
@@ -165,41 +170,111 @@ def forward_pipette_v2(
 
     # Calculate the number of repetitions
 
-    repetitions = math.ceil(volume / (pump.pipette.capacity_ul - DRIP_STOP))
+    repetitions = math.ceil(volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP))
     repetition_vol = volume / repetitions
 
     for j in range(repetitions):
         logger.info("Repetition %d of %d", j + 1, repetitions)
 
+        # Decap the source vial
+        if isinstance(from_vessel, StockVial):
+            toolkit.mill.safe_move(
+                from_vessel.coordinates.x,
+                from_vessel.coordinates.y,
+                from_vessel.coordinates.z_top,
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.decapper_engage()
+
         # Withdraw solution
-        pump.withdraw(volume_to_withdraw=AIR_GAP)
-        mill.safe_move(from_vessel.coordinates["x"], from_vessel.coordinates["y"], from_vessel.coordinates.z_bottom, Instruments.PIPETTE)
-        pump.withdraw(volume_to_withdraw=repetition_vol, solution=from_vessel, rate=pumping_rate)
+        toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
+        toolkit.mill.safe_move(
+            from_vessel.coordinates["x"],
+            from_vessel.coordinates["y"],
+            from_vessel.coordinates.z_bottom,
+            Instruments.PIPETTE,
+        )
+        toolkit.pump.withdraw(
+            volume_to_withdraw=repetition_vol, solution=from_vessel, rate=pumping_rate
+        )
         if isinstance(from_vessel, Well):
-            pump.withdraw(volume_to_withdraw=20)
-        mill.move_to_safe_position()
-        pump.withdraw(volume_to_withdraw=DRIP_STOP)
+            # Withdraw extra to try and remove of all solution
+            toolkit.pump.withdraw(volume_to_withdraw=20)
+        toolkit.mill.move_to_safe_position()
+        toolkit.pump.withdraw(volume_to_withdraw=DRIP_STOP)
+
+        # Cap the source vial
+        if isinstance(from_vessel, StockVial):
+            toolkit.mill.safe_move(
+                from_vessel.coordinates.x,
+                from_vessel.coordinates.y,
+                from_vessel.coordinates.z_top,
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.decapper_disengage()
 
         # Deposit solution
-        mill.safe_move(to_vessel.coordinates.x, to_vessel.coordinates.y, to_vessel.coordinates.z_top, Instruments.PIPETTE)
-        pump.infuse(
+
+        # If the to_vessel is a waste_vial decap the vial
+        if isinstance(to_vessel, WasteVial):
+            toolkit.mill.safe_move(
+                to_vessel.coordinates.x,
+                to_vessel.coordinates.y,
+                to_vessel.coordinates.z_top,
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.decapper_engage()
+
+        toolkit.mill.safe_move(
+            to_vessel.coordinates.x,
+            to_vessel.coordinates.y,
+            to_vessel.coordinates.z_top,
+            Instruments.PIPETTE,
+        )
+        toolkit.pump.infuse(
             volume_to_infuse=repetition_vol,
             being_infused=from_vessel,
             infused_into=to_vessel,
-            blowout_ul=(AIR_GAP + DRIP_STOP + 20 if isinstance(from_vessel, Well) else AIR_GAP + DRIP_STOP),
+            blowout_ul=(
+                AIR_GAP + DRIP_STOP + 20
+                if isinstance(from_vessel, Well)
+                else AIR_GAP + DRIP_STOP
+            ),
         )
 
         # Purge residual solution
-        for _, vol in pump.pipette.contents.items():
+        for _, vol in toolkit.pump.pipette.contents.items():
             if vol > 0.0:
                 logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
-                pump.infuse(volume_to_infuse=vol, being_infused=None, infused_into=to_vessel, blowout_ul=vol)
+                toolkit.pump.infuse(
+                    volume_to_infuse=vol,
+                    being_infused=None,
+                    infused_into=to_vessel,
+                    blowout_ul=vol,
+                )
 
-        if pump.pipette.volume > 0.0:
-            logger.warning("Pipette has residual volume of %f ul. Purging...", pump.pipette.volume)
-            pump.infuse(volume_to_infuse=pump.pipette.volume, being_infused=None, infused_into=to_vessel, blowout_ul=pump.pipette.volume)
-            pump.pipette.volume = 0.0
+        if toolkit.pump.pipette.volume > 0.0:
+            logger.warning(
+                "Pipette has residual volume of %f ul. Purging...",
+                toolkit.pump.pipette.volume,
+            )
+            toolkit.pump.infuse(
+                volume_to_infuse=toolkit.pump.pipette.volume,
+                being_infused=None,
+                infused_into=to_vessel,
+                blowout_ul=toolkit.pump.pipette.volume,
+            )
+            toolkit.pump.pipette.volume = 0.0
 
+        # Cap the destination vial
+        if isinstance(to_vessel, WasteVial):
+            toolkit.mill.safe_move(
+                to_vessel.coordinates.x,
+                to_vessel.coordinates.y,
+                to_vessel.coordinates.z_top,
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.decapper_disengage()
 
 @timing_wrapper
 def rinse_v2(
@@ -232,8 +307,7 @@ def rinse_v2(
                 correction_factor(instructions.rinse_vol),
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=toolkit.pump.max_pump_rate,
         )
         toolkit.mill.safe_move(
@@ -250,8 +324,7 @@ def rinse_v2(
                 "waste",
                 correction_factor(instructions.rinse_vol),
             ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
         )
 
     return 0
@@ -260,10 +333,9 @@ def rinse_v2(
 @timing_wrapper
 def flush_v2(
     flush_solution_name: str,
-    mill: Union[Mill, MockMill],
-    pump: Union[SyringePump, MockPump],
+    toolkit: Toolkit,
     flush_volume: float = float(120.0),
-    flush_count:int=1,
+    flush_count: int = 1,
     instructions: Optional[ExperimentBase] = None,
 ):
     """
@@ -297,8 +369,7 @@ def flush_v2(
                 flush_volume,
                 from_vessel=solution_selector(flush_solution_name, flush_volume),
                 to_vessel=waste_selector("waste", flush_volume),
-                pump=pump,
-                mill=mill,
+                toolkit=toolkit,
             )
 
         logger.debug(
@@ -402,6 +473,7 @@ def waste_selector(solution_name: str, volume: float) -> WasteVial:
             return waste_vial
     raise NoAvailableSolution(solution_name)
 
+
 @timing_wrapper
 def chrono_amp(
     ca_instructions: EchemExperimentBase,
@@ -487,9 +559,7 @@ def chrono_amp(
                     CAt2=ca_instructions.ca_step_2_time,
                     CAsamplerate=ca_instructions.ca_sample_period,
                 )  # CA
-            pstat.chrono(
-                chrono_params
-            )
+            pstat.chrono(chrono_params)
             pstat.activecheck()
             ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
         except Exception as e:
@@ -643,9 +713,7 @@ def cyclic_volt(
             )
 
         try:
-            pstat.cyclic(
-                cv_params
-            )
+            pstat.cyclic(cv_params)
             pstat.activecheck()
 
         except Exception as e:
@@ -703,6 +771,7 @@ def image_well(
     toolkit: Toolkit,
     instructions: EchemExperimentBase = None,
     step_description: str = None,
+    curvature_image: bool = False,
 ):
     """
     Image the well with the camera
@@ -724,7 +793,7 @@ def image_well(
         cmpgn_id = instructions.project_campaign_id or "test"
         # create file path
         filepath = image_filepath_generator(
-            exp_id, pjct_id, cmpgn_id, well_id,step_description, PATH_TO_DATA
+            exp_id, pjct_id, cmpgn_id, well_id, step_description, PATH_TO_DATA
         )
 
         # position lens above the well
@@ -742,9 +811,13 @@ def image_well(
         if TESTING:
             Path(filepath).touch()
         else:
+            if curvature_image:
+                toolkit.arduino.curvature_lights_on()
+            else:
+                toolkit.arduino.white_lights_on()
             logger.debug("Capturing image of well %s", instructions.well_id)
             capture_new_image(save=True, num_images=1, file_name=filepath)
-
+            toolkit.arduino.lights_off()
             dz_filename = filepath.stem + "_dz" + filepath.suffix
             dz_filepath = filepath.with_name(dz_filename)
 

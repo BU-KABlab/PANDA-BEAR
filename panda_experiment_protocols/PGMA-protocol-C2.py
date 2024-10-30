@@ -40,11 +40,11 @@ from panda_lib.actions import (
     CAFailure,
     CVFailure,
     DepositionFailure,
+    Instruments
 )
 from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 from panda_lib.experiment_class import PGMAExperiment, ExperimentStatus
 from panda_lib.correction_factors import correction_factor
-from panda_lib.mill_control import Instruments
 
 
 def main(
@@ -139,8 +139,7 @@ def PGMAdeposition(
             instructions.solutions_corrected[solution_name],
         ),
         to_vessel=current_well,
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
         pumping_rate=instructions.pumping_rate,
     )
 
@@ -184,17 +183,14 @@ def PGMAdeposition(
             "waste",
             current_well.volume,
         ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("4b. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="DMF-TBAPrinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
-
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("5. Rinsing the well 4x with rinse")
@@ -209,8 +205,7 @@ def PGMAdeposition(
                 correction_factor(320),
             ),
             to_vessel=current_well,
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
@@ -221,8 +216,7 @@ def PGMAdeposition(
                 "waste",
                 correction_factor(320),
             ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
         )
 
     toolkit.global_logger.info("6. Take after image")
@@ -273,8 +267,7 @@ def FC_prechar(
             instructions.solutions_corrected[solution_name],
         ),
         to_vessel=current_well,
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
         pumping_rate=instructions.pumping_rate,
     )
 
@@ -312,17 +305,14 @@ def FC_prechar(
             "waste",
             current_well.volume,
         ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("4a. Flushing the pipette tip with DMF-TBAPrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="DMF-TBAPrinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
-
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("4b. Rinsing the well 4x with DMF-TBAPrinse")
@@ -335,8 +325,7 @@ def FC_prechar(
                 correction_factor(320),
             ),
             to_vessel=current_well,
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
@@ -347,8 +336,7 @@ def FC_prechar(
                 "waste",
                 correction_factor(320),
             ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
         )
 
     toolkit.global_logger.info("5. Take after image")
@@ -399,8 +387,7 @@ def FC_postchar(
             instructions.solutions_corrected[solution_name],
         ),
         to_vessel=current_well,
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
         pumping_rate=instructions.pumping_rate,
     )
 
@@ -438,17 +425,14 @@ def FC_postchar(
             "waste",
             current_well.volume,
         ),
-        pump=toolkit.pump,
-        mill=toolkit.mill,
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("3a. Flushing the pipette tip with DMFrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="DMFrinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
-
+        toolkit=toolkit,
     )
 
     toolkit.global_logger.info("3b. Rinsing the well 4x with DMFrinse")
@@ -461,8 +445,7 @@ def FC_postchar(
                 correction_factor(320),
             ),
             to_vessel=current_well,
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
@@ -473,17 +456,14 @@ def FC_postchar(
                 "waste",
                 correction_factor(320),
             ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
         )
 
     toolkit.global_logger.info("4a. Flushing the pipette tip with ACNrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v2(
         flush_solution_name="ACNrinse",
-        mill=toolkit.mill,
-        pump=toolkit.pump,
-
+        toolkit=toolkit,
     )
     toolkit.global_logger.info("4b. Rinsing the well 4x with ACNrinse")
     for _ in range(4):
@@ -495,8 +475,7 @@ def FC_postchar(
                 correction_factor(320),
             ),
             to_vessel=current_well,
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
@@ -507,8 +486,7 @@ def FC_postchar(
                 "waste",
                 correction_factor(320),
             ),
-            pump=toolkit.pump,
-            mill=toolkit.mill,
+            toolkit=toolkit,
         )
 
     toolkit.global_logger.info("5. Take after image")
