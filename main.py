@@ -7,60 +7,118 @@ Or starting the PANDA_SDL either with or without mock instruments.
 
 # pylint: disable=broad-exception-caught, protected-access
 import multiprocessing
-import subprocess
+import os
 import sys
 import textwrap
+import threading
 import time
 from typing import Tuple
 
 from PIL import Image
 
 from license_text import show_conditions, show_warrenty
-from panda_lib import (controller, imaging, pipette, print_panda, utilities,
-                       vials, wellplate)
+from panda_experiment_analyzers import analysis_worker
+from panda_lib import (
+    controller,
+    imaging,
+    pipette,
+    print_panda,
+    utilities,
+    vials,
+    wellplate,
+)
 from panda_lib.config import print_config_values as print_config
-from panda_lib.config import (read_config, read_testing_config,
-                              write_testing_config)
+from panda_lib.config import read_config, read_testing_config, write_testing_config
 from panda_lib.experiment_class import ExperimentBase
 from panda_lib.movement import mill_calibration_and_positioning
-from panda_lib.sql_tools import (remove_testing_experiments,
-                                 sql_generator_utilities,
-                                 sql_protocol_utilities, sql_queue,
-                                 sql_system_state, sql_wellplate)
+from panda_lib.sql_tools import (
+    remove_testing_experiments,
+    sql_generator_utilities,
+    sql_protocol_utilities,
+    sql_queue,
+    sql_system_state,
+    sql_wellplate,
+)
+
+os.environ["KMP_AFFINITY"] = "none"
 
 
 def run_panda_sdl_with_ml():
     """Runs PANDA_SDL and enables the ML analysis."""
-    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running PANDA_SDL")
     length = int(input("Enter the campaign length: ").strip().lower())
-    controller.main(al_campaign_length=length)
+
+    exp_processes = multiprocessing.Process(
+        target=controller.experiment_loop_worker,
+        kwargs={
+            "status_queue": status_queue,
+            "process_id": ProcessIDs.CONTROL_LOOP,
+            "campaign_length": length,
+        },
+    )
+    exp_processes.start()
+    return exp_processes
 
 
 def run_panda_sdl_without_ml():
     """Runs PANDA_SDL."""
-    sql_system_state.set_system_status(utilities.SystemState.BUSY, "running PANDA_SDL")
     while True:
         one_off = input("Is this a one-off run? (y/n): ").strip().lower()
         if not one_off:
             print("Invalid choice. Please try again.")
             continue
         elif one_off[0] == "y":
-            print_queue_info()
-            spec_id = input("Enter the experiment ID: ").strip().lower()
-            controller.main(one_off=True, specific_experiment_id=spec_id)
+
+            exp_ids = print_queue_info()
+            try:
+                spec_id = int(input("Enter the experiment ID: ").strip().lower())
+
+            except EOFError:
+                spec_id = input("Enter the experiment ID: ").strip().lower()
+            except ValueError:
+                print("Invalid experiment ID. Please try again.")
+                continue
+            if spec_id not in exp_ids:
+                print("Invalid experiment ID. Please try again.")
+                continue
+
+            exp_processes = multiprocessing.Process(
+                target=controller.experiment_loop_worker,
+                kwargs={
+                    "one_off": True,
+                    "status_queue": status_queue,
+                    "process_id": ProcessIDs.CONTROL_LOOP,
+                    "specific_experiment_id": spec_id,
+                },
+            )
             break
         elif one_off[0] == "n":
-            controller.main()
+            exp_processes = multiprocessing.Process(
+                target=controller.experiment_loop_worker,
+                kwargs={
+                    "status_queue": status_queue,
+                    "process_id": ProcessIDs.CONTROL_LOOP,
+                },
+            )
             break
         else:
             print("Invalid choice. Please try again.")
             continue
 
+    exp_processes.start()
+    return exp_processes
+
 
 def change_wellplate():
     """Changes the current wellplate."""
-    sql_system_state.set_system_status(utilities.SystemState.BUSY, "changing wellplate")
-    wellplate.load_new_wellplate(ask=True)
+    wellplate_id = wellplate.load_new_wellplate(ask=True)
+    if wellplate_id:
+        location = sql_wellplate.select_wellplate_location(wellplate_id)
+        print(f"New wellplate loaded: {wellplate_id}")
+        print(f"Location of A1: {location[0]}, {location[1]}")
+        input("Press Enter to continue...")
+    else:
+        print("No wellplate loaded.")
+        input("Press Enter to continue...")
 
 
 def remove_wellplate_from_database():
@@ -71,23 +129,19 @@ def remove_wellplate_from_database():
     plate_to_remove = int(
         input("Enter the wellplate number to remove: ").strip().lower()
     )
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY,
-        "removing wellplate from database",
-        read_testing_config(),
-    )
+
     wellplate._remove_wellplate_from_db(plate_to_remove)
 
 
 def remove_experiment_from_database():
     """Removes a user provided experiment from the database."""
-    experiments_to_remove = input("Enter the experiment number(s) to remove seperated by commas: ").strip().lower()
-    experiments_to_remove = experiments_to_remove.split(",")
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY,
-        "removing experiment from database",
-        read_testing_config(),
+    experiments_to_remove = (
+        input("Enter the experiment number(s) to remove seperated by commas: ")
+        .strip()
+        .lower()
     )
+    experiments_to_remove = experiments_to_remove.split(",")
+
     removed = []
     not_removed = {}
 
@@ -114,6 +168,7 @@ def remove_experiment_from_database():
         print(f"{experiment}: {note}")
     input("Press Enter to continue...")
 
+
 def print_wellplate_info():
     """
     Prints a summary of the current wellplate.
@@ -123,10 +178,9 @@ def print_wellplate_info():
     Location of A1: x, y
 
     """
-    # input("Feature coming soon...")
     well_num, plate_type, avail_wells = wellplate.read_current_wellplate_info()
     (x, y, z_bottom, z_top, orientation, echem_height, image_height) = (
-        sql_wellplate.select_wellplate_location(num)
+        sql_wellplate.select_wellplate_location(well_num)
     )
     print(
         f"""
@@ -148,59 +202,52 @@ def print_queue_info():
     current_queue = sql_queue.select_queue()
     print("Current Queue:")
     print("Experiment ID-Project ID-Campaign ID-Priority-Well ID")
+    exp_ids = []
     for exp in current_queue:
         exp: ExperimentBase
-        print(f"{exp.experiment_id}-{exp.project_id}-{exp.project_campaign_id}-{exp.priority}-{exp.well_id}")
+        print(
+            f"{exp.experiment_id}-{exp.project_id}-{exp.project_campaign_id}-{exp.priority}-{exp.well_id}"
+        )
+        exp_ids.append(exp.experiment_id)
     input("Press Enter to continue...")
+    return exp_ids
 
 
 def reset_vials_stock():
     """Resets the stock vials."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "resetting stock vials"
-    )
+
     vials.reset_vials("stock")
 
 
 def reset_vials_waste():
     """Resets the waste vials."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "resetting waste vials"
-    )
+
     vials.reset_vials("waste")
 
 
 def input_new_vial_values_stock():
     """Inputs new values for the stock vials."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "inputting new vial values"
-    )
+
     print("\nNOTE: Vial names of none indicate a vial that doesn't exist.")
     vials.input_new_vial_values("stock")
 
 
 def input_new_vial_values_waste():
     """Inputs new values for the waste vials."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "inputting new vial values"
-    )
+
     print("\nNOTE: Vial names of none indicate a vial that doesn't exist.")
     vials.input_new_vial_values("waste")
 
 
 def change_wellplate_location():
     """Changes the location of the current wellplate."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "changing wellplate location"
-    )
+
     wellplate.change_wellplate_location()
 
 
 def run_experiment_generator():
     """Runs the edot voltage sweep experiment."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "generating experiment files"
-    )
+
     sql_generator_utilities.read_in_generators()
     available_generators = sql_generator_utilities.get_generators()
     # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
@@ -224,6 +271,8 @@ def run_experiment_generator():
     generator = sql_generator_utilities.get_generator_name(generator_id)
     sql_generator_utilities.run_generator(generator_id)
 
+    input("Press Enter to continue...")
+
 
 def toggle_testing_mode():
     """Sets the testing mode."""
@@ -235,9 +284,6 @@ def toggle_testing_mode():
 
 def calibrate_mill():
     """Calibrates the mill."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.CALIBRATING, "calibrating the mill"
-    )
 
     mill_calibration_and_positioning.calibrate_mill(
         read_testing_config(),
@@ -256,15 +302,13 @@ def test_image():
 
 def clean_up_testing_experiments():
     """Cleans up the testing experiments."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "cleaning up testing experiments"
-    )
+
     remove_testing_experiments.main()
 
 
 def exit_program():
     """Exits the program."""
-    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting PANDA_SDL")
+
     print("Exiting PANDA_SDL. Goodbye!")
     sys.exit()
 
@@ -309,9 +353,6 @@ def remove_training_data():
 
 def change_pipette_tip():
     """Changes the pipette tip."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "changing pipette tip"
-    )
     while True:
         try:
             new_capacity = float(
@@ -358,26 +399,78 @@ def import_vial_data():
 
 def generate_vial_data_template():
     """Generates a vial data template."""
-    sql_system_state.set_system_status(
-        utilities.SystemState.BUSY, "generating vial data template"
-    )
     vials.generate_template_vial_csv_file()
+    input("Press Enter to continue...")
 
-def slack_monitor_bot(testing=False):
+
+def slack_monitor_bot(testing, running_flag: threading.Event):
     """Runs the slack monitor bot."""
-    bot = controller.SlackBot(test=testing)
-    bot.run()
+    try:
+        bot = controller.SlackBot(test=testing)
+        bot.send_message("alert", "PANDA Bot is monitoring Slack")
 
-def run_experiment(uchoice) -> multiprocessing.Process:
+        while running_flag.is_set():
+            try:
+                time.sleep(10)
+                bot.status = bot.check_slack_messages(channel="alert")
+                bot.check_slack_messages(channel="data")
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                status_queue.put((ProcessIDs.SLACKBOT, f"An error occurred: {e}"))
+                time.sleep(15)
+                continue
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return
+
+    finally:
+        bot.off_duty()
+
+
+def run_control_loop(uchoice: callable) -> multiprocessing.Process:
     """Runs the experiment in a separate process."""
     exp_process = multiprocessing.Process(target=uchoice)
     exp_process.start()
     return exp_process
 
+
+def start_analsyis_loop():
+    """Starts the analysis loop."""
+    sql_system_state.set_system_status(
+        utilities.SystemState.BUSY, "starting analysis loop"
+    )
+    process = multiprocessing.Process(
+        target=analysis_worker, args=(status_queue, ProcessIDs.ANALYSIS)
+    )
+    process.start()
+    return process
+
+
+def stop_analysis_loop():
+    """Stops the analysis loop."""
+    if analysis_proceess:
+        stop_process(analysis_proceess)
+
+
+def stop_control_loop():
+    """Stops the control loop."""
+    if control_loop_process:
+        stop_process(control_loop_process)
+
+
+def stop_process(process: multiprocessing.Process):
+    """Stops a process."""
+    process.terminate()
+    process.join()
+
+
 experiment_choices = ["0", "1"]
+analysis_choices = ["10"]
 blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 
-def main_menu(reduced:bool = False) -> Tuple[callable, str]:
+
+def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
     menu_options = {
         "0": run_panda_sdl_with_ml,
@@ -405,6 +498,8 @@ def main_menu(reduced:bool = False) -> Tuple[callable, str]:
         "7": test_image,
         "8": instrument_check,
         "9": test_pipette,
+        "10": start_analsyis_loop,
+        "11": stop_analysis_loop,
         "t": toggle_testing_mode,
         "r": refresh,
         "w": show_warrenty,
@@ -429,129 +524,225 @@ def main_menu(reduced:bool = False) -> Tuple[callable, str]:
         input("Invalid choice. Please try again.")
         continue
 
-if __name__ == "__main__":
-    config = read_config()
+
+def main_menu_options(reduced: bool = False) -> dict[str, callable]:
+    """Main menu for PANDA_SDL."""
+    menu_options = {
+        "0": run_panda_sdl_with_ml,
+        "1": run_panda_sdl_without_ml,
+        "1.1": stop_panda_sdl,
+        "1.2": pause_panda_sdl,
+        "1.3": resume_panda_sdl,
+        "2": change_wellplate,
+        "2.1": change_wellplate_location,
+        "2.2": remove_wellplate_from_database,
+        "2.3": print_wellplate_info,
+        "2.5": remove_training_data,
+        "2.6": clean_up_testing_experiments,
+        "3": reset_vials_stock,
+        "3.1": reset_vials_waste,
+        "3.2": input_new_vial_values_stock,
+        "3.3": input_new_vial_values_waste,
+        "3.4": import_vial_data,
+        "3.5": generate_vial_data_template,
+        "4": print_queue_info,
+        "4.1": run_experiment_generator,
+        "4.2": remove_experiment_from_database,
+        "5": change_pipette_tip,
+        "6": calibrate_mill,
+        "7": test_image,
+        "8": instrument_check,
+        "9": test_pipette,
+        "10": start_analsyis_loop,
+        "11": stop_analysis_loop,
+        "t": toggle_testing_mode,
+        "r": refresh,
+        "w": show_warrenty,
+        "c": show_conditions,
+        "env": print_config,
+        "q": exit_program,
+    }
+
+    if reduced:
+        # Remove the blocking options
+        for key in blocking_choices:
+            menu_options.pop(key, None)
+
+    return menu_options
+
+
+def get_process_status(process_status_queue: multiprocessing.Queue, process_id):
+    """Get the latest status of a process from the status queue."""
+    latest_status = None
+    temp_queue = []
+    while not process_status_queue.empty():
+        pid, status = process_status_queue.get()
+        if pid == process_id:
+            latest_status = status
+        temp_queue.append((pid, status))
+
+    for item in temp_queue:
+        # Put the items back in the queue
+        process_status_queue.put(item)
+
+    return latest_status
+
+
+class ProcessIDs:
+    """Process IDs for the status queue."""
+
+    CONTROL_LOOP = 0
+    ANALYSIS = 1
+    SLACKBOT = 2
+
+
+def discalimer():
+    """Prints the disclaimer."""
     print(
         textwrap.dedent(
             """\n
-        PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
-        PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warrenty'
-        for more details.
+PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
+PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warrenty'
+for more details.
 
-        This is free software, and you are welcome to redistribute it
-        under certain conditions; choose `show_conditions' for details.
-    """
+This is free software, and you are welcome to redistribute it
+under certain conditions; choose `show_conditions' for details.
+"""
         ).strip()
     )
 
+
+def banner():
+    """Prints the banner."""
+    print(f"\n{print_panda.print_panda()}\n")
+
+
+if __name__ == "__main__":
+
+    control_loop_process: multiprocessing.Process = None
+    control_loop_status = None
+    control_loop_queue: multiprocessing.Queue = multiprocessing.Queue()
+    analysis_proceess: multiprocessing.Process = None
+    analysis_status = None
+    status_queue: multiprocessing.Queue = multiprocessing.Queue()
+    slackThread_running = threading.Event()
+    slackThread_running.set()
+
+    config = read_config()
+
+    discalimer()
     time.sleep(2)
 
-    sql_system_state.set_system_status(utilities.SystemState.ON, "at main menu")
-    time.sleep(0.1)
     sql_protocol_utilities.read_in_protocols()
 
-    print()
-    print(print_panda.print_panda())
-    print()
-    print("Welcome to PANDA_SDL!")
-
+    banner()
     # User sign in
-    while True:
-        user_name = input("Enter your username: ").strip().lower()
-        # Look up user in db
+    try:
+        while True:
+            user_name = input("Enter your username: ").strip().lower()
+            # Look up user in db
 
-        # If user is not found, ask if they would like to create a new user
+            # If user is not found, ask if they would like to create a new user
 
-        # If user is found, ask for password
+            # If user is found, ask for password
 
-        # If password is correct, continue to main menu
+            # If password is correct, continue to main menu
 
-        # If password is incorrect, ask if they would like to try again
+            # If password is incorrect, ask if they would like to try again
 
-        # If user chooses to try again, repeat password input
+            # If user chooses to try again, repeat password input
 
-        # If user chooses to exit, exit the program
-        break
-    
-    TESTING_STATE = "testing" if read_testing_config() else "production"
-    slackbot_process = subprocess.Popen(
-        [sys.executable, "slack_bot.py", "--testing" if TESTING_STATE == "testing" else "--production"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    # Main loop
-    while True:
-        sql_system_state.set_system_status(utilities.SystemState.IDLE, "at main menu")
-        # os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
-        print()
-        print(print_panda.print_panda())
-        print()
-        print(f"Welcome {user_name}!")
-        print("Testing mode is currently:", "ON" if read_testing_config() else "OFF")
-        if read_testing_config():
-            print("Database address: ", read_config()["TESTING"]["testing_db_address"])
-        else:
-            print(
-                "Database address: ",
-                read_config()["PRODUCTION"]["production_db_address"],
-            )
-        num, p_type, new_wells = wellplate.read_current_wellplate_info()
-        current_pipette = pipette.select_current_pipette_id()
-        uses = pipette.select_current_pipette_uses()
-        print(
-            f"""
-The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
-The current pipette id is {current_pipette} and has {int(round((2000-uses)/2,0))} uses left.
-The queue has {sql_queue.count_queue_length()} experiments.
-"""
+            # If user chooses to exit, exit the program
+            break
+
+        slackbot_thread = threading.Thread(
+            target=slack_monitor_bot,
+            args=(read_testing_config(), slackThread_running),
+            daemon=True,
         )
-        function_name, choice_key = main_menu()
-        # experiment_process:multiprocessing.Process = None
-        try:
-            if choice_key in experiment_choices:
-                function_name()
-                # exp_process = multiprocessing.Process(target=user_choice)
-                # exp_process.start()
-                # exp_process.join()
-                # Start a thread to handle the main menu with reduced options
-                #menu_thread = threading.Thread(target=main_menu, args=(True,))
-                #menu_thread.start()
-                #menu_thread.join()  # Wait for the menu thread to finish
-                continue
-            function_name()
-        except controller.ShutDownCommand:
-            # if experiment_process:
-            #     experiment_process.terminate()
-            # The PANDA_SDL loop has been stopped but we don't want to exit the program
-            pass
-        except controller.OCPFailure:
-            slack = controller.SlackBot()
-            slack.send_slack_message(
-                "alert", "OCP Failure has occured. Please check the system."
+        slackbot_thread.start()
+        # Main loop
+        while True:
+
+            os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
+            banner()
+            print(f"Welcome {user_name}!")
+            print(
+                "Testing mode is ", "ENABLED" if read_testing_config() else "DISABLED"
             )
-            channel_id = slack.channel_id("alert")
-            slack.take_screenshot(channel_id, "webcam")
-            slack.take_screenshot(channel_id, "vials")
-            time.sleep(5)
-            slack.send_slack_message("alert", "Would you like to continue? (y/n): ")
-            while True:
-                contiue_choice = (
-                    slack.check_latest_message(channel_id)[0].strip().lower()
-                )
-                if contiue_choice == "y":
-                    break
-                if contiue_choice == "n":
-                    break
-            if contiue_choice == "n":
-                continue
-            if contiue_choice == "y":
+            if read_testing_config():
+                print("DB: ", read_config()["TESTING"]["testing_db_address"])
+            else:
+                print("DB: ", read_config()["PRODUCTION"]["production_db_address"])
+            num, p_type, new_wells = wellplate.read_current_wellplate_info()
+            current_pipette = pipette.select_pipette_status()
+
+            new_control_loop_status = get_process_status(
+                status_queue, ProcessIDs.CONTROL_LOOP
+            )
+            new_analysis_status = get_process_status(status_queue, ProcessIDs.ANALYSIS)
+            # slackbot_status = get_process_status(status_queue, ProcessIDs.SLACKBOT)
+
+            if (
+                control_loop_status != new_control_loop_status
+                and new_control_loop_status is not None
+            ):
+                control_loop_status = new_control_loop_status
+            if (
+                analysis_status != new_analysis_status
+                and new_analysis_status is not None
+            ):
+                analysis_status = new_analysis_status
+
+            print(
+                f"""
+The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
+The current pipette id is {current_pipette.id} and has {int(round((2000-current_pipette.uses)/2,0))} uses left.
+The queue has {sql_queue.count_queue_length()} experiments.
+Process Status:
+    Control Loop: {control_loop_process.is_alive() if control_loop_process else False} - {control_loop_status}
+    Analysis Loop: {analysis_proceess.is_alive() if analysis_proceess else False} - {analysis_status}
+        """
+            )
+            function_name, choice_key = main_menu(
+                control_loop_process.is_alive() if control_loop_process else False
+            )
+
+            try:
+                if choice_key in experiment_choices:
+                    control_loop_process = function_name()
+                    continue
+                elif choice_key in analysis_choices:
+                    analysis_proceess = function_name()
+                    continue
                 function_name()
+            except controller.ShutDownCommand:
+                # Confirm that the control loop has been stopped
+                if control_loop_process:
+                    control_loop_process.terminate()
+                    control_loop_process.join()
+                # The PANDA_SDL loop has been stopped but we don't want to exit the program
+            except controller.OCPFailure:
+                slack = controller.SlackBot()
+                if slack.echem_error_procedure():
+                    function_name()
+                else:
+                    continue
 
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            # experiment_process.terminate()
-            break  # Exit the program if an unknown error occurs
-
-    # End of program tasks
-    slackbot_process.terminate()
-    sql_system_state.set_system_status(utilities.SystemState.OFF, "exiting PANDA_SDL")
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                raise e  # Exit the program if an unknown error occurs
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        # End of program tasks
+        if control_loop_process:
+            control_loop_process.terminate()
+            control_loop_process.join()
+        if analysis_proceess:
+            analysis_proceess.terminate()
+            analysis_proceess.join()
+        slackThread_running.clear()
+        slackbot_thread.join()
