@@ -143,6 +143,7 @@ class SlackBot:
         self.testing = test
         self.client = WebClient(token=SlackCred.TOKEN)
         self.auth_test_response = self.client.auth_test()
+        self.status = 1
 
         if not self.auth_test_response["ok"]:
             self.logger.error("Slack connection failed.")
@@ -152,12 +153,15 @@ class SlackBot:
         if not config_options.getboolean("use_slack"):
             self.testing = True
 
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.off_duty()
+
     def send_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
 
         # Check if slack is enabled
         if not config_options.getboolean("use_slack"):
-            print(message)
+            # print(message)
             return
 
         client = WebClient(SlackCred.TOKEN)
@@ -167,7 +171,7 @@ class SlackBot:
 
         try:
             result = client.chat_postMessage(channel=channel_id, text=message)
-            print("Slack:", message)
+            # print("Slack:", message)
             if result["ok"]:
                 self.logger.info("Message sent:%s", message)
             else:
@@ -234,7 +238,7 @@ class SlackBot:
             initial_comment=message,
         )
 
-        print(response)
+        # print(response)
 
     def check_latest_message(self, channel: str) -> str:
         """Check Slack for the latest message."""
@@ -337,7 +341,7 @@ class SlackBot:
                     if response == 0:
                         return 0
                     else:
-                        print(f"responded to {msg_id}")
+                        # print(f"responded to {msg_id}")
                         return 1
                 else:
                     continue
@@ -349,11 +353,11 @@ class SlackBot:
             self.logger.error(error_msg)
 
             if "rate_limited" in error_msg:
-                time.sleep(5)
+                time.sleep(30)
                 return self.check_slack_messages(channel)
 
 
-            return 0 #TODO haandle rate limiting error with a sleep
+            return 0
 
     def find_id(self, msg_id):
         """Find the message ID in the slack ticket tracker csv file."""
@@ -521,7 +525,7 @@ class SlackBot:
                 "resume -> resumes the experiment loop\n"
                 # "start - starts the experiment loop\n"
                 "shutdown -> stops the experiment loop and the main menu\n"
-                "stop -> stops the monitoring loop\n"
+                "stop -> stops the experiment loop\n"
                 "exit -> closes the slackbot\n"
             )
         else:  # data channel
@@ -541,7 +545,7 @@ class SlackBot:
                 "resume -> resumes the experiment loop\n"
                 # "start - starts the experiment loop\n"
                 "shutdown -> stops the experiment loop and the main menu\n"
-                "stop -> stops the controller loop\n"
+                "stop -> stops the experiment loop\n"
                 "exit -> closes the slackbot\n"
             )
         self.send_message(channel_id, message)
@@ -722,7 +726,7 @@ class SlackBot:
             except KeyboardInterrupt:
                 break
             except Exception as e:
-                print(e)
+                # print(e)
                 time.sleep(15)
                 continue
         self.send_message("alert", "PANDA Bot is off duty")
