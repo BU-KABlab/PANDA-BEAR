@@ -15,7 +15,7 @@ from panda_lib.sql_tools.sql_system_state import get_current_pin
 
 config = read_config()
 TESTING = read_testing_config()
-PROJECT_ID = 18
+PROJECT_ID = 18 # The project ID associates other experiments and the analysis
 EXPERIMENT_NAME = "PGMA-screening-C2"
 CAMPAIGN_ID = 1
 PLATE_TYPE = 7 # 10 mm diameter wells
