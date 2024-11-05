@@ -6,9 +6,10 @@ Date: 2024-05-02
 """
 
 import math
-
 # pylint: disable=line-too-long
 import os
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 from pathlib import Path
 
 import gpytorch
@@ -23,19 +24,13 @@ from gpytorch.models import ExactGP
 from scipy.interpolate import griddata
 from scipy.stats import qmc
 from sklearn.metrics import mean_squared_error
-
 # from tqdm.notebook import tqdm #use in jupyter notebook
 from tqdm import tqdm  # use in vscode
 
-from panda_lib.experiment_class import (
-    ExperimentResultsRecord,
-    insert_experiment_results,
-)
 from panda_experiment_analyzers.pedot.sql_ml_functions import (
-    model_iteration,
-    insert_best_test_point,
-    select_ml_training_data,
-)
+    insert_best_test_point, model_iteration, select_ml_training_data)
+from panda_lib.experiment_class import (ExperimentResultsRecord,
+                                        insert_experiment_results)
 
 
 def main(
