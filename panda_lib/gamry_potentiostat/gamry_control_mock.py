@@ -79,10 +79,10 @@ class GamryPotentiostat:
         COMPLETE_FILE_NAME.touch()
         return COMPLETE_FILE_NAME
 
-    def chrono(self, CAvi, CAti, CAv1, CAt1, CAv2, CAt2, CAsamplerate):
+    def chrono(self, chronoparams):
         pass
 
-    def cyclic(self, CVvi, CVap1, CVap2, CVvf, CVsr1, CVsr2, CVsr3, CVsamplerate, CVcycle):
+    def cyclic(self, cyclicparams):
         pass
 
     def save_data(self, complete_file_name):
