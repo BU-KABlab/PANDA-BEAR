@@ -35,7 +35,7 @@ from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import MillConfig
 
 # add the mill_control logger
-mill_control_logger = setup_default_logger(log_name="mill_control", console_level=logging.INFO)
+mill_control_logger = setup_default_logger(log_name="mill_control", console_level=logging.WARNING)
 
 # Mill movement logger - just for the movement commands
 mill_movement_logger = setup_default_logger(

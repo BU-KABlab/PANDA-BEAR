@@ -105,7 +105,7 @@ class Pipette:
             self._volume_ul,
             self.contents,
         )
-        print(f"Pipette has {self._volume_ul} ul of liquid")
+        # print(f"Pipette has {self._volume_ul} ul of liquid")
 
     def record_pipette_state(self) -> None:
         """Update the state file for the pipette"""
