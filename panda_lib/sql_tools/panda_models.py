@@ -34,6 +34,7 @@ class Experiments(Base):
     priority = Column(Integer, default=0)
     process_type = Column(Integer, default=0)
     filename = Column(String, default=None)
+    needs_analysis = Column(Boolean, default=False)
     created = Column(String)
     updated = Column(String, default=dt.now(timezone.utc))
 
