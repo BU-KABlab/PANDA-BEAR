@@ -879,6 +879,14 @@ class MockMill(Mill):
         elif self.status_mode == 3:
             return f"<Idle|MPos:{self.current_x-homing_pull_off},{self.current_y-homing_pull_off},{self.current_z-homing_pull_off}|Bf:15,127|FS:0,0>"
 
+    def fetch_saved_config(self) -> dict:
+        with SessionLocal() as session:
+            mill_config = (
+                session.query(MillConfig).order_by(MillConfig.id.desc()).first()
+            )
+            if mill_config:
+                return mill_config.config
+
     def __wait_for_completion(self, incoming_status, timeout=90):
         """Wait for the mill to complete the previous command"""
         status = incoming_status
