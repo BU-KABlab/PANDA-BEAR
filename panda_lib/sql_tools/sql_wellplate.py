@@ -22,6 +22,12 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
     with SessionLocal() as session:
         return session.query(WellPlates).filter(WellPlates.id == plate_id).count() > 0
 
+def check_if_plate_type_exists(type_id: int) -> bool:
+    """Check if a plate type exists in the plate_types table"""
+
+    with SessionLocal() as session:
+        return session.query(PlateTypes).filter(PlateTypes.id == type_id).count() > 0
+
 
 def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float, float, float, float, int, float, float]:
     """Select the location and characteristics of the wellplate from the wellplate
@@ -115,7 +121,8 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
                 z_bottom = 0,
                 z_top = 0,
                 orientation = 0,
-                echem_height = 0
+                echem_height = 0,
+                image_height = 0
             )
             )
         session.commit()
@@ -213,16 +220,6 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
         tuple[int, int, bool]: The wellplate ID, the wellplate type ID, and
         whether the wellplate is new.
     """
-    # result = sql_utilities.execute_sql_command(
-    #     """
-    #     SELECT id, type_id FROM wellplates
-    #     WHERE current = 1
-    #     """
-    # )
-    # if result == []:
-    #     return 0, 0, False
-    # is_new = check_if_current_wellplate_is_new()
-    # return result[0][0], result[0][1], is_new
 
     with SessionLocal() as session:
         result = session.query(WellPlates).filter(WellPlates.current == 1).first()
@@ -231,6 +228,20 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
         is_new = check_if_current_wellplate_is_new()
         return result.id, result.type_id, is_new
 
+def select_wellplate_info(plate_id: int) -> WellPlates:
+    """
+    Get the wellplate information from the wellplates table.
+
+    Args:
+        plate_id (int): The plate ID.
+
+    Returns:
+        tuple[int, int]: The wellplate ID and the wellplate type ID.
+    """
+
+    with SessionLocal() as session:
+        result = session.query(WellPlates).filter(WellPlates.id == plate_id).first()
+        return result
 
 def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
     """
