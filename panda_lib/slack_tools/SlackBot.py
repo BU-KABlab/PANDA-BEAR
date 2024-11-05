@@ -152,7 +152,7 @@ class SlackBot:
         if not config_options.getboolean("use_slack"):
             self.testing = True
 
-    def send_slack_message(self, channel_id: str, message) -> None:
+    def send_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
 
         # Check if slack is enabled
@@ -399,10 +399,10 @@ class SlackBot:
                 # Get status
                 status = exp.select_experiment_status(experiment_number)
                 message = f"The status of experiment {experiment_number} is {status}."
-                self.send_slack_message(channel_id, message)
+                self.send_message(channel_id, message)
             except ValueError:
                 message = "Please enter a valid experiment number."
-                self.send_slack_message(channel_id, message)
+                self.send_message(channel_id, message)
             return 1
 
         elif text[0:17] == "images experiment":
@@ -413,7 +413,7 @@ class SlackBot:
 
             except ValueError:
                 message = "Please enter a valid experiment number."
-                self.send_slack_message(channel_id, message)
+                self.send_message(channel_id, message)
             return 1
         elif text[0:11] == "vial status":
             self.__vial_status(channel_id=channel_id)
@@ -453,7 +453,7 @@ class SlackBot:
                 message = (
                     "Please specify which camera to take a screenshot of with a '-'."
                 )
-                self.send_slack_message(channel_id, message)
+                self.send_message(channel_id, message)
             return 1
 
         elif text[0:7] == "status":
@@ -475,7 +475,7 @@ class SlackBot:
             # system_state.set_system_status(system_state.SystemState.ON, "starting ePANDA", self.test)
             # start the experiment loop
             # controller.main()
-            self.send_slack_message(
+            self.send_message(
                 channel_id, "Sorry starting the ePANDA is not something I can do yet"
             )
             return 1
@@ -490,7 +490,7 @@ class SlackBot:
             sql_system_state.set_system_status(
                 sql_system_state.SystemState.STOP, "stopping ePANDA", self.testing
             )
-            self.send_slack_message(channel_id, "Stopping the controller loop")
+            self.send_message(channel_id, "Stopping the controller loop")
             return 1
 
         elif text[0:4] == "exit":
@@ -499,7 +499,7 @@ class SlackBot:
 
         else:
             message = "Sorry, I don't understand that command. Type !epanda help for commands I understand."
-            self.send_slack_message(channel_id, message)
+            self.send_message(channel_id, message)
             return 1
 
     def __help_menu(self, channel_id):
@@ -544,8 +544,26 @@ class SlackBot:
                 "stop -> stops the controller loop\n"
                 "exit -> closes the slackbot\n"
             )
-        self.send_slack_message(channel_id, message)
+        self.send_message(channel_id, message)
         return 1
+
+    def echem_error_procedure(self):
+        """Procedure to follow when an echem error occurs."""
+
+        channel_id = self.channel_id("alert")
+        self.send_message(channel_id, "Failure has occured. Please check the system.")
+        self.take_screenshot(channel_id, "webcam")
+        self.take_screenshot(channel_id, "vials")
+        time.sleep(5)
+        self.send_message(channel_id, "Would you like to continue? (y/n): ")
+        while True:
+            contiue_choice = self.check_latest_message(channel_id)[0].strip().lower()
+            if contiue_choice == "y":
+                return 1
+            if contiue_choice == "n":
+                return 0
+            time.sleep(5)
+
 
     def __vial_status(self, channel_id):
         """Sends the vial status to the user."""
@@ -577,7 +595,7 @@ class SlackBot:
     def __queue_length(self, channel_id):
         # Get queue length
         message = f"The queue length is {sql_queue.count_queue_length()}."
-        self.send_slack_message(channel_id, message)
+        self.send_message(channel_id, message)
         return 1
 
     def _get_well_color(self, status: str) -> str:
@@ -597,7 +615,7 @@ class SlackBot:
     def take_screenshot(self, channel_id, camera_name: str):
         """Take a screenshot of the camera."""
         if not config_options.getboolean("use_obs"):
-            self.send_slack_message(channel_id, "OBS is not enabled")
+            self.send_message(channel_id, "OBS is not enabled")
             return 1
         try:
             file_name = "tmp_screenshot.png"
@@ -606,12 +624,12 @@ class SlackBot:
             try:
                 sources = obs.client.get_source_active(camera_name)
             except Exception:
-                self.send_slack_message(
+                self.send_message(
                     channel_id, f"Could not find a camera source named {camera_name}"
                 )
                 return 1
             if not sources:
-                self.send_slack_message(
+                self.send_message(
                     channel_id, f"Camera {camera_name} is not active"
                 )
                 return 1
@@ -630,8 +648,8 @@ class SlackBot:
             return 1
 
         except Exception as e:
-            self.send_slack_message(channel_id, "Error taking screenshot")
-            self.send_slack_message(channel_id, str(e))
+            self.send_message(channel_id, "Error taking screenshot")
+            self.send_message(channel_id, str(e))
             return 1
 
     def __share_experiment_images(self, experiment_id: int):
@@ -643,7 +661,7 @@ class SlackBot:
         results = exp.select_specific_result(experiment_id, "image")
         if results == [] or results is None:
             message = f"Experiment {experiment_id} does not have any images. Or the experiment {experiment_id} does not exist."
-            self.send_slack_message("data", message)
+            self.send_message("data", message)
             return
         for result in results:
             result: exp.ExperimentResultsRecord
@@ -695,7 +713,7 @@ class SlackBot:
         """Run the slack bot."""
         self.status = 1
         # self._terminate_event = threading.Event()
-        self.send_slack_message("alert", "PANDA Bot is monitoring Slack")
+        self.send_message("alert", "PANDA Bot is monitoring Slack")
         while self.status == 1:# and not self._terminate_event.is_set():
             try:
                 time.sleep(5)
@@ -707,12 +725,12 @@ class SlackBot:
                 print(e)
                 time.sleep(15)
                 continue
-        self.send_slack_message("alert", "PANDA Bot is off duty")
+        self.send_message("alert", "PANDA Bot is off duty")
 
     
     def off_duty(self):
         self.status = 0
-        self.send_slack_message("alert", "PANDA Bot is off duty")
+        self.send_message("alert", "PANDA Bot is off duty")
         return
 
     # def terminate(self):
@@ -1041,4 +1059,4 @@ if __name__ == "__main__":
     TEST_MESSAGE = "This is a test message."
     EPANDA_HELLO = """Hello ePANDA team! I am ePANDA..."""
     # slack_bot.check_slack_messages("alert")
-    slack_bot.send_slack_message("alert", TEST_MESSAGE)
+    slack_bot.send_message("alert", TEST_MESSAGE)
