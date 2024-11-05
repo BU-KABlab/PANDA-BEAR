@@ -32,8 +32,10 @@ from .sql_tools.sql_queue import (
     get_next_experiment_from_queue,
 )
 from .sql_tools.sql_wellplate import (
+    check_if_plate_type_exists,
     get_well_by_id,
     select_current_wellplate_info,
+    select_wellplate_info,
     select_next_available_well,
     select_well_status,
     update_well,
@@ -306,6 +308,42 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
                 experiment.plate_id, _, _ = select_current_wellplate_info()
             ## Check if the well is available
             if check_well_status(experiment.well_id, experiment.plate_id) != "new":
+                # Check that the plate ID exists
+                if not check_if_plate_type_exists(experiment.well_type_number):
+                    logger.error(
+                        "Plate type %s does not exist, cannot add experiment to queue",
+                        experiment.plate_id,
+                    )
+                    print(
+                        f"Plate type {experiment.plate_id} does not exist, cannot add experiment to queue"
+                    )
+                    experiments.remove(experiment)
+                    continue
+
+                # Check if the target plate id has the target well type number
+                plate_info = select_wellplate_info(experiment.plate_id)
+                if plate_info is None:
+                    logger.error(
+                        "Plate %s does not exist, cannot add experiment to queue",
+                        experiment.plate_id,
+                    )
+                    print(
+                        f"Plate {experiment.plate_id} does not exist, cannot add experiment to queue"
+                    )
+                    experiments.remove(experiment)
+                    continue
+
+                if plate_info.type_id != experiment.well_type_number or plate_info.id != experiment.plate_id:
+                    logger.error(
+                        "Plate %s does not have the correct well type number, cannot add experiment to queue",
+                        experiment.plate_id,
+                    )
+                    print(
+                        f"Plate {experiment.plate_id} does not have the correct well type number, cannot add experiment to queue"
+                    )
+                    experiments.remove(experiment)
+                    continue
+
                 # Find the next available well
                 target_well = choose_next_new_well(experiment.plate_id)
                 if target_well is None:
@@ -314,10 +352,10 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
                         experiment.well_id,
                     )
                     print(
-                        "No wells available for experiment originally for well %s.",
-                        experiment.well_id,
+                        f"No wells available for experiment originally for well {experiment.well_id}."
                     )
                     experiments.remove(experiment)
+                    continue
                     # TODO Add a pending label to the experiment to be added to the queue when the right well is available
                 logger.info(
                     "Experiment originally for well %s is now for well %s.",
