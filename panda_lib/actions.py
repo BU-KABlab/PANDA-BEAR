@@ -184,7 +184,7 @@ def forward_pipette_v2(
                 from_vessel.coordinates.z_top,
                 Instruments.DECAPPER,
             )
-            toolkit.arduino.decapper_engage()
+            toolkit.arduino.no_cap()
 
         # Withdraw solution
         toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
@@ -211,7 +211,7 @@ def forward_pipette_v2(
                 from_vessel.coordinates.z_top,
                 Instruments.DECAPPER,
             )
-            toolkit.arduino.decapper_disengage()
+            toolkit.arduino.ALL_CAP()
 
         # Deposit solution
 
@@ -223,7 +223,7 @@ def forward_pipette_v2(
                 to_vessel.coordinates.z_top,
                 Instruments.DECAPPER,
             )
-            toolkit.arduino.decapper_engage()
+            toolkit.arduino.no_cap()
 
         toolkit.mill.safe_move(
             to_vessel.coordinates.x,
@@ -274,7 +274,7 @@ def forward_pipette_v2(
                 to_vessel.coordinates.z_top,
                 Instruments.DECAPPER,
             )
-            toolkit.arduino.decapper_disengage()
+            toolkit.arduino.ALL_CAP()
 
 @timing_wrapper
 def rinse_v2(

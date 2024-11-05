@@ -184,25 +184,25 @@ class ArduinoLink:
         """Turn off the rb lights"""
         return self.send(PawduinoFunctions.CURVATURE_LIGHTS_OFF.value)
 
-    def decapper_engage(self):
+    def no_cap(self):
         """Engage the decapper"""
         return self.send(PawduinoFunctions.DECAPPPER_ON.value)
 
-    def decapper_disengage(self):
+    def ALL_CAP(self):
         """Disengage the decapper"""
         return self.send(PawduinoFunctions.DECAPPPER_OFF.value)
 
     def hello(self):
         """Send a hello message to the Arduino"""
         return self.send(PawduinoFunctions.HELLO.value)
-    
+
     def lights_off(self):
         """Turn off all lights"""
         self.white_lights_off()
         self.curvature_lights_off()
 
 
-class MockArduinoLink:
+class MockArduinoLink(ArduinoLink):
     """
     This class provides a mock link between the computer and the Arduino
 
@@ -212,54 +212,29 @@ class MockArduinoLink:
     The class provides the following attributes:
     - arduinoQueue (a queue to store messages from the Arduino)
     """
-
     arduinoQueue = queue.Queue()
-
     def __init__(self):
         """Initialize the MockArduinoLink class"""
-        self.configured: bool = False
-        self.ack: str = "OK"
-
-    def __enter__(self):
-        """For use in a with statement"""
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Close the connection to the Arduino when exiting the with statement"""
-        pass
+        self.configured = True
 
     def send(self, cmd):
         """Send a message to the Arduino and wait for a response"""
-        try:
-            cmd = int(cmd)
-            return PawduinoReturnCodes[cmd].value
-        except (ValueError, TypeError):
-            return PawduinoReturnCodes[cmd].value
-
-    def receive(self):
-        """Listen to the Arduino and put the messages in the queue"""
-        pass
-
-    def configure(self):
-        """Configure the connection to the Arduino"""
-        self.configured = True
-
-    def close(self):
-        """Close the connection to the Arduino"""
-        pass
-
-    def trecieve(self):
-        """Threaded version of receive using the queue.
-        To be started elsewere.
-        """
-        pass
-
-    def tsend(self, cmd):
-        """Threaded version of send using the queue.
-        To be started elsewere.
-        """
-        return self.send(cmd)
-
+        if cmd == PawduinoFunctions.WHITE_LIGHTS_ON.value:
+            return PawduinoReturnCodes.WHITE_LIGHTS_ON.value
+        elif cmd == PawduinoFunctions.WHITE_LIGHTS_OFF.value:
+            return PawduinoReturnCodes.WHITE_LIGHTS_OFF.value
+        elif cmd == PawduinoFunctions.CURVATURE_LIGHTS_ON.value:
+            return PawduinoReturnCodes.CURVATURE_LIGHTS_ON.value
+        elif cmd == PawduinoFunctions.CURVATURE_LIGHTS_OFF.value:
+            return PawduinoReturnCodes.CURVATURE_LIGHTS_OFF.value
+        elif cmd == PawduinoFunctions.DECAPPPER_ON.value:
+            return PawduinoReturnCodes.DECAPPPER_ON.value
+        elif cmd == PawduinoFunctions.DECAPPPER_OFF.value:
+            return PawduinoReturnCodes.DECAPPPER_OFF.value
+        elif cmd == PawduinoFunctions.HELLO.value:
+            return PawduinoReturnCodes.HELLO.value
+        else:
+            return None
 
 class PawduinoFunctions(enum.Enum):
     """
