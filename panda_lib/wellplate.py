@@ -558,7 +558,7 @@ class Wellplate:
         Returns:
             dict: The coordinates of the corners of the well plate
         """
-
+        corner_keys = []
         # Possible order depending on orientation
         if self.orientation == 0:
             corner_keys = [
@@ -925,6 +925,7 @@ def load_new_wellplate(
         new_wellplate_type_number = input(
             f"Enter the new wellplate type number (Current type is {current_type_number}): "
         )
+
     else:
         if new_plate_id is None or new_plate_id == "":
             new_plate_id = current_wellplate_id + 1
