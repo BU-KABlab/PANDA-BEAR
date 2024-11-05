@@ -24,7 +24,7 @@ from panda_lib.actions_pedot import (
     cyclic_volt_edot_characterizing,
 )
 from panda_lib.experiment_class import PEDOTExperiment, ExperimentStatus
-from panda_lib.vials import StockVial, WasteVial
+from panda_lib.vials import StockVial, WasteVial, read_vials
 from panda_lib.correction_factors import correction_factor
 from panda_lib.utilities import solve_vials_ilp
 
@@ -32,8 +32,6 @@ from panda_lib.utilities import solve_vials_ilp
 def main(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     Wrapper function for the pedotLHSv1_screening function.
@@ -43,16 +41,13 @@ def main(
     pedot_lhs_v1_screening(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
+        
     )
 
 
 def pedot_lhs_v1_screening(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     The initial screening of the edot solution
@@ -119,20 +114,17 @@ def pedot_lhs_v1_screening(
     pedotdeposition(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
+        
     )
     pedotbleaching(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
+        
     )
     pedotcoloring(
         instructions=instructions,
         toolkit=toolkit,
-        stock_vials=stock_vials,
-        waste_vials=waste_vials,
+        
     )
 
     instructions.set_status_and_save(ExperimentStatus.COMPLETE)
@@ -141,8 +133,6 @@ def pedot_lhs_v1_screening(
 def pedotdeposition(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     0. Imaging the well
@@ -177,7 +167,7 @@ def pedotdeposition(
     # desired concentration at the desired volume. Calculations are done using units of 20 ul
     # as that is our minimum pipetting volume. However once the calculations are done, the
     # actual volume to be pipetted is calculated using the correction factor.
-
+    stock_vials, _ = read_vials()
     edot_vials = [
         vial for vial in stock_vials if vial.name == "edot" and vial.volume > 0
     ]
@@ -200,7 +190,7 @@ def pedotdeposition(
 
     # If the volumes are not found, raise an error
     if edot_vial_volumes is None:
-        raise ValueError("No solution found for edot vial volumes")
+        raise ValueError(f"No solution combinations found for edot {instructions.edot_concentration} mM")
     toolkit.global_logger.info(
         "Volumes to draw from each edot vial: %s uL", edot_vial_volumes
     )
@@ -326,8 +316,6 @@ def pedotdeposition(
 def pedotbleaching(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     0. Imaging the well
@@ -440,8 +428,6 @@ def pedotbleaching(
 def pedotcoloring(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     0. Imaging the well
@@ -556,8 +542,6 @@ def pedotcoloring(
 def pedotcv(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
-    stock_vials: Sequence[StockVial],
-    waste_vials: Sequence[WasteVial],
 ):
     """
     0. Imaging the well
