@@ -178,3 +178,4 @@ cython_debug/
 #.idea/
 panda_lib/config/panda_sdl_config.ini
 node_modules/*
+scratch.py
