@@ -14,4 +14,4 @@ def main(experiment_id: int = None, generate_experiment: bool = True)->int:
 
         """
         time.sleep(10) # Simulate analysis
-        return
+        return ANALYSIS_ID
