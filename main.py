@@ -463,12 +463,22 @@ def start_analsyis_loop():
 def stop_analysis_loop():
     """Stops the analysis loop."""
     if analysis_prcss:
+        while get_process_status(
+                status_queue, ProcessIDs.ANALYSIS, analysis_status
+            ) != "idle":
+            time.sleep(1)
+            
         stop_process(analysis_prcss)
 
 
 def stop_control_loop():
     """Stops the control loop."""
     if exp_loop_prcss:
+        while get_process_status(
+                status_queue, ProcessIDs.CONTROL_LOOP, exp_loop_status
+            ) != "idle":
+            time.sleep(1)
+            
         stop_process(exp_loop_prcss)
 
 
@@ -599,9 +609,9 @@ def main_menu_options(reduced: bool = False) -> dict[str, callable]:
 
 def get_process_status(process_status_queue: multiprocessing.Queue, process_id, current_status=None):
     """Get the latest status of a process from the status queue."""
-    latest_status = None
     temp_queue = []
     while not process_status_queue.empty():
+        latest_status = None
         pid, status = process_status_queue.get()
         # If the process ids match, and the status is different than the current
         # status save the status.
@@ -611,9 +621,9 @@ def get_process_status(process_status_queue: multiprocessing.Queue, process_id, 
                 latest_status = status
             else:
                 latest_status = current_status
-        
-        # Save the other process statuses back to the queue
-        temp_queue.append((pid, status))
+        else:
+            # Save the other process statuses back to the queue
+            temp_queue.append((pid, status))
 
     for item in temp_queue:
         # Return to queue if not the process we are looking for
