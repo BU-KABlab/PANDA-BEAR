@@ -60,7 +60,7 @@ def analysis_worker(
                             f"running analysis on experiment {experiment.experiment_id}",
                         )
                     )
-                    output = analyzer.main(
+                    output = analyzer(
                         experiment_id=experiment.experiment_id,
                         generate_experiment=generate_experiments,
                     )
@@ -86,6 +86,7 @@ def analysis_worker(
 
             if breaking_issue:
                 break
+            status_queue.put((process_id, "idle"))
             time.sleep(5)
 
     status_queue.put((process_id, "finished"))
