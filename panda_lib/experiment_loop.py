@@ -27,10 +27,7 @@ from panda_lib import scheduler
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
 from panda_lib.gamry_potentiostat import gamry_control
-from panda_lib.pawduino import (
-    ArduinoLink,
-    MockArduinoLink
-)
+from panda_lib.pawduino import ArduinoLink, MockArduinoLink
 from panda_lib.sql_tools import db_setup, panda_models, sql_queue
 
 from . import actions
@@ -199,14 +196,14 @@ def experiment_loop_worker(
                 status_queue.put(
                     (
                         process_id,
-                        "No new experiments to run...waiting for new experiments",
+                        "idle",
                     )
                 )
 
                 sql_system_state.set_system_status(
                     SystemState.PAUSE, "Waiting for new experiments"
                 )
-                status = system_status_loop(controller_slack)
+                status = system_status_loop(controller_slack, status_queue, process_id)
                 if status == SystemState.STOP:
                     break  # break out of the main while True loop
 
@@ -413,7 +410,7 @@ def experiment_loop_worker(
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
-            status = system_status_loop(controller_slack)
+            status = system_status_loop(controller_slack, status_queue, process_id)
             if status == SystemState.STOP:
                 break  # break out of the while True loop
     except (
@@ -498,9 +495,7 @@ def experiment_loop_worker(
         # if slack_thread.is_alive():
         #     slack_thread.join()
         controller_slack.send_message("alert", "PANDA_SDL is shutting down...goodbye")
-        status_queue.put(
-            process_id, "PANDA_SDL is shutting down...returning to main menu...goodbye"
-        )
+        status_queue.put((process_id, "idle"))
 
 
 @timing_wrapper
@@ -657,7 +652,9 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
 
 
 @timing_wrapper
-def system_status_loop(slack: SlackBot):
+def system_status_loop(
+    slack: SlackBot, status_queue: multiprocessing.Queue, process_id: int
+) -> SystemState:
     """
     Loop to check the system status and update the system status
     """
@@ -686,6 +683,7 @@ def system_status_loop(slack: SlackBot):
             #     break
             if first_pause:
                 slack.send_message("alert", "PANDA_SDL is paused")
+                status_queue.put((process_id, "idle"))
                 first_pause = False
             for remaining in range(60, 0, -1):
                 sys.stdout.write("\r")
