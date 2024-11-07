@@ -455,8 +455,6 @@ def experiment_loop_worker(
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.OFF)
         logger.info("User commanded shutting down of PANDA_SDL")
-        raise ShutDownCommand from error  # raise error to go to finally.
-        # This was triggered by the user to indicate they want to stop the program
 
     except KeyboardInterrupt as exc:
         if current_experiment is not None:
