@@ -1,10 +1,9 @@
 """The sequence of steps for a pedotLHSv1_screening experiment."""
 
 # Standard imports
-from typing import Sequence
 
 # Non-standard imports
-from panda_lib.controller import Toolkit
+from panda_lib.experiment_loop import Toolkit
 from panda_lib.actions import (
     forward_pipette_v2,
     solution_selector,
@@ -24,7 +23,7 @@ from panda_lib.actions_pedot import (
     cyclic_volt_edot_characterizing,
 )
 from panda_lib.experiment_class import PEDOTExperiment, ExperimentStatus
-from panda_lib.vials import StockVial, WasteVial, read_vials
+from panda_lib.vials import read_vials
 from panda_lib.correction_factors import correction_factor
 from panda_lib.utilities import solve_vials_ilp
 
@@ -148,8 +147,7 @@ def pedotdeposition(
     Args:
         instructions (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
-        stock_vials (Sequence[StockVial]): _description_
-        waste_vials (Sequence[WasteVial]): _description_
+  
     """
     toolkit.global_logger.info(
         "Running experimnet %s part 1", instructions.experiment_id
@@ -330,8 +328,6 @@ def pedotbleaching(
     Args:
         instructions (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
-        stock_vials (Sequence[StockVial]): _description_
-        waste_vials (Sequence[WasteVial]): _description_
     """
     toolkit.global_logger.info(
         "Running experiment %s part 2", instructions.experiment_id
@@ -442,8 +438,6 @@ def pedotcoloring(
     Args:
         instructions (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
-        stock_vials (Sequence[StockVial]): _description_
-        waste_vials (Sequence[WasteVial]): _description_
     """
     toolkit.global_logger.info(
         "Running experiment %s part 3", instructions.experiment_id
@@ -558,8 +552,6 @@ def pedotcv(
     Args:
         instructions (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
-        stock_vials (Sequence[StockVial]): _description_
-        waste_vials (Sequence[WasteVial]): _description_
     """
     toolkit.global_logger.info(
         "Running experiment %s part 4", instructions.experiment_id
