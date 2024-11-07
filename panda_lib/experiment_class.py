@@ -308,6 +308,8 @@ class ExperimentBase:
     well: object= None
     analyzer: Union[Callable, str, None] = None
     generator: Union[Callable, str, None] = None
+    analysis_id: int = None
+    needs_analysis: int = 0
 
     def __post_init__(self):
         # Validate that all dictionary keys are lowercase
