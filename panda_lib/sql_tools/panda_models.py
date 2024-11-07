@@ -28,6 +28,7 @@ class Experiments(Base):
     project_campaign_id = Column(Integer)
     well_type = Column(Integer)
     protocol_id = Column(Integer)
+    analysis_id = Column(Integer)
     pin = Column(String)
     experiment_type = Column(Integer)
     jira_issue_key = Column(String)
