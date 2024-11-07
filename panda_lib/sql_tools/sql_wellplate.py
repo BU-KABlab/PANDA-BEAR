@@ -242,6 +242,29 @@ def select_wellplate_info(plate_id: int) -> WellPlates:
     with SessionLocal() as session:
         result = session.query(WellPlates).filter(WellPlates.id == plate_id).first()
         return result
+def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
+    """
+    Get the well IDs from the well_hx table for the given or current wellplate.
+
+    Args:
+        plate_id (int): The plate ID.
+
+    Returns:
+        List[str]: The well IDs.
+    """
+
+    with SessionLocal() as session:
+        if plate_id is None:
+            plate_id = (
+                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+            )
+        result = (
+            session.query(WellHx.well_id)
+            .filter(WellHx.plate_id == plate_id)
+            .order_by(WellHx.well_id.asc())
+            .all()
+        )
+        return [row[0] for row in result]
 
 def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
     """
