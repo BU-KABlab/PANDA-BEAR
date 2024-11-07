@@ -17,9 +17,8 @@ from typing import Tuple
 from PIL import Image
 
 from license_text import show_conditions, show_warrenty
-from panda_experiment_analyzers import analysis_worker
 from panda_lib import (
-    controller,
+    experiment_loop,
     imaging,
     pipette,
     print_panda,
@@ -30,6 +29,7 @@ from panda_lib import (
 from panda_lib.config import print_config_values as print_config
 from panda_lib.config import read_config, read_testing_config, write_testing_config
 from panda_lib.experiment_class import ExperimentBase
+from panda_lib.experiment_analysis_loop import analysis_worker, load_analyzers
 from panda_lib.movement import mill_calibration_and_positioning
 from panda_lib.sql_tools import (
     remove_testing_experiments,
@@ -39,8 +39,21 @@ from panda_lib.sql_tools import (
     sql_system_state,
     sql_wellplate,
 )
+from panda_lib.utilities import input_validation
 
 os.environ["KMP_AFFINITY"] = "none"
+exp_loop_prcss: multiprocessing.Process = None
+exp_loop_status = None
+control_loop_queue: multiprocessing.Queue = multiprocessing.Queue()
+analysis_prcss: multiprocessing.Process = None
+analysis_status = None
+status_queue: multiprocessing.Queue = multiprocessing.Queue()
+slackbot_thread: threading.Thread = None
+slackThread_running = threading.Event()
+
+experiment_choices = ["0", "1"]
+analysis_choices = ["10"]
+blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 
 
 def run_panda_sdl_with_ml():
@@ -48,7 +61,7 @@ def run_panda_sdl_with_ml():
     length = int(input("Enter the campaign length: ").strip().lower())
 
     exp_processes = multiprocessing.Process(
-        target=controller.experiment_loop_worker,
+        target=experiment_loop.experiment_loop_worker,
         kwargs={
             "status_queue": status_queue,
             "process_id": ProcessIDs.CONTROL_LOOP,
@@ -82,7 +95,7 @@ def run_panda_sdl_without_ml():
                 continue
 
             exp_processes = multiprocessing.Process(
-                target=controller.experiment_loop_worker,
+                target=experiment_loop.experiment_loop_worker,
                 kwargs={
                     "one_off": True,
                     "status_queue": status_queue,
@@ -93,7 +106,7 @@ def run_panda_sdl_without_ml():
             break
         elif one_off[0] == "n":
             exp_processes = multiprocessing.Process(
-                target=controller.experiment_loop_worker,
+                target=experiment_loop.experiment_loop_worker,
                 kwargs={
                     "status_queue": status_queue,
                     "process_id": ProcessIDs.CONTROL_LOOP,
@@ -369,13 +382,13 @@ def instrument_check():
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "running instrument check"
     )
-    intruments, all_found = controller.test_instrument_connections(False)
+    intruments, all_found = experiment_loop.test_instrument_connections(False)
     if all_found:
         input("Press Enter to continue...")
     else:
         input("Press Enter to continue...")
 
-    controller.disconnect_from_instruments(intruments)
+    experiment_loop.disconnect_from_instruments(intruments)
     return
 
 
@@ -406,7 +419,7 @@ def generate_vial_data_template():
 def slack_monitor_bot(testing, running_flag: threading.Event):
     """Runs the slack monitor bot."""
     try:
-        bot = controller.SlackBot(test=testing)
+        bot = experiment_loop.SlackBot(test=testing)
         bot.send_message("alert", "PANDA Bot is monitoring Slack")
 
         while running_flag.is_set():
@@ -449,14 +462,14 @@ def start_analsyis_loop():
 
 def stop_analysis_loop():
     """Stops the analysis loop."""
-    if analysis_proceess:
-        stop_process(analysis_proceess)
+    if analysis_prcss:
+        stop_process(analysis_prcss)
 
 
 def stop_control_loop():
     """Stops the control loop."""
-    if control_loop_process:
-        stop_process(control_loop_process)
+    if exp_loop_prcss:
+        stop_process(exp_loop_prcss)
 
 
 def stop_process(process: multiprocessing.Process):
@@ -464,11 +477,22 @@ def stop_process(process: multiprocessing.Process):
     process.terminate()
     process.join()
 
+def update_well_status():
+    """Manually update the status of a well on the current wellpalte."""
+    wellplate_id = wellplate.read_current_wellplate_info()[0]
+    well_ids = sql_wellplate.select_well_ids(wellplate_id)
+    well_id = input_validation("Enter the well ID to update: ",str, None ,False,"Invalid Well ID",well_ids)
+    status = input_validation("Enter the status of the well: ",str)
+    sql_wellplate.update_well_status(well_id,wellplate_id, status)
 
-experiment_choices = ["0", "1"]
-analysis_choices = ["10"]
-blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
+def list_analysis_scrip_ids():
+    """List the analysis script IDs in the database."""
+    analyzers = load_analyzers()
+    print("Analysis Script IDs:")
+    for analyzer in analyzers:
+        print(analyzer.ANALYSIS_ID)
 
+    input("Press Enter to continue...") 
 
 def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
@@ -484,6 +508,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "2.3": print_wellplate_info,
         "2.5": remove_training_data,
         "2.6": clean_up_testing_experiments,
+        "2.7": update_well_status,
         "3": reset_vials_stock,
         "3.1": reset_vials_waste,
         "3.2": input_new_vial_values_stock,
@@ -500,6 +525,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "9": test_pipette,
         "10": start_analsyis_loop,
         "11": stop_analysis_loop,
+        "12": list_analysis_scrip_ids,
         "t": toggle_testing_mode,
         "r": refresh,
         "w": show_warrenty,
@@ -571,18 +597,26 @@ def main_menu_options(reduced: bool = False) -> dict[str, callable]:
     return menu_options
 
 
-def get_process_status(process_status_queue: multiprocessing.Queue, process_id):
+def get_process_status(process_status_queue: multiprocessing.Queue, process_id, current_status=None):
     """Get the latest status of a process from the status queue."""
     latest_status = None
     temp_queue = []
     while not process_status_queue.empty():
         pid, status = process_status_queue.get()
+        # If the process ids match, and the status is different than the current
+        # status save the status.
+        # If the status is None use the current status
         if pid == process_id:
-            latest_status = status
+            if current_status is None or status != current_status:
+                latest_status = status
+            else:
+                latest_status = current_status
+        
+        # Save the other process statuses back to the queue
         temp_queue.append((pid, status))
 
     for item in temp_queue:
-        # Put the items back in the queue
+        # Return to queue if not the process we are looking for
         process_status_queue.put(item)
 
     return latest_status
@@ -617,113 +651,102 @@ def banner():
     print(f"\n{print_panda.print_panda()}\n")
 
 
+def user_sign_in() -> str:
+    """Signs the user in."""
+    while True:
+        user_name = input("Enter your username: ").strip().lower()
+        # Look up user in db
+
+        # If user is not found, ask if they would like to create a new user
+
+        # If user is found, ask for password
+
+        # If password is correct, continue to main menu
+
+        # If password is incorrect, ask if they would like to try again
+
+        # If user chooses to try again, repeat password input
+
+        # If user chooses to exit, exit the program
+        break
+
+    return user_name.strip().capitalize()
+
+
+def start_slack_bot(event_flag: threading.Event) -> threading.Thread:
+    """Starts the slack bot."""
+    slack_thread = threading.Thread(
+        target=slack_monitor_bot, args=(read_testing_config(), event_flag)
+    )
+    slack_thread.start()
+    return slack_thread
+
+
+def get_active_db():
+    """Get the active database according to the config file."""
+    if read_testing_config():
+        return read_config()["TESTING"]["testing_db_address"]
+    else:
+        return read_config()["PRODUCTION"]["production_db_address"]
+
+
 if __name__ == "__main__":
-
-    control_loop_process: multiprocessing.Process = None
-    control_loop_status = None
-    control_loop_queue: multiprocessing.Queue = multiprocessing.Queue()
-    analysis_proceess: multiprocessing.Process = None
-    analysis_status = None
-    status_queue: multiprocessing.Queue = multiprocessing.Queue()
-    slackThread_running = threading.Event()
-    slackThread_running.set()
-
     config = read_config()
-
+    slackThread_running.set()
     discalimer()
     time.sleep(2)
-
     sql_protocol_utilities.read_in_protocols()
-
     banner()
-    # User sign in
+
     try:
+        user_name = user_sign_in()
+        slackbot_thread = start_slack_bot(slackThread_running)
         while True:
-            user_name = input("Enter your username: ").strip().lower()
-            # Look up user in db
-
-            # If user is not found, ask if they would like to create a new user
-
-            # If user is found, ask for password
-
-            # If password is correct, continue to main menu
-
-            # If password is incorrect, ask if they would like to try again
-
-            # If user chooses to try again, repeat password input
-
-            # If user chooses to exit, exit the program
-            break
-
-        slackbot_thread = threading.Thread(
-            target=slack_monitor_bot,
-            args=(read_testing_config(), slackThread_running),
-            daemon=True,
-        )
-        slackbot_thread.start()
-        # Main loop
-        while True:
-
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
-            banner()
-            print(f"Welcome {user_name}!")
-            print(
-                "Testing mode is ", "ENABLED" if read_testing_config() else "DISABLED"
-            )
-            if read_testing_config():
-                print("DB: ", read_config()["TESTING"]["testing_db_address"])
-            else:
-                print("DB: ", read_config()["PRODUCTION"]["production_db_address"])
             num, p_type, new_wells = wellplate.read_current_wellplate_info()
             current_pipette = pipette.select_pipette_status()
-
-            new_control_loop_status = get_process_status(
-                status_queue, ProcessIDs.CONTROL_LOOP
-            )
-            new_analysis_status = get_process_status(status_queue, ProcessIDs.ANALYSIS)
-            # slackbot_status = get_process_status(status_queue, ProcessIDs.SLACKBOT)
-
-            if (
-                control_loop_status != new_control_loop_status
-                and new_control_loop_status is not None
-            ):
-                control_loop_status = new_control_loop_status
-            if (
-                analysis_status != new_analysis_status
-                and new_analysis_status is not None
-            ):
-                analysis_status = new_analysis_status
-
+            remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
+            exp_loop_status = get_process_status(status_queue, ProcessIDs.CONTROL_LOOP, exp_loop_status)
+            analysis_status = get_process_status(status_queue, ProcessIDs.ANALYSIS, analysis_status)
+            # slackbot_status = get_process_status(status_queue, ProcessIDs.SLACKBOT, slackbot_status)
+            banner()
             print(
                 f"""
+Welcome {user_name}!
+Testing mode is {"ENABLED" if read_testing_config() else "DISABLED"}
+DB: {get_active_db()}
+
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
-The current pipette id is {current_pipette.id} and has {int(round((2000-current_pipette.uses)/2,0))} uses left.
+The current pipette id is {current_pipette.id} and has {remaining_uses} uses left.
 The queue has {sql_queue.count_queue_length()} experiments.
 Process Status:
-    Control Loop: {control_loop_process.is_alive() if control_loop_process else False} - {control_loop_status}
-    Analysis Loop: {analysis_proceess.is_alive() if analysis_proceess else False} - {analysis_status}
-        """
+    Control Loop: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
+    Analysis Loop: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
+    Slack Bot: {slackThread_running.is_set()}
+"""
             )
+            # Get the function name and the choice key, reducing the options
+            # if the experiment loop is running.
             function_name, choice_key = main_menu(
-                control_loop_process.is_alive() if control_loop_process else False
+                exp_loop_prcss.is_alive() if exp_loop_prcss else False
             )
 
             try:
                 if choice_key in experiment_choices:
-                    control_loop_process = function_name()
+                    exp_loop_prcss = function_name()
                     continue
                 elif choice_key in analysis_choices:
-                    analysis_proceess = function_name()
+                    analysis_prcss = function_name()
                     continue
                 function_name()
-            except controller.ShutDownCommand:
+            except experiment_loop.ShutDownCommand:
                 # Confirm that the control loop has been stopped
-                if control_loop_process:
-                    control_loop_process.terminate()
-                    control_loop_process.join()
+                if exp_loop_prcss:
+                    exp_loop_prcss.terminate()
+                    exp_loop_prcss.join()
                 # The PANDA_SDL loop has been stopped but we don't want to exit the program
-            except controller.OCPFailure:
-                slack = controller.SlackBot()
+            except experiment_loop.OCPFailure:
+                slack = experiment_loop.SlackBot()
                 if slack.echem_error_procedure():
                     function_name()
                 else:
@@ -733,16 +756,17 @@ Process Status:
                 print(f"An error occurred: {e}")
                 raise e  # Exit the program if an unknown error occurs
     except KeyboardInterrupt:
-        pass
+        print("Keyboard interrupt detected. Exiting PANDA_SDL.")
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
         # End of program tasks
-        if control_loop_process:
-            control_loop_process.terminate()
-            control_loop_process.join()
-        if analysis_proceess:
-            analysis_proceess.terminate()
-            analysis_proceess.join()
-        slackThread_running.clear()
-        slackbot_thread.join()
+        if exp_loop_prcss:
+            exp_loop_prcss.terminate()
+            exp_loop_prcss.join()
+        if analysis_prcss:
+            analysis_prcss.terminate()
+            analysis_prcss.join()
+        if slackbot_thread:
+            slackThread_running.clear()
+            slackbot_thread.join()
