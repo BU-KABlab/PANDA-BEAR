@@ -689,13 +689,13 @@ class Mill:
 
     def _validate_target_coordinates(self, target_coordinates: Coordinates):
         working_volume = Coordinates(**self.config["working_volume"])
-        if not (working_volume.x <= target_coordinates.x <= 1):
+        if not working_volume.x <= target_coordinates.x <= 1:
             mill_control_logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if not (working_volume.y <= target_coordinates.y <= 1):
+        if not working_volume.y <= target_coordinates.y <= 1:
             mill_control_logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if not (working_volume.z <= target_coordinates.z <= 1):
+        if not working_volume.z <= target_coordinates.z <= 1:
             mill_control_logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
@@ -817,7 +817,7 @@ class MockMill(Mill):
 
             # command_bytes = str(command).encode()
             self.mock_write(command)
-            time.sleep(2)
+            time.sleep(0.25)
             if command == "$$":
                 return self.mock_readline(settings=True)
             else:
@@ -886,17 +886,12 @@ class MockMill(Mill):
             )
             if mill_config:
                 return mill_config.config
+            else:
+                pass
 
     def __wait_for_completion(self, incoming_status, timeout=90):
         """Wait for the mill to complete the previous command"""
-        status = incoming_status
-        start_time = time.time()
-        while "Idle" not in status:
-            if time.time() - start_time > timeout:
-                mill_control_logger.warning("wait_for_completion: Command execution timed out")
-                break
-            status = self.current_status()
-            time.sleep(1)
+        pass
 
     def mock_write(self, command: str):
         """Simulate writing to the mill"""
