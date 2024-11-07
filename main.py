@@ -610,8 +610,8 @@ def main_menu_options(reduced: bool = False) -> dict[str, callable]:
 def get_process_status(process_status_queue: multiprocessing.Queue, process_id, current_status=None):
     """Get the latest status of a process from the status queue."""
     temp_queue = []
+    latest_status = None
     while not process_status_queue.empty():
-        latest_status = None
         pid, status = process_status_queue.get()
         # If the process ids match, and the status is different than the current
         # status save the status.
@@ -629,6 +629,8 @@ def get_process_status(process_status_queue: multiprocessing.Queue, process_id, 
         # Return to queue if not the process we are looking for
         process_status_queue.put(item)
 
+    if latest_status is None:
+        return current_status
     return latest_status
 
 
