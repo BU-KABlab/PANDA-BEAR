@@ -56,8 +56,9 @@ from panda_lib.movement import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.instrument_toolkit import Toolkit
-from panda_lib.vials import StockVial, WasteVial, read_vials
+from panda_lib.vials import StockVial, WasteVial, read_vials, Vessel
 from panda_lib.wellplate import Well
+from panda_lib.utilities import solve_vials_ilp
 
 TESTING = read_testing_config()
 
@@ -275,6 +276,230 @@ def forward_pipette_v2(
                 Instruments.DECAPPER,
             )
             toolkit.arduino.ALL_CAP()
+
+
+@timing_wrapper
+def forward_pipette_v3(
+    volume: float,
+    src_vessel: Union[str, Well, StockVial],
+    dst_vessel: Union[Well, WasteVial],
+    toolkit: Toolkit,
+    source_concentration: float = None,
+)->int:
+    """
+    Forward pipette from a given source to a given destination.
+    The source may be one of the following:
+        - A string representing the name of a solution
+        - A Well object
+        - A StockVial object
+    The destination may be one of the following:
+        - A Well object
+        - A WasteVial object
+
+    If the source is given as as string, the function will look up the solution in the stock vials and use it as the source.
+    If a concentration is provided for the solution, multiple source vials may be used to achieve the desired concentration.
+
+    Args:
+        volume (float): The desired volume to be pipetted in microliters. Will be corrected for viscocity.
+        source (Union[str, Well, StockVial]): The source vessel. Assumes a vial if a string is provided
+        destination (Union[Well, WasteVial]): The destination vessel
+        solution_concentration (float): The concentration of the solution to be used
+        toolkit (Toolkit): The toolkit object conatining the mill, pump, arduino and wellplate
+        solution_concentration (float): The concentration of the solution to be used in mol/L
+
+    Returns:
+        int: 0 if the function completes successfully
+    """
+    try:
+        if volume <= 0.0:
+            return
+
+        # Handle when a source solution name and concentration is provided (even if concentration is none)
+        selected_source_vessels: list[Vessel] = None
+        source_vessel_volumes: list = None
+        if isinstance(src_vessel, str):
+            # Fetch updated solutions from the db
+            stock_vials, _ = read_vials()
+            selected_source_vessels = [
+                vial for vial in stock_vials if vial.name == src_vessel and vial.volume > 0
+            ]
+
+            # If there are no edot vials, raise an error
+            if not selected_source_vessels:
+                toolkit.global_logger.error("No %s vials available", src_vessel)
+                raise ValueError(f"No {src_vessel} vials available")
+
+            # There are one or more vials, let's calculate the volume to be pipetted from each
+            # vial to get the desired volume and concentration
+            source_vessel_volumes, deviation, volumes_by_position = solve_vials_ilp(
+                # Concentrations of each vial in mM
+                vial_concentration_map={
+                    vial.position: vial.concentration for vial in selected_source_vessels
+                },
+                # Total volume to achieve in uL
+                v_total=volume,
+                # Target concentration in mM
+                c_target=source_concentration,
+            )
+
+            # If the volumes are not found, raise an error
+            if source_vessel_volumes is None:
+                raise ValueError(
+                    f"No solution combinations found for {src_vessel} {source_concentration} mM"
+                )
+
+            toolkit.global_logger.info(
+                "Deviation from target concentration: %s mM", deviation
+            )
+
+            # Pair the source vessels with their respective volumes base don the volumes by position
+            source_vessel_volumes = [
+                (vial, volumes_by_position[vial.position]) for vial in selected_source_vessels
+            ]
+        else:  # If the source is a single vessel
+            source_vessel_volumes = [(src_vessel, volume)]
+
+        # Log the plan for pipetting the solutions to achieve the desired concentration
+        if isinstance(src_vessel, str):
+            for vessel, source_vessel_volume in source_vessel_volumes:
+                toolkit.global_logger.info(
+                    "Pipetting %f uL from %s to achieve %f mM",
+                    source_vessel_volume,
+                    vessel.name,
+                    source_concentration,
+                )
+
+        else:
+            toolkit.global_logger.info(
+                "Pipetting %f uL from %s to %s",
+                volume,
+                src_vessel.name,
+                dst_vessel.name,
+            )
+
+        # Check to ensure that the source and destination are an allowed combination
+        for source_vial, _ in source_vessel_volumes:
+            if isinstance(source_vial, Well) and isinstance(dst_vessel, StockVial):
+                raise ValueError("Cannot pipette from a well to a stock vial")
+            if isinstance(source_vial, WasteVial) and isinstance(dst_vessel, Well):
+                raise ValueError("Cannot pipette from a waste vial to a well")
+            if isinstance(source_vial, StockVial) and isinstance(dst_vessel, StockVial):
+                raise ValueError("Cannot pipette from a stock vial to a stock vial")
+
+        # Cycle through the source_vials and pipette the volumes
+        for vessel, desired_volume in source_vessel_volumes:
+            # Calculate repetitions
+            vessel:Vessel
+            repetitions = math.ceil(desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP))
+            repetition_vol = correction_factor(desired_volume / repetitions, vessel.viscosity_cp)
+            logger.info("Pipetting %f uL from %s to %s", desired_volume, vessel.name, dst_vessel.name)
+            for j in range(repetitions):
+                logger.info("Repetition %d of %d", j + 1, repetitions)
+
+                # Decap the source vial
+                if isinstance(vessel, StockVial):
+                    toolkit.mill.safe_move(
+                        vessel.coordinates.x,
+                        vessel.coordinates.y,
+                        vessel.coordinates.z_top,
+                        Instruments.DECAPPER,
+                    )
+                    toolkit.arduino.no_cap()
+
+                # Withdraw solution
+                toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
+                toolkit.mill.safe_move(
+                    vessel.coordinates["x"],
+                    vessel.coordinates["y"],
+                    vessel.coordinates.z_bottom,
+                    Instruments.PIPETTE,
+                )
+                toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=vessel)
+                if isinstance(vessel, Well):
+                    # Withdraw extra to try and remove of all solution
+                    toolkit.pump.withdraw(volume_to_withdraw=20)
+                toolkit.mill.move_to_safe_position()
+                toolkit.pump.withdraw(volume_to_withdraw=DRIP_STOP)
+
+                # Cap the source vial
+                if isinstance(vessel, StockVial):
+                    toolkit.mill.safe_move(
+                        vessel.coordinates.x,
+                        vessel.coordinates.y,
+                        vessel.coordinates.z_top,
+                        Instruments.DECAPPER,
+                    )
+                    toolkit.arduino.ALL_CAP()
+
+                # Deposit solution
+
+                # If the to_vessel is a waste_vial decap the vial
+                if isinstance(dst_vessel, WasteVial):
+                    toolkit.mill.safe_move(
+                        dst_vessel.coordinates.x,
+                        dst_vessel.coordinates.y,
+                        dst_vessel.coordinates.z_top,
+                        Instruments.DECAPPER,
+                    )
+                    toolkit.arduino.no_cap()
+
+                toolkit.mill.safe_move(
+                    dst_vessel.coordinates.x,
+                    dst_vessel.coordinates.y,
+                    dst_vessel.coordinates.z_top,
+                    Instruments.PIPETTE,
+                )
+                toolkit.pump.infuse(
+                    volume_to_infuse=repetition_vol,
+                    being_infused=vessel,
+                    infused_into=dst_vessel,
+                    blowout_ul=(
+                        AIR_GAP + DRIP_STOP + 20
+                        if isinstance(vessel, Well)
+                        else AIR_GAP + DRIP_STOP
+                    ),
+                )
+
+                # Purge residual solution
+                for _, vol in toolkit.pump.pipette.contents.items():
+                    if vol > 0.0:
+                        logger.warning(
+                            "Pipette has residual volume of %f ul. Purging...", vol
+                        )
+                        toolkit.pump.infuse(
+                            volume_to_infuse=vol,
+                            being_infused=None,
+                            infused_into=dst_vessel,
+                            blowout_ul=vol,
+                        )
+
+                if toolkit.pump.pipette.volume > 0.0:
+                    logger.warning(
+                        "Pipette has residual volume of %f ul. Purging...",
+                        toolkit.pump.pipette.volume,
+                    )
+                    toolkit.pump.infuse(
+                        volume_to_infuse=toolkit.pump.pipette.volume,
+                        being_infused=None,
+                        infused_into=dst_vessel,
+                        blowout_ul=toolkit.pump.pipette.volume,
+                    )
+                    toolkit.pump.pipette.volume = 0.0
+
+                # Cap the destination vial
+                if isinstance(dst_vessel, WasteVial):
+                    toolkit.mill.safe_move(
+                        dst_vessel.coordinates.x,
+                        dst_vessel.coordinates.y,
+                        dst_vessel.coordinates.z_top,
+                        Instruments.DECAPPER,
+                    )
+                    toolkit.arduino.ALL_CAP()
+    except Exception as e:
+        toolkit.global_logger.error("Exception occurred during pipetting: %s", e)
+        raise e
+    return 0
+
 
 @timing_wrapper
 def rinse_v2(
