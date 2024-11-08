@@ -4,8 +4,9 @@
 
 // libraries
 // Include Libraries
-#include "Arduino.h"
+// #include "Arduino.h"
 #include "Adafruit_NeoPixel.h"
+#include <stdint.h>
 
 // Pin Definitions
 #define LEDR_1_PIN 5
