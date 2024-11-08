@@ -1,26 +1,26 @@
 """Custom functions for the PANDA_SDL library which are specific to a particular experiment type."""
 
 from panda_lib.actions import (
-    EchemExperimentBase,
-    ExperimentResult,
-    ExperimentStatus,
-    logger,
-    chrono_parameters,
-    cv_parameters,
-    chrono_amp,
-    cyclic_volt,
-    OCPFailure,
     CAFailure,
     CVFailure,
     DepositionFailure,
-    Tuple
+    ExperimentResult,
+    ExperimentStatus,
+    OCPFailure,
+    Tuple,
+    chrono_amp,
+    chrono_parameters,
+    cv_parameters,
+    cyclic_volt,
+    logger,
 )
+from panda_lib.experiment_class import PEDOTExperiment
 
 
 def chrono_amp_edot_bleaching(
-    ca_instructions: EchemExperimentBase,
+    ca_instructions: PEDOTExperiment,
     file_tag: str = "CA_bleaching",
-) -> Tuple[EchemExperimentBase, ExperimentResult]:
+) -> Tuple[PEDOTExperiment, ExperimentResult]:
     """
     Bleaching of an edot film already on ITO. This wraps the chrono_amp function.
 
@@ -63,15 +63,17 @@ def chrono_amp_edot_bleaching(
     except Exception as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
-        raise DepositionFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
+        raise DepositionFailure(
+            ca_instructions.experiment_id, ca_instructions.well_id
+        ) from e
 
     return ca_instructions, dep_results
 
 
 def chrono_amp_edot_coloring(
-    ca_instructions: EchemExperimentBase,
+    ca_instructions: PEDOTExperiment,
     file_tag: str = "CA_coloring",
-) -> Tuple[EchemExperimentBase, ExperimentResult]:
+) -> Tuple[PEDOTExperiment, ExperimentResult]:
     """
     Coloring of an edot film already on ITO. This wraps the chrono_amp function.
 
@@ -115,14 +117,16 @@ def chrono_amp_edot_coloring(
     except Exception as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
-        raise DepositionFailure(ca_instructions.experiment_id, ca_instructions.well_id) from e
+        raise DepositionFailure(
+            ca_instructions.experiment_id, ca_instructions.well_id
+        ) from e
 
     return ca_instructions, dep_results
 
 
 def cyclic_volt_edot_characterizing(
-    cv_instructions: EchemExperimentBase, file_tag: str = "CV_characterization"
-) -> Tuple[EchemExperimentBase, ExperimentResult]:
+    cv_instructions: PEDOTExperiment, file_tag: str = "CV_characterization"
+) -> Tuple[PEDOTExperiment, ExperimentResult]:
     """
     Characterization of the solutions on the substrate using CV.
     No pipetting is performed in this step.
