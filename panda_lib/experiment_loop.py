@@ -85,6 +85,7 @@ def experiment_loop_worker(
     specific_experiment_id: int = None,
     status_queue: multiprocessing.Queue = multiprocessing.Queue(),
     process_id: int = None,
+    command_queue: multiprocessing.Queue = multiprocessing.Queue(),
 ):
     """
     Main function
@@ -275,9 +276,9 @@ def experiment_loop_worker(
 
             logger.info("Beginning experiment %d", current_experiment.experiment_id)
 
-            # Get the protocol entry
+            # Get the protocol entry using either the name or id
             protocol_entry: sql_protocol_utilities.ProtocolEntry = (
-                sql_protocol_utilities.select_protocol_by_id(
+                sql_protocol_utilities.select_protocol(
                     current_experiment.protocol_id
                 )
             )
@@ -311,6 +312,11 @@ def experiment_loop_worker(
             current_experiment.set_status_and_save(ExperimentStatus.SAVING)
             scheduler.save_results(current_experiment)
             current_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
+            # Post to the alerts channel
+            controller_slack.send_message(
+                "alert",
+                f"Experiment {current_experiment.experiment_id} has completed",
+            )
             # Share any results images with the slack data channel
             share_to_slack(current_experiment)
 
