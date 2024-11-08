@@ -18,7 +18,6 @@ import logging
 # pylint: disable=unused-argument
 import os
 import platform
-from configparser import ConfigParser
 from typing import Sequence
 
 from panda_lib.experiment_class import (ExperimentResultsRecord,
@@ -28,15 +27,14 @@ from panda_lib.log_tools import setup_default_logger
 from panda_lib.utilities import Instruments, input_validation
 from panda_lib.vials import StockVial, WasteVial
 from panda_lib.wellplate import Well, WellCoordinates, Wellplate
+from panda_lib.config.config_tools import read_config
 
 from .mill_control import Mill, MockMill
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
-config = config["MILL"]
 
+config = read_config()["MILL"]
 
 def check_mill_settings(mill: Mill, *args, **kwargs):
     """
