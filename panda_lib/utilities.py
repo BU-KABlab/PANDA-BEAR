@@ -111,25 +111,28 @@ class ProtocolEntry:
         return f"{self.protocol_id}: {self.name}"
 
 
-def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
+def solve_vials_ilp(
+    vial_concentration_map: dict[str, float], v_total: float, c_target: float
+) -> tuple[dict[str, float], float, dict[str, float]]:
     """
     Solve the concentration mixing problem using integer linear programming.
 
     Parameters
     ----------
-    C : list of float - Concentrations of each vial in mM.
+    C : dict of str,floats - Concentrations of each vial in mM, keyed by vial_position.
     V_total : float - Total volume to achieve in uL.
     C_target : float - Target concentration in mM.
 
     Returns
     -------
-    volumes : list of float - Volumes to draw from each vial in uL.
+    vial_volumes : dict of str,floats - Volumes of each vial to achieve the target concentration in uL.
     deviation_value : float - Deviation from the target concentration in mM.
     """
-    num_vials = len(vial_concentrations)
+    num_vials = len(vial_concentration_map)
 
     # Validate and clean the incoming data to remove any Decimal objects
-    vial_concentrations = [float(c) for c in vial_concentrations]
+    vial_concentration_map = {k: float(v) for k, v in vial_concentration_map.items()}
+    vial_concentrations = [vial_concentration_map[position] for position in vial_concentration_map]
     v_total = float(v_total)
     c_target = float(c_target)
 
@@ -138,11 +141,13 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
 
     # Define variables:
     # volumes for each vial (integer), binary variables, and deviation (continuous)
-    v_vars = [
-        pulp.LpVariable(f"V{i}", lowBound=0, upBound=200, cat="Continuous")
-        for i in range(num_vials)
-    ]
-    b_vars = [pulp.LpVariable(f"B{i}", cat="Binary") for i in range(num_vials)]
+    v_vars = {
+        f"C{concentration}": pulp.LpVariable(
+            f"C{concentration}", lowBound=0, upBound=200, cat="Continuous"
+        )
+        for concentration in vial_concentrations
+    }
+    b_vars = [pulp.LpVariable(f"B{position}", cat="Binary") for position in vial_concentration_map]
     c_deviation = pulp.LpVariable("deviation", lowBound=0, cat="Continuous")
 
     # Objective function: Minimize the deviation
@@ -150,39 +155,66 @@ def solve_vials_ilp(vial_concentrations: list, v_total: float, c_target: float):
 
     # Constraints
     prob += (
-        pulp.lpSum([vial_concentrations[i] * v_vars[i] for i in range(num_vials)])
+        pulp.lpSum(
+            [
+                concentration * v_vars[f"C{concentration}"]
+                for concentration in vial_concentrations
+            ]
+        )
         == c_target * v_total,
         "ConcentrationConstraint",
     )
-    prob += pulp.lpSum(v_vars) == v_total, "VolumeConstraint"
+    prob += pulp.lpSum(v_vars.values()) == v_total, "VolumeConstraint"
     prob += (
-        pulp.lpSum([vial_concentrations[i] * v_vars[i] for i in range(num_vials)])
+        pulp.lpSum(
+            [
+                concentration * v_vars[f"C{concentration}"]
+                for concentration in vial_concentrations
+            ]
+        )
         - c_target * v_total
         <= c_deviation,
         "PositiveDeviation",
     )
     prob += (
-        -pulp.lpSum([vial_concentrations[i] * v_vars[i] for i in range(num_vials)])
+        -pulp.lpSum(
+            [
+                concentration * v_vars[f"C{concentration}"]
+                for concentration in vial_concentrations
+            ]
+        )
         + c_target * v_total
         <= c_deviation,
         "NegativeDeviation",
     )
 
     # Additional constraints to enforce volume values
-    for i in range(num_vials):
-        prob += v_vars[i] >= 20 * b_vars[i], f"LowerBoundConstraint{i}"
-        prob += v_vars[i] <= 120 * b_vars[i], f"UpperBoundConstraint{i}"
+    for i, concentration in enumerate(vial_concentrations):
+        prob += (
+            v_vars[f"C{concentration}"] >= 20 * b_vars[i],
+            f"LowerBoundConstraint{i}",
+        )
+        prob += (
+            v_vars[f"C{concentration}"] <= 120 * b_vars[i],
+            f"UpperBoundConstraint{i}",
+        )
 
     # Solve the problem
     solver = pulp.PULP_CBC_CMD(msg=False)
     prob.solve(solver)
 
     if prob.status == pulp.LpStatusOptimal:
-        vial_volumes = [
-            round(pulp.value(v_vars[i]), 2) for i in range(num_vials)
-        ]  # Round to the nearest hundredth
+        vial_vol_by_conc = {
+            concentration: round(pulp.value(v_vars[f"C{concentration}"]), 2)
+            for concentration in vial_concentrations
+        }  # Round to the nearest hundredth
+
+        vial_vol_by_location = {
+            position: round(pulp.value(v_vars[f"C{vial_concentration_map[position]}"]), 2)
+            for position in vial_concentration_map
+        }
         deviation_value = pulp.value(c_deviation)
-        return vial_volumes, deviation_value
+        return vial_vol_by_conc, deviation_value, vial_vol_by_location
     else:
         return None, None
 
@@ -262,3 +294,32 @@ def input_validation(
 
         except ValueError as e:
             print(e)
+
+
+if __name__ == "__main__":
+
+    mapped_vials = {"S1": 100, "S2": 50, "S3": 25}  # location: concentration
+    desired_volume = 100
+    desired_concentration = 75
+    volumes, deviation, locations = solve_vials_ilp(
+        mapped_vials, desired_volume, desired_concentration
+    )
+
+    print(
+        f"""
+    Possible Vials (Location: Concentration): {mapped_vials}
+    Target Volume: {desired_volume}
+    Target Concentration: {desired_concentration}
+    -------------------------
+    Volumes per concentration (concentration:volume): {volumes}
+
+    Deviation from target concentration: {deviation}
+
+    Volumes per location (location:volume): {locations}
+
+"""
+    )
+    position = "S2"
+    volume_for_position = next( (v for k,v in locations.items() if k == position), None)
+    print(volume_for_position)
+    
