@@ -65,7 +65,7 @@ def select_protocols() -> List(ProtocolEntry):
     return protocol_entries
 
 
-def select_protocol_by_id(protocol_id) -> ProtocolEntry:
+def select_protocol(protocol_id) -> ProtocolEntry:
     """
     Get a protocol from the database.
 
@@ -76,51 +76,12 @@ def select_protocol_by_id(protocol_id) -> ProtocolEntry:
         ProtocolEntry: The protocol from the database.
     """
 
-    # if isinstance(protocol_id, str):
-    #     query = "SELECT id, project, name, filepath FROM protocols WHERE name = ?"
-    # else:
-    #     query = "SELECT id, project, name, filepath FROM protocols WHERE id = ?"
-
-    # try:
-    #     conn = sqlite3.connect(SQL_DB_PATH)
-    #     cursor = conn.cursor()
-
-    #     # Get the protocol from the database
-    #     cursor.execute(
-    #         query,
-    #         (protocol_id,),
-    #     )
-    #     protocol = cursor.fetchone()
-
-    #     conn.close()
-
-    #     if protocol is None and isinstance(protocol_id, str):
-    #         protocol_id = protocol_id + ".py"
-    #         conn = sqlite3.connect(SQL_DB_PATH)
-    #         cursor = conn.cursor()
-
-    #         # Get the protocol from the database
-    #         cursor.execute(
-    #             query,
-    #             (protocol_id,),
-    #         )
-    #         protocol = cursor.fetchone()
-
-    #         conn.close()
-
-    #     protocol_entry = ProtocolEntry(*protocol)
-    #     return protocol_entry
-    # except TypeError as exc:
-    #     raise ProtocolNotFoundError(
-    #         f"Protocol with id {protocol_id} not found."
-    #     ) from exc
-
     with SessionLocal() as session:
         if isinstance(protocol_id, str):
             result = (
                 session.query(Protocols).filter(Protocols.name == protocol_id).first()
             )
-            if result is None:
+            if result is None: #Check if the protocol_id is a file name
                 result = (
                     session.query(Protocols)
                     .filter(Protocols.name == protocol_id + ".py")
