@@ -34,7 +34,8 @@ from panda_lib.utilities import SystemState, input_validation
 os.environ["KMP_AFFINITY"] = "none"
 exp_loop_prcss: Process = None
 exp_loop_status = None
-control_loop_queue: Queue = Queue()
+exp_loop_queue: Queue = Queue()
+exp_cmd_queue: Queue = Queue()
 analysis_prcss: Process = None
 analysis_status = None
 status_queue: Queue = Queue()
