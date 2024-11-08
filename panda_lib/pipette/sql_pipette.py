@@ -9,9 +9,8 @@ from panda_lib.sql_tools.panda_models import (
     PipetteLog,
 )  # Ensure you import your Base and Pipette model
 from panda_lib.sql_tools.db_setup import SessionLocal
-
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+from panda_lib.config.config_tools import read_config
+config = read_config()
 precision = config.getint("OPTIONS", "precision")
 
 

@@ -5,11 +5,10 @@ from typing import Tuple
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict
 import numpy as np
-from configparser import ConfigParser
+from panda_lib.config.config_tools import read_config
 
 logger = logging.getLogger("e_panda")
-config = ConfigParser()
-config.read("panda_lib/config/panda_sdl_config.ini")
+config = read_config()
 if config.getboolean("OPTIONS", "testing"):
     PATH_TO_DATA = pathlib.Path(config.get("TESTING", "data_dir"))
 else:
