@@ -276,6 +276,10 @@ class SlackBot:
         except SlackApiError as error:
             error_msg = f"Error creating conversation: {format(error)}"
             self.logger.error(error_msg)
+
+            if "rate_limited" in error_msg:
+                time.sleep(30)
+                return self.check_latest_message(channel)
             return 0
 
     def check_slack_messages(self, channel: str) -> int:
