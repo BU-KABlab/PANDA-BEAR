@@ -1,4 +1,3 @@
-import time
 import unittest
 from panda_lib.pipette import Pipette
 from panda_lib.pipette.sql_pipette import insert_new_pipette, activate_pipette

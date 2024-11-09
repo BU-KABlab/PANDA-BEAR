@@ -5,13 +5,11 @@ The script is intended to be used for testing and validation purposes.
 
 """
 
-from datetime import tzinfo
 from panda_lib.sql_tools import db_setup, panda_models
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 import pandas as pd
-import time
 
 
 # Function to stop the loop

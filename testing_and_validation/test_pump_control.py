@@ -1,5 +1,4 @@
 import unittest
-import time
 import nesp_lib_py as nesp_lib
 from panda_lib.syringepump import MockMill, MockPump, MockScale
 from panda_lib.vessel import VesselCoordinates
@@ -10,10 +9,8 @@ from panda_lib.vessel import VesselCoordinates
 
 from panda_lib.vials import (
     StockVial,
-    Vial2,
     WasteVial,
     delete_vial_position_and_hx_from_db,
-    reset_vials,
 )
 
 # pylint: disable=missing-function-docstring, protected-access

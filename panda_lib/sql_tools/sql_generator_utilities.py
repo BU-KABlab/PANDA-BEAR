@@ -11,7 +11,6 @@ import importlib
 import os
 
 # import sqlite3
-from configparser import ConfigParser
 
 from panda_lib.config.config_tools import read_config
 from panda_lib.sql_tools.db_setup import SessionLocal

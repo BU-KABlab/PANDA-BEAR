@@ -1,5 +1,5 @@
 import unittest
-from wellplate import Wellplate, OverFillException, OverDraftException, Well
+from wellplate import Wellplate, OverFillException, Well
 
 
 class TestWells2(unittest.TestCase):

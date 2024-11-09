@@ -1,5 +1,4 @@
 from atlassian import Jira
-from atlassian_tools.utilities import Issue
 from config.secrets import JiraSecrets
 
 epanda_jira = Jira(

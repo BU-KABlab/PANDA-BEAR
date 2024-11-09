@@ -2,7 +2,6 @@
 This module contains functions to interact with the pipette_status table in the database.
 """
 
-from configparser import ConfigParser
 import json
 from typing import Union
 from panda_lib.sql_tools.panda_models import (

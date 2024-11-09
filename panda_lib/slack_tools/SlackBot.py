@@ -732,7 +732,7 @@ class SlackBot:
                 self.check_slack_messages(channel="data")
             except KeyboardInterrupt:
                 break
-            except Exception as e:
+            except Exception:
                 # print(e)
                 time.sleep(15)
                 continue

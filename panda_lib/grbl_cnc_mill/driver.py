@@ -16,14 +16,9 @@ of the mill.
 # pylint: disable=line-too-long
 
 # standard libraries
-import dataclasses
 import json
-import logging
-from os import error
 import re
 import time
-from datetime import datetime
-from enum import Enum
 from pathlib import Path
 
 # third-party libraries
@@ -42,7 +37,7 @@ from .exceptions import (
     StatusReturnError,
     CNCMillException,
 )
-from .status_codes import Status, AlarmStatus, ErrorCodes
+from .status_codes import AlarmStatus, ErrorCodes
 from .instruments import Instruments
 
 current_directory = Path(__file__).parent

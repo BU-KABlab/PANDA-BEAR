@@ -454,7 +454,7 @@ def experiment_loop_worker(
         )
         raise error
 
-    except ShutDownCommand as error:
+    except ShutDownCommand:
         if current_experiment is not None:
             current_experiment.set_status_and_save(ExperimentStatus.ERROR)
         sql_system_state.set_system_status(SystemState.OFF)

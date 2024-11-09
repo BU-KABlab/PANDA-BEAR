@@ -2,18 +2,11 @@
 
 # standard libraries
 import re
-import time
-from unittest import mock
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
 from panda_lib.config import read_logging_dir
-from .instruments import Instruments
-from .exceptions import (
-    CommandExecutionError,
-    StatusReturnError,
-)
 from .logger import set_up_mill_logger
 from .driver import Mill as RealMill
 

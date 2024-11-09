@@ -22,7 +22,6 @@ The script can be run as a standalone script to test the connection to the
 database.
 """
 
-from configparser import ConfigParser
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text

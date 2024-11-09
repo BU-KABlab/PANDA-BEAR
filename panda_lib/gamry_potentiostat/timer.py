@@ -18,7 +18,7 @@ def countdown_timer(samplerate, cycle):
         sys.stdout.write("\n")
     except KeyboardInterrupt:
         pass
-    except Exception as e:
+    except Exception:
         pass
     finally:
         sys.stdout.write("\n")

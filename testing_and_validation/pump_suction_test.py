@@ -4,7 +4,6 @@ import time
 
 from panda_lib.actions import (
     Instruments,
-    forward_pipette_v2,
     solution_selector,
     waste_selector,
 )

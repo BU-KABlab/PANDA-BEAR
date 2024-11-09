@@ -11,7 +11,6 @@ from panda_lib.pipette.sql_pipette import (
 )
 from panda_lib.vessel import logger as vessel_logger
 
-from .state import PipetteState
 
 
 class Pipette:

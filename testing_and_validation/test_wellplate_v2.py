@@ -1,7 +1,6 @@
 import unittest
 from panda_lib.sql_tools import sql_wellplate as sql_utilities
 from panda_lib.wellplate import WellCoordinates, Wellplate
-from panda_lib.experiment_class import ExperimentBase
 import time
 
 
