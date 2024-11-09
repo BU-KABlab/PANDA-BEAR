@@ -19,6 +19,7 @@ class SlackTicket:
     """
     A dataclass to represent a slack ticket.
     """
+
     msg_id: str
     channel_id: str
     msg_txt: str

@@ -132,7 +132,9 @@ def solve_vials_ilp(
 
     # Validate and clean the incoming data to remove any Decimal objects
     vial_concentration_map = {k: float(v) for k, v in vial_concentration_map.items()}
-    vial_concentrations = [vial_concentration_map[position] for position in vial_concentration_map]
+    vial_concentrations = [
+        vial_concentration_map[position] for position in vial_concentration_map
+    ]
     v_total = float(v_total)
     c_target = float(c_target)
 
@@ -147,7 +149,10 @@ def solve_vials_ilp(
         )
         for concentration in vial_concentrations
     }
-    b_vars = [pulp.LpVariable(f"B{position}", cat="Binary") for position in vial_concentration_map]
+    b_vars = [
+        pulp.LpVariable(f"B{position}", cat="Binary")
+        for position in vial_concentration_map
+    ]
     c_deviation = pulp.LpVariable("deviation", lowBound=0, cat="Continuous")
 
     # Objective function: Minimize the deviation
@@ -210,7 +215,9 @@ def solve_vials_ilp(
         }  # Round to the nearest hundredth
 
         vial_vol_by_location = {
-            position: round(pulp.value(v_vars[f"C{vial_concentration_map[position]}"]), 2)
+            position: round(
+                pulp.value(v_vars[f"C{vial_concentration_map[position]}"]), 2
+            )
             for position in vial_concentration_map
         }
         deviation_value = pulp.value(c_deviation)
@@ -297,7 +304,6 @@ def input_validation(
 
 
 if __name__ == "__main__":
-
     mapped_vials = {"S1": 100, "S2": 50, "S3": 25}  # location: concentration
     desired_volume = 100
     desired_concentration = 75
@@ -320,6 +326,5 @@ if __name__ == "__main__":
 """
     )
     position = "S2"
-    volume_for_position = next( (v for k,v in locations.items() if k == position), None)
+    volume_for_position = next((v for k, v in locations.items() if k == position), None)
     print(volume_for_position)
-    

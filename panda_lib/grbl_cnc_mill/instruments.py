@@ -1,6 +1,8 @@
 """Class of the instruments used on the CNC mill."""
+
 import dataclasses
 from enum import Enum
+
 
 @dataclasses.dataclass
 class Instruments(Enum):

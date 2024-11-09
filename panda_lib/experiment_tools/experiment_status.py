@@ -1,5 +1,7 @@
 """Define the possible statuses of an experiment"""
+
 from enum import Enum
+
 
 class ExperimentStatus(str, Enum):
     """Define the possible statuses of an experiment"""

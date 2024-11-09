@@ -47,7 +47,9 @@ def select_queue() -> list:
         return session.query(Queue).order_by(Queue.priority, Queue.experiment_id).all()
 
 
-def get_next_experiment_from_queue(random_pick: bool = False, specific_experiment_id:int = None) -> tuple[int, int, str]:
+def get_next_experiment_from_queue(
+    random_pick: bool = False, specific_experiment_id: int = None
+) -> tuple[int, int, str]:
     """
     Reads the next experiment from the queue table, the experiment with the
     highest priority (lowest value).
@@ -61,7 +63,7 @@ def get_next_experiment_from_queue(random_pick: bool = False, specific_experimen
     Returns:
         tuple: The experiment ID, the process type, and the filename.
     """
-    
+
     if specific_experiment_id:
         with SessionLocal() as session:
             result = (

@@ -1,4 +1,5 @@
 """A class to hold all of the instruments"""
+
 from dataclasses import dataclass
 from logging import Logger
 from typing import Union

@@ -27,7 +27,9 @@ db = db_setup.SessionLocal()
 running = True
 
 # Create the initial plot for the vials and a plot for the pipette
-fig, (stock_vial_plot, waste_vial_plot, pipette_plot) = plt.subplots(3, 1, figsize=(20, 12))
+fig, (stock_vial_plot, waste_vial_plot, pipette_plot) = plt.subplots(
+    3, 1, figsize=(20, 12)
+)
 
 # Create the stop button
 ax_stop = plt.axes([0.81, 0.01, 0.1, 0.075])
@@ -112,7 +114,7 @@ while running:
 
     # Filter to the logs to the last 24 hours
     waste_vials_df = waste_vials_df[
-        waste_vials_df.index > pd.Timestamp.now(tz='utc') - pd.Timedelta(days=look_back)
+        waste_vials_df.index > pd.Timestamp.now(tz="utc") - pd.Timedelta(days=look_back)
     ]
 
     # Separate the stock vials into the positions
@@ -142,7 +144,11 @@ while running:
 
     stock_vial_plot.set_title("Stock Vial Volumes")
     for position, df in stock_vials_dict.items():
-        stock_vial_plot.plot(df.index, df["volume"], label=f"Stock Vial {position}",)
+        stock_vial_plot.plot(
+            df.index,
+            df["volume"],
+            label=f"Stock Vial {position}",
+        )
 
     stock_vial_plot.set_xlabel("Time")
 
@@ -152,7 +158,6 @@ while running:
     stock_vial_plot.legend(loc="center left", bbox_to_anchor=(1, 0.5))
 
     # Plot the waste vial data
-
 
     for position, df in waste_vials_dict.items():
         waste_vial_plot.plot(df.index, df["volume"], label=f"Waste Vial {position}")

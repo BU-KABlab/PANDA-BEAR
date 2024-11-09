@@ -1,8 +1,8 @@
 import unittest
 from panda_lib.utilities import solve_vials_ilp, Coordinates
 
-class TestUtilities(unittest.TestCase):
 
+class TestUtilities(unittest.TestCase):
     def test_solve_vials_ilp(self):
         # Test case 1
         vial_concentrations = [1.0, 2.0, 3.0]
@@ -66,6 +66,7 @@ class TestUtilities(unittest.TestCase):
         self.assertEqual(coordinates.x, new_x)
         self.assertEqual(coordinates.y, new_y)
         self.assertEqual(coordinates.z, new_z)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,13 +1,17 @@
 """Backfilling experiment parameters and results"""
-#pylint: disable=line-too-long
+
+# pylint: disable=line-too-long
 import json
 from pathlib import Path
 
-from panda_lib.experiment_class import (EchemExperimentBase, ExperimentResult,
-                                        insert_experiment_parameters,
-                                        insert_experiment_results,
-                                        insert_experiments,
-                                        select_experiment_information)
+from panda_lib.experiment_class import (
+    EchemExperimentBase,
+    ExperimentResult,
+    insert_experiment_parameters,
+    insert_experiment_results,
+    insert_experiments,
+    select_experiment_information,
+)
 
 PARAMS_FOLDER = Path()
 RESULTS_FOLDER = Path()

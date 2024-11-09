@@ -65,13 +65,17 @@ config = ConfigParser()
 #         save=True, num_images=1, file_name=file_path
 #     )
 
-def file_enumeration(file_path:Path) -> Path:
+
+def file_enumeration(file_path: Path) -> Path:
     """Enumerate a file path if it already exists"""
-    i=1
+    i = 1
     while file_path.exists():
-        file_path = file_path.with_name(file_path.stem + "_" + str(i) + file_path.suffix)
-        i+=1
+        file_path = file_path.with_name(
+            file_path.stem + "_" + str(i) + file_path.suffix
+        )
+        i += 1
     return file_path
+
 
 def image_filepath_generator(
     exp_id: int = "test",
@@ -97,12 +101,15 @@ def image_filepath_generator(
         filepath = file_enumeration(filepath)
     return filepath
 
-def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.tiff")) -> Path:
+
+def capture_new_image(
+    save=True, num_images=1, file_name: Path = Path("images/test.tiff")
+) -> Path:
     """Capture a new image from the FLIR camera"""
     # Check the file name and ennumerate if it already exists
     file_name = file_enumeration(file_name)
     pyspin_system: PySpin.SystemPtr = PySpin.System.GetInstance()
-    camera_list:PySpin.CameraList = pyspin_system.GetCameras()
+    camera_list: PySpin.CameraList = pyspin_system.GetCameras()
     # Run example on each camera
     for _, camera in enumerate(camera_list):
         camera: PySpin.CameraPtr
@@ -119,14 +126,14 @@ def capture_new_image(save=True, num_images=1, file_name:Path=Path("images/test.
 
     return file_name
 
+
 if __name__ == "__main__":
     from PIL import Image
     import time
-    FILE_NAME =  "test image"
-    file_path=Path(f'images/{str(FILE_NAME)}').with_suffix(".tiff")
-    capture_new_image(
-        save=True, num_images=1, file_name=file_path
-    )
+
+    FILE_NAME = "test image"
+    file_path = Path(f"images/{str(FILE_NAME)}").with_suffix(".tiff")
+    capture_new_image(save=True, num_images=1, file_name=file_path)
     time.sleep(5)
     # Show the image
     with Image.open(file_path) as img:

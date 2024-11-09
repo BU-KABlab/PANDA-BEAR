@@ -33,7 +33,6 @@ def should_move_to_zero_first(
 
 
 class TestMillControllerLogic(unittest.TestCase):
-
     def test_should_move_to_zero_first(self):
         # Test case 1
         self.assertTrue(

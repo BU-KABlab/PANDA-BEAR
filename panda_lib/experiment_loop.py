@@ -1,7 +1,7 @@
 """
 The controller is responsible for the following:
     - Running the scheduler and retriving the next experiment to run
-    - checking the state of the system (vials, wells, etc.) 
+    - checking the state of the system (vials, wells, etc.)
     - Running the experiment (passing the experiment, system state, and instruments)
     - Recieve data from the experiment, and store it in the database
     - Update system state (vials, wells, etc.)
@@ -278,9 +278,7 @@ def experiment_loop_worker(
 
             # Get the protocol entry using either the name or id
             protocol_entry: sql_protocol_utilities.ProtocolEntry = (
-                sql_protocol_utilities.select_protocol(
-                    current_experiment.protocol_id
-                )
+                sql_protocol_utilities.select_protocol(current_experiment.protocol_id)
             )
 
             # Convert the file path to a module name

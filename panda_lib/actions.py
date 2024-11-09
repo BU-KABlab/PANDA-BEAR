@@ -285,7 +285,7 @@ def forward_pipette_v3(
     dst_vessel: Union[Well, WasteVial],
     toolkit: Toolkit,
     source_concentration: float = None,
-)->int:
+) -> int:
     """
     Forward pipette from a given source to a given destination.
     The source may be one of the following:
@@ -321,7 +321,9 @@ def forward_pipette_v3(
             # Fetch updated solutions from the db
             stock_vials, _ = read_vials()
             selected_source_vessels = [
-                vial for vial in stock_vials if vial.name == src_vessel and vial.volume > 0
+                vial
+                for vial in stock_vials
+                if vial.name == src_vessel and vial.volume > 0
             ]
 
             # If there are no edot vials, raise an error
@@ -334,7 +336,8 @@ def forward_pipette_v3(
             source_vessel_volumes, deviation, volumes_by_position = solve_vials_ilp(
                 # Concentrations of each vial in mM
                 vial_concentration_map={
-                    vial.position: vial.concentration for vial in selected_source_vessels
+                    vial.position: vial.concentration
+                    for vial in selected_source_vessels
                 },
                 # Total volume to achieve in uL
                 v_total=volume,
@@ -354,7 +357,8 @@ def forward_pipette_v3(
 
             # Pair the source vessels with their respective volumes base don the volumes by position
             source_vessel_volumes = [
-                (vial, volumes_by_position[vial.position]) for vial in selected_source_vessels
+                (vial, volumes_by_position[vial.position])
+                for vial in selected_source_vessels
             ]
         else:  # If the source is a single vessel
             source_vessel_volumes = [(src_vessel, volume)]
@@ -389,10 +393,19 @@ def forward_pipette_v3(
         # Cycle through the source_vials and pipette the volumes
         for vessel, desired_volume in source_vessel_volumes:
             # Calculate repetitions
-            vessel:Vessel
-            repetitions = math.ceil(desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP))
-            repetition_vol = correction_factor(desired_volume / repetitions, vessel.viscosity_cp)
-            logger.info("Pipetting %f uL from %s to %s", desired_volume, vessel.name, dst_vessel.name)
+            vessel: Vessel
+            repetitions = math.ceil(
+                desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
+            )
+            repetition_vol = correction_factor(
+                desired_volume / repetitions, vessel.viscosity_cp
+            )
+            logger.info(
+                "Pipetting %f uL from %s to %s",
+                desired_volume,
+                vessel.name,
+                dst_vessel.name,
+            )
             for j in range(repetitions):
                 logger.info("Repetition %d of %d", j + 1, repetitions)
 
@@ -414,7 +427,9 @@ def forward_pipette_v3(
                     vessel.coordinates.z_bottom,
                     Instruments.PIPETTE,
                 )
-                toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=vessel)
+                toolkit.pump.withdraw(
+                    volume_to_withdraw=repetition_vol, solution=vessel
+                )
                 if isinstance(vessel, Well):
                     # Withdraw extra to try and remove of all solution
                     toolkit.pump.withdraw(volume_to_withdraw=20)
@@ -589,7 +604,6 @@ def flush_v2(
         )
 
         for _ in range(flush_count):
-
             forward_pipette_v2(
                 flush_volume,
                 from_vessel=solution_selector(flush_solution_name, flush_volume),

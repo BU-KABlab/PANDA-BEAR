@@ -1,4 +1,4 @@
-""" Experiment data class"""
+"""Experiment data class"""
 
 # pylint: disable=invalid-name, line-too-long, import-outside-toplevel, broad-exception-caught, protected-access
 import importlib.util
@@ -14,14 +14,22 @@ from pydantic.dataclasses import dataclass
 
 from panda_lib.config.config_tools import read_config
 from panda_lib.log_tools import setup_default_logger
+
 # from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
 #                                                 execute_sql_command_no_return)
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import (ExperimentParameters,
-                                              ExperimentResults, Experiments, ExperimentStatusView,
-                                              WellHx, WellPlates)
+from panda_lib.sql_tools.panda_models import (
+    ExperimentParameters,
+    ExperimentResults,
+    Experiments,
+    ExperimentStatusView,
+    WellHx,
+    WellPlates,
+)
+
 experiment_logger = setup_default_logger(log_name="experiment_logger")
 config = read_config()
+
 
 def load_analysis_script(script_path: str) -> Callable:
     """Load a script from a file and return the analyze function"""
@@ -283,7 +291,7 @@ class ExperimentBase:
     experiment_id: int = None
     experiment_name: str = None
     experiment_name = experiment_name.lower() if experiment_name else None
-    protocol_id: Union[int,str] = None
+    protocol_id: Union[int, str] = None
     priority: Optional[int] = 0
     well_id: Optional[str] = None
     pin: Union[str, int] = None
@@ -305,7 +313,7 @@ class ExperimentBase:
     process_type: Optional[int] = 1
     jira_issue_key: Optional[str] = None
     experiment_type: int = 0
-    well: object= None
+    well: object = None
     analyzer: Union[Callable, str, None] = None
     generator: Union[Callable, str, None] = None
     analysis_id: int = None
@@ -316,7 +324,9 @@ class ExperimentBase:
         if self.solutions is None:
             self.solutions = {}
         else:
-            self.solutions = {key.lower(): value for key, value in self.solutions.items()}
+            self.solutions = {
+                key.lower(): value for key, value in self.solutions.items()
+            }
         if self.solutions_corrected is None:
             self.solutions_corrected = self.solutions
 
@@ -334,13 +344,18 @@ class ExperimentBase:
         if isinstance(self.analyzer, str):
             # Load and execute the script
             analysis_function = load_analysis_script(self.analyzer)
-            analysis_function(experiment_id=self.experiment_id, add_to_training_data=True)
+            analysis_function(
+                experiment_id=self.experiment_id, add_to_training_data=True
+            )
         elif callable(self.analyzer):
             # Directly call the function
             self.analyzer(experiment_id=self.experiment_id, add_to_training_data=True)
 
         else:
-            experiment_logger.debug("\n No analysis function provided for experiment %s\n", self.experiment_id)
+            experiment_logger.debug(
+                "\n No analysis function provided for experiment %s\n",
+                self.experiment_id,
+            )
 
     def run_generator(self):
         """Run the generator"""
@@ -353,9 +368,10 @@ class ExperimentBase:
             self.generator()
 
         else:
-            experiment_logger.debug("\n No generator function provided for experiment %s\n", self.experiment_id)
-
-
+            experiment_logger.debug(
+                "\n No generator function provided for experiment %s\n",
+                self.experiment_id,
+            )
 
     # FIXME: Seperate the set status, and set status and save methods from the experimentbase. The experiment base should just be a dataclass
     # What could be an alternative is that there is a wrapper class that has the set status and set status and save methods using what
@@ -365,11 +381,12 @@ class ExperimentBase:
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
         try:
-            if config.getboolean("OPTIONS","testing") or not config.getboolean("OPTIONS","use_obs"):
+            if config.getboolean("OPTIONS", "testing") or not config.getboolean(
+                "OPTIONS", "use_obs"
+            ):
                 from .obs_controls import MockOBSController as OBSController
             else:
                 from .obs_controls import OBSController
-
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
@@ -390,7 +407,7 @@ class ExperimentBase:
             else:
                 experiment_logger.error("Well ID not set, cannot save status")
                 return
-        
+
         # Save the well to the database
         if self.well:
             self.well.status = new_status
@@ -398,13 +415,17 @@ class ExperimentBase:
             sql_wellplate.save_well_to_db(self.well)
 
         else:
-            experiment_logger.debug("Well object not set. Saving to db via alternative method")
+            experiment_logger.debug(
+                "Well object not set. Saving to db via alternative method"
+            )
             update_experiment_status(self)
 
         # Save the experiment to the database
         update_experiment(self)
         try:
-            if config.getboolean("OPTIONS","testing") or not config.getboolean("OPTIONS","use_obs"):
+            if config.getboolean("OPTIONS", "testing") or not config.getboolean(
+                "OPTIONS", "use_obs"
+            ):
                 from .obs_controls import MockOBSController as OBSController
             else:
                 from .obs_controls import OBSController
@@ -530,15 +551,15 @@ class ExperimentBase:
                     # Try to convert the parameter value to the specified type
                     parameter.parameter_value = possible_type(parameter.parameter_value)
 
-            elif attribute_type == int:
+            elif attribute_type is int:
                 parameter.parameter_value = int(parameter.parameter_value)
             elif attribute_type in [float, float]:
                 parameter.parameter_value = float(parameter.parameter_value)
-            elif attribute_type == bool:
+            elif attribute_type is bool:
                 parameter.parameter_value = bool(parameter.parameter_value)
-            elif attribute_type == str:
+            elif attribute_type is str:
                 parameter.parameter_value = str(parameter.parameter_value)
-            elif attribute_type == dict and json.loads(parameter.parameter_value):
+            elif attribute_type is dict and json.loads(parameter.parameter_value):
                 parameter.parameter_value = json.loads(parameter.parameter_value)
             elif attribute_type == ExperimentStatus:
                 parameter.parameter_value = ExperimentStatus(parameter.parameter_value)
@@ -594,8 +615,12 @@ class EchemExperimentBase(ExperimentBase):
     ca_sample_period: float = float(0.1)  # Deposition sample period
     ca_prestep_voltage: float = float(0.0)  # Pre-step voltage (V)
     ca_prestep_time_delay: float = float(0.0)  # Pre-step delay time (s)
-    ca_step_1_voltage: float = float(-1.7)  # Step 1 voltage (V), deposition potential (V)
-    ca_step_1_time: float = float(300.0)  # run time 300 seconds, deposition duration (s)
+    ca_step_1_voltage: float = float(
+        -1.7
+    )  # Step 1 voltage (V), deposition potential (V)
+    ca_step_1_time: float = float(
+        300.0
+    )  # run time 300 seconds, deposition duration (s)
     ca_step_2_voltage: float = float(0.0)  # Step 2 voltage (V)
     ca_step_2_time: float = float(0.0)  # Step 2 time (s)
     ca_sample_rate: float = float(0.5)  # sample period (s)
@@ -691,6 +716,7 @@ class EchemExperimentBase(ExperimentBase):
         {self.print_cv_parameters()}
     """
 
+
 # TODO: Is there a way to store experiment types in a database and then load them instead of hardcoding them?
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class PEDOTExperiment(EchemExperimentBase):
@@ -709,9 +735,11 @@ class FeCnVerificationExperiment(EchemExperimentBase):
     project_id: int = 17
     well_type_number: int = 4  # ito
 
+
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class PGMAExperiment(EchemExperimentBase):
     """Define the default data that is used to run a PGMA experiment"""
+
     project_id: int = 18
     well_type_number: int = 7  # gold
 
@@ -723,7 +751,7 @@ experiment_types_by_project_id = {
     17: FeCnVerificationExperiment,
     11: CorrectionFactorExperiment,
     18: PGMAExperiment,
-    999: PEDOTExperiment
+    999: PEDOTExperiment,
 }
 
 
@@ -751,7 +779,7 @@ def make_test_value() -> ExperimentBase:
         experiment_name="test",
         priority=2,
         well_id="D5",
-        pin='0',
+        pin="0",
         project_id=3,
         solutions={"dmf": 0, "peg": 145, "acrylate": 145, "ferrocene": 0, "custom": 0},
         status=ExperimentStatus.QUEUED,
@@ -816,9 +844,8 @@ def get_all_type_hints(cls):
     return hints
 
 
-
-
 # region Experiment SQL Functions
+
 
 def select_next_experiment_id() -> int:
     """Determines the next experiment id by checking the experiment table"""
@@ -831,7 +858,11 @@ def select_next_experiment_id() -> int:
     # )
 
     with SessionLocal() as session:
-        result = session.query(Experiments.experiment_id).order_by(Experiments.experiment_id.desc()).first()
+        result = (
+            session.query(Experiments.experiment_id)
+            .order_by(Experiments.experiment_id.desc())
+            .first()
+        )
     if result in [None, []]:
         return 10000000
     return result[0] + 1
@@ -868,12 +899,15 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
     # )
 
     with SessionLocal() as session:
-        result = session.query(Experiments).filter(Experiments.experiment_id == experiment_id).first()
+        result = (
+            session.query(Experiments)
+            .filter(Experiments.experiment_id == experiment_id)
+            .first()
+        )
 
     if result is None:
         return None
     else:
-
         # With the project_id known to determine the experiment type
         # object type
 
@@ -896,7 +930,7 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
 
 
 def select_experiment_paramaters(
-    experiment_to_select: Union[int, EchemExperimentBase]
+    experiment_to_select: Union[int, EchemExperimentBase],
 ) -> Union[list, EchemExperimentBase]:
     """
     Selects the experiment parameters from the experiment_parameters table.
@@ -928,7 +962,11 @@ def select_experiment_paramaters(
     # )
 
     with SessionLocal() as session:
-        result = session.query(ExperimentParameters).filter(ExperimentParameters.experiment_id == experiment_id).all()
+        result = (
+            session.query(ExperimentParameters)
+            .filter(ExperimentParameters.experiment_id == experiment_id)
+            .all()
+        )
     values = []
     for row in result:
         values.append(row)
@@ -954,6 +992,7 @@ def select_experiment_paramaters(
     experiment_object.map_parameter_list_to_experiment(values)
     return experiment_object
 
+
 def select_specific_parameter(experiment_id: int, parameter_name: str):
     """
     Select a specific parameter from the experiment_parameters table.
@@ -975,11 +1014,17 @@ def select_specific_parameter(experiment_id: int, parameter_name: str):
     # )
 
     with SessionLocal() as session:
-        result = session.query(ExperimentParameters.parameter_value).filter(ExperimentParameters.experiment_id == experiment_id).filter(ExperimentParameters.parameter_name == parameter_name).all()
+        result = (
+            session.query(ExperimentParameters.parameter_value)
+            .filter(ExperimentParameters.experiment_id == experiment_id)
+            .filter(ExperimentParameters.parameter_name == parameter_name)
+            .all()
+        )
 
     if not result:
         return None
     return result[0][0]
+
 
 def select_experiment_status(experiment_id: int) -> str:
     """
@@ -1000,11 +1045,16 @@ def select_experiment_status(experiment_id: int) -> str:
     # )
 
     with SessionLocal() as session:
-        result = session.query(ExperimentStatusView.status).filter(ExperimentStatusView.experiment_id == experiment_id).all()
+        result = (
+            session.query(ExperimentStatusView.status)
+            .filter(ExperimentStatusView.experiment_id == experiment_id)
+            .all()
+        )
 
     if result == []:
         return ValueError("No experiment found with that ID")
     return result[0][0]
+
 
 def insert_experiment(experiment: ExperimentBase) -> None:
     """
@@ -1076,20 +1126,23 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
 
     with SessionLocal() as session:
         for parameter in parameters:
-            session.add(Experiments(experiment_id=parameter[0],
-                                    project_id=parameter[1],
-                                    project_campaign_id=parameter[2],
-                                    well_type=parameter[3],
-                                    protocol_id=parameter[4],
-                                    pin=parameter[5],
-                                    experiment_type=parameter[6],
-                                    jira_issue_key=parameter[7],
-                                    priority=parameter[8],
-                                    process_type=parameter[9],
-                                    filename=parameter[10],
-                                    created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S")))
+            session.add(
+                Experiments(
+                    experiment_id=parameter[0],
+                    project_id=parameter[1],
+                    project_campaign_id=parameter[2],
+                    well_type=parameter[3],
+                    protocol_id=parameter[4],
+                    pin=parameter[5],
+                    experiment_type=parameter[6],
+                    jira_issue_key=parameter[7],
+                    priority=parameter[8],
+                    process_type=parameter[9],
+                    filename=parameter[10],
+                    created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S"),
+                )
+            )
         session.commit()
-
 
 
 def insert_experiment_parameters(experiment: ExperimentBase) -> None:
@@ -1109,7 +1162,7 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
     Args:
         experiments (List[ExperimentBase]): The experiments to insert.
     """
-    parameters_to_insert = [] # this will be a list of tuples of the parameters to insert
+    parameters_to_insert = []  # this will be a list of tuples of the parameters to insert
     for experiment in experiments:
         experiment_parameters: list[ExperimentParameterRecord] = (
             experiment.generate_parameter_list()
@@ -1142,10 +1195,14 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
 
     with SessionLocal() as session:
         for parameter in parameters_to_insert:
-            session.add(ExperimentParameters(experiment_id=parameter[0],
-                                             parameter_name=parameter[1],
-                                             parameter_value=parameter[2],
-                                             created=datetime.strptime(parameter[3], "%Y-%m-%dT%H:%M:%S")))
+            session.add(
+                ExperimentParameters(
+                    experiment_id=parameter[0],
+                    parameter_name=parameter[1],
+                    parameter_value=parameter[2],
+                    created=datetime.strptime(parameter[3], "%Y-%m-%dT%H:%M:%S"),
+                )
+            )
         session.commit()
 
 
@@ -1203,17 +1260,22 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
 
     with SessionLocal() as session:
         for parameter in parameters:
-            session.query(Experiments).filter(Experiments.experiment_id == parameter[10]).update(
-                {Experiments.project_id: parameter[0],
-                 Experiments.project_campaign_id: parameter[1],
-                 Experiments.well_type: parameter[2],
-                 Experiments.protocol_id: parameter[3],
-                 Experiments.pin: parameter[4],
-                 Experiments.experiment_type: parameter[5],
-                 Experiments.jira_issue_key: parameter[6],
-                 Experiments.priority: parameter[7],
-                 Experiments.process_type: parameter[8],
-                 Experiments.filename: parameter[9]})
+            session.query(Experiments).filter(
+                Experiments.experiment_id == parameter[10]
+            ).update(
+                {
+                    Experiments.project_id: parameter[0],
+                    Experiments.project_campaign_id: parameter[1],
+                    Experiments.well_type: parameter[2],
+                    Experiments.protocol_id: parameter[3],
+                    Experiments.pin: parameter[4],
+                    Experiments.experiment_type: parameter[5],
+                    Experiments.jira_issue_key: parameter[6],
+                    Experiments.priority: parameter[7],
+                    Experiments.process_type: parameter[8],
+                    Experiments.filename: parameter[9],
+                }
+            )
         session.commit()
 
 
@@ -1286,12 +1348,21 @@ def update_experiment_status(
     # )
 
     with SessionLocal() as session:
-        subquery = session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
-        session.query(WellHx).filter(WellHx.well_id == well_id).filter(WellHx.plate_id == subquery).update(
-            {WellHx.status: status.value,
-             WellHx.status_date: status_date,
-             WellHx.experiment_id: experiment_id,
-             WellHx.project_id: project_id})
+        subquery = (
+            session.query(WellPlates.id)
+            .filter(WellPlates.current == 1)
+            .scalar_subquery()
+        )
+        session.query(WellHx).filter(WellHx.well_id == well_id).filter(
+            WellHx.plate_id == subquery
+        ).update(
+            {
+                WellHx.status: status.value,
+                WellHx.status_date: status_date,
+                WellHx.experiment_id: experiment_id,
+                WellHx.project_id: project_id,
+            }
+        )
         session.commit()
 
 
@@ -1339,16 +1410,24 @@ def update_experiments_statuses(
 
     with SessionLocal() as session:
         for parameter in parameters:
-            session.query(WellHx).filter(WellHx.well_id == parameter[4]).filter(WellHx.plate_id == session.query(WellPlates.id).filter(WellPlates.current == 1)).update(
-                {WellHx.status: parameter[0],
-                 WellHx.status_date: parameter[1],
-                 WellHx.experiment_id: parameter[2],
-                 WellHx.project_id: parameter[3]})
+            session.query(WellHx).filter(WellHx.well_id == parameter[4]).filter(
+                WellHx.plate_id
+                == session.query(WellPlates.id).filter(WellPlates.current == 1)
+            ).update(
+                {
+                    WellHx.status: parameter[0],
+                    WellHx.status_date: parameter[1],
+                    WellHx.experiment_id: parameter[2],
+                    WellHx.project_id: parameter[3],
+                }
+            )
         session.commit()
+
 
 # endregion
 
 # region Result Functions
+
 
 def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
     """
@@ -1370,15 +1449,25 @@ def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
         entry.result_value = json.dumps(entry.result_value)
     if isinstance(entry.result_value, Path):
         entry.result_value = str(entry.result_value)
-    parameters = (entry.experiment_id, entry.result_type, entry.result_value, entry.context)
+    parameters = (
+        entry.experiment_id,
+        entry.result_type,
+        entry.result_value,
+        entry.context,
+    )
     # execute_sql_command_no_return(command, parameters)
 
     with SessionLocal() as session:
-        session.add(ExperimentResults(experiment_id=entry.experiment_id,
-                                      result_type=entry.result_type,
-                                      result_value=entry.result_value,
-                                      context=entry.context))
+        session.add(
+            ExperimentResults(
+                experiment_id=entry.experiment_id,
+                result_type=entry.result_type,
+                result_value=entry.result_value,
+                context=entry.context,
+            )
+        )
         session.commit()
+
 
 def insert_experiment_results(entries: List[ExperimentResultsRecord]) -> None:
     """
@@ -1415,20 +1504,26 @@ def select_results(experiment_id: int) -> List[ExperimentResultsRecord]:
     # )
     results = []
     with SessionLocal() as session:
-        result = session.query(ExperimentResults).filter(ExperimentResults.experiment_id == experiment_id).all()
+        result = (
+            session.query(ExperimentResults)
+            .filter(ExperimentResults.experiment_id == experiment_id)
+            .all()
+        )
 
     for row in result:
-        results.append(ExperimentResultsRecord(
-            experiment_id=row.experiment_id,
-            result_type=row.result_type,
-            result_value=row.result_value,
-            context=row.context
-        ))
+        results.append(
+            ExperimentResultsRecord(
+                experiment_id=row.experiment_id,
+                result_type=row.result_type,
+                result_value=row.result_value,
+                context=row.context,
+            )
+        )
     return results
 
 
 def select_specific_result(
-    experiment_id: int, result_type: str, context: Union[None,str] = None
+    experiment_id: int, result_type: str, context: Union[None, str] = None
 ) -> Union[List[ExperimentResultsRecord], ExperimentResultsRecord]:
     """
     Select a specific entry from the result table that is associated with an experiment.
@@ -1443,7 +1538,7 @@ def select_specific_result(
     # if context is None:
     #     result = execute_sql_command(
     #         """
-    #         SELECT 
+    #         SELECT
     #             experiment_id,
     #             result_type,
     #             result_value,
@@ -1469,20 +1564,31 @@ def select_specific_result(
 
     with SessionLocal() as session:
         if context is None:
-            result = session.query(ExperimentResults).filter(ExperimentResults.experiment_id == experiment_id).filter(ExperimentResults.result_type == result_type).all()
+            result = (
+                session.query(ExperimentResults)
+                .filter(ExperimentResults.experiment_id == experiment_id)
+                .filter(ExperimentResults.result_type == result_type)
+                .all()
+            )
         else:
-            result = session.query(ExperimentResults).filter(ExperimentResults.experiment_id == experiment_id).filter(ExperimentResults.result_type == result_type).filter(ExperimentResults.context == context).all()
+            result = (
+                session.query(ExperimentResults)
+                .filter(ExperimentResults.experiment_id == experiment_id)
+                .filter(ExperimentResults.result_type == result_type)
+                .filter(ExperimentResults.context == context)
+                .all()
+            )
 
     if not result:
         return None
 
     results = []
     for row in result:
-        results.append(ExperimentResultsRecord(
-            row.experiment_id,
-            row.result_type,
-            row.result_value,
-            row.context))
+        results.append(
+            ExperimentResultsRecord(
+                row.experiment_id, row.result_type, row.result_value, row.context
+            )
+        )
 
     if len(results) == 1:
         return results[0]

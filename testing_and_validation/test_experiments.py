@@ -1,4 +1,3 @@
-
 def test_parse():
     """Test that the class can be parsed from json and back"""
     value = make_test_value()
@@ -64,4 +63,3 @@ def test_schema():
     """Test that the class can generate a json schema"""
     # Useful if you have tools that validate your json externally
     print(json.dumps(TypeAdapter(ExperimentBase).json_schema(), indent=4))
-

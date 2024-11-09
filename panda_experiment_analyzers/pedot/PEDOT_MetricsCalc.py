@@ -1,4 +1,4 @@
-"""For PEDOT films calculates the charge passed during deposition, the capacitance, 
+"""For PEDOT films calculates the charge passed during deposition, the capacitance,
 the deposition efficiency, and the electrochromic efficiency."""
 
 # pylint: disable=broad-exception-caught

@@ -48,7 +48,7 @@ class TestWells2(unittest.TestCase):
         """
         Test the depth method of Wells2 by checking that it returns -76.0.
         """
-        self.assertAlmostEqual(self.wells['A1'].depth, -76.0,3)
+        self.assertAlmostEqual(self.wells["A1"].depth, -76.0, 3)
 
     def test_density(self):
         """

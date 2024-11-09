@@ -191,8 +191,6 @@ def stopacq():
     return
 
 
-
-
 def pstatdisconnect():
     """disconnect the pstat"""
     global PSTAT
@@ -320,7 +318,7 @@ def cyclic(params: cv_parameters):
 
 def chrono(params: chrono_parameters):
     """chronoamperometry
-    
+
     :param CAvi: initial voltage
     :param CAti: time interval
     :param CAv1: voltage 1
@@ -328,7 +326,7 @@ def chrono(params: chrono_parameters):
     :param CAv2: voltage 2
     :param CAt2: time 2
     :param CAsamplerate: sample rate
-    
+
     """
     global DTAQ
     global SIGNAL
@@ -390,7 +388,7 @@ def OCP(OCPvi, OCPti, OCPrate):
     :param OCPvi: initial voltage
     :param OCPti: time interval
     :param OCPrate: rate of change
-    
+
     """
     global DTAQ
     global SIGNAL

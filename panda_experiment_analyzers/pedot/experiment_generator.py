@@ -9,7 +9,7 @@ from panda_experiment_analyzers.pedot.generator import run_ml_model
 from .pedot_classes import PEDOTParams
 from .analysis import analyze
 
-CURRENT_PIN =  get_current_pin()
+CURRENT_PIN = get_current_pin()
 
 PROJECT_ID = 16
 
@@ -46,8 +46,8 @@ def pedot_generator(
         ca_step_2_time=0.0,
         ca_sample_rate=0.5,
         edot_concentration=params.concentration,
-        analyzer = analyze,
-        generator = run_ml_model
+        analyzer=analyze,
+        generator=run_ml_model,
     )
 
     # Add the correction factors
@@ -56,5 +56,9 @@ def pedot_generator(
             experiment.solutions[solution], experiment.well_type_number
         )
 
-    scheduler.add_nonfile_experiments([experiment,])
+    scheduler.add_nonfile_experiments(
+        [
+            experiment,
+        ]
+    )
     return experiment_id

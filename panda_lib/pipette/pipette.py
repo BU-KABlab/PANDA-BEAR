@@ -7,8 +7,8 @@ from panda_lib.pipette.sql_pipette import (
     activate_pipette,
     update_pipette_status,
     select_pipette_status,
-    deincrement_use_count
-    )
+    deincrement_use_count,
+)
 from panda_lib.vessel import logger as vessel_logger
 
 from .state import PipetteState
@@ -73,8 +73,8 @@ class Pipette:
         if volume < 0:
             raise ValueError("Volume must be non-negative.")
         self.volume = round(float(volume) * 1000, 6)
-        #self.log_contents()
-        #self.record_pipette_state()
+        # self.log_contents()
+        # self.record_pipette_state()
 
     def liquid_volume(self) -> float:
         """Get the volume of liquid in the pipette in ul
@@ -131,7 +131,11 @@ class Pipette:
                 self.capacity_ml = round(float(pipette_status.capacity_ml), 6)
                 self._volume_ul = round(float(pipette_status.volume_ul), 6)
                 self._volume_ml = round(float(pipette_status.volume_ml), 6)
-                self.contents = pipette_status.contents if pipette_status.contents is not None else {}
+                self.contents = (
+                    pipette_status.contents
+                    if pipette_status.contents is not None
+                    else {}
+                )
             else:
                 raise InvalidPipetteID("No pipette found in the database")
 
@@ -142,7 +146,7 @@ class Pipette:
                 self.capacity_ml = round(float(pipette_status.capacity_ml), 6)
                 self._volume_ul = round(float(pipette_status.volume_ul), 6)
                 self._volume_ml = round(float(pipette_status.volume_ml), 6)
-                self.contents =pipette_status.contents
+                self.contents = pipette_status.contents
 
                 if pipette_status.active == 0:
                     print(f"Pipette with id {self.id} is inactive.")
@@ -187,8 +191,8 @@ class Pipette:
     #     if result is None:
     #         # Pipette with the given id does not exist
     #         raise InvalidPipetteID(f"Pipette with id {self.id} does not exist")
-        
-    #     pipette_status = PipetteState(0.0, 0.0, 0.0, 0.0, {})        
+
+    #     pipette_status = PipetteState(0.0, 0.0, 0.0, 0.0, {})
     #     pipette_status.capacity_ul = round(float(result.capacity_ul), 6)
     #     pipette_status.capacity_ml = round(float(result[1]), 6)
     #     pipette_status.volume = round(float(result[2]), 6)
@@ -199,4 +203,5 @@ class Pipette:
 
 class InvalidPipetteID(Exception):
     """Exception for invalid pipette ID"""
+
     pass

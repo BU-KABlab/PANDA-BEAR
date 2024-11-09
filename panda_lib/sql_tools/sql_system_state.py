@@ -141,7 +141,10 @@ def set_system_status(
     with SessionLocal() as session:
         session.add(
             SystemStatus(
-                status=system_status.value, comment=comment, status_time=datetime.datetime.now(tz= utc)  ,test_mode=test_mode
+                status=system_status.value,
+                comment=comment,
+                status_time=datetime.datetime.now(tz=utc),
+                test_mode=test_mode,
             )
         )
         session.commit()

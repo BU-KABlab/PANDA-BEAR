@@ -3,8 +3,9 @@ from panda_lib.sql_tools import sql_wellplate as sql_utilities
 from panda_lib.wellplate import WellCoordinates, Wellplate
 from panda_lib.experiment_class import ExperimentBase
 import time
-class TestWellplate(unittest.TestCase):
 
+
+class TestWellplate(unittest.TestCase):
     def setUp(self):
         # Create a wellplate with 96 wells
         self.wp = Wellplate()  # Default is 96 wells from the json file and db
@@ -65,6 +66,7 @@ class TestWellplate(unittest.TestCase):
 
         # Check that the status is the same
         self.assertEqual(memory, db, original_status)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -65,11 +65,11 @@ class GRBLSettings:
 
     def status_report(self, argument):
         """
-        Status report 
-        '?' status.  
-        0=WCS position, 
-        1=report with machine position (MPos) and no buffer data reports, 
-        2=work position (WPos) and buffer data, 
+        Status report
+        '?' status.
+        0=WCS position,
+        1=report with machine position (MPos) and no buffer data reports,
+        2=work position (WPos) and buffer data,
         3=plan/buffer and Machine position."""
         return f"$10:{argument}"
 
@@ -189,7 +189,7 @@ class GRBLCodes:
         return f"F{argument}"
 
     def rapid_positioning(self):
-        """A Rapid positioning move at the Rapid Feed Rate. 
+        """A Rapid positioning move at the Rapid Feed Rate.
         In Laser mode Laser will be turned off."""
         return "G0"
 
@@ -207,8 +207,8 @@ class GRBLCodes:
 
     def pause_command(self, time):
         """
-        Pause command execution for the time in Pnnn. P specifies the time in seconds. 
-        Other systems use milliseconds as the pause time, 
+        Pause command execution for the time in Pnnn. P specifies the time in seconds.
+        Other systems use milliseconds as the pause time,
         if used unchanged this can result in VERY long pauses."""
         return f"G4 P{time}"
 
@@ -242,8 +242,8 @@ class GRBLCodes:
 
     def go_to_safe_position(self):
         """
-        Go to safe position. 
-        NOTE: If you have not run a homing cycle and have set the safe position 
+        Go to safe position.
+        NOTE: If you have not run a homing cycle and have set the safe position
         this is very UNSAFE to use.
         """
         return "G28"
@@ -258,7 +258,7 @@ class GRBLCodes:
 
     def set_predefined_position(self):
         """
-        Set Predefined position using absolute machine coordinates, 
+        Set Predefined position using absolute machine coordinates,
         a rapid G0 move to that position will be performed before the coordinates are saved.
         """
         return "G30.1"
@@ -305,7 +305,7 @@ class GRBLCodes:
 
     def canned_cycle_cancel(self):
         """
-        Canned Cycle Cancel. Grbl does not support any of the canned cycle modes 
+        Canned Cycle Cancel. Grbl does not support any of the canned cycle modes
         which this cancels so it does nothing.
         """
         return "G80"
@@ -324,7 +324,7 @@ class GRBLCodes:
 
     def set_current_coordinate_point(self):
         """
-        Sets the current coordinate point, used to set an origin point of zero, commonly 
+        Sets the current coordinate point, used to set an origin point of zero, commonly
         known as the home position.
         """
         return "G92"

@@ -6,7 +6,7 @@ from panda_lib import experiment_class
 from panda_lib import scheduler
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 
-CURRENT_PIN =  get_current_pin()
+CURRENT_PIN = get_current_pin()
 PROJECT_ID = 999
 EXPERIMENT_NAME = "system_test"
 CAMPAIGN_ID = 999
@@ -15,6 +15,7 @@ PLATE_TYPE = 4
 params_df = pd.read_csv(
     r".\panda_experiment_generators\system_test_params.csv"
 )  # Update path with location on PANDA computer
+
 
 def main():
     """Runs the edot voltage sweep experiment generator."""
@@ -31,8 +32,8 @@ def main():
         experiments.append(
             experiment_class.PEDOTExperiment(
                 experiment_id=experiment_id,
-                protocol_id='system_test',
-                well_id='A1',
+                protocol_id="system_test",
+                well_id="A1",
                 well_type_number=PLATE_TYPE,
                 experiment_name=EXPERIMENT_NAME,
                 pin=str(CURRENT_PIN),

@@ -1,14 +1,21 @@
 """Test the vials module"""
+
 import unittest
 from panda_lib.vials import Vial2, OverFillException, OverDraftException, Vessel
 
+
 class TestVessel(unittest.TestCase):
     """Test class for Vessel"""
+
     def setUp(self):
-        self.vessel = Vessel(name="Test Vessel", volume=50.0, 
-                             capacity=100.0, density=1.0, coordinates={},
-                             contents={}
-                             )
+        self.vessel = Vessel(
+            name="Test Vessel",
+            volume=50.0,
+            capacity=100.0,
+            density=1.0,
+            coordinates={},
+            contents={},
+        )
 
     def test_update_volume_positive(self):
         """Test the update_volume method with a positive value"""
@@ -26,10 +33,10 @@ class TestVessel(unittest.TestCase):
             self.vessel.update_volume(60.0)
 
     def test_str_representation(self):
-        """Test the __str__ method
-        """
+        """Test the __str__ method"""
         expected_str = "Test Vessel has 50.0 ul of 1.0 g/ml liquid"
         self.assertEqual(str(self.vessel), expected_str)
+
 
 class TestVial2(unittest.TestCase):
     """Test class for Vial2"""
@@ -38,7 +45,7 @@ class TestVial2(unittest.TestCase):
         """Set up a Vial2 object for testing"""
         self.vial = Vial2(
             name="Test Vial",
-            position = 'S0',
+            position="S0",
             category=0,
             volume=20000.0,
             capacity=20000.0,
@@ -54,7 +61,7 @@ class TestVial2(unittest.TestCase):
     def test_calculate_depth(self):
         """Test the calculate_depth method"""
         depth = self.vial.calculate_depth()
-        self.assertAlmostEqual(depth, self.vial.z_bottom + 53.277,2)
+        self.assertAlmostEqual(depth, self.vial.z_bottom + 53.277, 2)
 
     def test_check_volume_positive(self):
         """Test the check_volume method with a positive value"""
@@ -75,7 +82,7 @@ class TestVial2(unittest.TestCase):
         """Test the update_volume method with a positive value"""
         self.vial.update_volume(-50.0)
         self.assertEqual(self.vial.volume, 18950.0)
-        self.assertEqual(self.vial.depth, self.vial.z_bottom -1 + 51.428)
+        self.assertEqual(self.vial.depth, self.vial.z_bottom - 1 + 51.428)
         self.assertEqual(self.vial.contamination, 1)
 
     def test_update_volume_negative_overdraft(self):
@@ -91,7 +98,7 @@ class TestVial2(unittest.TestCase):
     def test_write_volume_to_disk(self):
         """Test the write_volume_to_disk method"""
         # Assuming the method doesn't raise any errors
-        #self.vial.write_volume_to_disk()
+        # self.vial.write_volume_to_disk()
 
     def test_update_contamination(self):
         """Test the update_contamination method"""
@@ -103,5 +110,6 @@ class TestVial2(unittest.TestCase):
         self.vial.update_contamination(new_contamination=5)
         self.assertEqual(self.vial.contamination, 5)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

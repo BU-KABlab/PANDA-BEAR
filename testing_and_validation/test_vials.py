@@ -12,7 +12,6 @@ from panda_lib.vials import (
 
 
 class TestReadVials(unittest.TestCase):
-
     @patch("epanda_lib.vials.get_current_vials")
     def test_read_vials(self, mock_get_current_vials):
         # Mock the return value of get_current_vials

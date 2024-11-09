@@ -29,7 +29,7 @@ def main():
     toolkit, _ = connect_to_instruments(False)
 
     test_volume = input_validation(
-        "Enter the volume to test (uL): ", (float, int), (0,200), 0, "Invalid volume."
+        "Enter the volume to test (uL): ", (float, int), (0, 200), 0, "Invalid volume."
     )
 
     test_volume = correction_factor(test_volume)

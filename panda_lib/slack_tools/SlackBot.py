@@ -40,7 +40,7 @@ from panda_lib.wellplate import Well, Wellplate, WellCoordinates
 # Create a lock for thread safety
 plot_lock = threading.Lock()
 
- # Initialize the configparser
+# Initialize the configparser
 config = configparser.ConfigParser()
 
 # Read the configuration file
@@ -50,22 +50,28 @@ config = read_config()
 slack_config = config["SLACK"]
 config_options = config["OPTIONS"]
 
+
 @dataclass
 class SlackCred:
     """This class is used to store the slack secrets"""
+
     # Assign the values from the configuration file
     TOKEN = slack_config.get("slack_token")
     DATA_CHANNEL_ID = slack_config.get("slack_data_channel_id")
     TEST_DATA_CHANNEL_ID = slack_config.get("slack_test_data_channel_id")
     CONVERSATION_CHANNEL_ID = slack_config.get("slack_conversation_channel_id")
-    TEST_CONVERSATION_CHANNEL_ID = slack_config.get("slack_test_conversation_channel_id")
+    TEST_CONVERSATION_CHANNEL_ID = slack_config.get(
+        "slack_test_conversation_channel_id"
+    )
     ALERT_CHANNEL_ID = slack_config.get("slack_alert_channel_id")
     TEST_ALERT_CHANNEL_ID = slack_config.get("slack_test_alert_channel_id")
+
 
 class Cameras(Enum):
     """
     Enum for camera types
     """
+
     WEBCAM = 0
     VIALS = 1
     PSTAT = 2
@@ -120,7 +126,9 @@ def select_slack_ticket(msg_id: str) -> SlackTicket:
     """
 
     with SessionLocal() as session:
-        ticket = session.query(SlackTickets).filter(SlackTickets.msg_id == msg_id).first()
+        ticket = (
+            session.query(SlackTickets).filter(SlackTickets.msg_id == msg_id).first()
+        )
     if not ticket:
         return None
     return SlackTicket(
@@ -130,7 +138,6 @@ def select_slack_ticket(msg_id: str) -> SlackTicket:
         valid_cmd=ticket.response,
         timestamp=ticket.timestamp,
         addressed_timestamp=ticket.addressed_timestamp,
-
     )
 
 
@@ -138,7 +145,6 @@ class SlackBot:
     """Class for sending messages to Slack."""
 
     def __init__(self, test: bool = read_testing_config()) -> None:
-
         self.logger = logging.getLogger("e_panda")
         self.testing = test
         self.client = WebClient(token=SlackCred.TOKEN)
@@ -266,7 +272,9 @@ class SlackBot:
             if conversation_history is None:
                 # This means the past 100 messages are from the bot, we should stop
                 sql_system_state.set_system_status(
-                    sql_system_state.SystemState.SHUTDOWN, "stopping ePANDA", self.testing
+                    sql_system_state.SystemState.SHUTDOWN,
+                    "stopping ePANDA",
+                    self.testing,
                 )
 
             else:
@@ -359,7 +367,6 @@ class SlackBot:
             if "rate_limited" in error_msg:
                 time.sleep(30)
                 return self.check_slack_messages(channel)
-
 
             return 0
 
@@ -572,7 +579,6 @@ class SlackBot:
                 return 0
             time.sleep(5)
 
-
     def __vial_status(self, channel_id):
         """Sends the vial status to the user."""
         # Get vial status
@@ -591,7 +597,6 @@ class SlackBot:
         self.send_slack_file(channel=channel_id, file=waste_status)
         Path(stock_status).unlink()
         Path(waste_status).unlink()
-
 
     def __well_status(self, channel_id):
         """Sends the well status to the user."""
@@ -637,9 +642,7 @@ class SlackBot:
                 )
                 return 1
             if not sources:
-                self.send_message(
-                    channel_id, f"Camera {camera_name} is not active"
-                )
+                self.send_message(channel_id, f"Camera {camera_name} is not active")
                 return 1
             screenshot = obs.client.get_source_screenshot(
                 camera_name, "png", 1920, 1080, -1
@@ -722,7 +725,7 @@ class SlackBot:
         self.status = 1
         # self._terminate_event = threading.Event()
         self.send_message("alert", "PANDA Bot is monitoring Slack")
-        while self.status == 1:# and not self._terminate_event.is_set():
+        while self.status == 1:  # and not self._terminate_event.is_set():
             try:
                 time.sleep(5)
                 self.status = self.check_slack_messages(channel="alert")
@@ -735,7 +738,6 @@ class SlackBot:
                 continue
         self.send_message("alert", "PANDA Bot is off duty")
 
-    
     def off_duty(self):
         self.status = 0
         self.send_message("alert", "PANDA Bot is off duty")
@@ -744,6 +746,7 @@ class SlackBot:
     # def terminate(self):
     #     """Terminate the slack bot."""
     #     self._terminate_event.set()
+
 
 def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
     """
@@ -774,25 +777,32 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
     ## Create a bar graph with volume on the x-axis and position on the y-axis
     ## Send the graph to slack
     with plot_lock:
-    
         plt.bar(
-            #x_positions_spaced,
+            # x_positions_spaced,
             stock_vials["position"],
             stock_vials["volume"],
             align="center",
             alpha=0.5,
             color="blue",
-            #width=1.0,
+            # width=1.0,
         )
         # label each bar with the volume
         for i, v in enumerate(stock_vials["volume"]):
-            plt.text(i*spacing, v, str(round(v, 2)), color="black", ha="center", bbox=dict(facecolor='white', edgecolor='none', pad=1), fontsize = 10)
+            plt.text(
+                i * spacing,
+                v,
+                str(round(v, 2)),
+                color="black",
+                ha="center",
+                bbox=dict(facecolor="white", edgecolor="none", pad=1),
+                fontsize=10,
+            )
 
         # Draw a horizontal line at 4000
         plt.axhline(y=2000, color="red", linestyle="-")
         # Write the name of the vial vertically in the bar
         for i, v in enumerate(stock_vials["contents"]):
-            plt.text(i*spacing, 1000, str(v), color="black", ha="center", rotation=90)
+            plt.text(i * spacing, 1000, str(v), color="black", ha="center", rotation=90)
         plt.xlabel("Position")
         plt.ylabel("Volume")
         plt.title("Stock Vial Status")
@@ -816,22 +826,30 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
         x_positions_spaced = [x * spacing for x in x_positions]
 
         plt.bar(
-            #x_positions_spaced,
+            # x_positions_spaced,
             waste_vials["position"],
             waste_vials["volume"],
             align="center",
             alpha=0.5,
             color="blue",
-            #width = 1.0
+            # width = 1.0
         )
         # label each bar with the volume
         for i, v in enumerate(waste_vials["volume"]):
-            plt.text(i*spacing, v, str(round(v, 2)), color="black", ha="center", bbox=dict(facecolor='white', edgecolor='none', pad=1), fontsize = 10)
+            plt.text(
+                i * spacing,
+                v,
+                str(round(v, 2)),
+                color="black",
+                ha="center",
+                bbox=dict(facecolor="white", edgecolor="none", pad=1),
+                fontsize=10,
+            )
         plt.axhline(y=20000, color="red", linestyle="-")
 
         # Write the name of the vial vertically in the bar
         for i, v in enumerate(waste_vials["name"]):
-            plt.text(i*spacing, 1000, str(v), color="black", ha="center", rotation=90)
+            plt.text(i * spacing, 1000, str(v), color="black", ha="center", rotation=90)
         plt.xlabel("Position")
         plt.ylabel("Volume")
         plt.title("Waste Vial Status")
@@ -845,15 +863,14 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
         else:
             return filepath_stock.absolute(), filepath_waste.absolute()
 
+
 def well_status() -> Path:
     """
     Create a plot of the well status and return the file path.
     """
     # Check current wellplate type
     _, type_number, _ = sql_wellplate.select_current_wellplate_info()
-    wellplate_type = sql_wellplate.select_well_characteristics(
-        type_number
-    )
+    wellplate_type = sql_wellplate.select_well_characteristics(type_number)
     # Choose the correct wellplate object based on the wellplate type
     wellplate: Wellplate = None
     if wellplate_type.shape == "circular":
@@ -895,11 +912,15 @@ def well_status() -> Path:
 
     # calculate the center of the wellplate
     center = bottom_left["x"] + (fabs(bottom_left["x"]) - fabs(bottom_right["x"])) / 2
-    
+
     with plot_lock:
         # plot the plate id
         plt.text(
-            center, bottom_left["y"] - 20, str(wellplate.plate_id), color="black", ha="center"
+            center,
+            bottom_left["y"] - 20,
+            str(wellplate.plate_id),
+            color="black",
+            ha="center",
         )
 
         ## Vial coordinates
@@ -912,7 +933,7 @@ def well_status() -> Path:
         #     data = json.load(stock)
         data = vials.get_current_vials("waste")
         for vial in data:
-            #vial = vial.to_dict()
+            # vial = vial.to_dict()
             vial_x.append(vial["vial_coordinates"]["x"])
             vial_y.append(vial["vial_coordinates"]["y"])
             volume = vial["volume"]
@@ -933,12 +954,16 @@ def well_status() -> Path:
         #     data = json.load(stock)
         data = vials.get_current_vials("stock")
         for vial in data:
-            #vial = vial.to_dict()
+            # vial = vial.to_dict()
             vial_x.append(vial["vial_coordinates"]["x"])
             vial_y.append(vial["vial_coordinates"]["y"])
             volume = vial["volume"]
             capacity = vial["capacity"]
-            if vial["name"] is None or vial["name"] in ["", "None", "none"] or capacity == 0:
+            if (
+                vial["name"] is None
+                or vial["name"] in ["", "None", "none"]
+                or capacity == 0
+            ):
                 vial_color.append("black")
                 vial_marker.append("x")
             elif volume / capacity > 0.5:
@@ -962,7 +987,11 @@ def well_status() -> Path:
         orientation = wellplate.orientation
 
         if orientation == 0:
-            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_y_wall_offset, wellplate.a1_y + wellplate.a1_x_wall_offset,0)
+            gasket_origin = WellCoordinates(
+                wellplate.a1_x + wellplate.a1_y_wall_offset,
+                wellplate.a1_y + wellplate.a1_x_wall_offset,
+                0,
+            )
 
             gasket_x = [
                 gasket_origin.x,
@@ -979,7 +1008,11 @@ def well_status() -> Path:
                 gasket_origin.y,
             ]
         elif orientation == 1:
-            gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
+            gasket_origin = WellCoordinates(
+                wellplate.a1_x - wellplate.a1_x_wall_offset,
+                wellplate.a1_y - wellplate.a1_y_wall_offset,
+                0,
+            )
             gasket_x = [
                 gasket_origin.x,
                 gasket_origin.x,
@@ -995,7 +1028,11 @@ def well_status() -> Path:
                 gasket_origin.y,
             ]
         elif orientation == 2:
-            gasket_origin = WellCoordinates(wellplate.a1_x - wellplate.a1_x_wall_offset, wellplate.a1_y + wellplate.a1_y_wall_offset,0)
+            gasket_origin = WellCoordinates(
+                wellplate.a1_x - wellplate.a1_x_wall_offset,
+                wellplate.a1_y + wellplate.a1_y_wall_offset,
+                0,
+            )
             gasket_x = [
                 gasket_origin.x,
                 gasket_origin.x + gasket_length,
@@ -1011,7 +1048,11 @@ def well_status() -> Path:
                 gasket_origin.y,
             ]
         elif orientation == 3:
-            gasket_origin = WellCoordinates(wellplate.a1_x + wellplate.a1_x_wall_offset, wellplate.a1_y - wellplate.a1_y_wall_offset,0)
+            gasket_origin = WellCoordinates(
+                wellplate.a1_x + wellplate.a1_x_wall_offset,
+                wellplate.a1_y - wellplate.a1_y_wall_offset,
+                0,
+            )
             gasket_x = [
                 gasket_origin.x,
                 gasket_origin.x - gasket_length,
@@ -1033,9 +1074,16 @@ def well_status() -> Path:
 
         # Plot the well plate
         plt.scatter(
-            x_coordinates, y_coordinates, marker=marker, c=color, s=3.14 *(wellplate.radius**2), alpha=0.5
+            x_coordinates,
+            y_coordinates,
+            marker=marker,
+            c=color,
+            s=3.14 * (wellplate.radius**2),
+            alpha=0.5,
         )
-        plt.scatter(vial_x, vial_y, marker="o", c=vial_color, s=3.14 *(vial_radius**2), alpha=1)
+        plt.scatter(
+            vial_x, vial_y, marker="o", c=vial_color, s=3.14 * (vial_radius**2), alpha=1
+        )
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.title("Status of Stage Items")
@@ -1048,7 +1096,7 @@ def well_status() -> Path:
         return file_path_for_plot.absolute()
 
 
-def get_well_color( status: str) -> str:
+def get_well_color(status: str) -> str:
     """Get the color of a well based on its status."""
     if status is None:
         return "black"
@@ -1061,6 +1109,7 @@ def get_well_color( status: str) -> str:
         "paused": "blue",
     }
     return color_mapping.get(status, "purple")
+
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)

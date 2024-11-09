@@ -1,11 +1,11 @@
 """
 This module contains the MillControl class, which is used to control the a GRBL CNC machine.
 The MillControl class is used by the EPanda class to move the pipette and electrode to the
-specified coordinates. 
+specified coordinates.
 
 The MillControl class contains methods to move the pipette and
 electrode to a safe position, rinse the electrode, and update the offsets in the mill config
-file. 
+file.
 
 The MillControl class contains methods to connect to the mill, execute commands,
 stop the mill, reset the mill, home the mill, get the current status of the mill, get the
@@ -55,37 +55,37 @@ class MillController:
         ser_mill (serial.Serial): The serial connection to the mill.
 
     Methods:
-        homing_sequence(self): 
+        homing_sequence(self):
             Homes the mill, sets the feed rate, and clears the buffers.
 
-        connect_to_mill(self) -> serial.Serial: 
+        connect_to_mill(self) -> serial.Serial:
             Connects to the mill.
 
-        disconnect(self): 
+        disconnect(self):
             Closes the serial connection to the mill.
 
-        read_json_config(self): 
+        read_json_config(self):
             Reads the config file.
 
-        execute_command(self, command): 
+        execute_command(self, command):
             Encodes and sends commands to the mill and returns the response.
 
-        stop(self): 
+        stop(self):
             Stops the mill.
 
-        reset(self): 
+        reset(self):
             Resets the mill.
 
-        home(self, timeout=90): 
+        home(self, timeout=90):
             Homes the mill with a timeout.
 
-        wait_for_completion(self, incoming_status, timeout=90): 
+        wait_for_completion(self, incoming_status, timeout=90):
             Waits for the mill to complete the previous command.
 
-        current_status(self) -> str: 
+        current_status(self) -> str:
             Gets the current status of the mill.
 
-        set_feed_rate(self, rate): 
+        set_feed_rate(self, rate):
             Sets the feed rate.
 
         clear_buffers(self):
@@ -100,10 +100,10 @@ class MillController:
         gcode_parser_state(self):
             Asks the mill for its gcode parser state.
 
-        move_center_to_position(self, x_coord, y_coord, z_coord) -> int: 
+        move_center_to_position(self, x_coord, y_coord, z_coord) -> int:
             Moves the mill to the specified coordinates.
-            
-        current_coordinates(self, instrument=Instruments.CENTER) -> list: 
+
+        current_coordinates(self, instrument=Instruments.CENTER) -> list:
             Gets the current coordinates of the mill.
     """
 
@@ -901,7 +901,6 @@ class CommandExecutionError(Exception):
 
 class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
-
 
 
 if __name__ == "__main__":

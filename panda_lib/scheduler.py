@@ -44,6 +44,7 @@ from .wellplate import Well
 
 logger = setup_default_logger(log_name="scheduler")
 
+
 @timing_wrapper
 def check_well_status(well_to_check: str, plate_id: int = None) -> str:
     """Checks the status of the well in the well_status view in the SQLite database"""
@@ -54,6 +55,7 @@ def check_well_status(well_to_check: str, plate_id: int = None) -> str:
         logger.error("Error occured while checking well status: %s", e)
         raise e
 
+
 @timing_wrapper
 def choose_next_new_well(plate_id: int = None) -> str:
     """Choose the next available well for an experiment"""
@@ -63,6 +65,7 @@ def choose_next_new_well(plate_id: int = None) -> str:
     except sqlite3.Error as e:
         logger.error("Error occured while choosing next well: %s", e)
         raise e
+
 
 @timing_wrapper
 def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> None:
@@ -94,6 +97,7 @@ def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> No
     except sqlite3.Error as e:
         logger.error("Error occured while changing well status: %s", e)
         raise e
+
 
 @timing_wrapper
 def read_next_experiment_from_queue(
@@ -134,6 +138,7 @@ def read_next_experiment_from_queue(
 
     return echem_experiment_base, filename
 
+
 @timing_wrapper
 def update_experiment_queue_priority(experiment_id: int, priority: int):
     """Update the priority of experiments in the queue"""
@@ -151,6 +156,7 @@ def update_experiment_queue_priority(experiment_id: int, priority: int):
     except sqlite3.Error as e:
         logger.error("Error occured while updating experiment queue priority: %s", e)
         raise e
+
 
 @timing_wrapper
 def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
@@ -170,6 +176,7 @@ def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
         logger.error("Error occured while updating experiment information: %s", e)
         raise e
 
+
 @timing_wrapper
 def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> None:
     """Update the experiment parameters in the experiment_parameters table"""
@@ -187,6 +194,7 @@ def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> 
     except sqlite3.Error as e:
         logger.error("Error occured while updating experiment parameters: %s", e)
         raise e
+
 
 @timing_wrapper
 def add_nonfile_experiment(
@@ -261,6 +269,7 @@ def add_nonfile_experiment(
     logger.info("Experiment %s added to queue", experiment.experiment_id)
     return "success"
 
+
 @timing_wrapper
 def add_to_queue(experiment: ExperimentBase) -> ExperimentBase:
     """Add the given experiment to the queue table"""
@@ -279,6 +288,7 @@ def add_to_queue(experiment: ExperimentBase) -> ExperimentBase:
         experiment.status = ExperimentStatus.ERROR
         raise e  # raise the error to be caught by the calling function
     return experiment
+
 
 @timing_wrapper
 def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
@@ -333,7 +343,10 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
                     experiments.remove(experiment)
                     continue
 
-                if plate_info.type_id != experiment.well_type_number or plate_info.id != experiment.plate_id:
+                if (
+                    plate_info.type_id != experiment.well_type_number
+                    or plate_info.id != experiment.plate_id
+                ):
                     logger.error(
                         "Plate %s does not have the correct well type number, cannot add experiment to queue",
                         experiment.plate_id,
@@ -418,6 +431,8 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
 
     logger.info("Experiments loaded and added to queue")
     return 1
+
+
 @timing_wrapper
 def check_project_id(project_id: int) -> bool:
     """Check if the project_id is in the projects table"""
@@ -430,6 +445,8 @@ def check_project_id(project_id: int) -> bool:
     except sqlite3.Error as e:
         logger.error("Error occured while checking project id: %s", e)
         raise e
+
+
 @timing_wrapper
 def add_project_id(project_id: int) -> None:
     """Add the project_id to the projects table"""
@@ -440,6 +457,8 @@ def add_project_id(project_id: int) -> None:
     except sqlite3.Error as e:
         logger.error("Error occured while adding project id: %s", e)
         raise e
+
+
 @timing_wrapper
 def save_results(experiment: ExperimentBase) -> None:
     """
@@ -468,6 +487,7 @@ def save_results(experiment: ExperimentBase) -> None:
     for result in results_lists:
         # Save the results to the database
         insert_experiment_result(result)
+
 
 @timing_wrapper
 def determine_next_experiment_id() -> int:

@@ -11,6 +11,7 @@ from panda_lib.sql_tools.panda_models import PlateTypes, WellPlates
 from panda_lib.experiment_class import ExperimentBase
 from panda_lib.utilities import input_validation
 
+
 def add_data_zone(
     image: Image, experiment: ExperimentBase = None, context: str = None
 ) -> Image:
@@ -53,11 +54,17 @@ def add_data_zone(
                             .type_id
                         )
                 else:
-                    experiment.well_type_number = input_validation("Enter the well type number: ",int,(0,1000000), False, None)
-
+                    experiment.well_type_number = input_validation(
+                        "Enter the well type number: ", int, (0, 1000000), False, None
+                    )
 
             with SessionLocal() as session:
-                substrate = session.query(PlateTypes).filter_by(id=experiment.well_type_number).first().substrate
+                substrate = (
+                    session.query(PlateTypes)
+                    .filter_by(id=experiment.well_type_number)
+                    .first()
+                    .substrate
+                )
         except:
             substrate = "ITO"
 
@@ -114,7 +121,7 @@ def add_data_zone(
         logo = Image.open("panda_lib/application_images/data_zone_logo.png")
         logo = logo.resize((int(logo.width * 0.15), int(logo.height * 0.15)))
         banner.paste(logo, (panda_sdl_logo_x, 0))
-     # incase the file cannot be found
+    # incase the file cannot be found
     except FileNotFoundError:
         # TODO: add logger to this module
         pass
@@ -253,7 +260,6 @@ def invert_image(image_path: str) -> str:
 
 
 if __name__ == "__main__":
-
     test_image = Image.open(Path(input("Enter the path to the image: ")))
     # pin = "201010102040500000101"
     # date_time = "2021-01-01 12:00:00"

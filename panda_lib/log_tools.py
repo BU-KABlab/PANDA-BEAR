@@ -50,7 +50,9 @@ def setup_default_logger(
         console_handler.set_name("console_handler")
         console_formatter = logging.Formatter("%(message)s")
         console_formatter.converter = time.gmtime
-        console_handler.setFormatter(console_formatter)  # Ensure console output is formatted
+        console_handler.setFormatter(
+            console_formatter
+        )  # Ensure console output is formatted
         logger.addHandler(console_handler)
 
     return logger
@@ -85,7 +87,8 @@ def apply_log_filter(
     experiment_id: int = None,
     target_well: Optional[str] = None,
     campaign_id: Optional[str] = None,
-    test: Optional[bool] = config.getboolean("OPTIONS", "testing"),):
+    test: Optional[bool] = config.getboolean("OPTIONS", "testing"),
+):
     """Add custom value to log format"""
     experiment_formatter = logging.Formatter(
         "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&%(custom1)s&%(custom2)s&%(custom3)s&%(message)s&%(custom4)s"
@@ -101,6 +104,7 @@ def apply_log_filter(
             campaign_id, experiment_id, target_well, test
         )
         handler.addFilter(custom_filter)
+
 
 def timing_wrapper(func):
     """A decorator that logs the time taken for a function to execute"""

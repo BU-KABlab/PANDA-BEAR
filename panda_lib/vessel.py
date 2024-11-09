@@ -1,6 +1,7 @@
 """
 Vessel module.
 """
+
 from dataclasses import dataclass
 from typing import Union, Optional
 from panda_lib.errors import OverFillException, OverDraftException
@@ -21,6 +22,7 @@ class VesselLogger:
 
 # Create an instance of the logger for the vessel module
 logger = VesselLogger("vessel").logger
+
 
 @dataclass
 class VesselCoordinates:
@@ -52,6 +54,7 @@ class VesselCoordinates:
     def __getitem__(self, key: str) -> Union[int, float]:
         """Allows subscripting the WellCoordinates for attributes."""
         return getattr(self, key)
+
 
 class Vessel:
     """
@@ -122,7 +125,7 @@ class Vessel:
 
     def update_volume(self, added_volume: float) -> None:
         """Updates the volume of the vessel by adding the specified volume."""
-        added_volume = round(added_volume,6)
+        added_volume = round(added_volume, 6)
         if self.volume + added_volume > self.capacity:
             raise OverFillException(self.name, self.volume, added_volume, self.capacity)
         if self.volume + added_volume < float(0):
@@ -180,11 +183,13 @@ class Vessel:
         -----------
         new_contamination (int, optional): The new contamination count of the vessel.
         """
-        # Different vessels will have different implementations of this method due to 
+        # Different vessels will have different implementations of this method due to
         # the different ways they save to the db
         pass
 
-    def update_contents(self, from_vessel: str, volume: float, save:bool = False) -> None:
+    def update_contents(
+        self, from_vessel: str, volume: float, save: bool = False
+    ) -> None:
         """
         Updates the contents of the vessel.
 

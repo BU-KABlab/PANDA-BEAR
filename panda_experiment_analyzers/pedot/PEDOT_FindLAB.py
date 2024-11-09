@@ -1,4 +1,5 @@
 """For PEDOT films calculates the Delta E00 values between the coloring and bleaching images."""
+
 import os
 
 import numpy as np
@@ -55,7 +56,8 @@ def rgbtolab(inputs: RequiredData) -> RawMetrics:
     """Converts RGB images to LAB color space and calculates Delta E00 values."""
     experiment_id: int = inputs.experiment_id
     images_by_exp_id: dict = {
-    experiment_id: {"deposition": None, "bleaching": None, "coloring": None}}
+        experiment_id: {"deposition": None, "bleaching": None, "coloring": None}
+    }
     images_by_exp_id[experiment_id]["deposition"] = inputs.BeforeDeposition
     images_by_exp_id[experiment_id]["bleaching"] = inputs.AfterBleaching
     images_by_exp_id[experiment_id]["coloring"] = inputs.AfterColoring

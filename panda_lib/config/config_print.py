@@ -25,14 +25,13 @@ def print_config_values():
     for section in config.sections():
         print(f"[{section}]")
         for key, value in config.items(section):
-
             # Handle None or blank values
             if value in [None, "", "None"]:
                 print(f"{key} = None")
                 continue
 
             if "dir" in key or "path" in key:
-                if value not in [None, "", "None",'""']:
+                if value not in [None, "", "None", '""']:
                     try:
                         # Check if the path exists
                         assert Path(value).exists()
@@ -77,7 +76,6 @@ def resolve_config_paths():
     # Print the config file values
     for section in config.sections():
         for key, value in config.items(section):
-
             # Handle None or blank values
             if value in [None, "", "None"]:
                 continue

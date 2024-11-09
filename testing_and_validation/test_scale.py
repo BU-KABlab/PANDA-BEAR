@@ -1,4 +1,5 @@
 """This test takes datapoints from the connected scale overtime to see how stable the readings are"""
+
 import datetime
 import logging
 import os
@@ -63,7 +64,7 @@ def scale_variance_check(mock: bool = False, test_name: str = "scale_testing"):
 
     plt.figure()
     for i, (interval, _) in enumerate(regimes):
-        plt.subplot(3, 1, i+1)
+        plt.subplot(3, 1, i + 1)
         plt.plot(arrays[i])
         plt.title("%ss between readings", interval)
         plt.ylabel("Reading (g)")

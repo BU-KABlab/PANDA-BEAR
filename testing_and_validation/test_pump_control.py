@@ -20,7 +20,6 @@ from panda_lib.vials import (
 
 
 class TestSyringePump(unittest.TestCase):
-
     def setUp(self):
         self.mock_mill = MockMill()
         self.mock_scale = MockScale()
@@ -61,7 +60,6 @@ class TestSyringePump(unittest.TestCase):
         assert self.pump.pipette.contents == {}
 
     def test_withdraw(self):
-
         self.pump.withdraw(100, solution=self.vial, rate=0.5)
         assert self.vial.volume == float(900)
         assert self.vial.contamination == 1
@@ -77,7 +75,6 @@ class TestSyringePump(unittest.TestCase):
         assert self.pump.pipette.contents == {"test_contents": 100}
 
     def test_withdraw_air(self):
-
         self.pump.withdraw_air(100)
         assert (
             self.pump.pump.pumping_direction.value
@@ -90,7 +87,6 @@ class TestSyringePump(unittest.TestCase):
         assert self.pump.pipette.contents == {}
 
     def test_infuse_air(self):
-
         self.pump.pipette.volume = 100
         self.pump.infuse_air(100)
         assert (
@@ -104,7 +100,6 @@ class TestSyringePump(unittest.TestCase):
         assert self.pump.pipette.contents == {}
 
     def test_infuse(self):
-
         self.pump.pipette.volume = 100
         self.pump.pipette.contents = {"test_contents": 100}
         self.pump.infuse(
@@ -125,12 +120,9 @@ class TestSyringePump(unittest.TestCase):
         assert self.pump.pipette.liquid_volume() == 0
         assert self.pump.pipette._volume_ul == 0
         assert self.pump.pipette._volume_ml == 0
-        assert self.pump.pipette.contents == {"test_contents": 0} | {
-            "test_contents": 0
-        }
+        assert self.pump.pipette.contents == {"test_contents": 0} | {"test_contents": 0}
 
     def tearDown(self):
-
         # input("Press Enter to continue with cleanup...")
         self.pump.pipette.reset_contents()
         self.pump.pipette.record_pipette_state()
@@ -147,9 +139,12 @@ def test_order():
     suite.addTest(TestSyringePump("test_infuse"))
     return suite
 
+
 def main():
     """Run the tests."""
     runner = unittest.TextTestRunner()
     runner.run(test_order())
+
+
 if __name__ == "__main__":
     main()

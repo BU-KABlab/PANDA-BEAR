@@ -1,6 +1,6 @@
 """
-Wellplate data class for the echem experiment. 
-This class is used to store the data for the 
+Wellplate data class for the echem experiment.
+This class is used to store the data for the
 wellplate and the wells in it.
 """
 

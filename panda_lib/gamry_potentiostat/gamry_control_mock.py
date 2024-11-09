@@ -1,4 +1,5 @@
 """a virtual pstat for testing main code logic"""
+
 import logging
 import pathlib
 from typing import Tuple
@@ -14,10 +15,10 @@ if config.getboolean("OPTIONS", "testing"):
 else:
     PATH_TO_DATA = pathlib.Path(config.get("PRODUCTION", "data_dir"))
 
+
 class GamryPotentiostat:
     def __init__(self):
         self.OPEN_CONNECTION = False
-
 
     def pstatconnect(self):
         self.OPEN_CONNECTION = True
@@ -42,35 +43,44 @@ class GamryPotentiostat:
         self.OPEN_CONNECTION = True
         return True, 0.0
 
-    def setfilename(self,
+    def setfilename(
+        self,
         experiment_id,
         experiment_type,
         project_campaign_id: int = None,
         campaign_id: int = None,
         well_id: str = None,
-        ) -> pathlib.Path:
+    ) -> pathlib.Path:
         """set the file name for the experiment"""
         global COMPLETE_FILE_NAME
         if project_campaign_id is None and campaign_id is None and well_id is None:
             file_name = f"{experiment_id}_{experiment_type}"
             file_name = file_name.replace(" ", "_")
             file_name_start = file_name + "_0"
-            filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(".txt")
+            filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(
+                ".txt"
+            )
             i = 1
             while filepath.exists():
                 next_file_name = f"{file_name}_{i}"
-                filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
+                filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(
+                    ".txt"
+                )
                 i += 1
         else:
             file_name = f"{project_campaign_id}_{campaign_id}_{experiment_id}_{well_id}_{experiment_type}"
             file_name = file_name.replace(" ", "_")
             file_name_start = file_name + "_0"
-            filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(".txt")
+            filepath: pathlib.Path = (PATH_TO_DATA / file_name_start).with_suffix(
+                ".txt"
+            )
             # Check if the file already exists. If it does then add a number to the end of the file name
             i = 1
             while filepath.exists():
                 next_file_name = f"{file_name}_{i}"
-                filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".txt")
+                filepath = pathlib.Path(PATH_TO_DATA / str(next_file_name)).with_suffix(
+                    ".txt"
+                )
                 filepath.resolve()
                 i += 1
 
@@ -86,7 +96,7 @@ class GamryPotentiostat:
 
     def save_data(self, complete_file_name):
         np.savetxt(complete_file_name, np.array([[1, 2], [3, 4]]), delimiter=",")
-    
+
     def __enter__(self):
         self.connect()
         return self
@@ -94,14 +104,15 @@ class GamryPotentiostat:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.disconnect()
 
+
 @dataclass(config=ConfigDict(validate_assignment=True))
 class cv_parameters:
     """CV Setup Parameters"""
 
     # CV Setup Parameters
     CVvi: float = 0.0  # initial voltage
-    CVap1: float = 0.5 
-    CVap2: float = -0.2 
+    CVap1: float = 0.5
+    CVap2: float = -0.2
     CVvf: float = 0.0  # final voltage
     CVstep: float = 0.01
     CVsr1: float = 0.1

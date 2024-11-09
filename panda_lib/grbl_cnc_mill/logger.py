@@ -1,8 +1,11 @@
 """Logger for the grbl_cnc_mill package."""
+
 import logging
 from pathlib import Path
+
+
 # Create a logger
-def set_up_mill_logger(path_to_logs:Path) -> logging.Logger:
+def set_up_mill_logger(path_to_logs: Path) -> logging.Logger:
     """Set up the mill logger.
 
     Args:

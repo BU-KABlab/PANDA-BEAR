@@ -3,8 +3,10 @@
 from enum import Enum
 from .exceptions import CNCMillException
 
+
 class Status(Enum):
     """Status of the CNC mill."""
+
     DISCONNECTED = "Disconnected"
     CONNECTING = "Connecting"
     IDLE = "Idle"
@@ -19,8 +21,10 @@ class Status(Enum):
     COOLING = "Cooling"
     AUTOHOLD = "AutoHold"
 
+
 class AlarmStatus(Enum):
     """Alarm status of the CNC mill."""
+
     ALARM1 = "Hard limit triggered. Position Lost."
     ALARM2 = "Soft limit alarm, position kept. Unlock is Safe."
     ALARM3 = "Reset while in motion. Position lost."
@@ -35,8 +39,10 @@ class AlarmStatus(Enum):
         """Raise an exception with the error message."""
         raise CNCMillException(self.value)
 
+
 class ErrorCodes(Enum):
     """Alarm status of the CNC mill."""
+
     ERROR1 = "GCode Command letter was not found."
     ERROR2 = "GCode Command value invalid or missing."
     ERROR3 = "Grbl '$' not recognized or supported."

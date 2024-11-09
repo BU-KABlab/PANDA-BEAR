@@ -1,6 +1,7 @@
 """
 This module contains functions to interact with the pipette_status table in the database.
 """
+
 from configparser import ConfigParser
 import json
 from typing import Union
@@ -10,6 +11,7 @@ from panda_lib.sql_tools.panda_models import (
 )  # Ensure you import your Base and Pipette model
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.config.config_tools import read_config
+
 config = read_config()
 precision = config.getint("OPTIONS", "precision")
 
@@ -128,6 +130,7 @@ def select_current_pipette_id():
         session.close()
     return pipette_status.id
 
+
 def select_current_pipette_uses():
     """
     Get the active pipette status from the pipette_status table.
@@ -140,6 +143,7 @@ def select_current_pipette_uses():
         pipette_status = session.query(Pipette).filter(Pipette.active == 1).first()
         session.close()
     return pipette_status.uses
+
 
 def insert_new_pipette(
     pipette_id: Union[int, None] = None, capacity: float = 200, activate: bool = True

@@ -18,13 +18,13 @@ TESTING = read_testing_config()
 PROJECT_ID = 18
 EXPERIMENT_NAME = "PGMA-screening-C3"
 CAMPAIGN_ID = 2
-PLATE_TYPE = 7 # 10 mm diameter wells
+PLATE_TYPE = 7  # 10 mm diameter wells
 DEFAULT_PUMPING_RATE = config.getfloat("DEFAULTS", "pumping_rate")
 GENERATORS_DIR = Path(config.get("GENERAL", "generators_dir"))
 SYSTEM_VERSION = get_current_pin()
 
 params_df = pd.read_csv(
-   GENERATORS_DIR / "LHS-Parameters-C3.csv"
+    GENERATORS_DIR / "LHS-Parameters-C3.csv"
 )  # Update path with location on PANDA computer
 
 
@@ -41,7 +41,7 @@ def main():
         experiments.append(
             experiment_class.PGMAExperiment(
                 experiment_id=experiment_id,
-                protocol_id='PGMA-protocol-C2',  # figure this out
+                protocol_id="PGMA-protocol-C2",  # figure this out
                 well_id="A1",
                 well_type_number=PLATE_TYPE,
                 experiment_name=EXPERIMENT_NAME,

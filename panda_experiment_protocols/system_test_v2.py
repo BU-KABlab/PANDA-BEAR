@@ -15,7 +15,7 @@ from panda_lib.actions import (
     CAFailure,
     CVFailure,
     DepositionFailure,
-    Instruments
+    Instruments,
 )
 from panda_lib.actions_pedot import (
     chrono_amp_edot_bleaching,
@@ -28,6 +28,8 @@ from panda_lib.correction_factors import correction_factor
 from panda_lib.utilities import solve_vials_ilp
 
 PROTOCOL_ID = 999
+
+
 def main(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
@@ -40,7 +42,6 @@ def main(
     pedot_lhs_v1_screening(
         instructions=instructions,
         toolkit=toolkit,
-        
     )
 
 
@@ -113,17 +114,14 @@ def pedot_lhs_v1_screening(
     pedotdeposition(
         instructions=instructions,
         toolkit=toolkit,
-        
     )
     pedotbleaching(
         instructions=instructions,
         toolkit=toolkit,
-        
     )
     pedotcoloring(
         instructions=instructions,
         toolkit=toolkit,
-        
     )
 
     instructions.set_status_and_save(ExperimentStatus.COMPLETE)
@@ -147,7 +145,7 @@ def pedotdeposition(
     Args:
         instructions (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
-  
+
     """
     toolkit.global_logger.info(
         "Running experimnet %s part 1", instructions.experiment_id
@@ -166,7 +164,7 @@ def pedotdeposition(
     # as that is our minimum pipetting volume. However once the calculations are done, the
     # actual volume to be pipetted is calculated using the correction factor.
     stock_vials, _ = read_vials()
-    edot_vials:list[Vial2] = [
+    edot_vials: list[Vial2] = [
         vial for vial in stock_vials if vial.name == "edot" and vial.volume > 0
     ]
 
@@ -179,7 +177,9 @@ def pedotdeposition(
     # vial to get the desired volume and concentration
     edot_vial_volumes, deviation, edot_volumes_by_pos = solve_vials_ilp(
         # Concentrations of each vial in mM
-        vial_concentration_map={vial.position: vial.concentration for vial in edot_vials},
+        vial_concentration_map={
+            vial.position: vial.concentration for vial in edot_vials
+        },
         # Total volume to achieve in uL
         v_total=instructions.solutions["edot"],
         # Target concentration in mM
@@ -188,7 +188,9 @@ def pedotdeposition(
 
     # If the volumes are not found, raise an error
     if edot_vial_volumes is None:
-        raise ValueError(f"No solution combinations found for edot {instructions.edot_concentration} mM")
+        raise ValueError(
+            f"No solution combinations found for edot {instructions.edot_concentration} mM"
+        )
     toolkit.global_logger.info(
         "Volumes to draw from each edot vial: %s uL", edot_vial_volumes
     )
@@ -198,7 +200,7 @@ def pedotdeposition(
     for position, volume in edot_volumes_by_pos.items():
         if volume == 0:
             continue
-        vial:Vial2 = next(vial for vial in edot_vials if vial.position == position)
+        vial: Vial2 = next(vial for vial in edot_vials if vial.position == position)
         forward_pipette_v2(
             volume=correction_factor(volume, vial.viscosity_cp),
             from_vessel=vial,
@@ -262,10 +264,7 @@ def pedotdeposition(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
-        flush_solution_name="rinse",
-        toolkit=toolkit
-    )
+    flush_v2(flush_solution_name="rinse", toolkit=toolkit)
 
     toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
     instructions.set_status_and_save(ExperimentStatus.RINSING)

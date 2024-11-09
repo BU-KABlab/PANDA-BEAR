@@ -9,8 +9,10 @@ from panda_lib.actions import (
     cyclic_volt,
     OCPFailure,
     CVFailure,
-    Tuple
+    Tuple,
 )
+
+
 def cyclic_volt_pgma_fc(
     cv_instructions: EchemExperimentBase, file_tag: str = "CV_characterization"
 ) -> Tuple[EchemExperimentBase, ExperimentResult]:

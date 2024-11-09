@@ -5,7 +5,6 @@ Useful for one-off tasks that don't require the full PANDA_SDL program to run.
 Or starting the PANDA_SDL either with or without mock instruments.
 """
 
-# pylint: disable=broad-exception-caught, protected-access
 import os
 import sys
 import textwrap
@@ -17,18 +16,20 @@ from typing import Tuple
 from PIL import Image
 
 from license_text import show_conditions, show_warrenty
-from panda_lib import (experiment_loop, imaging, pipette, print_panda, vials,
-                       wellplate)
+from panda_lib import experiment_loop, imaging, pipette, print_panda, vials, wellplate
 from panda_lib.config import print_config_values as print_config
-from panda_lib.config import (read_config, read_testing_config,
-                              write_testing_config)
+from panda_lib.config import read_config, read_testing_config, write_testing_config
 from panda_lib.experiment_analysis_loop import analysis_worker, load_analyzers
 from panda_lib.experiment_class import ExperimentBase
 from panda_lib.movement import mill_calibration_and_positioning
-from panda_lib.sql_tools import (remove_testing_experiments,
-                                 sql_generator_utilities,
-                                 sql_protocol_utilities, sql_queue,
-                                 sql_system_state, sql_wellplate)
+from panda_lib.sql_tools import (
+    remove_testing_experiments,
+    sql_generator_utilities,
+    sql_protocol_utilities,
+    sql_queue,
+    sql_system_state,
+    sql_wellplate,
+)
 from panda_lib.utilities import SystemState, input_validation
 
 os.environ["KMP_AFFINITY"] = "none"
@@ -71,7 +72,6 @@ def run_panda_sdl_without_ml():
             print("Invalid choice. Please try again.")
             continue
         elif one_off[0] == "y":
-
             exp_ids = print_queue_info()
             try:
                 spec_id = int(input("Enter the experiment ID: ").strip().lower())

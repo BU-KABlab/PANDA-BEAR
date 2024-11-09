@@ -5,7 +5,7 @@ The functions in this module allow the user to:
  - check and change mill settings
  - calibrate the locations of individual wells in a wellplate
  - calibrate the z_bottom of the wellplate to the mill
- 
+
 The module relies on other modules such as:
     - `mill_control`
     - `utilities`
@@ -15,13 +15,13 @@ The module relies on other modules such as:
 """
 
 import logging
+
 # pylint: disable=unused-argument
 import os
 import platform
 from typing import Sequence
 
-from panda_lib.experiment_class import (ExperimentResultsRecord,
-                                        insert_experiment_result)
+from panda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_result
 from panda_lib.imaging import capture_new_image, image_filepath_generator
 from panda_lib.log_tools import setup_default_logger
 from panda_lib.utilities import Instruments, input_validation
@@ -35,6 +35,7 @@ logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBU
 
 
 config = read_config()["MILL"]
+
 
 def check_mill_settings(mill: Mill, *args, **kwargs):
     """
@@ -141,7 +142,7 @@ def update_instrument_offsets(mill: Mill, *args, **kwargs):
     Repeat until the user is satisfied.
     """
     # Review the instrument offset settings
-    instrument_offsets:dict = mill.config["instrument_offsets"]
+    instrument_offsets: dict = mill.config["instrument_offsets"]
     print("\nCurrent instrument offsets:")
     for instrument, offset in instrument_offsets:
         print(f"{instrument}: {offset}")
@@ -175,7 +176,7 @@ def update_instrument_offsets(mill: Mill, *args, **kwargs):
                         except ValueError:
                             print("Invalid input, please try again")
                             continue
-                    else: # If the user enters nothing, keep the current value
+                    else:  # If the user enters nothing, keep the current value
                         new_coordinates[coordinate] = instrument_offsets[
                             instrument_to_change
                         ][coordinate]
@@ -606,6 +607,7 @@ You will be asked to accept the setting, and if you do not, you will be asked to
                 ),
             )
 
+
 def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     """Calibrate the height for the echem"""
     # Move the pipette to the top of the wellplate
@@ -614,7 +616,7 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     )
     if response.lower() == "q":
         return
-    
+
     mill.safe_move(
         wellplate.get_coordinates("A1", "x"),
         wellplate.get_coordinates("A1", "y"),
@@ -652,6 +654,7 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
             wellplate.echem_height = new_echem_height
             wellplate.write_wellplate_location()
             print(f"New echem height: {wellplate.echem_height}")
+
 
 def calibrate_vials(
     mill: Mill,
@@ -700,7 +703,6 @@ def calibrate_camera_focus(mill: Mill, wellplate: Wellplate, *args, **kwargs):
         wellplate.image_height,
         Instruments.LENS,
     )
-
 
     print(f"Current image height: {wellplate.image_height}")
 
@@ -860,7 +862,7 @@ def calibrate_mill(
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
             if option == "q":
-                #cncmill.rest_electrode()
+                # cncmill.rest_electrode()
                 break
             menu_options[option](cncmill, wellplate, stock_vials, waste_vials)
 

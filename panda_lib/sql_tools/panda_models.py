@@ -74,7 +74,9 @@ class ExperimentResults(Base):
     result_type = Column(String)
     result_value = Column(String)
     created = Column(String, default=dt.now(timezone.utc))
-    updated = Column(String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc))
+    updated = Column(
+        String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
+    )
     context = Column(String)
 
     def __repr__(self):
@@ -246,6 +248,7 @@ class SystemStatus(Base):
     def __repr__(self):
         return f"<SystemStatus(id={self.id}, status={self.status}, comment={self.comment}, status_time={self.status_time}, test_mode={self.test_mode})>"
 
+
 class Users(Base):
     """Users table model"""
 
@@ -258,10 +261,13 @@ class Users(Base):
     email = Column(String, nullable=False)
     active = Column(Boolean, default=True)
     created = Column(String, default=dt.now(timezone.utc))
-    updated = Column(String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc))
+    updated = Column(
+        String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
+    )
 
     def __repr__(self):
         return f"<Users(id={self.id}, first_name={self.first}, last_name={self.last}, username={self.username}, password={self.password}, email={self.email}, created={self.created}, updated={self.updated})>"
+
 
 def generate_username(mapper, connection, target):
     """Generate a unique username by concatenating the first letter of the first name with the last name and an auto-incremented number."""
@@ -279,16 +285,20 @@ def generate_username(mapper, connection, target):
         else:
             target.username = base_username
 
+
 # Attach the event listener to the Users model
-event.listen(Users, 'before_insert', generate_username)
+event.listen(Users, "before_insert", generate_username)
 
 # Junction table for the many-to-many relationship between users and projects
-user_projects = Table('user_projects', Base.metadata,
-    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
-    Column('project_id', Integer, ForeignKey('projects.id'), primary_key=True),
-    Column('current', Boolean, default=True),
-    Column('timestamp', Integer, default=dt.now(timezone.utc))
+user_projects = Table(
+    "user_projects",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("project_id", Integer, ForeignKey("projects.id"), primary_key=True),
+    Column("current", Boolean, default=True),
+    Column("timestamp", Integer, default=dt.now(timezone.utc)),
 )
+
 
 class Vials(Base):
     """
@@ -490,16 +500,20 @@ class VialStatus(Base):
     def __repr__(self):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
 
+
 class PotentiostatReadout(Base):
     """PotentiostatReadout table model"""
-    __tablename__ = 'potentiostat_readouts'
+
+    __tablename__ = "potentiostat_readouts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(String, nullable=False)
     interface = Column(String, nullable=False)
     technique = Column(String, nullable=False)
     readout_values = Column(Text, nullable=False)
-    experiment_id = Column(Integer, ForeignKey("panda_experiments.experiment_id"), nullable=False)
+    experiment_id = Column(
+        Integer, ForeignKey("panda_experiments.experiment_id"), nullable=False
+    )
 
     # @staticmethod
     # def validate_interface(mapper, connection, target):
@@ -515,12 +529,15 @@ class PotentiostatReadout(Base):
     #     if not getattr(technique, interface_column, False):
     #         raise ValueError(f"Interface '{target.interface}' is not supported for technique '{target.technique}'.")
 
+
 # Attach the event listener to the PotentiostatReadout model
 # event.listen(PotentiostatReadout, 'before_insert', PotentiostatReadout.validate_interface)
 
+
 class PotentiostatTechniques(Base):
     """PotentiostatTechniques table model"""
-    __tablename__ = 'potentiostat_techniques'
+
+    __tablename__ = "potentiostat_techniques"
 
     id = Column(Integer, primary_key=True)
     technique = Column(String, nullable=False)
@@ -529,4 +546,3 @@ class PotentiostatTechniques(Base):
     gamry_1010T = Column(Boolean, nullable=False)
     gamry_1010B = Column(Boolean, nullable=False)
     gamry_1010E = Column(Boolean, nullable=False)
-    

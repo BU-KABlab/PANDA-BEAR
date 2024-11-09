@@ -1,9 +1,9 @@
 """
-This module contains functions for interacting with the generators table in 
+This module contains functions for interacting with the generators table in
 the database.
 
-The functions in this module allow you to get, insert, update, and delete 
-generators in the database. The module also contains functions for reading in 
+The functions in this module allow you to get, insert, update, and delete
+generators in the database. The module also contains functions for reading in
 generators from the generators folder and running generators.
 """
 

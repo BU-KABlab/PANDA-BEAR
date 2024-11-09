@@ -3,6 +3,7 @@
 Requires the PyCapture2 library to be installed and run in a python 3.6 environment.
 This script is used to capture images from the FLIR camera.
 """
+
 from configparser import ConfigParser
 import logging
 from pathlib import Path
@@ -11,6 +12,7 @@ from typing import Union
 import PySpin
 from dotenv import load_dotenv
 
+
 def read_config() -> ConfigParser:
     """Reads a configuration file."""
     load_dotenv()
@@ -18,6 +20,7 @@ def read_config() -> ConfigParser:
     config = ConfigParser()
     config.read(config_path)
     return config
+
 
 config = read_config()
 
@@ -51,13 +54,14 @@ def setup_default_logger(
 
         console_handler = logging.StreamHandler()
         console_handler.setLevel(console_level)
-        console_formatter = logging.Formatter(
-            "%(message)s"
-        )
-        console_handler.setFormatter(console_formatter)  # Ensure console output is formatted
+        console_formatter = logging.Formatter("%(message)s")
+        console_handler.setFormatter(
+            console_formatter
+        )  # Ensure console output is formatted
         default_logger.addHandler(console_handler)
 
     return default_logger
+
 
 logger = setup_default_logger(
     log_name="FLIRCamera", console_level=logging.DEBUG, file_level=logging.DEBUG
@@ -74,7 +78,9 @@ def locate_connected_cameras() -> PySpin.CameraList:
 
     # Get current library version
     version: PySpin.LibraryVersion = system.GetLibraryVersion()
-    print(f"Library version: {version.major}.{version.minor}.{version.type}.{version.build}")
+    print(
+        f"Library version: {version.major}.{version.minor}.{version.type}.{version.build}"
+    )
     # Retrieve list of cameras from the system
     cam_list: PySpin.CameraList = system.GetCameras()
 
@@ -84,7 +90,6 @@ def locate_connected_cameras() -> PySpin.CameraList:
 
     # Finish if there are no cameras
     if num_cameras == 0:
-
         # Clear camera list before releasing system
         cam_list.Clear()
 
@@ -104,6 +109,7 @@ def locate_connected_cameras() -> PySpin.CameraList:
     input("Done! Press Enter to exit...")
     return cam_list
 
+
 def fetch_camera_list() -> PySpin.CameraList:
     """
     This function locates all connected cameras and returns the list of cameras found.
@@ -114,7 +120,9 @@ def fetch_camera_list() -> PySpin.CameraList:
 
     # Get current library version
     version: PySpin.LibraryVersion = system.GetLibraryVersion()
-    print(f"Library version: {version.major}.{version.minor}.{version.type}.{version.build}")
+    print(
+        f"Library version: {version.major}.{version.minor}.{version.type}.{version.build}"
+    )
     # Retrieve list of cameras from the system
     cam_list: PySpin.CameraList = system.GetCameras()
 
@@ -124,7 +132,6 @@ def fetch_camera_list() -> PySpin.CameraList:
 
     # Finish if there are no cameras
     if num_cameras == 0:
-
         # Clear camera list before releasing system
         cam_list.Clear()
 
@@ -136,6 +143,7 @@ def fetch_camera_list() -> PySpin.CameraList:
         return False
 
     return cam_list
+
 
 class StreamMode:
     """
@@ -255,7 +263,7 @@ def acquire_images(
         #  Retrieve enumeration node from nodemap
 
         # cam.Color
-        # In order to access the node entries, they have to be casted to a 
+        # In order to access the node entries, they have to be casted to a
         # pointer type (CEnumerationPtr here)
         node_acquisition_mode = PySpin.CEnumerationPtr(
             nodemap.GetNode("AcquisitionMode")
@@ -331,7 +339,6 @@ def acquire_images(
 
         for i in range(num_images):
             try:
-
                 #  Retrieve next received image
                 #
                 #  *** NOTES ***
@@ -357,7 +364,6 @@ def acquire_images(
                     )
 
                 else:
-
                     #  Print image information; height and width recorded in pixels
                     #
                     #  *** NOTES ***
@@ -471,7 +477,9 @@ def print_device_info(nodemap: PySpin.INodeMap) -> bool:
     return result
 
 
-def run_single_camera(cam: PySpin.CameraPtr, image_path: Union[str, Path] = None, num_images:int = 1) -> bool:
+def run_single_camera(
+    cam: PySpin.CameraPtr, image_path: Union[str, Path] = None, num_images: int = 1
+) -> bool:
     """
     This function acts as the body of the example; please see NodeMapInfo example
     for more in-depth comments on setting up cameras.
@@ -510,6 +518,7 @@ def run_single_camera(cam: PySpin.CameraPtr, image_path: Union[str, Path] = None
 
     return result
 
+
 def set_brightness(cam: PySpin.CameraPtr, brightness: int):
     """
     Sets the brightness for the camera.
@@ -542,17 +551,17 @@ def set_brightness(cam: PySpin.CameraPtr, brightness: int):
 
 def set_exposure(cam: PySpin.CameraPtr, exposure: float):
     """
-     This function configures a custom exposure time. Automatic exposure is turned
-     off in order to allow for the customization, and then the custom setting is
-     applied.
+    This function configures a custom exposure time. Automatic exposure is turned
+    off in order to allow for the customization, and then the custom setting is
+    applied.
 
-     :param cam: Camera to configure exposure for.
-     :type cam: CameraPtr
-     :return: True if successful, False otherwise.
-     :rtype: bool
+    :param cam: Camera to configure exposure for.
+    :type cam: CameraPtr
+    :return: True if successful, False otherwise.
+    :rtype: bool
     """
 
-    print('*** CONFIGURING EXPOSURE ***\n')
+    print("*** CONFIGURING EXPOSURE ***\n")
 
     try:
         result = True
@@ -576,11 +585,11 @@ def set_exposure(cam: PySpin.CameraPtr, exposure: float):
         # on to return the camera to its default state.
 
         if cam.ExposureAuto.GetAccessMode() != PySpin.RW:
-            print('Unable to disable automatic exposure. Aborting...')
+            print("Unable to disable automatic exposure. Aborting...")
             return False
 
         cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-        print('Automatic exposure disabled...')
+        print("Automatic exposure disabled...")
 
         # Set exposure time manually; exposure time recorded in microseconds
         #
@@ -595,17 +604,17 @@ def set_exposure(cam: PySpin.CameraPtr, exposure: float):
         # by checking SpinView.
 
         if cam.ExposureTime.GetAccessMode() != PySpin.RW:
-            print('Unable to set exposure time. Aborting...')
+            print("Unable to set exposure time. Aborting...")
             return False
 
         # Ensure desired exposure time does not exceed the maximum
         exposure_time_to_set = exposure
         exposure_time_to_set = min(cam.ExposureTime.GetMax(), exposure_time_to_set)
         cam.ExposureTime.SetValue(exposure_time_to_set)
-        print('Shutter time set to %s us...\n' % exposure_time_to_set)
+        print("Shutter time set to %s us...\n" % exposure_time_to_set)
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -630,19 +639,20 @@ def reset_exposure(cam: PySpin.CameraPtr) -> bool:
         # default state.
 
         if cam.ExposureAuto.GetAccessMode() != PySpin.RW:
-            print('Unable to enable automatic exposure (node retrieval). Non-fatal error...')
+            print(
+                "Unable to enable automatic exposure (node retrieval). Non-fatal error..."
+            )
             return False
 
         cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Continuous)
 
-        print('Automatic exposure enabled...')
+        print("Automatic exposure enabled...")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
-
 
 
 def set_sharpness(cam: PySpin.CameraPtr, sharpness: int):
@@ -702,6 +712,7 @@ def set_hue(cam: PySpin.CameraPtr, hue: int):
         print(f"Error setting hue: {ex}")
         result = False
 
+
 def set_saturation(cam: PySpin.CameraPtr, saturation: int):
     """
     Sets the saturation for the camera.
@@ -730,6 +741,7 @@ def set_saturation(cam: PySpin.CameraPtr, saturation: int):
     except PySpin.SpinnakerException as ex:
         print(f"Error setting saturation: {ex}")
         result = False
+
 
 def set_gamma(cam: PySpin.CameraPtr, gamma: int):
     """
@@ -867,6 +879,7 @@ def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
     except PySpin.SpinnakerException as ex:
         print(f"Error setting white balance: {ex}")
 
+
 def set_panda_image_profile(cam: PySpin.CameraPtr):
     """
     Camera settings for the panda profile
@@ -882,6 +895,7 @@ def set_panda_image_profile(cam: PySpin.CameraPtr):
     set_gain(cam, 0.0)
     set_framerate(cam, 5)
     set_white_balance(cam, 762, 813)
+
 
 # def epanda_camera_profile(self):
 #     """Camera settings for the epanda profile"""
@@ -1087,8 +1101,6 @@ def set_panda_image_profile(cam: PySpin.CameraPtr):
 #             self.camera.setEmbeddedImageInfo(ROIPosition=True)
 #         else:
 #             print("ROI position is not available.")
-
-
 
 
 if __name__ == "__main__":

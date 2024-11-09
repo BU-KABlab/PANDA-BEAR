@@ -93,7 +93,9 @@ def analysis_worker(
     return
 
 
-def load_analyzers(directory: str = Path("panda_experiment_analyzers/").resolve()) -> dict[int, object]:
+def load_analyzers(
+    directory: str = Path("panda_experiment_analyzers/").resolve(),
+) -> dict[int, object]:
     """
     Load the analysis scripts from the directory and return a dictionary
     of the analysis scripts.

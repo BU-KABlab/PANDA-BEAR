@@ -1,6 +1,7 @@
 """Utilities for setting and reading the configuration files"""
+
 import os
-from configparser import ConfigParser, Error as ConfigParserError
+from configparser import ConfigParser
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -11,11 +12,13 @@ def get_env_var(env_var_name: str) -> str:
     load_dotenv()
     return os.getenv(env_var_name)
 
+
 def get_repo_path():
     """Returns the path of the repository."""
     current_file = Path(__file__).resolve()
     repo_path = current_file.parent.parent
     return repo_path
+
 
 def read_testing_config():
     """Reads the testing configuration file."""
@@ -24,14 +27,16 @@ def read_testing_config():
     config.read(config_path)
     return config.getboolean("OPTIONS", "testing")
 
+
 def write_testing_config(enable_testing: bool):
     """Writes the testing configuration file."""
     config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
     config = ConfigParser()
     config.read(config_path)
     config.set("OPTIONS", "testing", str(enable_testing))
-    with open(config_path, "w", encoding='utf-8') as config_file:
+    with open(config_path, "w", encoding="utf-8") as config_file:
         config.write(config_file)
+
 
 def read_config() -> ConfigParser:
     """Reads a configuration file."""
@@ -39,6 +44,7 @@ def read_config() -> ConfigParser:
     config = ConfigParser()
     config.read(config_path)
     return config
+
 
 def read_logging_dir() -> str:
     """Reads the logging directory from the configuration file."""
@@ -48,6 +54,7 @@ def read_logging_dir() -> str:
     else:
         return config.get("LOGGING", "log_dir")
 
+
 def read_data_dir() -> str:
     """Reads the data directory from the configuration file."""
     config = read_config()
@@ -55,6 +62,7 @@ def read_data_dir() -> str:
         return config.get("DATA", "testing_data_dir")
     else:
         return config.get("DATA", "data_dir")
+
 
 def test():
     """Tests the functions in this module."""
@@ -64,6 +72,7 @@ def test():
     print(read_testing_config())
     write_testing_config(False)
     print(read_testing_config())
+
 
 if __name__ == "__main__":
     test()

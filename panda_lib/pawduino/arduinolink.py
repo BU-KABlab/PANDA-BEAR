@@ -212,7 +212,9 @@ class MockArduinoLink(ArduinoLink):
     The class provides the following attributes:
     - arduinoQueue (a queue to store messages from the Arduino)
     """
+
     arduinoQueue = queue.Queue()
+
     def __init__(self):
         """Initialize the MockArduinoLink class"""
         self.configured = True
@@ -235,6 +237,7 @@ class MockArduinoLink(ArduinoLink):
             return PawduinoReturnCodes.HELLO.value
         else:
             return None
+
 
 class PawduinoFunctions(enum.Enum):
     """

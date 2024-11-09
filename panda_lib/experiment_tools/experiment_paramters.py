@@ -1,6 +1,7 @@
 """How an experiment parameter record is represented in the database."""
 
-#TODO: Should this be with experiment_tools or should it be with SQL_tools?
+# TODO: Should this be with experiment_tools or should it be with SQL_tools?
+
 
 class ExperimentParameterRecord:
     """

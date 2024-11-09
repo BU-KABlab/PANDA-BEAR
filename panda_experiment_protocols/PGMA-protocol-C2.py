@@ -26,7 +26,6 @@
 # rinse well acetonitrile
 # image
 
-
 # Non-standard imports
 from panda_lib.experiment_loop import Toolkit
 from panda_lib.actions import (
@@ -40,7 +39,7 @@ from panda_lib.actions import (
     CAFailure,
     CVFailure,
     DepositionFailure,
-    Instruments
+    Instruments,
 )
 from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 from panda_lib.experiment_class import PGMAExperiment, ExperimentStatus

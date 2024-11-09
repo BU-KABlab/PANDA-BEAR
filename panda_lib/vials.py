@@ -463,7 +463,9 @@ class WasteVial(Vial2):
             try:
                 self.contents = ast.literal_eval(self.contents)
             except Exception as e:
-                vial_logger.error("Error occurred while converting contents to dict. Setting blank contents...")
+                vial_logger.error(
+                    "Error occurred while converting contents to dict. Setting blank contents..."
+                )
                 vial_logger.error("Error: %s", e)
                 self.contents = {}
         if isinstance(from_vessel, dict):
@@ -1179,7 +1181,6 @@ def import_vial_csv_file(filename: str = None) -> None:
 
     for each_vial in vial_parameters:
         try:
-
             if each_vial["vial_coordinates"] in [None, "", "{}", "{}"]:
                 vial_coordinates = {"x": 0, "y": 0, "z_bottom": 0}
             else:

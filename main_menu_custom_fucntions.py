@@ -1,6 +1,7 @@
 """
 Custom PANDA_SDL menu options
 """
+
 from pathlib import Path
 
 from PIL import Image
@@ -28,8 +29,7 @@ def generate_pedot_experiment_from_existing_data():
     """Generates an experiment from existing data using the ML model."""
     import panda_experiment_analyzers.pedot as pedot_analysis
     from panda_experiment_analyzers.pedot import sql_ml_functions
-    from panda_experiment_analyzers.pedot.pedot_classes import (MLOutput,
-                                                                PEDOTParams)
+    from panda_experiment_analyzers.pedot.pedot_classes import MLOutput, PEDOTParams
 
     sql_system_state.set_system_status(
         utilities.SystemState.BUSY, "generating experiment"

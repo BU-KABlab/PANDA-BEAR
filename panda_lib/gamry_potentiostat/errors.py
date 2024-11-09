@@ -46,7 +46,7 @@ class ErrorCodeLookup:
         3758096429: "List Invalid",
         3758096430: "Device Not Authorized",
         3758227620: "Invalid Signal Generation Parameters",
-        2148007941: "Reference Family Version Mismatch"
+        2148007941: "Reference Family Version Mismatch",
     }
 
     @classmethod

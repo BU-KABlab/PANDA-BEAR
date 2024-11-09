@@ -1,11 +1,11 @@
 """
 This module contains the MillControl class, which is used to control the a GRBL CNC machine.
 The MillControl class is used by the actions module to move the pipette and electrode to the
-specified coordinates. 
+specified coordinates.
 
 The MillControl class contains methods to move the pipette and
 electrode to a safe position, rinse the electrode, and update the offsets in the mill config
-file. 
+file.
 
 The MillControl class contains methods to connect to the mill, execute commands,
 stop the mill, reset the mill, home the mill, get the current status of the mill, get the
@@ -35,7 +35,9 @@ from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import MillConfig
 
 # add the mill_control logger
-mill_control_logger = setup_default_logger(log_name="mill_control", console_level=logging.WARNING)
+mill_control_logger = setup_default_logger(
+    log_name="mill_control", console_level=logging.WARNING
+)
 
 # Mill movement logger - just for the movement commands
 mill_movement_logger = setup_default_logger(
@@ -47,9 +49,13 @@ MILL_COM_PORT = config.get("MILL", "port")
 MILL_BAUD_RATE = config.getint("MILL", "baudrate")
 MILL_TIMEOUT = config.getint("MILL", "timeout")
 
-MILL_MOVE = "G01 X{} Y{} Z{}"  # Move to specified coordinates at the specified feed rate
+MILL_MOVE = (
+    "G01 X{} Y{} Z{}"  # Move to specified coordinates at the specified feed rate
+)
 MILL_MOVE_Z = "G01 Z{}"  # Move to specified Z coordinate at the specified feed rate
-RAPID_MILL_MOVE = "G00 X{} Y{} Z{}"  # Move to specified coordinates at the maximum feed rate
+RAPID_MILL_MOVE = (
+    "G00 X{} Y{} Z{}"  # Move to specified coordinates at the maximum feed rate
+)
 
 # Compile regex patterns once
 wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
@@ -102,7 +108,7 @@ class Mill:
         except configparser.Error as err:
             mill_control_logger.error("Error reading config file: %s", str(err))
             raise MillConfigError("Error reading config file") from err
-        
+
         except serial.SerialException as exep:
             mill_control_logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
@@ -110,7 +116,6 @@ class Mill:
         except MillConnectionError as exep:
             mill_control_logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
-
 
         # Check if the mill is currently in alarm state
         # If it is, reset the mill
@@ -133,7 +138,9 @@ class Mill:
             if reset_alarm[0].lower() == "y":
                 self.reset()
             else:
-                mill_control_logger.error("Mill is in alarm state, user chose not to reset the mill")
+                mill_control_logger.error(
+                    "Mill is in alarm state, user chose not to reset the mill"
+                )
                 raise MillConnectionError("Mill is in alarm state")
         if "error" in status.lower():
             mill_control_logger.error("Error in status: %s", status)
@@ -182,7 +189,9 @@ class Mill:
         time.sleep(2)
         mill_control_logger.info("Mill connected: %s", self.ser_mill.is_open)
         if self.ser_mill.is_open:
-            mill_control_logger.error("Failed to close the serial connection to the mill")
+            mill_control_logger.error(
+                "Failed to close the serial connection to the mill"
+            )
             raise MillConnectionError("Error closing serial connection to mill")
         else:
             mill_control_logger.info("Serial connection to mill closed successfully")
@@ -201,7 +210,9 @@ class Mill:
             if mill_config:
                 return mill_config.config
             else:
-                mill_control_logger.error("Config not found in db...attempting to fetch from mill")
+                mill_control_logger.error(
+                    "Config not found in db...attempting to fetch from mill"
+                )
 
                 try:
                     self.connect_to_mill()
@@ -268,11 +279,15 @@ class Mill:
                     self.set_feed_rate(2000)
                     mill_response = self.execute_command(command)
                 else:
-                    mill_control_logger.error("current_status: Error in status: %s", mill_response)
+                    mill_control_logger.error(
+                        "current_status: Error in status: %s", mill_response
+                    )
                     raise StatusReturnError(f"Error in status: {mill_response}")
 
         except Exception as exep:
-            mill_control_logger.error("Error executing command %s: %s", command, str(exep))
+            mill_control_logger.error(
+                "Error executing command %s: %s", command, str(exep)
+            )
             raise CommandExecutionError(
                 f"Error executing command {command}: {str(exep)}"
             ) from exep
@@ -424,7 +439,9 @@ class Mill:
                         "WPos coordinates not found in the line. Trying again..."
                     )
                     if _ == max_attempts - 1:
-                        mill_control_logger.error("Error occurred while getting WPos coordinates")
+                        mill_control_logger.error(
+                            "Error occurred while getting WPos coordinates"
+                        )
                         raise LocationNotFound
         elif status_mode in [1, 3]:
             match = mpos_pattern.search(status)
@@ -451,7 +468,9 @@ class Mill:
                         "MPos coordinates not found in the line. Trying again..."
                     )
                     if _ == max_attempts - 1:
-                        mill_control_logger.error("Error occurred while getting MPos coordinates")
+                        mill_control_logger.error(
+                            "Error occurred while getting MPos coordinates"
+                        )
                         raise LocationNotFound
         else:
             mill_control_logger.critical("Failed to obtain coordinates from the mill")
@@ -493,7 +512,7 @@ class Mill:
 
         for _ in range(rinses):
             command_block.append(f"G01 Z{coords['z']}")
-            command_block.append(f"G01 Z0")
+            command_block.append("G01 Z0")
 
         command_block = "\n".join(command_block)
         self.execute_command(command_block)
@@ -638,7 +657,9 @@ class Mill:
         self._validate_target_coordinates(target_coordinates)
 
         commands.extend(
-            self._generate_movement_commands(current_coordinates, target_coordinates,move_to_zero)
+            self._generate_movement_commands(
+                current_coordinates, target_coordinates, move_to_zero
+            )
         )
 
         if second_z_cord is not None:
@@ -676,7 +697,9 @@ class Mill:
             return Coordinates(x=goto.x, y=goto.y, z=goto.z + offsets.z)
         else:
             return Coordinates(
-                x=goto.x + offsets.x, y=goto.y + offsets.y, z= 0 if goto.z + offsets.z > 0 else goto.z + offsets.z
+                x=goto.x + offsets.x,
+                y=goto.y + offsets.y,
+                z=0 if goto.z + offsets.z > 0 else goto.z + offsets.z,
             )
 
     def _log_target_coordinates(self, target_coordinates: Coordinates):
@@ -700,7 +723,10 @@ class Mill:
             raise ValueError("z coordinate out of range")
 
     def _generate_movement_commands(
-        self, current_coordinates: Coordinates, target_coordinates: Coordinates, move_z_first: bool = False
+        self,
+        current_coordinates: Coordinates,
+        target_coordinates: Coordinates,
+        move_z_first: bool = False,
     ):
         commands = []
         if current_coordinates.z >= self.config["safe_height_floor"]:
@@ -713,7 +739,9 @@ class Mill:
                 commands.append(f"G01 Y{target_coordinates.y}")
             if target_coordinates.z != current_coordinates.z:
                 commands.append(f"G01 Z{target_coordinates.z}")
-            if target_coordinates.z == current_coordinates.z and move_z_first: # The mill moved to Z=0 first, so move back to the target Z
+            if (
+                target_coordinates.z == current_coordinates.z and move_z_first
+            ):  # The mill moved to Z=0 first, so move back to the target Z
                 commands.append(f"G01 Z{target_coordinates.z}")
         return commands
 
@@ -845,11 +873,15 @@ class MockMill(Mill):
                     self.set_feed_rate(2000)
                     mill_response = self.execute_command(command)
                 else:
-                    mill_control_logger.error("current_status: Error in status: %s", mill_response)
+                    mill_control_logger.error(
+                        "current_status: Error in status: %s", mill_response
+                    )
                     raise StatusReturnError(f"Error in status: {mill_response}")
 
         except Exception as exep:
-            mill_control_logger.error("Error executing command %s: %s", command, str(exep))
+            mill_control_logger.error(
+                "Error executing command %s: %s", command, str(exep)
+            )
             raise CommandExecutionError(
                 f"Error executing command {command}: {str(exep)}"
             ) from exep
@@ -917,7 +949,9 @@ class MockMill(Mill):
                 self.current_y = float(match.group(2) or self.current_y)
                 self.current_z = float(match.group(3) or self.current_z)
             else:
-                mill_control_logger.warning("Could not extract coordinates from the command")
+                mill_control_logger.warning(
+                    "Could not extract coordinates from the command"
+                )
 
     def mock_readline(self, settings: bool = False):
         """Simulate reading from the mill"""

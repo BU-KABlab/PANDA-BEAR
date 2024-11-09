@@ -1,5 +1,4 @@
-""" Contains mocks for cnc driver objects for offline testing
-"""
+"""Contains mocks for cnc driver objects for offline testing"""
 
 # standard libraries
 import re
@@ -93,8 +92,10 @@ class MockMill(RealMill):
         """Simulate clearing buffers"""
         logger.info("Clearing buffers")
 
-class MockSerialToMill():
+
+class MockSerialToMill:
     """A class that simulates a serial connection to the mill for testing purposes."""
+
     def __init__(self, port, baudrate, parity, stopbits, bytesize, timeout):
         self.port = port
         self.baudrate = baudrate
@@ -112,7 +113,7 @@ class MockSerialToMill():
         """Simulate closing the serial connection"""
         self.is_open = False
 
-    def write(self, command:bytes):
+    def write(self, command: bytes):
         """Simulate writing to the serial connection"""
         # decode the command to a string
         command = command.decode("utf-8")
@@ -145,7 +146,6 @@ class MockSerialToMill():
                 logger.warning("Could not extract coordinates from the command")
         else:
             pass
-
 
     def read(self):
         """Simulate reading from the serial connection"""

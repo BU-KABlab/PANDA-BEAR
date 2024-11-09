@@ -15,10 +15,10 @@ from panda_lib.sql_tools.sql_system_state import get_current_pin
 
 config = read_config()
 TESTING = read_testing_config()
-PROJECT_ID = 18 # The project ID associates other experiments and the analysis
+PROJECT_ID = 18  # The project ID associates other experiments and the analysis
 EXPERIMENT_NAME = "PGMA-screening-C2"
 CAMPAIGN_ID = 1
-PLATE_TYPE = 7 # 10 mm diameter wells
+PLATE_TYPE = 7  # 10 mm diameter wells
 DEFAULT_PUMPING_RATE = config.getfloat("DEFAULTS", "pumping_rate")
 GENERATORS_DIR = Path(config.get("GENERAL", "generators_dir"))
 SYSTEM_VERSION = get_current_pin()
@@ -27,7 +27,7 @@ print("TEST MODE: ", TESTING)
 input("Press enter to continue")
 
 params_df = pd.read_csv(
-   GENERATORS_DIR / "LHS-Parameters-C2.csv"
+    GENERATORS_DIR / "LHS-Parameters-C2.csv"
 )  # Update path with location on PANDA computer
 
 
@@ -45,10 +45,10 @@ def main():
         experiments.append(
             experiment_class.PGMAExperiment(
                 experiment_id=experiment_id,
-                protocol_id='PGMA-protocol-C2',
+                protocol_id="PGMA-protocol-C2",
                 well_id="A1",
                 well_type_number=PLATE_TYPE,
-                experiment_name='TEST_' + EXPERIMENT_NAME,
+                experiment_name="TEST_" + EXPERIMENT_NAME,
                 pin=SYSTEM_VERSION,
                 project_id=999,
                 project_campaign_id=CAMPAIGN_ID,
@@ -60,7 +60,7 @@ def main():
                     "ACNrinse": 320,
                 },
                 pumping_rate=DEFAULT_PUMPING_RATE,
-                filename='test_'+str(experiment_id),
+                filename="test_" + str(experiment_id),
                 # Echem specific
                 ocp=1,
                 baseline=0,

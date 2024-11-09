@@ -65,6 +65,7 @@ class SyringePump:
         )  # mL
         self.pump = self.set_up_pump()
         self.pipette = Pipette()
+
     @timing_wrapper
     def set_up_pump(self):
         """
@@ -93,6 +94,7 @@ class SyringePump:
             pump_control_logger.exception(e)
             raise e
         return syringe_pump
+
     @timing_wrapper
     def withdraw(
         self,
@@ -113,7 +115,7 @@ class SyringePump:
         """
         # Perform the withdrawl
         # TODO Consider tracking the volume of air in the pipette as blowout and dripstop?
-        volume_ml = round(float(volume_to_withdraw/1000), PRECISION)
+        volume_ml = round(float(volume_to_withdraw / 1000), PRECISION)
         if volume_ml <= 0:
             return None
 
@@ -125,9 +127,7 @@ class SyringePump:
                 self.max_pump_rate
             )  # if no solution, assume air and use the max pump rate
 
-        _ = self.run_pump(
-            nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density
-        )
+        _ = self.run_pump(nesp_lib.PumpingDirection.WITHDRAW, volume_ml, rate, density)
 
         volume_withdrawn_ml = round(self.pump.volume_withdrawn, PRECISION)
         volume_withdrawn_ul = round(volume_withdrawn_ml * 1000, PRECISION)
@@ -153,9 +153,7 @@ class SyringePump:
 
             # Update the solution volume and contents
             solution.update_volume(-volume_withdrawn_ul)
-            solution.update_contents(
-                solution.contents, -volume_withdrawn_ul, save=True
-            )
+            solution.update_contents(solution.contents, -volume_withdrawn_ul, save=True)
 
             # Updating the contents also updates the volume so we are done here
 
@@ -191,10 +189,11 @@ class SyringePump:
         self.pump.volume_withdrawn_clear()
 
         return None
+
     @timing_wrapper
     def withdraw_air(self, volume: float) -> int:
         """Withdraw the given ul of air with the pipette"""
-        volume_ml = round(float(volume/1000),PRECISION)
+        volume_ml = round(float(volume / 1000), PRECISION)
         if volume_ml <= 0:
             return 1
         _ = self.run_pump(
@@ -234,7 +233,7 @@ class SyringePump:
             int: The difference in weight if weighing, otherwise 0
         """
         # Convert volume to microliters
-        volume_ml = round(float(volume_to_infuse/1000), PRECISION)
+        volume_ml = round(float(volume_to_infuse / 1000), PRECISION)
         # Convert blowout volume to milliliters
         blowout_ml = round(float(blowout_ul) / 1000, PRECISION)
 
@@ -314,7 +313,7 @@ class SyringePump:
     @timing_wrapper
     def infuse_air(self, volume: float) -> int:
         """Infuse the given ul of air with the pipette"""
-        volume_ml = round(float(volume/1000),PRECISION)
+        volume_ml = round(float(volume / 1000), PRECISION)
         if volume_ml > 0:
             _ = self.run_pump(
                 nesp_lib.PumpingDirection.INFUSE, volume_ml, self.max_pump_rate
@@ -329,6 +328,7 @@ class SyringePump:
             self.pump.volume_infused_clear()
             self.pump.volume_withdrawn_clear()
         return 0
+
     @timing_wrapper
     def run_pump(
         self,
@@ -347,9 +347,9 @@ class SyringePump:
         # Set the pump parameters for the run
         if self.pump.pumping_direction != pump_direction:
             self.pump.pumping_direction = pump_direction
-        self.pump.pumping_volume = round(float(
-            volume_ml + blowout_ml
-        ),PRECISION)  # conver to float for nesp-lib
+        self.pump.pumping_volume = round(
+            float(volume_ml + blowout_ml), PRECISION
+        )  # conver to float for nesp-lib
         if rate is None:
             self.pump.pumping_rate = float(
                 self.max_pump_rate
@@ -363,7 +363,11 @@ class SyringePump:
         )
 
         pump_control_logger.info(
-            "%s %f ml (%f of solution) at %f mL/min...", action, self.pump.pumping_volume, volume_ml, self.pump.pumping_rate
+            "%s %f ml (%f of solution) at %f mL/min...",
+            action,
+            self.pump.pumping_volume,
+            volume_ml,
+            self.pump.pumping_rate,
         )
         time.sleep(0.5)
         self.pump.run()
@@ -417,6 +421,7 @@ class MockPump(SyringePump):
         pump_control_logger.info(log_msg)
         time.sleep(2)
         return syringe_pump
+
 
 if __name__ == "__main__":
     # test_mixing()

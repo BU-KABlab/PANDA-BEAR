@@ -1,5 +1,5 @@
 """
-This file simplifies controlling the OBS software in the ways that we need. 
+This file simplifies controlling the OBS software in the ways that we need.
 It is used to place the experiment information on the screen and to turn on and off the webcam.
 """
 
@@ -30,6 +30,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 # logger.addHandler(system_handler)
 
+
 @dataclass
 class OBSSecrets:
     """This class is used to store the OBS secrets"""
@@ -38,6 +39,7 @@ class OBSSecrets:
     PASSWORD = obs_config.get("obs_password")
     PORT = obs_config.getint("obs_port")
     TIMEOUT = obs_config.getint("obs_timeout")
+
 
 class OBSController:
     """This class is used simplify the control the OBS software for our needs"""
@@ -73,8 +75,7 @@ class OBSController:
         for source in self.sources.keys():
             try:
                 self.sources[source] = self.client.get_source_active(source)
-            except OBSerror.OBSSDKRequestError:
-
+            except OBSerror.OBSSDKRequestError as e:
                 self.logger.error("Error getting source active status: %s", e)
                 # self.logger.error("Trying to make source instead")
                 # self.client.create_input(source, source)
@@ -251,4 +252,3 @@ class MockOBSController:
     def disconnect_from_obs(self):
         """Disconnect from OBS"""
         pass
-

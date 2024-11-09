@@ -7,7 +7,7 @@ from e_panda import (
     NoAvailableSolution,
     flush_v2,
     rinse_v2,
-    chrono_amp
+    chrono_amp,
 )
 from vials import Vessel, StockVial, WasteVial
 from mill_control import MockMill
@@ -642,6 +642,7 @@ class TestEPanda(unittest.TestCase):
 #                 mill=self.mill,
 #                 wellplate=self.wellplate
 #             )
+
 
 class CustomTestResult(unittest.TextTestResult):
     """

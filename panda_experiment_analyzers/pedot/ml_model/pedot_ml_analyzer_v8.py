@@ -2,10 +2,11 @@
 Gausian Process ML Model for optimal PEDOT electrodeposition
 Verion 8
 Author: Harley Quinn
-Date: 2024-05-02 
+Date: 2024-05-02
 """
 
 import math
+
 # pylint: disable=line-too-long
 import os
 
@@ -24,13 +25,19 @@ from gpytorch.models import ExactGP
 from scipy.interpolate import griddata
 from scipy.stats import qmc
 from sklearn.metrics import mean_squared_error
+
 # from tqdm.notebook import tqdm #use in jupyter notebook
 from tqdm import tqdm  # use in vscode
 
 from panda_experiment_analyzers.pedot.sql_ml_functions import (
-    insert_best_test_point, model_iteration, select_ml_training_data)
-from panda_lib.experiment_class import (ExperimentResultsRecord,
-                                        insert_experiment_results)
+    insert_best_test_point,
+    model_iteration,
+    select_ml_training_data,
+)
+from panda_lib.experiment_class import (
+    ExperimentResultsRecord,
+    insert_experiment_results,
+)
 
 
 def main(
@@ -190,7 +197,6 @@ def main(
         time_target=(0, 1),
         concentration_target=(0, 1),
     ):
-
         voltage = voltage_original[0] + (
             (best_test_point_scaled[0] - voltage_target[0])
             * (voltage_original[1] - voltage_original[0])
@@ -422,9 +428,7 @@ def main(
     with torch.no_grad(), gpytorch.settings.fast_pred_var():
         best_test_point_tensor = torch.tensor(
             best_test_point, dtype=torch.float32
-        ).unsqueeze(
-            0
-        )  # Add batch dimension
+        ).unsqueeze(0)  # Add batch dimension
         predicted_distribution = likelihood(model(best_test_point_tensor))
         predicted_mean = predicted_distribution.mean.item()
         predicted_stddev = predicted_distribution.stddev.item()
@@ -608,7 +612,6 @@ def main(
 
 
 if __name__ == "__main__":
-
     # Before running update the paths accordingly
     TEST_TRAINING_FILE_PATH = "MLTrainingData_PEDOT.csv"  # training data file path
     TEST_MODEL_BASE_PATH = "pedot_gp_model_v8"
@@ -621,5 +624,5 @@ if __name__ == "__main__":
     main(
         model_base_path=TEST_MODEL_BASE_PATH,
         contourplots_path=TEST_CONTOURPLOTS_PATH,
-        experiment_id=1
+        experiment_id=1,
     )

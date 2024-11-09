@@ -22,6 +22,7 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
     with SessionLocal() as session:
         return session.query(WellPlates).filter(WellPlates.id == plate_id).count() > 0
 
+
 def check_if_plate_type_exists(type_id: int) -> bool:
     """Check if a plate type exists in the plate_types table"""
 
@@ -29,7 +30,9 @@ def check_if_plate_type_exists(type_id: int) -> bool:
         return session.query(PlateTypes).filter(PlateTypes.id == type_id).count() > 0
 
 
-def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float, float, float, float, int, float, float]:
+def select_wellplate_location(
+    plate_id: Union[int, None] = None,
+) -> Tuple[float, float, float, float, int, float, float]:
     """Select the location and characteristics of the wellplate from the wellplate
      table. If no plate_id is given, the current wellplate is assumed
 
@@ -37,12 +40,12 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float,
         plate_id (int): The plate ID.
 
     Returns:
-        x (float): The x coordinate of A1. 
-        y (float): The y coordinate of A1. 
-        z_bottom (float): The z coordinate of the bottom of the wellplate. 
-        z_top (float): The z coordinate of the top of the wellplate. 
-        orientation (int): The orientation of the wellplate. 
-        echem_height(float): The height of performing electrochemistry in a well. 
+        x (float): The x coordinate of A1.
+        y (float): The y coordinate of A1.
+        z_bottom (float): The z coordinate of the bottom of the wellplate.
+        z_top (float): The z coordinate of the top of the wellplate.
+        orientation (int): The orientation of the wellplate.
+        echem_height(float): The height of performing electrochemistry in a well.
         image_height(float): The height of the image taken of the wellplate.
 
     """
@@ -62,14 +65,13 @@ def select_wellplate_location(plate_id: Union[int, None] = None) -> Tuple[float,
             wellplate.z_top,
             wellplate.orientation,
             wellplate.echem_height,
-            wellplate.image_height
+            wellplate.image_height,
         )
 
 
-def update_wellplate_location(plate_id: Union[int,None], **kwargs) -> None:
+def update_wellplate_location(plate_id: Union[int, None], **kwargs) -> None:
     """Update the location and characteristics of the wellplate in the wellplates table"""
     with SessionLocal() as session:
-
         if plate_id is None:
             logger.info("No plate_id provided, updating the current wellplate")
             plate_id = (
@@ -105,7 +107,6 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
     """Add a new wellplate to the wellplates table"""
 
     with SessionLocal() as session:
-
         # Fetch the information about the type of wellplate
         well_type = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
 
@@ -114,17 +115,17 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
                 id=plate_id,
                 type_id=type_id,
                 current=0,
-                cols = well_type.cols,
-                rows = well_type.rows,
-                a1_x = 0,
-                a1_y = 0,
-                z_bottom = 0,
-                z_top = 0,
-                orientation = 0,
-                echem_height = 0,
-                image_height = 0
+                cols=well_type.cols,
+                rows=well_type.rows,
+                a1_x=0,
+                a1_y=0,
+                z_bottom=0,
+                z_top=0,
+                orientation=0,
+                echem_height=0,
+                image_height=0,
             )
-            )
+        )
         session.commit()
 
 
@@ -135,8 +136,10 @@ def check_if_current_wellplate_is_new() -> bool:
         result = (
             session.query(WellHx.status)
             .filter(
-            WellHx.plate_id
-            == session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
+                WellHx.plate_id
+                == session.query(WellPlates.id)
+                .filter(WellPlates.current == 1)
+                .scalar_subquery()
             )
             .all()
         )
@@ -167,7 +170,9 @@ def get_number_of_wells(plate_id: Union[int, None] = None) -> int:
                 session.query(WellHx)
                 .filter(
                     WellHx.plate_id
-                    == session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
+                    == session.query(WellPlates.id)
+                    .filter(WellPlates.current == 1)
+                    .scalar_subquery()
                 )
                 .count()
             )
@@ -197,7 +202,9 @@ def get_number_of_clear_wells(plate_id: Union[int, None] = None) -> int:
                 session.query(WellHx)
                 .filter(
                     WellHx.plate_id
-                    == session.query(WellPlates.id).filter(WellPlates.current == 1).scalar_subquery()
+                    == session.query(WellPlates.id)
+                    .filter(WellPlates.current == 1)
+                    .scalar_subquery()
                 )
                 .filter(WellHx.status.in_(["new", "clear", "queued"]))
                 .count()
@@ -228,6 +235,7 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
         is_new = check_if_current_wellplate_is_new()
         return result.id, result.type_id, is_new
 
+
 def select_wellplate_info(plate_id: int) -> WellPlates:
     """
     Get the wellplate information from the wellplates table.
@@ -242,6 +250,8 @@ def select_wellplate_info(plate_id: int) -> WellPlates:
     with SessionLocal() as session:
         result = session.query(WellPlates).filter(WellPlates.id == plate_id).first()
         return result
+
+
 def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
     """
     Get the well IDs from the well_hx table for the given or current wellplate.
@@ -265,6 +275,7 @@ def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
             .all()
         )
         return [row[0] for row in result]
+
 
 def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
     """
@@ -305,7 +316,7 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
         wells = []
         for row in result:
             try:
-                if isinstance(row[5],str):
+                if isinstance(row[5], str):
                     incoming_contents = json.loads(row[5])
                 else:
                     incoming_contents = row[5]
@@ -315,7 +326,7 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
                 incoming_contents = {}
 
             try:
-                if isinstance(row[9],str):
+                if isinstance(row[9], str):
                     incoming_coordinates = json.loads(row[9])
                 else:
                     incoming_coordinates = row[9]
@@ -463,7 +474,10 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
             session.query(WellHx.well_id)
             .filter(WellHx.status == "new")
             .filter(WellHx.plate_id == plate_id)
-            .order_by(func.substr(WellHx.well_id, 1, 1), cast(func.substr(WellHx.well_id, 2), Integer).asc())
+            .order_by(
+                func.substr(WellHx.well_id, 1, 1),
+                cast(func.substr(WellHx.well_id, 2), Integer).asc(),
+            )
             .first()
         )
         if result is None:
@@ -512,7 +526,9 @@ def save_well_to_db(well_to_save: object) -> None:
                 WellHx.experiment_id: well_to_save.experiment_id,
                 WellHx.project_id: well_to_save.project_id,
                 WellHx.status: well_to_save.status,
-                WellHx.status_date: datetime.strptime(well_to_save.status_date,'%Y-%m-%dT%H:%M:%S'),
+                WellHx.status_date: datetime.strptime(
+                    well_to_save.status_date, "%Y-%m-%dT%H:%M:%S"
+                ),
                 WellHx.contents: json.dumps(well_to_save.contents),
                 WellHx.volume: well_to_save.volume,
                 WellHx.coordinates: json.dumps(asdict(well_to_save.coordinates)),
@@ -535,16 +551,18 @@ def save_wells_to_db(wells_to_save: List[object]) -> None:
                     session.query(WellPlates).filter(WellPlates.current == 1).first().id
                 )
 
-            session.add(WellHx(
-                plate_id=well.plate_id,
-                well_id=well.well_id,
-                experiment_id=well.experiment_id,
-                project_id=well.project_id,
-                status=well.status,
-                contents=json.dumps(well.contents),
-                volume=well.volume,
-                coordinates=json.dumps(asdict(well.coordinates)),
-            ))
+            session.add(
+                WellHx(
+                    plate_id=well.plate_id,
+                    well_id=well.well_id,
+                    experiment_id=well.experiment_id,
+                    project_id=well.project_id,
+                    status=well.status,
+                    contents=json.dumps(well.contents),
+                    volume=well.volume,
+                    coordinates=json.dumps(asdict(well.coordinates)),
+                )
+            )
         session.commit()
 
 
@@ -594,6 +612,7 @@ def update_well(well_to_update: object) -> None:
         )
         session.commit()
 
+
 def get_well_by_id(
     well_id: str,
     plate_id: Union[int, None] = None,
@@ -622,9 +641,11 @@ def get_well_by_id(
         )
         if result == []:
             return None
-        
+
         # Convert coordinates to a WellCoordinates object
-        result[0].coordinates = wellplate_module.WellCoordinates(**json.loads(result[0].coordinates))
+        result[0].coordinates = wellplate_module.WellCoordinates(
+            **json.loads(result[0].coordinates)
+        )
         return result[0]
 
 

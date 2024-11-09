@@ -27,21 +27,32 @@ def query_potentiostat_readouts(experiment_id, instrument_name=None) -> list:
         list: A list of dictionaries containing the readout values.
     """
     with Session() as session:
-
         if instrument_name:
-            readouts = session.query(PotentiostatReadout).filter_by(instrument_name=instrument_name, experiment_id=experiment_id).order_by(PotentiostatReadout.timestamp).all()
+            readouts = (
+                session.query(PotentiostatReadout)
+                .filter_by(instrument_name=instrument_name, experiment_id=experiment_id)
+                .order_by(PotentiostatReadout.timestamp)
+                .all()
+            )
         else:
-            readouts = session.query(PotentiostatReadout).filter_by(experiment_id=experiment_id).order_by(PotentiostatReadout.timestamp).all()
+            readouts = (
+                session.query(PotentiostatReadout)
+                .filter_by(experiment_id=experiment_id)
+                .order_by(PotentiostatReadout.timestamp)
+                .all()
+            )
 
     # Convert readout values from JSON string to list/dictionary
     result = []
     for readout in readouts:
         readout: PotentiostatReadout
-        result.append({
-            'id': readout.id,
-            'timestamp': readout.timestamp,
-            'instrument_name': readout.interface,
-            'readout_values': json.loads(readout.readout_values)
-        })
+        result.append(
+            {
+                "id": readout.id,
+                "timestamp": readout.timestamp,
+                "instrument_name": readout.interface,
+                "readout_values": json.loads(readout.readout_values),
+            }
+        )
 
     return result

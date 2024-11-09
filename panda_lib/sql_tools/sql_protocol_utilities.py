@@ -81,7 +81,7 @@ def select_protocol(protocol_id) -> ProtocolEntry:
             result = (
                 session.query(Protocols).filter(Protocols.name == protocol_id).first()
             )
-            if result is None: #Check if the protocol_id is a file name
+            if result is None:  # Check if the protocol_id is a file name
                 result = (
                     session.query(Protocols)
                     .filter(Protocols.name == protocol_id + ".py")

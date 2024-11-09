@@ -52,7 +52,8 @@ class ExperimentBase:
     process_type: Optional[int] = 1
     jira_issue_key: Optional[str] = None
     experiment_type: int = 0
-    well: object= None
+    well: object = None
+
     # FIXME: Seperate the set status, and set status and save methods from the experimentbase. The experiment base should just be a dataclass
     # What could be an alternative is that there is a wrapper class that has the set status and set status and save methods using what
     # Method that the project chooses to use to save the data to the database
@@ -84,15 +85,15 @@ class ExperimentBase:
     #         print("Well object not set. Saving to db via alternative method")
     #         update_experiment_status(self)
 
-        # # Save the experiment to the database
-        # update_experiment(self)
-        # try:
-        #     from .obs_controls import OBSController
+    # # Save the experiment to the database
+    # update_experiment(self)
+    # try:
+    #     from .obs_controls import OBSController
 
-        #     OBSController().place_experiment_on_screen(self)
-        # except Exception as e:
-        #     print(f"Error sending status to OBS: {e}")
-        #     # don't raise the error, just print it
+    #     OBSController().place_experiment_on_screen(self)
+    # except Exception as e:
+    #     print(f"Error sending status to OBS: {e}")
+    #     # don't raise the error, just print it
 
     def is_same_id(self, other) -> bool:
         """Check if two experiments have the same id"""
@@ -242,6 +243,3 @@ def get_all_type_hints(cls):
     for base in reversed(cls.__mro__):
         hints.update(get_type_hints(base))
     return hints
-
-
-

@@ -1,4 +1,6 @@
 """Exceptions for the mill"""
+
+
 class StatusReturnError(Exception):
     """Raised when the mill returns an error in the status"""
 
@@ -21,6 +23,7 @@ class CommandExecutionError(Exception):
 
 class LocationNotFound(Exception):
     """Raised when the mill cannot find its location"""
+
 
 class CNCMillException(Exception):
     """Base exception for CNC mill errors."""

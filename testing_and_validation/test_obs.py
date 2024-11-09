@@ -3,8 +3,8 @@ from panda_lib.obs_controls import OBSController
 import time
 from pathlib import Path
 
-class TestOBSController(unittest.TestCase):
 
+class TestOBSController(unittest.TestCase):
     def setUp(self):
         self.obs_controller = OBSController()
 
@@ -60,7 +60,9 @@ class TestOBSController(unittest.TestCase):
         time.sleep(5)
         file_path = Path("testing\\test_image_2.png")
         source_name = "image"
-        self.obs_controller.change_image(file_path,source_name)
+        self.obs_controller.change_image(file_path, source_name)
         # Add your assertions here
+
+
 if __name__ == "__main__":
     unittest.main()

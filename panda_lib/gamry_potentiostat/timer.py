@@ -1,6 +1,7 @@
 import sys
 import time
 
+
 def countdown_timer(samplerate, cycle):
     """Countdown timer for the data acquisition"""
     try:
@@ -21,4 +22,3 @@ def countdown_timer(samplerate, cycle):
         pass
     finally:
         sys.stdout.write("\n")
-

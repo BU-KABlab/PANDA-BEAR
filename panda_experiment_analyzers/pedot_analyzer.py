@@ -8,23 +8,28 @@ import pandas as pd
 
 from panda_experiment_analyzers.pedot import PEDOT_FindLAB as lab
 from panda_experiment_analyzers.pedot import PEDOT_MetricsCalc as met
-from panda_experiment_analyzers.pedot.ml_input import \
-    populate_required_information as analysis_input
+from panda_experiment_analyzers.pedot.ml_input import (
+    populate_required_information as analysis_input,
+)
 from panda_experiment_analyzers.pedot.ml_model import pedot_model
-from panda_experiment_analyzers.pedot.pedot_classes import (MLInput, MLOutput,
-                                                            MLTrainingData,
-                                                            PEDOTMetrics,
-                                                            PEDOTParams,
-                                                            RawMetrics,
-                                                            RequiredData)
-from panda_experiment_analyzers.pedot.sql_ml_functions import \
-    insert_ml_training_data
+from panda_experiment_analyzers.pedot.pedot_classes import (
+    MLInput,
+    MLOutput,
+    MLTrainingData,
+    PEDOTMetrics,
+    PEDOTParams,
+    RawMetrics,
+    RequiredData,
+)
+from panda_experiment_analyzers.pedot.sql_ml_functions import insert_ml_training_data
 from panda_lib import experiment_class, scheduler
 from panda_lib.config.config_tools import read_testing_config
 from panda_lib.correction_factors import correction_factor
-from panda_lib.experiment_class import (ExperimentResultsRecord,
-                                        insert_experiment_result,
-                                        select_specific_result)
+from panda_lib.experiment_class import (
+    ExperimentResultsRecord,
+    insert_experiment_result,
+    select_specific_result,
+)
 from panda_lib.slack_tools.SlackBot import SlackBot
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 
@@ -134,7 +139,7 @@ def generator(
         edot_concentration=params.concentration,
         analyzer=analyze,
         generator=run_ml_model,
-        analysis_id=ANALYSIS_ID
+        analysis_id=ANALYSIS_ID,
     )
 
     # Add the correction factors

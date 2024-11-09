@@ -1,11 +1,11 @@
 """
 This module contains the MillControl class, which is used to control the a GRBL CNC machine.
 The MillControl class is used by the EPanda class to move the pipette and electrode to the
-specified coordinates. 
+specified coordinates.
 
 The MillControl class contains methods to move the pipette and
 electrode to a safe position, rinse the electrode, and update the offsets in the mill config
-file. 
+file.
 
 The MillControl class contains methods to connect to the mill, execute commands,
 stop the mill, reset the mill, home the mill, get the current status of the mill, get the
@@ -115,7 +115,7 @@ class Mill:
         """Close the serial connection to the mill"""
         logger.info("Disconnecting from the mill")
         self.ser_mill.close()
-        time.sleep(15) # Wait for the connection to close
+        time.sleep(15)  # Wait for the connection to close
         logger.info("Mill connected: %s", self.ser_mill.is_open)
         print("Mill connected: ", self.ser_mill.is_open)
 
@@ -133,7 +133,7 @@ class Mill:
         except Exception as err:
             logger.error("Error reading config file: %s", str(err))
             raise MillConfigError("Error reading config file") from err
-    
+
     def read_mill_config(self):
         """Read the mill config file"""
         return self.read_json_config(self.mill_config_file)
@@ -185,11 +185,15 @@ class Mill:
                 if alarm_code:
                     alarm_code = alarm_code.group().lower().replace("alarm", "alarm")
                     if alarm_code in AlarmStatus.__members__:
-                        logger.error("%s: %s", alarm_code, AlarmStatus[alarm_code].value)
+                        logger.error(
+                            "%s: %s", alarm_code, AlarmStatus[alarm_code].value
+                        )
                         raise StatusReturnError(f"Alarm in status: {mill_response}")
                     else:
                         logger.error("Alarm in status: %s", mill_response)
-                        raise StatusReturnError(f"Unkown Alarm in status: {mill_response}")
+                        raise StatusReturnError(
+                            f"Unkown Alarm in status: {mill_response}"
+                        )
                 else:
                     logger.error("current_status: Error in status: %s", mill_response)
                     raise StatusReturnError(f"Error in status: {mill_response}")
@@ -393,8 +397,12 @@ class Mill:
         coords = self.mill_config["electrode_bath"]
         self.safe_move(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
         for _ in range(rinses):
-            self.move_to_position(coords["x"], coords["y"], coords["z"], instrument=Instruments.ELECTRODE)
-            self.move_to_position(coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE)
+            self.move_to_position(
+                coords["x"], coords["y"], coords["z"], instrument=Instruments.ELECTRODE
+            )
+            self.move_to_position(
+                coords["x"], coords["y"], 0, instrument=Instruments.ELECTRODE
+            )
         return 0
 
     def rest_electrode(self):
@@ -421,8 +429,14 @@ class Mill:
         # )
 
         return self.execute_command("G01 Z0")
-    
-    def move_to_position(self, x_coord: float, y_coord: float, z_coord: float = 0.00, instrument: Instruments = Instruments.CENTER) -> int:
+
+    def move_to_position(
+        self,
+        x_coord: float,
+        y_coord: float,
+        z_coord: float = 0.00,
+        instrument: Instruments = Instruments.CENTER,
+    ) -> int:
         """
         Move the mill to the specified coordinates.
         Args:

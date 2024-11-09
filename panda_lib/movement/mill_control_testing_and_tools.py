@@ -163,10 +163,8 @@ def movement_test(mill: Mill):
 
             # mill.safe_move(
             # well1["x"], well1["y"], wellplate.z_top, instrument=Instruments.PIPETTE
-            #)
-            input(
-                "Begin corner to corner test. Press enter to continue..."
-            )
+            # )
+            input("Begin corner to corner test. Press enter to continue...")
 
             if (
                 input("Do you want to move the pipette to each corner? (y/n): ").lower()

@@ -1,4 +1,5 @@
 """The sequence of steps for a pedotLHSv1_screening experiment."""
+
 # For writing a protocol, use the available actions from the panda_lib.actions module.
 from panda_lib.actions import (
     forward_pipette_v3,
@@ -13,8 +14,9 @@ from panda_lib.actions import (
     DepositionFailure,
     Instruments,
     Toolkit,
-    ExperimentStatus
+    ExperimentStatus,
 )
+
 # If you are using custom actions, import them from the appropriate module.
 from panda_lib.actions_pedot import (
     chrono_amp_edot_bleaching,
@@ -24,6 +26,8 @@ from panda_lib.actions_pedot import (
 )
 
 PROTOCOL_ID = 999
+
+
 def main(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,

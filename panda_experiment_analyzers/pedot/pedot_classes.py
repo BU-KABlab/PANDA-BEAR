@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Union
+
+
 @dataclass
 class RequiredData:
     """Input data for the PEDOT analysis and ML model"""
+
     experiment_id: int
     ca_step_1_voltage: float
     ca_step_1_time: float
@@ -19,6 +22,7 @@ class RequiredData:
 @dataclass
 class RawMetrics:
     """Input data for the PEDOT analysis"""
+
     experiment_id: int
     l_c: float
     a_c: float
@@ -37,9 +41,11 @@ class RawMetrics:
     bleaching_roi_path: Path
     deposition_roi_path: Path
 
+
 @dataclass
 class PEDOTMetrics:
     """Output of PEDOT analysis"""
+
     experiment_id: int
     DepositionChargePassed: float
     BleachChargePassed: float
@@ -47,9 +53,11 @@ class PEDOTMetrics:
     DepositionEfficiency: float
     ElectrochromicEfficiency: float
 
+
 @dataclass
 class MLTrainingData:
     """Input data for the ML model"""
+
     experiment_id: int
     ca_step_1_voltage: float
     ca_step_1_time: float
@@ -59,29 +67,35 @@ class MLTrainingData:
     DepositionEfficiency: float
     ElectrochromicEfficiency: float
 
+
 @dataclass
 class MLInput:
     """The filepaths for the ML model's data and supporting files"""
+
     training_file_path: Path
     model_base_path: Path
     counter_file_path: Path
     BestTestPointsCSV: Path
     contourplots_path: Path
 
+
 @dataclass
 class MLOutput:
     """Output of the ML model"""
+
     v_dep: float
     t_dep: float
     edot_concentration: float
     predicted_mean: float
     predicted_stddev: float
     contour_plot: Path = None
-    model_id:int = None
+    model_id: int = None
+
 
 @dataclass
 class PEDOTParams:
     """Parameters for PEDOT experiments"""
+
     dep_v: float
     dep_t: float
     well_letter: str = None
