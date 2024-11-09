@@ -357,7 +357,7 @@ class ExperimentBase:
                 self.experiment_id,
             )
 
-    def run_generator(self)-> None:
+    def run_generator(self) -> None:
         """Run the generator."""
         if isinstance(self.generator, str):
             # Load and execute the script
@@ -411,7 +411,9 @@ class ExperimentBase:
         # Save the well to the database
         if self.well:
             self.well.status = new_status
-            self.well.status_date = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            self.well.status_date = datetime.now(timezone.utc).isoformat(
+                timespec="seconds"
+            )
             sql_wellplate.save_well_to_db(self.well)
 
         else:
@@ -521,11 +523,9 @@ class ExperimentBase:
                 else:
                     experiment_logger.debug(
                         "Attribute %s not found in class hierarchy",
-                        parameter.parameter_name
+                        parameter.parameter_name,
                     )
-                    error_message = (
-                        f"Attribute {parameter.parameter_name} not found in class hierarchy"
-                    )
+                    error_message = f"Attribute {parameter.parameter_name} not found in class hierarchy"
                     raise AttributeError(error_message) from exc
 
             if isinstance(
@@ -850,13 +850,6 @@ def get_all_type_hints(cls):
 
 def select_next_experiment_id() -> int:
     """Determines the next experiment id by checking the experiment table"""
-    # result = execute_sql_command(
-    #     """
-    #     SELECT experiment_id FROM experiments
-    #     ORDER BY experiment_id DESC
-    #     LIMIT 1
-    #     """
-    # )
 
     with SessionLocal() as session:
         result = (
@@ -879,25 +872,6 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
     Returns:
         ExperimentBase: The experiment information.
     """
-    # values = execute_sql_command(
-    #     """
-    #     SELECT
-    #         experiment_id,
-    #         project_id,
-    #         project_campaign_id,
-    #         well_type,
-    #         protocol_id,
-    #         pin,
-    #         experiment_type,
-    #         jira_issue_key,
-    #         priority,
-    #         process_type,
-    #         filename
-    #     FROM experiments
-    #     WHERE experiment_id = ?
-    #     """,
-    #     (experiment_id,),
-    # )
 
     with SessionLocal() as session:
         result = (
@@ -950,18 +924,6 @@ def select_experiment_paramaters(
         experiment_id = experiment_to_select.experiment_id
         experiment_object = experiment_to_select
 
-    # values = execute_sql_command(
-    #     """
-    #     SELECT
-    #         experiment_id,
-    #         parameter_name,
-    #         parameter_value
-    #     FROM experiment_parameters
-    #     WHERE experiment_id = ?
-    #     """,
-    #     (experiment_id,),
-    # )
-
     with SessionLocal() as session:
         result = (
             session.query(ExperimentParameters)
@@ -978,18 +940,6 @@ def select_experiment_paramaters(
     if not experiment_object:
         return values
 
-    # With the experiment_id known, look up the project_id to determine the experiment
-    # object type
-    # project_id_result = execute_sql_command(
-    #     "SELECT project_id FROM experiments WHERE experiment_id = ?",
-    #     (experiment_id,),
-    # )
-    # if project_id_result:
-    #     project_id = project_id_result[0][0]
-    #     experiment_object = experiment_types_by_project_id.get(project_id)()
-    # else:
-    #     pass
-
     experiment_object.map_parameter_list_to_experiment(values)
     return experiment_object
 
@@ -1005,14 +955,6 @@ def select_specific_parameter(experiment_id: int, parameter_name: str):
     Returns:
         any: The parameter value.
     """
-    # result = execute_sql_command(
-    #     """
-    #     SELECT parameter_value FROM experiment_parameters
-    #     WHERE experiment_id = ?
-    #     AND parameter_name = ?
-    #     """,
-    #     (experiment_id, parameter_name),
-    # )
 
     with SessionLocal() as session:
         result = (
@@ -1037,13 +979,6 @@ def select_experiment_status(experiment_id: int) -> str:
     Returns:
         str: The status of the experiment.
     """
-    # result = execute_sql_command(
-    #     """
-    #     SELECT status FROM well_hx
-    #     WHERE experiment_id = ?
-    #     """,
-    #     (experiment_id,),
-    # )
 
     with SessionLocal() as session:
         result = (
@@ -1092,38 +1027,6 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                 datetime.now().isoformat(timespec="seconds"),
             )
         )
-    # execute_sql_command_no_return(
-    #     """
-    #     INSERT INTO experiments (
-    #         experiment_id,
-    #         project_id,
-    #         project_campaign_id,
-    #         well_type,
-    #         protocol_id,
-    #         pin,
-    #         experiment_type,
-    #         jira_issue_key,
-    #         priority,
-    #         process_type,
-    #         filename,
-    #         created
-    #         )
-    #     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    #     ON CONFLICT (experiment_id) DO UPDATE SET
-    #         project_id = excluded.project_id,
-    #         project_campaign_id = excluded.project_campaign_id,
-    #         well_type = excluded.well_type,
-    #         protocol_id = excluded.protocol_id,
-    #         pin = excluded.pin,
-    #         experiment_type = excluded.experiment_type,
-    #         jira_issue_key = excluded.jira_issue_key,
-    #         priority = excluded.priority,
-    #         process_type = excluded.process_type,
-    #         filename = excluded.filename,
-    #         created = excluded.created
-    #     """,
-    #     parameters,
-    # )
 
     with SessionLocal() as session:
         for parameter in parameters:
@@ -1181,18 +1084,6 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
                     datetime.now().isoformat(timespec="seconds"),
                 )
             )
-    # execute_sql_command_no_return(
-    #     """
-    #     INSERT INTO experiment_parameters (
-    #         experiment_id,
-    #         parameter_name,
-    #         parameter_value,
-    #         created
-    #         )
-    #     VALUES (?, ?, ?, ?)
-    #     """,
-    #     parameters_to_insert,
-    # )
 
     with SessionLocal() as session:
         for parameter in parameters_to_insert:
@@ -1241,23 +1132,6 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.experiment_id,
             )
         )
-    # execute_sql_command_no_return(
-    #     """
-    #     UPDATE experiments
-    #     SET project_id = ?,
-    #         project_campaign_id = ?,
-    #         well_type = ?,
-    #         protocol_id = ?,
-    #         pin = ?,
-    #         experiment_type = ?,
-    #         jira_issue_key = ?,
-    #         priority = ?,
-    #         process_type = ?,
-    #         filename = ?
-    #     WHERE experiment_id = ?
-    #     """,
-    #     parameters,
-    # )
 
     with SessionLocal() as session:
         for parameter in parameters:
@@ -1328,25 +1202,6 @@ def update_experiment_status(
             status_date = experiment.status_date
         project_id = experiment.project_id
         well_id = experiment.well_id
-
-    # execute_sql_command(
-    #     """
-    #     UPDATE well_hx
-    #     SET status = ?,
-    #         status_date = ?,
-    #         experiment_id = ?,
-    #         project_id = ?
-    #     WHERE well_id = ?
-    #     AND plate_id = (SELECT id FROM wellplates WHERE current = 1)
-    #     """,
-    #     (
-    #         status.value,
-    #         status_date,
-    #         experiment_id,
-    #         project_id,
-    #         well_id,
-    #     ),
-    # )
 
     with SessionLocal() as session:
         subquery = (
@@ -1437,26 +1292,6 @@ def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
     Args:
         entry (ResultTableEntry): The entry to insert.
     """
-    command = """
-        INSERT INTO experiment_results (
-            experiment_id,
-            result_type,
-            result_value,
-            context
-            )
-        VALUES (?, ?, ?, ?)
-        """
-    if isinstance(entry.result_value, dict):
-        entry.result_value = json.dumps(entry.result_value)
-    if isinstance(entry.result_value, Path):
-        entry.result_value = str(entry.result_value)
-    parameters = (
-        entry.experiment_id,
-        entry.result_type,
-        entry.result_value,
-        entry.context,
-    )
-    # execute_sql_command_no_return(command, parameters)
 
     with SessionLocal() as session:
         session.add(
@@ -1536,32 +1371,6 @@ def select_specific_result(
     Returns:
         ResultTableEntry: The entry from the result table.
     """
-    # if context is None:
-    #     result = execute_sql_command(
-    #         """
-    #         SELECT
-    #             experiment_id,
-    #             result_type,
-    #             result_value,
-    #             context
-    #         FROM experiment_results
-    #         WHERE experiment_id = ? AND result_type = ?
-    #         """,
-    #         (experiment_id, result_type),
-    #     )
-    # else:
-    #     result = execute_sql_command(
-    #         """
-    #         SELECT
-    #             experiment_id,
-    #             result_type,
-    #             result_value,
-    #             context
-    #         FROM experiment_results
-    #         WHERE experiment_id = ? AND result_type = ? AND context = ?
-    #         """,
-    #         (experiment_id, result_type, context),
-    #     )
 
     with SessionLocal() as session:
         if context is None:
