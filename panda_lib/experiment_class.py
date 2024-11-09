@@ -4,7 +4,7 @@
 import importlib.util
 import json
 from dataclasses import field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple, Union, get_type_hints
@@ -357,8 +357,8 @@ class ExperimentBase:
                 self.experiment_id,
             )
 
-    def run_generator(self):
-        """Run the generator"""
+    def run_generator(self)-> None:
+        """Run the generator."""
         if isinstance(self.generator, str):
             # Load and execute the script
             generator_function = load_analysis_script(self.generator)
@@ -377,9 +377,9 @@ class ExperimentBase:
     # What could be an alternative is that there is a wrapper class that has the set status and set status and save methods using what
     # Method that the project chooses to use to save the data to the database
     def set_status(self, new_status: ExperimentStatus) -> None:
-        """Set the status of the experiment"""
+        """Set the status of the experiment."""
         self.status = new_status
-        self.status_date = datetime.now().isoformat(timespec="seconds")
+        self.status_date = datetime.now(tz=timezone.utc).isoformat(timespec="seconds")
         try:
             if config.getboolean("OPTIONS", "testing") or not config.getboolean(
                 "OPTIONS", "use_obs"
@@ -390,11 +390,11 @@ class ExperimentBase:
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
-            experiment_logger.error(f"Error sending status to OBS: {e}")
+            experiment_logger.exception("Error sending status to OBS: %s", e)
             # don't raise the error, just print it
 
     def set_status_and_save(self, new_status: ExperimentStatus) -> None:
-        """Set the status and status date of the experiment"""
+        """Set the status and status date of the experiment."""
         from .sql_tools import sql_wellplate
 
         self.status = new_status
@@ -411,7 +411,7 @@ class ExperimentBase:
         # Save the well to the database
         if self.well:
             self.well.status = new_status
-            self.well.status_date = datetime.now().isoformat(timespec="seconds")
+            self.well.status_date = datetime.now(timezone.utc).isoformat(timespec="seconds")
             sql_wellplate.save_well_to_db(self.well)
 
         else:
@@ -432,16 +432,16 @@ class ExperimentBase:
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
-            experiment_logger.error(f"Error sending status to OBS: {e}")
+            experiment_logger.error("Error sending status to OBS: %s", e)
             # don't raise the error, just print it
 
     def is_same_id(self, other) -> bool:
-        """Check if two experiments have the same id"""
+        """Check if two experiments have the same id."""
 
         return self.experiment_id == other.id
 
     def is_same_well_id(self, other) -> bool:
-        """Check if two experiments have the same well id"""
+        """Check if two experiments have the same well id."""
 
         return self.well_id == other.well_id
 
@@ -520,11 +520,13 @@ class ExperimentBase:
                     attribute_type = get_all_type_hints(cls)[parameter.parameter_name]
                 else:
                     experiment_logger.debug(
+                        "Attribute %s not found in class hierarchy",
+                        parameter.parameter_name
+                    )
+                    error_message = (
                         f"Attribute {parameter.parameter_name} not found in class hierarchy"
                     )
-                    raise AttributeError(
-                        f"Attribute {parameter.parameter_name} not found in class hierarchy"
-                    ) from exc
+                    raise AttributeError(error_message) from exc
 
             if isinstance(
                 attribute_type, type(Union)
@@ -591,10 +593,9 @@ class CorrectionFactorExperiment(ExperimentBase):
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class EchemExperimentBase(ExperimentBase):
-    """
-    Define the data that is used to run an elechrochemical experiment
+    """Define the data that is used to run an elechrochemical experiment.
 
-    This is the base class for all echem experiments
+    This is the base class for all echem experiments.
     """
 
     experiment_type: int = 1  # echem generic

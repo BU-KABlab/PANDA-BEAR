@@ -326,7 +326,7 @@ def forward_pipette_v3(
                 if vial.name == src_vessel and vial.volume > 0
             ]
 
-            # If there are no edot vials, raise an error
+            # If there are no desired stock solutions, raise an error
             if not selected_source_vessels:
                 toolkit.global_logger.error("No %s vials available", src_vessel)
                 raise ValueError(f"No {src_vessel} vials available")
@@ -334,7 +334,7 @@ def forward_pipette_v3(
             # There are one or more vials, let's calculate the volume to be pipetted from each
             # vial to get the desired volume and concentration
             source_vessel_volumes, deviation, volumes_by_position = solve_vials_ilp(
-                # Concentrations of each vial in mM
+                # Concentrations of each vial position in mM
                 vial_concentration_map={
                     vial.position: vial.concentration
                     for vial in selected_source_vessels

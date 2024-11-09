@@ -9,7 +9,7 @@ import pulp
 
 
 class WellStatus(Enum):
-    """Class for naming of the well status"""
+    """Class for naming of the well status."""
 
     EMPTY = "empty"
     FILLED = "filled"
@@ -27,7 +27,7 @@ class WellStatus(Enum):
 
 
 class Coordinates:
-    """Class for storing coordinates"""
+    """Class for storing coordinates."""
 
     def __init__(self, x, y, z):
         self.x = x
@@ -39,7 +39,7 @@ class Coordinates:
 
     @property
     def x(self):
-        """Getter for the x-coordinate"""
+        """Getter for the x-coordinate."""
         return round(float(self._x), 6)
 
     @x.setter
@@ -50,7 +50,7 @@ class Coordinates:
 
     @property
     def y(self):
-        """Getter for the y-coordinate"""
+        """Getter for the y-coordinate."""
         return round(float(self._y), 6)
 
     @y.setter
@@ -61,7 +61,7 @@ class Coordinates:
 
     @property
     def z(self):
-        """Getter for the z-coordinate"""
+        """Getter for the z-coordinate."""
         return round(float(self._z), 6)
 
     @z.setter
@@ -72,7 +72,7 @@ class Coordinates:
 
 
 class Instruments(Enum):
-    """Class for naming of the mill instruments"""
+    """Class for naming of the mill instruments."""
 
     CENTER = "center"
     PIPETTE = "pipette"
@@ -82,7 +82,7 @@ class Instruments(Enum):
 
 
 class SystemState(Enum):
-    """Class for naming of the system states"""
+    """Class for naming of the system states."""
 
     IDLE = "idle"
     BUSY = "running"
@@ -100,7 +100,7 @@ class SystemState(Enum):
 
 @dataclasses.dataclass
 class ProtocolEntry:
-    """Class for storing protocol entries"""
+    """Class for storing protocol entries."""
 
     protocol_id: int
     project: str
@@ -125,10 +125,20 @@ def solve_vials_ilp(
 
     Returns
     -------
-    vial_volumes : dict of str,floats - Volumes of each vial to achieve the target concentration in uL.
+    vial_volumes : dict of str,floats - Volumes of each concentration to achieve the target.
     deviation_value : float - Deviation from the target concentration in mM.
+    vial_vol_by_location : dict of str,floats - Volumes of each vial to achieve the target.
     """
-    num_vials = len(vial_concentration_map)
+    if len(vial_concentration_map) == 1:
+        
+        deviation_value = abs(vial_concentration_map[0] - c_target)
+        if deviation_value == 0:
+            vial_vol_by_conc = {vial_concentration_map[0]: v_total}
+            vial_vol_by_location = {position: v_total for position in vial_concentration_map}
+        else:
+            vial_vol_by_conc = None
+            vial_vol_by_location = None
+        return vial_vol_by_conc, deviation_value, vial_vol_by_location
 
     # Validate and clean the incoming data to remove any Decimal objects
     vial_concentration_map = {k: float(v) for k, v in vial_concentration_map.items()}
