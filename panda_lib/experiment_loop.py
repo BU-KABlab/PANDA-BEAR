@@ -416,7 +416,7 @@ def experiment_loop_worker(
             # check for paused status and hold until status changes to resume
             status = system_status_loop(controller_slack, status_queue, process_id)
             if status == SystemState.STOP:
-                break  # break out of the while True loop
+                break  # break out of the while True loop and the try block to go to finally
     except (
         OCPFailure,
         DepositionFailure,
