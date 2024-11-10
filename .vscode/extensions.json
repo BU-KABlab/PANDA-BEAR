@@ -2,9 +2,13 @@
     "recommendations": [
         "ms-vscode-remote.remote-wsl",
         "ms-python.vscode-pylance",
-        "ms-python.pylint",
-        "ms-python.black-formatter",
         "github.vscode-pull-request-github",
-        "ms-python.isort"
+        "tamasfe.even-better-toml",
+        "charliermarsh.ruff",
+        "redhat.vscode-yaml",
+        "esbenp.prettier-vscode",
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cpptools-themes"
     ]
 }
