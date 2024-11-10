@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Optional, Tuple, Union
 from PIL import Image
 
-# Local application imports
+# First party imports
 from panda_lib.imaging import capture_new_image, add_data_zone, image_filepath_generator
 from panda_lib.config.config_tools import (
     read_testing_config,
@@ -544,7 +544,7 @@ def rinse_v2(
             volume=correction_factor(instructions.rinse_vol),
             from_vessel=solution_selector(
                 "rinse",
-                correction_factor(instructions.rinse_vol),
+                instructions.rinse_vol,
             ),
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
@@ -562,7 +562,7 @@ def rinse_v2(
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
                 "waste",
-                correction_factor(instructions.rinse_vol),
+                instructions.rinse_vol,
             ),
             toolkit=toolkit,
         )
@@ -1019,6 +1019,7 @@ def image_well(
         toolkit (Toolkit): The toolkit object
         instructions (Experiment): The experiment instructions
         step_description (str): The description of the step
+        curvature_image (bool): Whether to take a curvature image
 
     Returns:
         None (void function) since the objects are passed by reference
@@ -1027,7 +1028,7 @@ def image_well(
         instructions.set_status_and_save(ExperimentStatus.IMAGING)
         logger.info("Imaging well %s", instructions.well_id)
         exp_id = instructions.experiment_id or "test"
-        well_id = well_id = instructions.well_id or "test"
+        well_id = instructions.well_id or "test"
         pjct_id = instructions.project_id or "test"
         cmpgn_id = instructions.project_campaign_id or "test"
         # create file path
