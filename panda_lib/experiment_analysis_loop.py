@@ -28,7 +28,7 @@ def analysis_worker(
     analysis process is run on the experiment and the results are stored
     in the experiment record in the database.
     """
-    breaking_issue = False
+    breaking_issue: bool = False
     analyzers: dict = load_analyzers()
     status_queue.put((process_id, "started"))
     with SessionLocal() as connection:
@@ -43,7 +43,7 @@ def analysis_worker(
             for experiment in experiments:
                 # Find the analyzer that matches the project ID
                 # analyzer = next((a for a in analyzers if a.PROJECT_ID == experiment.project_id), None)
-                analyzer = analyzers.get(experiment.analysis_id, None)
+                analyzer:callable = analyzers.get(experiment.analysis_id, None)
                 if analyzer is None:
                     status_queue.put(
                         (
@@ -57,7 +57,7 @@ def analysis_worker(
                     status_queue.put(
                         (
                             process_id,
-                            f"running analysis on experiment {experiment.experiment_id}",
+                            f"analysing experiment {experiment.experiment_id}",
                         )
                     )
                     output = analyzer(
@@ -95,7 +95,7 @@ def analysis_worker(
 
 def load_analyzers(
     directory: str = Path("panda_experiment_analyzers/").resolve(),
-) -> dict[int, object]:
+) -> dict[int, callable]:
     """
     Load the analysis scripts from the directory and return a dictionary
     of the analysis scripts.
