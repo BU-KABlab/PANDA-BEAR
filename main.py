@@ -403,14 +403,15 @@ def slack_monitor_bot(testing, running_flag: Event):
 
         while running_flag.is_set():
             try:
-                time.sleep(10)
-                bot.status = bot.check_slack_messages(channel="alert")
+                time.sleep(15)
+                bot.check_slack_messages(channel="alert")
+                time.sleep(1)
                 bot.check_slack_messages(channel="data")
             except KeyboardInterrupt:
                 break
             except Exception as e:
                 status_queue.put((ProcessIDs.SLACKBOT, f"An error occurred: {e}"))
-                time.sleep(15)
+                time.sleep(60)
                 continue
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -540,6 +541,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         if user_choice in menu_options:
             return menu_options[user_choice], user_choice
         input("Invalid choice. Please try again.")
+        refresh()
         continue
 
 
