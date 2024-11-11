@@ -1,6 +1,5 @@
 """Experiment data class"""
 
-# pylint: disable=invalid-name, line-too-long, import-outside-toplevel, broad-exception-caught, protected-access
 import importlib.util
 import json
 from dataclasses import field
@@ -9,7 +8,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple, Union, get_type_hints
 
-from pydantic import ConfigDict, RootModel
+from pydantic import ConfigDict, RootModel, ValidationError, Field
 from pydantic.dataclasses import dataclass
 
 from panda_lib.config.config_tools import read_config
@@ -26,7 +25,7 @@ from panda_lib.sql_tools.panda_models import (
     WellHx,
     WellPlates,
 )
-
+global_logger = setup_default_logger(log_name="panda")
 experiment_logger = setup_default_logger(log_name="experiment_logger")
 config = read_config()
 
@@ -163,6 +162,7 @@ class ExperimentStatus(str, Enum):
     PENDING = "pending"  # pending experiments either are waiting for a well to be assigned or lack the correct well type
     SAVING = "saving"
     ANALYZING = "analyzing"
+    MOVING = "moving"
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -296,28 +296,27 @@ class ExperimentBase:
     well_id: Optional[str] = None
     pin: Union[str, int] = None
     project_id: int = None
-    solutions: dict = None
-    solutions_corrected: dict = None
+    solutions: dict[str,dict[str,Union[int,float]]] = None
+    #solutions_corrected: dict = None # depreciated
     well_type_number: int = None
     pumping_rate: float = float(0.3)
     status: ExperimentStatus = ExperimentStatus.NEW
     status_date: datetime = field(default_factory=datetime.now)
     filename: str = None  # Optional[FilePath] = None
-    well_id: Optional[str] = None
-    pin: str = None
     results: Optional[ExperimentResult] = None
     project_campaign_id: int = None
     protocol_type: int = 1  # depreciated
     plate_id: Optional[int] = None
     override_well_selection: int = 0  # 0 is normal, 1 is override
-    process_type: Optional[int] = 1
-    jira_issue_key: Optional[str] = None
-    experiment_type: int = 0
+    process_type: Optional[int] = 1 # depreciated
+    jira_issue_key: Optional[str] = None # depreciated
+    experiment_type: int = 0 # depreciated
     well: object = None
     analyzer: Union[Callable, str, None] = None
     generator: Union[Callable, str, None] = None
     analysis_id: int = None
     needs_analysis: int = 0
+    steps: int = Field(default=0)
 
     def __post_init__(self):
         # Validate that all dictionary keys are lowercase
@@ -327,8 +326,7 @@ class ExperimentBase:
             self.solutions = {
                 key.lower(): value for key, value in self.solutions.items()
             }
-        if self.solutions_corrected is None:
-            self.solutions_corrected = self.solutions
+        
 
     @property
     def experiment_identifier(self):
@@ -445,7 +443,7 @@ class ExperimentBase:
     def is_same_well_id(self, other) -> bool:
         """Check if two experiments have the same well id."""
 
-        return self.well_id == other.well_id
+        return self.well_id == other.well_id and self.plate_id == other.plate_id
 
     ## other check if same methods
 
@@ -491,7 +489,7 @@ class ExperimentBase:
     def map_parameter_list_to_experiment(
         self, parameter_list: list[ExperimentParameterRecord]
     ):
-        """Map the parameter list to the experiment object"""
+        """Turn the parameter list from the sql database into to an experiment object"""
 
         def find_attribute_in_hierarchy(cls, attr):
             """Recursively search for an attribute in a class and its subclasses"""
@@ -504,11 +502,11 @@ class ExperimentBase:
             return None
 
         for parameter in parameter_list:
-            parameter = ExperimentParameterRecord(
-                experiment_id=parameter.experiment_id,
-                parameter_name=parameter.parameter_name,
-                parameter_value=parameter.parameter_value,
-            )
+            # parameter = ExperimentParameterRecord(
+            #     experiment_id=parameter.experiment_id,
+            #     parameter_name=parameter.parameter_name,
+            #     parameter_value=parameter.parameter_value,
+            # )
             try:
                 attribute_type = get_all_type_hints(type(self))[
                     parameter.parameter_name
@@ -569,6 +567,8 @@ class ExperimentBase:
                 parameter.parameter_value = datetime.fromisoformat(
                     parameter.parameter_value
                 )
+            elif parameter.parameter_name == "solutions":
+                parameter.parameter_value = json.loads(parameter.parameter_value)
             else:
                 experiment_logger.debug(f"Unknown attribute type {attribute_type}")
 
@@ -581,8 +581,13 @@ class ExperimentBase:
                 setattr(
                     self.__class__, parameter.parameter_name, parameter.parameter_value
                 )
-
-
+    def increment_steps(self):
+        self.steps += 1
+    def declare_step(self,step: str, status:ExperimentStatus)-> str:
+        """Handle setting the status"""
+        global_logger.info("%d. %s", self.steps, step)
+        self.increment_steps()
+        self.set_status_and_save(status)
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class CorrectionFactorExperiment(ExperimentBase):
     """Define the data that is used to run an experiment"""
@@ -605,7 +610,8 @@ class EchemExperimentBase(ExperimentBase):
     baseline: int = 0  # Baseline
 
     flush_sol_name: str = ""  # Flush solution name
-    flush_vol: int = 0  # Flush solution volume
+    flush_vol: Union[int,float] = 0  # Flush solution volume
+    flush_count: int = 3  # Flush solution concentration
 
     mix = 0  # Binary mix or dont mix
     mix_count: int = 0  # Number of times to mix
@@ -696,7 +702,6 @@ class EchemExperimentBase(ExperimentBase):
         Status: {self.status.value}
         Priority: {self.priority}
         Solutions: {self.solutions}
-        Corrected Solutions: {self.solutions_corrected}
         Filename: {self.filename}
 
         Echem Parameters
@@ -725,9 +730,6 @@ class PEDOTExperiment(EchemExperimentBase):
 
     project_id: int = 16
     well_type_number: int = 4  # ito
-    experiment_type: int = 2  # edot
-    edot_concentration: float = float(0.1)  # mM
-
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class FeCnVerificationExperiment(EchemExperimentBase):
@@ -895,11 +897,7 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
         experiment.project_campaign_id = result.project_campaign_id
         experiment.well_type_number = result.well_type
         experiment.protocol_id = result.protocol_id
-        experiment.pin = result.pin
-        experiment.experiment_type = result.experiment_type
-        experiment.jira_issue_key = result.jira_issue_key
         experiment.priority = result.priority
-        experiment.process_type = result.process_type
         experiment.filename = result.filename
         return experiment
 
@@ -1294,6 +1292,10 @@ def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
     """
 
     with SessionLocal() as session:
+
+        if isinstance(entry.result_value,Path):
+            # Turn the Path object into a string
+            entry.result_value = str(entry.result_value)
         session.add(
             ExperimentResults(
                 experiment_id=entry.experiment_id,
