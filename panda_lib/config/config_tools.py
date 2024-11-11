@@ -1,7 +1,7 @@
 """Utilities for setting and reading the configuration files"""
 
 import os
-from configparser import ConfigParser
+from configparser import ConfigParser, Error as ConfigParserError
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,10 +22,13 @@ def get_repo_path():
 
 def read_testing_config():
     """Reads the testing configuration file."""
-    config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
-    config = ConfigParser()
-    config.read(config_path)
-    return config.getboolean("OPTIONS", "testing")
+    try:
+        config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
+        config = ConfigParser()
+        config.read(config_path)
+        return config.getboolean("OPTIONS", "testing")
+    except ConfigParserError:
+        return False
 
 
 def write_testing_config(enable_testing: bool):
