@@ -131,9 +131,9 @@ def solve_vials_ilp(
     """
     if len(vial_concentration_map) == 1:
         
-        deviation_value = abs(vial_concentration_map[0] - c_target)
+        deviation_value = abs(next(iter(vial_concentration_map.values())) - c_target)
         if deviation_value == 0:
-            vial_vol_by_conc = {vial_concentration_map[0]: v_total}
+            vial_vol_by_conc = {next(iter(vial_concentration_map.keys())): v_total}
             vial_vol_by_location = {position: v_total for position in vial_concentration_map}
         else:
             vial_vol_by_conc = None
@@ -147,6 +147,27 @@ def solve_vials_ilp(
     ]
     v_total = float(v_total)
     c_target = float(c_target)
+
+    # Before solving the problem, check if the target concentration is already achievable with the given vials
+    if c_target in vial_concentrations:
+        vial_with_target_concentration = next(
+            (position for position, concentration in vial_concentration_map.items() if concentration == c_target),
+            None,
+        )
+        if vial_with_target_concentration:
+            vial_vol_by_conc = {c_target: v_total} 
+            vial_vol_by_location = {position: v_total for position in vial_concentration_map}
+            for position in vial_concentration_map:
+                # Set the volume of all vials to 0 except the vial with the target concentration
+                if position != vial_with_target_concentration:
+                    vial_vol_by_location[position] = 0
+            deviation_value = 0
+            return vial_vol_by_conc, deviation_value, vial_vol_by_location
+        else:
+            vial_vol_by_conc = None
+            deviation_value = None
+            vial_vol_by_location = None
+            return vial_vol_by_conc, deviation_value, vial_vol_by_location
 
     # Create a problem instance
     prob = pulp.LpProblem("VialMixing", pulp.LpMinimize)
@@ -233,7 +254,7 @@ def solve_vials_ilp(
         deviation_value = pulp.value(c_deviation)
         return vial_vol_by_conc, deviation_value, vial_vol_by_location
     else:
-        return None, None
+        return None, None, None
 
 
 def file_picker(file_types=None):

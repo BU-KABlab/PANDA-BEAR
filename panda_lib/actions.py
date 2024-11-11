@@ -56,7 +56,7 @@ from panda_lib.movement import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.instrument_toolkit import Toolkit
-from panda_lib.vials import StockVial, WasteVial, read_vials, Vessel
+from panda_lib.vials import StockVial, WasteVial, read_vials, Vessel, Vial2
 from panda_lib.wellplate import Well
 from panda_lib.utilities import solve_vials_ilp
 
@@ -319,6 +319,7 @@ def forward_pipette_v3(
         source_vessel_volumes: list = None
         if isinstance(src_vessel, str):
             # Fetch updated solutions from the db
+            selected_source_vessels: list[Vial2]
             stock_vials, _ = read_vials()
             selected_source_vessels = [
                 vial
@@ -330,7 +331,16 @@ def forward_pipette_v3(
             if not selected_source_vessels:
                 toolkit.global_logger.error("No %s vials available", src_vessel)
                 raise ValueError(f"No {src_vessel} vials available")
-
+            
+            # If the source concentration is not provided, raise an error
+            if source_concentration is None:
+                toolkit.global_logger.error("Source concentration not provided")
+                if selected_source_vessels[0].category == 0:
+                    try:
+                        source_concentration = float(selected_source_vessels[0].concentration)
+                    except ValueError:
+                        raise ValueError("Source concentration not provided")
+   
             # There are one or more vials, let's calculate the volume to be pipetted from each
             # vial to get the desired volume and concentration
             source_vessel_volumes, deviation, volumes_by_position = solve_vials_ilp(
@@ -360,20 +370,17 @@ def forward_pipette_v3(
                 (vial, volumes_by_position[vial.position])
                 for vial in selected_source_vessels
             ]
+
+            for vessel, source_vessel_volume in source_vessel_volumes:
+                if source_vessel_volume > 0:
+                    toolkit.global_logger.info(
+                        "Pipetting %f uL from %s to achieve %f mM",
+                        source_vessel_volume,
+                        vessel.name,
+                        source_concentration,
+                    )
         else:  # If the source is a single vessel
             source_vessel_volumes = [(src_vessel, volume)]
-
-        # Log the plan for pipetting the solutions to achieve the desired concentration
-        if isinstance(src_vessel, str):
-            for vessel, source_vessel_volume in source_vessel_volumes:
-                toolkit.global_logger.info(
-                    "Pipetting %f uL from %s to achieve %f mM",
-                    source_vessel_volume,
-                    vessel.name,
-                    source_concentration,
-                )
-
-        else:
             toolkit.global_logger.info(
                 "Pipetting %f uL from %s to %s",
                 volume,
@@ -382,21 +389,34 @@ def forward_pipette_v3(
             )
 
         # Check to ensure that the source and destination are an allowed combination
-        for source_vial, _ in source_vessel_volumes:
-            if isinstance(source_vial, Well) and isinstance(dst_vessel, StockVial):
+        for origin_vessel, _ in source_vessel_volumes:
+            if isinstance(origin_vessel, Well) and isinstance(dst_vessel, StockVial):
                 raise ValueError("Cannot pipette from a well to a stock vial")
-            if isinstance(source_vial, WasteVial) and isinstance(dst_vessel, Well):
+            if isinstance(origin_vessel, WasteVial) and isinstance(dst_vessel, Well):
                 raise ValueError("Cannot pipette from a waste vial to a well")
-            if isinstance(source_vial, StockVial) and isinstance(dst_vessel, StockVial):
+            if isinstance(origin_vessel, StockVial) and isinstance(dst_vessel, StockVial):
                 raise ValueError("Cannot pipette from a stock vial to a stock vial")
 
         # Cycle through the source_vials and pipette the volumes
         for vessel, desired_volume in source_vessel_volumes:
+            if desired_volume <= 0.0:
+                continue
             # Calculate repetitions
             vessel: Vessel
-            repetitions = math.ceil(
-                desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
-            )
+            try:
+                repetitions = math.ceil(
+                    desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
+                )
+            except ZeroDivisionError:
+                continue
+            
+            # We correct the volume for the viscosity of the solution at this point
+            # to ensure that the correct volume is withdrawn but also to ensure that the same
+            # volume is sent to the pump for deposition so that the pump returns to the same position
+            # and doesn't drift over time.
+
+            # We dont do it at the pump level so that we dont need to passs the viscosity of the solution
+            # to the pump every time we withdraw or infuse.
             repetition_vol = correction_factor(
                 desired_volume / repetitions, vessel.viscosity_cp
             )
@@ -569,6 +589,54 @@ def rinse_v2(
 
     return 0
 
+@timing_wrapper
+def rinse_v3(
+    instructions: EchemExperimentBase,
+    toolkit: Toolkit,
+):
+    """
+    Rinse the well with rinse_vol ul.
+    Involves pipetteing and then clearing the well with no purging steps
+
+    Args:
+        instructions (Experiment): The experiment instructions
+        toolkit (Toolkit): The toolkit object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+    Returns:
+        None (void function) since the objects are passed by reference
+    """
+
+    logger.info(
+        "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
+    )
+    instructions.set_status_and_save(ExperimentStatus.RINSING)
+    for _ in range(instructions.rinse_count):
+        # Pipette the rinse solution into the well
+        forward_pipette_v3(
+            volume=instructions.rinse_vol,
+            src_vessel="rinse",
+            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
+            toolkit=toolkit,
+        )
+        # toolkit.mill.safe_move(
+        #     x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        #     y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        #     z_coord=toolkit.wellplate.z_top,
+        #     instrument=Instruments.PIPETTE,
+        # )
+        # Clear the well
+        forward_pipette_v3(
+            volume=instructions.rinse_vol,
+            src_vessel=toolkit.wellplate.wells[instructions.well_id],
+            dst_vessel=waste_selector(
+                "waste",
+                instructions.rinse_vol,
+            ),
+            toolkit=toolkit,
+        )
+
+    return 0
 
 @timing_wrapper
 def flush_v2(
@@ -621,6 +689,57 @@ def flush_v2(
         logger.info("No flushing required. Flush volume is 0. Continuing...")
     return 0
 
+
+@timing_wrapper
+def flush_v3(
+    flush_solution_name: str,
+    toolkit: Toolkit,
+    flush_volume: float = 120.0,
+    flush_count: int = 1,
+    instructions: Optional[ExperimentBase] = None,
+):
+    """
+    Flush the pipette tip with the designated flush_volume ul to remove any residue
+    Args:
+        waste_vials (list): The list of waste vials
+        stock_vials (list): The list of stock vials
+        flush_solution_name (str): The name of the solution to flush with
+        mill (object): The mill object
+        pump (object): The pump object
+        pumping_rate (float): The pumping rate in ml/min
+        flush_volume (float): The volume to flush with in microliters
+        flush_count (int): The number of times to flush
+
+    Returns:
+        None (void function) since the objects are passed by reference
+    """
+
+    if flush_volume > 0.000:
+        if instructions is not None:
+            instructions.set_status_and_save(ExperimentStatus.FLUSHING)
+        logger.info(
+            "Flushing pipette tip with %f ul of %s...",
+            flush_volume,
+            flush_solution_name,
+        )
+
+        for _ in range(flush_count):
+            forward_pipette_v3(
+                flush_volume,
+                src_vessel=flush_solution_name,
+                dst_vessel=waste_selector("waste", flush_volume),
+                toolkit=toolkit,
+            )
+
+        logger.debug(
+            "Flushed pipette tip with %f ul of %s %dx times...",
+            flush_volume,
+            flush_solution_name,
+            flush_count,
+        )
+    else:
+        logger.info("No flushing required. Flush volume is 0. Continuing...")
+    return 0
 
 @timing_wrapper
 def purge_pipette(
