@@ -145,7 +145,7 @@ class SlackBot:
     """Class for sending messages to Slack."""
 
     def __init__(self, test: bool = read_testing_config()) -> None:
-        self.logger = logging.getLogger("e_panda")
+        self.logger = logging.getLogger("panda")
         self.testing = test
         self.client = WebClient(token=SlackCred.TOKEN)
         self.auth_test_response = self.client.auth_test()
@@ -307,7 +307,7 @@ class SlackBot:
         # latestTS = datetime.now().timestamp()
 
         try:
-            self.logger.info("Checking for new messages.")
+            self.logger.info("Checking for new messages in %s", channel)
             # Call the conversations.history method using the WebClient
             # conversations.history returns the first 100 messages by default
             # These results are paginated, see:
@@ -315,8 +315,6 @@ class SlackBot:
             result = client.conversations_history(
                 channel=channel_id,
                 limit=1,
-                inclusive=True,
-                latest=datetime.now().timestamp(),
             )
 
             conversation_history = result["messages"]
