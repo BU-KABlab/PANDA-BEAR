@@ -7,7 +7,7 @@ from panda_lib.actions import (
     chrono_amp,
     waste_selector,
     image_well,
-    flush_v2,
+    flush_v3,
     OCPFailure,
     CAFailure,
     CVFailure,
@@ -70,23 +70,19 @@ def pedotdeposition(
     toolkit.global_logger.info(
         "Running experimnet %s part 1", instructions.experiment_id
     )
-    toolkit.global_logger.info("0. Imaging the well")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    instructions.declare_step("Imaging the well Before Deposition", ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "BeforeDeposition")
-
-    instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
-    ## Deposit the experiment solution into the well
-    toolkit.global_logger.info("1. Depositing EDOT into well: %s", instructions.well_id)
+    instructions.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
     forward_pipette_v3(
-        volume=instructions.solutions["edot"],
+        volume=instructions.solutions["edot"]["volume"],
         src_vessel="edot",
         dst_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,
-        source_concentration=instructions.edot_concentration,
+        source_concentration=instructions.solutions["edot"]["concentration"],
     )
 
     ## Move the electrode to the well
-    toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
+    instructions.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
 
     ## Move the electrode to the well
     # Move the electrode to above the well
@@ -95,19 +91,11 @@ def pedotdeposition(
         y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
         z_coord=toolkit.wellplate.z_top,
         instrument=Instruments.ELECTRODE,
+        second_z_cord=toolkit.wellplate.echem_height,
+        second_z_cord_feed=100,
     )
-    # Set the feed rate to 1000 to avoid splashing
-    toolkit.mill.set_feed_rate(100)
-    toolkit.mill.safe_move(
-        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-        z_coord=toolkit.wellplate.echem_height,
-        instrument=Instruments.ELECTRODE,
-    )
-    # Set the feed rate back to 2000
-    toolkit.mill.set_feed_rate(2000)
 
-    toolkit.global_logger.info("3. Performing CA deposition")
+    instructions.declare_step("Performing CA", ExperimentStatus.CA)
     try:
         chrono_amp(instructions, file_tag="CA_deposition")
 
@@ -121,13 +109,11 @@ def pedotdeposition(
         raise e
 
     # Rinse electrode
-    toolkit.global_logger.info("4. Rinsing electrode")
-    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    instructions.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
     toolkit.mill.rinse_electrode(3)
 
     # Clear the well
-    toolkit.global_logger.info("5. Clearing well contents into waste")
-    instructions.set_status_and_save(ExperimentStatus.CLEARING)
+    instructions.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
     forward_pipette_v3(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         src_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -138,20 +124,24 @@ def pedotdeposition(
         toolkit=toolkit,
     )
 
-    toolkit.global_logger.info("6. Flushing the pipette tip")
+    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(flush_solution_name="rinse", toolkit=toolkit)
+    flush_v3(
+        flush_solution_name=instructions.flush_sol_name,
+        flush_volume=instructions.flush_vol,
+        flush_count=instructions.flush_count,
+        toolkit=toolkit,
+    )
 
-    toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
-    instructions.set_status_and_save(ExperimentStatus.RINSING)
-    for i in range(4):
+    instructions.declare_step(f"Rinsing the well {instructions.rinse_count}x with rinse",ExperimentStatus.RINSING)
+    for i in range(instructions.rinse_count):
         # Pipette the rinse solution into the well
-        toolkit.global_logger.info("Rinse %d of 4", i + 1)
+        toolkit.global_logger.info("Rinse %d of %d", i + 1, instructions.rinse_count)
         forward_pipette_v3(
-            volume=120,
+            volume=instructions.rinse_vol,
             src_vessel=solution_selector(
                 "rinse",
-                120,
+                instructions.rinse_vol,
             ),
             dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
@@ -164,24 +154,21 @@ def pedotdeposition(
         )
         # Clear the well
         forward_pipette_v3(
-            volume=120,
+            volume=instructions.rinse_vol,
             src_vessel=toolkit.wellplate.wells[instructions.well_id],
             dst_vessel=waste_selector(
                 "waste",
-                120,
+                instructions.rinse_vol,
             ),
             toolkit=toolkit,
         )
 
-    toolkit.global_logger.info("8. Take after image")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    instructions.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
         step_description="AfterDeposition",
     )
-    instructions.process_type = 2
-    instructions.priority = 1
     toolkit.global_logger.info("PEDOT deposition complete\n\n")
 
 
@@ -216,13 +203,14 @@ def pedotbleaching(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
     forward_pipette_v3(
-        volume=120,
+        volume=instructions.solutions["liclo4"]["volume"],
         src_vessel=solution_selector(
             "liclo4",
-            120,  # hard code this
+            instructions.solutions["edot"]["volume"],  # hard code this
         ),
         dst_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,
+        source_concentration=instructions.solutions["liclo4"]["concentration"],
     )
 
     ## Move the electrode to the well
@@ -235,18 +223,9 @@ def pedotbleaching(
         y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
         z_coord=toolkit.wellplate.z_top,
         instrument=Instruments.ELECTRODE,
+        second_z_cord=toolkit.wellplate.echem_height,
+        second_z_cord_feed=100,
     )
-    # Set the feed rate to 1000 to avoid splashing
-    toolkit.mill.set_feed_rate(100)
-    toolkit.mill.safe_move(
-        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-        z_coord=toolkit.wellplate.echem_height,
-        instrument=Instruments.ELECTRODE,
-    )
-    # Set the feed rate back to 2000
-    toolkit.mill.set_feed_rate(2000)
-
     toolkit.global_logger.info("3. Performing CA")
     try:
         chrono_amp_edot_bleaching(instructions)
@@ -274,15 +253,13 @@ def pedotbleaching(
         toolkit=toolkit,
     )
 
-    toolkit.global_logger.info("6. Flushing the pipette tip")
-    instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    flush_v3(
         flush_solution_name="rinse",
         toolkit=toolkit,
     )
 
-    toolkit.global_logger.info("7. Take after image")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    instructions.declare_step("Take after bleaching image", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
@@ -315,23 +292,20 @@ def pedotcoloring(
     toolkit.global_logger.info(
         "Running experiment %s part 3", instructions.experiment_id
     )
-    toolkit.global_logger.info("0. Imaging the well")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    instructions.declare_step("Imaging the well Before Coloring", ExperimentStatus.IMAGING)
+
     image_well(toolkit, instructions, "BeforeColoring")
 
-    instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
-    ## Deposit the experiment solution into the well
-    toolkit.global_logger.info(
-        "1. Depositing liclo4 into well: %s", instructions.well_id
-    )
+    instructions.declare_step("Depositing liclo4", ExperimentStatus.DEPOSITING)
     forward_pipette_v3(
-        volume=120,
+        volume=instructions.solutions["liclo4"]["volume"],
         src_vessel=solution_selector(
             "liclo4",
-            120,
+            instructions.solutions["liclo4"]["volume"],
         ),
         dst_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,
+        source_concentration=instructions.solutions["liclo4"]["concentration"],
     )
 
     ## Move the electrode to the well
@@ -344,17 +318,9 @@ def pedotcoloring(
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
+            second_z_cord=toolkit.wellplate.echem_height,
+            second_z_cord_feed=100,
         )
-        # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
 
         toolkit.global_logger.info("3. Performing CA")
         try:
@@ -368,13 +334,11 @@ def pedotcoloring(
         pass
 
     # Rinse electrode
-    toolkit.global_logger.info("4. Rinsing electrode")
-    instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+    instructions.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
     toolkit.mill.rinse_electrode(3)
 
     # Clear the well
-    toolkit.global_logger.info("5. Clearing well contents into waste")
-    instructions.set_status_and_save(ExperimentStatus.CLEARING)
+    instructions.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
     forward_pipette_v3(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         src_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -385,23 +349,20 @@ def pedotcoloring(
         toolkit=toolkit,
     )
 
-    toolkit.global_logger.info("6. Flushing the pipette tip")
-    instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
-        flush_solution_name="rinse",
+    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    flush_v3(
+        flush_solution_name=instructions.flush_sol_name,
         toolkit=toolkit,
-        flush_count=3,
+        flush_count=instructions.flush_count,
+        flush_volume=instructions.flush_vol,
     )
 
-    toolkit.global_logger.info("7. Take image of well")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    instructions.declare_step("Take image of well AfterColoring", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
         step_description="AfterColoring",
     )
-    instructions.process_type = 4
-    instructions.priority = 0
     toolkit.global_logger.info("PEDOT coloring complete\n\n")
 
 
@@ -428,27 +389,28 @@ def pedotcv(
     toolkit.global_logger.info(
         "Running experiment %s part 4", instructions.experiment_id
     )
-    toolkit.global_logger.info("0. Imaging the well")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "BeforeCharacterizing")
-
-    instructions.set_status_and_save(new_status=ExperimentStatus.DEPOSITING)
-    ## Deposit the experiment solution into the well
-    toolkit.global_logger.info(
-        "1. Depositing liclo4 into well: %s", instructions.well_id
+    instructions.declare_step(
+        "Imaging the well Before Characterization", ExperimentStatus.IMAGING
     )
+    image_well(toolkit, instructions, "Before_Characterizing")
+
+    instructions.declare_step("Depositing liclo4", ExperimentStatus.DEPOSITING)
+    liclo4_volume = instructions.solutions["liclo4"]["volume"]
+    liclo4_concentration = instructions.solutions["liclo4"]["concentration"]
+
     forward_pipette_v3(
-        volume=instructions.solutions_corrected["liclo4"],
+        volume=liclo4_volume,
         src_vessel=solution_selector(
             "liclo4",
-            instructions.solutions_corrected["liclo4"],
+            liclo4_volume,
         ),
         dst_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,
+        source_concentration=liclo4_concentration,
     )
 
     ## Move the electrode to the well
-    toolkit.global_logger.info("2. Moving electrode to well: %s", instructions.well_id)
+    instructions.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
     try:
         ## Move the electrode to the well
         # Move the electrode to above the well
@@ -457,32 +419,24 @@ def pedotcv(
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
+            second_z_cord=toolkit.wellplate.echem_height,
+            second_z_cord_feed=100,
         )
-        # Set the feed rate to 1000 to avoid splashing
-        toolkit.mill.set_feed_rate(100)
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.echem_height,
-            instrument=Instruments.ELECTRODE,
-        )
-        # Set the feed rate back to 2000
-        toolkit.mill.set_feed_rate(2000)
 
-        toolkit.global_logger.info("3. Performing CV")
+        instructions.declare_step("Performing CV", ExperimentStatus.CV)
         try:
             cyclic_volt_edot_characterizing(instructions)
         except Exception as e:
             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
             raise e
     finally:
-        toolkit.global_logger.info("4. Rinsing electrode")
-        instructions.set_status_and_save(new_status=ExperimentStatus.ERINSING)
+        instructions.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well
-    toolkit.global_logger.info("5. Clearing well contents into waste")
-    instructions.set_status_and_save(ExperimentStatus.CLEARING)
+    instructions.declare_step(
+        "Clearing well contents into waste", ExperimentStatus.CLEARING
+    )
     forward_pipette_v3(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         src_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -493,53 +447,53 @@ def pedotcv(
         toolkit=toolkit,
     )
 
-    toolkit.global_logger.info("6. Flushing the pipette tip")
-    instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
-        flush_solution_name="rinse",
+    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    flush_v3(
+        flush_solution_name=instructions.flush_sol_name,
+        flush_volume=instructions.flush_vol,
+        flush_count=instructions.flush_count,
         toolkit=toolkit,
-        flush_count=3,
     )
 
-    toolkit.global_logger.info("7. Take image of well")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    instructions.declare_step(
+        "Take image of well After_Characterizing", ExperimentStatus.IMAGING
+    )
     image_well(
         toolkit=toolkit,
         instructions=instructions,
-        step_description="AfterCharacterizing",
+        step_description="After_Characterizing",
     )
-    toolkit.global_logger.info("8. Rinsing the well 4x with rinse")
-    instructions.set_status_and_save(ExperimentStatus.RINSING)
-    for i in range(4):
+    instructions.declare_step(
+        f"Rinsing the well {instructions.rinse_count}x with rinse",
+        ExperimentStatus.RINSING,
+    )
+    for i in range(instructions.rinse_count):
         # Pipette the rinse solution into the well
-        toolkit.global_logger.info("Rinse %d of 4", i + 1)
+        toolkit.global_logger.info("Rinse %d of %d", i + 1, instructions.rinse_count)
         forward_pipette_v3(
-            volume=120,
+            volume=instructions.rinse_vol,
             src_vessel=solution_selector(
                 "rinse",
-                120,
+                instructions.rinse_vol,
             ),
             dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
         )
         # Clear the well
         forward_pipette_v3(
-            volume=120,
+            volume=instructions.rinse_vol,
             src_vessel=toolkit.wellplate.wells[instructions.well_id],
             dst_vessel=waste_selector(
                 "waste",
-                120,
+                instructions.rinse_vol,
             ),
             toolkit=toolkit,
         )
 
-    toolkit.global_logger.info("9. Take end image")
-    instructions.set_status_and_save(ExperimentStatus.IMAGING)
+    instructions.declare_step("Take end image", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
         instructions=instructions,
         step_description="EndImage",
     )
-    instructions.process_type = 99
-    instructions.priority = 99
     toolkit.global_logger.info("PEDOT characterizing complete\n\n")
