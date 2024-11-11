@@ -539,15 +539,15 @@ def establish_system_state() -> (
         )
         slack.send_message(
             "alert",
-            "Please refill the stock vials and confirm in the terminal that the program should continue",
+            "Please refill the stock vials and restart the program from the main menu",
         )
-        options = input(
-            "Confirm that the program should continue by pressing enter or q to exit: "
-        )
-        if options.lower() == "q":
-            slack.send_message("alert", "PANDA_SDL is shutting down")
-            raise ShutDownCommand
-        slack.send_message("alert", "The program is continuing")
+        # options = input(
+        #     "Confirm that the program should continue by pressing enter or q to exit: "
+        # )
+        # if options.lower() == "q":
+        slack.send_message("alert", "PANDA_SDL is shutting down")
+        raise ShutDownCommand
+        # slack.send_message("alert", "The program is continuing")
 
     ## read through the waste vials and log their name, contents, and volume
     for vial in waste_vials_only:
@@ -636,7 +636,7 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
     for solution in experiment.solutions:
         solution_lwr = str(solution).lower()
-        volume_required = experiment.solutions[solution]
+        volume_required = experiment.solutions[solution]["volume"]
         volume_available = sum(
             [
                 vial.volume
@@ -959,6 +959,10 @@ def share_to_slack(experiment: ExperimentBase):
     try:
         exp_id = experiment.experiment_id
 
+        if TESTING:
+            msg = f"Experiment {exp_id} has completed with status {experiment.status}. Testing mode, no images to share"
+            slack.send_message("data", msg)
+            return
         # images_with_dz = [
         #     image
         #     for image in experiment.results.image
