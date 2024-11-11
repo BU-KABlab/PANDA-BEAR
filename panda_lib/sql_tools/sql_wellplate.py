@@ -2,7 +2,7 @@
 
 import json
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple, Union
 
 from sqlalchemy import Integer, func, cast
@@ -526,9 +526,7 @@ def save_well_to_db(well_to_save: object) -> None:
                 WellHx.experiment_id: well_to_save.experiment_id,
                 WellHx.project_id: well_to_save.project_id,
                 WellHx.status: well_to_save.status,
-                WellHx.status_date: datetime.strptime(
-                    well_to_save.status_date, "%Y-%m-%dT%H:%M:%S"
-                ),
+                WellHx.status_date: datetime.now(tz=timezone.utc).isoformat(),
                 WellHx.contents: json.dumps(well_to_save.contents),
                 WellHx.volume: well_to_save.volume,
                 WellHx.coordinates: json.dumps(asdict(well_to_save.coordinates)),
