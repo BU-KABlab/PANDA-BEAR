@@ -235,7 +235,6 @@ def add_nonfile_experiment(
 
     # Data clean the solutions to all be lowercase
     experiment.solutions = {k.lower(): v for k, v in experiment.solutions.items()}
-    experiment.solutions_corrected = experiment.solutions
     # Save the experiment as a separate file in the experiment_queue subfolder
     experiment.set_status_and_save(ExperimentStatus.QUEUED)
 
@@ -383,7 +382,6 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
 
         # Data clean the solutions to all be lowercase
         experiment.solutions = {k.lower(): v for k, v in experiment.solutions.items()}
-        experiment.solutions_corrected = experiment.solutions
 
         # Individually insert the experiment and update the status
         # We do this so that the wellchecker is checking as the wells are allocated
