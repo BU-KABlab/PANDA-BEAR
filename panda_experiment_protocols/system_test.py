@@ -8,6 +8,7 @@ from panda_lib.actions import (
     waste_selector,
     image_well,
     flush_v3,
+    rinse_v3,
     OCPFailure,
     CAFailure,
     CVFailure,
@@ -134,34 +135,10 @@ def pedotdeposition(
     )
 
     instructions.declare_step(f"Rinsing the well {instructions.rinse_count}x with rinse",ExperimentStatus.RINSING)
-    for i in range(instructions.rinse_count):
-        # Pipette the rinse solution into the well
-        toolkit.global_logger.info("Rinse %d of %d", i + 1, instructions.rinse_count)
-        forward_pipette_v3(
-            volume=instructions.rinse_vol,
-            src_vessel=solution_selector(
-                "rinse",
-                instructions.rinse_vol,
-            ),
-            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
-            toolkit=toolkit,
-        )
-        toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.PIPETTE,
-        )
-        # Clear the well
-        forward_pipette_v3(
-            volume=instructions.rinse_vol,
-            src_vessel=toolkit.wellplate.wells[instructions.well_id],
-            dst_vessel=waste_selector(
-                "waste",
-                instructions.rinse_vol,
-            ),
-            toolkit=toolkit,
-        )
+    rinse_v3(
+        instructions=instructions,
+        toolkit=toolkit,
+    )
 
     instructions.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
     image_well(
@@ -255,7 +232,9 @@ def pedotbleaching(
 
     instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
     flush_v3(
-        flush_solution_name="rinse",
+        flush_solution_name=instructions.flush_sol_name,
+        flush_volume=instructions.flush_vol,
+        flush_count=instructions.flush_count,
         toolkit=toolkit,
     )
 
@@ -467,28 +446,10 @@ def pedotcv(
         f"Rinsing the well {instructions.rinse_count}x with rinse",
         ExperimentStatus.RINSING,
     )
-    for i in range(instructions.rinse_count):
-        # Pipette the rinse solution into the well
-        toolkit.global_logger.info("Rinse %d of %d", i + 1, instructions.rinse_count)
-        forward_pipette_v3(
-            volume=instructions.rinse_vol,
-            src_vessel=solution_selector(
-                "rinse",
-                instructions.rinse_vol,
-            ),
-            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
-            toolkit=toolkit,
-        )
-        # Clear the well
-        forward_pipette_v3(
-            volume=instructions.rinse_vol,
-            src_vessel=toolkit.wellplate.wells[instructions.well_id],
-            dst_vessel=waste_selector(
-                "waste",
-                instructions.rinse_vol,
-            ),
-            toolkit=toolkit,
-        )
+    rinse_v3(
+        instructions=instructions,
+        toolkit=toolkit,
+    )
 
     instructions.declare_step("Take end image", ExperimentStatus.IMAGING)
     image_well(

@@ -42,11 +42,13 @@ def main():
                     solutions={
                         "edot": {"volume": 120, "concentration": 0.01, "repeated": 1},
                         "liclo4": {"volume": 120, "concentration": 1.0, "repeated": 1},
-                        "rinse": {"volume": 120, "concentration": 1.0, "repeated": 4},
                     },
+                    rinse_sol_name="rinse",
+                    rinse_vol=120,
+                    rinse_count=4,
                     flush_sol_name="rinse",
                     flush_sol_vol=120,
-                    flush_conc=3,
+                    flush_count=3,
                     filename=EXPERIMENT_NAME + "_" + str(experiment_id),
                     # Echem specific
                     ocp=1,

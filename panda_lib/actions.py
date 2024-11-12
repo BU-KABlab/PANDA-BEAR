@@ -612,10 +612,11 @@ def rinse_v3(
     )
     instructions.set_status_and_save(ExperimentStatus.RINSING)
     for _ in range(instructions.rinse_count):
+        logger.info("Rinse %d of %d", _ + 1, instructions.rinse_count)
         # Pipette the rinse solution into the well
         forward_pipette_v3(
             volume=instructions.rinse_vol,
-            src_vessel="rinse",
+            src_vessel=instructions.rinse_sol_name,
             dst_vessel=toolkit.wellplate.wells[instructions.well_id],
             toolkit=toolkit,
         )
