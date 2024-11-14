@@ -48,7 +48,6 @@ from panda_lib.errors import (
 from panda_lib.experiment_class import (
     EchemExperimentBase,
     ExperimentBase,
-    ExperimentResult,
     ExperimentStatus,
 )
 from panda_lib.log_tools import timing_wrapper
@@ -298,6 +297,15 @@ def forward_pipette_v3(
 
     If the source is given as as string, the function will look up the solution in the stock vials and use it as the source.
     If a concentration is provided for the solution, multiple source vials may be used to achieve the desired concentration.
+
+    Actions taken:
+    1. If the source is a stock vial, the vial will be decapped
+    2. The solution will be withdrawn from the source
+    3. If the source is a stock vial, the vial will be recapped
+    4. The solution will be deposited into the destination
+    5. If the destination is a waste vial, the vial will be decapped
+    6. The solution will be dispensed into the destination
+    7. If the destination is a waste vial, the vial will be recapped
 
     Args:
         volume (float): The desired volume to be pipetted in microliters. Will be corrected for viscocity.
@@ -838,7 +846,7 @@ def chrono_amp(
     ca_instructions: EchemExperimentBase,
     file_tag: str = None,
     custom_parameters: Union[chrono_parameters, None] = None,
-) -> Tuple[EchemExperimentBase, ExperimentResult]:
+) -> Tuple[EchemExperimentBase]:
     """
     Deposition of the solutions onto the substrate. This includes the OCP and CA steps.
 
@@ -948,7 +956,7 @@ def chrono_amp(
     finally:
         pstat.pstatdisconnect()
 
-    return ca_instructions, ca_results
+    return ca_instructions
 
 
 @timing_wrapper
@@ -957,7 +965,7 @@ def cyclic_volt(
     file_tag: str = None,
     overwrite_inital_voltage: bool = True,
     custom_parameters: cv_parameters = None,
-) -> Tuple[EchemExperimentBase, ExperimentResult]:
+) -> Tuple[EchemExperimentBase]:
     """
     Cyclicvoltamety in a well. This includes the OCP and CV steps.
     Will perform OCP and then set the initial voltage for the CV based on the final OCP voltage.
@@ -1097,7 +1105,7 @@ def cyclic_volt(
     finally:
         pstat.pstatdisconnect()
 
-    return cv_instructions, cv_instructions.results
+    return cv_instructions
 
 
 @timing_wrapper
@@ -1221,33 +1229,6 @@ def image_well(
             toolkit.mill.move_to_safe_position()  # move to safe height above target well
 
 
-# @timing_wrapper
-# def image_filepath_generator(
-#     exp_id: int = "test",
-#     project_id: int = "test",
-#     project_campaign_id: int = "test",
-#     well_id: str = "test",
-#     step_description: str = None,
-# ) -> Path:
-#     """
-#     Generate the file path for the image
-#     """
-#     # create file name
-#     if step_description is not None:
-#         file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
-#     else:
-#         file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
-#     file_name = file_name.replace(" ", "_")  # clean up the file name
-#     file_name_start = file_name + "_0"  # enumerate the file name
-#     filepath = Path(PATH_TO_DATA / str(file_name_start)).with_suffix(".tiff")
-#     i = 1
-#     while filepath.exists():
-#         next_file_name = f"{file_name}_{i}"
-#         filepath = Path(PATH_TO_DATA / str(next_file_name)).with_suffix(".tiff")
-#         i += 1
-#     return filepath
-
-
 @timing_wrapper
 def mix(
     mill: Union[Mill, MockMill],
@@ -1319,6 +1300,234 @@ def mix(
     mill.move_to_safe_position()
     return 0
 
+# Not timed since it is a wrapper function
+def ca_deposition(
+    soln_name: str,
+    instructions: EchemExperimentBase,
+    toolkit: Toolkit,
+    custom_deposition_function: Optional[callable] = None,
+    rinse_well_at_end: bool = True,
+):
+    """
+    0. Imaging the well
+    1. Depositing solution into well
+    2. Moving electrode to well
+    3. Performing CA
+    4. Rinsing electrode
+    5. Clearing well contents into waste
+    6. Flushing the pipette tip
+    7. Rinsing the well 4x with rinse
+    8. Take after image
+
+    Args:
+        soln_name (str): Name of the solution to be deposited (should match the name of the vial)
+        instructions (EchemExperimentBase): The experiment instructions
+        toolkit (Toolkit): The toolkit object for interfacing with the hardware
+        custom_deposition_function (callable): A custom deposition function to be used instead of the default chrono_amp
+
+    """
+
+    instructions.declare_step(f"Imaging the {instructions.well_id} Before Deposition", ExperimentStatus.IMAGING)
+    image_well(toolkit, instructions, "BeforeDeposition")
+    instructions.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
+    forward_pipette_v3(
+        volume=instructions.solutions[soln_name]["volume"],
+        src_vessel=soln_name,
+        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
+        toolkit=toolkit,
+        source_concentration=instructions.solutions[soln_name]["concentration"],
+    )
+
+    ## Move the electrode to the well
+    instructions.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
+
+    ## Move the electrode to the well
+    # Move the electrode to above the well
+    toolkit.mill.safe_move(
+        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+        z_coord=toolkit.wellplate.z_top,
+        instrument=Instruments.ELECTRODE,
+        second_z_cord=toolkit.wellplate.echem_height,
+        second_z_cord_feed=100,
+    )
+
+    instructions.declare_step("Performing CA", ExperimentStatus.CA)
+    try:
+        if custom_deposition_function:
+            custom_deposition_function(instructions, file_tag="CA_deposition")
+        else:
+            chrono_amp(instructions, file_tag="CA_deposition")
+
+    except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
+        toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+        raise e
+    except Exception as e:
+        toolkit.global_logger.error(
+            "Unknown error occurred during chrono_amp: %s", str(e)
+        )
+        raise e
+
+    # Rinse electrode
+    instructions.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
+
+    # Clear the well
+    instructions.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
+    forward_pipette_v3(
+        volume=toolkit.wellplate.wells[instructions.well_id].volume,
+        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=waste_selector(
+            "waste",
+            toolkit.wellplate.wells[instructions.well_id].volume,
+        ),
+        toolkit=toolkit,
+    )
+
+    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    instructions.set_status_and_save(ExperimentStatus.FLUSHING)
+    flush_v3(
+        flush_solution_name=instructions.flush_sol_name,
+        flush_volume=instructions.flush_vol,
+        flush_count=instructions.flush_count,
+        toolkit=toolkit,
+    )
+
+    if rinse_well_at_end:
+        instructions.declare_step(f"Rinsing the well {instructions.rinse_count}x with rinse",ExperimentStatus.RINSING)
+        rinse_v3(
+            instructions=instructions,
+            toolkit=toolkit,
+        )
+
+    instructions.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
+    image_well(
+        toolkit=toolkit,
+        instructions=instructions,
+        step_description="AfterDeposition",
+    )
+    toolkit.global_logger.info("Deposition of %scomplete\n\n",soln_name)
+
+# Not timed since it is a wrapper function
+def pedotcv(
+    instructions: EchemExperimentBase,
+    toolkit: Toolkit,
+    custom_cv_function: Optional[callable] = None,
+    rinse_well_at_end: bool = True,
+):
+    """
+    0. Imaging the well
+    1. Depositing liclo4 into well
+    2. Moving electrode to well
+    3. Performing CV
+    4. Rinsing electrode
+    5. Clearing well contents into waste
+    6. Flushing the pipette tip
+    7. Take image of well
+    8. Rinsing the well 4x with rinse
+    9. Take end image
+
+    Args:
+        instructions (EchemExperimentBase): _description_
+        toolkit (Toolkit): _description_
+    """
+    toolkit.global_logger.info(
+        "Running experiment %s part 4", instructions.experiment_id
+    )
+    instructions.declare_step(
+        "Imaging the well Before Characterization", ExperimentStatus.IMAGING
+    )
+    image_well(toolkit, instructions, "Before_Characterizing")
+
+    instructions.declare_step("Depositing liclo4", ExperimentStatus.DEPOSITING)
+    char_soln_name = instructions.char_sol_name
+    char_soln_volume = instructions.char_vol
+    char_soln_concentration = instructions.char_concentration
+
+    forward_pipette_v3(
+        volume=char_soln_volume,
+        src_vessel=solution_selector(
+            char_soln_name,
+            char_soln_volume,
+        ),
+        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
+        toolkit=toolkit,
+        source_concentration=char_soln_concentration,
+    )
+
+    ## Move the electrode to the well
+    instructions.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
+    try:
+        ## Move the electrode to the well
+        # Move the electrode to above the well
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            z_coord=toolkit.wellplate.z_top,
+            instrument=Instruments.ELECTRODE,
+            second_z_cord=toolkit.wellplate.echem_height,
+            second_z_cord_feed=100,
+        )
+
+        instructions.declare_step("Performing CV", ExperimentStatus.CV)
+        try:
+            if custom_cv_function:
+                custom_cv_function(instructions, file_tag="CV_characterization")
+            else:
+                cyclic_volt(instructions, file_tag="CV_characterization")
+        except Exception as e:
+            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+            raise e
+    finally:
+        instructions.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
+        toolkit.mill.rinse_electrode(3)
+
+    # Clear the well
+    instructions.declare_step(
+        "Clearing well contents into waste", ExperimentStatus.CLEARING
+    )
+    forward_pipette_v3(
+        volume=toolkit.wellplate.wells[instructions.well_id].volume,
+        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=waste_selector(
+            "waste",
+            toolkit.wellplate.wells[instructions.well_id].volume,
+        ),
+        toolkit=toolkit,
+    )
+
+    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    flush_v3(
+        flush_solution_name=instructions.flush_sol_name,
+        flush_volume=instructions.flush_vol,
+        flush_count=instructions.flush_count,
+        toolkit=toolkit,
+    )
+
+    instructions.declare_step(
+        "Take image of well After_Characterizing", ExperimentStatus.IMAGING
+    )
+    image_well(
+        toolkit=toolkit,
+        instructions=instructions,
+        step_description="After_Characterizing",
+    )
+    instructions.declare_step(
+        f"Rinsing the well {instructions.rinse_count}x with rinse",
+        ExperimentStatus.RINSING,
+    )
+    rinse_v3(
+        instructions=instructions,
+        toolkit=toolkit,
+    )
+
+    instructions.declare_step("Take end image", ExperimentStatus.IMAGING)
+    image_well(
+        toolkit=toolkit,
+        instructions=instructions,
+        step_description="EndImage",
+    )
+    toolkit.global_logger.info("PEDOT characterizing complete\n\n")
 
 if __name__ == "__main__":
     pass
