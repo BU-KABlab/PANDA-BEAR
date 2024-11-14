@@ -953,7 +953,7 @@ def share_to_slack(experiment: ExperimentBase):
     if experiment.results is None:
         logger.error("The experiment has no results")
         return
-    if experiment.results.image is None:
+    if experiment.results.images is None:
         logger.error("The experiment has no image files")
         return
     try:
