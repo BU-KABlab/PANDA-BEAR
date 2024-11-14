@@ -2,7 +2,6 @@
 
 from panda_lib.actions import (
     EchemExperimentBase,
-    ExperimentResult,
     ExperimentStatus,
     logger,
     cv_parameters,
@@ -15,7 +14,7 @@ from panda_lib.actions import (
 
 def cyclic_volt_pgma_fc(
     cv_instructions: EchemExperimentBase, file_tag: str = "CV_characterization"
-) -> Tuple[EchemExperimentBase, ExperimentResult]:
+) -> Tuple[EchemExperimentBase]:
     """
     Characterization of the solutions on the substrate using CV.
     No pipetting is performed in this step.
@@ -44,7 +43,7 @@ def cyclic_volt_pgma_fc(
             CVcycle=3,
         )
 
-        cv_instructions, char_results = cyclic_volt(
+        cv_instructions=cyclic_volt(
             cv_instructions=cv_instructions,
             file_tag=file_tag,
             # Do not change the instructions initial voltage during custom CV
@@ -69,4 +68,4 @@ def cyclic_volt_pgma_fc(
         logger.error("An unknown exception occurred during %s CV: %s", file_tag, e)
         raise CVFailure(cv_instructions.experiment_id, cv_instructions.well_id) from e
 
-    return cv_instructions, char_results
+    return cv_instructions

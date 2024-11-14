@@ -4,7 +4,6 @@ from panda_lib.actions import (
     CAFailure,
     CVFailure,
     DepositionFailure,
-    ExperimentResult,
     ExperimentStatus,
     OCPFailure,
     Tuple,
@@ -20,7 +19,7 @@ from panda_lib.experiment_class import PEDOTExperiment
 def chrono_amp_edot_bleaching(
     ca_instructions: PEDOTExperiment,
     file_tag: str = "CA_bleaching",
-) -> Tuple[PEDOTExperiment, ExperimentResult]:
+) -> Tuple[PEDOTExperiment]:
     """
     Bleaching of an edot film already on ITO. This wraps the chrono_amp function.
 
@@ -67,13 +66,13 @@ def chrono_amp_edot_bleaching(
             ca_instructions.experiment_id, ca_instructions.well_id
         ) from e
 
-    return ca_instructions, dep_results
+    return ca_instructions
 
 
 def chrono_amp_edot_coloring(
     ca_instructions: PEDOTExperiment,
     file_tag: str = "CA_coloring",
-) -> Tuple[PEDOTExperiment, ExperimentResult]:
+) -> Tuple[PEDOTExperiment]:
     """
     Coloring of an edot film already on ITO. This wraps the chrono_amp function.
 
@@ -121,12 +120,12 @@ def chrono_amp_edot_coloring(
             ca_instructions.experiment_id, ca_instructions.well_id
         ) from e
 
-    return ca_instructions, dep_results
+    return ca_instructions
 
 
 def cyclic_volt_edot_characterizing(
     cv_instructions: PEDOTExperiment, file_tag: str = "CV_characterization"
-) -> Tuple[PEDOTExperiment, ExperimentResult]:
+) -> Tuple[PEDOTExperiment]:
     """
     Characterization of the solutions on the substrate using CV.
     No pipetting is performed in this step.
@@ -180,4 +179,4 @@ def cyclic_volt_edot_characterizing(
         logger.error("An unknown exception occurred during %s CV: %s", file_tag, e)
         raise CVFailure(cv_instructions.experiment_id, cv_instructions.well_id) from e
 
-    return cv_instructions, char_results
+    return cv_instructions
