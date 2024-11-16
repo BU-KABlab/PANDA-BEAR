@@ -28,7 +28,6 @@ def chrono_amp_edot_bleaching(
         file_tag (str): The file tag to be used for the data files
     Returns:
         dep_instructions (Experiment): The updated experiment instructions
-        dep_results (ExperimentResult): The updated experiment results
     """
     try:
         logger.info("Setting up eChem bleaching process...")
@@ -43,7 +42,7 @@ def chrono_amp_edot_bleaching(
             CAsamplerate=0.1,
         )
 
-        ca_instructions, dep_results = chrono_amp(
+        ca_instructions = chrono_amp(
             ca_instructions=ca_instructions,
             file_tag=file_tag,
             custom_parameters=bleaching_params,
@@ -81,7 +80,6 @@ def chrono_amp_edot_coloring(
         file_tag (str): The file tag to be used for the data files
     Returns:
         dep_instructions (Experiment): The updated experiment instructions
-        dep_results (ExperimentResult): The updated experiment results
     """
     try:
         # echem setup
@@ -97,7 +95,7 @@ def chrono_amp_edot_coloring(
             CAsamplerate=0.1,
         )
 
-        ca_instructions, dep_results = chrono_amp(
+        ca_instructions= chrono_amp(
             ca_instructions=ca_instructions,
             file_tag=file_tag,
             custom_parameters=coloring_params,
@@ -137,7 +135,6 @@ def cyclic_volt_edot_characterizing(
 
     Returns:
         char_instructions (Experiment): The updated experiment instructions
-        char_results (ExperimentResult): The updated experiment results
     """
     try:
         logger.info("Characterizing well: %s", cv_instructions.well_id)
@@ -154,7 +151,7 @@ def cyclic_volt_edot_characterizing(
             CVcycle=3,
         )
 
-        cv_instructions, char_results = cyclic_volt(
+        cv_instructions = cyclic_volt(
             cv_instructions=cv_instructions,
             file_tag=file_tag,
             # Do not change the instructions initial voltage during custom CV

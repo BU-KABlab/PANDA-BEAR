@@ -56,7 +56,7 @@ def print_config_values():
 
 def resolve_config_paths():
     # Read the config file
-    CONFIG_FILE = "./panda_lib/config/panda_sdl_config.ini"
+    CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
     config = ConfigParser()
 
     try:

@@ -20,6 +20,9 @@ ARG PYTHON_VERSION=3.10
 # Install Python 3.10
 RUN apt-get update && apt-get install -y python${PYTHON_VERSION} python3-pip && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Confrim the Python version
+RUN python --version
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -77,7 +80,7 @@ COPY /installers/${SPINNAKER_TAR_FILE} /tmp/${SPINNAKER_TAR_FILE}
 COPY /installers/${SPINNAKER_PYTHON_TAR_FILE} /tmp/${SPINNAKER_PYTHON_TAR_FILE}
 
 # Copy NI-VISA zip file into container
-COPY /installers/NILinux2024Q4DeviceDrivers.zip /tmp/NILinux2024Q4DeviceDrivers.zip
+# COPY /installers/NILinux2024Q4DeviceDrivers.zip /tmp/NILinux2024Q4DeviceDrivers.zip
 
 # Create a usrgroup called flirimaging
 RUN groupadd flirimaging
@@ -99,10 +102,10 @@ echo -e "yes\n\nyes\nyes\n\nyes\nno\nno\nno" | sh install_spinnaker.sh
 RUN cd /tmp && tar -xzf ${SPINNAKER_PYTHON_TAR_FILE} && pip install ${SPINNAKER_PYTHON_VERSION}
 
 # Install NI-VISA and dependencies
-RUN cd /tmp && unzip NILinux2024Q4DeviceDrivers.zip && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2004-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2204-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2404-drivers-stream.deb
+# RUN cd /tmp && unzip NILinux2024Q4DeviceDrivers.zip && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2004-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2204-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2404-drivers-stream.deb
 
 # Install PyVISA
-RUN pip install pyvisa
+# RUN pip install pyvisa
 
 # Switch to the new user (uncomment if needed)
 # ARG USER_UID=1000
