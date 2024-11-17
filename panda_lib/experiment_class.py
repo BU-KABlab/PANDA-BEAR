@@ -178,14 +178,13 @@ class ExperimentResult:
     ocp_cv_final_voltage: List[Tuple[float, str]] = field(default_factory=list)
     ca_data_file: List[Tuple[Path, str]] = field(default_factory=list)
     cv_data_file: List[Tuple[Path, str]] = field(default_factory=list)
-    image: List[Tuple[Path, str]] = field(default_factory=list)
+    images: List[Tuple[Path, str]] = field(default_factory=list)
     # deposition_plot_files: list[Path] = field(default_factory=list)
     # deposition_max_values: list[float] = field(default_factory=list)
     # depsotion_min_values: list[float] = field(default_factory=list)
     # characterization_plot_files: list[Path] = field(default_factory=list)
     # characterization_max_values: list[float] = field(default_factory=list)
     # characterization_min_values: list[float] = field(default_factory=list)
-    pumping_record: list = None
 
     def set_ocp_ca_file(
         self, file: Path, passed: bool, final_voltage: float, context: str = None
@@ -237,13 +236,9 @@ class ExperimentResult:
         # if min_value is not None:
         #     self.characterization_min_values.append(min_value)
 
-    def set_pumping_record(self, record: list):
-        """Set the pumping record"""
-        self.pumping_record = record
-
     def append_image_file(self, file: Path, context: str = None):
         """Append the image file"""
-        self.image.append((file, context))
+        self.images.append((file, context))
 
     def one_to_many(self) -> list[ExperimentResultsRecord]:
         """Turn the results object into individual result table records"""
@@ -314,7 +309,7 @@ class ExperimentBase:
     generator: Union[Callable, str, None] = Field(default=None, title="Generator", description="Generator function or script used for the experiment")
     analysis_id: int = Field(default=0, title="Analysis ID", description="Identifier for the analysis associated with the experiment")
     needs_analysis: int = Field(default=0, title="Needs Analysis", description="Flag indicating if the experiment needs analysis")
-    steps: int = Field(default=0, title="Steps", description="Number of steps completed in the experiment")
+    steps: int = Field(default=0, title="Steps", description="Number of steps completed in the experiment",exclude=True)
 
     @field_validator('experiment_name')
     def validate_experiment_name(cls, value):
@@ -640,6 +635,7 @@ class EchemExperimentBase(ExperimentBase):
 
     char_sol_name: str = ""  # Characterization solution name
     char_vol: int = 0  # Characterization solution volume
+    char_concentration: float = 1.0  # Characterization solution concentration
     cv_sample_period: float = float(0.1)  # Characterization sample period
     cv_initial_voltage: float = float(0.0)  # initial voltage
     cv_first_anodic_peak: float = float(0.5)  # first anodic peak
