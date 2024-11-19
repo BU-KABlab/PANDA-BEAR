@@ -307,7 +307,7 @@ class Vials(Base):
     Categories: 0 = Stock, 1 = Waste, 2 = Reagent, 3 = Unknown
     """
 
-    __tablename__ = "panda_vials"
+    __tablename__ = "panda_vial_hx"
     id = Column(Integer, primary_key=True)
     position = Column(String)
     contents = Column(String)

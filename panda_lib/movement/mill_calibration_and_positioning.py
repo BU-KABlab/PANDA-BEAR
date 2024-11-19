@@ -144,7 +144,7 @@ def update_instrument_offsets(mill: Mill, *args, **kwargs):
     # Review the instrument offset settings
     instrument_offsets: dict = mill.config["instrument_offsets"]
     print("\nCurrent instrument offsets:")
-    for instrument, offset in instrument_offsets:
+    for instrument, offset in instrument_offsets.items():
         print(f"{instrument}: {offset}")
 
     # Ask if user wants to change instrument offsets
