@@ -58,7 +58,7 @@ from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .syringepump import MockPump, SyringePump
 from .utilities import SystemState
 from .vials import StockVial, Vial2, WasteVial, read_vials
-from .wellplate import Wellplate
+from .wellplate import Wellplate, Well
 
 config = read_config()
 # set up slack globally so that it can be used in the main function and others
@@ -164,29 +164,6 @@ def experiment_loop_worker(
 
                     break  # break out of the while new experiment is None loop
 
-                # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-                # if (
-                #     al_campaign_length is not None
-                #     and al_campaign_iteration < al_campaign_length
-                # ):
-                #     # We run the model on with experiments that have already been run
-                #     sql_system_state.set_system_status(
-                #         SystemState.BUSY, "Running ML model"
-                #     )
-                #     next_exp_id = pedot_ml_model()
-                #     new_experiment, _ = scheduler.read_next_experiment_from_queue()
-                #     if new_experiment is not None:
-                #         slack.send_slack_message(
-                #             "alert",
-                #             f"New experiment generated from existing data {new_experiment.experiment_id}",
-                #         )
-                #         al_campaign_iteration += 1
-                #         break  # break out of the while new experiment is None loop
-                #     else:
-                #         slack.send_slack_message(
-                #             "alert", "No new experiment generated from existing data"
-                #         )
-                #         raise NoExperimentFromModel()
                 logger.info(
                     "No new experiments to run...waiting a minute for new experiments"
                 )
@@ -208,14 +185,27 @@ def experiment_loop_worker(
                 if status == SystemState.STOP:
                     break  # break out of the main while True loop
 
-            ## confirm that the new experiment is a valid experiment object
+            ## Validate the experiment object
+            # Does the experiment object exist and is it an instance of ExperimentBase
             if not isinstance(current_experiment, ExperimentBase):
-                logger.error("The experiment object is not valid")
+                logger.error("The experiment object is invalid")
                 controller_slack.send_message(
                     "alert",
                     "An invalid experiment object was passed to the controller",
                 )
                 break  # break out of the main while True loop
+
+            # Does the experiment object's well_type and well_id exist as new or queued in the wellplate
+            well:Well = toolkit.wellplate.wells[current_experiment.well_id]
+            if well.plate_id != toolkit.wellplate.plate_id or current_experiment.well_type_number != toolkit.wellplate.type_number:
+                logger.error(
+                    "The experiment object's well type and wellplate id do not match the current wellplate"
+                )
+                controller_slack.send_message(
+                    "alert",
+                    "The experiment object's well type and well id do not exist in the wellplate",
+                )
+                break  # break out of the main while True loop 
 
             logger.info(
                 "Experiment %d selected and validated", current_experiment.experiment_id
@@ -242,9 +232,12 @@ def experiment_loop_worker(
                 scheduler.update_experiment_queue_priority(
                     current_experiment.experiment_id, current_experiment.priority
                 )
-                current_experiment.set_status_and_save(ExperimentStatus.ERROR)
-                continue  # break out of the while True loop
-
+                controller_slack.send_message(
+                    "alert",
+                    f"Experiment {current_experiment.experiment_id} has been moved to the back of the queue. Checking for other experiments",
+                )
+                # continue  # continue to the next experiment
+                break # break out of the main while True loop
             # Announce the experiment
             pre_experiment_status_msg = (
                 f"Running experiment {current_experiment.experiment_id}"
@@ -292,8 +285,16 @@ def experiment_loop_worker(
             protocol_module = importlib.import_module(module_name.name)
 
             # Get the main function from the module
-            protocol_function = getattr(protocol_module, "main")
-
+            try:
+                protocol_function = getattr(protocol_module, "run")
+            except AttributeError:
+                try:
+                    protocol_function = getattr(protocol_module, "main")
+                except AttributeError:
+                    raise ProtocolNotFoundError(
+                        f"Protocol {protocol_entry.name} does not have a 'run' or 'main' function"
+                    )
+            
             try:
                 protocol_function(
                     instructions=current_experiment,
@@ -335,70 +336,6 @@ def experiment_loop_worker(
                         == current_experiment.experiment_id
                     ).update({"needs_analysis": True})
                     connection.commit()
-
-            # experiment_id = new_experiment.experiment_id
-
-            # if not TESTING:
-            #     # Analyze the experiment (will handle if in testing)
-            #     new_experiment.set_status_and_save(ExperimentStatus.ANALYZING)
-            #     pedot_analyzer(experiment_id)
-
-            #     next_exp_id = None
-            #     # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-            #     if (
-            #         al_campaign_length is not None
-            #         and al_campaign_iteration < al_campaign_length
-            #     ):
-            #         next_exp_id = pedot_ml_model()
-            #         al_campaign_iteration += 1
-
-            # Share the analysis results with slack
-            # pedot_analyzer.share_analysis_to_slack(experiment_id, next_exp_id, slack)
-
-            # if not TESTING:
-            #     # Check if a campaign length was set and if we have reached the end of the campaign
-            #     if (
-            #         al_campaign_length is not None
-            #         and al_campaign_iteration >= al_campaign_length
-            #     ):
-            #         controller_slack.send_message(
-            #             "alert",
-            #             "The AL campaign length has been reached. PANDA_SDL is shutting down",
-            #         )
-            #         raise ShutDownCommand
-
-            #     # If the AL campaign length is set, and we have not reached the end of the campaign, generate another experiment
-            #     if (
-            #         al_campaign_length is not None
-            #         and al_campaign_iteration < al_campaign_length
-            #     ):
-            #         # We run the model on with experiments that have already been run
-            #         sql_system_state.set_system_status(
-            #             SystemState.BUSY, "Running ML model"
-            #         )
-            #         next_exp_id = (
-            #             current_experiment.generator()
-            #         )  # generate an experiment with the appropriate parameters
-            #         current_experiment, _ = scheduler.read_next_experiment_from_queue(
-            #             random_pick=random_experiment_selection
-            #         )
-            #         if current_experiment is not None:
-            #             controller_slack.send_message(
-            #                 "alert",
-            #                 f"New experiment generated from data {next_exp_id}",
-            #             )
-            #             controller_slack.send_message(
-            #                 "alert",
-            #                 f"Next experiment {current_experiment.experiment_id}",
-            #             )
-            #             al_campaign_iteration += 1
-            #             continue  # continue to the next experiment
-
-            #         else:
-            #             controller_slack.send_message(
-            #                 "alert", "No new experiment generated from existing data"
-            #             )
-            #             raise NoExperimentFromModel()
 
             ## Clean up
             current_experiment = None  # reset new_experiment to None so that we can check the queue again

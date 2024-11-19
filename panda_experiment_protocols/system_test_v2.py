@@ -5,12 +5,12 @@
 # Non-standard imports
 from panda_lib.experiment_loop import Toolkit
 from panda_lib.actions import (
-    forward_pipette_v2,
+    __forward_pipette_v2,
     solution_selector,
     chrono_amp,
     waste_selector,
     image_well,
-    flush_v2,
+    __flush_v2,
     OCPFailure,
     CAFailure,
     CVFailure,
@@ -201,7 +201,7 @@ def pedotdeposition(
         if volume == 0:
             continue
         vial: Vial2 = next(vial for vial in edot_vials if vial.position == position)
-        forward_pipette_v2(
+        __forward_pipette_v2(
             volume=correction_factor(volume, vial.viscosity_cp),
             from_vessel=vial,
             to_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -252,7 +252,7 @@ def pedotdeposition(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    forward_pipette_v2(
+    __forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
@@ -264,14 +264,14 @@ def pedotdeposition(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(flush_solution_name="rinse", toolkit=toolkit)
+    __flush_v2(flush_solution_name="rinse", toolkit=toolkit)
 
     toolkit.global_logger.info("7. Rinsing the well 4x with rinse")
     instructions.set_status_and_save(ExperimentStatus.RINSING)
     for i in range(4):
         # Pipette the rinse solution into the well
         toolkit.global_logger.info("Rinse %d of 4", i + 1)
-        forward_pipette_v2(
+        __forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
                 "rinse",
@@ -288,7 +288,7 @@ def pedotdeposition(
             instrument=Instruments.PIPETTE,
         )
         # Clear the well
-        forward_pipette_v2(
+        __forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
@@ -340,7 +340,7 @@ def pedotbleaching(
     toolkit.global_logger.info(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
-    forward_pipette_v2(
+    __forward_pipette_v2(
         volume=correction_factor(120),
         from_vessel=solution_selector(
             "liclo4",
@@ -390,7 +390,7 @@ def pedotbleaching(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    forward_pipette_v2(
+    __forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
@@ -402,7 +402,7 @@ def pedotbleaching(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    __flush_v2(
         flush_solution_name="rinse",
         toolkit=toolkit,
     )
@@ -450,7 +450,7 @@ def pedotcoloring(
     toolkit.global_logger.info(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
-    forward_pipette_v2(
+    __forward_pipette_v2(
         volume=correction_factor(120),
         from_vessel=solution_selector(
             "liclo4",
@@ -502,7 +502,7 @@ def pedotcoloring(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    forward_pipette_v2(
+    __forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
@@ -514,7 +514,7 @@ def pedotcoloring(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    __flush_v2(
         flush_solution_name="rinse",
         toolkit=toolkit,
         flush_count=3,
@@ -564,7 +564,7 @@ def pedotcv(
     toolkit.global_logger.info(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
-    forward_pipette_v2(
+    __forward_pipette_v2(
         volume=instructions.solutions_corrected["liclo4"],
         from_vessel=solution_selector(
             "liclo4",
@@ -611,7 +611,7 @@ def pedotcv(
     # Clear the well
     toolkit.global_logger.info("5. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    forward_pipette_v2(
+    __forward_pipette_v2(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         from_vessel=toolkit.wellplate.wells[instructions.well_id],
         to_vessel=waste_selector(
@@ -623,7 +623,7 @@ def pedotcv(
 
     toolkit.global_logger.info("6. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    __flush_v2(
         flush_solution_name="rinse",
         toolkit=toolkit,
         flush_count=3,
@@ -641,7 +641,7 @@ def pedotcv(
     for i in range(4):
         # Pipette the rinse solution into the well
         toolkit.global_logger.info("Rinse %d of 4", i + 1)
-        forward_pipette_v2(
+        __forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=solution_selector(
                 "rinse",
@@ -652,7 +652,7 @@ def pedotcv(
             pumping_rate=toolkit.pump.max_pump_rate,
         )
         # Clear the well
-        forward_pipette_v2(
+        __forward_pipette_v2(
             volume=correction_factor(120),
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
