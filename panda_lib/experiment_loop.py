@@ -285,8 +285,16 @@ def experiment_loop_worker(
             protocol_module = importlib.import_module(module_name.name)
 
             # Get the main function from the module
-            protocol_function = getattr(protocol_module, "run")
-
+            try:
+                protocol_function = getattr(protocol_module, "run")
+            except AttributeError:
+                try:
+                    protocol_function = getattr(protocol_module, "main")
+                except AttributeError:
+                    raise ProtocolNotFoundError(
+                        f"Protocol {protocol_entry.name} does not have a 'run' or 'main' function"
+                    )
+            
             try:
                 protocol_function(
                     instructions=current_experiment,
