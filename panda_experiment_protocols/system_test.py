@@ -22,7 +22,7 @@ metadata = {
     "protocol_description": "PEDOT LHS v1 Screening",
     "protocol_version": "1.0",
     "protocol_owner": "Harley Quinn",
-    "protocol_owner_email": "",
+    "protocol_owner_email": "hquinn@bu.edu",
     "protocol_owner_institution": "KABLab",
 }
 
