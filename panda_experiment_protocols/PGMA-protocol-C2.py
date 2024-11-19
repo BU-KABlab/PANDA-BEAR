@@ -29,12 +29,12 @@
 # Non-standard imports
 from panda_lib.experiment_loop import Toolkit
 from panda_lib.actions import (
-    forward_pipette_v2,
+    transfer,
     solution_selector,
     chrono_amp,
     waste_selector,
     image_well,
-    flush_v2,
+    __flush_v2,
     OCPFailure,
     CAFailure,
     CVFailure,
@@ -43,7 +43,6 @@ from panda_lib.actions import (
 )
 from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 from panda_lib.experiment_class import PGMAExperiment, ExperimentStatus
-from panda_lib.correction_factors import correction_factor
 
 
 def main(
@@ -78,7 +77,7 @@ def PGMA_dep_v2_screening(
     # Apply correction factor to the programmed volumes
     toolkit.global_logger.info("Applying correction factor to the programmed volumes")
     for solution in instructions.solutions:
-        instructions.solutions_corrected[solution] = correction_factor(
+        instructions.solutions_corrected[solution] = (
             instructions.solutions[solution],
             solution_selector(
                 solution,  # The solution name
@@ -131,15 +130,14 @@ def PGMAdeposition(
     toolkit.global_logger.info(
         "1. Depositing %s into well: %s", solution_name, instructions.well_id
     )
-    forward_pipette_v2(
+    transfer(
         volume=instructions.solutions_corrected[solution_name],
-        from_vessel=solution_selector(
+        src_vessel=solution_selector(
             solution_name,
             instructions.solutions_corrected[solution_name],
         ),
-        to_vessel=current_well,
+        dst_vessel=current_well,
         toolkit=toolkit,
-        pumping_rate=instructions.pumping_rate,
     )
 
     ## Move the electrode to the well
@@ -175,10 +173,10 @@ def PGMAdeposition(
     # Clear the well
     toolkit.global_logger.info("4a. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    forward_pipette_v2(
+    transfer(
         volume=current_well.volume,
-        from_vessel=current_well,
-        to_vessel=waste_selector(
+        src_vessel=current_well,
+        dst_vessel=waste_selector(
             "waste",
             current_well.volume,
         ),
@@ -187,7 +185,7 @@ def PGMAdeposition(
 
     toolkit.global_logger.info("4b. Flushing the pipette tip")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    __flush_v2(
         flush_solution_name="DMF-TBAPrinse",
         toolkit=toolkit,
     )
@@ -197,23 +195,22 @@ def PGMAdeposition(
     for i in range(4):
         # Pipette the rinse solution into the well
         toolkit.global_logger.info("Rinse %d of 4", i + 1)
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=solution_selector(
+        transfer(
+            volume=(320),
+            src_vessel=solution_selector(
                 "DMF-TBAPrinse",
-                correction_factor(320),
+                (320),
             ),
-            to_vessel=current_well,
+            dst_vessel=current_well,
             toolkit=toolkit,
-            pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=current_well,
-            to_vessel=waste_selector(
+        transfer(
+            volume=(320),
+            src_vessel=current_well,
+            dst_vessel=waste_selector(
                 "waste",
-                correction_factor(320),
+                (320),
             ),
             toolkit=toolkit,
         )
@@ -259,15 +256,14 @@ def FC_prechar(
     toolkit.global_logger.info(
         "2. Dispensing %s into well: %s", solution_name, instructions.well_id
     )
-    forward_pipette_v2(
+    transfer(
         volume=instructions.solutions_corrected[solution_name.lower()],
-        from_vessel=solution_selector(
+        src_vessel=solution_selector(
             solution_name,
             instructions.solutions_corrected[solution_name],
         ),
-        to_vessel=current_well,
+        dst_vessel=current_well,
         toolkit=toolkit,
-        pumping_rate=instructions.pumping_rate,
     )
 
     ## Move the electrode to the well
@@ -297,10 +293,10 @@ def FC_prechar(
     # Clear the well
     toolkit.global_logger.info("3d. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    forward_pipette_v2(
+    transfer(
         volume=current_well.volume,
-        from_vessel=current_well,
-        to_vessel=waste_selector(
+        src_vessel=current_well,
+        dst_vessel=waste_selector(
             "waste",
             current_well.volume,
         ),
@@ -309,7 +305,7 @@ def FC_prechar(
 
     toolkit.global_logger.info("4a. Flushing the pipette tip with DMF-TBAPrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    __flush_v2(
         flush_solution_name="DMF-TBAPrinse",
         toolkit=toolkit,
     )
@@ -317,23 +313,23 @@ def FC_prechar(
     toolkit.global_logger.info("4b. Rinsing the well 4x with DMF-TBAPrinse")
     for _ in range(4):
         # Pipette the rinse solution into the well
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=solution_selector(
+        transfer(
+            volume=(320),
+            src_vessel=solution_selector(
                 "DMF-TBAPrinse",
-                correction_factor(320),
+                (320),
             ),
-            to_vessel=current_well,
+            dst_vessel=current_well,
             toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=current_well,
-            to_vessel=waste_selector(
+        transfer(
+            volume=(320),
+            src_vessel=current_well,
+            dst_vessel=waste_selector(
                 "waste",
-                correction_factor(320),
+                (320),
             ),
             toolkit=toolkit,
         )
@@ -379,15 +375,14 @@ def FC_postchar(
     toolkit.global_logger.info(
         "1. Depositing %s into well: %s", solution_name, instructions.well_id
     )
-    forward_pipette_v2(
+    transfer(
         volume=instructions.solutions_corrected[solution_name],
-        from_vessel=solution_selector(
+        src_vessel=solution_selector(
             solution_name,
             instructions.solutions_corrected[solution_name],
         ),
-        to_vessel=current_well,
+        dst_vessel=current_well,
         toolkit=toolkit,
-        pumping_rate=instructions.pumping_rate,
     )
 
     ## Move the electrode to the well
@@ -417,10 +412,10 @@ def FC_postchar(
     # Clear the well
     toolkit.global_logger.info("2d. Clearing well contents into waste")
     instructions.set_status_and_save(ExperimentStatus.CLEARING)
-    forward_pipette_v2(
+    transfer(
         volume=current_well.volume,
-        from_vessel=current_well,
-        to_vessel=waste_selector(
+        src_vessel=current_well,
+        dst_vessel=waste_selector(
             "waste",
             current_well.volume,
         ),
@@ -429,7 +424,7 @@ def FC_postchar(
 
     toolkit.global_logger.info("3a. Flushing the pipette tip with DMFrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    __flush_v2(
         flush_solution_name="DMFrinse",
         toolkit=toolkit,
     )
@@ -437,53 +432,53 @@ def FC_postchar(
     toolkit.global_logger.info("3b. Rinsing the well 4x with DMFrinse")
     for _ in range(4):
         # Pipette the rinse solution into the well
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=solution_selector(
+        transfer(
+            volume=(320),
+            src_vessel=solution_selector(
                 "DMFrinse",
-                correction_factor(320),
+                (320),
             ),
-            to_vessel=current_well,
+            dst_vessel=current_well,
             toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=current_well,
-            to_vessel=waste_selector(
+        transfer(
+            volume=(320),
+            src_vessel=current_well,
+            dst_vessel=waste_selector(
                 "waste",
-                correction_factor(320),
+                (320),
             ),
             toolkit=toolkit,
         )
 
     toolkit.global_logger.info("4a. Flushing the pipette tip with ACNrinse")
     instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v2(
+    __flush_v2(
         flush_solution_name="ACNrinse",
         toolkit=toolkit,
     )
     toolkit.global_logger.info("4b. Rinsing the well 4x with ACNrinse")
     for _ in range(4):
         # Pipette the rinse solution into the well
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=solution_selector(
+        transfer(
+            volume=(320),
+            src_vessel=solution_selector(
                 "ACNrinse",
-                correction_factor(320),
+                (320),
             ),
-            to_vessel=current_well,
+            dst_vessel=current_well,
             toolkit=toolkit,
             pumping_rate=instructions.pumping_rate,
         )
         # Clear the well
-        forward_pipette_v2(
-            volume=correction_factor(320),
-            from_vessel=current_well,
-            to_vessel=waste_selector(
+        transfer(
+            volume=(320),
+            src_vessel=current_well,
+            dst_vessel=waste_selector(
                 "waste",
-                correction_factor(320),
+                (320),
             ),
             toolkit=toolkit,
         )

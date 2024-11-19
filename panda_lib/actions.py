@@ -100,7 +100,7 @@ testing_logging = logging.getLogger("panda")
 
 
 @timing_wrapper
-def forward_pipette_v2(
+def __forward_pipette_v2(
     volume: float,
     from_vessel: Union[Well, StockVial, WasteVial],
     to_vessel: Union[Well, WasteVial],
@@ -278,7 +278,7 @@ def forward_pipette_v2(
 
 
 @timing_wrapper
-def forward_pipette_v3(
+def _forward_pipette_v3(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
     dst_vessel: Union[Well, WasteVial],
@@ -543,9 +543,19 @@ def forward_pipette_v3(
         raise e
     return 0
 
+# No timer wrapper for this function since its a wrapper itself
+def transfer(
+        volume: float,
+    src_vessel: Union[str, Well, StockVial],
+    dst_vessel: Union[Well, WasteVial],
+    toolkit: Toolkit,
+    source_concentration: float = None,
+) -> int:
+    return _forward_pipette_v3(volume, src_vessel, dst_vessel, toolkit, source_concentration)    
+
 
 @timing_wrapper
-def rinse_v2(
+def __rinse_v2(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
@@ -568,7 +578,7 @@ def rinse_v2(
     instructions.set_status_and_save(ExperimentStatus.RINSING)
     for _ in range(instructions.rinse_count):
         # Pipette the rinse solution into the well
-        forward_pipette_v2(
+        __forward_pipette_v2(
             volume=correction_factor(instructions.rinse_vol),
             from_vessel=solution_selector(
                 "rinse",
@@ -585,7 +595,7 @@ def rinse_v2(
             instrument=Instruments.PIPETTE,
         )
         # Clear the well
-        forward_pipette_v2(
+        __forward_pipette_v2(
             volume=correction_factor(instructions.rinse_vol),
             from_vessel=toolkit.wellplate.wells[instructions.well_id],
             to_vessel=waste_selector(
@@ -622,7 +632,7 @@ def rinse_v3(
     for _ in range(instructions.rinse_count):
         logger.info("Rinse %d of %d", _ + 1, instructions.rinse_count)
         # Pipette the rinse solution into the well
-        forward_pipette_v3(
+        _forward_pipette_v3(
             volume=instructions.rinse_vol,
             src_vessel=instructions.rinse_sol_name,
             dst_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -635,7 +645,7 @@ def rinse_v3(
         #     instrument=Instruments.PIPETTE,
         # )
         # Clear the well
-        forward_pipette_v3(
+        _forward_pipette_v3(
             volume=instructions.rinse_vol,
             src_vessel=toolkit.wellplate.wells[instructions.well_id],
             dst_vessel=waste_selector(
@@ -648,7 +658,7 @@ def rinse_v3(
     return 0
 
 @timing_wrapper
-def flush_v2(
+def __flush_v2(
     flush_solution_name: str,
     toolkit: Toolkit,
     flush_volume: float = float(120.0),
@@ -681,7 +691,7 @@ def flush_v2(
         )
 
         for _ in range(flush_count):
-            forward_pipette_v2(
+            __forward_pipette_v2(
                 flush_volume,
                 from_vessel=solution_selector(flush_solution_name, flush_volume),
                 to_vessel=waste_selector("waste", flush_volume),
@@ -733,7 +743,7 @@ def flush_v3(
         )
 
         for _ in range(flush_count):
-            forward_pipette_v3(
+            _forward_pipette_v3(
                 flush_volume,
                 src_vessel=flush_solution_name,
                 dst_vessel=waste_selector("waste", flush_volume),
@@ -1330,7 +1340,7 @@ def ca_deposition(
     instructions.declare_step(f"Imaging the {instructions.well_id} Before Deposition", ExperimentStatus.IMAGING)
     image_well(toolkit, instructions, "BeforeDeposition")
     instructions.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
-    forward_pipette_v3(
+    _forward_pipette_v3(
         volume=instructions.solutions[soln_name]["volume"],
         src_vessel=soln_name,
         dst_vessel=toolkit.wellplate.wells[instructions.well_id],
@@ -1374,7 +1384,7 @@ def ca_deposition(
 
     # Clear the well
     instructions.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
-    forward_pipette_v3(
+    _forward_pipette_v3(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         src_vessel=toolkit.wellplate.wells[instructions.well_id],
         dst_vessel=waste_selector(
@@ -1444,7 +1454,7 @@ def pedotcv(
     char_soln_volume = instructions.char_vol
     char_soln_concentration = instructions.char_concentration
 
-    forward_pipette_v3(
+    _forward_pipette_v3(
         volume=char_soln_volume,
         src_vessel=solution_selector(
             char_soln_name,
@@ -1486,7 +1496,7 @@ def pedotcv(
     instructions.declare_step(
         "Clearing well contents into waste", ExperimentStatus.CLEARING
     )
-    forward_pipette_v3(
+    _forward_pipette_v3(
         volume=toolkit.wellplate.wells[instructions.well_id].volume,
         src_vessel=toolkit.wellplate.wells[instructions.well_id],
         dst_vessel=waste_selector(

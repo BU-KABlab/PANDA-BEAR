@@ -16,9 +16,17 @@ from panda_lib.actions_pedot import (
 )
 
 PROTOCOL_ID = 999
+metadata = {
+    "protocol_id": PROTOCOL_ID,
+    "protocol_name": "PEDOT LHS v1 Screening",
+    "protocol_description": "PEDOT LHS v1 Screening",
+    "protocol_version": "1.0",
+    "protocol_owner": "Harley Quinn",
+    "protocol_owner_email": "",
+    "protocol_owner_institution": "KABLab",
+}
 
-
-def main(
+def run(
     instructions: PEDOTExperiment,
     toolkit: Toolkit,
 ):
