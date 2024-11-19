@@ -3,12 +3,15 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
 # Set variables for Spinnaker filenames
-ARG SPINNAKER_VERSION=spinnaker-4.0.0.116-amd64-pkg-22.04
-ARG SPINNAKER_PYTHON_VERSION=spinnaker_python-4.0.0.116-cp310-cp310-linux_x86_64
+ARG SPINNAKER_VERSION=spinnaker-4.0.0.116-arm64-pkg-22.04
+ARG SPINNAKER_PYTHON_VERSION=spinnaker_python-4.0.0.116-cp310-cp310-linux_aarch64
 
 # Make variables for the tar files
 ARG SPINNAKER_TAR_FILE=${SPINNAKER_VERSION}.tar.gz
 ARG SPINNAKER_PYTHON_TAR_FILE=${SPINNAKER_PYTHON_VERSION}.tar.gz
+
+# Make variable for the install script
+ARG install_script_name=install_spinnaker_arm.sh
 
 # Make whl file for the Spinnaker Python SDK
 ARG SPINNAKER_PYTHON_VERSION=${SPINNAKER_PYTHON_VERSION}.whl
@@ -71,13 +74,13 @@ RUN apt-get clean \
 RUN mkdir -p /etc/udev/rules.d/
 
 # Copy the Spinnaker tar file into container
-COPY /installers/${SPINNAKER_TAR_FILE} /tmp/${SPINNAKER_TAR_FILE}
+# COPY /installers/${SPINNAKER_TAR_FILE} /tmp/${SPINNAKER_TAR_FILE}
 
 # Copy Spinnaker Python SDK tar file into container
-COPY /installers/${SPINNAKER_PYTHON_TAR_FILE} /tmp/${SPINNAKER_PYTHON_TAR_FILE}
+# COPY /installers/${SPINNAKER_PYTHON_TAR_FILE} /tmp/${SPINNAKER_PYTHON_TAR_FILE}
 
 # Copy NI-VISA zip file into container
-COPY /installers/NILinux2024Q4DeviceDrivers.zip /tmp/NILinux2024Q4DeviceDrivers.zip
+# COPY /installers/NILinux2024Q4DeviceDrivers.zip /tmp/NILinux2024Q4DeviceDrivers.zip
 
 # Create a usrgroup called flirimaging
 RUN groupadd flirimaging
@@ -91,18 +94,41 @@ RUN usermod -aG flirimaging root
 # Extract the tar file
 # Get the first directory that matches the pattern
 # Run the install script
-RUN cd /tmp && tar -xzf ${SPINNAKER_TAR_FILE} && \ 
-cd $(ls | grep spinnaker- | head -n 1) && \ 
-echo -e "yes\n\nyes\nyes\n\nyes\nno\nno\nno" | sh install_spinnaker.sh
+
+# What each echo command does:
+# yes   - Agree to follow installation script
+# ""    - Continue
+# yes   - Accept EULA
+# yes   - Add udev entry to allow access to usb devices
+# ""    - continue
+# yes   - Restart udev deamon
+# yes   - Allow more memory to be allocated to the system
+# no    - Do not install prebuilt examples
+# no    - Do not add GENICAM_GENTL64_PATH to the environment
+
+
+RUN cd /tmp && tar -xzf ${SPINNAKER_TAR_FILE} && \
+    cd $(ls | grep spinnaker- | head -n 1) && \
+    { \
+    echo "yes"; \
+    echo ""; \
+    echo "yes"; \
+    echo "yes"; \
+    echo ""; \
+    echo "yes"; \
+    echo "yes"; \
+    echo "no"; \
+    echo "no"; \
+    } | sh ${install_script_name}
 
 # Install Spinnaker Python SDK
 RUN cd /tmp && tar -xzf ${SPINNAKER_PYTHON_TAR_FILE} && pip install ${SPINNAKER_PYTHON_VERSION}
 
 # Install NI-VISA and dependencies
-RUN cd /tmp && unzip NILinux2024Q4DeviceDrivers.zip && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2004-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2204-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2404-drivers-stream.deb
+# RUN cd /tmp && unzip NILinux2024Q4DeviceDrivers.zip && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2004-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2204-drivers-stream.deb && dpkg -i NILinux2024Q4DeviceDrivers/ni-ubuntu2404-drivers-stream.deb
 
 # Install PyVISA
-RUN pip install pyvisa
+# RUN pip install pyvisa
 
 # Switch to the new user (uncomment if needed)
 # ARG USER_UID=1000
