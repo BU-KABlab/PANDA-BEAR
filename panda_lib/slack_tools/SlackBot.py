@@ -238,7 +238,7 @@ class SlackBot:
                     "title": image.name,
                 }
             )
-        response = client.files_upload_v2(
+        _ = client.files_upload_v2(
             file_uploads=file_upload_parts,
             channel=channel_id,
             initial_comment=message,
@@ -1108,6 +1108,84 @@ def get_well_color(status: str) -> str:
     }
     return color_mapping.get(status, "purple")
 
+
+class MockSlackBot(SlackBot):
+    def __init__(self, test: bool = True):
+        super().__init__(test=test)
+        pass
+    def send_message(self, channel_id: str, message) -> None:
+        """Send a message to Slack."""
+        #print(message)
+        pass
+    def send_slack_file(self, channel: str, file, message=None) -> int:
+        """Send a file to Slack."""
+        #print(f"File: {file}")
+        pass
+    def upload_images(self, channel, images, message):
+        """Upload images to Slack."""
+        #print(f"Images: {images}")
+        pass
+    def check_latest_message(self, channel: str) -> str:
+        """Check Slack for the latest message."""
+        #print("Checking latest message")
+        pass
+    def check_slack_messages(self, channel: str) -> int:
+        """Check Slack for messages."""
+        #print("Checking slack messages")
+        pass
+    def parse_slack_message(self, text: str, channel_id) -> int:
+        """
+        Parse the Slack message for commands.
+        If command is valid, execute command and returns 0 else return 1.
+
+        Valid commands: help, plot experiment #, share experiment #, status experiment #, vial status, well status, pause, resume, start, stop
+
+        Args:
+            message (str): The message to parse without the bot keyword !epanda.
+
+        Returns:
+            1 if command is valid, 0 if command is invalid
+        """
+        #print(f"Message: {text}")
+        pass
+    def echem_error_procedure(self):
+        """Procedure to follow when an echem error occurs."""
+        #print("Echem error procedure")
+        pass
+    def __vial_status(self, channel_id):
+        """Sends the vial status to the user."""
+        #print("Vial status")
+        pass
+    def __well_status(self, channel_id):
+        """Sends the well status to the user."""
+        #print("Well status")
+        pass
+    def __queue_length(self, channel_id):
+        #print("Queue length")
+        pass
+    def take_screenshot(self, channel_id, camera_name: str):
+        """Take a screenshot of the camera."""
+        #print(f"Screenshot of {camera_name}")
+        pass
+    def __share_experiment_images(self, experiment_id: int):
+        """Share the images for an experiment."""
+        #print(f"Sharing images for experiment {experiment_id}")
+        pass
+    def channel_id(self, channel: str) -> str:
+        """Return the channel ID based on the channel name."""
+        return "channel_id"
+        pass    
+    def run(self):
+        """Run the slack bot."""
+        #print("Running slack bot")
+        pass
+    def off_duty(self):
+        #print("Off duty")
+        pass
+    def terminate(self):
+        """Terminate the slack bot."""
+        #print("Terminating slack bot")
+        pass
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)
