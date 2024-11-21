@@ -18,7 +18,7 @@ import multiprocessing
 import sys
 import time
 from pathlib import Path
-from typing import Sequence
+from typing import Sequence, Tuple
 
 import PySpin
 from slack_sdk import errors as slack_errors
@@ -41,15 +41,22 @@ from .errors import (
     ProtocolNotFoundError,
     ShutDownCommand,
     WellImportError,
+    MismatchWellplateTypeError,
+    InsufficientVolumeError,
+    ExperimentNotFoundError,
+    ExperimentError
 )
 from .experiment_class import (
+    EchemExperimentBase,
     ExperimentBase,
     ExperimentResult,
     ExperimentResultsRecord,
     ExperimentStatus,
+    select_experiment_paramaters,
+    select_experiment_status,
     select_specific_result,
 )
-from .instrument_toolkit import Toolkit
+from .instrument_toolkit import Hardware, Labware, Toolkit
 from .log_tools import apply_log_filter, setup_default_logger, timing_wrapper
 from .movement import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
@@ -108,7 +115,6 @@ def experiment_loop_worker(
     apply_log_filter(logger=logger)
     controller_slack.send_message("alert", "PANDA_SDL is starting up")
     toolkit = None
-    al_campaign_iteration = 0
     current_experiment = None
 
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
@@ -217,7 +223,8 @@ def experiment_loop_worker(
                 well_id=current_experiment.well_id,
             )
             ## Check that there is enough volume in the stock vials to run the experiment
-            if not check_stock_vials(current_experiment, stock_vials):
+            sufficient_stock, _ = check_stock_vials(current_experiment, stock_vials)
+            if not sufficient_stock:
                 error_message = f"Experiment {current_experiment.experiment_id} cannot be run because there is not enough volume in the stock vials"
                 controller_slack.send_message(
                     "alert",
@@ -426,6 +433,236 @@ def experiment_loop_worker(
         controller_slack.send_message("alert", "PANDA_SDL is shutting down...goodbye")
         status_queue.put((process_id, "idle"))
 
+def sila_experiment_loop_worker(
+    hardware: Hardware,
+    labware: Labware,
+    specific_experiment_id: int = None,
+    process_id: int = None,
+    status_queue: multiprocessing.Queue = multiprocessing.Queue(),
+    command_queue: multiprocessing.Queue = multiprocessing.Queue(),
+):
+    """
+ 
+    """
+    
+    def set_worker_state(state: SystemState):
+        """Set the worker state"""
+        sql_system_state.set_system_status(state)
+        status_queue.put((process_id,f"{specific_experiment_id}: {state.value}"))
+
+    set_worker_state(SystemState.STARTUP)
+    exp_logger = hardware.global_logger if hardware.global_logger is not None else setup_default_logger(log_name="panda")
+    ## Reset the logger to log to the PANDA_SDL.log file and format
+    apply_log_filter(logger=logger)
+
+    try:
+        exp_obj = None
+
+        ## Check that the pipette is empty, if not dispose of full volume into waste
+        if hardware.pump.pipette.volume > 0:
+            exp_logger.info("Pipette is not empty, purging into waste")
+            set_worker_state(SystemState.PIPETTE_PURGE)
+            actions.purge_pipette(
+                mill=hardware.mill,
+                pump=hardware.pump,
+            )
+
+
+        set_worker_state(SystemState.EXPERIMENT_LOOKUP)
+        ## Reset the logger to log to the PANDA_SDL.log file and format
+        apply_log_filter(logger=logger)            
+
+        while exp_obj is None:
+            ## Ask the scheduler for the next experiment
+            # This also validates the experiment parameters since its a pydantic object
+            exp_obj:EchemExperimentBase = select_experiment_paramaters(specific_experiment_id)
+            if exp_obj is None:
+                set_worker_state(SystemState.ERROR)
+                exp_logger.error("Could not find the experiment %d in the db", specific_experiment_id)
+                raise ExperimentNotFoundError(f"Could not find the experiment {specific_experiment_id} in the db")        
+
+        # Does the experiment object's well_type and well_id exist as new or queued in the wellplate
+        well:Well = labware.wellplate.wells[exp_obj.well_id]
+        if well.plate_id != labware.wellplate.plate_id or exp_obj.well_type_number != labware.wellplate.type_number:
+            logger.error(
+                "The experiment object's well type and wellplate id do not match the current wellplate"
+            )
+            set_worker_state(SystemState.ERROR)
+            raise MismatchWellplateTypeError("The experiment object's well type and well id do not exist in the wellplate")
+
+        logger.info(
+            "Experiment %d selected and validated", exp_obj.experiment_id
+        )
+        sql_system_state.set_system_status(SystemState.BUSY)
+        ## Initialize a results object
+        exp_obj.results = ExperimentResult(
+            experiment_id=exp_obj.experiment_id,
+            well_id=exp_obj.well_id,
+        )
+        ## Check that there is enough volume in the stock vials to run the experiment
+        sufficient_stock, check_table = check_stock_vials(exp_obj, labware.stock_vials)
+        if not sufficient_stock:
+            set_worker_state(SystemState.ERROR)
+            insufficient_vials:list = check_table["insufficient"]
+            missing_vials:list = check_table["missing"]
+
+            if len(insufficient_vials) > 0 and len(missing_vials) > 0:
+                error_message = f"Experiment {exp_obj.experiment_id} cannot be run because there is insufficient volume of: {insufficient_vials} and missing vials: {missing_vials}"
+            elif len(insufficient_vials) > 0:
+                error_message = f"Experiment {exp_obj.experiment_id} cannot be run because there is insufficient volume of {insufficient_vials}"
+            elif len(missing_vials) > 0:
+                error_message = f"Experiment {exp_obj.experiment_id} cannot be run because there are missing vials: {missing_vials}"
+            else:
+                error_message = f"Experiment {exp_obj.experiment_id} cannot be run because there is not enough volume in the stock vials"
+            raise InsufficientVolumeError(error_message)
+        # Announce the experiment
+        logger.info("Running experiment %d", exp_obj.experiment_id)
+        set_worker_state(SystemState.RUNNING)
+
+        ## Update the experiment status to running
+
+        # Tag the experiment with the wellplate it is running on
+        exp_obj.plate_id = hardware.wellplate.plate_id
+
+        # Add the well object to the experiment and populate the well object with the experiment information
+        exp_obj.well = hardware.wellplate.wells[exp_obj.well_id]
+        exp_obj.well.plate_id = hardware.wellplate.plate_id
+        exp_obj.well.experiment_id = exp_obj.experiment_id
+        exp_obj.well.project_id = exp_obj.project_id
+        exp_obj.set_status_and_save(ExperimentStatus.RUNNING)
+
+        ## Run the experiment
+        apply_log_filter(
+            logger,
+            exp_obj.experiment_id,
+            exp_obj.well_id,
+            str(exp_obj.project_id)
+            + "."
+            + str(exp_obj.project_campaign_id),
+        )
+
+        logger.info("Beginning experiment %d", exp_obj.experiment_id)
+
+        # Get the protocol script using either the name or id
+        protocol_scipt: sql_protocol_utilities.ProtocolEntry = (
+            sql_protocol_utilities.select_protocol(exp_obj.protocol_id)
+        )
+
+        # Convert the file path to a module name
+        module_name = Path(
+            (config.get("GENERAL", "protocols_dir") + "." + protocol_scipt.filepath)
+            .replace("/", ".")
+            .rstrip(".py")
+        )
+
+        # Import the module
+        protocol_module = importlib.import_module(module_name.name)
+
+        # Get the main function from the module
+        try:
+            protocol_function = getattr(protocol_module, "run")
+        except AttributeError:
+            try:
+                protocol_function = getattr(protocol_module, "main")
+            except AttributeError:
+                raise ProtocolNotFoundError(
+                    f"Protocol {protocol_scipt.name} does not have a 'run' or 'main' function"
+                )
+        
+        try:
+            protocol_function(
+                instructions=exp_obj,
+                hardware=hardware,
+                labware=labware,
+            )
+        except Exception as error:
+            logger.error(error)
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+            raise error
+
+        # Analysis function call if experiment includes one
+        # if not TESTING and exp_obj.analyzer is not None:
+        #     exp_obj.analyzer(exp_obj)
+
+        # Look up the experiment in the db to check the status
+        exp_obj_status = select_experiment_status(exp_obj.experiment_id)
+        if exp_obj_status == ExperimentStatus.ERROR:
+            exp_obj.set_status_and_save(ExperimentStatus.SAVING)
+            scheduler.save_results(exp_obj)
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+            raise ExperimentError("Experiment ended in error")
+        else:
+            exp_obj.set_status_and_save(ExperimentStatus.SAVING)
+            scheduler.save_results(exp_obj)
+            exp_obj.set_status_and_save(ExperimentStatus.COMPLETE)
+            with db_setup.SessionLocal() as connection:
+                connection.query(panda_models.Experiments).filter(
+                    panda_models.Experiments.experiment_id
+                    == exp_obj.experiment_id
+                ).update({"needs_analysis": True})
+                connection.commit()
+
+        ## Reset the logger to log to the PANDA_SDL.log file and format after the experiment is complete
+        apply_log_filter(logger=logger)
+
+        ## With returned experiment and results, update the experiment status and post the final status
+        post_experiment_status_msg = f"Experiment {exp_obj.experiment_id} ended with status {exp_obj.status.value}"
+        logger.info(post_experiment_status_msg)
+        set_worker_state(exp_obj.status)
+
+
+        ## Clean up
+        exp_obj = None  # reset new_experiment to None so that we can check the queue again
+        ## Update the system state with new vial and wellplate information
+
+        if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
+            # assume unreal volume, not actually solution, set to 0
+            hardware.pump.pipette.reset_contents()
+
+    except (
+        OCPFailure,
+        DepositionFailure,
+        CVFailure,
+        CAFailure,
+    ) as error:
+        if exp_obj is not None:
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+        sql_system_state.set_system_status(SystemState.ERROR)
+        # scheduler.change_well_status(
+        #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
+        # )
+        logger.error(error)
+        raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
+
+    except ProtocolNotFoundError as error:
+        if exp_obj is not None:
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+        sql_system_state.set_system_status(SystemState.ERROR)
+        logger.error(error)
+        raise error
+
+    except KeyboardInterrupt as exc:
+        if exp_obj is not None:
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+        sql_system_state.set_system_status(SystemState.ERROR)
+        logger.info("Keyboard interrupt detected")
+        raise KeyboardInterrupt from exc  # raise error to go to finally. This was triggered by the user to indicate they want to stop the program
+
+    except Exception as error:
+        if exp_obj is not None:
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+        sql_system_state.set_system_status(SystemState.ERROR)
+        logger.error(error)
+        logger.exception(error)
+        raise error  # raise error to go to finally. If we don't know what caused an error we don't want to continue
+
+    finally:
+        if exp_obj is not None:
+            scheduler.save_results(exp_obj)
+            share_to_slack(exp_obj)
+
+        hardware.mill.rest_electrode()
+        set_worker_state(SystemState.IDLE)
 
 @timing_wrapper
 def establish_system_state() -> (
@@ -532,7 +769,7 @@ def establish_system_state() -> (
 
 
 @timing_wrapper
-def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) -> bool:
+def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) -> Tuple[bool, dict]:
     """
     Check that there is enough volume in the stock vials to run the experiment
 
@@ -544,9 +781,19 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
         bool: True if there is enough volume in the stock vials to run the experiment
     """
     ## Check that the experiment has solutions and those soltuions are in the stock vials
+
+    check_table = {
+        "sufficient": [],
+        "insufficient": [],
+        "missing": [],
+    }
+
+    passes = False
+
     if len(experiment.solutions) == 0:
         logger.warning("The experiment has no solutions.")
-        return True
+        passes = True
+        return passes, check_table
     for solution in experiment.solutions:
         solution_lwr = str(solution).lower()
         logger.debug("Checking for solution %s in stock vials", solution_lwr)
@@ -557,7 +804,8 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
             )
-            return False
+            passes = False
+            check_table["missing"].append(solution)
 
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
@@ -576,8 +824,12 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
                 "There is not enough volume of solution %s to run the experiment",
                 solution,
             )
-            return False
-    return True
+            passes = False
+            check_table["insufficient"].append(solution)
+        else:
+            check_table["sufficient"].append(solution)
+        
+    return passes, check_table
 
 
 @timing_wrapper
