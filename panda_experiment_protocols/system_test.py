@@ -4,6 +4,8 @@
 from panda_lib.actions import (
     ca_deposition,
     Toolkit,
+    Hardware,
+    Labware,
     ExperimentStatus,
 )
 
@@ -28,7 +30,8 @@ metadata = {
 
 def run(
     instructions: PEDOTExperiment,
-    toolkit: Toolkit,
+    hardware: Hardware,
+    labware: Labware,
 ):
     """
     The initial screening of the edot solution
@@ -39,8 +42,18 @@ def run(
     4. Save
 
     """
-    toolkit.global_logger.info("Running experiment %s", instructions.experiment_id)
-    toolkit.global_logger.info(
+    toolkit = Toolkit(
+        mill=hardware.mill,
+        scale=hardware.scale,
+        pump=hardware.pump,
+        wellplate=labware.wellplate,
+        global_logger=hardware.global_logger,
+        experiment_logger=hardware.experiment_logger,
+        flir_camera=hardware.flir_camera,
+        arduino=hardware.arduino,
+    )
+    hardware.global_logger.info("Running experiment %s", instructions.experiment_id)
+    hardware.global_logger.info(
         "Running experiment %s part 1 of 3", instructions.experiment_id
     )
     ca_deposition(
