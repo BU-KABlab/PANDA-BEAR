@@ -136,3 +136,39 @@ class InstrumentConnectionError(Exception):
     def __init__(self, message="Instrument connection fails"):
         self.message = message
         super().__init__(self.message)
+
+class MismatchWellplateTypeError(Exception):
+    """Raised when the wellplate type does not match the experiment's desired type"""
+
+    def __init__(
+        self, message="Wellplate does not have the correct type of wells"
+    ):
+        self.message = message
+        super().__init__(self.message)
+
+class InsufficientVolumeError(Exception):
+    """Raised when the vessel does not have enough volume"""
+
+    def __init__(
+        self, message="Vessel does not have enough volume"
+    ):
+        self.message = message
+        super().__init__(self.message)
+
+class ExperimentNotFoundError(Exception):
+    """Raised when the experiment is not found"""
+
+    def __init__(
+        self, message="Experiment not found"
+    ):
+        self.message = message
+        super().__init__(self.message)
+
+class ExperimentError(Exception):
+    """Raised when the experiment fails"""
+
+    def __init__(
+        self, message="Experiment failed"
+    ):
+        self.message = message
+        super().__init__(self.message)
