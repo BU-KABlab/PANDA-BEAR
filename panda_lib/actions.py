@@ -54,7 +54,7 @@ from panda_lib.log_tools import timing_wrapper
 from panda_lib.movement import Instruments, Mill, MockMill
 from panda_lib.obs_controls import OBSController, MockOBSController
 from panda_lib.syringepump import MockPump, SyringePump
-from panda_lib.instrument_toolkit import Toolkit
+from panda_lib.instrument_toolkit import Toolkit, Hardware, Labware
 from panda_lib.vials import StockVial, WasteVial, read_vials, Vessel, Vial2
 from panda_lib.wellplate import Well
 from panda_lib.utilities import solve_vials_ilp
