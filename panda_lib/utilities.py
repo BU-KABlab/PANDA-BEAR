@@ -83,9 +83,12 @@ class Instruments(Enum):
 
 class SystemState(Enum):
     """Class for naming of the system states."""
-
+    STARTUP = "startup"
+    PIPETTE_PURGE = "pipette_purge"
+    EXPERIMENT_LOOKUP = "experiment_lookup"
     IDLE = "idle"
     BUSY = "running"
+    RUNNING = "running"
     ERROR = "error"
     ON = "on"
     OFF = "off"
