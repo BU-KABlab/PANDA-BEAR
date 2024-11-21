@@ -109,6 +109,8 @@ def read_next_experiment_from_queue(
     If random_pick is True, then a random experiment with the highest priority is selected.
     Otherwise, the lowest experiment id in the queue with the highest priority is selected.
 
+    If experiment_id is provided, then the experiment with that id is selected.
+
     Args:
         random_pick (bool): Whether to randomly select an experiment from the queue.
         experiment_id (int): The experiment id to select from the queue.

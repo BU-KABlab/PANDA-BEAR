@@ -18,6 +18,7 @@ Otherwise the experiment is not in the queue.
 # in the well_hx table should be added to the queue in some manner but this is not implemented yet.
 
 # from panda_lib.sql_tools.sql_utilities import execute_sql_command, execute_sql_command_no_return
+import random
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import Queue
 
@@ -57,8 +58,12 @@ def get_next_experiment_from_queue(
     If random_pick, a random experiment with highest priority (lowest value) is selected.
     Else, the lowest experiment id with the highest priority (lowest value) is selected.
 
+    Specific_experiment_id is used to select a specific experiment from the queue.
+    This overrides random_pick.
+
     Args:
         random_pick (bool): Whether to pick a random experiment from the queue.
+        specific_experiment_id (int): The experiment ID to select.
 
     Returns:
         tuple: The experiment ID, the process type, and the filename.
@@ -89,8 +94,11 @@ def get_next_experiment_from_queue(
                 session.query(Queue)
                 .filter(Queue.status == "queued")
                 .order_by(Queue.priority)
-                .first()
+                .all()
             )
+            random_index = random.randint(0, len(result) - 1)
+            result = result[random_index]
+
         else:
             result = (
                 session.query(Queue)
