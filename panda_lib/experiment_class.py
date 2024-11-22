@@ -283,9 +283,9 @@ class ExperimentResult:
 class ExperimentBase:
     """Define the common data used to run and define an experiment"""
 
-    experiment_id: int = Field(default=0, title="Experiment ID", description="Unique identifier for the experiment",frozen=True)
-    experiment_name: str = Field(default="experiment", title="Experiment Name", description="Name of the experiment",frozen=True)
-    protocol_id: Union[int, str] = Field(default=999, title="Protocol ID", description="Identifier for the protocol used in the experiment",frozen=True)
+    experiment_id: int = Field(default=0, title="Experiment ID", description="Unique identifier for the experiment")
+    experiment_name: str = Field(default="experiment", title="Experiment Name", description="Name of the experiment")
+    protocol_id: Union[int, str] = Field(default=999, title="Protocol ID", description="Identifier for the protocol used in the experiment")
     priority: Optional[int] = Field(default=0, title="Priority", description="Priority level of the experiment")
     well_id: Optional[str] = Field(default="A1", title="Well ID", description="Identifier for the well used in the experiment")
     pin: Union[str, int] = Field(default=0, title="PIN", description="Personal Identification Number associated with the experiment")

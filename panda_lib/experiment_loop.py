@@ -367,17 +367,7 @@ def experiment_loop_worker(
         #     toolkit.wellplate.wells[new_experiment.well_id], new_experiment
         # )
         logger.error(error)
-        controller_slack.send_message(
-            "alert", f"PANDA_SDL encountered an error: {error}"
-        )
-
-        controller_slack.take_screenshot("alert", "webcam")
-        controller_slack.take_screenshot("alert", "vials")
-        controller_slack.send_message(
-            "alert",
-            "Please use the terminal move the mill to the rest position if safe to do so.",
-        )
-        input("Press enter to continue")
+        controller_slack.echem_error_procedure()
 
         raise error  # raise error to go to finally. We do not want the program to continue if there is an electochemistry error as it usually indicates a hardware or solutions issue
 

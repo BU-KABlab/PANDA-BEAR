@@ -23,6 +23,9 @@ ARG PYTHON_VERSION=3.10
 # Install Python 3.10
 RUN apt-get update && apt-get install -y python${PYTHON_VERSION} python3-pip && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Confrim the Python version
+RUN python --version
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
