@@ -191,59 +191,7 @@ class Vial2(Vessel):
         Inserts a new vial record into the 'vials' table in the db. This will be used by
         the vial_status view as the most recent vial status.
         """
-        # try:
-        #     execute_sql_command(
-        #         """
-        #         INSERT INTO vials (
-        #             name,
-        #             category,
-        #             position,
-        #             volume,
-        #             capacity,
-        #             density,
-        #             vial_coordinates,
-        #             radius,
-        #             height,
-        #             contamination,
-        #             contents,
-        #             viscosity_cp,
-        #             depth,
-        #             concentration
-        #         )
-        #         VALUES (
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?
-        #         )
-        #         """,
-        #         (
-        #             self.name,
-        #             self.category,
-        #             self.position,
-        #             self.volume,
-        #             self.capacity,
-        #             self.density,
-        #             str(asdict(self.coordinates)),
-        #             self.radius,
-        #             self.height,
-        #             self.contamination,
-        #             str(self.contents),
-        #             self.viscosity_cp,
-        #             self.depth,
-        #             self.concentration,
-        #         ),
-        #     )
+        
         try:
             with SessionLocal() as session:
                 vial = Vials(
