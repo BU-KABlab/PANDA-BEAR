@@ -282,8 +282,9 @@ def _forward_pipette_v3(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
     dst_vessel: Union[Well, WasteVial],
-    toolkit: Toolkit,
+    toolkit: Union[Toolkit,Hardware],
     source_concentration: float = None,
+    labware: Optional[Labware] = None,
 ) -> int:
     """
     Forward pipette from a given source to a given destination.
@@ -635,7 +636,7 @@ def rinse_v3(
         _forward_pipette_v3(
             volume=instructions.rinse_vol,
             src_vessel=instructions.rinse_sol_name,
-            dst_vessel=toolkit.wellplate.wells[instructions.well_id],
+            dst_vessel=instructions.well,
             toolkit=toolkit,
         )
         # toolkit.mill.safe_move(
@@ -647,7 +648,7 @@ def rinse_v3(
         # Clear the well
         _forward_pipette_v3(
             volume=instructions.rinse_vol,
-            src_vessel=toolkit.wellplate.wells[instructions.well_id],
+            src_vessel=instructions.well,
             dst_vessel=waste_selector(
                 "waste",
                 instructions.rinse_vol,
@@ -769,7 +770,6 @@ def purge_pipette(
     Move the pipette over an available waste vessel and purge its contents
 
     Args:
-        waste_vials (Sequence[WasteVial]): _description_
         mill (Union[Mill, MockMill]): _description_
         pump (Union[Pump, MockPump]): _description_
     """
@@ -1313,7 +1313,7 @@ def mix(
 # Not timed since it is a wrapper function
 def ca_deposition(
     soln_name: str,
-    instructions: EchemExperimentBase,
+    exp_obj: EchemExperimentBase,
     toolkit: Toolkit,
     custom_deposition_function: Optional[callable] = None,
     rinse_well_at_end: bool = True,
@@ -1337,37 +1337,37 @@ def ca_deposition(
 
     """
 
-    instructions.declare_step(f"Imaging the {instructions.well_id} Before Deposition", ExperimentStatus.IMAGING)
-    image_well(toolkit, instructions, "BeforeDeposition")
-    instructions.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
+    exp_obj.declare_step(f"Imaging the {exp_obj.well_id} Before Deposition", ExperimentStatus.IMAGING)
+    image_well(toolkit, exp_obj, "BeforeDeposition")
+    exp_obj.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
     _forward_pipette_v3(
-        volume=instructions.solutions[soln_name]["volume"],
+        volume=exp_obj.solutions[soln_name]["volume"],
         src_vessel=soln_name,
-        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=exp_obj.well,
         toolkit=toolkit,
-        source_concentration=instructions.solutions[soln_name]["concentration"],
+        source_concentration=exp_obj.solutions[soln_name]["concentration"],
     )
 
     ## Move the electrode to the well
-    instructions.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
+    exp_obj.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
 
     ## Move the electrode to the well
     # Move the electrode to above the well
     toolkit.mill.safe_move(
-        x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-        y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-        z_coord=toolkit.wellplate.z_top,
+        x_coord = exp_obj.well.coordinates.x,
+        y_coord=exp_obj.well.coordinates.y,
+        z_coord=exp_obj.well.coordinates.z_top,
         instrument=Instruments.ELECTRODE,
         second_z_cord=toolkit.wellplate.echem_height,
         second_z_cord_feed=100,
     )
 
-    instructions.declare_step("Performing CA", ExperimentStatus.CA)
+    exp_obj.declare_step("Performing CA", ExperimentStatus.CA)
     try:
         if custom_deposition_function:
-            custom_deposition_function(instructions, file_tag="CA_deposition")
+            custom_deposition_function(exp_obj, file_tag="CA_deposition")
         else:
-            chrono_amp(instructions, file_tag="CA_deposition")
+            chrono_amp(exp_obj, file_tag="CA_deposition")
 
     except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
         toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
@@ -1379,48 +1379,48 @@ def ca_deposition(
         raise e
 
     # Rinse electrode
-    instructions.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
+    exp_obj.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
     toolkit.mill.rinse_electrode(3)
 
     # Clear the well
-    instructions.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
+    exp_obj.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
     _forward_pipette_v3(
-        volume=toolkit.wellplate.wells[instructions.well_id].volume,
-        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        volume=exp_obj.well.volume,
+        src_vessel=exp_obj.well,
         dst_vessel=waste_selector(
             "waste",
-            toolkit.wellplate.wells[instructions.well_id].volume,
+            exp_obj.well.volume,
         ),
         toolkit=toolkit,
     )
 
-    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
-    instructions.set_status_and_save(ExperimentStatus.FLUSHING)
+    exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    exp_obj.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_v3(
-        flush_solution_name=instructions.flush_sol_name,
-        flush_volume=instructions.flush_vol,
-        flush_count=instructions.flush_count,
+        flush_solution_name=exp_obj.flush_sol_name,
+        flush_volume=exp_obj.flush_vol,
+        flush_count=exp_obj.flush_count,
         toolkit=toolkit,
     )
 
     if rinse_well_at_end:
-        instructions.declare_step(f"Rinsing the well {instructions.rinse_count}x with rinse",ExperimentStatus.RINSING)
+        exp_obj.declare_step(f"Rinsing the well {exp_obj.rinse_count}x with rinse",ExperimentStatus.RINSING)
         rinse_v3(
-            instructions=instructions,
+            instructions=exp_obj,
             toolkit=toolkit,
         )
 
-    instructions.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
+    exp_obj.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
+        instructions=exp_obj,
         step_description="AfterDeposition",
     )
     toolkit.global_logger.info("Deposition of %scomplete\n\n",soln_name)
 
 # Not timed since it is a wrapper function
 def pedotcv(
-    instructions: EchemExperimentBase,
+    exp_obj: EchemExperimentBase,
     toolkit: Toolkit,
     custom_cv_function: Optional[callable] = None,
     rinse_well_at_end: bool = True,
@@ -1442,17 +1442,17 @@ def pedotcv(
         toolkit (Toolkit): _description_
     """
     toolkit.global_logger.info(
-        "Running experiment %s part 4", instructions.experiment_id
+        "Running experiment %s part 4", exp_obj.experiment_id
     )
-    instructions.declare_step(
+    exp_obj.declare_step(
         "Imaging the well Before Characterization", ExperimentStatus.IMAGING
     )
-    image_well(toolkit, instructions, "Before_Characterizing")
+    image_well(toolkit, exp_obj, "Before_Characterizing")
 
-    instructions.declare_step("Depositing liclo4", ExperimentStatus.DEPOSITING)
-    char_soln_name = instructions.char_sol_name
-    char_soln_volume = instructions.char_vol
-    char_soln_concentration = instructions.char_concentration
+    exp_obj.declare_step("Depositing liclo4", ExperimentStatus.DEPOSITING)
+    char_soln_name = exp_obj.char_sol_name
+    char_soln_volume = exp_obj.char_vol
+    char_soln_concentration = exp_obj.char_concentration
 
     _forward_pipette_v3(
         volume=char_soln_volume,
@@ -1460,81 +1460,81 @@ def pedotcv(
             char_soln_name,
             char_soln_volume,
         ),
-        dst_vessel=toolkit.wellplate.wells[instructions.well_id],
+        dst_vessel=exp_obj.well,
         toolkit=toolkit,
         source_concentration=char_soln_concentration,
     )
 
     ## Move the electrode to the well
-    instructions.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
+    exp_obj.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
     try:
         ## Move the electrode to the well
         # Move the electrode to above the well
         toolkit.mill.safe_move(
-            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            x_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
             instrument=Instruments.ELECTRODE,
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
         )
 
-        instructions.declare_step("Performing CV", ExperimentStatus.CV)
+        exp_obj.declare_step("Performing CV", ExperimentStatus.CV)
         try:
             if custom_cv_function:
-                custom_cv_function(instructions, file_tag="CV_characterization")
+                custom_cv_function(exp_obj, file_tag="CV_characterization")
             else:
-                cyclic_volt(instructions, file_tag="CV_characterization")
+                cyclic_volt(exp_obj, file_tag="CV_characterization")
         except Exception as e:
             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
             raise e
     finally:
-        instructions.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
+        exp_obj.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well
-    instructions.declare_step(
+    exp_obj.declare_step(
         "Clearing well contents into waste", ExperimentStatus.CLEARING
     )
     _forward_pipette_v3(
-        volume=toolkit.wellplate.wells[instructions.well_id].volume,
-        src_vessel=toolkit.wellplate.wells[instructions.well_id],
+        volume=exp_obj.well.volume,
+        src_vessel=exp_obj.well,
         dst_vessel=waste_selector(
             "waste",
-            toolkit.wellplate.wells[instructions.well_id].volume,
+            exp_obj.well.volume,
         ),
         toolkit=toolkit,
     )
 
-    instructions.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
     flush_v3(
-        flush_solution_name=instructions.flush_sol_name,
-        flush_volume=instructions.flush_vol,
-        flush_count=instructions.flush_count,
+        flush_solution_name=exp_obj.flush_sol_name,
+        flush_volume=exp_obj.flush_vol,
+        flush_count=exp_obj.flush_count,
         toolkit=toolkit,
     )
 
-    instructions.declare_step(
+    exp_obj.declare_step(
         "Take image of well After_Characterizing", ExperimentStatus.IMAGING
     )
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
+        instructions=exp_obj,
         step_description="After_Characterizing",
     )
-    instructions.declare_step(
-        f"Rinsing the well {instructions.rinse_count}x with rinse",
+    exp_obj.declare_step(
+        f"Rinsing the well {exp_obj.rinse_count}x with rinse",
         ExperimentStatus.RINSING,
     )
     rinse_v3(
-        instructions=instructions,
+        instructions=exp_obj,
         toolkit=toolkit,
     )
 
-    instructions.declare_step("Take end image", ExperimentStatus.IMAGING)
+    exp_obj.declare_step("Take end image", ExperimentStatus.IMAGING)
     image_well(
         toolkit=toolkit,
-        instructions=instructions,
+        instructions=exp_obj,
         step_description="EndImage",
     )
     toolkit.global_logger.info("PEDOT characterizing complete\n\n")
