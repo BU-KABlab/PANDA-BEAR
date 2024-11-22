@@ -326,7 +326,7 @@ class Wellplate:
         """
         Initializes a new instance of the Wells2 class.
         """
-        self.wells: dict = {}
+        self.wells: dict[str, Well] = {}
         self.a1_x: float = x_a1
         self.a1_y: float = y_a1
         self.rows: str = rows
