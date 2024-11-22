@@ -291,6 +291,7 @@ def input_validation(
     allow_blank: bool = True,
     custom_error: str = None,
     menu_items: list = None,
+    exit_option: bool = False,
 ):
     """Prompt the user for input and validate the input type."""
 
@@ -298,10 +299,18 @@ def input_validation(
         custom_error if custom_error else "Invalid input type. Please try again."
     )
 
+    if exit_option:
+        prompt += " (Type 'exit' to exit the program)"
+        if menu_items:
+            menu_items.append("exit")
+
     while True:
         try:
             user_input = input(prompt).strip()
             if not user_input and allow_blank:
+                return None
+
+            if exit_option and user_input.lower() == "exit":
                 return None
 
             # Attempt to convert the input to each of the valid types
