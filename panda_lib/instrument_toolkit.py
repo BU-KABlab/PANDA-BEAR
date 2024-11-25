@@ -34,9 +34,9 @@ class Toolkit:
 class Hardware:
     """A class to hold all of the hawrdware"""
 
-    mill: Union[Mill, MockMill, None]
-    scale: Union[Scale, MockScale, None]
-    pump: Union[SyringePump, MockPump, None]
+    mill: Union[Mill, MockMill, None] = None
+    scale: Union[Scale, MockScale, None] = None
+    pump: Union[SyringePump, MockPump, None] = None
     flir_camera: PySpin.Camera = None
     arduino: ArduinoLink = None
     # inlcude the global logger so that the hardware can log to the same file

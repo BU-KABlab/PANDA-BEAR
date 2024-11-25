@@ -322,7 +322,8 @@ class Vials(Base):
     volume = Column(Float)
     capacity = Column(Integer)
     contamination = Column(Integer)
-    vial_coordinates = Column(String)
+    vial_coordinates = Column(JSON)
+    wall_thickness = Column(Float)
     updated = Column(String, default=dt.now(timezone.utc))
 
     def __repr__(self):
@@ -494,7 +495,7 @@ class VialStatus(Base):
     volume = Column(Float)
     capacity = Column(Integer)
     contamination = Column(Integer)
-    vial_coordinates = Column(String)
+    vial_coordinates = Column(JSON)
     updated = Column(String, default=dt.now(timezone.utc))
 
     def __repr__(self):

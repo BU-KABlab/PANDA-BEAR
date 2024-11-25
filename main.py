@@ -136,6 +136,7 @@ def run_sila_experiment_function():
             "hardware": hardware,
             "labware": labware,
             "status_queue": status_queue,
+            "command_queue": exp_cmd_queue,
             "process_id": ProcessIDs.CONTROL_LOOP,
             "specific_experiment_id": exp_id,
         },

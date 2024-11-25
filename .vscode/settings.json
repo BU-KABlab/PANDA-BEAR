@@ -2,8 +2,8 @@
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "python.formatting.provider": "Black",
     "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoSearchPaths": true,
     "githubPullRequests.ignoredPullRequestBranches": [
         "main"
     ],
@@ -21,7 +21,7 @@
             "database": "P:\\epanda_prod.db"
         },
         {
-            "previewLimit": 50,
+            "previewLimit": 100,
             "driver": "SQLite",
             "name": "test_db",
             "database": "test_db.db"

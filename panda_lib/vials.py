@@ -1120,7 +1120,8 @@ def import_vial_csv_file(filename: str = None) -> None:
     """
     if not filename:
         filename = file_picker("csv")
-
+    if not filename:
+        return
     with open(filename, "r", encoding="UTF-8") as file:
         csv_reader = csv.DictReader(file)
         vial_parameters = []

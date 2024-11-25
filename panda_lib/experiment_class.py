@@ -171,13 +171,27 @@ class ExperimentResult:
 
     experiment_id: int = None
     well_id: str = None
+    
+    # OCP CA
     ocp_ca_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_ca_passed: List[Tuple[bool, str]] = field(default_factory=list)
+    ocp_ca_data: List[Tuple[str, str]] = field(default_factory=list)
+    
+    # OCP CV
     ocp_cv_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_cv_passed: List[Tuple[bool, str]] = field(default_factory=list)
+    ocp_cv_data: List[Tuple[str, str]] = field(default_factory=list)
     ocp_cv_final_voltage: List[Tuple[float, str]] = field(default_factory=list)
+    
+    # CA
     ca_data_file: List[Tuple[Path, str]] = field(default_factory=list)
+    ca_data: List[Tuple[str, str]] = field(default_factory=list)
+    
+    #CV
     cv_data_file: List[Tuple[Path, str]] = field(default_factory=list)
+    cv_data: List[Tuple[str, str]] = field(default_factory=list)
+    
+    # Images
     images: List[Tuple[Path, str]] = field(default_factory=list)
     # deposition_plot_files: list[Path] = field(default_factory=list)
     # deposition_max_values: list[float] = field(default_factory=list)
@@ -194,6 +208,10 @@ class ExperimentResult:
         self.ocp_ca_passed.append((passed, context))
         self.ocp_cv_final_voltage.append((final_voltage, context))
 
+        with open(file, "r") as f:
+            # Save the contents of the file (it will be text) into the data list as one index of the list
+            self.ocp_ca_data.append((f.read(), context))
+
     def set_ocp_cv_file(
         self, file: Path, passed: bool, final_voltage: float, context: str = None
     ):
@@ -201,6 +219,10 @@ class ExperimentResult:
         self.ocp_cv_file.append((file, context))
         self.ocp_cv_passed.append((passed, context))
         self.ocp_cv_final_voltage.append((final_voltage, context))
+
+        with open(file, "r") as f:
+            # Save the contents of the file (it will be text) into the data list as one index of the list
+            self.ocp_cv_data.append((f.read(), context))
 
     def set_ca_data_file(
         self,
@@ -212,6 +234,10 @@ class ExperimentResult:
     ):
         """Set the file, the plot file, the max value, and the min value"""
         self.ca_data_file.append((file, context))
+
+        with open(file, "r") as f:
+            # Save the contents of the file (it will be text) into the data list as one index of the list
+            self.ca_data.append((f.read(), context))
         # if plot_file is not None:
         #     self.deposition_plot_files.append(plot_file)
         # if max_value is not None:
@@ -229,6 +255,11 @@ class ExperimentResult:
     ):
         """Set the file, the plot file, the max value, and the min value"""
         self.cv_data_file.append((file, context))
+
+        with open(file, "r") as f:
+            # Save the contents of the file (it will be text) into the data list as one index of the list
+            self.cv_data.append((f.read(), context))
+
         # if plot_file is not None:
         #     self.characterization_plot_files.append(plot_file)
         # if max_value is not None:
