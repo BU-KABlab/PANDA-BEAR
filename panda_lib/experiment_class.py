@@ -393,7 +393,7 @@ class ExperimentBase:
         deprecated=True,
     )
     plate_id: Optional[int] = Field(
-        default=0,
+        default=None,
         title="Plate ID",
         description="Identifier for the plate used in the experiment",
     )

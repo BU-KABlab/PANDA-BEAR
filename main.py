@@ -505,7 +505,7 @@ def update_well_status():
     sql_wellplate.update_well_status(well_id, wellplate_id, status)
 
 
-def list_analysis_scrip_ids():
+def list_analysis_script_ids():
     """List the analysis script IDs in the database."""
     analyzers = load_analyzers()
     print("Analysis Script IDs:")
@@ -546,7 +546,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "9": test_pipette,
         "10": start_analsyis_loop,
         "11": stop_analysis_loop,
-        "12": list_analysis_scrip_ids,
+        "12": list_analysis_script_ids,
         "t": toggle_testing_mode,
         "r": refresh,
         "w": show_warrenty,
@@ -555,10 +555,24 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "q": exit_program,
     }
 
+    missing_labware = check_essential_labware()
+
     if reduced:
         # Remove the blocking options
         for key in blocking_choices:
             menu_options.pop(key, None)
+
+    if missing_labware:
+        # Prevent experiments from being run and prevent generation of experiments
+        for key in experiment_choices:
+            menu_options.pop(key, None)
+        additional_blocked = ["4.1", "3.0", "3.1", "3.2", "3.3", "1.1", "1.2", "1.3"]
+        for key in additional_blocked:
+            menu_options.pop(key, None)
+
+        print(f"""Missing essential labware:
+{', '.join(missing_labware)}
+Experiments and generation are disabled until the labware is present.""")
 
     while True:
         print("\nWhat would you like to do?")
@@ -668,6 +682,34 @@ def get_active_db():
         return read_config()["PRODUCTION"]["production_db_address"]
 
 
+def check_essential_labware():
+    """Check if the essential labware is present."""
+    missing = []
+
+    # Check if the stock and waste vials are present
+    stock_vials, waste_vials = vials.read_vials()
+    if not stock_vials:
+        missing.append("stock vials")
+
+    if not waste_vials:
+        missing.append("waste vials")
+
+    # Check if the wellplate is present
+    wellplate_id, _, new_wells = wellplate.read_current_wellplate_info()
+    if not wellplate_id:
+        missing.append("wellplate")
+
+    if new_wells is None or new_wells == 0:
+        missing.append("new wells")
+
+    # Check if the pipette is present
+    current_pipette = pipette.select_pipette_status()
+    if not current_pipette:
+        missing.append("pipette")
+
+    return missing
+
+
 if __name__ == "__main__":
     config = read_config()
     slackThread_running.set()
@@ -707,10 +749,11 @@ Process Status:
     Slack Bot: {slackThread_running.is_set()}
 """
             )
+
             # Get the function name and the choice key, reducing the options
             # if the experiment loop is running.
             function_name, choice_key = main_menu(
-                exp_loop_prcss.is_alive() if exp_loop_prcss else False
+                exp_loop_prcss.is_alive() if exp_loop_prcss else False,
             )
 
             try:

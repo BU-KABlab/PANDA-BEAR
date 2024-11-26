@@ -20,10 +20,10 @@ from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import (
     ExperimentParameters,
     Experiments,
-    WellHx,
-    WellPlates,
     MillConfig,
     PlateTypes,
+    WellHx,
+    WellPlates,
 )
 from .vessel import Vessel, VesselCoordinates
 
@@ -1060,7 +1060,7 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
     Returns:
         int: The current wellplate id
         int: The current wellplate type number
-        bool: Number of new wells
+        int: Number of new wells
     """
     current_plate_id, current_type_number, _ = (
         sql_wellplate.select_current_wellplate_info()
