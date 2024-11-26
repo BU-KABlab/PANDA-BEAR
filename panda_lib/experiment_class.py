@@ -8,7 +8,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple, Union, get_type_hints
 
-from pydantic import ConfigDict, RootModel, ValidationError, Field, field_validator
+from pydantic import ConfigDict, Field, RootModel, field_validator
 from pydantic.dataclasses import dataclass
 
 from panda_lib.config.config_tools import read_config
@@ -25,6 +25,7 @@ from panda_lib.sql_tools.panda_models import (
     WellHx,
     WellPlates,
 )
+
 global_logger = setup_default_logger(log_name="panda")
 experiment_logger = setup_default_logger(log_name="experiment_logger")
 config = read_config()
@@ -171,26 +172,26 @@ class ExperimentResult:
 
     experiment_id: int = None
     well_id: str = None
-    
+
     # OCP CA
     ocp_ca_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_ca_passed: List[Tuple[bool, str]] = field(default_factory=list)
     ocp_ca_data: List[Tuple[str, str]] = field(default_factory=list)
-    
+
     # OCP CV
     ocp_cv_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_cv_passed: List[Tuple[bool, str]] = field(default_factory=list)
     ocp_cv_data: List[Tuple[str, str]] = field(default_factory=list)
     ocp_cv_final_voltage: List[Tuple[float, str]] = field(default_factory=list)
-    
+
     # CA
     ca_data_file: List[Tuple[Path, str]] = field(default_factory=list)
     ca_data: List[Tuple[str, str]] = field(default_factory=list)
-    
-    #CV
+
+    # CV
     cv_data_file: List[Tuple[Path, str]] = field(default_factory=list)
     cv_data: List[Tuple[str, str]] = field(default_factory=list)
-    
+
     # Images
     images: List[Tuple[Path, str]] = field(default_factory=list)
     # deposition_plot_files: list[Path] = field(default_factory=list)
@@ -314,35 +315,144 @@ class ExperimentResult:
 class ExperimentBase:
     """Define the common data used to run and define an experiment"""
 
-    experiment_id: int = Field(default=0, title="Experiment ID", description="Unique identifier for the experiment")
-    experiment_name: str = Field(default="experiment", title="Experiment Name", description="Name of the experiment")
-    protocol_id: Union[int, str] = Field(default=999, title="Protocol ID", description="Identifier for the protocol used in the experiment")
-    priority: Optional[int] = Field(default=0, title="Priority", description="Priority level of the experiment")
-    well_id: Optional[str] = Field(default="A1", title="Well ID", description="Identifier for the well used in the experiment")
-    pin: Union[str, int] = Field(default=0, title="PIN", description="Personal Identification Number associated with the experiment")
-    project_id: int = Field(default=999, title="Project ID", description="Identifier for the project associated with the experiment")
-    solutions: dict[str, dict[str, Union[int, float]]] = Field(default={}, title="Solutions", description="Dictionary of solutions used in the experiment")
-    well_type_number: int = Field(default=None, title="Well Type Number", description="Type number of the well used in the experiment")
-    pumping_rate: float = Field(default=0.3, title="Pumping Rate", description="Rate at which the solution is pumped")
-    status: ExperimentStatus = Field(default=ExperimentStatus.NEW, title="Status", description="Current status of the experiment")
-    status_date: datetime = Field(default_factory=datetime.now, title="Status Date", description="Date and time when the status was last updated")
-    filename: str = Field(default=f"{experiment_id}_{experiment_name}", title="Filename", description="Filename associated with the experiment data")
-    results: Optional[ExperimentResult] = Field(default=None, title="Results", description="Results of the experiment")
-    project_campaign_id: int = Field(default=0, title="Project Campaign ID", description="Identifier for the project campaign associated with the experiment")
-    protocol_type: int = Field(default=1, title="Protocol Type", description="Type of protocol used in the experiment", deprecated=True)
-    plate_id: Optional[int] = Field(default=0, title="Plate ID", description="Identifier for the plate used in the experiment")
-    override_well_selection: int = Field(default=0, title="Override Well Selection", description="Flag to override well selection (0 is normal, 1 is override)")
-    process_type: Optional[int] = Field(default=1, title="Process Type", description="Type of process used in the experiment", deprecated=True)
-    jira_issue_key: Optional[str] = Field(default=None, title="JIRA Issue Key", description="JIRA issue key associated with the experiment", deprecated=True)
-    experiment_type: int = Field(default=0, title="Experiment Type", description="Type of experiment", deprecated=True)
-    well: object = Field(default=None, title="Well", description="Well object associated with the experiment")
-    analyzer: Union[Callable, str, None] = Field(default=None, title="Analyzer", description="Analyzer function or script used for the experiment")
-    generator: Union[Callable, str, None] = Field(default=None, title="Generator", description="Generator function or script used for the experiment")
-    analysis_id: int = Field(default=0, title="Analysis ID", description="Identifier for the analysis associated with the experiment")
-    needs_analysis: int = Field(default=0, title="Needs Analysis", description="Flag indicating if the experiment needs analysis")
-    steps: int = Field(default=0, title="Steps", description="Number of steps completed in the experiment",exclude=True)
+    experiment_id: int = Field(
+        default=0,
+        title="Experiment ID",
+        description="Unique identifier for the experiment",
+    )
+    experiment_name: str = Field(
+        default="experiment",
+        title="Experiment Name",
+        description="Name of the experiment",
+    )
+    protocol_id: Union[int, str] = Field(
+        default=999,
+        title="Protocol ID",
+        description="Identifier for the protocol used in the experiment",
+    )
+    priority: Optional[int] = Field(
+        default=0, title="Priority", description="Priority level of the experiment"
+    )
+    well_id: Optional[str] = Field(
+        default="A1",
+        title="Well ID",
+        description="Identifier for the well used in the experiment",
+    )
+    pin: Union[str, int] = Field(
+        default=0,
+        title="PIN",
+        description="Personal Identification Number associated with the experiment",
+    )
+    project_id: int = Field(
+        default=999,
+        title="Project ID",
+        description="Identifier for the project associated with the experiment",
+    )
+    solutions: dict[str, dict[str, Union[int, float]]] = Field(
+        default={},
+        title="Solutions",
+        description="Dictionary of solutions used in the experiment",
+    )
+    well_type_number: int = Field(
+        default=None,
+        title="Well Type Number",
+        description="Type number of the well used in the experiment",
+    )
+    pumping_rate: float = Field(
+        default=0.3,
+        title="Pumping Rate",
+        description="Rate at which the solution is pumped",
+    )
+    status: ExperimentStatus = Field(
+        default=ExperimentStatus.NEW,
+        title="Status",
+        description="Current status of the experiment",
+    )
+    status_date: datetime = Field(
+        default_factory=datetime.now,
+        title="Status Date",
+        description="Date and time when the status was last updated",
+    )
+    filename: str = Field(
+        default=f"{experiment_id}_{experiment_name}",
+        title="Filename",
+        description="Filename associated with the experiment data",
+    )
+    results: Optional[ExperimentResult] = Field(
+        default=None, title="Results", description="Results of the experiment"
+    )
+    project_campaign_id: int = Field(
+        default=0,
+        title="Project Campaign ID",
+        description="Identifier for the project campaign associated with the experiment",
+    )
+    protocol_type: int = Field(
+        default=1,
+        title="Protocol Type",
+        description="Type of protocol used in the experiment",
+        deprecated=True,
+    )
+    plate_id: Optional[int] = Field(
+        default=0,
+        title="Plate ID",
+        description="Identifier for the plate used in the experiment",
+    )
+    override_well_selection: int = Field(
+        default=0,
+        title="Override Well Selection",
+        description="Flag to override well selection (0 is normal, 1 is override)",
+    )
+    process_type: Optional[int] = Field(
+        default=1,
+        title="Process Type",
+        description="Type of process used in the experiment",
+        deprecated=True,
+    )
+    jira_issue_key: Optional[str] = Field(
+        default=None,
+        title="JIRA Issue Key",
+        description="JIRA issue key associated with the experiment",
+        deprecated=True,
+    )
+    experiment_type: int = Field(
+        default=0,
+        title="Experiment Type",
+        description="Type of experiment",
+        deprecated=True,
+    )
+    well: object = Field(
+        default=None,
+        title="Well",
+        description="Well object associated with the experiment",
+    )
+    analyzer: Union[Callable, str, None] = Field(
+        default=None,
+        title="Analyzer",
+        description="Analyzer function or script used for the experiment",
+    )
+    generator: Union[Callable, str, None] = Field(
+        default=None,
+        title="Generator",
+        description="Generator function or script used for the experiment",
+    )
+    analysis_id: int = Field(
+        default=0,
+        title="Analysis ID",
+        description="Identifier for the analysis associated with the experiment",
+    )
+    needs_analysis: int = Field(
+        default=0,
+        title="Needs Analysis",
+        description="Flag indicating if the experiment needs analysis",
+    )
+    steps: int = Field(
+        default=0,
+        title="Steps",
+        description="Number of steps completed in the experiment",
+        exclude=True,
+    )
 
-    @field_validator('experiment_name')
+    @field_validator("experiment_name")
     def validate_experiment_name(cls, value):
         if value:
             return value.lower()
@@ -356,7 +466,6 @@ class ExperimentBase:
             self.solutions = {
                 key.lower(): value for key, value in self.solutions.items()
             }
-        
 
     @property
     def experiment_identifier(self):
@@ -611,13 +720,17 @@ class ExperimentBase:
                 setattr(
                     self.__class__, parameter.parameter_name, parameter.parameter_value
                 )
+
     def increment_steps(self):
         self.steps += 1
-    def declare_step(self,step: str, status:ExperimentStatus)-> str:
+
+    def declare_step(self, step: str, status: ExperimentStatus) -> str:
         """Handle setting the status"""
         global_logger.info("%d. %s", self.steps, step)
         self.increment_steps()
         self.set_status_and_save(status)
+
+
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class CorrectionFactorExperiment(ExperimentBase):
     """Define the data that is used to run an experiment"""
@@ -640,7 +753,7 @@ class EchemExperimentBase(ExperimentBase):
     baseline: int = 0  # Baseline
 
     flush_sol_name: str = ""  # Flush solution name
-    flush_vol: Union[int,float] = 0  # Flush solution volume
+    flush_vol: Union[int, float] = 0  # Flush solution volume
     flush_count: int = 3  # Flush solution concentration
 
     mix = 0  # Binary mix or dont mix
@@ -763,6 +876,7 @@ class PEDOTExperiment(EchemExperimentBase):
 
     project_id: int = 16
     well_type_number: int = 4  # ito
+
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
 class FeCnVerificationExperiment(EchemExperimentBase):
@@ -936,7 +1050,7 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
 
 
 def select_experiment_paramaters(
-    experiment_to_select: Union[int, EchemExperimentBase],
+    experiment_to_select: Union[int, EchemExperimentBase], return_object: bool = False
 ) -> Union[list, EchemExperimentBase]:
     """
     Selects the experiment parameters from the experiment_parameters table.
@@ -950,6 +1064,8 @@ def select_experiment_paramaters(
     """
     if isinstance(experiment_to_select, int):
         experiment_id = experiment_to_select
+        if return_object:
+            experiment_object = EchemExperimentBase()
         experiment_object = None
     else:
         experiment_id = experiment_to_select.experiment_id
@@ -1021,6 +1137,28 @@ def select_experiment_status(experiment_id: int) -> str:
     if result == []:
         return ValueError("No experiment found with that ID")
     return result[0][0]
+
+
+def select_complete_experiment_information(experiment_id: int) -> ExperimentBase:
+    """
+    Selects the experiment information and parameters from the experiments and experiment_parameters tables.
+
+    Args:
+        experiment_id (int): The experiment ID.
+
+    Returns:
+        ExperimentBase: The experiment information and parameters.
+    """
+
+    experiment = select_experiment_information(experiment_id)
+    if experiment is None:
+        return None
+
+    experiment = select_experiment_paramaters(experiment)
+    if experiment is None:
+        return None
+
+    return experiment
 
 
 def insert_experiment(experiment: ExperimentBase) -> None:
@@ -1325,8 +1463,7 @@ def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
     """
 
     with SessionLocal() as session:
-
-        if isinstance(entry.result_value,Path):
+        if isinstance(entry.result_value, Path):
             # Turn the Path object into a string
             entry.result_value = str(entry.result_value)
         session.add(

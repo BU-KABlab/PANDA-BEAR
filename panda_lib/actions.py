@@ -28,14 +28,13 @@ import math
 # Third party or custom imports
 from pathlib import Path
 from typing import Optional, Tuple, Union
+
 from PIL import Image
 
-# First party imports
-from panda_lib.imaging import capture_new_image, add_data_zone, image_filepath_generator
 from panda_lib.config.config_tools import (
-    read_testing_config,
-    read_config,
     ConfigParserError,
+    read_config,
+    read_testing_config,
 )
 from panda_lib.correction_factors import correction_factor
 from panda_lib.errors import (
@@ -50,14 +49,17 @@ from panda_lib.experiment_class import (
     ExperimentBase,
     ExperimentStatus,
 )
+
+# First party imports
+from panda_lib.imaging import add_data_zone, capture_new_image, image_filepath_generator
+from panda_lib.instrument_toolkit import Hardware, Labware, Toolkit
 from panda_lib.log_tools import timing_wrapper
 from panda_lib.movement import Instruments, Mill, MockMill
-from panda_lib.obs_controls import OBSController, MockOBSController
+from panda_lib.obs_controls import MockOBSController, OBSController
 from panda_lib.syringepump import MockPump, SyringePump
-from panda_lib.instrument_toolkit import Toolkit, Hardware, Labware
-from panda_lib.vials import StockVial, WasteVial, read_vials, Vessel, Vial2
-from panda_lib.wellplate import Well
 from panda_lib.utilities import solve_vials_ilp
+from panda_lib.vials import StockVial, Vessel, Vial2, WasteVial, read_vials
+from panda_lib.wellplate import Well
 
 TESTING = read_testing_config()
 
@@ -282,7 +284,7 @@ def _forward_pipette_v3(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
     dst_vessel: Union[Well, WasteVial],
-    toolkit: Union[Toolkit,Hardware],
+    toolkit: Union[Toolkit, Hardware],
     source_concentration: float = None,
     labware: Optional[Labware] = None,
 ) -> int:
@@ -340,16 +342,25 @@ def _forward_pipette_v3(
             if not selected_source_vessels:
                 toolkit.global_logger.error("No %s vials available", src_vessel)
                 raise ValueError(f"No {src_vessel} vials available")
-            
+
             # If the source concentration is not provided, raise an error
             if source_concentration is None:
-                toolkit.global_logger.error("Source concentration not provided")
+                toolkit.global_logger.warning(
+                    "Source concentration not provided, using database value"
+                )
                 if selected_source_vessels[0].category == 0:
                     try:
-                        source_concentration = float(selected_source_vessels[0].concentration)
+                        source_concentration = float(
+                            selected_source_vessels[0].concentration
+                        )
                     except ValueError:
-                        raise ValueError("Source concentration not provided")
-   
+                        toolkit.global_logger.error(
+                            "Source concentration not provided and not available in the database"
+                        )
+                        raise ValueError(
+                            "Source concentration not provided and not available in the database"
+                        )
+
             # There are one or more vials, let's calculate the volume to be pipetted from each
             # vial to get the desired volume and concentration
             source_vessel_volumes, deviation, volumes_by_position = solve_vials_ilp(
@@ -403,7 +414,9 @@ def _forward_pipette_v3(
                 raise ValueError("Cannot pipette from a well to a stock vial")
             if isinstance(origin_vessel, WasteVial) and isinstance(dst_vessel, Well):
                 raise ValueError("Cannot pipette from a waste vial to a well")
-            if isinstance(origin_vessel, StockVial) and isinstance(dst_vessel, StockVial):
+            if isinstance(origin_vessel, StockVial) and isinstance(
+                dst_vessel, StockVial
+            ):
                 raise ValueError("Cannot pipette from a stock vial to a stock vial")
 
         # Cycle through the source_vials and pipette the volumes
@@ -418,7 +431,7 @@ def _forward_pipette_v3(
                 )
             except ZeroDivisionError:
                 continue
-            
+
             # We correct the volume for the viscosity of the solution at this point
             # to ensure that the correct volume is withdrawn but also to ensure that the same
             # volume is sent to the pump for deposition so that the pump returns to the same position
@@ -544,15 +557,18 @@ def _forward_pipette_v3(
         raise e
     return 0
 
+
 # No timer wrapper for this function since its a wrapper itself
 def transfer(
-        volume: float,
+    volume: float,
     src_vessel: Union[str, Well, StockVial],
     dst_vessel: Union[Well, WasteVial],
     toolkit: Toolkit,
     source_concentration: float = None,
 ) -> int:
-    return _forward_pipette_v3(volume, src_vessel, dst_vessel, toolkit, source_concentration)    
+    return _forward_pipette_v3(
+        volume, src_vessel, dst_vessel, toolkit, source_concentration
+    )
 
 
 @timing_wrapper
@@ -608,6 +624,7 @@ def __rinse_v2(
 
     return 0
 
+
 @timing_wrapper
 def rinse_v3(
     instructions: EchemExperimentBase,
@@ -657,6 +674,7 @@ def rinse_v3(
         )
 
     return 0
+
 
 @timing_wrapper
 def __flush_v2(
@@ -760,6 +778,7 @@ def flush_v3(
     else:
         logger.info("No flushing required. Flush volume is 0. Continuing...")
     return 0
+
 
 @timing_wrapper
 def purge_pipette(
@@ -1310,6 +1329,7 @@ def mix(
     mill.move_to_safe_position()
     return 0
 
+
 # Not timed since it is a wrapper function
 def ca_deposition(
     soln_name: str,
@@ -1337,7 +1357,9 @@ def ca_deposition(
 
     """
 
-    exp_obj.declare_step(f"Imaging the {exp_obj.well_id} Before Deposition", ExperimentStatus.IMAGING)
+    exp_obj.declare_step(
+        f"Imaging the {exp_obj.well_id} Before Deposition", ExperimentStatus.IMAGING
+    )
     image_well(toolkit, exp_obj, "BeforeDeposition")
     exp_obj.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
     _forward_pipette_v3(
@@ -1354,7 +1376,7 @@ def ca_deposition(
     ## Move the electrode to the well
     # Move the electrode to above the well
     toolkit.mill.safe_move(
-        x_coord = exp_obj.well.coordinates.x,
+        x_coord=exp_obj.well.coordinates.x,
         y_coord=exp_obj.well.coordinates.y,
         z_coord=exp_obj.well.coordinates.z_top,
         instrument=Instruments.ELECTRODE,
@@ -1404,7 +1426,10 @@ def ca_deposition(
     )
 
     if rinse_well_at_end:
-        exp_obj.declare_step(f"Rinsing the well {exp_obj.rinse_count}x with rinse",ExperimentStatus.RINSING)
+        exp_obj.declare_step(
+            f"Rinsing the well {exp_obj.rinse_count}x with rinse",
+            ExperimentStatus.RINSING,
+        )
         rinse_v3(
             instructions=exp_obj,
             toolkit=toolkit,
@@ -1416,7 +1441,8 @@ def ca_deposition(
         instructions=exp_obj,
         step_description="AfterDeposition",
     )
-    toolkit.global_logger.info("Deposition of %scomplete\n\n",soln_name)
+    toolkit.global_logger.info("Deposition of %scomplete\n\n", soln_name)
+
 
 # Not timed since it is a wrapper function
 def pedotcv(
@@ -1441,9 +1467,7 @@ def pedotcv(
         instructions (EchemExperimentBase): _description_
         toolkit (Toolkit): _description_
     """
-    toolkit.global_logger.info(
-        "Running experiment %s part 4", exp_obj.experiment_id
-    )
+    toolkit.global_logger.info("Running experiment %s part 4", exp_obj.experiment_id)
     exp_obj.declare_step(
         "Imaging the well Before Characterization", ExperimentStatus.IMAGING
     )
@@ -1493,9 +1517,7 @@ def pedotcv(
         toolkit.mill.rinse_electrode(3)
 
     # Clear the well
-    exp_obj.declare_step(
-        "Clearing well contents into waste", ExperimentStatus.CLEARING
-    )
+    exp_obj.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
     _forward_pipette_v3(
         volume=exp_obj.well.volume,
         src_vessel=exp_obj.well,
@@ -1538,6 +1560,7 @@ def pedotcv(
         step_description="EndImage",
     )
     toolkit.global_logger.info("PEDOT characterizing complete\n\n")
+
 
 if __name__ == "__main__":
     pass

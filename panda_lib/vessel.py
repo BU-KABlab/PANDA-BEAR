@@ -3,8 +3,9 @@ Vessel module.
 """
 
 from dataclasses import dataclass
-from typing import Union, Optional
-from panda_lib.errors import OverFillException, OverDraftException
+from typing import Optional, Union
+
+from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.log_tools import setup_default_logger
 
 # Set up the logger
@@ -54,6 +55,15 @@ class VesselCoordinates:
     def __getitem__(self, key: str) -> Union[int, float]:
         """Allows subscripting the WellCoordinates for attributes."""
         return getattr(self, key)
+
+    def as_json(self):
+        """Returns the VesselCoordinates as a dictionary with double quotes."""
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z_top": self.z_top,
+            "z_bottom": self.z_bottom,
+        }
 
 
 class Vessel:

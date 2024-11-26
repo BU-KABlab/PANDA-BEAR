@@ -19,6 +19,7 @@ Otherwise the experiment is not in the queue.
 
 # from panda_lib.sql_tools.sql_utilities import execute_sql_command, execute_sql_command_no_return
 import random
+
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import Queue
 
@@ -50,7 +51,7 @@ def select_queue() -> list:
 
 def get_next_experiment_from_queue(
     random_pick: bool = False, specific_experiment_id: int = None
-) -> tuple[int, int, str]:
+) -> tuple[int, int, str, int, int]:
     """
     Reads the next experiment from the queue table, the experiment with the
     highest priority (lowest value).
@@ -66,7 +67,7 @@ def get_next_experiment_from_queue(
         specific_experiment_id (int): The experiment ID to select.
 
     Returns:
-        tuple: The experiment ID, the process type, and the filename.
+        tuple: The experiment ID, process type, filename, project ID, and well ID.
     """
 
     if specific_experiment_id:
