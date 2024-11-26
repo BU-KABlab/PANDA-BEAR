@@ -21,7 +21,6 @@ PANDA SDL depends on Python 3.10 (3.11 does not work due to FLIR's PySpin being 
 
 ```pip install -r requirements.txt```
 
-
 ## Third Party / Proprietary Dependencies
 
 The project depends on one proprietary dependency from Teledyne FLIR for the imaging. See the README file in panda_sdl/flir_camera directory for installation isntructions.
@@ -52,4 +51,4 @@ PANDA SDL has the ability to use OBS to  record the system during experiments.
 
 PANDA SDL uses the integrated OBS webserver for control. To set it up, goto Tools/WebSocket Server Settings and fill in the desired server port and password. Note: The OBS application could be running on a serperate computer so long as the two computers are accessible over a network.
 
-The default "Scene" can be found in the repository and loaded into OBS. The SlackBot screenshot method relies on the source names to know which video feed to use, so update either one as needed.
+The default "Scene" can be found in the repository as 'OBS Scene.json' and loaded into OBS. The SlackBot screenshot method relies on the source names to know which video feed to use, so update either one as needed.

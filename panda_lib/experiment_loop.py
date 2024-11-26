@@ -435,9 +435,10 @@ def experiment_loop_worker(
 
 def sila_experiment_loop_worker(
     specific_experiment_id: Optional[int] = None,
+    specific_well_id: Optional[str] = None,
     process_id: Optional[int] = None,
-    status_queue: multiprocessing.Queue = multiprocessing.Queue(),
-    command_queue: multiprocessing.Queue = multiprocessing.Queue(),
+    status_queue: multiprocessing.Queue = None,
+    command_queue: multiprocessing.Queue = None,
 ) -> None:
     """
     Main worker function to execute SILA experiments.
@@ -480,7 +481,7 @@ def sila_experiment_loop_worker(
             actions.purge_pipette(hardware.mill, hardware.pump)
         # This also validates the experiment parameters since its a pydantic object
         exp_obj: EchemExperimentBase = _initialize_experiment(
-            specific_experiment_id, hardware, labware, exp_logger
+            specific_experiment_id, hardware, labware, exp_logger, specific_well_id
         )
 
         ## Check that there is enough volume in the stock vials to run the experiment
@@ -799,7 +800,12 @@ def check_stock_vials(
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
     for solution in experiment.solutions:
         solution_lwr = str(solution).lower()
-        volume_required = experiment.solutions[solution]["volume"]
+        vol = experiment.solutions[solution]["volume"]
+        try:
+            rep = experiment.solutions[solution]["repetitions"]
+        except KeyError:
+            rep = 1
+        volume_required = vol * rep
         volume_available = sum(
             [
                 vial.volume
