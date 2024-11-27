@@ -583,7 +583,9 @@ def _initialize_experiment(
     exp_obj = select_complete_experiment_information(exp_id)
 
     # TODO: this is silly but we need to reference the queue to get the well_id because the experiment object isn't updated with the correct target well_id
-    _, _, _, _, well_id = sql_queue.get_next_experiment_from_queue(exp_id)
+    _, _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
+        specific_experiment_id=exp_id
+    )
     # TODO: Replace with checking for available well, unless given one.
 
     exp_obj.well_id = well_id
@@ -802,7 +804,7 @@ def check_stock_vials(
         solution_lwr = str(solution).lower()
         vol = experiment.solutions[solution]["volume"]
         try:
-            rep = experiment.solutions[solution]["repetitions"]
+            rep = experiment.solutions[solution]["repeated"]
         except KeyError:
             rep = 1
         volume_required = vol * rep
