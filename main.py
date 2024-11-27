@@ -575,16 +575,23 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
 Experiments and generation are disabled until the labware is present.""")
 
     while True:
-        print("\nWhat would you like to do?")
-        for key, value in menu_options.items():
-            print(f"{key}. {value.__name__.replace('_', ' ').title()}")
+        menu_items = list(menu_options.items())
+        half = len(menu_items) // 2 + len(menu_items) % 2
 
+        for i in range(half):
+            left = f"{menu_items[i][0]}. {menu_items[i][1].__name__.replace('_', ' ').title()}"
+            right = (
+                f"{menu_items[i + half][0]}. {menu_items[i + half][1].__name__.replace('_', ' ').title()}"
+                if i + half < len(menu_items)
+                else ""
+            )
+            print(f"{left:<40} {right}")
         user_choice = input("Enter the number of your choice: ").strip().lower()
+
         if user_choice in menu_options:
             return menu_options[user_choice], user_choice
         input("Invalid choice. Please try again.")
         refresh()
-        continue
 
 
 def get_process_status(process_status_queue: Queue, process_id, current_status=None):
