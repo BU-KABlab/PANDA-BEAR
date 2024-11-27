@@ -1,8 +1,8 @@
 """Useful functions and dataclasses for the project."""
 
 import dataclasses
-from enum import Enum
 import tkinter as tk
+from enum import Enum
 from tkinter import filedialog
 
 import pulp
@@ -83,6 +83,7 @@ class Instruments(Enum):
 
 class SystemState(Enum):
     """Class for naming of the system states."""
+
     STARTUP = "startup"
     PIPETTE_PURGE = "pipette_purge"
     EXPERIMENT_LOOKUP = "experiment_lookup"
@@ -133,11 +134,12 @@ def solve_vials_ilp(
     vial_vol_by_location : dict of str,floats - Volumes of each vial to achieve the target.
     """
     if len(vial_concentration_map) == 1:
-        
         deviation_value = abs(next(iter(vial_concentration_map.values())) - c_target)
         if deviation_value == 0:
             vial_vol_by_conc = {next(iter(vial_concentration_map.keys())): v_total}
-            vial_vol_by_location = {position: v_total for position in vial_concentration_map}
+            vial_vol_by_location = {
+                position: v_total for position in vial_concentration_map
+            }
         else:
             vial_vol_by_conc = None
             vial_vol_by_location = None
@@ -154,12 +156,18 @@ def solve_vials_ilp(
     # Before solving the problem, check if the target concentration is already achievable with the given vials
     if c_target in vial_concentrations:
         vial_with_target_concentration = next(
-            (position for position, concentration in vial_concentration_map.items() if concentration == c_target),
+            (
+                position
+                for position, concentration in vial_concentration_map.items()
+                if concentration == c_target
+            ),
             None,
         )
         if vial_with_target_concentration:
-            vial_vol_by_conc = {c_target: v_total} 
-            vial_vol_by_location = {position: v_total for position in vial_concentration_map}
+            vial_vol_by_conc = {c_target: v_total}
+            vial_vol_by_location = {
+                position: v_total for position in vial_concentration_map
+            }
             for position in vial_concentration_map:
                 # Set the volume of all vials to 0 except the vial with the target concentration
                 if position != vial_with_target_concentration:
@@ -335,6 +343,10 @@ def input_validation(
                 )
 
             # Check if the converted input is in the specified menu items
+            # But first lowercase all menu items and the converted input
+            if menu_items and valid_types is str:
+                menu_items = [item.lower() for item in menu_items]
+                converted_input = converted_input.lower()
             if menu_items and converted_input not in menu_items:
                 raise ValueError(
                     f"Input must be one of the following: {', '.join(menu_items)}."
