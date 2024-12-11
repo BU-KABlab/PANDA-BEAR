@@ -6,11 +6,12 @@ import re
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
-from panda_lib.config import read_logging_dir
-from .logger import set_up_mill_logger
-from .driver import Mill as RealMill
 
-logger = set_up_mill_logger(read_logging_dir())
+from .driver import Mill as RealMill
+from .logger import set_up_mill_logger
+from .tools import Coordinates, ToolManager
+
+logger = set_up_mill_logger(__name__)
 
 
 class MockMill(RealMill):
@@ -51,10 +52,11 @@ class MockMill(RealMill):
     def __init__(self, config_file="configuration.json"):
         super().__init__(config_file)
         self.ser_mill: MockSerialToMill = self.connect_to_mill()
-        self.current_x = 0.0
-        self.current_y = 0.0
-        self.current_z = 0.0
-        self.feed_rate = 2000
+        self.homed = False
+        self.active_connection = False
+        self.tool_manager: ToolManager = ToolManager()
+        self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
+        self.safe_floor_height = -85.0
 
     def connect_to_mill(self):
         """Connect to the mill"""

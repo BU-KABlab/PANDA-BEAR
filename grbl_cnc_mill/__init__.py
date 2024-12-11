@@ -5,6 +5,6 @@ VERSION = "1.0.0"
 
 from .driver import Mill
 from .exceptions import *
-from .instruments import Instruments
 from .mock import MockMill
 from .status_codes import AlarmStatus, ErrorCodes, Status
+from .tools import Coordinates, ToolManager

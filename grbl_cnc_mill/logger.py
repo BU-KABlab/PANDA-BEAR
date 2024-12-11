@@ -5,7 +5,9 @@ from pathlib import Path
 
 
 # Create a logger
-def set_up_mill_logger(path_to_logs: Path) -> logging.Logger:
+def set_up_mill_logger(
+    path_to_logs: Path = Path(__file__).parent / "logs",
+) -> logging.Logger:
     """Set up the mill logger.
 
     Args:
