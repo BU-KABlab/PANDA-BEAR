@@ -1,6 +1,7 @@
 """Class of the instruments used on the CNC mill."""
 
 import json
+from pathlib import Path
 from typing import Dict
 
 # NOTE these are not mill agnostic, so they should be implemented by whichever
@@ -81,7 +82,7 @@ class ToolOffset:
 
 
 class ToolManager:
-    def __init__(self, json_file: str = "tools.json"):
+    def __init__(self, json_file: str = Path(__file__).parent / "tools.json"):
         self.json_file = json_file
         self.tool_offsets: Dict[str, ToolOffset] = self.load_tools()
 
@@ -94,7 +95,7 @@ class ToolManager:
             with open(self.json_file, "r") as file:
                 data = json.load(file)
                 return {item["name"]: ToolOffset.from_dict(item) for item in data}
-        except FileNotFoundError:
+        except (FileNotFoundError, json.JSONDecodeError):
             return {}
 
     def save_tools(self):

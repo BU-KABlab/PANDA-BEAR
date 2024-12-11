@@ -13,6 +13,8 @@ def set_up_mill_logger(
     Args:
     path_to_logs (Path): The path to the logs directory.
     """
+    if not path_to_logs.exists():
+        path_to_logs.mkdir()
     logger = logging.getLogger("grbl_cnc_mill")
     if not logger.hasHandlers():
         logger = logging.getLogger(__name__)

@@ -9,10 +9,7 @@ from pathlib import Path
 import serial
 
 from .driver import Mill as RealMill
-from .logger import set_up_mill_logger
 from .tools import Coordinates, ToolManager
-
-logger = set_up_mill_logger(__name__)
 
 
 class MockMill(RealMill):
@@ -50,8 +47,8 @@ class MockMill(RealMill):
     safe_move(x_coord, y_coord, z_coord, instrument): Simulate a safe move with horizontal and vertical movements.
     """
 
-    def __init__(self, config_file="configuration.json"):
-        super().__init__(config_file)
+    def __init__(self):
+        super().__init__()
         self.ser_mill: MockSerialToMill = self.connect_to_mill()
         self.homed = False
         self.active_connection = False
@@ -64,7 +61,7 @@ class MockMill(RealMill):
 
     def connect_to_mill(self):
         """Connect to the mill"""
-        logger.info("Connecting to the mill")
+        self.logger.info("Connecting to the mill")
         ser_mill = MockSerialToMill(
             port="COM4",
             baudrate=115200,
@@ -78,18 +75,18 @@ class MockMill(RealMill):
 
     def disconnect(self):
         """Disconnect from the mill"""
-        logger.info("Disconnecting from the mill")
+        self.logger.info("Disconnecting from the mill")
         self.ser_mill.close()
         self.active_connection = False
 
     def set_feed_rate(self, rate):
         """Simulate setting the feed rate"""
         self.feed_rate = rate
-        logger.info("Setting feed rate to %s", rate)
+        self.logger.info("Setting feed rate to %s", rate)
 
     def clear_buffers(self):
         """Simulate clearing buffers"""
-        logger.info("Clearing buffers")
+        self.logger.info("Clearing buffers")
 
 
 class MockSerialToMill:
@@ -142,7 +139,7 @@ class MockSerialToMill:
                     float(match.group(3)) if match.group(3) else self.current_z
                 )
             else:
-                logger.warning("Could not extract coordinates from the command")
+                self.logger.warning("Could not extract coordinates from the command")
         else:
             pass
 
