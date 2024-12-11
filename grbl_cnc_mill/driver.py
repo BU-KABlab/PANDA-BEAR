@@ -53,13 +53,25 @@ mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 
 class Mill:
     """
-    Set up the mill connection and pass commands, including special commands
+    Set up the mill connection and pass commands, including special commands.
+
+    Attributes:
+        mill_config_file (str): The name of the mill configuration file.
+        config (dict): The configuration of the mill.
+        ser_mill (serial.Serial): The serial connection to the mill.
+        homed (bool): True if the mill is homed, False otherwise.
+        active_connection (bool): True if the connection to the mill is active, False otherwise.
+        tool_manager (ToolManager): The tool manager for the mill.
+        working_volume (Coordinates): The working volume of the mill.
+        safe_floor_height (float): The safe floor height of the mill.
+        logger_location (Path): The location of the logger.
+        logger (Logger): The logger for the mill.
     """
 
     def __init__(self):
         # self.mill_config_file = "_configuration.json"
-        self.config = self.read_mill_config()
-        self.ser_mill: serial.Serial = self.connect_to_mill()
+        self.config = None
+        self.ser_mill: serial.Serial = None
         self.homed = False
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
@@ -80,7 +92,7 @@ class Mill:
 
     def connect_to_mill(
         self,
-        port,
+        port="COM4",
         baudrate=115200,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
@@ -119,6 +131,7 @@ class Mill:
 
         self.check_for_alarm_state()
         self.clear_buffers()
+        self.read_mill_config()
         return self.ser_mill
 
     def check_for_alarm_state(self):
@@ -220,13 +233,13 @@ class Mill:
             if self.ser_mill.is_open:
                 self.logger.info("Reading mill config")
                 mill_config = self.grbl_settings()
+                self.config = mill_config
                 self.logger.debug("Mill config: %s", mill_config)
-                return mill_config
             else:
                 self.logger.error("Serial connection to mill is not open")
-                raise MillConnectionError(
-                    "Serial connection to mill is not open, cannot read config"
-                )
+                # raise MillConnectionError(
+                #     "Serial connection to mill is not open, cannot read config"
+                # )
         except Exception as exep:
             self.logger.error("Error reading mill config: %s", str(exep))
             raise MillConfigError("Error reading mill config") from exep
