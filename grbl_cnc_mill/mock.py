@@ -1,6 +1,8 @@
 """Contains mocks for cnc driver objects for offline testing"""
 
 # standard libraries
+import json
+import logging
 import re
 from pathlib import Path
 
@@ -9,6 +11,7 @@ from pathlib import Path
 import serial
 
 from .driver import Mill as RealMill
+from .exceptions import MillConfigError
 from .tools import Coordinates, ToolManager
 
 
@@ -88,6 +91,25 @@ class MockMill(RealMill):
         """Simulate clearing buffers"""
         self.logger.info("Clearing buffers")
 
+    def read_mill_config(self):
+        """Read the mill config from the mill and set it as an attribute"""
+        try:
+            if self.ser_mill.is_open:
+                self.logger.info("Reading mill config")
+                config_path = Path("grbl_cnc_mill/_configuration.json")
+                with config_path.open("r") as file:
+                    mill_config = json.load(file)
+                self.config = mill_config
+                self.logger.debug("Mill config: %s", mill_config)
+            else:
+                self.logger.error("Serial connection to mill is not open")
+                # raise MillConnectionError(
+                #     "Serial connection to mill is not open, cannot read config"
+                # )
+        except Exception as exep:
+            self.logger.error("Error reading mill config: %s", str(exep))
+            raise MillConfigError("Error reading mill config") from exep
+
 
 class MockSerialToMill:
     """A class that simulates a serial connection to the mill for testing purposes."""
@@ -104,6 +126,7 @@ class MockSerialToMill:
         self.current_x = 0.0
         self.current_y = 0.0
         self.current_z = 0.0
+        self.logger = logging.getLogger(__name__)
 
     def close(self):
         """Simulate closing the serial connection"""
@@ -126,23 +149,42 @@ class MockSerialToMill:
             # G01 Z{}
 
             # Regular expression to extract the coordinates
-            pattern = re.compile(r"G01 X([\d.-]+)? Y([\d.-]+)? Z([\d.-]+)?")
-            match = pattern.search(command)
-            if match:
-                self.current_x = (
-                    float(match.group(1)) if match.group(1) else self.current_x
-                )
-                self.current_y = (
-                    float(match.group(2)) if match.group(2) else self.current_y
-                )
-                self.current_z = (
-                    float(match.group(3)) if match.group(3) else self.current_z
-                )
+            steps = command.count("\n")
+            pattern = re.compile(r"G01(?: X([\d.-]+))?(?: Y([\d.-]+))?(?: Z([\d.-]+))?")
+            for i in range(steps):
+                step = command.split("\n")[i]
+                match = pattern.search(step)
+                if match:
+                    if match.group(1) is not None:
+                        self.current_x = float(match.group(1))
+                    if match.group(2) is not None:
+                        self.current_y = float(match.group(2))
+                    if match.group(3) is not None:
+                        self.current_z = float(match.group(3))
+                else:
+                    self.logger.warning(
+                        "Could not extract coordinates from the command"
+                    )
             else:
-                self.logger.warning("Could not extract coordinates from the command")
-        else:
-            pass
+                pass
 
     def read(self):
+        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>".encode()
+
+    def readline(self):
         """Simulate reading from the serial connection"""
-        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>"
+        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>\n".encode()
+
+    def readlines(self):
+        """Simulate reading from the serial connection"""
+        return [
+            f"<Idle|MPos:{self.current_x},{self.current_y},{self.current_z}|Bf:15,127|FS:0,0>\n".encode()
+        ]
+
+    def flushInput(self):
+        """Simulate flushing the input buffer"""
+        pass
+
+    def flushOutput(self):
+        """Simulate flushing the output buffer"""
+        pass
