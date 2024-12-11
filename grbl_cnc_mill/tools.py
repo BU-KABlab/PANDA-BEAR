@@ -80,6 +80,9 @@ class ToolOffset:
             "z": self.offset.z,
         }
 
+    def __str__(self):
+        return f"{self.name}: {str(self.offset)}"
+
 
 class ToolManager:
     def __init__(self, json_file: str = Path(__file__).parent / "tools.json"):
@@ -104,8 +107,15 @@ class ToolManager:
                 [tool.to_dict() for tool in self.tool_offsets.values()], file, indent=4
             )
 
-    def add_tool(self, name: str, offset: Coordinates):
-        self.tool_offsets[name] = ToolOffset(name=name, offset=offset)
+    def add_tool(self, name: str, offset: Coordinates | tuple[float, float, float]):
+        if isinstance(offset, tuple):
+            offset = Coordinates(*offset)
+
+        if name in self.tool_offsets:
+            self.update_tool(name, offset)
+        else:
+            self.tool_offsets[name] = ToolOffset(name=name, offset=offset)
+
         self.save_tools()
 
     def get_tool(self, name: str) -> ToolOffset:
@@ -115,6 +125,8 @@ class ToolManager:
         return self.tool_offsets.get(name).offset
 
     def update_tool(self, name: str, offset: Coordinates):
+        if isinstance(offset, tuple):
+            offset = Coordinates(*offset)
         if name in self.tool_offsets:
             self.tool_offsets[name].offset = offset
             self.save_tools()
