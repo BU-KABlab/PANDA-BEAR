@@ -2,6 +2,7 @@
 
 # standard libraries
 import re
+from pathlib import Path
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
@@ -57,6 +58,9 @@ class MockMill(RealMill):
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
         self.safe_floor_height = -85.0
+        self.logger_location = Path(__file__).parent / "mock_logs"
+
+        self.change_logging_level("DEBUG")
 
     def connect_to_mill(self):
         """Connect to the mill"""

@@ -38,11 +38,6 @@ from .exceptions import (
 from .logger import set_up_mill_logger
 from .tools import Coordinates, ToolManager
 
-current_directory = Path(__file__).parent
-
-# Set up the logger
-logger = set_up_mill_logger(current_directory / "logs")
-
 # Formatted strings for the mill commands
 MILL_MOVE = (
     "G01 X{} Y{} Z{}"  # Move to specified coordinates at the specified feed rate
@@ -70,6 +65,12 @@ class Mill:
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
         self.safe_floor_height = -85.0
+        self.logger_location = Path(__file__).parent / "logs"
+        self.logger = set_up_mill_logger(self.logger_location)
+
+    def change_logging_level(self, level):
+        """Change the logging level"""
+        self.logger.setLevel(level)
 
     def homing_sequence(self):
         """Home the mill, set the feed rate, and clear the buffers"""
@@ -100,20 +101,20 @@ class Mill:
             time.sleep(2)
 
             if not ser_mill.is_open:
-                logger.info("Opening serial connection to mill...")
+                self.logger.info("Opening serial connection to mill...")
                 ser_mill.open()
                 time.sleep(2)
                 if ser_mill.is_open:
-                    logger.info("Serial connection to mill opened successfully")
+                    self.logger.info("Serial connection to mill opened successfully")
                     self.active_connection = True
                 else:
-                    logger.error("Serial connection to mill failed to open")
+                    self.logger.error("Serial connection to mill failed to open")
                     raise MillConnectionError("Error opening serial connection to mill")
 
-            logger.info("Mill connected: %s", ser_mill.is_open)
+            self.logger.info("Mill connected: %s", ser_mill.is_open)
             print("Mill connected: ", ser_mill.is_open)
         except Exception as exep:
-            logger.error("Error connecting to the mill: %s", str(exep))
+            self.logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
 
         self.check_for_alarm_state()
@@ -123,45 +124,47 @@ class Mill:
     def check_for_alarm_state(self):
         """Check if the mill is in an alarm state"""
         status = self.ser_mill.readlines()
-        logger.debug("Status: %s", status)
+        self.logger.debug("Status: %s", status)
         if not status:
-            logger.warning("Initial status reading from the mill is blank")
-            logger.warning("Querying the mill for status")
+            self.logger.warning("Initial status reading from the mill is blank")
+            self.logger.warning("Querying the mill for status")
 
             status = self.current_status()
-            logger.debug("Status: %s", status)
+            self.logger.debug("Status: %s", status)
             if not status:
-                logger.error("Failed to get status from the mill")
+                self.logger.error("Failed to get status from the mill")
                 raise MillConnectionError("Failed to get status from the mill")
         else:
             status = status[-1].decode().rstrip()
         if "alarm" in status.lower():
-            logger.warning("Mill is in alarm state")
+            self.logger.warning("Mill is in alarm state")
             reset_alarm = input("Reset the mill? (y/n): ")
             if reset_alarm[0].lower() == "y":
                 self.reset()
             else:
-                logger.error("Mill is in alarm state, user chose not to reset the mill")
+                self.logger.error(
+                    "Mill is in alarm state, user chose not to reset the mill"
+                )
                 raise MillConnectionError("Mill is in alarm state")
         if "error" in status.lower():
-            logger.error("Error in status: %s", status)
+            self.logger.error("Error in status: %s", status)
             raise MillConnectionError(f"Error in status: {status}")
 
         # We only check that the mill is indeed lock upon connection because we will home before any movement
         if "unlock" not in status.lower():
-            logger.error("Mill is not locked")
+            self.logger.error("Mill is not locked")
             proceed = input("Proceed? (y/n): ")
             if proceed[0].lower() == "n":
                 raise MillConnectionError("Mill is not locked")
             else:
-                logger.warning("Proceeding despite mill not being locked")
-                logger.warning("Current status: %s", status)
-                logger.warning("Homing is reccomended before any movement")
+                self.logger.warning("Proceeding despite mill not being locked")
+                self.logger.warning("Current status: %s", status)
+                self.logger.warning("Homing is reccomended before any movement")
                 home_now = input("Home now? (y/n): ")
                 if home_now.lower() == "y":
                     self.homing_sequence()
                 else:
-                    logger.warning("User chose not to home the mill")
+                    self.logger.warning("User chose not to home the mill")
 
     def __enter__(self):
         """Enter the context manager"""
@@ -173,25 +176,25 @@ class Mill:
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit the context manager"""
         self.disconnect()
-        logger.info("Exiting the mill context manager")
+        self.logger.info("Exiting the mill context manager")
 
     def disconnect(self):
         """Close the serial connection to the mill"""
-        logger.info("Disconnecting from the mill")
+        self.logger.info("Disconnecting from the mill")
 
         # This is PANDA specific and should be implemented by a wrapper class
         # if self.homed:
-        #     logger.debug("Mill was homed, resting electrode")
+        #     self.logger.debug("Mill was homed, resting electrode")
         #     self.rest_electrode()
 
         self.ser_mill.close()
         time.sleep(2)
-        logger.info("Mill connected: %s", self.ser_mill.is_open)
+        self.logger.info("Mill connected: %s", self.ser_mill.is_open)
         if self.ser_mill.is_open:
-            logger.error("Failed to close the serial connection to the mill")
+            self.logger.error("Failed to close the serial connection to the mill")
             raise MillConnectionError("Error closing serial connection to mill")
         else:
-            logger.info("Serial connection to mill closed successfully")
+            self.logger.info("Serial connection to mill closed successfully")
             self.active_connection = False
             self.ser_mill = None
         return
@@ -199,51 +202,51 @@ class Mill:
     def read_mill_config_file(self, config_file):
         """Read the config file"""
         try:
-            config_file_path = current_directory / config_file
+            config_file_path = Path(__file__).parent / config_file
             with open(config_file_path, "r", encoding="UTF-8") as file:
                 configuration = json.load(file)
-            logger.debug("Mill config loaded: %s", configuration)
+            self.logger.debug("Mill config loaded: %s", configuration)
             return configuration
         except FileNotFoundError as err:
-            logger.error("Config file not found")
+            self.logger.error("Config file not found")
             raise MillConfigNotFound("Config file not found") from err
         except Exception as err:
-            logger.error("Error reading config file: %s", str(err))
+            self.logger.error("Error reading config file: %s", str(err))
             raise MillConfigError("Error reading config file") from err
 
     def read_mill_config(self):
         """Read the mill config from the mill and set it as an attribute"""
         try:
             if self.ser_mill.is_open:
-                logger.info("Reading mill config")
+                self.logger.info("Reading mill config")
                 mill_config = self.grbl_settings()
-                logger.debug("Mill config: %s", mill_config)
+                self.logger.debug("Mill config: %s", mill_config)
                 return mill_config
             else:
-                logger.error("Serial connection to mill is not open")
+                self.logger.error("Serial connection to mill is not open")
                 raise MillConnectionError(
                     "Serial connection to mill is not open, cannot read config"
                 )
         except Exception as exep:
-            logger.error("Error reading mill config: %s", str(exep))
+            self.logger.error("Error reading mill config: %s", str(exep))
             raise MillConfigError("Error reading mill config") from exep
 
     def write_mill_config_file(self, config_file):
         """Write the mill config to the config file"""
         try:
-            config_file_path = current_directory / config_file
+            config_file_path = Path(__file__).parent / config_file
             with open(config_file_path, "w", encoding="UTF-8") as file:
                 json.dump(self.config, file, indent=4)
-            logger.info("Mill config written to file")
+            self.logger.info("Mill config written to file")
             return 0
         except Exception as exep:
-            logger.error("Error writing mill config to file: %s", str(exep))
+            self.logger.error("Error writing mill config to file: %s", str(exep))
             raise MillConfigError("Error writing mill config to file") from exep
 
     def execute_command(self, command: str):
         """Encodes and sends commands to the mill and returns the response"""
         try:
-            logger.debug("Command sent: %s", command)
+            self.logger.debug("Command sent: %s", command)
 
             command_bytes = str(command).encode()
             self.ser_mill.write(command_bytes + b"\n")
@@ -258,7 +261,7 @@ class Mill:
                         self.ser_mill.readline().decode().rstrip()
                     )
                 full_mill_response = full_mill_response[:-1]
-                logger.debug("Returned %s", full_mill_response)
+                self.logger.debug("Returned %s", full_mill_response)
 
                 # parse the settings into a dictionary
                 settings_dict = {}
@@ -270,25 +273,27 @@ class Mill:
                 return settings_dict
 
             elif not command.startswith("$"):
-                # logger.debug("Initially %s", mill_response)
+                # self.logger.debug("Initially %s", mill_response)
                 mill_response = self.__wait_for_completion(mill_response)
-                logger.debug("Returned %s", mill_response)
+                self.logger.debug("Returned %s", mill_response)
             else:
-                logger.debug("Returned %s", mill_response)
+                self.logger.debug("Returned %s", mill_response)
 
             if re.search(r"\b(error|alarm)\b", mill_response.lower()):
                 if re.search(r"\berror:22\b", mill_response.lower()):
                     # This is a GRBL error that occurs when the feed rate isn't set before moving with G01 command
-                    logger.error("Error in status: %s", mill_response)
+                    self.logger.error("Error in status: %s", mill_response)
                     # Try setting the feed rate and executing the command again
                     self.set_feed_rate(2000)
                     mill_response = self.execute_command(command)
                 else:
-                    logger.error("current_status: Error in status: %s", mill_response)
+                    self.logger.error(
+                        "current_status: Error in status: %s", mill_response
+                    )
                     raise StatusReturnError(f"Error in status: {mill_response}")
 
         except Exception as exep:
-            logger.error("Error executing command %s: %s", command, str(exep))
+            self.logger.error("Error executing command %s: %s", command, str(exep))
             raise CommandExecutionError(
                 f"Error executing command {command}: {str(exep)}"
             ) from exep
@@ -315,12 +320,12 @@ class Mill:
 
         while True:
             if time.time() - start_time > timeout:
-                logger.warning("Homing timed out")
+                self.logger.warning("Homing timed out")
                 break
 
             status = self.current_status()
             if "Idle" in status:
-                logger.info("Homing completed")
+                self.logger.info("Homing completed")
                 self.homed = True
                 break
 
@@ -332,7 +337,7 @@ class Mill:
         start_time = time.time()
         while "Idle" not in status:
             if time.time() - start_time > timeout:
-                logger.warning("Command execution timed out")
+                self.logger.warning("Command execution timed out")
                 return status
             status = self.current_status()
             time.sleep(0.25)
@@ -413,13 +418,13 @@ class Mill:
 
         # check that command coordinates are within working volume
         if command_coordinates.x > 0 or command_coordinates.x < self.working_volume.x:
-            logger.error("x coordinate out of range")
+            self.logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
         if command_coordinates.y > 0 or command_coordinates.y < self.working_volume.y:
-            logger.error("y coordinate out of range")
+            self.logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
         if command_coordinates.z > 0 or command_coordinates.z < self.working_volume.z:
-            logger.error("z coordinate out of range")
+            self.logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
         command = MILL_MOVE.format(*command_coordinates)
@@ -445,7 +450,7 @@ class Mill:
         status_mode = self.config["settings"]["$10"]
 
         if status_mode not in [0, 1, 2, 3]:
-            logger.error("Invalid status mode")
+            self.logger.error("Invalid status mode")
             raise ValueError("Invalid status mode")
 
         max_attempts = 3
@@ -464,7 +469,7 @@ class Mill:
                     x_coord += homing_pull_off
                     y_coord += homing_pull_off
                     z_coord += homing_pull_off
-                logger.info(
+                self.logger.info(
                     "%s coordinates: X = %s, Y = %s, Z = %s",
                     coord_type,
                     x_coord,
@@ -473,15 +478,17 @@ class Mill:
                 )
                 break
             else:
-                logger.warning(
+                self.logger.warning(
                     "%s coordinates not found in the line. Trying again...",
                     coord_type,
                 )
             if _ == max_attempts - 1:
-                logger.error("Error occurred while getting %s coordinates", coord_type)
+                self.logger.error(
+                    "Error occurred while getting %s coordinates", coord_type
+                )
                 raise LocationNotFound
         else:
-            logger.critical("Failed to obtain coordinates from the mill")
+            self.logger.critical("Failed to obtain coordinates from the mill")
             self.stop()
             self.disconnect()
             raise LocationNotFound
@@ -568,7 +575,7 @@ class Mill:
         try:
             offsets = self.tool_manager.get_offset(tool)
         except KeyError as e:
-            logger.error("Instrument not found in config file")
+            self.logger.error("Instrument not found in config file")
             raise MillConfigError("Instrument not found in config file") from e
         # updated target coordinates with offsets so the center of the mill moves to the right spot
         if coordinates:
@@ -585,13 +592,13 @@ class Mill:
         # Double check that the target coordinates are within the working volume
         # check that command coordinates are within working volume
         if cmd_coordinates.x > 1 or cmd_coordinates.x < self.working_volume.x:
-            logger.error("x coordinate out of range")
+            self.logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
         if cmd_coordinates.y > 1 or cmd_coordinates.y < self.working_volume.y:
-            logger.error("y coordinate out of range")
+            self.logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
         if cmd_coordinates.z > 1 or cmd_coordinates.z < self.working_volume.z:
-            logger.error("z coordinate out of range")
+            self.logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
         command = MILL_MOVE.format(*cmd_coordinates)
@@ -646,7 +653,7 @@ class Mill:
         current_coordinates, _ = self.current_coordinates()
 
         if self._is_already_at_target(goto, current_coordinates, offsets):
-            logger.debug(
+            self.logger.debug(
                 "%s is already at the target coordinates of [%s, %s, %s]",
                 tool,
                 x_coord,
@@ -663,13 +670,13 @@ class Mill:
         if self.__should_move_to_zero_first(
             current_coordinates, target_coordinates, self.safe_floor_height
         ):
-            logger.debug("Moving to Z=0 first")
+            self.logger.debug("Moving to Z=0 first")
             # self.execute_command("G01 Z0")
             commands.append("G01 Z0")
             # current_coordinates = self.current_coordinates(instrument)
             move_to_zero = True
         else:
-            logger.debug("Not moving to Z=0 first")
+            self.logger.debug("Not moving to Z=0 first")
 
         self._validate_target_coordinates(target_coordinates)
 
@@ -720,7 +727,7 @@ class Mill:
             )
 
     def _log_target_coordinates(self, target_coordinates: Coordinates):
-        logger.debug(
+        self.logger.debug(
             "Target coordinates: [%s, %s, %s]",
             target_coordinates.x,
             target_coordinates.y,
@@ -730,13 +737,13 @@ class Mill:
     def _validate_target_coordinates(self, target_coordinates: Coordinates):
         working_volume = Coordinates(**self.config["working_volume"])
         if not working_volume.x <= target_coordinates.x <= 1:
-            logger.error("x coordinate out of range")
+            self.logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
         if not working_volume.y <= target_coordinates.y <= 1:
-            logger.error("y coordinate out of range")
+            self.logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
         if not working_volume.z <= target_coordinates.z <= 1:
-            logger.error("z coordinate out of range")
+            self.logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
     def _generate_movement_commands(
