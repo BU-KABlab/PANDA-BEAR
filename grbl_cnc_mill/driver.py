@@ -665,7 +665,11 @@ class Mill:
         offsets = self.tool_manager.get_offset(tool)
         current_coordinates, _ = self.current_coordinates()
 
-        if self._is_already_at_target(goto, current_coordinates, offsets):
+        target_coordinates = self._calculate_target_coordinates(
+            goto, current_coordinates, offsets
+        )
+
+        if self._is_already_at_target(target_coordinates, current_coordinates):
             self.logger.debug(
                 "%s is already at the target coordinates of [%s, %s, %s]",
                 tool,
@@ -675,9 +679,6 @@ class Mill:
             )
             return current_coordinates
 
-        target_coordinates = self._calculate_target_coordinates(
-            goto, current_coordinates, offsets
-        )
         self._log_target_coordinates(target_coordinates)
         move_to_zero = False
         if self.__should_move_to_zero_first(
@@ -711,13 +712,13 @@ class Mill:
         return self.current_coordinates(tool)
 
     def _is_already_at_target(
-        self, goto: Coordinates, current_coordinates: Coordinates, offsets: Coordinates
+        self, goto: Coordinates, current_coordinates: Coordinates
     ):
         """Check if the mill is already at the target coordinates"""
-        return (goto.x + offsets.x, goto.y + offsets.y) == (
+        return (goto.x, goto.y) == (
             current_coordinates.x,
             current_coordinates.y,
-        ) and goto.z + offsets.z == current_coordinates.z
+        ) and goto.z == current_coordinates.z
 
     def _calculate_target_coordinates(
         self, goto: Coordinates, current_coordinates: Coordinates, offsets: Coordinates
@@ -730,14 +731,11 @@ class Mill:
             current_coordinates (Coordinates): The current coordinates of the mill center.
             offsets (Coordinates): The offsets for the instrument.
         """
-        if (goto.x, goto.y) == (current_coordinates.x, current_coordinates.y):
-            return Coordinates(x=goto.x, y=goto.y, z=goto.z + offsets.z)
-        else:
-            return Coordinates(
-                x=goto.x + offsets.x,
-                y=goto.y + offsets.y,
-                z=0 if goto.z + offsets.z > 0 else goto.z + offsets.z,
-            )
+        return Coordinates(
+            x=goto.x + offsets.x,
+            y=goto.y + offsets.y,
+            z=0 if goto.z + offsets.z > 0 else goto.z + offsets.z,
+        )
 
     def _log_target_coordinates(self, target_coordinates: Coordinates):
         self.logger.debug(
@@ -748,14 +746,13 @@ class Mill:
         )
 
     def _validate_target_coordinates(self, target_coordinates: Coordinates):
-        working_volume = Coordinates(**self.config["working_volume"])
-        if not working_volume.x <= target_coordinates.x <= 1:
+        if not self.working_volume.x <= target_coordinates.x <= 1:
             self.logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if not working_volume.y <= target_coordinates.y <= 1:
+        if not self.working_volume.y <= target_coordinates.y <= 1:
             self.logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if not working_volume.z <= target_coordinates.z <= 1:
+        if not self.working_volume.z <= target_coordinates.z <= 1:
             self.logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
@@ -766,7 +763,7 @@ class Mill:
         move_z_first: bool = False,
     ):
         commands = []
-        if current_coordinates.z >= self.config["safe_height_floor"]:
+        if current_coordinates.z >= self.safe_floor_height:
             commands.append(f"G01 X{target_coordinates.x} Y{target_coordinates.y}")
             commands.append(f"G01 Z{target_coordinates.z}")
         else:
