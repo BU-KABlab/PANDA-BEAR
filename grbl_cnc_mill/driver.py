@@ -66,6 +66,35 @@ class Mill:
         safe_floor_height (float): The safe floor height of the mill.
         logger_location (Path): The location of the logger.
         logger (Logger): The logger for the mill.
+
+    Methods:
+        change_logging_level(level): Change the logging level.
+        homing_sequence(): Home the mill, set the feed rate, and clear the buffers.
+        connect_to_mill(port, baudrate, parity, stopbits, bytesize, timeout): Connect to the mill.
+        check_for_alarm_state(): Check if the mill is in an alarm state.
+        read_mill_config_file(config_file): Read the mill configuration file.
+        read_mill_config(): Read the mill configuration from the mill and set it as an attribute.
+        write_mill_config_file(config_file): Write the mill configuration to the configuration file.
+        execute_command(command): Execute a command on the mill.
+        stop(): Stop the mill.
+        reset(): Reset the mill.
+        soft_reset(): Soft reset the mill.
+        home(timeout): Home the mill.
+        __wait_for_completion(incoming_status, timeout): Wait for the mill to complete the previous command.
+        current_status(): Get the current status of the mill.
+        set_feed_rate(rate): Set the feed rate of the mill.
+        clear_buffers(): Clear the input and output buffers of the mill.
+        gcode_mode(): Get the gcode mode of the mill.
+        gcode_parameters(): Get the gcode parameters of the mill.
+        gcode_parser_state(): Get the gcode parser state of the mill.
+        grbl_settings(): Get the GRBL settings of the mill.
+        set_grbl_setting(setting, value): Set a GRBL setting of the mill.
+        move_center_to_position(x_coord, y_coord, z_coord, coordinates): Move the mill to the specified coordinates.
+        current_coordinates(tool): Get the current coordinates of the mill.
+        move_to_safe_position(): Move the mill to its current x,y location and z = 0.
+        move_to_position(x, y, z, coordinates, tool): Move the mill to the specified coordinates.
+        update_offset(tool, offset_x, offset_y, offset_z): Update the offset in the config file.
+        safe_move(x_coord, y_coord, z_coord, coordinates, tool, second_z_cord, second_z_cord_feed): Move the mill to the specified coordinates using only horizontal (xy) and vertical movements.
     """
 
     def __init__(self):

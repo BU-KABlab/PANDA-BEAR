@@ -6,10 +6,10 @@ SQLAlchemy models for the PANDA database
 from datetime import datetime as dt
 from datetime import timezone
 
-from sqlalchemy import Column, ForeignKey, Text, text, event, Table
+from sqlalchemy import Column, ForeignKey, Table, Text, event, text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, relationship
-from sqlalchemy.sql.sqltypes import BigInteger, Integer, JSON, Float, String, Boolean
+from sqlalchemy.sql.sqltypes import JSON, BigInteger, Boolean, Float, Integer, String
 
 Base = declarative_base()
 
@@ -547,3 +547,43 @@ class PotentiostatTechniques(Base):
     gamry_1010T = Column(Boolean, nullable=False)
     gamry_1010B = Column(Boolean, nullable=False)
     gamry_1010E = Column(Boolean, nullable=False)
+
+
+class Tool(Base):
+    """Tool table model"""
+
+    __tablename__ = "panda_mill_tools"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    offset = Column(JSON, nullable=False)
+    updated = Column(String, default=dt.now(timezone.utc))
+
+    def __repr__(self):
+        return f"<Tool(id={self.id}, name={self.name}, offset={self.offset}, updated={self.updated})>"
+
+    @property
+    def x(self):
+        value: float = 0.0
+        try:
+            value = float(self.offset.get("x"))
+        except ValueError:
+            value = 0.0
+        return value
+
+    @property
+    def y(self):
+        value: float = 0.0
+        try:
+            value = float(self.offset.get("y"))
+        except ValueError:
+            value = 0.0
+        return value
+
+    @property
+    def z(self):
+        value: float = 0.0
+        try:
+            value = float(self.offset.get("z"))
+        except ValueError:
+            value = 0.0
+        return value

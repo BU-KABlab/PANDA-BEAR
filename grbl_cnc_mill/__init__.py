@@ -7,4 +7,4 @@ from .driver import Mill
 from .exceptions import *
 from .mock import MockMill
 from .status_codes import AlarmStatus, ErrorCodes, Status
-from .tools import Coordinates, ToolManager
+from .tools import Coordinates, ToolManager, ToolOffset

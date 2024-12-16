@@ -12,7 +12,7 @@ import serial
 
 from .driver import Mill as RealMill
 from .exceptions import MillConfigError
-from .tools import Coordinates, ToolManager
+from .tools import Coordinates
 
 
 class MockMill(RealMill):
@@ -53,9 +53,6 @@ class MockMill(RealMill):
     def __init__(self):
         super().__init__()
         self.ser_mill: MockSerialToMill = self.connect_to_mill()
-        self.homed = False
-        self.active_connection = False
-        self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
         self.safe_floor_height = -85.0
         self.logger_location = Path(__file__).parent / "mock_logs"

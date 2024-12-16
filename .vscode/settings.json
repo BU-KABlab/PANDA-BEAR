@@ -25,9 +25,26 @@
             "driver": "SQLite",
             "name": "test_db",
             "database": "test_db.db"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "100.84.246.115",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "BearGuest-Cornell",
+            "group": "KABLAB",
+            "database": "Bear",
+            "username": "BearGuest-Cornell",
+            "password": "BearGuest2024!"
         }
     ],
     "sqltools.useNodeRuntime": true,
-    "editor.rulers": [80,120],
-
+    "editor.rulers": [
+        100,
+        120
+    ],
 }

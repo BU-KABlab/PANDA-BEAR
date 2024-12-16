@@ -85,6 +85,20 @@ class ToolOffset:
 
 
 class ToolManager:
+    """
+    Class for managing the tools used on the CNC mill.
+    On initialization, the class will load the tools from a default JSON file located locally to the module.
+    If the file does not exist, the class will create a default tool called "center" with an offset of (0, 0, 0).
+
+    You can provide a different JSON file path to the class on initialization.
+
+    The class provides methods for adding, getting, updating, and deleting tools.
+
+    Attributes:
+        json_file (str): The path to the JSON file containing the tools.
+        tool_offsets (dict): A dictionary of the tool offsets.
+    """
+
     def __init__(self, json_file: str = Path(__file__).parent / "tools.json"):
         self.json_file = json_file
         self.tool_offsets: Dict[str, ToolOffset] = self.load_tools()
