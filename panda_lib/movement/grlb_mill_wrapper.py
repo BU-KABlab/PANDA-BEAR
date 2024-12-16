@@ -2,7 +2,7 @@ import time
 
 from config.config_tools import read_testing_config
 
-from grbl_cnc_mill import Coordinates, Mill, MillConnectionError, MockMill
+from grbl_cnc_mill import Coordinates, Mill, MillConnectionError
 from grbl_cnc_mill import logger as mill_control_logger
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import Tool
@@ -12,7 +12,7 @@ TESTING = read_testing_config()
 
 
 # A wrapper for the grbl_cnc_mill library adding electrode specific functions,
-class PandaMill(MockMill if TESTING else Mill):
+class PandaMill(Mill):
     # class PandaMill(Mill):
     """A wrapper for the grbl_cnc_mill library adding electrode specific functions."""
 
