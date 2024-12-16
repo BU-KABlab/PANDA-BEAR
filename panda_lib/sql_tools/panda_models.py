@@ -501,6 +501,22 @@ class VialStatus(Base):
     def __repr__(self):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
 
+    @property
+    def x(self):
+        return self.vial_coordinates.get("x")
+
+    @property
+    def y(self):
+        return self.vial_coordinates.get("y")
+
+    @property
+    def z_top(self):
+        return self.vial_coordinates.get("z_top")
+
+    @property
+    def z_bottom(self):
+        return self.vial_coordinates.get("z_bottom")
+
 
 class PotentiostatReadout(Base):
     """PotentiostatReadout table model"""

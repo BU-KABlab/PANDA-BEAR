@@ -99,15 +99,15 @@ class Mill:
 
     def __init__(self):
         # self.mill_config_file = "_configuration.json"
-        self.config = None
+        self.logger_location = Path(__file__).parent / "logs"
+        self.logger = set_up_mill_logger(self.logger_location)
+        self.config = self.read_mill_config_file("_configuration.json")
         self.ser_mill: serial.Serial = None
         self.homed = False
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
         self.safe_floor_height = -85.0
-        self.logger_location = Path(__file__).parent / "logs"
-        self.logger = set_up_mill_logger(self.logger_location)
 
     def change_logging_level(self, level):
         """Change the logging level"""
@@ -154,6 +154,8 @@ class Mill:
 
             self.logger.info("Mill connected: %s", ser_mill.is_open)
             print("Mill connected: ", ser_mill.is_open)
+
+            self.config = self.read_mill_config()
         except Exception as exep:
             self.logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
@@ -266,9 +268,9 @@ class Mill:
                 self.logger.debug("Mill config: %s", mill_config)
             else:
                 self.logger.error("Serial connection to mill is not open")
-                # raise MillConnectionError(
-                #     "Serial connection to mill is not open, cannot read config"
-                # )
+                self.logger.error("Falling back to reading from file")
+                self.config = self.read_mill_config_file("_configuration.json")
+
         except Exception as exep:
             self.logger.error("Error reading mill config: %s", str(exep))
             raise MillConfigError("Error reading mill config") from exep
@@ -554,43 +556,6 @@ class Mill:
             tool_head,
         )  # TODO ensure all calls of this function are updated to reflect the return of two coordinates
 
-    # NOTE The following methods are to be implemented by a wrapper class
-    # def rinse_electrode(self, rinses: int = 3):
-    #     """
-    #     Rinse the electrode by moving it to the rinse position and back to the
-    #     center position.
-    #     Args:
-    #         None
-    #     Returns:
-    #         None
-    #     """
-    #     coords = self.config["electrode_bath"]
-    #     self.safe_move(coords["x"], coords["y"], 0, instrument=Tools.ELECTRODE)
-    #     for _ in range(rinses):
-    #         self.move_to_position(
-    #             coords["x"], coords["y"], coords["z"], instrument=Tools.ELECTRODE
-    #         )
-    #         self.move_to_position(
-    #             coords["x"], coords["y"], 0, instrument=Tools.ELECTRODE
-    #         )
-    #     return 0
-
-    # def rest_electrode(self):
-    #     """
-    #     Rinse the electrode by moving it to the rinse position and back to the
-    #     center position.
-    #     Args:
-    #         None
-    #     Returns:
-    #         None
-    #     """
-    #     coords = self.config["electrode_bath"]
-    #     self.move_to_safe_position()
-    #     self.safe_move(
-    #         coords["x"], coords["y"], coords["z"], instrument=Tools.ELECTRODE
-    #     )
-    #     return 0
-
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and z = 0"""
         return self.execute_command("G01 Z0")  # Move to Z = 0
@@ -622,15 +587,16 @@ class Mill:
         # updated target coordinates with offsets so the center of the mill moves to the right spot
         if coordinates:
             cmd_coordinates = Coordinates(
-                coordinates.x + offsets["x"],
-                coordinates.y + offsets["y"],
-                coordinates.z + offsets["z"],
+                coordinates.x + offsets.x,
+                coordinates.y + offsets.y,
+                coordinates.z + offsets.z,
             )
-        cmd_coordinates = Coordinates(
-            x_coord=x + offsets["x"],
-            y_coord=y + offsets["y"],
-            z_coord=z + offsets["z"],
-        )
+        else:
+            cmd_coordinates = Coordinates(
+                x + offsets.x,
+                y + offsets.y,
+                z + offsets.z,
+            )
         # Double check that the target coordinates are within the working volume
         # check that command coordinates are within working volume
         if cmd_coordinates.x > 1 or cmd_coordinates.x < self.working_volume.x:
@@ -653,9 +619,9 @@ class Mill:
         """
         current_offset = self.tool_manager.get_offset(tool)
         new_offset = Coordinates(
-            current_offset["x"] + offset_x,
-            current_offset["y"] + offset_y,
-            current_offset["z"] + offset_z,
+            current_offset.x + offset_x,
+            current_offset.y + offset_y,
+            current_offset.z + offset_z,
         )
 
         self.tool_manager.update_tool(tool, new_offset)
@@ -663,9 +629,9 @@ class Mill:
     ## Special versions of the movement commands that avoid diagonal movements
     def safe_move(
         self,
-        x_coord,
-        y_coord,
-        z_coord,
+        x_coord=None,
+        y_coord=None,
+        z_coord=None,
         coordinates: Coordinates = None,
         tool: str = "center",
         second_z_cord: float = None,

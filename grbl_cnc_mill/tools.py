@@ -61,6 +61,11 @@ class Coordinates:
             raise ValueError("z-coordinate must be an int, float, or Decimal object")
         self._z = round(value, 6)
 
+    def __iter__(self):
+        yield self.x
+        yield self.y
+        yield self.z
+
 
 class ToolOffset:
     def __init__(self, name: str, offset: Coordinates):

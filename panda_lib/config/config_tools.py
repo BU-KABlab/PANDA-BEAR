@@ -1,7 +1,8 @@
 """Utilities for setting and reading the configuration files"""
 
 import os
-from configparser import ConfigParser, Error as ConfigParserError
+from configparser import ConfigParser
+from configparser import Error as ConfigParserError
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -53,18 +54,18 @@ def read_logging_dir() -> str:
     """Reads the logging directory from the configuration file."""
     config = read_config()
     if read_testing_config():
-        return config.get("LOGGING", "testing_log_dir")
+        return config.get("TESTING", "logging_dir")
     else:
-        return config.get("LOGGING", "log_dir")
+        return config.get("PRODUCTION", "logging_dir")
 
 
 def read_data_dir() -> str:
     """Reads the data directory from the configuration file."""
     config = read_config()
     if read_testing_config():
-        return config.get("DATA", "testing_data_dir")
+        return config.get("TESTING", "data_dir")
     else:
-        return config.get("DATA", "data_dir")
+        return config.get("PRODUCTION", "data_dir")
 
 
 def test():
