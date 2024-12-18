@@ -1,3 +1,77 @@
+[project]
+name = "panda_lib"
+version = "1.0.0"
+description = "A library for operating a PANDA SDL as a standalone device or in a SiLA environment."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
+    "scipy>=1.7.0",
+    "matplotlib>=3.4.0",
+    "annotated-types==0.7.0",
+    "contourpy==1.3.0",
+    "comtypes",
+    "cycler==0.12.1",
+    "filelock==3.16.0",
+    "fonttools==4.53.1",
+    "fsspec==2024.9.0",
+    "gitdb==4.0.11",
+    "GitPython==3.1.43",
+    "greenlet==3.1.0",
+    "imageio==2.35.1",
+    "jaxtyping==0.2.19",
+    "Jinja2==3.1.4",
+    "joblib==1.4.2",
+    "kiwisolver==1.4.7",
+    "lazy_loader==0.4",
+    "linear-operator==0.5.3",
+    "MarkupSafe==2.1.5",
+    "matplotlib==3.9.2",
+    "mpmath==1.3.0",
+    "networkx==3.3",
+    "numpy==1.26.0",
+    "obsws-python==1.7.0",
+    "opencv-python==4.10.0.84",
+    "packaging==24.1",
+    "pandas==2.2.2",
+    "pillow==10.4.0",
+    "pip",
+    "PuLP==2.9.0",
+    "pydantic==2.9.1",
+    "pydantic_core==2.23.3",
+    "pyparsing==3.1.4",
+    "pyserial==3.5",
+    "python-dateutil==2.9.0.post0",
+    "python-dotenv==1.0.1",
+    "pytz==2024.2",
+    "regex==2024.7.24",
+    "scikit-image==0.24.0",
+    "scikit-learn==1.5.1",
+    "scipy==1.14.1",
+    "six==1.16.0",
+    "sila2",
+    "sila2[codegen]",
+    "sila2[cryptography]",
+    "slack_sdk==3.32.0",
+    "smmap==5.0.1",
+    "SQLAlchemy==2.0.34",
+    "sympy==1.13.2",
+    "threadpoolctl==3.5.0",
+    "tifffile==2024.8.30",
+    "tomli==2.0.1",
+    "torch==2.4.0",
+    "torchvision==0.19.0",
+    "torchaudio==2.4.0",
+    "gpytorch",
+    "tqdm",
+    "typeguard==4.3.0",
+    "typing_extensions==4.12.2",
+    "tzdata==2024.1",
+    "websocket-client==1.8.0",
+    "ruff>=0.8.3",
+]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -33,8 +107,8 @@ exclude = [
 line-length = 88
 indent-width = 4
 
-# Assume Python 3.8
-target-version = "py38"
+# Assume Python 3.10
+target-version = "py310"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
