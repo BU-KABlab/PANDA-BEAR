@@ -603,3 +603,15 @@ class Tool(Base):
         except ValueError:
             value = 0.0
         return value
+
+    @x.setter
+    def x(self, value: float):
+        self.offset["x"] = value
+
+    @y.setter
+    def y(self, value: float):
+        self.offset["y"] = value
+
+    @z.setter
+    def z(self, value: float):
+        self.offset["z"] = value

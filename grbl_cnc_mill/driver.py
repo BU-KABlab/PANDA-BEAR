@@ -542,11 +542,10 @@ class Mill:
         # Now we need to adjust them based on the instrument to communicate where the current instrument is
         try:
             offsets = self.tool_manager.get_offset(tool)
-            # NOTE that the offsets are negative because we are starting with the center of the mill instead of a destination
             tool_head = Coordinates(
-                x_coord - offsets.x,
-                y_coord - offsets.y,
-                z_coord - offsets.z,
+                x_coord + offsets.x,
+                y_coord + offsets.y,
+                z_coord + offsets.z,
             )
 
         except Exception as exception:
