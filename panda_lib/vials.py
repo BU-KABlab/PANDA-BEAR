@@ -8,17 +8,14 @@ import csv
 import json
 import logging
 import math
-
 from pathlib import Path
-from dataclasses import asdict
-from typing import Sequence, Union, List, Tuple
+from typing import List, Sequence, Tuple, Union
 
 from panda_lib.utilities import directory_picker, file_picker
 
 from .sql_tools.db_setup import SessionLocal
-from .sql_tools.panda_models import VialStatus, Vials, model_to_dict
+from .sql_tools.panda_models import Vials, VialStatus, model_to_dict
 from .vessel import OverDraftException, OverFillException, Vessel, VesselCoordinates
-
 
 vial_logger = logging.getLogger("panda")
 
@@ -191,59 +188,7 @@ class Vial2(Vessel):
         Inserts a new vial record into the 'vials' table in the db. This will be used by
         the vial_status view as the most recent vial status.
         """
-        # try:
-        #     execute_sql_command(
-        #         """
-        #         INSERT INTO vials (
-        #             name,
-        #             category,
-        #             position,
-        #             volume,
-        #             capacity,
-        #             density,
-        #             vial_coordinates,
-        #             radius,
-        #             height,
-        #             contamination,
-        #             contents,
-        #             viscosity_cp,
-        #             depth,
-        #             concentration
-        #         )
-        #         VALUES (
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?,
-        #             ?
-        #         )
-        #         """,
-        #         (
-        #             self.name,
-        #             self.category,
-        #             self.position,
-        #             self.volume,
-        #             self.capacity,
-        #             self.density,
-        #             str(asdict(self.coordinates)),
-        #             self.radius,
-        #             self.height,
-        #             self.contamination,
-        #             str(self.contents),
-        #             self.viscosity_cp,
-        #             self.depth,
-        #             self.concentration,
-        #         ),
-        #     )
+
         try:
             with SessionLocal() as session:
                 vial = Vials(
@@ -253,7 +198,7 @@ class Vial2(Vessel):
                     volume=self.volume,
                     capacity=self.capacity,
                     density=self.density,
-                    vial_coordinates=str(asdict(self.coordinates)),
+                    vial_coordinates=self.coordinates.as_json(),
                     radius=self.radius,
                     height=self.height,
                     contamination=self.contamination,
@@ -542,7 +487,7 @@ def get_current_vials(group: Union[None, str] = None) -> List[dict]:
     vial_parameters_copy = list(vial_parameters)  # Convert the tuple to a list
     vial_parameters = []
     for vial in vial_parameters_copy:
-        coordinate_string = ast.literal_eval(vial["vial_coordinates"])
+        coordinate_string = vial["vial_coordinates"]
         contents = vial["contents"]
         if contents == "none":
             if vial["category"] == 0:

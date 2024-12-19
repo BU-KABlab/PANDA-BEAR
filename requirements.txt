@@ -25,6 +25,7 @@ opencv-python==4.10.0.84
 packaging==24.1
 pandas==2.2.2
 pillow==10.4.0
+pip
 PuLP==2.9.0
 pydantic==2.9.1
 pydantic_core==2.23.3
@@ -38,6 +39,9 @@ scikit-image==0.24.0
 scikit-learn==1.5.1
 scipy==1.14.1
 six==1.16.0
+sila2 
+sila2[codegen] 
+sila2[cryptography]
 slack_sdk==3.32.0
 smmap==5.0.1
 SQLAlchemy==2.0.34

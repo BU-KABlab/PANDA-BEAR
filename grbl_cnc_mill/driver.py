@@ -1,0 +1,806 @@
+"""
+This module contains the MillControl class, which is used to control the a GRBL CNC machine.
+The MillControl class is used by the EPanda class to move the pipette and electrode to the
+specified coordinates.
+
+The MillControl class contains methods to move the pipette and
+electrode to a safe position, rinse the electrode, and update the offsets in the mill config
+file.
+
+The MillControl class contains methods to connect to the mill, execute commands,
+stop the mill, reset the mill, home the mill, get the current status of the mill, get the
+gcode mode of the mill, get the gcode parameters of the mill, and get the gcode parser state
+of the mill.
+"""
+
+# pylint: disable=line-too-long
+
+# standard libraries
+import json
+import re
+import time
+from pathlib import Path
+
+# third-party libraries
+# from pydantic.dataclasses import dataclass
+import serial
+
+from .exceptions import (
+    CommandExecutionError,
+    LocationNotFound,
+    MillConfigError,
+    MillConfigNotFound,
+    MillConnectionError,
+    StatusReturnError,
+)
+
+# local libraries
+from .logger import set_up_mill_logger
+from .tools import Coordinates, ToolManager
+
+# Formatted strings for the mill commands
+MILL_MOVE = (
+    "G01 X{} Y{} Z{}"  # Move to specified coordinates at the specified feed rate
+)
+MILL_MOVE_Z = "G01 Z{}"  # Move to specified Z coordinate at the specified feed rate
+RAPID_MILL_MOVE = (
+    "G00 X{} Y{} Z{}"  # Move to specified coordinates at the maximum feed rate
+)
+# Compile regex patterns for extracting coordinates from the mill status
+wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
+mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
+
+
+class Mill:
+    """
+    Set up the mill connection and pass commands, including special commands.
+
+    Attributes:
+        mill_config_file (str): The name of the mill configuration file.
+        config (dict): The configuration of the mill.
+        ser_mill (serial.Serial): The serial connection to the mill.
+        homed (bool): True if the mill is homed, False otherwise.
+        active_connection (bool): True if the connection to the mill is active, False otherwise.
+        tool_manager (ToolManager): The tool manager for the mill.
+        working_volume (Coordinates): The working volume of the mill.
+        safe_floor_height (float): The safe floor height of the mill.
+        logger_location (Path): The location of the logger.
+        logger (Logger): The logger for the mill.
+
+    Methods:
+        change_logging_level(level): Change the logging level.
+        homing_sequence(): Home the mill, set the feed rate, and clear the buffers.
+        connect_to_mill(port, baudrate, parity, stopbits, bytesize, timeout): Connect to the mill.
+        check_for_alarm_state(): Check if the mill is in an alarm state.
+        read_mill_config_file(config_file): Read the mill configuration file.
+        read_mill_config(): Read the mill configuration from the mill and set it as an attribute.
+        write_mill_config_file(config_file): Write the mill configuration to the configuration file.
+        execute_command(command): Execute a command on the mill.
+        stop(): Stop the mill.
+        reset(): Reset the mill.
+        soft_reset(): Soft reset the mill.
+        home(timeout): Home the mill.
+        __wait_for_completion(incoming_status, timeout): Wait for the mill to complete the previous command.
+        current_status(): Get the current status of the mill.
+        set_feed_rate(rate): Set the feed rate of the mill.
+        clear_buffers(): Clear the input and output buffers of the mill.
+        gcode_mode(): Get the gcode mode of the mill.
+        gcode_parameters(): Get the gcode parameters of the mill.
+        gcode_parser_state(): Get the gcode parser state of the mill.
+        grbl_settings(): Get the GRBL settings of the mill.
+        set_grbl_setting(setting, value): Set a GRBL setting of the mill.
+        move_center_to_position(x_coord, y_coord, z_coord, coordinates): Move the mill to the specified coordinates.
+        current_coordinates(tool): Get the current coordinates of the mill.
+        move_to_safe_position(): Move the mill to its current x,y location and z = 0.
+        move_to_position(x, y, z, coordinates, tool): Move the mill to the specified coordinates.
+        update_offset(tool, offset_x, offset_y, offset_z): Update the offset in the config file.
+        safe_move(x_coord, y_coord, z_coord, coordinates, tool, second_z_cord, second_z_cord_feed): Move the mill to the specified coordinates using only horizontal (xy) and vertical movements.
+    """
+
+    def __init__(self):
+        # self.mill_config_file = "_configuration.json"
+        self.logger_location = Path(__file__).parent / "logs"
+        self.logger = set_up_mill_logger(self.logger_location)
+        self.config = self.read_mill_config_file("_configuration.json")
+        self.ser_mill: serial.Serial = None
+        self.homed = False
+        self.active_connection = False
+        self.tool_manager: ToolManager = ToolManager()
+        self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
+        self.safe_floor_height = -85.0
+
+    def change_logging_level(self, level):
+        """Change the logging level"""
+        self.logger.setLevel(level)
+
+    def homing_sequence(self):
+        """Home the mill, set the feed rate, and clear the buffers"""
+        self.home()
+        self.set_feed_rate(2000)  # Set feed rate to 2000
+        self.clear_buffers()
+
+    def connect_to_mill(
+        self,
+        port="COM4",
+        baudrate=115200,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=10,
+    ) -> serial.Serial:
+        """Connect to the mill"""
+        try:
+            ser_mill = serial.Serial(
+                # Hardcoded serial port (consider making this configurable)
+                port=port,
+                baudrate=baudrate,
+                parity=parity,
+                stopbits=stopbits,
+                bytesize=bytesize,
+                timeout=timeout,
+            )
+            time.sleep(2)
+
+            if not ser_mill.is_open:
+                self.logger.info("Opening serial connection to mill...")
+                ser_mill.open()
+                time.sleep(2)
+                if ser_mill.is_open:
+                    self.logger.info("Serial connection to mill opened successfully")
+                    self.active_connection = True
+                else:
+                    self.logger.error("Serial connection to mill failed to open")
+                    raise MillConnectionError("Error opening serial connection to mill")
+
+            self.logger.info("Mill connected: %s", ser_mill.is_open)
+            print("Mill connected: ", ser_mill.is_open)
+
+            self.config = self.read_mill_config()
+        except Exception as exep:
+            self.logger.error("Error connecting to the mill: %s", str(exep))
+            raise MillConnectionError("Error connecting to the mill") from exep
+
+        self.check_for_alarm_state()
+        self.clear_buffers()
+        self.read_mill_config()
+        return self.ser_mill
+
+    def check_for_alarm_state(self):
+        """Check if the mill is in an alarm state"""
+        status = self.ser_mill.readlines()
+        self.logger.debug("Status: %s", status)
+        if not status:
+            self.logger.warning("Initial status reading from the mill is blank")
+            self.logger.warning("Querying the mill for status")
+
+            status = self.current_status()
+            self.logger.debug("Status: %s", status)
+            if not status:
+                self.logger.error("Failed to get status from the mill")
+                raise MillConnectionError("Failed to get status from the mill")
+        else:
+            status = status[-1].decode().rstrip()
+        if "alarm" in status.lower():
+            self.logger.warning("Mill is in alarm state")
+            reset_alarm = input("Reset the mill? (y/n): ")
+            if reset_alarm[0].lower() == "y":
+                self.reset()
+            else:
+                self.logger.error(
+                    "Mill is in alarm state, user chose not to reset the mill"
+                )
+                raise MillConnectionError("Mill is in alarm state")
+        if "error" in status.lower():
+            self.logger.error("Error in status: %s", status)
+            raise MillConnectionError(f"Error in status: {status}")
+
+        # We only check that the mill is indeed lock upon connection because we will home before any movement
+        if "unlock" not in status.lower():
+            self.logger.error("Mill is not locked")
+            proceed = input("Proceed? (y/n): ")
+            if proceed[0].lower() == "n":
+                raise MillConnectionError("Mill is not locked")
+            else:
+                self.logger.warning("Proceeding despite mill not being locked")
+                self.logger.warning("Current status: %s", status)
+                self.logger.warning("Homing is reccomended before any movement")
+                home_now = input("Home now? (y/n): ")
+                if home_now.lower() == "y":
+                    self.homing_sequence()
+                else:
+                    self.logger.warning("User chose not to home the mill")
+
+    def __enter__(self):
+        """Enter the context manager"""
+        self.connect_to_mill()
+        self.read_mill_config()
+        self.homing_sequence()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Exit the context manager"""
+        self.disconnect()
+        self.logger.info("Exiting the mill context manager")
+
+    def disconnect(self):
+        """Close the serial connection to the mill"""
+        self.logger.info("Disconnecting from the mill")
+
+        # This is PANDA specific and should be implemented by a wrapper class
+        # if self.homed:
+        #     self.logger.debug("Mill was homed, resting electrode")
+        #     self.rest_electrode()
+
+        self.ser_mill.close()
+        time.sleep(2)
+        self.logger.info("Mill connected: %s", self.ser_mill.is_open)
+        if self.ser_mill.is_open:
+            self.logger.error("Failed to close the serial connection to the mill")
+            raise MillConnectionError("Error closing serial connection to mill")
+        else:
+            self.logger.info("Serial connection to mill closed successfully")
+            self.active_connection = False
+            self.ser_mill = None
+        return
+
+    def read_mill_config_file(self, config_file):
+        """Read the config file"""
+        try:
+            config_file_path = Path(__file__).parent / config_file
+            with open(config_file_path, "r", encoding="UTF-8") as file:
+                configuration = json.load(file)
+            self.logger.debug("Mill config loaded: %s", configuration)
+            return configuration
+        except FileNotFoundError as err:
+            self.logger.error("Config file not found")
+            raise MillConfigNotFound("Config file not found") from err
+        except Exception as err:
+            self.logger.error("Error reading config file: %s", str(err))
+            raise MillConfigError("Error reading config file") from err
+
+    def read_mill_config(self):
+        """Read the mill config from the mill and set it as an attribute"""
+        try:
+            if self.ser_mill.is_open:
+                self.logger.info("Reading mill config")
+                mill_config = self.grbl_settings()
+                self.config = mill_config
+                self.logger.debug("Mill config: %s", mill_config)
+            else:
+                self.logger.error("Serial connection to mill is not open")
+                self.logger.error("Falling back to reading from file")
+                self.config = self.read_mill_config_file("_configuration.json")
+
+        except Exception as exep:
+            self.logger.error("Error reading mill config: %s", str(exep))
+            raise MillConfigError("Error reading mill config") from exep
+
+    def write_mill_config_file(self, config_file):
+        """Write the mill config to the config file"""
+        try:
+            config_file_path = Path(__file__).parent / config_file
+            with open(config_file_path, "w", encoding="UTF-8") as file:
+                json.dump(self.config, file, indent=4)
+            self.logger.info("Mill config written to file")
+            return 0
+        except Exception as exep:
+            self.logger.error("Error writing mill config to file: %s", str(exep))
+            raise MillConfigError("Error writing mill config to file") from exep
+
+    def execute_command(self, command: str):
+        """Encodes and sends commands to the mill and returns the response"""
+        try:
+            self.logger.debug("Command sent: %s", command)
+
+            command_bytes = str(command).encode()
+            self.ser_mill.write(command_bytes + b"\n")
+            time.sleep(2)
+            mill_response = self.ser_mill.readline().decode().rstrip()
+
+            if command == "$$":
+                full_mill_response = []
+                full_mill_response.append(mill_response)
+                while full_mill_response[-1] != "ok":
+                    full_mill_response.append(
+                        self.ser_mill.readline().decode().rstrip()
+                    )
+                full_mill_response = full_mill_response[:-1]
+                self.logger.debug("Returned %s", full_mill_response)
+
+                # parse the settings into a dictionary
+                settings_dict = {}
+                for setting in full_mill_response:
+                    setting: str
+                    key, value = setting.split("=")
+                    settings_dict[key] = value
+
+                return settings_dict
+
+            elif not command.startswith("$"):
+                # self.logger.debug("Initially %s", mill_response)
+                mill_response = self.__wait_for_completion(mill_response)
+                self.logger.debug("Returned %s", mill_response)
+            else:
+                self.logger.debug("Returned %s", mill_response)
+
+            if re.search(r"\b(error|alarm)\b", mill_response.lower()):
+                if re.search(r"\berror:22\b", mill_response.lower()):
+                    # This is a GRBL error that occurs when the feed rate isn't set before moving with G01 command
+                    self.logger.error("Error in status: %s", mill_response)
+                    # Try setting the feed rate and executing the command again
+                    self.set_feed_rate(2000)
+                    mill_response = self.execute_command(command)
+                else:
+                    self.logger.error(
+                        "current_status: Error in status: %s", mill_response
+                    )
+                    raise StatusReturnError(f"Error in status: {mill_response}")
+
+        except Exception as exep:
+            self.logger.error("Error executing command %s: %s", command, str(exep))
+            raise CommandExecutionError(
+                f"Error executing command {command}: {str(exep)}"
+            ) from exep
+
+        return mill_response
+
+    def stop(self):
+        """Stop the mill"""
+        self.execute_command("!")
+
+    def reset(self):
+        """Reset or unlock the mill"""
+        self.execute_command("$X")
+
+    def soft_reset(self):
+        """Soft reset the mill"""
+        self.execute_command("0x18")
+
+    def home(self, timeout=90):
+        """Home the mill with a timeout"""
+        self.execute_command("$H")
+        time.sleep(15)
+        start_time = time.time()
+
+        while True:
+            if time.time() - start_time > timeout:
+                self.logger.warning("Homing timed out")
+                break
+
+            status = self.current_status()
+            if "Idle" in status:
+                self.logger.info("Homing completed")
+                self.homed = True
+                break
+
+            time.sleep(2)  # Check every 2 seconds
+
+    def __wait_for_completion(self, incoming_status, timeout=90):
+        """Wait for the mill to complete the previous command"""
+        status = incoming_status
+        start_time = time.time()
+        while "Idle" not in status:
+            if time.time() - start_time > timeout:
+                self.logger.warning("Command execution timed out")
+                return status
+            status = self.current_status()
+            time.sleep(0.25)
+        return status
+
+    def current_status(self) -> str:
+        """Get the current status of the mill"""
+        command = "?"
+        command_bytes = command.encode()
+        status = ""
+        attempt_limit = 25
+        while status == "" and attempt_limit > 0:
+            self.ser_mill.write(command_bytes + b"\n")
+            time.sleep(0.25)
+            status = self.ser_mill.readline().decode().rstrip()
+            attempt_limit -= 1
+        # Check for busy
+        while status == "ok":
+            status = self.ser_mill.readline().decode().rstrip()
+        return status
+
+    def set_feed_rate(self, rate):
+        """Set the feed rate"""
+        self.execute_command(f"F{rate}")
+
+    def clear_buffers(self):
+        """Clear input and output buffers"""
+        self.ser_mill.flushInput()  # Clear input buffer
+        self.ser_mill.flushOutput()  # Clear output buffer
+
+    def gcode_mode(self):
+        """Ask the mill for its gcode mode"""
+        self.execute_command("$C")
+
+    def gcode_parameters(self):
+        """Ask the mill for its gcode parameters"""
+        return self.execute_command("$#")
+
+    def gcode_parser_state(self):
+        """Ask the mill for its gcode parser state"""
+        return self.execute_command("$G")
+
+    def grbl_settings(self) -> dict:
+        """Ask the mill for its grbl settings"""
+        return self.execute_command("$$")
+
+    def set_grbl_setting(self, setting: str, value: str):
+        """Set a grbl setting"""
+        command = f"${setting}={value}"
+        return self.execute_command(command)
+
+    def move_center_to_position(
+        self, x_coord, y_coord, z_coord, coordinates: Coordinates = None
+    ) -> int:
+        """
+        Move the mill to the specified coordinates.
+        Args:
+            x_coord (float): X coordinate.
+            y_coord (float): Y coordinate.
+            z_coord (float): Z coordinate.
+        Returns:
+            str: Response from the mill after executing the command.
+        """
+        offsets = self.tool_manager.get_offset("center")
+
+        if coordinates:
+            command_coordinates = Coordinates(
+                coordinates.x + offsets.x,
+                coordinates.y + offsets.y,
+                coordinates.z + offsets.z,
+            )
+        else:
+            command_coordinates = Coordinates(
+                x_coord + offsets.x,
+                y_coord + offsets.y,
+                z_coord + offsets.z,
+            )
+
+        # check that command coordinates are within working volume
+        if command_coordinates.x > 0 or command_coordinates.x < self.working_volume.x:
+            self.logger.error("x coordinate out of range")
+            raise ValueError("x coordinate out of range")
+        if command_coordinates.y > 0 or command_coordinates.y < self.working_volume.y:
+            self.logger.error("y coordinate out of range")
+            raise ValueError("y coordinate out of range")
+        if command_coordinates.z > 0 or command_coordinates.z < self.working_volume.z:
+            self.logger.error("z coordinate out of range")
+            raise ValueError("z coordinate out of range")
+
+        command = MILL_MOVE.format(*command_coordinates)
+        self.execute_command(command)
+        return 0
+
+    def current_coordinates(
+        self, tool: str = "center"
+    ) -> tuple[Coordinates, Coordinates]:
+        """
+        Get the current coordinates of the mill.
+        Args:
+            tool (Tool): The tool for which to get the offset coordinates.
+        Returns:
+            mill_center (Coordinates): [x,y,z]
+            tool_head (Coordinates): [x,y,z]
+        """
+
+        status = self.current_status()
+
+        # Get the current mode of the mill
+        # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
+        status_mode = self.config["settings"]["$10"]
+
+        if status_mode not in [0, 1, 2, 3]:
+            self.logger.error("Invalid status mode")
+            raise ValueError("Invalid status mode")
+
+        max_attempts = 3
+        homing_pull_off = self.config["settings"]["$27"]
+
+        pattern = wpos_pattern if status_mode in [0, 2] else mpos_pattern
+        coord_type = "WPos" if status_mode in [0, 2] else "MPos"
+
+        for _ in range(max_attempts):
+            match = pattern.search(status)
+            if match:
+                x_coord = round(float(match.group(1)), 3)
+                y_coord = round(float(match.group(2)), 3)
+                z_coord = round(float(match.group(3)), 3)
+                if coord_type == "MPos":
+                    x_coord += homing_pull_off
+                    y_coord += homing_pull_off
+                    z_coord += homing_pull_off
+                self.logger.info(
+                    "%s coordinates: X = %s, Y = %s, Z = %s",
+                    coord_type,
+                    x_coord,
+                    y_coord,
+                    z_coord,
+                )
+                break
+            else:
+                self.logger.warning(
+                    "%s coordinates not found in the line. Trying again...",
+                    coord_type,
+                )
+            if _ == max_attempts - 1:
+                self.logger.error(
+                    "Error occurred while getting %s coordinates", coord_type
+                )
+                raise LocationNotFound
+        else:
+            self.logger.critical("Failed to obtain coordinates from the mill")
+            self.stop()
+            self.disconnect()
+            raise LocationNotFound
+
+        mill_center = Coordinates(x_coord, y_coord, z_coord)
+        # So far we have obtain the mill's coordinates
+        # Now we need to adjust them based on the instrument to communicate where the current instrument is
+        try:
+            offsets = self.tool_manager.get_offset(tool)
+            tool_head = Coordinates(
+                x_coord + offsets.x,
+                y_coord + offsets.y,
+                z_coord + offsets.z,
+            )
+
+        except Exception as exception:
+            raise ValueError("Invalid instrument") from exception
+        return (
+            mill_center,
+            tool_head,
+        )  # TODO ensure all calls of this function are updated to reflect the return of two coordinates
+
+    def move_to_safe_position(self) -> str:
+        """Move the mill to its current x,y location and z = 0"""
+        return self.execute_command("G01 Z0")  # Move to Z = 0
+
+    def move_to_position(
+        self,
+        x: float = 0.00,
+        y: float = 0.00,
+        z: float = 0.00,
+        coordinates: Coordinates = None,
+        tool: str = "center",
+    ) -> int:
+        """
+        Move the mill to the specified coordinates.
+        Args:
+            x_coord (float): X coordinate.
+            y_coord (float): Y coordinate.
+            z_coord (float): Z coordinate.
+            instrument (Instruments): Instrument to move.
+        Returns:
+            str: Response from the mill after executing the command.
+        """
+        # Fetch offsets for the specified instrument
+        try:
+            offsets = self.tool_manager.get_offset(tool)
+        except KeyError as e:
+            self.logger.error("Instrument not found in config file")
+            raise MillConfigError("Instrument not found in config file") from e
+        # updated target coordinates with offsets so the center of the mill moves to the right spot
+        if coordinates:
+            cmd_coordinates = Coordinates(
+                coordinates.x + offsets.x,
+                coordinates.y + offsets.y,
+                coordinates.z + offsets.z,
+            )
+        else:
+            cmd_coordinates = Coordinates(
+                x + offsets.x,
+                y + offsets.y,
+                z + offsets.z,
+            )
+        # Double check that the target coordinates are within the working volume
+        # check that command coordinates are within working volume
+        if cmd_coordinates.x > 1 or cmd_coordinates.x < self.working_volume.x:
+            self.logger.error("x coordinate out of range")
+            raise ValueError("x coordinate out of range")
+        if cmd_coordinates.y > 1 or cmd_coordinates.y < self.working_volume.y:
+            self.logger.error("y coordinate out of range")
+            raise ValueError("y coordinate out of range")
+        if cmd_coordinates.z > 1 or cmd_coordinates.z < self.working_volume.z:
+            self.logger.error("z coordinate out of range")
+            raise ValueError("z coordinate out of range")
+
+        command = MILL_MOVE.format(*cmd_coordinates)
+        self.execute_command(command)
+        return 0
+
+    def update_offset(self, tool, offset_x, offset_y, offset_z):
+        """
+        Update the offset in the config file
+        """
+        current_offset = self.tool_manager.get_offset(tool)
+        new_offset = Coordinates(
+            current_offset.x + offset_x,
+            current_offset.y + offset_y,
+            current_offset.z + offset_z,
+        )
+
+        self.tool_manager.update_tool(tool, new_offset)
+
+    ## Special versions of the movement commands that avoid diagonal movements
+    def safe_move(
+        self,
+        x_coord=None,
+        y_coord=None,
+        z_coord=None,
+        coordinates: Coordinates = None,
+        tool: str = "center",
+        second_z_cord: float = None,
+        second_z_cord_feed: float = None,
+    ) -> Coordinates:
+        """
+        Move the mill to the specified coordinates using only horizontal (xy) and vertical movements.
+
+        Args:
+            x_coord (float): X coordinate.
+            y_coord (float): Y coordinate.
+            z_coord (float): Z coordinate.
+            instrument (Instruments): The instrument to move to the specified coordinates.
+            second_z_cord (float): The second z coordinate to move to.
+            second_z_cord_feed (float): The feed rate to use when moving to the second z coordinate.
+
+        Returns:
+            Coordinates: Current center coordinates.
+        """
+        commands = []
+        goto = (
+            Coordinates(x=x_coord, y=y_coord, z=z_coord)
+            if not coordinates
+            else coordinates
+        )
+        offsets = self.tool_manager.get_offset(tool)
+        current_coordinates, _ = self.current_coordinates()
+
+        target_coordinates = self._calculate_target_coordinates(
+            goto, current_coordinates, offsets
+        )
+
+        if self._is_already_at_target(target_coordinates, current_coordinates):
+            self.logger.debug(
+                "%s is already at the target coordinates of [%s, %s, %s]",
+                tool,
+                x_coord,
+                y_coord,
+                z_coord,
+            )
+            return current_coordinates
+
+        self._log_target_coordinates(target_coordinates)
+        move_to_zero = False
+        if self.__should_move_to_zero_first(
+            current_coordinates, target_coordinates, self.safe_floor_height
+        ):
+            self.logger.debug("Moving to Z=0 first")
+            # self.execute_command("G01 Z0")
+            commands.append("G01 Z0")
+            # current_coordinates = self.current_coordinates(instrument)
+            move_to_zero = True
+        else:
+            self.logger.debug("Not moving to Z=0 first")
+
+        self._validate_target_coordinates(target_coordinates)
+
+        commands.extend(
+            self._generate_movement_commands(
+                current_coordinates, target_coordinates, move_to_zero
+            )
+        )
+
+        if second_z_cord is not None:
+            # Add the movement to the second z coordinate and feed rate
+            commands.append(f"G01 Z{second_z_cord} F{second_z_cord_feed}")
+            # Restore the feed rate to the default of 2000
+            commands.append("F2000")
+        # Form the individual movement commands into a block seperated by \n
+        commands = "\n".join(commands)
+        self._execute_commands(commands)
+
+        return self.current_coordinates(tool)
+
+    def _is_already_at_target(
+        self, goto: Coordinates, current_coordinates: Coordinates
+    ):
+        """Check if the mill is already at the target coordinates"""
+        return (goto.x, goto.y) == (
+            current_coordinates.x,
+            current_coordinates.y,
+        ) and goto.z == current_coordinates.z
+
+    def _calculate_target_coordinates(
+        self, goto: Coordinates, current_coordinates: Coordinates, offsets: Coordinates
+    ):
+        """
+        Calculate the target coordinates for the mill. Checking if the mill is already at the target xy coordinates and only moving if necessary.
+
+        Args:
+            goto (Coordinates): The target coordinates.
+            current_coordinates (Coordinates): The current coordinates of the mill center.
+            offsets (Coordinates): The offsets for the instrument.
+        """
+        return Coordinates(
+            x=goto.x + offsets.x,
+            y=goto.y + offsets.y,
+            z=0 if goto.z + offsets.z > 0 else goto.z + offsets.z,
+        )
+
+    def _log_target_coordinates(self, target_coordinates: Coordinates):
+        self.logger.debug(
+            "Target coordinates: [%s, %s, %s]",
+            target_coordinates.x,
+            target_coordinates.y,
+            target_coordinates.z,
+        )
+
+    def _validate_target_coordinates(self, target_coordinates: Coordinates):
+        if not self.working_volume.x <= target_coordinates.x <= 1:
+            self.logger.error("x coordinate out of range")
+            raise ValueError("x coordinate out of range")
+        if not self.working_volume.y <= target_coordinates.y <= 1:
+            self.logger.error("y coordinate out of range")
+            raise ValueError("y coordinate out of range")
+        if not self.working_volume.z <= target_coordinates.z <= 1:
+            self.logger.error("z coordinate out of range")
+            raise ValueError("z coordinate out of range")
+
+    def _generate_movement_commands(
+        self,
+        current_coordinates: Coordinates,
+        target_coordinates: Coordinates,
+        move_z_first: bool = False,
+    ):
+        commands = []
+        if current_coordinates.z >= self.safe_floor_height:
+            commands.append(f"G01 X{target_coordinates.x} Y{target_coordinates.y}")
+            commands.append(f"G01 Z{target_coordinates.z}")
+        else:
+            if target_coordinates.x != current_coordinates.x:
+                commands.append(f"G01 X{target_coordinates.x}")
+            if target_coordinates.y != current_coordinates.y:
+                commands.append(f"G01 Y{target_coordinates.y}")
+            if target_coordinates.z != current_coordinates.z:
+                commands.append(f"G01 Z{target_coordinates.z}")
+            if (
+                target_coordinates.z == current_coordinates.z and move_z_first
+            ):  # The mill moved to Z=0 first, so move back to the target Z
+                commands.append(f"G01 Z{target_coordinates.z}")
+        return commands
+
+    def _execute_commands(self, commands):
+        if isinstance(commands, str):
+            self.execute_command(commands)
+        else:
+            for command in commands:
+                self.execute_command(command)
+
+    def __should_move_to_zero_first(
+        self,
+        current: Coordinates,
+        destination: Coordinates,
+        safe_height_floor,
+    ):
+        """
+        Determine if the mill should move to Z=0 before moving to the specified coordinates.
+        Args:
+            current (Coordinates): Current coordinates.
+            offset (Coordinates): Target coordinates.
+            safe_height_floor (float): Safe floor height.
+        Returns:
+            bool: True if the mill should move to Z=0 first, False otherwise.
+        """
+        # If current Z is 0 or at or above the safe floor height, no need to move to Z=0
+        if current.z >= 0 or current.z >= safe_height_floor:
+            return False
+
+        # If current Z is below the safe floor height and X or Y coordinates are different, move to Z=0
+        if current.x != destination.x or current.y != destination.y:
+            return True
+
+        return False

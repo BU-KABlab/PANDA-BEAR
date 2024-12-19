@@ -4,6 +4,8 @@
 from panda_lib.actions import (
     ca_deposition,
     Toolkit,
+    Hardware,
+    Labware,
     ExperimentStatus,
 )
 
@@ -27,8 +29,9 @@ metadata = {
 }
 
 def run(
-    instructions: PEDOTExperiment,
-    toolkit: Toolkit,
+    experiment: PEDOTExperiment,
+    hardware: Hardware,
+    labware: Labware,
 ):
     """
     The initial screening of the edot solution
@@ -39,37 +42,47 @@ def run(
     4. Save
 
     """
-    toolkit.global_logger.info("Running experiment %s", instructions.experiment_id)
-    toolkit.global_logger.info(
-        "Running experiment %s part 1 of 3", instructions.experiment_id
+    toolkit = Toolkit(
+        mill=hardware.mill,
+        scale=hardware.scale,
+        pump=hardware.pump,
+        wellplate=labware.wellplate,
+        global_logger=hardware.global_logger,
+        experiment_logger=hardware.experiment_logger,
+        flir_camera=hardware.flir_camera,
+        arduino=hardware.arduino,
+    )
+    hardware.global_logger.info("Running experiment %s", experiment.experiment_id)
+    hardware.global_logger.info(
+        "Running experiment %s part 1 of 3", experiment.experiment_id
     )
     ca_deposition(
         soln_name="edot",
-        instructions=instructions,
+        exp_obj=experiment,
         toolkit=toolkit,
         rinse_well_at_end=True,
     )
     toolkit.global_logger.info(
-        "Running experimnet %s part 2 of 3", instructions.experiment_id
+        "Running experimnet %s part 2 of 3", experiment.experiment_id
     )
     ca_deposition(
-        instructions=instructions,
+        exp_obj=experiment,
         toolkit=toolkit,
         soln_name="liclo4",
         custom_deposition_function=chrono_amp_edot_bleaching,
         rinse_well_at_end=False,
     )
     toolkit.global_logger.info(
-        "Running experiment %s part 3 of 3", instructions.experiment_id
+        "Running experiment %s part 3 of 3", experiment.experiment_id
     )
     ca_deposition(
-        instructions=instructions,
+        exp_obj=experiment,
         toolkit=toolkit,
         soln_name="liclo4",
         custom_deposition_function=chrono_amp_edot_coloring,
         rinse_well_at_end=False,
     )
-    instructions.set_status_and_save(ExperimentStatus.COMPLETE)
+    experiment.set_status_and_save(ExperimentStatus.COMPLETE)
 
 
 # def pedotcv(

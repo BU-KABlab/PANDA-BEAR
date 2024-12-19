@@ -6,10 +6,10 @@ SQLAlchemy models for the PANDA database
 from datetime import datetime as dt
 from datetime import timezone
 
-from sqlalchemy import Column, ForeignKey, Text, text, event, Table
+from sqlalchemy import Column, ForeignKey, Table, Text, event, text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, relationship
-from sqlalchemy.sql.sqltypes import BigInteger, Integer, JSON, Float, String, Boolean
+from sqlalchemy.sql.sqltypes import JSON, BigInteger, Boolean, Float, Integer, String
 
 Base = declarative_base()
 
@@ -501,6 +501,22 @@ class VialStatus(Base):
     def __repr__(self):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
 
+    @property
+    def x(self):
+        return self.vial_coordinates.get("x")
+
+    @property
+    def y(self):
+        return self.vial_coordinates.get("y")
+
+    @property
+    def z_top(self):
+        return self.vial_coordinates.get("z_top")
+
+    @property
+    def z_bottom(self):
+        return self.vial_coordinates.get("z_bottom")
+
 
 class PotentiostatReadout(Base):
     """PotentiostatReadout table model"""
@@ -547,3 +563,55 @@ class PotentiostatTechniques(Base):
     gamry_1010T = Column(Boolean, nullable=False)
     gamry_1010B = Column(Boolean, nullable=False)
     gamry_1010E = Column(Boolean, nullable=False)
+
+
+class Tool(Base):
+    """Tool table model"""
+
+    __tablename__ = "panda_mill_tools"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    offset = Column(JSON, nullable=False)
+    updated = Column(String, default=dt.now(timezone.utc))
+
+    def __repr__(self):
+        return f"<Tool(id={self.id}, name={self.name}, offset={self.offset}, updated={self.updated})>"
+
+    @property
+    def x(self):
+        value: float = 0.0
+        try:
+            value = float(self.offset.get("x"))
+        except ValueError:
+            value = 0.0
+        return value
+
+    @property
+    def y(self):
+        value: float = 0.0
+        try:
+            value = float(self.offset.get("y"))
+        except ValueError:
+            value = 0.0
+        return value
+
+    @property
+    def z(self):
+        value: float = 0.0
+        try:
+            value = float(self.offset.get("z"))
+        except ValueError:
+            value = 0.0
+        return value
+
+    @x.setter
+    def x(self, value: float):
+        self.offset["x"] = value
+
+    @y.setter
+    def y(self, value: float):
+        self.offset["y"] = value
+
+    @z.setter
+    def z(self, value: float):
+        self.offset["z"] = value

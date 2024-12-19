@@ -14,11 +14,12 @@ Additionally controller should be able to:
 
 # pylint: disable=line-too-long, broad-exception-caught
 import importlib
+import logging
 import multiprocessing
 import sys
 import time
 from pathlib import Path
-from typing import Sequence
+from typing import Optional, Sequence, Tuple
 
 import PySpin
 from slack_sdk import errors as slack_errors
@@ -36,20 +37,27 @@ from .errors import (
     CAFailure,
     CVFailure,
     DepositionFailure,
+    ExperimentError,
+    ExperimentNotFoundError,
     InstrumentConnectionError,
+    InsufficientVolumeError,
+    MismatchWellplateTypeError,
     OCPFailure,
     ProtocolNotFoundError,
     ShutDownCommand,
     WellImportError,
 )
 from .experiment_class import (
+    EchemExperimentBase,
     ExperimentBase,
     ExperimentResult,
     ExperimentResultsRecord,
     ExperimentStatus,
+    select_complete_experiment_information,
+    select_experiment_status,
     select_specific_result,
 )
-from .instrument_toolkit import Toolkit
+from .instrument_toolkit import Hardware, Labware, Toolkit
 from .log_tools import apply_log_filter, setup_default_logger, timing_wrapper
 from .movement import Mill, MockMill
 from .obs_controls import MockOBSController, OBSController
@@ -58,7 +66,7 @@ from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .syringepump import MockPump, SyringePump
 from .utilities import SystemState
 from .vials import StockVial, Vial2, WasteVial, read_vials
-from .wellplate import Wellplate, Well
+from .wellplate import Well, Wellplate
 
 config = read_config()
 # set up slack globally so that it can be used in the main function and others
@@ -108,7 +116,6 @@ def experiment_loop_worker(
     apply_log_filter(logger=logger)
     controller_slack.send_message("alert", "PANDA_SDL is starting up")
     toolkit = None
-    al_campaign_iteration = 0
     current_experiment = None
 
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
@@ -196,8 +203,11 @@ def experiment_loop_worker(
                 break  # break out of the main while True loop
 
             # Does the experiment object's well_type and well_id exist as new or queued in the wellplate
-            well:Well = toolkit.wellplate.wells[current_experiment.well_id]
-            if well.plate_id != toolkit.wellplate.plate_id or current_experiment.well_type_number != toolkit.wellplate.type_number:
+            well: Well = toolkit.wellplate.wells[current_experiment.well_id]
+            if (
+                well.plate_id != toolkit.wellplate.plate_id
+                or current_experiment.well_type_number != toolkit.wellplate.type_number
+            ):
                 logger.error(
                     "The experiment object's well type and wellplate id do not match the current wellplate"
                 )
@@ -205,7 +215,7 @@ def experiment_loop_worker(
                     "alert",
                     "The experiment object's well type and well id do not exist in the wellplate",
                 )
-                break  # break out of the main while True loop 
+                break  # break out of the main while True loop
 
             logger.info(
                 "Experiment %d selected and validated", current_experiment.experiment_id
@@ -217,7 +227,8 @@ def experiment_loop_worker(
                 well_id=current_experiment.well_id,
             )
             ## Check that there is enough volume in the stock vials to run the experiment
-            if not check_stock_vials(current_experiment, stock_vials):
+            sufficient_stock, _ = check_stock_vials(current_experiment, stock_vials)
+            if not sufficient_stock:
                 error_message = f"Experiment {current_experiment.experiment_id} cannot be run because there is not enough volume in the stock vials"
                 controller_slack.send_message(
                     "alert",
@@ -237,7 +248,7 @@ def experiment_loop_worker(
                     f"Experiment {current_experiment.experiment_id} has been moved to the back of the queue. Checking for other experiments",
                 )
                 # continue  # continue to the next experiment
-                break # break out of the main while True loop
+                break  # break out of the main while True loop
             # Announce the experiment
             pre_experiment_status_msg = (
                 f"Running experiment {current_experiment.experiment_id}"
@@ -294,10 +305,10 @@ def experiment_loop_worker(
                     raise ProtocolNotFoundError(
                         f"Protocol {protocol_entry.name} does not have a 'run' or 'main' function"
                     )
-            
+
             try:
                 protocol_function(
-                    instructions=current_experiment,
+                    experiment=current_experiment,
                     toolkit=toolkit,
                 )
             except Exception as error:
@@ -417,14 +428,229 @@ def experiment_loop_worker(
         obs.place_text_on_screen("")
         obs.stop_recording()
         sql_system_state.set_system_status(SystemState.IDLE)
-        # controller_slack.send_slack_message(
-        #     "alert",
-        #     "Please command the slack monitor to 'stop' to end the slack monitoring",
-        # )
-        # if slack_thread.is_alive():
-        #     slack_thread.join()
+
         controller_slack.send_message("alert", "PANDA_SDL is shutting down...goodbye")
         status_queue.put((process_id, "idle"))
+
+
+def sila_experiment_loop_worker(
+    specific_experiment_id: Optional[int] = None,
+    specific_well_id: Optional[str] = None,
+    process_id: Optional[int] = None,
+    status_queue: multiprocessing.Queue = None,
+    command_queue: multiprocessing.Queue = None,
+) -> None:
+    """
+    Main worker function to execute SILA experiments.
+    """
+
+    toolkit, _ = connect_to_instruments()
+    hardware = Hardware(
+        pump=toolkit.pump,
+        mill=toolkit.mill,
+        flir_camera=toolkit.flir_camera,
+        arduino=toolkit.arduino,
+        global_logger=toolkit.global_logger,
+    )
+    labware = Labware(
+        wellplate=Wellplate(),
+        global_logger=toolkit.global_logger,
+    )
+
+    def set_worker_state(state: SystemState):
+        """Set the worker state"""
+        sql_system_state.set_system_status(state)
+        status_queue.put((process_id, f"{specific_experiment_id}: {state.value}"))
+
+    set_worker_state(SystemState.RUNNING)
+    exp_logger = (
+        hardware.global_logger
+        if hardware.global_logger is not None
+        else setup_default_logger(log_name="panda")
+    )
+    ## Reset the logger to log to the PANDA_SDL.log file and format
+    apply_log_filter(exp_logger)
+
+    try:
+        exp_obj = None
+
+        ## Check that the pipette is empty, if not dispose of full volume into waste
+        if hardware.pump.pipette.volume > 0:
+            exp_logger.info("Pipette not empty, purging into waste")
+            set_worker_state(SystemState.PIPETTE_PURGE)
+            actions.purge_pipette(hardware.mill, hardware.pump)
+        # This also validates the experiment parameters since its a pydantic object
+        exp_obj: EchemExperimentBase = _initialize_experiment(
+            specific_experiment_id, hardware, labware, exp_logger, specific_well_id
+        )
+
+        ## Check that there is enough volume in the stock vials to run the experiment
+        _validate_the_stock_solutions(exp_obj, labware)
+        # Announce the experiment
+        exp_logger.info("Running experiment %d", exp_obj.experiment_id)
+        exp_obj.set_status_and_save(ExperimentStatus.RUNNING)
+
+        ## Run the experiment
+        apply_log_filter(
+            exp_logger,
+            exp_obj.experiment_id,
+            exp_obj.well_id,
+            str(exp_obj.project_id) + "." + str(exp_obj.project_campaign_id),
+        )
+
+        exp_logger.info("Beginning experiment %d", exp_obj.experiment_id)
+        protocol_function = _fetch_protocol_function(exp_obj.protocol_id)
+
+        try:
+            protocol_function(
+                experiment=exp_obj,
+                hardware=hardware,
+                labware=labware,
+            )
+        except (
+            OCPFailure,
+            DepositionFailure,
+            CVFailure,
+            CAFailure,
+            ExperimentError,
+        ) as error:
+            if exp_obj:
+                exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+            exp_logger.exception(error)
+            raise error
+        except Exception as error:
+            exp_logger.exception(error)
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+            raise error
+
+        finally:
+            if exp_obj is not None:
+                status = select_experiment_status(exp_obj.experiment_id)
+                scheduler.save_results(exp_obj)
+                if status == ExperimentStatus.COMPLETE:
+                    with db_setup.SessionLocal() as connection:
+                        connection.query(panda_models.Experiments).filter(
+                            panda_models.Experiments.experiment_id
+                            == exp_obj.experiment_id
+                        ).update({"needs_analysis": True})
+                        connection.commit()
+
+    except (ProtocolNotFoundError, KeyboardInterrupt, Exception) as error:
+        set_worker_state(SystemState.ERROR)
+        if exp_obj is not None:
+            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+        exp_logger.exception(error)
+        raise error
+
+    finally:
+        # Lets handle the experiment first
+        if exp_obj is not None:
+            post_experiment_status_msg = f"Experiment {exp_obj.experiment_id} ended with status {exp_obj.status.value}"
+            logger.info(post_experiment_status_msg)
+            scheduler.save_results(exp_obj)
+            share_to_slack(exp_obj)
+
+        ## Clean up the instruments
+        if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
+            # assume unreal volume, not actually solution, set to 0
+            actions.purge_pipette(
+                mill=hardware.mill,
+                pump=hardware.pump,
+            )
+
+        hardware.mill.rest_electrode()
+        # We are not disconnecting from instruments with this function, that will
+        # be handled by a higher level function
+        apply_log_filter(exp_logger)
+        set_worker_state(SystemState.IDLE)
+
+
+def _attach_well_to_experiment(exp_obj: ExperimentBase, trgt_well: Well):
+    trgt_well.experiment_id = exp_obj.experiment_id
+    trgt_well.project_id = exp_obj.project_id
+    exp_obj.well = trgt_well
+    exp_obj.plate_id = trgt_well.plate_id
+
+
+def _initialize_experiment(
+    exp_id: int,
+    hardware: Hardware,
+    labware: Labware,
+    exp_logger: logging.Logger,
+    well_id: Optional[str] = None,
+) -> EchemExperimentBase:
+    """Initialize and validate the experiment."""
+    exp_obj = select_complete_experiment_information(exp_id)
+
+    # TODO: this is silly but we need to reference the queue to get the well_id because the experiment object isn't updated with the correct target well_id
+    _, _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
+        specific_experiment_id=exp_id
+    )
+    # TODO: Replace with checking for available well, unless given one.
+
+    exp_obj.well_id = well_id
+
+    if not exp_obj:
+        raise ExperimentNotFoundError(f"Experiment {exp_id} not found in the database.")
+
+    well = labware.wellplate.wells[exp_obj.well_id]
+    if (
+        well.plate_id != labware.wellplate.plate_id
+        or exp_obj.well_type_number != labware.wellplate.type_number
+    ):
+        raise MismatchWellplateTypeError("Mismatched wellplate type or ID.")
+
+    exp_logger.info("Experiment %d selected and validated", exp_obj.experiment_id)
+    exp_obj.results = ExperimentResult(
+        experiment_id=exp_obj.experiment_id,
+        well_id=exp_obj.well_id,
+    )
+
+    _attach_well_to_experiment(exp_obj, well)
+
+    return exp_obj
+
+
+def _validate_the_stock_solutions(exp: EchemExperimentBase, labware: Labware):
+    sufficient_stock, check_table = check_stock_vials(exp, labware.stock_vials)
+    if not sufficient_stock:
+        issues = []
+        if check_table["insufficient"]:
+            issues.append(f"insufficient volume of: {check_table['insufficient']}")
+        if check_table["missing"]:
+            issues.append(f"missing vials: {check_table['missing']}")
+        if issues == []:
+            issues.append("unknown reason")
+        error_message = f"Experiment {exp.experiment_id} cannot be run because {', and '.join(issues)}"
+        raise InsufficientVolumeError(error_message)
+
+
+def _fetch_protocol_function(protocol_id: int):
+    protocol_entry: sql_protocol_utilities.ProtocolEntry = (
+        sql_protocol_utilities.select_protocol(protocol_id)
+    )
+
+    # Convert the file path to a module name
+    module_name = Path(
+        (config.get("GENERAL", "protocols_dir") + "." + protocol_entry.filepath)
+        .replace("/", ".")
+        .rstrip(".py")
+    )
+
+    # Import the module
+    protocol_module = importlib.import_module(module_name.name)
+
+    # Get the main function from the module
+    try:
+        protocol_function = getattr(protocol_module, "run")
+    except AttributeError:
+        try:
+            protocol_function = getattr(protocol_module, "main")
+        except AttributeError:
+            raise ProtocolNotFoundError(
+                f"Protocol {protocol_entry.name} does not have a 'run' or 'main' function"
+            )
+    return protocol_function
 
 
 @timing_wrapper
@@ -532,7 +758,9 @@ def establish_system_state() -> (
 
 
 @timing_wrapper
-def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) -> bool:
+def check_stock_vials(
+    experiment: ExperimentBase, stock_vials: Sequence[Vial2]
+) -> Tuple[bool, dict]:
     """
     Check that there is enough volume in the stock vials to run the experiment
 
@@ -544,9 +772,19 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
         bool: True if there is enough volume in the stock vials to run the experiment
     """
     ## Check that the experiment has solutions and those soltuions are in the stock vials
+
+    check_table = {
+        "sufficient": [],
+        "insufficient": [],
+        "missing": [],
+    }
+
+    passes = True
+
     if len(experiment.solutions) == 0:
         logger.warning("The experiment has no solutions.")
-        return True
+        passes = True
+        return passes, check_table
     for solution in experiment.solutions:
         solution_lwr = str(solution).lower()
         logger.debug("Checking for solution %s in stock vials", solution_lwr)
@@ -557,13 +795,19 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
             )
-            return False
+            passes = False
+            check_table["missing"].append(solution)
 
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
     for solution in experiment.solutions:
         solution_lwr = str(solution).lower()
-        volume_required = experiment.solutions[solution]["volume"]
+        vol = experiment.solutions[solution]["volume"]
+        try:
+            rep = experiment.solutions[solution]["repeated"]
+        except KeyError:
+            rep = 1
+        volume_required = vol * rep
         volume_available = sum(
             [
                 vial.volume
@@ -576,8 +820,12 @@ def check_stock_vials(experiment: ExperimentBase, stock_vials: Sequence[Vial2]) 
                 "There is not enough volume of solution %s to run the experiment",
                 solution,
             )
-            return False
-    return True
+            passes = False
+            check_table["insufficient"].append(solution)
+        else:
+            check_table["sufficient"].append(solution)
+
+    return passes, check_table
 
 
 @timing_wrapper
@@ -641,6 +889,7 @@ def connect_to_instruments(
         global_logger=logger,
         experiment_logger=logger,
         arduino=None,
+        flir_camera=None,
     )
 
     if use_mock_instruments:

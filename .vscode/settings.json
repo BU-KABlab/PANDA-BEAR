@@ -2,8 +2,8 @@
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "python.formatting.provider": "Black",
     "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoSearchPaths": true,
     "githubPullRequests.ignoredPullRequestBranches": [
         "main"
     ],
@@ -21,13 +21,30 @@
             "database": "P:\\epanda_prod.db"
         },
         {
-            "previewLimit": 50,
+            "previewLimit": 100,
             "driver": "SQLite",
             "name": "test_db",
             "database": "test_db.db"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "100.84.246.115",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "BearGuest-Cornell",
+            "group": "KABLAB",
+            "database": "Bear",
+            "username": "BearGuest-Cornell",
+            "password": "BearGuest2024!"
         }
     ],
     "sqltools.useNodeRuntime": true,
-    "editor.rulers": [80,120],
-
+    "editor.rulers": [
+        100,
+        120
+    ],
 }

@@ -112,6 +112,34 @@ def run_panda_sdl_without_ml():
     return exp_processes
 
 
+def run_sila_experiment_function():
+    queue_list = print_queue_info()
+    exp_id = int(
+        input_validation(
+            "Enter the experiment ID: ",
+            int,
+            None,
+            False,
+            "Invalid experiment ID",
+            queue_list,
+        )
+    )
+    if not exp_id:
+        return
+
+    exp_processes = Process(
+        target=experiment_loop.sila_experiment_loop_worker,
+        kwargs={
+            "status_queue": status_queue,
+            "command_queue": exp_cmd_queue,
+            "process_id": ProcessIDs.CONTROL_LOOP,
+            "specific_experiment_id": exp_id,
+        },
+    )
+    exp_processes.start()
+    return exp_processes
+
+
 def change_wellplate():
     """Changes the current wellplate."""
     wellplate_id = wellplate.load_new_wellplate(ask=True)
@@ -477,7 +505,7 @@ def update_well_status():
     sql_wellplate.update_well_status(well_id, wellplate_id, status)
 
 
-def list_analysis_scrip_ids():
+def list_analysis_script_ids():
     """List the analysis script IDs in the database."""
     analyzers = load_analyzers()
     print("Analysis Script IDs:")
@@ -490,7 +518,7 @@ def list_analysis_scrip_ids():
 def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
     menu_options = {
-        "0": run_panda_sdl_with_ml,
+        "0": run_sila_experiment_function,
         "1": run_panda_sdl_without_ml,
         "1.1": stop_panda_sdl,
         "1.2": pause_panda_sdl,
@@ -518,7 +546,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "9": test_pipette,
         "10": start_analsyis_loop,
         "11": stop_analysis_loop,
-        "12": list_analysis_scrip_ids,
+        "12": list_analysis_script_ids,
         "t": toggle_testing_mode,
         "r": refresh,
         "w": show_warrenty,
@@ -527,22 +555,43 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "q": exit_program,
     }
 
+    missing_labware = check_essential_labware()
+
     if reduced:
         # Remove the blocking options
         for key in blocking_choices:
             menu_options.pop(key, None)
 
-    while True:
-        print("\nWhat would you like to do?")
-        for key, value in menu_options.items():
-            print(f"{key}. {value.__name__.replace('_', ' ').title()}")
+    if missing_labware:
+        # Prevent experiments from being run and prevent generation of experiments
+        for key in experiment_choices:
+            menu_options.pop(key, None)
+        additional_blocked = ["4.1", "3.0", "3.1", "3.2", "3.3", "1.1", "1.2", "1.3"]
+        for key in additional_blocked:
+            menu_options.pop(key, None)
 
+        print(f"""Missing essential labware:
+{', '.join(missing_labware)}
+Experiments and generation are disabled until the labware is present.""")
+
+    while True:
+        menu_items = list(menu_options.items())
+        half = len(menu_items) // 2 + len(menu_items) % 2
+
+        for i in range(half):
+            left = f"{menu_items[i][0]}. {menu_items[i][1].__name__.replace('_', ' ').title()}"
+            right = (
+                f"{menu_items[i + half][0]}. {menu_items[i + half][1].__name__.replace('_', ' ').title()}"
+                if i + half < len(menu_items)
+                else ""
+            )
+            print(f"{left:<40} {right}")
         user_choice = input("Enter the number of your choice: ").strip().lower()
+
         if user_choice in menu_options:
             return menu_options[user_choice], user_choice
         input("Invalid choice. Please try again.")
         refresh()
-        continue
 
 
 def get_process_status(process_status_queue: Queue, process_id, current_status=None):
@@ -640,6 +689,34 @@ def get_active_db():
         return read_config()["PRODUCTION"]["production_db_address"]
 
 
+def check_essential_labware():
+    """Check if the essential labware is present."""
+    missing = []
+
+    # Check if the stock and waste vials are present
+    stock_vials, waste_vials = vials.read_vials()
+    if not stock_vials:
+        missing.append("stock vials")
+
+    if not waste_vials:
+        missing.append("waste vials")
+
+    # Check if the wellplate is present
+    wellplate_id, _, new_wells = wellplate.read_current_wellplate_info()
+    if not wellplate_id:
+        missing.append("wellplate")
+
+    if new_wells is None or new_wells == 0:
+        missing.append("new wells")
+
+    # Check if the pipette is present
+    current_pipette = pipette.select_pipette_status()
+    if not current_pipette:
+        missing.append("pipette")
+
+    return missing
+
+
 if __name__ == "__main__":
     config = read_config()
     slackThread_running.set()
@@ -679,10 +756,11 @@ Process Status:
     Slack Bot: {slackThread_running.is_set()}
 """
             )
+
             # Get the function name and the choice key, reducing the options
             # if the experiment loop is running.
             function_name, choice_key = main_menu(
-                exp_loop_prcss.is_alive() if exp_loop_prcss else False
+                exp_loop_prcss.is_alive() if exp_loop_prcss else False,
             )
 
             try:

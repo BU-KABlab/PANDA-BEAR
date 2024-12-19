@@ -5,12 +5,17 @@ from pathlib import Path
 
 
 # Create a logger
-def set_up_mill_logger(path_to_logs: Path) -> logging.Logger:
+def set_up_mill_logger(
+    path_to_logs: Path = Path(__file__).parent / "logs",
+) -> logging.Logger:
     """Set up the mill logger.
 
     Args:
     path_to_logs (Path): The path to the logs directory.
     """
+    path_to_logs = Path(path_to_logs)
+    if not path_to_logs.exists():
+        path_to_logs.mkdir()
     logger = logging.getLogger("grbl_cnc_mill")
     if not logger.hasHandlers():
         logger = logging.getLogger(__name__)

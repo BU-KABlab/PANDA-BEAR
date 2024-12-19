@@ -52,7 +52,7 @@ class OBSController:
         client_timeout=3,
     ):
         if config.getboolean("OPTIONS", "testing"):
-            return
+            return MockOBSController()
         try:
             self.client = obsws.ReqClient(
                 host=client_host,

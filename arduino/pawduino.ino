@@ -1,10 +1,4 @@
-// The pawduino sketch is the main sketch that runs on the Arduino. It is responsible
-// for listening for commands from the computer, and sending confirmation.
-// Currently features include: turning on/off white LEDs, turning on/off red LEDs, turning on/off 5V electromagnet
-
-// libraries
 // Include Libraries
-// #include "Arduino.h"
 #include "Adafruit_NeoPixel.h"
 #include <stdint.h>
 
@@ -28,7 +22,7 @@
 #define hello 99
 
 // Global variables and defines
-#define NUMPIXELS 16
+#define NUMPIXELS 24
 // object initialization
 Adafruit_NeoPixel ring(NUMPIXELS, NEOPIXEL_RING_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -43,8 +37,24 @@ void setup()
   pinMode(LEDR_1_PIN, OUTPUT);
   pinMode(LEDR_2_PIN, OUTPUT);
   ring.begin();
-  ring.setBrightness(500); // adjust brightness here
+  ring.setBrightness(100); // adjust brightness here
   ring.show();            // Initialize all pixels to 'off'
+
+  ringTest();
+  ring.clear();
+  ring.show();
+}
+
+void ringTest()
+{
+  for (int i = 0; i < ring.numPixels(); i++)
+  {                               // For each pixel in strip...
+    ring.setPixelColor(i, ring.Color(0, 0, 255)); //  Set pixel's color (in RAM)
+    ring.show();
+    delay(500);
+    ring.setPixelColor(i, 0); // Turn off the pixel after delay
+  }
+  ring.clear();
 }
 
 void ringFill(uint32_t color)
@@ -52,8 +62,9 @@ void ringFill(uint32_t color)
   for (int i = 0; i < ring.numPixels(); i++)
   {                               // For each pixel in strip...
     ring.setPixelColor(i, color); //  Set pixel's color (in RAM)
+    ring.show();
+    
   }
-  ring.show();
 }
 
 void loop()
@@ -78,9 +89,9 @@ void loop()
     case co:
       digitalWrite(LEDR_1_PIN, HIGH); // turn on red LED
       digitalWrite(LEDR_2_PIN, HIGH);
-      ringFill(ring.Color(255, 255, 255)); // White
+      //ringFill(ring.Color(255, 255, 255)); // White
       ring.setPixelColor(0, ring.Color(0, 0, 255)); // Blue
-      ring.setPixelColor(8, ring.Color(0, 0, 255));
+      ring.setPixelColor(12, ring.Color(0, 0, 255));
       ring.show();
       Serial.println("103");
       break;

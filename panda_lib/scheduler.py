@@ -35,9 +35,9 @@ from .sql_tools.sql_wellplate import (
     check_if_plate_type_exists,
     get_well_by_id,
     select_current_wellplate_info,
-    select_wellplate_info,
     select_next_available_well,
     select_well_status,
+    select_wellplate_info,
     update_well,
 )
 from .wellplate import Well
@@ -108,6 +108,8 @@ def read_next_experiment_from_queue(
     Reads the next experiment from the queue table, the experiment with the highest priority (lowest number).
     If random_pick is True, then a random experiment with the highest priority is selected.
     Otherwise, the lowest experiment id in the queue with the highest priority is selected.
+
+    If experiment_id is provided, then the experiment with that id is selected.
 
     Args:
         random_pick (bool): Whether to randomly select an experiment from the queue.
@@ -181,11 +183,6 @@ def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
 def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> None:
     """Update the experiment parameters in the experiment_parameters table"""
     try:
-        # execute_sql_command(
-        #     "UPDATE experiment_parameters SET ? = ? WHERE experiment_id = ?",
-        #     (parameter, experiment[parameter], experiment.experiment_id),
-        # )
-
         with SessionLocal() as session:
             session.query(ExperimentParameters).filter_by(
                 experiment_id=experiment.experiment_id
@@ -232,7 +229,7 @@ def add_nonfile_experiment(
                 target_well,
             )
             experiment.well_id = target_well
-
+            # update_experiment_parameters(experiment, "well_id")
     # Data clean the solutions to all be lowercase
     experiment.solutions = {k.lower(): v for k, v in experiment.solutions.items()}
     # Save the experiment as a separate file in the experiment_queue subfolder

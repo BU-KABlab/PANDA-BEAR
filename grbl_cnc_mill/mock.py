@@ -1,16 +1,18 @@
 """Contains mocks for cnc driver objects for offline testing"""
 
 # standard libraries
+import json
+import logging
 import re
+from pathlib import Path
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
-from panda_lib.config import read_logging_dir
-from .logger import set_up_mill_logger
-from .driver import Mill as RealMill
 
-logger = set_up_mill_logger(read_logging_dir())
+from .driver import Mill as RealMill
+from .exceptions import MillConfigError
+from .tools import Coordinates
 
 
 class MockMill(RealMill):
@@ -48,17 +50,18 @@ class MockMill(RealMill):
     safe_move(x_coord, y_coord, z_coord, instrument): Simulate a safe move with horizontal and vertical movements.
     """
 
-    def __init__(self, config_file="configuration.json"):
-        super().__init__(config_file)
+    def __init__(self):
+        super().__init__()
         self.ser_mill: MockSerialToMill = self.connect_to_mill()
-        self.current_x = 0.0
-        self.current_y = 0.0
-        self.current_z = 0.0
-        self.feed_rate = 2000
+        self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
+        self.safe_floor_height = -85.0
+        self.logger_location = Path(__file__).parent / "mock_logs"
+
+        self.change_logging_level("DEBUG")
 
     def connect_to_mill(self):
         """Connect to the mill"""
-        logger.info("Connecting to the mill")
+        self.logger.info("Connecting to the mill")
         ser_mill = MockSerialToMill(
             port="COM4",
             baudrate=115200,
@@ -72,18 +75,37 @@ class MockMill(RealMill):
 
     def disconnect(self):
         """Disconnect from the mill"""
-        logger.info("Disconnecting from the mill")
+        self.logger.info("Disconnecting from the mill")
         self.ser_mill.close()
         self.active_connection = False
 
     def set_feed_rate(self, rate):
         """Simulate setting the feed rate"""
         self.feed_rate = rate
-        logger.info("Setting feed rate to %s", rate)
+        self.logger.info("Setting feed rate to %s", rate)
 
     def clear_buffers(self):
         """Simulate clearing buffers"""
-        logger.info("Clearing buffers")
+        self.logger.info("Clearing buffers")
+
+    def read_mill_config(self):
+        """Read the mill config from the mill and set it as an attribute"""
+        try:
+            if self.ser_mill.is_open:
+                self.logger.info("Reading mill config")
+                config_path = Path("grbl_cnc_mill/_configuration.json")
+                with config_path.open("r") as file:
+                    mill_config = json.load(file)
+                self.config = mill_config
+                self.logger.debug("Mill config: %s", mill_config)
+            else:
+                self.logger.error("Serial connection to mill is not open")
+                # raise MillConnectionError(
+                #     "Serial connection to mill is not open, cannot read config"
+                # )
+        except Exception as exep:
+            self.logger.error("Error reading mill config: %s", str(exep))
+            raise MillConfigError("Error reading mill config") from exep
 
 
 class MockSerialToMill:
@@ -101,6 +123,7 @@ class MockSerialToMill:
         self.current_x = 0.0
         self.current_y = 0.0
         self.current_z = 0.0
+        self.logger = logging.getLogger(__name__)
 
     def close(self):
         """Simulate closing the serial connection"""
@@ -123,23 +146,42 @@ class MockSerialToMill:
             # G01 Z{}
 
             # Regular expression to extract the coordinates
-            pattern = re.compile(r"G01 X([\d.-]+)? Y([\d.-]+)? Z([\d.-]+)?")
-            match = pattern.search(command)
-            if match:
-                self.current_x = (
-                    float(match.group(1)) if match.group(1) else self.current_x
-                )
-                self.current_y = (
-                    float(match.group(2)) if match.group(2) else self.current_y
-                )
-                self.current_z = (
-                    float(match.group(3)) if match.group(3) else self.current_z
-                )
+            steps = command.count("\n")
+            pattern = re.compile(r"G01(?: X([\d.-]+))?(?: Y([\d.-]+))?(?: Z([\d.-]+))?")
+            for i in range(steps):
+                step = command.split("\n")[i]
+                match = pattern.search(step)
+                if match:
+                    if match.group(1) is not None:
+                        self.current_x = float(match.group(1))
+                    if match.group(2) is not None:
+                        self.current_y = float(match.group(2))
+                    if match.group(3) is not None:
+                        self.current_z = float(match.group(3))
+                else:
+                    self.logger.warning(
+                        "Could not extract coordinates from the command"
+                    )
             else:
-                logger.warning("Could not extract coordinates from the command")
-        else:
-            pass
+                pass
 
     def read(self):
+        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>".encode()
+
+    def readline(self):
         """Simulate reading from the serial connection"""
-        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>"
+        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>\n".encode()
+
+    def readlines(self):
+        """Simulate reading from the serial connection"""
+        return [
+            f"<Idle|MPos:{self.current_x},{self.current_y},{self.current_z}|Bf:15,127|FS:0,0>\n".encode()
+        ]
+
+    def flushInput(self):
+        """Simulate flushing the input buffer"""
+        pass
+
+    def flushOutput(self):
+        """Simulate flushing the output buffer"""
+        pass

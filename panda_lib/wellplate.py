@@ -20,10 +20,10 @@ from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import (
     ExperimentParameters,
     Experiments,
-    WellHx,
-    WellPlates,
     MillConfig,
     PlateTypes,
+    WellHx,
+    WellPlates,
 )
 from .vessel import Vessel, VesselCoordinates
 
@@ -326,7 +326,7 @@ class Wellplate:
         """
         Initializes a new instance of the Wells2 class.
         """
-        self.wells: dict = {}
+        self.wells: dict[str, Well] = {}
         self.a1_x: float = x_a1
         self.a1_y: float = y_a1
         self.rows: str = rows
@@ -1060,7 +1060,7 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
     Returns:
         int: The current wellplate id
         int: The current wellplate type number
-        bool: Number of new wells
+        int: Number of new wells
     """
     current_plate_id, current_type_number, _ = (
         sql_wellplate.select_current_wellplate_info()
