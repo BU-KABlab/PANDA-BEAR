@@ -12,7 +12,7 @@
 /*white leds */
 #define wo 1
 #define wf 2
-/*red leds*/
+/*contact angle leds*/
 #define co 3
 #define cf 4
 /*electromagnet*/
@@ -24,7 +24,7 @@
 // Global variables and defines
 #define NUMPIXELS 24
 // object initialization
-Adafruit_NeoPixel ring(NUMPIXELS, NEOPIXEL_RING_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel ring(NUMPIXELS, NEOPIXEL_RING_PIN, NEO_GRBW + NEO_KHZ800);
 
 void setup()
 {
@@ -55,6 +55,7 @@ void ringTest()
     ring.setPixelColor(i, 0); // Turn off the pixel after delay
   }
   ring.clear();
+  Serial.println("Ring Test Complete");
 }
 
 void ringFill(uint32_t color)
@@ -90,8 +91,8 @@ void loop()
       digitalWrite(LEDR_1_PIN, HIGH); // turn on red LED
       digitalWrite(LEDR_2_PIN, HIGH);
       //ringFill(ring.Color(255, 255, 255)); // White
-      ring.setPixelColor(0, ring.Color(0, 0, 255)); // Blue
-      ring.setPixelColor(12, ring.Color(0, 0, 255));
+      ring.setPixelColor(6, ring.Color(0, 0, 255)); // Blue
+      ring.setPixelColor(18, ring.Color(0, 0, 255));
       ring.show();
       Serial.println("103");
       break;
