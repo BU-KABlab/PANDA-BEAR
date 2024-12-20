@@ -112,14 +112,14 @@ class Mill:
     def read_working_volume(self):
         """Checks the mill config for soft limits to be enabled, and then if so check the x, y, and z max travel limits"""
         multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
-        if self.config["settings"]["$20"] == 1:
+        if self.config["$20"] == 1:
             self.logger.info("Soft limits are enabled in the mill config")
-            if self.config["settings"]["$3"] == 0:
+            if self.config["$3"] == 0:
                 self.logger.info("Using default working volume, third octant")
                 multiplier = -1
-            self.working_volume.x = self.config["settings"]["$130"] * multiplier
-            self.working_volume.y = self.config["settings"]["$131"] * multiplier
-            self.working_volume.z = self.config["settings"]["$132"] * multiplier
+            self.working_volume.x = self.config["$130"] * multiplier
+            self.working_volume.y = self.config["$131"] * multiplier
+            self.working_volume.z = self.config["$132"] * multiplier
         else:
             self.logger.warning("Soft limits are not enabled in the mill config")
             self.logger.warning("Using default working volume")
@@ -509,14 +509,14 @@ class Mill:
 
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
-        status_mode = self.config["settings"]["$10"]
+        status_mode = self.config["$10"]
 
         if status_mode not in [0, 1, 2, 3]:
             self.logger.error("Invalid status mode")
             raise ValueError("Invalid status mode")
 
         max_attempts = 3
-        homing_pull_off = self.config["settings"]["$27"]
+        homing_pull_off = self.config["$27"]
 
         pattern = wpos_pattern if status_mode in [0, 2] else mpos_pattern
         coord_type = "WPos" if status_mode in [0, 2] else "MPos"
