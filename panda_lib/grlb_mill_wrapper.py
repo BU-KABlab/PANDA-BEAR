@@ -92,7 +92,7 @@ class PandaMill(MockMill):
                 db.query(VialStatus).filter(VialStatus.position == "e1").first()
             )
         coords: Coordinates = Coordinates(
-            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.z_bottom
+            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )
         self.safe_move(coords.x, coords.y, 0, tool="electrode")
         for _ in range(rinses):
@@ -108,7 +108,7 @@ class PandaMill(MockMill):
                 db.query(VialStatus).filter(VialStatus.position == "e1").first()
             )
         coords: Coordinates = Coordinates(
-            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.z_bottom
+            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )
         self.move_to_safe_position()
         self.safe_move(coordinates=coords, tool="electrode")
