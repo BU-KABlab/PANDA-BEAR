@@ -106,8 +106,24 @@ class Mill:
         self.homed = False
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
-        self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
+        self.working_volume: Coordinates = self.read_working_volume()
         self.safe_floor_height = -85.0
+
+    def read_working_volume(self):
+        """Checks the mill config for soft limits to be enabled, and then if so check the x, y, and z max travel limits"""
+        multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
+        if self.config["settings"]["$20"] == 1:
+            self.logger.info("Soft limits are enabled in the mill config")
+            if self.config["settings"]["$3"] == 0:
+                self.logger.info("Using default working volume, third octant")
+                multiplier = -1
+            self.working_volume.x = self.config["settings"]["$130"] * multiplier
+            self.working_volume.y = self.config["settings"]["$131"] * multiplier
+            self.working_volume.z = self.config["settings"]["$132"] * multiplier
+        else:
+            self.logger.warning("Soft limits are not enabled in the mill config")
+            self.logger.warning("Using default working volume")
+            self.working_volume = Coordinates(x=-415.0, y=-300.0, z=-85.0)
 
     def change_logging_level(self, level):
         """Change the logging level"""
@@ -263,7 +279,9 @@ class Mill:
         try:
             if self.ser_mill.is_open:
                 self.logger.info("Reading mill config")
-                mill_config = self.grbl_settings()
+                mill_config = (
+                    self.grbl_settings()
+                )  # TODO: Verify the format that settings are returned
                 self.config = mill_config
                 self.logger.debug("Mill config: %s", mill_config)
             else:
@@ -740,13 +758,16 @@ class Mill:
         )
 
     def _validate_target_coordinates(self, target_coordinates: Coordinates):
-        if not self.working_volume.x <= target_coordinates.x <= 1:
+        if (
+            not self.working_volume.x <= target_coordinates.x <= 0
+        ):  # TODO remove the <=0 check after verifying that new offsets work
+            # TODO move to overall travel from 0 to working volume as the check
             self.logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
-        if not self.working_volume.y <= target_coordinates.y <= 1:
+        if not self.working_volume.y <= target_coordinates.y <= 0:
             self.logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if not self.working_volume.z <= target_coordinates.z <= 1:
+        if not self.working_volume.z <= target_coordinates.z <= 0:
             self.logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 

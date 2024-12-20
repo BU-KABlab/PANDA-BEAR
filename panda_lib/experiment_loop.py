@@ -587,7 +587,6 @@ def _initialize_experiment(
         specific_experiment_id=exp_id
     )
     # TODO: Replace with checking for available well, unless given one.
-
     exp_obj.well_id = well_id
 
     if not exp_obj:
