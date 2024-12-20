@@ -30,9 +30,6 @@ from .vessel import Vessel, VesselCoordinates
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
-# MILL_CONFIG = "panda_lib/config/mill_config.json"
-# WELLPLATE_LOCATION = "panda_lib/config/wellplate_location.json" #TODO use wellpalte table going forward
-
 
 @dataclass
 class WellCoordinates:
