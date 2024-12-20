@@ -300,34 +300,68 @@ user_projects = Table(
 )
 
 
-class Vials(Base):
-    """
-    Vials table model
+class VialsBase:
+    """Base class for Vials and VialStatus models"""
 
-    Categories: 0 = Stock, 1 = Waste, 2 = Reagent, 3 = Unknown
-    """
-
-    __tablename__ = "panda_vial_hx"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     position = Column(String)
+    category = Column(Integer)
+    name = Column(String)
     contents = Column(String)
     viscosity_cp = Column(Float)
     concentration = Column(Float)
     density = Column(Float)
-    category = Column(Integer)
-    radius = Column(Integer)
-    height = Column(Integer)
-    depth = Column(Integer)
-    name = Column(String)
-    volume = Column(Float)
-    capacity = Column(Integer)
-    contamination = Column(Integer)
-    vial_coordinates = Column(JSON)
-    wall_thickness = Column(Float)
+    height = Column(Integer, default=57)
+    radius = Column(Integer, default=14)
+    volume = Column(Float, default=20000)
+    capacity = Column(Integer, default=20000)
+    contamination = Column(Integer, default=0)
+    coordinates = Column(JSON)
+    base_thickness = Column(Float, default=1.0)
+    dead_volume = Column(Integer, default=11000)
+    volume_height = Column(Float)
+    bottom = Column(Float)
+    top = Column(Float)
     updated = Column(String, default=dt.now(timezone.utc))
 
     def __repr__(self):
-        return f"<Vials(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
+        return f"<{self.__class__.__name__}(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
+
+    @property
+    def x(self):
+        return self.coordinates.get("x")
+
+    @property
+    def y(self):
+        return self.coordinates.get("y")
+
+    @property
+    def z(self):
+        return self.coordinates.get("z")
+
+    @x.setter
+    def x(self, value):
+        self.coordinates["x"] = value
+
+    @y.setter
+    def y(self, value):
+        self.coordinates["y"] = value
+
+    @z.setter
+    def z(self, value):
+        self.coordinates["z"] = value
+
+
+class Vials(VialsBase, Base):
+    """Vials table model"""
+
+    __tablename__ = "panda_vial_hx"
+
+
+class VialStatus(VialsBase, Base):
+    """VialStatus view model"""
+
+    __tablename__ = "panda_vial_status"
 
 
 class WellHx(Base):
@@ -396,25 +430,6 @@ class WellPlates(Base):
         return f"<WellPlates(id={self.id}, type_id={self.type_id}, current={self.current})>"
 
 
-class Queue(Base):
-    """Queue view model"""
-
-    __tablename__ = "panda_queue"
-    experiment_id = Column(Integer, primary_key=True)
-    project_id = Column(Integer)
-    project_campaign_id = Column(Integer)
-    priority = Column(Integer)
-    process_type = Column(String)
-    filename = Column(String)
-    well_type = Column(String, name="well type")
-    well_id = Column(String)
-    status = Column(String)
-    status_date = Column(String)
-
-    def __repr__(self):
-        return f"<Queue(experiment_id={self.experiment_id}, project_id={self.project_id}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, well_type={self.well_type}, well_id={self.well_id}, status={self.status}, status_date={self.status_date})>"
-
-
 class WellStatus(Base):
     """WellStatus view model"""
 
@@ -434,6 +449,25 @@ class WellStatus(Base):
 
     def __repr__(self):
         return f"<WellStatus(plate_id={self.plate_id}, type_number={self.type_number}, well_id={self.well_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, experiment_id={self.experiment_id}, project_id={self.project_id}, volume={self.volume}, coordinates={self.coordinates}, capacity={self.capacity}, height={self.height})>"
+
+
+class Queue(Base):
+    """Queue view model"""
+
+    __tablename__ = "panda_queue"
+    experiment_id = Column(Integer, primary_key=True)
+    project_id = Column(Integer)
+    project_campaign_id = Column(Integer)
+    priority = Column(Integer)
+    process_type = Column(String)
+    filename = Column(String)
+    well_type = Column(String, name="well type")
+    well_id = Column(String)
+    status = Column(String)
+    status_date = Column(String)
+
+    def __repr__(self):
+        return f"<Queue(experiment_id={self.experiment_id}, project_id={self.project_id}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, well_type={self.well_type}, well_id={self.well_id}, status={self.status}, status_date={self.status_date})>"
 
 
 class MillConfig(Base):
@@ -475,47 +509,6 @@ class SystemVersions(Base):
 
     def __repr__(self):
         return f"<SystemVersions(id={self.id}, mill={self.mill}, pump={self.pump}, potentiostat={self.potentiostat}, reference_electrode={self.reference_electrode}, working_electrode={self.working_electrode}, wells={self.wells}, pipette_adapter={self.pipette_adapter}, optics={self.optics}, scale={self.scale}, camera={self.camera}, lens={self.lens}, pin={self.pin})>"
-
-
-class VialStatus(Base):
-    """VialStatus view model"""
-
-    __tablename__ = "panda_vial_status"
-    id = Column(Integer, primary_key=True)
-    position = Column(String)
-    contents = Column(String)
-    viscosity_cp = Column(Float)
-    concentration = Column(Float)
-    density = Column(Float)
-    category = Column(Integer)
-    radius = Column(Integer)
-    height = Column(Integer)
-    depth = Column(Integer)
-    name = Column(String)
-    volume = Column(Float)
-    capacity = Column(Integer)
-    contamination = Column(Integer)
-    vial_coordinates = Column(JSON)
-    updated = Column(String, default=dt.now(timezone.utc))
-
-    def __repr__(self):
-        return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, depth={self.depth}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, vial_coordinates={self.vial_coordinates}, updated={self.updated})>"
-
-    @property
-    def x(self):
-        return self.vial_coordinates.get("x")
-
-    @property
-    def y(self):
-        return self.vial_coordinates.get("y")
-
-    @property
-    def z_top(self):
-        return self.vial_coordinates.get("z_top")
-
-    @property
-    def z_bottom(self):
-        return self.vial_coordinates.get("z_bottom")
 
 
 class PotentiostatReadout(Base):
