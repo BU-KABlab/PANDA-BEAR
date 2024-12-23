@@ -60,7 +60,6 @@ from .experiment_class import (
 from .instrument_toolkit import Hardware, Labware, Toolkit
 from .log_tools import apply_log_filter, setup_default_logger, timing_wrapper
 from .movement import Mill, MockMill
-from .obs_controls import MockOBSController, OBSController
 from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .syringepump import MockPump, SyringePump
@@ -106,12 +105,12 @@ def experiment_loop_worker(
 
     controller_slack = SlackBot(test=use_mock_instruments)
     # slack_thread = threading.Thread(target=run_slack_bot, args=(use_mock_instruments,))
-    if config.getboolean("OPTIONS", "testing") or not config.getboolean(
-        "OPTIONS", "use_obs"
-    ):
-        obs = MockOBSController()
-    else:
-        obs = OBSController()
+    # if config.getboolean("OPTIONS", "testing") or not config.getboolean(
+    #     "OPTIONS", "use_obs"
+    # ):
+    #     obs = MockOBSController()
+    # else:
+    #     obs = OBSController()
     ## Reset the logger to log to the PANDA_SDL.log file and format
     apply_log_filter(logger=logger)
     controller_slack.send_message("alert", "PANDA_SDL is starting up")
@@ -120,8 +119,8 @@ def experiment_loop_worker(
 
     # Everything runs in a try block so that we can close out of the serial connections if something goes wrong
     try:
-        obs.place_text_on_screen("PANDA_SDL is starting up")
-        obs.start_recording()
+        # obs.place_text_on_screen("PANDA_SDL is starting up")
+        # obs.start_recording()
         current_experiment = None
         # Connect to equipment
         toolkit, all_found = connect_to_instruments(use_mock_instruments)
@@ -129,7 +128,7 @@ def experiment_loop_worker(
             raise InstrumentConnectionError("Not all instruments connected")
 
         controller_slack.send_message("alert", "PANDA_SDL has connected to equipment")
-        obs.place_text_on_screen("PANDA_SDL has connected to equipment")
+        # obs.place_text_on_screen("PANDA_SDL has connected to equipment")
         status_queue.put((process_id, "connected to equipment"))
 
         ## Establish state of system - we do this each time because each experiment changes the system state
@@ -137,7 +136,7 @@ def experiment_loop_worker(
 
         ## Check that the pipette is empty, if not dispose of full volume into waste
         if toolkit.pump.pipette.volume > 0:
-            obs.place_text_on_screen("Pipette is not empty, purging into waste")
+            # obs.place_text_on_screen("Pipette is not empty, purging into waste")
             status_queue.put((process_id, "Purging pipette into waste"))
             actions.purge_pipette(
                 mill=toolkit.mill,
@@ -150,7 +149,7 @@ def experiment_loop_worker(
             # slack_thread.start()
 
             ## Reset the logger to log to the PANDA_SDL.log file and format
-            obs.place_text_on_screen("")
+            # obs.place_text_on_screen("")
             apply_log_filter(logger=logger)
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
@@ -425,8 +424,8 @@ def experiment_loop_worker(
         toolkit.mill.rest_electrode()
         if toolkit is not None:
             disconnect_from_instruments(toolkit)
-        obs.place_text_on_screen("")
-        obs.stop_recording()
+        # obs.place_text_on_screen("")
+        # obs.stop_recording()
         sql_system_state.set_system_status(SystemState.IDLE)
 
         controller_slack.send_message("alert", "PANDA_SDL is shutting down...goodbye")
