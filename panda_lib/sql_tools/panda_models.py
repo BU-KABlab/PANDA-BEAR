@@ -6,9 +6,9 @@ SQLAlchemy models for the PANDA database
 from datetime import datetime as dt
 from datetime import timezone
 
-from sqlalchemy import Column, ForeignKey, Table, Text, event, text
+from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, text
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import Mapped, declarative_base, relationship
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
 from sqlalchemy.sql.sqltypes import JSON, BigInteger, Boolean, Float, Integer, String
 
 Base = declarative_base()
@@ -253,15 +253,15 @@ class Users(Base):
     """Users table model"""
 
     __tablename__ = "panda_users"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    first = Column(String, nullable=False)
-    last = Column(String, nullable=False)
-    username = Column(String, unique=True)
-    password = Column(String, nullable=False)
-    email = Column(String, nullable=False)
-    active = Column(Boolean, default=True)
-    created = Column(String, default=dt.now(timezone.utc))
-    updated = Column(
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    first: Mapped[str] = mapped_column(String, nullable=False)
+    last: Mapped[str] = mapped_column(String, nullable=False)
+    username: Mapped[str] = mapped_column(String, unique=True)
+    password: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String, nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+    updated: Mapped[str] = mapped_column(
         String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
     )
 
@@ -300,32 +300,31 @@ user_projects = Table(
 )
 
 
-class VialsBase:
-    """Base class for Vials and VialStatus models"""
+class DeckObjectBase:
+    """Base class for DeckObject models
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    position = Column(String)
-    category = Column(Integer)
-    name = Column(String)
-    contents = Column(String)
-    viscosity_cp = Column(Float)
-    concentration = Column(Float)
-    density = Column(Float)
-    height = Column(Integer, default=57)
-    radius = Column(Integer, default=14)
-    volume = Column(Float, default=20000)
-    capacity = Column(Integer, default=20000)
-    contamination = Column(Integer, default=0)
-    coordinates = Column(JSON)
-    base_thickness = Column(Float, default=1.0)
-    dead_volume = Column(Integer, default=11000)
-    volume_height = Column(Float)
-    bottom = Column(Float)
-    top = Column(Float)
-    updated = Column(String, default=dt.now(timezone.utc))
+    Attributes:
+        coordinates (dict): The object coordinates.
+        base_thickness (float): The base thickness of the object.
+        height (float): The height of the object.
+        top (float): The top of the object.
+        bottom (float): The bottom of the object.
+        name (str): The name of the object.
+    """
 
-    def __repr__(self):
-        return f"<{self.__class__.__name__}(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
+    coordinates: Mapped[dict] = mapped_column(JSON, default={"x": 0, "y": 0, "z": 0})
+    base_thickness: Mapped[float] = mapped_column(Float, default=1.0)
+    height: Mapped[float] = mapped_column(Float, default=6.0)
+    top: Mapped[float] = mapped_column(
+        Float,
+        Computed(
+            "round(json_extract(coordinates, '$.z') + base_thickness + height, 2)"
+        ),
+    )
+    bottom: Mapped[float] = mapped_column(
+        Float, Computed("round(json_extract(coordinates, '$.z') + base_thickness, 2)")
+    )
+    name: Mapped[str] = mapped_column(String)
 
     @property
     def x(self):
@@ -352,10 +351,41 @@ class VialsBase:
         self.coordinates["z"] = value
 
 
+class VesselBase(DeckObjectBase):
+    radius: Mapped[int] = mapped_column(Integer, default=14)
+    volume: Mapped[float] = mapped_column(Float, default=20000)
+    capacity: Mapped[int] = mapped_column(Integer, default=20000)
+    contamination: Mapped[int] = mapped_column(Integer, default=0)
+    dead_volume: Mapped[int] = mapped_column(Integer, default=1000)
+    volume_height: Mapped[float] = mapped_column(
+        Float,
+        Computed(
+            "round(json_extract(coordinates, '$.z') + base_thickness + round(dead_volume / (pi() * radius * radius), 3), 2)"
+        ),
+    )
+    contents: Mapped[dict] = mapped_column(JSON, default={})
+
+
+class VialsBase(VesselBase):
+    """Base class for Vials and VialStatus models"""
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    position: Mapped[str] = mapped_column(String)
+    category: Mapped[int] = mapped_column(Integer)
+    viscosity_cp: Mapped[float] = mapped_column(Float)
+    concentration: Mapped[float] = mapped_column(Float)
+    density: Mapped[float] = mapped_column(Float)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
+
+
 class Vials(VialsBase, Base):
     """Vials table model"""
 
-    __tablename__ = "panda_vial_hx"
+    __tablename__ = "panda_vial"
 
 
 class VialStatus(VialsBase, Base):
@@ -364,67 +394,87 @@ class VialStatus(VialsBase, Base):
     __tablename__ = "panda_vial_status"
 
 
-class WellHx(Base):
+class WellModel(VesselBase, Base):
     """WellHx table model"""
 
     __tablename__ = "panda_well_hx"
-    plate_id = Column(Integer, primary_key=True)
-    well_id = Column(String, primary_key=True)
-    experiment_id = Column(Integer)
-    project_id = Column(Integer)
-    status = Column(String)
-    status_date = Column(String, default=dt.now(timezone.utc))
-    contents = Column(JSON)
-    volume = Column(Float)
-    coordinates = Column(JSON)
-    updated = Column(String, default=dt.now(timezone.utc))
+    plate_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    well_id: Mapped[str] = mapped_column(String, primary_key=True)
+    experiment_id: Mapped[int] = mapped_column(Integer)
+    project_id: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String)
+    dead_volume: Mapped[int] = mapped_column(Integer, default=100)
+    status_date: Mapped[str] = mapped_column(
+        String, default=dt.now(timezone.utc), nullable=False
+    )
+    updated: Mapped[str] = mapped_column(
+        String, default=dt.now(timezone.utc), nullable=False
+    )
 
     def __repr__(self):
-        return f"<WellHx(plate_id={self.plate_id}, well_id={self.well_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, volume={self.volume}, coordinates={self.coordinates}, updated={self.updated})>"
+        return f"<WellHx(plate_id={self.plate_id}, well_id={self.well_id}, experiment_id={self.experiment_id}, project_id={self.project_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, volume={self.volume}, coordinates={self.coordinates}, base_thickness={self.base_thickness}, height={self.height}, radius={self.radius}, capacity={self.capacity}, top={self.top}, bottom={self.bottom}, updated={self.updated})>"
 
 
 class PlateTypes(Base):
     """WellTypes table model"""
 
     __tablename__ = "panda_plate_types"
-    id: int = Column(Integer, primary_key=True)
-    substrate: str = Column(String)
-    gasket: str = Column(String)
-    count: int = Column(Integer)
-    rows: str = Column(String)
-    cols: int = Column(Integer)
-    shape: str = Column(String)
-    radius_mm: float = Column(Float)
-    y_spacing: float = Column(Float)
-    x_spacing: float = Column(Float)
-    gasket_length_mm: float = Column(Float)
-    gasket_width_mm: float = Column(Float)
-    gasket_height_mm: float = Column(Float)
-    x_offset: float = Column(Float)
-    y_offset: float = Column(Float)
-    max_liquid_height_mm: float = Column(Float)
-    capacity_ul: float = Column(Float)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    substrate: Mapped[str] = mapped_column(String)
+    gasket: Mapped[str] = mapped_column(String)
+    count: Mapped[int] = mapped_column(Integer)
+    rows: Mapped[str] = mapped_column(String)
+    cols: Mapped[int] = mapped_column(Integer)
+    shape: Mapped[str] = mapped_column(String)
+    radius_mm: Mapped[float] = mapped_column(Float)
+    y_spacing: Mapped[float] = mapped_column(Float)
+    x_spacing: Mapped[float] = mapped_column(Float)
+    gasket_length_mm: Mapped[float] = mapped_column(Float)
+    gasket_width_mm: Mapped[float] = mapped_column(Float)
+    gasket_height_mm: Mapped[float] = mapped_column(Float)
+    x_offset: Mapped[float] = mapped_column(Float)
+    y_offset: Mapped[float] = mapped_column(Float)
+    max_liquid_height_mm: Mapped[float] = mapped_column(Float)
+    capacity_ul: Mapped[float] = mapped_column(Float)
 
     def __repr__(self):
         return f"<WellTypes(id={self.id}, substrate={self.substrate}, gasket={self.gasket}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.y_spacing}, height_mm={self.gasket_height_mm}, max_liquid_height_mm={self.max_liquid_height_mm}, capacity_ul={self.capacity_ul})>"
 
 
-class WellPlates(Base):
-    """WellPlates table model"""
+class WellPlates(Base, DeckObjectBase):
+    """WellPlates table model
+
+    Attributes:
+        id (int): The well plate ID.
+        type_id (int): The well plate type ID.
+        current (bool): Is the wellplate the currently active wellplate on the deck.
+        a1_x (float): The x-coordinate of well A1.
+        a1_y (float): The y-coordinate of well A1.
+        orientation (int): The orientation of the well plate.
+        rows (str): The rows of the well plate.
+        cols (int): The columns of the well plate.
+        echem_height (float): The height of the electrochemical cell.
+        image_height (float): The height of the image.
+        coordinates (dict): The object coordinates.
+        base_thickness (float): The base thickness of the object.
+        height (float): The height of the object.
+        top (float): The top of the object.
+        bottom (float): The bottom of the object.
+        name (str): The name of the object.
+
+    """
 
     __tablename__ = "panda_wellplates"
-    id = Column(Integer, primary_key=True)
-    type_id = Column(Integer, ForeignKey("panda_plate_types.id"))
-    current = Column(Boolean, default=False)
-    a1_x = Column(Float)
-    a1_y = Column(Float)
-    orientation = Column(Integer)
-    rows = Column(String)
-    cols = Column(Integer)
-    z_bottom = Column(Float)
-    z_top = Column(Float)
-    echem_height = Column(Float)
-    image_height = Column(Float)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    type_id: Mapped[int] = mapped_column(Integer, ForeignKey("panda_plate_types.id"))
+    current: Mapped[bool] = mapped_column(Boolean, default=False)
+    a1_x: Mapped[float] = mapped_column(Float)
+    a1_y: Mapped[float] = mapped_column(Float)
+    orientation: Mapped[int] = mapped_column(Integer, default=0)
+    rows: Mapped[str] = mapped_column(String, default="ABCDEFGH")
+    cols: Mapped[int] = mapped_column(Integer, default=12)
+    echem_height: Mapped[float] = mapped_column(Float)
+    image_height: Mapped[float] = mapped_column(Float)
 
     def __repr__(self):
         return f"<WellPlates(id={self.id}, type_id={self.type_id}, current={self.current})>"
@@ -434,18 +484,18 @@ class WellStatus(Base):
     """WellStatus view model"""
 
     __tablename__ = "panda_well_status"
-    plate_id = Column(Integer, primary_key=True)
-    type_number = Column(Integer)
-    well_id = Column(String, primary_key=True)
-    status = Column(String)
-    status_date = Column(String)
-    contents = Column(JSON)
-    experiment_id = Column(Integer)
-    project_id = Column(Integer)
-    volume = Column(Float)
-    coordinates = Column(JSON)
-    capacity = Column(Float)
-    height = Column(Float)
+    plate_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    type_number: Mapped[int] = mapped_column(Integer)
+    well_id: Mapped[str] = mapped_column(String, primary_key=True)
+    status: Mapped[str] = mapped_column(String)
+    status_date: Mapped[str] = mapped_column(String)
+    contents: Mapped[dict] = mapped_column(JSON)
+    experiment_id: Mapped[int] = mapped_column(Integer)
+    project_id: Mapped[int] = mapped_column(Integer)
+    volume: Mapped[float] = mapped_column(Float)
+    coordinates: Mapped[dict] = mapped_column(JSON)
+    capacity: Mapped[float] = mapped_column(Float)
+    height: Mapped[float] = mapped_column(Float)
 
     def __repr__(self):
         return f"<WellStatus(plate_id={self.plate_id}, type_number={self.type_number}, well_id={self.well_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, experiment_id={self.experiment_id}, project_id={self.project_id}, volume={self.volume}, coordinates={self.coordinates}, capacity={self.capacity}, height={self.height})>"
