@@ -6,10 +6,10 @@
 # )
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
-    Experiments,
     ExperimentParameters,
     ExperimentResults,
-    WellHx,
+    Experiments,
+    WellModel,
 )
 
 
@@ -68,14 +68,14 @@ def main():
         session.query(ExperimentResults).filter(
             ExperimentResults.experiment_id.in_(experiment_ids)
         ).delete(synchronize_session=False)
-        session.query(WellHx).filter(WellHx.project_id == 999).update(
+        session.query(WellModel).filter(WellModel.project_id == 999).update(
             {
-                WellHx.experiment_id: None,
-                WellHx.project_id: None,
-                WellHx.status: "new",
-                WellHx.status_date: None,
-                WellHx.contents: {},
-                WellHx.volume: 0,
+                WellModel.experiment_id: None,
+                WellModel.project_id: None,
+                WellModel.status: "new",
+                WellModel.status_date: None,
+                WellModel.contents: {},
+                WellModel.volume: 0,
             },
             synchronize_session=False,
         )
