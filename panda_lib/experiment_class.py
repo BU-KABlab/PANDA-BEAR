@@ -22,7 +22,7 @@ from panda_lib.sql_tools.panda_models import (
     ExperimentResults,
     Experiments,
     ExperimentStatusView,
-    WellHx,
+    WellModel,
     WellPlates,
 )
 
@@ -1378,14 +1378,14 @@ def update_experiment_status(
             .filter(WellPlates.current == 1)
             .scalar_subquery()
         )
-        session.query(WellHx).filter(WellHx.well_id == well_id).filter(
-            WellHx.plate_id == subquery
+        session.query(WellModel).filter(WellModel.well_id == well_id).filter(
+            WellModel.plate_id == subquery
         ).update(
             {
-                WellHx.status: status.value,
-                WellHx.status_date: status_date,
-                WellHx.experiment_id: experiment_id,
-                WellHx.project_id: project_id,
+                WellModel.status: status.value,
+                WellModel.status_date: status_date,
+                WellModel.experiment_id: experiment_id,
+                WellModel.project_id: project_id,
             }
         )
         session.commit()
@@ -1435,15 +1435,15 @@ def update_experiments_statuses(
 
     with SessionLocal() as session:
         for parameter in parameters:
-            session.query(WellHx).filter(WellHx.well_id == parameter[4]).filter(
-                WellHx.plate_id
+            session.query(WellModel).filter(WellModel.well_id == parameter[4]).filter(
+                WellModel.plate_id
                 == session.query(WellPlates.id).filter(WellPlates.current == 1)
             ).update(
                 {
-                    WellHx.status: parameter[0],
-                    WellHx.status_date: parameter[1],
-                    WellHx.experiment_id: parameter[2],
-                    WellHx.project_id: parameter[3],
+                    WellModel.status: parameter[0],
+                    WellModel.status_date: parameter[1],
+                    WellModel.experiment_id: parameter[2],
+                    WellModel.project_id: parameter[3],
                 }
             )
         session.commit()
