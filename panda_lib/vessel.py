@@ -3,7 +3,7 @@ Vessel module.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Union
 
 from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.log_tools import setup_default_logger
@@ -34,23 +34,21 @@ class VesselCoordinates:
     -----
         x (Union[int, float, float]): The x-coordinate of the vessel.
         y (Union[int, float, float]): The y-coordinate of the vessel.
-        z_top (Union[int, float, float], optional): The z-coordinate of top the vessel.
-        z_bottom (Union[int, float, float], optional): The z-coordinate of the bottom of the vessel.
+        z (Union[int, float, float]): The z-coordinate of the vessel base.
     """
 
     x: Union[int, float]
     y: Union[int, float]
-    z_top: Union[int, float] = 0
-    z_bottom: Optional[Union[int, float]] = None
+    z: Union[int, float]
+    top: Union[int, float] = 0
+    bottom: Union[int, float] = 0
 
     def __post_init__(self):
-        if self.z_bottom is None:
-            self.z_bottom = 0
-
         self.x = round(self.x, 6)
         self.y = round(self.y, 6)
-        self.z_top = round(self.z_top, 6)
-        self.z_bottom = round(self.z_bottom, 6)
+        self.z = round(self.z, 6)
+        self.top = round(self.top, 6)
+        self.bottom = round(self.bottom, 6)
 
     def __getitem__(self, key: str) -> Union[int, float]:
         """Allows subscripting the WellCoordinates for attributes."""
@@ -61,8 +59,7 @@ class VesselCoordinates:
         return {
             "x": self.x,
             "y": self.y,
-            "z_top": self.z_top,
-            "z_bottom": self.z_bottom,
+            "z": self.z,
         }
 
 
@@ -108,27 +105,53 @@ class Vessel:
         density: float,
         coordinates: Union[VesselCoordinates, dict],
         contents={},
-        depth: float = float(0),
     ) -> None:
-        self.name = name.lower() if name is not None else ""
         self.position = None
-        self.volume = volume
-        self.capacity = capacity
-        self.density = density
+        self.category = None
+        self.name = name.lower() if name is not None else ""
+        self.contents = contents
         self.viscosity_cp = float(0.0)
-        if isinstance(coordinates, dict):
+        self.concentration = float(0.0)
+        self._density = density
+        self.height = 0.0
+        self.radius = 0.0
+        self._volume = volume
+        self.capacity = capacity
+        self.contamination = 0
+        self.coordinates = coordinates
+        self.base_thickness = 0.0
+        self.volume_height = 0.0
+        self.top = 0.0
+        self.bottom = 0.0
+
+        if isinstance(self.coordinates, dict):
             self.coordinates = VesselCoordinates(**coordinates)
         else:
-            self.coordinates = coordinates
+            pass
 
-        self.contents = contents
-        self.depth = depth
+    def round_to_6(func):
+        def wrapper(self, value):
+            return func(self, round(value, 6) if value is not None else 0)
 
-        # Round all floats to 6 decimal places
-        self.volume = round(self.volume, 6) if self.volume is not None else 0
-        self.capacity = round(self.capacity, 6) if self.capacity is not None else 0
-        self.density = round(self.density, 6) if self.density is not None else 0
-        self.depth = round(self.depth, 6) if self.depth is not None else 0
+        return wrapper
+
+    @property
+    def volume(self):
+        return self._volume
+
+    @volume.setter
+    @round_to_6
+    def volume(self, value):
+        self._volume = value
+
+    @property
+    def density(self):
+        return self._density
+
+    @density.setter
+    @round_to_6
+    def density(self, value):
+        self._density = value
 
     def __str__(self) -> str:
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
@@ -143,19 +166,12 @@ class Vessel:
                 self.name, self.volume, added_volume, self.capacity
             )
 
-        self.volume = round(self.volume + added_volume, 6)
+        self.volume = self.volume + added_volume
         logger.debug(
             "%s&%s",
             self.name + "_" + self.position if self.position is not None else self.name,
             self.volume,
         )
-
-        return self
-
-    def calculate_depth(self) -> float:
-        """Calculates the current depth of the solution in the vessel."""
-        # Different vessels will have different implementations of this method
-        pass
 
     def check_volume(self, volume_to_add: float) -> bool:
         """
