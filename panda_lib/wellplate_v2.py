@@ -21,7 +21,7 @@ from panda_lib.sql_tools.panda_models import (
     MillConfig,
     PlateTypes,
     WellModel,
-    WellPlates,
+    Wellplates,
 )
 
 from .sql_tools.sql_wellplate import (
@@ -158,7 +158,7 @@ class Well_v2(WellModel):
         self.session.commit()
 
 
-class Wellplate(WellPlates):
+class Wellplate(Wellplates):
     """
     Represents a well plate and each well in it.
     Is defined by by the Wellplates model class of the database, but also
@@ -190,7 +190,7 @@ class Wellplate(WellPlates):
         plate_id=None,
         type_id=None,
         create_new=False,
-        plate: WellPlates = None,
+        plate: Wellplates = None,
         type: PlateTypes = None,
         wells: dict[str:Well_v2] = None,
         orientation: int = 0,
@@ -209,7 +209,7 @@ class Wellplate(WellPlates):
         self.session = session
         self.orientation = orientation
         self.plate_id: int = plate_id
-        self.plate: WellPlates = plate
+        self.plate: Wellplates = plate
         self.type: PlateTypes = type
         self.wells: dict[str:Well_v2] = wells
 
@@ -228,12 +228,12 @@ class Wellplate(WellPlates):
             # Create a new WellPlates entry
             if self.plate_id:
                 # The user wants a new plate but is specifying a plate_id. This is allowed.
-                self.plate: WellPlates = WellPlates(
+                self.plate: Wellplates = Wellplates(
                     id=self.plate_id, type_id=type_id, **kwargs
                 )
             else:
                 # Create a new wellplate in the database and let the database assign the id
-                self.plate: WellPlates = WellPlates(type_id=type_id, **kwargs)
+                self.plate: Wellplates = Wellplates(type_id=type_id, **kwargs)
             session.add(self.plate)
 
             # Initialize wells
@@ -244,7 +244,7 @@ class Wellplate(WellPlates):
 
         elif self.plate_id:
             # Load an existing wellplate from the database
-            self.plate: WellPlates = session.query(WellPlates).get(self.plate_id)
+            self.plate: Wellplates = session.query(Wellplates).get(self.plate_id)
             if not self.plate:
                 raise ValueError(f"Wellplate with id {self.plate_id} does not exist.")
             self.type: PlateTypes = session.query(PlateTypes).get(self.plate.type_id)
@@ -252,7 +252,7 @@ class Wellplate(WellPlates):
         else:
             # Assume the user wants the current wellplate
             plate_id, type_id, _ = select_current_wellplate_info()
-            self.plate: WellPlates = session.query(WellPlates).get(plate_id)
+            self.plate: Wellplates = session.query(Wellplates).get(plate_id)
             self.type: PlateTypes = session.query(PlateTypes).get(type_id)
             self.wells = self._load_wells_from_db()
 
@@ -353,7 +353,7 @@ class Wellplate(WellPlates):
 
         # Set all wellplates to not current
         with self.session as session:
-            session.execute(update(WellPlates).values(current=False))
+            session.execute(update(Wellplates).values(current=False))
 
         # Set the current wellplate to true and update the database
         self.plate.current = True
@@ -369,7 +369,7 @@ class Wellplate(WellPlates):
             # Set the new active wellplate to true and update the database
             with self.session as session:
                 new_active_plate = session.execute(
-                    select(WellPlates).filter_by(id=new_active_plate_id)
+                    select(Wellplates).filter_by(id=new_active_plate_id)
                 ).scalar_one_or_none()
                 if new_active_plate:
                     new_active_plate.current = True
@@ -402,7 +402,7 @@ def _remove_wellplate_from_db(plate_id: int, session: Session = SessionLocal()) 
             session.delete(well)
 
         plate_to_delete = session.execute(
-            select(WellPlates).filter_by(id=plate_id)
+            select(Wellplates).filter_by(id=plate_id)
         ).scalar_one_or_none()
         if plate_to_delete:
             session.delete(plate_to_delete)
@@ -416,7 +416,7 @@ def _remove_wellplate_from_db(plate_id: int, session: Session = SessionLocal()) 
             .all()
         )
         plate = session.execute(
-            select(WellPlates).filter_by(id=plate_id)
+            select(Wellplates).filter_by(id=plate_id)
         ).scalar_one_or_none()
         if not wells and not plate:
             print(
