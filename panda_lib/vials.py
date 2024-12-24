@@ -66,7 +66,7 @@ class Vial2(Vessel):
         volume: float,
         capacity: float,
         density: float,
-        vial_coordinates: Union[VesselCoordinates],
+        vial_coordinates: VesselCoordinates,
         radius: float,
         height: float,
         contamination: int = 0,
@@ -454,27 +454,6 @@ def get_current_vials(group: Union[None, str] = None) -> List[dict]:
     """
     vial_parameters = []
     try:
-        # vial_parameters = execute_sql_command(
-        #     """
-        #     SELECT
-        #         name,
-        #         category,
-        #         position,
-        #         volume,
-        #         capacity,
-        #         density,
-        #         vial_coordinates,
-        #         radius,
-        #         height,
-        #         contamination,
-        #         contents,
-        #         viscosity_cp,
-        #         concentration,
-        #         depth
-        #     FROM vial_status
-        #     """
-        # )
-
         with SessionLocal() as session:
             vials = session.query(VialStatus).order_by(VialStatus.position).all()
             for vial in vials:
