@@ -9,7 +9,7 @@ import logging
 import math
 
 # pylint: disable=line-too-long
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from typing import Optional, Tuple, Union
 
 from panda_lib import experiment_class
@@ -22,8 +22,8 @@ from .sql_tools.panda_models import (
     Experiments,
     MillConfig,
     PlateTypes,
-    WellHx,
-    WellPlates,
+    WellModel,
+    Wellplates,
 )
 from .vessel import Vessel, VesselCoordinates
 
@@ -46,12 +46,16 @@ class WellCoordinates:
 
     x: Union[int, float]
     y: Union[int, float]
-    z_top: Union[int, float] = 0
-    z_bottom: Optional[Union[int, float]] = field(default=None)
+    z: Union[int, float] = 0
+    top: Union[int, float] = 0
+    bottom: Union[int, float] = 0
 
     def __post_init__(self):
-        if self.z_bottom is None:
-            self.z_bottom = 0
+        self.x = round(self.x, 6)
+        self.y = round(self.y, 6)
+        self.z = round(self.z, 6)
+        self.top = round(self.top, 6)
+        self.bottom = round(self.bottom, 6)
 
     def to_json_string(self) -> str:
         """Returns a JSON string representation of the coordinates."""
@@ -62,18 +66,18 @@ class WellCoordinates:
         return getattr(self, key)
 
 
-class WellCoordinatesEncoder(json.JSONEncoder):
-    """Custom JSON encoder for the WellCoordinates class."""
+# class WellCoordinatesEncoder(json.JSONEncoder):
+#     """Custom JSON encoder for the WellCoordinates class."""
 
-    def default(self, o) -> dict:
-        """Returns a dictionary representation of the WellCoordinates object."""
-        if isinstance(o, WellCoordinates):
-            return asdict(o)
-        return super().default(o)
+#     def default(self, o) -> dict:
+#         """Returns a dictionary representation of the WellCoordinates object."""
+#         if isinstance(o, WellCoordinates):
+#             return asdict(o)
+#         return super().default(o)
 
-    def encode(self, o) -> str:
-        """Returns a JSON representation of the WellCoordinates object."""
-        return json.dumps(o, cls=WellCoordinatesEncoder)
+#     def encode(self, o) -> str:
+#         """Returns a JSON representation of the WellCoordinates object."""
+#         return json.dumps(o, cls=WellCoordinatesEncoder)
 
 
 class Well(Vessel):
@@ -101,7 +105,7 @@ class Well(Vessel):
 
     def __init__(
         self,
-        well_id: str,
+        well_id: str,  # TODO: change to use the built in position attribute of vessel
         plate_id: int,
         coordinates: WellCoordinates,
         volume: float,
@@ -153,7 +157,6 @@ class Well(Vessel):
             density=density,
             coordinates=coordinates,
             contents=contents,
-            depth=depth,
         )
 
     def __str__(self) -> str:
@@ -761,8 +764,8 @@ def _remove_wellplate_from_db(plate_id: int) -> None:
         print("No action taken")
         return
     with SessionLocal() as session:
-        session.query(WellHx).filter(WellHx.plate_id == plate_id).delete()
-        session.query(WellPlates).filter(WellPlates.id == plate_id).delete()
+        session.query(WellModel).filter(WellModel.plate_id == plate_id).delete()
+        session.query(Wellplates).filter(Wellplates.id == plate_id).delete()
         session.commit()
 
 
@@ -791,8 +794,8 @@ def _remove_experiment_from_db(experiment_id: int) -> tuple[bool, str]:
                 .delete()
             )
             out_wells = (
-                session.query(WellHx)
-                .filter(WellHx.experiment_id == experiment_id)
+                session.query(WellModel)
+                .filter(WellModel.experiment_id == experiment_id)
                 .update({"experiment_id": None, "project_id": None, "status": "new"})
             )
             session.commit()
