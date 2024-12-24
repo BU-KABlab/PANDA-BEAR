@@ -10,7 +10,7 @@ from sqlalchemy import Integer, cast, func, select
 from panda_lib import wellplate as wellplate_module
 from panda_lib.sql_tools import sql_reports
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, WellPlates
+from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, Wellplates
 
 logger = sql_reports.logger
 
@@ -22,7 +22,7 @@ def check_if_wellplate_exists(plate_id: int) -> bool:
     with SessionLocal() as session:
         return (
             session.execute(
-                select(WellPlates).filter(WellPlates.id == plate_id)
+                select(Wellplates).filter(Wellplates.id == plate_id)
             ).scalar()
             is not None
         )
@@ -63,10 +63,10 @@ def select_wellplate_location(
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = session.execute(
-                select(WellPlates.id).filter(WellPlates.current == 1)
+                select(Wellplates.id).filter(Wellplates.current == 1)
             ).scalar()
-        wellplate: WellPlates = session.execute(
-            select(WellPlates).filter(WellPlates.id == plate_id)
+        wellplate: Wellplates = session.execute(
+            select(Wellplates).filter(Wellplates.id == plate_id)
         ).scalar_one_or_none()
         if wellplate is None:
             return None
@@ -87,10 +87,10 @@ def update_wellplate_location(plate_id: Union[int, None], **kwargs) -> None:
         if plate_id is None:
             logger.info("No plate_id provided, updating the current wellplate")
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
 
-        wellplate = session.query(WellPlates).filter(WellPlates.id == plate_id).first()
+        wellplate = session.query(Wellplates).filter(Wellplates.id == plate_id).first()
         if wellplate is None:
             raise ValueError(f"Wellplate {plate_id} does not exist")
         for key, value in kwargs.items():
@@ -106,11 +106,11 @@ def update_current_wellplate(new_plate_id: int) -> None:
     wellplate's current value to 1"""
 
     with SessionLocal() as session:
-        session.query(WellPlates).filter(WellPlates.current == 1).update(
-            {WellPlates.current: 0}
+        session.query(Wellplates).filter(Wellplates.current == 1).update(
+            {Wellplates.current: 0}
         )
-        session.query(WellPlates).filter(WellPlates.id == new_plate_id).update(
-            {WellPlates.current: 1}
+        session.query(Wellplates).filter(Wellplates.id == new_plate_id).update(
+            {Wellplates.current: 1}
         )
         session.commit()
 
@@ -123,7 +123,7 @@ def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
         well_type = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
 
         session.add(
-            WellPlates(
+            Wellplates(
                 id=plate_id,
                 type_id=type_id,
                 current=0,
@@ -146,7 +146,7 @@ def check_if_current_wellplate_is_new() -> bool:
 
     with SessionLocal() as session:
         current_plate_id = session.execute(
-            select(WellPlates.id).filter(WellPlates.current == 1)
+            select(Wellplates.id).filter(Wellplates.current == 1)
         ).scalar_one_or_none()
 
         if current_plate_id is None:
@@ -183,8 +183,8 @@ def get_number_of_wells(plate_id: Union[int, None] = None) -> int:
                 session.query(WellModel)
                 .filter(
                     WellModel.plate_id
-                    == session.query(WellPlates.id)
-                    .filter(WellPlates.current == 1)
+                    == session.query(Wellplates.id)
+                    .filter(Wellplates.current == 1)
                     .scalar_subquery()
                 )
                 .count()
@@ -217,8 +217,8 @@ def get_number_of_clear_wells(plate_id: Union[int, None] = None) -> int:
                 session.query(WellModel)
                 .filter(
                     WellModel.plate_id
-                    == session.query(WellPlates.id)
-                    .filter(WellPlates.current == 1)
+                    == session.query(Wellplates.id)
+                    .filter(Wellplates.current == 1)
                     .scalar_subquery()
                 )
                 .filter(WellModel.status.in_(["new", "clear", "queued"]))
@@ -244,9 +244,9 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
     """
 
     with SessionLocal() as session:
-        statement = select(WellPlates).filter_by(WellPlates.current == 1)
+        statement = select(Wellplates).filter_by(Wellplates.current == 1)
 
-        result: WellPlates = session.execute(statement).first()
+        result: Wellplates = session.execute(statement).first()
         current_plate_id = result.id
         current_type_number = result.type_id
         is_new = check_if_current_wellplate_is_new()
@@ -254,7 +254,7 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
     return current_plate_id, current_type_number, is_new
 
 
-def select_wellplate_info(plate_id: int) -> WellPlates:
+def select_wellplate_info(plate_id: int) -> Wellplates:
     """
     Get the wellplate information from the wellplates table.
 
@@ -266,7 +266,7 @@ def select_wellplate_info(plate_id: int) -> WellPlates:
     """
 
     with SessionLocal() as session:
-        result = session.query(WellPlates).filter(WellPlates.id == plate_id).first()
+        result = session.query(Wellplates).filter(Wellplates.id == plate_id).first()
         return result
 
 
@@ -284,7 +284,7 @@ def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
         result = (
             session.query(WellModel.well_id)
@@ -305,12 +305,12 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
         result = (
             session.query(
                 WellModel.plate_id,
-                WellPlates.type_id,
+                Wellplates.type_id,
                 WellModel.well_id,
                 WellModel.status,
                 WellModel.status_date,
@@ -322,8 +322,8 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
                 PlateTypes.capacity_ul,
                 PlateTypes.gasket_height_mm,
             )
-            .join(WellPlates, WellModel.plate_id == WellPlates.id)
-            .join(PlateTypes, WellPlates.type_id == PlateTypes.id)
+            .join(Wellplates, WellModel.plate_id == Wellplates.id)
+            .join(PlateTypes, Wellplates.type_id == PlateTypes.id)
             .filter(WellModel.plate_id == plate_id)
             .order_by(WellModel.well_id.asc())
             .all()
@@ -403,7 +403,7 @@ def select_well_status(well_id: str, plate_id: Union[int, None] = None) -> str:
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
         result = (
             session.query(WellModel.status)
@@ -443,7 +443,7 @@ def count_wells_with_new_status(plate_id: Union[int, None] = None) -> int:
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
 
         result = (
@@ -486,7 +486,7 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
         result = (
             session.query(WellModel.well_id)
@@ -517,7 +517,7 @@ def save_well_to_db(well_to_save: object) -> None:
     with SessionLocal() as session:
         if well_to_save.plate_id in [None, 0]:
             well_to_save.plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
 
         # Leaving this commented if we want to change how the table is structured.
@@ -564,7 +564,7 @@ def save_wells_to_db(wells_to_save: List[object]) -> None:
         for well in wells_to_save:
             if well.plate_id in [None, 0]:
                 well.plate_id = (
-                    session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                    session.query(Wellplates).filter(Wellplates.current == 1).first().id
                 )
 
             session.add(
@@ -647,7 +647,7 @@ def get_well_by_id(
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
         result = (
             session.query(WellModel)
@@ -718,7 +718,7 @@ def update_well_coordinates(
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
         session.query(WellModel).filter(WellModel.plate_id == plate_id).filter(
             WellModel.well_id == well_id
@@ -741,7 +741,7 @@ def update_well_status(
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
-                session.query(WellPlates).filter(WellPlates.current == 1).first().id
+                session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
         if status is None:
             status = select_well_status(well_id, plate_id)

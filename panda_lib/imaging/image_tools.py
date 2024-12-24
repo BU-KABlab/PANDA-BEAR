@@ -6,9 +6,9 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from pytz import utc
 
-from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import PlateTypes, WellPlates
 from panda_lib.experiment_class import ExperimentBase
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import PlateTypes, Wellplates
 from panda_lib.utilities import input_validation
 
 
@@ -48,7 +48,7 @@ def add_data_zone(
                 if experiment.plate_id is not None:
                     with SessionLocal() as session:
                         experiment.well_type_number = (
-                            session.query(WellPlates)
+                            session.query(Wellplates)
                             .filter_by(id=experiment.plate_id)
                             .first()
                             .type_id
