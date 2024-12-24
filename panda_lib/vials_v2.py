@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from panda_lib.utilities import directory_picker, file_picker
 
-from .sql_tools.db_setup import SessionLocal
+from .sql_tools.db_setup import SessionLocal as LocalSession
 from .sql_tools.panda_models import Vials
 from .vessel import OverFillException
 
@@ -64,7 +64,7 @@ class Vial(Vials):
         category: int,
         create_new: bool,
         activate: bool = True,
-        session: Session = SessionLocal(),
+        session: Session = LocalSession(),
         **kwargs,
     ) -> None:
         """
@@ -79,7 +79,7 @@ class Vial(Vials):
         self._contamination = kwargs.get("contamination", 0)
 
         if create_new:
-            self._create_or_update_vial(**kwargs, activate=activate)
+            self._create_or_update_vial(activate=activate, **kwargs)
         else:
             self._fetch_vial_from_db(activate=activate)
 
@@ -111,6 +111,7 @@ class Vial(Vials):
                         active=kwargs.get("active", True if activate else False),
                     )
                     session.add(self)
+                    # session.execute(insert(Vials).values(self.to_dict()))
                 else:
                     # Update existing vial
                     for key, value in kwargs.items():
@@ -118,14 +119,14 @@ class Vial(Vials):
                     session.add(vial)
 
                 session.commit()
-                self._fetch_vial_from_db()
+                # self._fetch_vial_from_db()
             except SQLAlchemyError as e:
                 session.rollback()
                 raise e
 
     def _fetch_vial_from_db(
         self,
-        activate,
+        activate: bool = True,
     ) -> None:
         with self.session as session:
             vial = session.execute(
@@ -268,9 +269,13 @@ class Vial(Vials):
                     session.add(vial)  # Update or insert a new one if it doesn't exist
                     session.commit()
                 else:
-                    raise ValueError(
+                    # raise ValueError(
+                    #     f"Vial with position {self.position} does not exist in the db"
+                    # )
+                    logger.warning(
                         f"Vial with position {self.position} does not exist in the db"
                     )
+                    logger.warning("Might be a new vial, creating a new record...")
             except SQLAlchemyError as e:
                 session.rollback()
                 raise e
@@ -306,7 +311,7 @@ class Vial(Vials):
         self.volume += volume
 
         logger.debug("Updated contents: %s", self.contents)
-        SessionLocal().commit()
+        self.session.commit()
 
     def remove_contents(self, volume: float) -> dict:
         """Removes contents from the well in the database and returns the removed contents."""
@@ -339,7 +344,7 @@ class Vial(Vials):
                 )
 
         logger.debug("Removed contents: %s", removed_contents)
-        SessionLocal().commit()
+        self.session.commit()
         return removed_contents
 
     def check_volume(self, volume_to_add: float) -> bool:
@@ -458,7 +463,7 @@ class WasteVial(Vial):
         return f"{self.name} has {self.volume} ul of {self.density} g/ml liquid"
 
 
-def get_active_vials(session: Session = SessionLocal()) -> List[Vial]:
+def get_active_vials(session: Session = LocalSession()) -> List[Vial]:
     """
     Get the active vials from the db
     """
@@ -521,7 +526,7 @@ def reset_vials(vialgroup: str) -> None:
 
 
 def delete_vial_position_from_db(
-    position: str, session: Session = SessionLocal()
+    position: str, session: Session = LocalSession()
 ) -> None:
     """Delete the vial position from the db"""
     with session as session:
