@@ -6,7 +6,7 @@ SQLAlchemy models for the PANDA database
 from datetime import datetime as dt
 from datetime import timezone
 
-from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, text
+from sqlalchemy import Column, Computed, ForeignKey, Text, text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
 from sqlalchemy.sql.sqltypes import JSON, BigInteger, Boolean, Float, Integer, String
@@ -249,55 +249,55 @@ class SystemStatus(Base):
         return f"<SystemStatus(id={self.id}, status={self.status}, comment={self.comment}, status_time={self.status_time}, test_mode={self.test_mode})>"
 
 
-class Users(Base):
-    """Users table model"""
+# class Users(Base):
+#     """Users table model"""
 
-    __tablename__ = "panda_users"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    first: Mapped[str] = mapped_column(String, nullable=False)
-    last: Mapped[str] = mapped_column(String, nullable=False)
-    username: Mapped[str] = mapped_column(String, unique=True)
-    password: Mapped[str] = mapped_column(String, nullable=False)
-    email: Mapped[str] = mapped_column(String, nullable=False)
-    active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
-    updated: Mapped[str] = mapped_column(
-        String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
-    )
+#     __tablename__ = "panda_users"
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+#     first: Mapped[str] = mapped_column(String, nullable=False)
+#     last: Mapped[str] = mapped_column(String, nullable=False)
+#     username: Mapped[str] = mapped_column(String, unique=True)
+#     password: Mapped[str] = mapped_column(String, nullable=False)
+#     email: Mapped[str] = mapped_column(String, nullable=False)
+#     active: Mapped[bool] = mapped_column(Boolean, default=True)
+#     created: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+#     updated: Mapped[str] = mapped_column(
+#         String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
+#     )
 
-    def __repr__(self):
-        return f"<Users(id={self.id}, first_name={self.first}, last_name={self.last}, username={self.username}, password={self.password}, email={self.email}, created={self.created}, updated={self.updated})>"
-
-
-def generate_username(mapper, connection, target):
-    """Generate a unique username by concatenating the first letter of the first name with the last name and an auto-incremented number."""
-    if target.first and target.last:
-        base_username = f"{target.first[0].lower()}{target.last.lower()}"
-        existing_usernames = connection.execute(
-            f"SELECT username FROM users WHERE username LIKE '{base_username}%'"
-        ).fetchall()
-        if existing_usernames:
-            max_suffix = max(
-                int(username[0].replace(base_username, "") or 0)
-                for username in existing_usernames
-            )
-            target.username = f"{base_username}{max_suffix + 1}"
-        else:
-            target.username = base_username
+#     def __repr__(self):
+#         return f"<Users(id={self.id}, first_name={self.first}, last_name={self.last}, username={self.username}, password={self.password}, email={self.email}, created={self.created}, updated={self.updated})>"
 
 
-# Attach the event listener to the Users model
-event.listen(Users, "before_insert", generate_username)
+# def generate_username(mapper, connection, target):
+#     """Generate a unique username by concatenating the first letter of the first name with the last name and an auto-incremented number."""
+#     if target.first and target.last:
+#         base_username = f"{target.first[0].lower()}{target.last.lower()}"
+#         existing_usernames = connection.execute(
+#             f"SELECT username FROM users WHERE username LIKE '{base_username}%'"
+#         ).fetchall()
+#         if existing_usernames:
+#             max_suffix = max(
+#                 int(username[0].replace(base_username, "") or 0)
+#                 for username in existing_usernames
+#             )
+#             target.username = f"{base_username}{max_suffix + 1}"
+#         else:
+#             target.username = base_username
 
-# Junction table for the many-to-many relationship between users and projects
-user_projects = Table(
-    "user_projects",
-    Base.metadata,
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("project_id", Integer, ForeignKey("projects.id"), primary_key=True),
-    Column("current", Boolean, default=True),
-    Column("timestamp", Integer, default=dt.now(timezone.utc)),
-)
+
+# # Attach the event listener to the Users model
+# event.listen(Users, "before_insert", generate_username)
+
+# # Junction table for the many-to-many relationship between users and projects
+# user_projects = Table(
+#     "user_projects",
+#     Base.metadata,
+#     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+#     Column("project_id", Integer, ForeignKey("projects.id"), primary_key=True),
+#     Column("current", Boolean, default=True),
+#     Column("timestamp", Integer, default=dt.now(timezone.utc)),
+# )
 
 
 class DeckObjectBase:
@@ -326,29 +326,29 @@ class DeckObjectBase:
     )
     name: Mapped[str] = mapped_column(String)
 
-    @property
-    def x(self):
-        return self.coordinates.get("x")
+    # @property
+    # def x(self):
+    #     return self.coordinates.get("x")
 
-    @property
-    def y(self):
-        return self.coordinates.get("y")
+    # @property
+    # def y(self):
+    #     return self.coordinates.get("y")
 
-    @property
-    def z(self):
-        return self.coordinates.get("z")
+    # @property
+    # def z(self):
+    #     return self.coordinates.get("z")
 
-    @x.setter
-    def x(self, value):
-        self.coordinates["x"] = value
+    # @x.setter
+    # def x(self, value):
+    #     self.coordinates["x"] = value
 
-    @y.setter
-    def y(self, value):
-        self.coordinates["y"] = value
+    # @y.setter
+    # def y(self, value):
+    #     self.coordinates["y"] = value
 
-    @z.setter
-    def z(self, value):
-        self.coordinates["z"] = value
+    # @z.setter
+    # def z(self, value):
+    #     self.coordinates["z"] = value
 
 
 class VesselBase(DeckObjectBase):
@@ -360,10 +360,16 @@ class VesselBase(DeckObjectBase):
     volume_height: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(json_extract(coordinates, '$.z') + base_thickness + round(dead_volume / (pi() * radius * radius), 3), 2)"
+            "round(json_extract(coordinates, '$.z') + base_thickness + ((volume) / (pi() * power(radius, 2))), 2)"
         ),
     )
     contents: Mapped[dict] = mapped_column(JSON, default={})
+    bottom: Mapped[float] = mapped_column(
+        Float,
+        Computed(
+            "round(json_extract(coordinates, '$.z') + base_thickness + ((dead_volume) / (pi() * power(radius, 2))), 2)"
+        ),
+    )
 
 
 class VialsBase(VesselBase):
@@ -385,7 +391,7 @@ class VialsBase(VesselBase):
 class Vials(VialsBase, Base):
     """Vials table model"""
 
-    __tablename__ = "panda_vial"
+    __tablename__ = "panda_vials"
 
 
 class VialStatus(VialsBase, Base):
@@ -436,13 +442,14 @@ class PlateTypes(Base):
     y_offset: Mapped[float] = mapped_column(Float)
     max_liquid_height_mm: Mapped[float] = mapped_column(Float)
     capacity_ul: Mapped[float] = mapped_column(Float)
+    base_thickness: Mapped[float] = mapped_column(Float, default=1.0)
 
     def __repr__(self):
         return f"<WellTypes(id={self.id}, substrate={self.substrate}, gasket={self.gasket}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.y_spacing}, height_mm={self.gasket_height_mm}, max_liquid_height_mm={self.max_liquid_height_mm}, capacity_ul={self.capacity_ul})>"
 
 
-class WellPlates(Base, DeckObjectBase):
-    """WellPlates table model
+class Wellplates(Base, DeckObjectBase):
+    """Wellplates table model
 
     Attributes:
         id (int): The well plate ID.
@@ -477,7 +484,7 @@ class WellPlates(Base, DeckObjectBase):
     image_height: Mapped[float] = mapped_column(Float)
 
     def __repr__(self):
-        return f"<WellPlates(id={self.id}, type_id={self.type_id}, current={self.current})>"
+        return f"<Wellplates(id={self.id}, type_id={self.type_id}, current={self.current})>"
 
 
 class WellStatus(Base):
