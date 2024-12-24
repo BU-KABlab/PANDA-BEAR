@@ -23,7 +23,7 @@ from panda_lib.sql_tools.panda_models import (
     Experiments,
     ExperimentStatusView,
     WellModel,
-    WellPlates,
+    Wellplates,
 )
 
 global_logger = setup_default_logger(log_name="panda")
@@ -1374,8 +1374,8 @@ def update_experiment_status(
 
     with SessionLocal() as session:
         subquery = (
-            session.query(WellPlates.id)
-            .filter(WellPlates.current == 1)
+            session.query(Wellplates.id)
+            .filter(Wellplates.current == 1)
             .scalar_subquery()
         )
         session.query(WellModel).filter(WellModel.well_id == well_id).filter(
@@ -1437,7 +1437,7 @@ def update_experiments_statuses(
         for parameter in parameters:
             session.query(WellModel).filter(WellModel.well_id == parameter[4]).filter(
                 WellModel.plate_id
-                == session.query(WellPlates.id).filter(WellPlates.current == 1)
+                == session.query(Wellplates.id).filter(Wellplates.current == 1)
             ).update(
                 {
                     WellModel.status: parameter[0],
