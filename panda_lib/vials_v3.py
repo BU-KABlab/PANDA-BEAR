@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from .errors import OverDraftException, OverFillException  # Custom exceptions
 from .schemas import VialReadModel, VialWriteModel  # Pydantic models
 from .services import VialService
+from .utilities import Coordinates
 
 
 # Define TypedDict for Vial kwargs
@@ -50,6 +51,48 @@ class Vial:
             self.create_new_vial(**kwargs)
         else:
             self.load_vial()
+
+    @property
+    def volume(self) -> float:
+        """Returns the current volume of the vial."""
+        return self.vial_data.volume
+
+    @property
+    def contents(self) -> Dict[str, float]:
+        """Returns the contents of the vial."""
+        return self.vial_data.contents
+
+    @property
+    def category(self) -> int:
+        """Returns the category of the vial."""
+        return self.vial_data.category
+
+    @property
+    def name(self) -> str:
+        """Returns the name of the vial."""
+        return self.vial_data.name
+
+    @property
+    def capacity(self) -> float:
+        """Returns the capacity of the vial."""
+        return self.vial_data.capacity
+
+    @property
+    def contamination(self) -> int:
+        """Returns the contamination count of the vial."""
+        return self.vial_data.contamination
+
+    @property
+    def coordinates(self) -> Coordinates:
+        """Returns the coordinates of the vial."""
+        return Coordinates(**self.vial_data.coordinates)
+
+    @property
+    def withdrawal_height(self) -> float:
+        """Returns the height of the vial from which contents are withdrawn."""
+        height = self.vial_data.volume_height - 1
+        if height < self.vial_data.dead_volume:
+            return self.vial_data.dead_volume / (3.14 * self.vial_data.radius**2)
 
     def create_new_vial(self, **kwargs: VialKwargs):
         """Creates a new vial in the database, and loads it back."""
