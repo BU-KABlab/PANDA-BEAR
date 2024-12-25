@@ -191,9 +191,9 @@ def __forward_pipette_v2(
         # Withdraw solution
         toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
         toolkit.mill.safe_move(
-            from_vessel.coordinates["x"],
-            from_vessel.coordinates["y"],
-            from_vessel.coordinates.z_bottom,
+            from_vessel.coordinates.x,
+            from_vessel.coordinates.y,
+            from_vessel.coordinates.z_bottom,  # TODO
             Instruments.PIPETTE,
         )
         toolkit.pump.withdraw(
@@ -210,7 +210,7 @@ def __forward_pipette_v2(
             toolkit.mill.safe_move(
                 from_vessel.coordinates.x,
                 from_vessel.coordinates.y,
-                from_vessel.coordinates.z_top,
+                from_vessel.coordinates.z_top,  # TODO
                 Instruments.DECAPPER,
             )
             toolkit.arduino.ALL_CAP()
@@ -222,7 +222,7 @@ def __forward_pipette_v2(
             toolkit.mill.safe_move(
                 to_vessel.coordinates.x,
                 to_vessel.coordinates.y,
-                to_vessel.coordinates.z_top,
+                to_vessel.coordinates.z_top,  # TODO
                 Instruments.DECAPPER,
             )
             toolkit.arduino.no_cap()
@@ -230,7 +230,7 @@ def __forward_pipette_v2(
         toolkit.mill.safe_move(
             to_vessel.coordinates.x,
             to_vessel.coordinates.y,
-            to_vessel.coordinates.z_top,
+            to_vessel.coordinates.z_top,  # TODO
             Instruments.PIPETTE,
         )
         toolkit.pump.infuse(
@@ -273,7 +273,7 @@ def __forward_pipette_v2(
             toolkit.mill.safe_move(
                 to_vessel.coordinates.x,
                 to_vessel.coordinates.y,
-                to_vessel.coordinates.z_top,
+                to_vessel.coordinates.z_top,  # TODO
                 Instruments.DECAPPER,
             )
             toolkit.arduino.ALL_CAP()
@@ -328,7 +328,11 @@ def _forward_pipette_v3(
         # Handle when a source solution name and concentration is provided (even if concentration is none)
         selected_source_vessels: list[Vessel] = None
         source_vessel_volumes: list = None
-        if isinstance(src_vessel, str):
+        # If given a vial name, there may be multiple vials with the same name, so we need to check for all of them
+        # and select those that let us meet the solution concentration
+        if isinstance(
+            src_vessel, str
+        ):  # FIXME: Assuming src_vessel is a string and a vial
             # Fetch updated solutions from the db
             selected_source_vessels: list[Vial2]
             stock_vials, _ = read_vials()
@@ -399,7 +403,9 @@ def _forward_pipette_v3(
                         vessel.name,
                         source_concentration,
                     )
-        else:  # If the source is a single vessel
+        elif isinstance(src_vessel, Well) or isinstance(
+            src_vessel, Vial2
+        ):  # If the source provided is a well or stock vial object
             source_vessel_volumes = [(src_vessel, volume)]
             toolkit.global_logger.info(
                 "Pipetting %f uL from %s to %s",
@@ -421,7 +427,9 @@ def _forward_pipette_v3(
 
         # Cycle through the source_vials and pipette the volumes
         for vessel, desired_volume in source_vessel_volumes:
-            if desired_volume <= 0.0:
+            if (
+                desired_volume <= 0.0
+            ):  # Skip if the volume is zero or negative. Even though we are removing volume from the vial the volume is positive
                 continue
             # Calculate repetitions
             vessel: Vessel
@@ -466,7 +474,7 @@ def _forward_pipette_v3(
                 toolkit.mill.safe_move(
                     vessel.coordinates["x"],
                     vessel.coordinates["y"],
-                    vessel.coordinates.z_bottom,
+                    vessel.coordinates.z_bottom,  # TODO
                     Instruments.PIPETTE,
                 )
                 toolkit.pump.withdraw(
@@ -483,7 +491,7 @@ def _forward_pipette_v3(
                     toolkit.mill.safe_move(
                         vessel.coordinates.x,
                         vessel.coordinates.y,
-                        vessel.coordinates.z_top,
+                        vessel.coordinates.z_top,  # TODO
                         Instruments.DECAPPER,
                     )
                     toolkit.arduino.ALL_CAP()
@@ -495,7 +503,7 @@ def _forward_pipette_v3(
                     toolkit.mill.safe_move(
                         dst_vessel.coordinates.x,
                         dst_vessel.coordinates.y,
-                        dst_vessel.coordinates.z_top,
+                        dst_vessel.coordinates.z_top,  # TODO
                         Instruments.DECAPPER,
                     )
                     toolkit.arduino.no_cap()
@@ -503,7 +511,7 @@ def _forward_pipette_v3(
                 toolkit.mill.safe_move(
                     dst_vessel.coordinates.x,
                     dst_vessel.coordinates.y,
-                    dst_vessel.coordinates.z_top,
+                    dst_vessel.coordinates.z_top,  # TODO
                     Instruments.PIPETTE,
                 )
                 toolkit.pump.infuse(
@@ -548,7 +556,7 @@ def _forward_pipette_v3(
                     toolkit.mill.safe_move(
                         dst_vessel.coordinates.x,
                         dst_vessel.coordinates.y,
-                        dst_vessel.coordinates.z_top,
+                        dst_vessel.coordinates.z_top,  # TODO
                         Instruments.DECAPPER,
                     )
                     toolkit.arduino.ALL_CAP()
@@ -608,7 +616,7 @@ def __rinse_v2(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
+            z_coord=toolkit.wellplate.z_top,  # TODO
             instrument=Instruments.PIPETTE,
         )
         # Clear the well
@@ -656,12 +664,7 @@ def rinse_v3(
             dst_vessel=instructions.well,
             toolkit=toolkit,
         )
-        # toolkit.mill.safe_move(
-        #     x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-        #     y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-        #     z_coord=toolkit.wellplate.z_top,
-        #     instrument=Instruments.PIPETTE,
-        # )
+
         # Clear the well
         _forward_pipette_v3(
             volume=instructions.rinse_vol,
@@ -800,7 +803,7 @@ def purge_pipette(
     mill.safe_move(
         purge_vial.coordinates.x,
         purge_vial.coordinates.y,
-        purge_vial.coordinates.z_top,
+        purge_vial.coordinates.z_top,  # TODO
         Instruments.PIPETTE,
     )
 
@@ -1296,7 +1299,7 @@ def mix(
         mill.safe_move(
             x_coord=well.coordinates.x,
             y_coord=well.coordinates.y,
-            z_coord=well.depth,
+            z_coord=well.depth,  # TODO
             instrument=Instruments.PIPETTE,
         )
 
@@ -1311,7 +1314,7 @@ def mix(
         mill.safe_move(
             x_coord=well.coordinates.x,
             y_coord=well.coordinates.y,
-            z_coord=mix_height,
+            z_coord=mix_height,  # TODO
             instrument=Instruments.PIPETTE,
         )
 
@@ -1378,7 +1381,7 @@ def ca_deposition(
     toolkit.mill.safe_move(
         x_coord=exp_obj.well.coordinates.x,
         y_coord=exp_obj.well.coordinates.y,
-        z_coord=exp_obj.well.coordinates.z_top,
+        z_coord=exp_obj.well.coordinates.z_top,  # TODO
         instrument=Instruments.ELECTRODE,
         second_z_cord=toolkit.wellplate.echem_height,
         second_z_cord_feed=100,
@@ -1497,7 +1500,7 @@ def pedotcv(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
+            z_coord=toolkit.wellplate.z_top,  # TODO
             instrument=Instruments.ELECTRODE,
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
