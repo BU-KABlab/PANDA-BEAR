@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.sql_tools.panda_models import Base, PlateTypes, WellModel, Wellplates
-from panda_lib.wellplate_v3 import Well, WellPlate
+from panda_lib.wellplate import Well, WellPlate
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
