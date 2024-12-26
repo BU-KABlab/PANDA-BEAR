@@ -4,755 +4,380 @@ This class is used to store the data for the
 wellplate and the wells in it.
 """
 
-import json
 import logging
-import math
 
 # pylint: disable=line-too-long
-from dataclasses import asdict, dataclass
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, TypedDict
 
-from panda_lib import experiment_class
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from .errors import OverFillException
-from .sql_tools import sql_wellplate
-from .sql_tools.db_setup import SessionLocal
-from .sql_tools.panda_models import (
+from panda_lib.errors import OverDraftException, OverFillException
+from panda_lib.schemas import (
+    PlateTypeModel,
+    WellplateReadModel,
+    WellplateWriteModel,
+    WellReadModel,
+    WellWriteModel,
+)
+from panda_lib.services import WellPlateService, WellService
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
+    ExperimentResults,
     Experiments,
     MillConfig,
-    PlateTypes,
     WellModel,
     Wellplates,
 )
-from .vessel import Vessel, VesselCoordinates
+
+from .sql_tools.sql_wellplate import (
+    count_wells_with_new_status,
+    select_current_wellplate_info,
+)
 
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
 logger = logging.getLogger("panda")
 
 
-@dataclass
-class WellCoordinates:
+# Define TypedDict for Well kwargs
+class WellKwargs(TypedDict, total=False):
     """
-    Represents the coordinates of a well.
-
-    Args:
-    -----
-        x (Union[int, float]): The x-coordinate of the well.
-        y (Union[int, float]): The y-coordinate of the well.
-        z_top (Union[int, float]): The z-coordinate of top the well.
-        z_bottom (Union[int, float]): The z-coordinate of the bottom of the well.
-    """
-
-    x: Union[int, float]
-    y: Union[int, float]
-    z: Union[int, float] = 0
-    top: Union[int, float] = 0
-    bottom: Union[int, float] = 0
-
-    def __post_init__(self):
-        self.x = round(self.x, 6)
-        self.y = round(self.y, 6)
-        self.z = round(self.z, 6)
-        self.top = round(self.top, 6)
-        self.bottom = round(self.bottom, 6)
-
-    def to_json_string(self) -> str:
-        """Returns a JSON string representation of the coordinates."""
-        return json.dumps(asdict(self))
-
-    def __getitem__(self, key: str) -> Union[int, float]:
-        """Allows subscripting the WellCoordinates for attributes."""
-        return getattr(self, key)
-
-
-# class WellCoordinatesEncoder(json.JSONEncoder):
-#     """Custom JSON encoder for the WellCoordinates class."""
-
-#     def default(self, o) -> dict:
-#         """Returns a dictionary representation of the WellCoordinates object."""
-#         if isinstance(o, WellCoordinates):
-#             return asdict(o)
-#         return super().default(o)
-
-#     def encode(self, o) -> str:
-#         """Returns a JSON representation of the WellCoordinates object."""
-#         return json.dumps(o, cls=WellCoordinatesEncoder)
-
-
-class Well(Vessel):
-    """
-    Represents a well object. Inherits from the Vessel class.
-
-    Args:
-    -----
-        well_id (str): The ID of the well.
-        plate_id (int): The ID of the well plate.
-        coordinates (WellCoordinates): The coordinates of the well.
-        volume (float): The volume of the well.
-        status (str): The status of the well.
-        contents (dict): The contents of the well.
-        status_date (str): The date of the well status. (Optional)
-        depth (float): The depth of the well. (Optional)
-        capacity (float): The capacity of the well. (Optional)
-        height (float): The height of the well. (Optional)
-        experiment_id (int): The ID of the experiment. (Optional)
-        project_id (int): The ID of the project. (Optional)
-        density (float): The density of the well. (Optional)
-        campaign_id (int): The ID of the campaign. (Optional)
-        well_type_number (int): The type of well. (Optional)
-    """
-
-    def __init__(
-        self,
-        well_id: str,  # TODO: change to use the built in position attribute of vessel
-        plate_id: int,
-        coordinates: WellCoordinates,
-        volume: float,
-        status: str,
-        contents: dict = None,
-        status_date: str = None,
-        depth: float = None,
-        capacity: float = None,
-        height: float = None,
-        experiment_id: int = None,
-        project_id: int = None,
-        density: float = None,
-        campaign_id: int = None,
-        well_type_number: int = None,
-    ):
-        """ """
-        if contents is None:
-            contents = {}
-
-        self.plate_id: int = plate_id
-        self.well_id: str = well_id
-        self.experiment_id: int = experiment_id
-        self.status: str = status
-        self.status_date: str = status_date
-        self.contents: dict = contents
-        self.project_id: int = project_id
-        self.campaign_id: int = campaign_id
-        self.volume: float = volume
-
-        if isinstance(coordinates, (WellCoordinates, VesselCoordinates)):
-            self.coordinates: WellCoordinates = coordinates
-        else:
-            try:
-                self.coordinates = WellCoordinates(**coordinates)
-            except json.JSONDecodeError:
-                self.coordinates = WellCoordinates(0, 0)
-
-        self.density: float = density
-        self.name: str = well_id
-        self.height: float = height
-        self.depth: float = depth
-        self.capacity: float = capacity
-        self.type_number: int = well_type_number
-
-        super().__init__(
-            name=self.well_id,
-            volume=volume,
-            capacity=capacity,
-            density=density,
-            coordinates=coordinates,
-            contents=contents,
-        )
-
-    def __str__(self) -> str:
-        """Returns a string representation of the well."""
-        return f"Well {self.well_id} with volume {self.volume} and status {self.status}"
-
-    def to__dict__(self) -> dict:
-        """Returns a dictionary representation of the well."""
-        return {
-            "well_id": self.well_id,
-            "plate_id": self.plate_id,
-            "coordinates": self.coordinates,
-            "volume": self.volume,
-            "status": self.status,
-            "contents": self.contents,
-            "status_date": self.status_date,
-            "depth": self.depth,
-            "capacity": self.capacity,
-            "height": self.height,
-            "experiment_id": self.experiment_id,
-            "project_id": self.project_id,
-            "density": self.density,
-            "campaign_id": self.campaign_id,
-            "well_type_number": self.type_number,
-        }
-
-    def __repr__(self) -> str:
-        """Returns a string representation of the well."""
-        return f"Well({self.well_id}, {self.status}, {self.status_date}, {self.contents}, {self.experiment_id}, {self.project_id}, {str(self.volume)}, {self.coordinates})"
-
-    def __iter__(self) -> Tuple:
-        """Returns an iterator of the well attributes."""
-        return iter(
-            (
-                self.well_id,
-                self.plate_id,
-                self.coordinates,
-                self.volume,
-                self.status,
-                self.contents,
-                self.status_date,
-                self.depth,
-                self.capacity,
-                self.height,
-                self.experiment_id,
-                self.project_id,
-                self.density,
-                self.campaign_id,
-                self.type_number,
-            )
-        )
-
-    def __getitem__(self, key):
-        return getattr(self, key)
-
-    def update_contents(
-        self, from_vessel: dict, volume: float, save: bool = False
-    ) -> None:
-        """Updates the contents of the well in the well_status.json file."""
-
-        # If we are removing a volume from a well we assume that the contents are equally mixed
-        # and we remove the same proportion of each vessel name AKA solution name
-        logger.debug("Updating well contents...")
-
-        # If we are removing a volume from a well then we update the Self contents accordingly
-        # We are assuming a well is equally mixed and we remove the same proportion of each vessel name AKA solution name
-        if volume < float(0):
-            if not isinstance(from_vessel, dict):
-                from_vessel = {from_vessel: volume}
-
-            try:
-                current_content_ratios: float = {
-                    key: float(value) / float(sum(self.contents.values()))
-                    for key, value in self.contents.items()
-                }
-
-                for key, value in self.contents.items():
-                    self.contents[key] = value + round(
-                        (volume * current_content_ratios[key]),
-                        6,  # TODO get the precision from config
-                    )
-
-                # logger.debug("Well %s is empty", self.name)
-            except KeyError as e:
-                logger.error("Key Error occurred while updating well contents: %s", e)
-                logger.error("Not critical, continuing....")
-            except ValueError as e:
-                logger.error("Value Error occurred while updating well contents: %s", e)
-                logger.error("Not critical, continuing....")
-
-        elif volume == float(0):
-            logger.debug("Volume to add was 0 well %s contents unchanged", self.name)
-
-        # If we are adding a volume to a well then we update the provided vessel name AKA solution name
-        # in the well contents with the provided volume
-        elif volume > float(0):
-            for key in from_vessel.keys():
-                if key in self.contents.keys():
-                    self.contents[key] += from_vessel[key]
-                    logger.debug("Updated %s contents: %s", self.name, self.contents)
-                else:
-                    self.contents[key] = from_vessel[key]
-                    logger.debug("New %s contents: %s", self.name, self.contents)
-        # Update the well in the db and log its new contents
-        if save:
-            self.save_to_db()
-        self.log_contents()
-
-    def update_status(self, new_status: str) -> None:
-        """Updates the status of the well in the well_hx table."""
-        self.status = new_status
-        sql_wellplate.update_well_status(self.well_id, self.plate_id, new_status)
-        logger.debug("Well %s status updated to %s", self.name, self.status)
-
-    def save_to_db(self) -> None:
-        """Inserts or Updates the well in the database"""
-        logger.info("Saving well %s to the database", self.name)
-        try:
-            sql_wellplate.save_well_to_db(self)
-            logger.info("Well %s saved to the database", self.name)
-        except Exception as e:
-            logger.error("Error occurred while saving well to the database: %s", e)
-            raise e
-
-    def update_well_coordinates(self, new_coordinates: WellCoordinates) -> None:
-        """Update the coordinates of a specific well"""
-        self.coordinates = new_coordinates
-        sql_wellplate.update_well_coordinates(
-            self.well_id, self.plate_id, new_coordinates
-        )
-
-
-class Wellplate:
-    """
-    Represents a well plate and each well in it.
-    To access the attributes of an individual well, use the well ID as the key.
-    Ex. to get the volume of well A1, use well_plate["A1"].volume
+    TypedDict for Well kwargs
 
     Attributes:
     -----------
-        wells (Dict[str, Well]): A dictionary of well objects.
-        a1_x (float): The x-coordinate of well A1.
-        a1_y (float): The y-coordinate of well A1.
-        orientation (int): The orientation of the well plate (0-3).
-            0 - Vertical, wells become more negative in both x and y from A1
-            1 - Vertical, wells become less negative in both x and y from A1
-            2 - Horizontal, wells become less negative from A1 in x and y
-            3 - Horizontal, wells become more negative from A1 in x and y
-        columns (str): The string representation of well plate columns.
-        rows (int): The number of rows in the well plate.
-        type_number (int): The type of well plate.
-        new_well_plate (bool): A flag to indicate if the well plate is new.
-        plate_id (int): The ID of the well plate.
+    name: str
+    volume: float
+    capacity: float
+    height: float
+    radius: float
+    contamination: int
+    dead_volume: float
+    contents: dict
+    coordinates: dict
+    """
+
+    name: str
+    volume: float
+    capacity: float
+    height: float
+    radius: float
+    contamination: int
+    dead_volume: float
+    contents: dict
+    coordinates: dict
+
+
+# Define TypedDict for WellPlate kwargs
+class WellPlateKwargs(TypedDict, total=False):
+    """
+    TypedDict for WellPlate kwargs
+
+    Attributes:
+    -----------
+    type_id: int
+    a1_x: float
+    a1_y: float
+    orientation: int
+    rows: str
+    cols: int
+    echem_height: float
+    image_height: float
+    coordinates: dict
+    """
+
+    name: str
+    type_id: int
+    a1_x: float
+    a1_y: float
+    orientation: int
+    rows: str
+    cols: int
+    echem_height: float
+    image_height: float
+    coordinates: dict
+
+
+class Well:
+    """
+    Class to represent a well in a wellplate.
+
+    Attributes:
+    -----------
+    well_id: str
+        The well id
+    plate_id: int
+        The plate id
+    session: Session
+        The database session
+    create_new: bool
+        If True, create a new well
+    kwargs: WellKwargs
+        Keyword arguments for making the well
+    well_data: Optional[WellReadModel]
+        The well data
+
+    Methods:
+    --------
+    create_new_well(**kwargs: WellKwargs)
+        Create a new well
+    load_well()
+        Load the well
+    save()
+        Save the well
+    add_contents(from_vessel: dict, volume: float)
+        Add contents to the well
+    remove_contents(volume: float) -> dict
+        Remove contents from the well
+    update_status(new_status: str)
+        Update the status of the well
+    update_coordinates(new_coordinates: dict)
+        Update the coordinates of the well
+    __repr__()
+        Return a string representation of the well
+
     """
 
     def __init__(
         self,
-        x_a1: float = float(0),
-        y_a1: float = float(0),
-        orientation: int = 0,
-        columns: int = 12,
-        rows: str = "ABCDEFGH",
-        type_number: Union[int, None] = None,
-        new_well_plate: bool = False,
-        plate_id: int = None,
-    ) -> None:
-        """
-        Initializes a new instance of the Wells2 class.
-        """
-        self.wells: dict[str, Well] = {}
-        self.a1_x: float = x_a1
-        self.a1_y: float = y_a1
-        self.rows: str = rows
-        self.columns: int = columns
-        self.orientation: int = orientation
-        self.z_bottom: float = -70
-        self.echem_height: float = -72.5  # for every well
-        self.image_height: float = -50  # The height from which to image the well in mm
-        current_plate_id, current_type_number, _ = (
-            sql_wellplate.select_current_wellplate_info()
-        )
-        if type_number is None:
-            self.type_number = current_type_number
+        well_id: str,
+        plate_id: int,
+        session: Session,
+        create_new: bool = False,
+        **kwargs: WellKwargs,
+    ):
+        self.well_id = well_id
+        self.plate_id = plate_id
+        self.session = session
+        self.service = WellService(self.session)
+        self.well_data: Optional[WellReadModel] = None
+
+        if create_new:
+            self.create_new_well(**kwargs)
         else:
-            self.type_number = type_number
-        self.plate_id = (
-            current_plate_id if plate_id is None else plate_id
-        )  # The id of the well plate
-        self.z_top: float = float(0)
-        self.height: float = float(6.0)  # The height of the well plate in mm
-        self.radius: float = float(3.25)  # new circular wells
-        self.well_row_offset: float = float(9.0)  # mm from center to center
-        self.well_col_offset: float = float(9.0)  # mm from center to center
-        self.well_capacity: float = float(300)  # ul
-        # overwrite the default values with the values from the well_type table
-        wellplate_type = self.read_well_type_characteristics(self.type_number)
-        self.radius: float = wellplate_type.radius_mm
-        self.well_row_offset: float = wellplate_type.y_spacing
-        self.well_col_offset: float = wellplate_type.x_spacing
-        self.well_capacity: float = wellplate_type.capacity_ul
-        self.height: float = wellplate_type.gasket_height_mm
-        self.shape: str = wellplate_type.shape
-        self.z_top: float = self.z_bottom + float(wellplate_type.gasket_height_mm)
-        self.gasket_length: float = wellplate_type.gasket_length_mm
-        self.gasket_width: float = wellplate_type.gasket_width_mm
-        self.a1_y_wall_offset: float = wellplate_type.y_offset
-        self.a1_x_wall_offset: float = wellplate_type.x_offset
-        self.rows: str = wellplate_type.rows
-        self.columns: int = int(wellplate_type.cols)
-        # Load the well plate location from the well_location json file
-        (
-            self.a1_x,
-            self.a1_y,
-            self.z_bottom,
-            self.z_top,
-            self.orientation,
-            self.echem_height,
-            self.image_height,
-        ) = self.load_wellplate_location()
-        self.a1_coordinates = {
-            "x": self.a1_x,
-            "y": self.a1_y,
-            "z_top": self.z_top,
-        }  # coordinates of A1
-        self.initial_volume = float(0.00)
-        self.establish_new_wells()  # we need to establish the wells before we can update their status from file
-        self.calculate_well_locations()  # now we can calculate the well locations
-        current_wellplate_id, current_wellplate_type, _ = (
-            sql_wellplate.select_current_wellplate_info()
-        )
-        if not new_well_plate:
-            self.plate_id = current_wellplate_id
-            self.type_number = current_wellplate_type
-            self.update_well_status_from_db()
-        else:
-            if plate_id is None:
-                self.plate_id = plate_id + 1
-            self.save_wells_to_db()  # save the new wells to the database
+            self.load_well()
 
-    def recalculate_well_locations(self) -> None:
-        """Recalculates the well locations"""
-        (
-            self.a1_x,
-            self.a1_y,
-            self.z_bottom,
-            self.z_top,
-            self.orientation,
-            self.echem_height,
-            self.image_height,
-        ) = self.load_wellplate_location()
-        self.a1_coordinates = {
-            "x": self.a1_x,
-            "y": self.a1_y,
-            "z_top": self.z_top,
-        }  # coordinates of A1
-        self.calculate_well_locations()
-        for well_id in self.wells:
-            well: Well = self.wells[well_id]
-            self.update_well_coordinates(well_id, well.coordinates)
-
-    def calculate_well_locations(self) -> None:
-        """
-        This method is used to calculate the location of the wells in a well plate.
-        It uses the A1 coordinates as the reference point, applying the row and
-        column offsets to calculate the coordinates of the other wells, and using
-        the appropriate sign for the offsets according to the orientation of the well plate.
-
-        Note the rows with be lettered and the columns numbered.
-        """
-        row_offset = self.well_row_offset
-        col_offset = self.well_col_offset
-        orientation = self.orientation
-
-        for row_idx, row in enumerate(self.rows):
-            for col in range(
-                1, self.columns + 1
-            ):  # We start at 1 and include the last number
-                well_id = row + str(col)
-                if well_id == "A1":
-                    x = self.a1_x
-                    y = self.a1_y
-                    depth = self.z_bottom
-                    # if depth < self.z_bottom:
-                    #     depth = self.z_bottom
-                    # else:
-                    #     depth = self.z_bottom
-                else:
-                    if orientation == 0:
-                        x = self.a1_x - row_idx * row_offset
-                        y = self.a1_y - (col - 1) * col_offset
-                    elif orientation == 1:
-                        x = self.a1_x + row_idx * row_offset
-                        y = self.a1_y + (col - 1) * col_offset
-                    elif orientation == 2:
-                        x = self.a1_x + (col - 1) * col_offset
-                        y = self.a1_y - row_idx * row_offset
-                    elif orientation == 3:
-                        x = self.a1_x - (col - 1) * col_offset
-                        y = self.a1_y + row_idx * row_offset
-                    else:
-                        raise ValueError(
-                            "Invalid orientation value. Must be 0, 1, 2, or 3."
-                        )
-
-                depth = self.z_bottom
-                # if depth < self.z_bottom:
-                #     depth = self.z_bottom
-                # else:
-                #     depth = self.z_bottom
-                top = self.z_top
-
-                # Round the coordinates to 2 decimal places
-                coordinates = WellCoordinates(
-                    x=round(x, 3),
-                    y=round(y, 3),
-                    z_top=round(top, 3),
-                    z_bottom=round(depth, 3),
-                )
-
-                self.set_coordinates(well_id, coordinates)
-
-    def establish_new_wells(self) -> None:
-        """Establish new wells in the well plate"""
-
-        for _, row in enumerate(
-            self.rows
-        ):  # range is exclusive of the last number so we add 1
-            for col in range(1, self.columns + 1):
-                well_id = str(row) + str(col)
-                self.wells[well_id] = Well(
-                    plate_id=self.plate_id,
-                    well_id=well_id,
-                    coordinates=WellCoordinates(x=float(0), y=float(0), z_top=float(0)),
-                    volume=self.initial_volume,
-                    height=self.height,
-                    depth=self.z_bottom,
-                    status="new",
-                    density=float(1.0),
-                    capacity=self.well_capacity,
-                    contents={},
-                )
-
-    def __getitem__(self, well_id: str) -> Well:
-        """Gets a Well object by well ID."""
-        return self.wells[well_id.upper()]
-
-    def update_well_status_from_db(self) -> None:
-        """Update the well status from the database"""
-        logger.debug("Updating well status from database...")
-        incoming_wells = sql_wellplate.select_wellplate_wells()
-        for saved_well in incoming_wells:
-            well = saved_well
-            well.plate_id = self.plate_id
-            well.depth = self.z_bottom
-        self.wells = {well.well_id: well for well in incoming_wells}
-        logger.debug("Well status updated from database")
-
-    def get_coordinates(self, well_id: str, axis: str = None) -> WellCoordinates:
-        """
-        Return the coordinate of a specific well
-        Args:
-            well_id (str): The well ID
-        Returns:
-            Coordinates: The coordinates of the well
-        """
-        well_id = well_id.upper()
-        if well_id in self.wells:
-            if axis:
-                return self.wells[well_id].coordinates[axis]
-            return self.wells[well_id].coordinates
-        else:
-            raise KeyError(f"Well {well_id} not found")
-
-    def set_coordinates(self, well_id: str, new_coordinates: WellCoordinates) -> None:
-        """Sets the coordinates of a specific well in memory only"""
-        # validate the coordinates
-        if not isinstance(new_coordinates, WellCoordinates):
-            raise TypeError("Coordinates must be a WellCoordinates object")
-        self.wells[well_id.upper()].coordinates = new_coordinates
-
-    def update_well_coordinates(
-        self, well_id: str, new_coordinates: WellCoordinates
-    ) -> None:
-        """Update the coordinates of a specific well in the db and in memory"""
-
-        logger.info("Updating well %s coordinates to %s", well_id, new_coordinates)
-        well_id = well_id.upper()
-        self.wells[well_id].update_well_coordinates = new_coordinates
-        logger.debug("Updating well %s coordinates in the database", well_id)
-        sql_wellplate.update_well_coordinates(well_id, self.plate_id, new_coordinates)
-
-    def get_corners(self) -> dict:
-        """
-        Return the coordinates of the corners of the well plate.
-
-        First checks the wellplate type to determine the number of rows and cols,
-        then using the first and last wells of the first and last rows to determine the corners.
-
-        Returns:
-            dict: The coordinates of the corners of the well plate
-        """
-        corner_keys = []
-        # Possible order depending on orientation
-        if self.orientation == 0:
-            corner_keys = [
-                "top_right",
-                "top_left",
-                "bottom_right",
-                "bottom_left",
-            ]  # A1 towards origin at top right
-        elif self.orientation == 1:
-            corner_keys = [
-                "bottom_left",
-                "bottom_right",
-                "top_left",
-                "top_right",
-            ]  # A1 at bottom right
-        elif self.orientation == 2:
-            corner_keys = [
-                "top_left",
-                "bottom_left",
-                "top_right",
-                "bottom_right",
-            ]  # A1 at bottom left
-        elif self.orientation == 3:
-            corner_keys = [
-                "bottom_right",
-                "top_right",
-                "bottom_left",
-                "top_left",
-            ]  # A1 at top left
-
-        corners = {}
-        # Get the corners of the well plate
-        for col in [1, self.columns]:
-            for row in [self.rows[0], self.rows[-1]]:
-                well_id = str(row) + str(col)
-                well = self.wells[well_id]
-                key = corner_keys.pop(0)
-                corners[key] = well.coordinates
-
-        return corners
-
-    def get_contents(self, well_id: str) -> dict:
-        """Return the contents of a specific well"""
-        return self.wells[well_id.upper()].contents
-
-    def get_volume(self, well_id: str) -> float:
-        """Return the volume of a specific well"""
-        return self.wells[well_id.upper()].volume
-
-    def get_depth(self, well_id: str) -> float:
-        """Return the depth of a specific well"""
-        return self.wells[well_id.upper()].depth
-
-    def get_density(self, well_id) -> float:
-        """Return the density of a specific well"""
-        return self.wells[well_id.upper()].density
-
-    def check_volume(self, well_id, added_volume: float) -> bool:
-        """Check if a volume can fit in a specific well"""
-        info_message = f"Checking if {added_volume} can fit in {well_id} ..."
-        logger.info(info_message)
-        if self.wells[well_id.upper()].volume + added_volume >= self.well_capacity:
-            raise OverFillException(
-                well_id, self.get_volume, added_volume, self.well_capacity
+    def create_new_well(self, **kwargs: WellKwargs):
+        if "type_id" in kwargs:
+            plate_type = self.service.fetch_well_type_characteristics(
+                db_session=self.session,
+                plate_id=self.plate_id,
+                type_id=kwargs.get("type_id"),
             )
         else:
-            info_message = f"{added_volume} can fit in {well_id}"
-            logger.info(info_message)
-            return True
-
-    def update_volume(self, well_id: str, added_volume: float):
-        """Update the volume of a specific well"""
-        well_id = well_id.upper()
-        if self.wells[well_id].volume + added_volume > self.well_capacity:
-            raise OverFillException(
-                well_id,
-                self.wells[well_id].volume,
-                added_volume,
-                self.well_capacity,
+            plate_type = self.service.fetch_well_type_characteristics(
+                db_session=self.session, plate_id=self.plate_id
             )
-        else:
-            self.wells[well_id].volume += added_volume
-            radius_mm = self.radius
-            area_mm2 = float(math.pi) * radius_mm**2
-            volume_mm3 = self.wells[well_id].volume
-            depth = float(volume_mm3) / float(area_mm2) + self.z_bottom
-            if depth < self.z_bottom:
-                depth = self.z_bottom
-            if depth - float(0.05) > self.z_bottom:
-                depth -= float(0.05)
-            self.wells[well_id].depth = depth
-            if self.wells[well_id].depth < self.z_bottom:
-                self.wells[well_id].depth = self.z_bottom
-            debug_message = f"New volume: {self.wells[well_id].volume} | New depth: {self.wells[well_id].depth}"
-            logger.debug(debug_message)
-
-    def check_well_status(self, well_id: str) -> str:
-        """Check the status of a specific well."""
-        return self.wells[well_id.upper()].status
-
-    def set_well_status(self, well_id: str, status: str) -> None:
-        """Update the status of a specific well."""
-        self.wells[well_id.upper()].update_status(status)
-
-    def update_well_status(self, well, status):
-        """Update the status of a specific well in memory and in the database"""
-        if isinstance(well, str):
-            well = well.upper()
-            self.wells[well].update_status(status)
-        elif isinstance(well, Well):
-            well.update_status(status)
-
-    def check_all_wells_status(self):
-        """Check the status of all wells"""
-        for well_id, well_data in self.wells.items():
-            logger.info("Well %s status: %s", well_id, well_data["status"])
-
-    def read_well_type_characteristics(self, type_number: int) -> PlateTypes:
-        """Read the well type characteristics from the well_type.csv config file"""
-
-        # Select the well type characteristics from the well_types sql table given the type_number
-        return sql_wellplate.select_well_characteristics(type_number)
-
-    def load_wellplate_location(
-        self,
-    ) -> Tuple[float, float, float, float, int, float]:
-        """Load the location of the well plate from the wellplates table  file"""
-
-        return sql_wellplate.select_wellplate_location(plate_id=self.plate_id)
-
-        # return (x, y, z_bottom, z_top, orientation, echem_height)
-
-    def reload_wellplate_location(self) -> None:
-        """Reload the well plate location from the wellplate table"""
-        (
-            self.a1_x,
-            self.a1_y,
-            self.z_bottom,
-            self.z_top,
-            self.orientation,
-            self.echem_height,
-            self.image_height,
-        ) = self.load_wellplate_location()
-
-        # Update the wells for the z_bottom as the depth
-        if isinstance(self.wells, dict) and all(
-            isinstance(value, Well) for value in self.wells.values()
-        ):
-            for well in self.wells.values():
-                well: Well
-                well.depth = self.z_bottom
-
-    def write_wellplate_location(self) -> None:
-        """Write the location of the well plate to the wellplates table"""
-
-        sql_wellplate.update_wellplate_location(
+        new_well = WellWriteModel(
+            well_id=self.well_id,
             plate_id=self.plate_id,
-            a1_x=self.a1_x,
-            a1_y=self.a1_y,
-            z_bottom=self.z_bottom,
-            z_top=self.z_top,
-            orientation=self.orientation,
-            rows=self.rows,
-            cols=self.columns,
-            echem_height=self.echem_height,
+            base_thickness=plate_type.base_thickness,
+            height=plate_type.gasket_height_mm,
+            radius=plate_type.radius_mm,
+            capacity=plate_type.capacity_ul,
+            **kwargs,
         )
-        logger.debug("Well plate location written to file")
+        self.well_data = WellWriteModel.model_validate(
+            self.service.create_well(new_well)
+        )
+        self.load_well()
 
-        self.reload_wellplate_location()
+    def load_well(self):
+        self.well_data = self.service.get_well(self.well_id, self.plate_id)
 
-    def write_well_status_to_file(self) -> None:
-        """Write the well status to the well_status.json file"""
-        # data_to_write = {
-        #     "plate_id": self.plate_id,
-        #     "type_number": self.type_number,
-        #     "wells": [well.__dict__() for well in self.wells.values()],
-        # }
-        # with open(WELL_STATUS, "w", encoding="UTF-8") as f:
-        #     json.dump(data_to_write, f, indent=4, cls=WellCoordinatesEncoder)
-        # logger.debug("Well status written to file")
-        self.save_wells_to_db()
+    def save(self):
+        self.service.update_well(
+            self.well_id, self.plate_id, self.well_data.model_dump()
+        )
 
-    def save_wells_to_db(self) -> None:
-        """Save the wells to the well_hx table. Replaces the write_well_status_to_file method"""
-        list_of_wells = [well for well in self.wells.values()]
-        sql_wellplate.save_wells_to_db(list_of_wells)
+    def add_contents(self, from_vessel: dict, volume: float):
+        if self.well_data.volume + volume > self.well_data.capacity:
+            raise OverFillException(
+                self.well_data.name,
+                self.well_data.volume,
+                volume,
+                self.well_data.capacity,
+            )
 
-    def print(self) -> None:
-        """Print the well plate"""
-        for well in self.wells.values():
-            print(well)
+        for key, val in from_vessel.items():
+            if key in self.well_data.contents:
+                self.well_data.contents[key] += val
+            else:
+                self.well_data.contents[key] = val
+
+        self.well_data.volume += volume
+        self.save()
+
+    def remove_contents(self, volume: float) -> dict:
+        if self.well_data.volume - volume < 0:
+            raise OverDraftException(
+                self.well_data.name,
+                self.well_data.volume,
+                -volume,
+                self.well_data.capacity,
+            )
+
+        current_content_ratios = {
+            key: value / sum(self.well_data.contents.values())
+            for key, value in self.well_data.contents.items()
+        }
+        removed_contents = {}
+        for key in self.well_data.contents:
+            removed_volume = round(volume * current_content_ratios[key], 6)
+            self.well_data.contents[key] -= removed_volume
+            removed_contents[key] = removed_volume
+
+        self.well_data.volume -= volume
+        self.save()
+        return removed_contents
+
+    def update_status(self, new_status: str):
+        self.well_data.status = new_status
+        self.save()
+
+    def update_coordinates(self, new_coordinates: dict):
+        self.well_data.coordinates = new_coordinates
+        self.save()
+
+    def __repr__(self):
+        return f"<Well(well_id={self.well_id}, volume={self.well_data.volume}, contents={self.well_data.contents})>"
 
 
-def _remove_wellplate_from_db(plate_id: int) -> None:
+class WellPlate:
+    def __init__(
+        self,
+        session: Session,
+        type_id: Optional[int] = None,
+        plate_id: Optional[int] = None,
+        create_new: bool = False,
+        **kwargs: WellPlateKwargs,
+    ):
+        self.session = session
+        self.service = WellPlateService(self.session)
+        self.plate_data: WellplateReadModel = None
+        self.plate_type: PlateTypeModel = None
+        self.wells: dict[str, Well] = {}
+
+        if create_new:
+            # If creating a new plate, must provide a plate_type_id
+            # If a plate ID is not provided, it will be autoincremented
+            if type_id is None and "plate_id" not in kwargs:
+                raise ValueError("Must provide a plate_type_id to create a new plate.")
+            self.create_new_plate(id=plate_id, type_id=type_id, **kwargs)
+        else:
+            # If loading an existing plate, must provide a plate_id
+            if plate_id is None:
+                raise ValueError("Must provide a plate_id to load an existing plate.")
+            self.load_plate(plate_id)
+
+    def create_new_plate(self, **kwargs: WellPlateKwargs):
+        # First create the wellplate
+        new_plate = WellplateWriteModel(**kwargs)
+        self.plate_data = WellplateWriteModel.model_validate(
+            self.service.create_plate(new_plate)
+        )
+        self.plate_type = self.service.get_plate_type(self.plate_data.type_id)
+        # Second create the wells
+        self.wells = self._create_wells_from_type()
+
+        self.load_plate(self.plate_data.id)
+
+    def load_plate(self, plate_id: int):
+        self.plate_data = self.service.get_plate(plate_id)
+        self.plate_type = self.service.get_plate_type(self.plate_data.type_id)
+        self.load_wells()
+
+    def load_wells(self):
+        wells_data = self.service.get_wells(self.plate_data.id)
+        self.wells = {
+            well_data.well_id: Well(
+                plate_id=self.plate_data.id,  # TODO: could add assuming the current plate ID
+                well_id=well_data.well_id,
+                session=self.session,
+            )
+            for well_data in wells_data
+        }
+
+    def save(self):
+        self.service.update_plate(self.plate_data.id, self.plate_data.model_dump())
+
+    def _create_wells_from_type(self):
+        """Create wells based on the type of wellplate."""
+        wells: dict[str:Well] = {}
+        rows: list = list(self.plate_data.rows)
+        cols: range = range(1, int(self.plate_data.cols) + 1)
+
+        for row in rows:
+            for col in cols:
+                coordinates = self.calculate_well_coordinates(row, col)
+                wells[str(row) + str(col)] = Well(
+                    create_new=True,
+                    session=self.session,
+                    plate_id=self.plate_data.id,
+                    well_id=f"{row}{col}",
+                    experiment_id=0,
+                    project_id=0,
+                    status="new",
+                    contents={},
+                    volume=0.0,
+                    coordinates=coordinates,
+                    contamination=0,
+                    dead_volume=0.0,
+                    name=f"{self.plate_data.id}_{row}{col}",
+                )
+        return wells
+
+    def update_coordinates(self, new_coordinates: dict):
+        self.plate_data.coordinates = new_coordinates
+        self.plate_data.a1_x = new_coordinates["x"]
+        self.plate_data.a1_y = new_coordinates["y"]
+        # self.recalculate_well_positions()
+
+    def recalculate_well_positions(self):
+        for well_id, well in self.wells.items():
+            row, col = well_id[0], int(well_id[1:])
+            well.update_coordinates(self.calculate_well_coordinates(row, col))
+
+    def calculate_well_coordinates(self, row: str, col: int) -> dict:
+        x = (col - 1) * self.plate_type.x_spacing
+        y = (ord(row.upper()) - ord("A")) * self.plate_type.y_spacing
+        x, y = self.__calculate_rotated_position(
+            x,
+            y,
+            self.plate_data.orientation,
+            self.plate_data.a1_x,
+            self.plate_data.a1_y,
+        )
+        return {"x": x, "y": y, "z": self.plate_data.coordinates["z"]}
+
+    def __calculate_rotated_position(
+        self, x: float, y: float, orientation: int, a1_x: float, a1_y: float
+    ) -> tuple:
+        if orientation == 0:
+            return a1_x - x, a1_y - y
+        elif orientation == 1:
+            return a1_x + x, a1_y + y
+        elif orientation == 2:
+            return a1_x + y, a1_y - x
+        elif orientation == 3:
+            return a1_x - y, a1_y + x
+        else:
+            raise ValueError("Invalid orientation value. Must be 0, 1, 2, or 3.")
+
+    def activate_plate(self):
+        self.plate_data = self.service.activate_plate(self.plate_data.id)
+
+    def deactivate_plate(self, new_active_plate_id: int = None):
+        self.plate_data = self.service.deactivate_plate(
+            self.plate_data.id, new_active_plate_id
+        )
+
+    def __repr__(self):
+        return f"<WellPlate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"
+
+
+def _remove_wellplate_from_db(plate_id: int, session: Session = SessionLocal()) -> None:
     """Removed all wells for the given plate id in well_hx, removes the plate id from the wellplate table"""
     user_choice = input(
         "Are you sure you want to remove the wellplate and all its wells from the database? This is irreversible. (y/n): "
@@ -763,17 +388,56 @@ def _remove_wellplate_from_db(plate_id: int) -> None:
     if user_choice.strip().lower()[0] != "y":
         print("No action taken")
         return
-    with SessionLocal() as session:
-        session.query(WellModel).filter(WellModel.plate_id == plate_id).delete()
-        session.query(Wellplates).filter(Wellplates.id == plate_id).delete()
+    with session as session:
+        wells_to_delete = (
+            session.execute(select(WellModel).filter_by(plate_id=plate_id))
+            .scalars()
+            .all()
+        )
+        for well in wells_to_delete:
+            session.delete(well)
+
+        plate_to_delete = session.execute(
+            select(Wellplates).filter_by(id=plate_id)
+        ).scalar_one_or_none()
+        if plate_to_delete:
+            session.delete(plate_to_delete)
+
         session.commit()
 
+        # Confirm by checking if the wells and plate still exist
+        wells = (
+            session.execute(select(WellModel).filter_by(plate_id=plate_id))
+            .scalars()
+            .all()
+        )
+        plate = session.execute(
+            select(Wellplates).filter_by(id=plate_id)
+        ).scalar_one_or_none()
+        if not wells and not plate:
+            print(
+                f"Wellplate {plate_id} and its wells have been removed from the database"
+            )
+        else:
+            print(f"Error occurred while deleting wellplate {plate_id}")
 
-def _remove_experiment_from_db(experiment_id: int) -> tuple[bool, str]:
+
+def _remove_experiment_from_db(
+    experiment_id: int, session: Session = SessionLocal()
+) -> tuple[bool, str]:
     """Removes the experiment from the database"""
 
     # Check that no experiment_results exist for this experiment. If they do, do not delete the experiment
-    results = experiment_class.select_results(experiment_id)
+    results = None
+    with session as session:
+        results = (
+            session.execute(
+                select(ExperimentResults).filter_by(experiment_id=experiment_id)
+            )
+            .scalars()
+            .all()
+        )
+
     if results:
         return False, "Experiment has associated results"
 
@@ -782,7 +446,7 @@ def _remove_experiment_from_db(experiment_id: int) -> tuple[bool, str]:
     # 2. Remove the experiment parameters from the experiment_parameters table
     # 3. Update the well_hx table to remove the experiment_id and project_id
     try:
-        with SessionLocal() as session:
+        with session as session:
             out_experiments = (
                 session.query(Experiments)
                 .filter(Experiments.experiment_id == experiment_id)
@@ -809,23 +473,27 @@ def _remove_experiment_from_db(experiment_id: int) -> tuple[bool, str]:
         return False, f"Error occurred while deleting the experiment: {e}"
 
 
-def change_wellplate_location():
+def change_wellplate_location(session: Session = SessionLocal()):
     """Change the location of the wellplate"""
 
-    with SessionLocal() as session:
-        mill_config_record = (
+    with session as session:
+        mill_config = (
             session.query(MillConfig).order_by(MillConfig.id.desc()).first()
-        )
-        working_volume = mill_config_record.config["working_volume"]
+        ).config
+        working_volume = {
+            "x": float(mill_config["$130"]),
+            "y": float(mill_config["$131"]),
+            "z": float(mill_config["132"]),
+        }
 
     ## Get the current plate id and location
-    current_plate_id, current_type_number, _ = (
-        sql_wellplate.select_current_wellplate_info()
-    )
+    current_plate_id, current_type_number, _ = select_current_wellplate_info()
+
     print(f"Current wellplate id: {current_plate_id}")
     print(f"Current wellplate type number: {current_type_number}")
 
-    wellplate = Wellplate(
+    wellplate = WellPlate(
+        session=session,
         plate_id=current_plate_id,
     )
 
@@ -833,7 +501,7 @@ def change_wellplate_location():
     while True:
         new_location_x = input("Enter the new x location of the wellplate: ")
         if new_location_x == "":
-            new_location_x = wellplate.a1_x
+            new_location_x = wellplate.plate_data.a1_x
             break
         try:
             new_location_x = float(new_location_x)
@@ -851,7 +519,7 @@ def change_wellplate_location():
         new_location_y = input("Enter the new y location of the wellplate: ")
 
         if new_location_y == "":
-            new_location_y = wellplate.a1_y
+            new_location_y = wellplate.plate_data.a1_y
             break
         else:
             try:
@@ -878,179 +546,23 @@ Orientation of the wellplate:
     2 - Horizontal, wells become more negative from A1
     3 - Horizontal, wells become less negative from A1
 Enter the new orientation of the wellplate: """
-            )
+            )  # TODO Use these instructions to fix the current rotation function
         )
         if new_orientation in [0, 1, 2, 3]:
             break
         else:
             print("Invalid input. Please enter 0, 1, 2, or 3.")
 
-    wellplate = Wellplate(
-        plate_id=current_plate_id,
-    )
-
-    wellplate.a1_x = new_location_x
-    wellplate.a1_y = new_location_y
-    wellplate.orientation = new_orientation
-    wellplate.write_wellplate_location()
-    wellplate.recalculate_well_locations()
-
-
-def load_new_wellplate(
-    ask: bool = False,
-    new_plate_id: Optional[int] = None,
-    new_wellplate_type_number: Optional[int] = None,
-) -> int:
-    """
-    Save the current wellplate, reset the well statuses to new.
-    If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1
-
-    Args:
-        new_plate_id (int, optional): The plate id being loaded. Defaults to None. If None, the plate id will be incremented by 1
-        new_wellplate_type_number (int, optional): The type of wellplate. Defaults to None. If None, the type number will not be changed
-
-    Returns:
-        int: The new wellplate id
-    """
-    (
-        current_wellplate_id,
-        current_type_number,
-        current_wellplate_is_new,
-    ) = sql_wellplate.select_current_wellplate_info()
-
-    if ask:
-        new_plate_id = input(
-            f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
-        )
-        new_wellplate_type_number = input(
-            f"Enter the new wellplate type number (Current type is {current_type_number}): "
-        )
-
-    else:
-        if new_plate_id is None or new_plate_id == "":
-            new_plate_id = current_wellplate_id + 1
-        if new_wellplate_type_number is None or new_wellplate_type_number == "":
-            new_wellplate_type_number = current_type_number
-
-    if current_wellplate_is_new and new_plate_id is None or new_plate_id == "":
-        return current_wellplate_id
-
-    ## Check if the new plate id exists in the well hx
-    ## If so, then load in that wellplate
-    ## If not, then create a new wellplate
-    if new_plate_id is None or new_plate_id == "":
-        new_plate_id = current_wellplate_id + 1
-    else:
-        new_plate_id = int(new_plate_id)
-
-    if new_wellplate_type_number is None or new_wellplate_type_number == "":
-        new_wellplate_type_number = current_type_number
-    else:
-        new_wellplate_type_number = int(new_wellplate_type_number)
-
-    ## Check if the wellplate exists in the well_hx table
-    already_exists = sql_wellplate.check_if_wellplate_exists(new_plate_id)
-    logger.debug("Wellplate exists: %s", already_exists)
-    if not already_exists:
-        sql_wellplate.add_wellplate_to_table(new_plate_id, new_wellplate_type_number)
-        sql_wellplate.update_current_wellplate(new_plate_id)
-        new_wellplate = Wellplate(
-            type_number=new_wellplate_type_number,
-            new_well_plate=True,
-            plate_id=new_plate_id,
-        )
-
-    else:
-        logger.debug(
-            "Wellplate already exists in the database. Setting as current wellplate"
-        )
-        sql_wellplate.update_current_wellplate(new_plate_id)
-        # TODO: Possibly run recaclulate well locations here
-        return new_plate_id
-
-    logger.info(
-        "Wellplate %d saved and wellplate %d loaded",
-        int(current_wellplate_id),
-        int(new_plate_id),
-    )
-    return new_wellplate.plate_id
-
-
-def load_new_wellplate_sql(
-    ask: bool = False,
-    new_plate_id: Optional[int] = None,
-    new_wellplate_type_number: Optional[int] = None,
-) -> int:
-    """
-    Save the current wellplate, reset the well statuses to new.
-    If no plate id or type number given assume same type number as the current wellplate and increment wellplate id by 1
-
-    Args:
-        new_plate_id (int, optional): The plate id being loaded. Defaults to None. If None, the plate id will be incremented by 1
-        new_wellplate_type_number (int, optional): The type of wellplate. Defaults to None. If None, the type number will not be changed
-
-    Returns:
-        int: The new wellplate id
-    """
-    # Get the current wellpate from the wellplates table
-    current_wellplate_id, current_type_number, current_wellplate_is_new = (
-        sql_wellplate.select_current_wellplate_info()
-    )
-
-    if ask:
-        new_plate_id = int(
-            input(
-                f"Enter the new wellplate id (Current id is {current_wellplate_id}): "
-            )
-        )
-        new_wellplate_type_number = int(
-            input(
-                f"Enter the new wellplate type number (Current type is {current_type_number}): "
-            )
-        )
-    else:
-        if new_plate_id is None or new_plate_id == "":
-            new_plate_id = current_wellplate_id + 1
-        if new_wellplate_type_number is None or new_wellplate_type_number == "":
-            new_wellplate_type_number = current_type_number
-
-    if current_wellplate_is_new and new_plate_id is None or new_plate_id == "":
-        return current_wellplate_id
-
-    ## Check if the new plate id exists in the well hx
-    ## If so, then load in that wellplate
-    ## If not, then create a new wellplate
-    if new_plate_id is None or new_plate_id == "":
-        new_plate_id = current_wellplate_id + 1
-    else:
-        new_plate_id = int(new_plate_id)
-
-    if new_wellplate_type_number is None:
-        new_wellplate_type_number = current_type_number
-    else:
-        new_wellplate_type_number = int(new_wellplate_type_number)
-
-    ## If the wellplate exists in the well hx, then load it
-    wellplate_exists = sql_wellplate.check_if_wellplate_exists(new_plate_id)
-    if wellplate_exists:
-        logger.debug("Wellplate already exists in the database. Returning new_plate_id")
-        logger.debug("Loading wellplate")
-        sql_wellplate.update_current_wellplate(new_plate_id)
-    else:
-        logger.debug("Creating new wellplate: %d", new_plate_id)
-        new_wellplate = Wellplate(
-            type_number=new_wellplate_type_number, new_well_plate=True
-        )
-        new_wellplate.plate_id = new_plate_id
-        new_wellplate.recalculate_well_locations()
-        new_wellplate.save_wells_to_db()
-
-        logger.info(
-            "Wellplate %d saved and wellplate %d loaded",
-            int(current_wellplate_id),
-            int(new_plate_id),
-        )
-    return new_plate_id
+    wellplate.plate_data.a1_x = new_location_x
+    wellplate.plate_data.a1_y = new_location_y
+    wellplate.plate_data.orientation = new_orientation
+    wellplate.plate_data.coordinates = {
+        "x": new_location_x,
+        "y": new_location_y,
+        "z": wellplate.plate_data.coordinates["z"],
+    }
+    wellplate.recalculate_well_positions()
+    wellplate.save()
 
 
 def read_current_wellplate_info() -> Tuple[int, int, int]:
@@ -1062,12 +574,11 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
         int: The current wellplate type number
         int: Number of new wells
     """
-    current_plate_id, current_type_number, _ = (
-        sql_wellplate.select_current_wellplate_info()
-    )
-    new_wells = sql_wellplate.count_wells_with_new_status(current_plate_id)
+    current_plate_id, current_type_number, _ = select_current_wellplate_info()
+    new_wells = count_wells_with_new_status(current_plate_id)
     return int(current_plate_id), int(current_type_number), new_wells
 
 
 if __name__ == "__main__":
+    # Lets add a wellplate to the database
     pass

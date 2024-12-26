@@ -56,10 +56,9 @@ from panda_lib.instrument_toolkit import Hardware, Labware, Toolkit
 from panda_lib.log_tools import timing_wrapper
 from panda_lib.movement import Instruments, Mill, MockMill
 from panda_lib.obs_controls import MockOBSController, OBSController
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.utilities import solve_vials_ilp
-from panda_lib.vials import StockVial, Vial, WasteVial, read_vials
+from panda_lib.vials import StockVial, Vessel, Vial2, WasteVial, read_vials
 from panda_lib.wellplate import Well
 
 TESTING = read_testing_config()
@@ -102,182 +101,182 @@ logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
 
-# @timing_wrapper
-# def __forward_pipette_v2(
-#     volume: float,
-#     from_vessel: Union[Well, StockVial, WasteVial],
-#     to_vessel: Union[Well, WasteVial],
-#     toolkit: Toolkit,
-#     pumping_rate: float = None,
-# ):
-#     """
-#     Pipette a volume from one vessel to another
+@timing_wrapper
+def __forward_pipette_v2(
+    volume: float,
+    from_vessel: Union[Well, StockVial, WasteVial],
+    to_vessel: Union[Well, WasteVial],
+    toolkit: Toolkit,
+    pumping_rate: float = None,
+):
+    """
+    Pipette a volume from one vessel to another
 
-#     Depending on the supplied vessels, this function will perform one of the following:
-#     1. Pipette from a stock vial to a well
-#     2. Pipette from a well to a waste vial*
-#     3. Pipette from a stock vial to a waste vial*
-#         * When pipetting to a waste vial the dispesnsing height will be above the solution depth to avoid contamination
+    Depending on the supplied vessels, this function will perform one of the following:
+    1. Pipette from a stock vial to a well
+    2. Pipette from a well to a waste vial*
+    3. Pipette from a stock vial to a waste vial*
+        * When pipetting to a waste vial the dispesnsing height will be above the solution depth to avoid contamination
 
-#     It will not allow:
-#     1. Pipetting from a waste vial to a well
-#     2. Pipetting from a well to a stock vial
-#     3. Pipetting from a stock vial toa  stock vial
+    It will not allow:
+    1. Pipetting from a waste vial to a well
+    2. Pipetting from a well to a stock vial
+    3. Pipetting from a stock vial toa  stock vial
 
-#     The steps that this function will perform:
-#     1. Determine the number of repetitions
-#     2. Withdraw the solution from the source
-#         a. Withdraw an air gap to engage the screw
-#         b. Move to the source
-#         c. Withdraw the solution
-#         d. Move back to safe height
-#         e. Withdraw an air gap to prevent dripping
-#     3. Deposit the solution into the destination vessel
-#         a. Move to the destination
-#         b. Deposit the solution and blow out
-#         c. Move back to safe height
-#         d. If depositing stock solution into a well, the recorded weight change will be saved to the target well
-#             in the wellplate object and the stock vial object will be updated with a corrected new volume based on the density of the solution.
-#     4. Repeat 2-3 until all repetitions are complete
+    The steps that this function will perform:
+    1. Determine the number of repetitions
+    2. Withdraw the solution from the source
+        a. Withdraw an air gap to engage the screw
+        b. Move to the source
+        c. Withdraw the solution
+        d. Move back to safe height
+        e. Withdraw an air gap to prevent dripping
+    3. Deposit the solution into the destination vessel
+        a. Move to the destination
+        b. Deposit the solution and blow out
+        c. Move back to safe height
+        d. If depositing stock solution into a well, the recorded weight change will be saved to the target well
+            in the wellplate object and the stock vial object will be updated with a corrected new volume based on the density of the solution.
+    4. Repeat 2-3 until all repetitions are complete
 
-#     Args:
-#         volume (float): The volume to be pipetted in microliters
-#         from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
-#         to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
-#         pumping_rate (float): The pumping rate in ml/min
-#         pump (object): The pump object
-#         mill (object): The mill object
-#         wellplate (Wells object): The wellplate object
+    Args:
+        volume (float): The volume to be pipetted in microliters
+        from_vessel (Vial or Well): The vessel object to be pipetted from (must be selected before calling this function)
+        to_vessel (Vial or Well): The vessel object to be pipetted to (must be selected before calling this function)
+        pumping_rate (float): The pumping rate in ml/min
+        pump (object): The pump object
+        mill (object): The mill object
+        wellplate (Wells object): The wellplate object
 
-#     Returns:
-#         None (void function) since the objects are passed by reference
+    Returns:
+        None (void function) since the objects are passed by reference
 
-#     """
-#     if volume <= 0.0:
-#         return
+    """
+    if volume <= 0.0:
+        return
 
-#     logger.info(
-#         "Forward pipetting %f ul from %s to %s",
-#         volume,
-#         from_vessel.name,
-#         to_vessel.name,
-#     )
+    logger.info(
+        "Forward pipetting %f ul from %s to %s",
+        volume,
+        from_vessel.name,
+        to_vessel.name,
+    )
 
-#     # Check to ensure that the from_vessel and to_vessel are an allowed combination
-#     if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
-#         raise ValueError("Cannot pipette from a well to a stock vial")
-#     if isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
-#         raise ValueError("Cannot pipette from a waste vial to a well")
-#     if isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
-#         raise ValueError("Cannot pipette from a stock vial to a stock vial")
+    # Check to ensure that the from_vessel and to_vessel are an allowed combination
+    if isinstance(from_vessel, Well) and isinstance(to_vessel, StockVial):
+        raise ValueError("Cannot pipette from a well to a stock vial")
+    if isinstance(from_vessel, WasteVial) and isinstance(to_vessel, Well):
+        raise ValueError("Cannot pipette from a waste vial to a well")
+    if isinstance(from_vessel, StockVial) and isinstance(to_vessel, StockVial):
+        raise ValueError("Cannot pipette from a stock vial to a stock vial")
 
-#     # Calculate the number of repetitions
+    # Calculate the number of repetitions
 
-#     repetitions = math.ceil(volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP))
-#     repetition_vol = volume / repetitions
+    repetitions = math.ceil(volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP))
+    repetition_vol = volume / repetitions
 
-#     for j in range(repetitions):
-#         logger.info("Repetition %d of %d", j + 1, repetitions)
+    for j in range(repetitions):
+        logger.info("Repetition %d of %d", j + 1, repetitions)
 
-#         # Decap the source vial
-#         if isinstance(from_vessel, StockVial):
-#             toolkit.mill.safe_move(
-#                 from_vessel.coordinates.x,
-#                 from_vessel.coordinates.y,
-#                 from_vessel.vial_data.top,
-#                 Instruments.DECAPPER,
-#             )
-#             toolkit.arduino.no_cap()
+        # Decap the source vial
+        if isinstance(from_vessel, StockVial):
+            toolkit.mill.safe_move(
+                from_vessel.coordinates.x,
+                from_vessel.coordinates.y,
+                from_vessel.coordinates.z_top,
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.no_cap()
 
-#         # Withdraw solution
-#         toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
-#         toolkit.mill.safe_move(
-#             from_vessel.coordinates.x,
-#             from_vessel.coordinates.y,
-#             from_vessel.coordinates.z_bottom,
-#             Instruments.PIPETTE,
-#         )
-#         toolkit.pump.withdraw(
-#             volume_to_withdraw=repetition_vol, solution=from_vessel, rate=pumping_rate
-#         )
-#         if isinstance(from_vessel, Well):
-#             # Withdraw extra to try and remove of all solution
-#             toolkit.pump.withdraw(volume_to_withdraw=20)
-#         toolkit.mill.move_to_safe_position()
-#         toolkit.pump.withdraw(volume_to_withdraw=DRIP_STOP)
+        # Withdraw solution
+        toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
+        toolkit.mill.safe_move(
+            from_vessel.coordinates.x,
+            from_vessel.coordinates.y,
+            from_vessel.coordinates.z_bottom,  # TODO
+            Instruments.PIPETTE,
+        )
+        toolkit.pump.withdraw(
+            volume_to_withdraw=repetition_vol, solution=from_vessel, rate=pumping_rate
+        )
+        if isinstance(from_vessel, Well):
+            # Withdraw extra to try and remove of all solution
+            toolkit.pump.withdraw(volume_to_withdraw=20)
+        toolkit.mill.move_to_safe_position()
+        toolkit.pump.withdraw(volume_to_withdraw=DRIP_STOP)
 
-#         # Cap the source vial
-#         if isinstance(from_vessel, StockVial):
-#             toolkit.mill.safe_move(
-#                 from_vessel.coordinates.x,
-#                 from_vessel.coordinates.y,
-#                 from_vessel.vial_data.top,
-#                 Instruments.DECAPPER,
-#             )
-#             toolkit.arduino.ALL_CAP()
+        # Cap the source vial
+        if isinstance(from_vessel, StockVial):
+            toolkit.mill.safe_move(
+                from_vessel.coordinates.x,
+                from_vessel.coordinates.y,
+                from_vessel.coordinates.z_top,  # TODO
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.ALL_CAP()
 
-#         # Deposit solution
+        # Deposit solution
 
-#         # If the to_vessel is a waste_vial decap the vial
-#         if isinstance(to_vessel, WasteVial):
-#             toolkit.mill.safe_move(
-#                 to_vessel.coordinates.x,
-#                 to_vessel.coordinates.y,
-#                 to_vessel.vial_data.top,
-#                 Instruments.DECAPPER,
-#             )
-#             toolkit.arduino.no_cap()
+        # If the to_vessel is a waste_vial decap the vial
+        if isinstance(to_vessel, WasteVial):
+            toolkit.mill.safe_move(
+                to_vessel.coordinates.x,
+                to_vessel.coordinates.y,
+                to_vessel.coordinates.z_top,  # TODO
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.no_cap()
 
-#         toolkit.mill.safe_move(
-#             to_vessel.coordinates.x,
-#             to_vessel.coordinates.y,
-#             to_vessel.vial_data.top,
-#             Instruments.PIPETTE,
-#         )
-#         toolkit.pump.infuse(
-#             volume_to_infuse=repetition_vol,
-#             being_infused=from_vessel,
-#             infused_into=to_vessel,
-#             blowout_ul=(
-#                 AIR_GAP + DRIP_STOP + 20
-#                 if isinstance(from_vessel, Well)
-#                 else AIR_GAP + DRIP_STOP
-#             ),
-#         )
+        toolkit.mill.safe_move(
+            to_vessel.coordinates.x,
+            to_vessel.coordinates.y,
+            to_vessel.coordinates.z_top,  # TODO
+            Instruments.PIPETTE,
+        )
+        toolkit.pump.infuse(
+            volume_to_infuse=repetition_vol,
+            being_infused=from_vessel,
+            infused_into=to_vessel,
+            blowout_ul=(
+                AIR_GAP + DRIP_STOP + 20
+                if isinstance(from_vessel, Well)
+                else AIR_GAP + DRIP_STOP
+            ),
+        )
 
-#         # Purge residual solution
-#         for _, vol in toolkit.pump.pipette.contents.items():
-#             if vol > 0.0:
-#                 logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
-#                 toolkit.pump.infuse(
-#                     volume_to_infuse=vol,
-#                     being_infused=None,
-#                     infused_into=to_vessel,
-#                     blowout_ul=vol,
-#                 )
+        # Purge residual solution
+        for _, vol in toolkit.pump.pipette.contents.items():
+            if vol > 0.0:
+                logger.warning("Pipette has residual volume of %f ul. Purging...", vol)
+                toolkit.pump.infuse(
+                    volume_to_infuse=vol,
+                    being_infused=None,
+                    infused_into=to_vessel,
+                    blowout_ul=vol,
+                )
 
-#         if toolkit.pump.pipette.volume > 0.0:
-#             logger.warning(
-#                 "Pipette has residual volume of %f ul. Purging...",
-#                 toolkit.pump.pipette.volume,
-#             )
-#             toolkit.pump.infuse(
-#                 volume_to_infuse=toolkit.pump.pipette.volume,
-#                 being_infused=None,
-#                 infused_into=to_vessel,
-#                 blowout_ul=toolkit.pump.pipette.volume,
-#             )
-#             toolkit.pump.pipette.volume = 0.0
+        if toolkit.pump.pipette.volume > 0.0:
+            logger.warning(
+                "Pipette has residual volume of %f ul. Purging...",
+                toolkit.pump.pipette.volume,
+            )
+            toolkit.pump.infuse(
+                volume_to_infuse=toolkit.pump.pipette.volume,
+                being_infused=None,
+                infused_into=to_vessel,
+                blowout_ul=toolkit.pump.pipette.volume,
+            )
+            toolkit.pump.pipette.volume = 0.0
 
-#         # Cap the destination vial
-#         if isinstance(to_vessel, WasteVial):
-#             toolkit.mill.safe_move(
-#                 to_vessel.coordinates.x,
-#                 to_vessel.coordinates.y,
-#                 to_vessel.vial_data.top,
-#                 Instruments.DECAPPER,
-#             )
-#             toolkit.arduino.ALL_CAP()
+        # Cap the destination vial
+        if isinstance(to_vessel, WasteVial):
+            toolkit.mill.safe_move(
+                to_vessel.coordinates.x,
+                to_vessel.coordinates.y,
+                to_vessel.coordinates.z_top,  # TODO
+                Instruments.DECAPPER,
+            )
+            toolkit.arduino.ALL_CAP()
 
 
 @timing_wrapper
@@ -292,7 +291,7 @@ def _forward_pipette_v3(
     """
     Forward pipette from a given source to a given destination.
     The source may be one of the following:
-        - A string representing the name of a vial
+        - A string representing the name of a solution
         - A Well object
         - A StockVial object
     The destination may be one of the following:
@@ -327,15 +326,16 @@ def _forward_pipette_v3(
             return
 
         # Handle when a source solution name and concentration is provided (even if concentration is none)
-        selected_source_vessels: list[Vial, Well] = None
+        selected_source_vessels: list[Vessel] = None
         source_vessel_volumes: list = None
         # If given a vial name, there may be multiple vials with the same name, so we need to check for all of them
         # and select those that let us meet the solution concentration
-        # FIXME: Assuming src_vessel is a string and a vial
-        if isinstance(src_vessel, (str)):
+        if isinstance(
+            src_vessel, str
+        ):  # FIXME: Assuming src_vessel is a string and a vial
             # Fetch updated solutions from the db
-            selected_source_vessels: list[Vial]
-            stock_vials, _ = read_vials(SessionLocal())
+            selected_source_vessels: list[Vial2]
+            stock_vials, _ = read_vials()
             selected_source_vessels = [
                 vial
                 for vial in stock_vials
@@ -404,7 +404,7 @@ def _forward_pipette_v3(
                         source_concentration,
                     )
         elif isinstance(src_vessel, Well) or isinstance(
-            src_vessel, Vial
+            src_vessel, Vial2
         ):  # If the source provided is a well or stock vial object
             source_vessel_volumes = [(src_vessel, volume)]
             toolkit.global_logger.info(
@@ -432,7 +432,7 @@ def _forward_pipette_v3(
             ):  # Skip if the volume is zero or negative. Even though we are removing volume from the vial the volume is positive
                 continue
             # Calculate repetitions
-            vessel: Union[Vial, Well]
+            vessel: Vessel
             try:
                 repetitions = math.ceil(
                     desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
@@ -464,7 +464,7 @@ def _forward_pipette_v3(
                     toolkit.mill.safe_move(
                         vessel.coordinates.x,
                         vessel.coordinates.y,
-                        vessel.vial_data.top,
+                        vessel.coordinates.z_top,
                         Instruments.DECAPPER,
                     )
                     toolkit.arduino.no_cap()
@@ -474,7 +474,7 @@ def _forward_pipette_v3(
                 toolkit.mill.safe_move(
                     vessel.coordinates["x"],
                     vessel.coordinates["y"],
-                    vessel.withdrawal_height,  # TODO
+                    vessel.coordinates.z_bottom,  # TODO
                     Instruments.PIPETTE,
                 )
                 toolkit.pump.withdraw(
@@ -491,7 +491,7 @@ def _forward_pipette_v3(
                     toolkit.mill.safe_move(
                         vessel.coordinates.x,
                         vessel.coordinates.y,
-                        vessel.vial_data.top,
+                        vessel.coordinates.z_top,  # TODO
                         Instruments.DECAPPER,
                     )
                     toolkit.arduino.ALL_CAP()
@@ -503,7 +503,7 @@ def _forward_pipette_v3(
                     toolkit.mill.safe_move(
                         dst_vessel.coordinates.x,
                         dst_vessel.coordinates.y,
-                        dst_vessel.vial_data.top,
+                        dst_vessel.coordinates.z_top,  # TODO
                         Instruments.DECAPPER,
                     )
                     toolkit.arduino.no_cap()
@@ -511,7 +511,7 @@ def _forward_pipette_v3(
                 toolkit.mill.safe_move(
                     dst_vessel.coordinates.x,
                     dst_vessel.coordinates.y,
-                    dst_vessel.vial_data.top,
+                    dst_vessel.coordinates.z_top,  # TODO
                     Instruments.PIPETTE,
                 )
                 toolkit.pump.infuse(
@@ -556,7 +556,7 @@ def _forward_pipette_v3(
                     toolkit.mill.safe_move(
                         dst_vessel.coordinates.x,
                         dst_vessel.coordinates.y,
-                        dst_vessel.vial_data.top,
+                        dst_vessel.coordinates.z_top,  # TODO
                         Instruments.DECAPPER,
                     )
                     toolkit.arduino.ALL_CAP()
@@ -579,58 +579,58 @@ def transfer(
     )
 
 
-# @timing_wrapper
-# def __rinse_v2(
-#     instructions: EchemExperimentBase,
-#     toolkit: Toolkit,
-# ):
-#     """
-#     Rinse the well with rinse_vol ul.
-#     Involves pipetteing and then clearing the well with no purging steps
+@timing_wrapper
+def __rinse_v2(
+    instructions: EchemExperimentBase,
+    toolkit: Toolkit,
+):
+    """
+    Rinse the well with rinse_vol ul.
+    Involves pipetteing and then clearing the well with no purging steps
 
-#     Args:
-#         instructions (Experiment): The experiment instructions
-#         toolkit (Toolkit): The toolkit object
-#         stock_vials (list): The list of stock vials
-#         waste_vials (list): The list of waste vials
-#     Returns:
-#         None (void function) since the objects are passed by reference
-#     """
+    Args:
+        instructions (Experiment): The experiment instructions
+        toolkit (Toolkit): The toolkit object
+        stock_vials (list): The list of stock vials
+        waste_vials (list): The list of waste vials
+    Returns:
+        None (void function) since the objects are passed by reference
+    """
 
-#     logger.info(
-#         "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
-#     )
-#     instructions.set_status_and_save(ExperimentStatus.RINSING)
-#     for _ in range(instructions.rinse_count):
-#         # Pipette the rinse solution into the well
-#         __forward_pipette_v2(
-#             volume=correction_factor(instructions.rinse_vol),
-#             from_vessel=solution_selector(
-#                 "rinse",
-#                 instructions.rinse_vol,
-#             ),
-#             to_vessel=toolkit.wellplate.wells[instructions.well_id],
-#             toolkit=toolkit,
-#             pumping_rate=toolkit.pump.max_pump_rate,
-#         )
-#         toolkit.mill.safe_move(
-#             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-#             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-#             z_coord=toolkit.wellplate.z_top,  # TODO
-#             instrument=Instruments.PIPETTE,
-#         )
-#         # Clear the well
-#         __forward_pipette_v2(
-#             volume=correction_factor(instructions.rinse_vol),
-#             from_vessel=toolkit.wellplate.wells[instructions.well_id],
-#             to_vessel=waste_selector(
-#                 "waste",
-#                 instructions.rinse_vol,
-#             ),
-#             toolkit=toolkit,
-#         )
+    logger.info(
+        "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
+    )
+    instructions.set_status_and_save(ExperimentStatus.RINSING)
+    for _ in range(instructions.rinse_count):
+        # Pipette the rinse solution into the well
+        __forward_pipette_v2(
+            volume=correction_factor(instructions.rinse_vol),
+            from_vessel=solution_selector(
+                "rinse",
+                instructions.rinse_vol,
+            ),
+            to_vessel=toolkit.wellplate.wells[instructions.well_id],
+            toolkit=toolkit,
+            pumping_rate=toolkit.pump.max_pump_rate,
+        )
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
+            z_coord=toolkit.wellplate.z_top,  # TODO
+            instrument=Instruments.PIPETTE,
+        )
+        # Clear the well
+        __forward_pipette_v2(
+            volume=correction_factor(instructions.rinse_vol),
+            from_vessel=toolkit.wellplate.wells[instructions.well_id],
+            to_vessel=waste_selector(
+                "waste",
+                instructions.rinse_vol,
+            ),
+            toolkit=toolkit,
+        )
 
-#     return 0
+    return 0
 
 
 @timing_wrapper
@@ -679,56 +679,56 @@ def rinse_v3(
     return 0
 
 
-# @timing_wrapper
-# def __flush_v2(
-#     flush_solution_name: str,
-#     toolkit: Toolkit,
-#     flush_volume: float = float(120.0),
-#     flush_count: int = 1,
-#     instructions: Optional[ExperimentBase] = None,
-# ):
-#     """
-#     Flush the pipette tip with the designated flush_volume ul to remove any residue
-#     Args:
-#         waste_vials (list): The list of waste vials
-#         stock_vials (list): The list of stock vials
-#         flush_solution_name (str): The name of the solution to flush with
-#         mill (object): The mill object
-#         pump (object): The pump object
-#         pumping_rate (float): The pumping rate in ml/min
-#         flush_volume (float): The volume to flush with in microliters
-#         flush_count (int): The number of times to flush
+@timing_wrapper
+def __flush_v2(
+    flush_solution_name: str,
+    toolkit: Toolkit,
+    flush_volume: float = float(120.0),
+    flush_count: int = 1,
+    instructions: Optional[ExperimentBase] = None,
+):
+    """
+    Flush the pipette tip with the designated flush_volume ul to remove any residue
+    Args:
+        waste_vials (list): The list of waste vials
+        stock_vials (list): The list of stock vials
+        flush_solution_name (str): The name of the solution to flush with
+        mill (object): The mill object
+        pump (object): The pump object
+        pumping_rate (float): The pumping rate in ml/min
+        flush_volume (float): The volume to flush with in microliters
+        flush_count (int): The number of times to flush
 
-#     Returns:
-#         None (void function) since the objects are passed by reference
-#     """
+    Returns:
+        None (void function) since the objects are passed by reference
+    """
 
-#     if flush_volume > 0.000:
-#         if instructions is not None:
-#             instructions.set_status_and_save(ExperimentStatus.FLUSHING)
-#         logger.info(
-#             "Flushing pipette tip with %f ul of %s...",
-#             flush_volume,
-#             flush_solution_name,
-#         )
+    if flush_volume > 0.000:
+        if instructions is not None:
+            instructions.set_status_and_save(ExperimentStatus.FLUSHING)
+        logger.info(
+            "Flushing pipette tip with %f ul of %s...",
+            flush_volume,
+            flush_solution_name,
+        )
 
-#         for _ in range(flush_count):
-#             __forward_pipette_v2(
-#                 flush_volume,
-#                 from_vessel=solution_selector(flush_solution_name, flush_volume),
-#                 to_vessel=waste_selector("waste", flush_volume),
-#                 toolkit=toolkit,
-#             )
+        for _ in range(flush_count):
+            __forward_pipette_v2(
+                flush_volume,
+                from_vessel=solution_selector(flush_solution_name, flush_volume),
+                to_vessel=waste_selector("waste", flush_volume),
+                toolkit=toolkit,
+            )
 
-#         logger.debug(
-#             "Flushed pipette tip with %f ul of %s %dx times...",
-#             flush_volume,
-#             flush_solution_name,
-#             flush_count,
-#         )
-#     else:
-#         logger.info("No flushing required. Flush volume is 0. Continuing...")
-#     return 0
+        logger.debug(
+            "Flushed pipette tip with %f ul of %s %dx times...",
+            flush_volume,
+            flush_solution_name,
+            flush_count,
+        )
+    else:
+        logger.info("No flushing required. Flush volume is 0. Continuing...")
+    return 0
 
 
 @timing_wrapper
@@ -803,7 +803,7 @@ def purge_pipette(
     mill.safe_move(
         purge_vial.coordinates.x,
         purge_vial.coordinates.y,
-        purge_vial.vial_data.top,
+        purge_vial.coordinates.z_top,  # TODO
         Instruments.PIPETTE,
     )
 
@@ -828,7 +828,7 @@ def solution_selector(solution_name: str, volume: float) -> StockVial:
         solution (object): The solution object
     """
     # Fetch updated solutions from the db
-    stock_vials, _ = read_vials(SessionLocal())
+    stock_vials, _ = read_vials()
 
     for solution in stock_vials:
         # if the solution names match and the requested volume is less than the available volume (volume - 10% of capacity)
@@ -856,7 +856,7 @@ def waste_selector(solution_name: str, volume: float) -> WasteVial:
         solution (object): The solution object
     """
     # Fetch updated solutions from the db
-    _, wate_vials = read_vials(SessionLocal())
+    _, wate_vials = read_vials()
     solution_name = solution_name.lower()
     for waste_vial in wate_vials:
         if (
@@ -1299,7 +1299,7 @@ def mix(
         mill.safe_move(
             x_coord=well.coordinates.x,
             y_coord=well.coordinates.y,
-            z_coord=well.bottom,  # TODO
+            z_coord=well.depth,  # TODO
             instrument=Instruments.PIPETTE,
         )
 
@@ -1314,7 +1314,7 @@ def mix(
         mill.safe_move(
             x_coord=well.coordinates.x,
             y_coord=well.coordinates.y,
-            z_coord=well.top,  # TODO
+            z_coord=mix_height,  # TODO
             instrument=Instruments.PIPETTE,
         )
 
@@ -1333,235 +1333,236 @@ def mix(
     return 0
 
 
-# # Not timed since it is a wrapper function
-# def ca_deposition(
-#     soln_name: str,
-#     exp_obj: EchemExperimentBase,
-#     toolkit: Toolkit,
-#     custom_deposition_function: Optional[callable] = None,
-#     rinse_well_at_end: bool = True,
-# ):
-#     """
-#     0. Imaging the well
-#     1. Depositing solution into well
-#     2. Moving electrode to well
-#     3. Performing CA
-#     4. Rinsing electrode
-#     5. Clearing well contents into waste
-#     6. Flushing the pipette tip
-#     7. Rinsing the well 4x with rinse
-#     8. Take after image
+# Not timed since it is a wrapper function
+def ca_deposition(
+    soln_name: str,
+    exp_obj: EchemExperimentBase,
+    toolkit: Toolkit,
+    custom_deposition_function: Optional[callable] = None,
+    rinse_well_at_end: bool = True,
+):
+    """
+    0. Imaging the well
+    1. Depositing solution into well
+    2. Moving electrode to well
+    3. Performing CA
+    4. Rinsing electrode
+    5. Clearing well contents into waste
+    6. Flushing the pipette tip
+    7. Rinsing the well 4x with rinse
+    8. Take after image
 
-#     Args:
-#         soln_name (str): Name of the solution to be deposited (should match the name of the vial)
-#         instructions (EchemExperimentBase): The experiment instructions
-#         toolkit (Toolkit): The toolkit object for interfacing with the hardware
-#         custom_deposition_function (callable): A custom deposition function to be used instead of the default chrono_amp
+    Args:
+        soln_name (str): Name of the solution to be deposited (should match the name of the vial)
+        instructions (EchemExperimentBase): The experiment instructions
+        toolkit (Toolkit): The toolkit object for interfacing with the hardware
+        custom_deposition_function (callable): A custom deposition function to be used instead of the default chrono_amp
 
-#     """
-#     exp_obj.declare_step(
-#         f"Imaging the {exp_obj.well_id} Before Deposition", ExperimentStatus.IMAGING
-#     )
-#     image_well(toolkit, exp_obj, "BeforeDeposition")
-#     exp_obj.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
-#     _forward_pipette_v3(
-#         volume=exp_obj.solutions[soln_name]["volume"],
-#         src_vessel=soln_name,
-#         dst_vessel=exp_obj.well,  # FIXME This is likely passing a string and we arent set up for finding wells as a string name yet.
-#         toolkit=toolkit,
-#         source_concentration=exp_obj.solutions[soln_name]["concentration"],
-#     )
+    """
 
-#     ## Move the electrode to the well
-#     exp_obj.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
+    exp_obj.declare_step(
+        f"Imaging the {exp_obj.well_id} Before Deposition", ExperimentStatus.IMAGING
+    )
+    image_well(toolkit, exp_obj, "BeforeDeposition")
+    exp_obj.declare_step("Depositing EDOT into well", ExperimentStatus.DEPOSITING)
+    _forward_pipette_v3(
+        volume=exp_obj.solutions[soln_name]["volume"],
+        src_vessel=soln_name,
+        dst_vessel=exp_obj.well,
+        toolkit=toolkit,
+        source_concentration=exp_obj.solutions[soln_name]["concentration"],
+    )
 
-#     ## Move the electrode to the well
-#     # Move the electrode to above the well
-#     toolkit.mill.safe_move(
-#         x_coord=exp_obj.well.coordinates.x,
-#         y_coord=exp_obj.well.coordinates.y,
-#         z_coord=exp_obj.well.well_data.top,  # TODO
-#         instrument=Instruments.ELECTRODE,
-#         second_z_cord=toolkit.wellplate.echem_height,
-#         second_z_cord_feed=100,
-#     )
+    ## Move the electrode to the well
+    exp_obj.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
 
-#     exp_obj.declare_step("Performing CA", ExperimentStatus.CA)
-#     try:
-#         if custom_deposition_function:
-#             custom_deposition_function(exp_obj, file_tag="CA_deposition")
-#         else:
-#             chrono_amp(exp_obj, file_tag="CA_deposition")
+    ## Move the electrode to the well
+    # Move the electrode to above the well
+    toolkit.mill.safe_move(
+        x_coord=exp_obj.well.coordinates.x,
+        y_coord=exp_obj.well.coordinates.y,
+        z_coord=exp_obj.well.coordinates.z_top,  # TODO
+        instrument=Instruments.ELECTRODE,
+        second_z_cord=toolkit.wellplate.echem_height,
+        second_z_cord_feed=100,
+    )
 
-#     except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
-#         toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-#         raise e
-#     except Exception as e:
-#         toolkit.global_logger.error(
-#             "Unknown error occurred during chrono_amp: %s", str(e)
-#         )
-#         raise e
+    exp_obj.declare_step("Performing CA", ExperimentStatus.CA)
+    try:
+        if custom_deposition_function:
+            custom_deposition_function(exp_obj, file_tag="CA_deposition")
+        else:
+            chrono_amp(exp_obj, file_tag="CA_deposition")
 
-#     # Rinse electrode
-#     exp_obj.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
-#     toolkit.mill.rinse_electrode(3)
+    except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
+        toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+        raise e
+    except Exception as e:
+        toolkit.global_logger.error(
+            "Unknown error occurred during chrono_amp: %s", str(e)
+        )
+        raise e
 
-#     # Clear the well
-#     exp_obj.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
-#     _forward_pipette_v3(
-#         volume=exp_obj.well.volume,
-#         src_vessel=exp_obj.well,
-#         dst_vessel=waste_selector(
-#             "waste",
-#             exp_obj.well.well_data.volume,
-#         ),
-#         toolkit=toolkit,
-#     )
+    # Rinse electrode
+    exp_obj.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
+    toolkit.mill.rinse_electrode(3)
 
-#     exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
-#     exp_obj.set_status_and_save(ExperimentStatus.FLUSHING)
-#     flush_v3(
-#         flush_solution_name=exp_obj.flush_sol_name,
-#         flush_volume=exp_obj.flush_vol,
-#         flush_count=exp_obj.flush_count,
-#         toolkit=toolkit,
-#     )
+    # Clear the well
+    exp_obj.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
+    _forward_pipette_v3(
+        volume=exp_obj.well.volume,
+        src_vessel=exp_obj.well,
+        dst_vessel=waste_selector(
+            "waste",
+            exp_obj.well.volume,
+        ),
+        toolkit=toolkit,
+    )
 
-#     if rinse_well_at_end:
-#         exp_obj.declare_step(
-#             f"Rinsing the well {exp_obj.rinse_count}x with rinse",
-#             ExperimentStatus.RINSING,
-#         )
-#         rinse_v3(
-#             instructions=exp_obj,
-#             toolkit=toolkit,
-#         )
+    exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    exp_obj.set_status_and_save(ExperimentStatus.FLUSHING)
+    flush_v3(
+        flush_solution_name=exp_obj.flush_sol_name,
+        flush_volume=exp_obj.flush_vol,
+        flush_count=exp_obj.flush_count,
+        toolkit=toolkit,
+    )
 
-#     exp_obj.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
-#     image_well(
-#         toolkit=toolkit,
-#         instructions=exp_obj,
-#         step_description="AfterDeposition",
-#     )
-#     toolkit.global_logger.info("Deposition of %scomplete\n\n", soln_name)
+    if rinse_well_at_end:
+        exp_obj.declare_step(
+            f"Rinsing the well {exp_obj.rinse_count}x with rinse",
+            ExperimentStatus.RINSING,
+        )
+        rinse_v3(
+            instructions=exp_obj,
+            toolkit=toolkit,
+        )
+
+    exp_obj.declare_step("Take after deposition image", ExperimentStatus.IMAGING)
+    image_well(
+        toolkit=toolkit,
+        instructions=exp_obj,
+        step_description="AfterDeposition",
+    )
+    toolkit.global_logger.info("Deposition of %scomplete\n\n", soln_name)
 
 
-# # Not timed since it is a wrapper function
-# def pedotcv(
-#     exp_obj: EchemExperimentBase,
-#     toolkit: Toolkit,
-#     custom_cv_function: Optional[callable] = None,
-#     rinse_well_at_end: bool = True,
-# ):
-#     """
-#     0. Imaging the well
-#     1. Depositing liclo4 into well
-#     2. Moving electrode to well
-#     3. Performing CV
-#     4. Rinsing electrode
-#     5. Clearing well contents into waste
-#     6. Flushing the pipette tip
-#     7. Take image of well
-#     8. Rinsing the well 4x with rinse
-#     9. Take end image
+# Not timed since it is a wrapper function
+def pedotcv(
+    exp_obj: EchemExperimentBase,
+    toolkit: Toolkit,
+    custom_cv_function: Optional[callable] = None,
+    rinse_well_at_end: bool = True,
+):
+    """
+    0. Imaging the well
+    1. Depositing liclo4 into well
+    2. Moving electrode to well
+    3. Performing CV
+    4. Rinsing electrode
+    5. Clearing well contents into waste
+    6. Flushing the pipette tip
+    7. Take image of well
+    8. Rinsing the well 4x with rinse
+    9. Take end image
 
-#     Args:
-#         instructions (EchemExperimentBase): _description_
-#         toolkit (Toolkit): _description_
-#     """
-#     toolkit.global_logger.info("Running experiment %s part 4", exp_obj.experiment_id)
-#     exp_obj.declare_step(
-#         "Imaging the well Before Characterization", ExperimentStatus.IMAGING
-#     )
-#     image_well(toolkit, exp_obj, "Before_Characterizing")
+    Args:
+        instructions (EchemExperimentBase): _description_
+        toolkit (Toolkit): _description_
+    """
+    toolkit.global_logger.info("Running experiment %s part 4", exp_obj.experiment_id)
+    exp_obj.declare_step(
+        "Imaging the well Before Characterization", ExperimentStatus.IMAGING
+    )
+    image_well(toolkit, exp_obj, "Before_Characterizing")
 
-#     exp_obj.declare_step("Depositing liclo4", ExperimentStatus.DEPOSITING)
-#     char_soln_name = exp_obj.char_sol_name
-#     char_soln_volume = exp_obj.char_vol
-#     char_soln_concentration = exp_obj.char_concentration
+    exp_obj.declare_step("Depositing liclo4", ExperimentStatus.DEPOSITING)
+    char_soln_name = exp_obj.char_sol_name
+    char_soln_volume = exp_obj.char_vol
+    char_soln_concentration = exp_obj.char_concentration
 
-#     _forward_pipette_v3(
-#         volume=char_soln_volume,
-#         src_vessel=solution_selector(
-#             char_soln_name,
-#             char_soln_volume,
-#         ),
-#         dst_vessel=exp_obj.well,
-#         toolkit=toolkit,
-#         source_concentration=char_soln_concentration,
-#     )
+    _forward_pipette_v3(
+        volume=char_soln_volume,
+        src_vessel=solution_selector(
+            char_soln_name,
+            char_soln_volume,
+        ),
+        dst_vessel=exp_obj.well,
+        toolkit=toolkit,
+        source_concentration=char_soln_concentration,
+    )
 
-#     ## Move the electrode to the well
-#     exp_obj.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
-#     try:
-#         ## Move the electrode to the well
-#         # Move the electrode to above the well
-#         toolkit.mill.safe_move(
-#             x_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "x"),
-#             y_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "y"),
-#             z_coord=toolkit.wellplate.z_top,  # TODO
-#             instrument=Instruments.ELECTRODE,
-#             second_z_cord=toolkit.wellplate.echem_height,
-#             second_z_cord_feed=100,
-#         )
+    ## Move the electrode to the well
+    exp_obj.declare_step("Moving electrode to well", ExperimentStatus.MOVING)
+    try:
+        ## Move the electrode to the well
+        # Move the electrode to above the well
+        toolkit.mill.safe_move(
+            x_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "x"),
+            y_coord=toolkit.wellplate.get_coordinates(exp_obj.well_id, "y"),
+            z_coord=toolkit.wellplate.z_top,  # TODO
+            instrument=Instruments.ELECTRODE,
+            second_z_cord=toolkit.wellplate.echem_height,
+            second_z_cord_feed=100,
+        )
 
-#         exp_obj.declare_step("Performing CV", ExperimentStatus.CV)
-#         try:
-#             if custom_cv_function:
-#                 custom_cv_function(exp_obj, file_tag="CV_characterization")
-#             else:
-#                 cyclic_volt(exp_obj, file_tag="CV_characterization")
-#         except Exception as e:
-#             toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
-#             raise e
-#     finally:
-#         exp_obj.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
-#         toolkit.mill.rinse_electrode(3)
+        exp_obj.declare_step("Performing CV", ExperimentStatus.CV)
+        try:
+            if custom_cv_function:
+                custom_cv_function(exp_obj, file_tag="CV_characterization")
+            else:
+                cyclic_volt(exp_obj, file_tag="CV_characterization")
+        except Exception as e:
+            toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
+            raise e
+    finally:
+        exp_obj.declare_step("Rinsing electrode", ExperimentStatus.ERINSING)
+        toolkit.mill.rinse_electrode(3)
 
-#     # Clear the well
-#     exp_obj.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
-#     _forward_pipette_v3(
-#         volume=exp_obj.well.volume,
-#         src_vessel=exp_obj.well,
-#         dst_vessel=waste_selector(
-#             "waste",
-#             exp_obj.well.volume,
-#         ),
-#         toolkit=toolkit,
-#     )
+    # Clear the well
+    exp_obj.declare_step("Clearing well contents into waste", ExperimentStatus.CLEARING)
+    _forward_pipette_v3(
+        volume=exp_obj.well.volume,
+        src_vessel=exp_obj.well,
+        dst_vessel=waste_selector(
+            "waste",
+            exp_obj.well.volume,
+        ),
+        toolkit=toolkit,
+    )
 
-#     exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
-#     flush_v3(
-#         flush_solution_name=exp_obj.flush_sol_name,
-#         flush_volume=exp_obj.flush_vol,
-#         flush_count=exp_obj.flush_count,
-#         toolkit=toolkit,
-#     )
+    exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
+    flush_v3(
+        flush_solution_name=exp_obj.flush_sol_name,
+        flush_volume=exp_obj.flush_vol,
+        flush_count=exp_obj.flush_count,
+        toolkit=toolkit,
+    )
 
-#     exp_obj.declare_step(
-#         "Take image of well After_Characterizing", ExperimentStatus.IMAGING
-#     )
-#     image_well(
-#         toolkit=toolkit,
-#         instructions=exp_obj,
-#         step_description="After_Characterizing",
-#     )
-#     exp_obj.declare_step(
-#         f"Rinsing the well {exp_obj.rinse_count}x with rinse",
-#         ExperimentStatus.RINSING,
-#     )
-#     rinse_v3(
-#         instructions=exp_obj,
-#         toolkit=toolkit,
-#     )
+    exp_obj.declare_step(
+        "Take image of well After_Characterizing", ExperimentStatus.IMAGING
+    )
+    image_well(
+        toolkit=toolkit,
+        instructions=exp_obj,
+        step_description="After_Characterizing",
+    )
+    exp_obj.declare_step(
+        f"Rinsing the well {exp_obj.rinse_count}x with rinse",
+        ExperimentStatus.RINSING,
+    )
+    rinse_v3(
+        instructions=exp_obj,
+        toolkit=toolkit,
+    )
 
-#     exp_obj.declare_step("Take end image", ExperimentStatus.IMAGING)
-#     image_well(
-#         toolkit=toolkit,
-#         instructions=exp_obj,
-#         step_description="EndImage",
-#     )
-#     toolkit.global_logger.info("PEDOT characterizing complete\n\n")
+    exp_obj.declare_step("Take end image", ExperimentStatus.IMAGING)
+    image_well(
+        toolkit=toolkit,
+        instructions=exp_obj,
+        step_description="EndImage",
+    )
+    toolkit.global_logger.info("PEDOT characterizing complete\n\n")
 
 
 if __name__ == "__main__":
