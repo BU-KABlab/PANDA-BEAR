@@ -9,7 +9,14 @@ from datetime import timezone
 from sqlalchemy import Column, Computed, ForeignKey, Text, text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
-from sqlalchemy.sql.sqltypes import JSON, BigInteger, Boolean, Float, Integer, String
+from sqlalchemy.sql.sqltypes import (
+    JSON,
+    BigInteger,
+    Boolean,
+    Float,
+    Integer,
+    String,
+)
 
 Base = declarative_base()
 
@@ -326,30 +333,6 @@ class DeckObjectBase:
     )
     name: Mapped[str] = mapped_column(String)
 
-    # @property
-    # def x(self):
-    #     return self.coordinates.get("x")
-
-    # @property
-    # def y(self):
-    #     return self.coordinates.get("y")
-
-    # @property
-    # def z(self):
-    #     return self.coordinates.get("z")
-
-    # @x.setter
-    # def x(self, value):
-    #     self.coordinates["x"] = value
-
-    # @y.setter
-    # def y(self, value):
-    #     self.coordinates["y"] = value
-
-    # @z.setter
-    # def z(self, value):
-    #     self.coordinates["z"] = value
-
 
 class VesselBase(DeckObjectBase):
     radius: Mapped[int] = mapped_column(Integer, default=14)
@@ -388,10 +371,88 @@ class VialsBase(VesselBase):
         return f"<{self.__class__.__name__}(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
 
 
-class Vials(VialsBase, Base):
+import json
+
+from sqlalchemy.types import TypeDecorator
+
+
+class JSONEncodedDict(TypeDecorator):
+    """Enables JSON storage by encoding and decoding on the fly."""
+
+    impl = String
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return "{}"
+        return json.dumps(value)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return {}
+        return json.loads(value)
+
+
+class Vials(Base):
     """Vials table model"""
 
     __tablename__ = "panda_vials"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    position: Mapped[str] = mapped_column(String, nullable=False)
+    category: Mapped[int] = mapped_column(Integer, nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    contents: Mapped[dict] = mapped_column(JSONEncodedDict, nullable=False, default={})
+    viscosity_cp: Mapped[float] = mapped_column(Float, nullable=False)
+    concentration: Mapped[float] = mapped_column(Float, nullable=False)
+    density: Mapped[float] = mapped_column(Float, nullable=False)
+    height: Mapped[float] = mapped_column(Float, nullable=False, default=57.0)
+    radius: Mapped[float] = mapped_column(Float, nullable=False, default=14.0)
+    volume: Mapped[float] = mapped_column(Float, nullable=False, default=20000.0)
+    capacity: Mapped[float] = mapped_column(Float, nullable=False, default=20000.0)
+    contamination: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    coordinates: Mapped[dict] = mapped_column(
+        JSONEncodedDict, nullable=False, default={"x": 0, "y": 0, "z": 0}
+    )
+    base_thickness: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
+    dead_volume: Mapped[float] = mapped_column(Float, nullable=False, default=1000.0)
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    updated: Mapped[str] = mapped_column(
+        String, nullable=False, default=dt.now(timezone.utc)
+    )
+
+    # Generated columns
+    volume_height: Mapped[float] = mapped_column(
+        Float,
+        Computed(
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + ((volume) / (pi() * power(radius, 2))), 2)"
+        ),
+    )
+    top: Mapped[float] = mapped_column(
+        Float,
+        Computed(
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + height, 2)"
+        ),
+    )
+    bottom: Mapped[float] = mapped_column(
+        Float,
+        Computed(
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + ((dead_volume) / (pi() * power(radius, 2))), 2)"
+        ),
+    )
+
+    def __repr__(self):
+        return f"<Vials(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
+
+    @property
+    def x(self):
+        return self.coordinates.get("x", 0)
+
+    @property
+    def y(self):
+        return self.coordinates.get("y", 0)
+
+    @property
+    def z(self):
+        return self.coordinates.get("z", 0)
 
 
 class VialStatus(VialsBase, Base):
