@@ -35,7 +35,7 @@ from .exceptions import (
 )
 
 # local libraries
-from .logger import set_up_mill_logger
+from .logger import set_up_command_logger, set_up_mill_logger
 from .tools import Coordinates, ToolManager
 
 # Formatted strings for the mill commands
@@ -108,22 +108,25 @@ class Mill:
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = self.read_working_volume()
         self.safe_floor_height = -85.0
+        self.command_logger = set_up_command_logger(self.logger_location)
 
     def read_working_volume(self):
         """Checks the mill config for soft limits to be enabled, and then if so check the x, y, and z max travel limits"""
+        working_volume: Coordinates = Coordinates(0, 0, 0)
         multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
         if self.config["$20"] == 1:
             self.logger.info("Soft limits are enabled in the mill config")
             if self.config["$3"] == 0:
                 self.logger.info("Using default working volume, third octant")
                 multiplier = -1
-            self.working_volume.x = self.config["$130"] * multiplier
-            self.working_volume.y = self.config["$131"] * multiplier
-            self.working_volume.z = self.config["$132"] * multiplier
+            working_volume.x = self.config["$130"] * multiplier
+            working_volume.y = self.config["$131"] * multiplier
+            working_volume.z = self.config["$132"] * multiplier
         else:
             self.logger.warning("Soft limits are not enabled in the mill config")
             self.logger.warning("Using default working volume")
-            self.working_volume = Coordinates(x=-415.0, y=-300.0, z=-85.0)
+            working_volume = Coordinates(x=-415.0, y=-300.0, z=-85.0)
+        return working_volume
 
     def change_logging_level(self, level):
         """Change the logging level"""
@@ -309,7 +312,7 @@ class Mill:
         """Encodes and sends commands to the mill and returns the response"""
         try:
             self.logger.debug("Command sent: %s", command)
-
+            self.command_logger.debug("%s", command)
             command_bytes = str(command).encode()
             self.ser_mill.write(command_bytes + b"\n")
             time.sleep(2)
