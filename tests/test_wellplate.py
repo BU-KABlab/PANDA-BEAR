@@ -12,9 +12,6 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
-# Create the tables in the in-memory database
-# Assuming Base.metadata.create_all(engine) is called somewhere in the project setup
-
 # populate the plate_types table
 plate_types_data = [
     (
