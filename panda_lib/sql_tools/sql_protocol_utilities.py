@@ -27,7 +27,7 @@ class ProtocolEntry:
         return f"{self.protocol_id}: {self.name}"
 
 
-def select_protocols() -> List(ProtocolEntry):
+def select_protocols() -> List[ProtocolEntry]:
     """
     Get all protocols from the database.
 
