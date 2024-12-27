@@ -110,6 +110,16 @@ class Vial:
         return Coordinates(**self.vial_data.coordinates)
 
     @property
+    def density(self) -> float:
+        """Returns the density of the vial."""
+        return self.vial_data.density
+
+    @property
+    def concentration(self) -> float:
+        """Returns the concentration of the vial."""
+        return self.vial_data.concentration
+
+    @property
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
         height = self.vial_data.volume_height - 1
