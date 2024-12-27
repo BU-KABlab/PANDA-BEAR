@@ -21,13 +21,15 @@ import os
 import platform
 from typing import Sequence
 
+from panda_lib.config.config_tools import read_config
 from panda_lib.experiment_class import ExperimentResultsRecord, insert_experiment_result
 from panda_lib.imaging import capture_new_image, image_filepath_generator
 from panda_lib.log_tools import setup_default_logger
+from panda_lib.utilities import Coordinates as WellCoordinates
 from panda_lib.utilities import Instruments, input_validation
 from panda_lib.vials import StockVial, WasteVial
-from panda_lib.wellplate import Well, WellCoordinates, Wellplate
-from panda_lib.config.config_tools import read_config
+from panda_lib.wellplate import Well
+from panda_lib.wellplate import Wellplates as Wellplate
 
 from .mill_control import Mill, MockMill
 

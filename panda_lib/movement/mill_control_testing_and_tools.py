@@ -10,21 +10,23 @@ from pathlib import Path
 from typing import Sequence
 
 from panda_lib.actions import capture_new_image
-
-from panda_lib.vials import StockVial, WasteVial, read_vials
-from panda_lib.wellplate import Well, Wellplate
 from panda_lib.config.config_tools import read_config
+from panda_lib.vials import StockVial, WasteVial, read_vials
+from panda_lib.wellplate import Well
+from panda_lib.wellplate import Wellplates as Wellplate
 
 from .mill_control import (
+    CommandExecutionError,
     Instruments,
+    LocationNotFound,
     Mill,
     MillConfigError,
     MillConfigNotFound,
     MillConnectionError,
-    CommandExecutionError,
-    StatusReturnError,
-    LocationNotFound,
     MockMill,
+    StatusReturnError,
+)
+from .mill_control import (
     mill_control_logger as logger,
 )
 
