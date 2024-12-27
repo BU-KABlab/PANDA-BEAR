@@ -4,19 +4,22 @@ import json
 import time
 
 from panda_lib.pipette.sql_pipette import (
+    Session,
+    SessionLocal,
     activate_pipette,
-    update_pipette_status,
-    select_pipette_status,
     deincrement_use_count,
+    select_pipette_status,
+    update_pipette_status,
 )
 from panda_lib.vessel import logger as vessel_logger
 
+from .errors import InvalidPipetteID
 
 
 class Pipette:
     """Class for storing pipette information"""
 
-    def __init__(self, pipette_id: int = None):
+    def __init__(self, pipette_id: int = None, session: Session = SessionLocal()):
         """Initialize the pipette"""
         self.capacity_ul: float = 0.0
         self.capacity_ml: float = 0.0
@@ -25,6 +28,10 @@ class Pipette:
         self.contents = {}
         self.id = pipette_id
         self.uses = 0
+        self.session = session
+
+        if self.id is not None and (self.id <= 0 or not isinstance(self.id, int)):
+            raise InvalidPipetteID("Pipette ID must be a positive integer")
 
         self.read_state_file()
         self.log_contents()
@@ -94,7 +101,7 @@ class Pipette:
         self.record_pipette_state()
         # Resetting the contents triggers the use counter to still increment
         # We need to deduct the use counter by 1
-        deincrement_use_count(self.id)
+        deincrement_use_count(self.id, self.session)
 
     def log_contents(self) -> None:
         """Log the contents of the pipette"""
@@ -115,6 +122,7 @@ class Pipette:
             self.volume_ml,
             json.dumps(self.contents),
             self.id,
+            self.session,
         )
 
     def read_state_file(self) -> None:
@@ -123,7 +131,7 @@ class Pipette:
         """
 
         if self.id is None:
-            pipette_status = select_pipette_status()
+            pipette_status = select_pipette_status(session=self.session)
             if pipette_status is not None:
                 self.id = pipette_status.id
                 self.capacity_ul = round(float(pipette_status.capacity_ul), 6)
@@ -139,7 +147,7 @@ class Pipette:
                 raise InvalidPipetteID("No pipette found in the database")
 
         else:
-            pipette_status = select_pipette_status(self.id)
+            pipette_status = select_pipette_status(self.id, self.session)
             if pipette_status is not None:
                 self.capacity_ul = round(float(pipette_status.capacity_ul), 6)
                 self.capacity_ml = round(float(pipette_status.capacity_ml), 6)
@@ -151,7 +159,7 @@ class Pipette:
                     print(f"Pipette with id {self.id} is inactive.")
                     activate = input("Do you want to activate it? (y/n): ")
                     if activate.lower() == "y":
-                        activate_pipette(self.id)
+                        self.activate()
                     else:
                         print("Pipette will remain inactive.")
 
@@ -162,45 +170,9 @@ class Pipette:
                                  Please create a pipette with the given id before using it.
                                  """)
 
-    def activate_pipette(self):
+    def activate(self):
         """Activate the pipette"""
-        activate_pipette(self.id)
-
-        # pipette_status:PipetteState = self.get_pipette_status()
-        # if pipette_status is not None:
-        #     self.capacity_ul = round(float(pipette_status.capacity_ul), 6)
-        #     self.capacity_ml = round(float(pipette_status.capacity_ml), 6)
-        #     self._volume_ul = round(float(pipette_status.volume), 6)
-        #     self._volume_ml = round(float(pipette_status.volume_ml), 6)
-        #     self.contents = {
-        #         k: round(float(v), 6) for k, v in pipette_status.contents.items()
-        #     }
-        # else:
-        #     self.reset_contents()
-        #     self.capacity_ul = 200.0
-        #     self.capacity_ml = 0.2
-        #     self.record_pipette_state()
+        activate_pipette(self.id, self.session)
 
     def __str__(self):
         return f"Pipette has {self._volume_ul} ul of liquid"
-
-    # def get_pipette_status(self) -> PipetteState:
-    #     """Get the status of the pipette"""
-    #     result = select_pipette_status(self.id)
-    #     if result is None:
-    #         # Pipette with the given id does not exist
-    #         raise InvalidPipetteID(f"Pipette with id {self.id} does not exist")
-
-    #     pipette_status = PipetteState(0.0, 0.0, 0.0, 0.0, {})
-    #     pipette_status.capacity_ul = round(float(result.capacity_ul), 6)
-    #     pipette_status.capacity_ml = round(float(result[1]), 6)
-    #     pipette_status.volume = round(float(result[2]), 6)
-    #     pipette_status.volume_ml = round(float(result[3]), 6)
-    #     pipette_status.contents = json.loads(result[4]) if result[4] is not None else {}
-    #     return pipette_status
-
-
-class InvalidPipetteID(Exception):
-    """Exception for invalid pipette ID"""
-
-    pass

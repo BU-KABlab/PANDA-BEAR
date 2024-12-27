@@ -3,6 +3,7 @@ SQLAlchemy models for the PANDA database
 """
 
 # pylint: disable=too-few-public-methods, line-too-long
+import json
 from datetime import datetime as dt
 from datetime import timezone
 
@@ -17,8 +18,25 @@ from sqlalchemy.sql.sqltypes import (
     Integer,
     String,
 )
+from sqlalchemy.types import TypeDecorator
 
 Base = declarative_base()
+
+
+class JSONEncodedDict(TypeDecorator):
+    """Enables JSON storage by encoding and decoding on the fly."""
+
+    impl = String
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return "{}"
+        return json.dumps(value)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return {}
+        return json.loads(value)
 
 
 def model_to_dict(model):
@@ -174,15 +192,15 @@ class Pipette(Base):
     """
 
     __tablename__ = "panda_pipette"
-    id = Column(Integer, primary_key=True)
-    capacity_ul = Column(Float, nullable=False)
-    capacity_ml = Column(Float, nullable=False)
-    volume_ul = Column(Float, nullable=False)
-    volume_ml = Column(Float, nullable=False)
-    contents = Column(String)
-    updated = Column(String, default=dt.now(timezone.utc))
-    active = Column(Integer)  # 0 = inactive, 1 = active
-    uses = Column(Integer, default=0)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    capacity_ul: Mapped[float] = mapped_column(Float, nullable=False)
+    capacity_ml: Mapped[float] = mapped_column(Float, nullable=False)
+    volume_ul: Mapped[float] = mapped_column(Float, nullable=False)
+    volume_ml: Mapped[float] = mapped_column(Float, nullable=False)
+    contents: Mapped[dict] = mapped_column(JSONEncodedDict())
+    updated: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+    active: Mapped[int] = mapped_column(Integer)  # 0 = inactive, 1 = active
+    uses: Mapped[int] = mapped_column(Integer, default=0)
 
     def __repr__(self):
         return f"<Pipette(id={self.id}, capacity_ul={self.capacity_ul}, capacity_ml={self.capacity_ml}, volume_ul={self.volume_ul}, volume_ml={self.volume_ml}, contents={self.contents}, updated={self.updated})>"
@@ -369,27 +387,6 @@ class VialsBase(VesselBase):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
-
-
-import json
-
-from sqlalchemy.types import TypeDecorator
-
-
-class JSONEncodedDict(TypeDecorator):
-    """Enables JSON storage by encoding and decoding on the fly."""
-
-    impl = String
-
-    def process_bind_param(self, value, dialect):
-        if value is None:
-            return "{}"
-        return json.dumps(value)
-
-    def process_result_value(self, value, dialect):
-        if value is None:
-            return {}
-        return json.loads(value)
 
 
 class Vials(Base):
