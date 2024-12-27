@@ -322,8 +322,8 @@ event.listen(Users, "before_insert", generate_username)
 user_projects = Table(
     "user_projects",
     Base.metadata,
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("project_id", Integer, ForeignKey("projects.id"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("panda_users.id"), primary_key=True),
+    Column("project_id", Integer, ForeignKey("panda_projects.id"), primary_key=True),
     Column("current", Boolean, default=True),
     Column("timestamp", Integer, default=dt.now(timezone.utc)),
 )
