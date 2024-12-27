@@ -10,8 +10,8 @@ a logger. The class has a run method that will run the analysis process.
 import importlib.util
 import logging
 import os
-from multiprocessing import Queue
 import time
+from multiprocessing import Queue
 from pathlib import Path
 
 from panda_lib.sql_tools.db_setup import SessionLocal
@@ -43,7 +43,7 @@ def analysis_worker(
             for experiment in experiments:
                 # Find the analyzer that matches the project ID
                 # analyzer = next((a for a in analyzers if a.PROJECT_ID == experiment.project_id), None)
-                analyzer:callable = analyzers.get(experiment.analysis_id, None)
+                analyzer: callable = analyzers.get(experiment.analysis_id, None)
                 if analyzer is None:
                     status_queue.put(
                         (
