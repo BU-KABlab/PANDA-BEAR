@@ -421,24 +421,6 @@ def count_wells_with_new_status(plate_id: Union[int, None] = None) -> int:
     Returns:
         int: The number of wells with a status of 'new'.
     """
-    # if plate_id is not None:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #         SELECT COUNT(*) FROM well_hx
-    #         WHERE status = 'new'
-    #         AND plate_id = ?
-    #         """,
-    #         (plate_id,),
-    #     )
-    # else:
-    #     result = sql_utilities.execute_sql_command(
-    #         """
-    #         SELECT COUNT(*) FROM well_status
-    #         WHERE status = 'new'
-    #         """
-    #     )
-
-    # return int(result[0][0])
 
     with SessionLocal() as session:
         if plate_id is None:
