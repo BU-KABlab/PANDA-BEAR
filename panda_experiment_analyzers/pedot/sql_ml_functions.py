@@ -195,12 +195,14 @@
 # # endregion
 
 # region SQLAlchemy Implementation
-from configparser import ConfigParser
 import json
+from configparser import ConfigParser
+
 import numpy as np
 import pandas as pd
-from panda_lib.sql_tools.panda_models import MlPedotBestTestPoints, MlPedotTrainingData
+
 from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.sql_tools.panda_models import MlPedotBestTestPoints, MlPedotTrainingData
 
 config = ConfigParser()
 config.read("panda_lib/config/panda_sdl_config.ini")
