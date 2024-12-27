@@ -1,7 +1,6 @@
 """Utilities for working with protocols in the database."""
 
 import os
-from ast import List
 
 from panda_lib.config.config_tools import read_config
 
@@ -27,7 +26,7 @@ class ProtocolEntry:
         return f"{self.protocol_id}: {self.name}"
 
 
-def select_protocols() -> List[ProtocolEntry]:
+def select_protocols() -> list[ProtocolEntry]:
     """
     Get all protocols from the database.
 

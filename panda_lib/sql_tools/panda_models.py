@@ -472,6 +472,18 @@ class VialStatus(VialsBase, Base):
     def __repr__(self):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
 
+    @property
+    def x(self):
+        return self.coordinates.get("x", 0)
+
+    @property
+    def y(self):
+        return self.coordinates.get("y", 0)
+
+    @property
+    def z(self):
+        return self.coordinates.get("z", 0)
+
 
 class WellModel(VesselBase, Base):
     """WellHx table model"""
