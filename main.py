@@ -48,68 +48,68 @@ analysis_choices = ["10"]
 blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 
 
-def run_panda_sdl_with_ml():
-    """Runs PANDA_SDL and enables the ML analysis."""
-    length = int(input("Enter the campaign length: ").strip().lower())
+# def run_panda_sdl_with_ml():
+#     """Runs PANDA_SDL and enables the ML analysis."""
+#     length = int(input("Enter the campaign length: ").strip().lower())
 
-    exp_processes = Process(
-        target=experiment_loop.experiment_loop_worker,
-        kwargs={
-            "status_queue": status_queue,
-            "process_id": ProcessIDs.CONTROL_LOOP,
-            "campaign_length": length,
-        },
-    )
-    exp_processes.start()
-    return exp_processes
+#     exp_processes = Process(
+#         target=experiment_loop.experiment_loop_worker,
+#         kwargs={
+#             "status_queue": status_queue,
+#             "process_id": ProcessIDs.CONTROL_LOOP,
+#             "campaign_length": length,
+#         },
+#     )
+#     exp_processes.start()
+#     return exp_processes
 
 
-def run_panda_sdl_without_ml():
-    """Runs PANDA_SDL."""
-    while True:
-        one_off = input("Is this a one-off run? (y/n): ").strip().lower()
-        if not one_off:
-            print("Invalid choice. Please try again.")
-            continue
-        elif one_off[0] == "y":
-            exp_ids = print_queue_info()
-            try:
-                spec_id = int(input("Enter the experiment ID: ").strip().lower())
+# def run_panda_sdl_without_ml():
+#     """Runs PANDA_SDL."""
+#     while True:
+#         one_off = input("Is this a one-off run? (y/n): ").strip().lower()
+#         if not one_off:
+#             print("Invalid choice. Please try again.")
+#             continue
+#         elif one_off[0] == "y":
+#             exp_ids = print_queue_info()
+#             try:
+#                 spec_id = int(input("Enter the experiment ID: ").strip().lower())
 
-            except EOFError:
-                spec_id = input("Enter the experiment ID: ").strip().lower()
-            except ValueError:
-                print("Invalid experiment ID. Please try again.")
-                continue
-            if spec_id not in exp_ids:
-                print("Invalid experiment ID. Please try again.")
-                continue
+#             except EOFError:
+#                 spec_id = input("Enter the experiment ID: ").strip().lower()
+#             except ValueError:
+#                 print("Invalid experiment ID. Please try again.")
+#                 continue
+#             if spec_id not in exp_ids:
+#                 print("Invalid experiment ID. Please try again.")
+#                 continue
 
-            exp_processes = Process(
-                target=experiment_loop.experiment_loop_worker,
-                kwargs={
-                    "one_off": True,
-                    "status_queue": status_queue,
-                    "process_id": ProcessIDs.CONTROL_LOOP,
-                    "specific_experiment_id": spec_id,
-                },
-            )
-            break
-        elif one_off[0] == "n":
-            exp_processes = Process(
-                target=experiment_loop.experiment_loop_worker,
-                kwargs={
-                    "status_queue": status_queue,
-                    "process_id": ProcessIDs.CONTROL_LOOP,
-                },
-            )
-            break
-        else:
-            print("Invalid choice. Please try again.")
-            continue
+#             exp_processes = Process(
+#                 target=experiment_loop.experiment_loop_worker,
+#                 kwargs={
+#                     "one_off": True,
+#                     "status_queue": status_queue,
+#                     "process_id": ProcessIDs.CONTROL_LOOP,
+#                     "specific_experiment_id": spec_id,
+#                 },
+#             )
+#             break
+#         elif one_off[0] == "n":
+#             exp_processes = Process(
+#                 target=experiment_loop.experiment_loop_worker,
+#                 kwargs={
+#                     "status_queue": status_queue,
+#                     "process_id": ProcessIDs.CONTROL_LOOP,
+#                 },
+#             )
+#             break
+#         else:
+#             print("Invalid choice. Please try again.")
+#             continue
 
-    exp_processes.start()
-    return exp_processes
+#     exp_processes.start()
+#     return exp_processes
 
 
 def run_sila_experiment_function():
@@ -142,11 +142,18 @@ def run_sila_experiment_function():
 
 def change_wellplate():
     """Changes the current wellplate."""
-    wellplate_id = wellplate.load_new_wellplate(ask=True)
-    if wellplate_id:
-        location = sql_wellplate.select_wellplate_location(wellplate_id)
-        print(f"New wellplate loaded: {wellplate_id}")
-        print(f"Location of A1: {location[0]}, {location[1]}")
+    new_plate_type = int(input("Enter the new wellplate type: ").strip().lower())
+    new_plate_numb = int(input("Enter the new wellplate number: ").strip().lower())
+
+    new_plate = wellplate.Wellplate(
+        create_new=True, plate_id=new_plate_numb, type_id=new_plate_type
+    )
+    if new_plate:
+        print(f"New wellplate loaded: {new_plate.plate_data.id}")
+        new_plate.activate_plate()
+        print(
+            f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
+        )
         input("Press Enter to continue...")
     else:
         print("No wellplate loaded.")
@@ -211,19 +218,18 @@ def print_wellplate_info():
 
     """
     well_num, plate_type, avail_wells = wellplate.read_current_wellplate_info()
-    (x, y, z_bottom, z_top, orientation, echem_height, image_height) = (
-        sql_wellplate.select_wellplate_location(well_num)
-    )
+    c_plate = wellplate.Wellplate(type_id=plate_type, plate_id=well_num)
+
     print(
         f"""
         Wellplate {well_num} - Type: {plate_type}
         Available new wells: {avail_wells}
-        Location of A1: x={x}, y={y}
-        Bottom Z: {z_bottom}
-        Top Z: {z_top}
-        Orientation: {orientation}
-        Echem height: {echem_height}
-        Image height: {image_height}
+        Location of A1: x={c_plate.plate_data.a1_x}, y={c_plate.plate_data.a1_y}
+        Bottom Z: {c_plate.plate_data.bottom}
+        Top Z: {c_plate.plate_data.top}
+        Orientation: {c_plate.plate_data.orientation}
+        Echem height: {c_plate.plate_data.echem_height}
+        Image height: {c_plate.plate_data.image_height}
         """
     )
     input("Press Enter to continue...")
@@ -406,7 +412,7 @@ def instrument_check():
 def test_pipette():
     """Runs the pipette test."""
     sql_system_state.set_system_status(SystemState.BUSY, "running pipette test")
-    from testing_and_validation.pump_suction_test import main as pipette_test
+    from testing_and_validation.pump_suction_check import main as pipette_test
 
     pipette_test()
 
@@ -519,7 +525,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
     menu_options = {
         "0": run_sila_experiment_function,
-        "1": run_panda_sdl_without_ml,
+        # "1": None,
         "1.1": stop_panda_sdl,
         "1.2": pause_panda_sdl,
         "1.3": resume_panda_sdl,
