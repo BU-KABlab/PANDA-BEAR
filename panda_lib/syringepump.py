@@ -6,19 +6,19 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 import time
 from typing import Optional, Union
 
+import panda_lib.wellplate as wp
 from nesp_lib_py import nesp_lib
 from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
-
-import panda_lib.wellplate as wp
 from panda_lib.config.config_tools import read_config
-from panda_lib.pipette import Pipette
-from panda_lib.vials import StockVial, Vial2, WasteVial
-
+from panda_lib.log_tools import (
+    default_logger as pump_control_logger,
+)
 from panda_lib.log_tools import (
     setup_default_logger,
-    default_logger as pump_control_logger,
     timing_wrapper,
 )
+from panda_lib.pipette import Pipette
+from panda_lib.vials import StockVial, Vial, WasteVial
 
 vessel_logger = setup_default_logger(log_name="vessel")
 
@@ -119,7 +119,7 @@ class SyringePump:
         if volume_ml <= 0:
             return None
 
-        if solution is not None and isinstance(solution, Vial2):
+        if solution is not None and isinstance(solution, Vial):
             density = solution.density
         else:
             density = None
@@ -133,7 +133,7 @@ class SyringePump:
         volume_withdrawn_ul = round(volume_withdrawn_ml * 1000, PRECISION)
 
         # Update the pipette volume
-        if isinstance(solution, (Vial2, wp.Well)):
+        if isinstance(solution, (Vial, wp.Well)):
             # If the solution is a vial or well, update the volume and contents
             if isinstance(solution.contents, dict):
                 # If the solution has multiple contents, calculate the ratio
