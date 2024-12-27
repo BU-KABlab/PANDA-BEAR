@@ -737,7 +737,11 @@ if __name__ == "__main__":
         while True:
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             num, p_type, new_wells = wellplate.read_current_wellplate_info()
-            current_pipette = pipette.select_pipette_status()
+            try:
+                current_pipette = pipette.select_pipette_status()
+            except AttributeError:
+                pipette.insert_new_pipette()
+                current_pipette = pipette.select_pipette_status()
             remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
             exp_loop_status = get_process_status(
                 status_queue, ProcessIDs.CONTROL_LOOP, exp_loop_status
