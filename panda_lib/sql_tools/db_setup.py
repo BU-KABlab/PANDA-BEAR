@@ -22,9 +22,8 @@ The script can be run as a standalone script to test the connection to the
 database.
 """
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
 
 from panda_lib.config.config_tools import read_config
 

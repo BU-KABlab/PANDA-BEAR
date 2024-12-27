@@ -2,15 +2,16 @@
 
 import os
 from ast import List
+
 from panda_lib.config.config_tools import read_config
+
+# region Protocols
+from panda_lib.errors import ProtocolNotFoundError
 
 # import sqlite3
 # from panda_lib.config.config import SQL_DB_PATH
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import Protocols
-
-# region Protocols
-from panda_lib.errors import ProtocolNotFoundError
 
 
 class ProtocolEntry:
