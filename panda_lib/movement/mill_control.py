@@ -21,8 +21,8 @@ import logging
 import re
 import sys
 import time
-from unittest.mock import MagicMock
 from typing import Union
+from unittest.mock import MagicMock
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
@@ -30,9 +30,9 @@ import serial
 
 from panda_lib.config.config_tools import read_config
 from panda_lib.log_tools import setup_default_logger, timing_wrapper
-from panda_lib.utilities import Coordinates, Instruments
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import MillConfig
+from panda_lib.utilities import Coordinates, Instruments
 
 # add the mill_control logger
 mill_control_logger = setup_default_logger(
