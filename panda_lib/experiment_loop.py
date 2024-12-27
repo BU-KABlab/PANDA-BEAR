@@ -64,8 +64,8 @@ from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .syringepump import MockPump, SyringePump
 from .utilities import SystemState
-from .vials import StockVial, Vial2, WasteVial, read_vials
-from .wellplate import Well, Wellplate
+from .vials import StockVial, Vial, WasteVial, read_vials
+from .wellplate import Well, Wellplates
 
 config = read_config()
 # set up slack globally so that it can be used in the main function and others
@@ -452,7 +452,7 @@ def sila_experiment_loop_worker(
         global_logger=toolkit.global_logger,
     )
     labware = Labware(
-        wellplate=Wellplate(),
+        wellplate=Wellplates(),
         global_logger=toolkit.global_logger,
     )
 
@@ -653,7 +653,7 @@ def _fetch_protocol_function(protocol_id: int):
 
 @timing_wrapper
 def establish_system_state() -> (
-    tuple[Sequence[StockVial], Sequence[WasteVial], Wellplate]
+    tuple[Sequence[StockVial], Sequence[WasteVial], Wellplates]
 ):
     """
     Establish state of system
@@ -668,7 +668,7 @@ def establish_system_state() -> (
     # waste_vials = get_current_vials("waste")
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
     waste_vials_only = [vial for vial in waste_vials if isinstance(vial, WasteVial)]
-    wellplate = Wellplate()
+    wellplate = Wellplates()
     logger.info("System state reestablished")
 
     ## read through the stock vials and log their name, contents, and volume
@@ -740,7 +740,7 @@ def establish_system_state() -> (
     ## check that wellplate has the appropriate number of wells
     if number_of_wells != len(wellplate.wells):
         logger.error(
-            "Wellplate status file does not have the correct number of wells. File may be corrupted"
+            "Wellplates status file does not have the correct number of wells. File may be corrupted"
         )
         raise WellImportError
     logger.info("There are %d clear wells", number_of_clear_wells)
@@ -757,7 +757,7 @@ def establish_system_state() -> (
 
 @timing_wrapper
 def check_stock_vials(
-    experiment: ExperimentBase, stock_vials: Sequence[Vial2]
+    experiment: ExperimentBase, stock_vials: Sequence[Vial]
 ) -> Tuple[bool, dict]:
     """
     Check that there is enough volume in the stock vials to run the experiment

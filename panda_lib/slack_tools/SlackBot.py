@@ -5,15 +5,15 @@
 import base64
 import configparser
 import logging
+import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from math import fabs
-import threading
 
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 from enum import Enum
 from io import BytesIO
+from math import fabs
 from pathlib import Path
 from typing import Union
 
@@ -23,9 +23,9 @@ from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from panda_lib.config.config_tools import read_testing_config, read_config
 import panda_lib.experiment_class as exp
 from panda_lib import vials
+from panda_lib.config.config_tools import read_config, read_testing_config
 from panda_lib.imaging.image_tools import add_data_zone
 from panda_lib.obs_controls import OBSController
 from panda_lib.sql_tools import (
@@ -35,7 +35,9 @@ from panda_lib.sql_tools import (
 )
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import SlackTickets
-from panda_lib.wellplate import Well, Wellplate, WellCoordinates
+from panda_lib.utilities import Coordinates as WellCoordinates
+from panda_lib.wellplate import Well
+from panda_lib.wellplate import Wellplates as Wellplate
 
 # Create a lock for thread safety
 plot_lock = threading.Lock()
@@ -1113,26 +1115,32 @@ class MockSlackBot(SlackBot):
     def __init__(self, test: bool = True):
         super().__init__(test=test)
         pass
+
     def send_message(self, channel_id: str, message) -> None:
         """Send a message to Slack."""
-        #print(message)
+        # print(message)
         pass
+
     def send_slack_file(self, channel: str, file, message=None) -> int:
         """Send a file to Slack."""
-        #print(f"File: {file}")
+        # print(f"File: {file}")
         pass
+
     def upload_images(self, channel, images, message):
         """Upload images to Slack."""
-        #print(f"Images: {images}")
+        # print(f"Images: {images}")
         pass
+
     def check_latest_message(self, channel: str) -> str:
         """Check Slack for the latest message."""
-        #print("Checking latest message")
+        # print("Checking latest message")
         pass
+
     def check_slack_messages(self, channel: str) -> int:
         """Check Slack for messages."""
-        #print("Checking slack messages")
+        # print("Checking slack messages")
         pass
+
     def parse_slack_message(self, text: str, channel_id) -> int:
         """
         Parse the Slack message for commands.
@@ -1146,46 +1154,57 @@ class MockSlackBot(SlackBot):
         Returns:
             1 if command is valid, 0 if command is invalid
         """
-        #print(f"Message: {text}")
+        # print(f"Message: {text}")
         pass
+
     def echem_error_procedure(self):
         """Procedure to follow when an echem error occurs."""
-        #print("Echem error procedure")
+        # print("Echem error procedure")
         pass
+
     def __vial_status(self, channel_id):
         """Sends the vial status to the user."""
-        #print("Vial status")
+        # print("Vial status")
         pass
+
     def __well_status(self, channel_id):
         """Sends the well status to the user."""
-        #print("Well status")
+        # print("Well status")
         pass
+
     def __queue_length(self, channel_id):
-        #print("Queue length")
+        # print("Queue length")
         pass
+
     def take_screenshot(self, channel_id, camera_name: str):
         """Take a screenshot of the camera."""
-        #print(f"Screenshot of {camera_name}")
+        # print(f"Screenshot of {camera_name}")
         pass
+
     def __share_experiment_images(self, experiment_id: int):
         """Share the images for an experiment."""
-        #print(f"Sharing images for experiment {experiment_id}")
+        # print(f"Sharing images for experiment {experiment_id}")
         pass
+
     def channel_id(self, channel: str) -> str:
         """Return the channel ID based on the channel name."""
         return "channel_id"
-        pass    
+        pass
+
     def run(self):
         """Run the slack bot."""
-        #print("Running slack bot")
+        # print("Running slack bot")
         pass
+
     def off_duty(self):
-        #print("Off duty")
+        # print("Off duty")
         pass
+
     def terminate(self):
         """Terminate the slack bot."""
-        #print("Terminating slack bot")
+        # print("Terminating slack bot")
         pass
+
 
 if __name__ == "__main__":
     slack_bot = SlackBot(test=False)
