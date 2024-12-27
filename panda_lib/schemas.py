@@ -10,8 +10,8 @@ class DeckObjectModel(BaseModel):
     )
     base_thickness: float = 1.0
     height: float = 6.0
-    top: float
-    bottom: float
+    top: Optional[float] = None
+    bottom: Optional[float] = None
     # @property
     # def top(self) -> float:
     #     return self.coordinates["z"] + self.base_thickness + self.height

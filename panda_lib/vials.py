@@ -1,11 +1,18 @@
-from typing import Dict, List, Optional, Tuple, TypedDict
+import csv
+import json
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 from sqlalchemy.orm import Session
 
 from .errors import OverDraftException, OverFillException  # Custom exceptions
+from .log_tools import setup_default_logger
 from .schemas import VialReadModel, VialWriteModel  # Pydantic models
 from .services import VialService
-from .utilities import Coordinates
+from .sql_tools.db_setup import SessionLocal
+from .utilities import Coordinates, directory_picker, file_picker
+
+vial_logger = setup_default_logger("vial_logger")
 
 
 # Define TypedDict for Vial kwargs
@@ -29,7 +36,7 @@ class Vial:
     def __init__(
         self,
         position: str,
-        session: Session,
+        session: Session = SessionLocal,
         create_new: bool = False,
         **kwargs: VialKwargs,
     ):
@@ -51,6 +58,21 @@ class Vial:
             self.create_new_vial(**kwargs)
         else:
             self.load_vial()
+
+    @property
+    def x(self) -> float:
+        """Returns the x-coordinate of the vial."""
+        return self.coordinates.x
+
+    @property
+    def y(self) -> float:
+        """Returns the y-coordinate of the vial."""
+        return self.coordinates.y
+
+    @property
+    def z(self) -> float:
+        """Returns the z-coordinate of the vial."""
+        return self.coordinates.z
 
     @property
     def volume(self) -> float:
@@ -209,13 +231,18 @@ class WasteVial(Vial):
     pass
 
 
-def read_vials(session: Session) -> Tuple[List[StockVial], List[WasteVial]]:
+def read_vials(
+    vial_group: Optional[str] = None,
+    session: Session = SessionLocal(),
+) -> Tuple[List[StockVial], List[WasteVial]]:
     """
     Read in the virtual vials from the json file
     """
 
     # Get the vial information from the vials table in the db
-    active_vials: List[VialReadModel] = VialService.list_active_vials()
+    active_vials: List[VialReadModel] = VialService(
+        db_session=session
+    ).list_active_vials()
 
     list_of_stock_solutions = []
     list_of_waste_solutions = []
@@ -231,8 +258,12 @@ def read_vials(session: Session) -> Tuple[List[StockVial], List[WasteVial]]:
                 **vial.model_dump(), session=session, create_new=False
             )
             list_of_waste_solutions.append(read_vial)
-
-    return list_of_stock_solutions, list_of_waste_solutions
+    if vial_group == "stock":
+        return list_of_stock_solutions
+    elif vial_group == "waste":
+        return list_of_waste_solutions
+    else:
+        return list_of_stock_solutions, list_of_waste_solutions
 
     # for items in vial_parameters:
     #     if items["name"] is not None:
@@ -243,3 +274,329 @@ def read_vials(session: Session) -> Tuple[List[StockVial], List[WasteVial]]:
     #             read_vial = WasteVial(**items)
     #             list_of_waste_solutions.append(read_vial)
     # return list_of_stock_solutions, list_of_waste_solutions
+
+
+def reset_vials(
+    categoty: Union[str, int],
+    session: Session = SessionLocal(),
+) -> List[Vial]:
+    """
+    Reset the active vials in the database
+    """
+
+    if categoty == "stock" or categoty == 0:
+        active_vials, _ = read_vials(session)
+    elif categoty == "waste" or categoty == 1:
+        _, active_vials = read_vials(session)
+
+    for vial in active_vials:
+        vial: Vial
+        vial.reset_vial()
+
+    return active_vials
+
+
+def delete_vial_position_and_hx_from_db(
+    position: str, session: Session = SessionLocal
+) -> None:
+    """Delete the vial position and hx from the db"""
+    try:
+        VialService(db_session=session).delete_vial(position)
+
+    except Exception as e:
+        vial_logger.error(
+            "Error occurred while deleting vial position and hx from the db: %s", e
+        )
+        vial_logger.error("Continuing....")
+        vial_logger.exception(e)
+
+
+def input_new_vial_values(vialgroup: str) -> None:
+    """For user inputting the new vial values for the state file"""
+
+    vials = read_vials(vialgroup)
+    vials = sorted(vials, key=lambda x: x.position)
+    vial_list = []
+    vial_lines = []
+    ## Print the current vials and their values
+    print("Current vials:")
+
+    max_lengths = [10, 20, 20, 15, 15, 15, 15]  # Initialize max lengths for each column
+    for vial in vials:
+        vial: Vial
+        vial_list.append(vial)
+        # if vial.contents is None:
+        #     vial_entry.contents = {}
+        # if vial.name is None:
+        #     # All parameters are blank except for position
+        #     vial_entry.name = "--"
+        #     vial_entry.vial_data.contents = "--"
+        #     vial_entry.vial_data.density = "--"
+        #     vial_entry.vial_data.volume = "--"
+        #     vial_entry.vial_data.capacity = "--"
+        #     vial_entry.vial_data.contamination = "--"
+
+        values = [
+            vial.vial_data.position,
+            vial.vial_data.name,
+            str(vial.vial_data.contents),
+            vial.vial_data.density,
+            vial.vial_data.volume,
+            vial.vial_data.capacity,
+            vial.vial_data.contamination,
+        ]
+        max_lengths = [
+            max(max_lengths[i], len(str(values[i]))) for i in range(len(values))
+        ]  # Update max lengths
+
+        vial_lines.append(
+            f"{values[0]:<{max_lengths[0]}} {values[1]:<{max_lengths[1]}} {values[2]:<{max_lengths[2]}} {values[3]:<{max_lengths[3]}} {values[4]:<{max_lengths[4]}} {values[5]:<{max_lengths[5]}} {values[6]:<{max_lengths[6]}}"
+        )
+
+    header_string = f"{'Position':<{max_lengths[0]}} {'Name':<{max_lengths[1]}} {'Contents':<{max_lengths[2]}} {'Density':<{max_lengths[3]}} {'Volume':<{max_lengths[4]}} {'Capacity':<{max_lengths[5]}} {'Contamination':<{max_lengths[6]}}"
+    print(header_string)
+    for line in vial_lines:
+        print(line)
+
+    while True:
+        choice = input(
+            "Which vial would you like to change? Enter the position of the vial or 'q' if finished: "
+        )
+        if choice == "q":
+            break
+        for vial in vials:
+            vial: Vial
+            if vial.position == choice:
+                print(
+                    "Please enter the new values for the vial, if you leave any blank the value will not be changed"
+                )
+                print(f"\nVial {vial.position}:")
+                new_name = input(
+                    f"Enter the new name of the vial (Current name is {vial.name}): "
+                )
+                if new_name != "":
+                    vial.vial_data.name = new_name
+                if vial.category == 0:  # Stock vial
+                    current_key = next(iter(vial.contents.keys()))
+                    new_key = input(
+                        f"Enter the new contents of the vial (Currently is {current_key}): "
+                    )
+                    if new_key != "":
+                        vial.vial_data.contents = {new_key: vial.contents[current_key]}
+                new_density = input(
+                    f"Enter the new density of the vial (Current density is {vial.vial_data.density}): "
+                )
+                if new_density != "":
+                    vial.vial_data.density = float(new_density)
+                new_volume = input(
+                    f"Enter the new volume of the vial (Current volume is {vial.volume}): "
+                )
+                if new_volume != "":
+                    vial.vial_data.volume = float(new_volume)
+                new_capacity = input(
+                    f"Enter the new capacity of the vial (Current capacity is {vial.capacity}): "
+                )
+                if new_capacity != "":
+                    vial.vial_data.capacity = float(new_capacity)
+                new_contamination = input(
+                    f"Enter the new contamination of the vial (Current contamination is {vial.contamination}): "
+                )
+                if new_contamination != "":
+                    try:
+                        vial.contamination = int(new_contamination)
+                    except ValueError:
+                        print("Invalid value for contamination. Should be integer")
+                        continue
+
+                vial.save()
+                # print("\r" + " " * 100 + "\r", end="")  # Clear the previous table
+                print("\nCurrent vials:")
+                print(
+                    f"{'Position':<10} {'Name':<20} {'Contents':<20} {'Density':<15} {'Volume':<15} {'Capacity':<15} {'Contamination':<15}"
+                )
+
+                for vial in vials:
+                    vial: Vial
+                    # if vial.contents is None:
+                    #     vial.contents = {}
+                    # if vial.name is None:
+                    #     # All parameters are blank except for position
+                    #     vial.vial_data.name = ""
+                    #     vial.vial_data.contents = ""
+                    #     vial.vial_data.density = ""
+                    #     vial.vial_data.volume = ""
+                    #     vial.vial_data.capacity = ""
+                    #     vial.vial_data.contamination = ""
+
+                    # contents_str = str(
+                    #     vial.vial_data.contents
+                    # )  # Convert contents dictionary to string
+                    print(
+                        f"{vial.position:<10} {vial.name:<20} {str(vial.vial_data.contents):<20} {vial.vial_data.density:<15} {vial.volume:<15} {vial.capacity:<15} {vial.contamination:<15}"
+                    )
+                break
+        else:
+            print("Invalid vial position")
+            continue
+
+
+def generate_template_vial_csv_file() -> None:
+    """
+    Generate a template vial csv file that can be filled with
+    multiple vials and their values
+    """
+    filename = "vials.csv"
+
+    # Prompt the user to idenitfy the directory to save the file
+    directory = directory_picker()
+
+    filename = Path(directory) / Path(filename)  # Convert to a Path object
+
+    with open(filename, "w", encoding="UTF-8", newline="") as file:
+        csv_writer = csv.writer(file)
+        csv_writer.writerow(
+            [
+                "id",
+                "position",
+                "category",
+                "name",
+                "contents",
+                "viscosity_cp",
+                "concentration",
+                "density",
+                "height",
+                "radius",
+                "volume",
+                "capacity",
+                "contamination",
+                "coordinates",
+                "base_thickness",
+                "dead_volume",
+                "volume_height",
+                "bottom",
+                "top",
+                "updated",
+                "active",
+            ]
+        )
+        csv_writer.writerow(
+            [
+                1,
+                "s0",
+                0,
+                "edot",
+                '{"edot": 20000}',
+                1,
+                1,
+                1,
+                57,
+                14,
+                20000,
+                20000,
+                0,
+                '{"x": -4, "y": -39, "z": -74}',
+                1,
+                1000,
+                -40.52,
+                -71.38,
+                -16,
+                "2024-12-20 15:40:59.666",
+                True,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                9,
+                "w0",
+                1,
+                "waste",
+                "{}",
+                0,
+                1.0,
+                0,
+                57,
+                14,
+                0,
+                20000,
+                0,
+                '{"x": -50, "y": -7, "z": -74}',
+                1,
+                1000,
+                -73,
+                -71.38,
+                -16,
+                "2024-12-20 15:45:53.100",
+                True,
+            ]
+        )
+        csv_writer.writerow(
+            [
+                17,
+                "e1",
+                0,
+                "none",
+                '{"none": 20000}',
+                1,
+                1,
+                1,
+                57,
+                14,
+                20000,
+                20000,
+                0,
+                '{"x": -409, "y": -35, "z": -74}',
+                1,
+                10000,
+                -40.52,
+                -56.76,
+                -16,
+                "2024-12-20 15:45:53.102",
+                True,
+            ]
+        )
+
+    print(f"Template vial csv file saved as {filename}")
+
+
+def import_vial_csv_file(filename: str = None) -> None:
+    """
+    Import the vial csv file and add the vials to the db
+    """
+    if not filename:
+        filename = file_picker("csv")
+    if not filename:
+        return
+    with open(filename, "r", encoding="UTF-8") as file:
+        csv_reader = csv.DictReader(file)
+        vial_parameters = []
+        for row in csv_reader:
+            vial_parameters.append(row)
+
+    for each_vial in vial_parameters:
+        try:
+            vial = Vial(
+                position=each_vial["position"],
+                session=SessionLocal(),
+                create_new=True,
+                category=int(each_vial["category"]),
+                name=each_vial["name"],
+                contents=json.loads(each_vial["contents"]),
+                viscosity_cp=float(each_vial["viscosity_cp"]),
+                concentration=float(each_vial["concentration"]),
+                density=float(each_vial["density"]),
+                coordinates=json.loads(each_vial["coordinates"]),
+                height=float(each_vial["height"]),
+                radius=float(each_vial["radius"]),
+                volume=float(each_vial["volume"]),
+                capacity=float(each_vial["capacity"]),
+                contamination=int(each_vial["contamination"]),
+                dead_volume=float(each_vial["dead_volume"]),
+            )
+
+            vial_logger.info("Vial %s imported successfully", vial.position)
+        except Exception as e:
+            vial_logger.error(
+                "Error occurred while importing vial %s: %s", each_vial["position"], e
+            )
+            vial_logger.error("Continuing....")
+            vial_logger.exception(e)

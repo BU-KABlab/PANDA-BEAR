@@ -20,7 +20,7 @@ from panda_lib.schemas import (
     WellReadModel,
     WellWriteModel,
 )
-from panda_lib.services import WellPlateService, WellService
+from panda_lib.services import WellplateService, WellService
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
@@ -29,11 +29,6 @@ from panda_lib.sql_tools.panda_models import (
     MillConfig,
     WellModel,
     Wellplates,
-)
-
-from .sql_tools.sql_wellplate import (
-    count_wells_with_new_status,
-    select_current_wellplate_info,
 )
 
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file
@@ -70,7 +65,7 @@ class WellKwargs(TypedDict, total=False):
 
 
 # Define TypedDict for WellPlate kwargs
-class WellPlateKwargs(TypedDict, total=False):
+class WellplateKwargs(TypedDict, total=False):
     """
     TypedDict for WellPlate kwargs
 
@@ -89,14 +84,14 @@ class WellPlateKwargs(TypedDict, total=False):
 
     name: str
     type_id: int
-    a1_x: float
-    a1_y: float
-    orientation: int
-    rows: str
-    cols: int
-    echem_height: float
-    image_height: float
-    coordinates: dict
+    a1_x: float = 0.0
+    a1_y: float = 0.0
+    orientation: int = 0
+    rows: str = "ABCDEFGH"
+    cols: int = 12
+    echem_height: float = 0.0
+    image_height: float = 0.0
+    coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
 
 
 class Well:
@@ -143,14 +138,14 @@ class Well:
         self,
         well_id: str,
         plate_id: int,
-        session: Session,
+        active_session: Session = SessionLocal(),
         create_new: bool = False,
         **kwargs: WellKwargs,
     ):
         self.well_id = well_id
         self.plate_id = plate_id
-        self.session = session
-        self.service = WellService(self.session)
+        self.active_session = active_session
+        self.service = WellService(self.active_session)
         self.well_data: Optional[WellReadModel] = None
 
         if create_new:
@@ -161,13 +156,13 @@ class Well:
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
-                db_session=self.session,
+                db_session=self.active_session,
                 plate_id=self.plate_id,
                 type_id=kwargs.get("type_id"),
             )
         else:
             plate_type = self.service.fetch_well_type_characteristics(
-                db_session=self.session, plate_id=self.plate_id
+                db_session=self.active_session, plate_id=self.plate_id
             )
         new_well = WellWriteModel(
             well_id=self.well_id,
@@ -244,20 +239,51 @@ class Well:
         return f"<Well(well_id={self.well_id}, volume={self.well_data.volume}, contents={self.well_data.contents})>"
 
 
-class WellPlate:
+class Wellplate:
     def __init__(
         self,
-        session: Session,
+        session: Session = SessionLocal(),
         type_id: Optional[int] = None,
         plate_id: Optional[int] = None,
         create_new: bool = False,
-        **kwargs: WellPlateKwargs,
+        **kwargs: WellplateKwargs,
     ):
         self.session = session
-        self.service = WellPlateService(self.session)
+        self.service = WellplateService(self.session)
         self.plate_data: WellplateReadModel = None
         self.plate_type: PlateTypeModel = None
         self.wells: dict[str, Well] = {}
+
+        # Check for the incoming plate_id and type_id. If the combo exists then don't create a new plate.
+        # If the combo does not exist, then create a new plate but use an autoincremented plate_id
+        existing_plate = self.service.get_plate(plate_id)
+        if (
+            existing_plate and create_new
+        ):  # There is an existing plate but we want to create a new one, so we need to check if the type_id is the same
+            if (existing_plate.type_id == type_id) and (existing_plate.id == plate_id):
+                create_new = False
+            elif (existing_plate.type_id != type_id) and (
+                existing_plate.id == plate_id
+            ):
+                print(
+                    "An existing plate with the same plate_id but different type_id was found."
+                )
+                print("Please provide a new plate_id or type_id.")
+                new_plate_id = input(
+                    "Enter a new plate_id (or enter to remain the same): "
+                )
+                new_type_id = input(
+                    "Enter a new type_id (or enter to remain the same): "
+                )
+                if not new_plate_id and not new_type_id:
+                    print("No changes made. Loading existing plate.")
+                    create_new = False
+
+                elif new_plate_id:
+                    plate_id = int(new_plate_id)
+
+                elif new_type_id:
+                    type_id = int(new_type_id)
 
         if create_new:
             # If creating a new plate, must provide a plate_type_id
@@ -271,13 +297,36 @@ class WellPlate:
                 raise ValueError("Must provide a plate_id to load an existing plate.")
             self.load_plate(plate_id)
 
-    def create_new_plate(self, **kwargs: WellPlateKwargs):
+    def create_new_plate(self, **kwargs: WellplateKwargs):
+        # If there is a currently active wellplate, fetch its characteristics
+        active_plate = self.service.get_active_plate()
+        if active_plate:
+            kwargs["a1_x"] = active_plate.a1_x
+            kwargs["a1_y"] = active_plate.a1_y
+            kwargs["orientation"] = active_plate.orientation
+            kwargs["echem_height"] = active_plate.echem_height
+            kwargs["image_height"] = active_plate.image_height
+            kwargs["coordinates"] = active_plate.coordinates
         # First create the wellplate
+        kwargs["name"] = f"{kwargs.get('id', 'default')}"
+        self.plate_type = self.service.get_plate_type(kwargs.get("type_id"))
+        for key, value in self.plate_type.model_dump().items():
+            if key == "id":
+                continue
+            if key == "gasket_height_mm":
+                key = "height"
+            if key == "radius_mm":
+                key = "radius"
+            if key == "capacity_ul":
+                key = "capacity"
+            if key not in kwargs:
+                kwargs[key] = value
+
         new_plate = WellplateWriteModel(**kwargs)
+
         self.plate_data = WellplateWriteModel.model_validate(
             self.service.create_plate(new_plate)
         )
-        self.plate_type = self.service.get_plate_type(self.plate_data.type_id)
         # Second create the wells
         self.wells = self._create_wells_from_type()
 
@@ -294,7 +343,7 @@ class WellPlate:
             well_data.well_id: Well(
                 plate_id=self.plate_data.id,  # TODO: could add assuming the current plate ID
                 well_id=well_data.well_id,
-                session=self.session,
+                active_session=self.session,
             )
             for well_data in wells_data
         }
@@ -313,7 +362,7 @@ class WellPlate:
                 coordinates = self.calculate_well_coordinates(row, col)
                 wells[str(row) + str(col)] = Well(
                     create_new=True,
-                    session=self.session,
+                    active_session=self.session,
                     plate_id=self.plate_data.id,
                     well_id=f"{row}{col}",
                     experiment_id=0,
@@ -478,21 +527,27 @@ def change_wellplate_location(session: Session = SessionLocal()):
 
     with session as session:
         mill_config = (
-            session.query(MillConfig).order_by(MillConfig.id.desc()).first()
-        ).config
+            session.execute(select(MillConfig).order_by(MillConfig.id.desc()))
+            .scalar_one()
+            .config
+        )
         working_volume = {
             "x": float(mill_config["$130"]),
             "y": float(mill_config["$131"]),
             "z": float(mill_config["132"]),
         }
 
-    ## Get the current plate id and location
-    current_plate_id, current_type_number, _ = select_current_wellplate_info()
+        ## Get the current plate id and location
+        statement = select(Wellplates).filter_by(current=1)
+
+        result: Wellplates = session.execute(statement).first()
+        current_plate_id = result.id
+        current_type_number = result.type_id
 
     print(f"Current wellplate id: {current_plate_id}")
     print(f"Current wellplate type number: {current_type_number}")
 
-    wellplate = WellPlate(
+    wellplate = Wellplate(
         session=session,
         plate_id=current_plate_id,
     )
@@ -565,7 +620,9 @@ Enter the new orientation of the wellplate: """
     wellplate.save()
 
 
-def read_current_wellplate_info() -> Tuple[int, int, int]:
+def read_current_wellplate_info(
+    session: Session = SessionLocal,
+) -> Tuple[int, int, int]:
     """
     Read the current wellplate
 
@@ -574,8 +631,21 @@ def read_current_wellplate_info() -> Tuple[int, int, int]:
         int: The current wellplate type number
         int: Number of new wells
     """
-    current_plate_id, current_type_number, _ = select_current_wellplate_info()
-    new_wells = count_wells_with_new_status(current_plate_id)
+
+    with SessionLocal() as session:
+        statement = select(Wellplates).filter_by(current=1)
+
+        result: Wellplates = session.execute(statement).scalar_one_or_none()
+        current_plate_id = result.id
+        current_type_number = result.type_id
+
+        new_wells = (
+            session.query(WellModel)
+            .filter(WellModel.status == "new")
+            .filter(WellModel.plate_id == current_plate_id)
+            .count()
+        )
+
     return int(current_plate_id), int(current_type_number), new_wells
 
 
