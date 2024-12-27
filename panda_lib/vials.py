@@ -230,12 +230,6 @@ class StockVial(Vial):
     def add_contents(self, from_vessel: Dict[str, float], volume: float):
         raise ValueError("Stock vials cannot have contents added to them.")
 
-    def remove_contents(self, volume: float) -> Dict[str, float]:
-        raise ValueError("Stock vials cannot have contents removed from them.")
-
-    def reset_vial(self):
-        raise ValueError("Stock vials cannot be reset.")
-
 
 class WasteVial(Vial):
     pass

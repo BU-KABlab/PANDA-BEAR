@@ -528,13 +528,13 @@ def change_wellplate_location(session: Session = SessionLocal()):
     with session as session:
         mill_config = (
             session.execute(select(MillConfig).order_by(MillConfig.id.desc()))
-            .scalar_one()
+            .scalar()
             .config
         )
         working_volume = {
             "x": float(mill_config["$130"]),
             "y": float(mill_config["$131"]),
-            "z": float(mill_config["132"]),
+            "z": float(mill_config["$132"]),
         }
 
         ## Get the current plate id and location
