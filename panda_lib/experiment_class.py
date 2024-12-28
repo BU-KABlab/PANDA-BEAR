@@ -25,6 +25,7 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
+from panda_lib.wellplate import Well
 
 global_logger = setup_default_logger(log_name="panda")
 experiment_logger = setup_default_logger(log_name="experiment_logger")
@@ -420,7 +421,7 @@ class ExperimentBase:
         description="Type of experiment",
         deprecated=True,
     )
-    well: object = Field(
+    well: Well = Field(
         default=None,
         title="Well",
         description="Well object associated with the experiment",
