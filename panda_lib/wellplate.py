@@ -308,7 +308,9 @@ class Wellplate:
             kwargs["image_height"] = active_plate.image_height
             kwargs["coordinates"] = active_plate.coordinates
         # First create the wellplate
-        kwargs["name"] = f"{kwargs.get('id', 'default')}"
+        if "name" not in kwargs:
+            kwargs["name"] = f"{kwargs.get('id', 'default')}"
+
         self.plate_type = self.service.get_plate_type(kwargs.get("type_id"))
         for key, value in self.plate_type.model_dump().items():
             if key == "id":
@@ -532,15 +534,16 @@ def change_wellplate_location(session: Session = SessionLocal()):
             .config
         )
         working_volume = {
-            "x": float(mill_config["$130"]),
-            "y": float(mill_config["$131"]),
-            "z": float(mill_config["$132"]),
+            "x": -float(mill_config["$130"]),
+            "y": -float(mill_config["$131"]),
+            "z": -float(mill_config["$132"]),
         }
+        # FIXME Note this is assuming the mill in use is working in negative coordinate space
 
         ## Get the current plate id and location
         statement = select(Wellplates).filter_by(current=1)
 
-        result: Wellplates = session.execute(statement).first()
+        result: Wellplates = session.execute(statement).scalar()
         current_plate_id = result.id
         current_type_number = result.type_id
 
@@ -590,6 +593,26 @@ def change_wellplate_location(session: Session = SessionLocal()):
             f"Invalid input. Please enter a value between {working_volume['y']} and 0."
         )
 
+    while True:
+        new_location_z = input("Enter the new z location of the wellplate: ")
+
+        if new_location_z == "":
+            new_location_z = wellplate.plate_data.coordinates["z"]
+            break
+
+        try:
+            new_location_z = float(new_location_z)
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            continue
+
+        if new_location_z > working_volume["z"] and new_location_z < 0:
+            break
+
+        print(
+            f"Invalid input. Please enter a value between {working_volume['z']} and 0."
+        )
+
     # Keep asking for input until the user enters a valid input
     while True:
         new_orientation = int(
@@ -614,7 +637,7 @@ Enter the new orientation of the wellplate: """
     wellplate.plate_data.coordinates = {
         "x": new_location_x,
         "y": new_location_y,
-        "z": wellplate.plate_data.coordinates["z"],
+        "z": new_location_z,
     }
     wellplate.recalculate_well_positions()
     wellplate.save()
