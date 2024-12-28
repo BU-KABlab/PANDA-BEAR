@@ -30,9 +30,9 @@ class Coordinates:
     """Class for storing coordinates."""
 
     def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
+        self.x = float(x)
+        self.y = float(y)
+        self.z = float(z)
 
     def __str__(self):
         return f"({self.x}, {self.y}, {self.z})"
@@ -45,7 +45,7 @@ class Coordinates:
     @x.setter
     def x(self, value):
         if not isinstance(value, (int, float)):
-            raise ValueError("x-coordinate must be an int, float, or Decimal object")
+            raise ValueError("x-coordinate must be an int, or float")
         self._x = round(value, 6)
 
     @property
