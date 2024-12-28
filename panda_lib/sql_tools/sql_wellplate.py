@@ -244,9 +244,9 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
     """
 
     with SessionLocal() as session:
-        statement = select(Wellplates).filter_by(Wellplates.current == 1)
+        statement = select(Wellplates).filter_by(current=1)
 
-        result: Wellplates = session.execute(statement).first()
+        result: Wellplates = session.execute(statement).scalar()
         current_plate_id = result.id
         current_type_number = result.type_id
         is_new = check_if_current_wellplate_is_new()
