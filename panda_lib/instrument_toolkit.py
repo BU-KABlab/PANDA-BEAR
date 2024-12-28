@@ -6,13 +6,13 @@ from typing import Union
 
 import PySpin
 
-import panda_lib.wellplate as wp
 from panda_lib.movement import Mill, MockMill
 from panda_lib.obs_controls import OBSController
 from panda_lib.pawduino import ArduinoLink
 from panda_lib.slack_tools.SlackBot import SlackBot
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.vials import StockVial, WasteVial, read_vials
+from panda_lib.wellplate import Wellplate
 from sartorius.sartorius import Scale
 from sartorius.sartorius.mock import Scale as MockScale
 
@@ -24,7 +24,7 @@ class Toolkit:
     mill: Union[Mill, MockMill, None]
     scale: Union[Scale, MockScale, None]
     pump: Union[SyringePump, MockPump, None]
-    wellplate: wp.Wellplates = None
+    wellplate: Wellplate = None
     global_logger: Logger = None
     experiment_logger: Logger = None
     flir_camera: PySpin.Camera = None
@@ -49,7 +49,7 @@ class Hardware:
 class Labware:
     """A class to hold all of the labware"""
 
-    wellplate: wp.Wellplates = None
+    wellplate: Wellplate = None
     # include the global logger so that the labware can log to the same file
     global_logger: Logger = None
 
