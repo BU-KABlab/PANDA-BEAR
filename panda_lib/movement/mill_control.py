@@ -411,14 +411,14 @@ class Mill:
 
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
-        status_mode = self.config["settings"]["$10"]
+        status_mode = self.config["$10"]
 
         if status_mode not in [0, 1, 2, 3]:
             mill_control_logger.error("Invalid status mode")
             raise ValueError("Invalid status mode")
 
         max_attempts = 3
-        homing_pull_off = self.config["settings"]["$27"]
+        homing_pull_off = self.config["$27"]
 
         if status_mode in [0, 2]:
             match = wpos_pattern.search(status)
@@ -820,7 +820,7 @@ class MockMill(Mill):
         self.current_y = 0.0
         self.current_z = 0.0
         self.feed_rate = 2000
-        self.status_mode = self.config["settings"]["$10"]
+        self.status_mode = self.config["$10"]
 
     def connect_to_mill(self):
         """Connect to the mill"""
@@ -899,7 +899,7 @@ class MockMill(Mill):
 
     def current_status(self) -> str:
         """Simulate getting the current status of the mill"""
-        homing_pull_off = self.config["settings"]["$27"]
+        homing_pull_off = self.config["$27"]
         if self.status_mode == 0:
             return f"<Idle|WPos:{self.current_x},{self.current_y},{self.current_z}>"
         elif self.status_mode == 1:
@@ -956,7 +956,7 @@ class MockMill(Mill):
     def mock_readline(self, settings: bool = False):
         """Simulate reading from the mill"""
         if settings:
-            return self.config["settings"]
+            return self.config
         else:
             return self.current_status()
         ## End of mock mill specific code
