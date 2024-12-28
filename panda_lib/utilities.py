@@ -348,8 +348,10 @@ def input_validation(
                 menu_items = [item.lower() for item in menu_items]
                 converted_input = converted_input.lower()
             if menu_items and converted_input not in menu_items:
+                # turn menu items into strings
+                menu_items_str = [str(item) for item in menu_items]
                 raise ValueError(
-                    f"Input must be one of the following: {', '.join(menu_items)}."
+                    f"Input must be one of the following: {', '.join(menu_items_str)}."
                 )
 
             return converted_input
