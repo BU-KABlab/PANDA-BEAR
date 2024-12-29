@@ -3,27 +3,32 @@ from panda_lib.utilities import Coordinates, solve_vials_ilp
 
 def test_solve_vials_ilp():
     # Test case 1
-    vial_concentrations = [1.0, 2.0, 3.0]
+    vial_concentration_map = {"A": 1.0, "B": 2.0, "C": 3.0}
     v_total = 100.0
     c_target = 2.5
-    expected_volumes = [50.0, 0.0, 50.0]
+    expected_volumes = {"A": 25.0, "B": 0.0, "C": 75.0}
     expected_deviation = 0.0
 
-    volumes, deviation = solve_vials_ilp(vial_concentrations, v_total, c_target)
+    volumes, deviation, locations = solve_vials_ilp(
+        vial_concentration_map, v_total, c_target
+    )
 
-    assert volumes == expected_volumes
+    assert locations == expected_volumes
     assert deviation == expected_deviation
 
     # Test case 2
-    vial_concentrations = [0.5, 1.0, 1.5, 2.0]
+    vial_concentration_map = {"A": 0.5, "B": 1.0, "C": 1.5, "D": 2.0}
     v_total = 200.0
     c_target = 1.25
-    expected_volumes = [100.0, 0.0, 0.0, 100.0]
+    expected_volumes_a = {"A": 100.0, "B": 0.0, "C": 0.0, "D": 100.0}
+    expected_volumes_b = {"A": 0.0, "B": 100.0, "C": 100.0, "D": 0}
     expected_deviation = 0.0
 
-    volumes, deviation = solve_vials_ilp(vial_concentrations, v_total, c_target)
+    volumes, deviation, locations = solve_vials_ilp(
+        vial_concentration_map, v_total, c_target
+    )
 
-    assert volumes == expected_volumes
+    assert locations == expected_volumes_a or locations == expected_volumes_b
     assert deviation == expected_deviation
 
 
