@@ -427,8 +427,20 @@ class Wellplate:
             self.plate_data.id, new_active_plate_id
         )
 
+    @property
+    def id(self):
+        return self.plate_data.id
+
+    @property
+    def type_id(self):
+        return self.plate_data.type_id
+
+    @property
+    def name(self):
+        return self.plate_data.name
+
     def __repr__(self):
-        return f"<WellPlate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"
+        return f"<Wellplate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"
 
 
 def _remove_wellplate_from_db(
