@@ -103,11 +103,11 @@ class SyringePump:
         rate: float = None,
     ) -> Optional[Union[wp.Well, StockVial, WasteVial]]:
         """
-        Withdraw the given volume at the given rate and depth from the specified position.
+        Withdraw the given volume at the given rate from the specified vessel.
         Update the volume of the pipette and the solution if given.
         Args:
             volume (float): Volume to be withdrawn in microliters.
-            solution (Vial object or str): The vial or wellplate ID to withdraw from
+            solution (Vessel object): The vial or well to withdraw from
             rate (float): Pumping rate in milliliters per minute. None defaults to the max pump rate.
 
         Returns:
@@ -135,27 +135,28 @@ class SyringePump:
         # Update the pipette volume
         if isinstance(solution, (Vial, wp.Well)):
             # If the solution is a vial or well, update the volume and contents
-            if isinstance(solution.contents, dict):
-                # If the solution has multiple contents, calculate the ratio
-                # of the solution being withdrawn
-                content_ratio = {
-                    key: value / sum(solution.contents.values())
-                    for key, value in solution.contents.items()
-                }
-                # Update the pipette contents according to the ratio
-                for key, ratio in content_ratio.items():
-                    self.pipette.update_contents(
-                        key, float(ratio * volume_withdrawn_ul)
-                    )
-            else:
-                # If the solution has a single content, update the pipette contents
-                self.pipette.update_contents(solution.contents, volume_withdrawn_ul)
+            # if isinstance(solution.contents, dict):
+            #     # If the solution has multiple contents, calculate the ratio
+            #     # of the solution being withdrawn
+            #     content_ratio = {
+            #         key: value / sum(solution.contents.values())
+            #         for key, value in solution.contents.items()
+            #     }
+            #     # Update the pipette contents according to the ratio
+            #     for key, ratio in content_ratio.items():
+            #         self.pipette.update_contents(
+            #             key, float(ratio * volume_withdrawn_ul)
+            #         )
+            # else:
+            #     # If the solution has a single content, update the pipette contents
+            #     self.pipette.update_contents(solution.contents, volume_withdrawn_ul)
 
             # Update the solution volume and contents
-            solution.update_volume(-volume_withdrawn_ul)
-            solution.update_contents(solution.contents, -volume_withdrawn_ul, save=True)
-
-            # Updating the contents also updates the volume so we are done here
+            # solution.update_volume(-volume_withdrawn_ul)
+            # solution.update_contents(solution.contents, -volume_withdrawn_ul, save=True)
+            removed_contents = solution.remove_contents(volume_withdrawn_ul)
+            for soln, vol in removed_contents.items():
+                self.pipette.update_contents(soln, vol)
 
             # log the action and return
             pump_control_logger.debug(
@@ -175,7 +176,7 @@ class SyringePump:
         # This is likely the case for air. Only the volume is updated.
         self.pipette.volume = round(
             self.pipette.volume + volume_withdrawn_ul, PRECISION
-        )
+        )  # TODO this could be simplified to self.pipette.volume += volume_withdrawn_ul and use a setter
 
         pump_control_logger.debug(
             "Pump has withdrawn: %0.6f ml at %fmL/min  Pipette vol: %0.3f ul",
@@ -191,7 +192,7 @@ class SyringePump:
         return None
 
     @timing_wrapper
-    def withdraw_air(self, volume: float) -> int:
+    def withdraw_air(self, volume: float) -> None:
         """Withdraw the given ul of air with the pipette"""
         volume_ml = round(float(volume / 1000), PRECISION)
         if volume_ml <= 0:
@@ -208,7 +209,7 @@ class SyringePump:
         )
         self.pump.volume_infused_clear()
         self.pump.volume_withdrawn_clear()
-        return 0  # return 0 if successful
+        return None
 
     def infuse(
         self,
@@ -217,7 +218,7 @@ class SyringePump:
         infused_into: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
         rate: float = None,
         blowout_ul: float = float(0.0),
-    ) -> int:
+    ) -> None:
         """
         Infuse the given volume at the given rate and depth from the specified position.
         Args:
@@ -285,10 +286,8 @@ class SyringePump:
 
         if infused_into is not None:
             # Update the volume and contents of the destination vial or well
-            infused_into.update_volume(volume_infused_ul)
-            infused_into.update_contents(
-                self.pipette.contents, volume_infused_ul, save=True
-            )
+            # infused_into.update_volume(volume_infused_ul)
+            infused_into.add_contents(self.pipette.contents, volume_infused_ul)
 
             # Calculate the ratio of each content in the pipette
             if sum(self.pipette.contents.values() or [0]) > 0:
@@ -301,14 +300,16 @@ class SyringePump:
 
             # Update the contents of the pipette based on the content ratio
             for key, ratio in content_ratio.items():
-                self.pipette.update_contents(key, -volume_infused_ul * ratio)
+                self.pipette.update_contents(
+                    key, -volume_infused_ul * ratio
+                )  # TODO see using vial.remove_contents or vial.add_contents methods
 
         else:
             # Update the volume of the pipette without the infused volume
             # We don't need to include the blowout because it was accounted for earlier
             self.pipette.volume -= volume_infused_ul
 
-        return 0  # TODO return infused into like withdraw does
+        return None
 
     @timing_wrapper
     def infuse_air(self, volume: float) -> int:
