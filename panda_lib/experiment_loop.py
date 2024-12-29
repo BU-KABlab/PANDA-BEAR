@@ -22,6 +22,10 @@ from pathlib import Path
 from typing import Optional, Sequence, Tuple
 
 import PySpin
+
+# from .movement import Mill, MockMill
+from grlb_mill_wrapper import MockPandaMill as MockMill
+from grlb_mill_wrapper import PandaMill as Mill
 from slack_sdk import errors as slack_errors
 
 from panda_lib import scheduler
@@ -59,7 +63,6 @@ from .experiment_class import (
 )
 from .instrument_toolkit import Hardware, Labware, Toolkit
 from .log_tools import apply_log_filter, setup_default_logger, timing_wrapper
-from .movement import Mill, MockMill
 from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
 from .syringepump import MockPump, SyringePump
@@ -132,7 +135,7 @@ def experiment_loop_worker(
         status_queue.put((process_id, "connected to equipment"))
 
         ## Establish state of system - we do this each time because each experiment changes the system state
-        stock_vials, _, toolkit.wellplate = establish_system_state()
+        stock_vials, _, toolkit.wellplate = _establish_system_state()
 
         ## Check that the pipette is empty, if not dispose of full volume into waste
         if toolkit.pump.pipette.volume > 0:
@@ -153,7 +156,7 @@ def experiment_loop_worker(
             apply_log_filter(logger=logger)
             sql_system_state.set_system_status(SystemState.BUSY)
             ## Establish state of system - we do this each time because each experiment changes the system state
-            stock_vials, _, toolkit.wellplate = establish_system_state()
+            stock_vials, _, toolkit.wellplate = _establish_system_state()
 
             while current_experiment is None:
                 ## Ask the scheduler for the next experiment
@@ -187,7 +190,9 @@ def experiment_loop_worker(
                 sql_system_state.set_system_status(
                     SystemState.PAUSE, "Waiting for new experiments"
                 )
-                status = system_status_loop(controller_slack, status_queue, process_id)
+                status = _monitor_system_status(
+                    controller_slack, status_queue, process_id
+                )
                 if status == SystemState.STOP:
                     break  # break out of the main while True loop
 
@@ -226,7 +231,7 @@ def experiment_loop_worker(
                 well_id=current_experiment.well_id,
             )
             ## Check that there is enough volume in the stock vials to run the experiment
-            sufficient_stock, _ = check_stock_vials(current_experiment, stock_vials)
+            sufficient_stock, _ = _check_stock_vials(current_experiment, stock_vials)
             if not sufficient_stock:
                 error_message = f"Experiment {current_experiment.experiment_id} cannot be run because there is not enough volume in the stock vials"
                 controller_slack.send_message(
@@ -361,7 +366,7 @@ def experiment_loop_worker(
                 raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
-            status = system_status_loop(controller_slack, status_queue, process_id)
+            status = _monitor_system_status(controller_slack, status_queue, process_id)
             if status == SystemState.STOP:
                 break  # break out of the while True loop and the try block to go to finally
     except (
@@ -593,8 +598,8 @@ def _initialize_experiment(
 
     well = labware.wellplate.wells[exp_obj.well_id]
     if (
-        well.plate_id != labware.wellplate.plate_id
-        or exp_obj.well_type_number != labware.wellplate.type_number
+        well.plate_id != labware.wellplate.id
+        or exp_obj.well_type_number != labware.wellplate.type_id
     ):
         raise MismatchWellplateTypeError("Mismatched wellplate type or ID.")
 
@@ -610,7 +615,7 @@ def _initialize_experiment(
 
 
 def _validate_the_stock_solutions(exp: EchemExperimentBase, labware: Labware):
-    sufficient_stock, check_table = check_stock_vials(exp, labware.stock_vials)
+    sufficient_stock, check_table = _check_stock_vials(exp, labware.stock_vials)
     if not sufficient_stock:
         issues = []
         if check_table["insufficient"]:
@@ -652,7 +657,7 @@ def _fetch_protocol_function(protocol_id: int):
 
 
 @timing_wrapper
-def establish_system_state() -> (
+def _establish_system_state() -> (
     tuple[Sequence[StockVial], Sequence[WasteVial], Wellplate]
 ):
     """
@@ -756,7 +761,7 @@ def establish_system_state() -> (
 
 
 @timing_wrapper
-def check_stock_vials(
+def _check_stock_vials(
     experiment: ExperimentBase, stock_vials: Sequence[Vial]
 ) -> Tuple[bool, dict]:
     """
@@ -827,7 +832,7 @@ def check_stock_vials(
 
 
 @timing_wrapper
-def system_status_loop(
+def _monitor_system_status(
     slack: SlackBot, status_queue: multiprocessing.Queue, process_id: int
 ) -> SystemState:
     """
