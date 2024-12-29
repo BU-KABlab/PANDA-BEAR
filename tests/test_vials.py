@@ -17,19 +17,20 @@ Base.metadata.create_all(engine)
 
 
 @pytest.fixture(scope="function")
-def session():
+def session_maker():
     """Create a new database session for a test."""
-    db = SessionLocal()
+    db = SessionLocal
     try:
         yield db
     finally:
-        db.close()
+        # db.close()
+        pass
 
 
-def test_create_new_vial(session: Session):
+def test_create_new_vial(session_maker: Session):
     vial = Vial(
         position="A1",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=10000.0,
@@ -43,18 +44,19 @@ def test_create_new_vial(session: Session):
     assert vial.vial_data.volume_height is not None
 
     # Verify that the vial in the db matches the vial object
-    db_vial = session.execute(select(Vials).filter_by(position="A1")).scalar_one()
+    with session_maker() as session:
+        db_vial = session.execute(select(Vials).filter_by(position="A1")).scalar_one()
     assert db_vial.name == "Test Vial"
     assert db_vial.volume == 10000.0
     assert db_vial.capacity == 20000.0
     assert db_vial.volume_height > 0.0
 
 
-def test_load_existing_vial(session: Session):
+def test_load_existing_vial(session_maker: Session):
     # Create a new vial first
     Vial(
         position="A2",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -63,15 +65,15 @@ def test_load_existing_vial(session: Session):
     )
 
     # Load the existing vial
-    vial = Vial(position="A2", session=session, create_new=False)
+    vial = Vial(position="A2", session=session_maker, create_new=False)
     assert vial.vial_data.name == "Test Vial"
     assert vial.vial_data.volume == 100.0
 
 
-def test_add_contents(session: Session):
+def test_add_contents(session_maker: Session):
     vial = Vial(
         position="A3",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -83,15 +85,16 @@ def test_add_contents(session: Session):
     assert vial.vial_data.volume == 150.0
     assert vial.vial_data.contents["chemicalA"] == 50.0
 
-    db_vial = session.execute(select(Vials).filter_by(position="A3")).scalar_one()
+    with session_maker() as session:
+        db_vial = session.execute(select(Vials).filter_by(position="A3")).scalar_one()
     assert db_vial.volume == 150.0
     assert db_vial.contents["chemicalA"] == 50.0
 
 
-def test_add_contents_overfill(session: Session):
+def test_add_contents_overfill(session_maker: Session):
     vial = Vial(
         position="A4",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -103,10 +106,10 @@ def test_add_contents_overfill(session: Session):
         vial.add_contents({"chemicalA": 100.0}, 100.0)
 
 
-def test_remove_contents(session: Session):
+def test_remove_contents(session_maker: Session):
     vial = Vial(
         position="A5",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -119,15 +122,16 @@ def test_remove_contents(session: Session):
     assert vial.vial_data.volume == 50.0
     assert removed_contents["chemicalA"] == 50.0
 
-    db_vial = session.execute(select(Vials).filter_by(position="A5")).scalar_one()
+    with session_maker() as session:
+        db_vial = session.execute(select(Vials).filter_by(position="A5")).scalar_one()
     assert db_vial.volume == 50.0
     assert db_vial.contents["chemicalA"] == 50.0
 
 
-def test_remove_contents_overdraft(session: Session):
+def test_remove_contents_overdraft(session_maker: Session):
     vial = Vial(
         position="A66",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=50.0,
@@ -140,10 +144,10 @@ def test_remove_contents_overdraft(session: Session):
         vial.remove_contents(100.0)
 
 
-def test_add_contents_stock_vial(session: Session):
+def test_add_contents_stock_vial(session_maker: Session):
     vial = Vial(
         position="A6",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -155,10 +159,10 @@ def test_add_contents_stock_vial(session: Session):
         vial.add_contents({"chemicalA": 50.0}, 50.0)
 
 
-def test_reset_vial_stock_vial(session: Session):
+def test_reset_vial_stock_vial(session_maker: Session):
     vial = Vial(
         position="A7",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -172,10 +176,10 @@ def test_reset_vial_stock_vial(session: Session):
     assert vial.vial_data.contents == {"chemicalA": 200.0}
 
 
-def test_reset_vial_waste(session: Session):
+def test_reset_vial_waste(session_maker: Session):
     vial = Vial(
         position="A8",
-        session=session,
+        session=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,

@@ -23,7 +23,7 @@ from .sql_tools.panda_models import Wellplates as WellPlateDBModel
 
 class VialService:
     def __init__(self, db_session_maker: sessionmaker = SessionLocal):
-        self.db_session: Session = db_session_maker()
+        self.db_session_maker = db_session_maker
         self.logger = logging.getLogger(__name__)
 
     def create_vial(self, vial_data: VialWriteModel) -> Vials:
@@ -36,28 +36,28 @@ class VialService:
         Returns:
             Vials: SQLAlchemy model instance representing the new vial.
         """
+        with self.db_session_maker() as db_session:
+            # Check if the vial position is currently active, and deactivate it if so
+            try:
+                stmt = select(Vials).filter_by(position=vial_data.position)
+                vials = db_session.execute(stmt).scalars().all()
+                for vial in vials:
+                    vial.active = False
+                    db_session.commit()
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error deactivating existing vial: {e}")
 
-        # Check if the vial position is currently active, and deactivate it if so
-        try:
-            stmt = select(Vials).filter_by(position=vial_data.position)
-            vials = self.db_session.execute(stmt).scalars().all()
-            for vial in vials:
-                vial.active = False
-                self.db_session.commit()
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error deactivating existing vial: {e}")
-
-        try:
-            # Convert Pydantic model to SQLAlchemy model
-            vial: Vials = Vials(**vial_data.model_dump())
-            self.db_session.add(vial)
-            self.db_session.commit()
-            self.db_session.refresh(vial)
-            return vial
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error creating vial: {e}")
+            try:
+                # Convert Pydantic model to SQLAlchemy model
+                vial: Vials = Vials(**vial_data.model_dump())
+                db_session.add(vial)
+                db_session.commit()
+                db_session.refresh(vial)
+                return vial
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error creating vial: {e}")
 
     def get_vial(self, position: str) -> VialReadModel:
         """
@@ -69,14 +69,15 @@ class VialService:
         Returns:
             VialModel: Pydantic model representing the vial.
         """
-        stmt = select(Vials).filter_by(position=position)
-        vial = self.db_session.execute(stmt).scalar()
-        if not vial:
-            raise ValueError(f"Vial at position {position} not found.")
-        # elif len(vial) > 1:
-        # raise ValueError(f"Multiple vials found at position {position}.")
-        # Convert SQLAlchemy model to Pydantic model
-        return VialReadModel.model_validate(vial)
+        with self.db_session_maker() as db_session:
+            stmt = select(Vials).filter_by(position=position)
+            vial = db_session.execute(stmt).scalar()
+            if not vial:
+                raise ValueError(f"Vial at position {position} not found.")
+            # elif len(vial) > 1:
+            # raise ValueError(f"Multiple vials found at position {position}.")
+            # Convert SQLAlchemy model to Pydantic model
+            return VialReadModel.model_validate(vial)
 
     def update_vial(self, position: str, updates: dict) -> Vials:
         """
@@ -89,24 +90,25 @@ class VialService:
         Returns:
             Vials: Updated SQLAlchemy model instance.
         """
-        try:
-            stmt = select(Vials).filter_by(position=position)
-            vial = self.db_session.execute(stmt).scalar()
-            if not vial:
-                raise ValueError(f"Vial at position {position} not found.")
-            # elif len(vial) > 1:
-            #     raise ValueError(f"Multiple vials found at position {position}.")
-            for key, value in updates.items():
-                if hasattr(vial, key):
-                    setattr(vial, key, value)
-                else:
-                    raise ValueError(f"Invalid attribute: {key}")
-            self.db_session.commit()
-            self.db_session.refresh(vial)
-            return vial
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error updating vial: {e}")
+        with self.db_session_maker() as db_session:
+            try:
+                stmt = select(Vials).filter_by(position=position)
+                vial = db_session.execute(stmt).scalar()
+                if not vial:
+                    raise ValueError(f"Vial at position {position} not found.")
+                # elif len(vial) > 1:
+                #     raise ValueError(f"Multiple vials found at position {position}.")
+                for key, value in updates.items():
+                    if hasattr(vial, key):
+                        setattr(vial, key, value)
+                    else:
+                        raise ValueError(f"Invalid attribute: {key}")
+                db_session.commit()
+                db_session.refresh(vial)
+                return vial
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error updating vial: {e}")
 
     def delete_vial(self, position: str) -> None:
         """
@@ -115,18 +117,19 @@ class VialService:
         Args:
             position (str): The position of the vial to delete.
         """
-        try:
-            stmt = select(Vials).filter_by(position=position)
-            vial = self.db_session.execute(stmt).scalar()
-            if not vial:
-                raise ValueError(f"Vial at position {position} not found.")
-            # elif len(vial) > 1:
-            #     raise ValueError(f"Multiple vials found at position {position}.")
-            self.db_session.delete(vial)
-            self.db_session.commit()
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error deleting vial: {e}")
+        with self.db_session_maker() as db_session:
+            try:
+                stmt = select(Vials).filter_by(position=position)
+                vial = db_session.execute(stmt).scalar()
+                if not vial:
+                    raise ValueError(f"Vial at position {position} not found.")
+                # elif len(vial) > 1:
+                #     raise ValueError(f"Multiple vials found at position {position}.")
+                db_session.delete(vial)
+                db_session.commit()
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error deleting vial: {e}")
 
     def list_active_vials(self) -> List[VialReadModel]:
         """
@@ -135,71 +138,120 @@ class VialService:
         Returns:
             List[VialModel]: List of Pydantic models representing active vials.
         """
-        stmt = select(Vials).filter_by(active=True)
-        result = self.db_session.execute(stmt)
-        vials = result.scalars().all() if result else []
+        with self.db_session_maker() as db_session:
+            stmt = select(Vials).filter_by(active=True)
+            result = db_session.execute(stmt)
+            vials = result.scalars().all() if result else []
 
-        # Log the raw data for debugging
-        self.logger.debug("Fetched vials: %s", vials)
+            # Log the raw data for debugging
+            self.logger.debug("Fetched vials: %s", vials)
 
-        try:
-            return [VialReadModel.model_validate(vial) for vial in vials]
-        except Exception as e:
-            self.logger.error("Error converting vials to Pydantic models: %s", e)
-            raise
+            try:
+                return [VialReadModel.model_validate(vial) for vial in vials]
+            except Exception as e:
+                self.logger.error("Error converting vials to Pydantic models: %s", e)
+                raise ValueError(f"Error converting vials to Pydantic models: {e}")
+
+    def list_all_vials(self) -> List[VialReadModel]:
+        """
+        Lists all vials in the database.
+
+        Returns:
+            List[VialModel]: List of Pydantic models representing all vials.
+        """
+        with self.db_session_maker() as db_session:
+            stmt = select(Vials)
+            result = db_session.execute(stmt)
+            vials = result.scalars().all() if result else []
+
+            # Log the raw data for debugging
+            self.logger.debug("Fetched vials: %s", vials)
+
+            try:
+                return [VialReadModel.model_validate(vial) for vial in vials]
+            except Exception as e:
+                self.logger.error("Error converting vials to Pydantic models: %s", e)
+                raise ValueError(f"Error converting vials to Pydantic models: {e}")
+
+    def list_inactive_vials(self) -> List[VialReadModel]:
+        """
+        Lists all inactive vials in the database.
+
+        Returns:
+            List[VialModel]: List of Pydantic models representing inactive vials.
+        """
+        with self.db_session_maker() as db_session:
+            stmt = select(Vials).filter_by(active=False)
+            result = db_session.execute(stmt)
+            vials = result.scalars().all() if result else []
+
+            # Log the raw data for debugging
+            self.logger.debug("Fetched vials: %s", vials)
+
+            try:
+                return [VialReadModel.model_validate(vial) for vial in vials]
+            except Exception as e:
+                self.logger.error("Error converting vials to Pydantic models: %s", e)
+                raise ValueError(f"Error converting vials to Pydantic models: {e}")
 
 
-class WellService:  # FIXME - resolve the inconsitant arguments of Session vs sessionmakers
+class WellService:
     def __init__(self, session_maker: sessionmaker = SessionLocal):
-        self.active_db_session: Session = session_maker()
+        self.session_maker = session_maker
 
     def create_well(self, well_data: WellWriteModel) -> WellDBModel:
-        try:
-            well: WellDBModel = WellDBModel(**well_data.model_dump())
-            self.active_db_session.add(well)
-            self.active_db_session.commit()
-            self.active_db_session.refresh(well)
-            return well
-        except SQLAlchemyError as e:
-            self.active_db_session.rollback()
-            raise ValueError(f"Error creating well: {e}")
+        with self.session_maker() as active_db_session:
+            try:
+                well: WellDBModel = WellDBModel(**well_data.model_dump())
+                active_db_session.add(well)
+                active_db_session.commit()
+                active_db_session.refresh(well)
+                return well
+            except SQLAlchemyError as e:
+                active_db_session.rollback()
+                raise ValueError(f"Error creating well: {e}")
 
     def get_well(self, well_id: str, plate_id: int) -> WellReadModel:
-        stmt = select(WellDBModel).filter_by(well_id=well_id, plate_id=plate_id)
-        well = self.active_db_session.execute(stmt).scalar()
-        if not well:
-            raise ValueError(f"Well with id {well_id} not found.")
-        return WellReadModel.model_validate(well)
+        with self.session_maker() as active_db_session:
+            stmt = select(WellDBModel).filter_by(well_id=well_id, plate_id=plate_id)
+            well = active_db_session.execute(stmt).scalar()
+            if not well:
+                raise ValueError(f"Well with id {well_id} not found.")
+
+            active_db_session.refresh(well)
+            return WellReadModel.model_validate(well)
 
     def update_well(self, well_id: str, plate_id: int, updates: dict) -> WellDBModel:
-        try:
-            stmt = select(WellDBModel).filter_by(well_id=well_id, plate_id=plate_id)
-            well = self.active_db_session.execute(stmt).scalar()
-            if not well:
-                raise ValueError(f"Well with id {well_id} not found.")
-            for key, value in updates.items():
-                if hasattr(well, key):
-                    setattr(well, key, value)
-                else:
-                    raise ValueError(f"Invalid attribute: {key}")
-            self.active_db_session.commit()
-            self.active_db_session.refresh(well)
-            return well
-        except SQLAlchemyError as e:
-            self.active_db_session.rollback()
-            raise ValueError(f"Error updating well: {e}")
+        with self.session_maker() as active_db_session:
+            try:
+                stmt = select(WellDBModel).filter_by(well_id=well_id, plate_id=plate_id)
+                well = active_db_session.execute(stmt).scalar()
+                if not well:
+                    raise ValueError(f"Well with id {well_id} not found.")
+                for key, value in updates.items():
+                    if hasattr(well, key):
+                        setattr(well, key, value)
+                    else:
+                        raise ValueError(f"Invalid attribute: {key}")
+                active_db_session.commit()
+                active_db_session.refresh(well)
+                return well
+            except SQLAlchemyError as e:
+                active_db_session.rollback()
+                raise ValueError(f"Error updating well: {e}")
 
     def delete_well(self, well_id: str) -> None:
-        try:
-            stmt = select(WellDBModel).filter_by(well_id=well_id)
-            well = self.active_db_session.execute(stmt).scalar()
-            if not well:
-                raise ValueError(f"Well with id {well_id} not found.")
-            self.active_db_session.delete(well)
-            self.active_db_session.commit()
-        except SQLAlchemyError as e:
-            self.active_db_session.rollback()
-            raise ValueError(f"Error deleting well: {e}")
+        with self.session_maker() as active_db_session:
+            try:
+                stmt = select(WellDBModel).filter_by(well_id=well_id)
+                well = active_db_session.execute(stmt).scalar()
+                if not well:
+                    raise ValueError(f"Well with id {well_id} not found.")
+                active_db_session.delete(well)
+                active_db_session.commit()
+            except SQLAlchemyError as e:
+                active_db_session.rollback()
+                raise ValueError(f"Error deleting well: {e}")
 
     def fetch_well_type_characteristics(
         self,
@@ -250,101 +302,109 @@ class WellService:  # FIXME - resolve the inconsitant arguments of Session vs se
 
 class WellplateService:
     def __init__(self, session_maker: sessionmaker = SessionLocal):
-        self.db_session: Session = session_maker()
+        self.session_maker = session_maker
 
     def create_plate(self, plate_data: WellplateWriteModel) -> WellPlateDBModel:
-        try:
-            plate: WellPlateDBModel = WellPlateDBModel(**plate_data.model_dump())
-            self.db_session.add(plate)
-            self.db_session.commit()
-            self.db_session.refresh(plate)
-            return plate
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error creating plate: {e}")
+        with self.session_maker() as db_session:
+            try:
+                plate: WellPlateDBModel = WellPlateDBModel(**plate_data.model_dump())
+                db_session.add(plate)
+                db_session.commit()
+                db_session.refresh(plate)
+                return plate
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error creating plate: {e}")
 
     def get_plate(self, plate_id: int) -> WellplateReadModel:
-        stmt = select(WellPlateDBModel).filter_by(id=plate_id)
-        plate = self.db_session.execute(stmt).scalar()
-        if not plate:
-            # raise ValueError(f"Plate with id {plate_id} not found.")
-            return None
-        return WellplateReadModel.model_validate(plate)
+        with self.session_maker() as db_session:
+            stmt = select(WellPlateDBModel).filter_by(id=plate_id)
+            plate = db_session.execute(stmt).scalar()
+            if not plate:
+                # raise ValueError(f"Plate with id {plate_id} not found.")
+                return None
+            return WellplateReadModel.model_validate(plate)
 
     def get_plate_type(self, type_id: int) -> PlateTypeModel:
-        stmt = select(PlateTypeDBModel).filter_by(id=type_id)
-        plate = self.db_session.execute(stmt).scalar()
-        if not plate:
-            raise ValueError(f"Plate type with id {type_id} not found.")
-        return PlateTypeModel.model_validate(plate)
+        with self.session_maker() as db_session:
+            stmt = select(PlateTypeDBModel).filter_by(id=type_id)
+            plate = db_session.execute(stmt).scalar()
+            if not plate:
+                raise ValueError(f"Plate type with id {type_id} not found.")
+            return PlateTypeModel.model_validate(plate)
 
     def get_wells(self, plate_id: int) -> List[WellWriteModel]:
-        stmt = select(WellDBModel).filter_by(plate_id=plate_id)
-        wells = self.db_session.execute(stmt).scalars().all()
-        return [WellWriteModel.model_validate(well) for well in wells]
+        with self.session_maker() as db_session:
+            stmt = select(WellDBModel).filter_by(plate_id=plate_id)
+            wells = db_session.execute(stmt).scalars().all()
+            return [WellWriteModel.model_validate(well) for well in wells]
 
     def update_plate(self, plate_id: int, updates: dict) -> WellPlateDBModel:
-        try:
-            stmt = select(WellPlateDBModel).filter_by(id=plate_id)
-            plate = self.db_session.execute(stmt).scalar()
-            if not plate:
-                raise ValueError(f"Plate with id {plate_id} not found.")
-            for key, value in updates.items():
-                if key in WellplateWriteModel.model_fields:
-                    setattr(plate, key, value)
-                else:
-                    print(f"Skipping read-only or invalid attribute: {key}")
-            self.db_session.commit()
-            self.db_session.refresh(plate)
-            return plate
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error updating plate: {e}")
+        with self.session_maker() as db_session:
+            try:
+                stmt = select(WellPlateDBModel).filter_by(id=plate_id)
+                plate = db_session.execute(stmt).scalar()
+                if not plate:
+                    raise ValueError(f"Plate with id {plate_id} not found.")
+                for key, value in updates.items():
+                    if key in WellplateWriteModel.model_fields:
+                        setattr(plate, key, value)
+                    else:
+                        print(f"Skipping read-only or invalid attribute: {key}")
+                db_session.commit()
+                db_session.refresh(plate)
+                return plate
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error updating plate: {e}")
 
     def activate_plate(self, plate_id: int) -> WellplateReadModel:
-        try:
-            self.db_session.execute(update(WellPlateDBModel).values(current=False))
-            stmt = select(WellPlateDBModel).filter_by(id=plate_id)
-            plate = self.db_session.execute(stmt).scalar()
-            if not plate:
-                raise ValueError(f"Plate with id {plate_id} not found.")
-            plate.current = True
-            self.db_session.commit()
+        with self.session_maker() as db_session:
+            try:
+                db_session.execute(update(WellPlateDBModel).values(current=False))
+                stmt = select(WellPlateDBModel).filter_by(id=plate_id)
+                plate = db_session.execute(stmt).scalar()
+                if not plate:
+                    raise ValueError(f"Plate with id {plate_id} not found.")
+                plate.current = True
+                db_session.commit()
 
-            return WellplateReadModel.model_validate(plate)
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error activating plate: {e}")
+                return WellplateReadModel.model_validate(plate)
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error activating plate: {e}")
 
     def deactivate_plate(
         self, plate_id: int, new_active_plate_id: int = None
     ) -> WellplateReadModel:
-        try:
-            stmt = select(WellPlateDBModel).filter_by(id=plate_id)
-            plate = self.db_session.execute(stmt).scalar()
-            if not plate:
-                raise ValueError(f"Plate with id {plate_id} not found.")
-            plate.current = False
-            self.db_session.commit()
-            if new_active_plate_id:
-                new_active_plate = self.db_session.execute(
-                    select(WellPlateDBModel).filter_by(id=new_active_plate_id)
-                ).scalar_one_or_none()
-                if new_active_plate:
-                    new_active_plate.current = True
-                    self.db_session.commit()
+        with self.session_maker() as db_session:
+            try:
+                stmt = select(WellPlateDBModel).filter_by(id=plate_id)
+                plate = db_session.execute(stmt).scalar()
+                if not plate:
+                    raise ValueError(f"Plate with id {plate_id} not found.")
+                plate.current = False
+                db_session.commit()
+                if new_active_plate_id:
+                    new_active_plate = db_session.execute(
+                        select(WellPlateDBModel).filter_by(id=new_active_plate_id)
+                    ).scalar_one_or_none()
+                    if new_active_plate:
+                        new_active_plate.current = True
+                        db_session.commit()
 
-            return WellplateReadModel.model_validate(plate)
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise ValueError(f"Error deactivating plate: {e}")
+                return WellplateReadModel.model_validate(plate)
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error deactivating plate: {e}")
 
     def get_active_plate(self) -> WellplateReadModel:
-        stmt = select(WellPlateDBModel).filter_by(current=True)
-        plate = self.db_session.execute(stmt).scalar()
-        if not plate:
-            return None
-        if not plate.name:
-            plate.name = f"{plate.id}"
-            self.db_session.commit()
-        return WellplateReadModel.model_validate(plate)
+        with self.session_maker() as db_session:
+            stmt = select(WellPlateDBModel).filter_by(current=True)
+            plate = db_session.execute(stmt).scalar()
+            if not plate:
+                return None
+            if not plate.name:
+                plate.name = f"{plate.id}"
+                db_session.commit()
+            return WellplateReadModel.model_validate(plate)
