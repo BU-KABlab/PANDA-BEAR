@@ -186,47 +186,49 @@ with Session(engine) as session:
 @pytest.fixture(scope="function")
 def session():
     """Create a new database session for a test."""
-    db = SessionLocal()
+    db = SessionLocal
     try:
         yield db
     finally:
-        db.close()
+        # db.close()
+        pass
 
 
-def test_create_new_well(session: Session):
+def test_create_new_well(session: sessionmaker):
     plate_type = 4
 
     well = Well(
         well_id="A1",
         plate_id=99,
         type_id=4,
-        active_session=session,
+        session_maker=session,
         create_new=True,
         name="Test Well",
     )
 
-    plate_type_data = session.execute(
-        select(PlateTypes).filter_by(id=plate_type)
-    ).scalar_one()
+    with session() as db:
+        plate_type_data = db.execute(
+            select(PlateTypes).filter_by(id=plate_type)
+        ).scalar_one()
 
-    assert well.well_data.name == "Test Well"
-    assert well.well_data.capacity == plate_type_data.capacity_ul
-    assert well.well_data.volume == 0.0
-    assert well.well_data.plate_id == 99
-    assert well.well_data.height == plate_type_data.gasket_height_mm
+        assert well.well_data.name == "Test Well"
+        assert well.well_data.capacity == plate_type_data.capacity_ul
+        assert well.well_data.volume == 0.0
+        assert well.well_data.plate_id == 99
+        assert well.well_data.height == plate_type_data.gasket_height_mm
 
-    # Verify that the well in the db matches the well object
-    db_well = session.execute(select(WellModel).filter_by(well_id="A1")).scalar_one()
-    assert db_well.name == "Test Well"
-    assert db_well.volume == well.well_data.volume
-    assert db_well.capacity == well.well_data.capacity
+        # Verify that the well in the db matches the well object
+        db_well = db.execute(select(WellModel).filter_by(well_id="A1")).scalar_one()
+        assert db_well.name == "Test Well"
+        assert db_well.volume == well.well_data.volume
+        assert db_well.capacity == well.well_data.capacity
 
 
-def test_load_existing_well(session: Session):
+def test_load_existing_well(session: sessionmaker):
     # Create a new well first
     well = Well(
         well_id="A1",
-        active_session=session,
+        session_maker=session,
         create_new=True,
         name="Test Well",
         plate_id=88,
@@ -234,15 +236,15 @@ def test_load_existing_well(session: Session):
     )
 
     # Load the existing well
-    well = Well(well_id="A1", plate_id=88, active_session=session, create_new=False)
+    well = Well(well_id="A1", plate_id=88, session_maker=session, create_new=False)
     assert well.well_data.name == "Test Well"
     assert well.well_data.volume == 0.0
 
 
-def test_add_contents(session: Session):
+def test_add_contents(session: sessionmaker):
     well = Well(
         well_id="A1",
-        active_session=session,
+        session_maker=session,
         create_new=True,
         name="Test Well",
         volume=100.0,
@@ -255,10 +257,10 @@ def test_add_contents(session: Session):
     assert well.well_data.contents["chemicalA"] == 50.0
 
 
-def test_add_contents_overfill(session: Session):
+def test_add_contents_overfill(session: sessionmaker):
     well = Well(
         well_id="A1",
-        active_session=session,
+        session_maker=session,
         create_new=True,
         name="Test Well",
         volume=100.0,
@@ -270,10 +272,10 @@ def test_add_contents_overfill(session: Session):
         well.add_contents({"chemicalA": 100.0}, 100.0)
 
 
-def test_remove_contents(session: Session):
+def test_remove_contents(session: sessionmaker):
     well = Well(
         well_id="A1",
-        active_session=session,
+        session_maker=session,
         create_new=True,
         name="Test Well",
         volume=100.0,
@@ -287,10 +289,10 @@ def test_remove_contents(session: Session):
     assert removed_contents["chemicalA"] == 50.0
 
 
-def test_remove_contents_overdraft(session: Session):
+def test_remove_contents_overdraft(session: sessionmaker):
     well = Well(
         well_id="A1",
-        active_session=session,
+        session_maker=session,
         create_new=True,
         name="Test Well",
         volume=50.0,
@@ -303,9 +305,9 @@ def test_remove_contents_overdraft(session: Session):
         well.remove_contents(100.0)
 
 
-def test_create_new_wellplate(session: Session):
+def test_create_new_wellplate(session: sessionmaker):
     plate = Wellplate(
-        session=session,
+        session_maker=session,
         plate_id=1,
         create_new=True,
         name="Test Plate",
@@ -320,17 +322,19 @@ def test_create_new_wellplate(session: Session):
     assert plate.plate_data.type_id == 1
 
     # Verify that the plate in the db matches the plate object
-    db_plate = session.execute(
-        select(Wellplates).filter_by(id=plate.plate_data.id)
-    ).scalar_one()
+    db_plate = (
+        session()
+        .execute(select(Wellplates).filter_by(id=plate.plate_data.id))
+        .scalar_one()
+    )
     assert db_plate.name == "Test Plate"
     assert db_plate.type_id == 1
 
 
-def test_load_existing_wellplate(session: Session):
+def test_load_existing_wellplate(session: sessionmaker):
     # Create a new wellplate first
     Wellplate(
-        session=session,
+        session_maker=session,
         plate_id=2,
         create_new=True,
         name="Test Plate",
@@ -340,17 +344,37 @@ def test_load_existing_wellplate(session: Session):
         orientation=0,
         rows="ABCDEFGH",
         cols=12,
-    )
+    ).activate_plate()
 
     # Load the existing wellplate
-    plate = Wellplate(session=session, plate_id=2, create_new=False)
+    plate = Wellplate(session_maker=session, plate_id=2, create_new=False)
     assert plate.plate_data.name == "Test Plate"
     assert plate.plate_data.type_id == 1
 
 
-def test_recalculate_well_positions(session: Session):
+def test_load_active_wellplate_by_default(session: sessionmaker):
+    Wellplate(
+        session_maker=session,
+        plate_id=22,
+        create_new=True,
+        name="Test Plate",
+        type_id=1,
+        a1_x=0.0,
+        a1_y=0.0,
+        orientation=0,
+        rows="ABCDEFGH",
+        cols=12,
+    ).activate_plate()
+
+    plate = Wellplate(session_maker=session)
+    assert plate.plate_data.name == "Test Plate"
+    assert plate.plate_data.current is True
+    assert plate.plate_data.id == 22
+
+
+def test_recalculate_well_positions(session: sessionmaker):
     plate = Wellplate(
-        session=session,
+        session_maker=session,
         plate_id=3,
         create_new=True,
         name="Test Plate",
@@ -377,9 +401,9 @@ def test_recalculate_well_positions(session: Session):
     assert plate.wells["A1"].well_data.coordinates["y"] == -100.0
 
 
-def test_activate_plate(session: Session):
+def test_activate_plate(session: sessionmaker):
     plate = Wellplate(
-        session=session,
+        session_maker=session,
         plate_id=4,
         create_new=True,
         name="Test Plate",
@@ -395,9 +419,9 @@ def test_activate_plate(session: Session):
     assert plate.plate_data.current is True
 
 
-def test_deactivate_plate(session: Session):
+def test_deactivate_plate(session: sessionmaker):
     plate = Wellplate(
-        session=session,
+        session_maker=session,
         create_new=True,
         name="Test Plate",
         type_id=1,

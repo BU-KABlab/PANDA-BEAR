@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from .errors import OverDraftException, OverFillException  # Custom exceptions
 from .log_tools import setup_default_logger
@@ -228,6 +228,16 @@ class Vial:
 
 class StockVial(Vial):
     def add_contents(self, from_vessel: Dict[str, float], volume: float):
+        """
+        Adds contents to the vial.
+
+        Args:
+            from_vessel (Dict[str, float]): Contents to be added.
+            volume (float): Volume to add.
+
+        Raises:
+            OverFillException: If the volume exceeds the vial's capacity.
+        """
         raise ValueError("Stock vials cannot have contents added to them.")
 
 
@@ -237,7 +247,7 @@ class WasteVial(Vial):
 
 def read_vials(
     vial_group: Optional[str] = None,
-    session: Session = SessionLocal(),
+    session: sessionmaker = SessionLocal,
 ) -> Tuple[List[StockVial], List[WasteVial]]:
     """
     Read in the virtual vials from the json file
@@ -245,7 +255,7 @@ def read_vials(
 
     # Get the vial information from the vials table in the db
     active_vials: List[VialReadModel] = VialService(
-        db_session=session
+        db_session_maker=session
     ).list_active_vials()
 
     list_of_stock_solutions = []
@@ -305,7 +315,7 @@ def delete_vial_position_and_hx_from_db(
 ) -> None:
     """Delete the vial position and hx from the db"""
     try:
-        VialService(db_session=session).delete_vial(position)
+        VialService(db_session_maker=session).delete_vial(position)
 
     except Exception as e:
         vial_logger.error(

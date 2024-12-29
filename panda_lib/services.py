@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from .schemas import (  # PyDanctic models
     PlateTypeModel,
@@ -22,8 +22,8 @@ from .sql_tools.panda_models import Wellplates as WellPlateDBModel
 
 
 class VialService:
-    def __init__(self, db_session: Session = SessionLocal()):
-        self.db_session: Session = db_session
+    def __init__(self, db_session_maker: sessionmaker = SessionLocal):
+        self.db_session: Session = db_session_maker()
         self.logger = logging.getLogger(__name__)
 
     def create_vial(self, vial_data: VialWriteModel) -> Vials:
@@ -149,9 +149,9 @@ class VialService:
             raise
 
 
-class WellService:
-    def __init__(self, active_db_session: Session = SessionLocal()):
-        self.active_db_session: Session = active_db_session
+class WellService:  # FIXME - resolve the inconsitant arguments of Session vs sessionmakers
+    def __init__(self, session_maker: sessionmaker = SessionLocal):
+        self.active_db_session: Session = session_maker()
 
     def create_well(self, well_data: WellWriteModel) -> WellDBModel:
         try:
@@ -249,8 +249,8 @@ class WellService:
 
 
 class WellplateService:
-    def __init__(self, db_session: Session = SessionLocal()):
-        self.db_session: Session = db_session
+    def __init__(self, session_maker: sessionmaker = SessionLocal):
+        self.db_session: Session = session_maker()
 
     def create_plate(self, plate_data: WellplateWriteModel) -> WellPlateDBModel:
         try:
