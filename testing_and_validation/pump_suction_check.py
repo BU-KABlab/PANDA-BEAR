@@ -9,9 +9,9 @@ from panda_lib.actions import (
 )
 from panda_lib.correction_factors import correction_factor
 from panda_lib.experiment_loop import (
+    _establish_system_state,
     connect_to_instruments,
     disconnect_from_instruments,
-    establish_system_state,
 )
 from panda_lib.utilities import input_validation
 
@@ -22,7 +22,7 @@ drip_stop = 5
 def main():
     """Test the syringe and pipette for retention and suction."""
     # Establish system state
-    _, _, _ = establish_system_state()
+    _, _, _ = _establish_system_state()
 
     # Connect to instruments
     toolkit, _ = connect_to_instruments(False)
