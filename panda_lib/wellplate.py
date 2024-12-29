@@ -10,7 +10,7 @@ import logging
 from typing import Optional, Tuple, TypedDict
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 
 from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.schemas import (
@@ -104,7 +104,7 @@ class Well:
         The well id
     plate_id: int
         The plate id
-    session: Session
+    session: sessionmaker
         The database session
     create_new: bool
         If True, create a new well
@@ -138,14 +138,14 @@ class Well:
         self,
         well_id: str,
         plate_id: int,
-        active_session: Session = SessionLocal(),
+        session_maker: sessionmaker = SessionLocal,
         create_new: bool = False,
         **kwargs: WellKwargs,
     ):
         self.well_id = well_id
         self.plate_id = plate_id
-        self.active_session = active_session
-        self.service = WellService(self.active_session)
+        self.active_session = session_maker()
+        self.service = WellService(session_maker=session_maker)
         self.well_data: Optional[WellReadModel] = None
 
         if create_new:
@@ -242,14 +242,15 @@ class Well:
 class Wellplate:
     def __init__(
         self,
-        session: Session = SessionLocal(),
+        session_maker: sessionmaker = SessionLocal,
         type_id: Optional[int] = None,
         plate_id: Optional[int] = None,
         create_new: bool = False,
         **kwargs: WellplateKwargs,
     ):
-        self.session = session
-        self.service = WellplateService(self.session)
+        self.database_session = session_maker
+        self.active_session = self.database_session()
+        self.service = WellplateService(session_maker)
         self.plate_data: WellplateReadModel = None
         self.plate_type: PlateTypeModel = None
         self.wells: dict[str, Well] = {}
@@ -292,9 +293,11 @@ class Wellplate:
                 raise ValueError("Must provide a plate_type_id to create a new plate.")
             self.create_new_plate(id=plate_id, type_id=type_id, **kwargs)
         else:
-            # If loading an existing plate, must provide a plate_id
+            # If loading an existing plate, and not id is provided, read the current plate info
             if plate_id is None:
-                raise ValueError("Must provide a plate_id to load an existing plate.")
+                plate_id, _, _ = read_current_wellplate_info(
+                    db_session=self.database_session
+                )
             self.load_plate(plate_id)
 
     def create_new_plate(self, **kwargs: WellplateKwargs):
@@ -345,7 +348,7 @@ class Wellplate:
             well_data.well_id: Well(
                 plate_id=self.plate_data.id,  # TODO: could add assuming the current plate ID
                 well_id=well_data.well_id,
-                active_session=self.session,
+                session_maker=self.database_session,
             )
             for well_data in wells_data
         }
@@ -364,7 +367,7 @@ class Wellplate:
                 coordinates = self.calculate_well_coordinates(row, col)
                 wells[str(row) + str(col)] = Well(
                     create_new=True,
-                    active_session=self.session,
+                    session_maker=self.database_session,
                     plate_id=self.plate_data.id,
                     well_id=f"{row}{col}",
                     experiment_id=0,
@@ -428,7 +431,9 @@ class Wellplate:
         return f"<WellPlate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"
 
 
-def _remove_wellplate_from_db(plate_id: int, session: Session = SessionLocal()) -> None:
+def _remove_wellplate_from_db(
+    plate_id: int, session: sessionmaker = SessionLocal()
+) -> None:
     """Removed all wells for the given plate id in well_hx, removes the plate id from the wellplate table"""
     user_choice = input(
         "Are you sure you want to remove the wellplate and all its wells from the database? This is irreversible. (y/n): "
@@ -474,7 +479,7 @@ def _remove_wellplate_from_db(plate_id: int, session: Session = SessionLocal()) 
 
 
 def _remove_experiment_from_db(
-    experiment_id: int, session: Session = SessionLocal()
+    experiment_id: int, session: sessionmaker = SessionLocal()
 ) -> tuple[bool, str]:
     """Removes the experiment from the database"""
 
@@ -524,10 +529,10 @@ def _remove_experiment_from_db(
         return False, f"Error occurred while deleting the experiment: {e}"
 
 
-def change_wellplate_location(session: Session = SessionLocal()):
+def change_wellplate_location(db_session: sessionmaker = SessionLocal):
     """Change the location of the wellplate"""
 
-    with session as session:
+    with db_session() as session:
         mill_config = (
             session.execute(select(MillConfig).order_by(MillConfig.id.desc()))
             .scalar()
@@ -551,7 +556,7 @@ def change_wellplate_location(session: Session = SessionLocal()):
     print(f"Current wellplate type number: {current_type_number}")
 
     wellplate = Wellplate(
-        session=session,
+        session_maker=db_session,
         plate_id=current_plate_id,
     )
 
@@ -644,7 +649,7 @@ Enter the new orientation of the wellplate: """
 
 
 def read_current_wellplate_info(
-    session: Session = SessionLocal,
+    db_session: sessionmaker = SessionLocal,
 ) -> Tuple[int, int, int]:
     """
     Read the current wellplate
@@ -655,7 +660,7 @@ def read_current_wellplate_info(
         int: Number of new wells
     """
 
-    with SessionLocal() as session:
+    with db_session() as session:
         statement = select(Wellplates).filter_by(current=1)
 
         result: Wellplates = session.execute(statement).scalar_one_or_none()
