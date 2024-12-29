@@ -55,11 +55,11 @@ class Labware:
 
     @property
     def stock_vials(self) -> list[StockVial]:
-        return read_vials()[0]
+        return read_vials("stock")
 
     @property
     def waste_vials(self) -> list[WasteVial]:
-        return read_vials()[1]
+        return read_vials("waste")
 
 
 @dataclass
