@@ -531,7 +531,7 @@ def solution_selector(
         solution (object): The solution object
     """
     # Fetch updated solutions from the db
-    stock_vials, _ = read_vials(db_session())
+    stock_vials, _ = read_vials("stock", db_session)
 
     for solution in stock_vials:
         # if the solution names match and the requested volume is less than the available volume (volume - 10% of capacity)
