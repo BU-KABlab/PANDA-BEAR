@@ -33,9 +33,9 @@ pipette_data = [
     (2, 200, 0.2, 0, 0, {}, datetime(2024, 12, 27, 1, 52, 35, 724000), 1, 0),
 ]
 
-with Session(engine) as session:
+with Session(engine) as session_maker:
     for pipette in pipette_data:
-        session.add(
+        session_maker.add(
             PipetteModel(
                 id=pipette[0],
                 capacity_ul=pipette[1],
@@ -48,23 +48,24 @@ with Session(engine) as session:
                 uses=pipette[8],
             )
         )
-    session.commit()
+    session_maker.commit()
 
 
 @pytest.fixture(scope="function")
-def session():
+def session_maker():
     """Create a new database session for a test."""
-    db = SessionLocal()
+    db = SessionLocal
     try:
         yield db
     finally:
-        db.close()
+        # db.close()
+        pass
 
 
-def test_pipette_initialization(session: Session):
-    pipette: Pipette = Pipette(session=session)
+def test_pipette_initialization(session_maker: sessionmaker):
+    pipette: Pipette = Pipette(db_session_maker=session_maker)
     stmt = select(PipetteModel).where(PipetteModel.id == 2)
-    pipette_db = session.execute(stmt).scalars().first()
+    pipette_db = session_maker().execute(stmt).scalars().first()
     assert pipette_db.capacity_ml == 0.2
     assert pipette_db.volume_ul == 0.0
     assert pipette_db.capacity_ul == 200.0
@@ -83,8 +84,8 @@ def test_pipette_initialization(session: Session):
     assert pipette.uses == pipette_db.uses
 
 
-def test_set_capacity(session: Session):
-    pipette: Pipette = Pipette(session=session)
+def test_set_capacity(session_maker: Session):
+    pipette: Pipette = Pipette(db_session_maker=session_maker)
     pipette.set_capacity(1000)
     assert pipette.capacity_ul == 1000.0
     assert pipette.capacity_ml == 1.0
@@ -93,8 +94,8 @@ def test_set_capacity(session: Session):
         pipette.set_capacity(-100)
 
 
-def test_update_contents(session: Session):
-    pipette: Pipette = Pipette(session=session)
+def test_update_contents(session_maker: Session):
+    pipette: Pipette = Pipette(db_session_maker=session_maker)
     pipette.update_contents("water", 500)
     assert pipette.contents["water"] == 500.0
     assert pipette.volume == 500.0
@@ -104,8 +105,8 @@ def test_update_contents(session: Session):
     assert pipette.volume == 300.0
 
 
-def test_volume_setter(session: Session):
-    pipette: Pipette = Pipette(session=session)
+def test_volume_setter(session_maker: Session):
+    pipette: Pipette = Pipette(db_session_maker=session_maker)
     pipette.volume = 1000
     assert pipette.volume == 1000.0
 
@@ -113,8 +114,8 @@ def test_volume_setter(session: Session):
         pipette.volume = -100
 
 
-def test_volume_ml_setter(session: Session):
-    pipette: Pipette = Pipette(session=session)
+def test_volume_ml_setter(session_maker: Session):
+    pipette: Pipette = Pipette(db_session_maker=session_maker)
     pipette.volume_ml = 1
     assert pipette.volume_ml == 1.0
     assert pipette.volume == 1000.0
@@ -123,8 +124,8 @@ def test_volume_ml_setter(session: Session):
         pipette.volume_ml = -1
 
 
-def test_reset_contents(session: Session):
-    pipette: Pipette = Pipette(session=session)
+def test_reset_contents(session_maker: Session):
+    pipette: Pipette = Pipette(db_session_maker=session_maker)
     pipette.update_contents("water", 500)
     pipette.reset_contents()
     assert pipette.contents == {}
@@ -132,20 +133,20 @@ def test_reset_contents(session: Session):
     assert pipette.volume_ml == 0.0
 
 
-def test_liquid_volume(session: Session):
-    pipette: Pipette = Pipette(session=session)
+def test_liquid_volume(session_maker: Session):
+    pipette: Pipette = Pipette(db_session_maker=session_maker)
     pipette.reset_contents()
     pipette.update_contents("water", 500)
     pipette.update_contents("ethanol", 300)
     assert pipette.liquid_volume() == 800.0
 
 
-def test_invalid_pipette_id(session: Session):
+def test_invalid_pipette_id(session_maker: Session):
     with pytest.raises(ValueError):
-        insert_new_pipette(session=session, pipette_id=-1)
+        insert_new_pipette(session_maker=session_maker, pipette_id=-1)
 
 
-def test_select_current_pipette_id(session: Session):
-    pipette_id = insert_new_pipette(session=session)
-    current_pipette_id = select_current_pipette_id(session=session)
+def test_select_current_pipette_id(session_maker: Session):
+    pipette_id = insert_new_pipette(session_maker=session_maker)
+    current_pipette_id = select_current_pipette_id(session_maker=session_maker)
     assert current_pipette_id == pipette_id

@@ -5,7 +5,7 @@ This module contains functions to interact with the pipette_status table in the 
 import json
 from typing import Union
 
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm.session import Session, sessionmaker
 
 from panda_lib.config.config_tools import read_config
 from panda_lib.sql_tools.db_setup import SessionLocal
@@ -19,7 +19,7 @@ precision = config.getint("OPTIONS", "precision")
 
 
 def select_pipette_status(
-    pipette_id: Union[int, None] = None, db_session: Session = SessionLocal
+    pipette_id: Union[int, None] = None, session_maker: sessionmaker = SessionLocal
 ):
     """
     Get the pipette status from the pipette_status table.
@@ -33,7 +33,7 @@ def select_pipette_status(
     Returns:
         Pipette: The current pipette status.
     """
-    with db_session() as session:
+    with session_maker() as session:
         session: Session
         if pipette_id is None:
             pipette_status = (
@@ -65,7 +65,7 @@ def update_pipette_status(
     volume_ml: float,
     contents: str,
     pipette_id: int,
-    db_session: Session = SessionLocal,
+    session_maker: Session = SessionLocal,
 ):
     """
     Update the pipette status of the pipette with the matching id in the pipette_status table.
@@ -79,7 +79,7 @@ def update_pipette_status(
         pipette_id (int): ID of the pipette to update or insert.
         session (Session, optional): The session to use. Defaults to SessionLocal.
     """
-    with db_session() as session:
+    with session_maker() as session:
         session: Session
         pipette_status = session.query(Pipette).filter(Pipette.id == pipette_id).first()
         if pipette_status is None:
@@ -101,14 +101,14 @@ def update_pipette_status(
         session.commit()
 
 
-def deincrement_use_count(pipette_id: int, db_session: Session = SessionLocal):
+def deincrement_use_count(pipette_id: int, session_maker: sessionmaker = SessionLocal):
     """
     Decrement the use count of the pipette with the given id in the pipette_status table.
     Args:
         pipette_id (int): ID of the pipette to update.
         session (Session, optional): The session to use. Defaults to SessionLocal.
     """
-    with db_session() as session:
+    with session_maker() as session:
         session: Session
         pipette_status = session.query(Pipette).filter(Pipette.id == pipette_id).first()
         try:
@@ -132,7 +132,7 @@ def deincrement_use_count(pipette_id: int, db_session: Session = SessionLocal):
             session.commit()
 
 
-def select_current_pipette_id(db_session: Session = SessionLocal):
+def select_current_pipette_id(session_maker: sessionmaker = SessionLocal):
     """
     Get the active pipette status from the pipette_status table.
     And return a pipette instance to be applied to the pipette that
@@ -143,14 +143,14 @@ def select_current_pipette_id(db_session: Session = SessionLocal):
     Returns:
         Pipette: The current pipette status.
     """
-    with db_session() as session:
+    with session_maker() as session:
         session: Session
         pipette_status = session.query(Pipette).filter(Pipette.active == 1).first()
         session.close()
     return pipette_status.id
 
 
-def select_current_pipette_uses(db_session: Session = SessionLocal):
+def select_current_pipette_uses(session_maker: sessionmaker = SessionLocal):
     """
     Get the active pipette status from the pipette_status table.
     And return a pipette record instance to be applied to the pipette that
@@ -162,7 +162,7 @@ def select_current_pipette_uses(db_session: Session = SessionLocal):
     Returns:
         Pipette: The current pipette status.
     """
-    with db_session() as session:
+    with session_maker() as session:
         session: Session
         pipette_status = session.query(Pipette).filter(Pipette.active == 1).first()
         session.close()
@@ -173,7 +173,7 @@ def insert_new_pipette(
     pipette_id: Union[int, None] = None,
     capacity: float = 200,
     activate: bool = True,
-    db_session: Session = SessionLocal,
+    session_maker: sessionmaker = SessionLocal,
 ) -> int:
     """
     Insert a new pipette with the given id into the pipette_status table.
@@ -193,7 +193,7 @@ def insert_new_pipette(
     if capacity < 0 or (pipette_id is not None and pipette_id <= 0):
         raise ValueError("Capacity must be non-negative.")
 
-    with db_session() as session:
+    with session_maker() as session:
         session: Session
         if pipette_id is None:
             pipette_id = (
@@ -224,12 +224,12 @@ def insert_new_pipette(
         # Wrap up the transaction
         session.commit()
     if activate:
-        activate_pipette(pipette_id, db_session=db_session)
+        activate_pipette(pipette_id, session_maker=session_maker)
 
     return pipette_id
 
 
-def activate_pipette(pipette_id: int, db_session: Session = SessionLocal):
+def activate_pipette(pipette_id: int, session_maker: sessionmaker = SessionLocal):
     """
     Activate the pipette with the given id in the pipette_status table by
     deactivating all other pipettes and activating the pipette with the given id.
@@ -238,7 +238,7 @@ def activate_pipette(pipette_id: int, db_session: Session = SessionLocal):
         pipette_id (int): ID of the pipette to activate.
         session (Session, optional): The session to use. Defaults to SessionLocal.
     """
-    with db_session() as session:
+    with session_maker() as session:
         session: Session
         session.query(Pipette).update({Pipette.active: 0})
         session.query(Pipette).filter(Pipette.id == pipette_id).update(
