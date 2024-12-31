@@ -117,7 +117,7 @@ class ProtocolEntry:
 
 def solve_vials_ilp(
     vial_concentration_map: dict[str, float], v_total: float, c_target: float
-) -> tuple[dict[str, float], float, dict[str, float]]:
+) -> tuple[dict[float, float], float, dict[str, float]]:
     """
     Solve the concentration mixing problem using integer linear programming.
 
@@ -129,9 +129,9 @@ def solve_vials_ilp(
 
     Returns
     -------
-    vial_volumes : dict of str,floats - Volumes of each concentration to achieve the target.
+    vial_volumes : dict[float,float] - [concentration, volume]  - Volumes of each concentration to achieve the target.
     deviation_value : float - Deviation from the target concentration in mM.
-    vial_vol_by_location : dict of str,floats - Volumes of each vial to achieve the target.
+    vial_vol_by_location : dict [str,float] - [position, volume] - Volumes of each vial to achieve the target.
     """
     if len(vial_concentration_map) == 1:
         deviation_value = abs(next(iter(vial_concentration_map.values())) - c_target)

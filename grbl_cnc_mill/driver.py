@@ -672,6 +672,11 @@ class Mill:
         Returns:
             Coordinates: Current center coordinates.
         """
+        if not isinstance(tool, str):
+            try:
+                tool = tool.value
+            except AttributeError:
+                raise ValueError("Invalid tool") from None
         commands = []
         goto = (
             Coordinates(x=x_coord, y=y_coord, z=z_coord)

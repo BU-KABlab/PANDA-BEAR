@@ -36,7 +36,7 @@ class Vial:
     def __init__(
         self,
         position: str,
-        session: Session = SessionLocal,
+        session_maker: sessionmaker = SessionLocal,
         create_new: bool = False,
         **kwargs: VialKwargs,
     ):
@@ -50,8 +50,8 @@ class Vial:
             **kwargs: Additional attributes for creating a new vial.
         """
         self.position = position
-        self.session = session
-        self.service = VialService(self.session)
+        self.session_maker = session_maker
+        self.service = VialService(self.session_maker)
         self.vial_data: Optional[VialReadModel] = None
 
         if create_new:
@@ -75,6 +75,16 @@ class Vial:
         return self.coordinates.z
 
     @property
+    def top(self) -> float:
+        """Returns the top of the vial."""
+        return self.vial_data.top
+
+    @property
+    def bottom(self) -> float:
+        """Returns the bottom of the vial."""
+        return self.vial_data.bottom
+
+    @property
     def volume(self) -> float:
         """Returns the current volume of the vial."""
         return self.vial_data.volume
@@ -83,6 +93,11 @@ class Vial:
     def contents(self) -> Dict[str, float]:
         """Returns the contents of the vial."""
         return self.vial_data.contents
+
+    @property
+    def viscosity_cp(self) -> float:
+        """Returns the viscosity of the vial."""
+        return self.vial_data.viscosity_cp
 
     @property
     def category(self) -> int:
@@ -264,18 +279,18 @@ def read_vials(
     for vial in active_vials:
         if vial.category == 0:
             read_vial = StockVial(
-                **vial.model_dump(), session=session, create_new=False
+                **vial.model_dump(), session_maker=session, create_new=False
             )
             list_of_stock_solutions.append(read_vial)
         elif vial.category == 1:
             read_vial = WasteVial(
-                **vial.model_dump(), session=session, create_new=False
+                **vial.model_dump(), session_maker=session, create_new=False
             )
             list_of_waste_solutions.append(read_vial)
     if vial_group == "stock":
-        return list_of_stock_solutions
+        return list_of_stock_solutions, None
     elif vial_group == "waste":
-        return list_of_waste_solutions
+        return list_of_waste_solutions, None
     else:
         return list_of_stock_solutions, list_of_waste_solutions
 
@@ -590,7 +605,7 @@ def import_vial_csv_file(filename: str = None) -> None:
         try:
             vial = Vial(
                 position=each_vial["position"],
-                session=SessionLocal(),
+                session_maker=SessionLocal(),
                 create_new=True,
                 category=int(each_vial["category"]),
                 name=each_vial["name"],

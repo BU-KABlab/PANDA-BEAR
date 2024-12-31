@@ -30,7 +30,7 @@ def session_maker():
 def test_create_new_vial(session_maker: Session):
     vial = Vial(
         position="A1",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=10000.0,
@@ -56,7 +56,7 @@ def test_load_existing_vial(session_maker: Session):
     # Create a new vial first
     Vial(
         position="A2",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -65,7 +65,7 @@ def test_load_existing_vial(session_maker: Session):
     )
 
     # Load the existing vial
-    vial = Vial(position="A2", session=session_maker, create_new=False)
+    vial = Vial(position="A2", session_maker=session_maker, create_new=False)
     assert vial.vial_data.name == "Test Vial"
     assert vial.vial_data.volume == 100.0
 
@@ -73,7 +73,7 @@ def test_load_existing_vial(session_maker: Session):
 def test_add_contents(session_maker: Session):
     vial = Vial(
         position="A3",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -94,7 +94,7 @@ def test_add_contents(session_maker: Session):
 def test_add_contents_overfill(session_maker: Session):
     vial = Vial(
         position="A4",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -109,7 +109,7 @@ def test_add_contents_overfill(session_maker: Session):
 def test_remove_contents(session_maker: Session):
     vial = Vial(
         position="A5",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -131,7 +131,7 @@ def test_remove_contents(session_maker: Session):
 def test_remove_contents_overdraft(session_maker: Session):
     vial = Vial(
         position="A66",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=50.0,
@@ -147,7 +147,7 @@ def test_remove_contents_overdraft(session_maker: Session):
 def test_add_contents_stock_vial(session_maker: Session):
     vial = Vial(
         position="A6",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -162,7 +162,7 @@ def test_add_contents_stock_vial(session_maker: Session):
 def test_reset_vial_stock_vial(session_maker: Session):
     vial = Vial(
         position="A7",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,
@@ -179,7 +179,7 @@ def test_reset_vial_stock_vial(session_maker: Session):
 def test_reset_vial_waste(session_maker: Session):
     vial = Vial(
         position="A8",
-        session=session_maker,
+        session_maker=session_maker,
         create_new=True,
         name="Test Vial",
         volume=100.0,

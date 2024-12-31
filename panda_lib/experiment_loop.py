@@ -22,16 +22,16 @@ from pathlib import Path
 from typing import Optional, Sequence, Tuple
 
 import PySpin
-
-# from .movement import Mill, MockMill
-from grlb_mill_wrapper import MockPandaMill as MockMill
-from grlb_mill_wrapper import PandaMill as Mill
 from slack_sdk import errors as slack_errors
 
 from panda_lib import scheduler
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
 from panda_lib.gamry_potentiostat import gamry_control
+
+# from .movement import Mill, MockMill
+from panda_lib.grlb_mill_wrapper import MockPandaMill as MockMill
+from panda_lib.grlb_mill_wrapper import PandaMill as Mill
 from panda_lib.pawduino import ArduinoLink, MockArduinoLink
 from panda_lib.sql_tools import db_setup, panda_models, sql_queue
 
@@ -231,7 +231,9 @@ def experiment_loop_worker(
                 well_id=current_experiment.well_id,
             )
             ## Check that there is enough volume in the stock vials to run the experiment
-            sufficient_stock, _ = _check_stock_vials(current_experiment, stock_vials)
+            sufficient_stock, _ = _check_stock_vials(
+                current_experiment.solutions, stock_vials
+            )
             if not sufficient_stock:
                 error_message = f"Experiment {current_experiment.experiment_id} cannot be run because there is not enough volume in the stock vials"
                 controller_slack.send_message(
@@ -615,7 +617,9 @@ def _initialize_experiment(
 
 
 def _validate_the_stock_solutions(exp: EchemExperimentBase, labware: Labware):
-    sufficient_stock, check_table = _check_stock_vials(exp, labware.stock_vials)
+    sufficient_stock, check_table = _check_stock_vials(
+        exp.solutions, labware.stock_vials
+    )
     if not sufficient_stock:
         issues = []
         if check_table["insufficient"]:
@@ -762,7 +766,7 @@ def _establish_system_state() -> (
 
 @timing_wrapper
 def _check_stock_vials(
-    experiment: ExperimentBase, stock_vials: Sequence[Vial]
+    exp_soln: dict, stock_vials: Sequence[Vial]
 ) -> Tuple[bool, dict]:
     """
     Check that there is enough volume in the stock vials to run the experiment
@@ -784,15 +788,15 @@ def _check_stock_vials(
 
     passes = True
 
-    if len(experiment.solutions) == 0:
+    if len(exp_soln) == 0:
         logger.warning("The experiment has no solutions.")
         passes = True
         return passes, check_table
-    for solution in experiment.solutions:
+    for solution in exp_soln:
         solution_lwr = str(solution).lower()
         logger.debug("Checking for solution %s in stock vials", solution_lwr)
-        if str(solution_lwr).lower() not in [
-            str(vial.contents).lower() for vial in stock_vials
+        if solution_lwr not in [
+            str(key).lower() for vial in stock_vials for key in vial.contents.keys()
         ]:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
@@ -803,11 +807,11 @@ def _check_stock_vials(
 
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
-    for solution in experiment.solutions:
+    for solution in exp_soln:
         solution_lwr = str(solution).lower()
-        vol = experiment.solutions[solution]["volume"]
+        vol = exp_soln[solution]["volume"]
         try:
-            rep = experiment.solutions[solution]["repeated"]
+            rep = exp_soln[solution]["repeated"]
         except KeyError:
             rep = 1
         volume_required = vol * rep
@@ -815,7 +819,12 @@ def _check_stock_vials(
             [
                 vial.volume
                 for vial in stock_vials
-                if str(vial.name).lower() == solution_lwr
+                if solution_lwr
+                in [
+                    str(key).lower()
+                    for vial in stock_vials
+                    for key in vial.contents.keys()
+                ]
             ]
         )  # we sum the volumes of all stock vials with the same name
         if volume_available < volume_required:

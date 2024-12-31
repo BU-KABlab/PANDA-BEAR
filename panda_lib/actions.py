@@ -24,6 +24,7 @@ Returns:
 # Standard library imports
 import logging
 import math
+from logging import Logger
 
 # Third party or custom imports
 from pathlib import Path
@@ -50,12 +51,14 @@ from panda_lib.experiment_class import (
     ExperimentBase,
     ExperimentStatus,
 )
+from panda_lib.grlb_mill_wrapper import MockPandaMill as MockMill
+from panda_lib.grlb_mill_wrapper import PandaMill as Mill
 
 # First party imports
 from panda_lib.imaging import add_data_zone, capture_new_image, image_filepath_generator
 from panda_lib.instrument_toolkit import Hardware, Labware, Toolkit
 from panda_lib.log_tools import timing_wrapper
-from panda_lib.movement import Instruments, Mill, MockMill
+from panda_lib.movement import Instruments
 from panda_lib.obs_controls import MockOBSController, OBSController
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.syringepump import MockPump, SyringePump
@@ -106,26 +109,29 @@ testing_logging = logging.getLogger("panda")
 def _handle_source_vessels(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
-    dst_vessel: Union[Well, WasteVial],
-    toolkit: Union[Toolkit, Hardware],
+    pjct_logger: Logger = logger,
     source_concentration: Optional[float] = None,
     db_session: Session = SessionLocal,
 ) -> Tuple[List[Union[Vial, Well]], List[Tuple[Union[Vial, Well], float]]]:
     selected_source_vessels: List[Union[Vial, Well]] = []
     source_vessel_volumes: List[Tuple[Union[Vial, Well], float]] = []
 
-    if isinstance(src_vessel, str):
+    if isinstance(src_vessel, (str, Vial)):
+        if isinstance(src_vessel, Vial):
+            src_vessel = src_vessel.name
         stock_vials, _ = read_vials(db_session())
         selected_source_vessels = [
-            vial for vial in stock_vials if vial.name == src_vessel and vial.volume > 0
+            vial
+            for vial in stock_vials
+            if vial.name == src_vessel and vial.volume > 0.0
         ]
 
         if not selected_source_vessels:
-            toolkit.global_logger.error("No %s vials available", src_vessel)
+            pjct_logger.error("No %s vials available", src_vessel)
             raise ValueError(f"No {src_vessel} vials available")
 
         if source_concentration is None:
-            toolkit.global_logger.warning(
+            pjct_logger.warning(
                 "Source concentration not provided, using database value"
             )
             if selected_source_vessels[0].category == 0:
@@ -134,7 +140,7 @@ def _handle_source_vessels(
                         selected_source_vessels[0].concentration
                     )
                 except ValueError:
-                    toolkit.global_logger.error(
+                    pjct_logger.error(
                         "Source concentration not provided and not available in the database"
                     )
                     raise ValueError(
@@ -154,9 +160,7 @@ def _handle_source_vessels(
                 f"No solution combinations found for {src_vessel} {source_concentration} mM"
             )
 
-        toolkit.global_logger.info(
-            "Deviation from target concentration: %s mM", deviation
-        )
+        pjct_logger.info("Deviation from target concentration: %s mM", deviation)
 
         source_vessel_volumes = [
             (vial, volumes_by_position[vial.position])
@@ -165,8 +169,8 @@ def _handle_source_vessels(
 
     elif isinstance(src_vessel, (Well, Vial)):
         source_vessel_volumes = [(src_vessel, volume)]
-        toolkit.global_logger.info(
-            "Pipetting %f uL from %s to %s", volume, src_vessel.name, dst_vessel.name
+        pjct_logger.info(
+            "Pipetting %f uL from %s", volume, src_vessel.name or src_vessel
         )
 
     return selected_source_vessels, source_vessel_volumes
@@ -178,12 +182,25 @@ def _pipette_action(
     dst_vessel: Union[Well, WasteVial],
     desired_volume: float,
 ):
+    """
+    Perform the pipetting action from the source vessel to the destination vessel
+
+    Args:
+        toolkit (Toolkit): The toolkit object
+        vessel (Union[Vial, Well]): The source vessel
+        dst_vessel (Union[Well, WasteVial]): The destination vessel
+        desired_volume (float): The volume to be pipetted
+    """
+
     repetitions = math.ceil(
         desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
     )
-    repetition_vol = correction_factor(
-        desired_volume / repetitions, vessel.viscosity_cp
-    )
+    if isinstance(vessel, Well):
+        repetition_vol = correction_factor(desired_volume / repetitions, 1.0)
+    else:
+        repetition_vol = correction_factor(
+            desired_volume / repetitions, vessel.viscosity_cp
+        )
     logger.info(
         "Pipetting %f uL from %s to %s", desired_volume, vessel.name, dst_vessel.name
     )
@@ -193,19 +210,19 @@ def _pipette_action(
 
         if isinstance(vessel, StockVial):
             toolkit.mill.safe_move(
-                vessel.coordinates.x,
-                vessel.coordinates.y,
-                vessel.vial_data.top,
-                Instruments.DECAPPER,
+                x_coord=vessel.x,
+                y_coord=vessel.y,
+                z_coord=vessel.top,
+                tool=Instruments.DECAPPER,
             )
             toolkit.arduino.no_cap()
 
         toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
         toolkit.mill.safe_move(
-            vessel.coordinates["x"],
-            vessel.coordinates["y"],
+            vessel.x,
+            vessel.y,
             vessel.withdrawal_height,
-            Instruments.PIPETTE,
+            tool=Instruments.PIPETTE,
         )
         toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=vessel)
         if isinstance(vessel, Well):
@@ -215,27 +232,27 @@ def _pipette_action(
 
         if isinstance(vessel, StockVial):
             toolkit.mill.safe_move(
-                vessel.coordinates.x,
-                vessel.coordinates.y,
-                vessel.vial_data.top,
-                Instruments.DECAPPER,
+                vessel.x,
+                vessel.y,
+                vessel.top,
+                tool=Instruments.DECAPPER,
             )
             toolkit.arduino.ALL_CAP()
 
         if isinstance(dst_vessel, WasteVial):
             toolkit.mill.safe_move(
-                dst_vessel.coordinates.x,
-                dst_vessel.coordinates.y,
-                dst_vessel.vial_data.top,
-                Instruments.DECAPPER,
+                dst_vessel.x,
+                dst_vessel.y,
+                dst_vessel.top,
+                tool=Instruments.DECAPPER,
             )
             toolkit.arduino.no_cap()
 
         toolkit.mill.safe_move(
-            dst_vessel.coordinates.x,
-            dst_vessel.coordinates.y,
-            dst_vessel.vial_data.top,
-            Instruments.PIPETTE,
+            dst_vessel.x,
+            dst_vessel.y,
+            dst_vessel.top,
+            tool=Instruments.PIPETTE,
         )
         toolkit.pump.infuse(
             volume_to_infuse=repetition_vol,
@@ -273,10 +290,10 @@ def _pipette_action(
 
         if isinstance(dst_vessel, WasteVial):
             toolkit.mill.safe_move(
-                dst_vessel.coordinates.x,
-                dst_vessel.coordinates.y,
-                dst_vessel.vial_data.top,
-                Instruments.DECAPPER,
+                dst_vessel.x,
+                dst_vessel.y,
+                dst_vessel.top,
+                tool=Instruments.DECAPPER,
             )
             toolkit.arduino.ALL_CAP()
 
@@ -295,7 +312,10 @@ def _forward_pipette_v3(
             return
 
         selected_source_vessels, source_vessel_volumes = _handle_source_vessels(
-            src_vessel, source_concentration, toolkit
+            volume=volume,
+            src_vessel=src_vessel,
+            source_concentration=source_concentration,
+            pjct_logger=toolkit.global_logger,
         )
 
         for origin_vessel, _ in source_vessel_volumes:
@@ -500,10 +520,10 @@ def purge_pipette(
 
     # Move to the purge vial
     mill.safe_move(
-        purge_vial.coordinates.x,
-        purge_vial.coordinates.y,
-        purge_vial.vial_data.top,
-        Instruments.PIPETTE,
+        purge_vial.x,
+        purge_vial.y,
+        purge_vial.top,
+        tool=Instruments.PIPETTE,
     )
 
     # Purge the pipette
@@ -907,10 +927,10 @@ def image_well(
         logger.debug("Moving camera above well %s", well_id)
         if well_id != "test":
             toolkit.mill.safe_move(
-                toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
-                toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-                toolkit.wellplate.image_height,
-                Instruments.LENS,
+                x_coord=instructions.well.well_data.x,
+                y_coord=instructions.well.well_data.y,
+                z_coord=toolkit.wellplate.plate_data.image_height,
+                tool=Instruments.LENS,
             )
         else:
             pass
@@ -991,9 +1011,9 @@ def mix(
         mix_height (float): The height to mix at
     """
     if mix_height is None:
-        mix_height = well.depth + well.height
+        mix_height = well.well_data.bottom + well.well_data.height
     else:
-        mix_height = well.depth + mix_height
+        mix_height = well.well_data.bottom + mix_height
 
     logger.info("Mixing well %s %dx...", well_id, mix_count)
 
@@ -1004,10 +1024,10 @@ def mix(
         logger.info("Mixing well %s %d of %d...", well_id, i + 1, mix_count)
         # Move to the bottom of the target well
         mill.safe_move(
-            x_coord=well.coordinates.x,
-            y_coord=well.coordinates.y,
-            z_coord=well.bottom,  # TODO
-            instrument=Instruments.PIPETTE,
+            x_coord=well.x,
+            y_coord=well.y,
+            z_coord=well.bottom,
+            tool=Instruments.PIPETTE,
         )
 
         # Withdraw the solutions from the well
@@ -1019,10 +1039,10 @@ def mix(
         )
 
         mill.safe_move(
-            x_coord=well.coordinates.x,
-            y_coord=well.coordinates.y,
-            z_coord=well.top,  # TODO
-            instrument=Instruments.PIPETTE,
+            x_coord=well.x,
+            y_coord=well.y,
+            z_coord=well.top,
+            tool=Instruments.PIPETTE,
         )
 
         # Deposit the solution back into the well

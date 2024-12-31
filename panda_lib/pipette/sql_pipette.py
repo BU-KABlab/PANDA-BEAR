@@ -48,12 +48,17 @@ def select_pipette_status(
             )
 
         if pipette_status.contents:
-            try:
+            if isinstance(pipette_status.contents, dict):
                 data = pipette_status.contents
-            except json.JSONDecodeError:
-                data = pipette_status.contents  # It was just a string
+            else:
+                try:
+                    data = json.loads(pipette_status.contents)
+                except json.JSONDecodeError:
+                    data = {}
+        else:
+            data = {}
 
-            pipette_status.contents = data
+        pipette_status.contents = data
 
     return pipette_status
 

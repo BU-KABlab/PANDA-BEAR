@@ -127,6 +127,11 @@ class ToolManager:
             )
 
     def add_tool(self, name: str, offset: Coordinates | tuple[float, float, float]):
+        if not isinstance(name, str):
+            try:
+                name = name.value
+            except AttributeError:
+                raise ValueError("Invalid tool") from None
         if isinstance(offset, tuple):
             offset = Coordinates(*offset)
 
@@ -138,12 +143,27 @@ class ToolManager:
         self.save_tools()
 
     def get_tool(self, name: str) -> ToolOffset:
+        if not isinstance(name, str):
+            try:
+                name = name.value
+            except AttributeError:
+                raise ValueError("Invalid tool") from None
         return self.tool_offsets.get(name)
 
     def get_offset(self, name: str) -> Coordinates:
+        if not isinstance(name, str):
+            try:
+                name = name.value
+            except AttributeError:
+                raise ValueError("Invalid tool") from None
         return self.tool_offsets.get(name).offset
 
     def update_tool(self, name: str, offset: Coordinates):
+        if not isinstance(name, str):
+            try:
+                name = name.value
+            except AttributeError:
+                raise ValueError("Invalid tool") from None
         if isinstance(offset, tuple):
             offset = Coordinates(*offset)
         if name in self.tool_offsets:

@@ -6,9 +6,8 @@ from typing import Union
 
 import PySpin
 
-from panda_lib.grlb_mill_wrapper import MockPandaMill as MockMill
-
 # from panda_lib.movement import Mill, MockMill
+from panda_lib.grlb_mill_wrapper import MockPandaMill as MockMill
 from panda_lib.grlb_mill_wrapper import PandaMill as Mill
 from panda_lib.obs_controls import OBSController
 from panda_lib.pawduino import ArduinoLink

@@ -502,22 +502,6 @@ def save_well_to_db(well_to_save: object) -> None:
                 session.query(Wellplates).filter(Wellplates.current == 1).first().id
             )
 
-        # Leaving this commented if we want to change how the table is structured.
-        # Currently the table is unique on plate_id and well_id, but we could in the future
-        # Allow for multiple entries with the same well_id and plate_id but different status
-        # Then use a view to get the most recent status for each well_id and plate_id
-        # session.add(WellHx(
-        #     plate_id=well_to_save.plate_id,
-        #     well_id=well_to_save.well_id,
-        #     experiment_id=well_to_save.experiment_id,
-        #     project_id=well_to_save.project_id,
-        #     status=well_to_save.status,
-        #     status_date=datetime.strptime(well_to_save.status_date,'%Y-%m-%dT%H:%M:%S'),
-        #     contents=well_to_save.contents,
-        #     volume=well_to_save.volume,
-        #     coordinates=well_to_save.coordinates.__dict__
-        # ))
-
         # Instead we will update the status of the well if it already exists
         session.query(WellModel).filter(
             WellModel.plate_id == well_to_save.plate_id

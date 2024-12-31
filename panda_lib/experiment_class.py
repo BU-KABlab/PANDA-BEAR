@@ -538,7 +538,7 @@ class ExperimentBase:
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
 
-        if not self.well or not isinstance(self.well, object):
+        if not self.well or not isinstance(self.well, Well):
             experiment_logger.warning("Well object not set. Checking for Well ID")
             if self.well_id:
                 self.well = sql_wellplate.get_well_by_id(self.well_id)
@@ -548,11 +548,8 @@ class ExperimentBase:
 
         # Save the well to the database
         if self.well:
-            self.well.status = new_status
-            self.well.status_date = datetime.now(timezone.utc).isoformat(
-                timespec="seconds"
-            )
-            sql_wellplate.save_well_to_db(self.well)
+            self.well.update_status(self.status)
+            # sql_wellplate.save_well_to_db(self.well)
 
         else:
             experiment_logger.debug(

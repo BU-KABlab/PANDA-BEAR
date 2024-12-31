@@ -153,6 +153,46 @@ class Well:
         else:
             self.load_well()
 
+    @property
+    def name(self):
+        return self.well_data.name
+
+    @property
+    def contents(self):
+        return self.well_data.contents
+
+    @property
+    def coordinates(self):
+        return self.well_data.coordinates
+
+    @property
+    def x(self):
+        return self.well_data.coordinates.get("x")
+
+    @property
+    def y(self):
+        return self.well_data.coordinates.get("y")
+
+    @property
+    def z(self):
+        return self.well_data.coordinates.get("z")
+
+    @property
+    def top(self):
+        return self.well_data.top
+
+    @property
+    def bottom(self):
+        return self.well_data.bottom
+
+    @property
+    def volume_height(self):
+        return self.well_data.volume_height
+
+    @property
+    def status(self):
+        return self.well_data.status
+
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
@@ -179,14 +219,31 @@ class Well:
         self.load_well()
 
     def load_well(self):
+        """Load the well data from the database"""
         self.well_data = self.service.get_well(self.well_id, self.plate_id)
 
     def save(self):
+        """Save the well data to the database"""
         self.service.update_well(
             self.well_id, self.plate_id, self.well_data.model_dump()
         )
 
     def add_contents(self, from_vessel: dict, volume: float):
+        """
+        Add contents to the well
+
+        Parameters:
+        -----------
+        from_vessel: dict
+            The contents to add
+        volume: float
+            The volume to add
+
+        Raises:
+        -------
+        OverFillException
+            If the well is overfilled
+        """
         if self.well_data.volume + volume > self.well_data.capacity:
             raise OverFillException(
                 self.well_data.name,
@@ -205,6 +262,19 @@ class Well:
         self.save()
 
     def remove_contents(self, volume: float) -> dict:
+        """
+        Remove contents from the well
+
+        Parameters:
+        -----------
+        volume: float
+            The volume to remove
+
+        Raises:
+        -------
+        OverDraftException
+            If the well is overdrafted
+        """
         if self.well_data.volume - volume < 0:
             raise OverDraftException(
                 self.well_data.name,
@@ -228,10 +298,12 @@ class Well:
         return removed_contents
 
     def update_status(self, new_status: str):
+        """Update the status of the well"""
         self.well_data.status = new_status
         self.save()
 
     def update_coordinates(self, new_coordinates: dict):
+        """Update the coordinates of the well"""
         self.well_data.coordinates = new_coordinates
         self.save()
 
