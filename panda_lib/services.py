@@ -51,6 +51,7 @@ class VialService:
             try:
                 # Convert Pydantic model to SQLAlchemy model
                 vial: Vials = Vials(**vial_data.model_dump())
+                vial.active = True
                 db_session.add(vial)
                 db_session.commit()
                 db_session.refresh(vial)
@@ -59,7 +60,7 @@ class VialService:
                 db_session.rollback()
                 raise ValueError(f"Error creating vial: {e}")
 
-    def get_vial(self, position: str) -> VialReadModel:
+    def get_vial(self, position: str, active_only: bool = True) -> VialReadModel:
         """
         Fetches a vial by position from the database.
 
@@ -70,7 +71,7 @@ class VialService:
             VialModel: Pydantic model representing the vial.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(position=position)
+            stmt = select(Vials).filter_by(position=position, active=active_only)
             vial = db_session.execute(stmt).scalar()
             if not vial:
                 raise ValueError(f"Vial at position {position} not found.")

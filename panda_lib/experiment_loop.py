@@ -23,6 +23,7 @@ from typing import Optional, Sequence, Tuple
 
 import PySpin
 from slack_sdk import errors as slack_errors
+from sqlalchemy.orm import sessionmaker
 
 from panda_lib import scheduler
 
@@ -65,6 +66,7 @@ from .instrument_toolkit import Hardware, Labware, Toolkit
 from .log_tools import apply_log_filter, setup_default_logger, timing_wrapper
 from .slack_tools.SlackBot import SlackBot
 from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
+from .sql_tools.db_setup import SessionLocal
 from .syringepump import MockPump, SyringePump
 from .utilities import SystemState
 from .vials import StockVial, Vial, WasteVial, read_vials
@@ -661,9 +663,9 @@ def _fetch_protocol_function(protocol_id: int):
 
 
 @timing_wrapper
-def _establish_system_state() -> (
-    tuple[Sequence[StockVial], Sequence[WasteVial], Wellplate]
-):
+def _establish_system_state(
+    session_maker: sessionmaker = SessionLocal,
+) -> tuple[Sequence[StockVial], Sequence[WasteVial], Wellplate]:
     """
     Establish state of system
     Returns:
@@ -672,7 +674,7 @@ def _establish_system_state() -> (
         wellplate (wellplate_module.Wells): wellplate object
     """
     slack = SlackBot()
-    stock_vials, waste_vials = read_vials()
+    stock_vials, waste_vials = read_vials(session=session_maker)
     # stock_vials = get_current_vials("stock")
     # waste_vials = get_current_vials("waste")
     stock_vials_only = [vial for vial in stock_vials if isinstance(vial, StockVial)]
@@ -766,13 +768,13 @@ def _establish_system_state() -> (
 
 @timing_wrapper
 def _check_stock_vials(
-    exp_soln: dict, stock_vials: Sequence[Vial]
+    exp_solns: dict, stock_vials: Sequence[Vial]
 ) -> Tuple[bool, dict]:
     """
     Check that there is enough volume in the stock vials to run the experiment
 
     Args:
-        experiment (Experiment): The experiment to be run
+        exp_solns (dict): Dictionary of solutions required for the experiment
         stock_vials (list[Vial]): The stock vials
 
     Returns:
@@ -788,11 +790,11 @@ def _check_stock_vials(
 
     passes = True
 
-    if len(exp_soln) == 0:
+    if len(exp_solns) == 0:
         logger.warning("The experiment has no solutions.")
         passes = True
         return passes, check_table
-    for solution in exp_soln:
+    for solution in exp_solns:
         solution_lwr = str(solution).lower()
         logger.debug("Checking for solution %s in stock vials", solution_lwr)
         if solution_lwr not in [
@@ -807,11 +809,11 @@ def _check_stock_vials(
 
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
-    for solution in exp_soln:
+    for solution in exp_solns:
         solution_lwr = str(solution).lower()
-        vol = exp_soln[solution]["volume"]
+        vol = exp_solns[solution]["volume"]
         try:
-            rep = exp_soln[solution]["repeated"]
+            rep = exp_solns[solution]["repeated"]
         except KeyError:
             rep = 1
         volume_required = vol * rep
