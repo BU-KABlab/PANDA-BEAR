@@ -137,7 +137,7 @@ def experiment_loop_worker(
         status_queue.put((process_id, "connected to equipment"))
 
         ## Establish state of system - we do this each time because each experiment changes the system state
-        stock_vials, _, toolkit.wellplate = _establish_system_state()
+        stock_vials, waste_vials, toolkit.wellplate = _establish_system_state()
 
         ## Check that the pipette is empty, if not dispose of full volume into waste
         if toolkit.pump.pipette.volume > 0:
@@ -683,13 +683,13 @@ def _establish_system_state(
     logger.info("System state reestablished")
 
     ## read through the stock vials and log their name, contents, and volume
-    for vial in stock_vials_only:
-        logger.debug(
-            "Stock vial %s contains %s with volume %d",
-            vial.name,
-            vial.contents,
-            vial.volume,
-        )
+    # for vial in stock_vials_only:
+    #     logger.debug(
+    #         "Stock vial %s contains %s with volume %d",
+    #         vial.name,
+    #         vial.contents,
+    #         vial.volume,
+    #     )
 
     ## if any stock vials are empty, send a slack message prompting the user to refill them and confirm if program should continue
     empty_stock_vials = [vial for vial in stock_vials_only if vial.volume < 1000]
@@ -712,13 +712,13 @@ def _establish_system_state(
         # slack.send_message("alert", "The program is continuing")
 
     ## read through the waste vials and log their name, contents, and volume
-    for vial in waste_vials_only:
-        logger.debug(
-            "Waste vial %s contains %s with volume %d",
-            vial.name,
-            vial.contents,
-            vial.volume,
-        )
+    # for vial in waste_vials_only:
+    #     logger.debug(
+    #         "Waste vial %s contains %s with volume %d",
+    #         vial.name,
+    #         vial.contents,
+    #         vial.volume,
+    #     )
 
     ## if any waste vials are full, send a slack message prompting the user to empty them and confirm if program should continue
     full_waste_vials = [vial for vial in waste_vials_only if vial.volume > 19000]
@@ -794,12 +794,16 @@ def _check_stock_vials(
         logger.warning("The experiment has no solutions.")
         passes = True
         return passes, check_table
+    contents_keys_list = []
+    for vial in stock_vials:
+        for key in vial.contents.keys():
+            contents_keys_list.append(str(key).lower())
+
     for solution in exp_solns:
         solution_lwr = str(solution).lower()
         logger.debug("Checking for solution %s in stock vials", solution_lwr)
-        if solution_lwr not in [
-            str(key).lower() for vial in stock_vials for key in vial.contents.keys()
-        ]:
+
+        if solution_lwr not in contents_keys_list:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
