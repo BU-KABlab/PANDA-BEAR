@@ -66,6 +66,9 @@ class Coordinates:
         yield self.y
         yield self.z
 
+    def __repr__(self):
+        return f"Coordinates(x={self.x}, y={self.y}, z={self.z})"
+
 
 class ToolOffset:
     def __init__(self, name: str, offset: Coordinates):
