@@ -27,22 +27,22 @@
 # image
 
 # Non-standard imports
-from panda_lib.experiment_loop import Toolkit
 from panda_lib.actions import (
-    transfer,
-    solution_selector,
-    chrono_amp,
-    waste_selector,
-    image_well,
-    __flush_v2,
-    OCPFailure,
     CAFailure,
     CVFailure,
     DepositionFailure,
     Instruments,
+    OCPFailure,
+    __flush_v2,
+    chrono_amp,
+    image_well,
+    solution_selector,
+    transfer,
+    waste_selector,
 )
 from panda_lib.actions_pgma import cyclic_volt_pgma_fc
-from panda_lib.experiment_class import PGMAExperiment, ExperimentStatus
+from panda_lib.experiment_class import ExperimentStatus, PGMAExperiment
+from panda_lib.experiment_loop import Toolkit
 
 
 def main(
@@ -147,8 +147,8 @@ def PGMAdeposition(
         toolkit.mill.safe_move(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
-            z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.ELECTRODE,
+            z_coord=toolkit.wellplate.top,
+            tool=Instruments.ELECTRODE,
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
         )
@@ -274,7 +274,7 @@ def FC_prechar(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.ELECTRODE,
+            tool=Instruments.ELECTRODE,
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
         )
@@ -393,7 +393,7 @@ def FC_postchar(
             x_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "x"),
             y_coord=toolkit.wellplate.get_coordinates(instructions.well_id, "y"),
             z_coord=toolkit.wellplate.z_top,
-            instrument=Instruments.ELECTRODE,
+            tool=Instruments.ELECTRODE,
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
         )
