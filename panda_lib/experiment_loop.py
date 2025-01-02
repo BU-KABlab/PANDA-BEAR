@@ -619,9 +619,33 @@ def _initialize_experiment(
 
 
 def _validate_the_stock_solutions(exp: EchemExperimentBase, labware: Labware):
-    sufficient_stock, check_table = _check_stock_vials(
+    # First check experiment specific solutions in solutions dictionary
+    sufficient_stock_1, check_table_a = _check_stock_vials(
         exp.solutions, labware.stock_vials
     )
+    # Next check for any additional solutions in the experiment under rinse_sol_name and flush_sol_name
+    if exp.rinse_sol_name:
+        rinse_sol = {
+            exp.rinse_sol_name: {"volume": exp.rinse_vol, "repeated": 1}
+        }  # This is a false repeated value but allows us to reuse the check_stock_vials function
+        sufficient_stock_2, check_table_b = _check_stock_vials(
+            rinse_sol, labware.stock_vials
+        )
+    if exp.flush_sol_name:
+        flush_sol = {exp.flush_sol_name: {"volume": exp.flush_sol_vol, "repeated": 1}}
+        sufficient_stock_3, check_table_c = _check_stock_vials(
+            flush_sol, labware.stock_vials
+        )
+
+    # Consolidate the check tables
+    check_table = {
+        **check_table_a,
+        **check_table_b,
+        **check_table_c,
+    }
+
+    sufficient_stock = all([sufficient_stock_1, sufficient_stock_2, sufficient_stock_3])
+
     if not sufficient_stock:
         issues = []
         if check_table["insufficient"]:
