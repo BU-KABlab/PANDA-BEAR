@@ -193,6 +193,14 @@ class Well:
     def status(self):
         return self.well_data.status
 
+    @property
+    def withdrawal_height(self) -> float:
+        """Returns the height of the vial from which contents are withdrawn."""
+        height = self.well_data.volume_height - 1
+        if height < self.well_data.dead_volume:
+            return self.well_data.dead_volume / (3.14 * self.well_data.radius**2)
+
+    @property
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
