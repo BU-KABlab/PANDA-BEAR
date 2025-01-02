@@ -630,9 +630,12 @@ class Mill:
 
         self._log_target_coordinates(target_coordinates)
         self._validate_target_coordinates(target_coordinates)
-
-        command = MILL_MOVE.format(*goto)
-        self.execute_command(command)
+        commands = self._generate_movement_commands(
+            current_coordinates, target_coordinates
+        )
+        # command = MILL_MOVE.format(*goto)
+        # self.execute_command(command)
+        self._execute_commands(commands)
         return 0
 
     def update_offset(self, tool, offset_x, offset_y, offset_z):
