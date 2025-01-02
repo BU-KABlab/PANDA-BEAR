@@ -854,7 +854,7 @@ class EchemExperimentBase(ExperimentBase):
             Run Cyclic Voltammetry: {bool(self.cv)}
             Run CV Baseline: {bool(self.baseline)}
             Flush Solution Name: {self.flush_sol_name}
-            Flush Solution Volume: {self.flush_vol}
+            Flush Solution Volume: {self.flush_sol_vol}
             Mix: {bool(self.mix)}
             Mix Count: {self.mix_count}
             Mix Volume: {self.mix_volume}
