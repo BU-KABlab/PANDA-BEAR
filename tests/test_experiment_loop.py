@@ -132,6 +132,37 @@ def test_check_stock_vials(mock_db_session):
     assert "sufficient" in check_table
 
 
+def test_validate_stock_solutions(mock_db_session):
+    stock_vials, _ = read_vials("stock", mock_db_session)
+
+    exp_soln_1 = {"solution1": {"volume": 500, "repeated": 1}}
+    sufficient_1, check_table_1 = _check_stock_vials(exp_soln_1, stock_vials)
+    assert sufficient_1 is True
+    assert "sufficient" in check_table_1
+
+    exp_soln_2 = {"edot": {"volume": 10000, "repeated": 1}}
+    sufficient_2, check_table_2 = _check_stock_vials(exp_soln_2, stock_vials)
+    assert sufficient_2 is True
+    assert "sufficient" in check_table_2
+
+    exp_soln_3 = {"rinse": {"volume": 25000, "repeated": 1}}
+    sufficient_3, check_table_3 = _check_stock_vials(exp_soln_3, stock_vials)
+    assert sufficient_3 is False
+    assert "insufficient" in check_table_3
+
+    # Consolidate the check tables
+    check_table = {
+        **check_table_1,
+        **check_table_2,
+        **check_table_3,
+    }
+
+    sufficient_stock = all([sufficient_1, sufficient_2, sufficient_3])
+
+    assert sufficient_stock is False
+    assert "insufficient" in check_table
+
+
 def test_insufficient_volume_error(mock_db_session):
     stock_vial_list = [
         StockVial(
