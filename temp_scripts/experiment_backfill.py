@@ -56,7 +56,7 @@ for file in PARAMS_FOLDER.glob("*.json"):
         cv=data["cv"],
         baseline=data["baseline"],
         flush_sol_name=data["flush_sol_name"],
-        flush_vol=data["flush_vol"],
+        flush_sol_vol=data["flush_vol"],
         mix_count=data["mix_count"],
         mix_volume=data["mix_volume"],
         rinse_count=data["rinse_count"],
