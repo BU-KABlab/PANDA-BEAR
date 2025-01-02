@@ -751,7 +751,7 @@ class EchemExperimentBase(ExperimentBase):
     baseline: int = 0  # Baseline
 
     flush_sol_name: str = ""  # Flush solution name
-    flush_vol: Union[int, float] = 0  # Flush solution volume
+    flush_sol_vol: Union[int, float] = 0  # Flush solution volume
     flush_count: int = 3  # Flush solution concentration
 
     mix = 0  # Binary mix or dont mix
