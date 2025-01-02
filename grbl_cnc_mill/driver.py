@@ -583,9 +583,9 @@ class Mill:
 
     def move_to_position(
         self,
-        x: float = 0.00,
-        y: float = 0.00,
-        z: float = 0.00,
+        x_coordinate: float = 0.00,
+        y_coordinate: float = 0.00,
+        z_coordinate: float = 0.00,
         coordinates: Coordinates = None,
         tool: str = "center",
     ) -> int:
@@ -606,31 +606,32 @@ class Mill:
             self.logger.error("Instrument not found in config file")
             raise MillConfigError("Instrument not found in config file") from e
         # updated target coordinates with offsets so the center of the mill moves to the right spot
-        if coordinates:
-            cmd_coordinates = Coordinates(
-                coordinates.x + offsets.x,
-                coordinates.y + offsets.y,
-                coordinates.z + offsets.z,
-            )
-        else:
-            cmd_coordinates = Coordinates(
-                x + offsets.x,
-                y + offsets.y,
-                z + offsets.z,
-            )
-        # Double check that the target coordinates are within the working volume
-        # check that command coordinates are within working volume
-        if cmd_coordinates.x > 1 or cmd_coordinates.x < self.working_volume.x:
-            self.logger.error("x coordinate out of range")
-            raise ValueError("x coordinate out of range")
-        if cmd_coordinates.y > 1 or cmd_coordinates.y < self.working_volume.y:
-            self.logger.error("y coordinate out of range")
-            raise ValueError("y coordinate out of range")
-        if cmd_coordinates.z > 1 or cmd_coordinates.z < self.working_volume.z:
-            self.logger.error("z coordinate out of range")
-            raise ValueError("z coordinate out of range")
+        goto = (
+            Coordinates(x=x_coordinate, y=y_coordinate, z=z_coordinate)
+            if not coordinates
+            else coordinates
+        )
+        offsets = self.tool_manager.get_offset(tool)
+        current_coordinates, _ = self.current_coordinates()
 
-        command = MILL_MOVE.format(*cmd_coordinates)
+        target_coordinates = self._calculate_target_coordinates(
+            goto, current_coordinates, offsets
+        )
+
+        if self._is_already_at_target(target_coordinates, current_coordinates):
+            self.logger.debug(
+                "%s is already at the target coordinates of [%s, %s, %s]",
+                tool,
+                x_coordinate,
+                y_coordinate,
+                z_coordinate,
+            )
+            return 0
+
+        self._log_target_coordinates(target_coordinates)
+        self._validate_target_coordinates(target_coordinates)
+
+        command = MILL_MOVE.format(*goto)
         self.execute_command(command)
         return 0
 
