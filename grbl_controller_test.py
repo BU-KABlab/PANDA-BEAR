@@ -118,6 +118,66 @@ def test_panda_grbl_wrapper():
     mill.disconnect()
 
 
+def test_movement_around_deck():
+    from panda_lib import grlb_mill_wrapper as grbl
+    # from panda_lib.wellplate import Wellplate, Well
+    # from panda_lib.vials import Vial, StockVial, WasteVial, read_vials
+
+    class CalibrationObject:
+        def __init__(self):
+            self.name = "calibration"
+            self.radius = 14
+            self.height = 100
+            self.base_thickness = 10
+            self.coordinates = {"x": -100, "y": -100, "z": -200}
+            self.top = -90
+            self.bottom = -190
+
+    # Set up labware
+    # wellplate = Wellplate()
+    # stock, waste = read_vials()
+    mill = grbl.PandaMill()
+
+    # Make a calibration object with is simply a cylinder with a known radius and height at a known position
+    cal = CalibrationObject()
+    c = []
+    # Move the center tool to above the calibration object at z = 0
+    c.append(mill.safe_move(-100, -100, 0, tool="center"))
+
+    # Move the center tool to the top of the calibration object
+    c.append(mill.safe_move(-100, -100, cal.top, tool="center"))
+
+    # Move the pipette tool to the top of the calibration object
+    c.append(mill.safe_move(-100, -100, cal.top, tool="pipette"))
+
+    # Move the pipette tool to the bottom of the calibration object
+    c.append(mill.safe_move(-100, -100, cal.bottom, tool="pipette"))
+
+    # Move the electrode tool to the top of the calibration object
+    c.append(mill.safe_move(-100, -100, cal.top, tool="electrode"))
+
+    # Move the electrode tool to the bottom of the calibration object
+    c.append(mill.safe_move(-100, -100, cal.bottom, tool="electrode"))
+
+    # Move the decapper tool to the top of the calibration object
+    c.append(mill.safe_move(-100, -100, cal.top, tool="decapper"))
+
+    # Move the decapper tool to the bottom of the calibration object
+    c.append(mill.safe_move(-100, -100, cal.bottom, tool="decapper"))
+
+    # Disconnect from the mill
+    mill.disconnect()
+
+    print("Commands executed:")
+    for command in c:
+        if isinstance(command, tuple):
+            first = command[0]
+        else:
+            first = command
+        print(f"{first.x}, {first.y}, {first.z}")
+
+
 if __name__ == "__main__":
     # test_grbl_controller()
-    test_panda_grbl_wrapper()
+    # test_panda_grbl_wrapper()
+    test_movement_around_deck()
