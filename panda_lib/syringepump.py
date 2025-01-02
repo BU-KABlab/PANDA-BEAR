@@ -243,7 +243,10 @@ class SyringePump:
 
         if being_infused is not None:
             # Get density and viscosity from the solution being infused
-            density = being_infused.density
+            if hasattr(being_infused, "density"):
+                density = being_infused.density
+            else:
+                density = None
             # viscosity = being_infused.viscosity_cp
         else:
             density = None
