@@ -54,8 +54,8 @@ class MockMill(RealMill):
         super().__init__()
         self.logger_location = Path(__file__).parent / "mock_logs"
         self.ser_mill: MockSerialToMill = self.connect_to_mill()
-        self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-85.0)
-        self.safe_floor_height = -85.0
+        self.working_volume: Coordinates = Coordinates(x=-415.0, y=-300.0, z=-200.0)
+        self.safe_floor_height = -10.0
 
         self.change_logging_level("DEBUG")
 
