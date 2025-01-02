@@ -148,7 +148,7 @@ def ca_deposition(
         x_coord=exp_obj.well.well_data.x,
         y_coord=exp_obj.well.well_data.y,
         z_coord=exp_obj.well.well_data.top,
-        instrument=Instruments.ELECTRODE,
+        tool=Instruments.ELECTRODE,
         second_z_cord=(
             toolkit.wellplate.plate_data.echem_height
             + toolkit.wellplate.plate_data.bottom
