@@ -107,7 +107,7 @@ class Mill:
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = self.read_working_volume()
-        self.safe_floor_height = -85.0
+        self.safe_floor_height = -10.0
         self.command_logger = set_up_command_logger(self.logger_location)
 
     def read_working_volume(self):
@@ -125,7 +125,7 @@ class Mill:
         else:
             self.logger.warning("Soft limits are not enabled in the mill config")
             self.logger.warning("Using default working volume")
-            working_volume = Coordinates(x=-415.0, y=-300.0, z=-85.0)
+            working_volume = Coordinates(x=-415.0, y=-300.0, z=-200.0)
         return working_volume
 
     def change_logging_level(self, level):
@@ -787,7 +787,7 @@ class Mill:
         move_z_first: bool = False,
     ):
         commands = []
-        if current_coordinates.z >= self.safe_floor_height:
+        if current_coordinates.z >= self.safe_floor_height or move_z_first:
             commands.append(f"G01 X{target_coordinates.x} Y{target_coordinates.y}")
             commands.append(f"G01 Z{target_coordinates.z}")
         else:
