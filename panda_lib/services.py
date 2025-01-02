@@ -105,7 +105,7 @@ class VialService:
                     ):
                         setattr(vial, key, value)
                     else:
-                        self.logger.error("Invalid attribute: %s. Not saved to db", key)
+                        self.logger.debug("Invalid attribute: %s. Not saved to db", key)
                 db_session.commit()
                 db_session.refresh(vial)
                 return vial
