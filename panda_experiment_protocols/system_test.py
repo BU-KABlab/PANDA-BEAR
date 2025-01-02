@@ -38,6 +38,7 @@ metadata = {
     "protocol_owner": "Harley Quinn",
     "protocol_owner_email": "hquinn@bu.edu",
     "protocol_owner_institution": "KABLab",
+    "hardware_plate_type": 4,
 }
 
 
