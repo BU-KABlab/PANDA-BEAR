@@ -499,6 +499,13 @@ class Wellplate:
             self.plate_data.id, new_active_plate_id
         )
 
+    def get_coordinates(self, well_id: str, axis: str = None) -> dict:
+        return (
+            self.wells[well_id].coordinates
+            if not axis
+            else self.wells[well_id].coordinates[axis]
+        )
+
     @property
     def id(self):
         return self.plate_data.id
@@ -510,6 +517,18 @@ class Wellplate:
     @property
     def name(self):
         return self.plate_data.name
+
+    @property
+    def top(self):
+        return self.plate_data.top
+
+    @property
+    def bottom(self):
+        return self.plate_data.bottom
+
+    @property
+    def echem_height(self):
+        return self.plate_data.echem_height
 
     def __repr__(self):
         return f"<Wellplate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"

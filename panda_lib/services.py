@@ -100,10 +100,12 @@ class VialService:
                 # elif len(vial) > 1:
                 #     raise ValueError(f"Multiple vials found at position {position}.")
                 for key, value in updates.items():
-                    if hasattr(vial, key) and hasattr(VialWriteModel, key):
+                    if hasattr(vial, key) and (
+                        key in VialWriteModel.model_fields.keys()
+                    ):
                         setattr(vial, key, value)
                     else:
-                        raise ValueError(f"Invalid attribute: {key}")
+                        self.logger.error("Invalid attribute: %s. Not saved to db", key)
                 db_session.commit()
                 db_session.refresh(vial)
                 return vial

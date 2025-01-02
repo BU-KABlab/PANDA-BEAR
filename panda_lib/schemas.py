@@ -88,6 +88,7 @@ class VialWriteModel(BaseModel):
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
     name: str = "default"
+    base_thickness: float = 1.0
 
     model_config = ConfigDict(from_attributes=True)
 
