@@ -682,7 +682,7 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
         except ValueError:
             print("Invalid input. Please enter a number.")
             continue
-        if new_location_x > working_volume["x"] and new_location_x < 0:
+        if new_location_x >= working_volume["x"] and new_location_x < 0:
             break
 
         print(
@@ -702,7 +702,7 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
                 print("Invalid input. Please enter a number.")
                 continue
 
-        if new_location_y > working_volume["y"] and new_location_y < 0:
+        if new_location_y >= working_volume["y"] and new_location_y < 0:
             break
 
         print(
@@ -722,7 +722,7 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
             print("Invalid input. Please enter a number.")
             continue
 
-        if new_location_z > working_volume["z"] and new_location_z < 0:
+        if new_location_z >= working_volume["z"] and new_location_z < 0:
             break
 
         print(

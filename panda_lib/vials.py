@@ -30,6 +30,7 @@ class VialKwargs(TypedDict, total=False):
     density: float
     coordinates: Dict[str, float]
     name: str
+    base_thickness: float
 
 
 class Vial:
@@ -238,7 +239,7 @@ class Vial:
         self.save()
 
     def __repr__(self):
-        return f"<Vial(position={self.position}, volume={self.vial_data.volume}, contents={self.vial_data.contents})>"
+        return f"<Vial(position={self.position}, volume={self.vial_data.volume}, contents={self.vial_data.contents}. top={self.vial_data.top}, bottom={self.vial_data.bottom})>"
 
 
 class StockVial(Vial):

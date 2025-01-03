@@ -6,9 +6,42 @@ import enum
 import os
 import queue
 import time
+
 import serial
 import serial.tools.list_ports
 from serial import Serial
+
+
+class MockSerial:
+    def __init__(self, *args, **kwargs):
+        self.is_open = True
+        self.in_waiting = 0
+        self.output = []
+        self.input = queue.Queue()
+
+    def isOpen(self):
+        return self.is_open
+
+    def close(self):
+        self.is_open = False
+
+    def write(self, data):
+        self.output.append(data)
+
+    def readline(self):
+        try:
+            return self.input.get_nowait()
+        except queue.Empty:
+            return b""
+
+    def flushInput(self):
+        pass
+
+    def flushOutput(self):
+        pass
+
+    def mock_input(self, data):
+        self.input.put(data)
 
 
 class ArduinoLink:
@@ -218,6 +251,7 @@ class MockArduinoLink(ArduinoLink):
     def __init__(self):
         """Initialize the MockArduinoLink class"""
         self.configured = True
+        self.ser = MockSerial()
 
     def send(self, cmd):
         """Send a message to the Arduino and wait for a response"""
