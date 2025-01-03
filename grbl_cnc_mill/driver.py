@@ -20,6 +20,7 @@ import json
 import re
 import time
 from pathlib import Path
+from typing import Optional
 
 # third-party libraries
 # from pydantic.dataclasses import dataclass
@@ -107,7 +108,8 @@ class Mill:
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = self.read_working_volume()
-        self.safe_floor_height = -10.0
+        self.safe_z_height = -10.0
+        self.max_z_height = 0.0
         self.command_logger = set_up_command_logger(self.logger_location)
 
     def read_working_volume(self):
@@ -137,6 +139,18 @@ class Mill:
         self.home()
         self.set_feed_rate(2000)  # Set feed rate to 2000
         self.clear_buffers()
+        self.check_max_z_height()
+
+    def check_max_z_height(self):
+        """
+        After homing, if there are no axes offset (G54-G59), the working coordinates should be 0,0,0.
+        If there are axes offset, the working coordinates should be the offset values.
+
+        For this function, if after homing the z coordinate is not 0, then the max z height is set to the current z coordinate.
+        """
+        _, current_coordinates = self.current_coordinates()
+        if current_coordinates.z != 0:
+            self.max_z_height = current_coordinates.z
 
     def connect_to_mill(
         self,
@@ -454,48 +468,6 @@ class Mill:
         command = f"${setting}={value}"
         return self.execute_command(command)
 
-    def move_center_to_position(
-        self, x_coord, y_coord, z_coord, coordinates: Coordinates = None
-    ) -> int:
-        """
-        Move the mill to the specified coordinates.
-        Args:
-            x_coord (float): X coordinate.
-            y_coord (float): Y coordinate.
-            z_coord (float): Z coordinate.
-        Returns:
-            str: Response from the mill after executing the command.
-        """
-        offsets = self.tool_manager.get_offset("center")
-
-        if coordinates:
-            command_coordinates = Coordinates(
-                coordinates.x + offsets.x,
-                coordinates.y + offsets.y,
-                coordinates.z + offsets.z,
-            )
-        else:
-            command_coordinates = Coordinates(
-                x_coord + offsets.x,
-                y_coord + offsets.y,
-                z_coord + offsets.z,
-            )
-
-        # check that command coordinates are within working volume
-        if command_coordinates.x > 0 or command_coordinates.x < self.working_volume.x:
-            self.logger.error("x coordinate out of range")
-            raise ValueError("x coordinate out of range")
-        if command_coordinates.y > 0 or command_coordinates.y < self.working_volume.y:
-            self.logger.error("y coordinate out of range")
-            raise ValueError("y coordinate out of range")
-        if command_coordinates.z > 0 or command_coordinates.z < self.working_volume.z:
-            self.logger.error("z coordinate out of range")
-            raise ValueError("z coordinate out of range")
-
-        command = MILL_MOVE.format(*command_coordinates)
-        self.execute_command(command)
-        return 0
-
     def current_coordinates(
         self, tool: str = "center"
     ) -> tuple[Coordinates, Coordinates]:
@@ -578,8 +550,8 @@ class Mill:
         )  # TODO ensure all calls of this function are updated to reflect the return of two coordinates
 
     def move_to_safe_position(self) -> str:
-        """Move the mill to its current x,y location and z = 0"""
-        return self.execute_command("G01 Z0")  # Move to Z = 0
+        """Move the mill to its current x,y location and the max z height"""
+        return self.execute_command(f"G01 Z{self.max_z_height}")
 
     def move_to_position(
         self,
@@ -588,7 +560,7 @@ class Mill:
         z_coordinate: float = 0.00,
         coordinates: Coordinates = None,
         tool: str = "center",
-    ) -> int:
+    ) -> Coordinates:
         """
         Move the mill to the specified coordinates.
         Args:
@@ -599,12 +571,6 @@ class Mill:
         Returns:
             str: Response from the mill after executing the command.
         """
-        # Fetch offsets for the specified instrument
-        try:
-            offsets = self.tool_manager.get_offset(tool)
-        except KeyError as e:
-            self.logger.error("Instrument not found in config file")
-            raise MillConfigError("Instrument not found in config file") from e
         # updated target coordinates with offsets so the center of the mill moves to the right spot
         goto = (
             Coordinates(x=x_coordinate, y=y_coordinate, z=z_coordinate)
@@ -626,7 +592,7 @@ class Mill:
                 y_coordinate,
                 z_coordinate,
             )
-            return 0
+            return current_coordinates
 
         self._log_target_coordinates(target_coordinates)
         self._validate_target_coordinates(target_coordinates)
@@ -636,7 +602,7 @@ class Mill:
         # command = MILL_MOVE.format(*goto)
         # self.execute_command(command)
         self._execute_commands(commands)
-        return 0
+        return self.current_coordinates(tool)
 
     def update_offset(self, tool, offset_x, offset_y, offset_z):
         """
@@ -706,16 +672,16 @@ class Mill:
 
         self._log_target_coordinates(target_coordinates)
         move_to_zero = False
-        if self.__should_move_to_zero_first(
-            current_coordinates, target_coordinates, self.safe_floor_height
+        if self.__should_move_to_safe_position_first(
+            current_coordinates, target_coordinates, self.max_z_height
         ):
-            self.logger.debug("Moving to Z=0 first")
+            self.logger.debug("Moving to Z=%s first", self.max_z_height)
             # self.execute_command("G01 Z0")
-            commands.append("G01 Z0")
+            commands.append(f"G01 Z{self.max_z_height}")
             # current_coordinates = self.current_coordinates(instrument)
             move_to_zero = True
         else:
-            self.logger.debug("Not moving to Z=0 first")
+            self.logger.debug("Not moving to Z=%s first", self.max_z_height)
 
         self._validate_target_coordinates(target_coordinates)
 
@@ -759,7 +725,9 @@ class Mill:
         return Coordinates(
             x=goto.x + offsets.x,
             y=goto.y + offsets.y,
-            z=0 if goto.z + offsets.z > 0 else goto.z + offsets.z,
+            z=self.max_z_height
+            if goto.z + offsets.z > self.max_z_height
+            else goto.z + offsets.z,
         )
 
     def _log_target_coordinates(self, target_coordinates: Coordinates):
@@ -778,9 +746,11 @@ class Mill:
             self.logger.error("x coordinate out of range")
             raise ValueError("x coordinate out of range")
         if not self.working_volume.y <= target_coordinates.y <= 0:
+            # If the target y is not between the working volume and 0, raise an error
             self.logger.error("y coordinate out of range")
             raise ValueError("y coordinate out of range")
-        if not self.working_volume.z <= target_coordinates.z <= 0:
+        if not self.working_volume.z <= target_coordinates.z <= self.max_z_height:
+            # If the target z is not between the working volume and the max z height, raise an error
             self.logger.error("z coordinate out of range")
             raise ValueError("z coordinate out of range")
 
@@ -791,7 +761,8 @@ class Mill:
         move_z_first: bool = False,
     ):
         commands = []
-        if current_coordinates.z >= self.safe_floor_height or move_z_first:
+        if current_coordinates.z >= self.safe_z_height or move_z_first:
+            # If above the safe height, allow an XY diagonal move then Z movement
             commands.append(f"G01 X{target_coordinates.x} Y{target_coordinates.y}")
             commands.append(f"G01 Z{target_coordinates.z}")
         else:
@@ -803,8 +774,9 @@ class Mill:
                 commands.append(f"G01 Z{target_coordinates.z}")
             if (
                 target_coordinates.z == current_coordinates.z and move_z_first
-            ):  # The mill moved to Z=0 first, so move back to the target Z
+            ):  # The mill moved to Z max first, so move back to the target Z
                 commands.append(f"G01 Z{target_coordinates.z}")
+
         return commands
 
     def _execute_commands(self, commands):
@@ -814,26 +786,28 @@ class Mill:
             for command in commands:
                 self.execute_command(command)
 
-    def __should_move_to_zero_first(
+    def __should_move_to_safe_position_first(
         self,
         current: Coordinates,
         destination: Coordinates,
-        safe_height_floor,
+        safe_height_floor: Optional[float] = None,
     ):
         """
-        Determine if the mill should move to Z=0 before moving to the specified coordinates.
+        Determine if the mill should move to self.max_z_height before moving to the specified coordinates.
         Args:
             current (Coordinates): Current coordinates.
             offset (Coordinates): Target coordinates.
             safe_height_floor (float): Safe floor height.
         Returns:
-            bool: True if the mill should move to Z=0 first, False otherwise.
+            bool: True if the mill should move to self.max_z_height first, False otherwise.
         """
-        # If current Z is 0 or at or above the safe floor height, no need to move to Z=0
-        if current.z >= 0 or current.z >= safe_height_floor:
+        if safe_height_floor is None:
+            safe_height_floor = self.safe_z_height
+        # If current Z is at z max or at or above the safe floor height, no need to move to Z max
+        if current.z >= self.max_z_height or current.z >= safe_height_floor:
             return False
 
-        # If current Z is below the safe floor height and X or Y coordinates are different, move to Z=0
+        # If current Z is below the safe floor height and X or Y coordinates are different, move to Z max
         if current.x != destination.x or current.y != destination.y:
             return True
 
