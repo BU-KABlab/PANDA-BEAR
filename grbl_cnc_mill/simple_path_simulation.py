@@ -1,8 +1,9 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import axes
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.widgets import CheckButtons
 
 # Define tool offsets
@@ -52,19 +53,34 @@ tool_coords = {name: list(zip(*positions)) for name, positions in trajectories.i
 # Setup figure and 3D axis
 fig = plt.figure()
 ax: axes = fig.add_subplot(111, projection="3d")
-ax.set_xlim(-400, 30)
-ax.set_ylim(-200, 30)
-ax.set_zlim(-90, 30)
+ax.set_xlim(-400, 0)
+ax.set_ylim(-300, 0)
+ax.set_zlim(-200, 0)
 ax.set_xlabel("X")
 ax.set_ylabel("Y")
 ax.set_zlabel("Z")
 
-# Add a grey plane at z = -85
-plane_z = -85
-x = [-400, 30, 30, -400]
-y = [-200, -200, 30, 30]
-z = [plane_z] * 4
-ax.add_collection3d(plt.fill_between(x, y, plane_z, color="grey", alpha=0.5))
+# Draw a flat plane at Z=-200 for all xy coordinates
+X, Y = np.meshgrid(np.linspace(-400, 0, 30), np.linspace(-300, 0, 30))
+Z = -200 * np.ones_like(X)
+ax.plot_surface(X, Y, Z, color="grey", alpha=0.2)
+
+
+# Draw the vial as a cylinder
+vial_center_x = -4
+vial_center_y = -106
+vial_radius = 14
+vial_height = 70
+vial_z_base = -200
+
+theta = np.linspace(0, 2 * np.pi, 30)
+vial_z = np.linspace(vial_z_base, vial_z_base + vial_height, 30)
+theta, vial_z = np.meshgrid(theta, vial_z)
+
+vial_x = vial_center_x + vial_radius * np.cos(theta)
+vial_y = vial_center_y + vial_radius * np.sin(theta)
+
+ax.plot_surface(vial_x, vial_y, vial_z, color="blue", alpha=0.2)
 
 # Plot initialization
 lines = {}
@@ -88,8 +104,20 @@ def update(num):
 
 # Animate
 ani = FuncAnimation(
-    fig, update, frames=len(tool_coords["center"][0]), interval=500, blit=False
+    fig,
+    update,
+    frames=len(tool_coords["center"][0]),
+    interval=500,
+    blit=False,
+    repeat=False,
 )
+
+
+# Function to save animation as GIF
+def save_animation(animation, filename):
+    writer = PillowWriter(fps=2)
+    animation.save(filename, writer=writer)
+
 
 # Checkboxes for toggling visibility
 rax = plt.axes([0.02, 0.4, 0.15, 0.2])  # Adjust as needed
@@ -127,3 +155,12 @@ check.on_clicked(toggle_visibility)
 
 plt.legend(loc="upper right")
 plt.show()
+
+
+# Save the animation as a GIF
+save = input("Save animation as GIF? (y/n): ")
+if save.lower() == "y":
+    save_animation(ani, "path_simulation.gif")
+    print("Animation saved as path_simulation.gif")
+else:
+    pass
