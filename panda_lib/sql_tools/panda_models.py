@@ -507,7 +507,7 @@ class WellModel(VesselBase, Base):
 
 
 class PlateTypes(Base):
-    """WellTypes table model"""
+    """PlateTypes table model"""
 
     __tablename__ = "panda_plate_types"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -530,7 +530,7 @@ class PlateTypes(Base):
     base_thickness: Mapped[float] = mapped_column(Float, default=1.0)
 
     def __repr__(self):
-        return f"<WellTypes(id={self.id}, substrate={self.substrate}, gasket={self.gasket}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.y_spacing}, height_mm={self.gasket_height_mm}, max_liquid_height_mm={self.max_liquid_height_mm}, capacity_ul={self.capacity_ul})>"
+        return f"<PlateTypes(id={self.id}, substrate={self.substrate}, gasket={self.gasket}, count={self.count}, shape={self.shape}, radius_mm={self.radius_mm}, offset_mm={self.y_spacing}, height_mm={self.gasket_height_mm}, max_liquid_height_mm={self.max_liquid_height_mm}, capacity_ul={self.capacity_ul})>"
 
 
 class Wellplates(Base, DeckObjectBase):

@@ -200,7 +200,6 @@ class Well:
         if height < self.well_data.dead_volume:
             return self.well_data.dead_volume / (3.14 * self.well_data.radius**2)
 
-    @property
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
@@ -224,6 +223,7 @@ class Well:
         self.well_data = WellWriteModel.model_validate(
             self.service.create_well(new_well)
         )
+        self.save()
         self.load_well()
 
     def load_well(self):
@@ -474,30 +474,59 @@ class Wellplate:
             well.update_coordinates(self.calculate_well_coordinates(row, col))
 
     def calculate_well_coordinates(self, row: str, col: int) -> dict:
-        x = (col - 1) * self.plate_type.x_spacing
-        y = (ord(row.upper()) - ord("A")) * self.plate_type.y_spacing
-        x, y = self.__calculate_rotated_position(
-            x,
-            y,
-            self.plate_data.orientation,
-            self.plate_data.a1_x,
-            self.plate_data.a1_y,
-        )
+        """
+        Calculate the x, y, z coordinates of a well in the wellplate
+        based on A1 position and the orientation of the wellplate.
+
+        Orientation:
+        0 - Vertical, wells become more negative from A1
+        1 - Vertical, wells become less negative from A1
+        2 - Horizontal, wells become more negative from A1
+        3 - Horizontal, wells become less negative from A1
+        """
+
+        if row.upper() == "A" and col == 1:
+            x = self.plate_data.a1_x
+            y = self.plate_data.a1_y
+        elif self.plate_data.orientation == 0:
+            x = (
+                self.plate_data.a1_x
+                - (ord(row.upper()) - ord("A")) * self.plate_type.x_spacing
+            )
+            y = self.plate_data.a1_y - (col - 1) * self.plate_type.y_spacing
+        elif self.plate_data.orientation == 1:
+            x = (
+                self.plate_data.a1_x
+                + (ord(row.upper()) - ord("A")) * self.plate_type.x_spacing
+            )
+            y = self.plate_data.a1_y + (col - 1) * self.plate_type.y_spacing
+        elif self.plate_data.orientation == 2:
+            x = self.plate_data.a1_x + (col - 1) * self.plate_type.y_spacing
+            y = (
+                self.plate_data.a1_y
+                - (ord(row.upper()) - ord("A")) * self.plate_type.x_spacing
+            )
+        elif self.plate_data.orientation == 3:
+            x = self.plate_data.a1_x - (col - 1) * self.plate_type.y_spacing
+            y = (
+                self.plate_data.a1_y
+                + (ord(row.upper()) - ord("A")) * self.plate_type.x_spacing
+            )
         return {"x": x, "y": y, "z": self.plate_data.coordinates["z"]}
 
-    def __calculate_rotated_position(
-        self, x: float, y: float, orientation: int, a1_x: float, a1_y: float
-    ) -> tuple:
-        if orientation == 0:
-            return a1_x - x, a1_y - y
-        elif orientation == 1:
-            return a1_x + x, a1_y + y
-        elif orientation == 2:
-            return a1_x + y, a1_y - x
-        elif orientation == 3:
-            return a1_x - y, a1_y + x
-        else:
-            raise ValueError("Invalid orientation value. Must be 0, 1, 2, or 3.")
+    # def __calculate_rotated_position(
+    #     self, x: float, y: float, orientation: int, a1_x: float, a1_y: float
+    # ) -> tuple:
+    #     if orientation == 0:
+    #         return a1_x - x, a1_y - y
+    #     elif orientation == 1:
+    #         return a1_x + x, a1_y + y
+    #     elif orientation == 2:
+    #         return a1_x + y, a1_y - x
+    #     elif orientation == 3:
+    #         return a1_x - y, a1_y + x
+    #     else:
+    #         raise ValueError("Invalid orientation value. Must be 0, 1, 2, or 3.")
 
     def activate_plate(self):
         self.plate_data = self.service.activate_plate(self.plate_data.id)
@@ -513,6 +542,19 @@ class Wellplate:
             if not axis
             else self.wells[well_id].coordinates[axis]
         )
+
+    def get_corners(self):
+        # FIXME: This assumes one orientation for the wellplate
+        return {
+            "top_left": self.calculate_well_coordinates("A", 1),
+            "top_right": self.calculate_well_coordinates(
+                "A", int(self.plate_data.cols)
+            ),
+            "bottom_left": self.calculate_well_coordinates(self.plate_data.rows[-1], 1),
+            "bottom_right": self.calculate_well_coordinates(
+                self.plate_data.rows[-1], int(self.plate_data.cols)
+            ),
+        }
 
     @property
     def id(self):
