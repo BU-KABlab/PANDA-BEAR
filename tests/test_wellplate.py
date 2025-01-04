@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
@@ -373,6 +375,9 @@ def test_load_active_wellplate_by_default(session: sessionmaker):
 
 
 def test_recalculate_well_positions(session: sessionmaker):
+    with open("tests/well_positions.json") as f:
+        well_positions = json.load(f)
+
     plate = Wellplate(
         session_maker=session,
         plate_id=3,
@@ -385,20 +390,15 @@ def test_recalculate_well_positions(session: sessionmaker):
         rows="ABCDEFGH",
         cols=12,
     )
-    assert plate.plate_data.coordinates == {"x": 0.0, "y": 0.0, "z": 0.0}
-    assert plate.wells["A1"].well_data.coordinates == {"x": 0.0, "y": 0.0, "z": 0.0}
-    plate.update_coordinates({"x": -100.0, "y": -100.0, "z": 0.0})
-    assert plate.plate_data.coordinates == {"x": -100.0, "y": -100.0, "z": 0.0}
-    assert plate.plate_data.a1_x == -100.0
-    assert plate.plate_data.a1_y == -100.0
 
-    plate.recalculate_well_positions()
-    for well in plate.wells.values():
-        assert well.well_data.coordinates["x"] is not None
-        assert well.well_data.coordinates["y"] is not None
+    for orientation in range(4):
+        plate.plate_data.orientation = orientation
+        plate.recalculate_well_positions()
+        expected_positions = well_positions[f"orientation_{orientation}"]
 
-    assert plate.wells["A1"].well_data.coordinates["x"] == -100.0
-    assert plate.wells["A1"].well_data.coordinates["y"] == -100.0
+        for well_id, coords in expected_positions.items():
+            assert plate.wells[well_id].well_data.coordinates["x"] == coords["x"]
+            assert plate.wells[well_id].well_data.coordinates["y"] == coords["y"]
 
 
 def test_activate_plate(session: sessionmaker):
