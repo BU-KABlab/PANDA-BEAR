@@ -3,7 +3,6 @@
         "aaron-bond.better-comments",
         "analytic-signal.preview-tiff",
         "charliermarsh.ruff",
-        "donjayamanne.python-environment-manager",
         "esbenp.prettier-vscode",
         "foxundermoon.shell-format",
         "github.copilot",
@@ -34,6 +33,7 @@
         "tamasfe.even-better-toml",
         "techer.open-in-browser",
         "twxs.cmake",
-        "yzhang.markdown-all-in-one"
+        "yzhang.markdown-all-in-one",
+        "ms-python.vscode-python-envs"
     ]
 }
