@@ -365,14 +365,14 @@ class VesselBase(DeckObjectBase):
     volume_height: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(json_extract(coordinates, '$.z') + base_thickness + ((volume) / (pi() * power(radius, 2))), 2)"
+            "round(json_extract(coordinates, '$.z') + base_thickness + ((volume) / (3.1459 * radius * radius)), 2)"
         ),
     )
     contents: Mapped[dict] = mapped_column(JSON, default={})
     bottom: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(json_extract(coordinates, '$.z') + base_thickness + ((dead_volume) / (pi() * power(radius, 2))), 2)"
+            "round(json_extract(coordinates, '$.z') + base_thickness + ((dead_volume) / (3.1459 * radius * radius)), 2)"
         ),
     )
 
@@ -424,7 +424,7 @@ class Vials(Base):
     volume_height: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + ((volume) / (pi() * power(radius, 2))), 2)"
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + (volume / (3.1459 * radius * radius)), 2)"
         ),
     )
     top: Mapped[float] = mapped_column(
@@ -436,7 +436,7 @@ class Vials(Base):
     bottom: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + ((dead_volume) / (pi() * power(radius, 2))), 2)"
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + (dead_volume / (3.1459 * radius * radius)), 2)"
         ),
     )
 

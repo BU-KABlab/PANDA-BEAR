@@ -64,7 +64,7 @@ class ArduinoLink:
 
     arduinoQueue = queue.Queue()
 
-    def __init__(self, port_address: str = "COM3", baud_rate: int = 115200):
+    def __init__(self, port_address: str = "COM4", baud_rate: int = 115200):
         """Initialize the ArduinoLink class"""
         self.ser: Serial = None
         self.port_address: str = port_address
@@ -88,7 +88,7 @@ class ArduinoLink:
         if os.name == "posix":
             ports = serial.tools.list_ports.grep("ttyACM")
         elif os.name == "nt":
-            ports = serial.tools.list_ports.grep("COM")
+            ports = list(serial.tools.list_ports.grep("COM"))
         else:
             print("Unsupported OS")
             return
@@ -110,7 +110,7 @@ class ArduinoLink:
     def configure(self):
         """Configure the connection to the Arduino"""
         if self.ser is None:
-            self.ser = Serial(self.choose_arduino_port(), self.baud_rate, self.timeout)
+            self.ser = Serial(self.choose_arduino_port(), self.baud_rate, timeout=self.timeout)
         else:
             self.ser = Serial(self.port_address, self.baud_rate, self.timeout)
 

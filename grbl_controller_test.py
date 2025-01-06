@@ -130,13 +130,14 @@ def test_movement_around_deck():
             self.height = 100
             self.base_thickness = 10
             self.coordinates = {"x": -100, "y": -100, "z": -200}
-            self.top = -90
+            self.top = -78
             self.bottom = -190
 
     # Set up labware
     # wellplate = Wellplate()
     # stock, waste = read_vials()
     mill = grbl.PandaMill()
+    mill.connect_to_mill()
 
     # Make a calibration object with is simply a cylinder with a known radius and height at a known position
     cal = CalibrationObject()
@@ -176,8 +177,16 @@ def test_movement_around_deck():
             first = command
         print(f"{first.x}, {first.y}, {first.z}")
 
+def current_status_check():
+    from panda_lib import grlb_mill_wrapper as grbl
+    mill = grbl.PandaMill()
+    mill.connect_to_mill()
+    for i in range(10):
+        print(mill.current_status())
+    mill.disconnect()
 
 if __name__ == "__main__":
     # test_grbl_controller()
     # test_panda_grbl_wrapper()
-    test_movement_around_deck()
+    # test_movement_around_deck()
+    current_status_check()

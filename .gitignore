@@ -1,6 +1,6 @@
 #Untracked directories
-logs/
-data/
+# logs/
+# data/
 .devcontainer/installers/*
 panda_lib/config/panda_sdl_config.ini
 node_modules/*

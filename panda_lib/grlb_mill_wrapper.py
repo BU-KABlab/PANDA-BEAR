@@ -19,7 +19,7 @@ mill_control_logger = set_up_mill_logger(Path(read_logging_dir()))
 
 
 # A wrapper for the grbl_cnc_mill library adding electrode specific functions,
-class PandaMill(MockMill):
+class PandaMill(Mill):
     """A wrapper for the grbl_cnc_mill library adding electrode specific functions."""
 
     def __init__(self):

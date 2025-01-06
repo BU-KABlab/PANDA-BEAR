@@ -50,7 +50,7 @@ def main():
     print(f"Vial {vial} has been created")
     # Set up the hardware connections
     with PandaMill() as mill:
-        with pawduino.MockArduinoLink() as arduino:
+        with pawduino.ArduinoLink() as arduino:
             # Check the tools in the tool manager
             print("Tools in the tool manager:")
             for tool in mill.tool_manager.tool_offsets.values():

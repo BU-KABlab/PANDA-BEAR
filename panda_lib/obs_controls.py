@@ -52,8 +52,8 @@ class OBSController:
         client_port=OBSSecrets.PORT,
         client_timeout=3,
     ):
-        if config.getboolean("OPTIONS", "testing"):
-            return MockOBSController()
+        # if config.getboolean("OPTIONS", "testing"):
+        #     return MockOBSController()
         try:
             self.client = obsws.ReqClient(
                 host=client_host,
@@ -152,8 +152,8 @@ Well: {well_id}"""
 
     def start_recording(self):
         """Start the recording"""
-        if config.getboolean("OPTIONS", "testing"):
-            return
+        # if config.getboolean("OPTIONS", "testing"):
+        #     return
         try:
             self.client.start_record()
             self.logger.info("Recording started.")
@@ -162,8 +162,8 @@ Well: {well_id}"""
 
     def stop_recording(self):
         """Stop the recording"""
-        if config.getboolean("OPTIONS", "testing"):
-            return
+        # if config.getboolean("OPTIONS", "testing"):
+        #     return
         try:
             self.client.stop_record()
             self.logger.info("Recording stopped.")
@@ -199,6 +199,17 @@ Well: {well_id}"""
             )
         except OBSerror.OBSSDKRequestError as e:
             self.logger.error("Error changing image: %s", e)
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        try:
+            self.stop_recording()
+        except Exception:
+            pass
+
+        self.client.disconnect()
 
 
 class MockOBSController:

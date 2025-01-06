@@ -116,14 +116,14 @@ class Mill:
         """Checks the mill config for soft limits to be enabled, and then if so check the x, y, and z max travel limits"""
         working_volume: Coordinates = Coordinates(0, 0, 0)
         multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
-        if self.config["$20"] == 1:
+        if int(self.config["$20"]) == 1:
             self.logger.info("Soft limits are enabled in the mill config")
-            if self.config["$3"] == 0:
+            if int(self.config["$3"]) == 0:
                 self.logger.info("Using default working volume, third octant")
                 multiplier = -1
-            working_volume.x = self.config["$130"] * multiplier
-            working_volume.y = self.config["$131"] * multiplier
-            working_volume.z = self.config["$132"] * multiplier
+            working_volume.x = float(self.config["$130"]) * multiplier
+            working_volume.y = float(self.config["$131"]) * multiplier
+            working_volume.z = float(self.config["$132"]) * multiplier
         else:
             self.logger.warning("Soft limits are not enabled in the mill config")
             self.logger.warning("Using default working volume")
@@ -154,7 +154,7 @@ class Mill:
 
     def connect_to_mill(
         self,
-        port="COM4",
+        port="COM11",
         baudrate=115200,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
@@ -184,11 +184,11 @@ class Mill:
                 else:
                     self.logger.error("Serial connection to mill failed to open")
                     raise MillConnectionError("Error opening serial connection to mill")
-
+            self.ser_mill = ser_mill
             self.logger.info("Mill connected: %s", ser_mill.is_open)
             print("Mill connected: ", ser_mill.is_open)
 
-            self.config = self.read_mill_config()
+            self.read_mill_config()
         except Exception as exep:
             self.logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
@@ -294,7 +294,7 @@ class Mill:
     def read_mill_config(self):
         """Read the mill config from the mill and set it as an attribute"""
         try:
-            if self.ser_mill.is_open:
+            if self.ser_mill is not None and self.ser_mill.is_open:
                 self.logger.info("Reading mill config")
                 mill_config = (
                     self.grbl_settings()
@@ -327,7 +327,7 @@ class Mill:
         try:
             self.logger.debug("Command sent: %s", command)
             self.command_logger.debug("%s", command)
-            command_bytes = str(command).encode()
+            command_bytes = str(command).encode(encoding="ascii")
             self.ser_mill.write(command_bytes + b"\n")
             time.sleep(2)
             mill_response = self.ser_mill.readline().decode().rstrip()
@@ -345,6 +345,8 @@ class Mill:
                 # parse the settings into a dictionary
                 settings_dict = {}
                 for setting in full_mill_response:
+                    if setting in ['',"Grbl 1.1h ['$' for help]","[MSG:'$H'|'$X' to unlock]"]:
+                        continue
                     setting: str
                     key, value = setting.split("=")
                     settings_dict[key] = value
@@ -425,12 +427,12 @@ class Mill:
     def current_status(self) -> str:
         """Get the current status of the mill"""
         command = "?"
-        command_bytes = command.encode()
+        command_bytes = command.encode(encoding="ascii")
         status = ""
-        attempt_limit = 25
+        attempt_limit = 10
         while status == "" and attempt_limit > 0:
-            self.ser_mill.write(command_bytes + b"\n")
-            time.sleep(0.25)
+            self.ser_mill.write(command_bytes)
+            time.sleep(1)
             status = self.ser_mill.readline().decode().rstrip()
             attempt_limit -= 1
         # Check for busy
@@ -484,14 +486,14 @@ class Mill:
 
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
-        status_mode = self.config["$10"]
+        status_mode = int(self.config["$10"])
 
-        if status_mode not in [0, 1, 2, 3]:
+        if int(status_mode) not in [0, 1, 2, 3]:
             self.logger.error("Invalid status mode")
             raise ValueError("Invalid status mode")
 
         max_attempts = 3
-        homing_pull_off = self.config["$27"]
+        homing_pull_off = float(self.config["$27"])
 
         pattern = wpos_pattern if status_mode in [0, 2] else mpos_pattern
         coord_type = "WPos" if status_mode in [0, 2] else "MPos"
