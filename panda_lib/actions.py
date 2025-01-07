@@ -943,7 +943,9 @@ def image_well(
             else:
                 toolkit.arduino.white_lights_on()
             logger.debug("Capturing image of well %s", instructions.well_id)
-            capture_new_image(save=True, num_images=1, file_name=filepath)
+            capture_new_image(
+                save=True, num_images=1, file_name=filepath, logger=logger
+            )
             toolkit.arduino.lights_off()
             dz_filename = filepath.stem + "_dz" + filepath.suffix
             dz_filepath = filepath.with_name(dz_filename)
