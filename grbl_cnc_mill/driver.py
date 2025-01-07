@@ -16,12 +16,13 @@ of the mill.
 # pylint: disable=line-too-long
 
 # standard libraries
+import os
 import json
 import re
 import time
 from pathlib import Path
 from typing import Optional
-
+import serial.tools.list_ports
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
@@ -50,6 +51,7 @@ RAPID_MILL_MOVE = (
 # Compile regex patterns for extracting coordinates from the mill status
 wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
+
 
 
 class Mill:
@@ -152,24 +154,126 @@ class Mill:
         if current_coordinates.z != 0:
             self.max_z_height = current_coordinates.z
 
+    def locate_mill_over_serial(self, port: Optional[str] = None) -> str:
+        """
+        Locate the mill over serial
+
+        Start with the port proivded and attempt to connect and then query for the mill settings ($$) to verify the connection. The response should begin with a $ and end with an ok
+
+        If the response does not begin with a $, scan for connected devices and attempt to connect to each one until a valid response is received.
+        """
+        def get_ports():
+            """List all available ports"""
+            if os.name == "posix":
+                ports = list(serial.tools.list_ports.grep("ttyUSB"))
+            elif os.name == "nt":
+                ports = list(serial.tools.list_ports.grep("COM"))
+            else:
+                raise OSError("Unsupported OS")
+            return ports
+                
+        def read_past_found_on_port()->str:
+            """Read past the found on port"""
+            with open(Path(__file__).parent / "mill_port.txt", "r") as file:
+                found_on = file.read()
+
+            if not found_on:
+                return []
+
+            return [found_on]
+
+        baudrate = 115200
+        parity = serial.PARITY_NONE
+        stopbits = serial.STOPBITS_ONE
+        bytesize = serial.EIGHTBITS
+        timeout = 10
+        ports = [port] if port else read_past_found_on_port()
+        for port in get_ports():
+            ports.append(port.device)
+        found = False
+        found_on = None
+        while not found:
+            for port in ports:
+                try:
+                    ser_mill = serial.Serial(
+                        port=port,
+                        baudrate=baudrate,
+                        parity=parity,
+                        stopbits=stopbits,
+                        bytesize=bytesize,
+                        timeout=timeout,
+                    )
+                    time.sleep(2)
+                    if not ser_mill.is_open:
+                        self.logger.info("Looking for mill on port %s", port)
+                        ser_mill.open()
+                        time.sleep(2)
+                        if ser_mill.is_open:
+                            self.logger.info("Serial connection opened successfully on port %s", port)
+                            self.active_connection = True
+                        else:
+                            self.logger.error("Serial connection to mill failed to open")
+                            continue
+                    
+                    self.logger.info("Querying the mill for status")
+                    statuses = ser_mill.readlines(4) # Read in any initial messages
+                    status = statuses[1].decode().rstrip() if statuses else ""
+                    # Check for "Grbl #.#[A-Z]" to verify the connection
+                    if not status:
+                        self.logger.warning("Initial status reading from the mill is blank")
+                        # Try to get settings
+                        settings = ser_mill.write(b"$$\n")
+                        time.sleep(2)
+                        settings = [item.decode().rstrip() for item in ser_mill.readlines()]
+                        settings = settings[1:-1] if settings else []
+                        if not settings:
+                            self.logger.error("Failed to get settings from the mill")
+                            ser_mill.close()
+                            continue
+                        if not settings[0][0] == "$" or not settings[-1]=="ok":
+                            self.logger.error("Invalid settings returned from the mill")
+                            ser_mill.close()
+                            continue
+                        else:
+                            found = True
+                            found_on = port
+                            ser_mill.close()
+                            break
+                    else:
+                        if "Grbl" not in status:
+                            self.logger.error("Invalid status returned from the mill")
+                            ser_mill.close()
+                            continue
+                    self.logger.info("Mill connected: %s", ser_mill.is_open)
+                    found = True
+                    found_on = port
+                    ser_mill.close()
+                    break
+                except Exception as exep:
+                    self.logger.error("Error connecting to port %s: %s",port, str(exep))
+                    self.active_connection = False
+                    continue
+                finally:
+                    ser_mill.close()
+
+        # Write the port to a file for future use
+        with open(Path(__file__).parent / "mill_port.txt", "w") as file:
+            file.write(found_on)
+
+        return found_on
+
     def connect_to_mill(
         self,
-        port="COM11",
+        port: Optional[str] = None,
         baudrate=115200,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS,
-        timeout=10,
+        timeout=3,
     ) -> serial.Serial:
         """Connect to the mill"""
         try:
             ser_mill = serial.Serial(
                 # Hardcoded serial port (consider making this configurable)
-                port=port,
+                port=self.locate_mill_over_serial(port),
                 baudrate=baudrate,
-                parity=parity,
-                stopbits=stopbits,
-                bytesize=bytesize,
                 timeout=timeout,
             )
             time.sleep(2)
@@ -186,21 +290,25 @@ class Mill:
                     raise MillConnectionError("Error opening serial connection to mill")
             self.ser_mill = ser_mill
             self.logger.info("Mill connected: %s", ser_mill.is_open)
-            print("Mill connected: ", ser_mill.is_open)
+            # print("Mill connected: ", ser_mill.is_open)
 
-            self.read_mill_config()
+            
         except Exception as exep:
             self.logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
 
+        # Update the mill config file with the settings from the mill
+        self.read_mill_config()
+        self.write_mill_config_file("_configuration.json")
+        self.read_working_volume()
+
         self.check_for_alarm_state()
         self.clear_buffers()
-        self.read_mill_config()
         return self.ser_mill
 
     def check_for_alarm_state(self):
         """Check if the mill is in an alarm state"""
-        status = self.ser_mill.readlines()
+        status = self.serial_rx()
         self.logger.debug("Status: %s", status)
         if not status:
             self.logger.warning("Initial status reading from the mill is blank")
@@ -246,8 +354,9 @@ class Mill:
     def __enter__(self):
         """Enter the context manager"""
         self.connect_to_mill()
-        self.read_mill_config()
-        self.homing_sequence()
+        
+        if not self.homed:
+            self.homing_sequence()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -329,15 +438,14 @@ class Mill:
             self.command_logger.debug("%s", command)
             command_bytes = str(command).encode(encoding="ascii")
             self.ser_mill.write(command_bytes + b"\n")
-            time.sleep(2)
-            mill_response = self.ser_mill.readline().decode().rstrip()
+            time.sleep(0.5)
 
             if command == "$$":
-                full_mill_response = []
-                full_mill_response.append(mill_response)
+                # This is a special command that returns multiple lines
+                full_mill_response = [self.ser_mill.readline().decode(encoding="ascii").rstrip()]
                 while full_mill_response[-1] != "ok":
                     full_mill_response.append(
-                        self.ser_mill.readline().decode().rstrip()
+                        self.ser_mill.readline().decode(encoding="ascii").rstrip()
                     )
                 full_mill_response = full_mill_response[:-1]
                 self.logger.debug("Returned %s", full_mill_response)
@@ -352,8 +460,9 @@ class Mill:
                     settings_dict[key] = value
 
                 return settings_dict
-
-            elif not command.startswith("$"):
+            
+            mill_response = self.serial_rx()
+            if not command.startswith("$"):
                 # self.logger.debug("Initially %s", mill_response)
                 mill_response = self.__wait_for_completion(mill_response)
                 self.logger.debug("Returned %s", mill_response)
@@ -412,7 +521,7 @@ class Mill:
 
             time.sleep(2)  # Check every 2 seconds
 
-    def __wait_for_completion(self, incoming_status, timeout=90):
+    def __wait_for_completion(self, incoming_status, timeout=5):
         """Wait for the mill to complete the previous command"""
         status = incoming_status
         start_time = time.time()
@@ -421,24 +530,46 @@ class Mill:
                 self.logger.warning("Command execution timed out")
                 return status
             status = self.current_status()
-            time.sleep(0.25)
+        # print("Time to wait for completion: ", time.time() - start_time)
         return status
 
     def current_status(self) -> str:
         """Get the current status of the mill"""
-        command = "?"
-        command_bytes = command.encode(encoding="ascii")
-        status = ""
-        attempt_limit = 10
-        while status == "" and attempt_limit > 0:
-            self.ser_mill.write(command_bytes)
-            time.sleep(1)
-            status = self.ser_mill.readline().decode().rstrip()
+        # start_time = time.time()
+        attempt_limit = 5
+        status = self.serial_rx()
+        # print(status)
+
+        while status in ["","ok"] and attempt_limit > 0:
+            self.ser_mill.write(b'?')
+            time.sleep(0.2)
+            status = self.serial_rx()
+            # print(status) if status else None
             attempt_limit -= 1
+
+        if not status:
+            # Try reading multiple lines looking for an error or alarm
+            status = self.ser_mill.readlines()
+            status = [item.decode().rstrip() for item in status]
+            if not status:
+                self.logger.error("Failed to get status from the mill")
+                raise StatusReturnError("Failed to get status from the mill")
+            if any(re.search(r"\b(error|alarm)\b", item.lower()) for item in status):
+                self.logger.error("Error in status: %s", status)
+                raise StatusReturnError(f"Error in status: {status}")
         # Check for busy
-        while status == "ok":
-            status = self.ser_mill.readline().decode().rstrip()
+        # while status == "ok":
+        #     status = self.serial_rx()
+        # print("Time to get status: ", time.time() - start_time)
         return status
+
+    def serial_rx(self):
+        msg = self.ser_mill.read(1)
+        if msg == b"":
+            return ""
+        msg += self.ser_mill.read_all()
+        msg=msg.decode(encoding='ascii')
+        return msg
 
     def set_feed_rate(self, rate):
         """Set the feed rate"""
@@ -446,8 +577,8 @@ class Mill:
 
     def clear_buffers(self):
         """Clear input and output buffers"""
-        self.ser_mill.flushInput()  # Clear input buffer
-        self.ser_mill.flushOutput()  # Clear output buffer
+        self.ser_mill.flush()  # Clear input buffer
+        self.ser_mill.read_all()  # Clear output buffer
 
     def gcode_mode(self):
         """Ask the mill for its gcode mode"""
@@ -481,9 +612,13 @@ class Mill:
             mill_center (Coordinates): [x,y,z]
             tool_head (Coordinates): [x,y,z]
         """
-
-        status = self.current_status()
-
+        self.ser_mill.write(b'?')
+        time.sleep(0.2)
+        status = self.serial_rx()
+        attempts = 0
+        while status[0] != "<" and attempts < 3:
+            status = self.serial_rx()
+            attempts += 1
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
         status_mode = int(self.config["$10"])
@@ -498,7 +633,7 @@ class Mill:
         pattern = wpos_pattern if status_mode in [0, 2] else mpos_pattern
         coord_type = "WPos" if status_mode in [0, 2] else "MPos"
 
-        for _ in range(max_attempts):
+        for i in range(max_attempts):
             match = pattern.search(status)
             if match:
                 x_coord = round(float(match.group(1)), 3)
@@ -521,7 +656,7 @@ class Mill:
                     "%s coordinates not found in the line. Trying again...",
                     coord_type,
                 )
-            if _ == max_attempts - 1:
+            if i == max_attempts - 1:
                 self.logger.error(
                     "Error occurred while getting %s coordinates", coord_type
                 )
@@ -562,6 +697,7 @@ class Mill:
         z_coordinate: float = 0.00,
         coordinates: Coordinates = None,
         tool: str = "center",
+
     ) -> Coordinates:
         """
         Move the mill to the specified coordinates.
@@ -603,8 +739,9 @@ class Mill:
         )
         # command = MILL_MOVE.format(*goto)
         # self.execute_command(command)
-        self._execute_commands(commands)
-        return self.current_coordinates(tool)
+        command_str = "\n".join(commands)
+        self.execute_command(command_str)
+        return None # self.current_coordinates(tool)
 
     def update_offset(self, tool, offset_x, offset_y, offset_z):
         """
@@ -628,7 +765,7 @@ class Mill:
         coordinates: Coordinates = None,
         tool: str = "center",
         second_z_cord: float = None,
-        second_z_cord_feed: float = None,
+        second_z_cord_feed: float = 2000,
     ) -> Coordinates:
         """
         Move the mill to the specified coordinates using only horizontal (xy) and vertical movements.
@@ -661,7 +798,7 @@ class Mill:
         target_coordinates = self._calculate_target_coordinates(
             goto, current_coordinates, offsets
         )
-
+        self._validate_target_coordinates(target_coordinates)
         if self._is_already_at_target(target_coordinates, current_coordinates):
             self.logger.debug(
                 "%s is already at the target coordinates of [%s, %s, %s]",
@@ -685,7 +822,7 @@ class Mill:
         else:
             self.logger.debug("Not moving to Z=%s first", self.max_z_height)
 
-        self._validate_target_coordinates(target_coordinates)
+        
 
         commands.extend(
             self._generate_movement_commands(
@@ -699,10 +836,10 @@ class Mill:
             # Restore the feed rate to the default of 2000
             commands.append("F2000")
         # Form the individual movement commands into a block seperated by \n
-        commands = "\n".join(commands)
-        self._execute_commands(commands)
+        command_str = "\n".join(commands)
+        self.execute_command(command_str)
 
-        return self.current_coordinates(tool)
+        return None #self.current_coordinates(tool)
 
     def _is_already_at_target(
         self, goto: Coordinates, current_coordinates: Coordinates
@@ -727,9 +864,7 @@ class Mill:
         return Coordinates(
             x=goto.x + offsets.x,
             y=goto.y + offsets.y,
-            z=self.max_z_height
-            if goto.z + offsets.z > self.max_z_height
-            else goto.z + offsets.z,
+            z=max(self.working_volume.z+3, min(goto.z+offsets.z, self.max_z_height))
         )
 
     def _log_target_coordinates(self, target_coordinates: Coordinates):
@@ -781,12 +916,7 @@ class Mill:
 
         return commands
 
-    def _execute_commands(self, commands):
-        if isinstance(commands, str):
-            self.execute_command(commands)
-        else:
-            for command in commands:
-                self.execute_command(command)
+
 
     def __should_move_to_safe_position_first(
         self,

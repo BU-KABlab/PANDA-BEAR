@@ -92,16 +92,21 @@ class ArduinoLink:
         else:
             print("Unsupported OS")
             return
-        choices = []
-        print("PORT\tDEVICE\t\t\tMANUFACTURER")
-        for index, value in enumerate(sorted(ports)):
-            if value.hwid != "n/a":
-                choices.append(index)
-                print(index, "\t", value.name, "\t", value.manufacturer)
-        choice = int(input("Choose the port that the Arduino is connected to: "))
-        if choice in choices:
-            port = sorted(ports)[choice]
-            return port.name
+        # choices = []
+        # print("PORT\tDEVICE\t\t\tMANUFACTURER")
+        # for index, value in enumerate(sorted(ports)):
+        #     if value.hwid != "n/a":
+        #         choices.append(index)
+        #         print(index, "\t", value.name, "\t", value.manufacturer)
+        # choice = int(input("Choose the port that the Arduino is connected to: "))
+        # if choice in choices:
+        #     port = sorted(ports)[choice]
+        #     return port.name
+
+        # Look for Arduino LLC in the manufacturer field
+        for port in ports:
+            if "Arduino LLC" in port.manufacturer:
+                return port.name
 
     def close(self):
         """Close the connection to the Arduino"""
@@ -114,18 +119,19 @@ class ArduinoLink:
         else:
             self.ser = Serial(self.port_address, self.baud_rate, self.timeout)
 
-        if self.ser.isOpen():
+        if self.ser.is_open:
             print(f"Connected to {self.ser.name} at {self.baud_rate} baud")
 
             # Look for acknowlegement
-            rx = self.ser.readline().decode().strip()
+            time.sleep(2)
+            rx = self.ser.read_all().decode().strip()
             if rx == self.ack:
                 print("Arduino acknowledged connection")
                 self.configured = True
             else:
                 print("Arduino is not ready")
                 self.configured = False
-                return
+                raise ConnectionError
 
             rx = self.send(PawduinoFunctions.HELLO.value)
             if rx == PawduinoReturnCodes.HELLO.value:
@@ -133,12 +139,12 @@ class ArduinoLink:
                 self.configured = True
             else:
                 print("Arduino is not configured")
-                self.configured = False
-                return
+                raise ConnectionError
+                
         else:
             print(f"Failed to connect to {self.ser.name} at {self.baud_rate} baud")
             self.configured = False
-            return
+            raise ConnectionError
 
     def receive(self):
         """Listen to the Arduino and put the messages in the queue"""
@@ -170,8 +176,8 @@ class ArduinoLink:
         To be started elsewere.
         """
         msg = str(cmd)
-        self.ser.flushInput()
-        self.ser.flushOutput()
+        self.ser.flush()
+        self.ser.read_all()
         self.ser.write(msg.encode())
         time.sleep(0.5)
         while self.arduinoQueue.empty():
@@ -181,21 +187,21 @@ class ArduinoLink:
 
     def send(self, cmd):
         """Send a message to the Arduino and wait for a response"""
-        self.ser.flushInput()
-        self.ser.flushOutput()
+        self.ser.flush()
+        self.ser.read_all()
         msg = str(cmd)
         attempts = 0
-        while True:
+        while True and attempts < 3:
             self.ser.write(msg.encode())
             time.sleep(0.5)
             rx = self.receive()
             if rx is not None:
                 break
-            else:
-                attempts += 1
-                if attempts > 3:
-                    print("Failed to communicate with Arduino")
-                    return None
+            
+            attempts += 1
+        
+        if rx is None:
+            raise ConnectionError
         try:
             return int(rx)
         except (ValueError, TypeError):

@@ -694,9 +694,8 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
         working_volume = {
             "x": -float(mill_config["$130"]),
             "y": -float(mill_config["$131"]),
-            "z": -float(mill_config["$132"]),
+            "z": -200 #-float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
         }
-        # FIXME Note this is assuming the mill in use is working in negative coordinate space
 
         ## Get the current plate id and location
         statement = select(Wellplates).filter_by(current=1)
