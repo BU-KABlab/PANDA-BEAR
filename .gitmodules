@@ -4,3 +4,7 @@
 [submodule "sartorius"]
 	path = sartorius
 	url = https://github.com/BU-KABlab/sartorius.git
+
+[submodule "SpinnakerVideoCapture"]
+	path = SpinnakerVideoCapture
+	url = https://github.com/matsuren/SpinnakerVideoCapture.git
