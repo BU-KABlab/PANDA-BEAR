@@ -1,14 +1,15 @@
-#!/c:/Users/Kab Lab/anaconda3/envs/python360/python.exe
 """
-Requires the PyCapture2 library to be installed and run in a python 3.6 environment.
+Requires the PySpin library to be installed and run in a python <=3.10 environment.
 This script is used to capture images from the FLIR camera.
 """
 
-from configparser import ConfigParser
 import logging
-from pathlib import Path
 import os
+from configparser import ConfigParser
+from pathlib import Path
 from typing import Union
+
+import cv2
 import PySpin
 from dotenv import load_dotenv
 
@@ -387,6 +388,7 @@ def acquire_images(
                     # image_converted: PySpin.ImagePtr = processor.Convert(
                     #     image_result, PySpin.PixelFormat_BayerBG8
                     # )
+                    image_converted = cv2.cvtColor(image_result, cv2.COLOR_BAYER_GR2BGR)
 
                     # Create a unique filename
                     if device_serial_number:
@@ -402,14 +404,17 @@ def acquire_images(
                     #  overwriting those of another.
                     if image_path is None:
                         image_path = Path("images")
-                        filepath = os.path.join(image_path, filename)
+                        filepath: Path = Path(os.path.join(image_path, filename))
                     else:
                         image_path = Path(image_path)
-                        filepath = image_path
+                        filepath: Path = image_path
+
+                    converted_path = filepath.with_name(f"{filename}_converted.tiff")
+
                     if filepath.suffix != ".tiff":
                         filepath = filepath.with_suffix(".tiff")
-                    # image_converted.Save(filepath)
-                    image_result.Save(str(filepath))
+                    cv2.imwrite(str(filepath), image_converted)
+                    image_result.Save(str(converted_path))
                     print(f"Image saved at {filepath}...")
 
                     #  Release image
