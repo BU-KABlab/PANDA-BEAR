@@ -10,6 +10,7 @@ from pathlib import Path
 
 import obsws_python as obsws
 from obsws_python import error as OBSerror
+from obsws_python.error import OBSSDKRequestError
 
 from .config.config_tools import read_config
 from .log_tools import default_logger as logger
@@ -157,6 +158,10 @@ Well: {well_id}"""
         try:
             self.client.start_record()
             self.logger.info("Recording started.")
+        except OBSSDKRequestError as e:
+            self.client.stop_record()
+            self.client.start_record()
+        
         except Exception as e:
             self.logger.error("Error starting recording: %s", e)
 

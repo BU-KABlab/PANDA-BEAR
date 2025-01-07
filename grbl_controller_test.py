@@ -127,66 +127,70 @@ def test_movement_around_deck():
         def __init__(self):
             self.name = "calibration"
             self.radius = 14
-            self.height = 100
-            self.base_thickness = 10
+            self.height = 68
+            self.base_thickness = 4
             self.coordinates = {"x": -100, "y": -100, "z": -200}
-            self.top = -78
-            self.bottom = -190
+            self.top = self.coordinates["z"] + self.height + self.base_thickness
+            self.bottom = self.coordinates["z"] + self.base_thickness
 
     # Set up labware
     # wellplate = Wellplate()
     # stock, waste = read_vials()
-    mill = grbl.PandaMill()
-    mill.connect_to_mill()
-
     # Make a calibration object with is simply a cylinder with a known radius and height at a known position
     cal = CalibrationObject()
-    c = []
-    # Move the center tool to above the calibration object at z = 0
-    c.append(mill.safe_move(-100, -100, 0, tool="center"))
+    print(f"Calibration object: {cal.__dict__}")
 
-    # Move the center tool to the top of the calibration object
-    c.append(mill.safe_move(-100, -100, cal.top, tool="center"))
+    with grbl.PandaMill() as mill:
 
-    # Move the pipette tool to the top of the calibration object
-    c.append(mill.safe_move(-100, -100, cal.top, tool="pipette"))
+        
+        # Move the center tool to above the calibration object at z = 0
+        print(f"Moving 'center' to coords: {-100}, {-100}, {0}")
+        print(mill.safe_move(-100, -100, 0, tool="center"))
 
-    # Move the pipette tool to the bottom of the calibration object
-    c.append(mill.safe_move(-100, -100, cal.bottom, tool="pipette"))
+        # Move the center tool to the top of the calibration object
+        print(f"Moving 'center' to coords: {-100}, {-100}, {cal.top}")
+        print(mill.safe_move(-100, -100, cal.top, tool="center"))
 
-    # Move the electrode tool to the top of the calibration object
-    c.append(mill.safe_move(-100, -100, cal.top, tool="electrode"))
+        # Move the pipette tool to the top of the calibration object
+        print(f"Moving 'pipette' to coords: {-100}, {-100}, {cal.top}")
+        print(mill.safe_move(-100, -100, cal.top, tool="pipette"))
 
-    # Move the electrode tool to the bottom of the calibration object
-    c.append(mill.safe_move(-100, -100, cal.bottom, tool="electrode"))
+        # Move the pipette tool to the bottom of the calibration object
+        print(f"Moving 'pipette' to coords: {-100}, {-100}, {cal.bottom}")
+        print(mill.safe_move(-100, -100, cal.bottom, tool="pipette"))
 
-    # Move the decapper tool to the top of the calibration object
-    c.append(mill.safe_move(-100, -100, cal.top, tool="decapper"))
+        # Move the electrode tool to the top of the calibration object
+        print(f"Moving 'electrode' to coords: {-100}, {-100}, {cal.top}")
+        print(mill.safe_move(-100, -100, cal.top, tool="electrode"))
 
-    # Move the decapper tool to the bottom of the calibration object
-    c.append(mill.safe_move(-100, -100, cal.bottom, tool="decapper"))
+        # Move the electrode tool to the bottom of the calibration object
+        print(f"Moving 'electrode' to coords: {-100}, {-100}, {cal.bottom}")
+        print(mill.safe_move(-100, -100, cal.bottom, tool="electrode"))
 
-    # Disconnect from the mill
-    mill.disconnect()
+        # Move the decapper tool to the top of the calibration object
+        print(f"Moving 'decapper' to coords: {-100}, {-100}, {cal.top}")
+        print(mill.safe_move(-100, -100, cal.top, tool="decapper"))
 
-    print("Commands executed:")
-    for command in c:
-        if isinstance(command, tuple):
-            first = command[0]
-        else:
-            first = command
-        print(f"{first.x}, {first.y}, {first.z}")
+def test_new_command_concatenation():
+    from panda_lib import grlb_mill_wrapper as grbl
+    with grbl.PandaMill() as mill:
+        mill.safe_move(-100, -100, -50, tool="center")
+
+        input("Press enter to continue")
+        
 
 def current_status_check():
     from panda_lib import grlb_mill_wrapper as grbl
     mill = grbl.PandaMill()
     mill.connect_to_mill()
-    for i in range(10):
+    for i in range(100):
         print(mill.current_status())
     mill.disconnect()
 
 if __name__ == "__main__":
     # test_grbl_controller()
     # test_panda_grbl_wrapper()
+
+    # current_status_check()
     # test_movement_around_deck()
-    current_status_check()
+    test_new_command_concatenation()

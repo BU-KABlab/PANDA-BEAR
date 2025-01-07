@@ -16,56 +16,62 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
-repetitions = 3
-pause = 10
+repetitions = 100
+pause = 3600
 
 
 def main():
     # Set up the OBS controller
-    obs_controller = OBSController()
-    obs_controller.set_recording_file_name("decapper_validation")
-    obs_controller.place_text_on_screen("Decapper validation program")
-    obs_controller.start_recording()
-    # populate the database with the vial
-    vkwargs = VialKwargs(
-        category=0,
-        name="edot",
-        contents={"edot": 20000},
-        viscosity_cp=1,
-        concentration=0.01,
-        density=1,
-        height=69,
-        radius=14,
-        volume=20000,
-        capacity=20000,
-        contamination=0,
-        coordinates={"x": -4, "y": -106, "z": -200},
-        base_thickness=1,
-        dead_volume=1000,
-    )
-    vial = StockVial(
-        position="s0", create_new=True, session_maker=SessionLocal, **vkwargs
-    )
-    vial.save()
-    print(f"Vial {vial} has been created")
-    # Set up the hardware connections
-    with PandaMill() as mill:
-        with pawduino.ArduinoLink() as arduino:
-            # Check the tools in the tool manager
-            print("Tools in the tool manager:")
-            for tool in mill.tool_manager.tool_offsets.values():
-                print(tool)
+    try:
+        obs_controller = OBSController()
+        obs_controller.set_recording_file_name("decapper_validation")
+        obs_controller.place_text_on_screen("Decapper validation program")
+        obs_controller.start_recording()
+        # populate the database with the vial
+        vkwargs = VialKwargs(
+            category=0,
+            name="edot",
+            contents={"edot": 20000},
+            viscosity_cp=1,
+            concentration=0.01,
+            density=1,
+            height=69,
+            radius=14,
+            volume=20000,
+            capacity=20000,
+            contamination=0,
+            coordinates={"x": -4, "y": -106, "z": -200},
+            base_thickness=1,
+            dead_volume=1000,
+        )
+        vial = StockVial(
+            position="s0", create_new=True, session_maker=SessionLocal, **vkwargs
+        )
+        vial.save()
+        print(f"Vial {vial} has been created")
+        # Set up the hardware connections
+        with PandaMill() as mill:
+            with pawduino.ArduinoLink() as arduino:
+                # Check the tools in the tool manager
+                print("Tools in the tool manager:")
+                for tool in mill.tool_manager.tool_offsets.values():
+                    print(tool)
 
-            if "decapper" not in mill.tool_manager.tool_offsets:
-                mill.add_tool("decapper", (-74, 0, 56))
-            if mill.homed:
-                print("Mill has been homed")
-            else:
-                print("Mill has not been homed")
-                exit()
+                if "decapper" not in mill.tool_manager.tool_offsets:
+                    mill.add_tool("decapper", (-74, 0, 56))
+                if mill.homed:
+                    print("Mill has been homed")
+                else:
+                    print("Mill has not been homed")
+                    exit()
 
-            # Run the decapping validation program
-            decapping_validation(mill, vial, arduino, obs_controller)
+                # Run the decapping validation program
+                decapping_validation(mill, vial, arduino, obs_controller)
+    except Exception as e:
+        print(e)
+    finally:
+        obs_controller.stop_recording()
+
 
 
 def decapping_validation(
@@ -75,7 +81,7 @@ def decapping_validation(
     # 100x decapping and capping of the vial
     # 1 hr pause
     # 100x decapping, bringing the pipette to the vial bottom, and then capping the vial
-
+    arduino.curvature_lights_on()
     # Decap and cap the vial 100 times with progress bar
     obs.place_text_on_screen(f"Decapping and capping the vial {repetitions} times")
     for i in tqdm(range(repetitions), desc="Decapping and capping"):
@@ -130,7 +136,7 @@ def decapping_validation(
     obs.place_text_on_screen(
         f"Decapping and capping the vial {repetitions} times: Done"
     )
-    obs.stop_recording()
+    arduino.curvature_lights_off()
 
 
 def decapping_sequence(
@@ -151,7 +157,7 @@ def decapping_sequence(
 
     # Move the decapper up 20mm
     mill.move_to_position(
-        target_coords.x, target_coords.y, target_coords.z + 20, tool="decapper"
+        target_coords.x, target_coords.y, target_coords.z + 20, tool="decapper",
     )
 
 
@@ -174,16 +180,16 @@ def capping_sequence(
 
     # Move the decapper +10mm in the y direction
     mill.move_to_position(
-        target_coords.x, target_coords.y + 10, target_coords.z, tool="decapper"
+        target_coords.x, target_coords.y + 10, target_coords.z+10, tool="decapper"
     )
 
-    # Move the decapper +10mm in the z direction
-    mill.move_to_position(
-        target_coords.x,
-        target_coords.y + 10,
-        target_coords.z + 10,
-        tool="decapper",
-    )
+    # # Move the decapper +10mm in the z direction
+    # mill.move_to_position(
+    #     target_coords.x,
+    #     target_coords.y + 10,
+    #     target_coords.z + 10,
+    #     tool="decapper",
+    # )
 
 
 if __name__ == "__main__":
