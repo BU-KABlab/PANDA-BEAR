@@ -16,16 +16,17 @@ of the mill.
 # pylint: disable=line-too-long
 
 # standard libraries
-import os
 import json
+import os
 import re
 import time
 from pathlib import Path
 from typing import Optional
-import serial.tools.list_ports
+
 # third-party libraries
 # from pydantic.dataclasses import dataclass
 import serial
+import serial.tools.list_ports
 
 from .exceptions import (
     CommandExecutionError,
@@ -52,6 +53,16 @@ RAPID_MILL_MOVE = (
 wpos_pattern = re.compile(r"WPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 mpos_pattern = re.compile(r"MPos:([\d.-]+),([\d.-]+),([\d.-]+)")
 
+axis_conf_table = [
+    {"setting_value": 0, "reverse_x": 0, "reverse_y": 0, "reverse_z": 0},
+    {"setting_value": 1, "reverse_x": 1, "reverse_y": 0, "reverse_z": 0},
+    {"setting_value": 2, "reverse_x": 0, "reverse_y": 1, "reverse_z": 0},
+    {"setting_value": 3, "reverse_x": 1, "reverse_y": 1, "reverse_z": 0},
+    {"setting_value": 4, "reverse_x": 0, "reverse_y": 0, "reverse_z": 1},
+    {"setting_value": 5, "reverse_x": 1, "reverse_y": 0, "reverse_z": 1},
+    {"setting_value": 6, "reverse_x": 0, "reverse_y": 1, "reverse_z": 1},
+    {"setting_value": 7, "reverse_x": 1, "reverse_y": 1, "reverse_z": 1},
+]
 
 
 class Mill:
@@ -120,12 +131,14 @@ class Mill:
         multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
         if int(self.config["$20"]) == 1:
             self.logger.info("Soft limits are enabled in the mill config")
-            if int(self.config["$3"]) == 0:
-                self.logger.info("Using default working volume, third octant")
-                multiplier = -1
-            working_volume.x = float(self.config["$130"]) * multiplier
-            working_volume.y = float(self.config["$131"]) * multiplier
-            working_volume.z = float(self.config["$132"]) * multiplier
+            # axis_conf_setting_value = int(self.config["$3"])
+            # axis_conf = axis_conf_table[axis_conf_setting_value]
+            xmultiplier = -1  # if axis_conf["reverse_x"] else 1
+            ymultiplier = -1  # if axis_conf["reverse_y"] else 1
+            zmultiplier = -1  # if axis_conf["reverse_z"] else 1
+            working_volume.x = float(self.config["$130"]) * xmultiplier
+            working_volume.y = float(self.config["$131"]) * ymultiplier
+            working_volume.z = float(self.config["$132"]) * zmultiplier
         else:
             self.logger.warning("Soft limits are not enabled in the mill config")
             self.logger.warning("Using default working volume")
@@ -162,6 +175,7 @@ class Mill:
 
         If the response does not begin with a $, scan for connected devices and attempt to connect to each one until a valid response is received.
         """
+
         def get_ports():
             """List all available ports"""
             if os.name == "posix":
@@ -171,8 +185,8 @@ class Mill:
             else:
                 raise OSError("Unsupported OS")
             return ports
-                
-        def read_past_found_on_port()->str:
+
+        def read_past_found_on_port() -> str:
             """Read past the found on port"""
             with open(Path(__file__).parent / "mill_port.txt", "r") as file:
                 found_on = file.read()
@@ -182,10 +196,8 @@ class Mill:
 
             return [found_on]
 
+        ser_mill = serial.Serial()
         baudrate = 115200
-        parity = serial.PARITY_NONE
-        stopbits = serial.STOPBITS_ONE
-        bytesize = serial.EIGHTBITS
         timeout = 10
         ports = [port] if port else read_past_found_on_port()
         for port in get_ports():
@@ -198,9 +210,6 @@ class Mill:
                     ser_mill = serial.Serial(
                         port=port,
                         baudrate=baudrate,
-                        parity=parity,
-                        stopbits=stopbits,
-                        bytesize=bytesize,
                         timeout=timeout,
                     )
                     time.sleep(2)
@@ -209,28 +218,36 @@ class Mill:
                         ser_mill.open()
                         time.sleep(2)
                         if ser_mill.is_open:
-                            self.logger.info("Serial connection opened successfully on port %s", port)
+                            self.logger.info(
+                                "Serial connection opened successfully on port %s", port
+                            )
                             self.active_connection = True
                         else:
-                            self.logger.error("Serial connection to mill failed to open")
+                            self.logger.error(
+                                "Serial connection to mill failed to open"
+                            )
                             continue
-                    
+
                     self.logger.info("Querying the mill for status")
-                    statuses = ser_mill.readlines(4) # Read in any initial messages
+                    statuses = ser_mill.readlines(4)  # Read in any initial messages
                     status = statuses[1].decode().rstrip() if statuses else ""
                     # Check for "Grbl #.#[A-Z]" to verify the connection
                     if not status:
-                        self.logger.warning("Initial status reading from the mill is blank")
+                        self.logger.warning(
+                            "Initial status reading from the mill is blank"
+                        )
                         # Try to get settings
                         settings = ser_mill.write(b"$$\n")
                         time.sleep(2)
-                        settings = [item.decode().rstrip() for item in ser_mill.readlines()]
+                        settings = [
+                            item.decode().rstrip() for item in ser_mill.readlines()
+                        ]
                         settings = settings[1:-1] if settings else []
                         if not settings:
                             self.logger.error("Failed to get settings from the mill")
                             ser_mill.close()
                             continue
-                        if not settings[0][0] == "$" or not settings[-1]=="ok":
+                        if not settings[0][0] == "$" or not settings[-1] == "ok":
                             self.logger.error("Invalid settings returned from the mill")
                             ser_mill.close()
                             continue
@@ -250,11 +267,13 @@ class Mill:
                     ser_mill.close()
                     break
                 except Exception as exep:
-                    self.logger.error("Error connecting to port %s: %s",port, str(exep))
+                    self.logger.error(
+                        "Error connecting to port %s: %s", port, str(exep)
+                    )
                     self.active_connection = False
                     continue
                 finally:
-                    ser_mill.close()
+                    ser_mill.close() if ser_mill.is_open else None
 
         # Write the port to a file for future use
         with open(Path(__file__).parent / "mill_port.txt", "w") as file:
@@ -271,7 +290,6 @@ class Mill:
         """Connect to the mill"""
         try:
             ser_mill = serial.Serial(
-                # Hardcoded serial port (consider making this configurable)
                 port=self.locate_mill_over_serial(port),
                 baudrate=baudrate,
                 timeout=timeout,
@@ -292,7 +310,6 @@ class Mill:
             self.logger.info("Mill connected: %s", ser_mill.is_open)
             # print("Mill connected: ", ser_mill.is_open)
 
-            
         except Exception as exep:
             self.logger.error("Error connecting to the mill: %s", str(exep))
             raise MillConnectionError("Error connecting to the mill") from exep
@@ -308,7 +325,7 @@ class Mill:
 
     def check_for_alarm_state(self):
         """Check if the mill is in an alarm state"""
-        status = self.serial_rx()
+        status = self.read()
         self.logger.debug("Status: %s", status)
         if not status:
             self.logger.warning("Initial status reading from the mill is blank")
@@ -354,7 +371,7 @@ class Mill:
     def __enter__(self):
         """Enter the context manager"""
         self.connect_to_mill()
-        
+
         if not self.homed:
             self.homing_sequence()
         return self
@@ -385,7 +402,7 @@ class Mill:
             self.ser_mill = None
         return
 
-    def read_mill_config_file(self, config_file):
+    def read_mill_config_file(self, config_file: str = "_configuration.json"):
         """Read the config file"""
         try:
             config_file_path = Path(__file__).parent / config_file
@@ -419,7 +436,7 @@ class Mill:
             self.logger.error("Error reading mill config: %s", str(exep))
             raise MillConfigError("Error reading mill config") from exep
 
-    def write_mill_config_file(self, config_file):
+    def write_mill_config_file(self, config_file="_configuration.json"):
         """Write the mill config to the config file"""
         try:
             config_file_path = Path(__file__).parent / config_file
@@ -442,7 +459,9 @@ class Mill:
 
             if command == "$$":
                 # This is a special command that returns multiple lines
-                full_mill_response = [self.ser_mill.readline().decode(encoding="ascii").rstrip()]
+                full_mill_response = [
+                    self.ser_mill.readline().decode(encoding="ascii").rstrip()
+                ]
                 while full_mill_response[-1] != "ok":
                     full_mill_response.append(
                         self.ser_mill.readline().decode(encoding="ascii").rstrip()
@@ -453,15 +472,20 @@ class Mill:
                 # parse the settings into a dictionary
                 settings_dict = {}
                 for setting in full_mill_response:
-                    if setting in ['',"Grbl 1.1h ['$' for help]","[MSG:'$H'|'$X' to unlock]"]:
+                    if setting in [
+                        "",
+                        "Grbl 1.1h ['$' for help]",
+                        "[MSG:'$H'|'$X' to unlock]",
+                        "[MSG:Check Limits]",
+                    ]:
                         continue
                     setting: str
                     key, value = setting.split("=")
                     settings_dict[key] = value
 
                 return settings_dict
-            
-            mill_response = self.serial_rx()
+
+            mill_response = self.read()
             if not command.startswith("$"):
                 # self.logger.debug("Initially %s", mill_response)
                 mill_response = self.__wait_for_completion(mill_response)
@@ -500,7 +524,7 @@ class Mill:
 
     def soft_reset(self):
         """Soft reset the mill"""
-        self.execute_command("0x18")
+        self.execute_command("^X")
 
     def home(self, timeout=90):
         """Home the mill with a timeout"""
@@ -519,9 +543,14 @@ class Mill:
                 self.homed = True
                 break
 
-            time.sleep(2)  # Check every 2 seconds
+            if "Alarm" in status:
+                # Try homing again
+                self.logger.warning("Homing failed, trying again...")
+                self.execute_command("$H")
 
-    def __wait_for_completion(self, incoming_status, timeout=5):
+            time.sleep(1)
+
+    def __wait_for_completion(self, incoming_status, timeout=30):
         """Wait for the mill to complete the previous command"""
         status = incoming_status
         start_time = time.time()
@@ -537,13 +566,13 @@ class Mill:
         """Get the current status of the mill"""
         # start_time = time.time()
         attempt_limit = 5
-        status = self.serial_rx()
+        status = self.read()
         # print(status)
 
-        while status in ["","ok"] and attempt_limit > 0:
-            self.ser_mill.write(b'?')
+        while status in ["", "ok"] and attempt_limit > 0:
+            self.ser_mill.write(b"?")
             time.sleep(0.2)
-            status = self.serial_rx()
+            status = self.read()
             # print(status) if status else None
             attempt_limit -= 1
 
@@ -563,13 +592,28 @@ class Mill:
         # print("Time to get status: ", time.time() - start_time)
         return status
 
-    def serial_rx(self):
+    def write(self, command: str):
+        """Write a command to the mill"""
+        command = command.upper()
+        if command != "?":
+            # If not a status request, ensure there is a carriage return at the end
+            command += "\n"
+
+        self.ser_mill.write(command.encode(encoding="ascii"))
+
+    def read(self):
         msg = self.ser_mill.read(1)
         if msg == b"":
             return ""
         msg += self.ser_mill.read_all()
-        msg=msg.decode(encoding='ascii')
+        msg = msg.decode(encoding="ascii")
         return msg
+
+    def txrx(self, command: str) -> str:
+        """Write a command to the mill and read the response"""
+        self.write(command)
+        time.sleep(0.2)
+        return self.read()
 
     def set_feed_rate(self, rate):
         """Set the feed rate"""
@@ -612,12 +656,12 @@ class Mill:
             mill_center (Coordinates): [x,y,z]
             tool_head (Coordinates): [x,y,z]
         """
-        self.ser_mill.write(b'?')
+        self.ser_mill.write(b"?")
         time.sleep(0.2)
-        status = self.serial_rx()
+        status = self.read()
         attempts = 0
         while status[0] != "<" and attempts < 3:
-            status = self.serial_rx()
+            status = self.read()
             attempts += 1
         # Get the current mode of the mill
         # 0=WCS position, 1=Machine position, 2= plan/buffer and WCS position, 3=plan/buffer and Machine position.
@@ -697,7 +741,6 @@ class Mill:
         z_coordinate: float = 0.00,
         coordinates: Coordinates = None,
         tool: str = "center",
-
     ) -> Coordinates:
         """
         Move the mill to the specified coordinates.
@@ -741,7 +784,7 @@ class Mill:
         # self.execute_command(command)
         command_str = "\n".join(commands)
         self.execute_command(command_str)
-        return None # self.current_coordinates(tool)
+        return None  # self.current_coordinates(tool)
 
     def update_offset(self, tool, offset_x, offset_y, offset_z):
         """
@@ -822,8 +865,6 @@ class Mill:
         else:
             self.logger.debug("Not moving to Z=%s first", self.max_z_height)
 
-        
-
         commands.extend(
             self._generate_movement_commands(
                 current_coordinates, target_coordinates, move_to_zero
@@ -839,7 +880,7 @@ class Mill:
         command_str = "\n".join(commands)
         self.execute_command(command_str)
 
-        return None #self.current_coordinates(tool)
+        return None  # self.current_coordinates(tool)
 
     def _is_already_at_target(
         self, goto: Coordinates, current_coordinates: Coordinates
@@ -864,7 +905,9 @@ class Mill:
         return Coordinates(
             x=goto.x + offsets.x,
             y=goto.y + offsets.y,
-            z=max(self.working_volume.z+3, min(goto.z+offsets.z, self.max_z_height))
+            z=max(
+                self.working_volume.z + 3, min(goto.z + offsets.z, self.max_z_height)
+            ),
         )
 
     def _log_target_coordinates(self, target_coordinates: Coordinates):
@@ -915,8 +958,6 @@ class Mill:
                 commands.append(f"G01 Z{target_coordinates.z}")
 
         return commands
-
-
 
     def __should_move_to_safe_position_first(
         self,
