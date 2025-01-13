@@ -70,6 +70,7 @@ dependencies = [
     "tzdata==2024.1",
     "websocket-client==1.8.0",
     "ruff>=0.8.3",
+    "spinnaker-python",
 ]
 
 [tool.ruff]
@@ -154,3 +155,6 @@ docstring-code-line-length = "dynamic"
 
 [tool.pytest.ini_options]
 pythonpath = "panda_lib"
+
+[tool.uv.sources]
+spinnaker-python = { path = "P:/panda_sdl_3rd_party_software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" }
