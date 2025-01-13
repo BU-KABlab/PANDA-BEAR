@@ -388,7 +388,9 @@ def acquire_images(
                     # image_converted: PySpin.ImagePtr = processor.Convert(
                     #     image_result, PySpin.PixelFormat_BayerBG8
                     # )
-                    image_converted = cv2.cvtColor(image_result, cv2.COLOR_BAYER_GR2BGR)
+                    image_converted = cv2.cvtColor(
+                        image_result.GetNDArray(), cv2.COLOR_BAYER_GR2BGR
+                    )
 
                     # Create a unique filename
                     if device_serial_number:
@@ -409,12 +411,14 @@ def acquire_images(
                         image_path = Path(image_path)
                         filepath: Path = image_path
 
-                    converted_path = filepath.with_name(f"{filename}_converted.tiff")
+                    converted_path = filepath.with_name(
+                        f"{image_path.name}_converted.tiff"
+                    )
 
                     if filepath.suffix != ".tiff":
                         filepath = filepath.with_suffix(".tiff")
-                    cv2.imwrite(str(filepath), image_converted)
-                    image_result.Save(str(converted_path))
+                    cv2.imwrite(str(converted_path), image_converted)
+                    image_result.Save(str(filepath))
                     print(f"Image saved at {filepath}...")
 
                     #  Release image
