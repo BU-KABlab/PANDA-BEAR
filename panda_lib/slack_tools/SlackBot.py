@@ -26,7 +26,7 @@ from slack_sdk.errors import SlackApiError
 import panda_lib.experiment_class as exp
 from panda_lib import vials
 from panda_lib.config.config_tools import read_config, read_testing_config
-from panda_lib.imaging.image_tools import add_data_zone
+from panda_lib.imaging.panda_image_tools import add_data_zone
 from panda_lib.obs_controls import OBSController
 from panda_lib.sql_tools import (
     sql_queue,
