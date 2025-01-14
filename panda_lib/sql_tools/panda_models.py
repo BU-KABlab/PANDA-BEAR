@@ -509,7 +509,7 @@ class WellModel(VesselBase, Base):
 class PlateTypes(Base):
     """PlateTypes table model"""
 
-    __tablename__ = "panda_plate_types"
+    __tablename__ = "panda_wellplate_types"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     substrate: Mapped[str] = mapped_column(String)
     gasket: Mapped[str] = mapped_column(String)
