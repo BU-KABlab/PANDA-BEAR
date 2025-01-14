@@ -315,7 +315,7 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
             ## Check if the well is available
             if check_well_status(experiment.well_id, experiment.plate_id) != "new":
                 # Check that the plate ID exists
-                if not check_if_plate_type_exists(experiment.well_type_number):
+                if not check_if_plate_type_exists(experiment.plate_type_number):
                     logger.error(
                         "Plate type %s does not exist, cannot add experiment to queue",
                         experiment.plate_id,
@@ -340,7 +340,7 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
                     continue
 
                 if (
-                    plate_info.type_id != experiment.well_type_number
+                    plate_info.type_id != experiment.plate_type_number
                     or plate_info.id != experiment.plate_id
                 ):
                     logger.error(

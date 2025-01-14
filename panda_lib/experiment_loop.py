@@ -212,7 +212,7 @@ def experiment_loop_worker(
             well: Well = toolkit.wellplate.wells[current_experiment.well_id]
             if (
                 well.plate_id != toolkit.wellplate.plate_id
-                or current_experiment.well_type_number != toolkit.wellplate.type_number
+                or current_experiment.plate_type_number != toolkit.wellplate.type_number
             ):
                 logger.error(
                     "The experiment object's well type and wellplate id do not match the current wellplate"
@@ -603,7 +603,7 @@ def _initialize_experiment(
     well = labware.wellplate.wells[exp_obj.well_id]
     if (
         well.plate_id != labware.wellplate.id
-        or exp_obj.well_type_number != labware.wellplate.type_id
+        or exp_obj.plate_type_number != labware.wellplate.type_id
     ):
         raise MismatchWellplateTypeError("Mismatched wellplate type or ID.")
 

@@ -354,10 +354,10 @@ class ExperimentBase:
         title="Solutions",
         description="Dictionary of solutions used in the experiment",
     )
-    well_type_number: int = Field(
+    plate_type_number: int = Field(
         default=None,
-        title="Well Type Number",
-        description="Type number of the well used in the experiment",
+        title="Plate Type Number",
+        description="Type number of the wellplate used in the experiment",
     )
     pumping_rate: float = Field(
         default=0.3,
@@ -1183,7 +1183,7 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.experiment_id,
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.well_type_number,
+                experiment.plate_type_number,
                 experiment.protocol_id,
                 experiment.pin,
                 experiment.experiment_type,
@@ -1288,7 +1288,7 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
             (
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.well_type_number,
+                experiment.plate_type_number,
                 experiment.protocol_id,
                 experiment.pin,
                 experiment.experiment_type,

@@ -40,7 +40,7 @@ for file in PARAMS_FOLDER.glob("*.json"):
         project_id=data["project_id"],
         solutions=data["solutions"],
         solutions_corrected=data["solutions_corrected"],
-        well_type_number=data["well_type_number"],
+        plate_type_number=data["well_type_number"],
         pumping_rate=data["pumping_rate"],
         status=data["status"],
         status_date=data["status_date"],
