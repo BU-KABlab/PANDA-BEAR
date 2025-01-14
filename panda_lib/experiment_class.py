@@ -25,7 +25,6 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
-from panda_lib.wellplate import Well
 
 global_logger = setup_default_logger(log_name="panda")
 experiment_logger = setup_default_logger(log_name="experiment_logger")
@@ -422,7 +421,7 @@ class ExperimentBase:
         description="Type of experiment",
         deprecated=True,
     )
-    well: Well = Field(
+    well: object = Field(
         default=None,
         title="Well",
         description="Well object associated with the experiment",
@@ -539,7 +538,7 @@ class ExperimentBase:
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
 
-        if not self.well or not isinstance(self.well, Well):
+        if not self.well or not isinstance(self.well, object):
             experiment_logger.warning("Well object not set. Checking for Well ID")
             if self.well_id:
                 self.well = sql_wellplate.get_well_by_id(self.well_id)
