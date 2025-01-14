@@ -12,6 +12,7 @@ from typing import Optional, Tuple, TypedDict
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
+from panda_lib.grlb_mill_wrapper import Coordinates
 from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.schemas import (
     PlateTypeModel,
@@ -200,6 +201,11 @@ class Well:
         if height < self.well_data.dead_volume:
             return self.well_data.dead_volume / (3.14 * self.well_data.radius**2)
 
+    @property
+    def top_coordinates(self) -> Coordinates:
+        """Returns the top coordinates of the well."""
+        return Coordinates(x=self.x, y=self.y, z=self.top)
+
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
@@ -311,7 +317,7 @@ class Well:
         self.save()
 
     def update_coordinates(self, new_coordinates: dict):
-        """Update the coordinates of the well"""
+        """Update the coordinates of the well and save to the database"""
         self.well_data.coordinates = new_coordinates
         self.save()
 
