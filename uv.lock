@@ -1124,6 +1124,7 @@ dependencies = [
     { name = "six" },
     { name = "slack-sdk" },
     { name = "smmap" },
+    { name = "spinnaker-python" },
     { name = "sqlalchemy" },
     { name = "sympy" },
     { name = "threadpoolctl" },
@@ -1194,6 +1195,7 @@ requires-dist = [
     { name = "six", specifier = "==1.16.0" },
     { name = "slack-sdk", specifier = "==3.32.0" },
     { name = "smmap", specifier = "==5.0.1" },
+    { name = "spinnaker-python", path = "P:/panda_sdl_3rd_party_software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" },
     { name = "sqlalchemy", specifier = "==2.0.34" },
     { name = "sympy", specifier = "==1.13.2" },
     { name = "threadpoolctl", specifier = "==3.5.0" },
@@ -1794,6 +1796,20 @@ sdist = { url = "https://files.pythonhosted.org/packages/88/04/b5bf6d21dc4041000
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a7/a5/10f97f73544edcdef54409f1d839f6049a0d79df68adbc1ceb24d1aaca42/smmap-5.0.1-py3-none-any.whl", hash = "sha256:e6d8668fa5f93e706934a62d7b4db19c8d9eb8cf2adbb75ef1b675aa332b69da", size = 24282 },
 ]
+
+[[package]]
+name = "spinnaker-python"
+version = "4.0.0.116"
+source = { path = "P:/panda_sdl_3rd_party_software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" }
+dependencies = [
+    { name = "numpy" },
+]
+wheels = [
+    { filename = "spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl", hash = "sha256:5d9e20c8b906d67640d47430e482321f897c763f79f65c6c24f03a66f87241d6" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "numpy", specifier = ">=1.15" }]
 
 [[package]]
 name = "sqlalchemy"

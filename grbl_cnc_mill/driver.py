@@ -550,11 +550,13 @@ class Mill:
 
             time.sleep(1)
 
-    def __wait_for_completion(self, incoming_status, timeout=30):
+    def __wait_for_completion(self, incoming_status, timeout=5):
         """Wait for the mill to complete the previous command"""
         status = incoming_status
         start_time = time.time()
         while "Idle" not in status:
+            if "<Run" in status:
+                start_time = time.time()
             if time.time() - start_time > timeout:
                 self.logger.warning("Command execution timed out")
                 return status

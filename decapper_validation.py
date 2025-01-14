@@ -30,8 +30,8 @@ def main():
         # populate the database with the vial
         vkwargs = VialKwargs(
             category=0,
-            name="edot",
-            contents={"edot": 20000},
+            name="IPA",
+            contents={"IPA": 20000},
             viscosity_cp=1,
             concentration=0.01,
             density=1,
@@ -58,7 +58,7 @@ def main():
                     print(tool)
 
                 if "decapper" not in mill.tool_manager.tool_offsets:
-                    mill.add_tool("decapper", (-74, 0, 56))
+                    mill.add_tool("decapper", (-74, 0, 57))
                 if mill.homed:
                     print("Mill has been homed")
                 else:

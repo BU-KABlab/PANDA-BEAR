@@ -68,6 +68,13 @@ class Coordinates:
 
     def __repr__(self):
         return f"Coordinates(x={self.x}, y={self.y}, z={self.z})"
+    
+    def to_dict(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+        }
 
 
 class ToolOffset:
