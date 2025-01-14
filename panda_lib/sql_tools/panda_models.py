@@ -558,7 +558,9 @@ class Wellplates(Base, DeckObjectBase):
 
     __tablename__ = "panda_wellplates"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    type_id: Mapped[int] = mapped_column(Integer, ForeignKey("panda_plate_types.id"))
+    type_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_wellplate_types.id")
+    )
     current: Mapped[bool] = mapped_column(Boolean, default=False)
     a1_x: Mapped[float] = mapped_column(Float)
     a1_y: Mapped[float] = mapped_column(Float)
