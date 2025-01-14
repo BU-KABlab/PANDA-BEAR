@@ -14,9 +14,9 @@ from panda_lib.actions import (
     Toolkit,
     _forward_pipette_v3,
     chrono_amp,
-    flush_v3,
+    flush_pipette,
     image_well,
-    rinse_v3,
+    rinse_well,
     waste_selector,
 )
 
@@ -191,7 +191,7 @@ def ca_deposition(
 
     exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
     exp_obj.set_status_and_save(ExperimentStatus.FLUSHING)
-    flush_v3(
+    flush_pipette(
         flush_solution_name=exp_obj.flush_sol_name,
         flush_volume=exp_obj.flush_sol_vol,
         flush_count=exp_obj.flush_count,
@@ -203,7 +203,7 @@ def ca_deposition(
             f"Rinsing the well {exp_obj.rinse_count}x with rinse",
             ExperimentStatus.RINSING,
         )
-        rinse_v3(
+        rinse_well(
             instructions=exp_obj,
             toolkit=toolkit,
         )

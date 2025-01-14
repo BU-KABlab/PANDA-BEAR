@@ -353,9 +353,12 @@ def transfer(
 
 
 @timing_wrapper
-def rinse_v3(
+def rinse_well(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
+    alt_sol_name: Optional[str] = None,
+    alt_vol: Optional[float] = None,
+    alt_count: Optional[int] = None,
 ):
     """
     Rinse the well with rinse_vol ul.
@@ -364,29 +367,31 @@ def rinse_v3(
     Args:
         instructions (Experiment): The experiment instructions
         toolkit (Toolkit): The toolkit object
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
+
     Returns:
         None (void function) since the objects are passed by reference
     """
+    sol_name = instructions.rinse_sol_name if alt_sol_name is None else alt_sol_name
+    vol = instructions.rinse_vol if alt_vol is None else alt_vol
+    count = instructions.rinse_count if alt_count is None else alt_count
 
     logger.info(
         "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
     )
     instructions.set_status_and_save(ExperimentStatus.RINSING)
-    for _ in range(instructions.rinse_count):
-        logger.info("Rinse %d of %d", _ + 1, instructions.rinse_count)
+    for _ in range(count):
+        logger.info("Rinse %d of %d", _ + 1, count)
         # Pipette the rinse solution into the well
         _forward_pipette_v3(
-            volume=instructions.rinse_vol,
-            src_vessel=instructions.rinse_sol_name,
+            volume=vol,
+            src_vessel=sol_name,
             dst_vessel=instructions.well,
             toolkit=toolkit,
         )
 
         # Clear the well
         _forward_pipette_v3(
-            volume=instructions.rinse_vol,
+            volume=vol,
             src_vessel=instructions.well,
             dst_vessel=waste_selector(
                 "waste",
@@ -451,7 +456,7 @@ def rinse_v3(
 
 
 @timing_wrapper
-def flush_v3(
+def flush_pipette(
     flush_solution_name: str,
     toolkit: Toolkit,
     flush_volume: float = 120.0,
@@ -461,14 +466,11 @@ def flush_v3(
     """
     Flush the pipette tip with the designated flush_volume ul to remove any residue
     Args:
-        waste_vials (list): The list of waste vials
-        stock_vials (list): The list of stock vials
         flush_solution_name (str): The name of the solution to flush with
-        mill (object): The mill object
-        pump (object): The pump object
-        pumping_rate (float): The pumping rate in ml/min
+        toolkit (Toolkit): The toolkit object
         flush_volume (float): The volume to flush with in microliters
         flush_count (int): The number of times to flush
+        instructions (ExperimentBase): The experiment instructions for setting the status
 
     Returns:
         None (void function) since the objects are passed by reference
@@ -992,10 +994,8 @@ def image_well(
 
 @timing_wrapper
 def mix(
-    mill: Union[Mill, MockMill],
-    pump: Union[SyringePump, MockPump],
+    toolkit: Union[Toolkit, Hardware],
     well: Well,
-    well_id: str,
     volume: float,
     mix_count: int = 3,
     mix_height: float = None,
@@ -1004,10 +1004,8 @@ def mix(
     Mix the solution in the well by pipetting it up and down
 
     Args:
-        mill (object): The mill object
-        pump (object): The pump object
-        wellplate (object): The wellplate object
-        well_id (str): The well to be mixed
+        toolkit (object): The toolkit object for hardware control
+        well (Well, str): The well to be mixed
         volume (float): The volume to be mixed
         mix_count (int): The number of times to mix
         mix_height (float): The height to mix at
@@ -1017,15 +1015,18 @@ def mix(
     else:
         mix_height = well.well_data.bottom + mix_height
 
-    logger.info("Mixing well %s %dx...", well_id, mix_count)
+    if isinstance(well, str):
+        well = toolkit.wellplate.get_well(well)
+
+    logger.info("Mixing well %s %dx...", well.name, mix_count)
 
     # Withdraw air for blow out volume
-    pump.withdraw_air(40)
+    toolkit.pump.withdraw_air(40)
 
     for i in range(mix_count):
-        logger.info("Mixing well %s %d of %d...", well_id, i + 1, mix_count)
+        logger.info("Mixing well %s %d of %d...", well.name, i + 1, mix_count)
         # Move to the bottom of the target well
-        mill.safe_move(
+        toolkit.mill.safe_move(
             x_coord=well.x,
             y_coord=well.y,
             z_coord=well.bottom,
@@ -1033,14 +1034,14 @@ def mix(
         )
 
         # Withdraw the solutions from the well
-        pump.withdraw(
+        toolkit.pump.withdraw(
             volume_to_withdraw=volume,
             solution=well,
-            rate=pump.max_pump_rate,
+            rate=toolkit.pump.max_pump_rate,
             weigh=False,
         )
 
-        mill.safe_move(
+        toolkit.mill.safe_move(
             x_coord=well.x,
             y_coord=well.y,
             z_coord=well.top,
@@ -1048,17 +1049,43 @@ def mix(
         )
 
         # Deposit the solution back into the well
-        pump.infuse(
+        toolkit.pump.infuse(
             volume_to_infuse=volume,
             being_infused=None,
             infused_into=well,
-            rate=pump.max_pump_rate,
+            rate=toolkit.pump.max_pump_rate,
             blowout_ul=0,
             weigh=False,
         )
 
-    pump.infuse_air(40)
-    mill.move_to_safe_position()
+    toolkit.pump.infuse_air(40)
+    toolkit.mill.move_to_safe_position()
+    return 0
+
+
+def clear_well(
+    toolkit: Union[Toolkit, Hardware],
+    well: Well,
+):
+    """
+    Clear the well by pipetting the solution out of the well
+
+    Args:
+        toolkit (object): The toolkit object for hardware control
+        well (Well, str): The well to be cleared
+        volume (float): The volume to be cleared
+    """
+    if isinstance(well, str):
+        well = toolkit.wellplate.get_well(well)
+
+    logger.info("Clearing well %s...", well.name)
+
+    transfer(
+        volume=well.volume,
+        src_vessel=well,
+        dst_vessel=waste_selector("waste", well.volume),
+        toolkit=toolkit,
+    )
     return 0
 
 
