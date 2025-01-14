@@ -70,6 +70,7 @@ dependencies = [
     "tzdata==2024.1",
     "websocket-client==1.8.0",
     "ruff>=0.8.3",
+    "pytest>=8.3.4",
 ]
 
 [tool.ruff]
