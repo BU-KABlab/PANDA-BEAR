@@ -165,12 +165,18 @@ class MockSerialToMill:
             else:
                 pass
 
-    def read(self):
-        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>".encode()
+    def read(self, size):
+        """Simulate reading from the serial connection"""
+        msg = f"<Idle|MPos:{self.current_x - 3},{self.current_y - 3},{self.current_z - 3}|Bf:15,127|FS:0,0>".encode()
+        return msg[:size]
+
+    def read_all(self):
+        """Simulate reading from the serial connection"""
+        return f"<Idle|MPos:{self.current_x - 3},{self.current_y - 3},{self.current_z - 3}|Bf:15,127|FS:0,0>\n".encode()
 
     def readline(self):
         """Simulate reading from the serial connection"""
-        return f"<Idle|MPos:{self.current_x-3},{self.current_y-3},{self.current_z-3}|Bf:15,127|FS:0,0>\n".encode()
+        return f"<Idle|MPos:{self.current_x - 3},{self.current_y - 3},{self.current_z - 3}|Bf:15,127|FS:0,0>\n".encode()
 
     def readlines(self):
         """Simulate reading from the serial connection"""
