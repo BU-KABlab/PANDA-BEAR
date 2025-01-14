@@ -6,14 +6,9 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from pytz import utc
 
-from panda_lib.experiment_class import ExperimentBase
-from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import PlateTypes, Wellplates
-from panda_lib.utilities import input_validation
-
 
 def add_data_zone(
-    image: Image, experiment: ExperimentBase = None, context: str = None
+    image: Image, experiment: object = None, context: str = None
 ) -> Image:
     """Adds a data zone to the bottom of the image."""
     # determin the size of the image
@@ -28,45 +23,16 @@ def add_data_zone(
         well_id = ""
         substrate = ""
     else:
-        pin = experiment.pin
-        date_time = experiment.status_date.isoformat(timespec="seconds")
-        project_id = experiment.project_id
-        campaign_id = experiment.project_campaign_id
-        experiment_id = experiment.experiment_id
-        wellplate_id = experiment.plate_id
-        well_id = experiment.well_id
-
-        try:
-            # substrate = str(
-            #     sql_utilities.execute_sql_command(
-            #         "SELECT substrate FROM well_types WHERE id = (SELECT type_id FROM wellplates WHERE id = ?)",
-            #         (wellplate_id,),
-            #     )[0][0]
-            # )
-            if experiment.well_type_number is None:
-                # Fetch the type number based on the plate id
-                if experiment.plate_id is not None:
-                    with SessionLocal() as session:
-                        experiment.well_type_number = (
-                            session.query(Wellplates)
-                            .filter_by(id=experiment.plate_id)
-                            .first()
-                            .type_id
-                        )
-                else:
-                    experiment.well_type_number = input_validation(
-                        "Enter the well type number: ", int, (0, 1000000), False, None
-                    )
-
-            with SessionLocal() as session:
-                substrate = (
-                    session.query(PlateTypes)
-                    .filter_by(id=experiment.well_type_number)
-                    .first()
-                    .substrate
-                )
-        except:
-            substrate = "ITO"
+        pin = getattr(experiment, "pin", "")
+        date_time = getattr(experiment, "status_date", datetime.now(tz=utc)).isoformat(
+            timespec="seconds"
+        )
+        project_id = getattr(experiment, "project_id", "")
+        campaign_id = getattr(experiment, "project_campaign_id", "")
+        experiment_id = getattr(experiment, "experiment_id", "")
+        wellplate_id = getattr(experiment, "plate_id", "")
+        well_id = getattr(experiment, "well_id", "")
+        substrate = getattr(experiment, "substrate", "ITO*")
 
     try:
         # Check the image file type
@@ -210,6 +176,9 @@ def add_data_zone(
     )
     draw_banner.text(
         (substrate_type_x, 30), f"{substrate}", font=font, fill="white", align="center"
+    )
+    draw_banner.text(
+        (substrate_type_x, 60), "ITO* is default if not given", font=font, fill="white"
     )
 
     image_with_banner = Image.new(
