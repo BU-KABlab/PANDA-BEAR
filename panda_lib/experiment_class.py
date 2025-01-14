@@ -165,6 +165,7 @@ class ExperimentStatus(str, Enum):
     SAVING = "saving"
     ANALYZING = "analyzing"
     MOVING = "moving"
+    PIPETTING = "pipetting"
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -737,7 +738,7 @@ class CorrectionFactorExperiment(ExperimentBase):
     correction_factor: float = float(1.0)
 
 
-@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
+@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=False))
 class EchemExperimentBase(ExperimentBase):
     """Define the data that is used to run an elechrochemical experiment.
 
