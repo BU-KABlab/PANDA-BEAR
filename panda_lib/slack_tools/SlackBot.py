@@ -763,7 +763,7 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
     # stock_vials["position"] = stock_vials["position"].astype(str)
     # stock_vials["volume"] = stock_vials["volume"].astype(float)
     spacing = 1
-    stock_vials = vials.get_current_vials("stock")  # returns a list of Vial objects
+    stock_vials = vials.read_vials("stock")[0]  # returns a list of Vial objects
     stock_vials = pd.DataFrame([vial for vial in stock_vials])
     stock_vials = stock_vials[["position", "volume", "name", "contents"]]
     stock_vials = stock_vials.dropna()
@@ -875,11 +875,11 @@ def well_status() -> Path:
     wellplate: Wellplate = None
     if wellplate_type.shape == "circular":
         wellplate = Wellplate(
-            type_number=type_number,
+            type_id=type_number,
         )
     elif wellplate_type.shape == "square":
         wellplate = Wellplate(
-            type_number=type_number,
+            type_id=type_number,
         )
 
     ## Well coordinates and colors
