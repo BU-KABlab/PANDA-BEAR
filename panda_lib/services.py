@@ -134,7 +134,7 @@ class VialService:
                 db_session.rollback()
                 raise ValueError(f"Error deleting vial: {e}")
 
-    def list_active_vials(self) -> List[VialReadModel]:
+    def list_active_vials(self, cat: Optional[int] = None) -> List[VialReadModel]:
         """
         Lists all active vials in the database.
 
@@ -145,7 +145,7 @@ class VialService:
             stmt = select(Vials).filter_by(active=True)
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
-
+            vials = [vial for vial in vials if vial.category == cat] if cat else vials
             # Log the raw data for debugging
             self.logger.debug("Fetched vials: %s", vials)
 
