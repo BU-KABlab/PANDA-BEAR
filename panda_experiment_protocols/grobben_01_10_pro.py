@@ -141,14 +141,14 @@ def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
 
     clear_well(toolkit, well)
     flush_pipette(
-        flush_solution_name="DMF-TBAPrise",
+        flush_solution_name="dmf-tbaprinse",
         toolkit=toolkit,
     )
     rinse_well(
         instructions=exp,
         toolkit=toolkit,
-        alt_sol_name="DMF-TBAPrise",
-        alt_sol_vol=320,
+        alt_sol_name="dmf-tbaprinse",
+        alt_vol=120,
         alt_count=4,
     )
 
@@ -169,6 +169,8 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
         exp.solutions["pgma-pama-phenol"]["concentration"],
         1,
     )
+    # The base we are using changes with each campaign but we follow the same protocol.
+    # This step checks to see which base is present in the instructions and uses that.
     base = None
     for key in ["tea", "tpa", "teaa"]:
         if key in exp.solutions:
@@ -238,7 +240,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
 
         try:
             chrono_amp(
-                instructions=exp,
+                ca_instructions=exp,
                 file_tag="CA_Deposition",
             )
         except Exception as e:
@@ -257,7 +259,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
 
     clear_well(toolkit, well)
     flush_pipette(
-        flush_solution_name="DMF-TBAPrise",
+        flush_solution_name="dmf-tbaprinse",
         toolkit=toolkit,
     )
     rinse_well(
@@ -267,7 +269,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
     image_well(
         toolkit=toolkit,
         instructions=exp,
-        image_name="Post Deposition",
+        step_description="Post Deposition",
     )
     log.info("PolyDeposition complete")
 
@@ -285,6 +287,9 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         exp.solutions["pgma-pama-phenol"]["concentration"],
         1,
     )
+
+    # The base we are using changes with each campaign but we follow the same protocol.
+    # This step checks to see which base is present in the instructions and uses that.
     base = None
     for key in ["tea", "tpa", "teaa"]:
         if key in exp.solutions:
@@ -389,12 +394,12 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         instructions=exp,
         toolkit=toolkit,
         alt_sol_name="ACNrinse",
-        alt_sol_vol=320,
+        alt_vol=120,
         alt_count=4,
     )
     image_well(
         toolkit=toolkit,
         instructions=exp,
-        image_name="Post PostCharacterization",
+        step_description="Post PostCharacterization",
     )
     log.info("PostCharacterization complete")
