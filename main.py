@@ -140,6 +140,24 @@ def run_sila_experiment_function():
     return exp_processes
 
 
+def run_queue():
+    """Runs the queue."""
+    queue = print_queue_info()
+
+    exp_processes = Process(
+        target=experiment_loop.sila_experiment_loop_worker,
+        kwargs={
+            "status_queue": status_queue,
+            "command_queue": exp_cmd_queue,
+            "process_id": ProcessIDs.CONTROL_LOOP,
+            "specific_experiment_ids": queue,
+        },
+    )
+    exp_processes.start()
+
+    return exp_processes
+
+
 def change_wellplate():
     """Changes the current wellplate."""
     new_plate_type = int(input("Enter the new wellplate type: ").strip().lower())
@@ -525,7 +543,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
     menu_options = {
         "0": run_sila_experiment_function,
-        # "1": None,
+        "1": run_queue,
         "1.1": stop_panda_sdl,
         "1.2": pause_panda_sdl,
         "1.3": resume_panda_sdl,
