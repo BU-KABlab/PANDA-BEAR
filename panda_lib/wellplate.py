@@ -12,8 +12,8 @@ from typing import Optional, Tuple, TypedDict
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from panda_lib.grlb_mill_wrapper import Coordinates
 from panda_lib.errors import OverDraftException, OverFillException
+from panda_lib.grlb_mill_wrapper import Coordinates
 from panda_lib.schemas import (
     PlateTypeModel,
     WellplateReadModel,
@@ -185,6 +185,10 @@ class Well:
     @property
     def bottom(self):
         return self.well_data.bottom
+
+    @property
+    def volume(self):
+        return self.well_data.volume
 
     @property
     def volume_height(self):
@@ -562,6 +566,9 @@ class Wellplate:
             ),
         }
 
+    def get_well(self, well_id: str) -> Well:
+        return self.wells[well_id]
+
     @property
     def id(self):
         return self.plate_data.id
@@ -700,7 +707,7 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
         working_volume = {
             "x": -float(mill_config["$130"]),
             "y": -float(mill_config["$131"]),
-            "z": -200 #-float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
+            "z": -200,  # -float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
         }
 
         ## Get the current plate id and location

@@ -577,7 +577,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
             menu_options.pop(key, None)
 
         print(f"""Missing essential labware:
-{', '.join(missing_labware)}
+{", ".join(missing_labware)}
 Experiments and generation are disabled until the labware is present.""")
 
     while True:

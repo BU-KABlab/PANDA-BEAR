@@ -118,7 +118,9 @@ def _handle_source_vessels(
 
     if isinstance(src_vessel, (str, Vial)):
         if isinstance(src_vessel, Vial):
-            src_vessel = src_vessel.name
+            src_vessel = src_vessel.name.lower()
+        else:
+            src_vessel = src_vessel.lower()
         stock_vials, _ = read_vials(db_session())
         selected_source_vessels = [
             vial
@@ -1038,7 +1040,6 @@ def mix(
             volume_to_withdraw=volume,
             solution=well,
             rate=toolkit.pump.max_pump_rate,
-            weigh=False,
         )
 
         toolkit.mill.safe_move(
@@ -1055,7 +1056,6 @@ def mix(
             infused_into=well,
             rate=toolkit.pump.max_pump_rate,
             blowout_ul=0,
-            weigh=False,
         )
 
     toolkit.pump.infuse_air(40)

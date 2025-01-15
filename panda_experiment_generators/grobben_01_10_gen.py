@@ -26,36 +26,36 @@ def main():
             experiments.append(
                 experiment_class.EchemExperimentBase(
                     experiment_id=experiment_id,
-                    protocol_id="grobben_01_10",
+                    protocol_id="grobben_01_10_pro",
                     well_id="A1",
-                    well_type_number=PLATE_TYPE,
+                    plate_type_number=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
                     project_id=PROJECT_ID,
                     project_campaign_id=CAMPAIGN_ID + i,
                     solutions={
                         "PGMA-PAMA-phenol": {
-                            "volume": 320,
+                            "volume": 90,
                             "concentration": 1.0,
                             "repeated": 1,
                         },
-                        "TEA": {"volume": 320, "concentration": 1.0, "repeated": 1},
-                        "TPA": {"volume": 320, "concentration": 1.0, "repeated": 1},
-                        "TEAA": {"volume": 320, "concentration": 1.0, "repeated": 1},
-                        "TBAP": {"volume": 320, "concentration": 1.0, "repeated": 1},
-                        "DMF-TBAPrise": {
-                            "volume": 320,
+                        "TEA": {"volume": 20, "concentration": 1.0, "repeated": 1},
+                        "TPA": {"volume": 20, "concentration": 1.0, "repeated": 1},
+                        "TEAA": {"volume": 20, "concentration": 1.0, "repeated": 1},
+                        "TBAP": {"volume": 40, "concentration": 1.0, "repeated": 1},
+                        "DMF-TBAPrinse": {
+                            "volume": 120,
                             "concentration": 1.0,
-                            "repeated": 1,
+                            "repeated": 6,
                         },
                         "DMFrinse": {
-                            "volume": 320,
+                            "volume": 120,
                             "concentration": 1.0,
-                            "repeated": 1,
+                            "repeated": 5,
                         },
                         "ACNrinse": {
-                            "volume": 320,
+                            "volume": 120,
                             "concentration": 1.0,
-                            "repeated": 12,
+                            "repeated": 9,
                         },
                     },
                     flush_sol_name="ACNrinse",
@@ -90,15 +90,19 @@ def main():
             )
             experiment_id += 1
             if experiments[-1].project_campaign_id == 1:
-                experiments[-1].solutions.pop("TPA")
-                experiments[-1].solutions.pop("TEAA")
+                experiments[-1].solutions.pop("tpa")
+                experiments[-1].solutions.pop("teaa")
             elif experiments[-1].project_campaign_id == 2:
-                experiments[-1].solutions.pop("TEA")
-                experiments[-1].solutions.pop("TEAA")
+                experiments[-1].solutions.pop("tea")
+                experiments[-1].solutions.pop("teaa")
             elif experiments[-1].project_campaign_id == 3:
-                experiments[-1].solutions.pop("TEA")
-                experiments[-1].solutions.pop("TPA")
+                experiments[-1].solutions.pop("tea")
+                experiments[-1].solutions.pop("tpa")
             else:
                 raise ValueError("Invalid campaign ID")
 
     scheduler.add_nonfile_experiments(experiments)
+
+
+if __name__ == "__main__":
+    main()

@@ -344,7 +344,7 @@ def delete_vial_position_and_hx_from_db(
 def input_new_vial_values(vialgroup: str) -> None:
     """For user inputting the new vial values for the state file"""
 
-    vials = read_vials(vialgroup)
+    vials = read_vials(vialgroup)[0]
     vials = sorted(vials, key=lambda x: x.position)
     vial_list = []
     vial_lines = []

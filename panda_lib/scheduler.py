@@ -132,13 +132,15 @@ def read_next_experiment_from_queue(
     else:
         experiment_id, _, filename, _, well_id = queue_info
     # Get the experiment information from the experiment table
-    experiment_base = select_experiment_information(experiment_id)
-    echem_experiment_base = select_experiment_paramaters(experiment_base)
+    experiment = select_experiment_information(experiment_id)
+    experiment.map_parameter_list_to_experiment(
+        select_experiment_paramaters(experiment_id)
+    )
 
     # Finally get the well id and plate id for the experiment based on the well_status view
-    echem_experiment_base.well_id = well_id
+    experiment.well_id = well_id
 
-    return echem_experiment_base, filename
+    return experiment, filename
 
 
 @timing_wrapper

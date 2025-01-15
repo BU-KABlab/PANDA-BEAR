@@ -107,6 +107,12 @@ class MockMill(RealMill):
             self.logger.error("Error reading mill config: %s", str(exep))
             raise MillConfigError("Error reading mill config") from exep
 
+    def __wait_for_completion(self, incoming_status, timeout=5):
+        return f"<Idle|MPos:{self.ser_mill.current_x - 3},{self.ser_mill.current_y - 3},{self.ser_mill.current_z - 3}|Bf:15,127|FS:0,0>"
+
+    def __current_status(self):
+        return f"<Idle|MPos:{self.ser_mill.current_x},{self.ser_mill.current_y},{self.ser_mill.current_z}|Bf:15,127|FS:0,0>"
+
 
 class MockSerialToMill:
     """A class that simulates a serial connection to the mill for testing purposes."""

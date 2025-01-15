@@ -336,11 +336,11 @@ class WellplateService:
                 raise ValueError(f"Plate type with id {type_id} not found.")
             return PlateTypeModel.model_validate(plate)
 
-    def get_wells(self, plate_id: int) -> List[WellWriteModel]:
+    def get_wells(self, plate_id: int) -> List[WellReadModel]:
         with self.session_maker() as db_session:
             stmt = select(WellDBModel).filter_by(plate_id=plate_id)
             wells = db_session.execute(stmt).scalars().all()
-            return [WellWriteModel.model_validate(well) for well in wells]
+            return [WellReadModel.model_validate(well) for well in wells]
 
     def update_plate(self, plate_id: int, updates: dict) -> WellPlateDBModel:
         with self.session_maker() as db_session:

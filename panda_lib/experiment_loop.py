@@ -464,6 +464,7 @@ def sila_experiment_loop_worker(
         wellplate=Wellplate(),
         global_logger=toolkit.global_logger,
     )
+    toolkit.wellplate = labware.wellplate
 
     def set_worker_state(state: SystemState):
         """Set the worker state"""
@@ -512,8 +513,9 @@ def sila_experiment_loop_worker(
         try:
             protocol_function(
                 experiment=exp_obj,
-                hardware=hardware,
-                labware=labware,
+                # hardware=hardware,
+                # labware=labware,
+                toolkit=toolkit,
             )
         except (
             OCPFailure,
@@ -638,11 +640,9 @@ def _validate_the_stock_solutions(exp: EchemExperimentBase, labware: Labware):
         )
 
     # Consolidate the check tables
-    check_table = {
-        **check_table_a,
-        **check_table_b,
-        **check_table_c,
-    }
+    check_table = {**check_table_a}
+    [check_table[key].extend(value) for key, value in check_table_b.items()]
+    [check_table[key].extend(value) for key, value in check_table_c.items()]
 
     sufficient_stock = all([sufficient_stock_1, sufficient_stock_2, sufficient_stock_3])
 
@@ -803,6 +803,7 @@ def _check_stock_vials(
 
     Returns:
         bool: True if there is enough volume in the stock vials to run the experiment
+        dict: Dictionary of solutions that are sufficient, insufficient, and missing
     """
     ## Check that the experiment has solutions and those soltuions are in the stock vials
 
@@ -811,8 +812,16 @@ def _check_stock_vials(
         "insufficient": [],
         "missing": [],
     }
-
     passes = True
+
+    # Lower all solutions in exp_solns
+    exp_solns = {key.lower(): value for key, value in exp_solns.items()}
+    # Lower all stock_vial names
+    for vial in stock_vials:
+        vial.vial_data.name.lower()
+        vial.vial_data.contents = {
+            key.lower(): value for key, value in vial.contents.items()
+        }
 
     if len(exp_solns) == 0:
         logger.warning("The experiment has no solutions.")
@@ -821,13 +830,12 @@ def _check_stock_vials(
     contents_keys_list = []
     for vial in stock_vials:
         for key in vial.contents.keys():
-            contents_keys_list.append(str(key).lower())
+            contents_keys_list.append(key)
 
     for solution in exp_solns:
-        solution_lwr = str(solution).lower()
-        logger.debug("Checking for solution %s in stock vials", solution_lwr)
+        logger.debug("Checking for solution %s in stock vials", solution)
 
-        if solution_lwr not in contents_keys_list:
+        if solution not in contents_keys_list:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
@@ -838,7 +846,7 @@ def _check_stock_vials(
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
     for solution in exp_solns:
-        solution_lwr = str(solution).lower()
+        solution_lwr = solution
         vol = exp_solns[solution]["volume"]
         try:
             rep = exp_solns[solution]["repeated"]
@@ -850,11 +858,7 @@ def _check_stock_vials(
                 vial.volume
                 for vial in stock_vials
                 if solution_lwr
-                in [
-                    str(key).lower()
-                    for vial in stock_vials
-                    for key in vial.contents.keys()
-                ]
+                in [key for vial in stock_vials for key in vial.contents.keys()]
             ]
         )  # we sum the volumes of all stock vials with the same name
         if volume_available < volume_required:

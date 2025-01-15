@@ -31,6 +31,10 @@ def run(experiment: EchemExperimentBase, toolkit: Toolkit):
     """Run the experiment."""
 
     toolkit.global_logger.info("Running experiment: " + experiment.experiment_name)
+    PreCharacterization(experiment, toolkit)
+    PolyDeposition(experiment, toolkit)
+    PostCharacterization(experiment, toolkit)
+    toolkit.global_logger.info("Experiment complete")
 
 
 def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
@@ -44,13 +48,13 @@ def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     log = toolkit.global_logger
     log.info("Running precharacterization for: " + exp.experiment_name)
     reag = Solution(
-        "PGMA-PAMA-phenol",
-        exp.solutions["PGMA-PAMA-phenol"]["volume"],
-        exp.solutions["PGMA-PAMA-phenol"]["concentration"],
+        "pgma-pama-phenol",
+        exp.solutions["pgma-pama-phenol"]["volume"],
+        exp.solutions["pgma-pama-phenol"]["concentration"],
         1,
     )
     base = None
-    for key in ["TEA", "TPA", "TEAA"]:
+    for key in ["tea", "tpa", "teaa"]:
         if key in exp.solutions:
             base = Solution(
                 key,
@@ -63,9 +67,9 @@ def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         log.error("No valid base found in the solutions.")
         return
     elyte = Solution(
-        "TBAP",
-        exp.solutions["TBAP"]["volume"],
-        exp.solutions["TBAP"]["concentration"],
+        "tbap",
+        exp.solutions["tbap"]["volume"],
+        exp.solutions["tbap"]["concentration"],
         1,
     )
     well: Well = toolkit.wellplate.get_well(exp.well_id)
@@ -73,14 +77,6 @@ def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     log.info("Imaging the well")
     image_well(toolkit, exp, "New Well")
     exp.set_status_and_save(ExperimentStatus.PIPETTING)
-
-    # Tranfer the reagent to the well
-    transfer(
-        volume=reag.volume,
-        src_vessel=reag.name,
-        dst_vessel=well,
-        toolkit=toolkit,
-    )
 
     # Transfer the base to the well
     transfer(
@@ -98,6 +94,14 @@ def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         toolkit=toolkit,
     )
 
+    # Transfer the reagent to the well last to avoid sticking to the bottom
+    transfer(
+        volume=reag.volume,
+        src_vessel=reag.name,
+        dst_vessel=well,
+        toolkit=toolkit,
+    )
+
     # Mix the contents of the well
     mix(
         toolkit=toolkit,
@@ -110,7 +114,7 @@ def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     # CV
     try:
         toolkit.mill.safe_move(
-            coordinates=well.top_coordinates(),
+            coordinates=well.top_coordinates,
             tool="electrode",
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
@@ -160,13 +164,13 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
     log = toolkit.global_logger
     log.info("Running PolyDeposition for: " + exp.experiment_name)
     reag = Solution(
-        "PGMA-PAMA-phenol",
-        exp.solutions["PGMA-PAMA-phenol"]["volume"],
-        exp.solutions["PGMA-PAMA-phenol"]["concentration"],
+        "pgma-pama-phenol",
+        exp.solutions["pgma-pama-phenol"]["volume"],
+        exp.solutions["pgma-pama-phenol"]["concentration"],
         1,
     )
     base = None
-    for key in ["TEA", "TPA", "TEAA"]:
+    for key in ["tea", "tpa", "teaa"]:
         if key in exp.solutions:
             base = Solution(
                 key,
@@ -179,9 +183,9 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
         log.error("No valid base found in the solutions.")
         return
     elyte = Solution(
-        "TBAP",
-        exp.solutions["TBAP"]["volume"],
-        exp.solutions["TBAP"]["concentration"],
+        "tbap",
+        exp.solutions["tbap"]["volume"],
+        exp.solutions["tbap"]["concentration"],
         1,
     )
     well: Well = toolkit.wellplate.get_well(exp.well_id)
@@ -189,14 +193,6 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
     log.info("Imaging the well")
     image_well(toolkit, exp, "New Well")
     exp.set_status_and_save(ExperimentStatus.PIPETTING)
-
-    # Tranfer the reagent to the well
-    transfer(
-        volume=reag.volume,
-        src_vessel=reag.name,
-        dst_vessel=well,
-        toolkit=toolkit,
-    )
 
     # Transfer the base to the well
     transfer(
@@ -214,6 +210,14 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
         toolkit=toolkit,
     )
 
+    # Transfer the reagent to the well
+    transfer(
+        volume=reag.volume,
+        src_vessel=reag.name,
+        dst_vessel=well,
+        toolkit=toolkit,
+    )
+
     # Mix the contents of the well
     mix(
         toolkit=toolkit,
@@ -226,7 +230,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
     # CV
     try:
         toolkit.mill.safe_move(
-            coordinates=well.top_coordinates(),
+            coordinates=well.top_coordinates,
             tool="electrode",
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
@@ -276,13 +280,13 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     log = toolkit.global_logger
     log.info("Running PostCharacterization for: " + exp.experiment_name)
     reag = Solution(
-        "PGMA-PAMA-phenol",
-        exp.solutions["PGMA-PAMA-phenol"]["volume"],
-        exp.solutions["PGMA-PAMA-phenol"]["concentration"],
+        "pgma-pama-phenol",
+        exp.solutions["pgma-pama-phenol"]["volume"],
+        exp.solutions["pgma-pama-phenol"]["concentration"],
         1,
     )
     base = None
-    for key in ["TEA", "TPA", "TEAA"]:
+    for key in ["tea", "tpa", "teaa"]:
         if key in exp.solutions:
             base = Solution(
                 key,
@@ -295,9 +299,9 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         log.error("No valid base found in the solutions.")
         return
     elyte = Solution(
-        "TBAP",
-        exp.solutions["TBAP"]["volume"],
-        exp.solutions["TBAP"]["concentration"],
+        "tbap",
+        exp.solutions["tbap"]["volume"],
+        exp.solutions["tbap"]["concentration"],
         1,
     )
     well: Well = toolkit.wellplate.get_well(exp.well_id)
@@ -305,14 +309,6 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     log.info("Imaging the well")
     image_well(toolkit, exp, "New Well")
     exp.set_status_and_save(ExperimentStatus.PIPETTING)
-
-    # Tranfer the reagent to the well
-    transfer(
-        volume=reag.volume,
-        src_vessel=reag.name,
-        dst_vessel=well,
-        toolkit=toolkit,
-    )
 
     # Transfer the base to the well
     transfer(
@@ -330,6 +326,14 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         toolkit=toolkit,
     )
 
+    # Tranfer the reagent to the well
+    transfer(
+        volume=reag.volume,
+        src_vessel=reag.name,
+        dst_vessel=well,
+        toolkit=toolkit,
+    )
+
     # Mix the contents of the well
     mix(
         toolkit=toolkit,
@@ -342,7 +346,7 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     # CV
     try:
         toolkit.mill.safe_move(
-            coordinates=well.top_coordinates(),
+            coordinates=well.top_coordinates,
             tool="electrode",
             second_z_cord=toolkit.wellplate.echem_height,
             second_z_cord_feed=100,
