@@ -211,8 +211,8 @@ def experiment_loop_worker(
             # Does the experiment object's well_type and well_id exist as new or queued in the wellplate
             well: Well = toolkit.wellplate.wells[current_experiment.well_id]
             if (
-                well.plate_id != toolkit.wellplate.plate_id
-                or current_experiment.plate_type_number != toolkit.wellplate.type_number
+                well.plate_id != toolkit.wellplate.id
+                or current_experiment.plate_type_number != toolkit.wellplate.type_id
             ):
                 logger.error(
                     "The experiment object's well type and wellplate id do not match the current wellplate"
@@ -266,13 +266,15 @@ def experiment_loop_worker(
             controller_slack.send_message("alert", pre_experiment_status_msg)
 
             ## Update the experiment status to running
-            current_experiment.plate_id = toolkit.wellplate.plate_id
+            current_experiment.plate_id = toolkit.wellplate.id
             current_experiment.well = toolkit.wellplate.wells[
                 current_experiment.well_id
             ]
-            current_experiment.well.plate_id = toolkit.wellplate.plate_id
-            current_experiment.well.experiment_id = current_experiment.experiment_id
-            current_experiment.well.project_id = current_experiment.project_id
+            current_experiment.well.plate_id = toolkit.wellplate.id
+            current_experiment.well.well_data.experiment_id = (
+                current_experiment.experiment_id
+            )
+            current_experiment.well.well_data.project_id = current_experiment.project_id
             current_experiment.set_status_and_save(ExperimentStatus.RUNNING)
 
             ## Run the experiment
@@ -443,6 +445,7 @@ def experiment_loop_worker(
 
 def sila_experiment_loop_worker(
     specific_experiment_id: Optional[int] = None,
+    specific_experiment_ids: Optional[list[int]] = None,
     specific_well_id: Optional[str] = None,
     process_id: Optional[int] = None,
     status_queue: multiprocessing.Queue = None,
@@ -466,113 +469,118 @@ def sila_experiment_loop_worker(
     )
     toolkit.wellplate = labware.wellplate
 
+    experiment_ids = (
+        [specific_experiment_id] if specific_experiment_id else specific_experiment_ids
+    )
+
     def set_worker_state(state: SystemState):
         """Set the worker state"""
         sql_system_state.set_system_status(state)
         status_queue.put((process_id, f"{specific_experiment_id}: {state.value}"))
 
-    set_worker_state(SystemState.RUNNING)
-    exp_logger = (
-        hardware.global_logger
-        if hardware.global_logger is not None
-        else setup_default_logger(log_name="panda")
-    )
-    ## Reset the logger to log to the PANDA_SDL.log file and format
-    apply_log_filter(exp_logger)
-
-    try:
-        exp_obj = None
-
-        ## Check that the pipette is empty, if not dispose of full volume into waste
-        if hardware.pump.pipette.volume > 0:
-            exp_logger.info("Pipette not empty, purging into waste")
-            set_worker_state(SystemState.PIPETTE_PURGE)
-            actions.purge_pipette(hardware.mill, hardware.pump)
-        # This also validates the experiment parameters since its a pydantic object
-        exp_obj: EchemExperimentBase = _initialize_experiment(
-            specific_experiment_id, hardware, labware, exp_logger, specific_well_id
+    for specific_experiment_id in experiment_ids:
+        set_worker_state(SystemState.RUNNING)
+        exp_logger = (
+            hardware.global_logger
+            if hardware.global_logger is not None
+            else setup_default_logger(log_name="panda")
         )
-
-        ## Check that there is enough volume in the stock vials to run the experiment
-        _validate_the_stock_solutions(exp_obj, labware)
-        # Announce the experiment
-        exp_logger.info("Running experiment %d", exp_obj.experiment_id)
-        exp_obj.set_status_and_save(ExperimentStatus.RUNNING)
-
-        ## Run the experiment
-        apply_log_filter(
-            exp_logger,
-            exp_obj.experiment_id,
-            exp_obj.well_id,
-            str(exp_obj.project_id) + "." + str(exp_obj.project_campaign_id),
-        )
-
-        exp_logger.info("Beginning experiment %d", exp_obj.experiment_id)
-        protocol_function = _fetch_protocol_function(exp_obj.protocol_id)
+        ## Reset the logger to log to the PANDA_SDL.log file and format
+        apply_log_filter(exp_logger)
 
         try:
-            protocol_function(
-                experiment=exp_obj,
-                # hardware=hardware,
-                # labware=labware,
-                toolkit=toolkit,
+            exp_obj = None
+
+            ## Check that the pipette is empty, if not dispose of full volume into waste
+            if hardware.pump.pipette.volume > 0:
+                exp_logger.info("Pipette not empty, purging into waste")
+                set_worker_state(SystemState.PIPETTE_PURGE)
+                actions.purge_pipette(hardware.mill, hardware.pump)
+            # This also validates the experiment parameters since its a pydantic object
+            exp_obj: EchemExperimentBase = _initialize_experiment(
+                specific_experiment_id, hardware, labware, exp_logger, specific_well_id
             )
-        except (
-            OCPFailure,
-            DepositionFailure,
-            CVFailure,
-            CAFailure,
-            ExperimentError,
-        ) as error:
-            if exp_obj:
+
+            ## Check that there is enough volume in the stock vials to run the experiment
+            _validate_the_stock_solutions(exp_obj, labware)
+            # Announce the experiment
+            exp_logger.info("Running experiment %d", exp_obj.experiment_id)
+            exp_obj.set_status_and_save(ExperimentStatus.RUNNING)
+
+            ## Run the experiment
+            apply_log_filter(
+                exp_logger,
+                exp_obj.experiment_id,
+                exp_obj.well_id,
+                str(exp_obj.project_id) + "." + str(exp_obj.project_campaign_id),
+            )
+
+            exp_logger.info("Beginning experiment %d", exp_obj.experiment_id)
+            protocol_function = _fetch_protocol_function(exp_obj.protocol_id)
+
+            try:
+                protocol_function(
+                    experiment=exp_obj,
+                    # hardware=hardware,
+                    # labware=labware,
+                    toolkit=toolkit,
+                )
+            except (
+                OCPFailure,
+                DepositionFailure,
+                CVFailure,
+                CAFailure,
+                ExperimentError,
+            ) as error:
+                if exp_obj:
+                    exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+                exp_logger.exception(error)
+                raise error
+            except Exception as error:
+                exp_logger.exception(error)
+                exp_obj.set_status_and_save(ExperimentStatus.ERROR)
+                raise error
+
+            finally:
+                if exp_obj is not None:
+                    status = select_experiment_status(exp_obj.experiment_id)
+                    scheduler.save_results(exp_obj)
+                    if status == ExperimentStatus.COMPLETE:
+                        with db_setup.SessionLocal() as connection:
+                            connection.query(panda_models.Experiments).filter(
+                                panda_models.Experiments.experiment_id
+                                == exp_obj.experiment_id
+                            ).update({"needs_analysis": True})
+                            connection.commit()
+
+        except (ProtocolNotFoundError, KeyboardInterrupt, Exception) as error:
+            set_worker_state(SystemState.ERROR)
+            if exp_obj is not None:
                 exp_obj.set_status_and_save(ExperimentStatus.ERROR)
             exp_logger.exception(error)
             raise error
-        except Exception as error:
-            exp_logger.exception(error)
-            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
-            raise error
 
         finally:
+            # Lets handle the experiment first
             if exp_obj is not None:
-                status = select_experiment_status(exp_obj.experiment_id)
+                post_experiment_status_msg = f"Experiment {exp_obj.experiment_id} ended with status {exp_obj.status.value}"
+                logger.info(post_experiment_status_msg)
                 scheduler.save_results(exp_obj)
-                if status == ExperimentStatus.COMPLETE:
-                    with db_setup.SessionLocal() as connection:
-                        connection.query(panda_models.Experiments).filter(
-                            panda_models.Experiments.experiment_id
-                            == exp_obj.experiment_id
-                        ).update({"needs_analysis": True})
-                        connection.commit()
+                share_to_slack(exp_obj)
 
-    except (ProtocolNotFoundError, KeyboardInterrupt, Exception) as error:
-        set_worker_state(SystemState.ERROR)
-        if exp_obj is not None:
-            exp_obj.set_status_and_save(ExperimentStatus.ERROR)
-        exp_logger.exception(error)
-        raise error
+            ## Clean up the instruments
+            if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
+                # assume unreal volume, not actually solution, set to 0
+                actions.purge_pipette(
+                    mill=hardware.mill,
+                    pump=hardware.pump,
+                )
 
-    finally:
-        # Lets handle the experiment first
-        if exp_obj is not None:
-            post_experiment_status_msg = f"Experiment {exp_obj.experiment_id} ended with status {exp_obj.status.value}"
-            logger.info(post_experiment_status_msg)
-            scheduler.save_results(exp_obj)
-            share_to_slack(exp_obj)
-
-        ## Clean up the instruments
-        if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
-            # assume unreal volume, not actually solution, set to 0
-            actions.purge_pipette(
-                mill=hardware.mill,
-                pump=hardware.pump,
-            )
-
-        hardware.mill.rest_electrode()
-        # We are not disconnecting from instruments with this function, that will
-        # be handled by a higher level function
-        apply_log_filter(exp_logger)
-        set_worker_state(SystemState.IDLE)
+            hardware.mill.rest_electrode()
+            # We are not disconnecting from instruments with this function, that will
+            # be handled by a higher level function
+            apply_log_filter(exp_logger)
+            set_worker_state(SystemState.IDLE)
 
 
 def _attach_well_to_experiment(exp_obj: ExperimentBase, trgt_well: Well):
