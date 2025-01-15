@@ -56,7 +56,7 @@ from panda_lib.grlb_mill_wrapper import PandaMill as Mill
 
 # First party imports
 from panda_lib.imaging import add_data_zone, capture_new_image, image_filepath_generator
-from panda_lib.instrument_toolkit import Hardware, Labware, Toolkit
+from panda_lib.instrument_toolkit import ArduinoLink, Hardware, Labware, Toolkit
 from panda_lib.log_tools import timing_wrapper
 from panda_lib.movement import Instruments
 from panda_lib.obs_controls import MockOBSController, OBSController
@@ -64,7 +64,7 @@ from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.utilities import solve_vials_ilp
 from panda_lib.vials import StockVial, Vial, WasteVial, read_vials
-from panda_lib.wellplate import Well
+from panda_lib.wellplate import Coordinates, Well
 
 TESTING = read_testing_config()
 
@@ -180,7 +180,7 @@ def _handle_source_vessels(
 
 def _pipette_action(
     toolkit: Union[Toolkit, Hardware],
-    vessel: Union[Vial, Well],
+    src_vessel: Union[Vial, Well],
     dst_vessel: Union[Well, WasteVial],
     desired_volume: float,
 ):
@@ -197,58 +197,55 @@ def _pipette_action(
     repetitions = math.ceil(
         desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
     )
-    if isinstance(vessel, Well):
+    if isinstance(src_vessel, Well):
         repetition_vol = correction_factor(desired_volume / repetitions, 1.0)
     else:
         repetition_vol = correction_factor(
-            desired_volume / repetitions, vessel.viscosity_cp
+            desired_volume / repetitions, src_vessel.viscosity_cp
         )
     logger.info(
-        "Pipetting %f uL from %s to %s", desired_volume, vessel.name, dst_vessel.name
+        "Pipetting %f uL from %s to %s",
+        desired_volume,
+        src_vessel.name,
+        dst_vessel.name,
     )
 
     for j in range(repetitions):
         logger.info("Repetition %d of %d", j + 1, repetitions)
 
-        if isinstance(vessel, StockVial):
-            toolkit.mill.safe_move(
-                x_coord=vessel.x,
-                y_coord=vessel.y,
-                z_coord=vessel.top,
-                tool=Instruments.DECAPPER,
+        if isinstance(src_vessel, StockVial):
+            decapping_sequence(
+                toolkit.mill,
+                Coordinates(src_vessel.x, src_vessel.y, src_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.no_cap()
 
         toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
         toolkit.mill.safe_move(
-            vessel.x,
-            vessel.y,
-            vessel.withdrawal_height,
+            src_vessel.x,
+            src_vessel.y,
+            src_vessel.withdrawal_height,
             tool=Instruments.PIPETTE,
         )
-        toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=vessel)
-        if isinstance(vessel, Well):
+        toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=src_vessel)
+        if isinstance(src_vessel, Well):
             toolkit.pump.withdraw(volume_to_withdraw=20)
         toolkit.mill.move_to_safe_position()
         toolkit.pump.withdraw(volume_to_withdraw=DRIP_STOP)
 
-        if isinstance(vessel, StockVial):
-            toolkit.mill.safe_move(
-                vessel.x,
-                vessel.y,
-                vessel.top,
-                tool=Instruments.DECAPPER,
+        if isinstance(src_vessel, StockVial):
+            capping_sequence(
+                toolkit.mill,
+                Coordinates(src_vessel.x, src_vessel.y, src_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.ALL_CAP()
 
         if isinstance(dst_vessel, WasteVial):
-            toolkit.mill.safe_move(
-                dst_vessel.x,
-                dst_vessel.y,
-                dst_vessel.top,
-                tool=Instruments.DECAPPER,
+            decapping_sequence(
+                toolkit.mill,
+                Coordinates(dst_vessel.x, dst_vessel.y, dst_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.no_cap()
 
         toolkit.mill.safe_move(
             dst_vessel.x,
@@ -258,11 +255,11 @@ def _pipette_action(
         )
         toolkit.pump.infuse(
             volume_to_infuse=repetition_vol,
-            being_infused=vessel,
+            being_infused=src_vessel,
             infused_into=dst_vessel,
             blowout_ul=(
                 AIR_GAP + DRIP_STOP + 20
-                if isinstance(vessel, Well)
+                if isinstance(src_vessel, Well)
                 else AIR_GAP + DRIP_STOP
             ),
         )
@@ -291,13 +288,11 @@ def _pipette_action(
             toolkit.pump.pipette.volume = 0.0
 
         if isinstance(dst_vessel, WasteVial):
-            toolkit.mill.safe_move(
-                dst_vessel.x,
-                dst_vessel.y,
-                dst_vessel.top,
-                tool=Instruments.DECAPPER,
+            capping_sequence(
+                toolkit.mill,
+                Coordinates(dst_vessel.x, dst_vessel.y, dst_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.ALL_CAP()
 
 
 @timing_wrapper
@@ -1087,6 +1082,48 @@ def clear_well(
         toolkit=toolkit,
     )
     return 0
+
+
+def decapping_sequence(mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink):
+    """
+    The decapping sequence is as follows:
+    - Move to the target coordinates
+    - Activate the decapper
+    - Move the decapper up 20mm
+    """
+
+    # Move to the target coordinates
+    mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+
+    # Activate the decapper
+    ard_link.no_cap()
+
+    # Move the decapper up 20mm
+    mill.move_to_position(
+        target_coords.x,
+        target_coords.y,
+        target_coords.z + 20,
+        tool="decapper",
+    )
+
+
+def capping_sequence(mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink):
+    """
+    The capping sequence is as follows:
+    - Move to the target coordinates
+    - deactivate the decapper
+    - Move the decapper +10mm in the y direction
+    - Move the decapper to 0 z
+    """
+
+    # Move to the target coordinates
+    mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+
+    # Deactivate the decapper
+    ard_link.ALL_CAP()
+
+    # Move the decapper +10mm in the y direction
+    mill.move_to_position(target_coords.x, target_coords.y + 10, 0, tool="decapper")
 
 
 if __name__ == "__main__":
