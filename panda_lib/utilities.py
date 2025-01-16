@@ -70,6 +70,10 @@ class Coordinates:
             raise ValueError("z-coordinate must be an int, float, or Decimal object")
         self._z = round(value, 6)
 
+    def dict(self):
+        """Return the coordinates as a dictionary."""
+        return {"x": self.x, "y": self.y, "z": self.z}
+
 
 class Instruments(Enum):
     """Class for naming of the mill instruments."""
