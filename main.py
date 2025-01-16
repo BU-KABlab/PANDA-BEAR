@@ -376,16 +376,19 @@ def refresh():
 
 def stop_panda_sdl():
     """Stops the PANDA_SDL loop."""
+    exp_cmd_queue.put(SystemState.STOP)
     sql_system_state.set_system_status(SystemState.SHUTDOWN, "stopping PANDA_SDL")
 
 
 def pause_panda_sdl():
     """Pauses the PANDA_SDL loop."""
+    exp_cmd_queue.put(SystemState.PAUSE)
     sql_system_state.set_system_status(SystemState.PAUSE, "stopping PANDA_SDL")
 
 
 def resume_panda_sdl():
     """Resumes the PANDA_SDL loop."""
+    exp_cmd_queue.put(SystemState.RESUME)
     sql_system_state.set_system_status(SystemState.RESUME, "stopping PANDA_SDL")
 
 
