@@ -454,7 +454,7 @@ def rinse_well(
 
 @timing_wrapper
 def flush_pipette(
-    flush_solution_name: str,
+    flush_with: str,
     toolkit: Toolkit,
     flush_volume: float = 120.0,
     flush_count: int = 1,
@@ -479,13 +479,13 @@ def flush_pipette(
         logger.info(
             "Flushing pipette tip with %f ul of %s...",
             flush_volume,
-            flush_solution_name,
+            flush_with,
         )
 
         for _ in range(flush_count):
             _forward_pipette_v3(
                 flush_volume,
-                src_vessel=flush_solution_name,
+                src_vessel=flush_with,
                 dst_vessel=waste_selector("waste", flush_volume),
                 toolkit=toolkit,
             )
@@ -493,7 +493,7 @@ def flush_pipette(
         logger.debug(
             "Flushed pipette tip with %f ul of %s %dx times...",
             flush_volume,
-            flush_solution_name,
+            flush_with,
             flush_count,
         )
     else:
