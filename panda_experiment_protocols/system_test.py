@@ -192,7 +192,7 @@ def ca_deposition(
     exp_obj.declare_step("Flushing the pipette tip", ExperimentStatus.FLUSHING)
     exp_obj.set_status_and_save(ExperimentStatus.FLUSHING)
     flush_pipette(
-        flush_solution_name=exp_obj.flush_sol_name,
+        flush_with=exp_obj.flush_sol_name,
         flush_volume=exp_obj.flush_sol_vol,
         flush_count=exp_obj.flush_count,
         toolkit=toolkit,

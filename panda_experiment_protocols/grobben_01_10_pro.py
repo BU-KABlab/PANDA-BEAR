@@ -142,7 +142,7 @@ def PreCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
 
     clear_well(toolkit, well)
     flush_pipette(
-        flush_solution_name="dmf-tbaprinse",
+        flush_with="dmf-tbaprinse",
         toolkit=toolkit,
     )
     rinse_well(
@@ -260,7 +260,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
 
     clear_well(toolkit, well)
     flush_pipette(
-        flush_solution_name="dmf-tbaprinse",
+        flush_with="dmf-tbaprinse",
         toolkit=toolkit,
     )
     rinse_well(
@@ -379,7 +379,7 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
 
     clear_well(toolkit, well)
     flush_pipette(
-        flush_solution_name="DMFrinse",
+        flush_with="DMFrinse",
         toolkit=toolkit,
     )
     rinse_well(
@@ -388,7 +388,7 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         alt_sol_name="DMFrinse",
     )
     flush_pipette(
-        flush_solution_name="ACNrinse",
+        flush_with="ACNrinse",
         toolkit=toolkit,
     )
     rinse_well(
