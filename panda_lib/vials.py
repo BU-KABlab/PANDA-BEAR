@@ -139,8 +139,13 @@ class Vial:
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
         height = self.vial_data.volume_height - 1
-        if height < self.vial_data.dead_volume:
-            return self.vial_data.dead_volume / (3.14 * self.vial_data.radius**2)
+        dead_height = self.bottom + self.vial_data.dead_volume / (
+            3.14 * self.vial_data.radius**2
+        )
+        if height < dead_height:
+            return dead_height
+        else:
+            return height
 
     def create_new_vial(self, **kwargs: VialKwargs):
         """Creates a new vial in the database, and loads it back."""
@@ -229,12 +234,15 @@ class Vial:
 
     def reset_vial(self):
         """Resets the vial to its default state."""
-        self.vial_data.volume = self.vial_data.capacity
+        self.vial_data.volume = (
+            self.vial_data.capacity if self.vial_data.category == 0 else 0
+        )
         self.vial_data.contents = (
             {}
             if self.vial_data.category == 1
             else {next(iter(self.vial_data.contents)): self.vial_data.capacity}
         )
+        self.save()
         self.vial_data.contamination = 0
         self.save()
 
