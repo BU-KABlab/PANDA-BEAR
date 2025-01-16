@@ -34,6 +34,7 @@ def run(experiment: EchemExperimentBase, toolkit: Toolkit):
     PreCharacterization(experiment, toolkit)
     PolyDeposition(experiment, toolkit)
     PostCharacterization(experiment, toolkit)
+    experiment.set_status_and_save(ExperimentStatus.COMPLETE)
     toolkit.global_logger.info("Experiment complete")
 
 
