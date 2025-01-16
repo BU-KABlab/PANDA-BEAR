@@ -9,9 +9,9 @@ from matplotlib.widgets import CheckButtons
 # Define tool offsets
 tool_offsets = {
     "center": {"x": 0.0, "y": 0.0, "z": 0.0},
-    "pipette": {"x": -107.5, "y": 0.0, "z": 85.0},
-    "electrode": {"x": 32.0, "y": 30.0, "z": 80.0},
-    "decapper": {"x": -75.5, "y": 0.0, "z": 56.0},
+    "pipette": {"x": -105, "y": 0.0, "z": 115.0},
+    "electrode": {"x": 32.0, "y": 30.0, "z": 102.0},
+    "decapper": {"x": -74, "y": 0.0, "z": 57.0},
 }
 
 # Load G-code file
@@ -68,7 +68,7 @@ ax.plot_surface(X, Y, Z, color="grey", alpha=0.2)
 
 # Draw the vial as a cylinder
 vial_center_x = -4
-vial_center_y = -106
+vial_center_y = -40
 vial_radius = 14
 vial_height = 70
 vial_z_base = -200
