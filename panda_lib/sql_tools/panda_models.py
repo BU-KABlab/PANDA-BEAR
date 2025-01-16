@@ -415,7 +415,7 @@ class Vials(Base):
     )
     base_thickness: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
     dead_volume: Mapped[float] = mapped_column(Float, nullable=False, default=1000.0)
-    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    active: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     updated: Mapped[str] = mapped_column(
         String, nullable=False, default=dt.now(timezone.utc)
     )
