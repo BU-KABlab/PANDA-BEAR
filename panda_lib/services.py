@@ -92,9 +92,15 @@ class VialService:
         Returns:
             Vials: Updated SQLAlchemy model instance.
         """
+        vial_id = updates.get("id", None)
         with self.db_session_maker() as db_session:
             try:
-                stmt = select(Vials).filter_by(position=position)
+                if vial_id:
+                    stmt = select(Vials).filter_by(
+                        id=vial_id, position=position, active=1
+                    )
+                else:
+                    stmt = select(Vials).filter_by(position=position, active=1)
                 vial = db_session.execute(stmt).scalar()
                 if not vial:
                     raise ValueError(f"Vial at position {position} not found.")
@@ -105,8 +111,8 @@ class VialService:
                         key in VialWriteModel.model_fields.keys()
                     ):
                         setattr(vial, key, value)
-                    else:
-                        self.logger.debug("Invalid attribute: %s. Not saved to db", key)
+                    # else:
+                    #     self.logger.debug("Invalid attribute: %s. Not saved to db", key)
                 db_session.commit()
                 db_session.refresh(vial)
                 return vial
