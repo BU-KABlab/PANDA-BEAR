@@ -479,6 +479,28 @@ def sila_experiment_loop_worker(
         status_queue.put((process_id, f"{specific_experiment_id}: {state.value}"))
 
     for specific_experiment_id in experiment_ids:
+        # Check the command queue for a stop command or a pause command
+        if command_queue is not None:
+            while True:
+                try:
+                    command = command_queue.get()
+                    if command is None:
+                        break
+                    if command == SystemState.STOP:
+                        set_worker_state(SystemState.STOP)
+                        return
+                    elif command == SystemState.PAUSE:
+                        set_worker_state(SystemState.PAUSE)
+                        command = command_queue.get()
+                        if command == SystemState.RESUME:
+                            set_worker_state(SystemState.RUNNING)
+                            break
+                        if command == SystemState.STOP:
+                            set_worker_state(SystemState.STOP)
+                            return
+                except Exception:
+                    break
+
         set_worker_state(SystemState.RUNNING)
         exp_logger = (
             hardware.global_logger
