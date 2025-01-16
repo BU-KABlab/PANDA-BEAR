@@ -100,7 +100,7 @@ class VialReadModel(VesselModel):
     viscosity_cp: float = 0.0
     concentration: float = 0.0
     density: float = 1.0
-    active: bool = True
+    active: int = 1
     updated: str
 
     model_config = ConfigDict(from_attributes=True)
