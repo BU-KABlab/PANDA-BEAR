@@ -94,11 +94,14 @@ class VialWriteModel(BaseModel):
 
 
 class VialReadModel(VesselModel):
+    id: int
     position: str
     category: int
     viscosity_cp: float = 0.0
     concentration: float = 0.0
     density: float = 1.0
+    active: bool = True
+    updated: str
 
     model_config = ConfigDict(from_attributes=True)
 
