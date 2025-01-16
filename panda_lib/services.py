@@ -42,7 +42,7 @@ class VialService:
                 stmt = select(Vials).filter_by(position=vial_data.position)
                 vials = db_session.execute(stmt).scalars().all()
                 for vial in vials:
-                    vial.active = False
+                    vial.active = 0
                     db_session.commit()
             except SQLAlchemyError as e:
                 db_session.rollback()
@@ -51,7 +51,7 @@ class VialService:
             try:
                 # Convert Pydantic model to SQLAlchemy model
                 vial: Vials = Vials(**vial_data.model_dump())
-                vial.active = True
+                vial.active = 1
                 db_session.add(vial)
                 db_session.commit()
                 db_session.refresh(vial)
@@ -71,6 +71,7 @@ class VialService:
             VialModel: Pydantic model representing the vial.
         """
         with self.db_session_maker() as db_session:
+            active_only = 1 if active_only else 0
             stmt = select(Vials).filter_by(position=position, active=active_only)
             vial = db_session.execute(stmt).scalar()
             if not vial:
@@ -142,7 +143,7 @@ class VialService:
             List[VialModel]: List of Pydantic models representing active vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(active=True)
+            stmt = select(Vials).filter_by(active=1)
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
             vials = [vial for vial in vials if vial.category == cat] if cat else vials
@@ -184,7 +185,7 @@ class VialService:
             List[VialModel]: List of Pydantic models representing inactive vials.
         """
         with self.db_session_maker() as db_session:
-            stmt = select(Vials).filter_by(active=False)
+            stmt = select(Vials).filter_by(active=0)
             result = db_session.execute(stmt)
             vials = result.scalars().all() if result else []
 
