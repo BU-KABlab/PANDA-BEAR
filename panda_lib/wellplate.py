@@ -145,7 +145,7 @@ class Well:
     ):
         self.well_id = well_id
         self.plate_id = plate_id
-        self.active_session = session_maker()
+        self.session_maker = session_maker
         self.service = WellService(session_maker=session_maker)
         self.well_data: Optional[WellReadModel] = None
 
@@ -211,13 +211,13 @@ class Well:
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
-                db_session=self.active_session,
+                db_session=self.session_maker,
                 plate_id=self.plate_id,
                 type_id=kwargs.get("type_id"),
             )
         else:
             plate_type = self.service.fetch_well_type_characteristics(
-                db_session=self.active_session, plate_id=self.plate_id
+                db_session=self.session_maker, plate_id=self.plate_id
             )
         new_well = WellWriteModel(
             well_id=self.well_id,

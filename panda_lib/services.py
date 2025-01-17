@@ -211,6 +211,7 @@ class WellService:
 
     def create_well(self, well_data: WellWriteModel) -> WellDBModel:
         with self.session_maker() as active_db_session:
+            active_db_session: Session
             try:
                 well: WellDBModel = WellDBModel(**well_data.model_dump())
                 active_db_session.add(well)
@@ -265,7 +266,7 @@ class WellService:
 
     def fetch_well_type_characteristics(
         self,
-        db_session: Session,
+        db_session: sessionmaker = SessionLocal,
         plate_id: Optional[int] = None,
         type_id: Optional[int] = None,
     ) -> PlateTypeModel:
@@ -287,25 +288,28 @@ class WellService:
         """
         if not plate_id and not type_id:
             raise ValueError("Either plate_id or type_id must be provided.")
+        with db_session() as active_db_session:
+            active_db_session: Session
+            if plate_id and not type_id:
+                # Fetch the plate using plate_id to get its type_id
+                stmt = select(WellPlateDBModel).filter_by(id=plate_id)
+                plate: WellPlateDBModel = active_db_session.execute(
+                    stmt
+                ).scalar_one_or_none()
+                if not plate:
+                    raise ValueError(f"Plate with given id {plate_id} not found.")
 
-        if plate_id and not type_id:
-            # Fetch the plate using plate_id to get its type_id
-            stmt = select(WellPlateDBModel).filter_by(id=plate_id)
-            plate = db_session.execute(stmt).scalar_one_or_none()
-            if not plate:
-                raise ValueError(f"Plate with given id {plate_id} not found.")
+                if type_id != plate.type_id and type_id is not None:
+                    raise ValueError(
+                        f"Type id {type_id} does not match the given plate type id {plate.type_id}"
+                    )
+                type_id = plate.type_id
 
-            if type_id != plate.type_id and type_id is not None:
-                raise ValueError(
-                    f"Type id {type_id} does not match the given plate type id {plate.type_id}"
-                )
-            type_id = plate.type_id
-
-        # Fetch the plate type using type_id
-        stmt = select(PlateTypeDBModel).filter_by(id=type_id)
-        plate_type = db_session.execute(stmt).scalar_one_or_none()
-        if not plate_type:
-            raise ValueError(f"Plate type with id {type_id} not found.")
+            # Fetch the plate type using type_id
+            stmt = select(PlateTypeDBModel).filter_by(id=type_id)
+            plate_type = active_db_session.execute(stmt).scalar_one_or_none()
+            if not plate_type:
+                raise ValueError(f"Plate type with id {type_id} not found.")
 
         return PlateTypeModel.model_validate(plate_type)
 
