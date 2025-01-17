@@ -26,7 +26,7 @@ def main():
             experiments.append(
                 experiment_class.EchemExperimentBase(
                     experiment_id=experiment_id,
-                    protocol_id="grobben_01_10_pro",
+                    protocol_id="grobben_01_12_pro",
                     well_id="A1",
                     plate_type_number=PLATE_TYPE,
                     experiment_name=EXPERIMENT_NAME,
