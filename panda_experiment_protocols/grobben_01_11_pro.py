@@ -68,12 +68,12 @@ def run(experiment: EchemExperimentBase, toolkit: Toolkit):
     """Run the experiment."""
 
     toolkit.global_logger.info("Running experiment: " + experiment.experiment_name)
-    InitializePrecharacterization(experiment, toolkit)
+    InitialPrecharacterization(experiment, toolkit)
     experiment.set_status_and_save(ExperimentStatus.COMPLETE)
     toolkit.global_logger.info("Experiment complete")
 
 
-def InitializePrecharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
+def InitialPrecharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     """
     Run the Initialcharacterization steps for the experiment.
 
