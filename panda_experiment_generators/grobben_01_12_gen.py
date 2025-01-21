@@ -12,7 +12,7 @@ CAMPAIGN_ID = 1
 PLATE_TYPE = 7  # 10 mm diameter wells on gold
 
 voltages = [1.0, 1.5, 2.0]
-replicates = 2
+replicates = 3
 
 
 def main():
