@@ -21,7 +21,6 @@ from panda_lib.config import print_config_values as print_config
 from panda_lib.config import read_config, read_testing_config, write_testing_config
 from panda_lib.experiment_analysis_loop import analysis_worker, load_analyzers
 from panda_lib.experiment_class import ExperimentBase
-from panda_lib.movement import mill_calibration_and_positioning
 from panda_lib.sql_tools import (
     remove_testing_experiments,
     sql_generator_utilities,
@@ -31,6 +30,8 @@ from panda_lib.sql_tools import (
     sql_wellplate,
 )
 from panda_lib.utilities import SystemState, input_validation
+
+from . import mill_calibration_and_positioning
 
 os.environ["KMP_AFFINITY"] = "none"
 exp_loop_prcss: Process = None
