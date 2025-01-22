@@ -88,6 +88,10 @@ class MockMill(RealMill):
         """Simulate clearing buffers"""
         self.logger.info("Clearing buffers")
 
+    def grbl_settings(self):
+        """Simulate getting the GRBL settings"""
+        return self.config
+
     def read_mill_config(self):
         """Read the mill config from the mill and set it as an attribute"""
         try:
@@ -197,3 +201,7 @@ class MockSerialToMill:
     def flushOutput(self):
         """Simulate flushing the output buffer"""
         pass
+
+    def grbl_settings(self):
+        """Simulate getting the GRBL settings"""
+        return "Grbl 1.1f ['$' for help]\n".encode()
