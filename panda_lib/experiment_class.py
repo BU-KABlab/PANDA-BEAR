@@ -25,7 +25,6 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
-from panda_lib.wellplate import Well
 
 global_logger = setup_default_logger(log_name="panda")
 experiment_logger = setup_default_logger(log_name="experiment_logger")
@@ -165,6 +164,7 @@ class ExperimentStatus(str, Enum):
     SAVING = "saving"
     ANALYZING = "analyzing"
     MOVING = "moving"
+    PIPETTING = "pipetting"
 
 
 @dataclass(config=ConfigDict(validate_assignment=True))
@@ -354,10 +354,10 @@ class ExperimentBase:
         title="Solutions",
         description="Dictionary of solutions used in the experiment",
     )
-    well_type_number: int = Field(
+    plate_type_number: int = Field(
         default=None,
-        title="Well Type Number",
-        description="Type number of the well used in the experiment",
+        title="Plate Type Number",
+        description="Type number of the wellplate used in the experiment",
     )
     pumping_rate: float = Field(
         default=0.3,
@@ -421,7 +421,7 @@ class ExperimentBase:
         description="Type of experiment",
         deprecated=True,
     )
-    well: Well = Field(
+    well: object = Field(
         default=None,
         title="Well",
         description="Well object associated with the experiment",
@@ -538,7 +538,7 @@ class ExperimentBase:
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
 
-        if not self.well or not isinstance(self.well, Well):
+        if not self.well or not isinstance(self.well, object):
             experiment_logger.warning("Well object not set. Checking for Well ID")
             if self.well_id:
                 self.well = sql_wellplate.get_well_by_id(self.well_id)
@@ -737,7 +737,7 @@ class CorrectionFactorExperiment(ExperimentBase):
     correction_factor: float = float(1.0)
 
 
-@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
+@dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=False))
 class EchemExperimentBase(ExperimentBase):
     """Define the data that is used to run an elechrochemical experiment.
 
@@ -899,6 +899,7 @@ experiment_types_by_project_id = {
     17: FeCnVerificationExperiment,
     11: CorrectionFactorExperiment,
     18: PGMAExperiment,
+    20: EchemExperimentBase,
     999: PEDOTExperiment,
 }
 
@@ -1033,23 +1034,18 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
         # With the project_id known to determine the experiment type
         # object type
 
-        project_id = result.project_id
-        experiment_object = experiment_types_by_project_id.get(project_id)()
-
-        experiment = experiment_object
+        experiment = EchemExperimentBase()
         experiment.experiment_id = experiment_id
         experiment.project_id = result.project_id
         experiment.project_campaign_id = result.project_campaign_id
-        experiment.well_type_number = result.well_type
+        experiment.plate_type_number = result.well_type
         experiment.protocol_id = result.protocol_id
         experiment.priority = result.priority
         experiment.filename = result.filename
         return experiment
 
 
-def select_experiment_paramaters(
-    experiment_to_select: Union[int, EchemExperimentBase], return_object: bool = False
-) -> Union[list, EchemExperimentBase]:
+def select_experiment_paramaters(experiment_id) -> list:
     """
     Selects the experiment parameters from the experiment_parameters table.
     If an experiment_object is provided, the parameters are added to the object.
@@ -1060,15 +1056,6 @@ def select_experiment_paramaters(
     Returns:
         EchemExperimentBase: The experiment parameters.
     """
-    if isinstance(experiment_to_select, int):
-        experiment_id = experiment_to_select
-        if return_object:
-            experiment_object = EchemExperimentBase()
-        experiment_object = None
-    else:
-        experiment_id = experiment_to_select.experiment_id
-        experiment_object = experiment_to_select
-
     with SessionLocal() as session:
         result = (
             session.query(ExperimentParameters)
@@ -1079,14 +1066,7 @@ def select_experiment_paramaters(
     for row in result:
         values.append(row)
 
-    if not values:
-        return None
-
-    if not experiment_object:
-        return values
-
-    experiment_object.map_parameter_list_to_experiment(values)
-    return experiment_object
+    return values
 
 
 def select_specific_parameter(experiment_id: int, parameter_name: str):
@@ -1152,7 +1132,8 @@ def select_complete_experiment_information(experiment_id: int) -> ExperimentBase
     if experiment is None:
         return None
 
-    experiment = select_experiment_paramaters(experiment)
+    params = select_experiment_paramaters(experiment_id)
+    experiment.map_parameter_list_to_experiment(params)
     if experiment is None:
         return None
 
@@ -1183,7 +1164,7 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.experiment_id,
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.well_type_number,
+                experiment.plate_type_number,
                 experiment.protocol_id,
                 experiment.pin,
                 experiment.experiment_type,
@@ -1288,7 +1269,7 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
             (
                 experiment.project_id,
                 experiment.project_campaign_id,
-                experiment.well_type_number,
+                experiment.plate_type_number,
                 experiment.protocol_id,
                 experiment.pin,
                 experiment.experiment_type,

@@ -73,7 +73,6 @@ def main():
         obs_controller.stop_recording()
 
 
-
 def decapping_validation(
     mill: PandaMill, vial: StockVial, arduino: pawduino.ArduinoLink, obs: OBSController
 ):
@@ -86,23 +85,23 @@ def decapping_validation(
     obs.place_text_on_screen(f"Decapping and capping the vial {repetitions} times")
     for i in tqdm(range(repetitions), desc="Decapping and capping"):
         obs.place_text_on_screen(
-            f"Decapping and capping the vial {repetitions} times: decapping \n{i+1} of {repetitions}"
+            f"Decapping and capping the vial {repetitions} times: decapping \n{i + 1} of {repetitions}"
         )
         decapping_sequence(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
         )
         obs.place_text_on_screen(
-            f"Decapping and capping the vial {repetitions} times: capping \n{i+1} of {repetitions}"
+            f"Decapping and capping the vial {repetitions} times: capping \n{i + 1} of {repetitions}"
         )
         capping_sequence(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
         )
 
     # Pause for 1 hour
-    obs.place_text_on_screen(f"Pausing for {round(pause/3600,0)} hour: 3600 seconds")
+    obs.place_text_on_screen(f"Pausing for {round(pause / 3600, 0)} hour: 3600 seconds")
     for i in tqdm(range(pause), desc="Pausing for 1 hour"):
         obs.place_text_on_screen(
-            f"Pausing for {round(pause/3600,0)} hour: {pause - i} seconds"
+            f"Pausing for {round(pause / 3600, 0)} hour: {pause - i} seconds"
         )
         time.sleep(1)
 
@@ -112,13 +111,13 @@ def decapping_validation(
     )
     for i in tqdm(range(repetitions), desc="Decapping, moving pipette, and capping"):
         obs.place_text_on_screen(
-            f"Decapping, dipping pipette, and capping the vial {repetitions} times: decapping \n{i+1} of {repetitions}"
+            f"Decapping, dipping pipette, and capping the vial {repetitions} times: decapping \n{i + 1} of {repetitions}"
         )
         decapping_sequence(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
         )
         obs.place_text_on_screen(
-            f"Decapping, dipping pipette, and capping the vial {repetitions} times: moving pipette \n{i+1} of {repetitions}"
+            f"Decapping, dipping pipette, and capping the vial {repetitions} times: moving pipette \n{i + 1} of {repetitions}"
         )
         mill.safe_move(
             vial.coordinates.x,
@@ -127,7 +126,7 @@ def decapping_validation(
             tool="pipette",
         )
         obs.place_text_on_screen(
-            f"Decapping, dipping pipette, and capping the vial {repetitions} times: capping \n{i+1} of {repetitions}"
+            f"Decapping, dipping pipette, and capping the vial {repetitions} times: capping \n{i + 1} of {repetitions}"
         )
         capping_sequence(
             mill, Coordinates(vial.coordinates.x, vial.coordinates.y, vial.top), arduino
@@ -157,7 +156,10 @@ def decapping_sequence(
 
     # Move the decapper up 20mm
     mill.move_to_position(
-        target_coords.x, target_coords.y, target_coords.z + 20, tool="decapper",
+        target_coords.x,
+        target_coords.y,
+        target_coords.z + 20,
+        tool="decapper",
     )
 
 
@@ -169,7 +171,7 @@ def capping_sequence(
     - Move to the target coordinates
     - deactivate the decapper
     - Move the decapper +10mm in the y direction
-    - Move the decapper +10mm in the z direction
+    - Move the decapper to 0 z
     """
 
     # Move to the target coordinates
@@ -179,17 +181,7 @@ def capping_sequence(
     ard_link.ALL_CAP()
 
     # Move the decapper +10mm in the y direction
-    mill.move_to_position(
-        target_coords.x, target_coords.y + 10, target_coords.z+10, tool="decapper"
-    )
-
-    # # Move the decapper +10mm in the z direction
-    # mill.move_to_position(
-    #     target_coords.x,
-    #     target_coords.y + 10,
-    #     target_coords.z + 10,
-    #     tool="decapper",
-    # )
+    mill.move_to_position(target_coords.x, target_coords.y + 10, 0, tool="decapper")
 
 
 if __name__ == "__main__":

@@ -132,13 +132,15 @@ def read_next_experiment_from_queue(
     else:
         experiment_id, _, filename, _, well_id = queue_info
     # Get the experiment information from the experiment table
-    experiment_base = select_experiment_information(experiment_id)
-    echem_experiment_base = select_experiment_paramaters(experiment_base)
+    experiment = select_experiment_information(experiment_id)
+    experiment.map_parameter_list_to_experiment(
+        select_experiment_paramaters(experiment_id)
+    )
 
     # Finally get the well id and plate id for the experiment based on the well_status view
-    echem_experiment_base.well_id = well_id
+    experiment.well_id = well_id
 
-    return echem_experiment_base, filename
+    return experiment, filename
 
 
 @timing_wrapper
@@ -315,7 +317,7 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
             ## Check if the well is available
             if check_well_status(experiment.well_id, experiment.plate_id) != "new":
                 # Check that the plate ID exists
-                if not check_if_plate_type_exists(experiment.well_type_number):
+                if not check_if_plate_type_exists(experiment.plate_type_number):
                     logger.error(
                         "Plate type %s does not exist, cannot add experiment to queue",
                         experiment.plate_id,
@@ -340,7 +342,7 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
                     continue
 
                 if (
-                    plate_info.type_id != experiment.well_type_number
+                    plate_info.type_id != experiment.plate_type_number
                     or plate_info.id != experiment.plate_id
                 ):
                     logger.error(

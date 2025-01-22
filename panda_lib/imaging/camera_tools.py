@@ -5,31 +5,11 @@ This script is used to capture images from the FLIR camera.
 
 import logging
 import os
-from configparser import ConfigParser
 from pathlib import Path
 from typing import Union
 
 import cv2
 import PySpin
-from dotenv import load_dotenv
-
-
-def read_config() -> ConfigParser:
-    """Reads a configuration file."""
-    load_dotenv()
-    config_path = os.getenv("PANDA_SDL_CONFIG_PATH")
-    config = ConfigParser()
-    config.read(config_path)
-    return config
-
-
-config = read_config()
-
-
-if config.getboolean("OPTIONS", "testing"):
-    PANDA_SDL_LOG = config.get("TESTING", "logging_dir")
-else:
-    PANDA_SDL_LOG = config.get("PRODUCTION", "logging_dir")
 
 
 def setup_default_logger(
@@ -37,11 +17,12 @@ def setup_default_logger(
     log_name="panda",
     file_level=logging.DEBUG,
     console_level=logging.DEBUG,
+    log_path: str = ".logs/",
 ):
     """Setup a default logger for the PANDA_SDL project"""
 
-    if not os.path.exists(PANDA_SDL_LOG):
-        os.makedirs(PANDA_SDL_LOG)
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
     default_logger = logging.getLogger(log_name)
     if not default_logger.handlers:  # Check if the logger already has handlers attached
         default_logger.setLevel(file_level)
@@ -49,7 +30,7 @@ def setup_default_logger(
             "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
         )
 
-        file_handler = logging.FileHandler(PANDA_SDL_LOG + "/" + log_name + ".log")
+        file_handler = logging.FileHandler(log_path + "/" + log_name + ".log")
         file_handler.setFormatter(formatter)
         default_logger.addHandler(file_handler)
 
@@ -67,6 +48,42 @@ def setup_default_logger(
 logger = setup_default_logger(
     log_name="FLIRCamera", console_level=logging.DEBUG, file_level=logging.DEBUG
 )
+
+
+def file_enumeration(file_path: Path) -> Path:
+    """Enumerate a file path if it already exists"""
+    i = 1
+    while file_path.exists():
+        file_path = file_path.with_name(
+            file_path.stem + "_" + str(i) + file_path.suffix
+        )
+        i += 1
+    return file_path
+
+
+def image_filepath_generator(
+    exp_id: int = "test",
+    project_id: int = "test",
+    project_campaign_id: int = "test",
+    well_id: str = "test",
+    step_description: str = None,
+    data_path: Path = Path("images"),
+) -> Path:
+    """
+    Generate the file path for the image
+    """
+    # create file name
+    if step_description is not None:
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_{step_description}_image"
+    else:
+        file_name = f"{project_id}_{project_campaign_id}_{exp_id}_{well_id}_image"
+    file_name = file_name.replace(" ", "_")  # clean up the file name
+    file_name_start = file_name + "_0"  # enumerate the file name
+    filepath = Path(data_path / str(file_name_start)).with_suffix(".tiff")
+    i = 1
+    while filepath.exists():
+        filepath = file_enumeration(filepath)
+    return filepath
 
 
 def locate_connected_cameras() -> PySpin.CameraList:
@@ -1120,14 +1137,14 @@ if __name__ == "__main__":
 
     # Run example on each camera
     for instance, camera in enumerate(camera_list):
-        print(f"Running example for camera {instance+1}...")
-        print(f"Applying panda profile to camera {instance+1}...")
+        print(f"Running example for camera {instance + 1}...")
+        print(f"Applying panda profile to camera {instance + 1}...")
         # set_panda_image_profile(camera)
         RESULT = run_single_camera(camera, num_images=1)
         if RESULT:
-            print(f"Camera {instance+1} example complete...")
+            print(f"Camera {instance + 1} example complete...")
         else:
-            print(f"Camera {instance+1} example failed...")
+            print(f"Camera {instance + 1} example failed...")
     # Clear camera list before releasing system
     camera_list.Clear()
 

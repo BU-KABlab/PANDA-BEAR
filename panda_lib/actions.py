@@ -56,7 +56,7 @@ from panda_lib.grlb_mill_wrapper import PandaMill as Mill
 
 # First party imports
 from panda_lib.imaging import add_data_zone, capture_new_image, image_filepath_generator
-from panda_lib.instrument_toolkit import Hardware, Labware, Toolkit
+from panda_lib.instrument_toolkit import ArduinoLink, Hardware, Labware, Toolkit
 from panda_lib.log_tools import timing_wrapper
 from panda_lib.movement import Instruments
 from panda_lib.obs_controls import MockOBSController, OBSController
@@ -64,7 +64,7 @@ from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.utilities import solve_vials_ilp
 from panda_lib.vials import StockVial, Vial, WasteVial, read_vials
-from panda_lib.wellplate import Well
+from panda_lib.wellplate import Coordinates, Well
 
 TESTING = read_testing_config()
 
@@ -118,7 +118,9 @@ def _handle_source_vessels(
 
     if isinstance(src_vessel, (str, Vial)):
         if isinstance(src_vessel, Vial):
-            src_vessel = src_vessel.name
+            src_vessel = src_vessel.name.lower()
+        else:
+            src_vessel = src_vessel.lower()
         stock_vials, _ = read_vials(db_session())
         selected_source_vessels = [
             vial
@@ -178,7 +180,7 @@ def _handle_source_vessels(
 
 def _pipette_action(
     toolkit: Union[Toolkit, Hardware],
-    vessel: Union[Vial, Well],
+    src_vessel: Union[Vial, Well],
     dst_vessel: Union[Well, WasteVial],
     desired_volume: float,
 ):
@@ -195,58 +197,55 @@ def _pipette_action(
     repetitions = math.ceil(
         desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
     )
-    if isinstance(vessel, Well):
+    if isinstance(src_vessel, Well):
         repetition_vol = correction_factor(desired_volume / repetitions, 1.0)
     else:
         repetition_vol = correction_factor(
-            desired_volume / repetitions, vessel.viscosity_cp
+            desired_volume / repetitions, src_vessel.viscosity_cp
         )
     logger.info(
-        "Pipetting %f uL from %s to %s", desired_volume, vessel.name, dst_vessel.name
+        "Pipetting %f uL from %s to %s",
+        desired_volume,
+        src_vessel.name,
+        dst_vessel.name,
     )
 
     for j in range(repetitions):
         logger.info("Repetition %d of %d", j + 1, repetitions)
 
-        if isinstance(vessel, StockVial):
-            toolkit.mill.safe_move(
-                x_coord=vessel.x,
-                y_coord=vessel.y,
-                z_coord=vessel.top,
-                tool=Instruments.DECAPPER,
+        if isinstance(src_vessel, StockVial):
+            decapping_sequence(
+                toolkit.mill,
+                Coordinates(src_vessel.x, src_vessel.y, src_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.no_cap()
 
         toolkit.pump.withdraw(volume_to_withdraw=AIR_GAP)
         toolkit.mill.safe_move(
-            vessel.x,
-            vessel.y,
-            vessel.withdrawal_height,
+            src_vessel.x,
+            src_vessel.y,
+            src_vessel.withdrawal_height,
             tool=Instruments.PIPETTE,
         )
-        toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=vessel)
-        if isinstance(vessel, Well):
+        toolkit.pump.withdraw(volume_to_withdraw=repetition_vol, solution=src_vessel)
+        if isinstance(src_vessel, Well):
             toolkit.pump.withdraw(volume_to_withdraw=20)
         toolkit.mill.move_to_safe_position()
         toolkit.pump.withdraw(volume_to_withdraw=DRIP_STOP)
 
-        if isinstance(vessel, StockVial):
-            toolkit.mill.safe_move(
-                vessel.x,
-                vessel.y,
-                vessel.top,
-                tool=Instruments.DECAPPER,
+        if isinstance(src_vessel, StockVial):
+            capping_sequence(
+                toolkit.mill,
+                Coordinates(src_vessel.x, src_vessel.y, src_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.ALL_CAP()
 
         if isinstance(dst_vessel, WasteVial):
-            toolkit.mill.safe_move(
-                dst_vessel.x,
-                dst_vessel.y,
-                dst_vessel.top,
-                tool=Instruments.DECAPPER,
+            decapping_sequence(
+                toolkit.mill,
+                Coordinates(dst_vessel.x, dst_vessel.y, dst_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.no_cap()
 
         toolkit.mill.safe_move(
             dst_vessel.x,
@@ -256,11 +255,11 @@ def _pipette_action(
         )
         toolkit.pump.infuse(
             volume_to_infuse=repetition_vol,
-            being_infused=vessel,
+            being_infused=src_vessel,
             infused_into=dst_vessel,
             blowout_ul=(
                 AIR_GAP + DRIP_STOP + 20
-                if isinstance(vessel, Well)
+                if isinstance(src_vessel, Well)
                 else AIR_GAP + DRIP_STOP
             ),
         )
@@ -289,13 +288,11 @@ def _pipette_action(
             toolkit.pump.pipette.volume = 0.0
 
         if isinstance(dst_vessel, WasteVial):
-            toolkit.mill.safe_move(
-                dst_vessel.x,
-                dst_vessel.y,
-                dst_vessel.top,
-                tool=Instruments.DECAPPER,
+            capping_sequence(
+                toolkit.mill,
+                Coordinates(dst_vessel.x, dst_vessel.y, dst_vessel.top),
+                toolkit.arduino,
             )
-            toolkit.arduino.ALL_CAP()
 
 
 @timing_wrapper
@@ -353,9 +350,12 @@ def transfer(
 
 
 @timing_wrapper
-def rinse_v3(
+def rinse_well(
     instructions: EchemExperimentBase,
     toolkit: Toolkit,
+    alt_sol_name: Optional[str] = None,
+    alt_vol: Optional[float] = None,
+    alt_count: Optional[int] = None,
 ):
     """
     Rinse the well with rinse_vol ul.
@@ -364,29 +364,31 @@ def rinse_v3(
     Args:
         instructions (Experiment): The experiment instructions
         toolkit (Toolkit): The toolkit object
-        stock_vials (list): The list of stock vials
-        waste_vials (list): The list of waste vials
+
     Returns:
         None (void function) since the objects are passed by reference
     """
+    sol_name = instructions.rinse_sol_name if alt_sol_name is None else alt_sol_name
+    vol = instructions.rinse_vol if alt_vol is None else alt_vol
+    count = instructions.rinse_count if alt_count is None else alt_count
 
     logger.info(
         "Rinsing well %s %dx...", instructions.well_id, instructions.rinse_count
     )
     instructions.set_status_and_save(ExperimentStatus.RINSING)
-    for _ in range(instructions.rinse_count):
-        logger.info("Rinse %d of %d", _ + 1, instructions.rinse_count)
+    for _ in range(count):
+        logger.info("Rinse %d of %d", _ + 1, count)
         # Pipette the rinse solution into the well
         _forward_pipette_v3(
-            volume=instructions.rinse_vol,
-            src_vessel=instructions.rinse_sol_name,
+            volume=vol,
+            src_vessel=sol_name,
             dst_vessel=instructions.well,
             toolkit=toolkit,
         )
 
         # Clear the well
         _forward_pipette_v3(
-            volume=instructions.rinse_vol,
+            volume=vol,
             src_vessel=instructions.well,
             dst_vessel=waste_selector(
                 "waste",
@@ -451,8 +453,8 @@ def rinse_v3(
 
 
 @timing_wrapper
-def flush_v3(
-    flush_solution_name: str,
+def flush_pipette(
+    flush_with: str,
     toolkit: Toolkit,
     flush_volume: float = 120.0,
     flush_count: int = 1,
@@ -461,14 +463,11 @@ def flush_v3(
     """
     Flush the pipette tip with the designated flush_volume ul to remove any residue
     Args:
-        waste_vials (list): The list of waste vials
-        stock_vials (list): The list of stock vials
         flush_solution_name (str): The name of the solution to flush with
-        mill (object): The mill object
-        pump (object): The pump object
-        pumping_rate (float): The pumping rate in ml/min
+        toolkit (Toolkit): The toolkit object
         flush_volume (float): The volume to flush with in microliters
         flush_count (int): The number of times to flush
+        instructions (ExperimentBase): The experiment instructions for setting the status
 
     Returns:
         None (void function) since the objects are passed by reference
@@ -480,13 +479,13 @@ def flush_v3(
         logger.info(
             "Flushing pipette tip with %f ul of %s...",
             flush_volume,
-            flush_solution_name,
+            flush_with,
         )
 
         for _ in range(flush_count):
             _forward_pipette_v3(
                 flush_volume,
-                src_vessel=flush_solution_name,
+                src_vessel=flush_with,
                 dst_vessel=waste_selector("waste", flush_volume),
                 toolkit=toolkit,
             )
@@ -494,7 +493,7 @@ def flush_v3(
         logger.debug(
             "Flushed pipette tip with %f ul of %s %dx times...",
             flush_volume,
-            flush_solution_name,
+            flush_with,
             flush_count,
         )
     else:
@@ -992,10 +991,8 @@ def image_well(
 
 @timing_wrapper
 def mix(
-    mill: Union[Mill, MockMill],
-    pump: Union[SyringePump, MockPump],
+    toolkit: Union[Toolkit, Hardware],
     well: Well,
-    well_id: str,
     volume: float,
     mix_count: int = 3,
     mix_height: float = None,
@@ -1004,10 +1001,8 @@ def mix(
     Mix the solution in the well by pipetting it up and down
 
     Args:
-        mill (object): The mill object
-        pump (object): The pump object
-        wellplate (object): The wellplate object
-        well_id (str): The well to be mixed
+        toolkit (object): The toolkit object for hardware control
+        well (Well, str): The well to be mixed
         volume (float): The volume to be mixed
         mix_count (int): The number of times to mix
         mix_height (float): The height to mix at
@@ -1017,15 +1012,18 @@ def mix(
     else:
         mix_height = well.well_data.bottom + mix_height
 
-    logger.info("Mixing well %s %dx...", well_id, mix_count)
+    if isinstance(well, str):
+        well = toolkit.wellplate.get_well(well)
+
+    logger.info("Mixing well %s %dx...", well.name, mix_count)
 
     # Withdraw air for blow out volume
-    pump.withdraw_air(40)
+    toolkit.pump.withdraw_air(40)
 
     for i in range(mix_count):
-        logger.info("Mixing well %s %d of %d...", well_id, i + 1, mix_count)
+        logger.info("Mixing well %s %d of %d...", well.name, i + 1, mix_count)
         # Move to the bottom of the target well
-        mill.safe_move(
+        toolkit.mill.safe_move(
             x_coord=well.x,
             y_coord=well.y,
             z_coord=well.bottom,
@@ -1033,14 +1031,13 @@ def mix(
         )
 
         # Withdraw the solutions from the well
-        pump.withdraw(
+        toolkit.pump.withdraw(
             volume_to_withdraw=volume,
             solution=well,
-            rate=pump.max_pump_rate,
-            weigh=False,
+            rate=toolkit.pump.max_pump_rate,
         )
 
-        mill.safe_move(
+        toolkit.mill.safe_move(
             x_coord=well.x,
             y_coord=well.y,
             z_coord=well.top,
@@ -1048,18 +1045,85 @@ def mix(
         )
 
         # Deposit the solution back into the well
-        pump.infuse(
+        toolkit.pump.infuse(
             volume_to_infuse=volume,
             being_infused=None,
             infused_into=well,
-            rate=pump.max_pump_rate,
+            rate=toolkit.pump.max_pump_rate,
             blowout_ul=0,
-            weigh=False,
         )
 
-    pump.infuse_air(40)
-    mill.move_to_safe_position()
+    toolkit.pump.infuse_air(40)
+    toolkit.mill.move_to_safe_position()
     return 0
+
+
+def clear_well(
+    toolkit: Union[Toolkit, Hardware],
+    well: Well,
+):
+    """
+    Clear the well by pipetting the solution out of the well
+
+    Args:
+        toolkit (object): The toolkit object for hardware control
+        well (Well, str): The well to be cleared
+        volume (float): The volume to be cleared
+    """
+    if isinstance(well, str):
+        well = toolkit.wellplate.get_well(well)
+
+    logger.info("Clearing well %s...", well.name)
+
+    transfer(
+        volume=well.volume,
+        src_vessel=well,
+        dst_vessel=waste_selector("waste", well.volume),
+        toolkit=toolkit,
+    )
+    return 0
+
+
+def decapping_sequence(mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink):
+    """
+    The decapping sequence is as follows:
+    - Move to the target coordinates
+    - Activate the decapper
+    - Move the decapper up 20mm
+    """
+
+    # Move to the target coordinates
+    mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+
+    # Activate the decapper
+    ard_link.no_cap()
+
+    # Move the decapper up 20mm
+    mill.move_to_position(
+        target_coords.x,
+        target_coords.y,
+        target_coords.z + 20,
+        tool="decapper",
+    )
+
+
+def capping_sequence(mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink):
+    """
+    The capping sequence is as follows:
+    - Move to the target coordinates
+    - deactivate the decapper
+    - Move the decapper +10mm in the y direction
+    - Move the decapper to 0 z
+    """
+
+    # Move to the target coordinates
+    mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
+
+    # Deactivate the decapper
+    ard_link.ALL_CAP()
+
+    # Move the decapper +10mm in the y direction
+    mill.move_to_position(target_coords.x, target_coords.y + 10, 0, tool="decapper")
 
 
 if __name__ == "__main__":

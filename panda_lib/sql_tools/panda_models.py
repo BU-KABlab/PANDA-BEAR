@@ -415,7 +415,7 @@ class Vials(Base):
     )
     base_thickness: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
     dead_volume: Mapped[float] = mapped_column(Float, nullable=False, default=1000.0)
-    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    active: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     updated: Mapped[str] = mapped_column(
         String, nullable=False, default=dt.now(timezone.utc)
     )
@@ -509,7 +509,7 @@ class WellModel(VesselBase, Base):
 class PlateTypes(Base):
     """PlateTypes table model"""
 
-    __tablename__ = "panda_plate_types"
+    __tablename__ = "panda_wellplate_types"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     substrate: Mapped[str] = mapped_column(String)
     gasket: Mapped[str] = mapped_column(String)
@@ -558,7 +558,9 @@ class Wellplates(Base, DeckObjectBase):
 
     __tablename__ = "panda_wellplates"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    type_id: Mapped[int] = mapped_column(Integer, ForeignKey("panda_plate_types.id"))
+    type_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("panda_wellplate_types.id")
+    )
     current: Mapped[bool] = mapped_column(Boolean, default=False)
     a1_x: Mapped[float] = mapped_column(Float)
     a1_y: Mapped[float] = mapped_column(Float)

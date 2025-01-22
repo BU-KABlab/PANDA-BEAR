@@ -12,8 +12,8 @@ from typing import Optional, Tuple, TypedDict
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from panda_lib.grlb_mill_wrapper import Coordinates
 from panda_lib.errors import OverDraftException, OverFillException
+from panda_lib.grlb_mill_wrapper import Coordinates
 from panda_lib.schemas import (
     PlateTypeModel,
     WellplateReadModel,
@@ -145,7 +145,7 @@ class Well:
     ):
         self.well_id = well_id
         self.plate_id = plate_id
-        self.active_session = session_maker()
+        self.session_maker = session_maker
         self.service = WellService(session_maker=session_maker)
         self.well_data: Optional[WellReadModel] = None
 
@@ -187,6 +187,10 @@ class Well:
         return self.well_data.bottom
 
     @property
+    def volume(self):
+        return self.well_data.volume
+
+    @property
     def volume_height(self):
         return self.well_data.volume_height
 
@@ -197,9 +201,7 @@ class Well:
     @property
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
-        height = self.well_data.volume_height - 1
-        if height < self.well_data.dead_volume:
-            return self.well_data.dead_volume / (3.14 * self.well_data.radius**2)
+        return self.bottom + 0.25
 
     @property
     def top_coordinates(self) -> Coordinates:
@@ -209,13 +211,13 @@ class Well:
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
-                db_session=self.active_session,
+                db_session=self.session_maker,
                 plate_id=self.plate_id,
                 type_id=kwargs.get("type_id"),
             )
         else:
             plate_type = self.service.fetch_well_type_characteristics(
-                db_session=self.active_session, plate_id=self.plate_id
+                db_session=self.session_maker, plate_id=self.plate_id
             )
         new_well = WellWriteModel(
             well_id=self.well_id,
@@ -562,6 +564,9 @@ class Wellplate:
             ),
         }
 
+    def get_well(self, well_id: str) -> Well:
+        return self.wells[well_id]
+
     @property
     def id(self):
         return self.plate_data.id
@@ -700,7 +705,7 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
         working_volume = {
             "x": -float(mill_config["$130"]),
             "y": -float(mill_config["$131"]),
-            "z": -200 #-float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
+            "z": -200,  # -float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
         }
 
         ## Get the current plate id and location

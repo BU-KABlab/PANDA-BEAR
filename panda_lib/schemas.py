@@ -94,11 +94,14 @@ class VialWriteModel(BaseModel):
 
 
 class VialReadModel(VesselModel):
+    id: int
     position: str
     category: int
     viscosity_cp: float = 0.0
     concentration: float = 0.0
     density: float = 1.0
+    active: int = 1
+    updated: str
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -167,7 +170,7 @@ class WellplateReadModel(DeckObjectModel):
     cols: int
     echem_height: float  # height of echem cell placement in mm
     image_height: float  # height of the image in mm
-
+    # TODO Add substrate and well count...probably inherit the PlateTypeModel instead or in addition to the DeckObjectModel
     model_config = ConfigDict(from_attributes=True)
 
 

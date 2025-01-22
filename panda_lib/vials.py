@@ -139,8 +139,13 @@ class Vial:
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
         height = self.vial_data.volume_height - 1
-        if height < self.vial_data.dead_volume:
-            return self.vial_data.dead_volume / (3.14 * self.vial_data.radius**2)
+        dead_height = self.bottom + self.vial_data.dead_volume / (
+            3.14 * self.vial_data.radius**2
+        )
+        if height < dead_height:
+            return dead_height
+        else:
+            return height
 
     def create_new_vial(self, **kwargs: VialKwargs):
         """Creates a new vial in the database, and loads it back."""
@@ -229,12 +234,15 @@ class Vial:
 
     def reset_vial(self):
         """Resets the vial to its default state."""
-        self.vial_data.volume = self.vial_data.capacity
+        self.vial_data.volume = (
+            self.vial_data.capacity if self.vial_data.category == 0 else 0
+        )
         self.vial_data.contents = (
             {}
             if self.vial_data.category == 1
             else {next(iter(self.vial_data.contents)): self.vial_data.capacity}
         )
+        self.save()
         self.vial_data.contamination = 0
         self.save()
 
@@ -268,7 +276,7 @@ def read_vials(
     """
     Read in the virtual vials from the json file
     """
-
+    groups = {"stock": 0, "waste": 1}
     # Get the vial information from the vials table in the db
     active_vials: List[VialReadModel] = VialService(
         db_session_maker=session
@@ -344,7 +352,7 @@ def delete_vial_position_and_hx_from_db(
 def input_new_vial_values(vialgroup: str) -> None:
     """For user inputting the new vial values for the state file"""
 
-    vials = read_vials(vialgroup)
+    vials = read_vials(vialgroup)[0]
     vials = sorted(vials, key=lambda x: x.position)
     vial_list = []
     vial_lines = []
@@ -481,7 +489,7 @@ def generate_template_vial_csv_file() -> None:
     directory = directory_picker()
 
     filename = Path(directory) / Path(filename)  # Convert to a Path object
-
+    stockvials, wastevials = read_vials()
     with open(filename, "w", encoding="UTF-8", newline="") as file:
         csv_writer = csv.writer(file)
         csv_writer.writerow(
@@ -509,81 +517,33 @@ def generate_template_vial_csv_file() -> None:
                 "active",
             ]
         )
-        csv_writer.writerow(
-            [
-                1,
-                "s0",
-                0,
-                "edot",
-                '{"edot": 20000}',
-                1,
-                1,
-                1,
-                57,
-                14,
-                20000,
-                20000,
-                0,
-                '{"x": -4, "y": -39, "z": -74}',
-                1,
-                1000,
-                -40.52,
-                -71.38,
-                -16,
-                "2024-12-20 15:40:59.666",
-                True,
-            ]
-        )
-        csv_writer.writerow(
-            [
-                9,
-                "w0",
-                1,
-                "waste",
-                "{}",
-                0,
-                1.0,
-                0,
-                57,
-                14,
-                0,
-                20000,
-                0,
-                '{"x": -50, "y": -7, "z": -74}',
-                1,
-                1000,
-                -73,
-                -71.38,
-                -16,
-                "2024-12-20 15:45:53.100",
-                True,
-            ]
-        )
-        csv_writer.writerow(
-            [
-                17,
-                "e1",
-                0,
-                "none",
-                '{"none": 20000}',
-                1,
-                1,
-                1,
-                57,
-                14,
-                20000,
-                20000,
-                0,
-                '{"x": -409, "y": -35, "z": -74}',
-                1,
-                10000,
-                -40.52,
-                -56.76,
-                -16,
-                "2024-12-20 15:45:53.102",
-                True,
-            ]
-        )
+        for vial in stockvials + wastevials:
+            vial: Vial
+            csv_writer.writerow(
+                [
+                    vial.vial_data.id,
+                    vial.vial_data.position,
+                    vial.vial_data.category,
+                    vial.vial_data.name,
+                    json.dumps(vial.vial_data.contents),
+                    vial.vial_data.viscosity_cp,
+                    vial.vial_data.concentration,
+                    vial.vial_data.density,
+                    vial.vial_data.height,
+                    vial.vial_data.radius,
+                    vial.vial_data.volume,
+                    vial.vial_data.capacity,
+                    vial.vial_data.contamination,
+                    json.dumps(vial.vial_data.coordinates),
+                    vial.vial_data.base_thickness,
+                    vial.vial_data.dead_volume,
+                    vial.vial_data.volume_height,
+                    vial.vial_data.bottom,
+                    vial.vial_data.top,
+                    vial.vial_data.updated,
+                    vial.vial_data.active,
+                ]
+            )
 
     print(f"Template vial csv file saved as {filename}")
 
@@ -606,7 +566,7 @@ def import_vial_csv_file(filename: str = None) -> None:
         try:
             vial = Vial(
                 position=each_vial["position"],
-                session_maker=SessionLocal(),
+                session_maker=SessionLocal,
                 create_new=True,
                 category=int(each_vial["category"]),
                 name=each_vial["name"],
