@@ -7,7 +7,7 @@ wellplate and the wells in it.
 import logging
 
 # pylint: disable=line-too-long
-from typing import Optional, Tuple, TypedDict
+from typing import Optional, Tuple, TypedDict, Union
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
@@ -208,6 +208,11 @@ class Well:
         """Returns the top coordinates of the well."""
         return Coordinates(x=self.x, y=self.y, z=self.top)
 
+    @property
+    def bottom_coordinates(self) -> Coordinates:
+        """Returns the bottom coordinates of the well."""
+        return Coordinates(x=self.x, y=self.y, z=self.bottom)
+
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
@@ -318,8 +323,10 @@ class Well:
         self.well_data.status = new_status
         self.save()
 
-    def update_coordinates(self, new_coordinates: dict):
+    def update_coordinates(self, new_coordinates: Union[dict, Coordinates]):
         """Update the coordinates of the well and save to the database"""
+        if isinstance(new_coordinates, Coordinates):
+            new_coordinates = new_coordinates.dict()
         self.well_data.coordinates = new_coordinates
         self.save()
 
