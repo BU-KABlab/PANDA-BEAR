@@ -28,10 +28,14 @@ from panda_lib.log_tools import setup_default_logger
 from panda_lib.utilities import Coordinates as WellCoordinates
 from panda_lib.utilities import Instruments, input_validation
 from panda_lib.vials import StockVial, WasteVial
-from panda_lib.wellplate import Well
-from panda_lib.wellplate import Wellplates as Wellplate
+from panda_lib.wellplate import Well, Wellplate
 
-from .mill_control import Mill, MockMill
+from panda_lib.grlb_mill_wrapper import (
+    PandaMill as Mill,
+    MockPandaMill as MockMill,
+    Tool,
+    Coordinates,
+)
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 
@@ -390,7 +394,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
 
     """
     # Enter well choice loop
-    instrument = Instruments.PIPETTE
+    instrument = "pipette"
     while True:
         coordinates_changed = False
         well_id = input(
@@ -400,11 +404,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
             break
 
         if well_id == "toggle":
-            instrument = (
-                Instruments.ELECTRODE
-                if instrument == Instruments.PIPETTE
-                else Instruments.PIPETTE
-            )
+            instrument = "electrode" if instrument == "pipette" else "pipette"
             print(f"Instrument has been toggled to {instrument}")
             well_id = input("Enter the well ID to test (e.g., A1): ").lower()
 
@@ -419,22 +419,21 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
 
         # Move the pipette to the top of the well
         mill.safe_move(
-            original_coordinates["x"],
-            original_coordinates["y"],
-            wellplate.z_top,
-            instrument,
+            coordinates=Coordinates(
+                original_coordinates["x"], original_coordinates["y"], wellplate.top
+            ),
+            tool=instrument,
         )
 
         # Enter confirmation loop
         while True:
-            current_coorinates = WellCoordinates(
+            current_coorinates = Coordinates(
                 original_coordinates["x"],
                 original_coordinates["y"],
-                z_top=wellplate.z_top,
+                wellplate.top,
             )
-            instrument: Instruments
             confirm = input(
-                f"Is the {(instrument.value)}  in the correct position? (yes/no): "
+                f"Is the {(instrument)}  in the correct position? (yes/no): "
             )
             if confirm is None or confirm.lower().strip()[0] in ["y", ""]:
                 break  # exit confirmation loop go to updating coordinates if changed
@@ -476,18 +475,16 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                     continue
                 break  # exit validation loop
 
-            new_coordinates = WellCoordinates(
+            new_coordinates = Coordinates(
                 new_x,
                 new_y,
-                z_top=wellplate.z_top,
+                wellplate.top,
             )
 
             # Safe move to the new coordinates
             mill.safe_move(
-                new_coordinates.x,
-                new_coordinates.y,
-                wellplate.z_top,
-                instrument,
+                coordinates=new_coordinates,
+                tool=instrument,
             )
 
         if coordinates_changed:
@@ -498,12 +495,14 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                         "Would you like to recalculate all well locations? (y/n): "
                     )
                     if recalc[0].lower() == "y":
-                        wellplate.a1_x = new_coordinates.x
-                        wellplate.a1_y = new_coordinates.y
-                        wellplate.write_wellplate_location()  # json file for wellplate location
-                        wellplate.recalculate_well_locations()  # Update wells with new coords and depth
+                        wellplate.plate_data.a1_x = new_coordinates.x
+                        wellplate.plate_data.a1_y = new_coordinates.y
+                        wellplate.save()  # json file for wellplate location
+                        wellplate.recalculate_well_positions()  # Update wells with new coords and depth
                 else:  # Update the well with new well coordinates
-                    wellplate.update_well_coordinates(well_id, new_coordinates)
+                    wellplate.wells[well_id].update_coordinates(
+                        new_coordinates.to_dict()
+                    )
 
 
 def calibrate_z_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwargs):
@@ -537,26 +536,26 @@ You will be asked to accept the setting, and if you do not, you will be asked to
 
         print(f"Current z_bottom of {well_id}: {current_z_bottom}")
         print(f"Current coordinates of {well_id}: {wellplate.get_coordinates(well_id)}")
+        well = wellplate.wells[well_id]
+
+        # Double check that the well and wellplate.wells[well_id] are the same
+        assert well.coordinates == wellplate.get_coordinates(well_id)
 
         input("Press enter to continue...")
 
         mill.safe_move(
-            wellplate.get_coordinates(well_id, "x"),
-            wellplate.get_coordinates(well_id, "y"),
-            0,
-            Instruments.PIPETTE,
+            coordinates=well.top_coordinates,
+            tool="pipette",
         )
         goto = input_validation(
-            "Enter a z_bottom to test or enter for no change: ", float, (-80, 0)
+            "Enter a bottom to test or enter for no change: ", float, (-80, 0)
         )
         if not goto:
             goto = current_z_bottom
 
         current = mill.safe_move(
-            wellplate.get_coordinates(well_id, "x"),
-            wellplate.get_coordinates(well_id, "y"),
-            goto,
-            Instruments.PIPETTE,
+            coordinates=Coordinates(well.x, well.y, goto),
+            tool="pipette",
         )
 
         while True:
@@ -571,43 +570,69 @@ You will be asked to accept the setting, and if you do not, you will be asked to
             new_z_bottom = input_validation(
                 f"Enter the new z_bottom for {well_id} (current: {current_z_bottom}): ",
                 float,
-                (-80, 0),
+                (-85, 0),
             )
 
             current = mill.safe_move(
-                wellplate.get_coordinates(well_id, "x"),
-                wellplate.get_coordinates(well_id, "y"),
-                new_z_bottom,
-                Instruments.PIPETTE,
+                coordinates=Coordinates(well.x, well.y, new_z_bottom),
+                tool="pipette",
             )
 
-        wellplate.z_bottom = new_z_bottom
-
-        apply_to_wellplate = input(
-            "Would you like to apply this to the entire wellplate? (y/n): "
-        )
-        if apply_to_wellplate.lower() in ["y", "yes", ""]:
-            wellplate.z_bottom = new_z_bottom
-            wellplate.z_top = new_z_bottom + wellplate.height
-            for well in wellplate.wells:
-                well_obj: Well = wellplate.wells[well]
-                well_obj.depth = new_z_bottom
-                well_obj.height = new_z_bottom + well_obj.height
-                # We do this instead of recalculating every well location incase
-                # they are uniquely located in x and y
-                # We are assuming the z_bottom is the same for all wells
-                wellplate.write_wellplate_location()  # json file for wellplate location
-                wellplate.recalculate_well_locations()  # Update wells with new coords and depth
+        # The bottom property of wells and wellplates is a generated value so we need to update the base_thickness of the wellplate
+        # The new_z_bottom is actually the z-coordinate + the base_thickness, so we will update the base_thickness according to
+        # the difference between the new_z_bottom and the current z coordinate of the well.
+        base_thickness = new_z_bottom - current.z
+        print(f"Setting well base_thickness to: {base_thickness}")
+        correct = input("Is this correct? (y/n): ")
+        if correct.lower() in ["y", "yes", ""]:
+            well.well_data.base_thickness = base_thickness
         else:
-            wellplate.update_well_coordinates(
-                well_id,
-                WellCoordinates(
-                    x=wellplate.get_coordinates(well_id, "x"),
-                    y=wellplate.get_coordinates(well_id, "y"),
-                    z_bottom=new_z_bottom,
-                    z_top=new_z_bottom + wellplate.height,
-                ),
-            )
+            print(f'How about: {current.z - new_z_bottom}?')
+            correct = input("Is this correct? (y/n): ")
+            if correct.lower() in ["y", "yes", ""]:
+                base_thickness = current.z - new_z_bottom
+                well.well_data.base_thickness = current.z - new_z_bottom
+            else:
+                print("Skipping well")
+                continue
+
+        well.save()
+
+        print(f"New z_bottom for {well_id}: {well.bottom}")
+
+        apply_to_wellplate = input("Would you like to apply this to the entire wellplate? (y/n): ")
+        if apply_to_wellplate.lower() in ["y", "yes", ""]:
+            wellplate.plate_data.base_thickness = base_thickness
+            wellplate.save()
+            wellplate.recalculate_well_positions()
+
+        # wellplate.bottom = new_z_bottom
+
+        # apply_to_wellplate = input(
+        #     "Would you like to apply this to the entire wellplate? (y/n): "
+        # )
+        # if apply_to_wellplate.lower() in ["y", "yes", ""]:
+        #     wellplate.bottom = new_z_bottom
+        #     wellplate.top = new_z_bottom + wellplate.height
+        #     for well in wellplate.wells:
+        #         well_obj: Well = wellplate.wells[well]
+        #         well_obj.depth = new_z_bottom
+        #         well_obj.height = new_z_bottom + well_obj.height
+        #         # We do this instead of recalculating every well location incase
+        #         # they are uniquely located in x and y
+        #         # We are assuming the z_bottom is the same for all wells
+        #         wellplate.write_wellplate_location()  # json file for wellplate location
+        #         wellplate.recalculate_well_locations()  # Update wells with new coords and depth
+        # else:
+        #     wellplate.update_well_coordinates(
+        #         well_id,
+        #         WellCoordinates(
+        #             x=wellplate.get_coordinates(well_id, "x"),
+        #             y=wellplate.get_coordinates(well_id, "y"),
+        #             z_bottom=new_z_bottom,
+        #             z_top=new_z_bottom + wellplate.height,
+        #         ),
+        #     )
 
 
 def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
