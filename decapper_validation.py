@@ -16,8 +16,8 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
-repetitions = 100
-pause = 3600
+repetitions = 3
+pause = 5
 
 
 def main():
@@ -26,7 +26,7 @@ def main():
         obs_controller = OBSController()
         obs_controller.set_recording_file_name("decapper_validation")
         obs_controller.place_text_on_screen("Decapper validation program")
-        obs_controller.start_recording()
+        #obs_controller.start_recording()
         # populate the database with the vial
         vkwargs = VialKwargs(
             category=0,
@@ -35,17 +35,17 @@ def main():
             viscosity_cp=1,
             concentration=0.01,
             density=1,
-            height=69,
+            height=64,
             radius=14,
             volume=20000,
             capacity=20000,
             contamination=0,
-            coordinates={"x": -4, "y": -106, "z": -200},
+            coordinates={"x": -4, "y": -139, "z": -197},
             base_thickness=1,
             dead_volume=1000,
         )
         vial = StockVial(
-            position="s0", create_new=True, session_maker=SessionLocal, **vkwargs
+            position="s3", create_new=True, session_maker=SessionLocal, **vkwargs
         )
         vial.save()
         print(f"Vial {vial} has been created")
@@ -70,7 +70,8 @@ def main():
     except Exception as e:
         print(e)
     finally:
-        obs_controller.stop_recording()
+        #obs_controller.stop_recording()
+        pass
 
 
 def decapping_validation(
