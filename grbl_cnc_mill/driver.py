@@ -882,7 +882,7 @@ class Mill:
         command_str = "\n".join(commands)
         self.execute_command(command_str)
 
-        return None  # self.current_coordinates(tool)
+        return self.current_coordinates(tool)[0]
 
     def _is_already_at_target(
         self, goto: Coordinates, current_coordinates: Coordinates

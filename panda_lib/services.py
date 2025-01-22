@@ -235,18 +235,18 @@ class WellService:
     def update_well(self, well_id: str, plate_id: int, updates: dict) -> WellDBModel:
         with self.session_maker() as active_db_session:
             try:
+                updated_model = WellWriteModel(**updates).model_dump()
                 stmt = select(WellDBModel).filter_by(well_id=well_id, plate_id=plate_id)
                 well = active_db_session.execute(stmt).scalar()
                 if not well:
                     raise ValueError(f"Well with id {well_id} not found.")
-                for key, value in updates.items():
-                    if hasattr(well, key):
-                        setattr(well, key, value)
-                    else:
-                        raise ValueError(f"Invalid attribute: {key}")
+                for key, value in updated_model.items():
+                    setattr(well, key, value)
                 active_db_session.commit()
                 active_db_session.refresh(well)
                 return well
+            except ValueError as e:
+                raise e
             except SQLAlchemyError as e:
                 active_db_session.rollback()
                 raise ValueError(f"Error updating well: {e}")
@@ -356,15 +356,13 @@ class WellplateService:
     def update_plate(self, plate_id: int, updates: dict) -> WellPlateDBModel:
         with self.session_maker() as db_session:
             try:
+                updates = WellplateWriteModel(**updates).model_dump()
                 stmt = select(WellPlateDBModel).filter_by(id=plate_id)
                 plate = db_session.execute(stmt).scalar()
                 if not plate:
                     raise ValueError(f"Plate with id {plate_id} not found.")
                 for key, value in updates.items():
-                    if key in WellplateWriteModel.model_fields:
-                        setattr(plate, key, value)
-                    else:
-                        print(f"Skipping read-only or invalid attribute: {key}")
+                    setattr(plate, key, value)
                 db_session.commit()
                 db_session.refresh(plate)
                 return plate

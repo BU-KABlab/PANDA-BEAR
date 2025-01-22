@@ -25,7 +25,23 @@ trajectories = {name: [] for name in tool_offsets}
 
 # Process G-code
 for line in gcode:
-    if line.startswith("G01"):
+    if line == "$H\n":
+        # Homing command, go to origin
+        current_position = {"x": 0, "y": 0, "z": 0}
+        for name, offset in tool_offsets.items():
+            trajectories[name].append(
+                [
+                    current_position["x"] - offset["x"],
+                    current_position["y"] - offset["y"],
+                    current_position["z"] - offset["z"],
+                ]
+            )
+        continue
+
+    if line.startswith("$"):
+        continue
+
+    if line.startswith("G"):
         parts = line.split()
         new_position = current_position.copy()
         for part in parts[1:]:
@@ -106,7 +122,7 @@ def update(num):
 ani = FuncAnimation(
     fig,
     update,
-    frames=len(tool_coords["center"][0]),
+    frames=len(tool_coords["center"][0]) + 1,
     interval=500,
     blit=False,
     repeat=False,

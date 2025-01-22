@@ -326,7 +326,7 @@ class Well:
     def update_coordinates(self, new_coordinates: Union[dict, Coordinates]):
         """Update the coordinates of the well and save to the database"""
         if isinstance(new_coordinates, Coordinates):
-            new_coordinates = new_coordinates.dict()
+            new_coordinates = new_coordinates.to_dict()
         self.well_data.coordinates = new_coordinates
         self.save()
 
@@ -596,7 +596,7 @@ class Wellplate:
 
     @property
     def echem_height(self):
-        return self.plate_data.echem_height
+        return self.plate_data.echem_height + self.plate_data.bottom
 
     def __repr__(self):
         return f"<Wellplate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"

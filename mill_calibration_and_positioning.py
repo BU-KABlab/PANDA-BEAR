@@ -269,29 +269,32 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     This is useful for when a single well is off and needs to be corrected.
     """
     instrument = "pipette"
+    coordinates_changed = False
     while True:
-        coordinates_changed = False
-        well_id = input(
-            "Enter the well ID to test (e.g., A1) toggle to switch to electrode or done to end: "
-        ).lower()
-        if well_id == "done":
+        well_id = (
+            input(
+                "Enter the well ID to test (e.g., A1) toggle to switch to between instruments or done to end: "
+            )
+            .upper()
+            .strip()
+        )
+        if well_id == "DONE":
             break
-        if well_id == "toggle":
+        if well_id == "TOGGLE":
             instrument = "electrode" if instrument == "pipette" else "pipette"
             print(f"Instrument has been toggled to {instrument}")
             well_id = input("Enter the well ID to test (e.g., A1): ").lower()
 
-        if well_id.upper() not in wellplate.wells:
+        if well_id not in wellplate.wells:
             print("Invalid well ID")
             continue
 
-        original_coordinates = wellplate.get_coordinates(well_id)
+        well = wellplate.wells[well_id]
+        original_coordinates = well.coordinates
         print(f"Current coordinates of {well_id}: {original_coordinates}")
-        current_coordinates = Coordinates(
-            original_coordinates["x"], original_coordinates["y"], wellplate.top
-        )
+        current_coordinates = original_coordinates
         mill.safe_move(
-            coordinates=current_coordinates,
+            coordinates=well.top_coordinates,
             tool=instrument,
         )
 
@@ -302,11 +305,19 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
             print(f"Current coordinates of {well_id}: {current_coordinates}")
             coordinates_changed = True
 
-            new_x = input(
-                f"Enter the new X coordinate for {well_id} or enter for no change: "
+            new_x = input_validation(
+                f"Enter the new X coordinate for {well_id} or enter for no change: ",
+                (int, float),
+                (mill.working_volume.x, 0),
+                allow_blank=1,
+                default=original_coordinates["x"],
             )
-            new_y = input(
-                f"Enter the new Y coordinate for {well_id} or enter for no change: "
+            new_y = input_validation(
+                f"Enter the new Y coordinate for {well_id} or enter for no change: ",
+                (int, float),
+                (mill.working_volume.y, 0),
+                allow_blank=1,
+                default=original_coordinates["y"],
             )
 
             if new_x == "":
@@ -318,17 +329,6 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                 new_y = float(new_y)
             except ValueError:
                 print("Invalid input, please try again")
-                continue
-
-            if new_x > 0 or new_x < mill.working_volume.x:
-                print(
-                    f"Invalid x coordinate, must be between 0 and {mill.working_volume.x}"
-                )
-                continue
-            if new_y > 0 or new_y < mill.working_volume.y:
-                print(
-                    f"Invalid y coordinate, must be between 0 and {mill.working_volume.y}"
-                )
                 continue
 
             new_coordinates = Coordinates(new_x, new_y, wellplate.top)
@@ -348,12 +348,17 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                         wellplate.plate_data.a1_y = new_coordinates.y
                         wellplate.save()
                         wellplate.recalculate_well_positions()
+                    else:
+                        well.update_coordinates(new_coordinates)
                 else:
-                    wellplate.wells[well_id].update_coordinates(new_coordinates)
+                    well.update_coordinates(new_coordinates)
 
 
-def calibrate_z_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwargs):
+def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     """Calibrate the bottom of the wellplate to the mill"""
+
+    offset = mill.tool_manager.tool_offsets["pipette"].offset
+
     while True:
         well_id = (
             input("Enter a well ID to check the bottom of or 'done' to finish: ")
@@ -370,7 +375,7 @@ def calibrate_z_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **k
 
         mill.safe_move(coordinates=well.top_coordinates, tool="pipette")
         goto = input_validation(
-            "Enter a bottom to test or enter for no change: ", float, (-85, 0)
+            "Enter a bottom to test or enter for no change: ", float, (-200, 0)
         )
         if not goto:
             goto = well.bottom
@@ -381,32 +386,34 @@ def calibrate_z_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **k
 
         while True:
             confirm = (
-                input(f"Is the pipette in the correct position {current.z}? (yes/no): ")
+                input(
+                    f"Is the pipette in the correct position {current.z - offset.z}? (yes/no): "
+                )
                 .lower()
                 .strip()[0]
             )
             if confirm in ["y", ""]:
                 break
 
-            new_bottom = input_validation(
+            goto = input_validation(
                 f"Enter the new bottom for {well_id} (currently at: {goto}): ",
                 float,
-                (-85, 0),
+                (-200, 0),
             )
             current = mill.safe_move(
-                coordinates=Coordinates(well.x, well.y, new_bottom), tool="pipette"
+                coordinates=Coordinates(well.x, well.y, goto), tool="pipette"
             )
 
-        base_thickness = abs(new_bottom - well.z)
+        base_thickness = abs(goto - well.z)
         print(f"Setting well base_thickness to: {base_thickness}")
         if input("Is this correct? (y/n): ").lower() in ["y", "yes", ""]:
             well.well_data.base_thickness = base_thickness
         else:
             if input(
-                f"How about: {current.z - new_bottom}? Is this correct? (y/n): "
+                f"How about: {current.z - goto}? Is this correct? (y/n): "
             ).lower() in ["y", "yes", ""]:
-                base_thickness = current.z - new_bottom
-                well.well_data.base_thickness = current.z - new_bottom
+                base_thickness = current.z - goto
+                well.well_data.base_thickness = current.z - goto
             else:
                 print("Skipping well")
                 continue
@@ -431,9 +438,11 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
         return
 
     well = wellplate.wells["A1"]
-
+    offset = mill.tool_manager.tool_offsets["electrode"].offset
     mill.safe_move(coordinates=well.top_coordinates, tool="electrode")
-    print(f"Current echem height is set to: {wellplate.echem_height}")
+    print(
+        f"Current echem height is set to: {wellplate.plate_data.echem_height} off the well bottom"
+    )
 
     if input("Would you like to set a new echem height? (y/n): ").lower() in [
         "y",
@@ -442,20 +451,22 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     ]:
         while True:
             new_echem_height = input_validation(
-                "Enter the new echem height or enter for no change: ", float, (-80, 0)
+                "Enter the new echem height or enter for no change: ", float, (0, 10)
             )
+            if new_echem_height is None:
+                new_echem_height = wellplate.echem_height
             current = mill.safe_move(
                 coordinates=Coordinates(well.x, well.y, new_echem_height),
                 tool=Instruments.ELECTRODE,
             )
 
             if input(
-                f"Is the echem in the correct position at {current.z}? (yes/no): "
+                f"Is the electrode in the correct position at {current.z - offset.z} ({new_echem_height} from the bottom)? (yes/no): "
             ).lower() in ["y", "yes", ""]:
                 break
 
         if new_echem_height is not None:
-            wellplate.echem_height = new_echem_height
+            wellplate.plate_data.echem_height = new_echem_height
             wellplate.save()
             print(f"New echem height: {wellplate.echem_height}")
 
@@ -585,7 +596,7 @@ menu_options = {
     "0": check_mill_settings,
     "1": home_mill,
     "3": calibrate_wells,
-    "4": calibrate_z_bottom_of_wellplate,
+    "4": calibrate_bottom_of_wellplate,
     "5": calibrate_echem_height,
     # "6": calibrate_camera_focus,
     "7": capture_well_photo_manually,
@@ -615,6 +626,9 @@ def calibrate_mill(
             option = input("Which operation would you like: ")
             if option == "q":
                 break
+            if option not in menu_options:
+                print("Invalid option")
+                continue
             menu_options[option](cncmill, wellplate, stock_vials, waste_vials)
 
 
