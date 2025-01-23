@@ -874,6 +874,9 @@ class Mill:
         )
 
         if second_z_cord is not None:
+            # Adjust the second_z_coord according to the tool offsets
+            second_z_cord += offsets.z
+
             # Add the movement to the second z coordinate and feed rate
             commands.append(f"G01 Z{second_z_cord} F{second_z_cord_feed}")
             # Restore the feed rate to the default of 2000
