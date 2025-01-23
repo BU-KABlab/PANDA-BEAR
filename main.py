@@ -15,6 +15,7 @@ from typing import Tuple
 
 from PIL import Image
 
+import mill_calibration_and_positioning
 from license_text import show_conditions, show_warrenty
 from panda_lib import experiment_loop, imaging, pipette, print_panda, vials, wellplate
 from panda_lib.config import print_config_values as print_config
@@ -30,8 +31,6 @@ from panda_lib.sql_tools import (
     sql_wellplate,
 )
 from panda_lib.utilities import SystemState, input_validation
-
-from . import mill_calibration_and_positioning
 
 os.environ["KMP_AFFINITY"] = "none"
 exp_loop_prcss: Process = None
