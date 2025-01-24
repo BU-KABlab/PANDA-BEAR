@@ -4,9 +4,12 @@ import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from panda_lib.pipette.pipette import Pipette
-from panda_lib.pipette.sql_pipette import Pipette as PipetteModel
-from panda_lib.pipette.sql_pipette import insert_new_pipette, select_current_pipette_id
+from hardware.pipette import (
+    Pipette,
+    PipetteModel,
+    insert_new_pipette,
+    select_current_pipette_id,
+)
 from panda_lib.sql_tools.panda_models import Base
 
 # NOTE: The pipette has no check on volume, and may be overfilled

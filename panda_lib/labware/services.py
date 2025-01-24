@@ -5,6 +5,11 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
+from ..sql_tools.db_setup import SessionLocal
+from ..sql_tools.panda_models import PlateTypes as PlateTypeDBModel
+from ..sql_tools.panda_models import Vials  # SQLAlchemy models
+from ..sql_tools.panda_models import WellModel as WellDBModel
+from ..sql_tools.panda_models import Wellplates as WellPlateDBModel
 from .schemas import (  # PyDanctic models
     PlateTypeModel,
     VialReadModel,
@@ -14,11 +19,6 @@ from .schemas import (  # PyDanctic models
     WellReadModel,
     WellWriteModel,
 )
-from .sql_tools.db_setup import SessionLocal
-from .sql_tools.panda_models import PlateTypes as PlateTypeDBModel
-from .sql_tools.panda_models import Vials  # SQLAlchemy models
-from .sql_tools.panda_models import WellModel as WellDBModel
-from .sql_tools.panda_models import Wellplates as WellPlateDBModel
 
 
 class VialService:

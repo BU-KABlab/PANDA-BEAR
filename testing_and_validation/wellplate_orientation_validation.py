@@ -1,3 +1,5 @@
+import json
+
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
@@ -169,7 +171,6 @@ plt.tight_layout()
 plt.show()
 
 # Output the well, and the wells_new_0, wells_new_1, wells_new_2, and wells_new_3 dictionaries as json
-import json
 
 with open("well_positions.json", "w") as f:
     json.dump(

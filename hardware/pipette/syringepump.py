@@ -6,10 +6,11 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 import time
 from typing import Optional, Union
 
-import panda_lib.wellplate as wp
-from nesp_lib_py import nesp_lib
-from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
+import panda_lib.labware.wellplate as wp
+from hardware.nesp_lib_py import nesp_lib
+from hardware.nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 from panda_lib.config.config_tools import read_config
+from panda_lib.labware.vials import StockVial, Vial, WasteVial
 from panda_lib.log_tools import (
     default_logger as pump_control_logger,
 )
@@ -17,8 +18,8 @@ from panda_lib.log_tools import (
     setup_default_logger,
     timing_wrapper,
 )
-from panda_lib.pipette import Pipette
-from panda_lib.vials import StockVial, Vial, WasteVial
+
+from .pipette import Pipette
 
 vessel_logger = setup_default_logger(log_name="vessel")
 

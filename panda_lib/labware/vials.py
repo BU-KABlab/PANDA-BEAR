@@ -5,12 +5,13 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 from sqlalchemy.orm import Session, sessionmaker
 
+from panda_lib.log_tools import setup_default_logger
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.utilities import Coordinates, directory_picker, file_picker
+
 from .errors import OverDraftException, OverFillException  # Custom exceptions
-from .log_tools import setup_default_logger
 from .schemas import VialReadModel, VialWriteModel  # Pydantic models
 from .services import VialService
-from .sql_tools.db_setup import SessionLocal
-from .utilities import Coordinates, directory_picker, file_picker
 
 vial_logger = setup_default_logger("vial_logger")
 
@@ -276,7 +277,7 @@ def read_vials(
     """
     Read in the virtual vials from the json file
     """
-    groups = {"stock": 0, "waste": 1}
+    # groups = {"stock": 0, "waste": 1}
     # Get the vial information from the vials table in the db
     active_vials: List[VialReadModel] = VialService(
         db_session_maker=session

@@ -4,11 +4,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 
-from panda_lib import pawduino
-from panda_lib.grlb_mill_wrapper import PandaMill
+from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
 from panda_lib.obs_controls import OBSController
+from panda_lib.panda_gantry import PandaMill
 from panda_lib.sql_tools.panda_models import Base
-from panda_lib.vials import Coordinates, StockVial, VialKwargs
+from panda_lib.tools import pawduino
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
@@ -26,7 +26,7 @@ def main():
         obs_controller = OBSController()
         obs_controller.set_recording_file_name("decapper_validation")
         obs_controller.place_text_on_screen("Decapper validation program")
-        #obs_controller.start_recording()
+        # obs_controller.start_recording()
         # populate the database with the vial
         vkwargs = VialKwargs(
             category=0,
@@ -70,7 +70,7 @@ def main():
     except Exception as e:
         print(e)
     finally:
-        #obs_controller.stop_recording()
+        # obs_controller.stop_recording()
         pass
 
 

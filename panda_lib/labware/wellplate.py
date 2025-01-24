@@ -13,15 +13,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 from panda_lib.errors import OverDraftException, OverFillException
-from panda_lib.grlb_mill_wrapper import Coordinates
-from panda_lib.schemas import (
-    PlateTypeModel,
-    WellplateReadModel,
-    WellplateWriteModel,
-    WellReadModel,
-    WellWriteModel,
-)
-from panda_lib.services import WellplateService, WellService
+from panda_lib.labware.services import WellplateService, WellService
+from panda_lib.panda_gantry import Coordinates
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
@@ -30,6 +23,14 @@ from panda_lib.sql_tools.panda_models import (
     MillConfig,
     WellModel,
     Wellplates,
+)
+
+from .schemas import (
+    PlateTypeModel,
+    WellplateReadModel,
+    WellplateWriteModel,
+    WellReadModel,
+    WellWriteModel,
 )
 
 ## set up logging to log to both the pump_control.log file and the PANDA_SDL.log file

@@ -7,7 +7,7 @@ import sys
 # from sqlalchemy import create_engine
 # from sqlalchemy.orm import sessionmaker
 
-# from panda_lib.pipette.sql_pipette import Pipette as PipetteModel
+# from hardware.pipette.sql_pipette import Pipette as PipetteModel
 # from panda_lib.sql_tools.panda_models import Base
 
 # Add the root directory of your project to the Python path

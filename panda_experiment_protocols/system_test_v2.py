@@ -3,28 +3,28 @@
 # Standard imports
 
 # Non-standard imports
-from panda_lib.experiment_loop import Toolkit
 from panda_lib.actions import (
-    __forward_pipette_v2,
-    solution_selector,
-    chrono_amp,
-    waste_selector,
-    image_well,
-    __flush_v2,
-    OCPFailure,
     CAFailure,
     CVFailure,
     DepositionFailure,
     Instruments,
+    OCPFailure,
+    __flush_v2,
+    __forward_pipette_v2,
+    chrono_amp,
+    image_well,
+    solution_selector,
+    waste_selector,
 )
 from panda_lib.actions_pedot import (
     chrono_amp_edot_bleaching,
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,
 )
-from panda_lib.experiment_class import PEDOTExperiment, ExperimentStatus
-from panda_lib.vials import read_vials, Vial2
 from panda_lib.correction_factors import correction_factor
+from panda_lib.experiment_class import ExperimentStatus, PEDOTExperiment
+from panda_lib.experiment_loop import Toolkit
+from panda_lib.labware.vials import Vial2, read_vials
 from panda_lib.utilities import solve_vials_ilp
 
 PROTOCOL_ID = 999

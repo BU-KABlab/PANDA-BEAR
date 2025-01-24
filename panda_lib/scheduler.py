@@ -26,6 +26,7 @@ from .experiment_class import (
     select_next_experiment_id,
     update_experiment_status,
 )
+from .labware.wellplate import Well
 from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import ExperimentParameters, Experiments, Projects
 from .sql_tools.sql_queue import (
@@ -40,7 +41,6 @@ from .sql_tools.sql_wellplate import (
     select_wellplate_info,
     update_well,
 )
-from .wellplate import Well
 
 logger = setup_default_logger(log_name="scheduler")
 

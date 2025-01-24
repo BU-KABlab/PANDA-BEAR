@@ -1,7 +1,7 @@
 import time
 from pathlib import Path
 
-from grbl_cnc_mill import (
+from hardware.grbl_cnc_mill import (
     Coordinates,
     Mill,
     MillConnectionError,

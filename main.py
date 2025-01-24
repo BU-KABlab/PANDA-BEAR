@@ -16,12 +16,17 @@ from typing import Tuple
 from PIL import Image
 
 import mill_calibration_and_positioning
+from hardware.pipette import (
+    insert_new_pipette,
+    select_pipette_status,
+)
 from license_text import show_conditions, show_warrenty
-from panda_lib import experiment_loop, imaging, pipette, print_panda, vials, wellplate
+from panda_lib import experiment_loop, imaging, print_panda
 from panda_lib.config import print_config_values as print_config
 from panda_lib.config import read_config, read_testing_config, write_testing_config
 from panda_lib.experiment_analysis_loop import analysis_worker, load_analyzers
 from panda_lib.experiment_class import ExperimentBase
+from panda_lib.labware import vials, wellplate
 from panda_lib.sql_tools import (
     remove_testing_experiments,
     sql_generator_utilities,
@@ -414,7 +419,7 @@ def change_pipette_tip():
             break
         except ValueError:
             print("Invalid input. Please try again.")
-    pipette.insert_new_pipette(capacity=new_capacity)
+    insert_new_pipette(capacity=new_capacity)
 
 
 def instrument_check():
@@ -737,7 +742,7 @@ def check_essential_labware():
         missing.append("new wells")
 
     # Check if the pipette is present
-    current_pipette = pipette.select_pipette_status()
+    current_pipette = select_pipette_status()
     if not current_pipette:
         missing.append("pipette")
 
@@ -759,10 +764,10 @@ if __name__ == "__main__":
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             num, p_type, new_wells = wellplate.read_current_wellplate_info()
             try:
-                current_pipette = pipette.select_pipette_status()
+                current_pipette = select_pipette_status()
             except AttributeError:
-                pipette.insert_new_pipette()
-                current_pipette = pipette.select_pipette_status()
+                insert_new_pipette()
+                current_pipette = select_pipette_status()
             remaining_uses = int(round((2000 - current_pipette.uses) / 2, 0))
             exp_loop_status = get_process_status(
                 status_queue, ProcessIDs.CONTROL_LOOP, exp_loop_status

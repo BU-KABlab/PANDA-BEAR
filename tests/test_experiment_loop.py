@@ -7,10 +7,10 @@ from panda_lib.experiment_loop import (
     _establish_system_state,
     read_vials,
 )
-from panda_lib.schemas import VialWriteModel, WellWriteModel
+from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
+from panda_lib.labware.vials import StockVial
+from panda_lib.labware.wellplate import Well, Wellplate
 from panda_lib.sql_tools.panda_models import Base, Vials, WellModel
-from panda_lib.vials import StockVial
-from panda_lib.wellplate import Well, Wellplate
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"

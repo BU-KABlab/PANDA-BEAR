@@ -179,7 +179,7 @@ class MockSerialToMill:
                         self.current_z = float(match.group(3))
                 else:
                     self.logger.warning(
-                        "Could not extract coordinates from the command"
+                        "Could not extract coordinates from the command: %s", step
                     )
             else:
                 pass

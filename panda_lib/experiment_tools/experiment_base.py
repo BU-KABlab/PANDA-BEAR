@@ -1,8 +1,8 @@
+import json
 from dataclasses import field
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Union, get_type_hints
-import json
 
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
@@ -207,19 +207,25 @@ class ExperimentBase:
                     # Try to convert the parameter value to the specified type
                     parameter.parameter_value = possible_type(parameter.parameter_value)
 
-            elif attribute_type == int:
+            if isinstance(attribute_type, type) and issubclass(attribute_type, int):
                 parameter.parameter_value = int(parameter.parameter_value)
-            elif attribute_type in [Decimal, float]:
+            elif isinstance(attribute_type, type) and issubclass(
+                attribute_type, (Decimal, float)
+            ):
                 parameter.parameter_value = Decimal(parameter.parameter_value)
-            elif attribute_type == bool:
+            elif isinstance(attribute_type, type) and issubclass(attribute_type, bool):
                 parameter.parameter_value = bool(parameter.parameter_value)
-            elif attribute_type == str:
+            elif isinstance(attribute_type, type) and issubclass(attribute_type, str):
                 parameter.parameter_value = str(parameter.parameter_value)
-            elif attribute_type == dict and json.loads(parameter.parameter_value):
+            elif isinstance(attribute_type, type) and issubclass(attribute_type, dict):
                 parameter.parameter_value = json.loads(parameter.parameter_value)
-            elif attribute_type == ExperimentStatus:
+            elif isinstance(attribute_type, type) and issubclass(
+                attribute_type, ExperimentStatus
+            ):
                 parameter.parameter_value = ExperimentStatus(parameter.parameter_value)
-            elif attribute_type == datetime:
+            elif isinstance(attribute_type, type) and issubclass(
+                attribute_type, datetime
+            ):
                 parameter.parameter_value = datetime.fromisoformat(
                     parameter.parameter_value
                 )

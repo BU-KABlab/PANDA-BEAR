@@ -33,6 +33,8 @@ from typing import List, Optional, Tuple, Union
 from PIL import Image
 from sqlalchemy.orm import Session
 
+from hardware.grbl_cnc_mill import Instruments
+from hardware.pipette.syringepump import MockPump, SyringePump
 from panda_lib.config.config_tools import (
     ConfigParserError,
     read_config,
@@ -51,35 +53,33 @@ from panda_lib.experiment_class import (
     ExperimentBase,
     ExperimentStatus,
 )
-from panda_lib.grlb_mill_wrapper import MockPandaMill as MockMill
-from panda_lib.grlb_mill_wrapper import PandaMill as Mill
 
 # First party imports
 from panda_lib.imaging import add_data_zone, capture_new_image, image_filepath_generator
 from panda_lib.instrument_toolkit import ArduinoLink, Hardware, Labware, Toolkit
+from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
+from panda_lib.labware.wellplate import Coordinates, Well
 from panda_lib.log_tools import timing_wrapper
-from panda_lib.movement import Instruments
 from panda_lib.obs_controls import MockOBSController, OBSController
+from panda_lib.panda_gantry import MockPandaMill as MockMill
+from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.syringepump import MockPump, SyringePump
 from panda_lib.utilities import solve_vials_ilp
-from panda_lib.vials import StockVial, Vial, WasteVial, read_vials
-from panda_lib.wellplate import Coordinates, Well
 
 TESTING = read_testing_config()
 
 if TESTING:
-    from panda_lib.gamry_potentiostat.gamry_control_mock import (
+    from hardware.gamry_potentiostat.gamry_control_mock import (
         GamryPotentiostat as echem,
     )
-    from panda_lib.gamry_potentiostat.gamry_control_mock import (
+    from hardware.gamry_potentiostat.gamry_control_mock import (
         chrono_parameters,
         cv_parameters,
         potentiostat_ocp_parameters,
     )
 else:
-    import panda_lib.gamry_potentiostat.gamry_control as echem
-    from panda_lib.gamry_potentiostat.gamry_control import (
+    import hardware.gamry_potentiostat.gamry_control as echem
+    from hardware.gamry_potentiostat.gamry_control import (
         chrono_parameters,
         cv_parameters,
         potentiostat_ocp_parameters,

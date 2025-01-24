@@ -128,7 +128,7 @@ class Mill:
     def read_working_volume(self):
         """Checks the mill config for soft limits to be enabled, and then if so check the x, y, and z max travel limits"""
         working_volume: Coordinates = Coordinates(0, 0, 0)
-        multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
+        # multiplier = 1  # Used for flipping the sign of the working volume depending on the working volume
         if int(self.config["$20"]) == 1:
             self.logger.info("Soft limits are enabled in the mill config")
             # axis_conf_setting_value = int(self.config["$3"])

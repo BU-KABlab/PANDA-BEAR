@@ -103,6 +103,9 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
+    "nesp_lib",
+    "SpinnakerVideoCapture",
+    "sartorius",
 ]
 
 # Same as Black.

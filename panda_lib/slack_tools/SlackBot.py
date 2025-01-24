@@ -24,9 +24,11 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 import panda_lib.experiment_class as exp
-from panda_lib import vials
 from panda_lib.config.config_tools import read_config, read_testing_config
 from panda_lib.imaging.panda_image_tools import add_data_zone
+from panda_lib.labware import vials
+from panda_lib.labware.wellplate import Well
+from panda_lib.labware.wellplate import Wellplates as Wellplate
 from panda_lib.obs_controls import OBSController
 from panda_lib.sql_tools import (
     sql_queue,
@@ -36,8 +38,6 @@ from panda_lib.sql_tools import (
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import SlackTickets
 from panda_lib.utilities import Coordinates as WellCoordinates
-from panda_lib.wellplate import Well
-from panda_lib.wellplate import Wellplates as Wellplate
 
 # Create a lock for thread safety
 plot_lock = threading.Lock()
@@ -771,8 +771,8 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
     stock_vials["volume"] = stock_vials["volume"].astype(float)
 
     # Create new x-coordinates with spacing
-    x_positions = range(len(stock_vials["position"]))
-    x_positions_spaced = [x * spacing for x in x_positions]
+    # x_positions = range(len(stock_vials["position"]))
+    # x_positions_spaced = [x * spacing for x in x_positions]
 
     ## Create a bar graph with volume on the x-axis and position on the y-axis
     ## Send the graph to slack
@@ -822,8 +822,8 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[Path, Path]:
         waste_vials["volume"] = waste_vials["volume"].astype(float)
 
         # Create new x-coordinates with spacing
-        x_positions = range(len(waste_vials["position"]))
-        x_positions_spaced = [x * spacing for x in x_positions]
+        # x_positions = range(len(waste_vials["position"]))
+        # x_positions_spaced = [x * spacing for x in x_positions]
 
         plt.bar(
             # x_positions_spaced,
@@ -905,10 +905,10 @@ def well_status() -> Path:
     ## Label the wellplate with the plate id below the bottom row and centered to the wellplate
     # get the coordinates of wells H12 and A12
     corners = wellplate.get_corners()
-    top_right = corners["top_right"]
+    # top_right = corners["top_right"]
     bottom_right = corners["bottom_right"]
     bottom_left = corners["bottom_left"]
-    top_left = corners["top_left"]
+    # top_left = corners["top_left"]
 
     # calculate the center of the wellplate
     center = bottom_left["x"] + (fabs(bottom_left["x"]) - fabs(bottom_right["x"])) / 2

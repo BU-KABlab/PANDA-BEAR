@@ -80,7 +80,7 @@ def image_filepath_generator(
     file_name = file_name.replace(" ", "_")  # clean up the file name
     file_name_start = file_name + "_0"  # enumerate the file name
     filepath = Path(data_path / str(file_name_start)).with_suffix(".tiff")
-    i = 1
+    # i = 1
     while filepath.exists():
         filepath = file_enumeration(filepath)
     return filepath
@@ -731,12 +731,12 @@ def set_hue(cam: PySpin.CameraPtr, hue: int):
     #     print(f"Error setting hue: {ex}")
 
     try:
-        result = True
+        # result = True
         cam.Hue.SetValue(hue)
         print(f"Hue set to: {hue}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting hue: {ex}")
-        result = False
+        # result = False
 
 
 def set_saturation(cam: PySpin.CameraPtr, saturation: int):
@@ -759,14 +759,14 @@ def set_saturation(cam: PySpin.CameraPtr, saturation: int):
     #     print(f"Error setting saturation: {ex}")
 
     try:
-        result = True
+        # result = True
         cam.SaturationEnable.SetValue(True)
         cam.Saturation.SetValue(saturation)
         print(f"Saturation set to: {saturation}")
 
     except PySpin.SpinnakerException as ex:
         print(f"Error setting saturation: {ex}")
-        result = False
+        # result = False
 
 
 def set_gamma(cam: PySpin.CameraPtr, gamma: int):
@@ -789,12 +789,12 @@ def set_gamma(cam: PySpin.CameraPtr, gamma: int):
     #     print(f"Error setting gamma: {ex}")
 
     try:
-        result = True
+        # result = True
         cam.Gamma.SetValue(gamma)
         print(f"Gamma set to: {gamma}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting gamma: {ex}")
-        result = False
+        # result = False
 
 
 def set_shutter(cam: PySpin.CameraPtr, shutter: float):
@@ -817,12 +817,12 @@ def set_shutter(cam: PySpin.CameraPtr, shutter: float):
     #     print(f"Error setting shutter: {ex}")
 
     try:
-        result = True
+        # result = True
         cam.Shutter.SetValue(shutter)
         print(f"Shutter set to: {shutter}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting shutter: {ex}")
-        result = False
+        # result = False
 
 
 def set_gain(cam: PySpin.CameraPtr, gain: float):
@@ -845,12 +845,12 @@ def set_gain(cam: PySpin.CameraPtr, gain: float):
     #     print(f"Error setting gain: {ex}")
 
     try:
-        result = True
+        # result = True
         cam.Gain.SetValue(gain)
         print(f"Gain set to: {gain}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting gain: {ex}")
-        result = False
+        # result = False
 
 
 def set_framerate(cam: PySpin.CameraPtr, framerate: float):
@@ -873,13 +873,13 @@ def set_framerate(cam: PySpin.CameraPtr, framerate: float):
     #     print(f"Error setting framerate: {ex}")
 
     try:
-        result = True
+        # result = True
         cam.AcquisitionFrameRateEnable.SetValue(True)
         cam.AcquisitionFrameRate.SetValue(framerate)
         print(f"Framerate set to: {framerate}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting framerate: {ex}")
-        result = False
+        # result = False
 
 
 def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):

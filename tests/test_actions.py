@@ -6,6 +6,10 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from hardware.pipette import (
+    Pipette,
+    PipetteModel,
+)
 from panda_lib.actions import (
     _handle_source_vessels,
     _pipette_action,
@@ -22,13 +26,11 @@ from panda_lib.instrument_toolkit import (
 from panda_lib.instrument_toolkit import (
     Toolkit,
 )
-from panda_lib.pawduino import MockArduinoLink as ArduinoLink
-from panda_lib.pipette.pipette import Pipette
-from panda_lib.pipette.sql_pipette import Pipette as PipetteModel
-from panda_lib.schemas import VialWriteModel, WellWriteModel
+from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
+from panda_lib.labware.vials import StockVial
+from panda_lib.labware.wellplate import Well
 from panda_lib.sql_tools.panda_models import Base, Vials, WellModel
-from panda_lib.vials import StockVial
-from panda_lib.wellplate import Well
+from panda_lib.tools.pawduino import MockArduinoLink as ArduinoLink
 
 test_logger = MagicMock(
     spec=logging.Logger, info=MagicMock(), debug=MagicMock(), error=MagicMock()

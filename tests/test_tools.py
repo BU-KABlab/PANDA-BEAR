@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from grbl_cnc_mill.tools import Coordinates, ToolManager, ToolOffset
+from hardware.grbl_cnc_mill.tools import Coordinates, ToolManager, ToolOffset
 from panda_lib.utilities import Instruments
 
 

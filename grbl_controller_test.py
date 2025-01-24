@@ -1,5 +1,5 @@
 def test_grbl_controller():
-    import grbl_cnc_mill as grbl
+    import hardware.grbl_cnc_mill as grbl
 
     # Set up the mill connection
     mill = grbl.MockMill()
@@ -72,7 +72,7 @@ def test_panda_grbl_wrapper():
     - It has methods for electrode rinsing and resting
     - On disconnect, it moves the electrode to the rest position
     """
-    from panda_lib import grlb_mill_wrapper as grbl
+    from panda_lib import panda_gantry as grbl
 
     # Set up the mill connection
     mill = grbl.PandaMill()
@@ -119,9 +119,9 @@ def test_panda_grbl_wrapper():
 
 
 def test_movement_around_deck():
-    from panda_lib import grlb_mill_wrapper as grbl
-    # from panda_lib.wellplate import Wellplate, Well
-    # from panda_lib.vials import Vial, StockVial, WasteVial, read_vials
+    from panda_lib import panda_gantry as grbl
+    # from panda_lib.labware.wellplate import Wellplate, Well
+    # from panda_lib.labware.vials import Vial, StockVial, WasteVial, read_vials
 
     class CalibrationObject:
         def __init__(self):
@@ -141,8 +141,6 @@ def test_movement_around_deck():
     print(f"Calibration object: {cal.__dict__}")
 
     with grbl.PandaMill() as mill:
-
-        
         # Move the center tool to above the calibration object at z = 0
         print(f"Moving 'center' to coords: {-100}, {-100}, {0}")
         print(mill.safe_move(-100, -100, 0, tool="center"))
@@ -171,21 +169,25 @@ def test_movement_around_deck():
         print(f"Moving 'decapper' to coords: {-100}, {-100}, {cal.top}")
         print(mill.safe_move(-100, -100, cal.top, tool="decapper"))
 
+
 def test_new_command_concatenation():
-    from panda_lib import grlb_mill_wrapper as grbl
+    from panda_lib import panda_gantry as grbl
+
     with grbl.PandaMill() as mill:
         mill.safe_move(-100, -100, -50, tool="center")
 
         input("Press enter to continue")
-        
+
 
 def current_status_check():
-    from panda_lib import grlb_mill_wrapper as grbl
+    from panda_lib import panda_gantry as grbl
+
     mill = grbl.PandaMill()
     mill.connect_to_mill()
     for i in range(100):
         print(mill.current_status())
     mill.disconnect()
+
 
 if __name__ == "__main__":
     # test_grbl_controller()

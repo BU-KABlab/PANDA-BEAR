@@ -58,7 +58,7 @@ def add_data_zone(
                 date_time = file_creation_time
         if isinstance(date_time, str):
             date_time = datetime.fromisoformat(date_time)
-    except:
+    except Exception:
         # Fallback on current time if all else fails
         date_time = datetime.now(tz=utc).isoformat(timespec="seconds")
 

@@ -2,9 +2,9 @@ import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from panda_lib.errors import OverDraftException, OverFillException
+from panda_lib.labware.errors import OverDraftException, OverFillException
+from panda_lib.labware.vials import Vial
 from panda_lib.sql_tools.panda_models import Base, Vials
-from panda_lib.vials import Vial
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"
@@ -188,6 +188,6 @@ def test_reset_vial_waste(session_maker: Session):
     )
 
     vial.reset_vial()
-    assert vial.vial_data.volume == 200.0
+    assert vial.vial_data.volume == 0.0  # A reset waste vial is empty
     assert vial.vial_data.contamination == 0
     assert vial.vial_data.contents == {}

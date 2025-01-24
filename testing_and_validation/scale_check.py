@@ -9,9 +9,10 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 from config.config import PATH_TO_DATA, PATH_TO_LOGS
-from sartorius_local import Scale
-from sartorius_local.mock import Scale as MockScale
 from tqdm import tqdm
+
+from hardware.sartorius_local import Scale
+from hardware.sartorius_local.mock import Scale as MockScale
 
 scale_logger = logging.getLogger(__name__)
 scale_logger.setLevel(logging.DEBUG)

@@ -158,10 +158,10 @@ Well: {well_id}"""
         try:
             self.client.start_record()
             self.logger.info("Recording started.")
-        except OBSSDKRequestError as e:
+        except OBSSDKRequestError:
             self.client.stop_record()
             self.client.start_record()
-        
+
         except Exception as e:
             self.logger.error("Error starting recording: %s", e)
 
@@ -207,7 +207,7 @@ Well: {well_id}"""
 
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
             self.stop_recording()

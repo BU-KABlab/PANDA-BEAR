@@ -1,20 +1,25 @@
 """Class of the instruments used on the CNC mill."""
 
 import json
+from enum import Enum
 from pathlib import Path
 from typing import Dict
 
 # NOTE these are not mill agnostic, so they should be implemented by whichever
 # project is using this library.
 
-# @dataclasses.dataclass
-# class Tools(Enum):
-#     """Class for naming of the mill instruments"""
 
-#     CENTER = "center"
-#     PIPETTE = "pipette"
-#     ELECTRODE = "electrode"
-#     LENS = "lens"
+class Instruments(Enum):
+    """Class for naming of the mill instruments."""
+
+    CENTER = "center"
+    PIPETTE = "pipette"
+    ELECTRODE = "electrode"
+    LENS = "lens"
+    DECAPPER = "decapper"
+
+
+Tools = Instruments
 
 
 class Coordinates:
@@ -68,7 +73,7 @@ class Coordinates:
 
     def __repr__(self):
         return f"Coordinates(x={self.x}, y={self.y}, z={self.z})"
-    
+
     def to_dict(self):
         return {
             "x": self.x,

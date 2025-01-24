@@ -18,13 +18,13 @@ import logging
 from typing import Sequence
 
 from panda_lib.config.config_tools import read_config
-from panda_lib.grlb_mill_wrapper import Coordinates
-from panda_lib.grlb_mill_wrapper import MockPandaMill as MockMill
-from panda_lib.grlb_mill_wrapper import PandaMill as Mill
+from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
+from panda_lib.labware.wellplate import Wellplate
 from panda_lib.log_tools import setup_default_logger
+from panda_lib.panda_gantry import Coordinates
+from panda_lib.panda_gantry import MockPandaMill as MockMill
+from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.utilities import Instruments, input_validation
-from panda_lib.vials import StockVial, Vial, WasteVial, read_vials
-from panda_lib.wellplate import Wellplate
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]

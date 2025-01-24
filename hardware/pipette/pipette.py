@@ -3,7 +3,7 @@
 import json
 import time
 
-from panda_lib.pipette.sql_pipette import (
+from hardware.pipette.sql_pipette import (
     SessionLocal,
     activate_pipette,
     deincrement_use_count,
@@ -11,7 +11,7 @@ from panda_lib.pipette.sql_pipette import (
     sessionmaker,
     update_pipette_status,
 )
-from panda_lib.vessel import logger as vessel_logger
+from panda_lib.labware.vessel import logger as vessel_logger
 
 from .errors import InvalidPipetteID
 

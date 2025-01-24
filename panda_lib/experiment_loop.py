@@ -25,20 +25,12 @@ import PySpin
 from slack_sdk import errors as slack_errors
 from sqlalchemy.orm import sessionmaker
 
-from panda_lib import scheduler
-
 # from panda_experiment_analyzers import pedot as pedot_analyzer
-from panda_lib.gamry_potentiostat import gamry_control
-
-# from .movement import Mill, MockMill
-from panda_lib.grlb_mill_wrapper import MockPandaMill as MockMill
-from panda_lib.grlb_mill_wrapper import PandaMill as Mill
-from panda_lib.pawduino import ArduinoLink, MockArduinoLink
-from panda_lib.sql_tools import db_setup, panda_models, sql_queue
-
-from . import actions
-from .config.config_tools import read_config, read_testing_config
-from .errors import (
+from hardware.gamry_potentiostat import gamry_control
+from hardware.pipette.syringepump import MockPump, SyringePump
+from panda_lib import actions, scheduler
+from panda_lib.config.config_tools import read_config, read_testing_config
+from panda_lib.errors import (
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -52,7 +44,7 @@ from .errors import (
     ShutDownCommand,
     WellImportError,
 )
-from .experiment_class import (
+from panda_lib.experiment_class import (
     EchemExperimentBase,
     ExperimentBase,
     ExperimentResult,
@@ -62,15 +54,26 @@ from .experiment_class import (
     select_experiment_status,
     select_specific_result,
 )
-from .instrument_toolkit import Hardware, Labware, Toolkit
-from .log_tools import apply_log_filter, setup_default_logger, timing_wrapper
-from .slack_tools.SlackBot import SlackBot
-from .sql_tools import sql_protocol_utilities, sql_system_state, sql_wellplate
-from .sql_tools.db_setup import SessionLocal
-from .syringepump import MockPump, SyringePump
-from .utilities import SystemState
-from .vials import StockVial, Vial, WasteVial, read_vials
-from .wellplate import Well, Wellplate
+from panda_lib.instrument_toolkit import Hardware, Labware, Toolkit
+from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
+from panda_lib.labware.wellplate import Well, Wellplate
+from panda_lib.log_tools import apply_log_filter, setup_default_logger, timing_wrapper
+
+# from .movement import Mill, MockMill
+from panda_lib.panda_gantry import MockPandaMill as MockMill
+from panda_lib.panda_gantry import PandaMill as Mill
+from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.sql_tools import (
+    db_setup,
+    panda_models,
+    sql_protocol_utilities,
+    sql_queue,
+    sql_system_state,
+    sql_wellplate,
+)
+from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.tools.pawduino import ArduinoLink, MockArduinoLink
+from panda_lib.utilities import SystemState
 
 config = read_config()
 # set up slack globally so that it can be used in the main function and others
