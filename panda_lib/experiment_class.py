@@ -522,9 +522,9 @@ class ExperimentBase:
             if config.getboolean("OPTIONS", "testing") or not config.getboolean(
                 "OPTIONS", "use_obs"
             ):
-                from .obs_controls import MockOBSController as OBSController
+                from .tools.obs_controls import MockOBSController as OBSController
             else:
-                from .obs_controls import OBSController
+                from .tools.obs_controls import OBSController
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:
@@ -563,9 +563,9 @@ class ExperimentBase:
             if config.getboolean("OPTIONS", "testing") or not config.getboolean(
                 "OPTIONS", "use_obs"
             ):
-                from .obs_controls import MockOBSController as OBSController
+                from .tools.obs_controls import MockOBSController as OBSController
             else:
-                from .obs_controls import OBSController
+                from .tools.obs_controls import OBSController
 
             OBSController().place_experiment_on_screen(self)
         except Exception as e:

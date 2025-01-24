@@ -15,12 +15,12 @@ from typing import Tuple
 
 from PIL import Image
 
-import mill_calibration_and_positioning
+import hardware_calibration.mill_calibration_and_positioning as mill_calibration_and_positioning
 from hardware.pipette import (
     insert_new_pipette,
     select_pipette_status,
 )
-from license_text import show_conditions, show_warrenty
+from menu.license_text import show_conditions, show_warrenty
 from panda_lib import experiment_loop, imaging, print_panda
 from panda_lib.config import print_config_values as print_config
 from panda_lib.config import read_config, read_testing_config, write_testing_config

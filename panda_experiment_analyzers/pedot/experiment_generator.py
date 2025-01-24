@@ -1,13 +1,12 @@
 """Generates a PEDOT experiment."""
 
-from panda_lib import experiment_class
-from panda_lib.correction_factors import correction_factor
-from panda_lib import scheduler
+from panda_experiment_analyzers.pedot import run_ml_model
+from panda_lib import experiment_class, scheduler
 from panda_lib.sql_tools.sql_system_state import get_current_pin
-from panda_experiment_analyzers.pedot.generator import run_ml_model
+from panda_lib.utilities import correction_factor
 
-from .pedot_classes import PEDOTParams
 from .analysis import analyze
+from .pedot_classes import PEDOTParams
 
 CURRENT_PIN = get_current_pin()
 

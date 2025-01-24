@@ -5,10 +5,10 @@ from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 
 from panda_lib.labware.vials import Coordinates, StockVial, VialKwargs
-from panda_lib.obs_controls import OBSController
 from panda_lib.panda_gantry import PandaMill
 from panda_lib.sql_tools.panda_models import Base
 from panda_lib.tools import pawduino
+from panda_lib.tools.obs_controls import OBSController
 
 # Setup an in-memory SQLite database for testing
 DATABASE_URL = "sqlite:///:memory:"

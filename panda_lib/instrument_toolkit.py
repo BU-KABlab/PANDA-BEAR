@@ -11,12 +11,12 @@ from hardware.sartorius.sartorius import Scale
 from hardware.sartorius.sartorius.mock import Scale as MockScale
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplate import Wellplate
-from panda_lib.obs_controls import OBSController
 
 # from panda_lib.movement import Mill, MockMill
 from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.tools.obs_controls import OBSController
 from panda_lib.tools.pawduino import ArduinoLink
 
 

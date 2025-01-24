@@ -7,13 +7,12 @@ from panda_lib.actions import (
     solution_selector,
     waste_selector,
 )
-from panda_lib.correction_factors import correction_factor
 from panda_lib.experiment_loop import (
     _establish_system_state,
     connect_to_instruments,
     disconnect_from_instruments,
 )
-from panda_lib.utilities import input_validation
+from panda_lib.utilities import correction_factor, input_validation
 
 purge = 40
 drip_stop = 5

@@ -21,11 +21,10 @@ from panda_lib.actions_pedot import (
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,
 )
-from panda_lib.correction_factors import correction_factor
 from panda_lib.experiment_class import ExperimentStatus, PEDOTExperiment
 from panda_lib.experiment_loop import Toolkit
 from panda_lib.labware.vials import Vial2, read_vials
-from panda_lib.utilities import solve_vials_ilp
+from panda_lib.utilities import correction_factor, solve_vials_ilp
 
 PROTOCOL_ID = 999
 

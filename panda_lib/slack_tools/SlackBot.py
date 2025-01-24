@@ -29,7 +29,6 @@ from panda_lib.imaging.panda_image_tools import add_data_zone
 from panda_lib.labware import vials
 from panda_lib.labware.wellplate import Well
 from panda_lib.labware.wellplate import Wellplates as Wellplate
-from panda_lib.obs_controls import OBSController
 from panda_lib.sql_tools import (
     sql_queue,
     sql_system_state,
@@ -37,6 +36,7 @@ from panda_lib.sql_tools import (
 )
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import SlackTickets
+from panda_lib.tools.obs_controls import OBSController
 from panda_lib.utilities import Coordinates as WellCoordinates
 
 # Create a lock for thread safety
