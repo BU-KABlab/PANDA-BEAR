@@ -1,10 +1,10 @@
 [submodule "nesp_lib_py"]
-	path = nesp_lib_py
-	url = https://github.com/BU-KABlab/nesp-lib-py.git
+path = hardware/nesp_lib_py
+url = https://github.com/BU-KABlab/nesp-lib-py.git
 [submodule "sartorius"]
-	path = sartorius
-	url = https://github.com/BU-KABlab/sartorius.git
+path = hardware/sartorius
+url = https://github.com/BU-KABlab/sartorius.git
 
 [submodule "SpinnakerVideoCapture"]
-	path = SpinnakerVideoCapture
-	url = https://github.com/matsuren/SpinnakerVideoCapture.git
+path = hardware/SpinnakerVideoCapture
+url = https://github.com/matsuren/SpinnakerVideoCapture.git
