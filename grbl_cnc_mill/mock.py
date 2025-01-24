@@ -88,6 +88,10 @@ class MockMill(RealMill):
         """Simulate clearing buffers"""
         self.logger.info("Clearing buffers")
 
+    def grbl_settings(self):
+        """Simulate getting the GRBL settings"""
+        return self.config
+
     def read_mill_config(self):
         """Read the mill config from the mill and set it as an attribute"""
         try:
@@ -112,6 +116,11 @@ class MockMill(RealMill):
 
     def __current_status(self):
         return f"<Idle|MPos:{self.ser_mill.current_x},{self.ser_mill.current_y},{self.ser_mill.current_z}|Bf:15,127|FS:0,0>"
+
+    def home(self):
+        """Simulate homing the mill"""
+        self.logger.info("Homing the mill")
+        self.ser_mill.write(b"$H\n")
 
 
 class MockSerialToMill:
@@ -139,6 +148,10 @@ class MockSerialToMill:
         """Simulate writing to the serial connection"""
         # decode the command to a string
         command = command.decode("utf-8")
+        if command == "$H\n" or command == "$H":
+            self.current_x = 0.0
+            self.current_y = 0.0
+            self.current_z = 0.0
         if command == "G01 Z0":
             self.current_z = 0.0
         elif command.startswith("G01"):
@@ -197,3 +210,7 @@ class MockSerialToMill:
     def flushOutput(self):
         """Simulate flushing the output buffer"""
         pass
+
+    def grbl_settings(self):
+        """Simulate getting the GRBL settings"""
+        return "Grbl 1.1f ['$' for help]\n".encode()

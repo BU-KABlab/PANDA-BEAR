@@ -25,11 +25,29 @@ trajectories = {name: [] for name in tool_offsets}
 
 # Process G-code
 for line in gcode:
-    if line.startswith("G01"):
+    if line == "$H\n":
+        # Homing command, go to origin
+        current_position = {"x": 0, "y": 0, "z": 0}
+        for name, offset in tool_offsets.items():
+            trajectories[name].append(
+                [
+                    current_position["x"] - offset["x"],
+                    current_position["y"] - offset["y"],
+                    current_position["z"] - offset["z"],
+                ]
+            )
+        continue
+
+    if line.startswith("$"):
+        continue
+
+    if line.startswith("G"):
         parts = line.split()
         new_position = current_position.copy()
         for part in parts[1:]:
             axis = part[0].lower()
+            if axis == "f":
+                continue
             value = float(part[1:])
             new_position[axis] = value
 
@@ -66,21 +84,93 @@ Z = -200 * np.ones_like(X)
 ax.plot_surface(X, Y, Z, color="grey", alpha=0.2)
 
 
-# Draw the vial as a cylinder
-vial_center_x = -4
-vial_center_y = -40
+# Draw multiple vials as cylinders
+vial_centers = [
+    {"x": -409.0, "y": -38.0, "z": -196.0},
+    {"x": -4.0, "y": -40.0, "z": -196.0},
+    {"x": -4.0, "y": -73.0, "z": -196.0},
+    {"x": -4.0, "y": -106.0, "z": -196.0},
+    {"x": -4.0, "y": -139.0, "z": -196.0},
+    {"x": -4.0, "y": -172.0, "z": -196.0},
+    {"x": -4.0, "y": -205.0, "z": -196.0},
+    {"x": -4.0, "y": -238.0, "z": -196.0},
+    {"x": -4.0, "y": -271.0, "z": -196.0},
+    {"x": -93.0, "y": -40.0, "z": -196.0},
+    {"x": -93.0, "y": -73.0, "z": -196.0},
+    {"x": -93.0, "y": -106.0, "z": -196.0},
+    {"x": -93.0, "y": -139.0, "z": -196.0},
+    {"x": -93.0, "y": -172.0, "z": -196.0},
+    {"x": -93.0, "y": -205.0, "z": -196.0},
+    {"x": -93.0, "y": -238.0, "z": -196.0},
+]
+
 vial_radius = 14
-vial_height = 70
-vial_z_base = -200
+vial_height = 66
 
 theta = np.linspace(0, 2 * np.pi, 30)
-vial_z = np.linspace(vial_z_base, vial_z_base + vial_height, 30)
+vial_z = np.linspace(-200, -200 + vial_height, 30)
 theta, vial_z = np.meshgrid(theta, vial_z)
 
-vial_x = vial_center_x + vial_radius * np.cos(theta)
-vial_y = vial_center_y + vial_radius * np.sin(theta)
+for center in vial_centers:
+    vial_x = center["x"] + vial_radius * np.cos(theta)
+    vial_y = center["y"] + vial_radius * np.sin(theta)
+    ax.plot_surface(vial_x, vial_y, vial_z, color="blue", alpha=0.2)
 
-ax.plot_surface(vial_x, vial_y, vial_z, color="blue", alpha=0.2)
+well_centers = [
+    {"x": -222.0, "y": -78.0, "z": -174.0},
+    {"x": -222.0, "y": -92.0, "z": -200.0},
+    {"x": -222.0, "y": -106.0, "z": -200.0},
+    {"x": -222.0, "y": -120.0, "z": -200.0},
+    {"x": -222.0, "y": -134.0, "z": -200.0},
+    {"x": -222.0, "y": -148.0, "z": -200.0},
+    {"x": -222.0, "y": -162.0, "z": -200.0},
+    {"x": -222.0, "y": -176.0, "z": -200.0},
+    {"x": -235.5, "y": -78.0, "z": -200.0},
+    {"x": -235.5, "y": -92.0, "z": -200.0},
+    {"x": -235.5, "y": -106.0, "z": -200.0},
+    {"x": -235.5, "y": -120.0, "z": -200.0},
+    {"x": -235.5, "y": -134.0, "z": -200.0},
+    {"x": -235.5, "y": -148.0, "z": -200.0},
+    {"x": -235.5, "y": -162.0, "z": -200.0},
+    {"x": -235.5, "y": -176.0, "z": -200.0},
+    {"x": -249.0, "y": -78.0, "z": -200.0},
+    {"x": -249.0, "y": -92.0, "z": -200.0},
+    {"x": -249.0, "y": -106.0, "z": -200.0},
+    {"x": -249.0, "y": -120.0, "z": -200.0},
+    {"x": -249.0, "y": -134.0, "z": -200.0},
+    {"x": -249.0, "y": -148.0, "z": -200.0},
+    {"x": -249.0, "y": -162.0, "z": -200.0},
+    {"x": -249.0, "y": -176.0, "z": -200.0},
+    {"x": -262.5, "y": -78.0, "z": -200.0},
+    {"x": -262.5, "y": -92.0, "z": -200.0},
+    {"x": -262.5, "y": -106.0, "z": -200.0},
+    {"x": -262.5, "y": -120.0, "z": -200.0},
+    {"x": -262.5, "y": -134.0, "z": -200.0},
+    {"x": -262.5, "y": -148.0, "z": -200.0},
+    {"x": -262.5, "y": -162.0, "z": -200.0},
+    {"x": -262.5, "y": -176.0, "z": -200.0},
+    {"x": -276.0, "y": -78.0, "z": -200.0},
+    {"x": -276.0, "y": -92.0, "z": -200.0},
+    {"x": -276.0, "y": -106.0, "z": -200.0},
+    {"x": -276.0, "y": -120.0, "z": -200.0},
+    {"x": -276.0, "y": -134.0, "z": -200.0},
+    {"x": -276.0, "y": -148.0, "z": -200.0},
+    {"x": -276.0, "y": -162.0, "z": -200.0},
+    {"x": -276.0, "y": -176.0, "z": -200.0},
+]
+
+well_radius = 5
+well_height = 6
+
+theta = np.linspace(0, 2 * np.pi, 30)
+well_z = np.linspace(-200, -200 + well_height, 30)
+theta, well_z = np.meshgrid(theta, well_z)
+
+for center in well_centers:
+    well_x = center["x"] + well_radius * np.cos(theta)
+    well_y = center["y"] + well_radius * np.sin(theta)
+    ax.plot_surface(well_x, well_y, well_z, color="red", alpha=0.2)
+
 
 # Plot initialization
 lines = {}
@@ -106,7 +196,7 @@ def update(num):
 ani = FuncAnimation(
     fig,
     update,
-    frames=len(tool_coords["center"][0]),
+    frames=len(tool_coords["center"][0]) + 1,
     interval=500,
     blit=False,
     repeat=False,

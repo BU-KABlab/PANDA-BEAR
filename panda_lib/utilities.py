@@ -70,7 +70,7 @@ class Coordinates:
             raise ValueError("z-coordinate must be an int, float, or Decimal object")
         self._z = round(value, 6)
 
-    def dict(self):
+    def to_dict(self):
         """Return the coordinates as a dictionary."""
         return {"x": self.x, "y": self.y, "z": self.z}
 
@@ -304,23 +304,39 @@ def input_validation(
     custom_error: str = None,
     menu_items: list = None,
     exit_option: bool = False,
+    default=None,
 ):
     """Prompt the user for input and validate the input type."""
 
     error_message = (
         custom_error if custom_error else "Invalid input type. Please try again."
     )
+    add_back = 0
+    if ":" in prompt:
+        add_back = 1
+        prompt = prompt.strip()[:-1]
+
+    if value_range:
+        # Sort the value range in ascending order
+        value_range = sorted(value_range)
+        prompt += f" (Values between {value_range[0]} and {value_range[1]})"
 
     if exit_option:
         prompt += " (Type 'exit' to exit the program)"
         if menu_items:
             menu_items.append("exit")
 
+    if add_back:
+        prompt += ": "
+
     while True:
         try:
             user_input = input(prompt).strip()
             if not user_input and allow_blank:
-                return None
+                if not default:
+                    return None
+                else:
+                    return default
 
             if exit_option and user_input.lower() == "exit":
                 return None

@@ -121,7 +121,7 @@ class Mill:
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = self.read_working_volume()
-        self.safe_z_height = -10.0
+        self.safe_z_height = -10.0  # TODO: In the PANDA wrapper, set the safe floor height to the max height of any active object on the mill + the pipette length
         self.max_z_height = 0.0
         self.command_logger = set_up_command_logger(self.logger_location)
 
@@ -874,6 +874,9 @@ class Mill:
         )
 
         if second_z_cord is not None:
+            # Adjust the second_z_coord according to the tool offsets
+            second_z_cord += offsets.z
+
             # Add the movement to the second z coordinate and feed rate
             commands.append(f"G01 Z{second_z_cord} F{second_z_cord_feed}")
             # Restore the feed rate to the default of 2000
@@ -882,7 +885,7 @@ class Mill:
         command_str = "\n".join(commands)
         self.execute_command(command_str)
 
-        return None  # self.current_coordinates(tool)
+        return self.current_coordinates(tool)[0]
 
     def _is_already_at_target(
         self, goto: Coordinates, current_coordinates: Coordinates

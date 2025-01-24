@@ -15,13 +15,13 @@ from typing import Tuple
 
 from PIL import Image
 
+import mill_calibration_and_positioning
 from license_text import show_conditions, show_warrenty
 from panda_lib import experiment_loop, imaging, pipette, print_panda, vials, wellplate
 from panda_lib.config import print_config_values as print_config
 from panda_lib.config import read_config, read_testing_config, write_testing_config
 from panda_lib.experiment_analysis_loop import analysis_worker, load_analyzers
 from panda_lib.experiment_class import ExperimentBase
-from panda_lib.movement import mill_calibration_and_positioning
 from panda_lib.sql_tools import (
     remove_testing_experiments,
     sql_generator_utilities,
