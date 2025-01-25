@@ -1,4 +1,4 @@
-# Construction | [Installation](installation.md) | [End User Manual](end_user_manual.md) | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md)
+# Construction | [Installation](installation.md) | [End User Manual](end_user_manual.md) | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md) <!-- omit from toc -->
 
 # Parts
 

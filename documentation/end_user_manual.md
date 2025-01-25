@@ -1,8 +1,6 @@
 <!-- title: PANDA SDL End User Manual -->
 
-# End User Manual <!-- omit from toc -->
-
-[Construction](constructions.md) | [Installation](installation.md) | End User Manual | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md)
+# [Construction](constructions.md) | [Installation](installation.md) | End User Manual | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md) <!-- omit from toc -->
 
 ## Table of Contents <!-- omit from toc -->
 - [Overview](#overview)
