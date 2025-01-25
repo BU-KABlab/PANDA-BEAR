@@ -1,4 +1,7 @@
 <!-- title: PANDA SDL Installation Instructions -->
+
+# Installation | [End User Manual](end_user_manual.md) | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md)
+
 # Installation
 
 Clone the repository to a directory on your machine. You may do this graphically from GitHub, or use the commandline.
