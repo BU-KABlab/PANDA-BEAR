@@ -1,11 +1,17 @@
 import json
+from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from panda_lib.errors import OverDraftException, OverFillException
-from panda_lib.labware.wellplate import Well, Wellplate
+from panda_lib.labware.wellplate import (
+    Well,
+    Wellplate,
+    load_configuration,
+    save_configuration,
+)
 from panda_lib.sql_tools.panda_models import Base, PlateTypes, WellModel, Wellplates
 
 # Setup an in-memory SQLite database for testing
@@ -435,6 +441,29 @@ def test_deactivate_plate(session: sessionmaker):
     )
     plate.deactivate_plate()
     assert plate.plate_data.current is False
+
+
+def test_load_configuration():
+    """Test loading the mill configuration from a JSON file. The Wellplate module uses this
+    to determine the valid x and y coordinates for the wells."""
+    config = load_configuration("tests/mill_config.json")
+    assert float(config["$130"]) == 410.0
+    assert float(config["$131"]) == 300.0
+
+
+def test_save_configuration():
+    """Test saving an updated configuration to a JSON file."""
+    config = load_configuration("tests/mill_config.json")
+    config["$130"] = 500.0
+    config["$131"] = 400.0
+
+    save_configuration(config, "tests/mill_config_updated.json")
+
+    new_config = load_configuration("tests/mill_config_updated.json")
+    assert float(new_config["$130"]) == 500.0
+    assert float(new_config["$131"]) == 400.0
+
+    Path("tests/mill_config_updated.json").unlink()  # Clean up the test file
 
 
 if __name__ == "__main__":
