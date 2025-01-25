@@ -8,11 +8,11 @@ Clone the repository to a directory on your machine. You may do this graphically
 
 # 1. FLIR SDKS
 
-This project uses a FLIR camera and requires their proprietary SDK which you can obtain for free from their website.
+This system uses a FLIR camera and requires their proprietary SDK which you can obtain for free from their website.
 
 ## Where to find the SDK files and examples
 
-Spinnaker is proprietary software made by Teledyne FLIR and as such cannot be included in the repository. To use the flir_camera module you must have installed both the Spinnaker SDK and the Python wrapper in your chosen environment.
+Spinnaker is proprietary software made by Teledyne FLIR and as such cannot be included in the repository. To use the `imaging` module you must have installed both the Spinnaker SDK and the Python SDK in your chosen environment.
 
 Downloading is free but you will need to make an account: <https://www.flir.com/products/spinnaker-sdk/>
 
@@ -26,7 +26,7 @@ The Linux SDKs do not come with examples, download the Windows or Mac zip files 
 
 [UV](https://docs.astral.sh/uv/) by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
 
-## Using UV
+## Using `UV`
 
 After installing UV (follow the link above to learn how), using the terminal, navigate to the directory you copied the project repository to.
 
@@ -53,7 +53,7 @@ Run the following commands:
 > uv sync
 ```
 
-## Using PIP
+## Using `PIP`
 
 Use your preferred environment manager to first create a python 3.10 environment. Then once activated, and in the repository directory, use:
 
@@ -61,11 +61,11 @@ Use your preferred environment manager to first create a python 3.10 environment
 pip install -r requirements.txt
 ```
 
-## .env File
+## `.env` File
 
 PANDA_SDL only uses one `.env` file variable to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
 
-## Config File
+## `Config.ini` File
 
 There is a `default_config.ini` in `panda_sdl/config` which you should use as a template and place wherever you desire so long as you update `.env`. Not all fields are required. A few fields are less self explanatory or an explanation is too long for a comment:
 
