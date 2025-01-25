@@ -381,7 +381,7 @@ def test_load_active_wellplate_by_default(session: sessionmaker):
 
 
 def test_recalculate_well_positions(session: sessionmaker):
-    with open("tests/well_positions.json") as f:
+    with open("tests/files/well_positions.json") as f:
         well_positions = json.load(f)
 
     plate = Wellplate(
@@ -446,24 +446,24 @@ def test_deactivate_plate(session: sessionmaker):
 def test_load_configuration():
     """Test loading the mill configuration from a JSON file. The Wellplate module uses this
     to determine the valid x and y coordinates for the wells."""
-    config = load_configuration("tests/mill_config.json")
+    config = load_configuration("tests/files/mill_config.json")
     assert float(config["$130"]) == 410.0
     assert float(config["$131"]) == 300.0
 
 
 def test_save_configuration():
     """Test saving an updated configuration to a JSON file."""
-    config = load_configuration("tests/mill_config.json")
+    config = load_configuration("tests/files/mill_config.json")
     config["$130"] = 500.0
     config["$131"] = 400.0
 
-    save_configuration(config, "tests/mill_config_updated.json")
+    save_configuration(config, "tests/files/mill_config_updated.json")
 
-    new_config = load_configuration("tests/mill_config_updated.json")
+    new_config = load_configuration("tests/files/mill_config_updated.json")
     assert float(new_config["$130"]) == 500.0
     assert float(new_config["$131"]) == 400.0
 
-    Path("tests/mill_config_updated.json").unlink()  # Clean up the test file
+    Path("tests/files/mill_config_updated.json").unlink()  # Clean up the test file
 
 
 if __name__ == "__main__":
