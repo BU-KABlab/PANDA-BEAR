@@ -16,16 +16,16 @@ logger = sql_reports.logger
 
 
 # region Wellplate Functions
-def check_if_wellplate_exists(plate_id: int) -> bool:
-    """Check if a wellplate exists in the wellplates table"""
+# def check_if_wellplate_exists(plate_id: int) -> bool:
+#     """Check if a wellplate exists in the wellplates table"""
 
-    with SessionLocal() as session:
-        return (
-            session.execute(
-                select(Wellplates).filter(Wellplates.id == plate_id)
-            ).scalar()
-            is not None
-        )
+#     with SessionLocal() as session:
+#         return (
+#             session.execute(
+#                 select(Wellplates).filter(Wellplates.id == plate_id)
+#             ).scalar()
+#             is not None
+#         )
 
 
 def check_if_plate_type_exists(type_id: int) -> bool:
@@ -40,105 +40,105 @@ def check_if_plate_type_exists(type_id: int) -> bool:
         )
 
 
-def select_wellplate_location(
-    plate_id: Union[int, None] = None,
-) -> Tuple[float, float, float, float, int, float, float]:
-    """Select the location and characteristics of the wellplate from the wellplate
-     table. If no plate_id is given, the current wellplate is assumed
+# def select_wellplate_location(
+#     plate_id: Union[int, None] = None,
+# ) -> Tuple[float, float, float, float, int, float, float]:
+#     """Select the location and characteristics of the wellplate from the wellplate
+#      table. If no plate_id is given, the current wellplate is assumed
 
-    Args:
-        plate_id (int): The plate ID.
+#     Args:
+#         plate_id (int): The plate ID.
 
-    Returns:
-        x (float): The x coordinate of A1.
-        y (float): The y coordinate of A1.
-        z_bottom (float): The z coordinate of the bottom of the wellplate.
-        z_top (float): The z coordinate of the top of the wellplate.
-        orientation (int): The orientation of the wellplate.
-        echem_height(float): The height of performing electrochemistry in a well.
-        image_height(float): The height of the image taken of the wellplate.
+#     Returns:
+#         x (float): The x coordinate of A1.
+#         y (float): The y coordinate of A1.
+#         z_bottom (float): The z coordinate of the bottom of the wellplate.
+#         z_top (float): The z coordinate of the top of the wellplate.
+#         orientation (int): The orientation of the wellplate.
+#         echem_height(float): The height of performing electrochemistry in a well.
+#         image_height(float): The height of the image taken of the wellplate.
 
-    """
+#     """
 
-    with SessionLocal() as session:
-        if plate_id is None:
-            plate_id = session.execute(
-                select(Wellplates.id).filter(Wellplates.current == 1)
-            ).scalar()
-        wellplate: Wellplates = session.execute(
-            select(Wellplates).filter(Wellplates.id == plate_id)
-        ).scalar_one_or_none()
-        if wellplate is None:
-            return None
-        return (
-            wellplate.a1_x,
-            wellplate.a1_y,
-            wellplate.bottom,
-            wellplate.top,
-            wellplate.orientation,
-            wellplate.echem_height,
-            wellplate.image_height,
-        )
-
-
-def update_wellplate_location(plate_id: Union[int, None], **kwargs) -> None:
-    """Update the location and characteristics of the wellplate in the wellplates table"""
-    with SessionLocal() as session:
-        if plate_id is None:
-            logger.info("No plate_id provided, updating the current wellplate")
-            plate_id = (
-                session.query(Wellplates).filter(Wellplates.current == 1).first().id
-            )
-
-        wellplate = session.query(Wellplates).filter(Wellplates.id == plate_id).first()
-        if wellplate is None:
-            raise ValueError(f"Wellplate {plate_id} does not exist")
-        for key, value in kwargs.items():
-            if hasattr(wellplate, key):
-                setattr(wellplate, key, value)
-            else:
-                raise ValueError(f"Invalid characteristic: {key}")
-        session.commit()
+#     with SessionLocal() as session:
+#         if plate_id is None:
+#             plate_id = session.execute(
+#                 select(Wellplates.id).filter(Wellplates.current == 1)
+#             ).scalar()
+#         wellplate: Wellplates = session.execute(
+#             select(Wellplates).filter(Wellplates.id == plate_id)
+#         ).scalar_one_or_none()
+#         if wellplate is None:
+#             return None
+#         return (
+#             wellplate.a1_x,
+#             wellplate.a1_y,
+#             wellplate.bottom,
+#             wellplate.top,
+#             wellplate.orientation,
+#             wellplate.echem_height,
+#             wellplate.image_height,
+#         )
 
 
-def update_current_wellplate(new_plate_id: int) -> None:
-    """Changes the current wellplate's current value to 0 and sets the new
-    wellplate's current value to 1"""
+# def update_wellplate_location(plate_id: Union[int, None], **kwargs) -> None:
+#     """Update the location and characteristics of the wellplate in the wellplates table"""
+#     with SessionLocal() as session:
+#         if plate_id is None:
+#             logger.info("No plate_id provided, updating the current wellplate")
+#             plate_id = (
+#                 session.query(Wellplates).filter(Wellplates.current == 1).first().id
+#             )
 
-    with SessionLocal() as session:
-        session.query(Wellplates).filter(Wellplates.current == 1).update(
-            {Wellplates.current: 0}
-        )
-        session.query(Wellplates).filter(Wellplates.id == new_plate_id).update(
-            {Wellplates.current: 1}
-        )
-        session.commit()
+#         wellplate = session.query(Wellplates).filter(Wellplates.id == plate_id).first()
+#         if wellplate is None:
+#             raise ValueError(f"Wellplate {plate_id} does not exist")
+#         for key, value in kwargs.items():
+#             if hasattr(wellplate, key):
+#                 setattr(wellplate, key, value)
+#             else:
+#                 raise ValueError(f"Invalid characteristic: {key}")
+#         session.commit()
 
 
-def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
-    """Add a new wellplate to the wellplates table"""
+# def update_current_wellplate(new_plate_id: int) -> None:
+#     """Changes the current wellplate's current value to 0 and sets the new
+#     wellplate's current value to 1"""
 
-    with SessionLocal() as session:
-        # Fetch the information about the type of wellplate
-        well_type = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
+#     with SessionLocal() as session:
+#         session.query(Wellplates).filter(Wellplates.current == 1).update(
+#             {Wellplates.current: 0}
+#         )
+#         session.query(Wellplates).filter(Wellplates.id == new_plate_id).update(
+#             {Wellplates.current: 1}
+#         )
+#         session.commit()
 
-        session.add(
-            Wellplates(
-                id=plate_id,
-                type_id=type_id,
-                current=0,
-                cols=well_type.cols,
-                rows=well_type.rows,
-                a1_x=0,
-                a1_y=0,
-                z_bottom=0,
-                z_top=0,
-                orientation=0,
-                echem_height=0,
-                image_height=0,
-            )
-        )
-        session.commit()
+
+# def add_wellplate_to_table(plate_id: int, type_id: int) -> None:
+#     """Add a new wellplate to the wellplates table"""
+
+#     with SessionLocal() as session:
+#         # Fetch the information about the type of wellplate
+#         well_type = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
+
+#         session.add(
+#             Wellplates(
+#                 id=plate_id,
+#                 type_id=type_id,
+#                 current=0,
+#                 cols=well_type.cols,
+#                 rows=well_type.rows,
+#                 a1_x=0,
+#                 a1_y=0,
+#                 z_bottom=0,
+#                 z_top=0,
+#                 orientation=0,
+#                 echem_height=0,
+#                 image_height=0,
+#             )
+#         )
+#         session.commit()
 
 
 def check_if_current_wellplate_is_new() -> bool:
@@ -444,26 +444,6 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
     Returns:
         str: The well ID of the next available well.
     """
-    # if plate_id is None:
-    #     plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-
-    # result = sql_utilities.execute_sql_command(
-    #     """
-    #     SELECT well_id FROM well_hx
-    #     WHERE status = 'new'
-    #     AND plate_id = ?
-    #     ORDER BY SUBSTR(well_id, 1, 1),
-    #           CAST(SUBSTR(well_id, 2) AS UNSIGNED) ASC
-    #     LIMIT 1
-    #     """,
-    #     (plate_id,),
-    # )
-
-    # if result == []:
-    #     return None
-    # return result[0][0]
 
     with SessionLocal() as session:
         if plate_id is None:
@@ -485,10 +465,6 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
         return result[0]
 
 
-# endregion
-
-
-# region Well Functions
 def save_well_to_db(well_to_save: object) -> None:
     """
     First check if the well is in the table. If so update the well where the
