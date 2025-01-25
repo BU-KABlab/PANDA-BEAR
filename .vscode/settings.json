@@ -58,7 +58,12 @@
         "dataclass",
         "dataclasses",
         "Echem",
+        "edot",
         "labware",
-        "sila"
+        "pedot",
+        "prcss",
+        "sila",
+        "slackbot",
+        "uchoice"
     ],
 }
