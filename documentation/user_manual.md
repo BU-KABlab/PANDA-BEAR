@@ -10,7 +10,7 @@ PANDA SDL, or "the panda", is an open-source SDL developed by Harley Quinn and G
 
 ![Fig. 1](images/figure1.bmp)
 
-## Contents
+## Navigation
 
 1. [Construction](construction.md)
 2. [Installation](installation.md)
