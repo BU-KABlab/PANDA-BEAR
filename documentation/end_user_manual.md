@@ -5,13 +5,14 @@
 [Construction](constructions.md) | [Installation](installation.md) | End User Manual | [Dev User Manual](developer_manual.md) | [Contents](user_manual.md)
 
 ## Table of Contents <!-- omit from toc -->
-- [Using `panda_lib` as an end user](#using-panda_lib-as-an-end-user)
+- [Overview](#overview)
 - [Operating the PANDA SDL](#operating-the-panda-sdl)
+- [SlackBot (If Using)](#slackbot-if-using)
 - [Protocols](#protocols)
 - [Generators](#generators)
 - [Analyzers](#analyzers)
 
-## Using `panda_lib` as an end user
+## Overview
 
 As an end user, you will hopefully not need to dive into the project code as deeply as someone developing new capabilities or fixing an issue. So you will be primarily working in 4 different directories (folders):
 
@@ -74,6 +75,9 @@ From the top project directory level run `main.py`. This will begin initializing
 | env         |            | print_config                    | Print the `config.ini` listed in .env                                                                                           |
 | q           |            | exit_program                    | Ends the main menu script, halts workers, disconnects from any instruments, and stops monitoring Slack.                         |
 
+## SlackBot (If Using)
+
+Coming soon...
 
 ## Protocols
 
