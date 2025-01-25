@@ -614,20 +614,6 @@ class Queue(Base):
         return f"<Queue(experiment_id={self.experiment_id}, project_id={self.project_id}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, well_type={self.well_type}, well_id={self.well_id}, status={self.status}, status_date={self.status_date})>"
 
 
-class MillConfig(Base):
-    """
-    Stores the JSON config for the grbl mill
-    """
-
-    __tablename__ = "panda_mill_config"
-    id = Column(Integer, primary_key=True)
-    config = Column(JSON, nullable=False)
-    timestamp = Column(String, default=dt.now(timezone.utc))
-
-    def __repr__(self):
-        return f"<MillConfig(id={self.id}, config={self.config})>"
-
-
 class SystemVersions(Base):
     """SystemVersions table model"""
 
