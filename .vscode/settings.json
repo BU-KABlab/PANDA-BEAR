@@ -53,4 +53,10 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "cmake.ignoreCMakeListsMissing": true,
+    "cSpell.words": [
+        "chrono",
+        "Echem",
+        "labware",
+        "sila"
+    ],
 }
