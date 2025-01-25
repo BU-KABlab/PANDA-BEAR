@@ -1,5 +1,5 @@
 """
-The main menue of PANDA_SDL.
+The main menu of PANDA_SDL.
 
 Useful for one-off tasks that don't require the full PANDA_SDL program to run.
 Or starting the PANDA_SDL either with or without mock instruments.
@@ -20,7 +20,7 @@ from hardware.pipette import (
     insert_new_pipette,
     select_pipette_status,
 )
-from menu.license_text import show_conditions, show_warrenty
+from menu.license_text import show_conditions, show_warranty
 from panda_lib import experiment_loop, imaging, print_panda
 from panda_lib.config import print_config_values as print_config
 from panda_lib.config import read_config, read_testing_config, write_testing_config
@@ -198,7 +198,7 @@ def remove_wellplate_from_database():
 def remove_experiment_from_database():
     """Removes a user provided experiment from the database."""
     experiments_to_remove = (
-        input("Enter the experiment number(s) to remove seperated by commas: ")
+        input("Enter the experiment number(s) to remove separated by commas: ")
         .strip()
         .lower()
     )
@@ -376,7 +376,7 @@ def exit_program():
 
 def refresh():
     """
-    Refreshes the main menue. Re-read the current wellplate info, and queue."""
+    Refreshes the main menu. Re-read the current wellplate info, and queue."""
 
 
 def stop_panda_sdl():
@@ -425,13 +425,13 @@ def change_pipette_tip():
 def instrument_check():
     """Runs the instrument check."""
     sql_system_state.set_system_status(SystemState.BUSY, "running instrument check")
-    intruments, all_found = experiment_loop.test_instrument_connections(False)
+    instruments, all_found = experiment_loop.test_instrument_connections(False)
     if all_found:
         input("Press Enter to continue...")
     else:
         input("Press Enter to continue...")
 
-    experiment_loop.disconnect_from_instruments(intruments)
+    experiment_loop.disconnect_from_instruments(instruments)
     return
 
 
@@ -480,7 +480,7 @@ def run_control_loop(uchoice: callable) -> Process:
     return exp_process
 
 
-def start_analsyis_loop():
+def start_analysis_loop():
     """Starts the analysis loop."""
     sql_system_state.set_system_status(SystemState.BUSY, "starting analysis loop")
     process = Process(target=analysis_worker, args=(status_queue, ProcessIDs.ANALYSIS))
@@ -519,7 +519,7 @@ def stop_process(process: Process):
 
 
 def update_well_status():
-    """Manually update the status of a well on the current wellpalte."""
+    """Manually update the status of a well on the current wellplate."""
     wellplate_id = wellplate.read_current_wellplate_info()[0]
     well_ids = sql_wellplate.select_well_ids(wellplate_id)
     well_id = input_validation(
@@ -567,12 +567,12 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "6": calibrate_mill,
         "7": test_image,
         "8": instrument_check,
-        "10": start_analsyis_loop,
+        "10": start_analysis_loop,
         "10.1": stop_analysis_loop,
         "10.2": list_analysis_script_ids,
         "t": toggle_testing_mode,
         "r": refresh,
-        "w": show_warrenty,
+        "w": show_warranty,
         "c": show_conditions,
         "env": print_config,
         "q": exit_program,
@@ -652,13 +652,13 @@ class ProcessIDs:
     SLACKBOT = 2
 
 
-def discalimer():
+def print_disclaimer():
     """Prints the disclaimer."""
     print(
         textwrap.dedent(
             """\n
 PANDA SDL version 1.0.0, Copyright (C) 2024 Gregory Robben, Harley Quinn
-PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warrenty'
+PANDA SDL comes with ABSOLUTELY NO WARRANTY; choose `show_warranty'
 for more details.
 
 This is free software, and you are welcome to redistribute it
@@ -743,7 +743,7 @@ def check_essential_labware():
 if __name__ == "__main__":
     config = read_config()
     slackThread_running.set()
-    discalimer()
+    print_disclaimer()
     time.sleep(2)
     sql_protocol_utilities.read_in_protocols()
     banner()

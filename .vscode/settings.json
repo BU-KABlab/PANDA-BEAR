@@ -55,6 +55,8 @@
     "cmake.ignoreCMakeListsMissing": true,
     "cSpell.words": [
         "chrono",
+        "dataclass",
+        "dataclasses",
         "Echem",
         "labware",
         "sila"

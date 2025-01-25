@@ -1,7 +1,7 @@
 """Prints the warrenty and license text"""
 
 
-def show_warrenty():
+def show_warranty():
     """Shows the warranty."""
     print(
         """
