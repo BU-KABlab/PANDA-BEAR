@@ -4,9 +4,9 @@ This class is used to store the data for the
 wellplate and the wells in it.
 """
 
+import json
 import logging
-
-# pylint: disable=line-too-long
+from pathlib import Path
 from typing import Optional, Tuple, TypedDict, Union
 
 from sqlalchemy import select
@@ -20,7 +20,6 @@ from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     ExperimentResults,
     Experiments,
-    MillConfig,
     WellModel,
     Wellplates,
 )
@@ -701,21 +700,45 @@ def _remove_experiment_from_db(
         return False, f"Error occurred while deleting the experiment: {e}"
 
 
+def load_configuration(filename: str = "hardware/grbl_cnc_mill/_configuration.json"):
+    """Load the configuration from the JSON file"""
+
+    filename: Path = Path(filename)
+
+    try:
+        filename.resolve(strict=True)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Configuration file {filename} not found")
+
+    with open(filename, "r") as f:
+        return json.load(f)
+
+
+def save_configuration(
+    config, filename: str = "hardware/grbl_cnc_mill/_configuration.json"
+):
+    """Save the configuration to the JSON file"""
+
+    # Validate that the config is json serializable
+    try:
+        json.dumps(config)
+    except TypeError as e:
+        raise TypeError(f"Configuration is not JSON serializable: {e}")
+
+    with open(Path(filename), "w") as f:
+        json.dump(config, f, indent=4)
+
+
 def change_wellplate_location(db_session: sessionmaker = SessionLocal):
     """Change the location of the wellplate"""
+    mill_config = load_configuration()
+    working_volume = {
+        "x": -float(mill_config["$130"]),
+        "y": -float(mill_config["$131"]),
+        "z": -200,  # -float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
+    }
 
     with db_session() as session:
-        mill_config = (
-            session.execute(select(MillConfig).order_by(MillConfig.id.desc()))
-            .scalar()
-            .config
-        )
-        working_volume = {
-            "x": -float(mill_config["$130"]),
-            "y": -float(mill_config["$131"]),
-            "z": -200,  # -float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
-        }
-
         ## Get the current plate id and location
         statement = select(Wellplates).filter_by(current=1)
 
