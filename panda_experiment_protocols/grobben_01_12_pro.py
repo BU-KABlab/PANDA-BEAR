@@ -2,10 +2,10 @@
 from dataclasses import dataclass
 from logging import Logger
 
-from panda_lib.actions import (
+from panda_lib import (
+    EchemExperimentBase,
     ExperimentStatus,
     Toolkit,
-    Well,
     chrono_amp,
     clear_well,
     flush_pipette,
@@ -13,10 +13,12 @@ from panda_lib.actions import (
     rinse_well,
     transfer,
 )
-from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 
 # If you are using custom actions, import them from the appropriate module.
-from panda_lib.experiment_class import EchemExperimentBase
+from panda_lib.actions_pgma import cyclic_volt_pgma_fc
+
+# To have specific types for the wells, import them from the labware module.
+from panda_lib.labware.wellplate import Well
 
 reag_name = "pgma-pama-phenol-teaa-tbap"
 
