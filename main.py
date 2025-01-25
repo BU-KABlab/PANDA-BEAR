@@ -435,14 +435,6 @@ def instrument_check():
     return
 
 
-def test_pipette():
-    """Runs the pipette test."""
-    sql_system_state.set_system_status(SystemState.BUSY, "running pipette test")
-    from testing_and_validation.pump_suction_check import main as pipette_test
-
-    pipette_test()
-
-
 def import_vial_data():
     """Imports vial data from a csv file."""
     sql_system_state.set_system_status(SystemState.BUSY, "importing vial data")
@@ -575,10 +567,9 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "6": calibrate_mill,
         "7": test_image,
         "8": instrument_check,
-        "9": test_pipette,
         "10": start_analsyis_loop,
-        "11": stop_analysis_loop,
-        "12": list_analysis_script_ids,
+        "10.1": stop_analysis_loop,
+        "10.2": list_analysis_script_ids,
         "t": toggle_testing_mode,
         "r": refresh,
         "w": show_warrenty,
