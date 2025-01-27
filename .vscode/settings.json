@@ -61,9 +61,14 @@
         "edot",
         "labware",
         "pedot",
+        "pgma",
         "prcss",
         "sila",
         "slackbot",
         "uchoice"
+    ],
+    "cSpell.ignoreWords": [
+        "decapping",
+        "wellplates"
     ],
 }
