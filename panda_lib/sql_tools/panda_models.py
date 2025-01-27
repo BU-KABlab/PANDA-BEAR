@@ -2,7 +2,6 @@
 SQLAlchemy models for the PANDA database
 """
 
-# pylint: disable=too-few-public-methods, line-too-long
 import json
 from datetime import datetime as dt
 from datetime import timezone

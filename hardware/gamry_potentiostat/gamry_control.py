@@ -3,10 +3,10 @@
 import gc
 import logging
 import pathlib
+import threading
 import time
 from decimal import Decimal
 from typing import Tuple
-import threading
 
 import comtypes
 import numpy as np
@@ -15,7 +15,8 @@ from comtypes import client
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
-from panda_lib.config.config_tools import read_config
+from shared_utilities.config.config_tools import read_config
+
 from .timer import countdown_timer
 
 config = read_config()

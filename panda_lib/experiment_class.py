@@ -11,9 +11,6 @@ from typing import Callable, List, Optional, Tuple, Union, get_type_hints
 from pydantic import ConfigDict, Field, RootModel, field_validator
 from pydantic.dataclasses import dataclass
 
-from panda_lib.config.config_tools import read_config
-from panda_lib.log_tools import setup_default_logger
-
 # from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
 #                                                 execute_sql_command_no_return)
 from panda_lib.sql_tools.db_setup import SessionLocal
@@ -25,6 +22,8 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
+from shared_utilities.config.config_tools import read_config
+from shared_utilities.log_tools import setup_default_logger
 
 global_logger = setup_default_logger(log_name="panda")
 experiment_logger = setup_default_logger(log_name="experiment_logger")

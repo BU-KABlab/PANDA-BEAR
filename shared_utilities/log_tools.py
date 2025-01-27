@@ -5,9 +5,10 @@ Methods and classses related to logging for the PANDA_SDL project
 import logging
 import os
 import time
-from panda_lib.config import config_tools
 from functools import wraps
 from typing import Optional
+
+from .config import config_tools
 
 config = config_tools.read_config()
 

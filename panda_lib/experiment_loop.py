@@ -27,9 +27,8 @@ from sqlalchemy.orm import sessionmaker
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
 from hardware.gamry_potentiostat import gamry_control
-from hardware.pipette.syringepump import MockPump, SyringePump
+from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from panda_lib import actions, scheduler
-from panda_lib.config.config_tools import read_config, read_testing_config
 from panda_lib.errors import (
     CAFailure,
     CVFailure,
@@ -56,8 +55,7 @@ from panda_lib.experiment_class import (
 )
 from panda_lib.instrument_toolkit import Hardware, Labware, Toolkit
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
-from panda_lib.labware.wellplate import Well, Wellplate
-from panda_lib.log_tools import apply_log_filter, setup_default_logger, timing_wrapper
+from panda_lib.labware.wellplates import Well, Wellplate
 
 # from .movement import Mill, MockMill
 from panda_lib.panda_gantry import MockPandaMill as MockMill
@@ -74,6 +72,12 @@ from panda_lib.sql_tools import (
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.tools.pawduino import ArduinoLink, MockArduinoLink
 from panda_lib.utilities import SystemState
+from shared_utilities.config.config_tools import read_config, read_testing_config
+from shared_utilities.log_tools import (
+    apply_log_filter,
+    setup_default_logger,
+    timing_wrapper,
+)
 
 config = read_config()
 # set up slack globally so that it can be used in the main function and others

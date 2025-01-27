@@ -1,8 +1,5 @@
 """
 The main menu of PANDA_SDL.
-
-Useful for one-off tasks that don't require the full PANDA_SDL program to run.
-Or starting the PANDA_SDL either with or without mock instruments.
 """
 
 import os
@@ -15,19 +12,21 @@ from typing import Tuple
 
 from PIL import Image
 
-import hardware_calibration.mill_calibration_and_positioning as mill_calibration_and_positioning
-from hardware.pipette import (
+from hardware.panda_pipette import (
     insert_new_pipette,
     select_pipette_status,
 )
+from hardware_calibration.mill_calibration_and_positioning import calibrate_mill
 from menu.license_text import show_conditions, show_warranty
-from panda_lib import experiment_loop, imaging, print_panda
-from panda_lib.config import print_config_values as print_config
-from panda_lib.config import read_config, read_testing_config, write_testing_config
-from panda_lib.experiment_analysis_loop import analysis_worker, load_analyzers
-from panda_lib.experiment_class import ExperimentBase
-from panda_lib.labware import vials, wellplate
-from panda_lib.sql_tools import (
+from panda_lib import (
+    ExperimentBase,
+    SystemState,
+    analysis_worker,
+    experiment_loop,
+    imaging,
+    input_validation,
+    load_analyzers,
+    print_panda,
     remove_testing_experiments,
     sql_generator_utilities,
     sql_protocol_utilities,
@@ -35,7 +34,13 @@ from panda_lib.sql_tools import (
     sql_system_state,
     sql_wellplate,
 )
-from panda_lib.utilities import SystemState, input_validation
+from panda_lib.labware import vials, wellplates
+from shared_utilities.config import (
+    print_config_values,
+    read_config,
+    read_testing_config,
+    write_testing_config,
+)
 
 os.environ["KMP_AFFINITY"] = "none"
 exp_loop_prcss: Process = None
@@ -168,7 +173,7 @@ def change_wellplate():
     new_plate_type = int(input("Enter the new wellplate type: ").strip().lower())
     new_plate_numb = int(input("Enter the new wellplate number: ").strip().lower())
 
-    new_plate = wellplate.Wellplate(
+    new_plate = wellplates.Wellplate(
         create_new=True, plate_id=new_plate_numb, type_id=new_plate_type
     )
     if new_plate:
@@ -192,7 +197,7 @@ def remove_wellplate_from_database():
         input("Enter the wellplate number to remove: ").strip().lower()
     )
 
-    wellplate._remove_wellplate_from_db(plate_to_remove)
+    wellplates._remove_wellplate_from_db(plate_to_remove)
 
 
 def remove_experiment_from_database():
@@ -210,7 +215,7 @@ def remove_experiment_from_database():
     for experiment in experiments_to_remove:
         try:
             experiment = int(experiment)
-            result, note = wellplate._remove_experiment_from_db(experiment)
+            result, note = wellplates._remove_experiment_from_db(experiment)
             if result:
                 removed.append(experiment)
             else:
@@ -240,8 +245,8 @@ def print_wellplate_info():
     Location of A1: x, y
 
     """
-    well_num, plate_type, avail_wells = wellplate.read_current_wellplate_info()
-    c_plate = wellplate.Wellplate(type_id=plate_type, plate_id=well_num)
+    well_num, plate_type, avail_wells = wellplates.read_current_wellplate_info()
+    c_plate = wellplates.Wellplate(type_id=plate_type, plate_id=well_num)
 
     print(
         f"""
@@ -303,7 +308,7 @@ def input_new_vial_values_waste():
 def change_wellplate_location():
     """Changes the location of the current wellplate."""
 
-    wellplate.change_wellplate_location()
+    wellplates.change_wellplate_location()
 
 
 def run_experiment_generator():
@@ -339,16 +344,16 @@ def toggle_testing_mode():
     """Sets the testing mode."""
     mode = read_testing_config()
     write_testing_config(not mode)
-    print("To complete the switch, please restart the program.")
+    print("To complete the switch, the program must be restarted. Exiting...")
     sys.exit()
 
 
-def calibrate_mill():
+def mill_calibration():
     """Calibrates the mill."""
 
-    mill_calibration_and_positioning.calibrate_mill(
+    calibrate_mill(
         read_testing_config(),
-        wellplate.Wellplate(),
+        wellplates.Wellplate(),
         vials.read_vials()[0],
         vials.read_vials()[1],
     )
@@ -359,12 +364,6 @@ def test_image():
     image = imaging.capture_new_image()
     open_image = Image.open(image)
     open_image.show()
-
-
-def clean_up_testing_experiments():
-    """Cleans up the testing experiments."""
-
-    remove_testing_experiments.main()
 
 
 def exit_program():
@@ -520,7 +519,7 @@ def stop_process(process: Process):
 
 def update_well_status():
     """Manually update the status of a well on the current wellplate."""
-    wellplate_id = wellplate.read_current_wellplate_info()[0]
+    wellplate_id = wellplates.read_current_wellplate_info()[0]
     well_ids = sql_wellplate.select_well_ids(wellplate_id)
     well_id = input_validation(
         "Enter the well ID to update: ", str, None, False, "Invalid Well ID", well_ids
@@ -552,7 +551,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "2.2": remove_wellplate_from_database,
         "2.3": print_wellplate_info,
         "2.5": remove_training_data,
-        "2.6": clean_up_testing_experiments,
+        "2.6": remove_testing_experiments,
         "2.7": update_well_status,
         "3": reset_vials_stock,
         "3.1": reset_vials_waste,
@@ -564,7 +563,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "4.1": run_experiment_generator,
         "4.2": remove_experiment_from_database,
         "5": change_pipette_tip,
-        "6": calibrate_mill,
+        "6": mill_calibration,
         "7": test_image,
         "8": instrument_check,
         "10": start_analysis_loop,
@@ -574,7 +573,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "r": refresh,
         "w": show_warranty,
         "c": show_conditions,
-        "env": print_config,
+        "env": print_config_values,
         "q": exit_program,
     }
 
@@ -725,7 +724,7 @@ def check_essential_labware():
         missing.append("waste vials")
 
     # Check if the wellplate is present
-    wellplate_id, _, new_wells = wellplate.read_current_wellplate_info()
+    wellplate_id, _, new_wells = wellplates.read_current_wellplate_info()
     if not wellplate_id:
         missing.append("wellplate")
 
@@ -753,7 +752,7 @@ if __name__ == "__main__":
         slackbot_thread = start_slack_bot(slackThread_running)
         while True:
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
-            num, p_type, new_wells = wellplate.read_current_wellplate_info()
+            num, p_type, new_wells = wellplates.read_current_wellplate_info()
             try:
                 current_pipette = select_pipette_status()
             except AttributeError:

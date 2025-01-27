@@ -10,8 +10,8 @@ from pathlib import Path
 import pandas as pd
 
 from panda_lib import experiment_class, scheduler
-from panda_lib.config.config_tools import read_config, read_testing_config
 from panda_lib.sql_tools.sql_system_state import get_current_pin
+from shared_utilities.config.config_tools import read_config, read_testing_config
 
 config = read_config()
 TESTING = read_testing_config()

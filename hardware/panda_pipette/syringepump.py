@@ -4,17 +4,17 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
 import time
-from typing import Optional, Union
+from typing import Optional
 
-import panda_lib.labware.wellplate as wp
 from hardware.nesp_lib_py import nesp_lib
 from hardware.nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
-from panda_lib.config.config_tools import read_config
-from panda_lib.labware.vials import StockVial, Vial, WasteVial
-from panda_lib.log_tools import (
+from panda_lib.labware import Vial
+from panda_lib.labware import wellplates as wp
+from shared_utilities.config.config_tools import read_config
+from shared_utilities.log_tools import (
     default_logger as pump_control_logger,
 )
-from panda_lib.log_tools import (
+from shared_utilities.log_tools import (
     setup_default_logger,
     timing_wrapper,
 )
@@ -100,9 +100,9 @@ class SyringePump:
     def withdraw(
         self,
         volume_to_withdraw: float,
-        solution: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
+        solution: Optional[object] = None,
         rate: float = None,
-    ) -> Optional[Union[wp.Well, StockVial, WasteVial]]:
+    ) -> Optional[object]:
         """
         Withdraw the given volume at the given rate from the specified vessel.
         Update the volume of the pipette and the solution if given.
@@ -215,8 +215,8 @@ class SyringePump:
     def infuse(
         self,
         volume_to_infuse: float,
-        being_infused: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
-        infused_into: Optional[Union[wp.Well, StockVial, WasteVial]] = None,
+        being_infused: Optional[object] = None,
+        infused_into: Optional[object] = None,
         rate: float = None,
         blowout_ul: float = float(0.0),
     ) -> None:

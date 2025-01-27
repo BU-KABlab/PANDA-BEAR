@@ -3,10 +3,12 @@
 import logging
 import pathlib
 from typing import Tuple
-from pydantic.dataclasses import dataclass
-from pydantic import ConfigDict
+
 import numpy as np
-from panda_lib.config.config_tools import read_config
+from pydantic import ConfigDict
+from pydantic.dataclasses import dataclass
+
+from shared_utilities.config.config_tools import read_config
 
 logger = logging.getLogger("e_panda")
 config = read_config()

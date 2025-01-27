@@ -5,9 +5,9 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from panda_lib.log_tools import setup_default_logger
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.utilities import Coordinates, directory_picker, file_picker
+from shared_utilities.log_tools import setup_default_logger
 
 from .errors import OverDraftException, OverFillException  # Custom exceptions
 from .schemas import VialReadModel, VialWriteModel  # Pydantic models

@@ -6,11 +6,11 @@ from typing import Union
 
 import PySpin
 
-from hardware.pipette.syringepump import MockPump, SyringePump
+from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from hardware.sartorius.sartorius import Scale
 from hardware.sartorius.sartorius.mock import Scale as MockScale
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
-from panda_lib.labware.wellplate import Wellplate
+from panda_lib.labware.wellplates import Wellplate
 
 # from panda_lib.movement import Mill, MockMill
 from panda_lib.panda_gantry import MockPandaMill as MockMill

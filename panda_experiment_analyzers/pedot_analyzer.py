@@ -23,7 +23,6 @@ from panda_experiment_analyzers.pedot.pedot_classes import (
 )
 from panda_experiment_analyzers.pedot.sql_ml_functions import insert_ml_training_data
 from panda_lib import experiment_class, scheduler
-from panda_lib.config.config_tools import read_testing_config
 from panda_lib.experiment_class import (
     ExperimentResultsRecord,
     insert_experiment_result,
@@ -32,6 +31,7 @@ from panda_lib.experiment_class import (
 from panda_lib.slack_tools.SlackBot import SlackBot
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 from panda_lib.utilities import correction_factor
+from shared_utilities.config.config_tools import read_testing_config
 
 CURRENT_PIN = get_current_pin()
 ANALYSIS_ID = 3

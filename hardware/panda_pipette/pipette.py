@@ -1,9 +1,10 @@
 """Module for the pipette class"""
 
 import json
+import logging
 import time
 
-from hardware.pipette.sql_pipette import (
+from hardware.panda_pipette.sql_pipette import (
     SessionLocal,
     activate_pipette,
     deincrement_use_count,
@@ -11,9 +12,10 @@ from hardware.pipette.sql_pipette import (
     sessionmaker,
     update_pipette_status,
 )
-from panda_lib.labware.vessel import logger as vessel_logger
 
 from .errors import InvalidPipetteID
+
+vessel_logger = logging.getLogger("vessel_logger")
 
 
 class Pipette:

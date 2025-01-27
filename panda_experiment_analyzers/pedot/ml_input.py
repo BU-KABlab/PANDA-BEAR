@@ -1,8 +1,8 @@
 import pandas as pd
 
-from panda_lib.config.config_tools import read_testing_config
 from panda_lib.experiment_class import select_specific_parameter, select_specific_result
 from panda_lib.sql_tools import sql_system_state
+from shared_utilities.config.config_tools import read_testing_config
 
 from .pedot_classes import RequiredData
 

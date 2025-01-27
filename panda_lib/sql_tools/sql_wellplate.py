@@ -7,7 +7,7 @@ from typing import List, Tuple, Union
 
 from sqlalchemy import Integer, cast, func, select
 
-from panda_lib.labware import wellplate as wellplate_module
+from panda_lib.labware import wellplates as wellplate_module
 from panda_lib.sql_tools import sql_reports
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, Wellplates

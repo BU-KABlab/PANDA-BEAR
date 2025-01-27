@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from hardware.pipette import (
+from hardware.panda_pipette import (
     Pipette,
     PipetteModel,
     insert_new_pipette,

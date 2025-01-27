@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from hardware.pipette import (
+from hardware.panda_pipette import (
     Pipette,
     PipetteModel,
 )
@@ -18,21 +18,13 @@ from panda_lib.actions import (
     waste_selector,
 )
 from panda_lib.instrument_toolkit import (
-    MockMill as Mill,
-)
-from panda_lib.instrument_toolkit import (
-    MockPump as SyringePump,
-)
-from panda_lib.instrument_toolkit import (
     Toolkit,
 )
+from panda_lib.labware import StockVial, Well
 from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
-from panda_lib.labware.vials import StockVial
-from panda_lib.labware.wellplate import Well
 from panda_lib.sql_tools.panda_models import Base, Vials, WellModel
-from panda_lib.tools.pawduino import MockArduinoLink as ArduinoLink
 
-test_logger = MagicMock(
+logger = MagicMock(
     spec=logging.Logger, info=MagicMock(), debug=MagicMock(), error=MagicMock()
 )
 
@@ -160,6 +152,14 @@ with Session(engine) as sesh:
 
 @pytest.fixture()
 def toolkit():
+    from panda_lib.instrument_toolkit import (
+        MockMill as Mill,
+    )
+    from panda_lib.instrument_toolkit import (
+        MockPump as SyringePump,
+    )
+    from panda_lib.tools.pawduino import MockArduinoLink as ArduinoLink
+
     toolkit = Toolkit(
         pump=SyringePump(), mill=Mill(), arduino=ArduinoLink(), scale=MagicMock()
     )
@@ -207,7 +207,7 @@ def test_handle_source_vessels(mock_db_session, src_vessel):
         selected_source_vessels, source_vessel_volumes = _handle_source_vessels(
             volume,
             src_vessel,
-            test_logger,
+            logger,
             source_concentration,
             mock_db_session,
         )

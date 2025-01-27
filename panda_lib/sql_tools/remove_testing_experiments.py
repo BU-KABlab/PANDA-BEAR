@@ -30,28 +30,6 @@ def main():
     Finally remove the experiments from experiments table
     Get the experiment_ids
     """
-    # sql_command = "SELECT experiment_id FROM experiments WHERE project_id = 999"
-    # experiment_ids = execute_sql_command(sql_command)
-
-    # # Delete records from experiment_parameters
-    # sql_command = "DELETE FROM experiment_parameters WHERE experiment_id IN ({})".format(
-    #     ", ".join([str(experiment_id[0]) for experiment_id in experiment_ids])
-    # )
-    # execute_sql_command_no_return(sql_command)
-
-    # # Delete records from experiment_results
-    # sql_command = "DELETE FROM experiment_results WHERE experiment_id IN ({})".format(
-    #     ", ".join([str(experiment_id[0]) for experiment_id in experiment_ids])
-    # )
-    # execute_sql_command_no_return(sql_command)
-
-    # # Update records in well_hx
-    # sql_command = "UPDATE well_hx SET experiment_id = NULL, project_id = NULL, status = 'new', status_date = NULL, contents = '{}', volume = 0 WHERE project_id = 999"
-    # execute_sql_command_no_return(sql_command)
-
-    # # Delete records from experiments
-    # sql_command = "DELETE FROM experiments WHERE project_id = 999"
-    # execute_sql_command_no_return(sql_command)
 
     with SessionLocal() as session:
         experiment_ids = (

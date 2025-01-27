@@ -19,8 +19,6 @@ Returns:
     Vials: The updated vials object.
 """
 
-# pylint: disable=line-too-long, too-many-arguments, too-many-lines, broad-exception-caught
-
 # Standard library imports
 import logging
 import math
@@ -34,36 +32,37 @@ from PIL import Image
 from sqlalchemy.orm import Session
 
 from hardware.grbl_cnc_mill import Instruments
-from hardware.pipette.syringepump import MockPump, SyringePump
-from panda_lib.config.config_tools import (
+from hardware.panda_pipette.syringepump import MockPump, SyringePump
+from shared_utilities.config.config_tools import (
     ConfigParserError,
     read_config,
     read_testing_config,
 )
-from panda_lib.errors import (
+from shared_utilities.log_tools import timing_wrapper
+
+from .errors import (
     CAFailure,
     CVFailure,
     DepositionFailure,
     NoAvailableSolution,
     OCPFailure,
 )
-from panda_lib.experiment_class import (
+from .experiment_class import (
     EchemExperimentBase,
     ExperimentBase,
     ExperimentStatus,
 )
 
 # First party imports
-from panda_lib.imaging import add_data_zone, capture_new_image, image_filepath_generator
-from panda_lib.instrument_toolkit import ArduinoLink, Hardware, Labware, Toolkit
-from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
-from panda_lib.labware.wellplate import Coordinates, Well
-from panda_lib.log_tools import timing_wrapper
-from panda_lib.panda_gantry import MockPandaMill as MockMill
-from panda_lib.panda_gantry import PandaMill as Mill
-from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.tools.obs_controls import MockOBSController, OBSController
-from panda_lib.utilities import correction_factor, solve_vials_ilp
+from .imaging import add_data_zone, capture_new_image, image_filepath_generator
+from .instrument_toolkit import ArduinoLink, Hardware, Labware, Toolkit
+from .labware.vials import StockVial, Vial, WasteVial, read_vials
+from .labware.wellplates import Coordinates, Well
+from .panda_gantry import MockPandaMill as MockMill
+from .panda_gantry import PandaMill as Mill
+from .sql_tools.db_setup import SessionLocal
+from .tools.obs_controls import MockOBSController, OBSController
+from .utilities import correction_factor, solve_vials_ilp
 
 TESTING = read_testing_config()
 

@@ -12,7 +12,7 @@ import sqlite3
 from pathlib import Path
 from typing import Tuple, Union
 
-from panda_lib.log_tools import setup_default_logger, timing_wrapper
+from shared_utilities.log_tools import setup_default_logger, timing_wrapper
 
 from .experiment_class import (
     ExperimentBase,
@@ -26,7 +26,7 @@ from .experiment_class import (
     select_next_experiment_id,
     update_experiment_status,
 )
-from .labware.wellplate import Well
+from .labware.wellplates import Well
 from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import ExperimentParameters, Experiments, Projects
 from .sql_tools.sql_queue import (

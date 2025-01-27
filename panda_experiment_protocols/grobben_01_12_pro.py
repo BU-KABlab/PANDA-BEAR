@@ -18,7 +18,7 @@ from panda_lib import (
 from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 
 # To have specific types for the wells, import them from the labware module.
-from panda_lib.labware.wellplate import Well
+from panda_lib.labware.wellplates import Well
 
 reag_name = "pgma-pama-phenol-teaa-tbap"
 

@@ -12,8 +12,8 @@ import obsws_python as obsws
 from obsws_python import error as OBSerror
 from obsws_python.error import OBSSDKRequestError
 
-from ..config.config_tools import read_config
-from ..log_tools import default_logger as logger
+from shared_utilities.config.config_tools import read_config
+from shared_utilities.log_tools import default_logger as logger
 
 config = read_config()
 if config.getboolean("OPTIONS", "testing"):

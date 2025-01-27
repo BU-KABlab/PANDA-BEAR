@@ -24,11 +24,10 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 import panda_lib.experiment_class as exp
-from panda_lib.config.config_tools import read_config, read_testing_config
 from panda_lib.imaging.panda_image_tools import add_data_zone
 from panda_lib.labware import vials
-from panda_lib.labware.wellplate import Well
-from panda_lib.labware.wellplate import Wellplates as Wellplate
+from panda_lib.labware.wellplates import Well
+from panda_lib.labware.wellplates import Wellplates as Wellplate
 from panda_lib.sql_tools import (
     sql_queue,
     sql_system_state,
@@ -36,6 +35,7 @@ from panda_lib.sql_tools import (
 )
 from panda_lib.tools.obs_controls import OBSController
 from panda_lib.utilities import Coordinates as WellCoordinates
+from shared_utilities.config.config_tools import read_config, read_testing_config
 
 from .sql_slack_tickets import SlackTicket, insert_slack_ticket, select_slack_ticket
 

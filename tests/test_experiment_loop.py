@@ -9,7 +9,7 @@ from panda_lib.experiment_loop import (
 )
 from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
 from panda_lib.labware.vials import StockVial
-from panda_lib.labware.wellplate import Well, Wellplate
+from panda_lib.labware.wellplates import Well, Wellplate
 from panda_lib.sql_tools.panda_models import Base, Vials, WellModel
 
 # Setup an in-memory SQLite database for testing

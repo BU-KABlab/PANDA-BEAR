@@ -22,10 +22,10 @@ from hardware.grbl_cnc_mill import (
     set_up_mill_logger,
 )
 from panda_lib.actions import capture_new_image
-from panda_lib.config.config_tools import read_config
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
-from panda_lib.labware.wellplate import Well
-from panda_lib.labware.wellplate import Wellplates as Wellplate
+from panda_lib.labware.wellplates import Well
+from panda_lib.labware.wellplates import Wellplates as Wellplate
+from shared_utilities.config.config_tools import read_config
 
 logger = set_up_mill_logger(Path("mill_testing.log"))
 config = read_config()

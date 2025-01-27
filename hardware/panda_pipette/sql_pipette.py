@@ -7,9 +7,10 @@ from typing import Union
 
 from sqlalchemy.orm.session import Session, sessionmaker
 
-from panda_lib.config.config_tools import read_config
-from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import (
+from shared_utilities.config.config_tools import read_config
+
+from .db_setup import SessionLocal
+from .models import (
     Pipette,
     PipetteLog,
 )  # Ensure you import your Base and Pipette model

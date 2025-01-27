@@ -8,9 +8,9 @@ from hardware.grbl_cnc_mill import (
     MockMill,
     set_up_mill_logger,
 )
-from panda_lib.config.config_tools import read_logging_dir, read_testing_config
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import Tool, VialStatus
+from shared_utilities.config.config_tools import read_logging_dir, read_testing_config
 
 # Set up the mill connection
 TESTING = read_testing_config()

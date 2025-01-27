@@ -67,7 +67,7 @@ PANDA_SDL only uses one `.env` file variable to point to the location of your co
 
 ## `Config.ini` File
 
-There is a `default_config.ini` in `panda_sdl/config` which you should use as a template and place wherever you desire so long as you update `.env`. Not all fields are required. A few fields are less self explanatory or an explanation is too long for a comment:
+There is a `default_config.ini` in `shared_utilities/config` which you should use as a template and place wherever you desire so long as you update `.env`. Not all fields are required. A few fields are less self explanatory or an explanation is too long for a comment:
 
 - **Protocols vs Experiment Generators**:
 

@@ -12,7 +12,7 @@ from .schemas import (
 )
 from .services import VialService, WellplateService, WellService
 from .vials import StockVial, Vial, WasteVial
-from .wellplate import Well, Wellplate
+from .wellplates import Well, Wellplate
 
 __all__ = [
     "Well",
