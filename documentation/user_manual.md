@@ -6,7 +6,7 @@
 
 # Intro
 
-PANDA SDL, or "the panda", is an open-source SDL developed by Harley Quinn and Gregory Robben, in the [KABLab](https://www.kablab.org/) at [Boston University](https://www.bu.edu/). The panda electrodeposits and functionally characterizes polymer films using a combination of electrochemical and optical techniques (Fig. 1). Experiments are performed in a novel well plate architecture (which you can make yourself in the [Wellplate and Gasket SOP](sops/wellplate_and_gasket_SOP_v1.md)!) in which the transparent bottom of each well constitutes the working electrode while enabling transmission optical characterization.
+PANDA SDL, or "the PANDA", is an open-source SDL developed by Harley Quinn and Gregory Robben, in the [KABLab](https://www.kablab.org/) at [Boston University](https://www.bu.edu/). The PANDA electrodeposits and functionally characterizes polymer films using a combination of electrochemical and optical techniques (Fig. 1). Experiments are performed in a novel well plate architecture (which you can make yourself in the [Wellplate and Gasket SOP](sops/wellplate_and_gasket_SOP_v1.md)!) in which the transparent bottom of each well constitutes the working electrode while enabling transmission optical characterization.
 
 ![Fig. 1](images/figure1.bmp)
 
