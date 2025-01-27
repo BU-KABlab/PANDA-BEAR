@@ -60,7 +60,7 @@ From the top project directory level run `main.py`. This will begin initializing
 | 4           | 1          | run_experiment_generator        | Run a specified experiment generator, will print a list of available generators and their IDs.                                  |
 | 4           | 2          | remove_experiment_from_database | Remove the specified experiment(s) from the DB if there are no associated results.                                              |
 | 5           |            | change_pipette_tip              | Logs that the pipette tip has been changed (incrementing the ID and resetting uses), asks what size.                            |
-| 6           |            | calibrate_mill                  | Begin the mill calibration program.                                                                                             |
+| 6           |            | mill_calibration                | Begin the mill calibration program.                                                                                             |
 | 7           |            | test_image                      | Takes an image with the FLIR camera and shows you.                                                                              |
 | 8           |            | instrument_check                | Checks that communication can be established with each instrument.                                                              |
 | 10          |            | start_analysis_loop             | Starts the analysis worker. Looks for experiments flagged for analysis and runs their associated analysis scripts.              |
