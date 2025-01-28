@@ -1,7 +1,7 @@
 """The sequence of steps for a pedotLHSv1_screening experiment."""
 
 # For writing a protocol, use the available actions from the panda_lib.actions module.
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -21,13 +21,12 @@ from panda_lib.actions import (
 )
 
 # If you are using custom actions, import them from the appropriate module.
-from panda_lib.actions_pedot import (
+from panda_lib.actions.actions_pedot import (
     # cyclic_volt_edot_characterizing,
-    PEDOTExperiment,
     chrono_amp_edot_bleaching,
     chrono_amp_edot_coloring,
 )
-from panda_lib.experiment_class import EchemExperimentBase
+from panda_lib.experiments.experiment_types import EchemExperimentBase
 
 PROTOCOL_ID = 999
 metadata = {
@@ -43,7 +42,7 @@ metadata = {
 
 
 def run(
-    experiment: PEDOTExperiment,
+    experiment: EchemExperimentBase,
     hardware: Hardware,
     labware: Labware,
 ):

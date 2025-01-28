@@ -23,7 +23,11 @@ from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-import panda_lib.experiment_class as exp
+from panda_lib.experiments.experiment_types import select_experiment_status
+from panda_lib.experiments.results import (
+    ExperimentResultsRecord,
+    select_specific_result,
+)
 from panda_lib.imaging.panda_image_tools import add_data_zone
 from panda_lib.labware import vials
 from panda_lib.labware.wellplates import Well
@@ -33,7 +37,7 @@ from panda_lib.sql_tools import (
     sql_system_state,
     sql_wellplate,
 )
-from panda_lib.tools.obs_controls import OBSController
+from panda_lib.tools import OBSController
 from panda_lib.utilities import Coordinates as WellCoordinates
 from shared_utilities.config.config_tools import read_config, read_testing_config
 
@@ -348,7 +352,7 @@ class SlackBot:
             try:
                 experiment_number = int(text[17:].strip())
                 # Get status
-                status = exp.select_experiment_status(experiment_number)
+                status = select_experiment_status(experiment_number)
                 message = f"The status of experiment {experiment_number} is {status}."
                 self.send_message(channel_id, message)
             except ValueError:
@@ -605,13 +609,13 @@ class SlackBot:
         # Then filter the results to only include those with dz in the name
         # Then send the images to slack
 
-        results = exp.select_specific_result(experiment_id, "image")
+        results = select_specific_result(experiment_id, "image")
         if results == [] or results is None:
             message = f"Experiment {experiment_id} does not have any images. Or the experiment {experiment_id} does not exist."
             self.send_message("data", message)
             return
         for result in results:
-            result: exp.ExperimentResultsRecord
+            result: ExperimentResultsRecord
             if "dz" not in result.result_value:
                 results.remove(result)
 

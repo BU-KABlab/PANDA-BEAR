@@ -3,7 +3,7 @@
 # Standard imports
 
 # Non-standard imports
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -16,13 +16,13 @@ from panda_lib.actions import (
     solution_selector,
     waste_selector,
 )
-from panda_lib.actions_pedot import (
+from panda_lib.actions.actions_pedot import (
     chrono_amp_edot_bleaching,
     chrono_amp_edot_coloring,
     cyclic_volt_edot_characterizing,
 )
-from panda_lib.experiment_class import ExperimentStatus, PEDOTExperiment
 from panda_lib.experiment_loop import Toolkit
+from panda_lib.experiments.experiment_types import EchemExperimentBase, ExperimentStatus
 from panda_lib.labware.vials import Vial2, read_vials
 from panda_lib.utilities import correction_factor, solve_vials_ilp
 
@@ -30,7 +30,7 @@ PROTOCOL_ID = 999
 
 
 def main(
-    instructions: PEDOTExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -45,7 +45,7 @@ def main(
 
 
 def pedot_lhs_v1_screening(
-    instructions: PEDOTExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -57,59 +57,7 @@ def pedot_lhs_v1_screening(
     3. pedotcoloring
 
     """
-    # Apply correction factor to the programmed volumes
-    toolkit.global_logger.info("Applying correction factor to the programmed volumes")
-    for solution in instructions.solutions:
-        instructions.solutions_corrected[solution] = correction_factor(
-            instructions.solutions[solution],
-            solution_selector(
-                solution,  # The solution name
-                instructions.solutions[solution],  # The volume of the solution
-            ).viscosity_cp,
-        )
 
-    # Run the experiment based on its experiment type
-    # if instructions.process_type in [0,1]:
-    #     pedotdeposition(
-    #         instructions=instructions,
-    #         toolkit=toolkit,
-    #         stock_vials=stock_vials,
-    #         waste_vials=waste_vials,
-    #     )
-    #     pedotbleaching(
-    #         instructions=instructions,
-    #         toolkit=toolkit,
-    #         stock_vials=stock_vials,
-    #         waste_vials=waste_vials,
-    #     )
-    #     pedotcoloring(
-    #         instructions=instructions,
-    #         toolkit=toolkit,
-    #         stock_vials=stock_vials,
-    #         waste_vials=waste_vials,
-    #     )
-
-    # elif instructions.process_type == 2:
-    #     pedotbleaching(
-    #         instructions=instructions,
-    #         toolkit=toolkit,
-    #         stock_vials=stock_vials,
-    #         waste_vials=waste_vials,
-    #     )
-    #     pedotcoloring(
-    #         instructions=instructions,
-    #         toolkit=toolkit,
-    #         stock_vials=stock_vials,
-    #         waste_vials=waste_vials,
-    #     )
-
-    # elif instructions.process_type == 3:
-    #     pedotcoloring(
-    #         instructions=instructions,
-    #         toolkit=toolkit,
-    #         stock_vials=stock_vials,
-    #         waste_vials=waste_vials,
-    #     )
     pedotdeposition(
         instructions=instructions,
         toolkit=toolkit,
@@ -127,7 +75,7 @@ def pedot_lhs_v1_screening(
 
 
 def pedotdeposition(
-    instructions: PEDOTExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -310,7 +258,7 @@ def pedotdeposition(
 
 
 def pedotbleaching(
-    instructions: PEDOTExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -420,7 +368,7 @@ def pedotbleaching(
 
 
 def pedotcoloring(
-    instructions: PEDOTExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -532,7 +480,7 @@ def pedotcoloring(
 
 
 def pedotcv(
-    instructions: PEDOTExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -564,10 +512,10 @@ def pedotcv(
         "1. Depositing liclo4 into well: %s", instructions.well_id
     )
     __forward_pipette_v2(
-        volume=instructions.solutions_corrected["liclo4"],
+        volume=instructions.solutions["liclo4"],
         from_vessel=solution_selector(
             "liclo4",
-            instructions.solutions_corrected["liclo4"],
+            instructions.solutions["liclo4"],
         ),
         to_vessel=toolkit.wellplate.wells[instructions.well_id],
         toolkit=toolkit,

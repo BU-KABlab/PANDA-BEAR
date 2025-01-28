@@ -14,18 +14,18 @@ from typing import Tuple, Union
 
 from shared_utilities.log_tools import setup_default_logger, timing_wrapper
 
-from .experiment_class import (
+from .experiments.experiment_types import (
     ExperimentBase,
     ExperimentStatus,
     insert_experiment,
     insert_experiment_parameters,
-    insert_experiment_result,
     insert_experiments_parameters,
     select_experiment_information,
     select_experiment_paramaters,
     select_next_experiment_id,
     update_experiment_status,
 )
+from .experiments.results import insert_experiment_result
 from .labware.wellplates import Well
 from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import ExperimentParameters, Experiments, Projects

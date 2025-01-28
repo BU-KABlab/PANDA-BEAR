@@ -11,7 +11,7 @@ from .schemas import (
     WellWriteModel,
 )
 from .services import VialService, WellplateService, WellService
-from .vials import StockVial, Vial, WasteVial
+from .vials import StockVial, Vial, WasteVial, read_vials
 from .wellplates import Well, Wellplate
 
 __all__ = [
@@ -34,4 +34,5 @@ __all__ = [
     "WellplateWriteModel",
     "OverFillException",
     "OverDraftException",
+    "read_vials",
 ]

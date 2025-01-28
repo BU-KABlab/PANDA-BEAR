@@ -1,11 +1,14 @@
 """Generates a PEDOT experiment."""
 
-from panda_experiment_analyzers.pedot import run_ml_model
-from panda_lib import experiment_class, scheduler
-from panda_lib.sql_tools.sql_system_state import get_current_pin
-from panda_lib.utilities import correction_factor
+from pedot.ml_model.pedot_ml_analyzer_v8 import (
+    main as run_ml_model,
+)
+from pedot_analyzer import analyze
 
-from .analysis import analyze
+from panda_lib import scheduler
+from panda_lib.experiments import ExperimentStatus, experiment_types
+from panda_lib.sql_tools.sql_system_state import get_current_pin
+
 from .pedot_classes import PEDOTParams
 
 CURRENT_PIN = get_current_pin()
@@ -18,7 +21,7 @@ def pedot_generator(
 ) -> int:
     """Generates a PEDOT experiment."""
     experiment_id = scheduler.determine_next_experiment_id()
-    experiment = experiment_class.PEDOTExperiment(
+    experiment = experiment_types.EchemExperimentBase(
         experiment_id=experiment_id,
         protocol_id=15,  # PEDOT protocol v4
         well_id="A1",  # Default to A1, let the program decide where else to put it
@@ -28,8 +31,7 @@ def pedot_generator(
         project_id=PROJECT_ID,
         project_campaign_id=campaign_id,
         solutions={"edot": 120, "liclo4": 0, "rinse": 120},
-        solutions_corrected={},
-        status=experiment_class.ExperimentStatus.NEW,
+        status=ExperimentStatus.NEW,
         filename=experiment_name + " " + str(experiment_id),
         # Echem specific
         ocp=1,
@@ -48,12 +50,6 @@ def pedot_generator(
         analyzer=analyze,
         generator=run_ml_model,
     )
-
-    # Add the correction factors
-    for solution in experiment.solutions.keys():
-        experiment.solutions_corrected[solution] = correction_factor(
-            experiment.solutions[solution], experiment.well_type_number
-        )
 
     scheduler.add_nonfile_experiments(
         [

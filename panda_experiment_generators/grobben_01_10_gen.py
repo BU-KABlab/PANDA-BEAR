@@ -4,7 +4,8 @@ Date: 2025-01-14
 Description: 3 series of experiments for PGMA-PAMA-phenol with 7mm wells, comparing the base used and the voltage of the CA.
 """
 
-from panda_lib import experiment_class, scheduler
+from panda_lib import scheduler
+from panda_lib.experiments import experiment_types
 
 PROJECT_ID = 20
 EXPERIMENT_NAME = "PGMA-PAMA-phenol-base-voltage-screening"
@@ -24,7 +25,7 @@ def main():
     for i in range(len(bases)):
         for voltage in voltages:
             experiments.append(
-                experiment_class.EchemExperimentBase(
+                experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_id="grobben_01_10_pro",
                     well_id="A1",

@@ -16,8 +16,7 @@ from panda_lib.labware.wellplates import Wellplate
 from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.slack_tools.SlackBot import SlackBot
-from panda_lib.tools.obs_controls import OBSController
-from panda_lib.tools.pawduino import ArduinoLink
+from panda_lib.tools import ArduinoLink, OBSController
 
 
 @dataclass

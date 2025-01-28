@@ -19,12 +19,9 @@ Returns:
     Vials: The updated vials object.
 """
 
-# Standard library imports
 import logging
 import math
 from logging import Logger
-
-# Third party or custom imports
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
@@ -40,29 +37,26 @@ from shared_utilities.config.config_tools import (
 )
 from shared_utilities.log_tools import timing_wrapper
 
-from .errors import (
+from ..errors import (
     CAFailure,
     CVFailure,
     DepositionFailure,
     NoAvailableSolution,
     OCPFailure,
 )
-from .experiment_class import (
+from ..experiments.experiment_types import (
     EchemExperimentBase,
     ExperimentBase,
     ExperimentStatus,
 )
-
-# First party imports
-from .imaging import add_data_zone, capture_new_image, image_filepath_generator
-from .instrument_toolkit import ArduinoLink, Hardware, Labware, Toolkit
-from .labware.vials import StockVial, Vial, WasteVial, read_vials
-from .labware.wellplates import Coordinates, Well
-from .panda_gantry import MockPandaMill as MockMill
-from .panda_gantry import PandaMill as Mill
-from .sql_tools.db_setup import SessionLocal
-from .tools.obs_controls import MockOBSController, OBSController
-from .utilities import correction_factor, solve_vials_ilp
+from ..imaging import add_data_zone, capture_new_image, image_filepath_generator
+from ..labware import StockVial, Vial, WasteVial, Well, read_vials
+from ..panda_gantry import MockPandaMill as MockMill
+from ..panda_gantry import PandaMill as Mill
+from ..sql_tools.db_setup import SessionLocal
+from ..toolkit import ArduinoLink, Hardware, Labware, Toolkit
+from ..tools import MockOBSController, OBSController
+from ..utilities import Coordinates, correction_factor, solve_vials_ilp
 
 TESTING = read_testing_config()
 

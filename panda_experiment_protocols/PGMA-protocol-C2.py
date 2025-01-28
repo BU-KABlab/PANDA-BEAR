@@ -27,7 +27,7 @@
 # image
 
 # Non-standard imports
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -40,13 +40,13 @@ from panda_lib.actions import (
     transfer,
     waste_selector,
 )
-from panda_lib.actions_pgma import cyclic_volt_pgma_fc
-from panda_lib.experiment_class import ExperimentStatus, PGMAExperiment
+from panda_lib.actions.actions_pgma import cyclic_volt_pgma_fc
 from panda_lib.experiment_loop import Toolkit
+from panda_lib.experiments.experiment_types import EchemExperimentBase, ExperimentStatus
 
 
 def main(
-    instructions: PGMAExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
     **kwargs,
 ):
@@ -62,7 +62,7 @@ def main(
 
 
 def PGMA_dep_v2_screening(
-    instructions: PGMAExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -76,14 +76,6 @@ def PGMA_dep_v2_screening(
     """
     # Apply correction factor to the programmed volumes
     toolkit.global_logger.info("Applying correction factor to the programmed volumes")
-    for solution in instructions.solutions:
-        instructions.solutions_corrected[solution] = (
-            instructions.solutions[solution],
-            solution_selector(
-                solution,  # The solution name
-                instructions.solutions[solution],  # The volume of the solution
-            ).viscosity_cp,
-        )
 
     # Run the experiment based on its experiment type
     FC_prechar(
@@ -103,7 +95,7 @@ def PGMA_dep_v2_screening(
 
 
 def PGMAdeposition(
-    instructions: PGMAExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -131,10 +123,10 @@ def PGMAdeposition(
         "1. Depositing %s into well: %s", solution_name, instructions.well_id
     )
     transfer(
-        volume=instructions.solutions_corrected[solution_name],
+        volume=instructions.solutions[solution_name],
         src_vessel=solution_selector(
             solution_name,
-            instructions.solutions_corrected[solution_name],
+            instructions.solutions[solution_name],
         ),
         dst_vessel=current_well,
         toolkit=toolkit,
@@ -223,7 +215,7 @@ def PGMAdeposition(
 
 
 def FC_prechar(
-    instructions: PGMAExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -257,10 +249,10 @@ def FC_prechar(
         "2. Dispensing %s into well: %s", solution_name, instructions.well_id
     )
     transfer(
-        volume=instructions.solutions_corrected[solution_name.lower()],
+        volume=instructions.solutions[solution_name.lower()],
         src_vessel=solution_selector(
             solution_name,
-            instructions.solutions_corrected[solution_name],
+            instructions.solutions[solution_name],
         ),
         dst_vessel=current_well,
         toolkit=toolkit,
@@ -347,7 +339,7 @@ def FC_prechar(
 
 
 def FC_postchar(
-    instructions: PGMAExperiment,
+    instructions: EchemExperimentBase,
     toolkit: Toolkit,
 ):
     """
@@ -376,10 +368,10 @@ def FC_postchar(
         "1. Depositing %s into well: %s", solution_name, instructions.well_id
     )
     transfer(
-        volume=instructions.solutions_corrected[solution_name],
+        volume=instructions.solutions[solution_name],
         src_vessel=solution_selector(
             solution_name,
-            instructions.solutions_corrected[solution_name],
+            instructions.solutions[solution_name],
         ),
         dst_vessel=current_well,
         toolkit=toolkit,

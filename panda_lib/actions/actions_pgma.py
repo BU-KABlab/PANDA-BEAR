@@ -1,6 +1,6 @@
 """Custom functions for the PANDA_SDL library which are specific to a particular experiment type."""
 
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     CVFailure,
     EchemExperimentBase,
     ExperimentStatus,

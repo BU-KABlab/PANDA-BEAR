@@ -9,7 +9,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from panda_lib import experiment_class, scheduler
+from panda_lib import scheduler
+from panda_lib.experiments import experiment_types
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 from shared_utilities.config.config_tools import read_config, read_testing_config
 
@@ -32,14 +33,14 @@ def main():
     """Runs the PGMA experiment generator."""
     starting_experiment_id = scheduler.determine_next_experiment_id()
     experiment_id = starting_experiment_id
-    experiments: list[experiment_class.PGMAExperiment] = []
+    experiments: list[experiment_types.EchemExperimentBase] = []
 
     for _, row in params_df.iterrows():
         dep_v = row["Voltage"]  # dep_V is used for deposition voltage
         dep_t = row["Time"]  # dep_t is used for deposition time
 
         experiments.append(
-            experiment_class.PGMAExperiment(
+            experiment_types.EchemExperimentBase(
                 experiment_id=experiment_id,
                 protocol_id="PGMA-protocol-C2",  # figure this out
                 well_id="A1",

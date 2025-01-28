@@ -1,12 +1,7 @@
-"""Experiment data class"""
-
 import importlib.util
 import json
-from dataclasses import field
 from datetime import datetime, timezone
-from enum import Enum
-from pathlib import Path
-from typing import Callable, List, Optional, Tuple, Union, get_type_hints
+from typing import Callable, List, Optional, Union, get_type_hints
 
 from pydantic import ConfigDict, Field, RootModel, field_validator
 from pydantic.dataclasses import dataclass
@@ -16,14 +11,18 @@ from pydantic.dataclasses import dataclass
 from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
-    ExperimentResults,
     Experiments,
     ExperimentStatusView,
     WellModel,
     Wellplates,
 )
+from panda_lib.sql_tools.sql_wellplate import get_well_by_id
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
+
+from .experiment_paramters import ExperimentParameterRecord
+from .experiment_status import ExperimentStatus
+from .results import ExperimentResult
 
 global_logger = setup_default_logger(log_name="panda")
 experiment_logger = setup_default_logger(log_name="experiment_logger")
@@ -40,275 +39,6 @@ def load_analysis_script(script_path: str) -> Callable:
     if not hasattr(module, "analyze"):
         raise AttributeError(f"Module {script_path} does not have an analyze function")
     return module.analyze
-
-
-class ExperimentResultsRecord:
-    """
-    A class for representing a single entry in a result table.
-    The table has columns:
-    id,
-    experiment_id,
-    result_type,
-    result_value
-    """
-
-    def __init__(
-        self, experiment_id: int, result_type: str, result_value: str, context=None
-    ):
-        self.experiment_id = experiment_id
-        self.result_type = result_type
-        self.result_value = result_value
-        self.context = context
-
-    def __str__(self):
-        return f"Experiment ID: {self.experiment_id}, Result Type: {self.result_type}, Result Value: {self.result_value}, Context: {self.context}"
-
-    def __repr__(self):
-        return f"ResultTableRecord({self.experiment_id}, {self.result_type}, {self.result_value}, {self.context})"
-
-    def __eq__(self, other):
-        return (
-            self.experiment_id == other.experiment_id
-            and self.result_type == other.result_type
-            and self.result_value == other.result_value
-            and self.context == other.context
-        )
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash(
-            (self.experiment_id, self.result_type, self.result_value, self.context)
-        )
-
-    def __iter__(self):
-        yield self.experiment_id
-        yield self.result_type
-        yield self.result_value
-        yield self.context
-
-    def __list__(self):
-        return [self.experiment_id, self.result_type, self.result_value, self.context]
-
-
-class ExperimentParameterRecord:
-    """
-    A class for representing a single entry in an experiment parameter table.
-    The table has columns:
-    id,
-    experiment_id,
-    parameter_name,
-    parameter_value
-    """
-
-    def __init__(self, experiment_id: int, parameter_name: str, parameter_value: str):
-        self.experiment_id = experiment_id
-        self.parameter_name = parameter_name
-        self.parameter_value = parameter_value
-
-    def __str__(self):
-        return f"Experiment ID: {self.experiment_id}, Parameter Type: {self.parameter_name}, Parameter Value: {self.parameter_value}"
-
-    def __repr__(self):
-        return f"ExperimentParameterRecord({self.experiment_id}, {self.parameter_name}, {self.parameter_value})"
-
-    def __eq__(self, other):
-        return (
-            self.experiment_id == other.experiment_id
-            and self.parameter_name == other.parameter_type
-            and self.parameter_value == other.parameter_value
-        )
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash((self.experiment_id, self.parameter_name, self.parameter_value))
-
-    def __iter__(self):
-        yield self.experiment_id
-        yield self.parameter_name
-        yield self.parameter_value
-
-    def __list__(self):
-        return [self.experiment_id, self.parameter_name, self.parameter_value]
-
-
-class ExperimentStatus(str, Enum):
-    """Define the possible statuses of an experiment"""
-
-    NEW = "new"
-    QUEUED = "queued"
-    RUNNING = "running"
-    OCPCHECK = "ocpcheck"
-    DEPOSITING = "depositing"
-    EDEPOSITING = "e_depositing"
-    RINSING = "rinsing"
-    ERINSING = "rinsing electrode"
-    BASELINE = "baselining"
-    CHARACTERIZING = "characterizing"
-    CA = "cyclic-amperometry"
-    CV = "cyclic-voltametry"
-    FINAL_RINSE = "final_rinse"
-    COMPLETE = "complete"
-    ERROR = "error"
-    MIXING = "mixing"
-    IMAGING = "imaging"
-    CLEARING = "clearing"
-    FLUSHING = "flushing"
-    PAUSED = "paused"
-    CANCELLED = "cancelled"
-    PENDING = "pending"  # pending experiments either are waiting for a well to be assigned or lack the correct well type
-    SAVING = "saving"
-    ANALYZING = "analyzing"
-    MOVING = "moving"
-    PIPETTING = "pipetting"
-
-
-@dataclass(config=ConfigDict(validate_assignment=True))
-class ExperimentResult:
-    """Define the data that is generated by an experiment"""
-
-    experiment_id: int = None
-    well_id: str = None
-
-    # OCP CA
-    ocp_ca_file: List[Tuple[Path, str]] = field(default_factory=list)
-    ocp_ca_passed: List[Tuple[bool, str]] = field(default_factory=list)
-    ocp_ca_data: List[Tuple[str, str]] = field(default_factory=list)
-
-    # OCP CV
-    ocp_cv_file: List[Tuple[Path, str]] = field(default_factory=list)
-    ocp_cv_passed: List[Tuple[bool, str]] = field(default_factory=list)
-    ocp_cv_data: List[Tuple[str, str]] = field(default_factory=list)
-    ocp_cv_final_voltage: List[Tuple[float, str]] = field(default_factory=list)
-
-    # CA
-    ca_data_file: List[Tuple[Path, str]] = field(default_factory=list)
-    ca_data: List[Tuple[str, str]] = field(default_factory=list)
-
-    # CV
-    cv_data_file: List[Tuple[Path, str]] = field(default_factory=list)
-    cv_data: List[Tuple[str, str]] = field(default_factory=list)
-
-    # Images
-    images: List[Tuple[Path, str]] = field(default_factory=list)
-    # deposition_plot_files: list[Path] = field(default_factory=list)
-    # deposition_max_values: list[float] = field(default_factory=list)
-    # depsotion_min_values: list[float] = field(default_factory=list)
-    # characterization_plot_files: list[Path] = field(default_factory=list)
-    # characterization_max_values: list[float] = field(default_factory=list)
-    # characterization_min_values: list[float] = field(default_factory=list)
-
-    def set_ocp_ca_file(
-        self, file: Path, passed: bool, final_voltage: float, context: str = None
-    ):
-        """Set the file, the pass/fail status, and the final voltage"""
-        self.ocp_ca_file.append((file, context))
-        self.ocp_ca_passed.append((passed, context))
-        self.ocp_cv_final_voltage.append((final_voltage, context))
-
-        with open(file, "r") as f:
-            # Save the contents of the file (it will be text) into the data list as one index of the list
-            self.ocp_ca_data.append((f.read(), context))
-
-    def set_ocp_cv_file(
-        self, file: Path, passed: bool, final_voltage: float, context: str = None
-    ):
-        """Set the file, the pass/fail status, and the final voltage"""
-        self.ocp_cv_file.append((file, context))
-        self.ocp_cv_passed.append((passed, context))
-        self.ocp_cv_final_voltage.append((final_voltage, context))
-
-        with open(file, "r") as f:
-            # Save the contents of the file (it will be text) into the data list as one index of the list
-            self.ocp_cv_data.append((f.read(), context))
-
-    def set_ca_data_file(
-        self,
-        file: Path,
-        # plot_file: Path = None,
-        # max_value: float = None,
-        # min_value: float = None,
-        context: str = None,
-    ):
-        """Set the file, the plot file, the max value, and the min value"""
-        self.ca_data_file.append((file, context))
-
-        with open(file, "r") as f:
-            # Save the contents of the file (it will be text) into the data list as one index of the list
-            self.ca_data.append((f.read(), context))
-        # if plot_file is not None:
-        #     self.deposition_plot_files.append(plot_file)
-        # if max_value is not None:
-        #     self.deposition_max_values.append(max_value)
-        # if min_value is not None:
-        #     self.depsotion_min_values.append(min_value)
-
-    def set_cv_data_file(
-        self,
-        file: Path,
-        # plot_file: Path = None,
-        # max_value: float = None,
-        # min_value: float = None,
-        context: str = None,
-    ):
-        """Set the file, the plot file, the max value, and the min value"""
-        self.cv_data_file.append((file, context))
-
-        with open(file, "r") as f:
-            # Save the contents of the file (it will be text) into the data list as one index of the list
-            self.cv_data.append((f.read(), context))
-
-        # if plot_file is not None:
-        #     self.characterization_plot_files.append(plot_file)
-        # if max_value is not None:
-        #     self.characterization_max_values.append(max_value)
-        # if min_value is not None:
-        #     self.characterization_min_values.append(min_value)
-
-    def append_image_file(self, file: Path, context: str = None):
-        """Append the image file"""
-        self.images.append((file, context))
-
-    def one_to_many(self) -> list[ExperimentResultsRecord]:
-        """Turn the results object into individual result table records"""
-        all_results = []
-        for key, value in self.__dict__.items():
-            if key in ["experiment_id", "well_id", "pumping_record"]:
-                continue
-            if isinstance(value, list):
-                for _, item in enumerate(value):
-                    all_results.append(
-                        ExperimentResultsRecord(
-                            self.experiment_id, key, item[0], item[1]
-                        )
-                    )
-            else:
-                all_results.append(
-                    ExperimentResultsRecord(self.experiment_id, key, value)
-                )
-        return all_results
-
-    def to_results_records(self) -> list[ExperimentResultsRecord]:
-        """Turn the results object into individual result table records"""
-        all_results = []
-        for key, value in self.__dict__.items():
-            if key in ["experiment_id", "well_id", "pumping_record"]:
-                continue
-            if isinstance(value, list):
-                for _, item in enumerate(value):
-                    all_results.append(
-                        ExperimentResultsRecord(
-                            self.experiment_id, key, item[0], item[1]
-                        )
-                    )
-            else:
-                all_results.append(
-                    ExperimentResultsRecord(self.experiment_id, key, value)
-                )
-        return all_results
 
 
 @dataclass(config=ConfigDict(validate_assignment=True, arbitrary_types_allowed=True))
@@ -517,22 +247,9 @@ class ExperimentBase:
         """Set the status of the experiment."""
         self.status = new_status
         self.status_date = datetime.now(tz=timezone.utc).isoformat(timespec="seconds")
-        try:
-            if config.getboolean("OPTIONS", "testing") or not config.getboolean(
-                "OPTIONS", "use_obs"
-            ):
-                from .tools import MockOBSController as OBSController
-            else:
-                from .tools import OBSController
-
-            OBSController().place_experiment_on_screen(self)
-        except Exception as e:
-            experiment_logger.exception("Error sending status to OBS: %s", e)
-            # don't raise the error, just print it
 
     def set_status_and_save(self, new_status: ExperimentStatus) -> None:
         """Set the status and status date of the experiment."""
-        from .sql_tools import sql_wellplate
 
         self.status = new_status
         self.status_date = datetime.now().isoformat(timespec="seconds")
@@ -540,7 +257,7 @@ class ExperimentBase:
         if not self.well or not isinstance(self.well, object):
             experiment_logger.warning("Well object not set. Checking for Well ID")
             if self.well_id:
-                self.well = sql_wellplate.get_well_by_id(self.well_id)
+                self.well = get_well_by_id(self.well_id)
             else:
                 experiment_logger.error("Well ID not set, cannot save status")
                 return
@@ -558,18 +275,6 @@ class ExperimentBase:
 
         # Save the experiment to the database
         update_experiment(self)
-        try:
-            if config.getboolean("OPTIONS", "testing") or not config.getboolean(
-                "OPTIONS", "use_obs"
-            ):
-                from .tools import MockOBSController as OBSController
-            else:
-                from .tools import OBSController
-
-            OBSController().place_experiment_on_screen(self)
-        except Exception as e:
-            experiment_logger.error("Error sending status to OBS: %s", e)
-            # don't raise the error, just print it
 
     def is_same_id(self, other) -> bool:
         """Check if two experiments have the same id."""
@@ -856,86 +561,6 @@ class EchemExperimentBase(ExperimentBase):
 
         {self.print_cv_parameters()}
     """
-
-
-def make_test_base_value() -> ExperimentBase:
-    """Create a test experiment value for the class"""
-    return ExperimentBase(
-        experiment_id=0,
-        experiment_name="test",
-        priority=2,
-        well_id="D5",
-        pin=100099000999,
-        project_id=3,
-        solutions={"dmf": 0, "peg": 145, "acrylate": 145, "ferrocene": 0, "custom": 0},
-        status=ExperimentStatus.QUEUED,
-        status_date=datetime.now().isoformat(timespec="seconds"),
-        filename=f"test_{0}.json",
-        results=None,
-    )
-
-
-def make_test_value() -> ExperimentBase:
-    """Create a test experiment value for the class"""
-    return ExperimentBase(
-        experiment_id=0,
-        experiment_name="test",
-        priority=2,
-        well_id="D5",
-        pin="0",
-        project_id=3,
-        solutions={"dmf": 0, "peg": 145, "acrylate": 145, "ferrocene": 0, "custom": 0},
-        status=ExperimentStatus.QUEUED,
-        status_date=datetime.now().isoformat(timespec="seconds"),
-        filename=f"test_{0}.json",
-        results=None,
-    )
-
-
-def parse_experiment(json_string: str) -> ExperimentBase:
-    """Parse an experiment from a json string"""
-    if isinstance(json_string, str):
-        parsed_json = json.loads(json_string)
-        if "ocp" in parsed_json:
-            return RootModel[EchemExperimentBase].model_validate_json(json_string).root
-    return RootModel[ExperimentBase].model_validate_json(json_string).root
-
-
-# def serialize_experiment(experiment: (Experiment,ExperimentBase)) -> str:
-#     '''Serialize an experiment to a json string'''
-#     if isinstance(experiment, Experiment):
-#         return RootModel[Experiment](experiment).model_dump_json(indent=4)
-
-
-def serialize_experiment(experiment: tuple[ExperimentBase, EchemExperimentBase]) -> str:
-    """Given an experiment, determine the type and then pass back the serialized json form"""
-
-    if isinstance(experiment, EchemExperimentBase):
-        return RootModel[EchemExperimentBase](experiment).model_dump_json(indent=4)
-    if isinstance(experiment, ExperimentBase):
-        return RootModel[ExperimentBase](experiment).model_dump_json(indent=4)
-    return None
-
-
-def parse_results(json_string: str) -> ExperimentResult:
-    """Parse an experiment result from a json string"""
-    return RootModel[ExperimentResult].model_validate_json(json_string).root
-
-
-def serialize_results(results: ExperimentResult) -> str:
-    """Serialize an experiment result to a json string"""
-    return RootModel[ExperimentResult](results).model_dump_json(indent=4)
-
-
-def get_all_type_hints(cls):
-    """Get all type hints for a class"""
-    hints = {}
-    for base in reversed(cls.__mro__):
-        hints.update(get_type_hints(base))
-    return hints
-
-
-# region Experiment SQL Functions
 
 
 def select_next_experiment_id() -> int:
@@ -1370,133 +995,34 @@ def update_experiments_statuses(
         session.commit()
 
 
-# endregion
-
-# region Result Functions
-
-
-def insert_experiment_result(entry: ExperimentResultsRecord) -> None:
-    """
-    Insert an entry into the result table.
-
-    Args:
-        entry (ResultTableEntry): The entry to insert.
-    """
-
-    with SessionLocal() as session:
-        if isinstance(entry.result_value, Path):
-            # Turn the Path object into a string
-            entry.result_value = str(entry.result_value)
-        session.add(
-            ExperimentResults(
-                experiment_id=entry.experiment_id,
-                result_type=entry.result_type,
-                result_value=entry.result_value,
-                context=entry.context,
-            )
-        )
-        session.commit()
+def get_all_type_hints(cls):
+    """Get all type hints for a class"""
+    hints = {}
+    for base in reversed(cls.__mro__):
+        hints.update(get_type_hints(base))
+    return hints
 
 
-def insert_experiment_results(entries: List[ExperimentResultsRecord]) -> None:
-    """
-    Insert a list of entries into the result table.
-
-    Args:
-        entries (List[ResultTableEntry]): The entries to insert.
-    """
-    for entry in entries:
-        insert_experiment_result(entry)
+def parse_experiment(json_string: str) -> ExperimentBase:
+    """Parse an experiment from a json string"""
+    if isinstance(json_string, str):
+        parsed_json = json.loads(json_string)
+        if "ocp" in parsed_json:
+            return RootModel[EchemExperimentBase].model_validate_json(json_string).root
+    return RootModel[ExperimentBase].model_validate_json(json_string).root
 
 
-def select_results(experiment_id: int) -> List[ExperimentResultsRecord]:
-    """
-    Select the entries from the result table that are associated with an experiment.
-
-    Args:
-        experiment_id (int): The experiment ID.
-
-    Returns:
-        List[ResultTableEntry]: The entries from the result table.
-    """
-    # result_parameters = execute_sql_command(
-    #     """
-    #     SELECT
-    #         experiment_id,
-    #         result_type,
-    #         result_value,
-    #         context
-    #     FROM experiment_results
-    #     WHERE experiment_id = ?
-    #     """,
-    #     (experiment_id,),
-    # )
-    results = []
-    with SessionLocal() as session:
-        result = (
-            session.query(ExperimentResults)
-            .filter(ExperimentResults.experiment_id == experiment_id)
-            .all()
-        )
-
-    for row in result:
-        results.append(
-            ExperimentResultsRecord(
-                experiment_id=row.experiment_id,
-                result_type=row.result_type,
-                result_value=row.result_value,
-                context=row.context,
-            )
-        )
-    return results
+# def serialize_experiment(experiment: (Experiment,ExperimentBase)) -> str:
+#     '''Serialize an experiment to a json string'''
+#     if isinstance(experiment, Experiment):
+#         return RootModel[Experiment](experiment).model_dump_json(indent=4)
 
 
-def select_specific_result(
-    experiment_id: int, result_type: str, context: Union[None, str] = None
-) -> Union[List[ExperimentResultsRecord], ExperimentResultsRecord]:
-    """
-    Select a specific entry from the result table that is associated with an experiment.
+def serialize_experiment(experiment: tuple[ExperimentBase, EchemExperimentBase]) -> str:
+    """Given an experiment, determine the type and then pass back the serialized json form"""
 
-    Args:
-        experiment_id (int): The experiment ID.
-        result_type (str): The result type.
-
-    Returns:
-        ResultTableEntry: The entry from the result table.
-    """
-
-    with SessionLocal() as session:
-        if context is None:
-            result = (
-                session.query(ExperimentResults)
-                .filter(ExperimentResults.experiment_id == experiment_id)
-                .filter(ExperimentResults.result_type == result_type)
-                .all()
-            )
-        else:
-            result = (
-                session.query(ExperimentResults)
-                .filter(ExperimentResults.experiment_id == experiment_id)
-                .filter(ExperimentResults.result_type == result_type)
-                .filter(ExperimentResults.context == context)
-                .all()
-            )
-
-    if not result:
-        return None
-
-    results = []
-    for row in result:
-        results.append(
-            ExperimentResultsRecord(
-                row.experiment_id, row.result_type, row.result_value, row.context
-            )
-        )
-
-    if len(results) == 1:
-        return results[0]
-
-    return results
-
-
-# endregion
+    if isinstance(experiment, EchemExperimentBase):
+        return RootModel[EchemExperimentBase](experiment).model_dump_json(indent=4)
+    if isinstance(experiment, ExperimentBase):
+        return RootModel[ExperimentBase](experiment).model_dump_json(indent=4)
+    return None

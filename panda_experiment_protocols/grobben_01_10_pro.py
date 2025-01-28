@@ -1,7 +1,7 @@
 # For writing a protocol, use the available actions from the panda_lib.actions module.
 from dataclasses import dataclass
 
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     ExperimentStatus,
     Toolkit,
     Well,
@@ -13,10 +13,10 @@ from panda_lib.actions import (
     rinse_well,
     transfer,
 )
-from panda_lib.actions_pgma import cyclic_volt_pgma_fc
+from panda_lib.actions.actions_pgma import cyclic_volt_pgma_fc
 
 # If you are using custom actions, import them from the appropriate module.
-from panda_lib.experiment_class import EchemExperimentBase
+from panda_lib.experiments.experiment_types import EchemExperimentBase
 
 
 @dataclass

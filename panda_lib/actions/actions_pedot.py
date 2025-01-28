@@ -1,6 +1,6 @@
 """Custom functions for the PANDA_SDL library which are specific to a particular experiment type."""
 
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     CAFailure,
     CVFailure,
     DepositionFailure,
@@ -13,13 +13,13 @@ from panda_lib.actions import (
     cyclic_volt,
     logger,
 )
-from panda_lib.experiment_class import PEDOTExperiment
+from panda_lib.experiments.experiment_types import EchemExperimentBase
 
 
 def chrono_amp_edot_bleaching(
-    ca_instructions: PEDOTExperiment,
+    ca_instructions: EchemExperimentBase,
     file_tag: str = "CA_bleaching",
-) -> Tuple[PEDOTExperiment]:
+) -> Tuple[EchemExperimentBase]:
     """
     Bleaching of an edot film already on ITO. This wraps the chrono_amp function.
 
@@ -69,9 +69,9 @@ def chrono_amp_edot_bleaching(
 
 
 def chrono_amp_edot_coloring(
-    ca_instructions: PEDOTExperiment,
+    ca_instructions: EchemExperimentBase,
     file_tag: str = "CA_coloring",
-) -> Tuple[PEDOTExperiment]:
+) -> Tuple[EchemExperimentBase]:
     """
     Coloring of an edot film already on ITO. This wraps the chrono_amp function.
 
@@ -95,7 +95,7 @@ def chrono_amp_edot_coloring(
             CAsamplerate=0.1,
         )
 
-        ca_instructions= chrono_amp(
+        ca_instructions = chrono_amp(
             ca_instructions=ca_instructions,
             file_tag=file_tag,
             custom_parameters=coloring_params,
@@ -122,8 +122,8 @@ def chrono_amp_edot_coloring(
 
 
 def cyclic_volt_edot_characterizing(
-    cv_instructions: PEDOTExperiment, file_tag: str = "CV_characterization"
-) -> Tuple[PEDOTExperiment]:
+    cv_instructions: EchemExperimentBase, file_tag: str = "CV_characterization"
+) -> Tuple[EchemExperimentBase]:
     """
     Characterization of the solutions on the substrate using CV.
     No pipetting is performed in this step.

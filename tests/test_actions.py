@@ -10,19 +10,19 @@ from hardware.panda_pipette import (
     Pipette,
     PipetteModel,
 )
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     _handle_source_vessels,
     _pipette_action,
     solution_selector,
     volume_correction,
     waste_selector,
 )
-from panda_lib.instrument_toolkit import (
-    Toolkit,
-)
 from panda_lib.labware import StockVial, Well
 from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
 from panda_lib.sql_tools.panda_models import Base, Vials, WellModel
+from panda_lib.toolkit import (
+    Toolkit,
+)
 
 logger = MagicMock(
     spec=logging.Logger, info=MagicMock(), debug=MagicMock(), error=MagicMock()
@@ -152,10 +152,10 @@ with Session(engine) as sesh:
 
 @pytest.fixture()
 def toolkit():
-    from panda_lib.instrument_toolkit import (
+    from panda_lib.toolkit import (
         MockMill as Mill,
     )
-    from panda_lib.instrument_toolkit import (
+    from panda_lib.toolkit import (
         MockPump as SyringePump,
     )
     from panda_lib.tools.pawduino import MockArduinoLink as ArduinoLink
@@ -189,14 +189,14 @@ def test_handle_source_vessels(mock_db_session, src_vessel):
     source_concentration = 1.0
 
     with (
-        patch("panda_lib.actions.read_vials") as mock_read_vials,
-        patch("panda_lib.actions.solve_vials_ilp") as mock_solve_vials_ilp,
+        patch("panda_lib.actions.actions_default.read_vials") as mock_read_vials,
+        patch(
+            "panda_lib.actions.actions_default.solve_vials_ilp"
+        ) as mock_solve_vials_ilp,
     ):
         mock_read_vials.return_value = (
-            [
-                src_vessel,
-            ],
-            [],
+            [src_vessel],  # stock vials
+            [],  # waste vials
         )
         mock_solve_vials_ilp.return_value = (
             {1.0, 100.0},

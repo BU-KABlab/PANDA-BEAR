@@ -1,10 +1,10 @@
 """Experiment parameters for the edot screening experiments"""
 
 import pandas as pd
-
-from panda_lib import experiment_class
 from pydantic import ValidationError
+
 from panda_lib import scheduler
+from panda_lib.experiments import experiment_types
 
 PROJECT_ID = 999
 EXPERIMENT_NAME = "system_test"
@@ -22,7 +22,7 @@ def main():
     # controller.load_new_wellplate(new_wellplate_type_number=6)
     starting_experiment_id = scheduler.determine_next_experiment_id()
     experiment_id = starting_experiment_id
-    experiments: list[experiment_class.PEDOTExperiment] = []
+    experiments: list[experiment_types.EchemExperimentBase] = []
 
     try:
         for _, row in params_df.iterrows():
@@ -30,7 +30,7 @@ def main():
             dep_t = row["dep_T"]  # dep_T is used for deposition time
 
             experiments.append(
-                experiment_class.PEDOTExperiment(
+                experiment_types.EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_id="system_test",
                     analysis_id=999,

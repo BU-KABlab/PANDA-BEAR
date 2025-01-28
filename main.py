@@ -19,7 +19,6 @@ from hardware.panda_pipette import (
 from hardware_calibration.mill_calibration_and_positioning import calibrate_mill
 from menu.license_text import show_conditions, show_warranty
 from panda_lib import (
-    ExperimentBase,
     SystemState,
     analysis_worker,
     experiment_loop,
@@ -34,6 +33,7 @@ from panda_lib import (
     sql_system_state,
     sql_wellplate,
 )
+from panda_lib.experiments.experiment_types import ExperimentBase
 from panda_lib.labware import vials, wellplates
 from shared_utilities.config import (
     print_config_values,
@@ -669,7 +669,7 @@ under certain conditions; choose `show_conditions' for details.
 
 def banner():
     """Prints the banner."""
-    print(f"\n{print_panda.print_panda()}\n")
+    print(f"\n{print_panda()}\n")
 
 
 def user_sign_in() -> str:
