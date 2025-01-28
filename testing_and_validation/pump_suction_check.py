@@ -2,7 +2,7 @@
 
 import time
 
-from panda_lib.actions import (
+from panda_lib.actions.actions_default import (
     Instruments,
     solution_selector,
     waste_selector,
