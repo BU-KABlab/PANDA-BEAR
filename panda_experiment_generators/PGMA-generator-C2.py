@@ -86,4 +86,4 @@ def main():
 
         experiment_id += 1
 
-    scheduler.add_nonfile_experiments(experiments)
+    scheduler.schedule_experiments(experiments)

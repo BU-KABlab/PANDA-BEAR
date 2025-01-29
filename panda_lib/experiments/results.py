@@ -144,8 +144,8 @@ class ExperimentResult:
         """Append the image file"""
         self.images.append((file, context))
 
-    def one_to_many(self) -> list[ExperimentResultsRecord]:
-        """Turn the results object into individual result table records"""
+    def to_results_records(self) -> list[ExperimentResultsRecord]:
+        """Turn the results object into a list result table records"""
         all_results = []
         for key, value in self.__dict__.items():
             if key in ["experiment_id", "well_id", "pumping_record"]:
@@ -163,24 +163,9 @@ class ExperimentResult:
                 )
         return all_results
 
-    def to_results_records(self) -> list[ExperimentResultsRecord]:
-        """Turn the results object into individual result table records"""
-        all_results = []
-        for key, value in self.__dict__.items():
-            if key in ["experiment_id", "well_id", "pumping_record"]:
-                continue
-            if isinstance(value, list):
-                for _, item in enumerate(value):
-                    all_results.append(
-                        ExperimentResultsRecord(
-                            self.experiment_id, key, item[0], item[1]
-                        )
-                    )
-            else:
-                all_results.append(
-                    ExperimentResultsRecord(self.experiment_id, key, value)
-                )
-        return all_results
+    def save_results(self) -> None:
+        """Save the results to the database"""
+        insert_experiment_results(self.to_results_records())
 
 
 def parse_results(json_string: str) -> ExperimentResult:

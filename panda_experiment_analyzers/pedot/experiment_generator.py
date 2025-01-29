@@ -51,7 +51,7 @@ def pedot_generator(
         generator=run_ml_model,
     )
 
-    scheduler.add_nonfile_experiments(
+    scheduler.schedule_experiments(
         [
             experiment,
         ]

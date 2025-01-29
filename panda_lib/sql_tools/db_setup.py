@@ -27,13 +27,19 @@ from sqlalchemy.orm import sessionmaker
 
 from shared_utilities.config.config_tools import read_config
 
+from .panda_models import Base
+
 config = read_config()
 # Determine if it's testing or production
 if config.getboolean("OPTIONS", "testing"):
-    db_type = config.get("TESTING", "testing_db_type")
-    db_address = config.get("TESTING", "testing_db_address")
-    db_user = config.get("TESTING", "testing_db_user", fallback=None)
-    db_password = config.get("TESTING", "testing_db_password", fallback=None)
+    if config.getboolean("OPTIONS", "memory_db"):
+        db_type = "sqlite"
+        db_address = ":memory:"
+    else:
+        db_type = config.get("TESTING", "testing_db_type")
+        db_address = config.get("TESTING", "testing_db_address")
+        db_user = config.get("TESTING", "testing_db_user", fallback=None)
+        db_password = config.get("TESTING", "testing_db_password", fallback=None)
 else:
     db_type = config.get("PRODUCTION", "production_db_type")
     db_address = config.get("PRODUCTION", "production_db_address")
@@ -48,14 +54,21 @@ elif db_type == "mysql":
 else:
     raise ValueError(f"Unsupported database type: {db_type}")
 
-engine = create_engine(
-    DATABASE_URL,
-    echo=False,
-    pool_size=20,
-    max_overflow=30,
-    pool_timeout=30,
-    pool_recycle=3600,
-)
+if db_type == "sqlite":
+    engine = create_engine(
+        DATABASE_URL,
+        echo=False,
+        pool_size=20,
+        pool_recycle=3600,
+    )
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        echo=False,
+        pool_size=20,
+        pool_recycle=3600,
+    )
+Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

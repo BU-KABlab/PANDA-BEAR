@@ -21,6 +21,22 @@ def get_repo_path():
     return repo_path
 
 
+def read_config_value(section: str, key: str) -> str:
+    """Reads a value from the configuration file."""
+    config = read_config()
+    return config.get(section, key)
+
+
+def write_config_value(section: str, key: str, value: str):
+    """Writes a value to the configuration file."""
+    config_path = get_env_var("PANDA_SDL_CONFIG_PATH")
+    config = ConfigParser()
+    config.read(config_path)
+    config.set(section, key, value)
+    with open(config_path, "w", encoding="utf-8") as config_file:
+        config.write(config_file)
+
+
 def read_testing_config():
     """Reads the testing configuration file."""
     try:

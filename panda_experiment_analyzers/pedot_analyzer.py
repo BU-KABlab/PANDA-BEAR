@@ -141,7 +141,7 @@ def generator(
         analysis_id=ANALYSIS_ID,
     )
 
-    scheduler.add_nonfile_experiments(
+    scheduler.schedule_experiments(
         [
             experiment,
         ]

@@ -102,7 +102,7 @@ def main():
             else:
                 raise ValueError("Invalid campaign ID")
 
-    scheduler.add_nonfile_experiments(experiments)
+    scheduler.schedule_experiments(experiments)
 
 
 if __name__ == "__main__":

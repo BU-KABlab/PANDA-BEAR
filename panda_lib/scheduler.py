@@ -18,14 +18,11 @@ from .experiments import (
     ExperimentBase,
     ExperimentStatus,
     insert_experiment,
-    insert_experiment_parameters,
     insert_experiments_parameters,
     select_experiment_information,
     select_experiment_parameters,
     select_next_experiment_id,
-    update_experiment_status,
 )
-from .experiments.results import insert_experiment_result
 from .labware.wellplates import Well
 from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import ExperimentParameters, Experiments, Projects
@@ -196,111 +193,121 @@ def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> 
 
 
 @timing_wrapper
-def add_nonfile_experiment(
+def schedule_experiment(
     experiment: ExperimentBase, override_well_available=False
-) -> str:
+) -> int:
     """
-    Adds an experiment which is not a file to the experiment queue directly.
-
-    Args:
-        experiment (ExperimentBase): The experiment to add.
-
-    Returns:
-        str: A message indicating whether the experiment was successfully added to the queue.
+    Deprecated function kept temporarily. It delegates to schedule_single_experiment.
     """
-    if not override_well_available:
-        ## First check the existing status, if not new or queued, then do not add to queue
-        if experiment.status not in [ExperimentStatus.NEW, ExperimentStatus.QUEUED]:
-            message = f"Experiment {experiment.experiment_id} is not new or queued, not adding to queue"
-            logger.info(message)
-            return message
+    return schedule_experiments([experiment], override=override_well_available)
 
-        ## Check if the well is available
-        if check_well_status(experiment.well_id) != "new":
-            # Find the next available well
-            target_well = choose_next_new_well()
-            if target_well is None:
-                logger.info(
-                    "No wells available for experiment originally for well %s.",
-                    experiment.well_id,
-                )
-                return "No wells available"
+
+def validate_experiment_plate(experiment: ExperimentBase) -> bool:
+    """
+    Checks if plate_id exists and matches the plate_type_number.
+    Returns True if valid, otherwise False.
+    """
+    # Check if the experiment is for a specific plate, if not choose the current plate
+    if experiment.plate_id is None:
+        experiment.plate_id, _, _ = select_current_wellplate_info()
+    # Check if the plate ID exists
+    if not check_if_plate_type_exists(experiment.plate_type_number):
+        logger.error(
+            "Plate type %s does not exist, cannot add experiment to queue",
+            experiment.plate_id,
+        )
+        print(
+            f"Plate type {experiment.plate_id} does not exist, cannot add experiment to queue"
+        )
+        return False
+
+    # Check if the target plate id has the target well type number
+    plate_info = select_wellplate_info(experiment.plate_id)
+    if plate_info is None:
+        logger.error(
+            "Plate %s does not exist, cannot add experiment to queue",
+            experiment.plate_id,
+        )
+        print(
+            f"Plate {experiment.plate_id} does not exist, cannot add experiment {experiment.experiment_id} AKA {experiment.experiment_name} to queue"
+        )
+        return False
+
+    if (
+        plate_info.type_id != experiment.plate_type_number
+        or plate_info.id != experiment.plate_id
+    ):
+        logger.error(
+            "Plate %s does not have the correct well type number, cannot add experiment to queue",
+            experiment.plate_id,
+        )
+        print(
+            f"Plate {experiment.plate_id} does not have the correct well type number {experiment.plate_type_number}, cannot add experiment to queue"
+        )
+        return False
+
+    return True
+
+
+def assign_well_if_unavailable(experiment: ExperimentBase) -> bool:
+    """
+    If the well is not 'new', attempts to assign another well
+    Returns True if a well was assigned, otherwise False.
+    """
+    if check_well_status(experiment.well_id, experiment.plate_id) != "new":
+        # Find the next available well
+        target_well = choose_next_new_well(experiment.plate_id)
+        if target_well is None:
             logger.info(
-                "Experiment originally for well %s is now for well %s.",
+                "No wells available for experiment originally for well %s.",
                 experiment.well_id,
-                target_well,
             )
-            experiment.well_id = target_well
-            # update_experiment_parameters(experiment, "well_id")
-    # Data clean the solutions to all be lowercase
-    experiment.solutions = {k.lower(): v for k, v in experiment.solutions.items()}
-    # Save the experiment as a separate file in the experiment_queue subfolder
-    experiment.set_status_and_save(ExperimentStatus.QUEUED)
-
-    ## Add the experiment to experiments table
-    try:
-        insert_experiment(experiment)
-    except sqlite3.Error as e:
-        logger.error(
-            "Error occurred while adding the experiment to experiments table: %s", e
+            print(
+                f"No wells available for experiment originally for well {experiment.well_id}."
+            )
+            return False
+        logger.info(
+            "Experiment originally for well %s is now for well %s.",
+            experiment.well_id,
+            target_well,
         )
-        experiment.status = ExperimentStatus.ERROR
-        raise e  # raise the error to be caught by the calling function
-
-    ## Add the experiment parameters to the experiment_parameters table
-    try:
-        insert_experiment_parameters(experiment)
-    except sqlite3.Error as e:
-        logger.error(
-            "Error occurred while adding the experiment parameters to experiment_parameters table: %s",
-            e,
-        )
-        experiment.status = ExperimentStatus.ERROR
-        raise e
-
-    ## Add the experiment to the queue
-    experiment = add_to_queue(experiment)
-
-    ## Change the status of the well
-    change_well_status(experiment.well_id, experiment)
-
-    logger.info("Experiment %s added to queue", experiment.experiment_id)
-    return "success"
+        experiment.well_id = target_well
+    return True
 
 
 @timing_wrapper
-def add_to_queue(experiment: ExperimentBase) -> ExperimentBase:
-    """Add the given experiment to the queue table"""
-    # Add the experiment to the queue
-    try:
-        # output = execute_sql_command(
-        #     "INSERT INTO queue (experiment_id, process_type, priority, filename) VALUES (?, ?, ?, ?)",
-        #     (experiment.id, experiment.process_type, experiment.priority, str(experiment.filename)),
-        # )
-        # print("Adding experiment to queue result:",output)
-        logger.warning("No queue to add to when using database, will be in a view")
-        experiment.status = ExperimentStatus.QUEUED
-
-    except sqlite3.Error as e:
-        logger.error("Error occurred while adding the experiment to queue table: %s", e)
-        experiment.status = ExperimentStatus.ERROR
-        raise e  # raise the error to be caught by the calling function
-    return experiment
-
-
-@timing_wrapper
-def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
+def schedule_experiments(
+    experiments: list[ExperimentBase], override: bool = False
+) -> int:
     """
-    Adds an experiment which is not a file to the experiment queue directly.
+    Schedules a list of experiments by assigning each to a wellplate well. Each experiment is assigned to an available well,
+    validated for plate type, and checked for project ID. If the well is unavailable, the function will request user input
+    unless the override flag is set.
 
     Args:
-        experiment (ExperimentBase): The experiment to add.
-
+        experiments (list[ExperimentBase]): A list of experiments to be added to the queue.
+        override (bool, optional): If True, overrides the well selection process. Defaults to False.
     Returns:
-        str: A message indicating whether the experiment was successfully added to the queue.
+        int: The number of experiments successfully added to the queue.
+    Raises:
+        sqlite3.Error: If an error occurs while inserting experiments or their parameters into the database.
+    Notes:
+        - Experiments that are not new or queued are removed from the list.
+        - Experiments with invalid plate types or unavailable wells are removed from the list.
+        - Project IDs not present in the projects table are added.
+        - Experiment solutions are converted to lowercase and stripped of whitespace.
+        - Experiments are individually inserted into the database and their status is updated to queued.
+        - Bulk insertion of experiment parameters is performed after individual experiment insertion.
     """
+    if len(experiments) == 0:
+        logger.info("No experiments to add to queue")
+        return 0
     for experiment in experiments:
-        if not experiment.override_well_selection:
+        try:
+            override = experiment.override_well_selection
+        except AttributeError:
+            pass
+        if not override:
             ## First check the existing status, if not new or queued, then do not add to queue
             if experiment.status not in [
                 ExperimentStatus.NEW,
@@ -311,115 +318,48 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
                 print(message)
                 experiments.remove(experiment)
 
-            ## Check if the experiment is for a specific plate, if not choose the current plate
-            if experiment.plate_id is None:
-                experiment.plate_id, _, _ = select_current_wellplate_info()
-            ## Check if the well is available
-            if check_well_status(experiment.well_id, experiment.plate_id) != "new":
-                # Check that the plate ID exists
-                if not check_if_plate_type_exists(experiment.plate_type_number):
-                    logger.error(
-                        "Plate type %s does not exist, cannot add experiment to queue",
-                        experiment.plate_id,
-                    )
-                    print(
-                        f"Plate type {experiment.plate_id} does not exist, cannot add experiment to queue"
-                    )
-                    experiments.remove(experiment)
-                    continue
+            if not validate_experiment_plate(experiment):
+                experiments.remove(experiment)
+                continue
 
-                # Check if the target plate id has the target well type number
-                plate_info = select_wellplate_info(experiment.plate_id)
-                if plate_info is None:
-                    logger.error(
-                        "Plate %s does not exist, cannot add experiment to queue",
-                        experiment.plate_id,
-                    )
-                    print(
-                        f"Plate {experiment.plate_id} does not exist, cannot add experiment to queue"
-                    )
-                    experiments.remove(experiment)
-                    continue
-
-                if (
-                    plate_info.type_id != experiment.plate_type_number
-                    or plate_info.id != experiment.plate_id
-                ):
-                    logger.error(
-                        "Plate %s does not have the correct well type number, cannot add experiment to queue",
-                        experiment.plate_id,
-                    )
-                    print(
-                        f"Plate {experiment.plate_id} does not have the correct well type number, cannot add experiment to queue"
-                    )
-                    experiments.remove(experiment)
-                    continue
-
-                # Find the next available well
-                target_well = choose_next_new_well(experiment.plate_id)
-                if target_well is None:
-                    logger.info(
-                        "No wells available for experiment originally for well %s.",
-                        experiment.well_id,
-                    )
-                    print(
-                        f"No wells available for experiment originally for well {experiment.well_id}."
-                    )
-                    experiments.remove(experiment)
-                    continue
-                    # TODO Add a pending label to the experiment to be added to the queue when the right well is available
-                logger.info(
-                    "Experiment originally for well %s is now for well %s.",
-                    experiment.well_id,
-                    target_well,
-                )
-                experiment.well_id = target_well
+            if not assign_well_if_unavailable(experiment):
+                experiments.remove(experiment)
+                continue
 
         # Check if the project_id is in the projects table, if not add it
         if not check_project_id(experiment.project_id):
             add_project_id(experiment.project_id)
 
         # Data clean the solutions to all be lowercase
-        experiment.solutions = {k.lower(): v for k, v in experiment.solutions.items()}
+        experiment.solutions = {
+            k.lower().strip(): v for k, v in experiment.solutions.items()
+        }
 
         # Individually insert the experiment and update the status
         # We do this so that the wellchecker is checking as the wells are allocated
         # The parameters are quite lengthy, so we will save those for a bulk entry
         try:
             insert_experiment(experiment)
-            update_experiment_status(experiment, ExperimentStatus.QUEUED)
+            experiment.set_status_and_save(ExperimentStatus.QUEUED)
         except sqlite3.Error as e:
             logger.error(
-                "Error occurred while adding the experiment to experiments table: %s",
+                "Error occurred while adding the experiment to experiments table: %s. The statements have been rolled back and nothing has been added to the tables.",
                 e,
-            )
-            logger.error(
-                "The statements have been rolled back and nothing has been added to the tables."
             )
             print(
                 "The statements have been rolled back and nothing has been added to the tables."
             )
             raise e
 
-    ## Add the experiment to experiments table
+    # Add the experiment to experiments table
     try:
-        # Bulk insert the experiments that had wells available
-        # sql_utilities.insert_experiments(experiments)
-        # Bulk set the status of the experiments that had wells available
-        # sql_utilities.update_experiments_statuses(
-        #     experiments, ExperimentStatus.QUEUED
-        # )
-
-        ## Bulk add the experiment parameters to the experiment_parameters table
+        # Bulk add the experiment parameters to the experiment_parameters table
         insert_experiments_parameters(experiments)
 
     except sqlite3.Error as e:
         logger.error(
-            "Error occurred while adding the experiment parameters to experiment_parameters table: %s",
+            "Error occurred while adding the experiment parameters to experiment_parameters table: %s. The statements have been rolled back and nothing has been added to the tables.",
             e,
-        )
-        logger.error(
-            "The statements have been rolled back and nothing has been added to the tables."
         )
         print(
             "The statements have been rolled back and nothing has been added to the tables."
@@ -427,7 +367,7 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
         raise e
 
     logger.info("Experiments loaded and added to queue")
-    return 1
+    return len(experiments)
 
 
 @timing_wrapper
@@ -446,7 +386,7 @@ def check_project_id(project_id: int) -> bool:
 
 @timing_wrapper
 def add_project_id(project_id: int) -> None:
-    """Add the project_id to the projects table"""
+    """Add the project_id to the projects table when an experiment is submitted with an unrecongized project_id"""
     try:
         with SessionLocal() as session:
             session.add(Projects(id=project_id))
@@ -457,38 +397,8 @@ def add_project_id(project_id: int) -> None:
 
 
 @timing_wrapper
-def save_results(experiment: ExperimentBase) -> None:
-    """
-    Save the results of the experiment to the experiment_results table in the SQL database.
-
-    The results are saved in a one to many relationship with the experiment id as the foreign key.
-    Each result value is saved as a separate row in the table.
-    This function accepts an Experiment object and turns it into a dictionary to be saved in the database.
-
-    The results table has columns:
-        - id (primary key) - autoincrement
-        - experiment_id (foreign key)
-        - result_type
-        - result_value
-        - created (timestamp)
-        - modified (timestamp)
-    Args:
-        experiment (ExperimentBase): The experiment that was just run
-
-    Returns:
-        None
-    """
-    # Turn the results into a list of values
-    results_lists = experiment.results.one_to_many()
-
-    for result in results_lists:
-        # Save the results to the database
-        insert_experiment_result(result)
-
-
-@timing_wrapper
 def determine_next_experiment_id() -> int:
-    """Load well history to get last experiment id and increment by 1"""
+    """FIX ME: This is used in many places but should be changed to directly call the sql function"""
     return select_next_experiment_id()
 
 

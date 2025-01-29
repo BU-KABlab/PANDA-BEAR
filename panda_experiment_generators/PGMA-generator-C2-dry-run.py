@@ -89,4 +89,4 @@ def main():
         )
         break
 
-    scheduler.add_nonfile_experiments(experiments)
+    scheduler.schedule_experiments(experiments)
