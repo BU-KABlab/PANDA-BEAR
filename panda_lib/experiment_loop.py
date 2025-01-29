@@ -40,13 +40,13 @@ from panda_lib.errors import (
     ShutDownCommand,
     WellImportError,
 )
-from panda_lib.experiments.experiment_types import (
+from panda_lib.experiments import (
     EchemExperimentBase,
     ExperimentBase,
     ExperimentResult,
     ExperimentStatus,
-    _select_complete_experiment_information,
-    _select_experiment_status,
+    select_complete_experiment_information,
+    select_experiment_status,
 )
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well, Wellplate
@@ -591,7 +591,7 @@ def sila_experiment_loop_worker(
 
             finally:
                 if exp_obj is not None:
-                    status = _select_experiment_status(exp_obj.experiment_id)
+                    status = select_experiment_status(exp_obj.experiment_id)
                     scheduler.save_results(exp_obj)
                     if status == ExperimentStatus.COMPLETE:
                         with db_setup.SessionLocal() as connection:
@@ -646,7 +646,7 @@ def _initialize_experiment(
     well_id: Optional[str] = None,
 ) -> EchemExperimentBase:
     """Initialize and validate the experiment."""
-    exp_obj = _select_complete_experiment_information(exp_id)
+    exp_obj = select_complete_experiment_information(exp_id)
 
     # TODO: this is silly but we need to reference the queue to get the well_id because the experiment object isn't updated with the correct target well_id
     _, _, _, _, well_id = sql_queue.get_next_experiment_from_queue(

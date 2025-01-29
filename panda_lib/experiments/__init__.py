@@ -2,6 +2,7 @@ from enum import Enum
 
 from .experiment_parameters import ExperimentParameterRecord
 from .experiment_types import EchemExperimentBase, ExperimentBase
+from .results import ExperimentResult, ExperimentResultsRecord
 from .sql_functions import (
     insert_experiment,
     insert_experiment_parameters,
@@ -54,6 +55,8 @@ class ExperimentStatus(str, Enum):
 __all__ = [
     "ExperimentStatus",
     "EchemExperimentBase",
+    "ExperimentResult",
+    "ExperimentResultsRecord",
     "ExperimentBase",
     "ExperimentParameterRecord",
     "insert_experiment",

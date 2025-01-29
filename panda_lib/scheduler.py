@@ -15,6 +15,8 @@ from typing import Tuple, Union
 from shared_utilities.log_tools import setup_default_logger, timing_wrapper
 
 from .experiments import (
+    ExperimentBase,
+    ExperimentStatus,
     insert_experiment,
     insert_experiment_parameters,
     insert_experiments_parameters,
@@ -22,10 +24,6 @@ from .experiments import (
     select_experiment_parameters,
     select_next_experiment_id,
     update_experiment_status,
-)
-from .experiments.experiment_types import (
-    ExperimentBase,
-    ExperimentStatus,
 )
 from .experiments.results import insert_experiment_result
 from .labware.wellplates import Well
