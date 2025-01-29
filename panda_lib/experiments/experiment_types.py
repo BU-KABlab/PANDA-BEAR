@@ -16,11 +16,14 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
+
+# from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
+#                                                 execute_sql_command_no_return)
 from panda_lib.sql_tools.sql_wellplate import get_well_by_id
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
 
-from .experiment_paramters import ExperimentParameterRecord
+from .experiment_parameters import ExperimentParameterRecord
 from .experiment_status import ExperimentStatus
 from .results import ExperimentResult
 
@@ -240,7 +243,7 @@ class ExperimentBase:
                 self.experiment_id,
             )
 
-    # FIXME: Seperate the set status, and set status and save methods from the experimentbase. The experiment base should just be a dataclass
+    # FIXME: separate the set status, and set status and save methods from the experimentbase. The experiment base should just be a dataclass
     # What could be an alternative is that there is a wrapper class that has the set status and set status and save methods using what
     # Method that the project chooses to use to save the data to the database
     def set_status(self, new_status: ExperimentStatus) -> None:
@@ -271,10 +274,10 @@ class ExperimentBase:
             experiment_logger.debug(
                 "Well object not set. Saving to db via alternative method"
             )
-            update_experiment_status(self)
+            _update_experiment_status(self)
 
         # Save the experiment to the database
-        update_experiment(self)
+        _update_experiment(self)
 
     def is_same_id(self, other) -> bool:
         """Check if two experiments have the same id."""
@@ -349,7 +352,7 @@ class ExperimentBase:
             #     parameter_value=parameter.parameter_value,
             # )
             try:
-                attribute_type = get_all_type_hints(type(self))[
+                attribute_type = _get_all_type_hints(type(self))[
                     parameter.parameter_name
                 ]
             except KeyError as exc:
@@ -358,7 +361,7 @@ class ExperimentBase:
                     self.__class__, parameter.parameter_name
                 )
                 if cls is not None:
-                    attribute_type = get_all_type_hints(cls)[parameter.parameter_name]
+                    attribute_type = _get_all_type_hints(cls)[parameter.parameter_name]
                 else:
                     experiment_logger.debug(
                         "Attribute %s not found in class hierarchy",
@@ -563,7 +566,7 @@ class EchemExperimentBase(ExperimentBase):
     """
 
 
-def select_next_experiment_id() -> int:
+def _select_next_experiment_id() -> int:
     """Determines the next experiment id by checking the experiment table"""
 
     with SessionLocal() as session:
@@ -612,7 +615,7 @@ def select_experiment_information(experiment_id: int) -> ExperimentBase:
         return experiment
 
 
-def select_experiment_paramaters(experiment_id) -> list:
+def _select_experiment_parameters(experiment_id) -> list:
     """
     Selects the experiment parameters from the experiment_parameters table.
     If an experiment_object is provided, the parameters are added to the object.
@@ -636,7 +639,7 @@ def select_experiment_paramaters(experiment_id) -> list:
     return values
 
 
-def select_specific_parameter(experiment_id: int, parameter_name: str):
+def _select_specific_parameter(experiment_id: int, parameter_name: str):
     """
     Select a specific parameter from the experiment_parameters table.
 
@@ -661,7 +664,7 @@ def select_specific_parameter(experiment_id: int, parameter_name: str):
     return result[0][0]
 
 
-def select_experiment_status(experiment_id: int) -> str:
+def _select_experiment_status(experiment_id: int) -> str:
     """
     Select the status of an experiment from the well_hx table.
 
@@ -684,7 +687,7 @@ def select_experiment_status(experiment_id: int) -> str:
     return result[0][0]
 
 
-def select_complete_experiment_information(experiment_id: int) -> ExperimentBase:
+def _select_complete_experiment_information(experiment_id: int) -> ExperimentBase:
     """
     Selects the experiment information and parameters from the experiments and experiment_parameters tables.
 
@@ -699,7 +702,7 @@ def select_complete_experiment_information(experiment_id: int) -> ExperimentBase
     if experiment is None:
         return None
 
-    params = select_experiment_paramaters(experiment_id)
+    params = _select_experiment_parameters(experiment_id)
     experiment.map_parameter_list_to_experiment(params)
     if experiment is None:
         return None
@@ -707,17 +710,17 @@ def select_complete_experiment_information(experiment_id: int) -> ExperimentBase
     return experiment
 
 
-def insert_experiment(experiment: ExperimentBase) -> None:
+def _insert_experiment(experiment: ExperimentBase) -> None:
     """
     Insert an experiment into the experiments table.
 
     Args:
         experiment (ExperimentBase): The experiment to insert.
     """
-    insert_experiments([experiment])
+    _insert_experiments([experiment])
 
 
-def insert_experiments(experiments: List[ExperimentBase]) -> None:
+def _insert_experiments(experiments: List[ExperimentBase]) -> None:
     """
     Insert a list of experiments into the experiments table.
 
@@ -764,17 +767,17 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
         session.commit()
 
 
-def insert_experiment_parameters(experiment: ExperimentBase) -> None:
+def _insert_experiment_parameters(experiment: ExperimentBase) -> None:
     """
     Insert the experiment parameters into the experiment_parameters table.
 
     Args:
         experiment (ExperimentBase): The experiment to insert.
     """
-    insert_experiments_parameters([experiment])
+    _insert_experiments_parameters([experiment])
 
 
-def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
+def _insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
     """
     Insert the experiment parameters into the experiment_parameters table.
 
@@ -813,17 +816,17 @@ def insert_experiments_parameters(experiments: List[ExperimentBase]) -> None:
         session.commit()
 
 
-def update_experiment(experiment: ExperimentBase) -> None:
+def _update_experiment(experiment: ExperimentBase) -> None:
     """
     Update an experiment in the experiments table.
 
     Args:
         experiment (ExperimentBase): The experiment to update.
     """
-    update_experiments([experiment])
+    _update_experiments([experiment])
 
 
-def update_experiments(experiments: List[ExperimentBase]) -> None:
+def _update_experiments(experiments: List[ExperimentBase]) -> None:
     """
     Update a list of experiments in the experiments table.
 
@@ -869,7 +872,7 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
         session.commit()
 
 
-def update_experiment_status(
+def _update_experiment_status(
     experiment: Union[ExperimentBase, int],
     status: ExperimentStatus = None,
     status_date: datetime = None,
@@ -937,7 +940,7 @@ def update_experiment_status(
         session.commit()
 
 
-def update_experiments_statuses(
+def _update_experiments_statuses(
     experiments: List[ExperimentBase],
     exp_status: ExperimentStatus,
     status_date: datetime = None,
@@ -995,7 +998,7 @@ def update_experiments_statuses(
         session.commit()
 
 
-def get_all_type_hints(cls):
+def _get_all_type_hints(cls):
     """Get all type hints for a class"""
     hints = {}
     for base in reversed(cls.__mro__):

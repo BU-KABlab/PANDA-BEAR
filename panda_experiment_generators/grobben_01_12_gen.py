@@ -5,7 +5,7 @@ Description: 3 series of experiments for PGMA-PAMA-phenol with 7mm wells, compar
 """
 
 from panda_lib import scheduler
-from panda_lib.experiments import experiment_types
+from panda_lib.experiments import EchemExperimentBase
 
 PROJECT_ID = 20
 EXPERIMENT_NAME = "grobben-01-11-pgma-pama-phenol-teaa-voltage-screening"
@@ -25,7 +25,7 @@ def main():
     for voltage in voltages:
         for i in range(replicates):
             experiments.append(
-                experiment_types.EchemExperimentBase(
+                EchemExperimentBase(
                     experiment_id=experiment_id,
                     protocol_id="grobben_01_12_pro",
                     well_id="A1",

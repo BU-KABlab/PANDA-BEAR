@@ -54,21 +54,28 @@
     "python.testing.pytestEnabled": true,
     "cmake.ignoreCMakeListsMissing": true,
     "cSpell.words": [
+        "acnrinse",
+        "Amperometry",
         "chrono",
         "dataclass",
         "dataclasses",
         "Echem",
         "edot",
         "labware",
+        "nonfile",
+        "ocpcheck",
         "pedot",
         "pgma",
         "prcss",
         "sila",
         "slackbot",
+        "tbap",
+        "teaa",
         "uchoice"
     ],
     "cSpell.ignoreWords": [
         "decapping",
+        "solns",
         "wellplates"
     ],
 }

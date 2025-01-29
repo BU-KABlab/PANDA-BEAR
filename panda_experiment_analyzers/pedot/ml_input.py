@@ -1,6 +1,6 @@
 import pandas as pd
 
-from panda_lib.experiments.experiment_types import select_specific_parameter
+from panda_lib.experiments.experiment_types import _select_specific_parameter
 from panda_lib.experiments.results import select_specific_result
 from panda_lib.sql_tools import sql_system_state
 from shared_utilities.config.config_tools import read_testing_config
@@ -75,7 +75,7 @@ def populate_required_information(experiment_id: int) -> RequiredData:
     parameters = df.loc[df["source"] == "parameter", "name"]
     for parameter in parameters:
         try:
-            df.loc[df["name"] == parameter, "value"] = select_specific_parameter(
+            df.loc[df["name"] == parameter, "value"] = _select_specific_parameter(
                 experiment_id, parameter
             )
         except Exception as e:

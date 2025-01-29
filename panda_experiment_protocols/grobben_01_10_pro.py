@@ -332,7 +332,7 @@ def PostCharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
         toolkit=toolkit,
     )
 
-    # Tranfer the reagent to the well
+    # transfer the reagent to the well
     transfer(
         volume=reag.volume,
         src_vessel=reag.name,

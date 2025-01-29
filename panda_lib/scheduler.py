@@ -1,6 +1,6 @@
 """
 The scheduler module will be responsible for:
-    - Injesting new experiments
+    - ingesting new experiments
     - Designating experiments to wells
     - Scheduling experiments by priority
     - Inserting control tests
@@ -14,16 +14,18 @@ from typing import Tuple, Union
 
 from shared_utilities.log_tools import setup_default_logger, timing_wrapper
 
-from .experiments.experiment_types import (
-    ExperimentBase,
-    ExperimentStatus,
+from .experiments import (
     insert_experiment,
     insert_experiment_parameters,
     insert_experiments_parameters,
     select_experiment_information,
-    select_experiment_paramaters,
+    select_experiment_parameters,
     select_next_experiment_id,
     update_experiment_status,
+)
+from .experiments.experiment_types import (
+    ExperimentBase,
+    ExperimentStatus,
 )
 from .experiments.results import insert_experiment_result
 from .labware.wellplates import Well
@@ -52,7 +54,7 @@ def check_well_status(well_to_check: str, plate_id: int = None) -> str:
         well_status = select_well_status(well_to_check, plate_id)
         return well_status
     except sqlite3.Error as e:
-        logger.error("Error occured while checking well status: %s", e)
+        logger.error("Error occurred while checking well status: %s", e)
         raise e
 
 
@@ -63,7 +65,7 @@ def choose_next_new_well(plate_id: int = None) -> str:
         next_well = select_next_available_well(plate_id)
         return next_well
     except sqlite3.Error as e:
-        logger.error("Error occured while choosing next well: %s", e)
+        logger.error("Error occurred while choosing next well: %s", e)
         raise e
 
 
@@ -95,7 +97,7 @@ def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> No
     try:
         update_well(well)
     except sqlite3.Error as e:
-        logger.error("Error occured while changing well status: %s", e)
+        logger.error("Error occurred while changing well status: %s", e)
         raise e
 
 
@@ -122,7 +124,7 @@ def read_next_experiment_from_queue(
     try:
         queue_info = get_next_experiment_from_queue(random_pick, experiment_id)
     except sqlite3.Error as e:
-        logger.error("Error occured while reading next experiment from queue: %s", e)
+        logger.error("Error occurred while reading next experiment from queue: %s", e)
         raise e
 
     if queue_info is None:
@@ -134,7 +136,7 @@ def read_next_experiment_from_queue(
     # Get the experiment information from the experiment table
     experiment = select_experiment_information(experiment_id)
     experiment.map_parameter_list_to_experiment(
-        select_experiment_paramaters(experiment_id)
+        select_experiment_parameters(experiment_id)
     )
 
     # Finally get the well id and plate id for the experiment based on the well_status view
@@ -158,7 +160,7 @@ def update_experiment_queue_priority(experiment_id: int, priority: int):
             session.commit()
 
     except sqlite3.Error as e:
-        logger.error("Error occured while updating experiment queue priority: %s", e)
+        logger.error("Error occurred while updating experiment queue priority: %s", e)
         raise e
 
 
@@ -177,7 +179,7 @@ def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
             ).update({column: getattr(experiment, column)})
             session.commit()
     except sqlite3.Error as e:
-        logger.error("Error occured while updating experiment information: %s", e)
+        logger.error("Error occurred while updating experiment information: %s", e)
         raise e
 
 
@@ -191,7 +193,7 @@ def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> 
             ).update({parameter: getattr(experiment, parameter)})
             session.commit()
     except sqlite3.Error as e:
-        logger.error("Error occured while updating experiment parameters: %s", e)
+        logger.error("Error occurred while updating experiment parameters: %s", e)
         raise e
 
 
@@ -242,7 +244,7 @@ def add_nonfile_experiment(
         insert_experiment(experiment)
     except sqlite3.Error as e:
         logger.error(
-            "Error occured while adding the experiment to experiments table: %s", e
+            "Error occurred while adding the experiment to experiments table: %s", e
         )
         experiment.status = ExperimentStatus.ERROR
         raise e  # raise the error to be caught by the calling function
@@ -252,7 +254,7 @@ def add_nonfile_experiment(
         insert_experiment_parameters(experiment)
     except sqlite3.Error as e:
         logger.error(
-            "Error occured while adding the experiment parameters to experiment_parameters table: %s",
+            "Error occurred while adding the experiment parameters to experiment_parameters table: %s",
             e,
         )
         experiment.status = ExperimentStatus.ERROR
@@ -282,7 +284,7 @@ def add_to_queue(experiment: ExperimentBase) -> ExperimentBase:
         experiment.status = ExperimentStatus.QUEUED
 
     except sqlite3.Error as e:
-        logger.error("Error occured while adding the experiment to queue table: %s", e)
+        logger.error("Error occurred while adding the experiment to queue table: %s", e)
         experiment.status = ExperimentStatus.ERROR
         raise e  # raise the error to be caught by the calling function
     return experiment
@@ -384,13 +386,13 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
 
         # Individually insert the experiment and update the status
         # We do this so that the wellchecker is checking as the wells are allocated
-        # The parameters are quite lengthly, so we will save those for a bulk entry
+        # The parameters are quite lengthy, so we will save those for a bulk entry
         try:
             insert_experiment(experiment)
             update_experiment_status(experiment, ExperimentStatus.QUEUED)
         except sqlite3.Error as e:
             logger.error(
-                "Error occured while adding the experiment to experiments table: %s",
+                "Error occurred while adding the experiment to experiments table: %s",
                 e,
             )
             logger.error(
@@ -415,7 +417,7 @@ def add_nonfile_experiments(experiments: list[ExperimentBase]) -> int:
 
     except sqlite3.Error as e:
         logger.error(
-            "Error occured while adding the experiment parameters to experiment_parameters table: %s",
+            "Error occurred while adding the experiment parameters to experiment_parameters table: %s",
             e,
         )
         logger.error(
@@ -440,7 +442,7 @@ def check_project_id(project_id: int) -> bool:
                 return False
             return True
     except sqlite3.Error as e:
-        logger.error("Error occured while checking project id: %s", e)
+        logger.error("Error occurred while checking project id: %s", e)
         raise e
 
 
@@ -452,7 +454,7 @@ def add_project_id(project_id: int) -> None:
             session.add(Projects(id=project_id))
             session.commit()
     except sqlite3.Error as e:
-        logger.error("Error occured while adding project id: %s", e)
+        logger.error("Error occurred while adding project id: %s", e)
         raise e
 
 
@@ -493,7 +495,7 @@ def determine_next_experiment_id() -> int:
 
 
 ####################################################################################################
-def test_well_status_update():
+def test_well_statusupdate():
     """
     Tests the change_well_status function.
     """
@@ -508,5 +510,5 @@ def test_well_status_update():
 
 
 if __name__ == "__main__":
-    test_well_status_update()
+    test_well_statusupdate()
     # scheduler.read_next_experiment_from_queue()

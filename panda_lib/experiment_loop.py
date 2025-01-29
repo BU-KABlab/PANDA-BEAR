@@ -1,9 +1,9 @@
 """
 The controller is responsible for the following:
-    - Running the scheduler and retriving the next experiment to run
+    - Running the scheduler and retrieving the next experiment to run
     - checking the state of the system (vials, wells, etc.)
     - Running the experiment (passing the experiment, system state, and instruments)
-    - Recieve data from the experiment, and store it in the database
+    - Receive data from the experiment, and store it in the database
     - Update system state (vials, wells, etc.)
     - Running the analyzer
 
@@ -21,13 +21,9 @@ import time
 from pathlib import Path
 from typing import Optional, Sequence, Tuple
 
-import PySpin
-from slack_sdk import errors as slack_errors
 from sqlalchemy.orm import sessionmaker
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
-from hardware.gamry_potentiostat import gamry_control
-from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from panda_lib import scheduler
 from panda_lib.actions import actions_default
 from panda_lib.errors import (
@@ -49,20 +45,14 @@ from panda_lib.experiments.experiment_types import (
     ExperimentBase,
     ExperimentResult,
     ExperimentStatus,
-    select_complete_experiment_information,
-    select_experiment_status,
-)
-from panda_lib.experiments.results import (
-    ExperimentResultsRecord,
-    select_specific_result,
+    _select_complete_experiment_information,
+    _select_experiment_status,
 )
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well, Wellplate
 
 # from .movement import Mill, MockMill
-from panda_lib.panda_gantry import MockPandaMill as MockMill
-from panda_lib.panda_gantry import PandaMill as Mill
-from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.slack_tools.SlackBot import SlackBot, share_to_slack
 from panda_lib.sql_tools import (
     db_setup,
     panda_models,
@@ -72,8 +62,12 @@ from panda_lib.sql_tools import (
     sql_wellplate,
 )
 from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.toolkit import Hardware, Labware, Toolkit
-from panda_lib.tools.pawduino import ArduinoLink, MockArduinoLink
+from panda_lib.toolkit import (
+    Hardware,
+    Labware,
+    connect_to_instruments,
+    disconnect_from_instruments,
+)
 from panda_lib.utilities import SystemState
 from shared_utilities.config.config_tools import read_config, read_testing_config
 from shared_utilities.log_tools import (
@@ -158,7 +152,7 @@ def experiment_loop_worker(
                 pump=toolkit.pump,
             )
 
-        # experiemnt loop
+        # experiment loop
         while True:
             ## Begin slack monitoring
             # slack_thread.start()
@@ -378,13 +372,36 @@ def experiment_loop_worker(
             if one_off:
                 break  # break out of the while True loop
 
-            if SystemState.SHUTDOWN in sql_system_state.select_system_status(2):
-                raise ShutDownCommand
+            # if SystemState.SHUTDOWN in sql_system_state.select_system_status(2):
+            # raise ShutDownCommand
 
             # check for paused status and hold until status changes to resume
-            status = _monitor_system_status(controller_slack, status_queue, process_id)
-            if status == SystemState.STOP:
-                break  # break out of the while True loop and the try block to go to finally
+            # status = _monitor_system_status(controller_slack, status_queue, process_id)
+            # if status == SystemState.STOP:
+            # break  # break out of the while True loop and the try block to go to finally
+
+            # Check for incoming commands
+            if not command_queue.empty():
+                cmd = command_queue.get_nowait()
+                if cmd == SystemState.STOP:
+                    logger.info("Received STOP command. Exiting loop.")
+                    break
+                elif cmd == SystemState.PAUSE:
+                    logger.info("Received PAUSE command. Waiting for RESUME.")
+                    while True:
+                        status_queue.put((process_id, "pause"))
+                        if not command_queue.empty():
+                            resume_cmd = command_queue.get_nowait()
+                            if resume_cmd == SystemState.RESUME:
+                                logger.info("Received RESUME command. Resuming loop.")
+                                break
+                            elif resume_cmd == SystemState.STOP:
+                                logger.info(
+                                    "Received STOP command during PAUSE. Exiting."
+                                )
+                                return
+                        time.sleep(0.5)  # small wait to avoid busy loop
+
     except (
         OCPFailure,
         DepositionFailure,
@@ -489,27 +506,25 @@ def sila_experiment_loop_worker(
         status_queue.put((process_id, f"{specific_experiment_id}: {state.value}"))
 
     for specific_experiment_id in experiment_ids:
-        # Check the command queue for a stop command or a pause command
-        # if command_queue is not None:
-        #     while True:
-        #         try:
-        #             command = command_queue.get_nowait()
-        #             if command is None:
-        #                 break
-        #             if command == SystemState.STOP:
-        #                 set_worker_state(SystemState.STOP)
-        #                 return
-        #             elif command == SystemState.PAUSE:
-        #                 set_worker_state(SystemState.PAUSE)
-        #                 command = command_queue.get_nowait()
-        #                 if command == SystemState.RESUME:
-        #                     set_worker_state(SystemState.RUNNING)
-        #                     break
-        #                 if command == SystemState.STOP:
-        #                     set_worker_state(SystemState.STOP)
-        #                     return
-        #         except Exception:
-        #             break
+        # Check for incoming commands
+        if not command_queue.empty():
+            cmd = command_queue.get_nowait()
+            if cmd == SystemState.STOP:
+                logger.info("Received STOP command. Exiting loop.")
+                break
+            elif cmd == SystemState.PAUSE:
+                logger.info("Received PAUSE command. Waiting for RESUME.")
+                while True:
+                    status_queue.put((process_id, "pause"))
+                    if not command_queue.empty():
+                        resume_cmd = command_queue.get_nowait()
+                        if resume_cmd == SystemState.RESUME:
+                            logger.info("Received RESUME command. Resuming loop.")
+                            break
+                        elif resume_cmd == SystemState.STOP:
+                            logger.info("Received STOP command during PAUSE. Exiting.")
+                            return
+                    time.sleep(0.5)  # small wait to avoid busy loop
 
         set_worker_state(SystemState.RUNNING)
         exp_logger = (
@@ -557,6 +572,7 @@ def sila_experiment_loop_worker(
                     # labware=labware,
                     toolkit=toolkit,
                 )
+
             except (
                 OCPFailure,
                 DepositionFailure,
@@ -575,7 +591,7 @@ def sila_experiment_loop_worker(
 
             finally:
                 if exp_obj is not None:
-                    status = select_experiment_status(exp_obj.experiment_id)
+                    status = _select_experiment_status(exp_obj.experiment_id)
                     scheduler.save_results(exp_obj)
                     if status == ExperimentStatus.COMPLETE:
                         with db_setup.SessionLocal() as connection:
@@ -616,8 +632,8 @@ def sila_experiment_loop_worker(
 
 
 def _attach_well_to_experiment(exp_obj: ExperimentBase, trgt_well: Well):
-    trgt_well.experiment_id = exp_obj.experiment_id
-    trgt_well.project_id = exp_obj.project_id
+    trgt_well.well_data.experiment_id = exp_obj.experiment_id
+    trgt_well.well_data.project_id = exp_obj.project_id
     exp_obj.well = trgt_well
     exp_obj.plate_id = trgt_well.plate_id
 
@@ -630,7 +646,7 @@ def _initialize_experiment(
     well_id: Optional[str] = None,
 ) -> EchemExperimentBase:
     """Initialize and validate the experiment."""
-    exp_obj = select_complete_experiment_information(exp_id)
+    exp_obj = _select_complete_experiment_information(exp_id)
 
     # TODO: this is silly but we need to reference the queue to get the well_id because the experiment object isn't updated with the correct target well_id
     _, _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
@@ -847,7 +863,7 @@ def _check_stock_vials(
         bool: True if there is enough volume in the stock vials to run the experiment
         dict: Dictionary of solutions that are sufficient, insufficient, and missing
     """
-    ## Check that the experiment has solutions and those soltuions are in the stock vials
+    ## Check that the experiment has solutions and those solutions are in the stock vials
 
     check_table = {
         "sufficient": [],
@@ -964,336 +980,307 @@ def _monitor_system_status(
             continue
 
 
-@timing_wrapper
-def connect_to_instruments(
-    use_mock_instruments: bool = TESTING,
-) -> tuple[Toolkit, bool]:
-    """Connect to the instruments"""
-    instruments = Toolkit(
-        mill=None,
-        scale=None,
-        pump=None,
-        wellplate=None,
-        global_logger=logger,
-        experiment_logger=logger,
-        arduino=None,
-        flir_camera=None,
-    )
+# @timing_wrapper
+# def connect_to_instruments(
+#     use_mock_instruments: bool = TESTING,
+# ) -> tuple[Toolkit, bool]:
+#     """Connect to the instruments"""
+#     instruments = Toolkit(
+#         mill=None,
+#         scale=None,
+#         pump=None,
+#         wellplate=None,
+#         global_logger=logger,
+#         experiment_logger=logger,
+#         arduino=None,
+#         flir_camera=None,
+#     )
 
-    if use_mock_instruments:
-        logger.info("Using mock instruments")
-        instruments.mill = MockMill()
-        instruments.mill.connect_to_mill()
-        # instruments.scale = MockScale()
-        instruments.pump = MockPump()
-        # pstat = echem_mock.GamryPotentiostat.connect()
-        instruments.arduino = MockArduinoLink()
-        return instruments, True
+#     if use_mock_instruments:
+#         logger.info("Using mock instruments")
+#         instruments.mill = MockMill()
+#         instruments.mill.connect_to_mill()
+#         # instruments.scale = MockScale()
+#         instruments.pump = MockPump()
+#         # pstat = echem_mock.GamryPotentiostat.connect()
+#         instruments.arduino = MockArduinoLink()
+#         return instruments, True
 
-    incomplete = False
-    logger.info("Connecting to instruments:")
-    try:
-        logger.debug("Connecting to mill")
-        instruments.mill = Mill()
-        instruments.mill.connect_to_mill()
-        instruments.mill.homing_sequence()
-    except Exception as error:
-        logger.error("No mill connected, %s", error)
-        instruments.mill = None
-        # raise error
-        incomplete = True
+#     incomplete = False
+#     logger.info("Connecting to instruments:")
+#     try:
+#         logger.debug("Connecting to mill")
+#         instruments.mill = Mill()
+#         instruments.mill.connect_to_mill()
+#         instruments.mill.homing_sequence()
+#     except Exception as error:
+#         logger.error("No mill connected, %s", error)
+#         instruments.mill = None
+#         # raise error
+#         incomplete = True
 
-    # try:
-    #     logger.debug("Connecting to scale")
-    #     scale = Scale(address="COM6")
-    #     info_dict = scale.get_info()
-    #     model = info_dict["model"]
-    #     serial = info_dict["serial"]
-    #     software = info_dict["software"]
-    #     if not model:
-    #         logger.error("No scale connected")
-    #         # raise Exception("No scale connected")
-    #     logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
-    # except Exception as error:
-    #     logger.error("No scale connected, %s", error)
-    #     instruments.scale = None
-    #     # raise error
-    #     incomplete = True
+#     # try:
+#     #     logger.debug("Connecting to scale")
+#     #     scale = Scale(address="COM6")
+#     #     info_dict = scale.get_info()
+#     #     model = info_dict["model"]
+#     #     serial = info_dict["serial"]
+#     #     software = info_dict["software"]
+#     #     if not model:
+#     #         logger.error("No scale connected")
+#     #         # raise Exception("No scale connected")
+#     #     logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
+#     # except Exception as error:
+#     #     logger.error("No scale connected, %s", error)
+#     #     instruments.scale = None
+#     #     # raise error
+#     #     incomplete = True
 
-    try:
-        logger.debug("Connecting to pump")
-        instruments.pump = SyringePump()
-        logger.debug("Connected to pump at %s", instruments.pump.pump.address)
+#     try:
+#         logger.debug("Connecting to pump")
+#         instruments.pump = SyringePump()
+#         logger.debug("Connected to pump at %s", instruments.pump.pump.address)
 
-    except Exception as error:
-        logger.error("No pump connected, %s", error)
-        instruments.pump = None
-        # raise error
-        incomplete = True
+#     except Exception as error:
+#         logger.error("No pump connected, %s", error)
+#         instruments.pump = None
+#         # raise error
+#         incomplete = True
 
-    # Check for FLIR Camera
-    try:
-        logger.debug("Connecting to FLIR Camera")
-        system = PySpin.System.GetInstance()
-        cam_list = system.GetCameras()
-        if cam_list.GetSize() == 0:
-            logger.error("No FLIR Camera connected")
-            instruments.flir_camera = None
-        else:
-            instruments.flir_camera = cam_list.GetByIndex(0)
-            # instruments.flir_camera.Init()
-            cam_list.Clear()
-            system.ReleaseInstance()
+#     # Check for FLIR Camera
+#     try:
+#         logger.debug("Connecting to FLIR Camera")
+#         system = PySpin.System.GetInstance()
+#         cam_list = system.GetCameras()
+#         if cam_list.GetSize() == 0:
+#             logger.error("No FLIR Camera connected")
+#             instruments.flir_camera = None
+#         else:
+#             instruments.flir_camera = cam_list.GetByIndex(0)
+#             # instruments.flir_camera.Init()
+#             cam_list.Clear()
+#             system.ReleaseInstance()
 
-            logger.debug("Connected to FLIR Camera")
-    except Exception as error:
-        logger.error("No FLIR Camera connected, %s", error)
-        instruments.flir_camera = None
-        incomplete = True
+#             logger.debug("Connected to FLIR Camera")
+#     except Exception as error:
+#         logger.error("No FLIR Camera connected, %s", error)
+#         instruments.flir_camera = None
+#         incomplete = True
 
-    # Connect to PSTAT
+#     # Connect to PSTAT
 
-    # Connect to Arduino
-    try:
-        logger.debug("Connecting to Arduino")
-        with ArduinoLink() as arduino:
-            if not arduino.configured:
-                logger.error("No Arduino connected")
-                incomplete = True
-                instruments.arduino = None
-            logger.debug("Connected to Arduino")
-            instruments.arduino = ArduinoLink()
-    except Exception as error:
-        logger.error("Error connecting to Arduino, %s", error)
-        incomplete = True
+#     # Connect to Arduino
+#     try:
+#         logger.debug("Connecting to Arduino")
+#         with ArduinoLink() as arduino:
+#             if not arduino.configured:
+#                 logger.error("No Arduino connected")
+#                 incomplete = True
+#                 instruments.arduino = None
+#             logger.debug("Connected to Arduino")
+#             instruments.arduino = ArduinoLink()
+#     except Exception as error:
+#         logger.error("Error connecting to Arduino, %s", error)
+#         incomplete = True
 
-    if incomplete:
-        print("Not all instruments connected")
-        return instruments, False
+#     if incomplete:
+#         print("Not all instruments connected")
+#         return instruments, False
 
-    logger.info("Connected to instruments")
-    return instruments, True
-
-
-@timing_wrapper
-def test_instrument_connections(
-    use_mock_instruments: bool = TESTING,
-) -> tuple[Toolkit, bool]:
-    """Connect to the instruments"""
-    instruments = Toolkit(
-        mill=None,
-        scale=None,
-        pump=None,
-        wellplate=None,
-        arduino=None,
-        global_logger=logger,
-        experiment_logger=logger,
-    )
-
-    if use_mock_instruments:
-        logger.info("Using mock instruments")
-        instruments.mill = MockMill()
-        instruments.mill.connect_to_mill()
-        # instruments.scale = MockScale()
-        instruments.pump = MockPump()
-        instruments.arduino = MockArduinoLink()
-        # pstat = echem_mock.GamryPotentiostat.connect()
-        return instruments
-
-    incomplete = False
-    logger.info("Connecting to instruments:")
-    try:
-        logger.debug("Connecting to mill")
-        instruments.mill = Mill()
-        instruments.mill.connect_to_mill()
-    except Exception as error:
-        logger.error("No mill connected, %s", error)
-        instruments.mill = None
-        # raise error
-        incomplete = True
-
-    # try:
-    #     logger.debug("Connecting to scale")
-    #     scale = Scale(address="COM6")
-    #     info_dict = scale.get_info()
-    #     model = info_dict["model"]
-    #     serial = info_dict["serial"]
-    #     software = info_dict["software"]
-    #     if not model:
-    #         logger.error("No scale connected")
-    #         # raise Exception("No scale connected")
-    #     logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
-    # except Exception as error:
-    #     logger.error("No scale connected, %s", error)
-    #     instruments.scale = None
-    #     # raise error
-    #     incomplete = True
-
-    try:
-        logger.debug("Connecting to pump")
-        instruments.pump = SyringePump()
-        logger.debug("Connected to pump at %s", instruments.pump.pump.address)
-
-    except Exception as error:
-        logger.error("No pump connected, %s", error)
-        instruments.pump = None
-        # raise error
-        incomplete = True
-
-    # Check for FLIR Camera
-    try:
-        logger.debug("Connecting to FLIR Camera")
-        system = PySpin.System.GetInstance()
-        cam_list = system.GetCameras()
-        if cam_list.GetSize() == 0:
-            logger.error("No FLIR Camera connected")
-            instruments.flir_camera = None
-            incomplete = True
-        else:
-            instruments.flir_camera = cam_list.GetByIndex(0)
-            # instruments.flir_camera.Init()
-            cam_list.Clear()
-            system.ReleaseInstance()
-
-            logger.debug("Connected to FLIR Camera")
-
-    except Exception as error:
-        logger.error("No FLIR Camera connected, %s", error)
-        instruments.flir_camera = None
-        incomplete = True
-
-    # Connect to PSTAT
-    try:
-        logger.debug("Connecting to Potentiostat")
-        connected = gamry_control.pstatconnect()
-        if not connected:
-            logger.error("No Potentiostat connected")
-            incomplete = True
-        else:
-            logger.debug("Connected to Potentiostat")
-            gamry_control.pstatdisconnect()
-    except Exception as error:
-        logger.error("Error connecting to Potentiostat, %s", error)
-        incomplete = True
-
-    # Connect to Arduino
-    try:
-        logger.debug("Connecting to Arduino")
-        with ArduinoLink() as arduino:
-            if not arduino.configured:
-                logger.error("No Arduino connected")
-                incomplete = True
-                instruments.arduino = None
-            logger.debug("Connected to Arduino")
-            instruments.arduino = arduino
-    except Exception as error:
-        logger.error("Error connecting to Arduino, %s", error)
-        incomplete = True
-
-    if incomplete:
-        print("Not all instruments connected")
-        return instruments, False
-
-    logger.info("Connected to all instruments")
-    return instruments, True
+#     logger.info("Connected to instruments")
+#     return instruments, True
 
 
-@timing_wrapper
-def disconnect_from_instruments(instruments: Toolkit):
-    """Disconnect from the instruments"""
-    logger.info("Disconnecting from instruments:")
-    if instruments.mill:
-        instruments.mill.disconnect()
-    # if instruments.flir_camera: instruments.flir_camera.DeInit()
+# @timing_wrapper
+# def test_instrument_connections(
+#     use_mock_instruments: bool = TESTING,
+# ) -> tuple[Toolkit, bool]:
+#     """Connect to the instruments"""
+#     instruments = Toolkit(
+#         mill=None,
+#         scale=None,
+#         pump=None,
+#         wellplate=None,
+#         arduino=None,
+#         global_logger=logger,
+#         experiment_logger=logger,
+#     )
 
-    logger.info("Disconnected from instruments")
+#     if use_mock_instruments:
+#         logger.info("Using mock instruments")
+#         instruments.mill = MockMill()
+#         instruments.mill.connect_to_mill()
+#         # instruments.scale = MockScale()
+#         instruments.pump = MockPump()
+#         instruments.arduino = MockArduinoLink()
+#         # pstat = echem_mock.GamryPotentiostat.connect()
+#         return instruments
+
+#     incomplete = False
+#     logger.info("Connecting to instruments:")
+#     try:
+#         logger.debug("Connecting to mill")
+#         instruments.mill = Mill()
+#         instruments.mill.connect_to_mill()
+#     except Exception as error:
+#         logger.error("No mill connected, %s", error)
+#         instruments.mill = None
+#         # raise error
+#         incomplete = True
+
+#     # try:
+#     #     logger.debug("Connecting to scale")
+#     #     scale = Scale(address="COM6")
+#     #     info_dict = scale.get_info()
+#     #     model = info_dict["model"]
+#     #     serial = info_dict["serial"]
+#     #     software = info_dict["software"]
+#     #     if not model:
+#     #         logger.error("No scale connected")
+#     #         # raise Exception("No scale connected")
+#     #     logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
+#     # except Exception as error:
+#     #     logger.error("No scale connected, %s", error)
+#     #     instruments.scale = None
+#     #     # raise error
+#     #     incomplete = True
+
+#     try:
+#         logger.debug("Connecting to pump")
+#         instruments.pump = SyringePump()
+#         logger.debug("Connected to pump at %s", instruments.pump.pump.address)
+
+#     except Exception as error:
+#         logger.error("No pump connected, %s", error)
+#         instruments.pump = None
+#         # raise error
+#         incomplete = True
+
+#     # Check for FLIR Camera
+#     try:
+#         logger.debug("Connecting to FLIR Camera")
+#         system = PySpin.System.GetInstance()
+#         cam_list = system.GetCameras()
+#         if cam_list.GetSize() == 0:
+#             logger.error("No FLIR Camera connected")
+#             instruments.flir_camera = None
+#             incomplete = True
+#         else:
+#             instruments.flir_camera = cam_list.GetByIndex(0)
+#             # instruments.flir_camera.Init()
+#             cam_list.Clear()
+#             system.ReleaseInstance()
+
+#             logger.debug("Connected to FLIR Camera")
+
+#     except Exception as error:
+#         logger.error("No FLIR Camera connected, %s", error)
+#         instruments.flir_camera = None
+#         incomplete = True
+
+#     # Connect to PSTAT
+#     try:
+#         logger.debug("Connecting to Potentiostat")
+#         connected = gamry_control.pstatconnect()
+#         if not connected:
+#             logger.error("No Potentiostat connected")
+#             incomplete = True
+#         else:
+#             logger.debug("Connected to Potentiostat")
+#             gamry_control.pstatdisconnect()
+#     except Exception as error:
+#         logger.error("Error connecting to Potentiostat, %s", error)
+#         incomplete = True
+
+#     # Connect to Arduino
+#     try:
+#         logger.debug("Connecting to Arduino")
+#         with ArduinoLink() as arduino:
+#             if not arduino.configured:
+#                 logger.error("No Arduino connected")
+#                 incomplete = True
+#                 instruments.arduino = None
+#             logger.debug("Connected to Arduino")
+#             instruments.arduino = arduino
+#     except Exception as error:
+#         logger.error("Error connecting to Arduino, %s", error)
+#         incomplete = True
+
+#     if incomplete:
+#         print("Not all instruments connected")
+#         return instruments, False
+
+#     logger.info("Connected to all instruments")
+#     return instruments, True
 
 
-@timing_wrapper
-def share_to_slack(experiment: ExperimentBase):
-    """Share the results of the experiment to the slack data channel"""
-    slack = SlackBot(test=TESTING)
+# @timing_wrapper
+# def disconnect_from_instruments(instruments: Toolkit):
+#     """Disconnect from the instruments"""
+#     logger.info("Disconnecting from instruments:")
+#     if instruments.mill:
+#         instruments.mill.disconnect()
+#     # if instruments.flir_camera: instruments.flir_camera.DeInit()
 
-    if experiment.results is None:
-        logger.error("The experiment has no results")
-        return
-    if experiment.results.images is None:
-        logger.error("The experiment has no image files")
-        return
-    try:
-        exp_id = experiment.experiment_id
+#     logger.info("Disconnected from instruments")
 
-        if TESTING:
-            msg = f"Experiment {exp_id} has completed with status {experiment.status}. Testing mode, no images to share"
-            slack.send_message("data", msg)
-            return
-        # images_with_dz = [
-        #     image
-        #     for image in experiment.results.image
-        #     if image[0].name.endswith("dz.tiff")
-        # ]
-        # if len(images_with_dz) == 0:
-        #     logger.error(
-        #         "The experiment %d has no dz.tiff image files", exp_id
-        #     )
-        #     msg = f"Experiment {exp_id} has completed with status {exp_id} but has no datazoned image files to share"
-        #     slack.send_slack_message("data", msg)
-        #     return
 
-        # for image in experiment.results.image:
-        #     image: Path = image[0]
-        #     images_with_dz = []
-        #     if image.name.endswith("dz.tiff"):
-        #         images_with_dz.append(image)
-        # msg = f"Experiment {exp_id} has completed with status {experiment.status}. Photos taken:"
-        #     slack.upload_images("data", images_with_dz, msg)
+# @timing_wrapper
+# def share_to_slack(experiment: ExperimentBase):
+#     """Share the results of the experiment to the slack data channel"""
+#     slack = SlackBot(test=TESTING)
 
-        results = select_specific_result(exp_id, "image")
+#     if experiment.results is None:
+#         logger.error("The experiment has no results")
+#         return
+#     if experiment.results.images is None:
+#         logger.error("The experiment has no image files")
+#         return
+#     try:
+#         exp_id = experiment.experiment_id
 
-        if results is None:
-            logger.error("The experiment %d has no image files", exp_id)
-            msg = f"Experiment {exp_id} has completed with status {experiment.status} but has no image files to share"
-            slack.send_message("data", msg)
-            return
+#         if TESTING:
+#             msg = f"Experiment {exp_id} has completed with status {experiment.status}. Testing mode, no images to share"
+#             slack.send_message("data", msg)
+#             return
 
-        for result in results:
-            result: ExperimentResultsRecord
-            if "dz" not in result.result_value:
-                results.remove(result)
+#         results = select_specific_result(exp_id, "image")
 
-        if len(results) == 0:
-            logger.error("The experiment %d has no dz.tiff image files", exp_id)
-            msg = f"Experiment {exp_id} has completed with status {experiment.status} but has no datazoned image files to share"
-            slack.send_message("data", msg)
-            return
+#         if results is None:
+#             logger.error("The experiment %d has no image files", exp_id)
+#             msg = f"Experiment {exp_id} has completed with status {experiment.status} but has no image files to share"
+#             slack.send_message("data", msg)
+#             return
 
-        msg = f"Experiment {exp_id} has completed with status {experiment.status}. Photos taken:"
-        image_paths = [result.result_value for result in results]
-        slack.upload_images("data", image_paths, f"{msg}")
-    except (
-        slack_errors.SlackApiError,
-        slack_errors.SlackClientError,
-        slack_errors.SlackRequestError,
-        slack_errors.SlackTokenRotationError,
-        slack_errors.BotUserAccessError,
-        slack_errors.SlackClientConfigurationError,
-        slack_errors.SlackObjectFormationError,
-        slack_errors.SlackRequestError,
-    ) as error:
-        logger.warning(
-            "A Slack specific error occured while sharing images from experiment %d with slack: %s",
-            experiment.experiment_id,
-            error,
-        )
-        # continue with the rest of the program
+#         for result in results:
+#             result: ExperimentResultsRecord
+#             if "dz" not in result.result_value:
+#                 results.remove(result)
 
-    except Exception as error:
-        logger.warning(
-            "An unanticipated error occured while sharing images from experiment %d with slack: %s",
-            experiment.experiment_id,
-            error,
-        )
-        # continue with the rest of the program
+#         if len(results) == 0:
+#             logger.error("The experiment %d has no dz.tiff image files", exp_id)
+#             msg = f"Experiment {exp_id} has completed with status {experiment.status} but has no datazoned image files to share"
+#             slack.send_message("data", msg)
+#             return
+
+#         msg = f"Experiment {exp_id} has completed with status {experiment.status}. Photos taken:"
+#         image_paths = [result.result_value for result in results]
+#         slack.upload_images("data", image_paths, f"{msg}")
+#     except slack_errors as error:
+#         logger.warning(
+#             "A Slack specific error occurred while sharing images from experiment %d with slack: %s",
+#             experiment.experiment_id,
+#             error,
+#         )
+#         # continue with the rest of the program
+
+#     except Exception as error:
+#         logger.warning(
+#             "An unanticipated error occurred while sharing images from experiment %d with slack: %s",
+#             experiment.experiment_id,
+#             error,
+#         )
+#         # continue with the rest of the program
 
 
 if __name__ == "__main__":

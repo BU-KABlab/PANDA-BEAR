@@ -38,7 +38,7 @@ From the top project directory level run `main.py`. This will begin initializing
 
 | Menu Option | Sub Option | Function Name                   | Description                                                                                                                     |
 | ----------- | ---------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 0           |            | run_sila_experiment_function    | Will prompt you for the experiment ID to run and then run that experiment.                                                      |
+| 0           |            | run_experiment                  | Will prompt you for the experiment ID to run and then run that experiment.                                                      |
 | 1           |            | run_queue                       | Will show you the current queue and then run all experiments in the queue.                                                      |
 | 1           | 1          | stop_panda_sdl                  | Instructs the experiment_worker to stop at the next opportunity.                                                                |
 | 1           | 2          | pause_panda_sdl                 | Instructs the experiment_worker to pause at the next opportunity.                                                               |

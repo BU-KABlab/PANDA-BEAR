@@ -13,6 +13,7 @@ from datetime import datetime
 # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 from enum import Enum
 from io import BytesIO
+from logging import Logger
 from math import fabs
 from pathlib import Path
 from typing import Union
@@ -23,7 +24,10 @@ from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from panda_lib.experiments.experiment_types import select_experiment_status
+from panda_lib.experiments.experiment_types import (
+    ExperimentBase,
+    _select_experiment_status,
+)
 from panda_lib.experiments.results import (
     ExperimentResultsRecord,
     select_specific_result,
@@ -112,13 +116,14 @@ class SlackBot:
             # print(message)
             return
 
-        client = WebClient(SlackCred.TOKEN)
+        # client = WebClient(SlackCred.TOKEN)
+
         channel_id = self.channel_id(channel_id)
         if channel_id == 0 or channel_id is None:
             return
 
         try:
-            result = client.chat_postMessage(channel=channel_id, text=message)
+            result = self.client.chat_postMessage(channel=channel_id, text=message)
             # print("Slack:", message)
             if result["ok"]:
                 self.logger.info("Message sent:%s", message)
@@ -134,7 +139,7 @@ class SlackBot:
         if not config_options.getboolean("use_slack"):
             return
 
-        client = WebClient(SlackCred.TOKEN)
+        # client = WebClient(SlackCred.TOKEN)
         file = Path(file)
         filename_to_post = file.name
 
@@ -145,7 +150,7 @@ class SlackBot:
         try:
             result = None
             with open(file, "rb") as f:
-                result = client.files_upload_v2(
+                result = self.client.files_upload_v2(
                     channel=channel_id,
                     file=f,
                     filename=filename_to_post,
@@ -236,7 +241,7 @@ class SlackBot:
         """Check Slack for messages."""
         if not config_options.getboolean("use_slack"):
             return
-        # WebClient insantiates a client that can call API methods
+        # WebClient instantiates a client that can call API methods
         # When using Bolt, you can use either `app.client` or the `client` passed to listeners.
         client = WebClient(token=SlackCred.TOKEN)
         # Store conversation history
@@ -335,7 +340,7 @@ class SlackBot:
 
         # Parse message
         if text == "help":
-            self.__help_menu(channel_id=channel_id)
+            self._help_menu(channel_id=channel_id)
             return 1
 
         elif text[0:15] == "data experiment":
@@ -352,7 +357,7 @@ class SlackBot:
             try:
                 experiment_number = int(text[17:].strip())
                 # Get status
-                status = select_experiment_status(experiment_number)
+                status = _select_experiment_status(experiment_number)
                 message = f"The status of experiment {experiment_number} is {status}."
                 self.send_message(channel_id, message)
             except ValueError:
@@ -364,29 +369,29 @@ class SlackBot:
             # Get experiment number
             try:
                 experiment_number = int(text[17:].strip())
-                self.__share_experiment_images(experiment_number)
+                self._share_experiment_images(experiment_number)
 
             except ValueError:
                 message = "Please enter a valid experiment number."
                 self.send_message(channel_id, message)
             return 1
         elif text[0:11] == "vial status":
-            self.__vial_status(channel_id=channel_id)
+            self._vial_status(channel_id=channel_id)
             return 1
 
         elif text[0:11] == "well status":
             # Get well status
-            self.__well_status(channel_id=channel_id)
+            self._well_status(channel_id=channel_id)
             return 1
 
         elif text[0:12] == "queue length":
-            self.__queue_length(channel_id=channel_id)
+            self._queue_length(channel_id=channel_id)
             return 1
         elif text[0:13] == "system status":
-            self.__queue_length(channel_id=channel_id)
-            self.__well_status(channel_id=channel_id)
+            self._queue_length(channel_id=channel_id)
+            self._well_status(channel_id=channel_id)
             time.sleep(1)
-            self.__vial_status(channel_id=channel_id)
+            self._vial_status(channel_id=channel_id)
             return 1
 
         elif text[0:10] == "screenshot":
@@ -457,7 +462,7 @@ class SlackBot:
             self.send_message(channel_id, message)
             return 1
 
-    def __help_menu(self, channel_id):
+    def _help_menu(self, channel_id):
         """Sends the help menu to the user."""
 
         if channel_id != SlackCred.DATA_CHANNEL_ID:
@@ -506,20 +511,20 @@ class SlackBot:
         """Procedure to follow when an echem error occurs."""
 
         channel_id = self.channel_id("alert")
-        self.send_message(channel_id, "Failure has occured. Please check the system.")
+        self.send_message(channel_id, "Failure has occurred. Please check the system.")
         self.take_screenshot(channel_id, "webcam")
         self.take_screenshot(channel_id, "vials")
         time.sleep(5)
         self.send_message(channel_id, "Would you like to continue? (y/n): ")
         while True:
-            contiue_choice = self.check_latest_message(channel_id)[0].strip().lower()
-            if contiue_choice == "y":
+            continue_decision = self.check_latest_message(channel_id)[0].strip().lower()
+            if continue_decision == "y":
                 return 1
-            if contiue_choice == "n":
+            if continue_decision == "n":
                 return 0
             time.sleep(5)
 
-    def __vial_status(self, channel_id):
+    def _vial_status(self, channel_id):
         """Sends the vial status to the user."""
         # Get vial status
         # ## Load the vial status json file
@@ -538,14 +543,14 @@ class SlackBot:
         Path(stock_status).unlink()
         Path(waste_status).unlink()
 
-    def __well_status(self, channel_id):
+    def _well_status(self, channel_id):
         """Sends the well status to the user."""
         file_path_for_plot = well_status()
         self.upload_images(channel_id, [file_path_for_plot.absolute()], "Well Status")
         file_path_for_plot.unlink()
         return 1
 
-    def __queue_length(self, channel_id):
+    def _queue_length(self, channel_id):
         # Get queue length
         message = f"The queue length is {sql_queue.count_queue_length()}."
         self.send_message(channel_id, message)
@@ -603,7 +608,7 @@ class SlackBot:
             self.send_message(channel_id, str(e))
             return 1
 
-    def __share_experiment_images(self, experiment_id: int):
+    def _share_experiment_images(self, experiment_id: int):
         """Share the images for an experiment."""
         # Look up there experiment_id in the db and find all results of type image
         # Then filter the results to only include those with dz in the name
@@ -1102,17 +1107,17 @@ class MockSlackBot(SlackBot):
         # print("Echem error procedure")
         pass
 
-    def __vial_status(self, channel_id):
+    def _vial_status(self, channel_id):
         """Sends the vial status to the user."""
         # print("Vial status")
         pass
 
-    def __well_status(self, channel_id):
+    def _well_status(self, channel_id):
         """Sends the well status to the user."""
         # print("Well status")
         pass
 
-    def __queue_length(self, channel_id):
+    def _queue_length(self, channel_id):
         # print("Queue length")
         pass
 
@@ -1121,7 +1126,7 @@ class MockSlackBot(SlackBot):
         # print(f"Screenshot of {camera_name}")
         pass
 
-    def __share_experiment_images(self, experiment_id: int):
+    def _share_experiment_images(self, experiment_id: int):
         """Share the images for an experiment."""
         # print(f"Sharing images for experiment {experiment_id}")
         pass
@@ -1144,6 +1149,68 @@ class MockSlackBot(SlackBot):
         """Terminate the slack bot."""
         # print("Terminating slack bot")
         pass
+
+
+def share_to_slack(
+    experiment: ExperimentBase,
+    logger: Logger = logging.getLogger("panda"),
+    slack_bot: SlackBot = SlackBot(),
+):
+    """Share the results of the experiment to the slack data channel"""
+    TESTING = read_testing_config()
+    slack_bot = SlackBot()
+
+    if experiment.results is None:
+        logger.error("The experiment has no results")
+        return
+    if experiment.results.images is None:
+        logger.error("The experiment has no image files")
+        return
+    try:
+        exp_id = experiment.experiment_id
+
+        if TESTING:
+            msg = f"Experiment {exp_id} has completed with status {experiment.status}. Testing mode, no images to share"
+            slack_bot.send_message("data", msg)
+            return
+
+        results = select_specific_result(exp_id, "image")
+
+        if results is None:
+            logger.error("The experiment %d has no image files", exp_id)
+            msg = f"Experiment {exp_id} has completed with status {experiment.status} but has no image files to share"
+            slack_bot.send_message("data", msg)
+            return
+
+        for result in results:
+            result: ExperimentResultsRecord
+            if "dz" not in result.result_value:
+                results.remove(result)
+
+        if len(results) == 0:
+            logger.error("The experiment %d has no dz.tiff image files", exp_id)
+            msg = f"Experiment {exp_id} has completed with status {experiment.status} but has no datazoned image files to share"
+            slack_bot.send_message("data", msg)
+            return
+
+        msg = f"Experiment {exp_id} has completed with status {experiment.status}. Photos taken:"
+        image_paths = [result.result_value for result in results]
+        slack_bot.upload_images("data", image_paths, f"{msg}")
+    except SlackApiError as error:
+        logger.warning(
+            "A Slack specific error occurred while sharing images from experiment %d with slack: %s",
+            experiment.experiment_id,
+            error,
+        )
+        # continue with the rest of the program
+
+    except Exception as error:
+        logger.warning(
+            "An unanticipated error occurred while sharing images from experiment %d with slack: %s",
+            experiment.experiment_id,
+            error,
+        )
+        # continue with the rest of the program
 
 
 if __name__ == "__main__":

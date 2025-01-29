@@ -26,15 +26,19 @@ from panda_lib import (
     input_validation,
     load_analyzers,
     print_panda,
-    remove_testing_experiments,
+)
+from panda_lib.experiments.experiment_types import ExperimentBase
+from panda_lib.labware import vials, wellplates
+from panda_lib.sql_tools import (
     sql_generator_utilities,
     sql_protocol_utilities,
     sql_queue,
     sql_system_state,
     sql_wellplate,
 )
-from panda_lib.experiments.experiment_types import ExperimentBase
-from panda_lib.labware import vials, wellplates
+from panda_lib.sql_tools.remove_testing_experiments import (
+    main as remove_testing_experiments,
+)
 from shared_utilities.config import (
     print_config_values,
     read_config,
@@ -122,7 +126,7 @@ blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 #     return exp_processes
 
 
-def run_sila_experiment_function():
+def run_experiment():
     queue_list = print_queue_info()
     exp_id = int(
         input_validation(
@@ -379,21 +383,18 @@ def refresh():
 
 
 def stop_panda_sdl():
-    """Stops the PANDA_SDL loop."""
     exp_cmd_queue.put(SystemState.STOP)
-    sql_system_state.set_system_status(SystemState.SHUTDOWN, "stopping PANDA_SDL")
+    print("Stop command sent.")
 
 
 def pause_panda_sdl():
-    """Pauses the PANDA_SDL loop."""
     exp_cmd_queue.put(SystemState.PAUSE)
-    sql_system_state.set_system_status(SystemState.PAUSE, "stopping PANDA_SDL")
+    print("Pause command sent.")
 
 
 def resume_panda_sdl():
-    """Resumes the PANDA_SDL loop."""
     exp_cmd_queue.put(SystemState.RESUME)
-    sql_system_state.set_system_status(SystemState.RESUME, "stopping PANDA_SDL")
+    print("Resume command sent.")
 
 
 def remove_training_data():
@@ -541,7 +542,7 @@ def list_analysis_script_ids():
 def main_menu(reduced: bool = False) -> Tuple[callable, str]:
     """Main menu for PANDA_SDL."""
     menu_options = {
-        "0": run_sila_experiment_function,
+        "0": run_experiment,
         "1": run_queue,
         "1.1": stop_panda_sdl,
         "1.2": pause_panda_sdl,
