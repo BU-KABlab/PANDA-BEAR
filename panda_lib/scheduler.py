@@ -12,6 +12,8 @@ import sqlite3
 from pathlib import Path
 from typing import Tuple, Union
 
+from sqlalchemy import select, update
+
 from panda_lib.experiments.sql_functions import update_experiment_status
 from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import setup_default_logger, timing_wrapper
@@ -67,7 +69,7 @@ def choose_next_new_well(plate_id: int = None) -> str:
 
 @timing_wrapper
 def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> None:
-    """Change the status of the well in the well_status view in the SQLite database"""
+    """Change the status of the well in the well_hx table"""
     logger.debug(
         "Changing %s status to %s",
         well,
@@ -102,7 +104,7 @@ def read_next_experiment_from_queue(
     experiment_id: int = None,
 ) -> Tuple[ExperimentBase, Path]:
     """
-    Reads the next experiment from the queue table, the experiment with the highest priority (lowest number).
+    Reads the next experiment from the queue, the experiment with the highest priority (lowest number).
     If random_pick is True, then a random experiment with the highest priority is selected.
     Otherwise, the lowest experiment id in the queue with the highest priority is selected.
 
@@ -144,14 +146,13 @@ def read_next_experiment_from_queue(
 def update_experiment_queue_priority(experiment_id: int, priority: int):
     """Update the priority of experiments in the queue"""
     try:
-        # execute_sql_command(
-        #     "UPDATE experiments SET priority = ? WHERE experiment_id = ?",
-        #     (priority, experiment_id),
-        # )
         with SessionLocal() as session:
-            session.query(Experiments).filter_by(experiment_id=experiment_id).update(
-                {"priority": priority}
+            stmt = (
+                update(Experiments)
+                .where(Experiments.experiment_id == experiment_id)
+                .values({"priority": priority})
             )
+            session.execute(stmt)
             session.commit()
 
     except sqlite3.Error as e:
@@ -163,15 +164,13 @@ def update_experiment_queue_priority(experiment_id: int, priority: int):
 def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
     """Update the experiment information in the experiments table"""
     try:
-        # execute_sql_command(
-        #     f"UPDATE experiments SET {column} = ? WHERE experiment_id = ?",
-        #     (getattr(experiment, column), experiment.experiment_id),
-        # )
-
         with SessionLocal() as session:
-            session.query(Experiments).filter_by(
-                experiment_id=experiment.experiment_id
-            ).update({column: getattr(experiment, column)})
+            stmt = (
+                update(Experiments)
+                .where(Experiments.experiment_id == experiment.experiment_id)
+                .values({column: getattr(experiment, column)})
+            )
+            session.execute(stmt)
             session.commit()
     except sqlite3.Error as e:
         logger.error("Error occurred while updating experiment information: %s", e)
@@ -203,9 +202,18 @@ def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> 
             value = getattr(experiment, parameter)
             value = json.dumps(value, default=str) if isinstance(value, dict) else value
 
-            session.query(ExperimentParameters).filter_by(
-                experiment_id=experiment.experiment_id, parameter_name=parameter
-            ).update({"parameter_value": value})
+            # session.query(ExperimentParameters).filter_by(
+            #     experiment_id=experiment.experiment_id, parameter_name=parameter
+            # ).update({"parameter_value": value})
+            stmt = (
+                update(ExperimentParameters)
+                .where(
+                    ExperimentParameters.experiment_id == experiment.experiment_id,
+                    ExperimentParameters.parameter_name == parameter,
+                )
+                .values({"parameter_value": value})
+            )
+            session.execute(stmt)
             session.commit()
     except sqlite3.Error as e:
         logger.error("Error occurred while updating experiment parameters: %s", e)
@@ -395,7 +403,7 @@ def check_project_id(project_id: int) -> bool:
     """Check if the project_id is in the projects table"""
     try:
         with SessionLocal() as session:
-            project = session.query(Projects).filter_by(id=project_id).first()
+            project = session.scalars(select(Projects).filter_by(id=project_id)).first()
             if project is None:
                 return False
             return True

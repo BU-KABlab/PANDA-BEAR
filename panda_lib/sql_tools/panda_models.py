@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from datetime import timezone
 
 import sqlalchemy as sa
-from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, text
+from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, select, text
 from sqlalchemy.ext import compiler
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
@@ -77,10 +77,6 @@ class Experiments(Base):
 
     def __repr__(self):
         return f"<Experiments(experiment_id={self.experiment_id}, project_id={self.project_id}, project_campaign_id={self.project_campaign_id}, well_type={self.well_type}, protocol_id={self.protocol_id}, pin={self.pin}, experiment_type={self.experiment_type}, jira_issue_key={self.jira_issue_key}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, created={self.created}, updated={self.updated})>"
-
-    # @classmethod
-    # def get_by_id(cls, session, experiment_id: int) -> Optional["Experiments"]:
-    #     return session.query(cls).filter(cls.experiment_id == experiment_id).first()
 
 
 class ExperimentStatusView:
@@ -306,9 +302,9 @@ def generate_username(mapper, connection, target):
     """Generate a unique username by concatenating the first letter of the first name with the last name and an auto-incremented number."""
     if target.first and target.last:
         base_username = f"{target.first[0].lower()}{target.last.lower()}"
-        existing_usernames = connection.execute(
-            f"SELECT username FROM users WHERE username LIKE '{base_username}%'"
-        ).fetchall()
+        existing_usernames = connection.scalars(
+            select(Users.username).where(Users.username.like(f"{base_username}%"))
+        )
         if existing_usernames:
             max_suffix = max(
                 int(username[0].replace(base_username, "") or 0)
