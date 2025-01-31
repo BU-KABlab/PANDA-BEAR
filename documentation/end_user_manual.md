@@ -85,11 +85,12 @@ The script will have at least one function, named "run" which accepts an experim
 
 Example:
 ```python
-# For writing a protocol, use the available actions and types from the panda_lib library.
-from panda_lib import (
-    EchemExperimentBase,
-    ExperimentStatus,
-    Toolkit,
+# For writing a protocol, use the available actions and types from the panda_lib library along with other libraries.
+from dataclasses import dataclass
+from logging import Logger
+
+from panda_lib import Toolkit
+from panda_lib.actions import (
     chrono_amp,
     clear_well,
     flush_pipette,
@@ -97,12 +98,13 @@ from panda_lib import (
     rinse_well,
     transfer,
 )
+from panda_lib.experiments import EchemExperimentBase, ExperimentStatus
+from panda_lib.labware.wellplates import Well
 
 # You can have a developer create custom actions for your system or project and save them as actions_name modules in panda_lib
 from panda_lib.actions_pgma import cyclic_volt_pgma_fc
 
 # A helper class for solutions is convenient
-from dataclasses import dataclass
 @dataclass
 class Solution:
     name: str
@@ -181,14 +183,10 @@ Date: YYYY-MM-DD
 Description: 3 series of experiments for polymer-deposition-voltage-screening with 10mm wells, comparing the voltage of the CA.
 """
 # Import the experiment type and the scheduler
-from panda_lib import EchemExperimentBase, scheduler
-
-PROJECT_ID = 123
-EXPERIMENT_NAME = "polymer-deposition-voltage-screening"
-CAMPAIGN_ID = 1
-PLATE_TYPE = 7  # 10 mm diameter wells on gold
-PROTOCOL_NAME = abc_experiment name_01.py # The name of the protocol file you wrote
-
+from panda_lib import scheduler
+from panda_lib.experiments import EchemExperimentBase
+# Set the initial or constant values your experiment will use
+campaign_id = 1
 voltages = [1.0, 1.5, 2.0]
 replicates = 3
 
@@ -205,17 +203,17 @@ def main():
                 # Define the experiment variables
                 EchemExperimentBase(
                     experiment_id=experiment_id,
-                    protocol_id=PROTOCOL_NAME,
+                    protocol_id=abc_experiment name_01.py, # The name of the protocol file you wrote
                     well_id="A1", # The desired well if available, will be reassigned automatically if not.
-                    plate_type_number=PLATE_TYPE,
-                    experiment_name=EXPERIMENT_NAME,
-                    project_id=PROJECT_ID,
-                    project_campaign_id=CAMPAIGN_ID + i,
+                    plate_type_number=7,  # 10 mm diameter wells on gold
+                    experiment_name="polymer-deposition-voltage-screening",
+                    project_id=123, # You can group experiments by a project ID for easy reference in the future,
+                    project_campaign_id=campaign_id + i, # The + i here is used to differentiate different runs of replicates. You can leave it as a static value or set it to change dynamically to suite your needs.
                     solutions={
                         "polymer_solution": {
-                            "volume": 320,
+                            "volume": 320, # The volume to be used per action
                             "concentration": 1.0,
-                            "repeated": 1,
+                            "repeated": 1, # Estimate the number of times a single experiment will repeat this volume of this solution. It will be used to check if enough it available.
                         },
                         "solventA rinse": {
                             "volume": 160,
@@ -230,8 +228,8 @@ def main():
                     },
                     flush_sol_name="solventB rinse",
                     rinse_sol_name="solventB rinse",
-                    pumping_rate=0.5,
                     filename=str(experiment_id)+EXPERIMENT_NAME,
+
                     # Echem specific - define all potentiostat parameters here
                     ocp=1, # Perform 1=yes 0=no
                     baseline=0,
