@@ -31,7 +31,7 @@ from shared_utilities.config.config_tools import read_config
 
 config = read_config()
 
-if os.environ.get("TEMP_DB") == "True":
+if os.environ.get("TEMP_DB") == "1":
     db_type = "sqlite"
     db_address = "temp.db"
 
