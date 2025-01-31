@@ -334,7 +334,7 @@ def experiment_loop_worker(
             # if not TESTING and current_experiment.analyzer is not None:
             #     current_experiment.analyzer(current_experiment)
             current_experiment.set_status_and_save(ExperimentStatus.SAVING)
-            current_experiment.results.save_results(current_experiment)
+            current_experiment.results.save_results()
             current_experiment.set_status_and_save(ExperimentStatus.COMPLETE)
             # Post to the alerts channel
             controller_slack.send_message(
@@ -458,7 +458,7 @@ def experiment_loop_worker(
 
     finally:
         if current_experiment is not None:
-            current_experiment.results.save_results(current_experiment)
+            current_experiment.results.save_results()
             share_to_slack(current_experiment)
 
         toolkit.mill.rest_electrode()
@@ -594,7 +594,7 @@ def sila_experiment_loop_worker(
             finally:
                 if exp_obj is not None:
                     status = select_experiment_status(exp_obj.experiment_id)
-                    exp_obj.results.save_results(exp_obj)
+                    exp_obj.results.save_results()
                     if status == ExperimentStatus.COMPLETE:
                         with SessionLocal() as connection:
                             stmt = (
@@ -617,7 +617,7 @@ def sila_experiment_loop_worker(
             if exp_obj is not None:
                 post_experiment_status_msg = f"Experiment {exp_obj.experiment_id} ended with status {exp_obj.status.value}"
                 logger.info(post_experiment_status_msg)
-                exp_obj.results.save_results(exp_obj)
+                exp_obj.results.save_results()
                 share_to_slack(exp_obj)
 
             ## Clean up the instruments
