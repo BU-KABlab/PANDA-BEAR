@@ -6,9 +6,13 @@ import json
 from datetime import datetime as dt
 from datetime import timezone
 
+import sqlalchemy as sa
 from sqlalchemy import Column, Computed, ForeignKey, Table, Text, event, text
+from sqlalchemy.ext import compiler
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
+from sqlalchemy.schema import DDLElement
+from sqlalchemy.sql import table
 from sqlalchemy.sql.sqltypes import (
     JSON,
     BigInteger,
@@ -472,18 +476,98 @@ class Vials(Base):
         return self.coordinates.get("z", 0)
 
 
-class VialStatus(VialsBase):
+class CreateView(DDLElement):
+    def __init__(self, name, selectable):
+        self.name = name
+        self.selectable = selectable
+
+
+class DropView(DDLElement):
+    def __init__(self, name):
+        self.name = name
+
+
+@compiler.compiles(CreateView)
+def _create_view(element, compiler, **kw):
+    return "CREATE VIEW %s AS %s" % (
+        element.name,
+        compiler.sql_compiler.process(element.selectable, literal_binds=True),
+    )
+
+
+@compiler.compiles(DropView)
+def _drop_view(element, compiler, **kw):
+    return "DROP VIEW %s" % (element.name)
+
+
+def view_exists(ddl, target, connection, **kw):
+    return ddl.name in sa.inspect(connection).get_view_names()
+
+
+def view_doesnt_exist(ddl, target, connection, **kw):
+    return not view_exists(ddl, target, connection, **kw)
+
+
+def view(name, metadata, selectable):
+    t = table(name)
+
+    t._columns._populate_separate_keys(
+        col._make_proxy(t) for col in selectable.selected_columns
+    )
+
+    sa.event.listen(
+        metadata,
+        "after_create",
+        CreateView(name, selectable).execute_if(callable_=view_doesnt_exist),
+    )
+    sa.event.listen(
+        metadata, "before_drop", DropView(name).execute_if(callable_=view_exists)
+    )
+    return t
+
+
+# NOTE: This is a view that is used to get the most recent vial status for each vial position
+
+_subquery = sa.select(
+    sa.func.row_number()
+    .over(partition_by=Vials.position, order_by=Vials.updated.desc())
+    .label("rn"),
+    Vials,
+).alias("RankedVials")
+
+_vial_status_view = view(
+    "panda_vial_status",
+    Base.metadata,
+    sa.select(
+        _subquery.c.id.label("id"),
+        _subquery.c.position.label("position"),
+        _subquery.c.category.label("category"),
+        _subquery.c.viscosity_cp.label("viscosity_cp"),
+        _subquery.c.concentration.label("concentration"),
+        _subquery.c.density.label("density"),
+        _subquery.c.active.label("active"),
+        _subquery.c.updated.label("updated"),
+        _subquery.c.coordinates.label("coordinates"),
+        _subquery.c.base_thickness.label("base_thickness"),
+        _subquery.c.height.label("height"),
+        _subquery.c.top.label("top"),
+        _subquery.c.bottom.label("bottom"),
+        _subquery.c.name.label("name"),
+        _subquery.c.radius.label("radius"),
+        _subquery.c.volume.label("volume"),
+        _subquery.c.capacity.label("capacity"),
+        _subquery.c.contamination.label("contamination"),
+        _subquery.c.dead_volume.label("dead_volume"),
+        _subquery.c.volume_height.label("volume_height"),
+        _subquery.c.contents.label("contents"),
+    ).where(_subquery.c.rn == 1),
+)
+
+
+class VialStatus(Base):
     """VialStatus view model"""
 
-    __tablename__ = "panda_vial_status"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    position: Mapped[str] = mapped_column(String)
-    category: Mapped[int] = mapped_column(Integer)
-    viscosity_cp: Mapped[float] = mapped_column(Float)
-    concentration: Mapped[float] = mapped_column(Float)
-    density: Mapped[float] = mapped_column(Float)
-    active: Mapped[bool] = mapped_column(Boolean, default=True)
-    updated: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+    __table__ = _vial_status_view
 
     def __repr__(self):
         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
@@ -499,6 +583,35 @@ class VialStatus(VialsBase):
     @property
     def z(self):
         return self.coordinates.get("z", 0)
+
+
+# class VialStatus(VialsBase):
+#     """VialStatus view model"""
+
+#     __tablename__ = "panda_vial_status"
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+#     position: Mapped[str] = mapped_column(String)
+#     category: Mapped[int] = mapped_column(Integer)
+#     viscosity_cp: Mapped[float] = mapped_column(Float)
+#     concentration: Mapped[float] = mapped_column(Float)
+#     density: Mapped[float] = mapped_column(Float)
+#     active: Mapped[bool] = mapped_column(Boolean, default=True)
+#     updated: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
+
+#     def __repr__(self):
+#         return f"<VialStatus(id={self.id}, position={self.position}, contents={self.contents}, viscosity_cp={self.viscosity_cp}, concentration={self.concentration}, density={self.density}, category={self.category}, radius={self.radius}, height={self.height}, name={self.name}, volume={self.volume}, capacity={self.capacity}, contamination={self.contamination}, coordinates={self.coordinates}, updated={self.updated})>"
+
+#     @property
+#     def x(self):
+#         return self.coordinates.get("x", 0)
+
+#     @property
+#     def y(self):
+#         return self.coordinates.get("y", 0)
+
+#     @property
+#     def z(self):
+#         return self.coordinates.get("z", 0)
 
 
 class WellModel(VesselBase, Base):

@@ -2,10 +2,11 @@ import json
 from datetime import datetime
 from typing import List, Union, get_type_hints
 
+from sqlalchemy import select
+
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     Experiments,
-    ExperimentStatusView,
     WellModel,
     Wellplates,
 )
@@ -135,11 +136,8 @@ def select_experiment_status(experiment_id: int) -> str:
     """
 
     with SessionLocal() as session:
-        result = (
-            session.query(ExperimentStatusView.status)
-            .filter(ExperimentStatusView.experiment_id == experiment_id)
-            .all()
-        )
+        stmt = select(WellModel.status).where(WellModel.experiment_id == experiment_id)
+        result = session.execute(stmt).fetchall()
 
     if result == []:
         return ValueError("No experiment found with that ID")

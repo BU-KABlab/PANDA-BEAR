@@ -21,6 +21,7 @@ import time
 from pathlib import Path
 from typing import Optional, Sequence, Tuple
 
+from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 
 # from panda_experiment_analyzers import pedot as pedot_analyzer
@@ -54,7 +55,6 @@ from panda_lib.labware.wellplates import Well, Wellplate
 # from .movement import Mill, MockMill
 from panda_lib.slack_tools.SlackBot import SlackBot, share_to_slack
 from panda_lib.sql_tools import (
-    db_setup,
     panda_models,
     sql_protocol_utilities,
     sql_queue,
@@ -355,11 +355,13 @@ def experiment_loop_worker(
 
             ## If the status is complete mark for analysis
             if current_experiment.status == ExperimentStatus.COMPLETE:
-                with db_setup.SessionLocal() as connection:
-                    connection.query(panda_models.Experiments).filter(
-                        panda_models.Experiments.experiment_id
-                        == current_experiment.experiment_id
-                    ).update({"needs_analysis": True})
+                with SessionLocal() as connection:
+                    stmt = (
+                        update(panda_models.Experiments)
+                        .where(panda_models.Experiments.experiment_id)
+                        .values(needs_analysis=True)
+                    )
+                    connection.execute(stmt)
                     connection.commit()
 
             ## Clean up
@@ -594,11 +596,13 @@ def sila_experiment_loop_worker(
                     status = select_experiment_status(exp_obj.experiment_id)
                     exp_obj.results.save_results(exp_obj)
                     if status == ExperimentStatus.COMPLETE:
-                        with db_setup.SessionLocal() as connection:
-                            connection.query(panda_models.Experiments).filter(
-                                panda_models.Experiments.experiment_id
-                                == exp_obj.experiment_id
-                            ).update({"needs_analysis": True})
+                        with SessionLocal() as connection:
+                            stmt = (
+                                update(panda_models.Experiments)
+                                .where(panda_models.Experiments.experiment_id)
+                                .values(needs_analysis=True)
+                            )
+                            connection.execute(stmt)
                             connection.commit()
 
         except (ProtocolNotFoundError, KeyboardInterrupt, Exception) as error:

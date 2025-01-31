@@ -208,7 +208,7 @@ class MockPandaMill(MockMill):
         ebath_vial = None
         ebath_vial = read_vial(position="e1")
         coords: Coordinates = Coordinates(
-            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
+            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.vial_data.volume_height
         )
         self.safe_move(coords.x, coords.y, ebath_vial.top, tool="electrode")
         for _ in range(rinses):
@@ -221,7 +221,7 @@ class MockPandaMill(MockMill):
         ebath_vial = None
         ebath_vial = read_vial(position="e1")
         coords: Coordinates = Coordinates(
-            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
+            x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.vial_data.volume_height
         )
         self.move_to_safe_position()
         self.safe_move(coordinates=coords, tool="electrode")
