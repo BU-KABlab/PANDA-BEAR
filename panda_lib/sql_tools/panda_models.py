@@ -30,6 +30,7 @@ class JSONEncodedDict(TypeDecorator):
     """Enables JSON storage by encoding and decoding on the fly."""
 
     impl = String
+    cache_ok = False
 
     def process_bind_param(self, value, dialect):
         if value is None:
