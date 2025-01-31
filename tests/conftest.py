@@ -2,22 +2,8 @@ import os
 import sys
 from datetime import datetime
 
-import dotenv
-import pytest
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import close_all_sessions, sessionmaker
-
-from hardware.panda_pipette import (
-    PipetteModel,
-)
-from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
-from panda_lib.labware.wellplates import Wellplate
-from panda_lib.sql_tools.panda_models import (
-    Base,
-    PlateTypes,
-    Vials,
-    WellModel,
-)
+os.environ["TEMP_DB"] = "1"
+import pytest  # noqa: E402
 
 # Add the root directory of your project to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -28,8 +14,22 @@ def temp_test_db():
     """
     Creates an temp SQLite DB, sets up tables for tests.
     """
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.orm import close_all_sessions, sessionmaker
+
+    from hardware.panda_pipette import (
+        PipetteModel,
+    )
+    from panda_lib.labware.schemas import VialWriteModel, WellWriteModel
+    from panda_lib.labware.wellplates import Wellplate
+    from panda_lib.sql_tools.panda_models import (
+        Base,
+        PlateTypes,
+        Vials,
+        WellModel,
+    )
     # Toggle using the temp db in the config
-    dotenv.set_key(".env", "TEMP_DB", "1")
+
     # Create an in-memory SQLite database
     engine = create_engine("sqlite:///temp.db", echo=False)
     TestingSessionLocal = sessionmaker(bind=engine)
@@ -433,11 +433,11 @@ def temp_test_db():
         else:
             raise Exception("Not using in-memory database")
 
-        # Remove the temp db from the config
-        dotenv.set_key(".env", "TEMP_DB", "0")
+        # Toggle using the temp db in the config
+        os.environ["TEMP_DB"] = "0"
 
         engine.dispose()
         close_all_sessions()
         SessionLocal = None
         del SessionLocal
-        os.remove("temp.db")
+        # os.remove("temp.db")
