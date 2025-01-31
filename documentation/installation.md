@@ -6,13 +6,26 @@
 
 Clone the repository to a directory on your machine. You may do this graphically from GitHub, or use the commandline.
 
+[GitHub Docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+
+**Using the CLI**
+
+You may need to install git on your device first - [heres how](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+
+```git clone -b <branch> <remote_repo>```
+
+Example:
+
+```git clone -b my-branch git@github.com:user/myproject.git```
+
+
 # 1. FLIR SDKS
 
 This system uses a FLIR camera and requires their proprietary SDK which you can obtain for free from their website.
 
 ## Where to find the SDK files and examples
 
-Spinnaker is proprietary software made by Teledyne FLIR and as such cannot be included in the repository. To use the `imaging` module you must have installed both the Spinnaker SDK and the Python SDK in your chosen environment.
+Spinnaker is proprietary software made by FLIR and as such cannot be included in the repository. To use the `imaging` module you must have installed both the Spinnaker SDK and the Python SDK in your chosen environment.
 
 Downloading is free but you will need to make an account: <https://www.flir.com/products/spinnaker-sdk/>
 
@@ -30,7 +43,7 @@ The Linux SDKs do not come with examples, download the Windows or Mac zip files 
 
 After installing UV (follow the link above to learn how), using the terminal, navigate to the directory you copied the project repository to.
 
-In `pyproject.toml` under tool.uv.sources you will need to provide the path between the {} to the Spinnaker/FLIR python `.whl` that you downloaded earlier (you did do part 1 right?).
+In `pyproject.toml` under tool.uv.sources you will need to provide the path between the `{}` to the Spinnaker python `.whl` that you downloaded earlier (you did do part 1 right?).
 
 ```toml
 [tool.uv.sources]
@@ -55,7 +68,23 @@ Run the following commands:
 
 ## Using `PIP`
 
-Use your preferred environment manager to first create a python 3.10 environment. Then once activated, and in the repository directory, use:
+Use your preferred environment manager to first create a python 3.10 environment. 
+
+**Example using built in Python tools:**
+
+```cmd
+python -m venv panda_sdl
+```
+Windows
+```cmd
+panda_sdl\Scripts\activate
+```
+macOS/Linux
+```cmd
+source panda_sdl/bin/activate
+```
+
+Once activated, and in the repository directory, use:
 
 ```cmd
 pip install -r requirements.txt
@@ -63,7 +92,11 @@ pip install -r requirements.txt
 
 ## `.env` File
 
-PANDA_SDL only uses two `.env` file variables: one to point to the location of your configuration file and the other to toggle usinga temp_db for tests. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
+PANDA_SDL only uses one `.env` file variables to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
+
+## Test Your Installation
+
+From the top directory, run: ```pytest tests -v```
 
 ## `Config.ini` File
 
