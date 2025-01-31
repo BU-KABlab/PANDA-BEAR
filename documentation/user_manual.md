@@ -10,6 +10,8 @@ PANDA SDL, or "the PANDA", is an open-source SDL developed by Harley Quinn and G
 
 ![Fig. 1](images/figure1.bmp)
 
+**NOTICE:** The current potentiostat implementation uses a Gamry model. Gamry is restricted to Windows only.
+
 ## Navigation
 
 1. [Construction](construction.md)
