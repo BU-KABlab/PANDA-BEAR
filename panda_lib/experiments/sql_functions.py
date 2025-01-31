@@ -2,9 +2,6 @@ import json
 from datetime import datetime
 from typing import List, Union, get_type_hints
 
-# from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
-#                                                 execute_sql_command_no_return)
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     Experiments,
@@ -13,6 +10,10 @@ from panda_lib.sql_tools.panda_models import (
     Wellplates,
 )
 from shared_utilities.config.config_tools import read_config
+
+# from panda_lib.sql_tools.sql_utilities import (execute_sql_command,
+#                                                 execute_sql_command_no_return)
+from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import setup_default_logger
 
 from .experiment_parameters import ExperimentParameterRecord

@@ -35,6 +35,7 @@ from shared_utilities.config.config_tools import (
     read_config,
     read_testing_config,
 )
+from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import timing_wrapper
 
 from ..errors import (
@@ -53,7 +54,6 @@ from ..imaging import add_data_zone, capture_new_image, image_filepath_generator
 from ..labware import StockVial, Vial, WasteVial, Well, read_vials
 from ..panda_gantry import MockPandaMill as MockMill
 from ..panda_gantry import PandaMill as Mill
-from ..sql_tools.db_setup import SessionLocal
 from ..toolkit import ArduinoLink, Hardware, Labware, Toolkit
 from ..tools import MockOBSController, OBSController
 from ..utilities import Coordinates, correction_factor, solve_vials_ilp

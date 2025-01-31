@@ -22,24 +22,24 @@ The script can be run as a standalone script to test the connection to the
 database.
 """
 
+import os
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from shared_utilities.config.config_tools import read_config
 
-from .panda_models import Base
-
 config = read_config()
 # Determine if it's testing or production
-if config.getboolean("OPTIONS", "testing"):
-    if config.getboolean("OPTIONS", "memory_db"):
-        db_type = "sqlite"
-        db_address = ":memory:"
-    else:
-        db_type = config.get("TESTING", "testing_db_type")
-        db_address = config.get("TESTING", "testing_db_address")
-        db_user = config.get("TESTING", "testing_db_user", fallback=None)
-        db_password = config.get("TESTING", "testing_db_password", fallback=None)
+if os.environ.get("TEMP_DB") == "1":
+    db_type = "sqlite"
+    db_address = "temp.db"
+
+elif config.getboolean("OPTIONS", "testing"):
+    db_type = config.get("TESTING", "testing_db_type")
+    db_address = config.get("TESTING", "testing_db_address")
+    db_user = config.get("TESTING", "testing_db_user", fallback=None)
+    db_password = config.get("TESTING", "testing_db_password", fallback=None)
 else:
     db_type = config.get("PRODUCTION", "production_db_type")
     db_address = config.get("PRODUCTION", "production_db_address")
@@ -68,9 +68,8 @@ else:
         pool_size=20,
         pool_recycle=3600,
     )
-Base.metadata.create_all(bind=engine)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Test connection from config file
 

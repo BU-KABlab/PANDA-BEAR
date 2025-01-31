@@ -4,13 +4,13 @@
 #     execute_sql_command,
 #     execute_sql_command_no_return,
 # )
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     ExperimentResults,
     Experiments,
     WellModel,
 )
+from shared_utilities.db_setup import SessionLocal
 
 
 def main():

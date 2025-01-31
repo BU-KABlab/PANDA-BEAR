@@ -63,7 +63,7 @@ pip install -r requirements.txt
 
 ## `.env` File
 
-PANDA_SDL only uses one `.env` file variable to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
+PANDA_SDL only uses two `.env` file variables: one to point to the location of your configuration file and the other to toggle usinga temp_db for tests. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
 
 ## `Config.ini` File
 

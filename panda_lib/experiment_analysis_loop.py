@@ -14,8 +14,8 @@ import time
 from multiprocessing import Queue
 from pathlib import Path
 
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import Experiments
+from shared_utilities.db_setup import SessionLocal
 
 logger = logging.getLogger("panda")
 

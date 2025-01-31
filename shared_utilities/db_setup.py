@@ -22,14 +22,21 @@ The script can be run as a standalone script to test the connection to the
 database.
 """
 
+import os
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from shared_utilities.config.config_tools import read_config
 
 config = read_config()
+
+if os.environ.get("TEMP_DB") == "True":
+    db_type = "sqlite"
+    db_address = "temp.db"
+
 # Determine if it's testing or production
-if config.getboolean("OPTIONS", "testing"):
+elif config.getboolean("OPTIONS", "testing"):
     db_type = config.get("TESTING", "testing_db_type")
     db_address = config.get("TESTING", "testing_db_address")
     db_user = config.get("TESTING", "testing_db_user", fallback=None)
@@ -48,14 +55,21 @@ elif db_type == "mysql":
 else:
     raise ValueError(f"Unsupported database type: {db_type}")
 
-engine = create_engine(
-    DATABASE_URL,
-    echo=False,
-    pool_size=20,
-    max_overflow=30,
-    pool_timeout=30,
-    pool_recycle=3600,
-)
+if db_type == "sqlite":
+    engine = create_engine(
+        DATABASE_URL,
+        echo=False,
+        pool_size=20,
+        pool_recycle=3600,
+    )
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        echo=False,
+        pool_size=20,
+        pool_recycle=3600,
+    )
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

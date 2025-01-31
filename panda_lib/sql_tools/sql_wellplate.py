@@ -9,8 +9,8 @@ from sqlalchemy import Integer, cast, func, select
 
 from panda_lib.labware import wellplates as wellplate_module
 from panda_lib.sql_tools import sql_reports
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import PlateTypes, WellModel, Wellplates
+from shared_utilities.db_setup import SessionLocal
 
 logger = sql_reports.logger
 
@@ -556,16 +556,18 @@ def update_well(well_to_update: object) -> None:
 
     with SessionLocal() as session:
         session.query(WellModel).filter(
-            WellModel.plate_id == well_to_update.plate_id
-        ).filter(WellModel.well_id == well_to_update.well_id).update(
+            WellModel.plate_id == well_to_update.well_data.plate_id
+        ).filter(WellModel.well_id == well_to_update.well_data.well_id).update(
             {
-                WellModel.experiment_id: well_to_update.experiment_id,
-                WellModel.project_id: well_to_update.project_id,
-                WellModel.status: well_to_update.status,
+                WellModel.experiment_id: well_to_update.well_data.experiment_id,
+                WellModel.project_id: well_to_update.well_data.project_id,
+                WellModel.status: well_to_update.well_data.status,
                 WellModel.status_date: datetime.now().isoformat(timespec="seconds"),
-                WellModel.contents: json.dumps(well_to_update.contents),
+                WellModel.contents: json.dumps(well_to_update.well_data.contents),
                 WellModel.volume: well_to_update.volume,
-                WellModel.coordinates: json.dumps(asdict(well_to_update.coordinates)),
+                WellModel.coordinates: json.dumps(
+                    (well_to_update.well_data.coordinates)
+                ),
             }
         )
         session.commit()
@@ -574,7 +576,7 @@ def update_well(well_to_update: object) -> None:
 def get_well_by_id(
     well_id: str,
     plate_id: Union[int, None] = None,
-) -> object:
+) -> wellplate_module.Well:
     """
     Get a well from the well_hx table.
 
@@ -599,12 +601,12 @@ def get_well_by_id(
         )
         if result == []:
             return None
-
-        # Convert coordinates to a WellCoordinates object
-        result[0].coordinates = wellplate_module.WellCoordinates(
-            **json.loads(result[0].coordinates)
+        result = result[0]
+        well = wellplate_module.Well(
+            well_id=result.well_id,
+            plate_id=plate_id,
         )
-        return result[0]
+        return well
 
 
 def get_well_by_experiment_id(experiment_id: str) -> Tuple:

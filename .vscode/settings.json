@@ -40,6 +40,12 @@
             "database": "Bear",
             "username": "BearGuest-Cornell",
             "password": "BearGuest2024!"
+        },
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "memory db",
+            "database": ":memory:"
         }
     ],
     "sqltools.useNodeRuntime": true,

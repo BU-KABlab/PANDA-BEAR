@@ -8,8 +8,8 @@ This module contains utility functions for executing SQL commands on the databas
 import json
 import logging
 
-from panda_lib.sql_tools.db_setup import SessionLocal as Session
 from panda_lib.sql_tools.panda_models import PotentiostatReadout
+from shared_utilities.db_setup import SessionLocal as Session
 from shared_utilities.log_tools import setup_default_logger
 
 logger: logging.Logger = setup_default_logger(log_name="sql_logger")

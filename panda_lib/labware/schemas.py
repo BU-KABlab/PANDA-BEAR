@@ -180,9 +180,9 @@ class WellplateWriteModel(BaseModel):
     id: Optional[int] = None  # is allowed to be None, the db will autoincrement
     type_id: int
     current: bool = False
-    a1_x: float
-    a1_y: float
-    orientation: int = 3
+    a1_x: float = 0.0
+    a1_y: float = 0.0
+    orientation: int = 0
     rows: str = "ABCDEFGH"
     cols: int = 12
     echem_height: float = 0.0  # height of echem cell placement in mm

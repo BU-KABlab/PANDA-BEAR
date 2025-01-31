@@ -8,8 +8,8 @@ from typing import Union
 from sqlalchemy.orm.session import Session, sessionmaker
 
 from shared_utilities.config.config_tools import read_config
+from shared_utilities.db_setup import SessionLocal
 
-from .db_setup import SessionLocal
 from .models import (
     Pipette,
     PipetteLog,

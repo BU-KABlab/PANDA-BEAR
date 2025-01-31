@@ -20,8 +20,35 @@ Otherwise the experiment is not in the queue.
 # from panda_lib.sql_tools.sql_utilities import execute_sql_command, execute_sql_command_no_return
 import random
 
-from panda_lib.sql_tools.db_setup import SessionLocal
-from panda_lib.sql_tools.panda_models import Queue
+from sqlalchemy import text
+
+from shared_utilities.db_setup import SessionLocal
+
+
+class Queue:
+    def __init__(
+        self,
+        experiment_id: int,
+        project_id: int,
+        project_campaign_id: int,
+        priority: int,
+        process_type: str,
+        filename: str,
+        well_type: str,
+        well_id: int,
+        status: str,
+        status_date: str,
+    ):
+        self.experiment_id = experiment_id
+        self.project_id = project_id
+        self.project_campaign_id = project_campaign_id
+        self.priority = priority
+        self.process_type = process_type
+        self.filename = filename
+        self.well_type = well_type
+        self.well_id = well_id
+        self.status = status
+        self.status_date = status_date
 
 
 def select_queue() -> list:
@@ -31,22 +58,31 @@ def select_queue() -> list:
     Returns:
         list: The entries from the queue table.
     """
-    # result = execute_sql_command(
-    #     """
-    #     SELECT
-    #         experiment_id,
-    #         process_type,
-    #         priority,
-    #         well_id,
-    #         filename
-    #     FROM queue
-    #     ORDER BY experiment_id ASC
-    #     """
-    # )
-    # return result
-
+    statment = text(
+        """
+    SELECT a.experiment_id,
+           a.project_id,
+           a.project_campaign_id,
+           a.priority,
+           a.process_type,
+           a.filename,
+           a.well_type,
+           c.well_id,
+           c.status,
+           c.status_date
+      FROM panda_experiments AS a
+           JOIN
+           panda_wellplates AS b ON a.well_type = b.type_id
+           JOIN
+           panda_well_hx AS c ON a.experiment_id = c.experiment_id AND
+                                 c.status IN ('queued', 'waiting') 
+     WHERE b.current = 1
+     ORDER BY a.priority ASC,
+              a.experiment_id ASC;
+"""
+    )
     with SessionLocal() as session:
-        return session.query(Queue).order_by(Queue.priority, Queue.experiment_id).all()
+        return session.execute(statment).fetchall()
 
 
 def get_next_experiment_from_queue(
@@ -71,43 +107,11 @@ def get_next_experiment_from_queue(
     """
 
     if specific_experiment_id:
-        with SessionLocal() as session:
-            result = (
-                session.query(Queue)
-                .filter(Queue.experiment_id == specific_experiment_id)
-                .first()
-            )
-
-            if result is None:
-                return None
-
-            return (
-                result.experiment_id,
-                result.process_type,
-                result.filename,
-                result.project_id,
-                result.well_id,
-            )
-
-    with SessionLocal() as session:
-        if random_pick:
-            result = (
-                session.query(Queue)
-                .filter(Queue.status == "queued")
-                .order_by(Queue.priority)
-                .all()
-            )
-            random_index = random.randint(0, len(result) - 1)
-            result = result[random_index]
-
-        else:
-            result = (
-                session.query(Queue)
-                .filter(Queue.status == "queued")
-                .order_by(Queue.priority, Queue.experiment_id)
-                .first()
-            )
-
+        result_all = select_queue()
+        result = [x for x in result_all if x.experiment_id == specific_experiment_id][0]
+        if len(result) == 0:
+            return None
+        result = Queue(**result._mapping)
         if result is None:
             return None
 
@@ -119,28 +123,51 @@ def get_next_experiment_from_queue(
             result.well_id,
         )
 
+    result = select_queue()
+    if random_pick:
+        result = select_queue()
 
-def clear_queue() -> None:
-    """Go through and change the status of any queued experiment to pending"""
-    # execute_sql_command_no_return(
-    #     """
-    #     UPDATE well_hx SET status = 'pending'
-    #     WHERE status = 'queued'
-    #     """
-    # )
+        if len(result) == 0:
+            return None
 
-    with SessionLocal() as session:
-        session.query(Queue).filter(Queue.status == "queued").update(
-            {Queue.status: "pending"}
-        )
-        session.commit()
+        random_index = random.randint(0, len(result) - 1)
+        result = result[random_index]
+
+    else:
+        result = Queue(**result[0])
+
+    if result is None:
+        return None
+
+    return (
+        result.experiment_id,
+        result.process_type,
+        result.filename,
+        result.project_id,
+        result.well_id,
+    )
+
+
+# def clear_queue() -> None:
+#     """Go through and change the status of any queued experiment to pending"""
+#     # execute_sql_command_no_return(
+#     #     """
+#     #     UPDATE well_hx SET status = 'pending'
+#     #     WHERE status = 'queued'
+#     #     """
+#     # )
+
+#     with SessionLocal() as session:
+#         session.query(Queue).filter(Queue.status == "queued").update(
+#             {Queue.status: "pending"}
+#         )
+#         session.commit()
 
 
 def count_queue_length() -> int:
     """Count the number of experiments in the queue"""
 
-    with SessionLocal() as session:
-        return session.query(Queue).filter(Queue.status == "queued").count()
+    return len(select_queue())
 
 
 # endregion

@@ -8,9 +8,10 @@ from hardware.grbl_cnc_mill import (
     MockMill,
     set_up_mill_logger,
 )
-from panda_lib.sql_tools.db_setup import SessionLocal
+from panda_lib.labware.vials import read_vial
 from panda_lib.sql_tools.panda_models import Tool, VialStatus
 from shared_utilities.config.config_tools import read_logging_dir, read_testing_config
+from shared_utilities.db_setup import SessionLocal
 
 # Set up the mill connection
 TESTING = read_testing_config()
@@ -205,10 +206,7 @@ class MockPandaMill(MockMill):
     def rinse_electrode(self, rinses: int = 3):
         """Rinse the electrode by moving it to the rinse position and back to the center position."""
         ebath_vial = None
-        with SessionLocal() as db:
-            ebath_vial = (
-                db.query(VialStatus).filter(VialStatus.position == "e1").first()
-            )
+        ebath_vial = read_vial(position="e1")
         coords: Coordinates = Coordinates(
             x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )
@@ -221,10 +219,7 @@ class MockPandaMill(MockMill):
     def rest_electrode(self):
         """Rinse the electrode by moving it to the rinse position and back to the center position."""
         ebath_vial = None
-        with SessionLocal() as db:
-            ebath_vial = (
-                db.query(VialStatus).filter(VialStatus.position == "e1").first()
-            )
+        ebath_vial = read_vial(position="e1")
         coords: Coordinates = Coordinates(
             x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )

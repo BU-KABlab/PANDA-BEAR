@@ -7,10 +7,10 @@ from typing import List, Tuple, Union
 from pydantic import ConfigDict, RootModel
 from pydantic.dataclasses import dataclass
 
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
     ExperimentResults,
 )
+from shared_utilities.db_setup import SessionLocal
 
 
 class ExperimentResultsRecord:

@@ -61,7 +61,6 @@ from panda_lib.sql_tools import (
     sql_system_state,
     sql_wellplate,
 )
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.toolkit import (
     Hardware,
     Labware,
@@ -70,6 +69,7 @@ from panda_lib.toolkit import (
 )
 from panda_lib.utilities import SystemState
 from shared_utilities.config.config_tools import read_config, read_testing_config
+from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import (
     apply_log_filter,
     setup_default_logger,

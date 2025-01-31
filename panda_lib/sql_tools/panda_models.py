@@ -78,7 +78,7 @@ class Experiments(Base):
     #     return session.query(cls).filter(cls.experiment_id == experiment_id).first()
 
 
-class ExperimentStatusView(Base):
+class ExperimentStatusView:
     """ExperimentStatus view model"""
 
     __tablename__ = "panda_experiment_status"
@@ -117,8 +117,8 @@ class ExperimentParameters(Base):
     experiment_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("panda_experiments.experiment_id")
     )
-    parameter_name: Mapped[str] = mapped_column(String)
-    parameter_value: Mapped[str] = mapped_column(String)
+    parameter_name: Mapped[str] = mapped_column(String, nullable=True)
+    parameter_value: Mapped[str] = mapped_column(String, nullable=True)
     created: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
     updated: Mapped[str] = mapped_column(
         String, default=dt.now(timezone.utc), onupdate=dt.now(timezone.utc)
@@ -230,7 +230,7 @@ class Projects(Base):
 
     __tablename__ = "panda_projects"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    project_name: Mapped[str] = mapped_column(String)
+    project_name: Mapped[str] = mapped_column(String, nullable=True)
     added: Mapped[str] = mapped_column(String, default=dt.now(timezone.utc))
 
     def __repr__(self):
@@ -319,7 +319,7 @@ event.listen(Users, "before_insert", generate_username)
 
 # Junction table for the many-to-many relationship between users and projects
 user_projects = Table(
-    "user_projects",
+    "panda_user_projects",
     Base.metadata,
     Column("user_id", Integer, ForeignKey("panda_users.id"), primary_key=True),
     Column("project_id", Integer, ForeignKey("panda_projects.id"), primary_key=True),
@@ -346,11 +346,18 @@ class DeckObjectBase:
     top: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(json_extract(coordinates, '$.z') + base_thickness + height, 2)"
+            "round(json_extract(coordinates, '$.z') + base_thickness + height, 2)",
+            persisted=True,
         ),
+        nullable=True,
     )
     bottom: Mapped[float] = mapped_column(
-        Float, Computed("round(json_extract(coordinates, '$.z') + base_thickness, 2)")
+        Float,
+        Computed(
+            "round(json_extract(coordinates, '$.z') + base_thickness, 2)",
+            persisted=True,
+        ),
+        nullable=True,
     )
     name: Mapped[str] = mapped_column(String)
 
@@ -364,15 +371,19 @@ class VesselBase(DeckObjectBase):
     volume_height: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(json_extract(coordinates, '$.z') + base_thickness + ((volume) / (3.1459 * radius * radius)), 2)"
+            "round(json_extract(coordinates, '$.z') + base_thickness + ((volume) / (3.1459 * radius * radius)), 2)",
+            persisted=True,
         ),
+        nullable=True,
     )
     contents: Mapped[dict] = mapped_column(JSON, default={})
     bottom: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(json_extract(coordinates, '$.z') + base_thickness + ((dead_volume) / (3.1459 * radius * radius)), 2)"
+            "round(json_extract(coordinates, '$.z') + base_thickness + ((dead_volume) / (3.1459 * radius * radius)), 2)",
+            persisted=True,
         ),
+        nullable=True,
     )
 
 
@@ -423,20 +434,26 @@ class Vials(Base):
     volume_height: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + (volume / (3.1459 * radius * radius)), 2)"
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + (volume / (3.1459 * radius * radius)), 2)",
+            persisted=True,
         ),
+        nullable=True,
     )
     top: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + height, 2)"
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + height, 2)",
+            persisted=True,
         ),
+        nullable=True,
     )
     bottom: Mapped[float] = mapped_column(
         Float,
         Computed(
-            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + (dead_volume / (3.1459 * radius * radius)), 2)"
+            "round(coalesce(json_extract(coordinates, '$.z'), 0) + base_thickness + (dead_volume / (3.1459 * radius * radius)), 2)",
+            persisted=True,
         ),
+        nullable=True,
     )
 
     def __repr__(self):
@@ -455,7 +472,7 @@ class Vials(Base):
         return self.coordinates.get("z", 0)
 
 
-class VialStatus(VialsBase, Base):
+class VialStatus(VialsBase):
     """VialStatus view model"""
 
     __tablename__ = "panda_vial_status"
@@ -573,7 +590,7 @@ class Wellplates(Base, DeckObjectBase):
         return f"<Wellplates(id={self.id}, type_id={self.type_id}, current={self.current})>"
 
 
-class WellStatus(Base):
+class WellStatus:
     """WellStatus view model"""
 
     __tablename__ = "panda_well_status"
@@ -594,20 +611,20 @@ class WellStatus(Base):
         return f"<WellStatus(plate_id={self.plate_id}, type_number={self.type_number}, well_id={self.well_id}, status={self.status}, status_date={self.status_date}, contents={self.contents}, experiment_id={self.experiment_id}, project_id={self.project_id}, volume={self.volume}, coordinates={self.coordinates}, capacity={self.capacity}, height={self.height})>"
 
 
-class Queue(Base):
+class Queue:
     """Queue view model"""
 
     __tablename__ = "panda_queue"
-    experiment_id = Column(Integer, primary_key=True)
-    project_id = Column(Integer)
-    project_campaign_id = Column(Integer)
-    priority = Column(Integer)
-    process_type = Column(String)
-    filename = Column(String)
-    well_type = Column(String, name="well type")
-    well_id = Column(String)
-    status = Column(String)
-    status_date = Column(String)
+    experiment_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(Integer)
+    project_campaign_id: Mapped[int] = mapped_column(Integer)
+    priority: Mapped[int] = mapped_column(Integer)
+    process_type: Mapped[str] = mapped_column(String)
+    filename: Mapped[str] = mapped_column(String)
+    well_type: Mapped[str] = mapped_column(String, name="well type")
+    well_id: Mapped[str] = mapped_column(String)
+    status: Mapped[str] = mapped_column(String)
+    status_date: Mapped[str] = mapped_column(String)
 
     def __repr__(self):
         return f"<Queue(experiment_id={self.experiment_id}, project_id={self.project_id}, priority={self.priority}, process_type={self.process_type}, filename={self.filename}, well_type={self.well_type}, well_id={self.well_id}, status={self.status}, status_date={self.status_date})>"

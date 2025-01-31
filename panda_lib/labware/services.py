@@ -5,7 +5,8 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from ..sql_tools.db_setup import SessionLocal
+from shared_utilities.db_setup import SessionLocal
+
 from ..sql_tools.panda_models import PlateTypes as PlateTypeDBModel
 from ..sql_tools.panda_models import Vials  # SQLAlchemy models
 from ..sql_tools.panda_models import WellModel as WellDBModel
@@ -60,7 +61,9 @@ class VialService:
                 db_session.rollback()
                 raise ValueError(f"Error creating vial: {e}")
 
-    def get_vial(self, position: str, active_only: bool = True) -> VialReadModel:
+    def get_vial(
+        self, position: str = None, name: str = None, active_only: bool = True
+    ) -> VialReadModel:
         """
         Fetches a vial by position from the database.
 
@@ -72,7 +75,12 @@ class VialService:
         """
         with self.db_session_maker() as db_session:
             active_only = 1 if active_only else 0
-            stmt = select(Vials).filter_by(position=position, active=active_only)
+            if name:
+                stmt = select(Vials).filter_by(name=name, active=active_only)
+            elif position:
+                stmt = select(Vials).filter_by(position=position, active=active_only)
+            else:
+                raise ValueError("Either position or name must be provided.")
             vial = db_session.execute(stmt).scalar()
             if not vial:
                 raise ValueError(f"Vial at position {position} not found.")

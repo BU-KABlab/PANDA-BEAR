@@ -15,7 +15,6 @@ from sqlalchemy.orm import sessionmaker
 from panda_lib.errors import OverDraftException, OverFillException
 from panda_lib.labware.services import WellplateService, WellService
 from panda_lib.panda_gantry import Coordinates
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.sql_tools.panda_models import (
     ExperimentParameters,
     ExperimentResults,
@@ -23,6 +22,7 @@ from panda_lib.sql_tools.panda_models import (
     WellModel,
     Wellplates,
 )
+from shared_utilities.db_setup import SessionLocal
 
 from .schemas import (
     PlateTypeModel,
@@ -213,6 +213,10 @@ class Well:
         """Returns the bottom coordinates of the well."""
         return Coordinates(x=self.x, y=self.y, z=self.bottom)
 
+    @property
+    def experiment_id(self):
+        return self.well_data.experiment_id
+
     def create_new_well(self, **kwargs: WellKwargs):
         if "type_id" in kwargs:
             plate_type = self.service.fetch_well_type_characteristics(
@@ -396,6 +400,12 @@ class Wellplate:
             self.load_plate(plate_id)
 
     def create_new_plate(self, **kwargs: WellplateKwargs):
+        """
+        Create a new wellplate using the provided kwargs.
+
+        If there is an active wellplate, the new wellplate will inherit the geographic characteristics of the active wellplate.
+
+        """
         # If there is a currently active wellplate, fetch its characteristics
         active_plate = self.service.get_active_plate()
         if active_plate:
@@ -487,6 +497,7 @@ class Wellplate:
         for well_id, well in self.wells.items():
             row, col = well_id[0], int(well_id[1:])
             well.update_coordinates(self.calculate_well_coordinates(row, col))
+            well.well_data.base_thickness = self.plate_data.base_thickness
 
     def calculate_well_coordinates(self, row: str, col: int) -> dict:
         """
@@ -812,6 +823,24 @@ def change_wellplate_location(db_session: sessionmaker = SessionLocal):
             f"Invalid input. Please enter a value between {working_volume['z']} and 0."
         )
 
+    while True:
+        new_base_thickness = input("Enter the new base thickness of the wellplate: ")
+
+        if new_base_thickness == "":
+            new_base_thickness = wellplate.plate_data.base_thickness
+            break
+
+        try:
+            new_base_thickness = float(new_base_thickness)
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            continue
+
+        if new_base_thickness >= 0:
+            break
+
+        print("Invalid input. Please enter a value greater than or equal to 0.")
+
     # Keep asking for input until the user enters a valid input
     while True:
         new_orientation = int(
@@ -838,6 +867,7 @@ Enter the new orientation of the wellplate: """
         "y": new_location_y,
         "z": new_location_z,
     }
+    wellplate.plate_data.base_thickness = new_base_thickness
     wellplate.recalculate_well_positions()
     wellplate.save()
 
@@ -854,21 +884,25 @@ def read_current_wellplate_info(
         int: Number of new wells
     """
 
-    with db_session() as session:
-        statement = select(Wellplates).filter_by(current=1)
+    try:
+        with db_session() as session:
+            statement = select(Wellplates).filter_by(current=1)
 
-        result: Wellplates = session.execute(statement).scalar_one_or_none()
-        current_plate_id = result.id
-        current_type_number = result.type_id
+            result: Wellplates = session.execute(statement).scalar_one_or_none()
+            current_plate_id = result.id
+            current_type_number = result.type_id
 
-        new_wells = (
-            session.query(WellModel)
-            .filter(WellModel.status == "new")
-            .filter(WellModel.plate_id == current_plate_id)
-            .count()
-        )
+            new_wells = (
+                session.query(WellModel)
+                .filter(WellModel.status == "new")
+                .filter(WellModel.plate_id == current_plate_id)
+                .count()
+            )
 
-    return int(current_plate_id), int(current_type_number), new_wells
+        return int(current_plate_id), int(current_type_number), new_wells
+    except Exception as e:
+        print(f"Error occurred while reading the current wellplate: {e}")
+        return 0, 0, 0
 
 
 if __name__ == "__main__":

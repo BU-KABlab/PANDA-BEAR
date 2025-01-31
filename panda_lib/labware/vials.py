@@ -5,8 +5,8 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from panda_lib.sql_tools.db_setup import SessionLocal
 from panda_lib.utilities import Coordinates, directory_picker, file_picker
+from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import setup_default_logger
 
 from .errors import OverDraftException, OverFillException  # Custom exceptions
@@ -40,6 +40,7 @@ class Vial:
         position: str,
         session_maker: sessionmaker = SessionLocal,
         create_new: bool = False,
+        vial_name: Optional[str] = None,
         **kwargs: VialKwargs,
     ):
         """
@@ -55,6 +56,7 @@ class Vial:
         self.session_maker = session_maker
         self.service = VialService(self.session_maker)
         self.vial_data: Optional[VialReadModel] = None
+        self._vial_name = vial_name
 
         if create_new:
             self.create_new_vial(**kwargs)
@@ -158,7 +160,10 @@ class Vial:
 
     def load_vial(self):
         """Loads an existing vial from the database."""
-        self.vial_data = self.service.get_vial(self.position)
+        if self._vial_name:
+            self.vial_data = self.service.get_vial(name=self._vial_name)
+        else:
+            self.vial_data = self.service.get_vial(position=self.position)
 
     def save(self):
         """Updates the database with the current state of the vial."""
@@ -270,6 +275,28 @@ class WasteVial(Vial):
     pass
 
 
+def read_vial(
+    name: Optional[str] = None,
+    position: Optional[str] = None,
+    session: sessionmaker = SessionLocal,
+) -> Vial:
+    """
+    Read a vial from the database, either by name or position
+    """
+    if name:
+        vial = Vial(name=name, session_maker=session, create_new=False)
+        if position:
+            assert vial.position == position
+    elif position:
+        vial = Vial(position=position, session_maker=session, create_new=False)
+        if name:
+            assert vial.name == name
+    else:
+        raise ValueError("Either name or position must be provided")
+
+    return vial
+
+
 def read_vials(
     vial_group: Optional[str] = None,
     session: sessionmaker = SessionLocal,
@@ -364,17 +391,6 @@ def input_new_vial_values(vialgroup: str) -> None:
     for vial in vials:
         vial: Vial
         vial_list.append(vial)
-        # if vial.contents is None:
-        #     vial_entry.contents = {}
-        # if vial.name is None:
-        #     # All parameters are blank except for position
-        #     vial_entry.name = "--"
-        #     vial_entry.vial_data.contents = "--"
-        #     vial_entry.vial_data.density = "--"
-        #     vial_entry.vial_data.volume = "--"
-        #     vial_entry.vial_data.capacity = "--"
-        #     vial_entry.vial_data.contamination = "--"
-
         values = [
             vial.vial_data.position,
             vial.vial_data.name,
@@ -388,6 +404,16 @@ def input_new_vial_values(vialgroup: str) -> None:
             max(max_lengths[i], len(str(values[i]))) for i in range(len(values))
         ]  # Update max lengths
 
+    for vial in vial_list:
+        values = [
+            vial.vial_data.position,
+            vial.vial_data.name,
+            str(vial.vial_data.contents),
+            vial.vial_data.density,
+            vial.vial_data.volume,
+            vial.vial_data.capacity,
+            vial.vial_data.contamination,
+        ]
         vial_lines.append(
             f"{values[0]:<{max_lengths[0]}} {values[1]:<{max_lengths[1]}} {values[2]:<{max_lengths[2]}} {values[3]:<{max_lengths[3]}} {values[4]:<{max_lengths[4]}} {values[5]:<{max_lengths[5]}} {values[6]:<{max_lengths[6]}}"
         )

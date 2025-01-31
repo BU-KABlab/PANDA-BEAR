@@ -7,24 +7,25 @@ The scheduler module will be responsible for:
     - Returning the next experiment to run
 """
 
-# pylint: disable = line-too-long
+import json
 import sqlite3
 from pathlib import Path
 from typing import Tuple, Union
 
+from panda_lib.experiments.sql_functions import update_experiment_status
+from shared_utilities.db_setup import SessionLocal
 from shared_utilities.log_tools import setup_default_logger, timing_wrapper
 
 from .experiments import (
     ExperimentBase,
     ExperimentStatus,
-    insert_experiment,
+    insert_experiments,
     insert_experiments_parameters,
     select_experiment_information,
     select_experiment_parameters,
     select_next_experiment_id,
 )
 from .labware.wellplates import Well
-from .sql_tools.db_setup import SessionLocal
 from .sql_tools.panda_models import ExperimentParameters, Experiments, Projects
 from .sql_tools.sql_queue import (
     get_next_experiment_from_queue,
@@ -81,8 +82,7 @@ def change_well_status(well: Union[Well, str], experiment: ExperimentBase) -> No
             raise ValueError(f"Well {well_id} not found")
 
     # Update the well status
-    well.status = experiment.status.value
-    well.status_date = experiment.status_date
+    well.update_status(experiment.status.value)
 
     # Verify that the well has a plate id
     if well.plate_id is None:
@@ -180,12 +180,32 @@ def update_experiment_info(experiment: ExperimentBase, column: str) -> None:
 
 @timing_wrapper
 def update_experiment_parameters(experiment: ExperimentBase, parameter: str) -> None:
-    """Update the experiment parameters in the experiment_parameters table"""
+    """
+    Update the experiment parameters in the experiment_parameters table.
+
+    Perform an update on the experiment_parameters table for the given experiment_id and parameter name.
+    The parameter value is updated to the value of the parameter attribute in the experiment object.
+
+    NOTE: The ExperimentParameters table is a many to one relationship with the Experiments table. There are
+    just 6 columns, and we only work with 3 of them: experiment_id, parameter_name, and parameter_value.
+
+    Args:
+        experiment (ExperimentBase): The experiment to update.
+        parameter (str): The parameter to update.
+
+    Raises:
+        sqlite3.Error: If an error occurs while updating the experiment parameters in the experiment_parameters table.
+
+
+    """
     try:
         with SessionLocal() as session:
+            value = getattr(experiment, parameter)
+            value = json.dumps(value, default=str) if isinstance(value, dict) else value
+
             session.query(ExperimentParameters).filter_by(
-                experiment_id=experiment.experiment_id
-            ).update({parameter: getattr(experiment, parameter)})
+                experiment_id=experiment.experiment_id, parameter_name=parameter
+            ).update({"parameter_value": value})
             session.commit()
     except sqlite3.Error as e:
         logger.error("Error occurred while updating experiment parameters: %s", e)
@@ -197,7 +217,7 @@ def schedule_experiment(
     experiment: ExperimentBase, override_well_available=False
 ) -> int:
     """
-    Deprecated function kept temporarily. It delegates to schedule_single_experiment.
+    Deprecated function kept temporarily. It delegates to schedule_experiments.
     """
     return schedule_experiments([experiment], override=override_well_available)
 
@@ -339,8 +359,8 @@ def schedule_experiments(
         # We do this so that the wellchecker is checking as the wells are allocated
         # The parameters are quite lengthy, so we will save those for a bulk entry
         try:
-            insert_experiment(experiment)
-            experiment.set_status_and_save(ExperimentStatus.QUEUED)
+            insert_experiments([experiment])
+            update_experiment_status(experiment, ExperimentStatus.QUEUED)
         except sqlite3.Error as e:
             logger.error(
                 "Error occurred while adding the experiment to experiments table: %s. The statements have been rolled back and nothing has been added to the tables.",
