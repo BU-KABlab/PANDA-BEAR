@@ -436,8 +436,17 @@ def temp_test_db():
         # Toggle using the temp db in the config
         os.environ["TEMP_DB"] = "0"
 
-        engine.dispose()
         close_all_sessions()
+        engine.dispose()
         SessionLocal = None
         del SessionLocal
-        # os.remove("temp.db")
+
+        # Ensure all connections are closed before deleting the file
+        import time
+
+        # Wait a moment for connections to close
+        time.sleep(1)
+        try:
+            os.remove("temp.db")
+        except PermissionError:
+            print("Failed to delete temp.db, file is in use.")

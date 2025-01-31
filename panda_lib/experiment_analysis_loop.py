@@ -2,9 +2,7 @@
 The analysis component is a process that monitors the experiments table for
 records that have "needs_analysis" set to True. When it finds a record that
 needs analysis, it will run the analysis on the experiment and update the
-experiment record with the analysis results. The analysis process is
-implemented as a class that is instantiated with a database connection and
-a logger. The class has a run method that will run the analysis process.
+experiment record with the analysis results.
 """
 
 import importlib.util
@@ -13,6 +11,8 @@ import os
 import time
 from multiprocessing import Queue
 from pathlib import Path
+
+from sqlalchemy import select
 
 from panda_lib.sql_tools.panda_models import Experiments
 from shared_utilities.db_setup import SessionLocal
@@ -24,9 +24,7 @@ def analysis_worker(
     status_queue: Queue, process_id: int, generate_experiments: bool = False
 ):
     """
-    Run the analysis process on experiments that need analysis. The
-    analysis process is run on the experiment and the results are stored
-    in the experiment record in the database.
+    Run the analysis process on experiments that are flagged for analysis.
     """
     breaking_issue: bool = False
     analyzers: dict = load_analyzers()
@@ -35,29 +33,27 @@ def analysis_worker(
         while True:
             # Get the experiments that need analysis
             status_queue.put((process_id, "checking for experiments"))
-            experiments: list[Experiments] = (
-                connection.query(Experiments)
-                .filter(Experiments.needs_analysis == 1)
-                .all()
+            experiments: list[Experiments] = connection.scalars(
+                select(Experiments).filter(Experiments.needs_analysis == 1)
             )
             for experiment in experiments:
                 # Find the analyzer that matches the project ID
-                # analyzer = next((a for a in analyzers if a.PROJECT_ID == experiment.project_id), None)
                 analyzer: callable = analyzers.get(experiment.analysis_id, None)
                 if analyzer is None:
                     status_queue.put(
                         (
                             process_id,
-                            f"error: no analyzer found for Anlysis ID {experiment.analysis_id}",
+                            f"error: no analyzer found for Analysis ID {experiment.analysis_id}",
                         )
                     )
                     continue  # Keep checking for other experiments
+
                 # Run the analysis on the experiment
                 try:
                     status_queue.put(
                         (
                             process_id,
-                            f"analysing experiment {experiment.experiment_id}",
+                            f"analyzing experiment {experiment.experiment_id}",
                         )
                     )
                     output = analyzer(

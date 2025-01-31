@@ -1,6 +1,8 @@
 import time
 from pathlib import Path
 
+from sqlalchemy import select
+
 from hardware.grbl_cnc_mill import (
     Coordinates,
     Mill,
@@ -34,7 +36,7 @@ class PandaMill(Mill):
         """Loads all of the tools from the PANDA db."""
         self.tools = {}
         with SessionLocal() as db:
-            tools = db.query(Tool).all()
+            tools = db.scalars(select(Tool)).all()
             for tool in tools:
                 # NOTE: We use the tool_manager's add_tool method to add the tools from the db without updating the db
                 # for this one time operation. Otherwise you would use the add_tool method.
@@ -44,7 +46,9 @@ class PandaMill(Mill):
         """Adds a tool to the tool manager."""
         self.tool_manager.add_tool(tool_name, tool_offset)
         with SessionLocal() as db:
-            existing_tool = db.query(Tool).filter(Tool.name == tool_name).first()
+            existing_tool = db.scalars(
+                select(Tool).filter(Tool.name == tool_name)
+            ).first()
             if existing_tool:
                 existing_tool.x = tool_offset[0]
                 existing_tool.y = tool_offset[1]
@@ -65,7 +69,7 @@ class PandaMill(Mill):
         """Updates a tool in the tool manager."""
         self.tool_manager.update_tool(tool_name, tool_offset)
         with SessionLocal() as db:
-            tool = db.query(Tool).filter(Tool.name == tool_name).first()
+            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
             if tool:
                 tool.x = tool_offset[0]
                 tool.y = tool_offset[1]
@@ -78,7 +82,7 @@ class PandaMill(Mill):
         """Deletes a tool from the tool manager."""
         self.tool_manager.delete_tool(tool_name)
         with SessionLocal() as db:
-            tool = db.query(Tool).filter(Tool.name == tool_name).first()
+            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
             if tool:
                 db.delete(tool)
                 db.commit()
@@ -89,9 +93,9 @@ class PandaMill(Mill):
         """Rinse the electrode by moving it to the rinse position and back to the center position."""
         ebath_vial = None
         with SessionLocal() as db:
-            ebath_vial = (
-                db.query(VialStatus).filter(VialStatus.position == "e1").first()
-            )
+            ebath_vial = db.scalars(
+                select(VialStatus).filter(VialStatus.position == "e1")
+            ).first()
         coords: Coordinates = Coordinates(
             x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )
@@ -105,9 +109,9 @@ class PandaMill(Mill):
         """Rinse the electrode by moving it to the rinse position and back to the center position."""
         ebath_vial = None
         with SessionLocal() as db:
-            ebath_vial = (
-                db.query(VialStatus).filter(VialStatus.position == "e1").first()
-            )
+            ebath_vial = db.scalars(
+                select(VialStatus).filter(VialStatus.position == "e1")
+            ).first()
         coords: Coordinates = Coordinates(
             x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )
@@ -139,7 +143,7 @@ class PandaMill(Mill):
 
 
 class MockPandaMill(MockMill):
-    """A wrapper for the grbl_cnc_mill library adding electrode specific functions."""
+    """Mock Version of the Panda Mill, used to simulate a mill connection for testing purposes."""
 
     def __init__(self):
         """Initializes the PandaMill class."""
@@ -152,7 +156,7 @@ class MockPandaMill(MockMill):
         """Loads all of the tools from the PANDA db."""
         self.tools = {}
         with SessionLocal() as db:
-            tools = db.query(Tool).all()
+            tools = db.scalars(select(Tool)).all()
             for tool in tools:
                 # NOTE: We use the tool_manager's add_tool method to add the tools from the db without updating the db
                 # for this one time operation. Otherwise you would use the add_tool method.
@@ -162,7 +166,9 @@ class MockPandaMill(MockMill):
         """Adds a tool to the tool manager."""
         self.tool_manager.add_tool(tool_name, tool_offset)
         with SessionLocal() as db:
-            existing_tool = db.query(Tool).filter(Tool.name == tool_name).first()
+            existing_tool = db.scalars(
+                select(Tool).filter(Tool.name == tool_name)
+            ).first()
             if existing_tool:
                 existing_tool.x = tool_offset[0]
                 existing_tool.y = tool_offset[1]
@@ -183,7 +189,7 @@ class MockPandaMill(MockMill):
         """Updates a tool in the tool manager."""
         self.tool_manager.update_tool(tool_name, tool_offset)
         with SessionLocal() as db:
-            tool = db.query(Tool).filter(Tool.name == tool_name).first()
+            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
             if tool:
                 tool.x = tool_offset[0]
                 tool.y = tool_offset[1]
@@ -196,7 +202,7 @@ class MockPandaMill(MockMill):
         """Deletes a tool from the tool manager."""
         self.tool_manager.delete_tool(tool_name)
         with SessionLocal() as db:
-            tool = db.query(Tool).filter(Tool.name == tool_name).first()
+            tool = db.scalars(select(Tool).filter(Tool.name == tool_name)).first()
             if tool:
                 db.delete(tool)
                 db.commit()
