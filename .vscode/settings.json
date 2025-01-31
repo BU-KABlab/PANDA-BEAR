@@ -67,6 +67,7 @@
         "dataclasses",
         "Echem",
         "edot",
+        "electrodeposited",
         "epanda",
         "labware",
         "nonfile",
