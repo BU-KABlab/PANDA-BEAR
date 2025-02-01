@@ -84,8 +84,13 @@ macOS/Linux
 source panda_sdl/bin/activate
 ```
 
-Once activated, and in the repository directory, use:
+Once activated, and in the repository directory - open `requirements.txt` and update the entry for `spinnaker-python` to be where you have saved the spinnaker python whl
 
+```requirements
+spinnaker-python @ <file_path>/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl
+```
+
+Then you may run the following command:
 ```cmd
 pip install -r requirements.txt
 ```
