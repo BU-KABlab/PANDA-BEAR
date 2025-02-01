@@ -8,6 +8,8 @@
 
 PANDA SDL, or "the PANDA", is an open-source SDL developed by Harley Quinn and Gregory Robben, in the [KABLab](https://www.kablab.org/) at [Boston University](https://www.bu.edu/). The PANDA electrodeposits and functionally characterizes polymer films using a combination of electrochemical and optical techniques (Fig. 1). Experiments are performed in a novel well plate architecture (which you can make yourself in the [Wellplate and Gasket SOP](sops/wellplate_and_gasket_SOP_v1.md)!) in which the transparent bottom of each well constitutes the working electrode while enabling transmission optical characterization.
 
+You can read all about it in [PANDA: a self-driving lab for studying electrodeposited polymer films published by Materials Horizons](https://pubs.rsc.org/en/content/articlelanding/2024/mh/d4mh00797b)
+
 ![Fig. 1](images/figure1.bmp)
 
 **NOTICE:** The current potentiostat implementation uses a Gamry model. Gamry is restricted to Windows only.

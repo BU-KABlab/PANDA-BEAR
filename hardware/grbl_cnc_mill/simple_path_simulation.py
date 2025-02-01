@@ -15,7 +15,7 @@ tool_offsets = {
 }
 
 # Load G-code file
-command_log_path = Path("./grbl_cnc_mill/logs/command.log")
+command_log_path = Path("hardware/grbl_cnc_mill/logs/command.log").resolve()
 with open(command_log_path, "r") as gcode_file:
     gcode = gcode_file.readlines()
 
@@ -79,7 +79,7 @@ ax.set_ylabel("Y")
 ax.set_zlabel("Z")
 
 # Draw a flat plane at Z=-200 for all xy coordinates
-X, Y = np.meshgrid(np.linspace(-400, 0, 30), np.linspace(-300, 0, 30))
+X, Y = np.meshgrid(np.linspace(-400, 0, 10), np.linspace(-300, 0, 10))
 Z = -200 * np.ones_like(X)
 ax.plot_surface(X, Y, Z, color="grey", alpha=0.2)
 
@@ -107,8 +107,8 @@ vial_centers = [
 vial_radius = 14
 vial_height = 66
 
-theta = np.linspace(0, 2 * np.pi, 30)
-vial_z = np.linspace(-200, -200 + vial_height, 30)
+theta = np.linspace(0, 2 * np.pi, 5)
+vial_z = np.linspace(-200, -200 + vial_height, 5)
 theta, vial_z = np.meshgrid(theta, vial_z)
 
 for center in vial_centers:
@@ -162,8 +162,8 @@ well_centers = [
 well_radius = 5
 well_height = 6
 
-theta = np.linspace(0, 2 * np.pi, 30)
-well_z = np.linspace(-200, -200 + well_height, 30)
+theta = np.linspace(0, 2 * np.pi, 5)
+well_z = np.linspace(-200, -200 + well_height, 5)
 theta, well_z = np.meshgrid(theta, well_z)
 
 for center in well_centers:

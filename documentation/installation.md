@@ -27,7 +27,7 @@ This system uses a FLIR camera and requires their proprietary SDK which you can 
 
 Spinnaker is proprietary software made by FLIR and as such cannot be included in the repository. To use the `imaging` module you must have installed both the Spinnaker SDK and the Python SDK in your chosen environment.
 
-Downloading is free but you will need to make an account: <https://www.flir.com/products/spinnaker-sdk/>
+Downloading is free but you will need to make an account: <https://www.flir.com/products/spinnaker-sdk/>.
 
 Download both the Spinnaker SDK as well as the Python SDK that matches your OS and architecture. Install the SDK to your system to allow for using the Python SDK with this project.
 
@@ -52,7 +52,7 @@ spinnaker-python = {}
 
 Run the following commands:
 
-`uv venv --python 3.10` you can add a venv name if you want with `uv venv <name> --python 3.11`
+`uv venv --python 3.10` you can add a venv name if you want with `uv venv <name> --python 3.10`
 
 `.venv\Scripts\activate` Activates the environment (change .venv to your .custom_name if you used one)
 
@@ -84,8 +84,13 @@ macOS/Linux
 source panda_sdl/bin/activate
 ```
 
-Once activated, and in the repository directory, use:
+Once activated, and in the repository directory - open `requirements.txt` and update the entry for `spinnaker-python` to be where you have saved the spinnaker python whl
 
+```requirements
+spinnaker-python @ <file_path>/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl
+```
+
+Then you may run the following command:
 ```cmd
 pip install -r requirements.txt
 ```
