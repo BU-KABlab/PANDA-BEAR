@@ -19,7 +19,7 @@ Example:
 ```git clone -b my-branch git@github.com:user/myproject.git```
 
 
-# 1. FLIR SDKS
+# 1. FLIR SDKs
 
 This system uses a FLIR camera and requires their proprietary SDK which you can obtain for free from their website.
 
