@@ -87,7 +87,6 @@ Example:
 ```python
 # For writing a protocol, use the available actions and types from the panda_lib library along with other libraries.
 from dataclasses import dataclass
-from logging import Logger
 
 from panda_lib import Toolkit
 from panda_lib.actions import (
