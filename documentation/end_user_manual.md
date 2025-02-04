@@ -227,7 +227,7 @@ def main():
                     },
                     flush_sol_name="solventB rinse",
                     rinse_sol_name="solventB rinse",
-                    filename=str(experiment_id)+EXPERIMENT_NAME,
+                    filename=str(experiment_id)+"polymer-deposition-voltage-screening",
 
                     # Echem specific - define all potentiostat parameters here
                     ocp=1, # Perform 1=yes 0=no
