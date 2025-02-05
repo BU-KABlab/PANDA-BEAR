@@ -496,8 +496,9 @@ class Wellplate:
     def recalculate_well_positions(self):
         for well_id, well in self.wells.items():
             row, col = well_id[0], int(well_id[1:])
-            well.update_coordinates(self.calculate_well_coordinates(row, col))
             well.well_data.base_thickness = self.plate_data.base_thickness
+            well.update_coordinates(self.calculate_well_coordinates(row, col))
+            
 
     def calculate_well_coordinates(self, row: str, col: int) -> dict:
         """

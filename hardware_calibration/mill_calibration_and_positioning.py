@@ -101,7 +101,7 @@ def update_grbl_settings(mill: Mill, *args, **kwargs):
                 mill.write_mill_config_file()
                 break
             else:
-                mill.fetch_saved_config()
+                mill.read_mill_config_file()
                 print("Settings have not been applied")
                 if input("Would you like to try again? (y/n): ").lower() in ["n", "no"]:
                     break
