@@ -273,7 +273,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     while True:
         well_id = (
             input(
-                "Enter the well ID to test (e.g., A1) toggle to switch to between instruments or done to end: "
+                f"Current instrument: {instrument}\nEnter the well ID to test (e.g., A1) toggle to switch to between instruments or done to end: "
             )
             .upper()
             .strip()
@@ -283,7 +283,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
         if well_id == "TOGGLE":
             instrument = "electrode" if instrument == "pipette" else "pipette"
             print(f"Instrument has been toggled to {instrument}")
-            well_id = input("Enter the well ID to test (e.g., A1): ").lower()
+            continue  # Skip the rest of the loop
 
         if well_id not in wellplate.wells:
             print("Invalid well ID")
@@ -592,13 +592,170 @@ def quit_calibration():
     return
 
 
+def calibrate_vial_holders(
+    mill: Mill,
+    stock_vials: Sequence[StockVial],
+    waste_vials: Sequence[WasteVial],
+    *args,
+    **kwargs,
+):
+    """
+    Calibrate the positions of vial holders. Each holder contains 8 vials spaced 33mm apart.
+    The first vial (index 0) is used as reference for recalculating other positions.
+    Updates can be made to individual vials or entire holders can be recalculated.
+    """
+    VIAL_SPACING = 33.0  # mm between vials in y-axis
+
+    while True:
+        # Select holder type
+        holder_type = (
+            input("\nSelect holder type to calibrate (stock/waste/done): ")
+            .lower()
+            .strip()
+        )
+        if holder_type == "done":
+            break
+
+        if holder_type not in ["stock", "waste"]:
+            print("Invalid holder type")
+            continue
+
+        vials = stock_vials if holder_type == "stock" else waste_vials
+
+        # Display current vial positions
+        print(f"\nCurrent {holder_type} vial positions:")
+        for i, vial in enumerate(vials):
+            print(f"Vial {i}: {vial.coordinates}")
+
+        # Select vial to calibrate
+        vial_index = input_validation(
+            "\nEnter vial index to calibrate (0-7) or enter to skip: ",
+            int,
+            (0, 7),
+            allow_blank=True,
+        )
+
+        if vial_index is None:
+            continue
+
+        vial: Vial = vials[vial_index]
+
+        # Note our coodinates are funky, where the z component is currently the deck, and the actual
+        # z is the bottom of the vial defined by the base thickness. In the future with the holder the
+        # initial z height will come from the holder and then any wall thickness will be added to that
+        original_coords = vial.coordinates
+        original_bottom = vial.bottom
+        print(f"\nCalibrating {holder_type} vial {vial_index}")
+        print(
+            f"Current coordinates: {original_coords} with the bottom at Z={original_bottom}"
+        )
+
+        # Move to the original top of vial position
+        goto = Coordinates(original_coords.x, original_coords.y, vial.top)
+        mill.safe_move(coordinates=goto, tool="pipette")
+
+        # Check if safe to proceed to bottom, if not, adjust the xy position
+        while True:
+            safe_to_proceed = input(
+                "Is it safe to proceed to the bottom of the vial? (y/n): "
+            ).lower()
+
+            if safe_to_proceed not in ["y", "yes", ""]:
+                new_x = input_validation(
+                    "Enter new X coordinate or enter for no change: ",
+                    float,
+                    (mill.working_volume.x, 0),
+                    allow_blank=True,
+                    default=original_coords.x,
+                )
+                new_y = input_validation(
+                    "Enter new Y coordinate or enter for no change: ",
+                    float,
+                    (mill.working_volume.y, 0),
+                    allow_blank=True,
+                    default=original_coords.y,
+                )
+
+                goto = Coordinates(new_x, new_y, vial.top)
+                mill.safe_move(coordinates=goto, tool="pipette")
+                continue
+
+            break
+
+        # Now move to the bottom of the vial
+        goto = Coordinates(original_coords.x, original_coords.y, original_bottom)
+        mill.safe_move(coordinates=goto, tool="pipette")
+
+        # Adjust position
+        while True:
+            if input(
+                "\nIs the pipette in the correct position? (y/n): "
+            ).lower() not in ["y", "yes", ""]:
+                new_x = input_validation(
+                    "Enter new X coordinate or enter for no change: ",
+                    float,
+                    (mill.working_volume.x, 0),
+                    allow_blank=True,
+                    default=original_coords.x,
+                )
+                new_y = input_validation(
+                    "Enter new Y coordinate or enter for no change: ",
+                    float,
+                    (mill.working_volume.y, 0),
+                    allow_blank=True,
+                    default=original_coords.y,
+                )
+                new_z = input_validation(
+                    "Enter new Z coordinate or enter for no change: ",
+                    float,
+                    (-200, 0),
+                    allow_blank=True,
+                    default=original_bottom,
+                )
+
+                new_coords = Coordinates(
+                    new_x if new_x is not None else original_coords.x,
+                    new_y if new_y is not None else original_coords.y,
+                    original_coords.z,  # We are not changing the z position here, we will change the thickness below
+                )
+                new_bottom = new_z if new_z is not None else original_bottom
+                goto = Coordinates(new_coords.x, new_coords.y, new_bottom)
+                mill.safe_move(coordinates=goto, tool="pipette")
+                continue
+
+            break
+
+        # Save new position
+        if input("\nSave new position? (y/n): ").lower() in ["y", "yes", ""]:
+            vial.vial_data.coordinates = new_coords
+            vial.vial_data.base_thickness = abs(
+                new_bottom - original_coords.z
+            )  # Assumes new bottom is greater than coordinate z
+            vial.save()
+
+            # If calibrating first vial, offer to recalculate all positions
+            if vial_index == 0:
+                if input(
+                    "\nRecalculate all vial positions in this holder? (y/n): "
+                ).lower() in ["y", "yes", ""]:
+                    base_y = new_coords.y
+                    for i, v in enumerate(vials):
+                        if i == 0:
+                            continue
+                        v.vial_data.coordinates = Coordinates(
+                            new_coords.x, base_y - (i * VIAL_SPACING), original_coords.z
+                        )
+                        v.save()
+                    print(f"\nUpdated all {holder_type} vial positions")
+
+
 menu_options = {
     "0": check_mill_settings,
     "1": home_mill,
     "3": calibrate_wells,
     "4": calibrate_bottom_of_wellplate,
     "5": calibrate_echem_height,
-    # "6": calibrate_camera_focus,
+    "6": calibrate_vial_holders,
     "7": capture_well_photo_manually,
     "q": quit_calibration,
 }

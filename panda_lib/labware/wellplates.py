@@ -252,6 +252,7 @@ class Well:
         self.service.update_well(
             self.well_id, self.plate_id, self.well_data.model_dump()
         )
+        self.load_well()
 
     def add_contents(self, from_vessel: dict, volume: float):
         """
@@ -498,7 +499,6 @@ class Wellplate:
             row, col = well_id[0], int(well_id[1:])
             well.well_data.base_thickness = self.plate_data.base_thickness
             well.update_coordinates(self.calculate_well_coordinates(row, col))
-            
 
     def calculate_well_coordinates(self, row: str, col: int) -> dict:
         """
