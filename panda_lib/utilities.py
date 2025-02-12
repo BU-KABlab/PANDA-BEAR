@@ -5,6 +5,7 @@ import tkinter as tk
 from enum import Enum
 from math import isclose
 from tkinter import filedialog
+from typing import Optional
 
 import pulp
 
@@ -74,6 +75,31 @@ class Coordinates:
     def to_dict(self):
         """Return the coordinates as a dictionary."""
         return {"x": self.x, "y": self.y, "z": self.z}
+
+    def __eq__(self, other):
+        if not isinstance(other, Coordinates):
+            return False
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
+    def __setitem__(self, key, value):
+        if key == 0 or key == "x":
+            self.x = value
+        elif key == 1 or key == "y":
+            self.y = value
+        elif key == 2 or key == "z":
+            self.z = value
+        else:
+            raise IndexError("Index out of range")
+
+    def __getitem__(self, key):
+        if key == 0 or key == "x":
+            return self.x
+        elif key == 1 or key == "y":
+            return self.y
+        elif key == 2 or key == "z":
+            return self.z
+        else:
+            raise IndexError("Index out of range")
 
 
 class Instruments(Enum):
@@ -267,7 +293,7 @@ def solve_vials_ilp(
             )
             for position in vial_concentration_map
         }
-        deviation_value = pulp.value(c_deviation)
+        deviation_value = float(pulp.value(c_deviation))
         return vial_vol_by_conc, deviation_value, vial_vol_by_location
     else:
         return None, None, None
@@ -300,11 +326,11 @@ def directory_picker():
 def input_validation(
     prompt: str,
     valid_types: tuple | type | list,
-    value_range: tuple = None,
-    allow_blank: bool = True,
-    custom_error: str = None,
-    menu_items: list = None,
-    exit_option: bool = False,
+    value_range: Optional[tuple] = None,
+    allow_blank: Optional[bool] = True,
+    custom_error: Optional[str] = None,
+    menu_items: Optional[list] = None,
+    exit_option: Optional[bool] = False,
     default=None,
 ):
     """Prompt the user for input and validate the input type."""

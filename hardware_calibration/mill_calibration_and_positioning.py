@@ -18,7 +18,7 @@ import logging
 from typing import Sequence
 
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
-from panda_lib.labware.wellplates import Wellplate
+from panda_lib.labware.wellplates import Well, Wellplate
 from panda_lib.panda_gantry import Coordinates
 from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
@@ -155,7 +155,7 @@ def update_instrument_offsets(mill: Mill, *args, **kwargs):
                     )
 
             tool_manager.update_tool(tool_name, Coordinates(**new_coordinates))
-            mill.save_config()
+            mill.write_mill_config_file()
 
             if input(
                 "Would you like to change any other instrument offsets? (y/n): "
@@ -226,7 +226,7 @@ def update_working_volume(mill: Mill, *args, **kwargs):
                 new_working_volume[coordinate] = working_volume[coordinate]
 
         mill.config["working_volume"] = new_working_volume
-        mill.save_config()
+        mill.write_mill_config_file()
         print(f"New working volume: {working_volume}")
 
 
@@ -236,7 +236,7 @@ def update_electrode_bath(mill: Mill, *args, **kwargs):
     """
 
     electrode_bath_vial = Vial("e1")
-    electrode_bath_coordinates = electrode_bath_vial.coordinates()
+    electrode_bath_coordinates = electrode_bath_vial.coordinates
     print(f"Current electrode bath location: {electrode_bath_coordinates}")
 
     if input(
@@ -255,7 +255,7 @@ def update_electrode_bath(mill: Mill, *args, **kwargs):
             else:
                 new_coordinates[coordinate] = electrode_bath_coordinates[coordinate]
 
-        electrode_bath_vial.vial_data.coordinates = new_coordinates
+        electrode_bath_vial.vial_data.coordinates = new_coordinates.to_dict()
         electrode_bath_vial.save()
         print(f"New electrode bath location: {new_coordinates}")
 
@@ -298,6 +298,8 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
             tool=instrument,
         )
 
+        new_x, new_y = original_coordinates["x"], original_coordinates["y"]
+
         while True:
             confirm = input(f"Is the {instrument} in the correct position? (yes/no): ")
             if confirm.lower().strip()[0] in ["y", ""]:
@@ -309,14 +311,14 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                 f"Enter the new X coordinate for {well_id} or enter for no change: ",
                 (int, float),
                 (mill.working_volume.x, 0),
-                allow_blank=1,
+                allow_blank=True,
                 default=original_coordinates["x"],
             )
             new_y = input_validation(
                 f"Enter the new Y coordinate for {well_id} or enter for no change: ",
                 (int, float),
                 (mill.working_volume.y, 0),
-                allow_blank=1,
+                allow_blank=True,
                 default=original_coordinates["y"],
             )
 
@@ -368,7 +370,7 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
         if well_id in ["DONE", "d"]:
             break
 
-        well = wellplate.wells[well_id]
+        well: Well = wellplate.wells[well_id]
         print(f"Current bottom of {well_id}: {well.bottom}")
         print(f"Current coordinates of {well_id}: {wellplate.get_coordinates(well_id)}")
         input("Press enter to continue...")
@@ -520,7 +522,8 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
     Project id and campaign id are integers.
     Context is one of these strings: 'BeforeDeposition', 'AfterBleaching', 'AfterColoring'
     """
-    pass  # TODO: Implement this function
+    print("This function is not yet implemented")
+    # TODO: Implement this function
     # while True:
     #     well_id = (
     #         input("Enter the well ID to capture a photo of (e.g., A1): ")
@@ -594,6 +597,7 @@ def quit_calibration():
 
 def calibrate_vial_holders(
     mill: Mill,
+    wellplate: Wellplate,
     stock_vials: Sequence[StockVial],
     waste_vials: Sequence[WasteVial],
     *args,
@@ -653,7 +657,8 @@ def calibrate_vial_holders(
         # Move to the original top of vial position
         goto = Coordinates(original_coords.x, original_coords.y, vial.top)
         mill.safe_move(coordinates=goto, tool="pipette")
-
+        # Adjust position
+        new_coords = Coordinates(original_coords.x, original_coords.y, original_bottom)
         # Check if safe to proceed to bottom, if not, adjust the xy position
         while True:
             safe_to_proceed = input(
@@ -681,11 +686,11 @@ def calibrate_vial_holders(
                 continue
 
             break
-
+        new_coords.x = new_x if new_x is not None else original_coords.x
+        new_coords.y = new_y if new_y is not None else original_coords.y
         # Now move to the bottom of the vial
-        goto = Coordinates(original_coords.x, original_coords.y, original_bottom)
-        mill.safe_move(coordinates=goto, tool="pipette")
-
+        mill.safe_move(coordinates=new_coords, tool="pipette")
+        new_x, new_y, new_bottom = new_coords.x, new_coords.y, original_bottom
         # Adjust position
         while True:
             if input(
@@ -696,14 +701,14 @@ def calibrate_vial_holders(
                     float,
                     (mill.working_volume.x, 0),
                     allow_blank=True,
-                    default=original_coords.x,
+                    default=new_coords.x,
                 )
                 new_y = input_validation(
                     "Enter new Y coordinate or enter for no change: ",
                     float,
                     (mill.working_volume.y, 0),
                     allow_blank=True,
-                    default=original_coords.y,
+                    default=new_coords.y,
                 )
                 new_z = input_validation(
                     "Enter new Z coordinate or enter for no change: ",
@@ -714,8 +719,8 @@ def calibrate_vial_holders(
                 )
 
                 new_coords = Coordinates(
-                    new_x if new_x is not None else original_coords.x,
-                    new_y if new_y is not None else original_coords.y,
+                    new_x if new_x is not None else new_coords.x,
+                    new_y if new_y is not None else new_coords.y,
                     original_coords.z,  # We are not changing the z position here, we will change the thickness below
                 )
                 new_bottom = new_z if new_z is not None else original_bottom
@@ -727,10 +732,10 @@ def calibrate_vial_holders(
 
         # Save new position
         if input("\nSave new position? (y/n): ").lower() in ["y", "yes", ""]:
-            vial.vial_data.coordinates = new_coords
-            vial.vial_data.base_thickness = abs(
-                new_bottom - original_coords.z
-            )  # Assumes new bottom is greater than coordinate z
+            vial.vial_data.coordinates = Coordinates(goto.x, goto.y, original_coords.z).to_dict()
+            # vial.vial_data.base_thickness = abs(
+            #     new_bottom - original_coords.z
+            # )  # Assumes new bottom is greater than coordinate z
             vial.save()
 
             # If calibrating first vial, offer to recalculate all positions
@@ -744,7 +749,7 @@ def calibrate_vial_holders(
                             continue
                         v.vial_data.coordinates = Coordinates(
                             new_coords.x, base_y - (i * VIAL_SPACING), original_coords.z
-                        )
+                        ).to_dict()
                         v.save()
                     print(f"\nUpdated all {holder_type} vial positions")
 

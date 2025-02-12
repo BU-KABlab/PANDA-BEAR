@@ -74,6 +74,31 @@ class Coordinates:
     def __repr__(self):
         return f"Coordinates(x={self.x}, y={self.y}, z={self.z})"
 
+    def __eq__(self, other):
+        if not isinstance(other, Coordinates):
+            return False
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
+    def __setitem__(self, key, value):
+        if key == 0 or key == "x":
+            self.x = value
+        elif key == 1 or key == "y":
+            self.y = value
+        elif key == 2 or key == "z":
+            self.z = value
+        else:
+            raise IndexError("Index out of range")
+
+    def __getitem__(self, key):
+        if key == 0 or key == "x":
+            return self.x
+        elif key == 1 or key == "y":
+            return self.y
+        elif key == 2 or key == "z":
+            return self.z
+        else:
+            raise IndexError("Index out of range")
+
     def to_dict(self):
         return {
             "x": self.x,

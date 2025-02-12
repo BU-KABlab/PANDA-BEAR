@@ -171,7 +171,7 @@ class MockSerialToMill:
                 step = command.split("\n")[i]
                 match = pattern.search(step)
                 if match:
-                    goto = [0.0, 0.0, 0.0]
+                    goto = [self.current_x, self.current_y, self.current_z]
                     if match.group(1) is not None:
                         self.current_x = float(match.group(1))
                         goto[0] = self.current_x
