@@ -6,8 +6,11 @@
 Polymer analysis and discovery array (PANDA) self-driving lab (SDL): an automated system for high-throughput electrodeposition and functional characterization of polymer films
 
 ![PANDA-logo](https://github.com/BU-KABlab/PANDA-SDL/blob/2c1d91d546d233a9af88f7912e32f243253305e5/PANDAlogo.png)
-## Purpose
-To electrodeposit polymer thin films, evaluate and compare their electrical properties using optical assays correlated to said properties, and use this information to autonomously select the parameters used to create new polymer thin films.
+
+
+## Usage
+
+Refer to the End User documenation in the documentation folder.
 
 ## Instruments
 * [Genmitsu PROVerXL 4030 CNC Router](https://www.sainsmart.com/products/genmitsu-proverxl-4030-cnc-router-with-carveco-maker-subscription)
@@ -37,7 +40,6 @@ To electrodeposit polymer thin films, evaluate and compare their electrical prop
 * [FlyCapture SDK](https://www.flir.com/products/flycapture-sdk/)
 * [Open Broadcast Software](https://obsproject.com/)
 
-
 ## Team
 * Harley Quinn
 * Gregory Robben
@@ -45,3 +47,7 @@ To electrodeposit polymer thin films, evaluate and compare their electrical prop
 * Alan Gardner
 * Dr. Jörg G. Werner
 * Dr. Keith Brown
+
+## License
+
+This project is licensed under the GPL2 License - see the LICENSE file for details.

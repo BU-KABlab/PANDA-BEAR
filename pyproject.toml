@@ -1,9 +1,18 @@
 [project]
 name = "panda_lib"
 version = "1.5.0"
+authors = [
+  { name="Gregory Robben", email="grobben@bu.edu" },{name="Harley Quinn", email="hjquinn@bu.edu"}
+]
 description = "A library for operating a PANDA SDL as a standalone device or in a SiLA environment."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "numpy>=1.21.0",
     "pandas>=1.3.0",
@@ -73,6 +82,10 @@ dependencies = [
     "pytest>=8.3.4",
     "spinnaker-python",
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/yourusername/PANDA-BEAR"
+"Bug Tracker" = "https://github.com/yourusername/PANDA-BEAR/issues"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
