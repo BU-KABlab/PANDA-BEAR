@@ -29,8 +29,18 @@ logger = sql_reports.logger
 
 
 def check_if_plate_type_exists(type_id: int) -> bool:
-    """Check if a plate type exists in the plate_types table"""
+    """Check if a plate type exists in the plate_types table.
 
+    Parameters
+    ----------
+    type_id : int
+        The ID of the plate type to check.
+
+    Returns
+    -------
+    bool
+        True if the plate type exists, False otherwise.
+    """
     with SessionLocal() as session:
         return (
             session.execute(
@@ -142,8 +152,13 @@ def check_if_plate_type_exists(type_id: int) -> bool:
 
 
 def check_if_current_wellplate_is_new() -> bool:
-    """Check if the current wellplate is new"""
+    """Check if the current wellplate is new.
 
+    Returns
+    -------
+    bool
+        True if all wells in current wellplate have 'new' status, False otherwise.
+    """
     with SessionLocal() as session:
         current_plate_id = session.execute(
             select(Wellplates.id).filter(Wellplates.current == 1)
@@ -167,16 +182,18 @@ def check_if_current_wellplate_is_new() -> bool:
 
 
 def get_number_of_wells(plate_id: Union[int, None] = None) -> int:
+    """Get the number of wells in the well_hx table for the given or current wellplate.
+
+    Parameters
+    ----------
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
+
+    Returns
+    -------
+    int
+        The number of wells.
     """
-    Get the number of wells in the well_hx table for the given or current wellplate.
-
-    Args:
-        plate_id (int): The plate ID.
-
-    Returns:
-        int: The number of wells.
-    """
-
     with SessionLocal() as session:
         if plate_id is None:
             result = (
@@ -197,20 +214,21 @@ def get_number_of_wells(plate_id: Union[int, None] = None) -> int:
 
 
 def get_number_of_clear_wells(plate_id: Union[int, None] = None) -> int:
+    """Query the well_hx table and count wells with specific statuses.
+
+    Counts wells with status in 'new', 'clear', 'queued' for the specified or
+    current wellplate.
+
+    Parameters
+    ----------
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
+
+    Returns
+    -------
+    int
+        The number of wells with status in 'new', 'clear', 'queued'.
     """
-    Query the well_hx table and count the number of wells with status in
-    'new', 'clear','queued' for the current wellplate.
-
-    If plate_id is provided, count the wells of the specified wellplate in
-    well_hx instead of the current wellplate.
-
-    Args:
-        plate_id (int): The plate ID.
-
-    Returns:
-        int: The number of wells with status in 'new', 'clear','queued'.
-    """
-
     with SessionLocal() as session:
         if plate_id is None:
             result = (
@@ -235,14 +253,16 @@ def get_number_of_clear_wells(plate_id: Union[int, None] = None) -> int:
 
 
 def select_current_wellplate_info() -> tuple[int, int, bool]:
-    """
-    Get the current wellplate information from the wellplates table.
+    """Get the current wellplate information.
 
-    Returns:
-        tuple[int, int, bool]: The wellplate ID, the wellplate type ID, and
-        whether the wellplate is new.
+    Returns
+    -------
+    tuple[int, int, bool]
+        A tuple containing:
+        - wellplate ID (int)
+        - wellplate type ID (int)
+        - whether the wellplate is new (bool)
     """
-
     with SessionLocal() as session:
         statement = select(Wellplates).filter_by(current=1)
 
@@ -255,32 +275,36 @@ def select_current_wellplate_info() -> tuple[int, int, bool]:
 
 
 def select_wellplate_info(plate_id: int) -> Wellplates:
+    """Get the wellplate information from the wellplates table.
+
+    Parameters
+    ----------
+    plate_id : int
+        The plate ID.
+
+    Returns
+    -------
+    Wellplates
+        The wellplate object that matches the plate_id.
     """
-    Get the wellplate information from the wellplates table.
-
-    Args:
-        plate_id (int): The plate ID.
-
-    Returns:
-        tuple[int, int]: The wellplate ID and the wellplate type ID.
-    """
-
     with SessionLocal() as session:
         result = session.query(Wellplates).filter(Wellplates.id == plate_id).first()
         return result
 
 
 def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
+    """Get the well IDs from the well_hx table.
+
+    Parameters
+    ----------
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
+
+    Returns
+    -------
+    List[str]
+        List of well IDs.
     """
-    Get the well IDs from the well_hx table for the given or current wellplate.
-
-    Args:
-        plate_id (int): The plate ID.
-
-    Returns:
-        List[str]: The well IDs.
-    """
-
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
@@ -296,12 +320,19 @@ def select_well_ids(plate_id: Union[int, None] = None) -> List[str]:
 
 
 def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
-    """
-    Selects all wells from the well_hx table for a specific wellplate.
-    Or if no plate_id is provided, all wells of the current wellplate are
-    selected.
-    """
+    """Select all wells from the well_hx table for a specific wellplate.
 
+    Parameters
+    ----------
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
+
+    Returns
+    -------
+    List[object]
+        List of well objects containing well information.
+        Returns None if no wells are found.
+    """
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
@@ -378,28 +409,20 @@ def select_wellplate_wells(plate_id: Union[int, None] = None) -> List[object]:
 
 
 def select_well_status(well_id: str, plate_id: Union[int, None] = None) -> str:
+    """Get the status of a well from the well_hx table.
+
+    Parameters
+    ----------
+    well_id : str
+        The well ID.
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
+
+    Returns
+    -------
+    str
+        The status of the well.
     """
-    Get the status of a well from the well_hx table.
-
-    Args:
-        well_id (str): The well ID.
-
-    Returns:
-        str: The status of the well.
-    """
-    # if plate_id is None:
-    #     plate_id = sql_utilities.execute_sql_command(
-    #         "SELECT id FROM wellplates WHERE current = 1"
-    #     )[0][0]
-    # result = sql_utilities.execute_sql_command(
-    #     "SELECT status FROM well_status WHERE well_id = ? AND plate_id = ?",
-    #     (
-    #         well_id,
-    #         plate_id,
-    #     ),
-    # )
-    # return result[0][0]
-
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
@@ -415,13 +438,18 @@ def select_well_status(well_id: str, plate_id: Union[int, None] = None) -> str:
 
 
 def count_wells_with_new_status(plate_id: Union[int, None] = None) -> int:
-    """
-    Count the number of wells with a status of 'new' in the well_hx table.
+    """Count the number of wells with a status of 'new' in the well_hx table.
 
-    Returns:
-        int: The number of wells with a status of 'new'.
-    """
+    Parameters
+    ----------
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
 
+    Returns
+    -------
+    int
+        The number of wells with a status of 'new'.
+    """
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
@@ -438,13 +466,18 @@ def count_wells_with_new_status(plate_id: Union[int, None] = None) -> int:
 
 
 def select_next_available_well(plate_id: Union[int, None] = None) -> str:
-    """
-    Choose the next available well in the well_hx table.
+    """Choose the next available well in the well_hx table.
 
-    Returns:
-        str: The well ID of the next available well.
-    """
+    Parameters
+    ----------
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
 
+    Returns
+    -------
+    str
+        The well ID of the next available well.
+    """
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
@@ -466,12 +499,14 @@ def select_next_available_well(plate_id: Union[int, None] = None) -> str:
 
 
 def save_well_to_db(well_to_save: object) -> None:
-    """
-    First check if the well is in the table. If so update the well where the
-        values are different.
-    Otherwise insert the well into the table.
-    """
+    """First check if the well is in the table. If so update the well where the
+    values are different. Otherwise insert the well into the table.
 
+    Parameters
+    ----------
+    well_to_save : object
+        The well object to save.
+    """
     with SessionLocal() as session:
         if well_to_save.plate_id in [None, 0]:
             well_to_save.plate_id = (
@@ -496,12 +531,14 @@ def save_well_to_db(well_to_save: object) -> None:
 
 
 def save_wells_to_db(wells_to_save: List[object]) -> None:
-    """
-    First check if the well is in the table. If so update the well where the
-        values are different.
-    Otherwise insert the well into the table.
-    """
+    """First check if the well is in the table. If so update the well where the
+    values are different. Otherwise insert the well into the table.
 
+    Parameters
+    ----------
+    wells_to_save : List[object]
+        List of well objects to save.
+    """
     with SessionLocal() as session:
         for well in wells_to_save:
             if well.plate_id in [None, 0]:
@@ -525,35 +562,29 @@ def save_wells_to_db(wells_to_save: List[object]) -> None:
 
 
 def insert_well(well_to_insert: object) -> None:
-    """
-    Insert a well into the well_hx table.
+    """Insert a well into the well_hx table.
 
     Insert_well will accept a well object, and using its attributes, insert a new
     row into the well_hx table.
 
-    Args:
-        well_to_insert (Well): The well to insert.
-
-    Returns:
-        None
+    Parameters
+    ----------
+    well_to_insert : object
+        The well to insert.
     """
-
     with SessionLocal() as session:
         session.add(WellModel(**well_to_insert.__dict__))
         session.commit()
 
 
 def update_well(well_to_update: object) -> None:
+    """Updating the entry in the well_hx table that matches the well and plate ids.
+
+    Parameters
+    ----------
+    well_to_update : object
+        The well to update.
     """
-    Updating the entry in the well_hx table that matches the well and plate ids.
-
-    Args:
-        well_to_update (Well): The well to update.
-
-    Returns:
-        None
-    """
-
     with SessionLocal() as session:
         session.query(WellModel).filter(
             WellModel.plate_id == well_to_update.well_data.plate_id
@@ -577,17 +608,20 @@ def get_well_by_id(
     well_id: str,
     plate_id: Union[int, None] = None,
 ) -> wellplate_module.Well:
+    """Get a well from the well_hx table.
+
+    Parameters
+    ----------
+    well_id : str
+        The well ID.
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
+
+    Returns
+    -------
+    wellplate_module.Well
+        The well.
     """
-    Get a well from the well_hx table.
-
-    Args:
-        plate_id (int): The plate ID.
-        well_id (str): The well ID.
-
-    Returns:
-        Well: The well.
-    """
-
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
@@ -610,16 +644,18 @@ def get_well_by_id(
 
 
 def get_well_by_experiment_id(experiment_id: str) -> Tuple:
+    """Get a well from the well_hx table by experiment ID.
+
+    Parameters
+    ----------
+    experiment_id : str
+        The experiment ID.
+
+    Returns
+    -------
+    Tuple
+        The well.
     """
-    Get a well from the well_hx table by experiment ID.
-
-    Args:
-        experiment_id (str): The experiment ID.
-
-    Returns:
-        Well: The well.
-    """
-
     with SessionLocal() as session:
         result = (
             session.query(WellModel)
@@ -632,16 +668,18 @@ def get_well_by_experiment_id(experiment_id: str) -> Tuple:
 
 
 def select_well_characteristics(type_id: int) -> PlateTypes:
-    """
-    Select the well characteristics from the well_types table.
+    """Select the well characteristics from the well_types table.
 
-    Args:
-        type_id (int): The well type ID.
+    Parameters
+    ----------
+    type_id : int
+        The well type ID.
 
-    Returns:
+    Returns
+    -------
+    PlateTypes
         The SQL Alchemy object for the well type.
     """
-
     with SessionLocal() as session:
         result = session.query(PlateTypes).filter(PlateTypes.id == type_id).first()
         return result
@@ -650,15 +688,17 @@ def select_well_characteristics(type_id: int) -> PlateTypes:
 def update_well_coordinates(
     well_id: str, plate_id: Union[int, None], coordinates: object
 ) -> None:
-    """
-    Update the coordinates of an individal well in the well_hx table.
+    """Update the coordinates of an individal well in the well_hx table.
 
-    Args:
-        well_id (str): The well ID.
-        plate_id (int): The plate ID.
-        coordinates (WellCoordinates): The coordinates.
+    Parameters
+    ----------
+    well_id : str
+        The well ID.
+    plate_id : int
+        The plate ID.
+    coordinates : object
+        The coordinates.
     """
-
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
@@ -673,15 +713,17 @@ def update_well_coordinates(
 def update_well_status(
     well_id: str, plate_id: Union[None, int] = None, status: Union[None, str] = None
 ) -> None:
-    """
-    Update the status of a well in the well_hx table.
+    """Update the status of a well in the well_hx table.
 
-    Args:
-        well_id (str): The well ID.
-        plate_id (int): The plate ID.
-        status (str): The status.
+    Parameters
+    ----------
+    well_id : str
+        The well ID.
+    plate_id : int, optional
+        The plate ID. If None, uses current wellplate.
+    status : str, optional
+        The status. If None, uses current status.
     """
-
     with SessionLocal() as session:
         if plate_id is None:
             plate_id = (
