@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Tuple, TypedDict, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
@@ -94,8 +94,7 @@ class WellplateKwargs(BaseModel):
     image_height: float = 0.0
     coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
 
-    class Config:
-        validate_assignment = True
+    model_config = ConfigDict(validate_assignment=True)
 
 
 class Well:

@@ -7,7 +7,6 @@ import re
 from pathlib import Path
 
 # third-party libraries
-# from pydantic.dataclasses import dataclass
 import serial
 
 from .driver import Mill as RealMill
