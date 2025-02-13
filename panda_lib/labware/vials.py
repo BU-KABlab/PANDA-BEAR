@@ -1,9 +1,9 @@
 import csv
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from panda_lib.utilities import Coordinates, directory_picker, file_picker
 from shared_utilities.db_setup import SessionLocal
@@ -37,7 +37,7 @@ class VialKwargs(TypedDict, total=False):
 class Vial:
     def __init__(
         self,
-        position: str,
+        position: Optional[str] = None,
         session_maker: sessionmaker = SessionLocal,
         create_new: bool = False,
         vial_name: Optional[str] = None,
@@ -52,10 +52,12 @@ class Vial:
             create_new (bool): Whether to create a new vial in the database.
             **kwargs: Additional attributes for creating a new vial.
         """
-        self.position = position
+        self._position = position
+        if position:
+            self.position: str = position
         self.session_maker = session_maker
         self.service = VialService(self.session_maker)
-        self.vial_data: Optional[VialReadModel] = None
+        self.vial_data: VialReadModel
         self._vial_name = vial_name
 
         if create_new:
@@ -79,12 +81,12 @@ class Vial:
         return self.coordinates.z
 
     @property
-    def top(self) -> float:
+    def top(self) -> Optional[float]:
         """Returns the top of the vial."""
         return self.vial_data.top
 
     @property
-    def bottom(self) -> float:
+    def bottom(self) -> Optional[float]:
         """Returns the bottom of the vial."""
         return self.vial_data.bottom
 
@@ -142,7 +144,8 @@ class Vial:
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
         height = self.vial_data.volume_height - 1
-        dead_height = self.bottom + self.vial_data.dead_volume / (
+        bottom = self.bottom if self.bottom else 0
+        dead_height = bottom + self.vial_data.dead_volume / (
             3.14 * self.vial_data.radius**2
         )
         if height < dead_height:
@@ -152,10 +155,10 @@ class Vial:
 
     def create_new_vial(self, **kwargs: VialKwargs):
         """Creates a new vial in the database, and loads it back."""
-        new_vial = VialWriteModel(position=self.position, **kwargs)
+        new_vial = VialWriteModel(position=self.position, **kwargs)  # type: ignore
         self.vial_data = VialWriteModel.model_validate(
             self.service.create_vial(new_vial)
-        )
+        )  # type: ignore
         self.load_vial()
 
     def load_vial(self):
@@ -284,13 +287,19 @@ def read_vial(
     Read a vial from the database, either by name or position
     """
     if name:
-        vial = Vial(name=name, session_maker=session, create_new=False)
         if position:
-            assert vial.position == position
+            vial = Vial(
+                position=position,
+                vial_name=name,
+                session_maker=session,
+                create_new=False,
+            )
+        else:
+            vial = Vial(vial_name=name, session_maker=session, create_new=False)
     elif position:
         vial = Vial(position=position, session_maker=session, create_new=False)
         if name:
-            assert vial.name == name
+            assert vial.vial_data.name == name
     else:
         raise ValueError("Either name or position must be provided")
 
@@ -300,7 +309,7 @@ def read_vial(
 def read_vials(
     vial_group: Optional[str] = None,
     session: sessionmaker = SessionLocal,
-) -> Tuple[List[StockVial], List[WasteVial]]:
+) -> Union[Tuple[List[StockVial], List[WasteVial]], Tuple[List[Vial], None]]:
     """
     Read in the virtual vials from the json file
     """
@@ -344,16 +353,16 @@ def read_vials(
 
 def reset_vials(
     categoty: Union[str, int],
-    session: Session = SessionLocal(),
-) -> List[Vial]:
+    session: sessionmaker = SessionLocal,
+) -> Sequence[Vial]:
     """
     Reset the active vials in the database
     """
-
+    active_vials: Sequence[Vial]
     if categoty == "stock" or categoty == 0:
-        active_vials, _ = read_vials(session)
+        active_vials, _ = read_vials("stock", session=session)
     elif categoty == "waste" or categoty == 1:
-        _, active_vials = read_vials(session)
+        active_vials, _ = read_vials("waste", session=session)
 
     for vial in active_vials:
         vial: Vial
@@ -363,7 +372,7 @@ def reset_vials(
 
 
 def delete_vial_position_and_hx_from_db(
-    position: str, session: Session = SessionLocal
+    position: str, session: sessionmaker = SessionLocal
 ) -> None:
     """Delete the vial position and hx from the db"""
     try:
@@ -381,7 +390,7 @@ def input_new_vial_values(vialgroup: str) -> None:
     """For user inputting the new vial values for the state file"""
 
     vials = read_vials(vialgroup)[0]
-    vials = sorted(vials, key=lambda x: x.position)
+    vials = sorted(vials, key=lambda x: x.vial_data.position)
     vial_list = []
     vial_lines = []
     ## Print the current vials and their values
@@ -468,7 +477,7 @@ def input_new_vial_values(vialgroup: str) -> None:
                 )
                 if new_contamination != "":
                     try:
-                        vial.contamination = int(new_contamination)
+                        vial.vial_data.contamination = int(new_contamination)
                     except ValueError:
                         print("Invalid value for contamination. Should be integer")
                         continue
@@ -544,7 +553,10 @@ def generate_template_vial_csv_file() -> None:
                 "active",
             ]
         )
-        for vial in stockvials + wastevials:
+        all_vials = (stockvials if stockvials else []) + (
+            wastevials if wastevials else []
+        )
+        for vial in all_vials:
             vial: Vial
             csv_writer.writerow(
                 [
@@ -575,7 +587,7 @@ def generate_template_vial_csv_file() -> None:
     print(f"Template vial csv file saved as {filename}")
 
 
-def import_vial_csv_file(filename: str = None) -> None:
+def import_vial_csv_file(filename: Optional[str] = None) -> None:
     """
     Import the vial csv file and add the vials to the db
     """
@@ -591,10 +603,7 @@ def import_vial_csv_file(filename: str = None) -> None:
 
     for each_vial in vial_parameters:
         try:
-            vial = Vial(
-                position=each_vial["position"],
-                session_maker=SessionLocal,
-                create_new=True,
+            vkwargs = VialKwargs(
                 category=int(each_vial["category"]),
                 name=each_vial["name"],
                 contents=json.loads(each_vial["contents"]),
@@ -608,6 +617,14 @@ def import_vial_csv_file(filename: str = None) -> None:
                 capacity=float(each_vial["capacity"]),
                 contamination=int(each_vial["contamination"]),
                 dead_volume=float(each_vial["dead_volume"]),
+            )
+
+            vial = Vial(
+                position=each_vial["position"],
+                session_maker=SessionLocal,
+                create_new=True,
+                vial_name=each_vial["name"],
+                kwargs=vkwargs,
             )
 
             vial_logger.info("Vial %s imported successfully", vial.position)

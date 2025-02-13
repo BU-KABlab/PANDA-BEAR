@@ -6,7 +6,7 @@ import logging
 import os
 import time
 from functools import wraps
-from typing import Optional
+from typing import Optional, Union
 
 from .config import config_tools
 
@@ -20,10 +20,10 @@ else:
 
 
 def setup_default_logger(
-    log_file="panda.log",
-    log_name="panda",
-    file_level=config.get("LOGGING", "file_level"),
-    console_level=config.get("LOGGING", "console_level"),
+    log_file: str = "panda.log",
+    log_name: str = "panda",
+    file_level: Union[str, int] = config.get("LOGGING", "file_level"),
+    console_level: Union[str, int] = config.get("LOGGING", "console_level"),
 ):
     """Setup a default logger for the PANDA_SDL project"""
 
@@ -82,7 +82,7 @@ class CustomLoggingFilter(logging.Filter):
 
 def apply_log_filter(
     logger: logging.Logger,
-    experiment_id: int = None,
+    experiment_id: Optional[int] = None,
     target_well: Optional[str] = None,
     campaign_id: Optional[str] = None,
     test: Optional[bool] = config.getboolean("OPTIONS", "testing"),

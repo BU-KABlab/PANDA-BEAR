@@ -171,12 +171,18 @@ class MockSerialToMill:
                 step = command.split("\n")[i]
                 match = pattern.search(step)
                 if match:
+                    goto = [self.current_x, self.current_y, self.current_z]
                     if match.group(1) is not None:
                         self.current_x = float(match.group(1))
+                        goto[0] = self.current_x
                     if match.group(2) is not None:
                         self.current_y = float(match.group(2))
+                        goto[1] = self.current_y
                     if match.group(3) is not None:
                         self.current_z = float(match.group(3))
+                        goto[2] = self.current_z
+                    self.logger.info("Moving to coordinates: %s", goto)
+                    print(f"Moving to coordinates: G00 X{goto[0]} Y{goto[1]} Z{goto[2]}")
                 else:
                     self.logger.warning(
                         "Could not extract coordinates from the command: %s", step

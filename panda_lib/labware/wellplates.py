@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Tuple, TypedDict, Union
 
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
@@ -65,10 +66,9 @@ class WellKwargs(TypedDict, total=False):
     coordinates: dict
 
 
-# Define TypedDict for WellPlate kwargs
-class WellplateKwargs(TypedDict, total=False):
+class WellplateKwargs(BaseModel):
     """
-    TypedDict for WellPlate kwargs
+    Model for WellPlate kwargs
 
     Attributes:
     -----------
@@ -83,8 +83,8 @@ class WellplateKwargs(TypedDict, total=False):
     coordinates: dict
     """
 
-    name: str
-    type_id: int
+    name: str | None = None
+    type_id: int | None = None
     a1_x: float = 0.0
     a1_y: float = 0.0
     orientation: int = 0
@@ -93,6 +93,9 @@ class WellplateKwargs(TypedDict, total=False):
     echem_height: float = 0.0
     image_height: float = 0.0
     coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
+
+    class Config:
+        validate_assignment = True
 
 
 class Well:
@@ -147,7 +150,7 @@ class Well:
         self.plate_id = plate_id
         self.session_maker = session_maker
         self.service = WellService(session_maker=session_maker)
-        self.well_data: Optional[WellReadModel] = None
+        self.well_data: WellReadModel
 
         if create_new:
             self.create_new_well(**kwargs)
@@ -245,13 +248,16 @@ class Well:
 
     def load_well(self):
         """Load the well data from the database"""
-        self.well_data = self.service.get_well(self.well_id, self.plate_id)
+        self.well_data: WellReadModel = self.service.get_well(
+            self.well_id, self.plate_id
+        )
 
     def save(self):
         """Save the well data to the database"""
         self.service.update_well(
             self.well_id, self.plate_id, self.well_data.model_dump()
         )
+        self.load_well()
 
     def add_contents(self, from_vessel: dict, volume: float):
         """
@@ -496,8 +502,8 @@ class Wellplate:
     def recalculate_well_positions(self):
         for well_id, well in self.wells.items():
             row, col = well_id[0], int(well_id[1:])
-            well.update_coordinates(self.calculate_well_coordinates(row, col))
             well.well_data.base_thickness = self.plate_data.base_thickness
+            well.update_coordinates(self.calculate_well_coordinates(row, col))
 
     def calculate_well_coordinates(self, row: str, col: int) -> dict:
         """

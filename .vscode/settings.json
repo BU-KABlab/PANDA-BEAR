@@ -1,90 +1,80 @@
 {
-    "[python]": {
-        "editor.defaultFormatter": "charliermarsh.ruff"
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoSearchPaths": true,
+  "githubPullRequests.ignoredPullRequestBranches": ["main"],
+  "sqltools.connections": [
+    {
+      "previewLimit": 100,
+      "driver": "SQLite",
+      "name": "epanda_dev",
+      "database": "P:\\epanda_dev.db"
     },
-    "python.analysis.typeCheckingMode": "off",
-    "python.analysis.autoSearchPaths": true,
-    "githubPullRequests.ignoredPullRequestBranches": [
-        "main"
-    ],
-    "sqltools.connections": [
-        {
-            "previewLimit": 100,
-            "driver": "SQLite",
-            "name": "epanda_dev",
-            "database": "P:\\epanda_dev.db"
-        },
-        {
-            "previewLimit": 100,
-            "driver": "SQLite",
-            "name": "epanda_prod",
-            "database": "P:\\epanda_prod.db"
-        },
-        {
-            "previewLimit": 100,
-            "driver": "SQLite",
-            "name": "test_db",
-            "database": "test_db.db"
-        },
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "100.84.246.115",
-            "port": 3306,
-            "driver": "MySQL",
-            "name": "BearGuest-Cornell",
-            "group": "KABLAB",
-            "database": "Bear",
-            "username": "BearGuest-Cornell",
-            "password": "BearGuest2024!"
-        },
-        {
-            "previewLimit": 50,
-            "driver": "SQLite",
-            "name": "memory db",
-            "database": ":memory:"
-        }
-    ],
-    "sqltools.useNodeRuntime": true,
-    "editor.rulers": [
-        100,
-        120
-    ],
-    "python.testing.pytestArgs": [
-        "tests"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "cmake.ignoreCMakeListsMissing": true,
-    "cSpell.words": [
-        "acnrinse",
-        "Amperometry",
-        "chrono",
-        "dataclass",
-        "dataclasses",
-        "Echem",
-        "edot",
-        "electrodeposited",
-        "epanda",
-        "labware",
-        "nonfile",
-        "ocpcheck",
-        "pdms",
-        "pedot",
-        "pgma",
-        "prcss",
-        "sila",
-        "slackbot",
-        "tbap",
-        "teaa",
-        "uchoice"
-    ],
-    "cSpell.ignoreWords": [
-        "decapping",
-        "solns",
-        "wellplates"
-    ],
+    {
+      "previewLimit": 100,
+      "driver": "SQLite",
+      "name": "epanda_prod",
+      "database": "P:\\epanda_prod.db"
+    },
+    {
+      "previewLimit": 100,
+      "driver": "SQLite",
+      "name": "test_db",
+      "database": "test_db.db"
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "100.84.246.115",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "BearGuest-Cornell",
+      "group": "KABLAB",
+      "database": "Bear",
+      "username": "BearGuest-Cornell",
+      "password": "BearGuest2024!"
+    },
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "memory db",
+      "database": ":memory:"
+    }
+  ],
+  "sqltools.useNodeRuntime": true,
+  "editor.rulers": [100, 120],
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "cmake.ignoreCMakeListsMissing": true,
+  "cSpell.words": [
+    "acnrinse",
+    "Amperometry",
+    "chrono",
+    "dataclass",
+    "dataclasses",
+    "Echem",
+    "edot",
+    "electrodeposited",
+    "epanda",
+    "labware",
+    "nonfile",
+    "ocpcheck",
+    "pdms",
+    "pedot",
+    "pgma",
+    "prcss",
+    "sila",
+    "slackbot",
+    "tbap",
+    "teaa",
+    "uchoice"
+  ],
+  "cSpell.ignoreWords": ["decapping", "solns", "wellplates"],
+  "python-envs.pythonProjects": []
 }

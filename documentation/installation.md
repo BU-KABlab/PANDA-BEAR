@@ -54,7 +54,7 @@ Run the following commands:
 
 `uv venv --python 3.10` you can add a venv name if you want with `uv venv <name> --python 3.10`
 
-`.venv\Scripts\activate` Activates the environment (change .venv to your .custom_name if you used one)
+`source .venv\Scripts\activate` Activates the environment (change .venv to your .custom_name if you used one)
 
 `uv sync` This will read the `pyproject.toml` file and install dependencies.
 

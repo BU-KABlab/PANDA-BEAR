@@ -7,6 +7,7 @@
 - [Placing Objects on the Deck](#placing-objects-on-the-deck)
   - [Vials](#vials)
   - [Wellplates](#wellplates)
+- [Mapping the Location of Objects and Calibrating Offsets](#mapping-the-location-of-objects-and-calibrating-offsets)
 
 
 
@@ -72,3 +73,7 @@ Use the vial holder found in 3d-prints. Vials should be positioned along the Y-a
 When using the main menu to change the wellplate, you will be asked for the wellplate's a1 (XYZ) location and the orientation of the wellplate. Refer to the following figure to determine your wellplate orientation:
 
 ![Wellplate Orientations](images/wellplate_orientations.png)
+
+# Mapping the Location of Objects and Calibrating Offsets
+
+From the main menu there is the option to run `mill_calibration_and_positioning.py`. If the system is in testing mode, the mill will not move, but the program will print the xyz movements that it would have sent so that you may manually move the mill yourself. However, any changes you make WILL be saved to the active database.

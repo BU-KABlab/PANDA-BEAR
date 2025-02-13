@@ -92,6 +92,10 @@ class VialWriteModel(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        return cls(**kwargs)
+
 
 class VialReadModel(VesselModel):
     id: int
@@ -188,7 +192,7 @@ class WellplateWriteModel(BaseModel):
     echem_height: float = 0.0  # height of echem cell placement in mm
     image_height: float = 0.0  # height of the image in mm
     height: float = 6.0
-    name: str = f"{id}" if id is not None else None
+    name: Optional[str] = f"{id}" if id is not None else None
     coordinates: Dict[str, float] = Field(
         default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0}
     )
