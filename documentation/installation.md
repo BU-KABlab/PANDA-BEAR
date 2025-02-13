@@ -19,7 +19,7 @@ Example:
 ```git clone -b my-branch git@github.com:user/myproject.git```
 
 
-# 1. FLIR SDKS
+# 1. FLIR SDKs
 
 This system uses a FLIR camera and requires their proprietary SDK which you can obtain for free from their website.
 
@@ -35,7 +35,7 @@ Download both the Spinnaker SDK as well as the Python SDK that matches your OS a
 
 The Linux SDKs do not come with examples, download the Windows or Mac zip files and extract the "Examples" folder.
 
-# 2. Setting up your Python Environment
+# 2. Setting Up Your Python Environment
 
 [UV](https://docs.astral.sh/uv/) by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
 
