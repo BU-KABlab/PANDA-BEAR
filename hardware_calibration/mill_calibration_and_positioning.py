@@ -660,6 +660,10 @@ def calibrate_vial_holders(
         # Adjust position
         new_coords = Coordinates(original_coords.x, original_coords.y, original_bottom)
         # Check if safe to proceed to bottom, if not, adjust the xy position
+        new_x = None
+        new_y = None
+
+        
         while True:
             safe_to_proceed = input(
                 "Is it safe to proceed to the bottom of the vial? (y/n): "
