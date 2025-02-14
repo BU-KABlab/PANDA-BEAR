@@ -2,7 +2,7 @@
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.typeCheckingMode": "off",
   "python.analysis.autoSearchPaths": true,
   "githubPullRequests.ignoredPullRequestBranches": ["main"],
   "sqltools.connections": [

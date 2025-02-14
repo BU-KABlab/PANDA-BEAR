@@ -5,7 +5,7 @@ import tkinter as tk
 from enum import Enum
 from math import isclose
 from tkinter import filedialog
-from typing import Optional
+from typing import Any, Optional
 
 import pulp
 
@@ -331,7 +331,7 @@ def input_validation(
     custom_error: Optional[str] = None,
     menu_items: Optional[list] = None,
     exit_option: Optional[bool] = False,
-    default=None,
+    default:Any=None,
 ):
     """Prompt the user for input and validate the input type."""
 

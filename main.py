@@ -132,7 +132,7 @@ def run_experiment():
         input_validation(
             "Enter the experiment ID: ",
             int,
-            None,
+            (queue_list[0], queue_list[-1]),
             False,
             "Invalid experiment ID",
             queue_list,
@@ -267,7 +267,7 @@ def print_wellplate_info():
     input("Press Enter to continue...")
 
 
-def print_queue_info():
+def print_queue_info()-> list[str]:
     """Prints a summary of the current queue."""
     current_queue = sql_queue.select_queue()
     print("Current Queue:")
