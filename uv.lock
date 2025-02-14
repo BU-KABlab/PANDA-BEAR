@@ -1074,7 +1074,7 @@ wheels = [
 
 [[package]]
 name = "panda-lib"
-version = "1.0.0"
+version = "1.5.0"
 source = { virtual = "." }
 dependencies = [
     { name = "annotated-types" },
@@ -1195,7 +1195,7 @@ requires-dist = [
     { name = "six", specifier = "==1.16.0" },
     { name = "slack-sdk", specifier = "==3.32.0" },
     { name = "smmap", specifier = "==5.0.1" },
-    { name = "spinnaker-python", path = "P:/panda_sdl_3rd_party_software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" },
+    { name = "spinnaker-python", path = "P:/software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" },
     { name = "sqlalchemy", specifier = "==2.0.34" },
     { name = "sympy", specifier = "==1.13.2" },
     { name = "threadpoolctl", specifier = "==3.5.0" },
@@ -1800,7 +1800,7 @@ wheels = [
 [[package]]
 name = "spinnaker-python"
 version = "4.0.0.116"
-source = { path = "P:/panda_sdl_3rd_party_software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" }
+source = { path = "P:/software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" }
 dependencies = [
     { name = "numpy" },
 ]
