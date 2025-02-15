@@ -66,7 +66,7 @@ class WellKwargs(TypedDict, total=False):
     coordinates: dict
 
 
-class WellplateKwargs(BaseModel):
+class WellplateKwargs(BaseModel, validate_assignment=True):
     """
     Model for WellPlate kwargs
 
@@ -93,9 +93,6 @@ class WellplateKwargs(BaseModel):
     echem_height: float = 0.0
     image_height: float = 0.0
     coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
-
-    class Config:
-        validate_assignment = True
 
 
 class Well:
