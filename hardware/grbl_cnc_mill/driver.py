@@ -339,9 +339,10 @@ class Mill:
         else:
             status = status[-1].decode().rstrip()
         if "alarm" in status.lower():
-            self.logger.warning("Mill is in alarm state")
-            reset_alarm = input("Reset the mill? (y/n): ")
+            self.logger.warning("Mill is in alarm state. Requesting user input")
+            reset_alarm = input("Mill is in alarm state. Reset the mill? (y/n): ")
             if reset_alarm[0].lower() == "y":
+                self.logger.info("Resetting the mill")
                 self.reset()
             else:
                 self.logger.error(
@@ -353,20 +354,22 @@ class Mill:
             raise MillConnectionError(f"Error in status: {status}")
 
         # We only check that the mill is indeed lock upon connection because we will home before any movement
-        if "unlock" not in status.lower():
-            self.logger.error("Mill is not locked")
-            proceed = input("Proceed? (y/n): ")
-            if proceed[0].lower() == "n":
-                raise MillConnectionError("Mill is not locked")
-            else:
-                self.logger.warning("Proceeding despite mill not being locked")
-                self.logger.warning("Current status: %s", status)
-                self.logger.warning("Homing is reccomended before any movement")
-                home_now = input("Home now? (y/n): ")
-                if home_now.lower() == "y":
-                    self.homing_sequence()
-                else:
-                    self.logger.warning("User chose not to home the mill")
+        # if "unlock" not in status.lower():
+        #     self.logger.error("Mill is not locked")
+        #     proceed = input("Proceed? (y/n): ")
+        #     if proceed[0].lower() == "n":
+        #         raise MillConnectionError("Mill is not locked")
+        #     else:
+        #         self.logger.warning("Proceeding despite mill not being locked")
+        #         self.logger.warning("Current status: %s", status)
+        #         self.logger.warning("Homing is reccomended before any movement")
+        #         home_now = input("Home now? (y/n): ")
+        #         if home_now.lower() == "y":
+        #             self.homing_sequence()
+        #         else:
+        #             self.logger.warning("User chose not to home the mill")
+        self.logger.info("Mill is connected and ready for use, homing first")
+        self.homing_sequence()
 
     def __enter__(self):
         """Enter the context manager"""
