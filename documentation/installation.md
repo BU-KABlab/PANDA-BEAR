@@ -49,6 +49,9 @@ The Linux SDKs do not come with examples, download the Windows or Mac zip files 
 
 **[UV](https://docs.astral.sh/uv/)** by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
 
+Jump to [Using UV](#option-a-using-uv) 
+
+Jump to [Useing PIP](#option-b-using-pip)
 
 ## Option A: Using `UV`
 
@@ -87,6 +90,8 @@ The commandline should now begin with `(.venv)` or the custom name you used.
 > .panda_sdl\Scripts\activate
 > uv sync
 ```
+
+[Skip to next step](#env-file)
 
 ## Option B Using `PIP`
 
