@@ -29,7 +29,17 @@ Spinnaker is proprietary software made by FLIR and as such cannot be included in
 
 Downloading is free but you will need to make an account: <https://www.flir.com/products/spinnaker-sdk/>.
 
-Download both the Spinnaker SDK as well as the Python SDK that matches your OS and architecture. Install the SDK to your system to allow for using the Python SDK with this project.
+Download both the 4.0 version of the Full Spinnaker SDK as well as the Python SDK that matches your OS and architecture. For example: Windows AMD which is the same as Windows x86.
+
+Install the SDK to your system (you do not need the developer version) to allow for using the Python SDK with this project.
+
+Copy the full path to the python SDK `.whl` file. 
+
+Might look something like:
+
+`C:\Users\<your name>\Downloads\spinnaker_python-4.0.#.###-cp310-cp310-win_amd64\spinnaker_python-4.0.#.###-cp310-cp310-win_amd64.whl`
+
+Note: The location doesn't actually matter (could be on your D: drive) so long as you can provide the full path. Your exact version might have slightly different version numbers but so long as the major version is the same it should work.
 
 ## Examples
 
@@ -37,26 +47,38 @@ The Linux SDKs do not come with examples, download the Windows or Mac zip files 
 
 # 2. Setting Up Your Python Environment
 
-[UV](https://docs.astral.sh/uv/) by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
+**[UV](https://docs.astral.sh/uv/)** by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
 
-## Using `UV`
 
-After installing UV (follow the link above to learn how), using the terminal, navigate to the directory you copied the project repository to.
+## Option A: Using `UV`
 
-In `pyproject.toml` under tool.uv.sources you will need to provide the path between the `{}` to the Spinnaker python `.whl` that you downloaded earlier (you did do part 1 right?).
+### Installing UV
+To quickly install, you may enter the following into a PowerShell Terminal:
+
+`powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+
+Following the installation, check the terminal for instructions to either restart or run another command (the Powershell command will begin with $).
+
+## Provide path to Spinnaker SDK
+After installing UV, navigate to the directory you copied the project repository to. 
+
+Edit `pyproject.toml` with a text editor to change the `[tool.uv.sources]` section. You will need to provide the path between the `{}` to the Spinnaker Python `.whl` that you downloaded earlier (you did do part 1 right?).
 
 ```toml
 [tool.uv.sources]
-spinnaker-python = {}
+spinnaker-python = {<your path here>}
 ```
 
+### Set up Virtual Environment and Install Dependencies
 Run the following commands:
 
-`uv venv --python 3.10` you can add a venv name if you want with `uv venv <name> --python 3.10`
+`uv venv --python 3.10`  -- Creates the virtual environment. You can add a name if you want with `uv venv <name> --python 3.10`
 
-`source .venv\Scripts\activate` Activates the environment (change .venv to your .custom_name if you used one)
+`source .venv\Scripts\activate` -- Activates the environment (change .venv to your .custom_name if you used one)
 
-`uv sync` This will read the `pyproject.toml` file and install dependencies.
+The commandline should now begin with `(.venv)` or the custom name you used.
+
+`uv sync` -- This will read the `pyproject.toml` file and install dependencies.
 
 ### Summary using 'panda_sdl' as environment name
 
@@ -66,11 +88,11 @@ Run the following commands:
 > uv sync
 ```
 
-## Using `PIP`
+## Option B Using `PIP`
 
 Use your preferred environment manager to first create a python 3.10 environment. 
 
-**Example using built in Python tools:**
+**Example using builtin Python tools:**
 
 ```cmd
 python -m venv panda_sdl
@@ -84,34 +106,32 @@ macOS/Linux
 source panda_sdl/bin/activate
 ```
 
-Once activated, and in the repository directory - open `requirements.txt` and update the entry for `spinnaker-python` to be where you have saved the spinnaker python whl
+The commandline should now begin with `(.venv)` or the custom name you used.
+
+Once activated, and in the folder you copied the project to - open `requirements.txt` with a text editor and update the entry for `spinnaker-python` to be where you have saved the spinnaker python `.whl`.
 
 ```requirements
-spinnaker-python @ <file_path>/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl
+spinnaker-python @ <your file path>/spinnaker_python-4.0.#.###-cp310-cp310-win_amd64/spinnaker_python-4.0.#.###-cp310-cp310-win_amd64.whl
 ```
 
-Then you may run the following command:
+Then run the following command:
 ```cmd
 pip install -r requirements.txt
 ```
 
 ## `.env` File
 
-PANDA_SDL only uses one `.env` file variables to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
+PANDA_SDL only uses one `.env` file variable to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
+
+## `Config.ini` File
+
+There is a `default_config.ini` in `shared_utilities/config` which you should use as a template and place wherever you desire so long as you update `.env`. Not all fields are required those that are, are prefilled.
 
 ## Test Your Installation
 
 From the top directory, run: ```pytest tests -v```
 
-## `Config.ini` File
-
-There is a `default_config.ini` in `shared_utilities/config` which you should use as a template and place wherever you desire so long as you update `.env`. Not all fields are required. A few fields are less self explanatory or an explanation is too long for a comment:
-
-- **Protocols vs Experiment Generators**:
-
-    PANDA_SDL defines the list of steps to perform an experiment as a *protocol*.
-    Metadata about an experiment, including which protocol to follow, is defined
-    in the *ExperimentBase* (or *ExperimentBase* derived) object which the *experiment_generator* creates. There is usually a one-to-one ratio of protocols to generators unless the protocol is updated but the metadata stays the same.
+If all tests pass you are ready to use the PANDA SDL!
 
 ## Project Data
 
