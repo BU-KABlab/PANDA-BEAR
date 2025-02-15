@@ -10,7 +10,9 @@ def mock_slack_bot():
     """
     Returns a SlackBot instance with mocked WebClient so no real API calls occur.
     """
-    with patch("panda_lib.slack_tools.SlackBot.WebClient"):
+    with patch("panda_lib.slack_tools.SlackBot.WebClient") and patch(
+        "panda_lib.slack_tools.SlackBot.config_options.getboolean", return_value=True
+    ):
         bot = SlackBot(test=True)
         yield bot
 
