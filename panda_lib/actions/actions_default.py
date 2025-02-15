@@ -105,6 +105,33 @@ def _handle_source_vessels(
     source_concentration: Optional[float] = None,
     db_session: Session = SessionLocal,
 ) -> Tuple[List[Union[Vial, Well]], List[Tuple[Union[Vial, Well], float]]]:
+    """Handle selection and processing of source vessels for liquid transfer.
+
+    Parameters
+    ----------
+    volume : float
+        The volume to be transferred in microliters.
+    src_vessel : Union[str, Well, StockVial]
+        The source vessel identifier or object.
+    pjct_logger : Logger, optional
+        Logger instance for recording events, by default logger
+    source_concentration : float, optional
+        Target concentration in mM, by default None
+    db_session : Session, optional
+        Database session for querying vials, by default SessionLocal
+
+    Returns
+    -------
+    Tuple[List[Union[Vial, Well]], List[Tuple[Union[Vial, Well], float]]]
+        A tuple containing:
+        - List of selected source vessels
+        - List of tuples containing (vessel, volume) pairs
+
+    Raises
+    ------
+    ValueError
+        If no suitable vials are available or if source concentration cannot be determined
+    """
     selected_source_vessels: List[Union[Vial, Well]] = []
     source_vessel_volumes: List[Tuple[Union[Vial, Well], float]] = []
 
@@ -175,17 +202,27 @@ def _pipette_action(
     src_vessel: Union[Vial, Well],
     dst_vessel: Union[Well, WasteVial],
     desired_volume: float,
-):
-    """
-    Perform the pipetting action from the source vessel to the destination vessel
+) -> None:
+    """Perform pipetting action from source to destination vessel.
 
-    Args:
-        toolkit (Toolkit): The toolkit object
-        vessel (Union[Vial, Well]): The source vessel
-        dst_vessel (Union[Well, WasteVial]): The destination vessel
-        desired_volume (float): The volume to be pipetted
-    """
+    Parameters
+    ----------
+    toolkit : Union[Toolkit, Hardware]
+        The toolkit object containing mill and pump controls
+    src_vessel : Union[Vial, Well]
+        The source vessel to withdraw from
+    dst_vessel : Union[Well, WasteVial]
+        The destination vessel to deposit into
+    desired_volume : float
+        The volume to be transferred in microliters
 
+    Notes
+    -----
+    This function handles the physical movement of liquid between vessels, including:
+    - Air gap management
+    - Decapping/capping of vials
+    - Multi-step transfers for volumes exceeding pipette capacity
+    """
     repetitions = math.ceil(
         desired_volume / (toolkit.pump.pipette.capacity_ul - DRIP_STOP)
     )
@@ -336,6 +373,30 @@ def transfer(
     toolkit: Toolkit,
     source_concentration: float = None,
 ) -> int:
+    """Transfer liquid between vessels.
+
+    Parameters
+    ----------
+    volume : float
+        Volume to transfer in microliters
+    src_vessel : Union[str, Well, StockVial]
+        Source vessel identifier or object
+    dst_vessel : Union[Well, WasteVial]
+        Destination vessel object
+    toolkit : Toolkit
+        Toolkit object for hardware control
+    source_concentration : float, optional
+        Target concentration in mM, by default None
+
+    Returns
+    -------
+    int
+        0 on success
+
+    Notes
+    -----
+    This is a wrapper around _forward_pipette_v3 for more convenient usage
+    """
     return _forward_pipette_v3(
         volume, src_vessel, dst_vessel, toolkit, source_concentration
     )
@@ -348,17 +409,30 @@ def rinse_well(
     alt_sol_name: Optional[str] = None,
     alt_vol: Optional[float] = None,
     alt_count: Optional[int] = None,
-):
-    """
-    Rinse the well with rinse_vol ul.
-    Involves pipetteing and then clearing the well with no purging steps
+) -> int:
+    """Rinse a well with specified solution.
 
-    Args:
-        instructions (Experiment): The experiment instructions
-        toolkit (Toolkit): The toolkit object
+    Parameters
+    ----------
+    instructions : EchemExperimentBase
+        Experiment instructions containing rinse parameters
+    toolkit : Toolkit
+        Toolkit object for hardware control
+    alt_sol_name : str, optional
+        Alternative solution name to use, by default None
+    alt_vol : float, optional
+        Alternative volume to use, by default None
+    alt_count : int, optional
+        Alternative rinse count to use, by default None
 
-    Returns:
-        None (void function) since the objects are passed by reference
+    Returns
+    -------
+    int
+        0 on success
+
+    Notes
+    -----
+    Performs multiple rinse cycles of pipetting solution in and out of the well
     """
     sol_name = instructions.rinse_sol_name if alt_sol_name is None else alt_sol_name
     vol = instructions.rinse_vol if alt_vol is None else alt_vol
@@ -1081,7 +1155,7 @@ def decapping_sequence(mill: Mill, target_coords: Coordinates, ard_link: Arduino
     The decapping sequence is as follows:
     - Move to the target coordinates
     - Activate the decapper
-    - Move the decapper up 20mm
+    - Move the decapper up to 0mm
     """
 
     # Move to the target coordinates
@@ -1090,11 +1164,11 @@ def decapping_sequence(mill: Mill, target_coords: Coordinates, ard_link: Arduino
     # Activate the decapper
     ard_link.no_cap()
 
-    # Move the decapper up 20mm
+    # Move the decapper up to 0
     mill.move_to_position(
         target_coords.x,
         target_coords.y,
-        target_coords.z + 20,
+        0,
         tool="decapper",
     )
 
@@ -1104,7 +1178,7 @@ def capping_sequence(mill: Mill, target_coords: Coordinates, ard_link: ArduinoLi
     The capping sequence is as follows:
     - Move to the target coordinates
     - deactivate the decapper
-    - Move the decapper +10mm in the y direction
+    - Move the decapper +5mm in the y direction
     - Move the decapper to 0 z
     """
 
@@ -1115,7 +1189,7 @@ def capping_sequence(mill: Mill, target_coords: Coordinates, ard_link: ArduinoLi
     ard_link.ALL_CAP()
 
     # Move the decapper +10mm in the y direction
-    mill.move_to_position(target_coords.x, target_coords.y + 10, 0, tool="decapper")
+    mill.move_to_position(target_coords.x, target_coords.y + 5, 0, tool="decapper")
 
 
 if __name__ == "__main__":

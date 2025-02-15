@@ -1,19 +1,3 @@
-from .actions_default import (
-    capping_sequence,
-    chrono_amp,
-    clear_well,
-    cyclic_volt,
-    decapping_sequence,
-    flush_pipette,
-    image_well,
-    mix,
-    purge_pipette,
-    rinse_well,
-    solution_selector,
-    transfer,
-    volume_correction,
-    waste_selector,
-)
 from .actions_pedot import (
     chrono_amp_edot_bleaching,
     chrono_amp_edot_coloring,
@@ -23,6 +7,22 @@ from .actions_pgma import (
     cyclic_volt_pgma_fc,
     cyclic_volt_pgma_pama,
 )
+from .electrochemistry import (
+    chrono_amp,
+    cyclic_volt,
+)
+from .imaging import image_well
+from .movement import capping_sequence, decapping_sequence, move_to_vial, move_to_well
+from .pipetting import (
+    clear_well,
+    flush_pipette,
+    mix,
+    purge_pipette,
+    rinse_well,
+    transfer,
+    volume_correction,
+)
+from .vessel_handling import _handle_source_vessels, solution_selector, waste_selector
 
 __all__ = [
     "capping_sequence",
@@ -44,4 +44,7 @@ __all__ = [
     "transfer",
     "volume_correction",
     "waste_selector",
+    "_handle_source_vessels",
+    "move_to_vial",
+    "move_to_well",
 ]
