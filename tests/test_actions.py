@@ -11,11 +11,13 @@ from hardware.panda_pipette import (
     Pipette,
     # PipetteModel,
 )
-from panda_lib.actions.actions_default import (
-    _handle_source_vessels,
+from panda_lib.actions.pipetting import (
     _pipette_action,
-    solution_selector,
     volume_correction,
+)
+from panda_lib.actions.vessel_handling import (
+    _handle_source_vessels,
+    solution_selector,
     waste_selector,
 )
 from panda_lib.labware import StockVial, Well
@@ -66,9 +68,9 @@ def test_handle_source_vessels(temp_test_db, src_vessel):
     source_concentration = 1.0
 
     with (
-        patch("panda_lib.actions.actions_default.read_vials") as mock_read_vials,
+        patch("panda_lib.actions.vessel_handling.read_vials") as mock_read_vials,
         patch(
-            "panda_lib.actions.actions_default.solve_vials_ilp"
+            "panda_lib.actions.vessel_handling.solve_vials_ilp"
         ) as mock_solve_vials_ilp,
     ):
         mock_read_vials.return_value = (
