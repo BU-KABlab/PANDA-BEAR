@@ -26,6 +26,8 @@ from panda_lib.utilities import Instruments, input_validation
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
 
+from .decapper_testing import main as test_decapper
+
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]
 
@@ -663,7 +665,6 @@ def calibrate_vial_holders(
         new_x = None
         new_y = None
 
-        
         while True:
             safe_to_proceed = input(
                 "Is it safe to proceed to the bottom of the vial? (y/n): "
@@ -736,7 +737,9 @@ def calibrate_vial_holders(
 
         # Save new position
         if input("\nSave new position? (y/n): ").lower() in ["y", "yes", ""]:
-            vial.vial_data.coordinates = Coordinates(goto.x, goto.y, original_coords.z).to_dict()
+            vial.vial_data.coordinates = Coordinates(
+                goto.x, goto.y, original_coords.z
+            ).to_dict()
             # vial.vial_data.base_thickness = abs(
             #     new_bottom - original_coords.z
             # )  # Assumes new bottom is greater than coordinate z
@@ -766,6 +769,8 @@ menu_options = {
     "5": calibrate_echem_height,
     "6": calibrate_vial_holders,
     "7": capture_well_photo_manually,
+    "8": calibrate_image_height,
+    "9": test_decapper,
     "q": quit_calibration,
 }
 
