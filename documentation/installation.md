@@ -39,6 +39,12 @@ The Linux SDKs do not come with examples, download the Windows or Mac zip files 
 
 [UV](https://docs.astral.sh/uv/) by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
 
+To quickly install, you may enter the following into a PowerShell Terminal:
+
+`powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+
+Following the installation, check the terminal for instructions to either restart or run another command (the Powershell command will begin with $)
+
 ## Using `UV`
 
 After installing UV (follow the link above to learn how), using the terminal, navigate to the directory you copied the project repository to.
@@ -99,9 +105,6 @@ pip install -r requirements.txt
 
 PANDA_SDL only uses one `.env` file variables to point to the location of your configuration file. This way the config file can live outside of the repository and safely contain keys and tokens. The `.env` is in the repository's top directory.
 
-## Test Your Installation
-
-From the top directory, run: ```pytest tests -v```
 
 ## `Config.ini` File
 
@@ -112,6 +115,11 @@ There is a `default_config.ini` in `shared_utilities/config` which you should us
     PANDA_SDL defines the list of steps to perform an experiment as a *protocol*.
     Metadata about an experiment, including which protocol to follow, is defined
     in the *ExperimentBase* (or *ExperimentBase* derived) object which the *experiment_generator* creates. There is usually a one-to-one ratio of protocols to generators unless the protocol is updated but the metadata stays the same.
+
+
+## Test Your Installation
+
+From the top directory, run: ```pytest tests -v```
 
 ## Project Data
 
