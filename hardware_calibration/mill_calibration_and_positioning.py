@@ -635,7 +635,7 @@ def calibrate_vial_holders(
 
         # Select vial to calibrate
         vial_index = input_validation(
-            "\nEnter vial index to calibrate (0-7) or enter to skip: ",
+            "\nEnter vial index to calibrate or enter to skip: ",
             int,
             (0, 7),
             allow_blank=True,
@@ -744,20 +744,22 @@ def calibrate_vial_holders(
             #     new_bottom - original_coords.z
             # )  # Assumes new bottom is greater than coordinate z
             vial.save()
+            vial.load_vial()
 
             # If calibrating first vial, offer to recalculate all positions
             if vial_index == 0:
                 if input(
                     "\nRecalculate all vial positions in this holder? (y/n): "
                 ).lower() in ["y", "yes", ""]:
-                    base_y = new_coords.y
+                    base_y = goto.y
                     for i, v in enumerate(vials):
                         if i == 0:
                             continue
                         v.vial_data.coordinates = Coordinates(
-                            new_coords.x, base_y - (i * VIAL_SPACING), original_coords.z
+                            goto.x, base_y - (i * VIAL_SPACING), original_coords.z
                         ).to_dict()
                         v.save()
+                        v.load_vial()
                     print(f"\nUpdated all {holder_type} vial positions")
 
 
@@ -800,7 +802,10 @@ def calibrate_mill(
             if option not in menu_options:
                 print("Invalid option")
                 continue
-            menu_options[option](cncmill, wellplate, stock_vials, waste_vials)
+            if option == '9':
+                menu_options[option]()
+            else:
+                menu_options[option](cncmill, wellplate, stock_vials, waste_vials)
 
 
 def main():
