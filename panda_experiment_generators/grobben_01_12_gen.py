@@ -59,6 +59,8 @@ def main():
                     baseline=0,
                     cv=1,
                     ca=1,
+
+                    # Chronoamperometry
                     ca_sample_period=0.1,
                     ca_prestep_voltage=0.0,
                     ca_prestep_time_delay=0.0,
@@ -67,6 +69,9 @@ def main():
                     ca_step_2_voltage=0.0,
                     ca_step_2_time=0.0,
                     ca_sample_rate=0.5,
+                    deposition_voltage=voltage,
+
+                    # Cyclic Voltammetry
                     cv_step_size=0.002,
                     cv_first_anodic_peak=1.6,
                     cv_second_anodic_peak=0.0,
@@ -77,7 +82,6 @@ def main():
                     cv_initial_voltage=0.0,
                     cv_final_voltage=0.0,
                     cv_sample_period=0.1,
-                    deposition_voltage=voltage,
                 )
             )
             experiment_id += 1

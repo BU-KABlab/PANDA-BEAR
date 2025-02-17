@@ -2,10 +2,7 @@
 from dataclasses import dataclass
 from logging import Logger
 
-from panda_lib.actions.actions_default import (
-    ExperimentStatus,
-    Toolkit,
-    Well,
+from panda_lib.actions import (
     clear_well,
     flush_pipette,
     image_well,
@@ -13,6 +10,9 @@ from panda_lib.actions.actions_default import (
     transfer,
 )
 from panda_lib.actions.actions_pgma import cyclic_volt_pgma_pama
+from panda_lib.experiments.experiment_status import ExperimentStatus
+from panda_lib.toolkit import Toolkit
+from panda_lib.labware.wellplates import Well
 
 # If you are using custom actions, import them from the appropriate module.
 from panda_lib.experiments.experiment_types import EchemExperimentBase
@@ -21,7 +21,6 @@ from panda_lib.experiments.experiment_types import EchemExperimentBase
 # Short protocol to run a CV with PGMA-PAMA-Phenol-TEAA-TBAP in order to observe the behavior over a
 # range of voltages to inform future experiments.
 
-reag_name = "pgma-pama-phenol-teaa-tbap"
 
 
 @dataclass
@@ -83,7 +82,7 @@ def InitialPrecharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     """
     log = toolkit.global_logger
     log.info("Running Initialcharacterization for: " + exp.experiment_name)
-
+    reag_name = "pgma-pama-phenol-teaa-tbap"
     reag = Solution(
         reag_name,
         exp.solutions[reag_name]["volume"],
@@ -95,9 +94,9 @@ def InitialPrecharacterization(exp: EchemExperimentBase, toolkit: Toolkit):
     exp.set_status_and_save(ExperimentStatus.IMAGING)
     log.info("Imaging the well")
     image_well(toolkit, exp, "New Well")
-    exp.set_status_and_save(ExperimentStatus.PIPETTING)
 
     # Transfer the reagent to the well last to avoid sticking to the bottom
+    exp.set_status_and_save(ExperimentStatus.PIPETTING)
     transfer(reag.volume, reag.name, well, toolkit)
 
     _cv_steps(
