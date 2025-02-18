@@ -37,7 +37,7 @@ from panda_lib.sql_tools import (
     sql_wellplate,
 )
 from panda_lib.sql_tools.remove_testing_experiments import (
-    main as remove_testing_experiments,
+    main as _remove_testing_experiments,
 )
 from shared_utilities.config import (
     print_config_values,
@@ -192,6 +192,12 @@ def change_wellplate():
         input("Press Enter to continue...")
 
 
+def remove_testing_experiments():
+    """Removes all testing experiments from the database."""
+    _remove_testing_experiments()
+    input("Press Enter to continue...")
+
+
 def remove_wellplate_from_database():
     """Removes the current wellplate from the database."""
     if not read_testing_config():
@@ -267,7 +273,7 @@ def print_wellplate_info():
     input("Press Enter to continue...")
 
 
-def print_queue_info()-> list[str]:
+def print_queue_info() -> list[str]:
     """Prints a summary of the current queue."""
     current_queue = sql_queue.select_queue()
     print("Current Queue:")
@@ -325,21 +331,29 @@ def run_experiment_generator():
     if not available_generators:
         print("No generators available.")
         return
-    print("Available generators:")
-    for generator in available_generators:
-        print(generator.id, generator.name)
+    while True:
+        generator_ids = []
+        print("Available generators:")
+        for generator in available_generators:
+            generator_ids.append(generator.id)
+            print(generator.id, generator.name)
 
-    generator_id = (
-        input("Enter the id of the generator you would like to run or 'q' to go back: ")
-        .strip()
-        .lower()
-    )
+        generator_id = input_validation(
+            prompt="Enter the id of the generator you would like to run or 'q' to go back: ",
+            valid_types=(str, int),
+            menu_items=generator_ids,
+            allow_blank=False,
+            custom_error="Invalid generator ID",
+            exit_option="q",
+        )
+
     if generator_id == "q":
         return
     generator_id = int(generator_id)
     sql_protocol_utilities.read_in_protocols()
     generator = sql_generator_utilities.get_generator_name(generator_id)
-    sql_generator_utilities.run_generator(generator_id)
+    if generator:
+        sql_generator_utilities.run_generator(generator_id)
 
     input("Press Enter to continue...")
 
