@@ -26,7 +26,7 @@ from panda_lib.utilities import Instruments, input_validation
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import setup_default_logger
 
-from .decapper_testing import main as test_decapper
+from .decapper_testing import main as decapper_test
 
 logger = setup_default_logger(log_name="mill_config", console_level=logging.DEBUG)
 config = read_config()["MILL"]
@@ -763,6 +763,13 @@ def calibrate_vial_holders(
                     print(f"\nUpdated all {holder_type} vial positions")
 
 
+def test_decapper(mill: Mill, *args, **kwargs):
+    """
+    Test the decapper by moving it to a vial and then moving it up and down
+    """
+    decapper_test()
+
+
 menu_options = {
     "0": check_mill_settings,
     "1": home_mill,
@@ -802,8 +809,6 @@ def calibrate_mill(
             if option not in menu_options:
                 print("Invalid option")
                 continue
-            if option == '9':
-                menu_options[option]()
             else:
                 menu_options[option](cncmill, wellplate, stock_vials, waste_vials)
 
