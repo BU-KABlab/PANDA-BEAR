@@ -8,7 +8,7 @@ from panda_lib import scheduler
 from panda_lib.experiments import EchemExperimentBase
 
 PROJECT_ID = 20
-EXPERIMENT_NAME = "grobben-01-11-pgma-pama-phenol-teaa-voltage-screening"
+EXPERIMENT_NAME = "grobben-01-12-pgma-pama-phenol-teaa-voltage-screening"
 CAMPAIGN_ID = 1
 PLATE_TYPE = 7  # 10 mm diameter wells on gold
 
@@ -57,7 +57,7 @@ def main():
                     # Echem specific
                     ocp=1,
                     baseline=0,
-                    cv=1,
+                    cv=0,
                     ca=1,
 
                     # Chronoamperometry
@@ -71,17 +71,6 @@ def main():
                     ca_sample_rate=0.5,
                     deposition_voltage=voltage,
 
-                    # Cyclic Voltammetry
-                    cv_step_size=0.002,
-                    cv_first_anodic_peak=1.6,
-                    cv_second_anodic_peak=0.0,
-                    cv_scan_rate_cycle_1=0.025,
-                    cv_scan_rate_cycle_2=0.025,
-                    cv_scan_rate_cycle_3=0.025,
-                    cv_cycle_count=3,
-                    cv_initial_voltage=0.0,
-                    cv_final_voltage=0.0,
-                    cv_sample_period=0.1,
                 )
             )
             experiment_id += 1
