@@ -157,20 +157,20 @@ class Vial:
         """Creates a new vial in the database, and loads it back."""
         new_vial = VialWriteModel(
             position=self.position,
-            category = kwargs.get("category", 0),
-            height = kwargs.get("height", 57.0),
-            radius = kwargs.get("radius", 13.5),
-            volume = kwargs.get("volume", 20000.0),
-            capacity = kwargs.get("capacity", 20000.0),
-            contamination = kwargs.get("contamination", 0),
-            dead_volume = kwargs.get("dead_volume", 1000.0),
-            contents = kwargs.get("contents", {}),
-            viscosity_cp = kwargs.get("viscosity_cp", 0.0),
-            concentration = kwargs.get("concentration", 0.0),
-            density = kwargs.get("density", 1.0),
-            coordinates = kwargs.get("coordinates", {"x": 0.0, "y": 0.0, "z": 0.0}),
-            name = kwargs.get("name", "default"),
-            base_thickness = kwargs.get("base_thickness", 1.0),
+            category=kwargs.get("category", 0),
+            height=kwargs.get("height", 57.0),
+            radius=kwargs.get("radius", 13.5),
+            volume=kwargs.get("volume", 20000.0),
+            capacity=kwargs.get("capacity", 20000.0),
+            contamination=kwargs.get("contamination", 0),
+            dead_volume=kwargs.get("dead_volume", 1000.0),
+            contents=kwargs.get("contents", {}),
+            viscosity_cp=kwargs.get("viscosity_cp", 0.0),
+            concentration=kwargs.get("concentration", 0.0),
+            density=kwargs.get("density", 1.0),
+            coordinates=kwargs.get("coordinates", {"x": 0.0, "y": 0.0, "z": 0.0}),
+            name=kwargs.get("name", "default"),
+            base_thickness=kwargs.get("base_thickness", 1.0),
         )
         self.vial_data = VialWriteModel.model_validate(
             self.service.create_vial(new_vial)
@@ -483,6 +483,8 @@ def input_new_vial_values(vialgroup: str) -> None:
                 )
                 if new_volume != "":
                     vial.vial_data.volume = float(new_volume)
+                    if vial.vial_data.category == 0:  # Stock vial
+                        vial.vial_data.contents[0] = float(new_volume)
                 new_capacity = input(
                     f"Enter the new capacity of the vial (Current capacity is {vial.capacity}): "
                 )
@@ -616,6 +618,15 @@ def import_vial_csv_file(filename: Optional[str] = None) -> None:
         vial_parameters = []
         for row in csv_reader:
             vial_parameters.append(row)
+
+    # Data cleaning - remove rows with empty names or positions
+    vial_parameters = [
+        vial for vial in vial_parameters if vial["name"] and vial["position"]
+    ]
+
+    vial_parameters = [
+        vial["contents"] if vial["contents"] else "{}" for vial in vial_parameters
+    ]
 
     for each_vial in vial_parameters:
         try:
