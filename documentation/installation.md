@@ -12,12 +12,11 @@ Clone the repository to a directory on your machine. You may do this graphically
 
 You may need to install git on your device first - [heres how](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
-```git clone -b <branch> <remote_repo>```
+`git clone -b <branch> <remote_repo>`
 
 Example:
 
-```git clone -b my-branch git@github.com:user/myproject.git```
-
+`git clone -b my-branch git@github.com:user/myproject.git`
 
 # 1. FLIR SDKs
 
@@ -33,7 +32,7 @@ Download both the 4.0 version of the Full Spinnaker SDK as well as the Python SD
 
 Install the SDK to your system (you do not need the developer version) to allow for using the Python SDK with this project.
 
-Copy the full path to the python SDK `.whl` file. 
+Copy the full path to the python SDK `.whl` file.
 
 Might look something like:
 
@@ -49,13 +48,14 @@ The Linux SDKs do not come with examples, download the Windows or Mac zip files 
 
 **[UV](https://docs.astral.sh/uv/)** by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
 
-Jump to [Using UV](#option-a-using-uv) 
+Jump to [Using UV](#option-a-using-uv)
 
 Jump to [Useing PIP](#option-b-using-pip)
 
 ## Option A: Using `UV`
 
 ### Installing UV
+
 To quickly install, you may enter the following into a PowerShell Terminal:
 
 `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
@@ -63,7 +63,8 @@ To quickly install, you may enter the following into a PowerShell Terminal:
 Following the installation, check the terminal for instructions to either restart or run another command (the Powershell command will begin with $).
 
 ## Provide path to Spinnaker SDK
-After installing UV, navigate to the directory you copied the project repository to. 
+
+After installing UV, navigate to the directory you copied the project repository to.
 
 Edit `pyproject.toml` with a text editor to change the `[tool.uv.sources]` section. You will need to provide the path between the `{}` to the Spinnaker Python `.whl` that you downloaded earlier (you did do part 1 right?).
 
@@ -73,9 +74,10 @@ spinnaker-python = {<your path here>}
 ```
 
 ### Set up Virtual Environment and Install Dependencies
+
 Run the following commands:
 
-`uv venv --python 3.10`  -- Creates the virtual environment. You can add a name if you want with `uv venv <name> --python 3.10`
+`uv venv --python 3.10` -- Creates the virtual environment. You can add a name if you want with `uv venv <name> --python 3.10`
 
 `source .venv\Scripts\activate` -- Activates the environment (change .venv to your .custom_name if you used one)
 
@@ -87,7 +89,7 @@ The commandline should now begin with `(.venv)` or the custom name you used.
 
 ```cmd
 > uv venv panda_sdl --python 3.10
-> .panda_sdl\Scripts\activate
+> .venv\Scripts\activate
 > uv sync
 ```
 
@@ -95,18 +97,22 @@ The commandline should now begin with `(.venv)` or the custom name you used.
 
 ## Option B Using `PIP`
 
-Use your preferred environment manager to first create a python 3.10 environment. 
+Use your preferred environment manager to first create a python 3.10 environment.
 
 **Example using builtin Python tools:**
 
 ```cmd
 python -m venv panda_sdl
 ```
+
 Windows
+
 ```cmd
 panda_sdl\Scripts\activate
 ```
+
 macOS/Linux
+
 ```cmd
 source panda_sdl/bin/activate
 ```
@@ -120,6 +126,7 @@ spinnaker-python @ <your file path>/spinnaker_python-4.0.#.###-cp310-cp310-win_a
 ```
 
 Then run the following command:
+
 ```cmd
 pip install -r requirements.txt
 ```
@@ -134,7 +141,7 @@ There is a `default_config.ini` in `shared_utilities/config` which you should us
 
 ## Test Your Installation
 
-From the top directory, run: ```pytest tests -v```
+From the top directory, run: `pytest tests -v`
 
 If all tests pass you are ready to use the PANDA SDL!
 
@@ -160,7 +167,7 @@ For each channel that you want the app to have access to you first need to add t
 
 ## Setting up OBS [Optional]
 
-PANDA SDL has the ability to use OBS to  record the system during experiments.
+PANDA SDL has the ability to use OBS to record the system during experiments.
 
 PANDA SDL uses the integrated OBS webserver for control. To set it up, goto Tools/WebSocket Server Settings and fill in the desired server port and password. Note: The OBS application could be running on a separate computer so long as the two computers are accessible over a network.
 
