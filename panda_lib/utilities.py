@@ -331,7 +331,7 @@ def input_validation(
     custom_error: Optional[str] = None,
     menu_items: Optional[list] = None,
     exit_option: Optional[bool] = False,
-    default:Any=None,
+    default: Any = None,
 ):
     """Prompt the user for input and validate the input type."""
 
