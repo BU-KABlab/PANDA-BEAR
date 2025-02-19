@@ -12,6 +12,7 @@ import sqlite3
 from pathlib import Path
 from typing import Tuple, Union
 
+import sqlalchemy.exc
 from sqlalchemy import select, update
 
 from panda_lib.experiments.sql_functions import update_experiment_status
@@ -372,7 +373,19 @@ def schedule_experiments(
         try:
             insert_experiments([experiment])
             update_experiment_status(experiment, ExperimentStatus.QUEUED)
-        except sqlite3.Error as e:
+        except (sqlite3.IntegrityError, sqlalchemy.exc.IntegrityError) as e:
+            if "UNIQUE" in str(e):
+                logger.info(
+                    "Experiment %s already exists in the experiments table, skipping",
+                    experiment.experiment_id,
+                )
+                print(
+                    f"Experiment {experiment.experiment_id} already exists in the experiments table, skipping"
+                )
+                experiments.remove(experiment)
+                continue
+
+        except (sqlite3.Error, sqlalchemy.exc.SQLAlchemyError) as e:
             logger.error(
                 "Error occurred while adding the experiment to experiments table: %s. The statements have been rolled back and nothing has been added to the tables.",
                 e,
@@ -380,7 +393,8 @@ def schedule_experiments(
             print(
                 "The statements have been rolled back and nothing has been added to the tables."
             )
-            raise e
+            experiments.remove(experiment)
+            continue
 
     # Add the experiment to experiments table
     try:
