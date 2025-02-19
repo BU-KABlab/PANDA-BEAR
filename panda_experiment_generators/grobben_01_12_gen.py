@@ -59,7 +59,6 @@ def main():
                     baseline=0,
                     cv=0,
                     ca=1,
-
                     # Chronoamperometry
                     ca_sample_period=0.1,
                     ca_prestep_voltage=0.0,
@@ -70,7 +69,6 @@ def main():
                     ca_step_2_time=0.0,
                     ca_sample_rate=0.5,
                     deposition_voltage=voltage,
-
                 )
             )
             experiment_id += 1
