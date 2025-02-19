@@ -331,21 +331,20 @@ def run_experiment_generator():
     if not available_generators:
         print("No generators available.")
         return
-    while True:
-        generator_ids = []
-        print("Available generators:")
-        for generator in available_generators:
-            generator_ids.append(generator.id)
-            print(generator.id, generator.name)
+    generator_ids = []
+    print("Available generators:")
+    for generator in available_generators:
+        generator_ids.append(generator.id)
+        print(generator.id, generator.name)
 
-        generator_id = input_validation(
-            prompt="Enter the id of the generator you would like to run or 'q' to go back: ",
-            valid_types=(str, int),
-            menu_items=generator_ids,
-            allow_blank=False,
-            custom_error="Invalid generator ID",
-            exit_option="q",
-        )
+    generator_id = input_validation(
+        prompt="Enter the id of the generator you would like to run or 'q' to go back: ",
+        valid_types=int,
+        menu_items=generator_ids,
+        allow_blank=False,
+        custom_error="Invalid generator ID",
+        exit_option="q",
+    )
 
     if generator_id == "q":
         return
