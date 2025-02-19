@@ -20,7 +20,7 @@ Otherwise the experiment is not in the queue.
 # from panda_lib.sql_tools.sql_utilities import execute_sql_command, execute_sql_command_no_return
 import random
 
-from sqlalchemy import text
+from sqlalchemy import and_, select
 
 from shared_utilities.db_setup import SessionLocal
 
@@ -58,31 +58,46 @@ def select_queue() -> list:
     Returns:
         list: The entries from the queue table.
     """
-    statment = text(
-        """
-    SELECT a.experiment_id,
-           a.project_id,
-           a.project_campaign_id,
-           a.priority,
-           a.process_type,
-           a.filename,
-           a.well_type,
-           c.well_id,
-           c.status,
-           c.status_date
-      FROM panda_experiments AS a
-           JOIN
-           panda_wellplates AS b ON a.well_type = b.type_id
-           JOIN
-           panda_well_hx AS c ON a.experiment_id = c.experiment_id AND
-                                 c.status IN ('queued', 'waiting') 
-     WHERE b.current = 1
-     ORDER BY a.priority ASC,
-              a.experiment_id ASC;
-"""
+    from .panda_models import (
+        Experiments,
+        WellModel,
+        Wellplates,
     )
+
     with SessionLocal() as session:
-        return session.execute(statment).fetchall()
+        stmt = (
+            select(
+                Experiments.experiment_id,
+                Experiments.project_id,
+                Experiments.project_campaign_id,
+                Experiments.priority,
+                Experiments.process_type,
+                Experiments.filename,
+                Wellplates.id,
+                Experiments.well_type,
+                WellModel.well_id,
+                WellModel.status,
+                WellModel.status_date,
+            )
+            .join(
+                Wellplates,
+                Experiments.well_type == Wellplates.type_id,
+            )
+            .join(
+                WellModel,
+                and_(
+                    WellModel.experiment_id == Experiments.experiment_id,
+                    WellModel.plate_id == Wellplates.id,
+                ),
+            )
+            .where(
+                and_(
+                    Wellplates.current == 1, WellModel.status.in_(["queued", "waiting"])
+                )
+            )
+            .order_by(Experiments.priority, Experiments.experiment_id)
+        )
+        return session.execute(stmt).fetchall()
 
 
 def get_next_experiment_from_queue(
