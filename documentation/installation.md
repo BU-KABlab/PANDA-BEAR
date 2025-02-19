@@ -49,7 +49,6 @@ The Linux SDKs do not come with examples, download the Windows or Mac zip files 
 **[UV](https://docs.astral.sh/uv/)** by Astral is highly recommended (along with ruff) but you can also use `pip` to setup your environment.
 
 Jump to [Using UV](#option-a-using-uv)
-
 Jump to [Useing PIP](#option-b-using-pip)
 
 ## Option A: Using `UV`
@@ -144,6 +143,11 @@ There is a `default_config.ini` in `shared_utilities/config` which you should us
 From the top directory, run: `pytest tests -v`
 
 If all tests pass you are ready to use the PANDA SDL!
+
+
+## Test Your Installation
+
+From the top directory, run: ```pytest tests -v```
 
 ## Project Data
 

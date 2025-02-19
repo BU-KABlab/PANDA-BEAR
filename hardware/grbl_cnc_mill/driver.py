@@ -24,7 +24,6 @@ from pathlib import Path
 from typing import Optional
 
 # third-party libraries
-# from pydantic.dataclasses import dataclass
 import serial
 import serial.tools.list_ports
 
