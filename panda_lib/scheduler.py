@@ -253,8 +253,10 @@ def validate_experiment_plate(experiment: ExperimentBase) -> bool:
     plate_info = select_wellplate_info(experiment.plate_id)
     if plate_info is None:
         logger.error(
-            "Plate %s does not exist, cannot add experiment to queue",
+            "Plate %s does not exist, cannot add experiment %s AKA %s to queue",
             experiment.plate_id,
+            experiment.experiment_id,
+            experiment.experiment_name,
         )
         print(
             f"Plate {experiment.plate_id} does not exist, cannot add experiment {experiment.experiment_id} AKA {experiment.experiment_name} to queue"
@@ -266,8 +268,9 @@ def validate_experiment_plate(experiment: ExperimentBase) -> bool:
         or plate_info.id != experiment.plate_id
     ):
         logger.error(
-            "Plate %s does not have the correct well type number, cannot add experiment to queue",
+            "Plate %s does not have the correct well type number %s, cannot add experiment to queue",
             experiment.plate_id,
+            experiment.plate_type_number,
         )
         print(
             f"Plate {experiment.plate_id} does not have the correct well type number {experiment.plate_type_number}, cannot add experiment to queue"

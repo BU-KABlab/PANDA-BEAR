@@ -46,6 +46,91 @@ def test_schedule_experiment_new_experiment(temp_test_db):
     assert result == 1
 
 
+def test_schedule_experiment_existing_experiment(temp_test_db):
+    """
+    Tests scheduling an experiment that already exists in the database.
+    """
+    from panda_lib.scheduler import schedule_experiment
+
+    experiment = ExperimentBase(
+        experiment_id=1,
+        project_id=1,
+        project_campaign_id=1,
+        plate_id=1,
+        plate_type_number=1,
+        protocol_id=1,
+        analysis_id=1,
+        pin="test_pin",
+        experiment_type=1,
+        jira_issue_key="test_key",
+        priority=0,
+        process_type=0,
+        filename="test_file",
+        needs_analysis=False,
+        created="2022-01-01T00:00:00Z",
+        updated="2022-01-01T00:00:00Z",
+    )
+    schedule_experiment(experiment)
+    result = schedule_experiment(experiment)
+    assert result == 0
+
+
+def test_schedule_experiment_to_nonexistent_plate(temp_test_db):
+    """
+    Tests scheduling an experiment to a plate that doesn't exist.
+    """
+    from panda_lib.scheduler import schedule_experiment
+
+    experiment = ExperimentBase(
+        experiment_id=1,
+        project_id=1,
+        project_campaign_id=1,
+        plate_id=999,
+        plate_type_number=1,
+        protocol_id=1,
+        analysis_id=1,
+        pin="test_pin",
+        experiment_type=1,
+        jira_issue_key="test_key",
+        priority=0,
+        process_type=0,
+        filename="test_file",
+        needs_analysis=False,
+        created="2022-01-01T00:00:00Z",
+        updated="2022-01-01T00:00:00Z",
+    )
+    result = schedule_experiment(experiment)
+    assert result == 0
+
+
+def test_schedule_experiment_to_nonexistent_plate_type(temp_test_db):
+    """
+    Tests scheduling an experiment to a plate type that doesn't exist.
+    """
+    from panda_lib.scheduler import schedule_experiment
+
+    experiment = ExperimentBase(
+        experiment_id=1,
+        project_id=1,
+        project_campaign_id=1,
+        plate_id=1,
+        plate_type_number=999,
+        protocol_id=1,
+        analysis_id=1,
+        pin="test_pin",
+        experiment_type=1,
+        jira_issue_key="test_key",
+        priority=0,
+        process_type=0,
+        filename="test_file",
+        needs_analysis=False,
+        created="2022-01-01T00:00:00Z",
+        updated="2022-01-01T00:00:00Z",
+    )
+    result = schedule_experiment(experiment)
+    assert result == 0
+
+
 def test_check_well_status(temp_test_db):
     """
     Tests checking the status of a well.
