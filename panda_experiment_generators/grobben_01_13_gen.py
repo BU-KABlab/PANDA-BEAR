@@ -1,7 +1,7 @@
 """
 Author: Gregory Robben
 Date: 2025-02-18
-Description: 2 campaigns of 3 repeated experiments for modified and unmodieid PGMA-PAMA with 10mm wells.
+Description: 2 experiments for modified and unmodieid PGMA-PAMA with 10mm wells.
 """
 
 from panda_lib import scheduler
