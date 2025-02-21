@@ -179,13 +179,13 @@ def connect_to_instruments(
     # Connect to Arduino
     try:
         logger.debug("Connecting to Arduino")
-        with ArduinoLink() as arduino:
-            if not arduino.configured:
-                logger.error("No Arduino connected")
-                incomplete = True
-                instruments.arduino = None
-            logger.debug("Connected to Arduino")
-            instruments.arduino = ArduinoLink()
+        arduino = ArduinoLink()
+        if not arduino.configured:
+            logger.error("No Arduino connected")
+            incomplete = True
+            instruments.arduino = None
+        logger.debug("Connected to Arduino")
+        instruments.arduino = arduino
     except Exception as error:
         logger.error("Error connecting to Arduino, %s", error)
         incomplete = True
