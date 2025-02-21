@@ -339,7 +339,7 @@ class Mill:
             status = status[-1].decode().rstrip()
         if "alarm" in status.lower():
             self.logger.warning("Mill is in alarm state. Requesting user input")
-            reset_alarm = input("Mill is in alarm state. Reset the mill? (y/n): ")
+            reset_alarm = "y"  # input("Reset the alarm? (y/n): ")
             if reset_alarm[0].lower() == "y":
                 self.logger.info("Resetting the mill")
                 self.reset()
