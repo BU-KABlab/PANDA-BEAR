@@ -620,15 +620,15 @@ def import_vial_csv_file(filename: Optional[str] = None) -> None:
             vial_parameters.append(row)
 
     # Data cleaning - remove rows with empty names or positions
-    vial_parameters = [
+    vial_parameters_clean = [
         vial for vial in vial_parameters if vial["name"] and vial["position"]
     ]
 
-    vial_parameters = [
-        vial["contents"] if vial["contents"] else "{}" for vial in vial_parameters
-    ]
+    for each in vial_parameters_clean:
+        if each["contents"] is None or each["contents"] == "" or each["contents"] == "none":
+            each["contents"] = "{}"
 
-    for each_vial in vial_parameters:
+    for each_vial in vial_parameters_clean:
         try:
             vkwargs = VialKwargs(
                 category=int(each_vial["category"]),
