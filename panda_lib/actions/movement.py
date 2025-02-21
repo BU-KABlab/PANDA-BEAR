@@ -358,7 +358,7 @@ def capping_sequence(
     ard_link.ALL_CAP()
 
     # Move the decapper +10mm in the y direction
-    mill.move_to_position(target_coords.x, target_coords.y + 5, 0, tool="decapper")
+    mill.move_to_position(target_coords.x, target_coords.y + 15, 0, tool="decapper")
 
 
 if __name__ == "__main__":
