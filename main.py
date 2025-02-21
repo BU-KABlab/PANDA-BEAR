@@ -26,6 +26,7 @@ from panda_lib import (
     input_validation,
     load_analyzers,
     print_panda,
+    toolkit,
 )
 from panda_lib.experiments.experiment_types import ExperimentBase
 from panda_lib.labware import vials, wellplates
@@ -438,7 +439,7 @@ def change_pipette_tip():
 def instrument_check():
     """Runs the instrument check."""
     sql_system_state.set_system_status(SystemState.BUSY, "running instrument check")
-    instruments, all_found = experiment_loop.test_instrument_connections(False)
+    instruments, all_found = toolkit.test_instrument_connections(False)
     if all_found:
         input("Press Enter to continue...")
     else:
@@ -755,7 +756,7 @@ def check_essential_labware():
 
 if __name__ == "__main__":
     config = read_config()
-    slackThread_running.set()
+    #slackThread_running.set()
     print_disclaimer()
     time.sleep(2)
     sql_protocol_utilities.read_in_protocols()
@@ -763,7 +764,9 @@ if __name__ == "__main__":
 
     try:
         user_name = user_sign_in()
-        slackbot_thread = start_slack_bot(slackThread_running)
+        if config.getboolean("OPTIONS","use_slack"):
+            pass
+            #slackbot_thread = start_slack_bot(slackThread_running)
         while True:
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             num, p_type, new_wells = wellplates.read_current_wellplate_info()
@@ -839,6 +842,6 @@ Process Status:
         if analysis_prcss:
             analysis_prcss.terminate()
             analysis_prcss.join()
-        if slackbot_thread:
-            slackThread_running.clear()
-            slackbot_thread.join()
+        #if slackbot_thread:
+            #slackThread_running.clear()
+            #slackbot_thread.join()
