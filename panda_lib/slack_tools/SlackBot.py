@@ -1174,7 +1174,7 @@ def share_to_slack(
             slack_bot.send_message("data", msg)
             return
 
-        results = select_specific_result(exp_id, "image")
+        results = select_specific_result(exp_id, "images")
 
         if results is None:
             logger.error("The experiment %d has no image files", exp_id)
