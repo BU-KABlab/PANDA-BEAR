@@ -76,17 +76,6 @@ logger = setup_default_logger(log_name="panda")
 TESTING = read_testing_config()
 
 
-def run_slack_bot(testing_mode: bool = TESTING):
-    """
-    Run the slack bot
-    Args:
-    ----
-        testing_mode (bool, optional): Whether to run the slack bot in testing mode. Defaults to TESTING.
-    """
-    slack_monitor = SlackBot(test=testing_mode)
-    slack_monitor.run()
-
-
 def experiment_loop_worker(
     use_mock_instruments: bool = TESTING,
     one_off: bool = False,
@@ -462,7 +451,7 @@ def sila_experiment_loop_worker(
     Main worker function to execute SILA experiments.
     """
 
-    toolkit, _ = connect_to_instruments()
+    toolkit, _ = connect_to_instruments(config.getboolean("OPTIONS", "testing"))
     hardware = Hardware(
         pump=toolkit.pump,
         mill=toolkit.mill,
