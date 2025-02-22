@@ -20,12 +20,14 @@ __all__ = [
     "invert_image",
 ]
 
+default_logger = Logger("panda")
+
 
 def capture_new_image(
     save=True,
     num_images=1,
     file_name: Path = Path("images/test.tiff"),
-    logger: Optional[Logger] = None,
+    logger: Optional[Logger] = default_logger,
 ) -> Path:
     """Capture a new image from the FLIR camera"""
     # Check the file name and ennumerate if it already exists

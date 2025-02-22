@@ -428,14 +428,15 @@ def acquire_images(
                         image_path = Path(image_path)
                         filepath: Path = image_path
 
-                    converted_path = filepath.with_name(
-                        f"{image_path.name}_converted.tiff"
+                    raw_path = filepath.with_stem(f"{filepath.stem}_raw")
+                    converted_path = filepath.with_stem(
+                        f"{image_path.stem}"
                     )
 
                     if filepath.suffix != ".tiff":
                         filepath = filepath.with_suffix(".tiff")
                     cv2.imwrite(str(converted_path), image_converted)
-                    image_result.Save(str(filepath))
+                    image_result.Save(str(raw_path))
                     print(f"Image saved at {filepath}...")
 
                     #  Release image
