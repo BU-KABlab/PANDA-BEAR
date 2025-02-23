@@ -99,10 +99,21 @@ class PandaMill(Mill):
         coords: Coordinates = Coordinates(
             x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )
-        self.safe_move(coords.x, coords.y, ebath_vial.top, tool="electrode")
-        for _ in range(rinses):
-            self.move_to_position(coordinates=coords, tool="electrode")
-            self.move_to_position(coords.x, coords.y, 0, tool="electrode")
+        #self.safe_move(coords.x, coords.y, ebath_vial.top, tool="electrode")
+        cc, _ = self.current_coordinates()
+        coordinate_list = [
+            Coordinates(cc.x, cc.y, 0),
+            Coordinates(coords.x, coords.y, ebath_vial.volume_height),
+            Coordinates(coords.x, coords.y, 0),
+            Coordinates(coords.x, coords.y, ebath_vial.volume_height),
+            Coordinates(coords.x, coords.y, 0),
+            Coordinates(coords.x, coords.y, ebath_vial.volume_height),
+            Coordinates(coords.x, coords.y, 0),
+            ]
+        self.move_to_positions(coordinate_list, tool="electrode")
+        # for _ in range(rinses):
+        #     self.move_to_position(coordinates=coords, tool="electrode")
+        #     self.move_to_position(coords.x, coords.y, 0, tool="electrode")
         return 0
 
     def rest_electrode(self):
@@ -115,7 +126,7 @@ class PandaMill(Mill):
         coords: Coordinates = Coordinates(
             x=ebath_vial.x, y=ebath_vial.y, z=ebath_vial.volume_height
         )
-        self.move_to_safe_position()
+
         self.safe_move(coordinates=coords, tool="electrode")
         return 0
 
