@@ -42,13 +42,14 @@ def capture_new_image(
             logger.info(f"Camera {camera.DeviceSerialNumber} took image...")
         else:
             logger.error(f"Camera {camera.DeviceSerialNumber} failed to take image...")
+            
     # Clear camera list before releasing system
     camera_list.Clear()
 
     # Release system instance
     pyspin_system.ReleaseInstance()
 
-    return file_name
+    return file_name, result
 
 
 if __name__ == "__main__":
