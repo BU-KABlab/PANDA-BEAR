@@ -21,7 +21,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Optional, List
+from typing import List, Optional
 
 # third-party libraries
 import serial
@@ -487,7 +487,7 @@ class Mill:
 
                 return settings_dict
 
-            mill_response = self.read()
+            mill_response = self.read().lower()
             if not command.startswith("$"):
                 # self.logger.debug("Initially %s", mill_response)
                 mill_response = self.__wait_for_completion(mill_response)
@@ -495,8 +495,8 @@ class Mill:
             else:
                 self.logger.debug("Returned %s", mill_response)
 
-            if re.search(r"\b(error|alarm)\b", mill_response.lower()):
-                if re.search(r"\berror:22\b", mill_response.lower()):
+            if re.search(r"(error|alarm)", mill_response):
+                if re.search(r"error:22", mill_response):
                     # This is a GRBL error that occurs when the feed rate isn't set before moving with G01 command
                     self.logger.error("Error in status: %s", mill_response)
                     # Try setting the feed rate and executing the command again
@@ -790,23 +790,70 @@ class Mill:
         self.execute_command(command_str)
         return None  # self.current_coordinates(tool)
 
-    def move_to_positions(self, coordinates: List[Coordinates], tool: str = "center"):
+    def move_to_positions(
+        self,
+        coordinates: List[Coordinates],
+        tool: str = "center",
+        safe_move_required: bool = True,
+    ) -> None:
         """
-        Move the mill to the specified list of coordinate locations in one go.
+        Move the mill to the specified list of coordinate locations safely.
+        Each movement ensures proper Z-axis clearance before horizontal movements.
+
+        Args:
+            coordinates (List[Coordinates]): List of target coordinates to move to in sequence
+            tool (str): The tool being used (default: "center")
+            safe_move_required (bool): Whether to enforce safe movement patterns (default: True)
         """
         current_coordinates, _ = self.current_coordinates(tool)
+        offsets = self.tool_manager.get_offset(tool)
         commands = []
-        for coordinate in coordinates:
+
+        for target in coordinates:
             target_coordinates = self._calculate_target_coordinates(
-                coordinate, current_coordinates, self.tool_manager.get_offset(tool)
+                target, current_coordinates, offsets
             )
+
             self._validate_target_coordinates(target_coordinates)
-            commands.extend(
-                self._generate_movement_commands(current_coordinates, target_coordinates)
-            )
+
+            if self._is_already_at_target(target_coordinates, current_coordinates):
+                self.logger.debug(
+                    "%s is already at target coordinates [%s, %s, %s]",
+                    tool,
+                    target_coordinates.x,
+                    target_coordinates.y,
+                    target_coordinates.z,
+                )
+                continue
+
+            if safe_move_required:
+                # Check if we need to move to safe height first
+                if self.__should_move_to_safe_position_first(
+                    current_coordinates, target_coordinates, self.max_z_height
+                ):
+                    commands.append(f"G01 Z{self.max_z_height}")
+                    move_to_zero = True
+                else:
+                    move_to_zero = False
+
+                commands.extend(
+                    self._generate_movement_commands(
+                        current_coordinates, target_coordinates, move_to_zero
+                    )
+                )
+            else:
+                # Original direct movement behavior
+                commands.extend(
+                    self._generate_movement_commands(
+                        current_coordinates, target_coordinates
+                    )
+                )
+
             current_coordinates = target_coordinates
-        command_str = "\n".join(commands)
-        self.execute_command(command_str)
+
+        if commands:
+            command_str = "\n".join(commands)
+            self.execute_command(command_str)
 
     def update_offset(self, tool, offset_x, offset_y, offset_z):
         """
