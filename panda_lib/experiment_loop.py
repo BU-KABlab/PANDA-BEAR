@@ -48,7 +48,7 @@ from panda_lib.experiments import (
 )
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well, Wellplate
-from panda_lib.slack_tools.SlackBot import SlackBot, share_to_slack
+from panda_lib.slack_tools.slackbot_module import SlackBot, share_to_slack
 from panda_lib.sql_tools import (
     panda_models,
     sql_protocol_utilities,

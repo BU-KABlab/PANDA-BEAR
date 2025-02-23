@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.slack_tools.slackbot_module import SlackBot
 
 
 @pytest.fixture
