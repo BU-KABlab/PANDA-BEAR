@@ -14,12 +14,9 @@ from datetime import datetime
 from enum import Enum
 from io import BytesIO
 from logging import Logger
-from math import fabs
 from pathlib import Path
 from typing import Union, List
 
-import matplotlib.pyplot as plt
-import pandas as pd
 from PIL import Image
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
