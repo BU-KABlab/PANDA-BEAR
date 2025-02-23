@@ -21,7 +21,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 # third-party libraries
 import serial
@@ -789,6 +789,24 @@ class Mill:
         command_str = "\n".join(commands)
         self.execute_command(command_str)
         return None  # self.current_coordinates(tool)
+
+    def move_to_positions(self, coordinates: List[Coordinates], tool: str = "center"):
+        """
+        Move the mill to the specified list of coordinate locations in one go.
+        """
+        current_coordinates, _ = self.current_coordinates(tool)
+        commands = []
+        for coordinate in coordinates:
+            target_coordinates = self._calculate_target_coordinates(
+                coordinate, current_coordinates, self.tool_manager.get_offset(tool)
+            )
+            self._validate_target_coordinates(target_coordinates)
+            commands.extend(
+                self._generate_movement_commands(current_coordinates, target_coordinates)
+            )
+            current_coordinates = target_coordinates
+        command_str = "\n".join(commands)
+        self.execute_command(command_str)
 
     def update_offset(self, tool, offset_x, offset_y, offset_z):
         """
