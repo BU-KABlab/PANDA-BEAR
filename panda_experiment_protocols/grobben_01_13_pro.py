@@ -4,10 +4,10 @@ from logging import Logger
 
 from panda_lib import Toolkit
 from panda_lib.actions import (
-    cyclic_volt,
     clear_well,
     flush_pipette,
     image_well,
+    perform_cyclic_voltammetry,
     rinse_well,
     transfer,
 )
@@ -17,6 +17,7 @@ from panda_lib.experiments import EchemExperimentBase, ExperimentStatus
 
 # To have specific types for the wells, import them from the labware module.
 from panda_lib.labware.wellplates import Well
+
 
 @dataclass
 class Solution:
@@ -39,7 +40,7 @@ def _cv_steps(
         )
 
         try:
-            cyclic_volt(
+            perform_cyclic_voltammetry(
                 cv_instructions=exp,
                 file_tag=file_tag,
             )
@@ -75,7 +76,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
     log.info("Running PolyDeposition for: " + exp.experiment_name)
 
     campaign_id = exp.project_campaign_id
-    possible_reagents = ["pgma-pama-phenol-teaa-tbap","pgma-pama-teaa-tbap"]
+    possible_reagents = ["pgma-pama-phenol-teaa-tbap", "pgma-pama-teaa-tbap"]
     reag_name = possible_reagents[campaign_id]
 
     reag = Solution(

@@ -4,7 +4,7 @@ from panda_lib.actions.actions_default import (
     CVFailure,
     EchemExperimentBase,
     ExperimentStatus,
-    OCPFailure,
+    OCPError,
     Tuple,
     cv_parameters,
     cyclic_volt,
@@ -53,7 +53,7 @@ def cyclic_volt_pgma_fc(
             custom_parameters=characterizing_cyclic_volt_params,
         )
 
-    except OCPFailure as e:
+    except OCPError as e:
         cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", cv_instructions.well_id)
         raise e
@@ -112,7 +112,7 @@ def cyclic_volt_pgma_pama(
             custom_parameters=characterizing_cyclic_volt_params,
         )
 
-    except OCPFailure as e:
+    except OCPError as e:
         cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", cv_instructions.well_id)
         raise e

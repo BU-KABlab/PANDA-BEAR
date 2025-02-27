@@ -9,7 +9,7 @@ from panda_lib.actions.actions_default import (
     Hardware,
     Instruments,
     Labware,
-    OCPFailure,
+    OCPError,
     Optional,
     Toolkit,
     _forward_pipette_v3,
@@ -163,7 +163,7 @@ def ca_deposition(
         else:
             chrono_amp(exp_obj, file_tag="CA_deposition")
 
-    except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
+    except (OCPError, CAFailure, CVFailure, DepositionFailure) as e:
         toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
         raise e
     except Exception as e:
