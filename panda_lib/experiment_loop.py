@@ -33,7 +33,7 @@ from panda_lib.errors import (
     InstrumentConnectionError,
     InsufficientVolumeError,
     MismatchWellplateTypeError,
-    OCPFailure,
+    OCPError,
     ProtocolNotFoundError,
     ShutDownCommand,
     WellImportError,
@@ -374,7 +374,7 @@ def experiment_loop_worker(
                         time.sleep(0.5)  # small wait to avoid busy loop
 
     except (
-        OCPFailure,
+        OCPError,
         DepositionFailure,
         CVFailure,
         CAFailure,
@@ -543,7 +543,7 @@ def sila_experiment_loop_worker(
                 )
 
             except (
-                OCPFailure,
+                OCPError,
                 DepositionFailure,
                 CVFailure,
                 CAFailure,

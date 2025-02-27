@@ -1,4 +1,5 @@
 import logging
+from logging import Logger
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -9,16 +10,13 @@ from shared_utilities.config.config_tools import (
 )
 from shared_utilities.log_tools import timing_wrapper
 
-from ..errors import (
-    CAFailure,
-    CVFailure,
-    DepositionFailure,
-    OCPFailure,
-)
+from ..errors import CAFailure, CVFailure, DepositionFailure, OCPError, OCPFailure
 from ..experiments.experiment_types import (
     EchemExperimentBase,
     ExperimentStatus,
 )
+from ..labware.wellplates import Well
+from ..toolkit import Toolkit
 
 TESTING = read_testing_config()
 
@@ -60,8 +58,147 @@ logger = logging.getLogger("panda")
 testing_logging = logging.getLogger("panda")
 
 
+def open_circuit_potential(
+    file_tag: str,
+    exp: Optional[EchemExperimentBase] = None,
+    testing: bool = False,
+) -> Tuple[bool, float]:
+    """Perform open circuit potential measurement sequence.
+
+    Parameters
+    ----------
+    file_tag : str
+        Additional identifier for output files
+    exp : EchemExperimentBase
+        Experiment parameters and configuration
+
+    Returns
+    -------
+    float
+        The final open circuit potential voltage
+    """
+    well = "test"
+    experiment = "test"
+    try:
+        if TESTING:
+            pstat = echem()
+        else:
+            pstat = echem
+        pstat.pstatconnect()
+        if exp:
+            exp.set_status_and_save(ExperimentStatus.OCPCHECK)
+            base_filename = pstat.setfilename(
+                exp.experiment_id,
+                file_tag + "_OCP" if file_tag else "OCP",
+                exp.project_id,
+                exp.project_campaign_id,
+                exp.well_id,
+            )
+            well = exp.well
+            experiment = exp.experiment_id
+        else:
+            base_filename = pstat.setfilename(
+                "test",
+                file_tag + "_OCP" if file_tag else "OCP",
+                "test",
+                "test",
+                "test",
+            )
+        pstat.OCP(
+            potentiostat_ocp_parameters.OCPvi,
+            potentiostat_ocp_parameters.OCPti,
+            potentiostat_ocp_parameters.OCPrate,
+        )  # OCP
+        pstat.activecheck()
+        ocp_pass, ocp_final_voltage = pstat.check_vf_range(base_filename)
+        exp.results.set_ocp_file(base_filename, ocp_pass, ocp_final_voltage, file_tag)
+        logger.info(
+            "OCP of well %s passed: %s",
+            well,
+            ocp_pass,
+        )
+        if not ocp_pass:
+            exp.set_status_and_save(ExperimentStatus.ERROR)
+            raise OCPError("OCP")
+    except OCPError as e:
+        exp.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", well)
+        raise e
+    except Exception as e:
+        exp.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("Exception occurred during OCP: %s", e)
+        raise OCPFailure(experiment, well) from e
+    finally:
+        pstat.pstatdisconnect()
+    return ocp_pass, ocp_final_voltage
+
+
+ocp = open_circuit_potential
+
+
+def ocp_check(
+    exp: EchemExperimentBase,
+    well: Well,
+    file_tag: str,
+    toolkit: Toolkit,
+    log: Logger,
+) -> Tuple[bool, float]:
+    """Perform open circuit potential measurement sequence.
+
+    Parameters
+    ----------
+    exp : EchemExperimentBase
+        Experiment parameters and configuration
+    file_tag : str
+        Additional identifier for output files
+
+    Returns
+    -------
+    float
+        The final open circuit potential voltage
+    """
+    adjustment = 0.0
+    adjust_by = 0.5  # mm
+    for i in range(3):
+        toolkit.mill.safe_move(
+            coordinates=well.top_coordinates,
+            tool="electrode",
+            second_z_cord=toolkit.wellplate.echem_height + adjustment,
+            second_z_cord_feed=100,
+        )
+
+        passed, potential = ocp(
+            file_tag=file_tag,
+            exp=exp,
+        )
+
+        if not passed:
+            if (
+                abs(potential) < 0.001
+            ):  # if the potential is less than 1mV, then the counter electrode maybe touching the working electrode
+                adjustment += adjust_by
+                log.error("OCP failed to read a potential")
+                log.error("Attempting to raise mill and retry")
+                continue
+            elif (
+                abs(potential) > 1.0
+            ):  # likely out of solution, and something else is wrong
+                log.error("OCP voltage above 1V, likely out of solution")
+                log.error("Aborting CV")
+                exp.set_status_and_save(ExperimentStatus.ERROR)
+                raise OCPError("CV")
+            else:
+                # If the OCP did not pass but is also not around 0 or above 1 there is likely an issue with the electrode
+                log.error("OCP failed to pass")
+                log.error("Aborting CV")
+                exp.set_status_and_save(ExperimentStatus.ERROR)
+                raise OCPError("CV")
+        else:
+            break
+
+
 @timing_wrapper
-def chrono_amp(
+def perform_chronoamperometry(
     ca_instructions: EchemExperimentBase,
     file_tag: Optional[str] = None,
     custom_parameters: Optional[chrono_parameters] = None,
@@ -129,7 +266,7 @@ def chrono_amp(
         # echem CA - deposition
         if not ocp_dep_pass:
             ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
-            raise OCPFailure("CA")
+            raise OCPError("CA")
 
         try:
             ca_instructions.set_status_and_save(ExperimentStatus.EDEPOSITING)
@@ -168,7 +305,7 @@ def chrono_amp(
                 ca_instructions.experiment_id, ca_instructions.well_id
             ) from e
 
-    except OCPFailure as e:
+    except OCPError as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", ca_instructions.well_id)
         raise e
@@ -191,8 +328,11 @@ def chrono_amp(
     return ca_instructions
 
 
+ca = perform_chronoamperometry
+
+
 @timing_wrapper
-def cyclic_volt(
+def perform_cyclic_voltammetry(
     cv_instructions: EchemExperimentBase,
     file_tag: str = None,
     overwrite_inital_voltage: bool = True,
@@ -252,7 +392,7 @@ def cyclic_volt(
         except Exception as e:
             cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during OCP: %s", e)
-            raise OCPFailure("CV") from e
+            raise OCPError("CV") from e
         (
             ocp_char_pass,
             ocp_final_voltage,
@@ -269,7 +409,7 @@ def cyclic_volt(
         if not ocp_char_pass:
             cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("OCP of well %s failed", cv_instructions.well_id)
-            raise OCPFailure("CV")
+            raise OCPFailure(cv_instructions.experiment_id, cv_instructions.well_id)
 
         # echem CV - characterization
         if cv_instructions.baseline == 1:
@@ -326,6 +466,10 @@ def cyclic_volt(
         cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", cv_instructions.well_id)
         raise e
+
+    except OCPError as e:
+        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        raise e
     except CVFailure as e:
         cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("CV of well %s failed", cv_instructions.well_id)
@@ -338,6 +482,86 @@ def cyclic_volt(
         pstat.pstatdisconnect()
 
     return cv_instructions
+
+
+cv = perform_cyclic_voltammetry
+
+
+def move_to_and_perform_cv(
+    exp: EchemExperimentBase, toolkit: Toolkit, file_tag: str, well: Well, log: Logger
+):
+    # CV
+    try:
+        ocp_check(
+            exp=exp,
+            well=well,
+            file_tag=file_tag,
+            toolkit=toolkit,
+            log=log,
+        )
+
+        perform_cyclic_voltammetry(
+            cv_instructions=exp,
+            file_tag=file_tag,
+        )
+
+    except OCPFailure:
+        log.error("OCP failed at %s", toolkit.wellplate.echem_height)
+        log.error("Attempting to raise mill and retry")
+
+    except OCPError as e:
+        log.error("OCP failed")
+        log.error(e)
+        exp.set_status_and_save(ExperimentStatus.ERROR)
+        raise e
+
+    except CVFailure as e:
+        log.error("CV failed")
+        log.error(e)
+        exp.set_status_and_save(ExperimentStatus.ERROR)
+        raise e
+
+    except Exception as e:
+        log.error("CV postcharacterization failed")
+        log.error(e)
+        exp.set_status_and_save(ExperimentStatus.ERROR)
+        raise e
+
+    finally:
+        toolkit.mill.rinse_electrode(3)
+
+
+def move_to_and_perform_ca(
+    exp: EchemExperimentBase, toolkit: Toolkit, file_tag: str, well: Well, log: Logger
+):
+    # CA
+    try:
+        ocp_check(
+            exp=exp,
+            well=well,
+            file_tag=file_tag,
+            toolkit=toolkit,
+            log=log,
+        )
+
+        try:
+            perform_chronoamperometry(
+                ca_instructions=exp,
+                file_tag=file_tag,
+            )
+        except Exception as e:
+            log.error("CA Deposition failed")
+            log.error(e)
+            exp.set_status_and_save(ExperimentStatus.ERROR)
+            raise e
+    except Exception as e:
+        log.error("Failed to move the mill to the well")
+        log.error(e)
+        exp.set_status_and_save(ExperimentStatus.ERROR)
+        raise e
+
+    finally:
+        toolkit.mill.rinse_electrode(3)
 
 
 if __name__ == "__main__":

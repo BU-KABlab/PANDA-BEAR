@@ -70,6 +70,12 @@ class ExperimentResult:
     experiment_id: int = None
     well_id: str = None
 
+    # OCP Data
+    ocp_file: List[Tuple[str, str]] = field(default_factory=list)
+    ocp_passed: List[Tuple[bool, str]] = field(default_factory=list)
+    ocp_data: List[Tuple[str, str]] = field(default_factory=list)
+    ocp_final_voltages: List[Tuple[float, str]] = field(default_factory=list)
+
     # OCP CA
     ocp_ca_file: List[Tuple[Path, str]] = field(default_factory=list)
     ocp_ca_passed: List[Tuple[bool, str]] = field(default_factory=list)
@@ -91,6 +97,18 @@ class ExperimentResult:
 
     # Images
     images: List[Tuple[Path, str]] = field(default_factory=list)
+
+    def set_ocp_file(
+        self, file: str, passed: bool, final_voltage: float, context: str = None
+    ):
+        """Set the file, the pass/fail status, and the final voltage"""
+        self.ocp_file.append((file, context))
+        self.ocp_passed.append((passed, context))
+        self.ocp_final_voltages.append((final_voltage, context))
+
+        with open(file, "r") as f:
+            # Save the contents of the file (it will be text) into the data list as one index of the list
+            self.ocp_data.append((f.read(), context))
 
     def set_ocp_ca_file(
         self, file: Path, passed: bool, final_voltage: float, context: str = None

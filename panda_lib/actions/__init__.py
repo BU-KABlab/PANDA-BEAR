@@ -8,8 +8,8 @@ from .actions_pgma import (
     cyclic_volt_pgma_pama,
 )
 from .electrochemistry import (
-    chrono_amp,
-    cyclic_volt,
+    perform_chronoamperometry,
+    perform_cyclic_voltammetry,
 )
 from .imaging import image_well
 from .movement import capping_sequence, decapping_sequence, move_to_vial, move_to_well
@@ -26,10 +26,10 @@ from .vessel_handling import _handle_source_vessels, solution_selector, waste_se
 
 __all__ = [
     "capping_sequence",
-    "chrono_amp",
+    "perform_chronoamperometry",
     "chrono_amp_edot_bleaching",
     "chrono_amp_edot_coloring",
-    "cyclic_volt",
+    "perform_cyclic_voltammetry",
     "cyclic_volt_edot_characterizing",
     "cyclic_volt_pgma_fc",
     "cyclic_volt_pgma_pama",
