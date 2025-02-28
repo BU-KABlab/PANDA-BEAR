@@ -756,7 +756,7 @@ def check_essential_labware():
 
 if __name__ == "__main__":
     config = read_config()
-    #slackThread_running.set()
+    # slackThread_running.set()
     print_disclaimer()
     time.sleep(2)
     sql_protocol_utilities.read_in_protocols()
@@ -764,9 +764,9 @@ if __name__ == "__main__":
 
     try:
         user_name = user_sign_in()
-        if config.getboolean("OPTIONS","use_slack"):
+        if config.getboolean("OPTIONS", "use_slack"):
             pass
-            #slackbot_thread = start_slack_bot(slackThread_running)
+            # slackbot_thread = start_slack_bot(slackThread_running)
         while True:
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             num, p_type, new_wells = wellplates.read_current_wellplate_info()
@@ -820,7 +820,7 @@ Process Status:
                     exp_loop_prcss.terminate()
                     exp_loop_prcss.join()
                 # The PANDA_SDL loop has been stopped but we don't want to exit the program
-            except experiment_loop.OCPFailure:
+            except experiment_loop.OCPError:
                 slack = experiment_loop.SlackBot()
                 if slack.echem_error_procedure():
                     function_name()
@@ -842,6 +842,6 @@ Process Status:
         if analysis_prcss:
             analysis_prcss.terminate()
             analysis_prcss.join()
-        #if slackbot_thread:
-            #slackThread_running.clear()
-            #slackbot_thread.join()
+        # if slackbot_thread:
+        # slackThread_running.clear()
+        # slackbot_thread.join()
