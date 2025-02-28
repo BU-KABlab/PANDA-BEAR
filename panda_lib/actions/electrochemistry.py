@@ -505,9 +505,10 @@ def move_to_and_perform_cv(
             file_tag=file_tag,
         )
 
-    except OCPFailure:
+    except OCPFailure as e:
         log.error("OCP failed at %s", toolkit.wellplate.echem_height)
         log.error("Attempting to raise mill and retry")
+        raise e
 
     except OCPError as e:
         log.error("OCP failed")
