@@ -35,12 +35,22 @@ class NoExperimentFromModel(Exception):
         super().__init__(self.message)
 
 
-class OCPFailure(Exception):
+class OCPError(Exception):
     """Raised when OCP fails"""
 
     def __init__(self, stage):
         self.stage = stage
         self.message = f"OCP failed before {stage}"
+        super().__init__(self.message)
+
+
+class OCPFailure(Exception):
+    """Raised when OCP fails"""
+
+    def __init__(self, experiment_id, well_id):
+        self.experiment_id = experiment_id
+        self.well_id = well_id
+        self.message = f"OCP failed for experiment {experiment_id} well {well_id}"
         super().__init__(self.message)
 
 
