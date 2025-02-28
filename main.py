@@ -379,10 +379,13 @@ def mill_calibration():
 
 def test_image():
     """Runs the mill control in testing mode."""
-    image = imaging.capture_new_image()
-    open_image = Image.open(image)
-    open_image.show()
-
+    image, result = imaging.capture_new_image()
+    if result:
+        open_image = Image.open(image)
+        open_image.show()
+    else:
+        print("Failed to capture image.")
+    input("Press Enter to continue...")
 
 def exit_program():
     """Exits the program."""
