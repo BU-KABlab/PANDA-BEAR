@@ -7,7 +7,6 @@ import sys
 import textwrap
 import time
 from multiprocessing import Process, Queue
-from threading import Event, Thread
 from typing import Tuple
 
 from PIL import Image
@@ -55,8 +54,6 @@ exp_cmd_queue: Queue = Queue()
 analysis_prcss: Process = None
 analysis_status = None
 status_queue: Queue = Queue()
-slackbot_thread: Thread = None
-slackThread_running = Event()
 
 experiment_choices = ["0", "1"]
 analysis_choices = ["10"]
@@ -464,32 +461,6 @@ def generate_vial_data_template():
     input("Press Enter to continue...")
 
 
-def slack_monitor_bot(testing, running_flag: Event):
-    """Runs the slack monitor bot."""
-    try:
-        bot = experiment_loop.SlackBot(test=testing)
-        bot.send_message("alert", "PANDA Bot is monitoring Slack")
-
-        while running_flag.is_set():
-            try:
-                time.sleep(15)
-                bot.check_slack_messages(channel="alert")
-                time.sleep(1)
-                bot.check_slack_messages(channel="data")
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                status_queue.put((ProcessIDs.SLACKBOT, f"An error occurred: {e}"))
-                time.sleep(60)
-                continue
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return
-
-    finally:
-        bot.off_duty()
-
-
 def run_control_loop(uchoice: callable) -> Process:
     """Runs the experiment in a separate process."""
     exp_process = Process(target=uchoice)
@@ -712,15 +683,6 @@ def user_sign_in() -> str:
     return user_name.strip().capitalize()
 
 
-def start_slack_bot(event_flag: Event) -> Thread:
-    """Starts the slack bot."""
-    slack_thread = Thread(
-        target=slack_monitor_bot, args=(read_testing_config(), event_flag)
-    )
-    slack_thread.start()
-    return slack_thread
-
-
 def get_active_db():
     """Get the active database according to the config file."""
     if read_testing_config():
@@ -799,7 +761,6 @@ The queue has {sql_queue.count_queue_length()} experiments.
 Process Status:
     Experiment Loop: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
     Analysis Loop: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
-    Slack Bot: {slackThread_running.is_set()}
 """
             )
 
@@ -845,6 +806,3 @@ Process Status:
         if analysis_prcss:
             analysis_prcss.terminate()
             analysis_prcss.join()
-        # if slackbot_thread:
-        # slackThread_running.clear()
-        # slackbot_thread.join()
