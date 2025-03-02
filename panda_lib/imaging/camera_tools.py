@@ -533,6 +533,129 @@ def check_device_is_readable(nodemap: PySpin.INodeMap) -> bool:
 
     return result
 
+def configure_custom_image_settings(nodemap):
+    """
+    Configures a number of settings on the camera including offsets X and Y, width,
+    height, and pixel format. These settings must be applied before BeginAcquisition()
+    is called; otherwise, they will be read only. Also, it is important to note that
+    settings are applied immediately. This means if you plan to reduce the width and
+    move the x offset accordingly, you need to apply such changes in the appropriate order.
+
+    :param nodemap: GenICam nodemap.
+    :type nodemap: INodeMap
+    :return: True if successful, False otherwise.
+    :rtype: bool
+    """
+    print('\n*** CONFIGURING CUSTOM IMAGE SETTINGS *** \n')
+
+    try:
+        result = True
+
+        # Apply RGB8 pixel format
+        #
+        # *** NOTES ***
+        # Enumeration nodes are slightly more complicated to set than other
+        # nodes. This is because setting an enumeration node requires working
+        # with two nodes instead of the usual one.
+        #
+        # As such, there are a number of steps to setting an enumeration node:
+        # retrieve the enumeration node from the nodemap, retrieve the desired
+        # entry node from the enumeration node, retrieve the integer value from
+        # the entry node, and set the new value of the enumeration node with
+        # the integer value from the entry node.
+        #
+        # Retrieve the enumeration node from the nodemap
+        node_pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode('PixelFormat'))
+        if PySpin.IsReadable(node_pixel_format) and PySpin.IsWritable(node_pixel_format):
+
+            # Retrieve the desired entry node from the enumeration node
+            node_pixel_format_rgb8 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('RGB8'))
+            if PySpin.IsReadable(node_pixel_format_rgb8):
+
+                # Retrieve the integer value from the entry node
+                pixel_format_rgb8 = node_pixel_format_rgb8.GetValue()
+
+                # Set integer as new value for enumeration node
+                node_pixel_format.SetIntValue(pixel_format_rgb8)
+
+                print('Pixel format set to %s...' % node_pixel_format.GetCurrentEntry().GetSymbolic())
+
+            else:
+                print('Pixel format RGB8 not readable...')
+
+        else:
+            print('Pixel format not readable or writable...')
+
+        # Apply minimum to offset X
+        #
+        # *** NOTES ***
+        # Numeric nodes have both a minimum and maximum. A minimum is retrieved
+        # with the method GetMin(). Sometimes it can be important to check
+        # minimums to ensure that your desired value is within range.
+        node_offset_x = PySpin.CIntegerPtr(nodemap.GetNode('OffsetX'))
+        if PySpin.IsReadable(node_offset_x) and PySpin.IsWritable(node_offset_x):
+
+            node_offset_x.SetValue(node_offset_x.GetMin())
+            print('Offset X set to %i...' % node_offset_x.GetMin())
+
+        else:
+            print('Offset X not readable or writable...')
+
+        # Apply minimum to offset Y
+        #
+        # *** NOTES ***
+        # It is often desirable to check the increment as well. The increment
+        # is a number of which a desired value must be a multiple of. Certain
+        # nodes, such as those corresponding to offsets X and Y, have an
+        # increment of 1, which basically means that any value within range
+        # is appropriate. The increment is retrieved with the method GetInc().
+        node_offset_y = PySpin.CIntegerPtr(nodemap.GetNode('OffsetY'))
+        if PySpin.IsReadable(node_offset_y) and PySpin.IsWritable(node_offset_y):
+
+            node_offset_y.SetValue(node_offset_y.GetMin())
+            print('Offset Y set to %i...' % node_offset_y.GetMin())
+
+        else:
+            print('Offset Y not readable or writable...')
+
+        # Set maximum width
+        #
+        # *** NOTES ***
+        # Other nodes, such as those corresponding to image width and height,
+        # might have an increment other than 1. In these cases, it can be
+        # important to check that the desired value is a multiple of the
+        # increment. However, as these values are being set to the maximum,
+        # there is no reason to check against the increment.
+        node_width = PySpin.CIntegerPtr(nodemap.GetNode('Width'))
+        if PySpin.IsReadable(node_width) and PySpin.IsWritable(node_width):
+
+            width_to_set = node_width.GetMax()
+            node_width.SetValue(width_to_set)
+            print('Width set to %i...' % node_width.GetValue())
+
+        else:
+            print('Width not readable or writable...')
+
+        # Set maximum height
+        #
+        # *** NOTES ***
+        # A maximum is retrieved with the method GetMax(). A node's minimum and
+        # maximum should always be a multiple of its increment.
+        node_height = PySpin.CIntegerPtr(nodemap.GetNode('Height'))
+        if  PySpin.IsReadable(node_height) and PySpin.IsWritable(node_height):
+
+            height_to_set = node_height.GetMax()
+            node_height.SetValue(height_to_set)
+            print('Height set to %i...' % node_height.GetValue())
+
+        else:
+            print('Height not readable or writable...')
+
+    except PySpin.SpinnakerException as ex:
+        print('Error: %s' % ex)
+        return False
+
+    return result
 def run_single_camera(
     cam: PySpin.CameraPtr, image_path: Union[str, Path] = None, num_images: int = 1
 ) -> bool:
@@ -560,6 +683,8 @@ def run_single_camera(
 
         # Retrieve GenICam nodemap
         nodemap = cam.GetNodeMap()
+
+        configure_custom_image_settings(nodemap)
 
         # Set Stream Modes
         # result &= set_stream_mode(cam)
@@ -908,10 +1033,11 @@ def set_framerate(cam: PySpin.CameraPtr, framerate: float):
         # result = True
         cam.AcquisitionFrameRateEnable.SetValue(True)
         cam.AcquisitionFrameRate.SetValue(framerate)
-        print(f"Framerate set to: {framerate}")
+        if not cam.AcquisitionFrameRateEnable.GetValue() or not cam.AcquisitionFrameRate.GetValue() == framerate:
+            raise PySpin.SpinnakerException("Error setting framerate.")
+        print(f"Framerate set to: {cam.AcquisitionFrameRate.GetValue()}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting framerate: {ex}")
-        # result = False
 
 
 def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
@@ -931,6 +1057,11 @@ def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
         if PySpin.IsWritable(prop_red) and PySpin.IsWritable(prop_blue):
             prop_red.SetValue(red)
             prop_blue.SetValue(blue)
+
+            # Verify the values stuck
+            if not prop_red.GetValue() == red or not prop_blue.GetValue() == blue:
+                raise PySpin.SpinnakerException("Error setting white balance.")
+
             print(f"White balance set to: Red={red}, Blue={blue}")
         else:
             print("White balance properties not writable.")
@@ -943,16 +1074,16 @@ def set_panda_image_profile(cam: PySpin.CameraPtr):
     Camera settings for the panda profile
     """
     print("Turning off auto settings...")
-    # set_brightness(cam, 12.012)
-    set_exposure(cam, 1.392)
-    set_sharpness(cam, 1024)
+    set_brightness(cam, 5.859)
+    set_exposure(cam, 1.0)
+    set_sharpness(cam, 1536)
     set_hue(cam, 0.0)
     set_saturation(cam, 100)
     set_gamma(cam, 1.250)
-    set_shutter(cam, 50.023)
+    set_shutter(cam, 6.2)
     set_gain(cam, 0.0)
-    set_framerate(cam, 5)
-    set_white_balance(cam, 762, 813)
+    set_framerate(cam, 30.0)
+    set_white_balance(cam, 684, 632)
 
 
 # def epanda_camera_profile(self):
