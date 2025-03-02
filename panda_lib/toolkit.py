@@ -119,7 +119,7 @@ def connect_to_instruments(
         logger.debug("Connecting to mill")
         instruments.mill = Mill()
         instruments.mill.connect_to_mill()
-        instruments.mill.homing_sequence()
+        # instruments.mill.homing_sequence()
     except Exception as error:
         logger.error("No mill connected, %s", error)
         instruments.mill = None
