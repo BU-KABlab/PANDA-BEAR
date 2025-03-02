@@ -39,9 +39,9 @@ def capture_new_image(
         camera: PySpin.CameraPtr
         result = run_single_camera(camera, image_path=file_name, num_images=num_images)
         if result:
-            logger.info(f"Camera {camera.DeviceSerialNumber} took image...")
+            logger.info(f"Camera {camera.DeviceSerialNumber.GetValue()} took image...")
         else:
-            logger.error(f"Camera {camera.DeviceSerialNumber} failed to take image...")
+            logger.error(f"Camera {camera.DeviceSerialNumber.GetValue()} failed to take image...")
             
     # Clear camera list before releasing system
     camera_list.Clear()
