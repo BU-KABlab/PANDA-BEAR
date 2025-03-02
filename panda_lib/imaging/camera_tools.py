@@ -8,45 +8,15 @@ import os
 from pathlib import Path
 from typing import Union
 
-import cv2
 import PySpin
 
-
-def setup_default_logger(
-    log_file="panda.log",
-    log_name="panda",
-    file_level=logging.DEBUG,
-    console_level=logging.DEBUG,
-    log_path: str = ".logs/",
-):
-    """Setup a default logger for the PANDA_SDL project"""
-
-    if not os.path.exists(log_path):
-        os.makedirs(log_path)
-    default_logger = logging.getLogger(log_name)
-    if not default_logger.handlers:  # Check if the logger already has handlers attached
-        default_logger.setLevel(file_level)
-        formatter = logging.Formatter(
-            "%(asctime)s&%(name)s&%(levelname)s&%(module)s&%(funcName)s&%(lineno)d&&&&%(message)s&"
-        )
-
-        file_handler = logging.FileHandler(log_path + "/" + log_name + ".log")
-        file_handler.setFormatter(formatter)
-        default_logger.addHandler(file_handler)
-
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(console_level)
-        console_formatter = logging.Formatter("%(message)s")
-        console_handler.setFormatter(
-            console_formatter
-        )  # Ensure console output is formatted
-        default_logger.addHandler(console_handler)
-
-    return default_logger
-
+from shared_utilities.log_tools import setup_default_logger
 
 logger = setup_default_logger(
-    log_name="FLIRCamera", console_level=logging.ERROR, file_level=logging.DEBUG
+    log_file="FLIRCamera.log",
+    log_name="camera",
+    console_level=logging.ERROR,
+    file_level=logging.DEBUG,
 )
 
 
@@ -253,7 +223,7 @@ def acquire_images(
     :rtype: bool
     """
 
-    #print("*** IMAGE ACQUISITION ***\n")
+    # print("*** IMAGE ACQUISITION ***\n")
     try:
         result = True
 
@@ -339,7 +309,7 @@ def acquire_images(
         )
         if PySpin.IsReadable(node_device_serial_number):
             device_serial_number = node_device_serial_number.GetValue()
-            logger.info("Device serial number retrieved as %s",device_serial_number)
+            logger.info("Device serial number retrieved as %s", device_serial_number)
 
         # Retrieve, convert, and save images
 
@@ -377,10 +347,9 @@ def acquire_images(
                 #  Further, check image status for a little more insight into
                 #  why an image is incomplete.
                 if image_result.IsIncomplete():
-                    msg = (
-                        f"Image incomplete with image status {image_result.GetImageStatus()}..."
-                    )
+                    msg = f"Image incomplete with image status {image_result.GetImageStatus()}..."
                     logger.error(msg)
+                    raise PySpin.SpinnakerException(msg)
 
                 else:
                     #  Print image information; height and width recorded in pixels
@@ -391,7 +360,9 @@ def acquire_images(
                     #  name a few.
                     width = image_result.GetWidth()
                     height = image_result.GetHeight()
-                    logger.info("Grabbed Image %s, width = %s, height = %s...",i,width,height)
+                    logger.info(
+                        "Grabbed Image %s, width = %s, height = %s...", i, width, height
+                    )
                     #  Convert image to mono 8
                     #
                     #  *** NOTES ***
@@ -405,7 +376,9 @@ def acquire_images(
                     # image_converted: PySpin.ImagePtr = processor.Convert(
                     #     image_result, PySpin.PixelFormat_BayerBG8
                     # )
-                    image_converted:PySpin.ImagePtr = processor.Convert(image_result,PySpin.PixelFormat_RGB8)
+                    image_converted: PySpin.ImagePtr = processor.Convert(
+                        image_result, PySpin.PixelFormat_RGB8
+                    )
 
                     # Create a unique filename
                     if device_serial_number:
@@ -427,15 +400,13 @@ def acquire_images(
                         filepath: Path = image_path
 
                     raw_path = filepath.with_stem(f"{filepath.stem}_raw")
-                    converted_path = filepath.with_stem(
-                        f"{image_path.stem}"
-                    )
+                    converted_path = filepath.with_stem(f"{image_path.stem}")
 
-                    #cv2.imwrite(str(converted_path), image_converted)
+                    # cv2.imwrite(str(converted_path), image_converted)
                     try:
                         image_result.Save(str(raw_path))
                         image_converted.Save(str(converted_path))
-                        logger.info("Image saved at %s...",filepath)
+                        logger.info("Image saved at %s...", filepath)
                     except PySpin.SpinnakerException as ex:
                         logger.error(f"Error: {ex}")
                         # If error try and save in the local directory as to not loose the image
@@ -447,15 +418,18 @@ def acquire_images(
                     #  Images retrieved directly from the camera (i.e. non-converted
                     #  images) need to be released in order to keep from filling the
                     #  buffer.
-                    #image_result.Release()
+                    # image_result.Release()
 
             except PySpin.SpinnakerException as ex:
                 print(f"Error: {ex}")
                 return False
-            
+
             finally:
                 if image_result.IsIncomplete():
-                    logger.error("Image incomplete with image status %s...",image_result.GetImageStatus())
+                    logger.error(
+                        "Image incomplete with image status %s...",
+                        image_result.GetImageStatus(),
+                    )
                     image_result.Release()
                 else:
                     logger.info("Image grabbed successfully...")
@@ -513,6 +487,7 @@ def print_device_info(nodemap: PySpin.INodeMap) -> bool:
 
     return result
 
+
 def check_device_is_readable(nodemap: PySpin.INodeMap) -> bool:
     """This performs the same check as print_device_info without printing the information"""
     try:
@@ -523,7 +498,7 @@ def check_device_is_readable(nodemap: PySpin.INodeMap) -> bool:
 
         if PySpin.IsReadable(node_device_information):
             result = True
-                
+
         else:
             result = False
 
@@ -532,6 +507,7 @@ def check_device_is_readable(nodemap: PySpin.INodeMap) -> bool:
         result = False
 
     return result
+
 
 def run_single_camera(
     cam: PySpin.CameraPtr, image_path: Union[str, Path] = None, num_images: int = 1
@@ -554,7 +530,7 @@ def run_single_camera(
         result = check_device_is_readable(nodemap_tldevice)
         if not result:
             return False
-        
+
         # Initialize camera
         cam.Init()
 
