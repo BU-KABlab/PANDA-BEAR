@@ -115,7 +115,9 @@ class ArduinoLink:
     def configure(self):
         """Configure the connection to the Arduino"""
         if self.ser is None:
-            self.ser = Serial(self.choose_arduino_port(), self.baud_rate, timeout=self.timeout)
+            self.ser = Serial(
+                self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
+            )
         else:
             self.ser = Serial(self.port_address, self.baud_rate, self.timeout)
 
@@ -126,21 +128,21 @@ class ArduinoLink:
             time.sleep(2)
             rx = self.ser.read_all().decode().strip()
             if rx == self.ack:
-                print("Arduino acknowledged connection")
+                # print("Arduino acknowledged connection")
                 self.configured = True
             else:
-                print("Arduino is not ready")
+                # print("Arduino is not ready")
                 self.configured = False
                 raise ConnectionError
 
             rx = self.send(PawduinoFunctions.HELLO.value)
             if rx == PawduinoReturnCodes.HELLO.value:
-                print("Arduino is configured")
+                # print("Arduino is configured")
                 self.configured = True
             else:
-                print("Arduino is not configured")
+                # print("Arduino is not configured")
                 raise ConnectionError
-                
+
         else:
             print(f"Failed to connect to {self.ser.name} at {self.baud_rate} baud")
             self.configured = False
@@ -197,9 +199,9 @@ class ArduinoLink:
             rx = self.receive()
             if rx is not None:
                 break
-            
+
             attempts += 1
-        
+
         if rx is None:
             raise ConnectionError
         try:
