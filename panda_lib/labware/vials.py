@@ -472,9 +472,10 @@ def input_new_vial_values(vialgroup: str) -> None:
                 if vial.category == 0:  # Stock vial
                     current_key = next(iter(vial.contents.keys()))
                     new_key = input(
-                        f"Enter the new contents of the vial (Currently is {current_key}): "
+                        f"Enter the new contents name of the vial (Currently is {current_key}): "
                     )
                     if new_key != "":
+                        # Replace the key in the contents dictionary with the new key but old value
                         vial.vial_data.contents = {new_key: vial.contents[current_key]}
                 new_density = input(
                     f"Enter the new density of the vial (Current density is {vial.vial_data.density}): "
@@ -487,7 +488,12 @@ def input_new_vial_values(vialgroup: str) -> None:
                 if new_volume != "":
                     vial.vial_data.volume = float(new_volume)
                     if vial.vial_data.category == 0:  # Stock vial
-                        vial.vial_data.contents[0] = float(new_volume)
+                        # Get the key of the contents
+                        # There should only be one key in the contents dictionary
+                        key = vial.vial_data.contents.keys()
+                        key = next(iter(key))
+                        # Update the new volume in the contents dictionary
+                        vial.vial_data.contents = {key: float(new_volume)}
                 new_capacity = input(
                     f"Enter the new capacity of the vial (Current capacity is {vial.capacity}): "
                 )
@@ -628,7 +634,11 @@ def import_vial_csv_file(filename: Optional[str] = None) -> None:
     ]
 
     for each in vial_parameters_clean:
-        if each["contents"] is None or each["contents"] == "" or each["contents"] == "none":
+        if (
+            each["contents"] is None
+            or each["contents"] == ""
+            or each["contents"] == "none"
+        ):
             each["contents"] = "{}"
 
     for each_vial in vial_parameters_clean:
