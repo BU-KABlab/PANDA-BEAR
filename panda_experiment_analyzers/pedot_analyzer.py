@@ -29,7 +29,7 @@ from panda_lib.experiments.results import (
     insert_experiment_result,
     select_specific_result,
 )
-from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.slack_tools.slackbot_module import SlackBot
 from panda_lib.sql_tools.sql_system_state import get_current_pin
 from shared_utilities.config.config_tools import read_testing_config
 

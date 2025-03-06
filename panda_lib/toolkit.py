@@ -17,7 +17,7 @@ from panda_lib.labware.wellplates import Wellplate
 # from panda_lib.movement import Mill, MockMill
 from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
-from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.slack_tools.slackbot_module import SlackBot
 from panda_lib.tools import ArduinoLink, MockArduinoLink, OBSController
 
 
@@ -119,7 +119,7 @@ def connect_to_instruments(
         logger.debug("Connecting to mill")
         instruments.mill = Mill()
         instruments.mill.connect_to_mill()
-        instruments.mill.homing_sequence()
+        # instruments.mill.homing_sequence()
     except Exception as error:
         logger.error("No mill connected, %s", error)
         instruments.mill = None
@@ -179,13 +179,13 @@ def connect_to_instruments(
     # Connect to Arduino
     try:
         logger.debug("Connecting to Arduino")
-        with ArduinoLink() as arduino:
-            if not arduino.configured:
-                logger.error("No Arduino connected")
-                incomplete = True
-                instruments.arduino = None
-            logger.debug("Connected to Arduino")
-            instruments.arduino = ArduinoLink()
+        arduino = ArduinoLink()
+        if not arduino.configured:
+            logger.error("No Arduino connected")
+            incomplete = True
+            instruments.arduino = None
+        logger.debug("Connected to Arduino")
+        instruments.arduino = arduino
     except Exception as error:
         logger.error("Error connecting to Arduino, %s", error)
         incomplete = True

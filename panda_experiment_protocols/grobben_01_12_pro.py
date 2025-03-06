@@ -4,10 +4,10 @@ from logging import Logger
 
 from panda_lib import Toolkit
 from panda_lib.actions import (
-    chrono_amp,
     clear_well,
     flush_pipette,
     image_well,
+    perform_chronoamperometry,
     rinse_well,
     transfer,
 )
@@ -75,7 +75,7 @@ def _ca_steps(
         )
 
         try:
-            chrono_amp(
+            perform_chronoamperometry(
                 ca_instructions=exp,
                 file_tag=file_tag,
             )

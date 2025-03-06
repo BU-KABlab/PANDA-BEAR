@@ -20,6 +20,9 @@ from ..imaging import add_data_zone, capture_new_image, image_filepath_generator
 from ..toolkit import Toolkit
 from ..tools import MockOBSController, OBSController
 
+class ImageFailure(Exception):
+    pass
+
 TESTING = read_testing_config()
 
 if TESTING:
@@ -106,10 +109,14 @@ def image_well(
             else:
                 toolkit.arduino.white_lights_on()
             logger.debug("Capturing image of well %s", instructions.well_id)
-            capture_new_image(
+            filepath, result = capture_new_image(
                 save=True, num_images=1, file_name=filepath, logger=logger
             )
             toolkit.arduino.lights_off()
+
+            if not result:
+                raise ImageFailure("Failed to capture image")
+
             dz_filename = filepath.stem + "_dz" + filepath.suffix
             dz_filepath = filepath.with_name(dz_filename)
 
@@ -139,6 +146,11 @@ def image_well(
             # Not critical if the image is not posted to OBS
             logger.exception("Failed to post image to OBS")
             logger.exception(e)
+
+    except ImageFailure as e:
+        logger.exception("Failed to image well %s. Error %s occured", well_id, e)
+        # raise ImageCaputreFailure(instructions.well_id) from e
+        # don't raise anything and continue with the experiment. The image is not critical to the experiment
 
     except Exception as e:
         logger.exception(

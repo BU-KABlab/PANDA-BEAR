@@ -205,31 +205,32 @@ def update_working_volume(mill: Mill, *args, **kwargs):
     """
     Update the working volume of the mill
     """
-    working_volume = mill.config["working_volume"]
-    print(f"Current working volume: {working_volume}")
+    pass
+    # working_volume = mill.config["working_volume"]
+    # print(f"Current working volume: {working_volume}")
 
-    if input("Would you like to change the working volume? (y/n): ").lower() in [
-        "y",
-        "yes",
-        "",
-    ]:
-        new_working_volume = {}
-        for coordinate in ["x", "y", "z"]:
-            new_coordinate = input(
-                f"Enter the new {coordinate.upper()} coordinate for the working volume or enter for no change: "
-            )
-            if new_coordinate != "":
-                try:
-                    new_working_volume[coordinate] = float(new_coordinate)
-                except ValueError:
-                    print("Invalid input, please try again")
-                    continue
-            else:
-                new_working_volume[coordinate] = working_volume[coordinate]
+    # if input("Would you like to change the working volume? (y/n): ").lower() in [
+    #     "y",
+    #     "yes",
+    #     "",
+    # ]:
+    #     new_working_volume = {}
+    #     for coordinate in ["x", "y", "z"]:
+    #         new_coordinate = input(
+    #             f"Enter the new {coordinate.upper()} coordinate for the working volume or enter for no change: "
+    #         )
+    #         if new_coordinate != "":
+    #             try:
+    #                 new_working_volume[coordinate] = float(new_coordinate)
+    #             except ValueError:
+    #                 print("Invalid input, please try again")
+    #                 continue
+    #         else:
+    #             new_working_volume[coordinate] = working_volume[coordinate]
 
-        mill.config["working_volume"] = new_working_volume
-        mill.write_mill_config_file()
-        print(f"New working volume: {working_volume}")
+    #     mill.config["working_volume"] = new_working_volume
+    #     mill.write_mill_config_file()
+    #     print(f"New working volume: {working_volume}")
 
 
 def update_electrode_bath(mill: Mill, *args, **kwargs):
@@ -769,6 +770,11 @@ def test_decapper(mill: Mill, *args, **kwargs):
     """
     decapper_test()
 
+def rinse_electrode(mill: Mill, *args, **kwargs):
+    """
+    Rinse the electrode in the electrode bath
+    """
+    mill.rinse_electrode()
 
 menu_options = {
     "0": check_mill_settings,
@@ -780,6 +786,7 @@ menu_options = {
     "7": capture_well_photo_manually,
     "8": calibrate_image_height,
     "9": test_decapper,
+    "10": rinse_electrode,
     "q": quit_calibration,
 }
 

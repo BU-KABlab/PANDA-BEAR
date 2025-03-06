@@ -1,9 +1,11 @@
 import os
 import sys
 from datetime import datetime
+from unittest.mock import MagicMock
+
+import pytest
 
 os.environ["TEMP_DB"] = "1"
-import pytest  # noqa: E402
 
 # Add the root directory of your project to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -450,3 +452,99 @@ def temp_test_db():
             os.remove("temp.db")
         except PermissionError:
             print("Failed to delete temp.db, file is in use.")
+
+
+@pytest.fixture
+def mock_config():
+    """Mock configuration settings."""
+    config_mock = MagicMock()
+    config_mock.getfloat.return_value = 0.5
+    config_mock.get.return_value = "test_path"
+    return config_mock
+
+
+@pytest.fixture
+def mock_gamry_potentiostat():
+    """Mock for the Gamry Potentiostat."""
+    mock = MagicMock()
+
+    # Mock common method returns
+    mock.pstatconnect.return_value = True
+    mock.pstatdisconnect.return_value = True
+    mock.setfilename.return_value = "test_filename"
+    mock.OCP.return_value = True
+    mock.activecheck.return_value = True
+    mock.check_vf_range.return_value = (True, -0.5)  # Success, voltage value
+    mock.chrono.return_value = True
+    mock.cyclic.return_value = True
+
+    return mock
+
+
+@pytest.fixture
+def mock_chrono_parameters():
+    """Mock for chronoamperometry parameters."""
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_cv_parameters():
+    """Mock for CV parameters."""
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_ocp_parameters():
+    """Mock for OCP parameters."""
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_toolkit():
+    """Mock for the Toolkit."""
+    mock = MagicMock()
+    mock.mill.safe_move.return_value = True
+    mock.wellplate.echem_height = 10.0
+    return mock
+
+
+@pytest.fixture
+def mock_well():
+    """Mock for a Well."""
+    mock = MagicMock()
+    mock.top_coordinates = [10.0, 20.0, 30.0]
+    return mock
+
+
+@pytest.fixture
+def mock_experiment():
+    """Mock for an EchemExperimentBase."""
+    mock = MagicMock()
+    mock.experiment_id = "test_experiment"
+    mock.project_id = "test_project"
+    mock.project_campaign_id = "test_campaign"
+    mock.well_id = "test_well"
+    mock.results.set_ocp_file.return_value = None
+    mock.results.set_ocp_ca_file.return_value = None
+    mock.results.set_ca_data_file.return_value = None
+    mock.results.set_ocp_cv_file.return_value = None
+    mock.results.set_cv_data_file.return_value = None
+    mock.set_status_and_save.return_value = None
+    mock.baseline = 0
+    mock.ca_prestep_voltage = -0.1
+    mock.ca_prestep_time_delay = 5
+    mock.ca_step_1_voltage = -0.5
+    mock.ca_step_1_time = 300
+    mock.ca_step_2_voltage = 0.0
+    mock.ca_step_2_time = 0
+    mock.ca_sample_period = 0.5
+    mock.cv_initial_voltage = -0.5
+    mock.cv_first_anodic_peak = 0.8
+    mock.cv_second_anodic_peak = 0.0
+    mock.cv_final_voltage = -0.5
+    mock.cv_scan_rate_cycle_1 = 0.1
+    mock.cv_scan_rate_cycle_2 = 0.0
+    mock.cv_scan_rate_cycle_3 = 0.0
+    mock.cv_cycle_count = 1
+    mock.well = "test_well"
+    return mock

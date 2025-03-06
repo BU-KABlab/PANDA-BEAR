@@ -126,7 +126,18 @@ def get_next_experiment_from_queue(
         result = [x for x in result_all if x.experiment_id == specific_experiment_id][0]
         if len(result) == 0:
             return None
-        result = Queue(**result._mapping)
+        result = Queue(
+            result.experiment_id,
+            result.project_id,
+            result.project_campaign_id,
+            result.priority,
+            result.process_type,
+            result.filename,
+            result.well_type,
+            result.well_id,
+            result.status,
+            result.status_date,
+        )
         if result is None:
             return None
 

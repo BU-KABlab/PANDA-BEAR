@@ -7,7 +7,6 @@ import sys
 import textwrap
 import time
 from multiprocessing import Process, Queue
-from threading import Event, Thread
 from typing import Tuple
 
 from PIL import Image
@@ -26,6 +25,7 @@ from panda_lib import (
     input_validation,
     load_analyzers,
     print_panda,
+    toolkit,
 )
 from panda_lib.experiments.experiment_types import ExperimentBase
 from panda_lib.labware import vials, wellplates
@@ -54,8 +54,6 @@ exp_cmd_queue: Queue = Queue()
 analysis_prcss: Process = None
 analysis_status = None
 status_queue: Queue = Queue()
-slackbot_thread: Thread = None
-slackThread_running = Event()
 
 experiment_choices = ["0", "1"]
 analysis_choices = ["10"]
@@ -378,10 +376,13 @@ def mill_calibration():
 
 def test_image():
     """Runs the mill control in testing mode."""
-    image = imaging.capture_new_image()
-    open_image = Image.open(image)
-    open_image.show()
-
+    image, result = imaging.capture_new_image()
+    if result:
+        open_image = Image.open(image)
+        open_image.show()
+    else:
+        print("Failed to capture image.")
+    input("Press Enter to continue...")
 
 def exit_program():
     """Exits the program."""
@@ -438,7 +439,7 @@ def change_pipette_tip():
 def instrument_check():
     """Runs the instrument check."""
     sql_system_state.set_system_status(SystemState.BUSY, "running instrument check")
-    instruments, all_found = experiment_loop.test_instrument_connections(False)
+    instruments, all_found = toolkit.test_instrument_connections(False)
     if all_found:
         input("Press Enter to continue...")
     else:
@@ -458,32 +459,6 @@ def generate_vial_data_template():
     """Generates a vial data template."""
     vials.generate_template_vial_csv_file()
     input("Press Enter to continue...")
-
-
-def slack_monitor_bot(testing, running_flag: Event):
-    """Runs the slack monitor bot."""
-    try:
-        bot = experiment_loop.SlackBot(test=testing)
-        bot.send_message("alert", "PANDA Bot is monitoring Slack")
-
-        while running_flag.is_set():
-            try:
-                time.sleep(15)
-                bot.check_slack_messages(channel="alert")
-                time.sleep(1)
-                bot.check_slack_messages(channel="data")
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                status_queue.put((ProcessIDs.SLACKBOT, f"An error occurred: {e}"))
-                time.sleep(60)
-                continue
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return
-
-    finally:
-        bot.off_duty()
 
 
 def run_control_loop(uchoice: callable) -> Process:
@@ -708,15 +683,6 @@ def user_sign_in() -> str:
     return user_name.strip().capitalize()
 
 
-def start_slack_bot(event_flag: Event) -> Thread:
-    """Starts the slack bot."""
-    slack_thread = Thread(
-        target=slack_monitor_bot, args=(read_testing_config(), event_flag)
-    )
-    slack_thread.start()
-    return slack_thread
-
-
 def get_active_db():
     """Get the active database according to the config file."""
     if read_testing_config():
@@ -755,7 +721,7 @@ def check_essential_labware():
 
 if __name__ == "__main__":
     config = read_config()
-    slackThread_running.set()
+    # slackThread_running.set()
     print_disclaimer()
     time.sleep(2)
     sql_protocol_utilities.read_in_protocols()
@@ -763,7 +729,9 @@ if __name__ == "__main__":
 
     try:
         user_name = user_sign_in()
-        slackbot_thread = start_slack_bot(slackThread_running)
+        if config.getboolean("OPTIONS", "use_slack"):
+            pass
+            # slackbot_thread = start_slack_bot(slackThread_running)
         while True:
             os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal
             num, p_type, new_wells = wellplates.read_current_wellplate_info()
@@ -793,7 +761,6 @@ The queue has {sql_queue.count_queue_length()} experiments.
 Process Status:
     Experiment Loop: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
     Analysis Loop: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
-    Slack Bot: {slackThread_running.is_set()}
 """
             )
 
@@ -817,7 +784,7 @@ Process Status:
                     exp_loop_prcss.terminate()
                     exp_loop_prcss.join()
                 # The PANDA_SDL loop has been stopped but we don't want to exit the program
-            except experiment_loop.OCPFailure:
+            except experiment_loop.OCPError:
                 slack = experiment_loop.SlackBot()
                 if slack.echem_error_procedure():
                     function_name()
@@ -839,6 +806,3 @@ Process Status:
         if analysis_prcss:
             analysis_prcss.terminate()
             analysis_prcss.join()
-        if slackbot_thread:
-            slackThread_running.clear()
-            slackbot_thread.join()

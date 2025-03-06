@@ -5,7 +5,7 @@ from panda_lib.actions.actions_default import (
     CVFailure,
     DepositionFailure,
     ExperimentStatus,
-    OCPFailure,
+    OCPError,
     Tuple,
     chrono_amp,
     chrono_parameters,
@@ -48,7 +48,7 @@ def chrono_amp_edot_bleaching(
             custom_parameters=bleaching_params,
         )
 
-    except OCPFailure as e:
+    except OCPError as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", ca_instructions.well_id)
         raise e
@@ -101,7 +101,7 @@ def chrono_amp_edot_coloring(
             custom_parameters=coloring_params,
         )
 
-    except OCPFailure as e:
+    except OCPError as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", ca_instructions.well_id)
         raise e
@@ -161,7 +161,7 @@ def cyclic_volt_edot_characterizing(
             custom_parameters=characterizing_cyclic_volt_params,
         )
 
-    except OCPFailure as e:
+    except OCPError as e:
         cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", cv_instructions.well_id)
         raise e

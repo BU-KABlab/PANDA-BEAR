@@ -8,7 +8,6 @@ import os
 from pathlib import Path
 from typing import Union
 
-import cv2
 import PySpin
 
 
@@ -46,7 +45,7 @@ def setup_default_logger(
 
 
 logger = setup_default_logger(
-    log_name="FLIRCamera", console_level=logging.DEBUG, file_level=logging.DEBUG
+    log_name="FLIRCamera", console_level=logging.ERROR, file_level=logging.DEBUG
 )
 
 
@@ -253,7 +252,7 @@ def acquire_images(
     :rtype: bool
     """
 
-    print("*** IMAGE ACQUISITION ***\n")
+    #print("*** IMAGE ACQUISITION ***\n")
     try:
         result = True
 
@@ -289,7 +288,7 @@ def acquire_images(
         if not PySpin.IsReadable(node_acquisition_mode) or not PySpin.IsWritable(
             node_acquisition_mode
         ):
-            print(
+            logger.error(
                 "Unable to set acquisition mode to continuous (enum retrieval). Aborting..."
             )
             return False
@@ -310,7 +309,7 @@ def acquire_images(
         # Set integer value from entry node as new value of enumeration node
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
-        print("Acquisition mode set to continuous...")
+        logger.info("Acquisition mode set to continuous...")
 
         #  Begin acquiring images
         #
@@ -325,7 +324,7 @@ def acquire_images(
         #  Image acquisition must be ended when no more images are needed.
         cam.BeginAcquisition()
 
-        print("Acquiring images...")
+        logger.info("Acquiring images...")
 
         #  Retrieve device serial number for filename
         #
@@ -339,7 +338,7 @@ def acquire_images(
         )
         if PySpin.IsReadable(node_device_serial_number):
             device_serial_number = node_device_serial_number.GetValue()
-            print(f"Device serial number retrieved as {device_serial_number}...")
+            logger.info("Device serial number retrieved as %s",device_serial_number)
 
         # Retrieve, convert, and save images
 
@@ -377,9 +376,10 @@ def acquire_images(
                 #  Further, check image status for a little more insight into
                 #  why an image is incomplete.
                 if image_result.IsIncomplete():
-                    print(
+                    msg = (
                         f"Image incomplete with image status {image_result.GetImageStatus()}..."
                     )
+                    logger.error(msg)
 
                 else:
                     #  Print image information; height and width recorded in pixels
@@ -390,8 +390,7 @@ def acquire_images(
                     #  name a few.
                     width = image_result.GetWidth()
                     height = image_result.GetHeight()
-                    print(f"Grabbed Image {i}, width = {width}, height = {height}...")
-
+                    logger.info("Grabbed Image %s, width = %s, height = %s...",i,width,height)
                     #  Convert image to mono 8
                     #
                     #  *** NOTES ***
@@ -405,9 +404,7 @@ def acquire_images(
                     # image_converted: PySpin.ImagePtr = processor.Convert(
                     #     image_result, PySpin.PixelFormat_BayerBG8
                     # )
-                    image_converted = cv2.cvtColor(
-                        image_result.GetNDArray(), cv2.COLOR_BAYER_GR2BGR
-                    )
+                    image_converted:PySpin.ImagePtr = processor.Convert(image_result,PySpin.PixelFormat_RGB8)
 
                     # Create a unique filename
                     if device_serial_number:
@@ -428,15 +425,20 @@ def acquire_images(
                         image_path = Path(image_path)
                         filepath: Path = image_path
 
-                    converted_path = filepath.with_name(
-                        f"{image_path.name}_converted.tiff"
+                    raw_path = filepath.with_stem(f"{filepath.stem}_raw")
+                    converted_path = filepath.with_stem(
+                        f"{image_path.stem}"
                     )
 
-                    if filepath.suffix != ".tiff":
-                        filepath = filepath.with_suffix(".tiff")
-                    cv2.imwrite(str(converted_path), image_converted)
-                    image_result.Save(str(filepath))
-                    print(f"Image saved at {filepath}...")
+                    #cv2.imwrite(str(converted_path), image_converted)
+                    try:
+                        image_result.Save(str(raw_path))
+                        image_converted.Save(str(converted_path))
+                        logger.info("Image saved at %s...",filepath)
+                    except PySpin.SpinnakerException as ex:
+                        logger.error(f"Error: {ex}")
+                        # If error try and save in the local directory as to not loose the image
+                        image_result.Save(f"{filename}")
 
                     #  Release image
                     #
@@ -444,12 +446,19 @@ def acquire_images(
                     #  Images retrieved directly from the camera (i.e. non-converted
                     #  images) need to be released in order to keep from filling the
                     #  buffer.
-                    image_result.Release()
-                    print("")
+                    #image_result.Release()
 
             except PySpin.SpinnakerException as ex:
                 print(f"Error: {ex}")
                 return False
+            
+            finally:
+                if image_result.IsIncomplete():
+                    logger.error("Image incomplete with image status %s...",image_result.GetImageStatus())
+                    image_result.Release()
+                else:
+                    logger.info("Image grabbed successfully...")
+                    image_result.Release()
 
         #  End acquisition
         #
@@ -457,6 +466,7 @@ def acquire_images(
         #  Ending acquisition appropriately helps ensure that devices clean up
         #  properly and do not need to be power-cycled to maintain integrity.
         cam.EndAcquisition()
+        return result
 
     except PySpin.SpinnakerException as ex:
         print(f"Error: {ex}")
@@ -502,6 +512,151 @@ def print_device_info(nodemap: PySpin.INodeMap) -> bool:
 
     return result
 
+def check_device_is_readable(nodemap: PySpin.INodeMap) -> bool:
+    """This performs the same check as print_device_info without printing the information"""
+    try:
+        result = True
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
+
+        if PySpin.IsReadable(node_device_information):
+            result = True
+                
+        else:
+            result = False
+
+    except PySpin.SpinnakerException as ex:
+        print(f"Error: {ex}")
+        result = False
+
+    return result
+
+def configure_custom_image_settings(nodemap):
+    """
+    Configures a number of settings on the camera including offsets X and Y, width,
+    height, and pixel format. These settings must be applied before BeginAcquisition()
+    is called; otherwise, they will be read only. Also, it is important to note that
+    settings are applied immediately. This means if you plan to reduce the width and
+    move the x offset accordingly, you need to apply such changes in the appropriate order.
+
+    :param nodemap: GenICam nodemap.
+    :type nodemap: INodeMap
+    :return: True if successful, False otherwise.
+    :rtype: bool
+    """
+
+    try:
+        result = True
+
+        # Apply RGB8 pixel format
+        #
+        # *** NOTES ***
+        # Enumeration nodes are slightly more complicated to set than other
+        # nodes. This is because setting an enumeration node requires working
+        # with two nodes instead of the usual one.
+        #
+        # As such, there are a number of steps to setting an enumeration node:
+        # retrieve the enumeration node from the nodemap, retrieve the desired
+        # entry node from the enumeration node, retrieve the integer value from
+        # the entry node, and set the new value of the enumeration node with
+        # the integer value from the entry node.
+        #
+        # Retrieve the enumeration node from the nodemap
+        node_pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode('PixelFormat'))
+        if PySpin.IsReadable(node_pixel_format) and PySpin.IsWritable(node_pixel_format):
+
+            # Retrieve the desired entry node from the enumeration node
+            node_pixel_format_rgb8 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('RGB8'))
+            if PySpin.IsReadable(node_pixel_format_rgb8):
+
+                # Retrieve the integer value from the entry node
+                pixel_format_rgb8 = node_pixel_format_rgb8.GetValue()
+
+                # Set integer as new value for enumeration node
+                node_pixel_format.SetIntValue(pixel_format_rgb8)
+
+                logger.info('Pixel format set to %s...' % node_pixel_format.GetCurrentEntry().GetSymbolic())
+
+            else:
+                raise Exception('Pixel format RGB8 not readable...')
+
+        else:
+            raise Exception('Pixel format not readable or writable...')
+        # Apply minimum to offset X
+        #
+        # *** NOTES ***
+        # Numeric nodes have both a minimum and maximum. A minimum is retrieved
+        # with the method GetMin(). Sometimes it can be important to check
+        # minimums to ensure that your desired value is within range.
+        node_offset_x = PySpin.CIntegerPtr(nodemap.GetNode('OffsetX'))
+        if PySpin.IsReadable(node_offset_x) and PySpin.IsWritable(node_offset_x):
+
+            node_offset_x.SetValue(node_offset_x.GetMin())
+            logger.info('Offset X set to %i...' % node_offset_x.GetMin())
+
+        else:
+            raise Exception('Offset X not readable or writable...')
+
+        # Apply minimum to offset Y
+        #
+        # *** NOTES ***
+        # It is often desirable to check the increment as well. The increment
+        # is a number of which a desired value must be a multiple of. Certain
+        # nodes, such as those corresponding to offsets X and Y, have an
+        # increment of 1, which basically means that any value within range
+        # is appropriate. The increment is retrieved with the method GetInc().
+        node_offset_y = PySpin.CIntegerPtr(nodemap.GetNode('OffsetY'))
+        if PySpin.IsReadable(node_offset_y) and PySpin.IsWritable(node_offset_y):
+
+            node_offset_y.SetValue(node_offset_y.GetMin())
+            logger.info('Offset Y set to %i...' % node_offset_y.GetMin())
+
+        else:
+            raise Exception('Offset Y not readable or writable...')
+
+        # Set maximum width
+        #
+        # *** NOTES ***
+        # Other nodes, such as those corresponding to image width and height,
+        # might have an increment other than 1. In these cases, it can be
+        # important to check that the desired value is a multiple of the
+        # increment. However, as these values are being set to the maximum,
+        # there is no reason to check against the increment.
+        node_width = PySpin.CIntegerPtr(nodemap.GetNode('Width'))
+        if PySpin.IsReadable(node_width) and PySpin.IsWritable(node_width):
+
+            width_to_set = node_width.GetMax()
+            node_width.SetValue(width_to_set)
+            logger.info('Width set to %i...' % node_width.GetValue())
+
+        else:
+            raise Exception('Width not readable or writable...')
+
+        # Set maximum height
+        #
+        # *** NOTES ***
+        # A maximum is retrieved with the method GetMax(). A node's minimum and
+        # maximum should always be a multiple of its increment.
+        node_height = PySpin.CIntegerPtr(nodemap.GetNode('Height'))
+        if  PySpin.IsReadable(node_height) and PySpin.IsWritable(node_height):
+
+            height_to_set = node_height.GetMax()
+            node_height.SetValue(height_to_set)
+            logger.info('Height set to %i...' % node_height.GetValue())
+
+        else:
+            raise Exception('Height not readable or writable...')
+
+    except PySpin.SpinnakerException as ex:
+        logger.error('Error: %s' % ex)
+        return False
+
+    except Exception as ex:
+        logger.error('Error: %s' % ex)
+        return False
+
+    return result
 
 def run_single_camera(
     cam: PySpin.CameraPtr, image_path: Union[str, Path] = None, num_images: int = 1
@@ -521,19 +676,24 @@ def run_single_camera(
         # Retrieve TL device nodemap and print device information
         nodemap_tldevice = cam.GetTLDeviceNodeMap()
 
-        result &= print_device_info(nodemap_tldevice)
-
+        result = check_device_is_readable(nodemap_tldevice)
+        if not result:
+            return False
+        
         # Initialize camera
         cam.Init()
 
         # Retrieve GenICam nodemap
         nodemap = cam.GetNodeMap()
 
+        configured = configure_custom_image_settings(nodemap)
+        if not configured:
+            return False
         # Set Stream Modes
         # result &= set_stream_mode(cam)
 
         # Acquire images
-        result &= acquire_images(cam, nodemap, nodemap_tldevice, image_path, num_images)
+        result = acquire_images(cam, nodemap, nodemap_tldevice, image_path, num_images)
 
         # Deinitialize camera
         cam.DeInit()
@@ -876,10 +1036,11 @@ def set_framerate(cam: PySpin.CameraPtr, framerate: float):
         # result = True
         cam.AcquisitionFrameRateEnable.SetValue(True)
         cam.AcquisitionFrameRate.SetValue(framerate)
-        print(f"Framerate set to: {framerate}")
+        if not cam.AcquisitionFrameRateEnable.GetValue() or not cam.AcquisitionFrameRate.GetValue() == framerate:
+            raise PySpin.SpinnakerException("Error setting framerate.")
+        print(f"Framerate set to: {cam.AcquisitionFrameRate.GetValue()}")
     except PySpin.SpinnakerException as ex:
         print(f"Error setting framerate: {ex}")
-        # result = False
 
 
 def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
@@ -899,6 +1060,11 @@ def set_white_balance(cam: PySpin.CameraPtr, red: float, blue: float):
         if PySpin.IsWritable(prop_red) and PySpin.IsWritable(prop_blue):
             prop_red.SetValue(red)
             prop_blue.SetValue(blue)
+
+            # Verify the values stuck
+            if not prop_red.GetValue() == red or not prop_blue.GetValue() == blue:
+                raise PySpin.SpinnakerException("Error setting white balance.")
+
             print(f"White balance set to: Red={red}, Blue={blue}")
         else:
             print("White balance properties not writable.")
@@ -911,16 +1077,16 @@ def set_panda_image_profile(cam: PySpin.CameraPtr):
     Camera settings for the panda profile
     """
     print("Turning off auto settings...")
-    # set_brightness(cam, 12.012)
-    set_exposure(cam, 1.392)
-    set_sharpness(cam, 1024)
+    set_brightness(cam, 5.859)
+    set_exposure(cam, 1.0)
+    set_sharpness(cam, 1536)
     set_hue(cam, 0.0)
     set_saturation(cam, 100)
     set_gamma(cam, 1.250)
-    set_shutter(cam, 50.023)
+    set_shutter(cam, 6.2)
     set_gain(cam, 0.0)
-    set_framerate(cam, 5)
-    set_white_balance(cam, 762, 813)
+    set_framerate(cam, 30.0)
+    set_white_balance(cam, 684, 632)
 
 
 # def epanda_camera_profile(self):

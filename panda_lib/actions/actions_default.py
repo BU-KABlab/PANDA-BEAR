@@ -43,7 +43,7 @@ from ..errors import (
     CVFailure,
     DepositionFailure,
     NoAvailableSolution,
-    OCPFailure,
+    OCPError,
 )
 from ..experiments.experiment_types import (
     EchemExperimentBase,
@@ -721,7 +721,7 @@ def chrono_amp(
         # echem CA - deposition
         if not ocp_dep_pass:
             ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
-            raise OCPFailure("CA")
+            raise OCPError("CA")
 
         try:
             ca_instructions.set_status_and_save(ExperimentStatus.EDEPOSITING)
@@ -760,7 +760,7 @@ def chrono_amp(
                 ca_instructions.experiment_id, ca_instructions.well_id
             ) from e
 
-    except OCPFailure as e:
+    except OCPError as e:
         ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", ca_instructions.well_id)
         raise e
@@ -844,7 +844,7 @@ def cyclic_volt(
         except Exception as e:
             cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during OCP: %s", e)
-            raise OCPFailure("CV") from e
+            raise OCPError("CV") from e
         (
             ocp_char_pass,
             ocp_final_voltage,
@@ -861,7 +861,7 @@ def cyclic_volt(
         if not ocp_char_pass:
             cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("OCP of well %s failed", cv_instructions.well_id)
-            raise OCPFailure("CV")
+            raise OCPError("CV")
 
         # echem CV - characterization
         if cv_instructions.baseline == 1:
@@ -914,7 +914,7 @@ def cyclic_volt(
                 cv_instructions.experiment_id, cv_instructions.well_id
             ) from e
 
-    except OCPFailure as e:
+    except OCPError as e:
         cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("OCP of well %s failed", cv_instructions.well_id)
         raise e

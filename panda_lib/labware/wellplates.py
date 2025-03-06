@@ -200,7 +200,7 @@ class Well:
     @property
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
-        return self.bottom + 0.25
+        return self.bottom + 0.1
 
     @property
     def top_coordinates(self) -> Coordinates:

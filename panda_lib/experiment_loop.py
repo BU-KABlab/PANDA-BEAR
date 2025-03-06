@@ -33,7 +33,7 @@ from panda_lib.errors import (
     InstrumentConnectionError,
     InsufficientVolumeError,
     MismatchWellplateTypeError,
-    OCPFailure,
+    OCPError,
     ProtocolNotFoundError,
     ShutDownCommand,
     WellImportError,
@@ -48,7 +48,7 @@ from panda_lib.experiments import (
 )
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well, Wellplate
-from panda_lib.slack_tools.SlackBot import SlackBot, share_to_slack
+from panda_lib.slack_tools.slackbot_module import SlackBot, share_to_slack
 from panda_lib.sql_tools import (
     panda_models,
     sql_protocol_utilities,
@@ -74,17 +74,6 @@ from shared_utilities.log_tools import (
 config = read_config()
 logger = setup_default_logger(log_name="panda")
 TESTING = read_testing_config()
-
-
-def run_slack_bot(testing_mode: bool = TESTING):
-    """
-    Run the slack bot
-    Args:
-    ----
-        testing_mode (bool, optional): Whether to run the slack bot in testing mode. Defaults to TESTING.
-    """
-    slack_monitor = SlackBot(test=testing_mode)
-    slack_monitor.run()
 
 
 def experiment_loop_worker(
@@ -385,7 +374,7 @@ def experiment_loop_worker(
                         time.sleep(0.5)  # small wait to avoid busy loop
 
     except (
-        OCPFailure,
+        OCPError,
         DepositionFailure,
         CVFailure,
         CAFailure,
@@ -462,7 +451,7 @@ def sila_experiment_loop_worker(
     Main worker function to execute SILA experiments.
     """
 
-    toolkit, _ = connect_to_instruments()
+    toolkit, _ = connect_to_instruments(config.getboolean("OPTIONS", "testing"))
     hardware = Hardware(
         pump=toolkit.pump,
         mill=toolkit.mill,
@@ -554,7 +543,7 @@ def sila_experiment_loop_worker(
                 )
 
             except (
-                OCPFailure,
+                OCPError,
                 DepositionFailure,
                 CVFailure,
                 CAFailure,

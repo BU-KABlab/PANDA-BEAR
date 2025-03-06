@@ -5,6 +5,7 @@ from typing import Optional, Union
 
 from hardware.grbl_cnc_mill import Instruments
 from hardware.panda_pipette.syringepump import MockPump, SyringePump
+from panda_lib.errors import NoAvailableSolution
 from shared_utilities.config.config_tools import (
     ConfigParserError,
     read_config,
@@ -23,7 +24,7 @@ from ..panda_gantry import PandaMill as Mill
 from ..toolkit import Hardware, Labware, Toolkit
 from ..utilities import Coordinates, correction_factor
 from .movement import capping_sequence, decapping_sequence
-from .vessel_handling import _handle_source_vessels, waste_selector
+from .vessel_handling import _handle_source_vessels, solution_selector, waste_selector
 
 TESTING = read_testing_config()
 config = read_config()
@@ -178,7 +179,7 @@ def _pipette_action(
 def _forward_pipette_v3(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
-    dst_vessel: Union[Well, WasteVial],
+    dst_vessel: Union[str, Well, WasteVial],
     toolkit: Union[Toolkit, Hardware],
     source_concentration: float = None,
     labware: Optional[Labware] = None,
@@ -186,7 +187,24 @@ def _forward_pipette_v3(
     try:
         if volume <= 0.0:
             return
+        try:
+            if isinstance(dst_vessel, str):
+                if dst_vessel.lower() == "waste":
+                    dst_vessel = waste_selector("waste", volume)
+                elif len(dst_vessel) in [2, 3]:
+                    dst_vessel = toolkit.wellplate.get_well(dst_vessel)
+                else:
+                    dst_vessel = solution_selector(dst_vessel, volume)
 
+        except NoAvailableSolution as e:
+            toolkit.global_logger.error("No available destination vial found: %s", e)
+            raise e
+        
+        except KeyError as e:
+            toolkit.global_logger.error("Well %s not found on wellplate: %s",dst_vessel, e)
+            raise e
+
+            
         selected_source_vessels, source_vessel_volumes = _handle_source_vessels(
             volume=volume,
             src_vessel=src_vessel,
@@ -219,7 +237,7 @@ def _forward_pipette_v3(
 def transfer(
     volume: float,
     src_vessel: Union[str, Well, StockVial],
-    dst_vessel: Union[Well, WasteVial],
+    dst_vessel: Union[str, Well, WasteVial],
     toolkit: Toolkit,
     source_concentration: float = None,
 ) -> int:

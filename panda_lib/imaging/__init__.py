@@ -20,33 +20,42 @@ __all__ = [
     "invert_image",
 ]
 
+default_logger = Logger("panda")
+
 
 def capture_new_image(
     save=True,
     num_images=1,
     file_name: Path = Path("images/test.tiff"),
-    logger: Optional[Logger] = None,
+    logger: Optional[Logger] = default_logger,
 ) -> Path:
     """Capture a new image from the FLIR camera"""
     # Check the file name and ennumerate if it already exists
     file_name = file_enumeration(file_name)
-    pyspin_system: PySpin.SystemPtr = PySpin.System.GetInstance()
-    camera_list: PySpin.CameraList = pyspin_system.GetCameras()
-    # Run example on each camera
-    for _, camera in enumerate(camera_list):
-        camera: PySpin.CameraPtr
-        result = run_single_camera(camera, image_path=file_name, num_images=num_images)
-        if result:
-            logger.info(f"Camera {camera.DeviceSerialNumber} took image...")
-        else:
-            logger.error(f"Camera {camera.DeviceSerialNumber} failed to take image...")
-    # Clear camera list before releasing system
-    camera_list.Clear()
+    try:
+        pyspin_system: PySpin.SystemPtr = PySpin.System.GetInstance()
+        camera_list: PySpin.CameraList = pyspin_system.GetCameras()
+        # Run example on each camera
+        for _, camera in enumerate(camera_list):
+            camera: PySpin.CameraPtr
+            result = run_single_camera(camera, image_path=file_name, num_images=num_images)
+            if result:
+                logger.info("Camera took image...")
+            else:
+                logger.error("Camera failed to take image...")
+    
+    except PySpin.SpinnakerException as ex:
+        logger.error(f"Error: {ex}")
+        return file_name, False
 
-    # Release system instance
-    pyspin_system.ReleaseInstance()
+    finally:                
+        # Clear camera list before releasing system
+        camera_list.Clear()
 
-    return file_name
+            # Release system instance
+        pyspin_system.ReleaseInstance()
+
+    return file_name, result
 
 
 if __name__ == "__main__":

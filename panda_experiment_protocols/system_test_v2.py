@@ -8,7 +8,7 @@ from panda_lib.actions.actions_default import (
     CVFailure,
     DepositionFailure,
     Instruments,
-    OCPFailure,
+    OCPError,
     __flush_v2,
     __forward_pipette_v2,
     chrono_amp,
@@ -182,7 +182,7 @@ def pedotdeposition(
     try:
         chrono_amp(instructions, file_tag="CA_deposition")
 
-    except (OCPFailure, CAFailure, CVFailure, DepositionFailure) as e:
+    except (OCPError, CAFailure, CVFailure, DepositionFailure) as e:
         toolkit.global_logger.error("Error occurred during chrono_amp: %s", str(e))
         raise e
     except Exception as e:
