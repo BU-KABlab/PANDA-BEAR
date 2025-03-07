@@ -63,7 +63,7 @@ dependencies = [
     "sila2[codegen]",
     "sila2[cryptography]",
     "six==1.16.0",
-    "slack_sdk==3.32.0",
+    "slack_sdk>=3.4.0",
     "smmap==5.0.1",
     "spinnaker-python",
     "SQLAlchemy==2.0.34",
@@ -78,6 +78,7 @@ dependencies = [
     "typeguard==4.3.0",
     "typing_extensions==4.12.2",
     "tzdata==2024.1",
+    "uv>=0.6.4",
     "websocket-client==1.8.0",
 ]
 
