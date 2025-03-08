@@ -1,19 +1,17 @@
 # For writing a protocol, use the available actions from the panda_lib.actions module.
 from dataclasses import dataclass
-from logging import Logger
 
 from panda_lib import Toolkit
 from panda_lib.actions import (
     clear_well,
     flush_pipette,
     image_well,
-    perform_chronoamperometry,
+    move_to_and_perform_ca,
     rinse_well,
     transfer,
 )
 
 # If you are using custom actions, import them from the appropriate module.
-from panda_lib.actions.actions_pgma import cyclic_volt_pgma_fc
 from panda_lib.experiments import EchemExperimentBase, ExperimentStatus
 
 # To have specific types for the wells, import them from the labware module.
@@ -28,70 +26,6 @@ class Solution:
     volume: int
     concentration: float
     repeated: int
-
-
-def _cv_steps(
-    exp: EchemExperimentBase, toolkit: Toolkit, file_tag: str, well: Well, log: Logger
-):
-    # CV
-    try:
-        toolkit.mill.safe_move(
-            coordinates=well.top_coordinates,
-            tool="electrode",
-            second_z_cord=toolkit.wellplate.echem_height,
-            second_z_cord_feed=100,
-        )
-
-        try:
-            cyclic_volt_pgma_fc(
-                cv_instructions=exp,
-                file_tag=file_tag,
-            )
-        except Exception as e:
-            log.error("CV postcharacterization failed")
-            log.error(e)
-            exp.set_status_and_save(ExperimentStatus.ERROR)
-            raise e
-    except Exception as e:
-        log.error("Failed to move the mill to the well")
-        log.error(e)
-        exp.set_status_and_save(ExperimentStatus.ERROR)
-        raise e
-
-    finally:
-        toolkit.mill.rinse_electrode(3)
-
-
-def _ca_steps(
-    exp: EchemExperimentBase, toolkit: Toolkit, file_tag: str, well: Well, log: Logger
-):
-    # CA
-    try:
-        toolkit.mill.safe_move(
-            coordinates=well.top_coordinates,
-            tool="electrode",
-            second_z_cord=toolkit.wellplate.echem_height,
-            second_z_cord_feed=100,
-        )
-
-        try:
-            perform_chronoamperometry(
-                ca_instructions=exp,
-                file_tag=file_tag,
-            )
-        except Exception as e:
-            log.error("CA Deposition failed")
-            log.error(e)
-            exp.set_status_and_save(ExperimentStatus.ERROR)
-            raise e
-    except Exception as e:
-        log.error("Failed to move the mill to the well")
-        log.error(e)
-        exp.set_status_and_save(ExperimentStatus.ERROR)
-        raise e
-
-    finally:
-        toolkit.mill.rinse_electrode(3)
 
 
 def run(experiment: EchemExperimentBase, toolkit: Toolkit):
@@ -124,7 +58,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
     # Transfer the reagent to the well
     transfer(reag.volume, reag.name, well, toolkit)
 
-    _ca_steps(
+    move_to_and_perform_ca(
         exp=exp,
         toolkit=toolkit,
         file_tag="CA_Deposition",

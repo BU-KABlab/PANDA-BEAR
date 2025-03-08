@@ -7,6 +7,7 @@ from panda_lib.actions import (
     clear_well,
     flush_pipette,
     image_well,
+    move_to_and_perform_cv,
     perform_cyclic_voltammetry,
     rinse_well,
     transfer,
@@ -41,7 +42,7 @@ def _cv_steps(
 
         try:
             perform_cyclic_voltammetry(
-                cv_instructions=exp,
+                experiment=exp,
                 file_tag=file_tag,
             )
         except Exception as e:
@@ -94,7 +95,7 @@ def PolyDeposition(exp: EchemExperimentBase, toolkit: Toolkit):
     # Transfer the reagent to the well
     transfer(reag.volume, reag.name, well, toolkit)
 
-    _cv_steps(
+    move_to_and_perform_cv(
         exp=exp,
         toolkit=toolkit,
         file_tag="CV_scan",
