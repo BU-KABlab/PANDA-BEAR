@@ -143,7 +143,10 @@ def ocp_check(
     toolkit: Toolkit,
     log: Logger,
 ) -> Tuple[bool, float]:
-    """Perform open circuit potential measurement sequence.
+    """Perform open circuit potential measurement sequence. If short circuit is detected,
+    the mill will be raised by 0.5mm and the OCP will be retried, repeating this process up to 3 times.
+
+    If the OCP fails to pass, the experiment status will be set to ERROR and an OCPError will be raised.
 
     Parameters
     ----------
@@ -199,7 +202,7 @@ def ocp_check(
 
 @timing_wrapper
 def perform_chronoamperometry(
-    ca_instructions: EchemExperimentBase,
+    experiment: EchemExperimentBase,
     file_tag: Optional[str] = None,
     custom_parameters: Optional[chrono_parameters] = None,
 ) -> EchemExperimentBase:
@@ -236,17 +239,17 @@ def perform_chronoamperometry(
         pstat.pstatconnect()
 
         # echem OCP
-        logger.info("Beginning eChem OCP of well: %s", ca_instructions.well_id)
-        ca_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
+        logger.info("Beginning eChem OCP of well: %s", experiment.well_id)
+        experiment.set_status_and_save(ExperimentStatus.OCPCHECK)
 
         base_filename = pstat.setfilename(
-            ca_instructions.experiment_id,
+            experiment.experiment_id,
             file_tag + "_OCP_CA" if file_tag else "OCP_CA",
-            ca_instructions.project_id,
-            ca_instructions.project_campaign_id,
-            ca_instructions.well_id,
+            experiment.project_id,
+            experiment.project_campaign_id,
+            experiment.well_id,
         )
-        ca_results = ca_instructions.results
+        ca_results = experiment.results
         pstat.OCP(
             potentiostat_ocp_parameters.OCPvi,
             potentiostat_ocp_parameters.OCPti,
@@ -259,26 +262,24 @@ def perform_chronoamperometry(
         )
         logger.info(
             "OCP of well %s passed: %s",
-            ca_instructions.well_id,
+            experiment.well_id,
             ocp_dep_pass,
         )
 
         # echem CA - deposition
         if not ocp_dep_pass:
-            ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            experiment.set_status_and_save(ExperimentStatus.ERROR)
             raise OCPError("CA")
 
         try:
-            ca_instructions.set_status_and_save(ExperimentStatus.EDEPOSITING)
-            logger.info(
-                "Beginning eChem deposition of well: %s", ca_instructions.well_id
-            )
+            experiment.set_status_and_save(ExperimentStatus.EDEPOSITING)
+            logger.info("Beginning eChem deposition of well: %s", experiment.well_id)
             deposition_data_file = pstat.setfilename(
-                ca_instructions.experiment_id,
+                experiment.experiment_id,
                 file_tag + "_CA" if file_tag else "CA",
-                ca_instructions.project_id,
-                ca_instructions.project_campaign_id,
-                ca_instructions.well_id,
+                experiment.project_id,
+                experiment.project_campaign_id,
+                experiment.well_id,
             )
 
             # FEATURE have chrono return the max and min values for the deposition
@@ -287,45 +288,41 @@ def perform_chronoamperometry(
                 chrono_params = custom_parameters
             else:
                 chrono_params = chrono_parameters(
-                    CAvi=ca_instructions.ca_prestep_voltage,
-                    CAti=ca_instructions.ca_prestep_time_delay,
-                    CAv1=ca_instructions.ca_step_1_voltage,
-                    CAt1=ca_instructions.ca_step_1_time,
-                    CAv2=ca_instructions.ca_step_2_voltage,
-                    CAt2=ca_instructions.ca_step_2_time,
-                    CAsamplerate=ca_instructions.ca_sample_period,
+                    CAvi=experiment.ca_prestep_voltage,
+                    CAti=experiment.ca_prestep_time_delay,
+                    CAv1=experiment.ca_step_1_voltage,
+                    CAt1=experiment.ca_step_1_time,
+                    CAv2=experiment.ca_step_2_voltage,
+                    CAt2=experiment.ca_step_2_time,
+                    CAsamplerate=experiment.ca_sample_period,
                 )  # CA
             pstat.chrono(chrono_params)
             pstat.activecheck()
             ca_results.set_ca_data_file(deposition_data_file, context=file_tag)
         except Exception as e:
-            ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            experiment.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during deposition: %s", e)
-            raise CAFailure(
-                ca_instructions.experiment_id, ca_instructions.well_id
-            ) from e
+            raise CAFailure(experiment.experiment_id, experiment.well_id) from e
 
     except OCPError as e:
-        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("OCP of well %s failed", ca_instructions.well_id)
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", experiment.well_id)
         raise e
 
     except CAFailure as e:
-        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("CA of well %s failed", ca_instructions.well_id)
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CA of well %s failed", experiment.well_id)
         raise e
 
     except Exception as e:
-        ca_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("Exception occurred during deposition: %s", e)
-        raise DepositionFailure(
-            ca_instructions.experiment_id, ca_instructions.well_id
-        ) from e
+        raise DepositionFailure(experiment.experiment_id, experiment.well_id) from e
 
     finally:
         pstat.pstatdisconnect()
 
-    return ca_instructions
+    return experiment
 
 
 ca = perform_chronoamperometry
@@ -333,7 +330,7 @@ ca = perform_chronoamperometry
 
 @timing_wrapper
 def perform_cyclic_voltammetry(
-    cv_instructions: EchemExperimentBase,
+    experiment: EchemExperimentBase,
     file_tag: str = None,
     overwrite_inital_voltage: bool = True,
     custom_parameters: cv_parameters = None,
@@ -361,24 +358,22 @@ def perform_cyclic_voltammetry(
     try:
         # echem OCP
         if file_tag:
-            logger.info(
-                "Beginning %s OCP of well: %s", file_tag, cv_instructions.well_id
-            )
+            logger.info("Beginning %s OCP of well: %s", file_tag, experiment.well_id)
         else:
-            logger.info("Beginning OCP of well: %s", cv_instructions.well_id)
+            logger.info("Beginning OCP of well: %s", experiment.well_id)
         if TESTING:
             pstat = echem()
         else:
             pstat = echem
 
         pstat.pstatconnect()
-        cv_instructions.set_status_and_save(ExperimentStatus.OCPCHECK)
+        experiment.set_status_and_save(ExperimentStatus.OCPCHECK)
         ocp_char_file = pstat.setfilename(
-            cv_instructions.experiment_id,
+            experiment.experiment_id,
             file_tag + "_OCP_CV" if file_tag else "OCP_CV",
-            cv_instructions.project_id,
-            cv_instructions.project_campaign_id,
-            cv_instructions.well_id,
+            experiment.project_id,
+            experiment.project_campaign_id,
+            experiment.well_id,
         )
 
         try:
@@ -390,65 +385,63 @@ def perform_cyclic_voltammetry(
             pstat.activecheck()
 
         except Exception as e:
-            cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            experiment.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during OCP: %s", e)
             raise OCPError("CV") from e
         (
             ocp_char_pass,
             ocp_final_voltage,
         ) = pstat.check_vf_range(ocp_char_file)
-        cv_instructions.results.set_ocp_cv_file(
+        experiment.results.set_ocp_cv_file(
             ocp_char_file, ocp_char_pass, ocp_final_voltage, file_tag
         )
         logger.info(
             "OCP of well %s passed: %s",
-            cv_instructions.well_id,
+            experiment.well_id,
             ocp_char_pass,
         )
 
         if not ocp_char_pass:
-            cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
-            logger.error("OCP of well %s failed", cv_instructions.well_id)
-            raise OCPFailure(cv_instructions.experiment_id, cv_instructions.well_id)
+            experiment.set_status_and_save(ExperimentStatus.ERROR)
+            logger.error("OCP of well %s failed", experiment.well_id)
+            raise OCPFailure(experiment.experiment_id, experiment.well_id)
 
         # echem CV - characterization
-        if cv_instructions.baseline == 1:
+        if experiment.baseline == 1:
             test_type = "CV_baseline"
-            cv_instructions.set_status_and_save(ExperimentStatus.BASELINE)
+            experiment.set_status_and_save(ExperimentStatus.BASELINE)
         else:
             test_type = "CV"
-            cv_instructions.set_status_and_save(ExperimentStatus.CHARACTERIZING)
+            experiment.set_status_and_save(ExperimentStatus.CHARACTERIZING)
 
-        logger.info(
-            "Beginning eChem %s of well: %s", test_type, cv_instructions.well_id
-        )
+        logger.info("Beginning eChem %s of well: %s", test_type, experiment.well_id)
 
         characterization_data_file = pstat.setfilename(
-            cv_instructions.experiment_id,
+            experiment.experiment_id,
             file_tag + "_CV" if file_tag else test_type,
-            cv_instructions.project_id,
-            cv_instructions.project_campaign_id,
-            cv_instructions.well_id,
+            experiment.project_id,
+            experiment.project_campaign_id,
+            experiment.well_id,
         )
-        cv_instructions.results.set_cv_data_file(characterization_data_file, file_tag)
+        experiment.results.set_cv_data_file(characterization_data_file, file_tag)
         # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
         if overwrite_inital_voltage:
-            cv_instructions.cv_initial_voltage = ocp_final_voltage
+            experiment.cv_initial_voltage = ocp_final_voltage
 
         if custom_parameters:  # if not none then use the custom parameters
             cv_params = custom_parameters
             cv_params.CVvi = ocp_final_voltage  # still need to set the initial voltage, not overwriting the original
         else:
             cv_params = cv_parameters(
-                CVvi=cv_instructions.cv_initial_voltage,
-                CVap1=cv_instructions.cv_first_anodic_peak,
-                CVap2=cv_instructions.cv_second_anodic_peak,
-                CVvf=cv_instructions.cv_final_voltage,
-                CVsr1=cv_instructions.cv_scan_rate_cycle_1,
-                CVsr2=cv_instructions.cv_scan_rate_cycle_2,
-                CVsr3=cv_instructions.cv_scan_rate_cycle_3,
-                CVcycle=cv_instructions.cv_cycle_count,
+                CVvi=experiment.cv_initial_voltage,
+                CVap1=experiment.cv_first_anodic_peak,
+                CVap2=experiment.cv_second_anodic_peak,
+                CVvf=experiment.cv_final_voltage,
+                CVsr1=experiment.cv_scan_rate_cycle_1,
+                CVsr2=experiment.cv_scan_rate_cycle_2,
+                CVsr3=experiment.cv_scan_rate_cycle_3,
+                CVcycle=experiment.cv_cycle_count,
             )
 
         try:
@@ -456,32 +449,30 @@ def perform_cyclic_voltammetry(
             pstat.activecheck()
 
         except Exception as e:
-            cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+            experiment.set_status_and_save(ExperimentStatus.ERROR)
             logger.error("Exception occurred during CV: %s", e)
-            raise CVFailure(
-                cv_instructions.experiment_id, cv_instructions.well_id
-            ) from e
+            raise CVFailure(experiment.experiment_id, experiment.well_id) from e
 
     except OCPFailure as e:
-        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("OCP of well %s failed", cv_instructions.well_id)
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("OCP of well %s failed", experiment.well_id)
         raise e
 
     except OCPError as e:
-        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
         raise e
     except CVFailure as e:
-        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
-        logger.error("CV of well %s failed", cv_instructions.well_id)
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
+        logger.error("CV of well %s failed", experiment.well_id)
         raise e
     except Exception as e:
-        cv_instructions.set_status_and_save(ExperimentStatus.ERROR)
+        experiment.set_status_and_save(ExperimentStatus.ERROR)
         logger.error("An unknown exception occurred during CV: %s", e)
-        raise CVFailure(cv_instructions.experiment_id, cv_instructions.well_id) from e
+        raise CVFailure(experiment.experiment_id, experiment.well_id) from e
     finally:
         pstat.pstatdisconnect()
 
-    return cv_instructions
+    return experiment
 
 
 cv = perform_cyclic_voltammetry
@@ -501,7 +492,7 @@ def move_to_and_perform_cv(
         )
 
         perform_cyclic_voltammetry(
-            cv_instructions=exp,
+            experiment=exp,
             file_tag=file_tag,
         )
 
@@ -547,7 +538,7 @@ def move_to_and_perform_ca(
 
         try:
             perform_chronoamperometry(
-                ca_instructions=exp,
+                experiment=exp,
                 file_tag=file_tag,
             )
         except Exception as e:
