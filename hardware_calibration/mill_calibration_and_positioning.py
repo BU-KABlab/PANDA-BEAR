@@ -437,7 +437,7 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
 def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     """Calibrate the height for the echem"""
     response = input(
-        "Electrode will move to 0 above A1. Press enter to proceed or 'q' to quit: "
+        "Electrode will move to the top of A1 with the electrode. Press enter to proceed or 'q' to quit: "
     )
     if response.lower() == "q":
         return
@@ -446,8 +446,18 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     offset = mill.tool_manager.tool_offsets["electrode"].offset
     mill.safe_move(coordinates=well.top_coordinates, tool="electrode")
     print(
-        f"Current echem height is set to: {wellplate.plate_data.echem_height} off the well bottom"
+        f"Current echem height is set to: {wellplate.plate_data.echem_height} mm from the well bottom"
     )
+    print(f"This is a z-coordinate of {wellplate.echem_height}")
+    print(f"Current mill height is {mill.current_coordinates().z}")
+
+    goto_original = input_validation("Proceed to current echem height? (y/n): ", str)
+    if goto_original.lower() in ["y", "yes", ""]:
+        current = mill.safe_move(
+            coordinates=Coordinates(well.x, well.y, wellplate.echem_height),
+            tool=Instruments.ELECTRODE,
+        )
+        print(f"Current echem height: {wellplate.echem_height}")
 
     if input("Would you like to set a new echem height? (y/n): ").lower() in [
         "y",
@@ -455,11 +465,14 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
         "",
     ]:
         while True:
-            new_echem_height = input_validation(
+            new_echem_offset = input_validation(
                 "Enter the new echem height or enter for no change: ", float, (0, 10)
             )
-            if new_echem_height is None:
+            if new_echem_offset is None:
                 new_echem_height = wellplate.echem_height
+            else:
+                new_echem_height = wellplate.bottom + new_echem_offset
+
             current = mill.safe_move(
                 coordinates=Coordinates(well.x, well.y, new_echem_height),
                 tool=Instruments.ELECTRODE,
@@ -770,11 +783,13 @@ def test_decapper(mill: Mill, *args, **kwargs):
     """
     decapper_test()
 
+
 def rinse_electrode(mill: Mill, *args, **kwargs):
     """
     Rinse the electrode in the electrode bath
     """
     mill.rinse_electrode()
+
 
 menu_options = {
     "0": check_mill_settings,
