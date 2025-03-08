@@ -428,3 +428,9 @@ class WellplateService:
                 plate.name = f"{plate.id}"
                 db_session.commit()
             return WellplateReadModel.model_validate(plate)
+
+    def check_plate_exists(self, plate_id: int) -> bool:
+        with self.session_maker() as db_session:
+            stmt = select(WellPlateDBModel).filter_by(id=plate_id)
+            plate = db_session.execute(stmt).scalar()
+            return plate is not None
