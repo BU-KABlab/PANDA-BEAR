@@ -393,7 +393,10 @@ def toggle_testing_mode():
 def mill_calibration():
     """Calibrates the mill."""
 
-    mode = input("Control the mill manually or automatically (manual/auto): ")
+    if not read_testing_config():
+        mode = input("Control the mill manually or automatically (manual/auto): ")
+    else:
+        mode = "manual"
 
     if mode == "manual":
         print("Manual control of the mill")
@@ -414,7 +417,7 @@ def mill_calibration():
 
 
 def test_image():
-    """Runs the mill control in testing mode."""
+    """Take an image with the camera and display it."""
     image, result = imaging.capture_new_image()
     if result:
         open_image = Image.open(image)
@@ -768,7 +771,7 @@ if __name__ == "__main__":
     banner()
 
     try:
-        user_name = user_sign_in()
+        # user_name = user_sign_in()
         if config.getboolean("OPTIONS", "use_slack"):
             pass
             # slackbot_thread = start_slack_bot(slackThread_running)
@@ -791,7 +794,7 @@ if __name__ == "__main__":
             banner()
             print(
                 f"""
-Welcome {user_name}!
+Welcome!
 Testing mode is {"ENABLED" if read_testing_config() else "DISABLED"}
 DB: {get_active_db()}
 
