@@ -393,11 +393,23 @@ def toggle_testing_mode():
 def mill_calibration():
     """Calibrates the mill."""
 
+    mode = input("Control the mill manually or automatically (manual/auto): ")
+
+    if mode == "manual":
+        print("Manual control of the mill")
+        input("Open Candel and press enter to continue...")
+        use_mock_mill = True
+
+    elif mode == "auto":
+        print("Automatic control of the mill")
+        use_mock_mill = False
+
+    wellplate_to_use = wellplates.Wellplate()
+    stock_vials_to_use = vials.read_vials()[0]
+    waste_vials_to_use = vials.read_vials()[1]
+
     calibrate_mill(
-        read_testing_config(),
-        wellplates.Wellplate(),
-        vials.read_vials()[0],
-        vials.read_vials()[1],
+        use_mock_mill, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
     )
 
 
