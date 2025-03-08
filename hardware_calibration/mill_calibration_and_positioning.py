@@ -781,6 +781,11 @@ def test_decapper(mill: Mill, *args, **kwargs):
     """
     Test the decapper by moving it to a vial and then moving it up and down
     """
+    warn = input(
+        "Warning: This test uses a hardcoded vial location and will control the mill if available to cap and decap the vial. Proceed? (y/n): "
+    ).lower()
+    if warn not in ["y", "yes"]:
+        return
     decapper_test()
 
 
@@ -798,10 +803,9 @@ menu_options = {
     "4": calibrate_bottom_of_wellplate,
     "5": calibrate_echem_height,
     "6": calibrate_vial_holders,
-    "7": capture_well_photo_manually,
-    "8": calibrate_image_height,
-    "9": test_decapper,
-    "10": rinse_electrode,
+    "7": calibrate_image_height,
+    "8": test_decapper,
+    "9": rinse_electrode,
     "q": quit_calibration,
 }
 
