@@ -813,10 +813,10 @@ def calibrate_mill(
     waste_vials: Sequence[WasteVial],
 ):
     """Calibrate the mill to the wellplate and stock vials"""
-    if not use_mock_mill:
-        mill = Mill
-    else:
+    if use_mock_mill:
         mill = MockMill
+    else:
+        mill = Mill
 
     # Connect to the mill
     with mill() as cncmill:
@@ -840,13 +840,24 @@ def main():
     testing = input("Enter 'y' to use testing configuration: ").lower() == "y"
 
     print("Testing mode:", testing)
-    input("Press enter to continue")
+    mode = input("Control the mill manually or automatically (manual/auto): ")
+
+    if mode == "manual":
+        print("Manual control of the mill")
+        input("Open Candel and press enter to continue...")
+        use_mock_mill = True
+
+    elif mode == "auto":
+        print("Automatic control of the mill")
+        use_mock_mill = False
 
     wellplate_to_use = Wellplate()
     stock_vials_to_use: Sequence[StockVial] = read_vials()[0]
     waste_vials_to_use: Sequence[WasteVial] = read_vials()[1]
 
-    calibrate_mill(True, wellplate_to_use, stock_vials_to_use, waste_vials_to_use)
+    calibrate_mill(
+        use_mock_mill, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
+    )
 
 
 if __name__ == "__main__":
