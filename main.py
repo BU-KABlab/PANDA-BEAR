@@ -29,6 +29,7 @@ from panda_lib import (
 )
 from panda_lib.experiments.experiment_types import ExperimentBase
 from panda_lib.labware import vials, wellplates
+from panda_lib.labware.services import WellplateService
 from panda_lib.sql_tools import (
     sql_generator_utilities,
     sql_protocol_utilities,
@@ -172,21 +173,47 @@ def run_queue():
 
 def change_wellplate():
     """Changes the current wellplate."""
-    new_plate_type = int(input("Enter the new wellplate type: ").strip().lower())
     new_plate_numb = int(input("Enter the new wellplate number: ").strip().lower())
 
-    new_plate = wellplates.Wellplate(
-        create_new=True, plate_id=new_plate_numb, type_id=new_plate_type
-    )
-    if new_plate:
-        print(f"New wellplate loaded: {new_plate.plate_data.id}")
-        new_plate.activate_plate()
-        print(
-            f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
+    if not WellplateService().check_plate_exists(new_plate_numb):
+        print(f"Wellplate {new_plate_numb} does not exist yet.")
+        new_plate_type = int(input("Enter the new wellplate type: ").strip().lower())
+
+        new_plate = wellplates.Wellplate(
+            create_new=True, plate_id=new_plate_numb, type_id=new_plate_type
         )
-        input("Press Enter to continue...")
+
+        if new_plate:
+            print(f"New wellplate loaded: {new_plate.plate_data.id}")
+            new_plate.activate_plate()
+
+            # Confirm the plate is active
+            active_plate = WellplateService().get_active_plate()
+            if active_plate.id == new_plate.plate_data.id:
+                print(f"Wellplate {new_plate_numb} is active")
+                print(
+                    f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
+                )
+            else:
+                print(f"Issue with activating wellplate {new_plate_numb}")
+            input("Press Enter to continue...")
+        else:
+            print("Failed to create new wellplate.")
+            input("Press Enter to continue...")
+
     else:
-        print("No wellplate loaded.")
+        print(f"Wellplate {new_plate_numb} exists.")
+        plate = wellplates.Wellplate(plate_id=new_plate_numb)
+        plate.activate_plate()
+
+        # Confirm the plate is active
+        active_plate = WellplateService().get_active_plate()
+        if active_plate.id == plate.id:
+            print(f"Wellplate {new_plate_numb} is active.")
+            print(f"Location of A1: {plate.plate_data.a1_x}, {plate.plate_data.a1_y}")
+
+        else:
+            print(f"Issue with activating wellplate {new_plate_numb}.")
         input("Press Enter to continue...")
 
 
@@ -383,6 +410,7 @@ def test_image():
     else:
         print("Failed to capture image.")
     input("Press Enter to continue...")
+
 
 def exit_program():
     """Exits the program."""
