@@ -248,9 +248,9 @@ class MockPandaMill(MockMill):
         """Close the serial connection to the mill"""
         mill_control_logger.info("Disconnecting from the mill")
 
-        if self.homed:
-            mill_control_logger.debug("Mill was homed, resting electrode")
-            self.rest_electrode()
+        # if self.homed:
+        #     mill_control_logger.debug("Mill was homed, resting electrode")
+        #     self.rest_electrode()
 
         self.ser_mill.close()
         time.sleep(2)
