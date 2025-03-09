@@ -394,7 +394,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                 (mill.working_volume.y, 0),
             )
 
-            new_coordinates = Coordinates(new_x, new_y, wellplate.top)
+            new_coordinates = Coordinates(new_x, new_y, well.bottom)
             mill.safe_move(coordinates=new_coordinates, tool=instrument)
 
         # Step 10: Save changes if confirmed
@@ -460,8 +460,8 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
 
         well: Well = wellplate.wells[well_id]
         print(f"\nCurrent settings for {well_id}:")
-        print(f"  - X coordinate: {well.coordinates.x}")
-        print(f"  - Y coordinate: {well.coordinates.y}")
+        print(f"  - X coordinate: {well.x}")
+        print(f"  - Y coordinate: {well.y}")
         print(f"  - Z bottom: {well.bottom}")
         print(f"  - Deck to bottom distance: {well.well_data.base_thickness}")
 
@@ -665,10 +665,12 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
         save_changes = input("\nSave this new echem height? (y/n): ").lower().strip()
 
         if save_changes in ["y", "yes", ""]:
-            wellplate.plate_data.echem_height = new_echem_height
+            wellplate.plate_data.echem_height = new_echem_offset
             wellplate.save()
-            print(f"\nEchem height successfully updated to {new_echem_height}")
-            print(f"This is {new_echem_height - well.bottom}mm above the well bottom")
+            print(
+                f"\nEchem height successfully updated to {new_echem_offset}mm from the well bottom"
+            )
+            # print(f"This is {new_echem_height - well.bottom}mm above the well bottom")
         else:
             print("\nChanges discarded.")
 
