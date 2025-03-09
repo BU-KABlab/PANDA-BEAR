@@ -400,7 +400,7 @@ def mill_calibration():
 
     if mode == "manual":
         print("Manual control of the mill")
-        input("Open Candel and press enter to continue...")
+        input("Open Candle and press enter to continue...")
         use_mock_mill = True
 
     elif mode == "auto":
@@ -414,6 +414,9 @@ def mill_calibration():
     calibrate_mill(
         use_mock_mill, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
     )
+
+    if mode == "manual":
+        input("Please close Candle and press enter to continue...")
 
 
 def test_image():
