@@ -486,13 +486,14 @@ def change_pipette_tip():
 def instrument_check():
     """Runs the instrument check."""
     sql_system_state.set_system_status(SystemState.BUSY, "running instrument check")
-    instruments, all_found = toolkit.test_instrument_connections(False)
-    if all_found:
-        input("Press Enter to continue...")
-    else:
-        input("Press Enter to continue...")
-
-    experiment_loop.disconnect_from_instruments(instruments)
+    try:
+        instruments, all_found = toolkit.test_instrument_connections(False)
+        if all_found:
+            input("Press Enter to continue...")
+        else:
+            input("Press Enter to continue...")
+    finally:
+        experiment_loop.disconnect_from_instruments(instruments)
     return
 
 
