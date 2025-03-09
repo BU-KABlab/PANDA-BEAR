@@ -35,9 +35,7 @@ def mock_current_coordinates():
 def test_move_to_positions_single_target(mock_mill):
     """Test moving to a single target position"""
     # Mock current_coordinates to return a known position
-    mock_mill.current_coordinates = Mock(
-        return_value=(Coordinates(-100, -100, -50), Coordinates(-100, -100, -50))
-    )
+    mock_mill.current_coordinates = Mock(return_value=Coordinates(-100, -100, -50))
 
     target = Coordinates(x=-200, y=-200, z=-75)
     mock_mill.move_to_positions([target], tool="center", safe_move_required=True)
@@ -51,9 +49,7 @@ def test_move_to_positions_single_target(mock_mill):
 
 def test_move_to_positions_multiple_targets(mock_mill):
     """Test moving to multiple target positions"""
-    mock_mill.current_coordinates = Mock(
-        return_value=(Coordinates(-100, -100, -50), Coordinates(-100, -100, -50))
-    )
+    mock_mill.current_coordinates = Mock(return_value=(Coordinates(-100, -100, -50)))
     mock_mill.ser_mill.readline.return_value = b"ok\r\n"
     targets = [Coordinates(x=-200, y=-200, z=-75), Coordinates(x=-300, y=-200, z=-100)]
 
@@ -69,7 +65,7 @@ def test_move_to_positions_multiple_targets(mock_mill):
 def test_move_to_positions_already_at_target(mock_mill):
     """Test when current position is already at target"""
     current_pos = Coordinates(-100, -100, -50)
-    mock_mill.current_coordinates = Mock(return_value=(current_pos, current_pos))
+    mock_mill.current_coordinates = Mock(return_value=current_pos)
 
     # Try to move to current position
     mock_mill.move_to_positions([current_pos], tool="center", safe_move_required=True)
@@ -95,9 +91,7 @@ def test_move_to_positions_invalid_coordinates(mock_mill):
 
 def test_move_to_positions_without_safe_move(mock_mill):
     """Test moving without safe move requirement"""
-    mock_mill.current_coordinates = Mock(
-        return_value=(Coordinates(-100, -100, -50), Coordinates(-100, -100, -50))
-    )
+    mock_mill.current_coordinates = Mock(return_value=Coordinates(-100, -100, -50))
     mock_mill.ser_mill.readline.return_value = b"ok\r\n"
     target = Coordinates(x=-200, y=-200, z=-75)
     mock_mill.move_to_positions([target], tool="center", safe_move_required=False)
@@ -111,9 +105,7 @@ def test_move_to_positions_without_safe_move(mock_mill):
 
 def test_move_to_positions_with_tool_offset(mock_mill):
     """Test moving with tool offset"""
-    mock_mill.current_coordinates = Mock(
-        return_value=(Coordinates(-100, -100, -50), Coordinates(-100, -100, -50))
-    )
+    mock_mill.current_coordinates = Mock(return_value=Coordinates(-100, -100, -50))
     mock_mill.ser_mill.readline.return_value = b"ok\r\n"
     # Set up a tool with offset
     tool_offset = Coordinates(x=10, y=10, z=10)
