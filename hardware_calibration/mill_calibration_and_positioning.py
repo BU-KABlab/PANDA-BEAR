@@ -366,7 +366,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
 
         # Step 8: Move to new position for verification
         new_coordinates = Coordinates(new_x, new_y, wellplate.top)
-        print(f"\nMoving to new coordinates: X={new_x}, Y={new_y}")
+        # print(f"\nMoving to new coordinates: X={new_x}, Y={new_y}")
         mill.safe_move(coordinates=new_coordinates, tool=instrument)
 
         # Step 9: Confirm the new position
@@ -399,7 +399,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
 
         # Step 10: Save changes if confirmed
         save_changes = (
-            input("\nSave these new coordinates for well {well_id}? (y/n): ")
+            input(f"\nSave these new coordinates for well {well_id}? (y/n): ")
             .lower()
             .strip()
         )
@@ -460,14 +460,14 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
 
         well: Well = wellplate.wells[well_id]
         print(f"\nCurrent settings for {well_id}:")
-        print(f"  - Bottom Z-coordinate: {well.bottom}")
-        print(f"  - Base thickness: {well.well_data.base_thickness}")
-        print(f"  - Well position: {well.coordinates}")
+        print(f"  - X coordinate: {well.coordinates.x}")
+        print(f"  - Y coordinate: {well.coordinates.y}")
+        print(f"  - Z bottom: {well.bottom}")
+        print(f"  - Deck to bottom distance: {well.well_data.base_thickness}")
 
         # Step 2: Move to the top of the well
         print(f"\nMoving to the top of well {well_id}...")
         mill.safe_move(coordinates=well.top_coordinates, tool="pipette")
-
         # Step 3: Safety check before proceeding
         proceed = (
             input("\nIs it safe to proceed to test the well bottom? (y/n/q): ")
@@ -482,7 +482,9 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
 
         # Step 4: Ask if user wants to test current bottom or specify a new test value
         use_current = (
-            input(f"\nDo you want to test the current bottom ({well.bottom})? (y/n): ")
+            input(
+                f"\nDo you want to test the current bottom ({well.bottom})? The pipette tip is currently located at {mill.current_coordinates(tool='pipette').z} (y/n): "
+            )
             .lower()
             .strip()
         )
@@ -593,8 +595,9 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     print(
         f"  - Echem height offset from well bottom: {wellplate.plate_data.echem_height} mm"
     )
-    print(f"  - Absolute Z-coordinate: {wellplate.echem_height}")
-    print(f"  - Current mill Z-position: {mill.current_coordinates()[0].z}")
+    print(f"  - Echem Z-target: {wellplate.echem_height}")
+    print(f"  - RE Z-position:  {mill.current_coordinates('electrode').z}")
+    print(f"  - Mill Z-position:{mill.current_coordinates().z}")
 
     # Step 4: Optionally test current setting
     check_current = (
@@ -604,12 +607,13 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     )
 
     if check_current in ["y", "yes", ""]:
-        print(f"\nMoving to current echem height: Z = {wellplate.echem_height}")
+        print(
+            f"\nMoving to target echem height of {wellplate.echem_height} with electrode"
+        )
         current = mill.safe_move(
             coordinates=Coordinates(well.x, well.y, wellplate.echem_height),
             tool="electrode",
         )
-        print(f"Positioned at Z = {current.z - offset.z} (with tool offset applied)")
 
     # Step 5: Ask if user wants to set a new height
     adjust_height = (
@@ -822,7 +826,7 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
 def home_mill(mill: Mill, *args, **kwargs):
     """Homes the mill"""
     mill.home()
-    print("Mill has been homed")
+    print("Gantry has been homed")
 
 
 def quit_calibration():
@@ -1045,8 +1049,8 @@ def calibrate_mill(
     # Connect to the mill
     with mill() as cncmill:
         while True:
-            print("\n\n")
-            print("""\nWelcome to the mill calibration and positioning menu:""")
+            print("\n=====================================")
+            print("Welcome to the mill calibration and positioning menu:")
             for key, value in menu_options.items():
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
