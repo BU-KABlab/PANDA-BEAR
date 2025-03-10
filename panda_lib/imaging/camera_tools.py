@@ -522,7 +522,6 @@ def configure_custom_image_settings(nodemap):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print("\n*** CONFIGURING CUSTOM IMAGE SETTINGS *** \n")
 
     try:
         result = True
@@ -556,17 +555,16 @@ def configure_custom_image_settings(nodemap):
                 # Set integer as new value for enumeration node
                 node_pixel_format.SetIntValue(pixel_format_rgb8)
 
-                print(
+                logger.info(
                     "Pixel format set to %s..."
                     % node_pixel_format.GetCurrentEntry().GetSymbolic()
                 )
 
             else:
-                print("Pixel format RGB8 not readable...")
+                raise Exception("Pixel format RGB8 not readable...")
 
         else:
-            print("Pixel format not readable or writable...")
-
+            raise Exception("Pixel format not readable or writable...")
         # Apply minimum to offset X
         #
         # *** NOTES ***
@@ -576,10 +574,10 @@ def configure_custom_image_settings(nodemap):
         node_offset_x = PySpin.CIntegerPtr(nodemap.GetNode("OffsetX"))
         if PySpin.IsReadable(node_offset_x) and PySpin.IsWritable(node_offset_x):
             node_offset_x.SetValue(node_offset_x.GetMin())
-            print("Offset X set to %i..." % node_offset_x.GetMin())
+            logger.info("Offset X set to %i..." % node_offset_x.GetMin())
 
         else:
-            print("Offset X not readable or writable...")
+            raise Exception("Offset X not readable or writable...")
 
         # Apply minimum to offset Y
         #
@@ -592,10 +590,10 @@ def configure_custom_image_settings(nodemap):
         node_offset_y = PySpin.CIntegerPtr(nodemap.GetNode("OffsetY"))
         if PySpin.IsReadable(node_offset_y) and PySpin.IsWritable(node_offset_y):
             node_offset_y.SetValue(node_offset_y.GetMin())
-            print("Offset Y set to %i..." % node_offset_y.GetMin())
+            logger.info("Offset Y set to %i..." % node_offset_y.GetMin())
 
         else:
-            print("Offset Y not readable or writable...")
+            raise Exception("Offset Y not readable or writable...")
 
         # Set maximum width
         #
@@ -609,10 +607,10 @@ def configure_custom_image_settings(nodemap):
         if PySpin.IsReadable(node_width) and PySpin.IsWritable(node_width):
             width_to_set = node_width.GetMax()
             node_width.SetValue(width_to_set)
-            print("Width set to %i..." % node_width.GetValue())
+            logger.info("Width set to %i..." % node_width.GetValue())
 
         else:
-            print("Width not readable or writable...")
+            raise Exception("Width not readable or writable...")
 
         # Set maximum height
         #
@@ -623,13 +621,17 @@ def configure_custom_image_settings(nodemap):
         if PySpin.IsReadable(node_height) and PySpin.IsWritable(node_height):
             height_to_set = node_height.GetMax()
             node_height.SetValue(height_to_set)
-            print("Height set to %i..." % node_height.GetValue())
+            logger.info("Height set to %i..." % node_height.GetValue())
 
         else:
-            print("Height not readable or writable...")
+            raise Exception("Height not readable or writable...")
 
     except PySpin.SpinnakerException as ex:
-        print("Error: %s" % ex)
+        logger.error("Error: %s" % ex)
+        return False
+
+    except Exception as ex:
+        logger.error("Error: %s" % ex)
         return False
 
     return result
@@ -663,8 +665,9 @@ def run_single_camera(
         # Retrieve GenICam nodemap
         nodemap = cam.GetNodeMap()
 
-        configure_custom_image_settings(nodemap)
-
+        configured = configure_custom_image_settings(nodemap)
+        if not configured:
+            return False
         # Set Stream Modes
         # result &= set_stream_mode(cam)
 

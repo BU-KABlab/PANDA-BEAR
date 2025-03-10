@@ -21,7 +21,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple, Union
 
 # third-party libraries
 import serial
@@ -162,7 +162,7 @@ class Mill:
 
         For this function, if after homing the z coordinate is not 0, then the max z height is set to the current z coordinate.
         """
-        _, current_coordinates = self.current_coordinates()
+        current_coordinates = self.current_coordinates()
         if current_coordinates.z != 0:
             self.max_z_height = current_coordinates.z
 
@@ -650,8 +650,8 @@ class Mill:
         return self.execute_command(command)
 
     def current_coordinates(
-        self, tool: str = "center"
-    ) -> tuple[Coordinates, Coordinates]:
+        self, tool: Optional[str] = None, tool_only: bool = True
+    ) -> Union[Coordinates, Tuple[Coordinates, Coordinates]]:
         """
         Get the current coordinates of the mill.
         Args:
@@ -718,21 +718,27 @@ class Mill:
         mill_center = Coordinates(x_coord, y_coord, z_coord)
         # So far we have obtain the mill's coordinates
         # Now we need to adjust them based on the instrument to communicate where the current instrument is
-        try:
-            offsets = self.tool_manager.get_offset(tool)
-            # NOTE that these have minus instead of plus as usual since we are saying where the tool head is
-            tool_head = Coordinates(
-                x_coord - offsets.x,
-                y_coord - offsets.y,
-                z_coord - offsets.z,
-            )
+        if tool:
+            try:
+                offsets = self.tool_manager.get_offset(tool)
+                # NOTE that these have minus instead of plus as usual since we are saying where the tool head is
+                tool_head = Coordinates(
+                    x_coord - offsets.x,
+                    y_coord - offsets.y,
+                    z_coord - offsets.z,
+                )
 
-        except Exception as exception:
-            raise ValueError("Invalid instrument") from exception
-        return (
-            mill_center,
-            tool_head,
-        )  # TODO ensure all calls of this function are updated to reflect the return of two coordinates
+            except Exception as exception:
+                raise ValueError("Invalid instrument") from exception
+
+            if tool_only:
+                return tool_head
+            else:
+                return mill_center, tool_head
+        else:
+            return mill_center
+
+    # TODO ensure all calls of this function are updated to reflect the return of two coordinates
 
     def move_to_safe_position(self) -> str:
         """Move the mill to its current x,y location and the max z height"""
@@ -763,7 +769,7 @@ class Mill:
             else coordinates
         )
         offsets = self.tool_manager.get_offset(tool)
-        current_coordinates, _ = self.current_coordinates()
+        current_coordinates = self.current_coordinates()
 
         target_coordinates = self._calculate_target_coordinates(
             goto, current_coordinates, offsets
@@ -805,7 +811,7 @@ class Mill:
             tool (str): The tool being used (default: "center")
             safe_move_required (bool): Whether to enforce safe movement patterns (default: True)
         """
-        current_coordinates, _ = self.current_coordinates(tool)
+        current_coordinates = self.current_coordinates()
         offsets = self.tool_manager.get_offset(tool)
         commands = []
 
@@ -905,7 +911,7 @@ class Mill:
             else coordinates
         )
         offsets = self.tool_manager.get_offset(tool)
-        current_coordinates, _ = self.current_coordinates()
+        current_coordinates = self.current_coordinates()
 
         target_coordinates = self._calculate_target_coordinates(
             goto, current_coordinates, offsets
@@ -952,7 +958,7 @@ class Mill:
         command_str = "\n".join(commands)
         self.execute_command(command_str)
 
-        return self.current_coordinates(tool)[0]
+        return self.current_coordinates()
 
     def _is_already_at_target(
         self, goto: Coordinates, current_coordinates: Coordinates

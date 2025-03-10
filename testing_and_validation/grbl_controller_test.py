@@ -34,20 +34,21 @@ def test_grbl_controller():
         print(tool)
 
     print(mill.current_status())
-    machine_coord, tool_coord = mill.current_coordinates()
+    machine_coord, tool_coord = mill.current_coordinates(tool="center", tool_only=False)
     print(f"Machine Coord: {machine_coord} | Tool Coord: {tool_coord}")
 
-    machine_coord, tool_coord = mill.current_coordinates("test_pipette")
+    machine_coord, tool_coord = mill.current_coordinates("test_pipette", False)
     print(f"Machine Coord: {machine_coord} | test_pipette Coord: {tool_coord}")
 
-    machine_coord, tool_coord = mill.current_coordinates("test_test_electrode")
+    machine_coord, tool_coord = mill.current_coordinates("test_test_electrode", False)
     print(f"Machine Coord: {machine_coord} | test_electrode Coord: {tool_coord}")
 
-    machine_coord, tool_coord = mill.current_coordinates("test_decapper")
+    machine_coord, tool_coord = mill.current_coordinates("test_decapper", False)
     print(f"Machine Coord: {machine_coord} | test_decapper Coord: {tool_coord}")
 
     mill.safe_move(0, 0, 0, tool="test_pipette")
-    machine_coord, tool_coord = mill.current_coordinates("test_pipette")
+    machine_coord, tool_coord = mill.current_coordinates("test_pipette", False)
+
     print(f"Machine Coord: {machine_coord} | test_pipette Coord: {tool_coord}")
 
     mill.move_to_safe_position()

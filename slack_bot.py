@@ -3,15 +3,15 @@
 import argparse
 import time
 
-from panda_lib.slack_tools.SlackBot import SlackBot
+from panda_lib.slack_tools.slackbot_module import SlackBot
 
 
 def run_slack_bot(testing=False):
     """Runs the slack monitor bot."""
-    while True:
-        try:
-            bot = SlackBot(test=testing)
-            bot.send_message("alert", "PANDA Bot is monitoring Slack")
+    try:
+        bot = SlackBot(test=testing)
+        bot.send_message("alert", "PANDA Bot is monitoring Slack")
+        while True:
             try:
                 time.sleep(15)
                 bot.check_slack_messages(channel="alert")
@@ -22,12 +22,12 @@ def run_slack_bot(testing=False):
             except Exception:
                 time.sleep(60)
                 continue
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return
 
-        finally:
-            bot.off_duty()
+    finally:
+        bot.off_duty()
 
 
 def main():
@@ -50,4 +50,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    run_slack_bot(testing=False)

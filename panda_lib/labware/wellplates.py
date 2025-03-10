@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Tuple, TypedDict, Union
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
@@ -93,6 +93,7 @@ class WellplateKwargs(BaseModel, validate_assignment=True):
     echem_height: float = 0.0
     image_height: float = 0.0
     coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
+
 
 class Well:
     """
@@ -179,18 +180,22 @@ class Well:
 
     @property
     def top(self):
+        """The z-coordinate of the top of the gasket in mm"""
         return self.well_data.top
 
     @property
     def bottom(self):
+        """The z-coordinate of the well bottom in mm"""
         return self.well_data.bottom
 
     @property
     def volume(self):
+        """The volume of the well in microliters"""
         return self.well_data.volume
 
     @property
     def volume_height(self):
+        """The z-coordinate of the predicted volume top (-1) in the well in mm"""
         return self.well_data.volume_height
 
     @property
@@ -605,6 +610,7 @@ class Wellplate:
 
     @property
     def bottom(self):
+        """The z-coordinate of the wellplate bottom"""
         return self.plate_data.bottom
 
     @property

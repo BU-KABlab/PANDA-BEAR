@@ -15,8 +15,12 @@ The module relies on other modules such as:
 """
 
 import logging
+import os
+import platform
+from pathlib import Path
 from typing import Sequence
 
+from panda_lib.imaging import capture_new_image
 from panda_lib.labware.vials import StockVial, Vial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Well, Wellplate
 from panda_lib.panda_gantry import Coordinates
@@ -272,91 +276,164 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     This is useful for when a single well is off and needs to be corrected.
     """
     instrument = "pipette"
-    coordinates_changed = False
+
+    print("\n=== Wellplate XY Position Calibration ===")
+    print("This will help you calibrate the X-Y positions of individual wells.")
+    print("The instrument will move to the top of each selected well.")
+
     while True:
+        # Step 1: Select a well or change instrument
         well_id = (
             input(
-                f"Current instrument: {instrument}\nEnter the well ID to test (e.g., A1) toggle to switch to between instruments or done to end: "
+                f"\nCurrent instrument: {instrument}\n"
+                "Enter well ID to calibrate (e.g., A1), 'toggle' to switch instruments, "
+                "or 'done' to finish: "
             )
             .upper()
             .strip()
         )
+
         if well_id == "DONE":
             break
+
         if well_id == "TOGGLE":
             instrument = "electrode" if instrument == "pipette" else "pipette"
             print(f"Instrument has been toggled to {instrument}")
-            continue  # Skip the rest of the loop
-
-        if well_id not in wellplate.wells:
-            print("Invalid well ID")
             continue
 
+        if well_id not in wellplate.wells:
+            print("Invalid well ID. Please try again.")
+            continue
+
+        # Step 2: Move to the well and display current position
         well = wellplate.wells[well_id]
-        original_coordinates = well.coordinates
-        print(f"Current coordinates of {well_id}: {original_coordinates}")
-        current_coordinates = original_coordinates
+        original_coordinates = well.top_coordinates
+        print(f"\nCurrent settings for {well_id}:")
+        print(f"  - X coordinate: {original_coordinates.x}")
+        print(f"  - Y coordinate: {original_coordinates.y}")
+        print(f"  - Z top: {wellplate.top}")
+
+        # Step 3: Move to the well
+        print(f"\nMoving {instrument} to the top of well {well_id}...")
         mill.safe_move(
-            coordinates=well.top_coordinates,
+            coordinates=original_coordinates,
             tool=instrument,
         )
 
-        new_x, new_y = original_coordinates["x"], original_coordinates["y"]
+        # Step 4: Check if position needs adjustment
+        position_correct = (
+            input(
+                f"\nIs the {instrument} positioned correctly above well {well_id}? (y/n): "
+            )
+            .lower()
+            .strip()
+        )
 
+        if position_correct in ["y", "yes", ""]:
+            continue
+
+        # Step 5: Position is not correct, get new coordinates
+
+        # Step 6: Get new X coordinate
+        new_x = input_validation(
+            "Enter new X coordinate or enter for no change: ",
+            (int, float),
+            (mill.working_volume.x, 0),
+            allow_blank=True,
+            default=original_coordinates.x,
+        )
+        if new_x == "":
+            new_x = original_coordinates.x
+
+        # Step 7: Get new Y coordinate
+        new_y = input_validation(
+            "Enter new Y coordinate or enter for no change: ",
+            (int, float),
+            (mill.working_volume.y, 0),
+            allow_blank=True,
+            default=original_coordinates.y,
+        )
+        if new_y == "":
+            new_y = original_coordinates.y
+
+        # Convert to appropriate types
+        try:
+            new_x = float(new_x)
+            new_y = float(new_y)
+        except ValueError:
+            print("Invalid input. Using original coordinates.")
+            new_x, new_y = original_coordinates.x, original_coordinates.y
+
+        # Step 8: Move to new position for verification
+        new_coordinates = Coordinates(new_x, new_y, wellplate.top)
+        # print(f"\nMoving to new coordinates: X={new_x}, Y={new_y}")
+        mill.safe_move(coordinates=new_coordinates, tool=instrument)
+
+        # Step 9: Confirm the new position
         while True:
-            confirm = input(f"Is the {instrument} in the correct position? (yes/no): ")
-            if confirm.lower().strip()[0] in ["y", ""]:
-                break
-            print(f"Current coordinates of {well_id}: {current_coordinates}")
-            coordinates_changed = True
+            confirm = (
+                input(
+                    f"Is the {instrument} now positioned correctly above well {well_id}? (y/n): "
+                )
+                .lower()
+                .strip()
+            )
 
+            if confirm in ["y", "yes", ""]:
+                break
+
+            # Position still not correct, get new coordinates again
             new_x = input_validation(
-                f"Enter the new X coordinate for {well_id} or enter for no change: ",
-                (int, float),
+                "Enter new X coordinate: ",
+                float,
                 (mill.working_volume.x, 0),
-                allow_blank=True,
-                default=original_coordinates["x"],
             )
             new_y = input_validation(
-                f"Enter the new Y coordinate for {well_id} or enter for no change: ",
-                (int, float),
+                "Enter new Y coordinate: ",
+                float,
                 (mill.working_volume.y, 0),
-                allow_blank=True,
-                default=original_coordinates["y"],
             )
 
-            if new_x == "":
-                new_x = original_coordinates["x"]
-            if new_y == "":
-                new_y = original_coordinates["y"]
-            try:
-                new_x = float(new_x)
-                new_y = float(new_y)
-            except ValueError:
-                print("Invalid input, please try again")
-                continue
-
-            new_coordinates = Coordinates(new_x, new_y, wellplate.top)
+            new_coordinates = Coordinates(new_x, new_y, well.bottom)
             mill.safe_move(coordinates=new_coordinates, tool=instrument)
 
-        if coordinates_changed:
-            if input("Would you like to save the new coordinates? (y/n): ").lower() in [
-                "y",
-                "yes",
-                "",
-            ]:
-                if well_id.upper() == "A1":
-                    if input(
-                        "Would you like to recalculate all well locations? (y/n): "
-                    ).lower() in ["y", "yes", ""]:
-                        wellplate.plate_data.a1_x = new_coordinates.x
-                        wellplate.plate_data.a1_y = new_coordinates.y
-                        wellplate.save()
-                        wellplate.recalculate_well_positions()
-                    else:
-                        well.update_coordinates(new_coordinates)
+        # Step 10: Save changes if confirmed
+        save_changes = (
+            input(f"\nSave these new coordinates for well {well_id}? (y/n): ")
+            .lower()
+            .strip()
+        )
+
+        if save_changes in ["y", "yes", ""]:
+            # If well is A1, ask about recalculating all wells
+            if well_id == "A1":
+                recalculate = (
+                    input(
+                        "\nThis is well A1. Would you like to recalculate all well positions? (y/n): "
+                    )
+                    .lower()
+                    .strip()
+                )
+
+                if recalculate in ["y", "yes", ""]:
+                    print("Updating A1 coordinates and recalculating all wells...")
+                    wellplate.plate_data.a1_x = new_coordinates.x
+                    wellplate.plate_data.a1_y = new_coordinates.y
+                    wellplate.save()
+                    wellplate.recalculate_well_positions()
+                    print("All well positions have been updated.")
                 else:
+                    # Update only this well
                     well.update_coordinates(new_coordinates)
+                    print(f"Updated coordinates for well {well_id} only.")
+            else:
+                # For wells other than A1, just update the individual well
+                well.update_coordinates(new_coordinates)
+                print(f"Updated coordinates for well {well_id}.")
+        else:
+            print("Changes discarded.")
+
+    print("\nWellplate XY position calibration complete.")
 
 
 def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwargs):
@@ -364,120 +441,255 @@ def calibrate_bottom_of_wellplate(mill: Mill, wellplate: Wellplate, *args, **kwa
 
     offset = mill.tool_manager.tool_offsets["pipette"].offset
 
+    print("\n=== Wellplate Bottom Calibration ===")
+    print("This will help you calibrate the bottom position (Z-coordinate) of wells.")
+
     while True:
+        # Step 1: Select a well to calibrate
         well_id = (
-            input("Enter a well ID to check the bottom of or 'done' to finish: ")
+            input("\nEnter a well ID to calibrate (e.g., A1) or 'done' to finish: ")
             .upper()
             .strip()
         )
-        if well_id in ["DONE", "d"]:
+        if well_id in ["DONE", "D"]:
             break
 
+        if well_id not in wellplate.wells:
+            print("Invalid well ID. Please try again.")
+            continue
+
         well: Well = wellplate.wells[well_id]
-        print(f"Current bottom of {well_id}: {well.bottom}")
-        print(f"Current coordinates of {well_id}: {wellplate.get_coordinates(well_id)}")
-        input("Press enter to continue...")
+        print(f"\nCurrent settings for {well_id}:")
+        print(f"  - X coordinate: {well.x}")
+        print(f"  - Y coordinate: {well.y}")
+        print(f"  - Z bottom: {well.bottom}")
+        print(f"  - Deck to bottom distance: {well.well_data.base_thickness}")
 
+        # Step 2: Move to the top of the well
+        print(f"\nMoving to the top of well {well_id}...")
         mill.safe_move(coordinates=well.top_coordinates, tool="pipette")
-        goto = input_validation(
-            "Enter a bottom to test or enter for no change: ", float, (-200, 0)
+        # Step 3: Safety check before proceeding
+        proceed = (
+            input("\nIs it safe to proceed to test the well bottom? (y/n/q): ")
+            .lower()
+            .strip()
         )
-        if not goto:
-            goto = well.bottom
+        if proceed == "q":
+            break
+        if proceed not in ["y", "yes", ""]:
+            print("Skipping this well.")
+            continue
 
-        current = mill.safe_move(
-            coordinates=Coordinates(well.x, well.y, goto), tool="pipette"
-        )
-
-        while True:
-            confirm = (
-                input(
-                    f"Is the pipette in the correct position {current.z - offset.z}? (yes/no): "
-                )
-                .lower()
-                .strip()[0]
+        # Step 4: Ask if user wants to test current bottom or specify a new test value
+        use_current = (
+            input(
+                f"\nDo you want to test the current bottom ({well.bottom})? The pipette tip is currently located at {mill.current_coordinates(tool='pipette').z} (y/n): "
             )
-            if confirm in ["y", ""]:
+            .lower()
+            .strip()
+        )
+        if use_current in ["y", "yes", ""]:
+            test_bottom = well.bottom
+        else:
+            test_bottom = input_validation(
+                "Enter a bottom Z-coordinate to test: ", float, (-200, 0)
+            )
+            if test_bottom is None:
+                test_bottom = well.bottom
+
+        # Step 5: Move to the test bottom position
+        print(f"\nMoving to test bottom position: Z = {test_bottom}")
+        current = mill.safe_move(
+            coordinates=Coordinates(well.x, well.y, test_bottom), tool="pipette"
+        )
+
+        # Step 6: Iteratively adjust the bottom position until correct
+        while True:
+            is_correct = (
+                input("\nIs the pipette at the correct bottom position? (y/n): ")
+                .lower()
+                .strip()
+            )
+
+            if is_correct in ["y", "yes", ""]:
                 break
 
-            goto = input_validation(
-                f"Enter the new bottom for {well_id} (currently at: {goto}): ",
-                float,
-                (-200, 0),
-            )
-            current = mill.safe_move(
-                coordinates=Coordinates(well.x, well.y, goto), tool="pipette"
+            test_bottom = input_validation(
+                "Enter a new bottom Z-coordinate to test: ", float, (-200, 0)
             )
 
-        base_thickness = abs(goto - well.z)
-        print(f"Setting well base_thickness to: {base_thickness}")
-        if input("Is this correct? (y/n): ").lower() in ["y", "yes", ""]:
-            well.well_data.base_thickness = base_thickness
-        else:
-            if input(
-                f"How about: {current.z - goto}? Is this correct? (y/n): "
-            ).lower() in ["y", "yes", ""]:
-                base_thickness = current.z - goto
-                well.well_data.base_thickness = current.z - goto
-            else:
-                print("Skipping well")
+            if test_bottom is None:
+                print("Invalid input. Keeping current position.")
                 continue
 
-        well.save()
-        print(f"New z_bottom for {well_id}: {well.bottom}")
+            current = mill.safe_move(
+                coordinates=Coordinates(well.x, well.y, test_bottom), tool="pipette"
+            )
 
-        if input(
-            "Would you like to apply this to the entire wellplate? (y/n): "
-        ).lower() in ["y", "yes", ""]:
-            wellplate.plate_data.base_thickness = base_thickness
-            wellplate.save()
-            wellplate.recalculate_well_positions()
+        # Step 7: Calculate base thickness from final position
+        final_z = current.z - offset.z  # Adjust for tool offset
+        base_thickness = abs(final_z - well.z)
+        print(f"\nCalculated base thickness: {base_thickness} mm")
+
+        # Step 8: Confirm and save changes
+        save_changes = (
+            input("Save this base thickness for this well? (y/n): ").lower().strip()
+        )
+        if save_changes in ["y", "yes", ""]:
+            well.well_data.base_thickness = base_thickness
+            well.save()
+            print(
+                f"Updated well {well_id} with new base thickness: {base_thickness} mm"
+            )
+            print(f"New bottom Z-coordinate for {well_id}: {well.bottom}")
+
+            # Step 9: Optionally apply to the entire wellplate
+            apply_all = (
+                input(
+                    "\nApply this base thickness to ALL wells in the wellplate? (y/n): "
+                )
+                .lower()
+                .strip()
+            )
+
+            if apply_all in ["y", "yes", ""]:
+                wellplate.plate_data.base_thickness = base_thickness
+                wellplate.save()
+                wellplate.recalculate_well_positions()
+                print(f"Updated wellplate with base thickness: {base_thickness} mm")
+        else:
+            print("Changes discarded.")
+
+    print("\nWellplate bottom calibration complete.")
 
 
 def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
-    """Calibrate the height for the echem"""
-    response = input(
-        "Electrode will move to 0 above A1. Press enter to proceed or 'q' to quit: "
+    """Calibrate the height for electrochemical measurements"""
+
+    print("\n=== Electrochemical Height Calibration ===")
+    print("This will help you calibrate the height for electrochemical measurements.")
+    print(
+        "The electrode will be positioned at the correct height above the well bottom."
     )
-    if response.lower() == "q":
+
+    # Step 1: Initial confirmation
+    response = (
+        input(
+            "\nThe electrode will move to well A1. Press enter to proceed or 'q' to quit: "
+        )
+        .lower()
+        .strip()
+    )
+    if response == "q":
         return
 
+    # Step 2: Move to the reference well (A1)
     well = wellplate.wells["A1"]
     offset = mill.tool_manager.tool_offsets["electrode"].offset
+
+    print("\nMoving electrode to the top of well A1...")
     mill.safe_move(coordinates=well.top_coordinates, tool="electrode")
+
+    # Step 3: Display current settings
+    print("\nCurrent echem height settings:")
     print(
-        f"Current echem height is set to: {wellplate.plate_data.echem_height} off the well bottom"
+        f"  - Echem height offset from well bottom: {wellplate.plate_data.echem_height} mm"
+    )
+    print(f"  - Echem Z-target: {wellplate.echem_height}")
+    print(f"  - RE Z-position:  {mill.current_coordinates('electrode').z}")
+    print(f"  - Mill Z-position:{mill.current_coordinates().z}")
+
+    # Step 4: Optionally test current setting
+    check_current = (
+        input("\nWould you like to test the current echem height? (y/n): ")
+        .lower()
+        .strip()
     )
 
-    if input("Would you like to set a new echem height? (y/n): ").lower() in [
-        "y",
-        "yes",
-        "",
-    ]:
+    if check_current in ["y", "yes", ""]:
+        print(
+            f"\nMoving to target echem height of {wellplate.echem_height} with electrode"
+        )
+        current = mill.safe_move(
+            coordinates=Coordinates(well.x, well.y, wellplate.echem_height),
+            tool="electrode",
+        )
+
+    # Step 5: Ask if user wants to set a new height
+    adjust_height = (
+        input("\nWould you like to set a new echem height? (y/n): ").lower().strip()
+    )
+
+    if adjust_height in ["y", "yes", ""]:
+        # Step 6: Iteratively adjust the height
         while True:
-            new_echem_height = input_validation(
-                "Enter the new echem height or enter for no change: ", float, (0, 10)
+            # Get height offset from bottom (positive value)
+            new_echem_offset = input_validation(
+                "\nEnter the new height offset from the well bottom (0-10mm): ",
+                float,
+                (0, 10),
+                allow_blank=True,
             )
-            if new_echem_height is None:
+
+            # If blank entry, keep current value
+            if new_echem_offset is None:
                 new_echem_height = wellplate.echem_height
+                print(f"Keeping current height: {wellplate.echem_height}")
+            else:
+                # Calculate absolute Z value from bottom offset
+                new_echem_height = well.bottom + new_echem_offset
+                print(f"Setting offset to {new_echem_offset}mm above well bottom")
+                print(f"This corresponds to Z-coordinate: {new_echem_height}")
+
+            # Move to the position
+            print(f"\nMoving electrode to test position: Z = {new_echem_height}")
             current = mill.safe_move(
                 coordinates=Coordinates(well.x, well.y, new_echem_height),
-                tool=Instruments.ELECTRODE,
+                tool="electrode",
             )
 
-            if input(
-                f"Is the electrode in the correct position at {current.z - offset.z} ({new_echem_height} from the bottom)? (yes/no): "
-            ).lower() in ["y", "yes", ""]:
+            # Check if height is correct
+            is_correct = (
+                input("\nIs the electrode at the correct height? (y/n): ")
+                .lower()
+                .strip()
+            )
+
+            if is_correct in ["y", "yes", ""]:
                 break
 
-        if new_echem_height is not None:
-            wellplate.plate_data.echem_height = new_echem_height
+            # If not correct, loop again to get a new value
+            print("Let's try a different height.")
+
+        # Step 7: Save the new height
+        save_changes = input("\nSave this new echem height? (y/n): ").lower().strip()
+
+        if save_changes in ["y", "yes", ""]:
+            wellplate.plate_data.echem_height = new_echem_offset
             wellplate.save()
-            print(f"New echem height: {wellplate.echem_height}")
+            print(
+                f"\nEchem height successfully updated to {new_echem_offset}mm from the well bottom"
+            )
+            # print(f"This is {new_echem_height - well.bottom}mm above the well bottom")
+        else:
+            print("\nChanges discarded.")
+
+    print("\nElectrochemical height calibration complete.")
 
 
 def calibrate_image_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
     """Calibrate the height for the image"""
+    print("\n=== Image Height Calibration ===")
+    print("This will help you calibrate the height for taking focused images.")
+    print(
+        "The image height is the absolute z-coordinate for the lens when taking an image."
+    )
+    image_paths = []
+    use_spinview = input("Are you using spinview to check the image? y/n:")
+    if use_spinview.lower() == "y":
+        use_spinview = True
+    else:
+        use_spinview = False
     response = input("Lens will move above A1. Press enter to proceed or 'q' to quit: ")
     if response.lower() == "q":
         return
@@ -489,6 +701,9 @@ def calibrate_image_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
         tool="lens",
     )
     print(f"Current image height is set to: {wellplate.plate_data.image_height}")
+
+    if not use_spinview:
+        image_paths.append(take_picture_and_display())
 
     if input("Would you like to set a new image height? (y/n): ").lower() in [
         "y",
@@ -504,6 +719,9 @@ def calibrate_image_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                 tool=Instruments.LENS,
             )
 
+            if not use_spinview:
+                image_paths.append(take_picture_and_display())
+
             if input(
                 f"Is the image in the correct position at {current.z}? (yes/no): "
             ).lower() in ["y", "yes", ""]:
@@ -513,6 +731,27 @@ def calibrate_image_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
             wellplate.plate_data.image_height = new_image_height
             wellplate.save()
             print(f"New image height: {wellplate.plate_data.image_height}")
+
+    # Clean up images taken
+    for image in image_paths:
+        os.remove(image)
+
+
+def take_picture_and_display() -> Path:
+    """
+    Take a picture and display it using the appropriate system command
+    """
+    filepath = capture_new_image(save=True, num_images=1)
+    if platform.system() == "Windows":
+        os.system(f"start {filepath}")
+    elif platform.system() == "Darwin":
+        os.system(f"open {filepath}")
+    elif platform.system() == "Linux":
+        os.system(f"xdg-open {filepath}")
+    else:
+        print("Unsupported OS")
+
+    return filepath
 
 
 def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwargs):
@@ -589,7 +828,7 @@ def capture_well_photo_manually(mill: Mill, wellplate: Wellplate, *args, **kwarg
 def home_mill(mill: Mill, *args, **kwargs):
     """Homes the mill"""
     mill.home()
-    print("Mill has been homed")
+    print("Gantry has been homed")
 
 
 def quit_calibration():
@@ -768,13 +1007,20 @@ def test_decapper(mill: Mill, *args, **kwargs):
     """
     Test the decapper by moving it to a vial and then moving it up and down
     """
+    warn = input(
+        "Warning: This test uses a hardcoded vial location and will control the mill if available to cap and decap the vial. Proceed? (y/n): "
+    ).lower()
+    if warn not in ["y", "yes"]:
+        return
     decapper_test()
+
 
 def rinse_electrode(mill: Mill, *args, **kwargs):
     """
     Rinse the electrode in the electrode bath
     """
     mill.rinse_electrode()
+
 
 menu_options = {
     "0": check_mill_settings,
@@ -783,10 +1029,9 @@ menu_options = {
     "4": calibrate_bottom_of_wellplate,
     "5": calibrate_echem_height,
     "6": calibrate_vial_holders,
-    "7": capture_well_photo_manually,
-    "8": calibrate_image_height,
-    "9": test_decapper,
-    "10": rinse_electrode,
+    "7": calibrate_image_height,
+    "8": test_decapper,
+    "9": rinse_electrode,
     "q": quit_calibration,
 }
 
@@ -798,16 +1043,16 @@ def calibrate_mill(
     waste_vials: Sequence[WasteVial],
 ):
     """Calibrate the mill to the wellplate and stock vials"""
-    if not use_mock_mill:
-        mill = Mill
-    else:
+    if use_mock_mill:
         mill = MockMill
+    else:
+        mill = Mill
 
     # Connect to the mill
     with mill() as cncmill:
         while True:
-            print("\n\n")
-            print("""\nWelcome to the mill calibration and positioning menu:""")
+            print("\n=====================================")
+            print("Welcome to the mill calibration and positioning menu:")
             for key, value in menu_options.items():
                 print(f"{key}. {value.__name__.replace('_', ' ').title()}")
             option = input("Which operation would you like: ")
@@ -825,13 +1070,24 @@ def main():
     testing = input("Enter 'y' to use testing configuration: ").lower() == "y"
 
     print("Testing mode:", testing)
-    input("Press enter to continue")
+    mode = input("Control the mill manually or automatically (manual/auto): ")
+
+    if mode == "manual":
+        print("Manual control of the mill")
+        input("Open Candel and press enter to continue...")
+        use_mock_mill = True
+
+    elif mode == "auto":
+        print("Automatic control of the mill")
+        use_mock_mill = False
 
     wellplate_to_use = Wellplate()
     stock_vials_to_use: Sequence[StockVial] = read_vials()[0]
     waste_vials_to_use: Sequence[WasteVial] = read_vials()[1]
 
-    calibrate_mill(True, wellplate_to_use, stock_vials_to_use, waste_vials_to_use)
+    calibrate_mill(
+        use_mock_mill, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
+    )
 
 
 if __name__ == "__main__":

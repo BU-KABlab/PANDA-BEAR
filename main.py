@@ -29,6 +29,7 @@ from panda_lib import (
 )
 from panda_lib.experiments.experiment_types import ExperimentBase
 from panda_lib.labware import vials, wellplates
+from panda_lib.labware.services import WellplateService
 from panda_lib.sql_tools import (
     sql_generator_utilities,
     sql_protocol_utilities,
@@ -172,21 +173,47 @@ def run_queue():
 
 def change_wellplate():
     """Changes the current wellplate."""
-    new_plate_type = int(input("Enter the new wellplate type: ").strip().lower())
     new_plate_numb = int(input("Enter the new wellplate number: ").strip().lower())
 
-    new_plate = wellplates.Wellplate(
-        create_new=True, plate_id=new_plate_numb, type_id=new_plate_type
-    )
-    if new_plate:
-        print(f"New wellplate loaded: {new_plate.plate_data.id}")
-        new_plate.activate_plate()
-        print(
-            f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
+    if not WellplateService().check_plate_exists(new_plate_numb):
+        print(f"Wellplate {new_plate_numb} does not exist yet.")
+        new_plate_type = int(input("Enter the new wellplate type: ").strip().lower())
+
+        new_plate = wellplates.Wellplate(
+            create_new=True, plate_id=new_plate_numb, type_id=new_plate_type
         )
-        input("Press Enter to continue...")
+
+        if new_plate:
+            print(f"New wellplate loaded: {new_plate.plate_data.id}")
+            new_plate.activate_plate()
+
+            # Confirm the plate is active
+            active_plate = WellplateService().get_active_plate()
+            if active_plate.id == new_plate.plate_data.id:
+                print(f"Wellplate {new_plate_numb} is active")
+                print(
+                    f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
+                )
+            else:
+                print(f"Issue with activating wellplate {new_plate_numb}")
+            input("Press Enter to continue...")
+        else:
+            print("Failed to create new wellplate.")
+            input("Press Enter to continue...")
+
     else:
-        print("No wellplate loaded.")
+        print(f"Wellplate {new_plate_numb} exists.")
+        plate = wellplates.Wellplate(plate_id=new_plate_numb)
+        plate.activate_plate()
+
+        # Confirm the plate is active
+        active_plate = WellplateService().get_active_plate()
+        if active_plate.id == plate.id:
+            print(f"Wellplate {new_plate_numb} is active.")
+            print(f"Location of A1: {plate.plate_data.a1_x}, {plate.plate_data.a1_y}")
+
+        else:
+            print(f"Issue with activating wellplate {new_plate_numb}.")
         input("Press Enter to continue...")
 
 
@@ -366,16 +393,35 @@ def toggle_testing_mode():
 def mill_calibration():
     """Calibrates the mill."""
 
+    if not read_testing_config():
+        mode = input("Control the mill manually or automatically (manual/auto): ")
+    else:
+        mode = "manual"
+
+    if mode == "manual":
+        print("Manual control of the mill")
+        input("Open Candle and press enter to continue...")
+        print("\n\n")
+        use_mock_mill = True
+
+    elif mode == "auto":
+        print("Automatic control of the mill")
+        use_mock_mill = False
+
+    wellplate_to_use = wellplates.Wellplate()
+    stock_vials_to_use = vials.read_vials()[0]
+    waste_vials_to_use = vials.read_vials()[1]
+
     calibrate_mill(
-        read_testing_config(),
-        wellplates.Wellplate(),
-        vials.read_vials()[0],
-        vials.read_vials()[1],
+        use_mock_mill, wellplate_to_use, stock_vials_to_use, waste_vials_to_use
     )
+
+    if mode == "manual":
+        input("Please close Candle and press enter to continue...")
 
 
 def test_image():
-    """Runs the mill control in testing mode."""
+    """Take an image with the camera and display it."""
     image, result = imaging.capture_new_image()
     if result:
         open_image = Image.open(image)
@@ -383,6 +429,7 @@ def test_image():
     else:
         print("Failed to capture image.")
     input("Press Enter to continue...")
+
 
 def exit_program():
     """Exits the program."""
@@ -439,13 +486,14 @@ def change_pipette_tip():
 def instrument_check():
     """Runs the instrument check."""
     sql_system_state.set_system_status(SystemState.BUSY, "running instrument check")
-    instruments, all_found = toolkit.test_instrument_connections(False)
-    if all_found:
-        input("Press Enter to continue...")
-    else:
-        input("Press Enter to continue...")
-
-    experiment_loop.disconnect_from_instruments(instruments)
+    try:
+        instruments, all_found = toolkit.test_instrument_connections(False)
+        if all_found:
+            input("Press Enter to continue...")
+        else:
+            input("Press Enter to continue...")
+    finally:
+        experiment_loop.disconnect_from_instruments(instruments)
     return
 
 
@@ -728,7 +776,7 @@ if __name__ == "__main__":
     banner()
 
     try:
-        user_name = user_sign_in()
+        # user_name = user_sign_in()
         if config.getboolean("OPTIONS", "use_slack"):
             pass
             # slackbot_thread = start_slack_bot(slackThread_running)
@@ -751,7 +799,7 @@ if __name__ == "__main__":
             banner()
             print(
                 f"""
-Welcome {user_name}!
+Welcome!
 Testing mode is {"ENABLED" if read_testing_config() else "DISABLED"}
 DB: {get_active_db()}
 

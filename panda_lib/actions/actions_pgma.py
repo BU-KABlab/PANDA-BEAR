@@ -11,6 +11,8 @@ from panda_lib.actions.actions_default import (
     logger,
 )
 
+from .electrochemistry import perform_cyclic_voltammetry
+
 
 def cyclic_volt_pgma_fc(
     cv_instructions: EchemExperimentBase, file_tag: str = "CV_characterization"
@@ -43,8 +45,8 @@ def cyclic_volt_pgma_fc(
             CVcycle=3,
         )
 
-        cv_instructions = cyclic_volt(
-            cv_instructions=cv_instructions,
+        cv_instructions = perform_cyclic_voltammetry(
+            experiment=cv_instructions,
             file_tag=file_tag,
             # Do not change the instructions initial voltage during custom CV
             # We only change this for the deposition step which is the only step that

@@ -151,6 +151,9 @@ class MockSerialToMill:
             self.current_x = 0.0
             self.current_y = 0.0
             self.current_z = 0.0
+            print("Homing the mill")
+            print("Setting current coordinates to 0, 0, 0")
+
         if command == "G01 Z0":
             self.current_z = 0.0
         elif command.startswith("G01"):
@@ -181,7 +184,9 @@ class MockSerialToMill:
                         self.current_z = float(match.group(3))
                         goto[2] = self.current_z
                     self.logger.info("Moving to coordinates: %s", goto)
-                    print(f"Moving to coordinates: G00 X{goto[0]} Y{goto[1]} Z{goto[2]}")
+                    print(
+                        f"Moving to coordinates: G00 X{goto[0]} Y{goto[1]} Z{goto[2]}"
+                    )
                 else:
                     self.logger.warning(
                         "Could not extract coordinates from the command: %s", step
