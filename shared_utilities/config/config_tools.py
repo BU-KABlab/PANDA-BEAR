@@ -84,6 +84,45 @@ def read_data_dir() -> str:
         return config.get("PRODUCTION", "data_dir")
 
 
+def read_camera_type() -> str:
+    """Reads the camera type from the configuration file.
+
+    Returns:
+        str: The camera type ('flir' or 'webcam')
+    """
+    config = read_config()
+    try:
+        return config.get("CAMERA", "camera_type")
+    except (ConfigParserError, KeyError):
+        # Default to flir if not specified
+        return "flir"
+
+
+def read_webcam_settings() -> tuple:
+    """Reads webcam settings from the configuration file.
+
+    Returns:
+        tuple: (webcam_id, resolution_width, resolution_height)
+    """
+    config = read_config()
+    try:
+        webcam_id = config.getint("CAMERA", "webcam_id")
+    except (ConfigParserError, KeyError):
+        webcam_id = 0
+
+    try:
+        width = config.getint("CAMERA", "webcam_resolution_width")
+    except (ConfigParserError, KeyError):
+        width = 1280
+
+    try:
+        height = config.getint("CAMERA", "webcam_resolution_height")
+    except (ConfigParserError, KeyError):
+        height = 720
+
+    return webcam_id, (width, height)
+
+
 def test():
     """Tests the functions in this module."""
     print(get_repo_path())
