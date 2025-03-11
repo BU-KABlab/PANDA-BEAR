@@ -1,0 +1,22 @@
+{
+    "name": "standard_8_vial_holder",
+    "category": "stock",
+    "version": "1.0.0",
+    "namespace": "panda_vial_holders",
+    "num_vials": 8,
+    "spacing_y": 33.0,
+    "vial_diameter": 27.0,
+    "vial_height": 57.0,
+    "base_thickness": 1.0,
+    "dead_volume": 1000.0,
+    "mount_offset_x": 0.0,
+    "mount_offset_y": 0.0,
+    "mount_offset_z": 0.0,
+    "default_volume": 20000.0,
+    "default_capacity": 20000.0,
+    "reference_point_offset": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    }
+}

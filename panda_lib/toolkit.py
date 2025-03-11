@@ -12,6 +12,8 @@ from hardware.panda_pipette.syringepump import MockPump, SyringePump
 from hardware.sartorius.sartorius import Scale
 from hardware.sartorius.sartorius.mock import Scale as MockScale
 from panda_lib.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
+from panda_lib.labware.deck import Deck
+from panda_lib.labware.labware_definitions import LabwareRegistry
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Wellplate
 from panda_lib.panda_gantry import MockPandaMill as MockMill
@@ -38,6 +40,8 @@ class Toolkit:
     flir_camera: PySpin.Camera = None
     opencv_camera: Union[OpenCVCamera, MockOpenCVCamera, None] = None
     arduino: ArduinoLink = None
+    deck: Deck = None
+    labware_registry: LabwareRegistry = None
 
 
 @dataclass
@@ -108,6 +112,8 @@ def connect_to_instruments(
         flir_camera=None,
         opencv_camera=None,
         arduino=None,
+        deck=Deck(),
+        labware_registry=LabwareRegistry(),
     )
 
     # Determine which type of camera to use
@@ -264,6 +270,8 @@ def test_instrument_connections(
         experiment_logger=logger,
         flir_camera=None,
         opencv_camera=None,
+        deck=Deck(),
+        labware_registry=LabwareRegistry(),
     )
 
     # Track connected and disconnected instruments for summary

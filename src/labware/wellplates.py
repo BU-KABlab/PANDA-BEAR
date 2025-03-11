@@ -14,7 +14,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
 from panda_lib.errors import OverDraftException, OverFillException
-from panda_lib.labware.deck import Deck
 from panda_lib.labware.services import WellplateService, WellService
 from panda_lib.panda_gantry import Coordinates
 from panda_lib.sql_tools.panda_models import (
@@ -94,8 +93,6 @@ class WellplateKwargs(BaseModel, validate_assignment=True):
     echem_height: float = 0.0
     image_height: float = 0.0
     coordinates: dict = {"x": 0.0, "y": 0.0, "z": 0.0}
-    deck_slot: str | None = None
-    labware_definition: str | None = None
 
 
 class Well:
@@ -183,22 +180,18 @@ class Well:
 
     @property
     def top(self):
-        """The z-coordinate of the top of the gasket in mm"""
         return self.well_data.top
 
     @property
     def bottom(self):
-        """The z-coordinate of the well bottom in mm"""
         return self.well_data.bottom
 
     @property
     def volume(self):
-        """The volume of the well in microliters"""
         return self.well_data.volume
 
     @property
     def volume_height(self):
-        """The z-coordinate of the predicted volume top (-1) in the well in mm"""
         return self.well_data.volume_height
 
     @property
@@ -208,7 +201,7 @@ class Well:
     @property
     def withdrawal_height(self) -> float:
         """Returns the height of the vial from which contents are withdrawn."""
-        return self.bottom + 0.1
+        return self.bottom + 0.25
 
     @property
     def top_coordinates(self) -> Coordinates:
@@ -355,9 +348,6 @@ class Wellplate:
         type_id: Optional[int] = None,
         plate_id: Optional[int] = None,
         create_new: bool = False,
-        deck: Optional[Deck] = None,
-        deck_slot: Optional[str] = None,
-        labware_definition: Optional[str] = None,
         **kwargs: WellplateKwargs,
     ):
         self.database_session = session_maker
@@ -366,9 +356,6 @@ class Wellplate:
         self.plate_data: WellplateReadModel = None
         self.plate_type: PlateTypeModel = None
         self.wells: dict[str, Well] = {}
-        self.deck = deck
-        self.deck_slot = deck_slot
-        self.labware_definition_name = labware_definition
 
         # Check for the incoming plate_id and type_id. If the combo exists then don't create a new plate.
         # If the combo does not exist, then create a new plate but use an autoincremented plate_id
@@ -401,12 +388,6 @@ class Wellplate:
                 elif new_type_id:
                     type_id = int(new_type_id)
 
-        # Save deck slot and labware definition if provided
-        if deck_slot:
-            kwargs["deck_slot"] = deck_slot
-        if labware_definition:
-            kwargs["labware_definition"] = labware_definition
-
         if create_new:
             # If creating a new plate, must provide a plate_type_id
             # If a plate ID is not provided, it will be autoincremented
@@ -420,20 +401,6 @@ class Wellplate:
                     db_session=self.database_session
                 )
             self.load_plate(plate_id)
-
-        # If we have a deck and a deck slot, register this labware
-        if self.deck and self.deck_slot:
-            # If we're using deck slots, position the labware on the deck
-            self.deck.place_labware(str(self.plate_data.id), [self.deck_slot])
-
-            # If we have a valid labware definition, update coordinates from deck
-            if self.labware_definition_name:
-                from panda_lib.labware.labware_definitions import LabwareRegistry
-
-                registry = LabwareRegistry()
-                labware_def = registry.get_definition(self.labware_definition_name)
-                if labware_def:
-                    self.update_coordinates_from_deck(labware_def)
 
     def create_new_plate(self, **kwargs: WellplateKwargs):
         """
@@ -639,7 +606,6 @@ class Wellplate:
 
     @property
     def bottom(self):
-        """The z-coordinate of the wellplate bottom"""
         return self.plate_data.bottom
 
     @property
@@ -648,38 +614,6 @@ class Wellplate:
 
     def __repr__(self):
         return f"<Wellplate(id={self.plate_data.id}, type_id={self.plate_data.type_id}, wells={len(self.wells)})>"
-
-    def update_coordinates_from_deck(self, labware_def) -> None:
-        """Update plate and well coordinates based on deck position and labware definition."""
-        if not self.deck or not self.deck_slot:
-            logger.warning("Cannot update coordinates without deck and deck slot")
-            return
-
-        # Get coordinates from deck
-        labware_pos = self.deck.calculate_labware_coordinates(
-            labware_def, self.deck_slot
-        )
-
-        # Update plate coordinates
-        new_coords = {"x": labware_pos.x, "y": labware_pos.y, "z": labware_pos.z}
-        self.update_coordinates(new_coords)
-
-        # Update all well coordinates
-        for well_id, well in self.wells.items():
-            # Skip wells that don't match the expected format
-            if not (well_id[0].isalpha() and well_id[1:].isdigit()):
-                continue
-
-            try:
-                # Calculate well position based on labware definition
-                well_pos = self.deck.calculate_well_coordinates(
-                    labware_def, self.deck_slot, well_id
-                )
-                well.update_coordinates(
-                    {"x": well_pos.x, "y": well_pos.y, "z": well_pos.z}
-                )
-            except ValueError as e:
-                logger.warning(f"Could not update well {well_id}: {e}")
 
 
 def _remove_wellplate_from_db(
@@ -809,15 +743,13 @@ def save_configuration(
         json.dump(config, f, indent=4)
 
 
-def change_wellplate_location(
-    db_session: sessionmaker = SessionLocal, use_deck: bool = False
-):
+def change_wellplate_location(db_session: sessionmaker = SessionLocal):
     """Change the location of the wellplate"""
     mill_config = load_configuration()
     working_volume = {
         "x": -float(mill_config["$130"]),
         "y": -float(mill_config["$131"]),
-        "z": -200,  # -float(mill_config["$132"]), #NOTE: Override the mill settings
+        "z": -200,  # -float(mill_config["$132"]), #NOTE: Override the mill settings as there is a soft limit to prevent tools from crashing into the deck
     }
 
     with db_session() as session:
@@ -836,52 +768,6 @@ def change_wellplate_location(
         plate_id=current_plate_id,
     )
 
-    if use_deck:
-        # Use deck-based positioning
-        from panda_lib.labware.labware_definitions import LabwareRegistry
-
-        registry = LabwareRegistry()
-
-        # List available definitions
-        definitions = registry.get_all_definitions()
-        print("\nAvailable Labware Definitions:")
-        for i, definition in enumerate(definitions):
-            print(f"{i + 1}. {definition.name} - {definition.description}")
-
-        # Select labware definition
-        definition_idx = int(input("\nSelect labware definition (number): ")) - 1
-        if 0 <= definition_idx < len(definitions):
-            selected_def = definitions[definition_idx]
-        else:
-            print("Invalid selection. Using direct coordinates.")
-            use_deck = False
-
-        if use_deck:
-            # Select deck slot
-            deck_slot = input("\nEnter deck slot (e.g., A1): ").strip().upper()
-            from panda_lib.labware.deck import Deck, DeckSlot
-
-            try:
-                # Validate slot
-                DeckSlot(deck_slot)
-
-                # Create deck and update wellplate
-                deck = Deck()
-                wellplate.deck = deck
-                wellplate.deck_slot = deck_slot
-                wellplate.labware_definition_name = selected_def.name
-
-                # Update coordinates from deck
-                wellplate.update_coordinates_from_deck(selected_def)
-                print(
-                    f"Wellplate positioned at deck slot {deck_slot} using {selected_def.name} definition"
-                )
-                return
-            except ValueError:
-                print(f"Invalid deck slot: {deck_slot}. Using direct coordinates.")
-                use_deck = False
-
-    # If not using deck or deck positioning failed, use direct coordinates
     ## Ask for the new location
     while True:
         new_location_x = input("Enter the new x location of the wellplate: ")
