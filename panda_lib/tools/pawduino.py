@@ -122,7 +122,7 @@ class ArduinoLink:
             self.ser = Serial(self.port_address, self.baud_rate, self.timeout)
 
         if self.ser.is_open:
-            print(f"Connected to {self.ser.name} at {self.baud_rate} baud")
+            # print(f"Connected to {self.ser.name} at {self.baud_rate} baud")
 
             # Look for acknowlegement
             time.sleep(2)
@@ -144,7 +144,7 @@ class ArduinoLink:
                 raise ConnectionError
 
         else:
-            print(f"Failed to connect to {self.ser.name} at {self.baud_rate} baud")
+            # print(f"Failed to connect to {self.ser.name} at {self.baud_rate} baud")
             self.configured = False
             raise ConnectionError
 
