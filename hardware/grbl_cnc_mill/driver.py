@@ -205,6 +205,8 @@ class Mill:
         found_on = None
         while not found:
             for port in ports:
+                if not port:
+                    break
                 try:
                     ser_mill = serial.Serial(
                         port=port,
