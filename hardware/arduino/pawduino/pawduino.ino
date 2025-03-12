@@ -133,87 +133,6 @@ void setup()
   lastState = sensorState;
 }
 
-/*
-Main loop for the Arduino controller
-- Check for incoming serial commands
-- Execute commands based on the command code
-- Send responses based on the command code
-*/
-void loop()
-{
-  while (Serial.available() > 0)
-  {
-    int command = Serial.parseInt();
-
-    switch (command)
-    {
-    case CMD_WHITE_ON:
-      ringFill(ring.Color(255, 255, 255)); // White
-      sendResponse(RESP_WHITE_ON);
-      break;
-    case CMD_WHITE_OFF:
-      ring.clear();
-      ring.show();
-      sendResponse(RESP_WHITE_OFF);
-      break;
-    case CMD_CONTACT_ON:
-      digitalWrite(LEDR_1_PIN, HIGH);
-      digitalWrite(LEDR_2_PIN, HIGH);
-      ring.setPixelColor(6, ring.Color(0, 0, 255));
-      ring.setPixelColor(18, ring.Color(0, 0, 255));
-      ring.show();
-      // Verify both LEDs are on
-      sendResponse(RESP_CONTACT_ON,
-                   verifyPinState(LEDR_1_PIN, HIGH) &&
-                       verifyPinState(LEDR_2_PIN, HIGH));
-      break;
-    case CMD_CONTACT_OFF:
-      digitalWrite(LEDR_1_PIN, LOW);
-      digitalWrite(LEDR_2_PIN, LOW);
-      ring.clear();
-      ring.show();
-      // Verify both LEDs are off
-      sendResponse(RESP_CONTACT_OFF,
-                   verifyPinState(LEDR_1_PIN, LOW) &&
-                       verifyPinState(LEDR_2_PIN, LOW));
-      break;
-    case CMD_EMAG_ON:
-      digitalWrite(EMAG, HIGH);
-      sendResponse(RESP_EMAG_ON, verifyPinState(EMAG, HIGH));
-      break;
-    case CMD_EMAG_OFF:
-      digitalWrite(EMAG, LOW);
-      sendResponse(RESP_EMAG_OFF, verifyPinState(EMAG, LOW));
-      break;
-    case CMD_LINE_BREAK:
-      if (digitalRead(SENSORPIN) == LOW)
-      {
-        Serial.println("107");
-      }
-      else
-      {
-        Serial.println("108");
-      }
-      break;
-
-    case CMD_LINE_TEST:
-      lineBreakTest();
-      break;
-
-    case CMD_HELLO:
-      Serial.println("999");
-      break;
-    default:
-      Serial.println(-1);
-    }
-
-    // Clear the serial buffer
-    while (Serial.available() > 0)
-    {
-      Serial.read();
-    }
-  }
-}
 
 /*
 Light up each ring LED on then off, one at a time, then make sure the ring is clear
@@ -310,4 +229,87 @@ bool verifyPinState(uint8_t pin, uint8_t expectedState)
 {
   // Read the actual pin state and compare with expected state
   return digitalRead(pin) == expectedState;
+}
+
+
+/*
+Main loop for the Arduino controller
+- Check for incoming serial commands
+- Execute commands based on the command code
+- Send responses based on the command code
+*/
+void loop()
+{
+  while (Serial.available() > 0)
+  {
+    int command = Serial.parseInt();
+
+    switch (command)
+    {
+    case CMD_WHITE_ON:
+      ringFill(ring.Color(255, 255, 255)); // White
+      sendResponse(RESP_WHITE_ON);
+      break;
+    case CMD_WHITE_OFF:
+      ring.clear();
+      ring.show();
+      sendResponse(RESP_WHITE_OFF);
+      break;
+    case CMD_CONTACT_ON:
+      digitalWrite(LEDR_1_PIN, HIGH);
+      digitalWrite(LEDR_2_PIN, HIGH);
+      ring.setPixelColor(6, ring.Color(0, 0, 255));
+      ring.setPixelColor(18, ring.Color(0, 0, 255));
+      ring.show();
+      // Verify both LEDs are on
+      sendResponse(RESP_CONTACT_ON,
+                   verifyPinState(LEDR_1_PIN, HIGH) &&
+                       verifyPinState(LEDR_2_PIN, HIGH));
+      break;
+    case CMD_CONTACT_OFF:
+      digitalWrite(LEDR_1_PIN, LOW);
+      digitalWrite(LEDR_2_PIN, LOW);
+      ring.clear();
+      ring.show();
+      // Verify both LEDs are off
+      sendResponse(RESP_CONTACT_OFF,
+                   verifyPinState(LEDR_1_PIN, LOW) &&
+                       verifyPinState(LEDR_2_PIN, LOW));
+      break;
+    case CMD_EMAG_ON:
+      digitalWrite(EMAG, HIGH);
+      sendResponse(RESP_EMAG_ON, verifyPinState(EMAG, HIGH));
+      break;
+    case CMD_EMAG_OFF:
+      digitalWrite(EMAG, LOW);
+      sendResponse(RESP_EMAG_OFF, verifyPinState(EMAG, LOW));
+      break;
+    case CMD_LINE_BREAK:
+      if (digitalRead(SENSORPIN) == LOW)
+      {
+        Serial.println("107");
+      }
+      else
+      {
+        Serial.println("108");
+      }
+      break;
+
+    case CMD_LINE_TEST:
+      lineBreakTest();
+      break;
+
+    case CMD_HELLO:
+      Serial.println("999");
+      break;
+    default:
+      Serial.println(-1);
+    }
+
+    // Clear the serial buffer
+    while (Serial.available() > 0)
+    {
+      Serial.read();
+    }
+  }
 }
