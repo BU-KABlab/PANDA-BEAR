@@ -9,7 +9,11 @@ from typing import Optional
 
 from PySpin import PySpin
 
-from .camera_tools import file_enumeration, image_filepath_generator, run_single_camera
+from .flir_camera_tools import (
+    file_enumeration,
+    image_filepath_generator,
+    run_single_camera,
+)
 from .panda_image_tools import add_data_zone, invert_image
 
 __all__ = [
@@ -38,21 +42,23 @@ def capture_new_image(
         # Run example on each camera
         for _, camera in enumerate(camera_list):
             camera: PySpin.CameraPtr
-            result = run_single_camera(camera, image_path=file_name, num_images=num_images)
+            result = run_single_camera(
+                camera, image_path=file_name, num_images=num_images
+            )
             if result:
                 logger.info("Camera took image...")
             else:
                 logger.error("Camera failed to take image...")
-    
+
     except PySpin.SpinnakerException as ex:
         logger.error(f"Error: {ex}")
         return file_name, False
 
-    finally:                
+    finally:
         # Clear camera list before releasing system
         camera_list.Clear()
 
-            # Release system instance
+        # Release system instance
         pyspin_system.ReleaseInstance()
 
     return file_name, result

@@ -137,8 +137,13 @@ class GamryDtaqEvents(object):
         self.call_savedata(self.complete_file_name)
 
 
-def pstatconnect():
-    """connect to the pstat"""
+def pstatconnect() -> bool:
+    """connect to the pstat
+
+    Returns:
+        bool: True if the connection is successful, False otherwise
+
+    """
     global PSTAT
     global DEVICES
     global GAMRY_COM
@@ -159,7 +164,7 @@ def pstatconnect():
     return OPEN_CONNECTION
 
 
-def gamry_error_decoder(err):
+def gamry_error_decoder(err) -> GamryCOMError:
     """Decode a COM error from GamryCOM into a more useful exception."""
     if isinstance(err, comtypes.COMError):
         hresult = 2**32 + err.args[0]
