@@ -54,35 +54,30 @@
 
 // Include Libraries
 #include <Adafruit_NeoPixel.h>
-#include <Adafruit_MotorShield.h>
-#include <Wire.h>
 #include <stdint.h>
 #include <AccelStepper.h>
 #include <ezButton.h>
 
 // Definitions
-// Pinoouts
+#define LEDR_2_PIN 6
 #define NEOPIXEL_RING_PIN 2
 #define EMAG 3
-#define SENSORPIN 4
-#define LEDR_1_PIN 5
-#define LEDR_2_PIN 6
-#define LINEBREAKLED 7
 #define NUMPIXELS 24
-
+#define LINEBREAKLED 7
+#define SENSORPIN 4
 #define SENSITIVITY 100
 #define SERIAL_TIMEOUT 1000 // ms
 #define SERIAL_BAUD 115200
 
 // Pipette motor pins and constants
+#define PIPETTE_STEP_PIN 9
+#define PIPETTE_DIR_PIN 8
+#define PIPETTE_LIMIT_PIN 10
 #define PIPETTE_MAX_POSITION 100.0 // Maximum travel in mm
 #define PIPETTE_STEPS_PER_MM 200   // For Gen2 pipette (48 for Gen1)
 #define PIPETTE_MAX_SPEED 10000    // Steps per second
 #define PIPETTE_ACCELERATION 800   // Steps per second per second
 #define PIPETTE_HOMING_SPEED 2000  // Lower speed for homing
-#define PIPETTE_LIMIT_PIN 10       // Limit switch pin
-#define MOTOR_STEPS 200            // Steps per revolution for the stepper motor
-#define STEPPER_PORT 1             // Which port on the MotorShield (1 or 2)
 
 // Message Definitions
 enum CommandCodes
@@ -126,21 +121,18 @@ Adafruit_NeoPixel ring(NUMPIXELS, NEOPIXEL_RING_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel dot_1(1, LEDR_2_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel dot_2(2, LEDR_2_PIN, NEO_GRB + NEO_KHZ800);
 
-// Initialize Adafruit MotorShield and stepper motor
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-// Connect stepper to port M1+M2 or M3+M4 (STEPPER_PORT 1 or 2)
-Adafruit_StepperMotor *pipetteMotor = AFMS.getStepper(MOTOR_STEPS, STEPPER_PORT);
-ezButton pipetteLimitSwitch(PIPETTE_LIMIT_PIN);
-
 // variables will change:
 int sensorState = 0,
     lastState = 0; // variable for reading the pushbutton status
+
+// Initialize stepper motor and limit switch
+AccelStepper pipetteStepper(AccelStepper::DRIVER, PIPETTE_STEP_PIN, PIPETTE_DIR_PIN);
+ezButton pipetteLimitSwitch(PIPETTE_LIMIT_PIN);
 
 // Pipette state variables
 bool pipetteIsHomed = false;
 float pipettePosition = 0.0; // Position in mm
 float pipetteVolume = 0.0;   // Volume in µL
-int pipetteCurrentSteps = 0; // Track current position in steps
 
 // Forward declarations
 void ringTest();
@@ -154,7 +146,6 @@ bool movePipetteToPosition(float position);
 bool aspiratePipette(float volume);
 bool dispensePipette(float volume);
 void getPipetteStatus();
-void stepMotor(int steps, bool holdPosition = false);
 
 /*
 Set up the Arduino board and initialize the hardware components
@@ -206,20 +197,13 @@ void setup()
   }
   lastState = sensorState;
 
-  // Initialize MotorShield with error checking
-  if (!AFMS.begin())
-  {
-    Serial.println("Could not find Motor Shield. Check wiring.");
-    while (1)
-      ; // Wait forever if shield not found
-  }
-  Serial.println("Motor Shield found.");
-
-  // Set motor speed in RPM
-  pipetteMotor->setSpeed(60); // 60 RPM
-
   // Initialize pipette limit switch
   pipetteLimitSwitch.setDebounceTime(50); // 50ms debounce time
+
+  // Initialize pipette stepper motor
+  pipetteStepper.setMaxSpeed(PIPETTE_MAX_SPEED);
+  pipetteStepper.setAcceleration(PIPETTE_ACCELERATION);
+  pipetteStepper.setCurrentPosition(0);
 }
 
 /*
@@ -312,34 +296,6 @@ bool verifyNeoPixelState(Adafruit_NeoPixel &pixels, uint8_t pixel, uint32_t expe
 }
 
 /*
- * Helper function to step the motor a specified number of steps
- * Positive steps move forward, negative steps move backward
- */
-void stepMotor(int steps, bool holdPosition = false)
-{
-  uint8_t direction = FORWARD;
-  if (steps < 0)
-  {
-    direction = BACKWARD;
-    steps = abs(steps);
-  }
-
-  for (int i = 0; i < steps; i++)
-  {
-    pipetteMotor->onestep(direction, MICROSTEP);
-    // Update our position tracking
-    pipetteCurrentSteps += (direction == FORWARD ? 1 : -1);
-    delay(1); // Small delay to prevent overwhelming the motor controller
-  }
-
-  if (!holdPosition)
-  {
-    pipetteMotor->release(); // Release motor to prevent heating
-  }
-  // If holdPosition is true, don't release the motor to maintain torque
-}
-
-/*
  * Home the pipette by moving until the limit switch is triggered
  * This simulates the homing routine from the Duet configuration
  */
@@ -348,43 +304,51 @@ void homePipette()
   // First ensure the limit switch is initialized
   pipetteLimitSwitch.loop();
 
+  // Set a slower speed for homing
+  pipetteStepper.setMaxSpeed(PIPETTE_HOMING_SPEED);
+
   Serial.println("Homing pipette...");
 
-  // Set lower speed for homing
-  pipetteMotor->setSpeed(30); // 30 RPM for homing
-
   // Move in positive direction until limit switch is hit
+  // (This matches the direction in the Duet config where the motor moves towards the endstop)
   while (pipetteLimitSwitch.getState() == HIGH)
   {
-    pipetteMotor->onestep(FORWARD, MICROSTEP);
+    pipetteStepper.move(100); // Move a bit at a time
+    pipetteStepper.run();
     pipetteLimitSwitch.loop(); // Update limit switch state
-    delay(5);                  // Small delay to not overwhelm the controller
+
+    // Add a small delay to not block completely
+    delay(1);
   }
 
+  // Stop the motor
+  pipetteStepper.stop();
+
   // Back off from the limit switch
-  for (int i = 0; i < 100; i++)
+  pipetteStepper.move(-100); // Move away from switch in negative direction
+  while (pipetteStepper.distanceToGo() != 0)
   {
-    pipetteMotor->onestep(BACKWARD, MICROSTEP);
-    delay(5);
+    pipetteStepper.run();
   }
 
   // Find switch again at slower speed for precision
-  pipetteMotor->setSpeed(15); // Even slower for precise homing
+  pipetteStepper.setMaxSpeed(PIPETTE_HOMING_SPEED / 2);
   while (pipetteLimitSwitch.getState() == HIGH)
   {
-    pipetteMotor->onestep(FORWARD, MICROSTEP);
+    pipetteStepper.move(10); // Smaller movements
+    pipetteStepper.run();
     pipetteLimitSwitch.loop();
-    delay(10);
+    delay(1);
   }
 
   // Set this position as zero
-  pipetteCurrentSteps = 0;
+  pipetteStepper.setCurrentPosition(0);
   pipettePosition = 0.0;
   pipetteVolume = 0.0;
   pipetteIsHomed = true;
 
   // Reset to normal speed
-  pipetteMotor->setSpeed(60);
+  pipetteStepper.setMaxSpeed(PIPETTE_MAX_SPEED);
 
   // Move to a safe starting position (0.5mm)
   movePipetteToPosition(0.5);
@@ -411,11 +375,16 @@ bool movePipetteToPosition(float position)
   }
 
   // Convert mm to steps
-  int targetSteps = position * PIPETTE_STEPS_PER_MM;
-  int stepsToMove = targetSteps - pipetteCurrentSteps;
+  long targetSteps = position * PIPETTE_STEPS_PER_MM;
 
-  // Move to position and hold
-  stepMotor(stepsToMove, true); // Hold position after movement
+  // Move to position
+  pipetteStepper.moveTo(targetSteps);
+
+  // Wait for move to complete
+  while (pipetteStepper.distanceToGo() != 0)
+  {
+    pipetteStepper.run();
+  }
 
   // Update current position
   pipettePosition = position;
@@ -519,6 +488,9 @@ void loop()
 {
   // Update limit switch state
   pipetteLimitSwitch.loop();
+
+  // Process any pending stepper movements
+  pipetteStepper.run();
 
   while (Serial.available() > 0)
   {

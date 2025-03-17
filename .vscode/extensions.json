@@ -29,6 +29,7 @@
     "tamasfe.even-better-toml",
     "twxs.cmake",
     "yzhang.markdown-all-in-one",
-    "ms-python.vscode-python-envs"
+    "ms-python.vscode-python-envs",
+    "vscode-arduino.vscode-arduino-community"
   ]
 }
