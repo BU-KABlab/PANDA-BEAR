@@ -18,11 +18,13 @@ Example:
 
 `git clone -b my-branch git@github.com:user/myproject.git`
 
-# 1. FLIR SDKs
+# 1. Drivers and SDKs
+
+## FLIR SDK
 
 This system uses a FLIR camera and requires their proprietary SDK which you can obtain for free from their website.
 
-## Where to find the SDK files and examples
+### Where to find the SDK files and examples
 
 Spinnaker is proprietary software made by FLIR and as such cannot be included in the repository. To use the `imaging` module you must have installed both the Spinnaker SDK and the Python SDK in your chosen environment.
 
@@ -40,9 +42,21 @@ Might look something like:
 
 Note: The location doesn't actually matter (could be on your D: drive) so long as you can provide the full path. Your exact version might have slightly different version numbers but so long as the major version is the same it should work.
 
-## Examples
+### Examples
 
 The Linux SDKs do not come with examples, download the Windows or Mac zip files and extract the "Examples" folder.
+
+## UART USB-Serial Adapter
+
+If you are using PANDA V1.0 and an Alladin AL-1000 syring pump, you may need to install the following driver to communicate using a USB to RS-232 adapter.
+
+[Download Link](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads)
+
+## GAMRY Potentiostat SDKs and Drivers
+
+If you are using a Gamry potentiostat, you will need to install GAMRY Framwork and associated applications. The python SDK is not required, as it is limited to Python 3.7 which is beyond end-of-life.
+
+You will need to either refer to the media included with your potentiostat purchase or reach out to Gamry instruments. Their website doesn't offer the download for free.
 
 # 2. Setting Up Your Python Environment
 
@@ -144,10 +158,9 @@ From the top directory, run: `pytest tests -v`
 
 If all tests pass you are ready to use the PANDA SDL!
 
-
 ## Test Your Installation
 
-From the top directory, run: ```pytest tests -v```
+From the top directory, run: `pytest tests -v`
 
 ## Project Data
 

@@ -3,8 +3,11 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 """
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
+import os
 import time
 from typing import Optional
+
+import serial
 
 from hardware.nesp_lib_py import nesp_lib
 from hardware.nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
@@ -74,27 +77,63 @@ class SyringePump:
         Returns:
             Pump: Initialized pump object.
         """
-        try:
-            pump_control_logger.debug("Setting up pump...")
-            pump_port = nesp_lib.Port(
-                config.get("PUMP", "port", fallback="COM5"),
-                config.getint("PUMP", "baudrate", fallback=19200),
-            )
-            syringe_pump = nesp_lib.Pump(pump_port)
-            syringe_pump.syringe_diameter = config.getfloat(
-                "PUMP", "syringe_inside_diameter", fallback=4.600
-            )  # millimeters
-            syringe_pump.pumping_rate = self.max_pump_rate
-            syringe_pump.volume_infused_clear()
-            syringe_pump.volume_withdrawn_clear()
-            log_msg = f"Pump found at address {syringe_pump.address}"
-            pump_control_logger.info(log_msg)
-            time.sleep(2)
-        except Exception as e:
-            pump_control_logger.error("Error setting up pump: %s", e)
-            pump_control_logger.exception(e)
-            raise e
-        return syringe_pump
+
+        def get_ports():
+            """List all available ports"""
+            if os.name == "posix":
+                ports = list(serial.tools.list_ports.grep("ttyUSB"))
+            elif os.name == "nt":
+                ports = list(serial.tools.list_ports.grep("COM"))
+            else:
+                raise OSError("Unsupported OS")
+            return [port.device for port in ports]
+
+        ports = get_ports()
+        if not ports:
+            pump_control_logger.error("No ports found")
+            raise Exception("No ports found")
+
+        # Try the configured port first if it exists
+        initial_port = config.get("PUMP", "port", fallback=None)
+        if initial_port in ports:
+            # Move the initial port to the front of the list
+            ports.remove(initial_port)
+            ports.insert(0, initial_port)
+
+        last_exception = None
+        for port in ports:
+            try:
+                pump_control_logger.debug(f"Setting up pump on port {port}...")
+                pump_port = nesp_lib.Port(
+                    port,
+                    config.getint("PUMP", "baudrate", fallback=19200),
+                )
+
+                syringe_pump = nesp_lib.Pump(pump_port)
+                syringe_pump.syringe_diameter = config.getfloat(
+                    "PUMP", "syringe_inside_diameter", fallback=4.600
+                )  # millimeters
+                syringe_pump.pumping_rate = self.max_pump_rate
+                syringe_pump.volume_infused_clear()
+                syringe_pump.volume_withdrawn_clear()
+                log_msg = f"Pump found at address {syringe_pump.address}"
+                config.set("PUMP", "port", port)
+                pump_control_logger.info(log_msg)
+                time.sleep(2)
+                return syringe_pump
+
+            except Exception as e:
+                last_exception = e
+                pump_control_logger.error(f"Error setting up pump on port {port}: {e}")
+                pump_control_logger.exception(e)
+                continue
+
+        # If we've tried all ports and none worked
+        pump_control_logger.error("All ports exhausted, no pump found")
+        if last_exception:
+            raise Exception(f"All ports exhausted, last error: {last_exception}")
+        else:
+            raise Exception("All ports exhausted, no pump found")
 
     @timing_wrapper
     def withdraw(
