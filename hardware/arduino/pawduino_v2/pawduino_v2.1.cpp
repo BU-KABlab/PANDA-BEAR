@@ -62,8 +62,8 @@
 
 // Definitions
 // Pinoouts
-#define NEOPIXEL_RING_PIN 2
-#define EMAG 3
+#define NEOPIXEL_RING_PIN 3
+#define EMAG 11
 #define SENSORPIN 4
 #define LEDR_1_PIN 5
 #define LEDR_2_PIN 6
@@ -122,9 +122,9 @@ enum ResponseCodes
 };
 
 // object initialization
-Adafruit_NeoPixel ring(NUMPIXELS, NEOPIXEL_RING_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel dot_1(1, LEDR_2_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel dot_2(2, LEDR_2_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel ring(NUMPIXELS, NEOPIXEL_RING_PIN, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel dot_1(1, LEDR_2_PIN, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel dot_2(2, LEDR_2_PIN, NEO_GRBW + NEO_KHZ800);
 
 // Initialize Adafruit MotorShield and stepper motor
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -169,6 +169,7 @@ void setup()
 {
   // initialize serial communication:
   Serial.begin(SERIAL_BAUD);
+  Serial.setTimeout(SERIAL_TIMEOUT); // Set a timeout for reading serial input
   while (!Serial)
     ; // wait for serial port to connect
   Serial.println("OK");
@@ -179,15 +180,27 @@ void setup()
 
   // Initialize NeoPixel dots
   dot_1.begin();
-  dot_1.setBrightness(500); // adjust brightness here
+  dot_1.setBrightness(150); // adjust brightness here (max value is 255)
   dot_1.show();             // Initialize all pixels to 'off'
   dot_2.begin();
-  dot_2.setBrightness(500); // adjust brightness here
+  dot_2.setBrightness(150); // adjust brightness here (max value is 255)
   dot_2.show();             // Initialize all pixels to 'off'
+
+  // Blink each dot
+  dot_1.setPixelColor(0, dot_1.Color(255, 0, 0)); // First dot red
+  dot_1.show();
+  delay(500);
+  dot_1.clear();
+  dot_1.show();
+  dot_2.setPixelColor(0, dot_2.Color(255, 0, 0)); // Second dot red
+  dot_2.show();
+  delay(500);
+  dot_2.clear();
+  dot_2.show();
 
   // Initialize NeoPixel ring
   ring.begin();
-  ring.setBrightness(500); // adjust brightness here
+  ring.setBrightness(150); // adjust brightness here (max value is 255)
   ring.show();             // Initialize all pixels to 'off'
 
   ringTest();
@@ -210,16 +223,23 @@ void setup()
   if (!AFMS.begin())
   {
     Serial.println("Could not find Motor Shield. Check wiring.");
-    while (1)
-      ; // Wait forever if shield not found
+    // while (1)
+    ; // Wait forever if shield not found
   }
-  Serial.println("Motor Shield found.");
+  else
+  {
+    Serial.println("Motor Shield found.");
 
-  // Set motor speed in RPM
-  pipetteMotor->setSpeed(60); // 60 RPM
+    // Set motor speed in RPM
+    pipetteMotor->setSpeed(60); // 60 RPM
 
-  // Initialize pipette limit switch
-  pipetteLimitSwitch.setDebounceTime(50); // 50ms debounce time
+    // Initialize pipette limit switch
+    pipetteLimitSwitch.setDebounceTime(50); // 50ms debounce time
+
+    // Home the pipette on startup
+    homePipette();
+  }
+  Serial.println("Setup complete");
 }
 
 /*
@@ -227,14 +247,24 @@ Light up each ring LED on then off, one at a time, then make sure the ring is cl
 */
 void ringTest()
 {
-  for (int i = 0; i < ring.numPixels(); i++)
+  for (uint16_t i = 0; i < ring.numPixels(); i++)
   {
     ring.setPixelColor(i, ring.Color(0, 0, 255)); //  Set pixel's color
     ring.show();
-    delay(500);
+    delay(300);
     ring.setPixelColor(i, 0); // Turn off the pixel after delay
   }
   ring.clear();
+
+  ringFill(ring.Color(0, 255, 0)); // Green
+  delay(500);
+  ring.clear();
+  ring.show();
+
+  ringFill(ring.Color(128, 0, 128)); // Purple
+  delay(500);
+  ring.clear();
+  ring.show();
   Serial.println("Ring Test Complete");
 }
 
@@ -243,11 +273,11 @@ Set all ring LEDs to a specific color
 */
 void ringFill(uint32_t color)
 {
-  for (int i = 0; i < ring.numPixels(); i++)
+  for (uint16_t i = 0; i < ring.numPixels(); i++)
   {                               // For each pixel in strip...
     ring.setPixelColor(i, color); //  Set pixel's color (in RAM)
-    ring.show();
   }
+  ring.show();
 }
 
 /*
@@ -268,7 +298,7 @@ void lineBreakTest()
       dot_2.setPixelColor(0, dot_2.Color(255, 0, 0)); // Second dot red
       dot_1.show();
       dot_2.show();
-      Serial.println("beam roken");
+      Serial.println("beam broken");
     }
     else
     { // Beam unbroken
@@ -287,11 +317,11 @@ void lineBreakTest()
       lastState = sensorState;
     }
 
-    delay(100); // Small delay between readings
+    delay(500); // Small delay between readings
   }
 }
 
-void sendResponse(int code, bool success = true)
+void sendResponse(int code, bool success)
 {
   Serial.print(success ? "OK:" : "ERR:");
   Serial.println(code); // Send the response code
@@ -315,7 +345,7 @@ bool verifyNeoPixelState(Adafruit_NeoPixel &pixels, uint8_t pixel, uint32_t expe
  * Helper function to step the motor a specified number of steps
  * Positive steps move forward, negative steps move backward
  */
-void stepMotor(int steps, bool holdPosition = false)
+void stepMotor(int steps, bool holdPosition)
 {
   uint8_t direction = FORWARD;
   if (steps < 0)
@@ -542,8 +572,8 @@ void loop()
       dot_1.show();
       dot_2.show();
       // Also set ring pixels for visual feedback
-      ring.setPixelColor(6, ring.Color(0, 0, 255)); // Blue
-      ring.setPixelColor(18, ring.Color(0, 0, 255));
+      ring.setPixelColor(8, ring.Color(0, 0, 255)); // Blue
+      ring.setPixelColor(20, ring.Color(0, 0, 255));
       ring.show();
 
       // Verify NeoPixel dots are on with red color
@@ -593,47 +623,69 @@ void loop()
       break;
 
     case CMD_PIPETTE_MOVE:
-      // Expect a float parameter for position in mm
+    { // Expect a float parameter for position in mm
+      // Example:
+      // Initial serial command to select this case: 10
+      // Followed by: 15.0 (to move to 15mm)
       while (Serial.available() == 0)
         delay(10);
       float targetPosition = Serial.parseFloat();
       bool moveSuccess = movePipetteToPosition(targetPosition);
       sendResponse(RESP_PIPETTE_MOVED, moveSuccess);
       break;
+    }
 
     case CMD_PIPETTE_ASPIRATE:
-      // Expect a float parameter for volume in µL
+    { // Expect a float parameter for volume in µL
+      // Example:
+      // Initial serial command to select this case: 11
+      // Followed by: 10.0 (to aspirate 10µL)
       while (Serial.available() == 0)
         delay(10);
       float aspirateVolume = Serial.parseFloat();
       bool aspirateSuccess = aspiratePipette(aspirateVolume);
       sendResponse(RESP_PIPETTE_ASPIRATED, aspirateSuccess);
       break;
-
+    }
     case CMD_PIPETTE_DISPENSE:
-      // Expect a float parameter for volume in µL
+    { // Expect a float parameter for volume in µL
+      // Example:
+      // Initial serial command to select this case: 12
+      // Followed by: 5.0 (to dispense 5µL)
       while (Serial.available() == 0)
         delay(10);
       float dispenseVolume = Serial.parseFloat();
       bool dispenseSuccess = dispensePipette(dispenseVolume);
       sendResponse(RESP_PIPETTE_DISPENSED, dispenseSuccess);
       break;
-
+    }
     case CMD_PIPETTE_STATUS:
+    { // Report current pipette status
+      // Example:
+      // Initial serial command to select this case: 13
+      // Response: STATUS:1,0.5,10.0 (homed, position 0.5mm, 10µL volume)
       getPipetteStatus();
       break;
-
-    case CMD_HELLO:
-      Serial.println("999");
-      break;
-    default:
-      Serial.println(-1);
     }
 
-    // Clear the serial buffer
-    while (Serial.available() > 0)
+    case CMD_HELLO:
+    {
+      sendResponse(RESP_HELLO);
+      break;
+    }
+    default:
+    {
+      Serial.println(-1);
+    }
+    }
+
+    // Clear the serial buffer with a safety counter
+    int clearCount = 0;
+    int maxClearCount = 20; // Maximum bytes to clear to prevent infinite loops
+    while (Serial.available() > 0 && clearCount < maxClearCount)
     {
       Serial.read();
+      clearCount++;
     }
   }
 }
