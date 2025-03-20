@@ -195,7 +195,7 @@ def change_wellplate():
                     f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
                 )
             else:
-                print(f"Issue with activating wellplate {new_plate_numb}")
+                print(f"Problem with activating wellplate {new_plate_numb}")
             input("Press Enter to continue...")
         else:
             print("Failed to create new wellplate.")
@@ -213,7 +213,7 @@ def change_wellplate():
             print(f"Location of A1: {plate.plate_data.a1_x}, {plate.plate_data.a1_y}")
 
         else:
-            print(f"Issue with activating wellplate {new_plate_numb}.")
+            print(f"Problem with activating wellplate {new_plate_numb}.")
         input("Press Enter to continue...")
 
 

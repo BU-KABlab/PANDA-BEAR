@@ -2,17 +2,16 @@
 This module provides a class to link the computer and the Arduino
 """
 
+import asyncio
 import enum
 import os
 import queue
 import time
-import asyncio
-from typing import Optional, Union, Any
+from typing import Optional, Union
 
 import serial
 import serial.tools.list_ports
 from serial import Serial
-import serial_asyncio
 
 
 class MockSerial:
@@ -208,11 +207,11 @@ class ArduinoLink:
         loop = asyncio.get_event_loop()
         self.ser.flush()
         await loop.run_in_executor(None, self.ser.read_all)
-        
+
         msg = str(cmd)
         attempts = 0
         rx = None
-        
+
         while attempts < 3:
             await loop.run_in_executor(None, lambda: self.ser.write(msg.encode()))
             await asyncio.sleep(0.5)
@@ -232,9 +231,9 @@ class ArduinoLink:
         """Start monitoring Arduino messages in the background"""
         if self._running:
             return
-            
+
         self._running = True
-        
+
         async def monitor():
             while self._running:
                 try:
@@ -245,10 +244,10 @@ class ArduinoLink:
                     print(f"Error in Arduino monitor: {e}")
                     await asyncio.sleep(1)
                 await asyncio.sleep(0.1)
-                
+
         self._monitor_task = asyncio.create_task(monitor())
         return self._monitor_task
-        
+
     async def stop_monitoring(self):
         """Stop the background monitor"""
         self._running = False
@@ -266,13 +265,13 @@ class ArduinoLink:
             return await asyncio.wait_for(self._event_queue.get(), timeout)
         except asyncio.TimeoutError:
             return None
-    
+
     # Helper methods that can be used either synchronously or asynchronously
-    
+
     async def async_white_lights_on(self):
         """Turn on the white lights asynchronously"""
         return await self.async_send(PawduinoFunctions.CMD_WHITE_ON.value)
-    
+
     def white_lights_on(self):
         """Turn on the white lights"""
         return self.send(PawduinoFunctions.CMD_WHITE_ON.value)
@@ -350,19 +349,19 @@ class ArduinoLink:
     def pipette_home(self):
         """Home the pipette"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_HOME.value)
-    
+
     def pipette_move(self, distance):
         """Move the pipette a distance in mm"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_MOVE.value + str(distance))
-    
+
     def pipette_aspirate(self, volume):
         """Aspirate a volume in uL"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_ASPIRATE.value + str(volume))
-    
+
     def pipette_dispense(self, volume):
         """Dispense a volume in uL"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_DISPENSE.value + str(volume))
-    
+
     def pipette_status(self):
         """Get the status of the pipette"""
         return self.send(PawduinoFunctions.CMD_PIPETTE_STATUS.value)
@@ -400,7 +399,7 @@ class MockArduinoLink(ArduinoLink):
         self.ser.write(str(cmd).encode())
         if isinstance(cmd, tuple):
             cmd = cmd[0]  # Handle tuple values from the enum
-            
+
         if cmd == PawduinoFunctions.CMD_WHITE_ON.value[0]:
             return PawduinoReturnCodes.RESP_WHITE_ON.value[0]
         elif cmd == PawduinoFunctions.CMD_WHITE_OFF.value[0]:
@@ -435,11 +434,11 @@ class MockArduinoLink(ArduinoLink):
 
 class AsyncMockArduinoLink(MockArduinoLink):
     """Mock version of ArduinoLink that supports async operations"""
-    
+
     async def async_send(self, cmd):
         """Async version of send"""
         return self.send(cmd)
-        
+
     # Add async versions of all other methods from MockArduinoLink
 
 
@@ -457,21 +456,21 @@ class PawduinoFunctions(enum.Enum):
     - rb_lights_off (turns off the rb lights)
 
     """
-    CMD_WHITE_ON = 1,
-    CMD_WHITE_OFF = 2,
-    CMD_CONTACT_ON = 3,
-    CMD_CONTACT_OFF = 4,
-    CMD_EMAG_ON = 5,
-    CMD_EMAG_OFF = 6,
-    CMD_LINE_BREAK = 7,
-    CMD_LINE_TEST = 8,
-    CMD_PIPETTE_HOME = 9,
-    CMD_PIPETTE_MOVE = 10,
-    CMD_PIPETTE_ASPIRATE = 11,
-    CMD_PIPETTE_DISPENSE = 12,
-    CMD_PIPETTE_STATUS = 13,
-    CMD_HELLO = 99
 
+    CMD_WHITE_ON = (1,)
+    CMD_WHITE_OFF = (2,)
+    CMD_CONTACT_ON = (3,)
+    CMD_CONTACT_OFF = (4,)
+    CMD_EMAG_ON = (5,)
+    CMD_EMAG_OFF = (6,)
+    CMD_LINE_BREAK = (7,)
+    CMD_LINE_TEST = (8,)
+    CMD_PIPETTE_HOME = (9,)
+    CMD_PIPETTE_MOVE = (10,)
+    CMD_PIPETTE_ASPIRATE = (11,)
+    CMD_PIPETTE_DISPENSE = (12,)
+    CMD_PIPETTE_STATUS = (13,)
+    CMD_HELLO = 99
 
 
 class PawduinoReturnCodes(enum.Enum):
@@ -487,24 +486,25 @@ class PawduinoReturnCodes(enum.Enum):
     - rb_lights_off (the rb lights are off)
 
     """
-    RESP_WHITE_ON = 101,
-    RESP_WHITE_OFF = 102,
-    RESP_CONTACT_ON = 103,
-    RESP_CONTACT_OFF = 104,
-    RESP_EMAG_ON = 105,
-    RESP_EMAG_OFF = 106,
-    RESP_LINE_BREAK = 107,
-    RESP_LINE_UNBROKEN = 108,
-    RESP_PIPETTE_HOMED = 109,
-    RESP_PIPETTE_MOVED = 110,
-    RESP_PIPETTE_ASPIRATED = 111,
-    RESP_PIPETTE_DISPENSED = 112,
-    RESP_PIPETTE_STATUS = 113,
+
+    RESP_WHITE_ON = (101,)
+    RESP_WHITE_OFF = (102,)
+    RESP_CONTACT_ON = (103,)
+    RESP_CONTACT_OFF = (104,)
+    RESP_EMAG_ON = (105,)
+    RESP_EMAG_OFF = (106,)
+    RESP_LINE_BREAK = (107,)
+    RESP_LINE_UNBROKEN = (108,)
+    RESP_PIPETTE_HOMED = (109,)
+    RESP_PIPETTE_MOVED = (110,)
+    RESP_PIPETTE_ASPIRATED = (111,)
+    RESP_PIPETTE_DISPENSED = (112,)
+    RESP_PIPETTE_STATUS = (113,)
     RESP_HELLO = 999
 
 
 def test_of_pawduino():
-    """Test the pawduino sketch. By sending commands to the Arduino, and checking the response."""
+    """Test the pawduino sketch by sending each command, and checking the response."""
     with ArduinoLink() as arduino:
         if arduino.configured is False:
             print("Failed to configure the Arduino")
@@ -514,7 +514,7 @@ def test_of_pawduino():
                 f"Sending '{function.name}' to the Arduino. Expecting return code {PawduinoReturnCodes[function.name].value}"
             )
             response = arduino.send(function.value)
-            print(f"Arduino says: {response}")
+            print(f"Arduino returned: {response}")
             assert response == PawduinoReturnCodes[function.name].value
 
     print("All tests passed")
@@ -527,21 +527,22 @@ async def async_test_of_pawduino():
         if arduino.configured is False:
             print("Failed to configure the Arduino")
             return
-            
+
         # Start background monitoring
         monitor_task = await arduino.start_monitoring()
-        
+
         for function in PawduinoFunctions:
             print(f"Sending '{function.name}' to the Arduino")
             response = await arduino.async_send(function.value)
             print(f"Arduino says: {response}")
-            
+
         # Stop background monitoring
         await arduino.stop_monitoring()
-            
+
         print("All tests passed")
     finally:
         arduino.close()
+
 
 # Function to run the async test from synchronous code
 def run_async_test():
@@ -557,13 +558,13 @@ if __name__ == "__main__":
         await arduino.start_monitoring()
         response = await arduino.async_white_lights_on()
         print(f"Response: {response}")
-        
+
         # Listen for incoming messages
         while True:
             msg = await arduino.get_next_message(timeout=1.0)
             if msg is not None:
                 print(f"Received: {msg}")
-                
+
         await arduino.stop_monitoring()
         arduino.close()
 
