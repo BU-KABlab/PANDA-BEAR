@@ -328,6 +328,10 @@ def decapping_sequence(
         tool="decapper",
     )
 
+    # Check that a cap is present by checking the line break sensor (should be true - broken line and cap present)
+    if not ard_link.async_line_break():
+        raise ValueError("Cap is not present on decapper after decapping operation")
+
 
 def capping_sequence(
     mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink
@@ -359,6 +363,10 @@ def capping_sequence(
 
     # Move the decapper +10mm in the y direction
     mill.move_to_position(target_coords.x, target_coords.y + 15, 0, tool="decapper")
+
+    # Check that a cap is present by checking the line break sensor (should be false - no cap present)
+    if ard_link.async_line_break()
+        raise ValueError("Cap is still present after capping operation")
 
 
 if __name__ == "__main__":
