@@ -23,6 +23,9 @@ from .schemas import (  # PyDanctic models
 
 
 class VialService:
+    """
+    Service class for interacting with vials in the database.
+    """
     def __init__(self, db_session_maker: sessionmaker = SessionLocal):
         self.db_session_maker = db_session_maker
         self.logger = logging.getLogger(__name__)
@@ -214,6 +217,9 @@ class VialService:
 
 
 class WellService:
+    """
+    Service class for interacting with wells in the database.
+    """
     def __init__(self, session_maker: sessionmaker = SessionLocal):
         self.session_maker = session_maker
 
@@ -323,6 +329,9 @@ class WellService:
 
 
 class WellplateService:
+    """
+    Service class for interacting with well plates in the database.
+    """
     def __init__(self, session_maker: sessionmaker = SessionLocal):
         self.session_maker = session_maker
 
@@ -434,3 +443,107 @@ class WellplateService:
             stmt = select(WellPlateDBModel).filter_by(id=plate_id)
             plate = db_session.execute(stmt).scalar()
             return plate is not None
+
+class WellTypeService:
+    """
+    Class for interacting with well types in the database, adding, updating, and deleting well types.
+    """
+    def __init__(self, session_maker: sessionmaker = SessionLocal):
+        self.session_maker = session_maker
+
+    def create_plate_type(self, plate_type_data: PlateTypeModel) -> PlateTypeDBModel:
+        """
+        Creates a new well plate type in the database.
+
+        Args:
+            plate_type_data (PlateTypeModel): Pydantic model with well plate type details.
+
+        Returns:
+            PlateTypeDBModel: SQLAlchemy model instance representing the new well plate type.
+        """
+        with self.session_maker() as db_session:
+            try:
+                plate_type: PlateTypeDBModel = PlateTypeDBModel(**plate_type_data.model_dump())
+                db_session.add(plate_type)
+                db_session.commit()
+                db_session.refresh(plate_type)
+                return plate_type
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error creating plate type: {e}")
+
+    def get_plate_type(self, type_id: int) -> PlateTypeModel:
+        """
+        Fetches a well plate type by ID from the database.
+
+        Args:
+            type_id (int): The ID of the well plate type to fetch.
+
+        Returns:
+            PlateTypeModel: Pydantic model representing the well plate type.
+        """
+        with self.session_maker() as db_session:
+            stmt = select(PlateTypeDBModel).filter_by(id=type_id)
+            plate_type = db_session.execute(stmt).scalar()
+            if not plate_type:
+                raise ValueError(f"Plate type with id {type_id} not found.")
+            return PlateTypeModel.model_validate(plate_type)
+
+    def update_plate_type(self, type_id: int, updates: dict) -> PlateTypeDBModel:
+        """
+        Updates an existing well plate type in the database.
+
+        Args:
+            type_id (int): The ID of the well plate type to update.
+            updates (dict): Key-value pairs of attributes to update.
+
+        Returns:
+            PlateTypeDBModel: Updated SQLAlchemy model instance.
+        """
+        with self.session_maker() as db_session:
+            try:
+                updates = PlateTypeModel(**updates).model_dump()
+                stmt = select(PlateTypeDBModel).filter_by(id=type_id)
+                plate_type = db_session.execute(stmt).scalar()
+                if not plate_type:
+                    raise ValueError(f"Plate type with id {type_id} not found.")
+                for key, value in updates.items():
+                    setattr(plate = db_session.execute(stmt).scalar(), key, value)
+                    setattr(plate_type, key, value)
+                db_session.commit()
+                db_session.refresh(plate_type)
+                return plate_type
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error updating plate type: {e}")
+            
+    def delete_plate_type(self, type_id: int) -> None:
+        """
+        Deletes a well plate type from the database.
+
+        Args:
+            type_id (int): The ID of the well plate type to delete.
+        """
+        with self.session_maker() as db_session:
+            try:
+                stmt = select(PlateTypeDBModel).filter_by(id=type_id)
+                plate_type = db_session.execute(stmt).scalar()
+                if not plate_type:
+                    raise ValueError(f"Plate type with id {type_id} not found.")
+                db_session.delete(plate_type)
+                db_session.commit()
+            except SQLAlchemyError as e:
+                db_session.rollback()
+                raise ValueError(f"Error deleting plate type: {e}")
+            
+    def list_plate_types(self) -> List[PlateTypeModel]:
+        """
+        Lists all well plate types in the database.
+        Returns:
+            List[PlateTypeModel]: List of Pydantic models representing all well plate types.
+        """
+        with self.session_maker() as db_session:
+            stmt = select(PlateTypeDBModel)
+            plate_types = db_session.execute(stmt).scalars().all()
+            return [PlateTypeModel.model_validate(plate_type) for plate_type in plate_types]
+        
