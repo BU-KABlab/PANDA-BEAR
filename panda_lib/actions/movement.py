@@ -365,7 +365,7 @@ def capping_sequence(
     mill.move_to_position(target_coords.x, target_coords.y + 15, 0, tool="decapper")
 
     # Check that a cap is present by checking the line break sensor (should be false - no cap present)
-    if ard_link.async_line_break()
+    if ard_link.async_line_break():
         raise ValueError("Cap is still present after capping operation")
 
 

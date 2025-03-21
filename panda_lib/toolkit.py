@@ -18,7 +18,11 @@ from panda_lib.panda_gantry import MockPandaMill as MockMill
 from panda_lib.panda_gantry import PandaMill as Mill
 from panda_lib.slack_tools.slackbot_module import SlackBot
 from panda_lib.tools import ArduinoLink, MockArduinoLink, OBSController
-from shared_utilities.config.config_tools import read_camera_type, read_webcam_settings
+from shared_utilities.config.config_tools import (
+    read_camera_type,
+    read_config_value,
+    read_webcam_settings,
+)
 
 
 @dataclass
@@ -307,30 +311,31 @@ def test_instrument_connections(
         disconnected_instruments.append("Mill")
         incomplete = True
 
-    # Scale connection (commented out in original code)
-    # print("Checking scale connection...", end="\r", flush=True)
-    # try:
-    #     logger.debug("Connecting to scale")
-    #     scale = Scale(address="COM6")
-    #     info_dict = scale.get_info()
-    #     model = info_dict["model"]
-    #     serial = info_dict["serial"]
-    #     software = info_dict["software"]
-    #     if not model:
-    #         logger.error("No scale connected")
-    #         print("Scale not found                        ", flush=True)
-    #         disconnected_instruments.append("Scale")
-    #         incomplete = True
-    #     else:
-    #         logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
-    #         print("Scale connected                        ", flush=True)
-    #         connected_instruments.append("Scale")
-    # except Exception as error:
-    #     logger.error("No scale connected, %s", error)
-    #     instruments.scale = None
-    #     print("Scale not found                        ", flush=True)
-    #     disconnected_instruments.append("Scale")
-    #     incomplete = True
+    print("Checking scale connection...", end="\r", flush=True)
+    try:
+        if not read_config_value("SCALE", "port"):
+            raise Exception("No scale port specified in the configuration file")
+        logger.debug("Connecting to scale")
+        scale = Scale(address=read_config_value("SCALE", "port"))
+        info_dict = scale.get_info()
+        model = info_dict["model"]
+        serial = info_dict["serial"]
+        software = info_dict["software"]
+        if not model:
+            logger.error("No scale connected")
+            print("Scale not found                        ", flush=True)
+            disconnected_instruments.append("Scale")
+            incomplete = True
+        else:
+            logger.debug("Connected to scale:\n%s\n%s\n%s\n", model, serial, software)
+            print("Scale connected                        ", flush=True)
+            connected_instruments.append("Scale")
+    except Exception as error:
+        logger.error("No scale connected, %s", error)
+        instruments.scale = None
+        print("Scale not found                        ", flush=True)
+        disconnected_instruments.append("Scale")
+        incomplete = True
 
     # Pump connection
     print("Checking pump connection...", end="\r", flush=True)

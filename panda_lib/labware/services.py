@@ -26,6 +26,7 @@ class VialService:
     """
     Service class for interacting with vials in the database.
     """
+
     def __init__(self, db_session_maker: sessionmaker = SessionLocal):
         self.db_session_maker = db_session_maker
         self.logger = logging.getLogger(__name__)
@@ -220,6 +221,7 @@ class WellService:
     """
     Service class for interacting with wells in the database.
     """
+
     def __init__(self, session_maker: sessionmaker = SessionLocal):
         self.session_maker = session_maker
 
@@ -332,6 +334,7 @@ class WellplateService:
     """
     Service class for interacting with well plates in the database.
     """
+
     def __init__(self, session_maker: sessionmaker = SessionLocal):
         self.session_maker = session_maker
 
@@ -444,10 +447,12 @@ class WellplateService:
             plate = db_session.execute(stmt).scalar()
             return plate is not None
 
+
 class WellTypeService:
     """
     Class for interacting with well types in the database, adding, updating, and deleting well types.
     """
+
     def __init__(self, session_maker: sessionmaker = SessionLocal):
         self.session_maker = session_maker
 
@@ -463,7 +468,9 @@ class WellTypeService:
         """
         with self.session_maker() as db_session:
             try:
-                plate_type: PlateTypeDBModel = PlateTypeDBModel(**plate_type_data.model_dump())
+                plate_type: PlateTypeDBModel = PlateTypeDBModel(
+                    **plate_type_data.model_dump()
+                )
                 db_session.add(plate_type)
                 db_session.commit()
                 db_session.refresh(plate_type)
@@ -508,7 +515,9 @@ class WellTypeService:
                 if not plate_type:
                     raise ValueError(f"Plate type with id {type_id} not found.")
                 for key, value in updates.items():
-                    setattr(plate = db_session.execute(stmt).scalar(), key, value)
+                    setattr(
+                        plate=db_session.execute(stmt).scalar(), name=key, value=value
+                    )
                     setattr(plate_type, key, value)
                 db_session.commit()
                 db_session.refresh(plate_type)
@@ -516,7 +525,7 @@ class WellTypeService:
             except SQLAlchemyError as e:
                 db_session.rollback()
                 raise ValueError(f"Error updating plate type: {e}")
-            
+
     def delete_plate_type(self, type_id: int) -> None:
         """
         Deletes a well plate type from the database.
@@ -535,7 +544,7 @@ class WellTypeService:
             except SQLAlchemyError as e:
                 db_session.rollback()
                 raise ValueError(f"Error deleting plate type: {e}")
-            
+
     def list_plate_types(self) -> List[PlateTypeModel]:
         """
         Lists all well plate types in the database.
@@ -545,5 +554,6 @@ class WellTypeService:
         with self.session_maker() as db_session:
             stmt = select(PlateTypeDBModel)
             plate_types = db_session.execute(stmt).scalars().all()
-            return [PlateTypeModel.model_validate(plate_type) for plate_type in plate_types]
-        
+            return [
+                PlateTypeModel.model_validate(plate_type) for plate_type in plate_types
+            ]
