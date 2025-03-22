@@ -529,7 +529,7 @@ async def async_test_of_pawduino():
             return
 
         # Start background monitoring
-        monitor_task = await arduino.start_monitoring()
+        await arduino.start_monitoring()
 
         for function in PawduinoFunctions:
             print(f"Sending '{function.name}' to the Arduino")
