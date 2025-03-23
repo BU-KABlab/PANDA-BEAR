@@ -53,8 +53,11 @@ class LabwareRegistry:
         with open(file_path, "r") as f:
             data = json.load(f)
 
-        definition = Labware.from_dict(data)
-        self.definitions[definition.name] = definition
+        # definition = Labware.from_definition(data)
+        # self.definitions[definition.id] = definition
+
+        definition = data
+        self.definitions[data["parameters"]["loadName"]] = data
         return definition
 
     def get_definition(self, name: str) -> Optional[Labware]:
@@ -73,7 +76,7 @@ class LabwareRegistry:
 
     def register_definition(self, definition: Dict) -> Labware:
         """Register a new labware definition from a dictionary."""
-        labware_def = Labware.from_dict(definition)
+        labware_def = Labware.from_definition(definition)
         self.definitions[labware_def.name] = labware_def
 
         # Save to file

@@ -1,0 +1,158 @@
+{
+    "ordering": [
+        [
+            "A1"
+        ],
+        [
+            "A2"
+        ],
+        [
+            "A3"
+        ],
+        [
+            "A4"
+        ],
+        [
+            "A5"
+        ],
+        [
+            "A6"
+        ],
+        [
+            "A7"
+        ],
+        [
+            "A8"
+        ]
+    ],
+    "brand": {
+        "brand": "KABlab",
+        "brandId": [
+            "HQLabware-vialrack-8"
+        ]
+    },
+    "metadata": {
+        "displayName": "KABlab 8 Vial Rack with Fisherbrand 20 mL",
+        "displayCategory": "vialRack",
+        "displayVolumeUnits": "µL",
+        "tags": []
+    },
+    "dimensions": {
+        "xDimension": 266,
+        "yDimension": 35,
+        "zDimension": 68
+    },
+    "wells": {
+        "A1": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 0,
+            "y": 0,
+            "z": 2
+        },
+        "A2": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 33,
+            "y": 0,
+            "z": 2
+        },
+        "A3": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 66,
+            "y": 0,
+            "z": 2
+        },
+        "A4": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 99,
+            "y": 0,
+            "z": 2
+        },
+        "A5": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 132,
+            "y": 0,
+            "z": 2
+        },
+        "A6": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 165,
+            "y": 0,
+            "z": 2
+        },
+        "A7": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 198,
+            "y": 0,
+            "z": 2
+        },
+        "A8": {
+            "depth": 66,
+            "totalLiquidVolume": 20000,
+            "shape": "circular",
+            "diameter": 20,
+            "x": 231,
+            "y": 0,
+            "z": 2
+        }
+    },
+    "groups": [
+        {
+            "brand": {
+                "brand": "Fisherbrand",
+                "brandId": [
+                    "033377"
+                ]
+            },
+            "metadata": {
+                "wellBottomShape": "flat",
+                "displayCategory": "vialRack"
+            },
+            "wells": [
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8"
+            ]
+        }
+    ],
+    "parameters": {
+        "rotation": 0,
+        "quirks": [],
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "kablab_8_vialrack_20000ul"
+    },
+    "namespace": "panda_v2",
+    "version": 1,
+    "schemaVersion": 2,
+    "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    }
+}

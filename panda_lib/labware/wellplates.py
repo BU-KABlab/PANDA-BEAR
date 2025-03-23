@@ -846,7 +846,7 @@ def change_wellplate_location(
         definitions = registry.get_all_definitions()
         print("\nAvailable Labware Definitions:")
         for i, definition in enumerate(definitions):
-            print(f"{i + 1}. {definition.name} - {definition.description}")
+            print(f"{i + 1}. {definition.id} - {definition.description}")
 
         # Select labware definition
         definition_idx = int(input("\nSelect labware definition (number): ")) - 1
@@ -869,12 +869,12 @@ def change_wellplate_location(
                 deck = Deck()
                 wellplate.deck = deck
                 wellplate.deck_slot = deck_slot
-                wellplate.labware_definition_name = selected_def.name
+                wellplate.labware_definition_name = selected_def.id
 
                 # Update coordinates from deck
                 wellplate.update_coordinates_from_deck(selected_def)
                 print(
-                    f"Wellplate positioned at deck slot {deck_slot} using {selected_def.name} definition"
+                    f"Wellplate positioned at deck slot {deck_slot} using {selected_def.id} definition"
                 )
                 return
             except ValueError:

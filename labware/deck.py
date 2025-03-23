@@ -27,7 +27,17 @@ definition_schema = [
 class DeckSlot:
     """Represents a physical slot on the instrument deck."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        position: str,
+        row: str,
+        column: int,
+        shape: str,
+        diameter: float,
+        x: float,
+        y: float,
+        z: float,
+    ):
         """
         Initialize a deck slot.
 
@@ -35,27 +45,20 @@ class DeckSlot:
             position: String position in format 'A1', 'B2', etc.
         """
 
-        self.position: str
-        self.row: str
-        self.column: int
+        self.position: str = position
+        self.row: str = row
+        self.column: int = column
         self.occupied = False
         self.labware_id = None
-        self.shape: str
-        self.diameter: float
-        self.x: float
-        self.y: float
-        self.z: float
+        self.shape: str = shape
+        self.diameter: float = diameter
+        self.x: float = x
+        self.y: float = y
+        self.z: float = z
 
     @classmethod
-    def from_dict(self, data: dict) -> "DeckSlot":
+    def from_definition(self, data: dict, position: str) -> "DeckSlot":
         """Create a Well from a dictionary representation."""
-
-        # Verify that the data matches the definition schema
-        if not all(key in data for key in definition_schema):
-            logger.error("Invalid deck slot definition")
-
-        position = data.keys()[0]
-
         return self(
             position=position,
             row=position[0],
@@ -79,8 +82,10 @@ class DeckSlot:
         except ValueError:
             return False
 
-        if isinstance(row, str) and len(row) != 1 or col < 1:
+        if isinstance(row, str) and len(row) > 2 or col < 1:
             return False
+
+        return True
 
     def __repr__(self):
         status = "occupied" if self.occupied else "empty"
@@ -90,6 +95,7 @@ class DeckSlot:
 class LabwareCategory(Enum):
     """Types of labware supported by the system."""
 
+    DECK = "deck"
     WELLPLATE = "wellPlate"
     VIAL_RACK = "vialRack"
     CUSTOM = "custom"
@@ -147,11 +153,10 @@ class Well:
     contents: WellContents = None
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Well":
+    def from_definition(cls, data: dict) -> "Well":
         """Create a Well from a dictionary representation."""
         # Verify that the data matches the definition schema
-        if not all(key in data for key in definition_schema):
-            logger.error("Invalid Well definition")
+
         return cls(
             depth=data["depth"],
             total_liquid_volume=data["totalLiquidVolume"],
@@ -194,7 +199,12 @@ class Labware:
 
     """
 
-    def __init__(self, name: str, deck_slot_reference: str, definition: dict = None):
+    def __init__(
+        self,
+        name: str = None,
+        definition: dict = None,
+        orientation: int = 0,
+    ):
         self.id: str = name
         self.labware_category: LabwareCategory
         self.category: str
@@ -207,12 +217,39 @@ class Labware:
         self.dimensions: Dimension
         self.slot_offset: Offset
         self.ordering: tuple
+        self.order: List[str]
         self.wells: Dict[str:Well]
-        self.orientation: int = 0
+        self.orientation: int = orientation
         self.metadata: Dict = field(default_factory=dict)
+        self.rows: int
+        self.columns: int
 
         if definition:
-            self.from_definition(definition)
+            ob = self.from_definition(definition)
+            self.labware_category = ob.labware_category
+            self.brand = ob.brand
+            self.brand_id = ob.brand_id
+            self.dimensions = ob.dimensions
+            self.slot_offset = ob.slot_offset
+            self.ordering = ob.ordering
+            self.rows = ob.rows
+            self.columns = ob.columns
+            self.orientation = ob.orientation
+            # Flatten the nested list of well IDs
+            flat_ordering = [well for row in ob.ordering for well in row if well]
+
+            # Sort alphanumerically by row (letter) then column (number)
+            self.order = sorted(
+                flat_ordering,
+                key=lambda x: (
+                    x[0],  # First sort by the letter part
+                    int("".join(filter(str.isdigit, x))),  # Then by the numeric part
+                ),
+            )
+            self.wells = ob.wells
+            self.metadata = ob.metadata
+            self.id = ob.id
+            self.category = ob.category
 
     @staticmethod
     def validate_deck_position(position: str) -> bool:
@@ -228,7 +265,7 @@ class Labware:
 
         labware = self()
 
-        labware.labware_category = LabwareCategory(data["metadata"]["labwareCategory"])
+        labware.labware_category = LabwareCategory(data["metadata"]["displayCategory"])
         labware.brand = data["brand"]["brand"]
         labware.brand_id = data["brand"]["brandId"]
         labware.dimensions = Dimension(
@@ -237,12 +274,14 @@ class Labware:
             zDimension=data["dimensions"]["zDimension"],
         )
         labware.slot_offset = Offset(
-            x=data["slotOffset"]["x"],
-            y=data["slotOffset"]["y"],
-            z=data["slotOffset"]["z"],
+            x=data["cornerOffsetFromSlot"]["x"],
+            y=data["cornerOffsetFromSlot"]["y"],
+            z=data["cornerOffsetFromSlot"]["z"],
         )
         labware.ordering = data["ordering"]
-        labware.wells = {k: Well.from_dict(v) for k, v in data["wells"].items()}
+        labware.wells = {k: Well.from_definition(v) for k, v in data["wells"].items()}
+        labware.rows = len(data["ordering"])
+        labware.columns = len(data["ordering"][0])
         labware.orientation = data.get("orientation", 0)
 
         labware.metadata = Metadata(
@@ -251,7 +290,7 @@ class Labware:
             displayVolumeUnits=data["metadata"]["displayVolumeUnits"],
             tags=data["metadata"]["tags"],
         )
-        labware.id = data["metadata"]["displayName"]
+        labware.id = data["parameters"]["loadName"]
         labware.category = data["metadata"]["displayCategory"]
 
         return labware
@@ -261,6 +300,9 @@ class Labware:
 
     def well_location(self, well_id: str) -> SlotPosition:
         """Return the physical location of a well in the labware."""
+        if not self.deck_slot_reference or not self.deck_slot_reference_coordinates:
+            logger.error("Labware not placed on the deck")
+            return None
         well = self.wells[well_id]
         x_direction_multiplier, y_direction_multiplier = directionMultipliers(
             self.orientation
@@ -269,7 +311,7 @@ class Labware:
         reference_slot = self.deck_slot_reference_coordinates
         true_x = reference_slot.x + well.x * x_direction_multiplier
         true_y = reference_slot.y + well.y * y_direction_multiplier
-        true_z = -200.0 + well.z
+        true_z = reference_slot.z + well.z
         return SlotPosition(x=true_x, y=true_y, z=true_z)
 
 
@@ -280,14 +322,17 @@ class Deck:
 
     def __init__(self, definition: dict = None):
         """Initialize an empty deck."""
-        self.slots: Dict[str, DeckSlot]
-        self.dimensions: Dimension
-        self.labware_positions: Dict[str, List[str]]
-        self.calibration_offset: Offset = Offset(0.0, 0.0, -200.0)
-        self.metadata: Metadata
+        self.slots: Dict[str, DeckSlot] = {}
+        self.dimensions: Dimension = None
+        self.labware_positions: Dict[str, List[str]] = {}
+        self.calibration_offset: Offset = None
+        self.metadata: Metadata = None
 
         if definition:
-            self.from_definition(definition)
+            deck = self.from_definition(definition)
+            self.slots = deck.slots
+            self.dimensions = deck.dimensions
+            self.metadata = deck.metadata
 
     @classmethod
     def from_definition(self, data: dict) -> "Deck":
@@ -302,7 +347,9 @@ class Deck:
         # Create slot objects for all positions defined in the ordering
         for row in data["ordering"]:
             for position in row:
-                deck.slots[position] = DeckSlot.from_dict(data["wells"][position])
+                deck.slots[position] = DeckSlot.from_definition(
+                    data["wells"][position], position
+                )
 
         # Set deck dimensions if needed
         if "dimensions" in data:
@@ -325,7 +372,9 @@ class Deck:
 
         return deck
 
-    def place_labware(self, labware: Labware, reference_slot: str | DeckSlot) -> bool:
+    def place_labware(
+        self, labware: Labware, reference_slot: str | DeckSlot, orientation: int = None
+    ) -> bool:
         """
         Place labware on the deck at the specified slots.
 
@@ -339,6 +388,18 @@ class Deck:
         Returns:
             True if placement successful, False otherwise
         """
+        # Check if the labware is already placed
+        # if labware.id in self.labware_positions:
+        #     logger.error(f"Labware {labware.id} is already placed on the deck")
+        #     return False
+
+        # Check if the reference slot is valid
+        if not DeckSlot._validate_position(reference_slot):
+            logger.error(f"Invalid reference slot: {reference_slot}")
+            return False
+
+        if orientation is not None:
+            labware.orientation = orientation
 
         reference_slot = (
             reference_slot
@@ -351,7 +412,7 @@ class Deck:
         orientation = labware.orientation
         x_dim = labware.dimensions.xDimension  # in mm
         y_dim = labware.dimensions.yDimension  # in mm
-
+        x_dim, y_dim = reorient_coordinates(x_dim, y_dim, orientation)
         # calculate the area of the labware footprint
         # if the orientation is 0 or 2, the x dimension is the width of the labware
         # if the orientation is 0 the footprint grows in the positive x and y directions
@@ -366,6 +427,7 @@ class Deck:
         x_direction, y_direction = directionMultipliers(orientation)
 
         # Calculate bounds using the direction multipliers
+
         bounds_of_x_dimensions = (
             reference_coordinates[0],
             reference_coordinates[0] + (x_dim * x_direction),
@@ -375,13 +437,30 @@ class Deck:
             reference_coordinates[1] + (y_dim * y_direction),
         )
 
+        # Sort the bounds to ensure the lower bound is first
+        bounds_of_x_dimensions = sorted(bounds_of_x_dimensions)
+        bounds_of_y_dimensions = sorted(bounds_of_y_dimensions)
+
         for slot in self.slots:
-            slot_coordinates = (slot.x, slot.y)
+            self.slots[slot].x
+            slot_coordinates = (self.slots[slot].x, self.slots[slot].y)
             if (
-                slot_coordinates[0] >= bounds_of_x_dimensions[0]
-                and slot_coordinates[0] <= bounds_of_x_dimensions[1]
-                and slot_coordinates[1] >= bounds_of_y_dimensions[0]
-                and slot_coordinates[1] <= bounds_of_y_dimensions[1]
+                slot_coordinates[0]
+                >= bounds_of_x_dimensions[
+                    0
+                ]  # slot is greater than or equal to lower x bound
+                and slot_coordinates[0]
+                <= bounds_of_x_dimensions[
+                    1
+                ]  # slot is less than or equal to upper x bound
+                and slot_coordinates[1]
+                >= bounds_of_y_dimensions[
+                    0
+                ]  # slot is greater than or equal to lower y bound
+                and slot_coordinates[1]
+                <= bounds_of_y_dimensions[
+                    1
+                ]  # slot is less than or equal to upper y bound
             ):
                 deck_positions.append(slot)
 
@@ -400,9 +479,8 @@ class Deck:
             x=reference_slot.x, y=reference_slot.y, z=reference_slot.z
         )
         labware.deck_slots = deck_positions
-        for position in deck_positions:
+        for index, position in enumerate(deck_positions):
             self.slots[position].occupied = True
-            self.slots[position].labware_id = labware.id
 
         self.labware_positions[labware.id] = deck_positions
 
@@ -457,22 +535,22 @@ class Deck:
         rows = sorted(set(pos[0] for pos in self.slots.keys()))
         cols = sorted(set(int(pos[1:]) for pos in self.slots.keys()))
 
-        # Create header row
-        result = "    " + " ".join(f"{col:2}" for col in cols) + "\n"
+        # Create header row with proper alignment
+        result = "    " + " ".join(f"{col:2d}" for col in cols) + "\n"
 
         # Create separator
         result += "   " + "─" * (len(cols) * 3) + "\n"
 
-        # Create the grid
+        # Create the grid with aligned positions
         for row in rows:
             result += f"{row} │ "
             for col in cols:
                 position = f"{row}{col}"
                 if position in self.slots:
                     marker = "■" if self.slots[position].occupied else "□"
-                    result += f"{marker} "
+                    result += f"{marker}  "
                 else:
-                    result += "  "
+                    result += "   "
             result += "\n"
 
         return result
@@ -492,6 +570,9 @@ class Deck:
             import matplotlib.pyplot as plt
         except ImportError:
             logger.error(
+                "Matplotlib is required for plot_grid(). Install with 'pip install matplotlib'"
+            )
+            print(
                 "Matplotlib is required for plot_grid(). Install with 'pip install matplotlib'"
             )
             return None
@@ -519,7 +600,7 @@ class Deck:
                         ax.text(
                             j + 0.45,
                             i + 0.45,
-                            self.slots[position].labware_id,
+                            self.slots[position].well_id,
                             ha="center",
                             va="center",
                             fontsize=8,
@@ -551,6 +632,14 @@ class Deck:
 def directionMultipliers(orientation: int) -> tuple:
     # Define direction multipliers for each orientation
     x_direction = -1 if orientation in [1, 2] else 1
-    y_direction = -1 if orientation in [0, 1] else 1
+    y_direction = -1 if orientation in [2, 3] else 1
 
     return x_direction, y_direction
+
+
+def reorient_coordinates(x: float, y: float, orientation: int) -> tuple:
+    # Define direction multipliers for each orientation
+    if orientation in [1, 3]:
+        x, y = y, x
+
+    return x, y

@@ -1,6 +1,16 @@
-from .deck import Deck, DeckPosition, DeckSlot
+from .deck import (
+    Deck,
+    DeckSlot,
+    Labware,
+    LabwareCategory,
+    Metadata,
+    Offset,
+    SlotPosition,
+    WellContents,
+)
+from .deck import Well as DeckWell
 from .errors import OverDraftException, OverFillException
-from .labware_definitions import LabwareDefinition, LabwareRegistry, LabwareType
+from .labware_definitions import LabwareRegistry
 from .schemas import (
     DeckObjectModel,
     PlateTypeModel,
@@ -38,9 +48,13 @@ __all__ = [
     "OverDraftException",
     "read_vials",
     "Deck",
-    "DeckPosition",
+    "SlotPosition",
     "DeckSlot",
-    "LabwareDefinition",
+    "Labware",
     "LabwareRegistry",
-    "LabwareType",
+    "LabwareCategory",
+    "Metadata",
+    "Offset",
+    "DeckWell",
+    "WellContents",
 ]
