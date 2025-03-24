@@ -25,6 +25,7 @@ def print_config_values():
     for section in config.sections():
         print(f"[{section}]")
         for key, value in config.items(section):
+            value = value.split(";", 1)[0].strip()
             # Handle None or blank values
             if value in [None, "", "None"]:
                 print(f"{key} = None")
@@ -76,31 +77,32 @@ def resolve_config_paths():
     # Print the config file values
     for section in config.sections():
         for key, value in config.items(section):
+            value = value.split(";", 1)[0].strip()
             # Check that the db_address for both testing and production are valid
             if "db_address" in key:
-                    try:
-                        if value not in [None, "", "None", '""']:
-                            # Check if the path exists
-                            assert Path(value).exists()
-                        else:
-                            raise AssertionError
-                    except AssertionError:
-                        print(f"{key} = Path does not exist: {value}")
-                        generate_blank_db = input("Use default template database? (y/n): ")
-                        if generate_blank_db.lower() == "y":
-                            from shutil import copyfile
-                            copyfile("./panda_lib/config/template.db", ".")
-                        else:
-                            raise FileNotFoundError
-            
+                try:
+                    if value not in [None, "", "None", '""']:
+                        # Check if the path exists
+                        assert Path(value).resolve().exists()
+                    else:
+                        raise AssertionError
+                except AssertionError:
+                    print(f"{key} = Path does not exist: {value}")
+                    generate_blank_db = input("Use default template database? (y/n): ")
+                    if generate_blank_db.lower() == "y":
+                        from shutil import copyfile
+
+                        copyfile("./panda_lib/config/template.db", ".")
+                    else:
+                        raise FileNotFoundError
+
             # Handle None or blank values
             if value in [None, "", "None"]:
                 continue
 
-
             if "dir" in key or "path" in key:
                 # Check if the path exists
-                if not Path(value).exists():
+                if not Path(value).resolve().exists():
                     print(f"{key} = Path does not exist: {value}")
                     create = input("Create the path? (y/n): ")
                     if create.lower() == "y":

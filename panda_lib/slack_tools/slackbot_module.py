@@ -5,6 +5,7 @@
 import base64
 import configparser
 import logging
+import math
 import threading
 import time
 from dataclasses import dataclass
@@ -15,7 +16,7 @@ from enum import Enum
 from io import BytesIO
 from logging import Logger
 from pathlib import Path
-from typing import Union, List
+from typing import List, Union
 
 from PIL import Image
 from slack_sdk import WebClient
@@ -42,7 +43,7 @@ from shared_utilities.config.config_tools import read_config, read_testing_confi
 from shared_utilities.log_tools import setup_default_logger
 
 from .sql_slack_tickets import SlackTicket, insert_slack_ticket, select_slack_ticket
-import math
+
 # Create a lock for thread safety
 plot_lock = threading.Lock()
 
@@ -55,6 +56,7 @@ config = read_config()
 # Access the SLACK section
 slack_config = config["SLACK"]
 config_options = config["OPTIONS"]
+
 
 @dataclass
 class IconEmojies:
@@ -107,19 +109,21 @@ class SlackBot:
     """Class for sending messages to Slack."""
 
     def __init__(self, test: bool = read_testing_config()) -> None:
-        self.logger = setup_default_logger("slack_bot.log", "slack_bot", logging.INFO, logging.ERROR)
+        self.logger = setup_default_logger(
+            "slack_bot.log", "slack_bot", logging.INFO, logging.ERROR
+        )
         self.testing = test
-        self.client = WebClient(token=SlackCred.TOKEN)
-        self.auth_test_response = self.client.auth_test()
+        if config_options.getboolean("use_slack"):
+            self.client = WebClient(token=SlackCred.TOKEN)
+            self.auth_test_response = self.client.auth_test()
+            if not self.auth_test_response["ok"]:
+                self.logger.error("Slack connection failed.")
+                return
+            self.user_id = self.auth_test_response["user_id"]
         self.status = 1
 
         self.logger.setLevel(logging.ERROR)
 
-        if not self.auth_test_response["ok"]:
-            self.logger.error("Slack connection failed.")
-            return
-
-        self.user_id = self.auth_test_response["user_id"]
         if not config_options.getboolean("use_slack"):
             self.testing = True
 
@@ -703,25 +707,26 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[str, str]:
     Create formatted messages of the vial status and return them.
     Returns tuple of (stock_message, waste_message)
     """
+
     def get_stock_status_emoji(percentage: float) -> str:
         if percentage == 0 or math.isnan(percentage):
-            return "⚫"  
+            return "⚫"
         elif percentage < 25:
             return "🔴"
         elif percentage < 50:
-            return "🟡" 
+            return "🟡"
         else:
-            return "🟢" 
-        
+            return "🟢"
+
     def get_waste_status_emoji(percentage: float) -> str:
         if math.isnan(percentage):
-            return "⚫" 
-        elif percentage < 50: 
+            return "⚫"
+        elif percentage < 50:
             return "🟢"
         elif percentage > 50:
             return "🟡"
         elif percentage > 75:
-            return "🔴" 
+            return "🔴"
 
     # Get stock vials
     stock_vials = vials.read_vials("stock")[0]
@@ -734,7 +739,9 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[str, str]:
     for vial in stock_vials:
         percentage = (vial.volume / vial.capacity) * 100 if vial.capacity != 0 else 0
         emoji = get_stock_status_emoji(percentage)
-        stock_msg += f"\nPosition {vial.position}: {vial.contents} - {percentage:.1f}% {emoji}"
+        stock_msg += (
+            f"\nPosition {vial.position}: {vial.contents} - {percentage:.1f}% {emoji}"
+        )
     stock_msg += "\n```"
 
     # Format waste vials message
@@ -742,7 +749,9 @@ def vial_status(vial_type: Union[str, None] = None) -> tuple[str, str]:
     for vial in waste_vials:
         percentage = (vial.volume / vial.capacity) * 100 if vial.capacity != 0 else 0
         emoji = get_waste_status_emoji(percentage)
-        waste_msg += f"\nPosition {vial.position}: {vial.name} - {percentage:.1f}% {emoji}"
+        waste_msg += (
+            f"\nPosition {vial.position}: {vial.name} - {percentage:.1f}% {emoji}"
+        )
     waste_msg += "\n```"
 
     if vial_type == "stock":
@@ -764,22 +773,22 @@ def well_status() -> str:
     rows = plate_type.rows
     columns = plate_type.cols
 
-    current_wells:List[Well] = sql_wellplate.select_wellplate_wells()
+    current_wells: List[Well] = sql_wellplate.select_wellplate_wells()
     # turn tuple of well info into a list of well objects
     current_wells = [well for well in current_wells]
 
     wells_and_status = {}
     for well in current_wells:
         status = well.status
-        wells_and_status[well.well_id] = getattr(IconEmojies, status, IconEmojies.yellow)
-
-    
+        wells_and_status[well.well_id] = getattr(
+            IconEmojies, status, IconEmojies.yellow
+        )
 
     table = ""
     for row in rows:
         table += f"{row:>3} "
         for j in range(1, columns + 1):
-            table += f"{wells_and_status[row+str(j)]:>3} "
+            table += f"{wells_and_status[row + str(j)]:>3} "
         table += "\n"
 
     table = f"```\n{table}\n```"
