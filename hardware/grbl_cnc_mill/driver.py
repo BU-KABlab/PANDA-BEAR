@@ -369,8 +369,8 @@ class Mill:
         #             self.homing_sequence()
         #         else:
         #             self.logger.warning("User chose not to home the mill")
-        self.logger.info("Mill is connected and ready for use, homing first")
-        self.homing_sequence()
+        # self.logger.info("Mill is connected and ready for use, homing first")
+        # self.homing_sequence()
 
     def __enter__(self):
         """Enter the context manager"""
