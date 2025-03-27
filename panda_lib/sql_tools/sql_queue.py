@@ -190,10 +190,10 @@ def get_next_experiment_from_queue(
 #         session.commit()
 
 
-def count_queue_length() -> int:
+def count_queue_length(project_id: Optional[int] = None) -> int:
     """Count the number of experiments in the queue"""
 
-    return len(select_queue())
+    return len(select_queue(project_id=project_id))
 
 
 # endregion
