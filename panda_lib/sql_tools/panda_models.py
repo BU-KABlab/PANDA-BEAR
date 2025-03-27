@@ -61,8 +61,8 @@ class Experiments(Base):
     priority = Column(Integer, default=0)
     filename = Column(String, default=None)
     needs_analysis = Column(Boolean, default=False)
-    panda_version = (Column(Float, default=False),)
-    panda_unit_id = (Column(Integer, default=False),)
+    panda_version = Column(Float, default=False)
+    panda_unit_id = Column(Integer, default=False)
     created = Column(String)
     updated = Column(String, default=dt.now(timezone.utc))
 
