@@ -50,7 +50,6 @@ def main():
                 well_id="A1",
                 well_type_number=PLATE_TYPE,
                 experiment_name="TEST_" + EXPERIMENT_NAME,
-                pin=SYSTEM_VERSION,
                 project_id=999,
                 project_campaign_id=CAMPAIGN_ID,
                 solutions={
