@@ -71,7 +71,7 @@ class ArduinoLink:
         self.ser: Serial = None
         self.port_address: str = port_address
         self.baud_rate: int = baud_rate
-        self.timeout: int = 1
+        self.timeout: int = 10
         self.configured: bool = False
         self.ack: str = "OK"
         self._monitor_task = None
@@ -109,12 +109,13 @@ class ArduinoLink:
 
     def configure(self):
         """Configure the connection to the Arduino"""
-        if self.ser is None:
+        if self.ser is None and self.port_address is None:
+            # If no port address is provided, choose the port interactively
             self.ser = Serial(
                 self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
             )
         else:
-            self.ser = Serial(self.port_address, self.baud_rate, self.timeout)
+            self.ser = Serial(self.port_address, self.baud_rate, timeout=self.timeout)
 
         if self.ser.is_open:
             # Look for acknowlegement
@@ -126,8 +127,8 @@ class ArduinoLink:
                 self.configured = False
                 raise ConnectionError
 
-            rx = self.send(PawduinoFunctions.HELLO.value)
-            if rx == PawduinoReturnCodes.HELLO.value:
+            rx = self.send(PawduinoFunctions.CMD_HELLO.value)
+            if rx == PawduinoReturnCodes.RESP_HELLO.value:
                 self.configured = True
             else:
                 raise ConnectionError
@@ -550,22 +551,22 @@ def run_async_test():
     asyncio.run(async_test_of_pawduino())
 
 
-if __name__ == "__main__":
-    # test_of_pawduino()
-    # run_async_test()
-    async def main():
-        arduino = ArduinoLink()
-        await arduino.start_monitoring()
-        response = await arduino.async_white_lights_on()
-        print(f"Response: {response}")
+# if __name__ == "__main__":
+# test_of_pawduino()
+# run_async_test()
+# async def main():
+#     arduino = ArduinoLink()
+#     await arduino.start_monitoring()
+#     response = await arduino.async_white_lights_on()
+#     print(f"Response: {response}")
 
-        # Listen for incoming messages
-        while True:
-            msg = await arduino.get_next_message(timeout=1.0)
-            if msg is not None:
-                print(f"Received: {msg}")
+#     # Listen for incoming messages
+#     while True:
+#         msg = await arduino.get_next_message(timeout=1.0)
+#         if msg is not None:
+#             print(f"Received: {msg}")
 
-        await arduino.stop_monitoring()
-        arduino.close()
+#     await arduino.stop_monitoring()
+#     arduino.close()
 
-    asyncio.run(main())
+# asyncio.run(main())
