@@ -881,6 +881,7 @@ Project ID: {prj_id}
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
 The current pipette id is {current_pipette.id} and has {remaining_uses} uses left.
 The queue has {sql_queue.count_queue_length()} experiments.
+Project {prj_id} has {sql_queue.count_queue_length(prj_id)} experiments.
 Process Status:
     Experiment Loop: {exp_loop_prcss.is_alive() if exp_loop_prcss else False} - {exp_loop_status}
     Analysis Loop: {analysis_prcss.is_alive() if analysis_prcss else False} - {analysis_status}
