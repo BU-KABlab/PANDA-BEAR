@@ -394,7 +394,7 @@ def calibrate_wells(mill: Mill, wellplate: Wellplate, *args, **kwargs):
                 (mill.working_volume.y, 0),
             )
 
-            new_coordinates = Coordinates(new_x, new_y, well.bottom)
+            new_coordinates = Coordinates(new_x, new_y, wellplate.bottom)
             mill.safe_move(coordinates=new_coordinates, tool=instrument)
 
         # Step 10: Save changes if confirmed
