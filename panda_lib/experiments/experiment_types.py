@@ -72,11 +72,7 @@ class ExperimentBase:
         title="Well ID",
         description="Identifier for the well used in the experiment",
     )
-    pin: Union[str, int] = Field(
-        default=0,
-        title="PIN",
-        description="Personal Identification Number associated with the experiment",
-    )
+
     project_id: int = Field(
         default=999,
         title="Project ID",
@@ -120,12 +116,7 @@ class ExperimentBase:
         title="Project Campaign ID",
         description="Identifier for the project campaign associated with the experiment",
     )
-    protocol_type: int = Field(
-        default=1,
-        title="Protocol Type",
-        description="Type of protocol used in the experiment",
-        deprecated=True,
-    )
+
     plate_id: Optional[int] = Field(
         default=None,
         title="Plate ID",
@@ -136,24 +127,7 @@ class ExperimentBase:
         title="Override Well Selection",
         description="Flag to override well selection (0 is normal, 1 is override)",
     )
-    process_type: Optional[int] = Field(
-        default=1,
-        title="Process Type",
-        description="Type of process used in the experiment",
-        deprecated=True,
-    )
-    jira_issue_key: Optional[str] = Field(
-        default=None,
-        title="JIRA Issue Key",
-        description="JIRA issue key associated with the experiment",
-        deprecated=True,
-    )
-    experiment_type: int = Field(
-        default=0,
-        title="Experiment Type",
-        description="Type of experiment",
-        deprecated=True,
-    )
+
     well: object = Field(
         default=None,
         title="Well",
@@ -444,7 +418,6 @@ class EchemExperimentBase(ExperimentBase):
     This is the base class for all echem experiments.
     """
 
-    experiment_type: int = 1  # echem generic
     ocp: int = 1  # Open Circuit Potential
     ca: int = 1  # Cyclic Amperometry
     cv: int = 1  # Cyclic Voltammetry
@@ -577,7 +550,7 @@ def _select_next_experiment_id() -> int:
             .first()
         )
     if result in [None, []]:
-        return 10000000
+        return 1
     return result[0] + 1
 
 
