@@ -36,7 +36,7 @@ def select_next_experiment_id() -> int:
             .first()
         )
     if result in [None, []]:
-        return 10000000
+        return 1
     return result[0] + 1
 
 
@@ -193,11 +193,7 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.project_campaign_id,
                 experiment.plate_type_number,
                 experiment.protocol_id,
-                experiment.pin,
-                experiment.experiment_type,
-                experiment.jira_issue_key,
                 experiment.priority,
-                experiment.process_type,
                 experiment.filename,
                 datetime.now().isoformat(timespec="seconds"),
             )
@@ -212,11 +208,7 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                     project_campaign_id=parameter[2],
                     well_type=parameter[3],
                     protocol_id=parameter[4],
-                    pin=parameter[5],
-                    experiment_type=parameter[6],
-                    jira_issue_key=parameter[7],
                     priority=parameter[8],
-                    process_type=parameter[9],
                     filename=parameter[10],
                     created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S"),
                 )
@@ -298,11 +290,7 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.project_campaign_id,
                 experiment.plate_type_number,
                 experiment.protocol_id,
-                experiment.pin,
-                experiment.experiment_type,
-                experiment.jira_issue_key,
                 experiment.priority,
-                experiment.process_type,
                 experiment.filename,
                 experiment.experiment_id,
             )
@@ -318,11 +306,7 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
                     Experiments.project_campaign_id: parameter[1],
                     Experiments.well_type: parameter[2],
                     Experiments.protocol_id: parameter[3],
-                    Experiments.pin: parameter[4],
-                    Experiments.experiment_type: parameter[5],
-                    Experiments.jira_issue_key: parameter[6],
                     Experiments.priority: parameter[7],
-                    Experiments.process_type: parameter[8],
                     Experiments.filename: parameter[9],
                 }
             )

@@ -160,6 +160,18 @@ class ExperimentBase:
         exclude=True,
     )
 
+    panda_version: float = Field(
+        default=config.getfloat("PANDA", "version", fallback=0.0),
+        title="Panda System Version",
+        description="Version of the PANDA system used for the experiment",
+    )
+
+    panda_unit_id: int = Field(
+        default=config.getint("PANDA", "unit_id", fallback=0),
+        title="Panda Unit ID",
+        description="Identifier for the PANDA unit used for the experiment",
+    )
+
     @field_validator("experiment_name")
     def validate_experiment_name(cls, value):
         if value:
