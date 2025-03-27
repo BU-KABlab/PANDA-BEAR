@@ -9,6 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def load_default_config():
+    """Load the default configuration file."""
+    config = ConfigParser()
+    config.read("./panda_lib/config/default_config.ini")
+    return config
+
+
 def print_config_values():
     # Read the config file
     CONFIG_FILE = os.getenv("PANDA_SDL_CONFIG_PATH")
@@ -73,6 +80,28 @@ def resolve_config_paths():
 
         # Read the config file
         config.read(CONFIG_FILE)
+
+        print(
+            "Default config file generated. Please edit the config file and run again."
+        )
+
+    # Check that the config file has all sections and keys as the default config file
+    default_config = load_default_config()
+    for section in default_config.sections():
+        if not config.has_section(section):
+            print(f"Missing section: {section} in config file, creating it...")
+            config.add_section(section)
+            for key, value in default_config.items(section):
+                config.set(section, key, value)
+            continue
+        for key, value in default_config.items(section):
+            if not config.has_option(section, key):
+                print(
+                    f"Missing key: {key} in section: {section} in config file. Creating it..."
+                )
+                config.set(section, key, value)
+                continue
+            # Not checking the value of the key, just that it exists
 
     # Print the config file values
     for section in config.sections():
