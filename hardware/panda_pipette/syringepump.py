@@ -61,6 +61,7 @@ class SyringePump:
         """
         Initialize the pump and set the capacity.
         """
+        self.connected = False
         self.max_pump_rate = config.getfloat(
             "PUMP", "max_pumping_rate", fallback=0.640
         )  # ml/min
@@ -68,6 +69,7 @@ class SyringePump:
             "PUMP", "syringe_capacity", fallback=1.0
         )  # mL
         self.pump = self.set_up_pump()
+
         self.pipette = Pipette()
 
     @timing_wrapper
@@ -119,6 +121,7 @@ class SyringePump:
                 log_msg = f"Pump found at address {syringe_pump.address}"
                 config.set("PUMP", "port", port)
                 pump_control_logger.info(log_msg)
+                self.connected = True
                 time.sleep(2)
                 return syringe_pump
 
@@ -134,6 +137,27 @@ class SyringePump:
             raise Exception(f"All ports exhausted, last error: {last_exception}")
         else:
             raise Exception("All ports exhausted, no pump found")
+
+    def __enter__(self):
+        """Enter the context manager"""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Exit the context manager"""
+        self.close()
+
+    def close(self):
+        """Disconnect the pump"""
+        if self.pump:
+            if self.pump.__port.__serial.is_open:
+                self.pump.__port.__serial.close()
+                pump_control_logger.info("Pump port closed")
+            self.pump.__port.__serial = None
+            self.pump.__port = None
+            self.pump = None
+            pump_control_logger.info("Pump disconnected")
+        else:
+            pump_control_logger.warning("Pump not connected")
 
     @timing_wrapper
     def withdraw(
@@ -462,9 +486,13 @@ class MockPump(SyringePump):
         syringe_pump.volume_infused_clear()
         syringe_pump.volume_withdrawn_clear()
         log_msg = f"Pump found at address {syringe_pump.address}"
+        self.connected = True
         pump_control_logger.info(log_msg)
         time.sleep(2)
         return syringe_pump
+
+    def close(self):
+        self.connected = False
 
 
 if __name__ == "__main__":
