@@ -117,6 +117,7 @@ class Mill:
         self.config = self.read_mill_config_file("_configuration.json")
         self.ser_mill: serial.Serial = None
         self.homed = False
+        self.auto_home = True
         self.active_connection = False
         self.tool_manager: ToolManager = ToolManager()
         self.working_volume: Coordinates = self.read_working_volume()
@@ -374,9 +375,11 @@ class Mill:
 
     def __enter__(self):
         """Enter the context manager"""
+        # Connect to mill with any port specified during object creation
         self.connect_to_mill()
 
-        if not self.homed:
+        # Optional auto-homing behavior that can be controlled by a property
+        if not self.homed and getattr(self, "auto_home", True):
             self.homing_sequence()
         return self
 
