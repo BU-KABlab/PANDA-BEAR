@@ -186,4 +186,3 @@ cython_debug/
 *.db-wal
 hardware/grbl_cnc_mill/_configuration.json
 hardware/grbl_cnc_mill/mill_port.txt
-hardware/grbl_cnc_mill/mill_port.txt
