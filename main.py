@@ -59,6 +59,7 @@ status_queue: Queue = Queue()
 experiment_choices = ["0", "1"]
 analysis_choices = ["10"]
 blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
+global prj_id
 prj_id = None
 
 
@@ -156,7 +157,8 @@ def run_experiment():
 
 def run_queue():
     """Runs the queue."""
-    queue = print_queue_info()
+    global prj_id
+    queue = sql_queue.select_queue(project_id=prj_id)
 
     exp_processes = Process(
         target=experiment_loop.sila_experiment_loop_worker,
@@ -301,7 +303,8 @@ def print_wellplate_info():
 
 def print_queue_info() -> list[str]:
     """Prints a summary of the current queue."""
-    current_queue = sql_queue.select_queue()
+    global prj_id
+    current_queue = sql_queue.select_queue(project_id=prj_id)
     print("Current Queue:")
     print("Experiment ID-Project ID-Campaign ID-Priority-Well ID")
     exp_ids = []
@@ -650,6 +653,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "6": mill_calibration,
         "7": test_image,
         "8": instrument_check,
+        "9": change_project_id,  # Add the change_project_id function to the menu
         "10": start_analysis_loop,
         "10.1": stop_analysis_loop,
         "10.2": list_analysis_script_ids,
@@ -660,6 +664,9 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "env": print_config_values,
         "q": exit_program,
     }
+
+    # Update blocking_choices to include the new menu option
+    blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
 
     missing_labware = check_essential_labware()
 
@@ -780,10 +787,22 @@ def user_sign_in() -> str:
 
 def prompt_for_project_id() -> int:
     """Prompts the user for a project ID."""
-    project_id = input_validation(
+    global prj_id
+    prj_id = input_validation(
         "Enter the project ID: ", int, None, False, "Invalid Project ID"
     )
-    return project_id
+    return prj_id
+
+
+def change_project_id():
+    """Changes the project ID."""
+    global prj_id
+    prj_id = int(
+        input_validation(
+            "Enter the new project ID: ", int, None, False, "Invalid Project ID"
+        )
+    )
+    print(f"Project ID changed to {prj_id}.")
 
 
 def get_active_db():
