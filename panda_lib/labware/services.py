@@ -447,6 +447,44 @@ class WellplateService:
             plate = db_session.execute(stmt).scalar()
             return plate is not None
 
+    def get_plate_types(self) -> List[PlateTypeModel]:
+        """
+        Fetches all plate types from the database.
+
+        Returns:
+            List[PlateTypeModel]: List of Pydantic models representing all plate types.
+            str: Formatted string table of plate types.
+        """
+        with self.session_maker() as db_session:
+            stmt = select(PlateTypeDBModel)
+            plate_types = db_session.execute(stmt).scalars().all()
+            plate_type_list = [
+                PlateTypeModel.model_validate(plate_type) for plate_type in plate_types
+            ]
+
+            return plate_type_list
+
+    def tabulate_plate_type_list(self, plate_types: List[PlateTypeModel] = None) -> str:
+        """
+        Prints a formatted string table of plate types.
+
+        Returns:
+            str: Formatted string table of plate types.
+        """
+        if not plate_types:
+            plate_types = self.get_plate_types()
+        if not plate_types:
+            return "No plate types found."
+
+        header = f"{'ID':<5} {'Substrate':<15} {'Gasket':<15} {'Count':<6}"
+        separator = "-" * len(header)
+        rows = [
+            f"{plate.id:<5} {plate.substrate:<15} {plate.gasket:<15} {plate.count:<6}"
+            for plate in plate_types
+        ]
+
+        return "\n".join([header, separator] + rows)
+
 
 class WellTypeService:
     """
