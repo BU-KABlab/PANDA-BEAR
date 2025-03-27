@@ -59,6 +59,7 @@ status_queue: Queue = Queue()
 experiment_choices = ["0", "1"]
 analysis_choices = ["10"]
 blocking_choices = ["0", "1", "6", "7", "8", "9", "t", "q"]
+prj_id = None
 
 
 # def run_panda_sdl_with_ml():
@@ -346,6 +347,51 @@ def change_wellplate_location():
     wellplates.change_wellplate_location()
 
 
+def add_new_wellplate():
+    """Adds a new wellplate."""
+
+    while True:
+        try:
+            plate_id = int(input("Enter the new wellplate ID: ").strip().lower())
+            if WellplateService.check_plate_exists(plate_id):
+                print(f"Wellplate {plate_id} already exists.")
+                continue
+            break
+
+        except ValueError:
+            print("Invalid input. Please try again.")
+        except EOFError:
+            print("Invalid input. Please try again.")
+            continue
+
+    print("Available wellplate types:")
+    print(WellplateService.tabulate_plate_type_list())
+
+    plate_type = int(input("Enter the new wellplate type: ").strip().lower())
+
+    new_plate = wellplates.Wellplate(
+        create_new=True, plate_id=plate_id, type_id=plate_type
+    )
+
+    if new_plate:
+        print(f"New wellplate loaded: {new_plate.plate_data.id}")
+        new_plate.activate_plate()
+
+        # Confirm the plate is active
+        active_plate = WellplateService().get_active_plate()
+        if active_plate.id == new_plate.plate_data.id:
+            print(f"Wellplate {plate_id} is active")
+            print(
+                f"Location of A1: {new_plate.plate_data.a1_x}, {new_plate.plate_data.a1_y}"
+            )
+        else:
+            print(f"Problem with activating wellplate {plate_id}")
+        input("Press Enter to continue...")
+    else:
+        print("Failed to create new wellplate.")
+        input("Press Enter to continue...")
+
+
 def run_experiment_generator():
     """Runs the edot voltage sweep experiment."""
 
@@ -587,8 +633,7 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "2.1": change_wellplate_location,
         "2.2": remove_wellplate_from_database,
         "2.3": print_wellplate_info,
-        "2.5": remove_training_data,
-        "2.6": remove_testing_experiments,
+        "2.4": add_new_wellplate,
         "2.7": update_well_status,
         "3": reset_vials_stock,
         "3.1": reset_vials_waste,
@@ -599,6 +644,8 @@ def main_menu(reduced: bool = False) -> Tuple[callable, str]:
         "4": print_queue_info,
         "4.1": run_experiment_generator,
         "4.2": remove_experiment_from_database,
+        "4.3": remove_training_data,
+        "4.4": remove_testing_experiments,
         "5": change_pipette_tip,
         "6": mill_calibration,
         "7": test_image,
@@ -731,6 +778,14 @@ def user_sign_in() -> str:
     return user_name.strip().capitalize()
 
 
+def prompt_for_project_id() -> int:
+    """Prompts the user for a project ID."""
+    project_id = input_validation(
+        "Enter the project ID: ", int, None, False, "Invalid Project ID"
+    )
+    return project_id
+
+
 def get_active_db():
     """Get the active database according to the config file."""
     if read_testing_config():
@@ -776,7 +831,7 @@ if __name__ == "__main__":
     banner()
 
     try:
-        # user_name = user_sign_in()
+        prj_id = prompt_for_project_id()
         if config.getboolean("OPTIONS", "use_slack"):
             pass
             # slackbot_thread = start_slack_bot(slackThread_running)
@@ -802,6 +857,7 @@ if __name__ == "__main__":
 Welcome!
 Testing mode is {"ENABLED" if read_testing_config() else "DISABLED"}
 DB: {get_active_db()}
+Project ID: {prj_id}
 
 The current wellplate is #{num} - Type: {p_type} - Available new wells: {new_wells}
 The current pipette id is {current_pipette.id} and has {remaining_uses} uses left.
