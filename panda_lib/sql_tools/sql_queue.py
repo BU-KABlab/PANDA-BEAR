@@ -19,6 +19,7 @@ Otherwise the experiment is not in the queue.
 
 # from panda_lib.sql_tools.sql_utilities import execute_sql_command, execute_sql_command_no_return
 import random
+from typing import Optional
 
 from sqlalchemy import and_, select
 
@@ -32,7 +33,6 @@ class Queue:
         project_id: int,
         project_campaign_id: int,
         priority: int,
-        process_type: str,
         filename: str,
         well_type: str,
         well_id: int,
@@ -43,7 +43,6 @@ class Queue:
         self.project_id = project_id
         self.project_campaign_id = project_campaign_id
         self.priority = priority
-        self.process_type = process_type
         self.filename = filename
         self.well_type = well_type
         self.well_id = well_id
@@ -51,7 +50,7 @@ class Queue:
         self.status_date = status_date
 
 
-def select_queue() -> list:
+def select_queue(project_id: Optional[int] = None) -> list:
     """
     Selects all the entries from the queue table.
 
@@ -71,7 +70,6 @@ def select_queue() -> list:
                 Experiments.project_id,
                 Experiments.project_campaign_id,
                 Experiments.priority,
-                Experiments.process_type,
                 Experiments.filename,
                 Wellplates.id,
                 Experiments.well_type,
@@ -92,7 +90,11 @@ def select_queue() -> list:
             )
             .where(
                 and_(
-                    Wellplates.current == 1, WellModel.status.in_(["queued", "waiting"])
+                    Wellplates.current == 1,
+                    WellModel.status.in_(["queued", "waiting"]),
+                    Experiments.project_id == project_id
+                    if project_id is not None
+                    else Experiments.project_id is not None,
                 )
             )
             .order_by(Experiments.priority, Experiments.experiment_id)
@@ -101,7 +103,9 @@ def select_queue() -> list:
 
 
 def get_next_experiment_from_queue(
-    random_pick: bool = False, specific_experiment_id: int = None
+    random_pick: Optional[bool] = False,
+    specific_experiment_id: Optional[int] = None,
+    project_id: Optional[int] = None,
 ) -> tuple[int, int, str, int, int]:
     """
     Reads the next experiment from the queue table, the experiment with the
@@ -122,7 +126,9 @@ def get_next_experiment_from_queue(
     """
 
     if specific_experiment_id:
-        result_all = select_queue()
+        result_all = select_queue(project_id=project_id)
+        if len(result_all) == 0:
+            return None
         result = [x for x in result_all if x.experiment_id == specific_experiment_id][0]
         if len(result) == 0:
             return None
@@ -131,7 +137,6 @@ def get_next_experiment_from_queue(
             result.project_id,
             result.project_campaign_id,
             result.priority,
-            result.process_type,
             result.filename,
             result.well_type,
             result.well_id,
@@ -143,19 +148,15 @@ def get_next_experiment_from_queue(
 
         return (
             result.experiment_id,
-            result.process_type,
             result.filename,
             result.project_id,
             result.well_id,
         )
 
-    result = select_queue()
+    result = select_queue(project_id=project_id)
+    if len(result) == 0:
+        return None
     if random_pick:
-        result = select_queue()
-
-        if len(result) == 0:
-            return None
-
         random_index = random.randint(0, len(result) - 1)
         result = result[random_index]
 
@@ -167,7 +168,6 @@ def get_next_experiment_from_queue(
 
     return (
         result.experiment_id,
-        result.process_type,
         result.filename,
         result.project_id,
         result.well_id,
