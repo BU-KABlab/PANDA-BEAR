@@ -823,6 +823,7 @@ def _check_stock_vials(
     Args:
     -----
         exp_solns (dict): Dictionary of solutions required for the experiment
+            formatted as:  {solution_name: {"volume": volume, "repeated": number_of_repeats}}
         stock_vials (list[Vial]): The stock vials
 
     Returns:
@@ -857,16 +858,27 @@ def _check_stock_vials(
         for key in vial.contents.keys():
             contents_keys_list.append(key)
 
+    names_list = [vial.vial_data.name.lower() for vial in stock_vials]
+    # Check that the experiment solution names are found in the stock vials
     for solution in exp_solns:
-        logger.debug("Checking for solution %s in stock vials", solution)
-
-        if solution not in contents_keys_list:
+        if solution not in names_list:
             logger.error(
                 "The experiment requires solution %s but it is not in the stock vials",
                 solution,
             )
             passes = False
             check_table["missing"].append(solution)
+
+    # for solution in exp_solns:
+    #     logger.debug("Checking for solution %s in stock vials", solution)
+
+    # if solution not in contents_keys_list:
+    #     logger.error(
+    #         "The experiment requires solution %s but it is not in the stock vials",
+    #         solution,
+    #     )
+    #     passes = False
+    #     check_table["missing"].append(solution)
 
     ## Check that there is enough volume in the stock vials to run the experiment
     ## Note there may be multiple of the same stock vial so we need to sum the volumes
