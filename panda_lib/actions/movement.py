@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from logging import Logger
 from pathlib import Path
@@ -313,6 +314,8 @@ def decapping_sequence(
     1. Move to target coordinates
     2. Activate decapper
     3. Move decapper up to 0mm Z position
+    4. Check that a cap is present by checking the line break sensor
+       (should be true - broken line and cap present)
     """
     # Move to the target coordinates
     mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
@@ -329,7 +332,8 @@ def decapping_sequence(
     )
 
     # Check that a cap is present by checking the line break sensor (should be true - broken line and cap present)
-    if not ard_link.async_line_break():
+    line_break_result = asyncio.run(ard_link.async_line_break())
+    if not line_break_result:
         raise ValueError("Cap is not present on decapper after decapping operation")
 
 
@@ -352,8 +356,10 @@ def capping_sequence(
     Sequence steps:
     1. Move to target coordinates
     2. Deactivate decapper
-    3. Move decapper +5mm in Y direction
+    3. Move decapper +15mm in Y direction
     4. Move decapper to 0mm Z position
+    5. Check that a cap is present by checking the line break sensor
+       (should be false - no cap present)
     """
     # Move to the target coordinates
     mill.safe_move(target_coords.x, target_coords.y, target_coords.z, tool="decapper")
@@ -365,7 +371,8 @@ def capping_sequence(
     mill.move_to_position(target_coords.x, target_coords.y + 15, 0, tool="decapper")
 
     # Check that a cap is present by checking the line break sensor (should be false - no cap present)
-    if ard_link.async_line_break():
+    line_break_result = asyncio.run(ard_link.async_line_break())
+    if line_break_result:
         raise ValueError("Cap is still present after capping operation")
 
 
