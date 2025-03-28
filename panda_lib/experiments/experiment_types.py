@@ -287,7 +287,7 @@ class ExperimentBase:
             for parameter_type, parameter_value in self.__dict__.items()
         ]
 
-        # Remove project_id, project_campaign_id, well_type,protocol_id, pin, experiment_type, jira_issue_key, priority, process_type, filename, status, status_date, results, well
+        # Remove project_id, project_campaign_id, well_type,protocol_id, priority, filename, status, status_date, results, well
         all_parameters = [
             parameter
             for parameter in all_parameters
@@ -298,11 +298,7 @@ class ExperimentBase:
                 "well_type",
                 "protocol_id",
                 "protocol_type",  # depreciated
-                "pin",
-                "experiment_type",
-                "jira_issue_key",
                 "priority",
-                "process_type",
                 "filename",
                 "status",
                 "status_date",
@@ -722,11 +718,7 @@ def _insert_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.project_campaign_id,
                 experiment.plate_type_number,
                 experiment.protocol_id,
-                experiment.pin,
-                experiment.experiment_type,
-                experiment.jira_issue_key,
                 experiment.priority,
-                experiment.process_type,
                 experiment.filename,
                 datetime.now().isoformat(timespec="seconds"),
             )
@@ -741,13 +733,9 @@ def _insert_experiments(experiments: List[ExperimentBase]) -> None:
                     project_campaign_id=parameter[2],
                     well_type=parameter[3],
                     protocol_id=parameter[4],
-                    pin=parameter[5],
-                    experiment_type=parameter[6],
-                    jira_issue_key=parameter[7],
-                    priority=parameter[8],
-                    process_type=parameter[9],
-                    filename=parameter[10],
-                    created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S"),
+                    priority=parameter[5],
+                    filename=parameter[6],
+                    created=datetime.strptime(parameter[7], "%Y-%m-%dT%H:%M:%S"),
                 )
             )
         session.commit()
@@ -827,11 +815,7 @@ def _update_experiments(experiments: List[ExperimentBase]) -> None:
                 experiment.project_campaign_id,
                 experiment.plate_type_number,
                 experiment.protocol_id,
-                experiment.pin,
-                experiment.experiment_type,
-                experiment.jira_issue_key,
                 experiment.priority,
-                experiment.process_type,
                 experiment.filename,
                 experiment.experiment_id,
             )
@@ -840,19 +824,15 @@ def _update_experiments(experiments: List[ExperimentBase]) -> None:
     with SessionLocal() as session:
         for parameter in parameters:
             session.query(Experiments).filter(
-                Experiments.experiment_id == parameter[10]
+                Experiments.experiment_id == parameter[6]
             ).update(
                 {
                     Experiments.project_id: parameter[0],
                     Experiments.project_campaign_id: parameter[1],
                     Experiments.well_type: parameter[2],
                     Experiments.protocol_id: parameter[3],
-                    Experiments.pin: parameter[4],
-                    Experiments.experiment_type: parameter[5],
-                    Experiments.jira_issue_key: parameter[6],
-                    Experiments.priority: parameter[7],
-                    Experiments.process_type: parameter[8],
-                    Experiments.filename: parameter[9],
+                    Experiments.priority: parameter[4],
+                    Experiments.filename: parameter[5],
                 }
             )
         session.commit()

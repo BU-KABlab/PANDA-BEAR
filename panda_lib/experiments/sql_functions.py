@@ -208,9 +208,9 @@ def insert_experiments(experiments: List[ExperimentBase]) -> None:
                     project_campaign_id=parameter[2],
                     well_type=parameter[3],
                     protocol_id=parameter[4],
-                    priority=parameter[8],
-                    filename=parameter[10],
-                    created=datetime.strptime(parameter[11], "%Y-%m-%dT%H:%M:%S"),
+                    priority=parameter[5],
+                    filename=parameter[6],
+                    created=datetime.strptime(parameter[7], "%Y-%m-%dT%H:%M:%S"),
                 )
             )
         session.commit()
@@ -299,15 +299,15 @@ def update_experiments(experiments: List[ExperimentBase]) -> None:
     with SessionLocal() as session:
         for parameter in parameters:
             session.query(Experiments).filter(
-                Experiments.experiment_id == parameter[10]
+                Experiments.experiment_id == parameter[6]
             ).update(
                 {
                     Experiments.project_id: parameter[0],
                     Experiments.project_campaign_id: parameter[1],
                     Experiments.well_type: parameter[2],
                     Experiments.protocol_id: parameter[3],
-                    Experiments.priority: parameter[7],
-                    Experiments.filename: parameter[9],
+                    Experiments.priority: parameter[4],
+                    Experiments.filename: parameter[5],
                 }
             )
         session.commit()
