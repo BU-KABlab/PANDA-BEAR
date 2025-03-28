@@ -130,7 +130,7 @@ def read_next_experiment_from_queue(
         return None, None
 
     else:
-        experiment_id, _, filename, _, well_id = queue_info
+        experiment_id, filename, _, well_id = queue_info
     # Get the experiment information from the experiment table
     experiment = select_experiment_information(experiment_id)
     experiment.map_parameter_list_to_experiment(
