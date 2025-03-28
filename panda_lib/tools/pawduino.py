@@ -42,6 +42,12 @@ class MockSerial:
     def flushOutput(self):
         pass
 
+    def flush(self):
+        pass
+
+    def read_all(self):
+        pass
+
     def mock_input(self, data):
         self.input.put(data)
 
@@ -327,8 +333,12 @@ class ArduinoLink:
         else:
             return None
 
-    async def async_line_break(self):
-        """Check if the capper line is broken (cap is present) asynchronously"""
+    async def async_line_break(self) -> bool:
+        """
+        Check if the capper line is broken (cap is present) asynchronously
+
+        Returns True if the line is broken, False if it is not, and None if there was an error
+        """
         value = await self.async_send(PawduinoFunctions.CMD_LINE_BREAK.value)
         if value == PawduinoReturnCodes.RESP_LINE_BREAK.value:
             return True
@@ -414,7 +424,7 @@ class MockArduinoLink(ArduinoLink):
         elif cmd == PawduinoFunctions.CMD_EMAG_OFF.value[0]:
             return PawduinoReturnCodes.RESP_EMAG_OFF.value[0]
         elif cmd == PawduinoFunctions.CMD_LINE_BREAK.value[0]:
-            return PawduinoReturnCodes.RESP_LINE_BREAK.value[0]
+            return True
         elif cmd == PawduinoFunctions.CMD_LINE_TEST.value[0]:
             return PawduinoReturnCodes.RESP_LINE_UNBROKEN.value[0]
         elif cmd == PawduinoFunctions.CMD_PIPETTE_HOME.value[0]:
@@ -431,6 +441,28 @@ class MockArduinoLink(ArduinoLink):
             return PawduinoReturnCodes.RESP_HELLO.value[0]
         else:
             return None
+
+    def receive(self):
+        """Mock receive method"""
+        if not self.arduinoQueue.empty():
+            return self.arduinoQueue.get()
+        return None
+
+    async def async_receive(self):
+        """Mock async receive method"""
+        if not self.arduinoQueue.empty():
+            return self.arduinoQueue.get_nowait()
+        return None
+
+    async def async_send(self, cmd):
+        """Mock async send method"""
+        self.ser.write(str(cmd).encode())
+        if isinstance(cmd, tuple):
+            cmd = cmd[0]
+        return self.send(cmd)
+
+    async def async_line_break(self):
+        return await self.async_send(PawduinoFunctions.CMD_LINE_BREAK.value)
 
 
 class AsyncMockArduinoLink(MockArduinoLink):
