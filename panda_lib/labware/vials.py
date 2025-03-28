@@ -359,16 +359,6 @@ def read_vials(
     else:
         return list_of_stock_solutions, list_of_waste_solutions
 
-    # for items in vial_parameters:
-    #     if items["name"] is not None:
-    #         if items["category"] == 0:  # Stock vial
-    #             read_vial = StockVial(**items)
-    #             list_of_stock_solutions.append(read_vial)
-    #         elif items["category"] == 1:  # Waste vial
-    #             read_vial = WasteVial(**items)
-    #             list_of_waste_solutions.append(read_vial)
-    # return list_of_stock_solutions, list_of_waste_solutions
-
 
 def reset_vials(
     categoty: Union[str, int],
