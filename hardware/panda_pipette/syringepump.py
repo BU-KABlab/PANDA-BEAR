@@ -3,16 +3,14 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 """
 
 # pylint: disable=line-too-long, too-many-arguments, too-many-lines, too-many-instance-attributes, too-many-locals, import-outside-toplevel
-import os
 import time
 from typing import Optional
-
-import serial
 
 from hardware.nesp_lib_py import nesp_lib
 from hardware.nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
+from shared_utilities import get_ports
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import (
     default_logger as pump_control_logger,
@@ -79,17 +77,6 @@ class SyringePump:
         Returns:
             Pump: Initialized pump object.
         """
-
-        def get_ports():
-            """List all available ports"""
-            if os.name == "posix":
-                ports = list(serial.tools.list_ports.grep("ttyUSB"))
-            elif os.name == "nt":
-                ports = list(serial.tools.list_ports.grep("COM"))
-            else:
-                raise OSError("Unsupported OS")
-            return [port.device for port in ports]
-
         ports = get_ports()
         if not ports:
             pump_control_logger.error("No ports found")
@@ -149,13 +136,9 @@ class SyringePump:
     def close(self):
         """Disconnect the pump"""
         if self.pump:
-            if self.pump.__port.__serial.is_open:
-                self.pump.__port.__serial.close()
+            if self.pump.__port.close():
                 pump_control_logger.info("Pump port closed")
-            self.pump.__port.__serial = None
-            self.pump.__port = None
-            self.pump = None
-            pump_control_logger.info("Pump disconnected")
+                pump_control_logger.info("Pump disconnected")
         else:
             pump_control_logger.warning("Pump not connected")
 
