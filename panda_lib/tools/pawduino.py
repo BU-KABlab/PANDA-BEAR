@@ -93,7 +93,7 @@ class ArduinoLink:
         """Close the connection to the Arduino when exiting the with statement"""
         self.close()
 
-    def choose_arduino_port(self):
+    def choose_arduino_port(self, interactive: bool = False) -> str:
         """Interactive method to choose the port that the Arduino is connected to"""
         # Check the OS and list the available ports accordingly
         if os.name == "posix":
@@ -103,11 +103,32 @@ class ArduinoLink:
         else:
             print("Unsupported OS")
             return
+        if not interactive:
+            # Look for Arduino LLC in the manufacturer field
+            for port in ports:
+                if "Arduino LLC" in port.manufacturer:
+                    return port.name
 
-        # Look for Arduino LLC in the manufacturer field
-        for port in ports:
-            if "Arduino LLC" in port.manufacturer:
-                return port.name
+        # If interactive, ask the user to choose the port
+        print("Available ports:")
+        for i, port in enumerate(ports):
+            print(f"{i}: {port.device} ({port.description})")
+        while True:
+            try:
+                choice = int(input("Choose the port number: "))
+                if choice < 0 or choice >= len(ports):
+                    print("Invalid choice")
+                    return
+                return ports[choice].device
+            except ValueError:
+                print("Invalid choice")
+
+            except KeyboardInterrupt:
+                print("\nExiting...")
+                return
+            except Exception as e:
+                print(f"Error: {e}")
+                return
 
     def close(self):
         """Close the connection to the Arduino"""
