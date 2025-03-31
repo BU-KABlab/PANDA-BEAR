@@ -6,8 +6,9 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 import time
 from typing import Optional
 
-from hardware.nesp_lib_py import nesp_lib
-from hardware.nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
+from nesp_lib_py import nesp_lib
+from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
+
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
 from shared_utilities import get_ports

@@ -6,11 +6,11 @@ from logging import Logger
 from typing import Union
 
 import PySpin
+from sartorius import Scale
+from sartorius.mock import Scale as MockScale
 
 from hardware.gamry_potentiostat import gamry_control
 from hardware.panda_pipette.syringepump import MockPump, SyringePump
-from hardware.sartorius.sartorius import Scale
-from hardware.sartorius.sartorius.mock import Scale as MockScale
 from panda_lib.imaging.open_cv_camera import MockOpenCVCamera, OpenCVCamera
 from panda_lib.labware.vials import StockVial, WasteVial, read_vials
 from panda_lib.labware.wellplates import Wellplate

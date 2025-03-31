@@ -585,7 +585,7 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
 
     # Step 2: Move to the reference well (A1)
     well = wellplate.wells["A1"]
-    offset = mill.tool_manager.tool_offsets["electrode"].offset
+    _ = mill.tool_manager.tool_offsets["electrode"].offset
 
     print("\nMoving electrode to the top of well A1...")
     mill.safe_move(coordinates=well.top_coordinates, tool="electrode")
@@ -610,7 +610,7 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
         print(
             f"\nMoving to target echem height of {wellplate.echem_height} with electrode"
         )
-        current = mill.safe_move(
+        _ = mill.safe_move(
             coordinates=Coordinates(well.x, well.y, wellplate.echem_height),
             tool="electrode",
         )
@@ -643,7 +643,7 @@ def calibrate_echem_height(mill: Mill, wellplate: Wellplate, *args, **kwargs):
 
             # Move to the position
             print(f"\nMoving electrode to test position: Z = {new_echem_height}")
-            current = mill.safe_move(
+            _ = mill.safe_move(
                 coordinates=Coordinates(well.x, well.y, new_echem_height),
                 tool="electrode",
             )

@@ -23,7 +23,7 @@ def add_data_zone(
         well_id = ""
         substrate = ""
     else:
-        pin = getattr(experiment, "pin", "")
+        pin = "1.0"
         date_time = getattr(experiment, "status_date", datetime.now(tz=utc)).isoformat(
             timespec="seconds"
         )
@@ -98,7 +98,7 @@ def add_data_zone(
     )
     draw_banner.text(
         (version_x, 30),
-        "PANDA SDL Version 1.0",
+        f"PANDA SDL Version {pin}",
         font=ImageFont.truetype("arial.ttf", 20),
         fill="white",
         align="center",

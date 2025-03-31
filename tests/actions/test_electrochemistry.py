@@ -43,7 +43,7 @@ def test_open_circuit_potential(
         patch(
             "panda_lib.actions.electrochemistry.echem",
             return_value=mock_gamry_potentiostat,
-        ) as mock_echem,
+        ) as _,
         patch(
             "panda_lib.actions.electrochemistry.potentiostat_ocp_parameters",
             mock_ocp_parameters,
@@ -135,7 +135,7 @@ def test_perform_chronoamperometry(
         patch(
             "panda_lib.actions.electrochemistry.echem",
             return_value=mock_gamry_potentiostat,
-        ) as mock_echem,
+        ) as _,
         patch(
             "panda_lib.actions.electrochemistry.chrono_parameters",
             return_value=mock_chrono_parameters,
@@ -144,7 +144,7 @@ def test_perform_chronoamperometry(
         from panda_lib.actions.electrochemistry import perform_chronoamperometry
 
         # Test successful CA
-        result = perform_chronoamperometry(mock_experiment, "test_tag")
+        _ = perform_chronoamperometry(mock_experiment, "test_tag")
 
         # Verify function behavior
         mock_gamry_potentiostat.pstatconnect.assert_called_once()
@@ -183,7 +183,7 @@ def test_perform_cyclic_voltammetry(
         patch(
             "panda_lib.actions.electrochemistry.echem",
             return_value=mock_gamry_potentiostat,
-        ) as mock_echem,
+        ) as _,
         patch(
             "panda_lib.actions.electrochemistry.cv_parameters",
             return_value=mock_cv_parameters,
@@ -193,7 +193,7 @@ def test_perform_cyclic_voltammetry(
         from panda_lib.actions.electrochemistry import perform_cyclic_voltammetry
 
         # Test successful CV
-        result = perform_cyclic_voltammetry(mock_experiment, "test_tag")
+        _ = perform_cyclic_voltammetry(mock_experiment, "test_tag")
 
         # Verify function behavior
         mock_gamry_potentiostat.pstatconnect.assert_called_once()
@@ -206,7 +206,7 @@ def test_perform_cyclic_voltammetry(
         mock_experiment.reset_mock()
         mock_experiment.baseline = 1
 
-        result = perform_cyclic_voltammetry(mock_experiment, "test_tag")
+        _ = perform_cyclic_voltammetry(mock_experiment, "test_tag")
         mock_experiment.set_status_and_save.assert_any_call(ExperimentStatus.BASELINE)
 
         # Test OCP failure
