@@ -1,3 +1,0 @@
-[submodule "hardware/sartorius"]
-	path = hardware/sartorius
-	url = https://github.com/BU-KABlab/sartorius.git
