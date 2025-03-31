@@ -1,6 +1,3 @@
-[submodule "hardware/nesp_lib_py"]
-	path = hardware/nesp_lib_py
-	url = https://github.com/BU-KABlab/nesp-lib-py.git
 [submodule "hardware/sartorius"]
 	path = hardware/sartorius
 	url = https://github.com/BU-KABlab/sartorius.git
