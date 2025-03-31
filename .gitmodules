@@ -1,6 +1,3 @@
-[submodule "SpinnakerVideoCapture"]
-path = hardware/SpinnakerVideoCapture
-url = https://github.com/matsuren/SpinnakerVideoCapture.git
 [submodule "hardware/nesp_lib_py"]
 	path = hardware/nesp_lib_py
 	url = https://github.com/BU-KABlab/nesp-lib-py.git
