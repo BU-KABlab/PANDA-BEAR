@@ -25,6 +25,7 @@ dependencies = [
     "GitPython==3.1.43",
     "gpytorch==1.13",
     "greenlet==3.1.0",
+    "hardpotato",
     "imageio==2.35.1",
     "jaxtyping==0.2.19",
     "Jinja2==3.1.4",
@@ -174,3 +175,4 @@ pythonpath = "panda_lib"
 
 [tool.uv.sources]
 spinnaker-python = { path = "P:/software/flir/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64/spinnaker_python-4.0.0.116-cp310-cp310-win_amd64.whl" }
+hardpotato = { git = "https://github.com/BU-KABlab/hardpotato.git", branch = "testing" }
