@@ -6,12 +6,12 @@ A "driver" class for controlling a new era A-1000 syringe pump using the nesp-li
 import time
 from typing import Optional
 
-from nesp_lib_py import nesp_lib
-from nesp_lib_py.nesp_lib.mock import Pump as MockNespLibPump
+import nesp_lib
+from nesp_lib.mock import Pump as MockNespLibPump
 
 from panda_lib.labware import Vial
 from panda_lib.labware import wellplates as wp
-from shared_utilities import get_ports
+from shared_utilities import get_port_manufacturers, get_ports
 from shared_utilities.config.config_tools import read_config
 from shared_utilities.log_tools import (
     default_logger as pump_control_logger,
@@ -90,13 +90,22 @@ class SyringePump:
             ports.remove(initial_port)
             ports.insert(0, initial_port)
 
+        # Check if a port has silicon labs in the name, if so try that first
+        ports_manurfacturers = get_port_manufacturers()
+        for port, manufacturer in ports_manurfacturers.items():
+            if "silicon" in manufacturer.lower():
+                ports.remove(port)
+                ports.insert(0, port)
+                break
+
         last_exception = None
         for port in ports:
             try:
                 pump_control_logger.debug(f"Setting up pump on port {port}...")
                 pump_port = nesp_lib.Port(
-                    port,
-                    config.getint("PUMP", "baudrate", fallback=19200),
+                    name=port,
+                    baud_rate= config.getint("PUMP", "baudrate", fallback=19200),
+                    timeout = 5,
                 )
 
                 syringe_pump = nesp_lib.Pump(pump_port)
@@ -137,7 +146,7 @@ class SyringePump:
     def close(self):
         """Disconnect the pump"""
         if self.pump:
-            if self.pump.__port.close():
+            if self.pump.close():
                 pump_control_logger.info("Pump port closed")
                 pump_control_logger.info("Pump disconnected")
         else:
