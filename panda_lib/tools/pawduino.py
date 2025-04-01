@@ -136,33 +136,47 @@ class ArduinoLink:
 
     def configure(self):
         """Configure the connection to the Arduino"""
-        if self.ser is None and self.port_address is None:
-            # If no port address is provided, choose the port interactively
-            self.ser = Serial(
-                self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
-            )
-        else:
-            self.ser = Serial(self.port_address, self.baud_rate, timeout=self.timeout)
+        try:
+            if self.ser is None and self.port_address is None:
+                # If no port address is provided, choose the port interactively
+                self.ser = Serial(
+                    self.choose_arduino_port(), self.baud_rate, timeout=self.timeout
+                )
+            else:
+                self.ser = Serial(
+                    self.port_address, self.baud_rate, timeout=self.timeout
+                )
 
-        if self.ser.is_open:
-            # Look for acknowlegement
-            time.sleep(2)
-            rx = self.ser.read_all().decode().strip()
-            if rx == self.ack:
-                self.configured = True
+            if self.ser.is_open:
+                # Look for acknowlegement
+                time.sleep(2)
+                rx = self.ser.read_all().decode().strip()
+                if rx == self.ack:
+                    self.configured = True
+                else:
+                    self.configured = False
+                    raise ConnectionError
+
+                rx = self.send(PawduinoFunctions.CMD_HELLO.value)
+                if rx == PawduinoReturnCodes.RESP_HELLO.value:
+                    self.configured = True
+                else:
+                    raise ConnectionError
+
             else:
                 self.configured = False
                 raise ConnectionError
 
-            rx = self.send(PawduinoFunctions.CMD_HELLO.value)
-            if rx == PawduinoReturnCodes.RESP_HELLO.value:
-                self.configured = True
-            else:
-                raise ConnectionError
+        except ConnectionError:
+            # Attempt to connect using the port finder if a port was supplied but didnt work
+            if self.port_address is not None:
+                self.ser = None
+                self.port_address = None
+                self.configure()
+                return
 
-        else:
+        except serial.SerialException:
             self.configured = False
-            raise ConnectionError
 
     def receive(self):
         """Listen to the Arduino and put the messages in the queue"""
