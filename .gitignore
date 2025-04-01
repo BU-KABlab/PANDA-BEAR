@@ -1,6 +1,8 @@
 #Untracked directories
 logs/
 data/
+logs_test/
+data_test/
 .devcontainer/installers/*
 panda_sdl_config.ini
 node_modules/*
@@ -130,6 +132,9 @@ ipython_config.py
 
 # UV
 uv.lock
+
+# Ruff
+.ruff_cache
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
