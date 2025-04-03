@@ -159,14 +159,17 @@ def run_queue():
     """Runs the queue."""
     global prj_id
     queue = sql_queue.select_queue(project_id=prj_id)
-
+    queue_ids = [item[0] for item in queue]
+    if not queue_ids:
+        print("No experiments in the queue.")
+        return
     exp_processes = Process(
         target=experiment_loop.sila_experiment_loop_worker,
         kwargs={
             "status_queue": status_queue,
             "command_queue": exp_cmd_queue,
             "process_id": ProcessIDs.CONTROL_LOOP,
-            "specific_experiment_ids": queue,
+            "specific_experiment_ids": queue_ids,
         },
     )
     exp_processes.start()
