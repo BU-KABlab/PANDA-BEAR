@@ -129,10 +129,7 @@ def experiment_loop_worker(
         if toolkit.pump.pipette.volume > 0:
             # obs.place_text_on_screen("Pipette is not empty, purging into waste")
             status_queue.put((process_id, "Purging pipette into waste"))
-            actions_default.purge_pipette(
-                mill=toolkit.mill,
-                pump=toolkit.pump,
-            )
+            actions_default.purge_pipette(toolkit)
 
         while True:
             ## Begin slack monitoring
@@ -511,7 +508,7 @@ def sila_experiment_loop_worker(
             if hardware.pump.pipette.volume > 0:
                 exp_logger.info("Pipette not empty, purging into waste")
                 set_worker_state(SystemState.PIPETTE_PURGE)
-                actions_default.purge_pipette(hardware.mill, hardware.pump)
+                actions_default.purge_pipette(toolkit)
             # This also validates the experiment parameters since its a pydantic object
             exp_obj: EchemExperimentBase = _initialize_experiment(
                 specific_experiment_id, hardware, labware, exp_logger, specific_well_id
@@ -590,10 +587,7 @@ def sila_experiment_loop_worker(
             ## Clean up the instruments
             if hardware.pump.pipette.volume > 0 and hardware.pump.pipette.volume_ml < 1:
                 # assume unreal volume, not actually solution, set to 0
-                actions_default.purge_pipette(
-                    mill=hardware.mill,
-                    pump=hardware.pump,
-                )
+                actions_default.purge_pipette(toolkit)
 
             hardware.mill.rest_electrode()
             # We are not disconnecting from instruments with this function, that will
@@ -620,7 +614,8 @@ def _initialize_experiment(
     exp_obj = select_complete_experiment_information(exp_id)
 
     # TODO: this is silly but we need to reference the queue to get the well_id because the experiment object isn't updated with the correct target well_id
-    _, _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
+    # TODO: make a function that just gets the well_id from the queue and returns it
+    _, _, _, well_id = sql_queue.get_next_experiment_from_queue(
         specific_experiment_id=exp_id
     )
     # TODO: Replace with checking for available well, unless given one.

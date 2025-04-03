@@ -385,8 +385,7 @@ def flush_pipette(
 
 @timing_wrapper
 def purge_pipette(
-    mill: Union[Mill, MockMill],
-    pump: Union[SyringePump, MockPump],
+    toolkit:Toolkit,
 ):
     """
     Move the pipette over an available waste vessel and purge its contents
@@ -395,12 +394,19 @@ def purge_pipette(
         mill (Union[Mill, MockMill]): _description_
         pump (Union[Pump, MockPump]): _description_
     """
-    liquid_volume = pump.pipette.liquid_volume()
-    total_volume = pump.pipette.volume
+    liquid_volume = toolkit.pump.pipette.liquid_volume()
+    total_volume = toolkit.pump.pipette.volume
     purge_vial = waste_selector("waste", liquid_volume)
 
-    # Move to the purge vial
-    mill.safe_move(
+    # Decap the waste vial
+    decapping_sequence(
+        toolkit.mill,
+        Coordinates(purge_vial.x, purge_vial.y, purge_vial.top),
+        toolkit.arduino,
+    )
+
+    # Move to the waste vial
+    toolkit.mill.safe_move(
         purge_vial.x,
         purge_vial.y,
         purge_vial.top,
@@ -408,13 +414,19 @@ def purge_pipette(
     )
 
     # Purge the pipette
-    pump.infuse(
+    toolkit.pump.infuse(
         volume_to_infuse=liquid_volume,
         being_infused=None,
         infused_into=purge_vial,
         blowout_ul=total_volume - liquid_volume,
     )
 
+    # Cap the waste vial
+    capping_sequence(
+        toolkit.mill,
+        Coordinates(purge_vial.x, purge_vial.y, purge_vial.top),
+        toolkit.arduino,
+    )
 
 @timing_wrapper
 def volume_correction(
