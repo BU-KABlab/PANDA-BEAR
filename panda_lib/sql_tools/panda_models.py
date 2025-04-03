@@ -56,7 +56,7 @@ class Experiments(Base):
     project_id = Column(Integer)
     project_campaign_id = Column(Integer)
     well_type = Column(Integer)
-    protocol_id = Column(Integer)
+    protocol_id = Column(String)
     analysis_id = Column(Integer)
     priority = Column(Integer, default=0)
     filename = Column(String, default=None)
