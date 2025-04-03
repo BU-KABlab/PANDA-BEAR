@@ -331,11 +331,16 @@ def decapping_sequence(
         tool="decapper",
     )
 
+    unit_version = config.get("PANDA", "unit_version")
     # Check that a cap is present by checking the line break sensor (should be true - broken line and cap present)
-    line_break_result = asyncio.run(ard_link.async_line_break())
-    if not line_break_result:
-        raise ValueError("Cap is not present on decapper after decapping operation")
-
+    if unit_version > 1.0:
+        line_break_result = asyncio.run(ard_link.async_line_break())
+        if not line_break_result:
+            raise ValueError("Cap is not present on decapper after decapping operation")
+    else:
+        # For unit versions <= 1.0, we assume the cap is present
+        # as the line break sensor is not available
+        pass
 
 def capping_sequence(
     mill: Mill, target_coords: Coordinates, ard_link: ArduinoLink
@@ -370,11 +375,16 @@ def capping_sequence(
     # Move the decapper +10mm in the y direction
     mill.move_to_position(target_coords.x, target_coords.y + 15, 0, tool="decapper")
 
+    unit_version = config.get("PANDA", "unit_version")
     # Check that a cap is present by checking the line break sensor (should be false - no cap present)
-    line_break_result = asyncio.run(ard_link.async_line_break())
-    if line_break_result:
-        raise ValueError("Cap is still present after capping operation")
-
+    if unit_version > 1.0:
+        line_break_result = asyncio.run(ard_link.async_line_break())
+        if line_break_result:
+            raise ValueError("Cap is still present after capping operation")
+    else:
+        # For unit versions <= 1.0, we assume the cap is not present
+        # as the line break sensor is not available
+        pass
 
 if __name__ == "__main__":
     pass
