@@ -95,7 +95,7 @@ def read_camera_type() -> str:
         return config.get("CAMERA", "camera_type")
     except (ConfigParserError, KeyError):
         # Default to flir if not specified
-        return "flir"
+        return None
 
 
 def read_webcam_settings() -> tuple:
