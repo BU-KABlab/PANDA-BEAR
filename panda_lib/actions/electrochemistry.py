@@ -423,7 +423,6 @@ def perform_cyclic_voltammetry(
             experiment.project_campaign_id,
             experiment.well_id,
         )
-        experiment.results.set_cv_data_file(characterization_data_file, file_tag)
         # FEATURE have cyclic return the max and min values for the characterization
         # and save them to the results
         if overwrite_inital_voltage:
@@ -470,6 +469,12 @@ def perform_cyclic_voltammetry(
         logger.error("An unknown exception occurred during CV: %s", e)
         raise CVFailure(experiment.experiment_id, experiment.well_id) from e
     finally:
+        try:
+            experiment.results.set_cv_data_file(characterization_data_file, file_tag)
+
+        except Exception as e:
+            logger.error("Failed to set CV data file: %s", e)
+
         pstat.pstatdisconnect()
 
     return experiment
