@@ -135,8 +135,8 @@ class WellWriteModel(BaseModel):
 class WellReadModel(VesselModel):
     well_id: str
     plate_id: int
-    experiment_id: int = 0
-    project_id: int = 0
+    experiment_id: Optional[int]
+    project_id: Optional[int]
     status: str = "new"
 
     model_config = ConfigDict(from_attributes=True)
